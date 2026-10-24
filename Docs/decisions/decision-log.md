@@ -494,3 +494,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Design §6.2/§6.7. Avoids any cross-tenant table on the request path, and revocation is immediate. Card-size rule.
 - Alternatives: stateless JWT cookie; global session table; hostname tenancy (all in ADR-0016).
 - ADR: ADR-0016 · Status: proposed (awaiting human — security)
+
+### DL-0069 — Conductor writes shared files atomically (temp + rename)
+- Date: 2026-10-24 · By: claude · Task: T-0003 (found in T-0105 verify) · Category: tooling
+- Decision: Task cards, state.json and HANDOVER.md are written through `writeFileAtomic` (sibling temp file, then rename). New writers of files that another process may read must use it.
+- Why: Root cause of the intermittent conductor failure: the running conductor rewrote a card while the agent's `conductor release` read it, saw an empty file ("missing frontmatter"), exited 8, and the provider was relaunched. Probe: 75,969 of 79,072 concurrent reads were partial with the old write; 0 after. Failover repro: race at iteration 16 before, 0 in 240 runs after (half under load).
+- Alternatives: file locks (heavier, platform-specific); retry-on-parse-error in readers (hides the bug).
+- ADR: none · Status: accepted
