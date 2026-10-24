@@ -601,3 +601,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Product owner asked for parallel sub-agents. The global migration sequence and the shared registers are the only serialisation points, so pre-assignment removes them.
 - Alternatives: sequential build (slower); parallel without pre-assignment (migration number and id collisions).
 - ADR: none · Status: accepted
+
+### DL-0090 — Timeline lanes: greedy first-fit stacking with per-scale caps and "+n more"; Quarter = ISO weeks, Year = months; actual and expected never summed together
+- Date: 2026-10-24 · By: claude · Task: T-0106 · Category: ui
+- Decision: Resolve RQ-0021. Lane items are placed by greedy first-fit interval partitioning on a per-scale day footprint (Week 1 d, 5 weeks 4 d, Quarter 14 d, Year 31 d), sorted by start, then due-now first, then id; rows are capped per scale (3 / 2 / 2 / 1) and the rest go into non-overlapping "+n more" markers that reveal them on demand and say when they hide a due-now item. Quarter aggregates by ISO week (Monday start), Year by calendar month; Week and 5 weeks by day. Each bucket keeps separate exact `Money` totals for actual and expected; overdue items are left out of expected and reported as `leftOut`; expected cash buckets report their closing balance and their lowest point.
+- Why: Greedy first-fit is optimal for interval partitioning, so nothing is hidden unless it must be; deterministic and testable without text measurement; weekly buckets are the 13-week cash-flow practice because monthly totals hide troughs; P13 and P15 (RQ-0021 S1–S9).
+- Alternatives: hand-set levels as in the prototype (overprints with real data); measuring text in the browser (non-deterministic, untestable in jsdom); monthly buckets for Quarter (hides the pay-run trough); counting overdue as expected today (Float's choice; shows money that may never arrive as expected cash).
+- ADR: none · Status: accepted
