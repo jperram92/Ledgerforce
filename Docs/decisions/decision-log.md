@@ -459,3 +459,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: verify gate 7 (pnpm audit --prod) failed on T-0104. A same-maintainer security patch carries less risk than a known high-severity vulnerability. The 14-day rule (DL-0061) exists to reduce supply-chain risk, not to keep known vulnerabilities.
 - Alternatives: accept the risk because no upload route exists yet (rejected: the gate must stay green, and file uploads arrive with bill capture UC-05); wait for NestJS (rejected: open-ended).
 - ADR: none · Status: accepted
+
+### DL-0064 — UI research: direction C "Timeline" proposed, with A's queue for list screens
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: ui
+- Decision: Propose C as the UI direction: one shared date axis, each document as a life story, colour showing time state (solid happened, dashed expected, teal today). Reuse A's turn tokens, decision bar and keyboard queue for list screens, and B's flow diagram on documents for owners.
+- Why: Best genericness score (1, lower is better), a distinct page outline, and the only direction serving INS-09 ("will I have enough on Tuesday?"); 17/22 on the insights (`Docs/ui/research/03-recommendation.md`).
+- Alternatives: A Turns (18/22, but an app-shell outline close to v0.1 and queue-first for owners); B Flows (14/22, weak for operators).
+- ADR: none · Status: proposed (awaiting human: product owner chooses the direction)
+
+### DL-0065 — Genericness checklist G1–G13 and probes required for UI work
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: ui
+- Decision: Score every new screen against G1–G13 (pass ≤ 4, no item at 2). Keep the automated probes (shadows, radius, all-caps tracking, middle dots, arrows, purple) and axe `wcag22aa`.
+- Why: RQ-0084; the checklist explains both rejections (v0.1 = the market's common shell; v2 = second-wave defaults: hairlines, all caps, mono figures, paper costume).
+- Alternatives: taste review only (rejected twice by the product owner).
+- ADR: none · Status: proposed (awaiting human)
+
+### DL-0066 — Proposed principle changes P3, P11, P12 and new P13–P15
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: ui
+- Decision: Density default by role; money direction in words for owners; a plain gloss beside accounting terms; new P13 "Whose turn is it?", P14 "Stability", P15 "Expected is never shown as actual".
+- Why: INS-01, 04, 05, 07, 09 (`Docs/ui/research/01-research-report.md`).
+- Alternatives: keep principles v0.1.
+- ADR: none · Status: proposed (awaiting human)
+
+### DL-0067 — Typefaces chosen by measured tabular figures; OFL fonts bundled
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: tooling
+- Decision: Run `Docs/ui/research/tools/fonttest.mjs` before adopting any face for money. Exclude Lexend, Libre Franklin and B612 for amounts (no working tabular figures, or brackets set wrongly). Bundle woff2 files plus the OFL licence. Use axe-core from a scratch `npm pack`, not as a dependency.
+- Why: RQ-0085, experiment E1 (19 faces measured).
+- Alternatives: choose by appearance.
+- ADR: none · Status: proposed (awaiting human)
