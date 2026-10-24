@@ -14,15 +14,24 @@ export default defineConfig({
       {
         test: {
           name: 'unit',
-          include: ['packages/*/src/**/*.test.ts', 'packages/*/eslint-rules/**/*.test.ts'],
-          exclude: ['**/*.db.test.ts', '**/node_modules/**'],
+          include: [
+            'apps/*/src/**/*.test.{ts,tsx}',
+            'packages/*/src/**/*.test.{ts,tsx}',
+            'packages/*/*/src/**/*.test.{ts,tsx}', // nested: packages/modules/<m>, packages/connectors/<c>
+            'packages/*/eslint-rules/**/*.test.ts',
+          ],
+          exclude: ['**/*.db.test.ts', '**/node_modules/**', '**/dist/**'],
           environment: 'node',
         },
       },
       {
         test: {
           name: 'db',
-          include: ['packages/*/src/**/*.db.test.ts'],
+          include: [
+            'apps/*/src/**/*.db.test.ts',
+            'packages/*/src/**/*.db.test.ts',
+            'packages/*/*/src/**/*.db.test.ts',
+          ],
           exclude: ['**/node_modules/**'],
           environment: 'node',
           globalSetup: ['packages/db/src/testing/global-setup.ts'],

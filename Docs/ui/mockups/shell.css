@@ -44,7 +44,7 @@ p a, .nav-foot a, .explain a, .banner a, td a.ul, tfoot a, .timeline a, .jp-foot
 
 .main-col { min-width: 0; display: flex; flex-direction: column; }
 .topbar { height: var(--lf-topbar-h); background: var(--lf-surface); border-bottom: 1px solid var(--lf-border); display: flex; align-items: center; gap: 10px; padding: 0 20px; position: sticky; top: 0; z-index: 20; }
-.switcher { display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 1px solid var(--lf-border); border-radius: var(--lf-radius-md); background: var(--lf-surface); color: var(--lf-text); font: inherit; font-weight: 500; cursor: pointer; }
+.switcher { white-space: nowrap; flex: none; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 1px solid var(--lf-border); border-radius: var(--lf-radius-md); background: var(--lf-surface); color: var(--lf-text); font: inherit; font-weight: 500; cursor: pointer; }
 .switcher .co-logo { width: 22px; height: 22px; border-radius: 5px; background: #0e6a83; color: #fff; font-size: 11px; font-weight: 700; display: grid; place-items: center; }
 .switcher small { color: var(--lf-text-subtle); font-weight: 400; }
 .search { flex: 1; min-width: 220px; max-width: 420px; white-space: nowrap; overflow: hidden; display: flex; align-items: center; gap: 8px; height: 36px; padding: 0 10px; border: 1px solid var(--lf-border); border-radius: var(--lf-radius-md); background: var(--lf-surface-2); color: var(--lf-text-subtle); }
@@ -58,7 +58,7 @@ p a, .nav-foot a, .explain a, .banner a, td a.ul, tfoot a, .timeline a, .jp-foot
 .iconbtn { width: 34px; height: 34px; display: grid; place-items: center; border-radius: var(--lf-radius-md); border: 1px solid transparent; background: transparent; color: var(--lf-text-muted); cursor: pointer; position: relative; }
 .iconbtn:hover { background: var(--lf-surface-hover); }
 .iconbtn .badge { position: absolute; top: 4px; right: 4px; width: 8px; height: 8px; border-radius: 50%; background: var(--lf-danger-solid); border: 2px solid var(--lf-surface); }
-.userchip { display: flex; align-items: center; gap: 8px; padding-left: 6px; }
+.userchip { white-space: nowrap; display: flex; align-items: center; gap: 8px; padding-left: 6px; }
 .avatar { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 600; background: var(--lf-accent-soft); color: var(--lf-accent-text); flex: none; }
 .avatar.sm { width: 24px; height: 24px; font-size: 10.5px; }
 .avatar.b { background: var(--lf-status-paid-bg); color: var(--lf-status-paid-fg); }
