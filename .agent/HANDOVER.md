@@ -1,34 +1,29 @@
-# Handover - 2026-10-24 07:45 UTC
-From: claude (lead session, sprint-0 run r01)    Reason: in progress — sub-agents resumed after usage-limit stop (HTTP 429 at ~07:2x UTC, reset 07:30 UTC)
-Task: Sprint 0 framework (T-0001..T-0009)
-Branch: claude/app-framework-agents-dzmkya   Last green commit: n/a (sprint-0 scaffolding; per-task green commits start at T-0010)
+# Handover - 2026-10-24 10:52 UTC
+From: codex (run 2026-10-24-codex-r01)    Reason: Blocked: Windows heartbeat regression remains red; recovery and evidence preserved
+Task: T-0010 Tenancy: tenant and company tables, RLS context middleware
+Branch: feat/T-0010-tenant-context   Last green commit: none
+Done: Recovery commit 936b5ae; phase-gate regressions 5/5; unit tests 170/170; PostgreSQL 17 tests 61/61; SS-PLAT-04 report and manifest; E2E 26/26 with screenshots; lint/typecheck/format and standalone audit pass.
+In progress: T-0010 blocked on unchanged Windows missed-heartbeat test returning null after 25 seconds. WIP process-tree and launch-lease fixes are not green. Original Claude RED proof absent. Cross-provider review and full verify remain incomplete.
+Next action: Reproduce scripts/agent/test/run.test.ts test named missed heartbeat, trace the spawned Windows/Git Bash process tree, and fix termination without weakening its deadline; then run full verify and obtain Claude review.
+Decisions taken: DL-0056 through DL-0060; RQ-0013 and RQ-0014.
+Open questions for human: No new questions. Existing accounting/security ADR, golden posting, phase and UI direction gates remain in their cards; none is approved by this recovery.
+Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
 
-Done:
-- AGENTS.md / CLAUDE.md / .agent/config.yaml / state.json (T-0002)
-- ADRs 0001-0015, decision process, CHANGELOG, PR/issue templates (T-0004)
-- UC-01..12 specs, success-scenario register (121 SS), backlog T-0001..T-0102, golden postings DRAFT GP-001..019 (T-0006, T-0007)
-- 11 sub-agents, 16 skills, 12 process loops, TDD / DoD / human-gate docs, nested AGENTS.md, .agents/skills bridge (T-0002)
-In progress (wip commit 2089650):
-- T-0003 conductor + failover loop (scripts/agent) — tests were green, finishing alignment with definition-of-done.md
-- T-0005 research pack — RQ-0001..0005 written; RQ-0006..0012 + index pending
-- T-0008 scaffold + DB harness — migrations/src written; root tooling + full green run pending
-- T-0009 UI principles + mockups — mockups 01-07 written; 08-12, index, principles.md pending
-Next action: when each finishes, commit per task id, append its DL entries to Docs/decisions/decision-log.md, run `bash scripts/agent/verify.sh --quick`, then publish the UI principles page for the product owner.
-Decisions taken: DL-0001..DL-0023 (see decision log)
-Open questions for human:
-- Approve golden postings GP-001..019 and answer accountant questions Q1-Q11 (Docs/accounting/postings.md) — blocks T-0031 and all posting work
-- Accept/reject Proposed ADRs 0003, 0004, 0005, 0006, 0007, 0009 (licence), 0010
-- Design §11.2 open decisions: product name, licence, first market, delivery model, invoice trigger default, SoD thresholds, agent budget/parallelism
-- UC-12 LWC: MVP (§8.2) vs Phase 1 (§9.1) — carded as MVP T-0072 pending confirmation
-- Research findings that contradict the design (Docs/research/RQ-0012, RQ-0004, RQ-0009) — need your call:
-  1. CDC entity cap is 5 without add-on; design §5.3 lists 8 (proposal DL-0030: poll Order/OrderItem/ACR)
-  2. ATO rounds GST at invoice total, design §3.4 says per line (proposal DL-0032)
-  3. Customer prepayment GST timing on accruals basis (postings.md Q7)
-  4. Ledger-bypass holes found in the DB pattern (proposal DL-0028)
-  5. MVP items depending on Phase 1 capabilities (UC-12 LWC, UC-05 bill capture, UC-10 BAS, Xero import in wizard)
-  6. SoD gaps: AP clerk self-approval below $1,000; nobody owns supplier creation; first-time bank details unverified
-Do not: change Docs/accounting golden files; delete anything; push to main.
+## Codex continuation prompt
 
+> Resume T-0010 on feat/T-0010-tenant-context. Read AGENTS.md section 2, this
+> handover, the task card, and .agent/runs/2026-10-24-codex-r01.md. Inspect the
+> latest commit body; recovery baseline is 936b5ae (Claude baseline 2fe5073).
+> Run `node scripts/agent/conductor.ts status`. The task is deliberately blocked,
+> not done. Reproduce `node --test --test-name-pattern='missed heartbeat'
+> scripts/agent/test/run.test.ts` with Git usr/bin first in PATH. Windows tree
+> termination can require execution outside the sandbox. The failure is original
+> PID not found while descendants retain pipes. Do not increase the fixture's
+> lease, timeout or 20-second assertion. Preserve evidence and fix process ownership.
+> See the run log for PostgreSQL and Playwright setup, then rerun the full verifier.
+> Never invent Claude's missing RED history or self-approve Codex changes.
+
+## Log
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
 - 2026-10-24 ~07:2x 4 sub-agents stopped by usage limit; checkpointed 2089650; resumed 07:45 after reset — failover-by-repo-state worked as designed
@@ -41,4 +36,8 @@ Do not: change Docs/accounting golden files; delete anything; push to main.
 - 2026-10-24T08:18:05.954Z human: release T-0008 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
 - 2026-10-24T08:18:06.103Z unknown: T-0009 → in_progress
 - 2026-10-24T08:18:48.097Z human: release T-0009 → blocked (human gate: product owner to choose UI direction from the UI/UX research agent's three options (DL-0052); evidence harness part is complete)
-- 2026-10-24T08:23:59.164Z claude: T-0010 → verifying
+- 2026-10-24T10:30:33.965Z codex: T-0010 → in_progress
+- 2026-10-24T10:34:09.059Z codex: handover: Recovery checkpoint; verification continues
+- 2026-10-24T10:47:41.970Z codex: T-0010 → in_progress
+- 2026-10-24T10:52:32.170Z codex: handover: Blocked: Windows heartbeat regression remains red; recovery and evidence preserved
+- 2026-10-24T10:52:33.083Z codex: release T-0010 → blocked (Windows missed-heartbeat regression still times out after 25 seconds; original provider PID disappears while descendant pipes remain open. Keep test unchanged and fix process ownership before full verification and Claude review.)

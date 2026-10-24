@@ -183,7 +183,14 @@ export function memoryGate(ctx: Ctx, id: string | null): Gate {
   if (!['verifying', 'review', 'done'].includes(st)) lines.push(`${id}: status "${st}" (expected verifying, review or done when verifying)`);
   const stepsSection = card.body.match(/^##\s+Steps[^\n]*\n([\s\S]*?)(?=^##\s|(?![\s\S]))/m);
   const unticked = (stepsSection ? stepsSection[1] : '').split('\n').filter((l) => /^\s*[-*]\s+\[ \]/.test(l));
-  for (const u of unticked) lines.push(`${id}: unticked step: ${u.trim()}`);
+  for (const u of unticked) {
+    // Explicit workflow markers avoid guessing from words such as "review" in build steps.
+    // Verification itself cannot be complete until this gate has run (DL-0057).
+    const phase = u.trim().match(/\[phase: (verify|review|finish)\]$/)?.[1];
+    const pending = st === 'verifying' ? ['verify', 'review', 'finish']
+      : st === 'review' ? ['review', 'finish'] : [];
+    if (!phase || !pending.includes(phase)) lines.push(`${id}: unticked step: ${u.trim()}`);
+  }
   const rqs: string[] = Array.isArray(card.data.research) ? card.data.research.map(String) : [];
   const rdir = join(ctx.root, ctx.cfg.paths.research);
   for (const rq of rqs) {
@@ -193,5 +200,5 @@ export function memoryGate(ctx: Ctx, id: string | null): Gate {
     if (/^\s*[-*]?\s*\**status\**\s*:?\**\s*open\b/im.test(t)) lines.push(`${id}: linked research ${rq} is still open (${f})`);
   }
   if (!existsSync(join(ctx.root, ctx.cfg.paths.handover))) lines.push(`${ctx.cfg.paths.handover} missing`);
-  return lines.length ? { result: 'FAIL', lines } : { result: 'PASS', lines: [`${id}: steps ticked, status ${st}, ${rqs.length} linked RQ(s) resolved, HANDOVER present`] };
+  return lines.length ? { result: 'FAIL', lines } : { result: 'PASS', lines: [`${id}: required steps ticked for status ${st}, ${rqs.length} linked RQ(s) resolved, HANDOVER present`] };
 }

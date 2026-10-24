@@ -16,7 +16,7 @@ export function git(root: string, ...args: string[]): string {
 
 /** Copy the fixture repo into a temp dir, git init it and make an initial commit. */
 export function makeRepo(opts: { config?: string } = {}): string {
-  const root = mkdtempSync(join(tmpdir(), 'lf-conductor-'));
+  const root = mkdtempSync(join(tmpdir(), 'lf-conductor-')).replaceAll('\\', '/');
   cpSync(join(FIXTURES, 'repo'), root, { recursive: true });
   if (opts.config !== undefined) writeFileSync(join(root, '.agent/config.yaml'), opts.config);
   git(root, 'init', '-q', '-b', 'main');
@@ -107,5 +107,5 @@ ${o.extra ?? ''}
 }
 
 export function fake(name: string): string {
-  return `bash ${join(BIN, name)}`;
+  return `bash ${join(BIN, name).replaceAll('\\', '/')}`;
 }

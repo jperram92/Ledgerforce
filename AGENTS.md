@@ -75,6 +75,24 @@ Read §3 (ledger), §6 (security) and §10 (agentic build system) before your fi
 
 ## 2. Session protocol (every session, every provider)
 
+### Primary continuation prompt (Codex or Claude)
+
+> Resume from the repository, not the chat. Read `AGENTS.md`, run the resume skill,
+> then read `.agent/HANDOVER.md`, `.agent/state.json`, the active task card and the
+> latest run log. Inspect `git status`, branch and the latest commit including its
+> body. Explain what the last commit changed, why, what was actually tested and
+> what remains unfinished. Follow the handover's next action with the research,
+> TDD, evidence and cross-provider review gates intact. Never infer completion
+> from a checkbox or a previous conversation. Before stopping, persist the exact
+> next action and validation results in the repository.
+
+Every commit must have a body explaining **What changed**, **Why**, **Validation**
+(commands/results, including failures or checks not run), and **Next action**.
+Explain the commit to the user after creating it. Put a current, copyable
+**Codex continuation prompt** near the top of `.agent/HANDOVER.md`, naming the task,
+branch, relevant commit and next command. This applies to WIP and documentation
+commits as well as completed features; never label unverified work green.
+
 ```
 START ─▶ resume ─▶ claim ─▶ research gate ─▶ TDD loop ─▶ verify ─▶ review ─▶ finish
             ▲                                    │ checkpoint every green step

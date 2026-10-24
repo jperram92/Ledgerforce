@@ -403,3 +403,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Environment constraint; commit tags keep per-task history separable.
 - Alternatives: local-only task branches (rejected: unpushed work is lost when the container is reclaimed).
 - ADR: none · Status: accepted
+
+### DL-0056 — Durable continuation prompts and explanatory commits
+- Date: 2026-10-24 · By: codex · Task: T-0010 · Category: process
+- Decision: Add the owner's requested primary continuation prompt to AGENTS.md section 2. Each commit explains What changed, Why, Validation and Next action; HANDOVER starts with a current Codex continuation prompt.
+- Why: Checkout 2fe5073 has a stale Sprint 0 handover and lacks the later recorder/gate changes described in the interrupted chat. Repository memory must distinguish committed code from narrative claims.
+- Alternatives: rely on conversation history (rejected by directive 1).
+- ADR: none · Status: accepted
+
+### DL-0057 — Explicit workflow phase markers remove the verification cycle
+- Date: 2026-10-24 · By: codex · Task: T-0010 · Category: process
+- Decision: A step ending in [phase: verify], [phase: review] or [phase: finish] can remain open while that phase or a prior phase is running. In review, verify must be complete. At done all steps must be complete. Unmarked implementation steps and unknown markers always remain mandatory.
+- Why: Gate 12 previously required verification and subsequent cross-review to be complete before verification could pass. Five regression tests cover the cycle and rejection cases; two failed for the expected reason before implementation, all five passed after.
+- Alternatives: infer phase from prose or ignore every step following verify (rejected: can conceal unfinished implementation).
+- ADR: none · Status: accepted
+
+### DL-0058 — Windows checkout and evidence path portability
+- Date: 2026-10-24 · By: codex · Task: T-0010 · Category: tooling
+- Decision: Keep text source LF via .gitattributes; render evidence file paths with forward slashes on all platforms, as the existing tests require. Use Git Bash and workspace-local Corepack shims for the existing verifier. Run the DB suite against isolated PostgreSQL 17 on localhost:55432 using the existing external-server harness.
+- Why: CRLF checkout broke Bash and format checks; two unmodified evidence assertions failed on backslashes. Windows Docker pipe access requires escalation and the harness auto-probe assumes a Unix socket.
+- Alternatives: weaken assertions, skip DB tests or change dependency versions (rejected). No runtime dependency added.
+- ADR: none · Status: accepted
+
+### DL-0059 — Windows provider tree cleanup and portable run-log links
+- Date: 2026-10-24 · By: codex · Task: T-0010, T-0003 · Category: tooling
+- Decision: Use taskkill.exe with the exact spawned provider PID, /T and /F on Windows when a heartbeat expires; retain POSIX group signalling elsewhere. Suppress late termination after close. Normalize run-log reference paths to forward slashes.
+- Why: The unchanged failover suite passed 78/80 tests; missed-heartbeat timed out because shell children held pipes, and notification link matching failed on backslashes. RQ-0014 documents Microsoft's process-tree termination semantics.
+- Alternatives: increase timeout or weaken link assertions (rejected); kill by image name (rejected: unrelated processes).
+- ADR: none · Status: accepted
+
+### DL-0060 — Start provider heartbeat allowance at launch
+- Date: 2026-10-24 · By: codex · Task: T-0010, T-0003 · Category: process
+- Decision: Refresh the same owner's lease immediately before provider launch, after resume-prompt construction; refuse launch if task/provider/lease ownership changed. Keep the configured duration and heartbeat test deadline unchanged. Use Git's usr/bin/bash.exe directly on Windows, avoiding its bin launcher.
+- Why: The 3-second heartbeat fixture showed the next provider losing its lease during prompt construction, before it could checkpoint. Windows launcher process IDs can disappear while descendant pipes remain open.
+- Alternatives: lengthen test timeout or heartbeat fixture lease (rejected: conceals behavior); self-approve verification (rejected).
+- ADR: none · Status: accepted
