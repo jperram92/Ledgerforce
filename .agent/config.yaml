@@ -1,0 +1,38 @@
+# LedgerForce agent conductor configuration (design §10.4). Human-owned.
+# Model choice is left to each CLI's default so this file never pins a model id.
+providers:
+  - id: claude
+    cli: "claude -p"                       # Claude Code headless (print) mode
+    role: [build, review]
+    instructions: CLAUDE.md                # imports AGENTS.md
+  - id: codex
+    cli: "codex exec"                      # OpenAI Codex non-interactive mode
+    role: [build, review]
+    instructions: AGENTS.md
+failover_order: [claude, codex]            # Claude primary; Codex takes over on credit/quota/rate-limit failure
+review: cross_provider                     # code by one provider is reviewed by the other
+lease_minutes: 45
+heartbeat_minutes: 10                      # agent renews lease at every checkpoint, at least this often
+max_attempts_per_task: 3                   # across providers, then status: blocked
+parallel_tasks: 1                          # design §11.2 open decision: parallel builds — 1 until human decides
+budgets:
+  claude: { daily_usd: 40 }
+  codex: { daily_usd: 40 }
+failure_patterns:                          # stderr/stdout patterns that trigger provider failover
+  quota:
+    - "429"
+    - "rate.?limit"
+    - "insufficient_quota"
+    - "credit balance"
+    - "usage limit"
+    - "quota exceeded"
+    - "overloaded"
+human_gates: [adr:accounting, adr:security, release, golden_postings, phase_gate, out_of_scope]
+paths:
+  state: .agent/state.json
+  handover: .agent/HANDOVER.md
+  backlog: .agent/backlog
+  runs: .agent/runs
+  evidence: .agent/evidence
+  decision_log: Docs/decisions/decision-log.md
+  research: Docs/research
