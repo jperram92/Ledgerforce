@@ -155,9 +155,9 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-32 | AU services SMB chart template is valid | — | MVP | unit | no | packages/modules/gl/src/templates.test.ts | T-0018 | green | [.agent/evidence/T-0018/manifest.json](../../.agent/evidence/T-0018/manifest.json) | 42fc3ba |
 | SS-PLAT-33 | Dimension sets are deduplicated by a hash of their sorted pairs | — | MVP | db-integration + property | no | packages/ledger/src/dimension-set.db.test.ts | T-0019 | green | [.agent/evidence/T-0019/manifest.json](../../.agent/evidence/T-0019/manifest.json) | 361b38f |
 | SS-PLAT-34 | Required dimensions per account are enforced; dimension identity is stable | — | MVP | db-integration | no | packages/ledger/src/dimension-set.db.test.ts | T-0019 | green | [.agent/evidence/T-0019/manifest.json](../../.agent/evidence/T-0019/manifest.json) | 361b38f |
-| SS-PLAT-35 | Party identifiers are validated and normalised | — | MVP | unit + property | no | packages/modules/parties/src/identifiers.test.ts | T-0036 | green | — | — |
-| SS-PLAT-36 | One party with roles, addresses, contacts and contact roles | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | — | — |
-| SS-PLAT-37 | An invoice cannot be approved for a customer with no Billing To contact | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | — | — |
+| SS-PLAT-35 | Party identifiers are validated and normalised | — | MVP | unit + property | no | packages/modules/parties/src/identifiers.test.ts | T-0036 | green | [.agent/evidence/T-0036/manifest.json](../../.agent/evidence/T-0036/manifest.json) | 481ae75 |
+| SS-PLAT-36 | One party with roles, addresses, contacts and contact roles | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | [.agent/evidence/T-0036/manifest.json](../../.agent/evidence/T-0036/manifest.json) | 481ae75 |
+| SS-PLAT-37 | An invoice cannot be approved for a customer with no Billing To contact | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | [.agent/evidence/T-0036/manifest.json](../../.agent/evidence/T-0036/manifest.json) | 481ae75 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)

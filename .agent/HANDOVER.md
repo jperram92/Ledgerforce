@@ -1,11 +1,11 @@
-# Handover - 2026-10-24 19:35 UTC
-From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022 and T-0024 (gapless numbering) verified and in review; register corrected (DL-0077)
-Task: T-0024 done to review; next = `node scripts/agent/conductor.ts next`
+# Handover - 2026-10-24 19:50 UTC
+From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036 (parties) verified and in review; register corrected (DL-0077)
+Task: T-0036 done to review; next = `node scripts/agent/conductor.ts next` (T-0107 company ABN is small and now claimable)
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
-Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024 verified (exit 0) and in review; conductor race fixed (DL-0069).
+Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: nothing mid-edit. Working tree clean after the last commit.
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
-Decisions taken: DL-0061..DL-0078; RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
+Decisions taken: DL-0061..DL-0079; RQ-0017; RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
   2. Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
@@ -47,6 +47,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0024 — packages/db/migrations/0010_ledger_number_series.sql (counter under row lock, guard,
 >     no-truncate formatter); packages/ledger/src/numbering.ts; DL-0078. SS-UC02-06 is proven at
 >     the numbering layer only (its invoice batch is T-0044)
+>   • T-0036 — RQ-0017; packages/db/migrations/0011_parties_party_model.sql; packages/modules/parties/**
+>     (identifiers with ABR/Salesforce vectors, service, Billing To helper); DL-0079 (company-scoped parties)
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -110,3 +112,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T19:31:01.463Z claude: T-0024 → verifying
 - 2026-10-24T19:32:50.220Z claude: release T-0024 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
 - 2026-10-24 19:3x claude: register rows evidenced→green until cross-review (DL-0077); T-0024 built (migration 0010), SS-PLAT-05 + SS-UC02-06 (numbering layer) green with evidence, verify 12 PASS/0 FAIL → review
+- 2026-10-24T19:45:42.609Z claude: T-0036 → verifying
+- 2026-10-24T19:47:53.403Z claude: release T-0036 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 19:5x claude: T-0036 built (RQ-0017, migration 0011), SS-PLAT-35/36/37 green with evidence, verify 12 PASS/0 FAIL → review; T-0107 added; run log updated
