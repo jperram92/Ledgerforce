@@ -128,7 +128,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-05 | Gapless numbering under concurrency and rollback | — | MVP | db-integration | no | — | T-0024 | not-started | — | — |
 | SS-PLAT-06 | Period status matrix is enforced as data | — | MVP | unit | no | — | T-0023 | not-started | — | — |
 | SS-PLAT-07 | Control accounts reject manual journals, imports and rule lines | — | MVP | db-integration | no | — | T-0029 | not-started | — | — |
-| SS-PLAT-08 | Audit log is append-only | — | MVP | db-integration | no | — | T-0014 | not-started | — | — |
+| SS-PLAT-08 | Audit log is append-only | — | MVP | db-integration | no | packages/db/src/platform.db.test.ts | T-0014 | evidenced | [.agent/evidence/T-0014/manifest.json](../../.agent/evidence/T-0014/manifest.json) | 93e3e18 |
 | SS-PLAT-09 | Failover resume works | — | Sprint 0 | unit | no | — | T-0003 | not-started | — | — |
 | SS-PLAT-10 | No-delete guard | — | Sprint 0 | unit | no | — | T-0003 | not-started | — | — |
 | SS-PLAT-11 | Invariants hold over 10,000 random documents | — | MVP | property | no | — | T-0033 | not-started | — | — |
@@ -150,7 +150,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-27 | Replay id resume after restart | — | MVP | db-integration | no | — | T-0064 | not-started | — | — |
 | SS-PLAT-28 | Every API request runs in its own tenant transaction | — | MVP | db-integration | no | apps/api/src/tenancy/tenant-transaction.db.test.ts | T-0104 | evidenced | [.agent/evidence/T-0104/manifest.json](../../.agent/evidence/T-0104/manifest.json) | 3ca2bd9 |
 | SS-PLAT-29 | Timeline components honour P3, P13, P15 and the genericness probes | — | MVP | e2e-playwright | yes | — | T-0106 | not-started | — | — |
-| SS-PLAT-30 | Every successful API mutation leaves one audit row | — | MVP | db-integration | no | — | T-0014 | not-started | — | — |
+| SS-PLAT-30 | Every successful API mutation leaves one audit row | — | MVP | db-integration | no | apps/api/src/audit/audit.db.test.ts | T-0014 | evidenced | [.agent/evidence/T-0014/manifest.json](../../.agent/evidence/T-0014/manifest.json) | 93e3e18 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | evidenced | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)

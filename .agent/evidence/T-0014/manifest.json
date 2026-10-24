@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0014",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-08",
+      "file": ".agent/evidence/T-0014/20261024-140632-tests-db.json",
+      "test": "4 test(s): packages/db/src/platform.db.test.ts › SS-PLAT-08: Audit log is append-only (design §6.8) › lf_app can INSERT for its own tenant | packages/db/src/platform.db.test.ts › SS-PLAT-08: Audit log is append-only (design §6.8) › lf_app cannot UPDATE, DELETE, TRUNCATE or SELECT audit rows (privilege) | packages/db/src/platform.db.test.ts › SS-PLAT-08: Audit log is append-only (design §6.8) › even the owner (lf_migrator) is blocked from UPDATE/DELETE/TRUNCATE by trigger | packages/db/src/platform.db.test.ts › SS-PLAT-08: Audit log is append-only (design §6.8) › lf_app cannot disable the triggers or switch replication role",
+      "commit": "93e3e18c427f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T14:06:32.291Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-30",
+      "file": ".agent/evidence/T-0014/20261024-140635-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/audit/audit.db.test.ts › SS-PLAT-30: Every successful API mutation leaves one audit row › a successful mutation writes exactly one row with actor, action, ip, user agent and request id | apps/api/src/audit/audit.db.test.ts › SS-PLAT-30: Every successful API mutation leaves one audit row › the handler-supplied entity and before/after are recorded | apps/api/src/audit/audit.db.test.ts › SS-PLAT-30: Every successful API mutation leaves one audit row › generates a request id when the client sends none, and echoes it | apps/api/src/audit/audit.db.test.ts › SS-PLAT-30: Every successful API mutation leaves one audit row › reads and refused requests write no audit rows",
+      "commit": "93e3e18c427f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T14:06:35.779Z",
+      "result": "passed"
+    }
+  ]
+}

@@ -13,8 +13,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 
 | Status | Cards |
 |---|---:|
-| todo | 94 |
-| review | 11 |
+| todo | 93 |
+| review | 12 |
 | blocked | 1 |
 | **total** | **106** |
 
@@ -104,7 +104,7 @@ graph LR
 | [T-0011](T-0011.md) | OIDC authentication (Keycloak dev realm) and session policy | MVP | todo | T-0105 | — | 1 |
 | [T-0012](T-0012.md) | Roles and permissions (role templates, permission checks) | MVP | todo | T-0011 | UC-02 | 1 |
 | [T-0013](T-0013.md) | MFA enforcement for finance roles and step-up re-authentication | MVP | todo | T-0011, T-0012 | UC-06 | 2 |
-| [T-0014](T-0014.md) | Append-only audit log (separate schema) | MVP | todo | T-0010 | — | 1 |
+| [T-0014](T-0014.md) | Append-only audit log (separate schema) | MVP | review | T-0010 | — | 1 |
 | [T-0015](T-0015.md) | Segregation-of-duties engine and small-team mode | MVP | todo | T-0012, T-0014 | UC-05, UC-06, UC-11 | 5 |
 | [T-0016](T-0016.md) | User lifecycle (joiner/mover/leaver) and scoped API tokens | MVP | todo | T-0012, T-0014, T-0013 | — | 1 |
 | [T-0017](T-0017.md) | Money package (decimal.js) and no-float lint rule | MVP | todo | T-0001 | — | 1 |

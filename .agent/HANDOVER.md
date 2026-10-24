@@ -2,12 +2,11 @@
 From: claude (lead session r01)    Reason: checkpoint — T-0105 in review; waiting on product-owner decisions; T-0011 next
 Task: next is T-0011 (OIDC login/callback/logout creating T-0105 sessions; tenant slug lookup step 4a)
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
-Done today: Codex recovery merged; T-0010, T-0104 (API skeleton), T-0105 (sessions) all verified (exit 0) and in review; conductor race fixed (DL-0069); UI research finished — 3 directions published for the owner.
+Done today: Codex recovery merged; T-0010, T-0104 (API skeleton), T-0105 (sessions), T-0009 (UI: Timeline adopted, DL-0070), T-0014 (audit writer) all verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: nothing mid-edit. Working tree clean after the last commit.
 Next action: (codex) cross-review T-0010, T-0104, T-0105 — see prompt below. (claude or codex) claim T-0011.
 Decisions taken: DL-0061..DL-0069; ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
-  1. UI direction: A Turns / B Flows / C Timeline (recommended) — https://claude.ai/artifact/AW5fz95QMtbuJ3srmeb9iY ; Docs/ui/research/
   2. Accept/reject ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
   4. Design contradictions in RQ-0012 (CDC 5-object cap, ATO GST rounding, prepayment GST, SoD gaps)
@@ -23,12 +22,14 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >     packages/testing/src/evidence/{test-report,record-tests}.ts
 >   • T-0104 — apps/api/** skeleton (NestJS on SWC, TenantInterceptor, refuseAllResolver), vitest api projects,
 >     eslint apps/api block, pnpm override multer 2.5.0 (DL-0063)
+>   • T-0009 — tests/e2e/evidence-harness.spec.ts; Docs/ui/principles.md v1; Docs/ui/system/ (Timeline, DL-0070)
+>   • T-0014 — apps/api/src/audit/request-id.ts; audit write in tenant.interceptor.ts; AuditTrail in tenant-tx.ts
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
 > commit with a What/Why/Validation/Next body, and on PASS tick steps 8–9 then
 > `node scripts/agent/conductor.ts release <T-ID> --status done`.
-> THEN: on Windows take T-0103; otherwise `node scripts/agent/conductor.ts next` (expect T-0011).
+> THEN: on Windows take T-0103; otherwise `node scripts/agent/conductor.ts next`.
 > Tests: `pnpm test`, `pnpm test:db` (local initdb cluster or LF_TEST_DATABASE_URL), `bash scripts/agent/verify.sh --task <T-ID>`.
 
 ## Log
@@ -62,3 +63,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T14:02:08.218Z human: release T-0009 → todo (unblocked: product owner chose direction C (DL-0070))
 - 2026-10-24T14:02:08.588Z claude: T-0009 → verifying
 - 2026-10-24T14:03:46.723Z claude: release T-0009 → review (verify exit 0; Timeline adopted; awaiting codex cross-review)
+- 2026-10-24T14:06:31.727Z claude: T-0014 → verifying
+- 2026-10-24T14:08:14.888Z claude: release T-0014 → review (verify exit 0; awaiting codex cross-review)
+- 2026-10-24 14:1x claude: product owner chose UI direction C (DL-0070); T-0009 and T-0014 → review (verify exit 0)
