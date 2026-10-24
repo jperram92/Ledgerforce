@@ -165,7 +165,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-42 | Login refuses unknown users, replayed or expired state and unknown tenants | — | MVP | db-integration | no | apps/api/src/auth/oidc.db.test.ts | T-0011 | green | [.agent/evidence/T-0011/manifest.json](../../.agent/evidence/T-0011/manifest.json) | c259211 |
 | SS-PLAT-45 | Salesforce package metadata matches the connector contract (offline) | — | MVP | unit | no | salesforce/test/package-contract.test.ts, salesforce/test/xml.test.ts | T-0062 | green | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
 | SS-PLAT-46 | Salesforce permission sets grant least privilege; only the integration user writes | — | MVP | unit | no | salesforce/test/package-contract.test.ts | T-0062 | green | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
-| SS-PLAT-47 | A company ABN must pass the ABR checksum | — | MVP | db-integration | no | packages/db/src/company-abn.db.test.ts | T-0107 | green | — | — |
+| SS-PLAT-47 | A company ABN must pass the ABR checksum | — | MVP | db-integration | no | packages/db/src/company-abn.db.test.ts | T-0107 | green | [.agent/evidence/T-0107/manifest.json](../../.agent/evidence/T-0107/manifest.json) | 3ec79cd |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
