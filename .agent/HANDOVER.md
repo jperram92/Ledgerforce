@@ -1,13 +1,13 @@
-# Handover - 2026-10-24 17:45 UTC
-From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0021 (chart, dimensions, journal + balance, immutability) verified and in review
-Task: T-0021 done to review; next = `node scripts/agent/conductor.ts next` (expected T-0022 hash chain: open the canonical-serialisation RQ first, per ADR-0004 follow-ups)
+# Handover - 2026-10-24 18:20 UTC
+From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022 (chart, dimensions, journal + balance, immutability, hash chain) verified and in review
+Task: T-0022 done to review; next = `node scripts/agent/conductor.ts next` (expected T-0024 gapless numbering; T-0023 periods needs T-0012 roles)
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
-Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021 verified (exit 0) and in review; conductor race fixed (DL-0069).
+Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: nothing mid-edit. Working tree clean after the last commit.
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
-Decisions taken: DL-0061..DL-0075; new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
+Decisions taken: DL-0061..DL-0076; RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
-  2. Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
+  2. Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
   4. Design contradictions in RQ-0012 (CDC 5-object cap, ATO GST rounding, prepayment GST, SoD gaps)
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
@@ -41,6 +41,9 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0021 — packages/db/migrations/0008_ledger_immutability.sql (owner-binding triggers,
 >     journal_mark_reversed SECURITY DEFINER + mirror check); packages/ledger/src/journal.ts;
 >     testing/journal-fixture.ts; DL-0075 (security-relevant: also act as security-reviewer)
+>   • T-0022 — RQ-0016; ADR-0017; packages/db/migrations/0009_ledger_hash_chain.sql (chain at commit,
+>     head lock, SECURITY DEFINER append); packages/ledger/src/hash-chain.ts (independent verifier) — check
+>     canonicalV1 against the RQ-0016 text yourself, not against the SQL; DL-0076
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -97,3 +100,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T17:44:30.092Z claude: T-0021 → verifying
 - 2026-10-24T17:46:34.418Z claude: release T-0021 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
 - 2026-10-24 17:4x claude: T-0021 built (migration 0008), evidenced SS-PLAT-02, verify 12 PASS/0 FAIL → review (resumed after a usage-limit stop; no work lost)
+- 2026-10-24T18:17:38.353Z claude: T-0022 → verifying
+- 2026-10-24T18:19:37.397Z claude: release T-0022 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 18:2x claude: T-0022 built (RQ-0016, ADR-0017, migration 0009), evidenced SS-PLAT-03, verify 12 PASS/0 FAIL → review
