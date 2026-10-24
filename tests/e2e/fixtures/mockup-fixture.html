@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LedgerForce — e2e harness fixture</title>
+    <style>
+      :root {
+        --bg: #f7f7f5;
+        --fg: #1d1d1b;
+        --accent: #0b5cad;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--fg);
+      }
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 24px 16px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+      }
+      td.num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Harness fixture page</h1>
+      <p>
+        Stand-in used by <code>tests/e2e/ui-mockups.spec.ts</code> when no
+        <code>Docs/ui/mockups/*.html</code> exist yet. It proves the evidence pipeline works.
+      </p>
+      <table aria-label="Sample journal">
+        <thead>
+          <tr><th>Account</th><th>Debit</th><th>Credit</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1100 Accounts receivable</td><td class="num">110.00</td><td class="num"></td></tr>
+          <tr><td>4000 Sales</td><td class="num"></td><td class="num">100.00</td></tr>
+          <tr><td>2200 GST collected</td><td class="num"></td><td class="num">10.00</td></tr>
+        </tbody>
+      </table>
+    </main>
+  </body>
+</html>

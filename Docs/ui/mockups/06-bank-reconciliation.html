@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reconcile Operating account — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  .balance { display: grid; grid-template-columns: 1fr auto 1fr auto 1.1fr; align-items: center; gap: 16px; padding: 18px var(--lf-card-pad); }
+  .balance .l { font-size: 12.5px; color: var(--lf-text-muted); }
+  .balance .v { font-size: 24px; font-weight: 600; font-variant-numeric: var(--lf-numeric); }
+  .balance .op { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--lf-surface-2); border: 1px solid var(--lf-border); color: var(--lf-text-muted); font-size: 18px; font-weight: 600; }
+  .diff { border-radius: var(--lf-radius-lg); padding: 10px 14px; background: var(--lf-warning-bg); border: 1px solid var(--lf-warning-border); color: var(--lf-warning-fg); }
+  .diff .v { font-size: 20px; }
+  .diff .l { color: var(--lf-warning-fg); }
+  .match { display: grid; grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1.15fr) 170px; gap: 0; border-bottom: 1px solid var(--lf-border); align-items: stretch; }
+  .match:last-child { border-bottom: 0; }
+  .match > div { padding: 14px 16px; }
+  .stmt { background: var(--lf-surface); }
+  .stmt .d { font-size: 12px; color: var(--lf-text-subtle); }
+  .stmt .desc { font-family: var(--lf-font-mono); font-size: 12.5px; margin: 2px 0; }
+  .amt { font-variant-numeric: var(--lf-numeric); font-weight: 600; font-size: 15px; }
+  .amt.in { color: var(--lf-success-fg); }
+  .link-col { display: grid; place-items: center; color: var(--lf-text-subtle); padding: 0 !important; }
+  .sugg { background: var(--lf-surface-2); border-left: 1px solid var(--lf-border); }
+  .sugg .what { font-weight: 500; }
+  .sugg .why { font-size: 12px; color: var(--lf-text-subtle); margin-top: 4px; }
+  .sugg .row { flex-wrap: wrap; }
+  .acts { display: flex; flex-direction: column; gap: 6px; justify-content: center; background: var(--lf-surface-2); }
+  .acts .btn { width: 100%; }
+  .colhead { display: grid; grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1.15fr) 170px; font-size: 12px; color: var(--lf-text-muted); font-weight: 500; background: var(--lf-surface-2); border-bottom: 1px solid var(--lf-border); }
+  .colhead div { padding: 8px 16px; }
+</style>
+</head>
+<body data-active="reconcile" data-user="Priya Shah" data-initials="PS" data-role="Accountant" data-period="Oct 2026" data-period-state="Open" data-sync="ok" data-sync-text="Synced 2 min ago">
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <nav class="sidenav" id="lf-nav" aria-label="Primary"></nav>
+  <div class="main-col">
+    <header class="topbar" id="lf-top"></header>
+    <main id="main" class="content">
+      <div class="page-head">
+        <div>
+          <div class="crumbs"><a href="#">Bank</a><i data-i="chevron-right" class="i-sm"></i>Reconcile</div>
+          <h1>Reconcile · Operating account ···418</h1>
+          <p class="sub">Statement imported 24 Oct, 7:30 am (CSV, 44 lines, 1–23 Oct 2026)</p>
+        </div>
+        <div class="actions"><button class="btn" type="button"><i data-i="upload"></i>Import statement</button><button class="btn" type="button"><i data-i="zap"></i>Matching rules</button><button class="btn" type="button"><i data-i="file"></i>Reconciliation report</button></div>
+      </div>
+
+      <section class="card" aria-labelledby="bal-h" style="margin-bottom:16px">
+        <h2 id="bal-h" class="sr-only">Balance check</h2>
+        <div class="balance">
+          <div><div class="l">Statement balance · 23 Oct</div><div class="v">$152,604.10</div></div>
+          <div class="op" aria-hidden="true">≠</div>
+          <div><div class="l">Book balance · reconciled items</div><div class="v">$158,749.12</div></div>
+          <div class="op" aria-hidden="true">→</div>
+          <div class="diff" role="status"><div class="l row"><i data-i="alert" class="i-sm"></i>Not yet balanced · difference</div><div class="v">−$6,145.02</div><div class="xs">Exactly the 6 lines below. Confirm them to reach $0.00.</div></div>
+        </div>
+        <div class="card-f"><span><b>38 of 44</b> lines matched automatically (amount + reference)</span><div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="44" aria-valuenow="38" aria-label="Lines matched" style="width:320px"><span style="width:86%"></span></div></div>
+      </section>
+
+      <section class="card" aria-labelledby="rev-h">
+        <div class="tabs" role="tablist" aria-label="Statement lines">
+          <a href="#" role="tab" aria-selected="true" id="rev-h">To review<span class="n">6</span></a>
+          <a href="#" role="tab" aria-selected="false">Auto-matched<span class="n">38</span></a>
+          <a href="#" role="tab" aria-selected="false">History</a>
+        </div>
+        <div class="colhead" aria-hidden="true"><div>Bank statement</div><div></div><div>LedgerForce suggests</div><div></div></div>
+        <div role="list" aria-label="Lines to review">
+          <div class="match" role="listitem">
+            <div class="stmt"><div class="d">23 Oct 2026</div><div class="desc">STRIPE PAYOUT PO_4471</div><div class="amt in">+6,712.38</div></div>
+            <div class="link-col"><i data-i="match"></i></div>
+            <div class="sugg"><div class="row"><span class="chip st-info"><i data-i="zap"></i>Rule match</span><span class="what">Stripe payout · 3 receipts</span></div><div class="why">INV-001054, INV-001049, INV-001043 = 6,912.20 less fees 199.82 (GST 18.17) → 6,712.38</div></div>
+            <div class="acts"><button class="btn sm primary" type="button"><i data-i="check"></i>Confirm</button><button class="btn sm ghost" type="button">Show journal</button></div>
+          </div>
+          <div class="match" role="listitem">
+            <div class="stmt"><div class="d">22 Oct 2026</div><div class="desc">DIRECT CREDIT KESTREL LOGIST INV1048</div><div class="amt in">+6,050.00</div></div>
+            <div class="link-col"><i data-i="match"></i></div>
+            <div class="sugg"><div class="row"><span class="chip st-ok"><i data-i="check-circle"></i>Exact match</span><span class="what">Receipt for INV-001048 · Kestrel Logistics</span></div><div class="why">Same amount and reference “INV1048”. Invoice becomes Paid; Salesforce updates.</div></div>
+            <div class="acts"><button class="btn sm primary" type="button"><i data-i="check"></i>Confirm</button><button class="btn sm ghost" type="button">Find other</button></div>
+          </div>
+          <div class="match" role="listitem">
+            <div class="stmt"><div class="d">22 Oct 2026</div><div class="desc">TELSTRA BPAY 4410228</div><div class="amt">(389.00)<span class="sr-only"> minus</span></div></div>
+            <div class="link-col"><i data-i="plus"></i></div>
+            <div class="sugg"><div class="row"><span class="chip st-info"><i data-i="zap"></i>Rule: phone &amp; internet</span><span class="what">Create spend money</span></div><div class="why">6220 Telephone &amp; internet 353.64 + GST paid 35.36 · rule used 14 times</div></div>
+            <div class="acts"><button class="btn sm primary" type="button"><i data-i="plus"></i>Create</button><button class="btn sm ghost" type="button">Edit coding</button></div>
+          </div>
+          <div class="match" role="listitem">
+            <div class="stmt"><div class="d">21 Oct 2026</div><div class="desc">TFR TO BUS SAVER 902</div><div class="amt">(20,000.00)<span class="sr-only"> minus</span></div></div>
+            <div class="link-col"><i data-i="match"></i></div>
+            <div class="sugg"><div class="row"><span class="chip st-info"><i data-i="bank"></i>Transfer</span><span class="what">To Business Saver ···902</span></div><div class="why">Matching +20,000.00 found on Saver statement 21 Oct</div></div>
+            <div class="acts"><button class="btn sm primary" type="button"><i data-i="check"></i>Confirm</button><button class="btn sm ghost" type="button">Show journal</button></div>
+          </div>
+          <div class="match" role="listitem">
+            <div class="stmt"><div class="d">21 Oct 2026</div><div class="desc">MERCHANT FEE OCT</div><div class="amt">(18.40)<span class="sr-only"> minus</span></div></div>
+            <div class="link-col"><i data-i="plus"></i></div>
+            <div class="sugg"><div class="row"><span class="chip st-info"><i data-i="zap"></i>Rule: bank fees</span><span class="what">Create spend money</span></div><div class="why">6110 Bank fees 18.40 · GST-free</div></div>
+            <div class="acts"><button class="btn sm primary" type="button"><i data-i="plus"></i>Create</button><button class="btn sm ghost" type="button">Edit coding</button></div>
+          </div>
+          <div class="match" role="listitem">
+            <div class="stmt"><div class="d">20 Oct 2026</div><div class="desc">DIRECT CREDIT C BAY TOURISM</div><div class="amt in">+1,500.00</div></div>
+            <div class="link-col"><i data-i="search"></i></div>
+            <div class="sugg"><div class="row"><span class="chip st-warn"><i data-i="alert"></i>No exact match</span><span class="what">Possibly part of INV-001051 · Coral Bay Tourism</span></div><div class="why">Invoice is 2,970.00 and 23 days overdue. Record 1,500.00 as a part payment?</div></div>
+            <div class="acts"><button class="btn sm" type="button">Part payment</button><button class="btn sm ghost" type="button">Find &amp; match</button></div>
+          </div>
+        </div>
+        <div class="card-f"><span>Keyboard: <span class="kbd">↑</span> <span class="kbd">↓</span> move · <span class="kbd">Enter</span> confirm · <span class="kbd">E</span> edit coding · <span class="kbd">J</span> show journal</span><span>Bank lines are never edited — only matched or explained.</span></div>
+      </section>
+    </main>
+  </div>
+</div>
+</body>
+</html>

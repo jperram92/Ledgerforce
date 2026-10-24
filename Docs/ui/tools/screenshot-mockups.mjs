@@ -132,7 +132,11 @@ for (const name of pages) {
       for (const x of axe) problems.push(`axe ${x.id} (${x.impact}) x${x.nodes}: ${x.sample}`);
     }
     const file = `${name}${v.suffix}.png`;
-    await page.screenshot({ path: join(outDir, file), fullPage: true });
+    // Grow the viewport to the document height so sticky bars and 100vh panels render in their
+    // natural place (fullPage capture would pin sticky elements to the first viewport).
+    const fullH = await page.evaluate(() => document.documentElement.scrollHeight);
+    if (fullH > vp.height) { await page.setViewportSize({ width: vp.width, height: fullH }); await page.waitForTimeout(50); }
+    await page.screenshot({ path: join(outDir, file) });
     await ctx.close();
     const entry = { page: name + v.suffix, viewport: `${vp.width}x${vp.height}`, screenshot: `screenshots/${file}`, title: meta.title,
       bodyContrast: Number(contrast.body.toFixed(2)), minTextContrast: Number(contrast.min.toFixed(2)), minTextAt: contrast.minAt,

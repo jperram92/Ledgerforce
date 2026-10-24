@@ -15,7 +15,7 @@ h3 { font-size: var(--lf-text-base); }
 p { margin: 0; }
 a { color: var(--lf-accent-text); text-decoration: none; }
 a:hover { text-decoration: underline; }
-p a, .nav-foot a, .explain a, .banner a, td a.ul { text-decoration: underline; text-underline-offset: 2px; }
+p a, .nav-foot a, .explain a, .banner a, td a.ul, tfoot a, .timeline a, .jp-foot a, .card-f span a { text-decoration: underline; text-underline-offset: 2px; }
 :focus-visible { outline: 2px solid var(--lf-focus); outline-offset: 2px; border-radius: var(--lf-radius-sm); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .skip { position: absolute; left: 8px; top: -40px; background: var(--lf-accent); color: var(--lf-accent-fg); padding: 8px 12px; border-radius: var(--lf-radius-md); z-index: 100; }

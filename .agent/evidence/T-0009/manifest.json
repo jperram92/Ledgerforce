@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0009",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-041107-SS-PLAT-UI-01-01-home-dashboard-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 390px",
+      "commit": "3b4ffdf5c1ac-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T04:11:07.804Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-041107-SS-PLAT-UI-01-01-home-dashboard-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 1440px",
+      "commit": "3b4ffdf5c1ac-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T04:11:07.748Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-041108-SS-PLAT-UI-01-02-invoice-list-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 1440px",
+      "commit": "3b4ffdf5c1ac-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T04:11:08.392Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-041108-SS-PLAT-UI-01-02-invoice-list-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 390px",
+      "commit": "3b4ffdf5c1ac-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T04:11:08.439Z",
+      "result": "passed"
+    }
+  ]
+}

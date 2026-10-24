@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
+    "@ledgerforce/testing": "workspace:*",
     "@playwright/test": "1.63.0",
     "@types/node": "22.20.5",
     "eslint": "10.13.0",

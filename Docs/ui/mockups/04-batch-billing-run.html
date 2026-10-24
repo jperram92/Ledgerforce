@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batch billing BR-0032 preview — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  .steps { display: flex; gap: 0; list-style: none; margin: 0 0 18px; padding: 0; }
+  .steps li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--lf-text-subtle); font-weight: 500; }
+  .steps li + li::before { content: ""; width: 40px; height: 1px; background: var(--lf-border-strong); margin: 0 12px; }
+  .steps .n { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; border: 1px solid var(--lf-border-strong); color: var(--lf-text-muted); background: var(--lf-surface); }
+  .steps .done .n { background: var(--lf-success-bg); color: var(--lf-success-fg); border-color: var(--lf-success-border); }
+  .steps .cur { color: var(--lf-text); }
+  .steps .cur .n { background: var(--lf-accent); color: var(--lf-accent-fg); border-color: var(--lf-accent); }
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; align-items: start; }
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .kpi-row > div { padding: 14px 18px; border-right: 1px solid var(--lf-border); }
+  .kpi-row > div:last-child { border-right: 0; }
+  .kpi-row .l { font-size: 12.5px; color: var(--lf-text-muted); }
+  .kpi-row .v { font-size: 22px; font-weight: 600; font-variant-numeric: var(--lf-numeric); }
+  .exc td { vertical-align: top; }
+  .exc td:first-child, .card-h + .table-wrap td:first-child { white-space: nowrap; }
+  .panel table.journal { font-size: 13px; }
+  .panel table.journal td, .panel table.journal th { padding-left: 12px; padding-right: 12px; }
+  .actionbar { position: sticky; bottom: 16px; margin-top: 16px; background: var(--lf-surface); border: 1px solid var(--lf-border); border-radius: var(--lf-radius-lg); box-shadow: var(--lf-shadow-lg); padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+  .actionbar .sum { font-size: 13px; color: var(--lf-text-muted); }
+  .actionbar .sum b { color: var(--lf-text); font-variant-numeric: var(--lf-numeric); }
+</style>
+</head>
+<body data-active="batch" data-user="Priya Shah" data-initials="PS" data-role="Accountant" data-period="Nov 2026" data-period-state="Open" data-sync="ok" data-sync-text="Synced 1 min ago">
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <nav class="sidenav" id="lf-nav" aria-label="Primary"></nav>
+  <div class="main-col">
+    <header class="topbar" id="lf-top"></header>
+    <main id="main" class="content">
+      <div class="page-head">
+        <div>
+          <div class="crumbs"><a href="#">Sales</a><i data-i="chevron-right" class="i-sm"></i><a href="#">Batch billing</a><i data-i="chevron-right" class="i-sm"></i>BR-0032</div>
+          <h1>November retainers · BR-0032</h1>
+          <p class="sub">Invoice date 1 Nov 2026 · template “Monthly retainer” · prepared by Jordan Lee (AR Clerk) 24 Oct, 8:40 am</p>
+        </div>
+        <div class="actions"><button class="btn" type="button"><i data-i="download"></i>Export preview CSV</button></div>
+      </div>
+
+      <ol class="steps" aria-label="Batch steps">
+        <li class="done"><span class="n"><i data-i="check" class="i-sm"></i></span>Select accounts</li>
+        <li class="cur" aria-current="step"><span class="n">2</span>Preview and fix</li>
+        <li><span class="n">3</span>Approve and post</li>
+        <li><span class="n">4</span>Email PDFs</li>
+      </ol>
+
+      <div class="layout">
+        <div class="stack">
+          <section class="card" aria-label="Batch totals">
+            <div class="kpi-row">
+              <div><div class="l">Invoices ready</div><div class="v">38 <span class="small muted" style="font-weight:400">of 40</span></div></div>
+              <div><div class="l">Subtotal (ex GST)</div><div class="v">86,420.00</div></div>
+              <div><div class="l">GST</div><div class="v">8,642.00</div></div>
+              <div><div class="l">Total to invoice</div><div class="v">95,062.00</div></div>
+            </div>
+          </section>
+
+          <section class="card" aria-labelledby="exc-h">
+            <div class="card-h"><h2 id="exc-h">Needs attention <span class="subtle" style="font-weight:400">· 2 excluded, 3 warnings</span></h2><span class="meta">Excluded invoices don't block the rest</span></div>
+            <div class="table-wrap">
+              <table class="data exc">
+                <caption class="sr-only">Exceptions and warnings</caption>
+                <thead><tr><th scope="col">Customer</th><th scope="col">Issue and what happens</th><th scope="col" class="num">Amount</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
+                <tbody>
+                  <tr><td><b>Lighthouse Learning</b></td><td><div class="row" style="gap:8px"><span class="chip st-err"><i data-i="x-circle"></i>Excluded</span><b class="small">No Billing To contact on the Account</b></div><span class="sec" style="margin-top:4px">Rule: an invoice can't be approved without a Billing To contact (§4.2)</span></td><td class="num">3,520.00</td><td><a class="btn sm" href="#"><i data-i="ext"></i>Fix in Salesforce</a></td></tr>
+                  <tr><td><b>Redgum Ventures</b></td><td><div class="row" style="gap:8px"><span class="chip st-err"><i data-i="x-circle"></i>Excluded</span><b class="small">On credit hold · 61+ days overdue</b></div><span class="sec" style="margin-top:4px">Credit hold blocks new invoices. A Finance Admin can release the hold.</span></td><td class="num">2,200.00</td><td><button class="btn sm" type="button">Request release</button></td></tr>
+                  <tr><td><b>Coral Bay Tourism</b></td><td><div class="row" style="gap:8px"><span class="chip st-warn"><i data-i="alert"></i>Warning</span><b class="small">Amount 12% higher than October</b></div><span class="sec" style="margin-top:4px">Will post. Price change came from Salesforce Opportunity line on 20 Oct.</span></td><td class="num">3,327.00</td><td><button class="btn sm ghost" type="button">View lines</button></td></tr>
+                  <tr><td><b>Flinders Freight Co</b></td><td><div class="row" style="gap:8px"><span class="chip st-warn"><i data-i="alert"></i>Warning</span><b class="small">Billing email bounced on 1 Oct</b></div><span class="sec" style="margin-top:4px">Will post. PDF goes to Billing CC (finance@flinders.example) as well.</span></td><td class="num">2,722.50</td><td><button class="btn sm ghost" type="button">Edit contacts</button></td></tr>
+                  <tr><td><b>Murray River Organics</b></td><td><div class="row" style="gap:8px"><span class="chip st-warn"><i data-i="alert"></i>Warning</span><b class="small">Unpaid part of October invoice</b></div><span class="sec" style="margin-top:4px">Will post. $2,750.00 still owing on INV-001055 — shown on the statement.</span></td><td class="num">5,500.00</td><td><button class="btn sm ghost" type="button">View account</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section class="card" aria-labelledby="inv-h">
+            <div class="card-h"><h2 id="inv-h">Invoices in this run</h2><div class="seg" role="group" aria-label="Show"><button type="button" aria-pressed="true">All 40</button><button type="button" aria-pressed="false">Ready 38</button><button type="button" aria-pressed="false">Excluded 2</button></div></div>
+            <div class="table-wrap">
+              <table class="data">
+                <caption class="sr-only">Invoice preview</caption>
+                <thead><tr><th scope="col">Customer</th><th scope="col">Billing To</th><th scope="col" class="num">Lines</th><th scope="col">Result</th><th scope="col" class="num">Ex GST</th><th scope="col" class="num">GST</th><th scope="col" class="num">Total</th></tr></thead>
+                <tbody>
+                  <tr><td>Bondi Coastal Physio</td><td class="muted">Ari Patel</td><td class="num">2</td><td><span class="chip st-ok"><i data-i="check"></i>Ready</span></td><td class="num">2,400.00</td><td class="num">240.00</td><td class="num">2,640.00</td></tr>
+                  <tr><td>Coral Bay Tourism</td><td class="muted">Tom Reid</td><td class="num">2</td><td><span class="chip st-warn"><i data-i="alert"></i>Ready · warning</span></td><td class="num">3,024.55</td><td class="num">302.45</td><td class="num">3,327.00</td></tr>
+                  <tr><td>Flinders Freight Co</td><td class="muted">Mia Stone</td><td class="num">1</td><td><span class="chip st-warn"><i data-i="alert"></i>Ready · warning</span></td><td class="num">2,475.00</td><td class="num">247.50</td><td class="num">2,722.50</td></tr>
+                  <tr><td>Kestrel Logistics Pty Ltd</td><td class="muted">Dana Kerr</td><td class="num">3</td><td><span class="chip st-ok"><i data-i="check"></i>Ready</span></td><td class="num">6,745.00</td><td class="num">674.50</td><td class="num">7,419.50</td></tr>
+                  <tr><td>Lighthouse Learning</td><td><span class="chip st-err"><i data-i="x-circle"></i>Missing</span></td><td class="num">2</td><td><span class="chip st-err"><i data-i="x-circle"></i>Excluded</span></td><td class="num">3,200.00</td><td class="num">320.00</td><td class="num">3,520.00</td></tr>
+                  <tr><td>Murray River Organics</td><td class="muted">Ellie Moss</td><td class="num">1</td><td><span class="chip st-warn"><i data-i="alert"></i>Ready · warning</span></td><td class="num">5,000.00</td><td class="num">500.00</td><td class="num">5,500.00</td></tr>
+                  <tr><td>Pinnacle Dental Group</td><td class="muted">Dr Raj Iyer</td><td class="num">1</td><td><span class="chip st-ok"><i data-i="check"></i>Ready</span></td><td class="num">1,250.00</td><td class="num">125.00</td><td class="num">1,375.00</td></tr>
+                  <tr><td>Southern Cross Solar</td><td class="muted">Leah Brooks</td><td class="num">4</td><td><span class="chip st-ok"><i data-i="check"></i>Ready</span></td><td class="num">8,150.00</td><td class="num">815.00</td><td class="num">8,965.00</td></tr>
+                </tbody>
+                <tfoot><tr><td colspan="4">8 of 40 shown · <a href="#">show all</a> · totals are for the 38 ready invoices</td><td class="num">86,420.00</td><td class="num">8,642.00</td><td class="num">95,062.00</td></tr></tfoot>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <div class="stack">
+          <section class="panel" aria-labelledby="jr-h">
+            <div class="card-h"><h2 id="jr-h">Batch journal preview</h2><span data-chip="draft">Not posted</span></div>
+            <table class="data journal">
+              <caption class="sr-only">Summary of the 38 journals this batch will post</caption>
+              <thead><tr><th scope="col">Account</th><th scope="col" class="num">Debit</th><th scope="col" class="num">Credit</th></tr></thead>
+              <tbody>
+                <tr><td class="acct"><span class="code">1200</span>Trade debtors</td><td class="num">95,062.00</td><td></td></tr>
+                <tr><td class="acct"><span class="code">4120</span>Subscriptions</td><td></td><td class="num">61,800.00</td></tr>
+                <tr><td class="acct"><span class="code">4110</span>Professional services</td><td></td><td class="num">21,600.00</td></tr>
+                <tr><td class="acct"><span class="code">4190</span>Recoverable costs</td><td></td><td class="num">3,020.00</td></tr>
+                <tr><td class="acct"><span class="code">2310</span>GST collected</td><td></td><td class="num">8,642.00</td></tr>
+              </tbody>
+              <tfoot><tr><td><span class="balanced"><i data-i="equal"></i>Balanced</span></td><td class="num">95,062.00</td><td class="num">95,062.00</td></tr></tfoot>
+            </table>
+            <div class="card-f"><span>One journal per invoice; this is their sum. <a href="#">See all 38</a></span></div>
+          </section>
+
+          <section class="card" aria-labelledby="who-h">
+            <div class="card-h"><h2 id="who-h">Approval</h2></div>
+            <div class="card-b stack" style="gap:12px">
+              <div class="people">
+                <div class="person"><span class="avatar sm c" aria-hidden="true">JL</span><div><div class="role">Prepared by</div><div class="name">Jordan Lee</div></div></div>
+                <i data-i="arrow" class="muted"></i>
+                <div class="person me"><span class="avatar sm" aria-hidden="true">PS</span><div><div class="role">Approver · you</div><div class="name">Priya Shah</div></div></div>
+              </div>
+              <div class="explain"><i data-i="info"></i><span>After you approve, all 38 post in one job and email to each Billing To and CC contact. <b>If one invoice fails, it moves to exceptions and the others still post.</b></span></div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div class="actionbar" role="region" aria-label="Batch actions">
+        <span class="sum">Posting <b>38 invoices</b> · <b>$95,062.00</b> inc GST · dated 1 Nov 2026 (period open)</span>
+        <span style="flex:1"></span>
+        <button class="btn ghost" type="button">Cancel run</button>
+        <button class="btn" type="button">Save and finish later</button>
+        <button class="btn primary" type="button"><i data-i="check"></i>Approve and post 38 invoices</button>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>
