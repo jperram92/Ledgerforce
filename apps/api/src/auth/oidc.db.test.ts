@@ -153,7 +153,15 @@ beforeAll(async () => {
     [PRIYA, A, 'priya@harbour.test', 'Priya Shah', 'sub-priya', 'ISSUER', 'invited'],
     [DAN, A, 'dan@harbour.test', 'Dan Leaver', 'sub-dan', 'ISSUER', 'disabled'],
     [OMAR, B, 'omar@other.test', 'Omar Other', 'sub-omar', 'ISSUER', 'active'],
-    [STRANGER, A, 'x@harbour.test', 'Elsewhere', 'sub-stranger', 'https://other-idp.test', 'active'],
+    [
+      STRANGER,
+      A,
+      'x@harbour.test',
+      'Elsewhere',
+      'sub-stranger',
+      'https://other-idp.test',
+      'active',
+    ],
   ] as const) {
     await tdb.admin.query(
       `INSERT INTO app.app_user (id, tenant_id, email, display_name, idp_subject, idp_issuer, status)
@@ -488,9 +496,7 @@ describe('SS-PLAT-20: MFA and session policy for finance roles — login', () =>
     });
     expect(res.status).toBe(303);
     const sid = (cookieValue(res, 'lf_session') ?? '').split('.')[1];
-    const { rows } = await tdb.admin.query('SELECT amr, acr FROM app.session WHERE id = $1', [
-      sid,
-    ]);
+    const { rows } = await tdb.admin.query('SELECT amr, acr FROM app.session WHERE id = $1', [sid]);
     expect(rows).toEqual([{ amr: ['pwd'], acr: 'urn:ledgerforce:loa:pwd' }]);
   });
 });

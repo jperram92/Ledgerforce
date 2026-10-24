@@ -6,6 +6,8 @@ import { Kysely, PostgresDialect } from 'kysely';
 import pg from 'pg';
 import type { AddressInfo } from 'node:net';
 import { AuthController, SESSION_SERVICE } from './auth/auth.controller.ts';
+import { LoginController, OIDC_SERVICE } from './auth/login.controller.ts';
+import { OidcService, type OidcOptions } from './auth/oidc.service.ts';
 import { SessionTenantResolver } from './auth/session-tenant-resolver.ts';
 import { SessionService, type Clock } from './auth/session.service.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
@@ -27,6 +29,8 @@ export interface ApiOptions {
   poolSize?: number;
   /** Server-side sessions (ADR-0016). When set, the session resolver is used unless `tenantResolver` is given. */
   sessions?: { clock?: Clock };
+  /** OIDC login (ADR-0016, T-0011): GET /t/:slug/auth/login and GET /auth/callback. Needs `sessions`. */
+  oidc?: OidcOptions;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
   tenantResolver?: TenantResolver;
   /** Test hook: called once per SQL statement. */
@@ -50,6 +54,7 @@ class AppModule {
     db: Kysely<Database>,
     resolver: TenantResolver,
     sessions: SessionService | undefined,
+    oidc: OidcService | undefined,
   ): DynamicModule {
     return {
       module: AppModule,
@@ -58,11 +63,13 @@ class AppModule {
         CompaniesController,
         PartyBankAccountsController,
         ...(sessions ? [AuthController] : []),
+        ...(oidc ? [LoginController] : []),
       ],
       providers: [
         { provide: DB, useValue: db },
         { provide: TENANT_RESOLVER, useValue: resolver },
         { provide: SESSION_SERVICE, useValue: sessions ?? null },
+        { provide: OIDC_SERVICE, useValue: oidc ?? null },
         TenantTx,
         AuditTrail,
         { provide: APP_INTERCEPTOR, useClass: TenantInterceptor },
@@ -86,19 +93,33 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
       : {}),
   });
   const sessions = opts.sessions ? new SessionService(db, opts.sessions.clock) : undefined;
+  if (opts.oidc && !sessions) throw new Error('createApi: oidc login needs sessions');
+  // The listen URL is known only after listen(); the redirect URI is first needed at login.
+  let listenUrl = '';
+  const oidc =
+    opts.oidc && sessions
+      ? new OidcService(
+          db,
+          sessions,
+          opts.oidc,
+          () => opts.oidc?.publicUrl ?? listenUrl,
+          opts.sessions?.clock,
+        )
+      : undefined;
   const resolver =
     opts.tenantResolver ?? (sessions ? new SessionTenantResolver(sessions) : refuseAllResolver);
-  const app = await NestFactory.create(AppModule.forRoot(db, resolver, sessions), {
+  const app = await NestFactory.create(AppModule.forRoot(db, resolver, sessions, oidc), {
     logger: ['error', 'warn'],
   });
   app.use(requestIdMiddleware);
   await app.listen(opts.port ?? 0, opts.host ?? '127.0.0.1');
   const addr = app.getHttpServer().address() as AddressInfo;
+  listenUrl = `http://${opts.host ?? '127.0.0.1'}:${String(addr.port)}`;
   return {
     app,
     db,
     sessions,
-    url: `http://${opts.host ?? '127.0.0.1'}:${String(addr.port)}`,
+    url: listenUrl,
     async close() {
       await app.close();
       await db.destroy();
