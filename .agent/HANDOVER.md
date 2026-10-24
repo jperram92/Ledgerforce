@@ -127,3 +127,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T20:07:34.153Z claude: T-0037 → verifying
 - 2026-10-24T20:09:30.915Z claude: release T-0037 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review (security-relevant: ADR-0018))
 - 2026-10-24 20:1x claude: T-0037 built (RQ-0018, ADR-0018, migration 0012, shared/crypto, API masked read), SS-PLAT-22/38 green with evidence, verify 12 PASS/0 FAIL → review; T-0108 added
+- 2026-10-24 22:4x claude (lead): all four parallel agents stopped on the usage limit (HTTP 429, reset 22:40 UTC) and were resumed from their worktrees. Saved progress: T-0058 research + red tests (30095b0); T-0106 research + red tests (60ee4fe); T-0062 metadata green (447b6c3); T-0011 migration 0014 + login green (c259211). No work lost.
