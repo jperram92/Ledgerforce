@@ -69,7 +69,7 @@ function pickTask(ctx: Ctx, explicit?: string): Card | undefined {
     const c = all.find((x) => x.id === s.current_task);
     if (c && ACTIVE_STATUSES.includes(String(c.data.status))) return c;
   }
-  return nextClaimable(all, now());
+  return nextClaimable(all, now(), 1, { satisfiedBy: ctx.cfg.dependency_satisfied_by })[0];
 }
 
 export function taskBranch(card: Card): string {

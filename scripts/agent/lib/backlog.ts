@@ -86,15 +86,27 @@ export function isClaimableStatus(card: Card, now: number): boolean {
   return ACTIVE_STATUSES.includes(s) && !isLeaseActive(card, now);
 }
 
-export function unmetDeps(card: Card, cards: Card[]): string[] {
+export interface NextOptions {
+  /** statuses that satisfy depends_on (default [done]) */
+  satisfiedBy?: string[];
+  /** statuses a builder must not be offered — `review` belongs to the cross-reviewer */
+  exclude?: string[];
+}
+
+/** Dependencies not yet in one of the `satisfiedBy` statuses (default: done only; config
+ *  `dependency_satisfied_by` may add `review` while no cross-review provider is available, DL-0053). */
+export function unmetDeps(card: Card, cards: Card[], satisfiedBy: string[] = ['done']): string[] {
   const m = new Map(cards.map((c) => [c.id, c]));
-  return deps(card).filter((d) => m.get(d)?.data.status !== 'done');
+  return deps(card).filter((d) => !satisfiedBy.includes(String(m.get(d)?.data.status)));
 }
 
 export function nextClaimable(cards: Card[], now: number): Card | undefined;
-export function nextClaimable(cards: Card[], now: number, count: number): Card[];
-export function nextClaimable(cards: Card[], now: number, count?: number): Card | Card[] | undefined {
-  const list = topoOrder(cards).filter((c) => isClaimableStatus(c, now) && unmetDeps(c, cards).length === 0);
+export function nextClaimable(cards: Card[], now: number, count: number, opts?: NextOptions): Card[];
+export function nextClaimable(cards: Card[], now: number, count?: number, opts: NextOptions = {}): Card | Card[] | undefined {
+  const satisfiedBy = opts.satisfiedBy ?? ['done'];
+  const exclude = opts.exclude ?? [];
+  const list = topoOrder(cards).filter((c) => !exclude.includes(String(c.data.status))
+    && isClaimableStatus(c, now) && unmetDeps(c, cards, satisfiedBy).length === 0);
   return count === undefined ? list[0] : list.slice(0, count);
 }
 

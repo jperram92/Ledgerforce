@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, cpSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { loadCards, topoOrder, nextClaimable, lintBacklog, isLeaseActive } from '../lib/backlog.ts';
+import { loadCards, topoOrder, nextClaimable, lintBacklog, isLeaseActive, unmetDeps } from '../lib/backlog.ts';
 import { FIXTURES } from './helpers.ts';
 
 function fixtureCopy(): string {
@@ -78,4 +78,23 @@ test('lintBacklog skips the scenario check when the register does not exist', ()
   const r3 = mkdtempSync(join(tmpdir(), 'lf-backlog-'));
   cpSync(join(FIXTURES, 'repo/.agent'), join(r3, '.agent'), { recursive: true });
   assert.deepEqual(lintBacklog(r3, '.agent/backlog'), []);
+});
+
+// DL-0053: when the cross-review provider is unavailable, a dependency in `review` (verify-green,
+// awaiting the other provider) may provisionally satisfy dependants — only when configured.
+test('unmetDeps treats review as unmet by default and as met when satisfiedBy includes review', () => {
+  const cards = loadCards(join(fixtureCopy(), '.agent/backlog'));
+  const t2 = cards.find((c) => c.id === 'T-0002')!;
+  t2.data.status = 'review';
+  const t3 = cards.find((c) => c.id === 'T-0003')!;
+  assert.deepEqual(unmetDeps(t3, cards), ['T-0002']);
+  assert.deepEqual(unmetDeps(t3, cards, ['done', 'review']), []);
+});
+
+test('a card in review is never offered to a builder by nextClaimable', () => {
+  const cards = loadCards(join(fixtureCopy(), '.agent/backlog'));
+  for (const c of cards) { if (c.id === 'T-0002') { c.data.status = 'review'; c.data.lease_expires_at = null; } }
+  const ids = nextClaimable(cards, NOW, 10, { satisfiedBy: ['done', 'review'], exclude: ['review'] }).map((c) => c.id);
+  assert.ok(!ids.includes('T-0002'));
+  assert.ok(ids.includes('T-0003'));
 });

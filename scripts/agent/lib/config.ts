@@ -34,6 +34,8 @@ export interface Config {
   poll_seconds: number;
   /** maximum characters of the resume context pack embedded in the prompt */
   prompt_max_chars: number;
+  /** card statuses that satisfy a depends_on entry (default [done]; DL-0053 allows review provisionally) */
+  dependency_satisfied_by: string[];
   paths: {
     state: string; handover: string; backlog: string; runs: string; evidence: string;
     decision_log: string; research: string; notifications: string;
@@ -101,6 +103,7 @@ export function loadConfig(root: string): Config {
     retry_policy: raw.retry_policy === 'same' ? 'same' : 'rotate',
     poll_seconds: num(raw.poll_seconds, 30),
     prompt_max_chars: num(raw.prompt_max_chars, 60_000),
+    dependency_satisfied_by: Array.isArray(raw.dependency_satisfied_by) ? raw.dependency_satisfied_by.map(String) : ['done'],
     paths: {
       state: paths.state ?? '.agent/state.json',
       handover: paths.handover ?? '.agent/HANDOVER.md',

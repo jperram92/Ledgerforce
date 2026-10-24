@@ -24,6 +24,7 @@
     "@ledgerforce/testing": "workspace:*",
     "@playwright/test": "1.63.0",
     "@types/node": "22.20.5",
+    "@vitest/coverage-v8": "4.1.12",
     "eslint": "10.13.0",
     "fast-check": "4.10.2",
     "globals": "17.13.0",

@@ -32,3 +32,11 @@ Do not: change Docs/accounting golden files; delete anything; push to main.
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
 - 2026-10-24 ~07:2x 4 sub-agents stopped by usage limit; checkpointed 2089650; resumed 07:45 after reset — failover-by-repo-state worked as designed
+- 2026-10-24T08:18:05.120Z human: release T-0001 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.272Z human: release T-0002 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.436Z human: release T-0003 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.560Z human: release T-0004 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.687Z human: release T-0005 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.819Z human: release T-0006 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.954Z human: release T-0008 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:06.103Z unknown: T-0009 → in_progress

@@ -382,3 +382,24 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: The product owner wants a design that comes out of real UI/UX research, not the lead's taste.
 - Alternatives: iterate v2 (rejected by the product owner).
 - ADR: none · Status: accepted · Supersedes DL-0051
+
+### DL-0053 — Provisional dependency satisfaction by `review` while no cross-review provider runs here
+- Date: 2026-10-24 · By: claude · Task: T-0003 · Category: process
+- Decision: This cloud container has no `codex` CLI and no OpenAI key, so cross-provider review cannot run. A task whose full `verify.sh` is green moves to `review` (awaiting codex). `.agent/config.yaml → dependency_satisfied_by: [done, review]` lets dependants start on it; `review` cards are never offered to builders (`next` excludes them). Set back to `[done]` when codex is available; a review FAIL reopens the card and its dependants are re-verified.
+- Why: Blocking 93 cards on an unavailable reviewer stalls the build; building on verify-green work with an explicit review queue keeps every gate honest and the debt visible (status counts in `.agent/backlog/README.md`).
+- Alternatives: self-review by claude (rejected: AGENTS.md forbids, conductor refuses); mark done without review (rejected: shortcut); wait (rejected: stall).
+- ADR: ADR-0011 addendum · Status: proposed (awaiting human)
+
+### DL-0054 — Coverage gate enabled with @vitest/coverage-v8 and a committed baseline
+- Date: 2026-10-24 · By: claude · Task: T-0001 · Category: tooling
+- Decision: Dev dependency `@vitest/coverage-v8@4.1.12` (matches vitest); baseline `.agent/coverage-baseline.json` = lines 72.22%, branches 69.37%. Gate 2c compares against the baseline on main.
+- Why: Definition of done §10.8 item 2 "coverage does not drop".
+- Alternatives: istanbul provider (slower, no benefit).
+- ADR: none · Status: accepted
+
+### DL-0055 — In this cloud session, task work lands on the session branch
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: The cloud harness permits pushing only to `claude/app-framework-agents-dzmkya`, so tasks are built sequentially on that branch with Conventional Commits tagged `[T-NNNN]` and `wip(T-NNNN)` checkpoints, instead of one `feat/T-NNNN-*` branch per task (AGENTS.md §2). The conductor's per-task branches apply when it runs headless elsewhere.
+- Why: Environment constraint; commit tags keep per-task history separable.
+- Alternatives: local-only task branches (rejected: unpushed work is lost when the container is reclaimed).
+- ADR: none · Status: accepted

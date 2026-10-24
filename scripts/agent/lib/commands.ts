@@ -76,8 +76,8 @@ export function claim(ctx: Ctx, id: string, provider: string): { lease: string; 
   if (!isClaimableStatus(card, t)) {
     throw new ExitError(EXIT.REFUSED, `${id} has status "${card.data.status}"; only todo or an expired claim can be claimed`);
   }
-  const unmet = unmetDeps(card, all);
-  if (unmet.length) throw new ExitError(EXIT.REFUSED, `${id} depends_on ${unmet.join(', ')} which is not done`);
+  const unmet = unmetDeps(card, all, ctx.cfg.dependency_satisfied_by);
+  if (unmet.length) throw new ExitError(EXIT.REFUSED, `${id} depends_on ${unmet.join(', ')} which is not ${ctx.cfg.dependency_satisfied_by.join(' or ')}`);
   const s = state(ctx);
   const holders = all.filter((c) => c.id !== id && isLeaseActive(c, t))
     .map((c) => `${c.id} (${c.data.claimed_by} until ${c.data.lease_expires_at})`);
@@ -293,7 +293,7 @@ export function setStatus(ctx: Ctx, id: string, status: string, reason?: string)
 // ---------------- status / next / lease-check / lint ----------------
 
 export function next(ctx: Ctx, count = 1): string[] {
-  return nextClaimable(cards(ctx), now(), count).map((c) => c.id);
+  return nextClaimable(cards(ctx), now(), count, { satisfiedBy: ctx.cfg.dependency_satisfied_by, exclude: ['review'] }).map((c) => c.id);
 }
 
 export function status(ctx: Ctx): string {
@@ -319,7 +319,7 @@ export function status(ctx: Ctx): string {
   for (const [p, ps] of Object.entries(s.providers)) {
     if (ps.exhausted_until && Date.parse(ps.exhausted_until) > t) lines.push(`Provider ${p}: exhausted until ${ps.exhausted_until} (${ps.last_failure})`);
   }
-  lines.push(`Next claimable: ${nextClaimable(all, t)?.id ?? 'none'}`);
+  lines.push(`Next claimable: ${nextClaimable(all, t, 1, { satisfiedBy: ctx.cfg.dependency_satisfied_by, exclude: ['review'] })[0]?.id ?? 'none'}`);
   lines.push(`Updated: ${s.updated_at}`);
   return lines.join('\n');
 }

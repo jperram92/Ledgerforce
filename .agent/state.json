@@ -1,12 +1,16 @@
 {
   "schema_version": 1,
-  "phase": "sprint-0",
-  "current_task": null,
+  "current_task": "T-0009",
   "branch": "claude/app-framework-agents-dzmkya",
   "step": null,
   "claimed_by": null,
-  "lease_expires_at": null,
+  "lease_expires_at": "2026-10-24T09:03:06.100Z",
   "last_green_commit": null,
+  "run_id": null,
+  "updated_at": "2026-10-24T08:18:06.102Z",
+  "phase": "sprint-0",
   "attempts": {},
-  "updated_at": "2026-10-24T04:00:00Z"
+  "failures": {},
+  "providers": {},
+  "pending_checkpoints": []
 }
