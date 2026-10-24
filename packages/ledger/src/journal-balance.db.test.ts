@@ -4,25 +4,21 @@
  * and an entry must have lines. Everything runs as lf_app in a tenant transaction; amounts are
  * decimal strings built from integers (no floating point on money, AGENTS.md §4).
  */
-import { createDb, withTenant, type Database } from '@ledgerforce/db';
-import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
-import { auServicesSmb, loadChartTemplate } from '@ledgerforce/gl';
 import { Money } from '@ledgerforce/shared/money';
 import fc from 'fast-check';
-import { sql, type Kysely, type Transaction } from 'kysely';
-import { randomUUID } from 'node:crypto';
+import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { dimensionSetId } from './dimension-set.ts';
+import { createLedgerFixture, type LedgerFixture, type Line } from './testing/journal-fixture.ts';
 
-const T = '01900000-0000-7000-8000-0000000005aa';
-let tdb: TestDatabase;
-let db: Kysely<Database>;
+let f: LedgerFixture;
 let companyId: string;
 let otherCompanyAccount: string;
 let emptySet: string;
-const acct: Record<string, string> = {};
-
-const inTenant = <R>(fn: (trx: Transaction<Database>) => Promise<R>) => withTenant(db, T, fn);
+let acct: Record<string, string>;
+const inTenant: LedgerFixture['inTenant'] = (fn) => f.inTenant(fn);
+const insertEntry: LedgerFixture['insertEntry'] = (trx, lines, opts) =>
+  f.insertEntry(trx, lines, opts);
+const countEntries = () => f.countEntries();
 
 /** 4-decimal string from an integer number of ten-thousandths (exact; no float). */
 const money = (units: bigint): string => {
@@ -30,85 +26,14 @@ const money = (units: bigint): string => {
   return `${s.slice(0, -4)}.${s.slice(-4)}`;
 };
 
-interface Line {
-  code: string;
-  debit?: string;
-  credit?: string;
-}
-
-async function insertEntry(trx: Transaction<Database>, lines: Line[], company = companyId) {
-  const entry = await trx
-    .insertInto('app.journal_entry')
-    .values({
-      company_id: company,
-      entry_date: '2026-10-24',
-      source_type: 'manual_journal',
-      status: 'posted',
-      idempotency_key: randomUUID(),
-      posted_at: new Date('2026-10-24T09:00:00Z'),
-    })
-    .returning('id')
-    .executeTakeFirstOrThrow();
-  if (lines.length > 0) {
-    await trx
-      .insertInto('app.journal_line')
-      .values(
-        lines.map((l, i) => {
-          const id = acct[l.code] ?? l.code;
-          const amount = l.debit ?? l.credit ?? '0';
-          return {
-            company_id: company,
-            entry_id: entry.id,
-            line_no: i + 1,
-            account_id: id,
-            debit: l.debit ?? '0',
-            credit: l.credit ?? '0',
-            txn_currency: 'AUD',
-            txn_amount: amount,
-            fx_rate: '1',
-            dimension_set_id: emptySet,
-          };
-        }),
-      )
-      .execute();
-  }
-  return entry.id;
-}
-
-const countEntries = () =>
-  inTenant((trx) =>
-    trx
-      .selectFrom('app.journal_entry')
-      .select(sql<number>`count(*)::int`.as('n'))
-      .executeTakeFirstOrThrow(),
-  ).then((r) => r.n);
-
 beforeAll(async () => {
-  tdb = await createTestDatabase({ migrate: true });
-  db = createDb(tdb.url('lf_app'), 4);
-  await inTenant(async (trx) => {
-    await trx.insertInto('app.tenant').values({ id: T, name: 'Harbour & Co Pty Ltd' }).execute();
-    const [c1, c2] = await trx
-      .insertInto('app.company')
-      .values([
-        { name: 'Harbour & Co Pty Ltd', base_currency: 'AUD' },
-        { name: 'Harbour Holdings Pty Ltd', base_currency: 'AUD' },
-      ])
-      .returning('id')
-      .execute();
-    if (!c1 || !c2) throw new Error('seed failed');
-    companyId = c1.id;
-    const chart = await loadChartTemplate(trx, companyId, auServicesSmb);
-    for (const [code, id] of chart.accounts) acct[code] = id;
-    const other = await loadChartTemplate(trx, c2.id, auServicesSmb);
-    otherCompanyAccount = other.accounts.get('1010') ?? '';
-    emptySet = await dimensionSetId(trx, companyId, []);
-  });
+  f = await createLedgerFixture('01900000-0000-7000-8000-0000000005aa');
+  ({ companyId, emptySet, acct } = f);
+  otherCompanyAccount = f.otherAcct['1010'] ?? '';
 });
 
 afterAll(async () => {
-  await db.destroy();
-  await tdb.close();
+  await f.close();
 });
 
 describe('SS-PLAT-01: Balance trigger rejects unbalanced entries', () => {
@@ -216,7 +141,7 @@ describe('SS-PLAT-01: Balance trigger rejects unbalanced entries', () => {
         FROM information_schema.columns
        WHERE table_schema = 'app' AND table_name IN ('journal_line', 'journal_entry')
          AND column_name IN ('debit', 'credit', 'txn_amount', 'tax_amount', 'fx_rate')
-       ORDER BY column_name`.execute(db);
+       ORDER BY column_name`.execute(f.db);
     expect(cols.rows).toEqual([
       { column_name: 'credit', data_type: 'numeric', p: 19, s: 4 },
       { column_name: 'debit', data_type: 'numeric', p: 19, s: 4 },
