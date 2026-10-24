@@ -61,6 +61,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     created_at: () => '2026-01-01T00:00:00Z',
     expires_at: () => '2026-01-01T00:10:00Z',
   },
+  // Role grants (migration 0016): a known role template; inserted active (no revoke columns).
+  'app.user_role': { role: () => 'auditor' },
   'app.account': {
     code: () => String(100_000 + (randomBytes(3).readUIntBE(0, 3) % 900_000)),
     type: () => 'asset',

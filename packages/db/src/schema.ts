@@ -69,6 +69,19 @@ export interface AuthRequestTable {
   consumed_at: Timestamp | null;
 }
 
+/** Role grant (migration 0016, ADR-0023). Never deleted: revoked once by setting revoked_at. */
+export interface UserRoleTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  user_id: string;
+  role: string;
+  granted_at: Generated<Timestamp>;
+  granted_by: string | null;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  revoke_reason: string | null;
+}
+
 export type AccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
 
 /** Chart of accounts (migration 0005, design §3.2). Never deleted: archive instead. */
@@ -390,6 +403,7 @@ export interface Database {
   'app.app_user': AppUserTable;
   'app.session': SessionTable;
   'app.auth_request': AuthRequestTable;
+  'app.user_role': UserRoleTable;
   'app.account': AccountTable;
   'app.account_system_role': AccountSystemRoleTable;
   'app.dimension': DimensionTable;
