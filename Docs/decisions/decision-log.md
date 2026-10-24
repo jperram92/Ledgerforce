@@ -67,3 +67,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Agent sandboxes (including the one this was built in) often have Postgres binaries but no Docker daemon; "no Docker" must not become "no database tests". Local binaries here are PostgreSQL 16, so migrations must stay compatible with 16 and 17 until ADR says otherwise.
 - Alternatives: skip DB tests without Docker (rejected: shortcut); pg-mem / PGlite (rejected: no full RLS/trigger/role fidelity — see research).
 - ADR: none (tooling) · Status: accepted
+
+### DL-0008 — ADR system adopted; seed ADR statuses assigned
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: ADRs live in `Docs/adr/` as MADR files with machine-checkable frontmatter. 0001, 0002 and 0008 are Accepted; 0003, 0004, 0005, 0007 and 0010 stay Proposed with human_gate yes ("design-committed; awaiting product-owner acceptance"); 0006 stays Proposed until the connector task.
+- Why: Design §10.6 and §10.1 principle 6; AGENTS.md §6 human gates.
+- Alternatives: accept all design-committed ADRs now (rejected: bypasses the accounting/security gate); a wiki (rejected: not repo-resident).
+- ADR: ADR-0001 · Status: accepted
+
+### DL-0009 — Licence left open; no LICENSE file until decided
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: scope
+- Decision: ADR-0009 is Proposed with the recommendation (AGPL-3.0 core, Apache-2.0 SDKs and Salesforce package) and the alternatives. Agents add no LICENSE file or SPDX headers until the product owner decides.
+- Why: Design §11.2 open decision; §11.1 says decide before the first public commit.
+- Alternatives: adopt the recommendation unilaterally (rejected: human gate).
+- ADR: ADR-0009 · Status: proposed (awaiting human)
+
+### DL-0010 — Sprint 0 process decisions recorded as ADRs 0011–0015
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: Failover/repo-state model, TDD with golden postings and invariants, the DB harness, the no-delete policy and Playwright evidence each get an Accepted ADR cross-linked to DL-0002 and DL-0004–DL-0007.
+- Why: They constrain every future task and migration — meets the §10.6 ADR bar.
+- Alternatives: decision-log entries only (rejected: lack options and verification).
+- ADR: ADR-0011..0015 · Status: accepted
+
+### DL-0011 — Seed ADRs double as dependency ADRs for decimal.js and pg-boss
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: architecture
+- Decision: ADR-0005 covers the `decimal.js` runtime dependency and ADR-0008 covers `pg-boss` (major version pinned; supports PG ≥13, so 16 and 17).
+- Why: AGENTS.md §4 requires an ADR per runtime dependency; facts checked on the npm registry and pg-boss README.
+- Alternatives: separate dependency ADRs (rejected: duplication).
+- ADR: ADR-0005, ADR-0008 · Status: proposed (0005) / accepted (0008)
+
+### DL-0012 — Changelog tool is release-please; Unreleased kept by hand until first release
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: tooling
+- Decision: Use release-please, not Changesets.
+- Why: Works directly from the Conventional Commits AGENTS.md already mandates; no per-PR changeset files.
+- Alternatives: Changesets (rejected: extra file per PR).
+- ADR: none · Status: accepted
+
+### DL-0013 — Human-gate labels applied only by the product owner
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: `adr:accounting`, `adr:security`, `golden_postings` and `human-gate` are applied only by the human; `cross-review` by the provider that did not build the work.
+- Why: Design §10.6 acceptance is by PR label; an agent labelling its own approval defeats the gate.
+- Alternatives: GitHub approvals only (rejected: can't tell gate types apart).
+- ADR: ADR-0001 · Status: accepted
