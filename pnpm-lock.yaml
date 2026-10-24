@@ -59,6 +59,12 @@ importers:
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@ledgerforce/parties':
+        specifier: workspace:*
+        version: link:../../packages/modules/parties
+      '@ledgerforce/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@nestjs/common':
         specifier: 12.1.2
         version: 12.1.2(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -180,6 +186,9 @@ importers:
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../db
+      '@ledgerforce/shared':
+        specifier: workspace:*
+        version: link:../../shared
       kysely:
         specifier: 0.29.7
         version: 0.29.7

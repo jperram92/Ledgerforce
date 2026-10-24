@@ -72,6 +72,35 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   'app.party_address': { kind: () => 'billing' },
   // An active contact role needs an active party role (trigger); a generated party has none.
   'app.party_contact_role': { role: () => 'billing_to', active: () => 'false' },
+  'app.party_bank_account': {
+    id: () => randomUUID(),
+    bsb: () => '062-000',
+    account_number_last3: () => '123',
+    account_number_ct: () => '\\x01',
+    account_number_iv: () => `\\x${'00'.repeat(12)}`,
+    account_number_tag: () => `\\x${'00'.repeat(16)}`,
+    dek_wrapped: () => `\\x${'00'.repeat(60)}`,
+    kek_id: () => 'k1',
+    enc_version: () => '1',
+    source: () => 'ui',
+  },
+};
+
+/**
+ * Rows a generated row needs besides its foreign-key parents, created as superuser like those
+ * parents, because a trigger checks for them (the rule itself stays intact).
+ */
+export const PREREQUISITES: Readonly<
+  Record<string, (admin: Queryable, row: ReadonlyMap<string, string>) => Promise<void>>
+> = {
+  // Bank details need an active supplier or employee role on the party (migration 0012).
+  'app.party_bank_account': async (admin, row) => {
+    await admin.query(
+      `INSERT INTO app.party_role (tenant_id, company_id, party_id, role) VALUES ($1, $2, $3, 'supplier')
+       ON CONFLICT DO NOTHING`,
+      [row.get('tenant_id'), row.get('company_id'), row.get('party_id')],
+    );
+  },
 };
 
 export async function discoverTenantTables(db: Queryable): Promise<TableRef[]> {
@@ -308,6 +337,7 @@ export async function buildRow(
     if (o) values.set(c.name, o());
     else if (c.required) values.set(c.name, valueFor(t, c));
   }
+  await PREREQUISITES[t.qualified]?.(admin, values);
   return values;
 }
 

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
     "kysely": "0.29.7"
   },
   "devDependencies": {

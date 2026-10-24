@@ -1,5 +1,5 @@
 /**
- * Kysely table types for the platform schema (migrations 0001–0011). Keep in step with
+ * Kysely table types for the platform schema (migrations 0001–0012). Keep in step with
  * packages/db/migrations; the db tests exercise every table through these types.
  */
 import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
@@ -263,6 +263,27 @@ export interface PartyContactRoleTable {
   created_at: Timestamp;
 }
 
+/** Bank details (migration 0012, ADR-0018). Account number envelope-encrypted; lf_app may update status only. */
+export interface PartyBankAccountTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  bsb: ColumnType<string, string, never>;
+  account_name: ColumnType<string, string, never>;
+  account_number_last3: ColumnType<string, string, never>;
+  account_number_ct: ColumnType<Buffer, Buffer, never>;
+  account_number_iv: ColumnType<Buffer, Buffer, never>;
+  account_number_tag: ColumnType<Buffer, Buffer, never>;
+  dek_wrapped: ColumnType<Buffer, Buffer, never>;
+  kek_id: ColumnType<string, string, never>;
+  enc_version: ColumnType<number, number, never>;
+  source: ColumnType<'ui' | 'api' | 'import', 'ui' | 'api' | 'import', never>;
+  status: Generated<'pending_verification' | 'active' | 'superseded' | 'archived'>;
+  created_by: ColumnType<string | null, string | null | undefined, never>;
+  created_at: Timestamp;
+}
+
 export interface AuditLogTable {
   id: ColumnType<string, never, never>;
   tenant_id: TenantId;
@@ -298,6 +319,7 @@ export interface Database {
   'app.party_address': PartyAddressTable;
   'app.party_contact': PartyContactTable;
   'app.party_contact_role': PartyContactRoleTable;
+  'app.party_bank_account': PartyBankAccountTable;
   /** INSERT only for lf_app — do not use RETURNING (needs SELECT). */
   'audit.audit_log': AuditLogTable;
 }

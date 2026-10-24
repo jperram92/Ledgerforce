@@ -580,3 +580,16 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Design §4.2; RQ-0017.
 - Alternatives: tenant-scoped parties (would need per-company settings tables now, for no MVP benefit); storing both 15- and 18-char Ids (duplicate risk).
 - ADR: none · Status: accepted
+
+### DL-0080 — Bank details: envelope-encrypted account number, masked reads, one decrypt path; built to ADR-0018
+- Date: 2026-10-24 · By: claude · Task: T-0037 · Category: security
+- Decision:
+  - `@ledgerforce/shared/crypto`: a `Kms` interface plus `LocalKeyringKms` (key file / Docker secret; rotation by adding a key and switching `active`), and `sealField`/`openField` (per-field DEK, AES-256-GCM, random 96-bit IV, record-bound AAD, fail-closed DecryptionError).
+  - Migration `0012_parties_bank_accounts.sql`: `app.party_bank_account` keeps BSB, name and last 3 in clear; the account number as ciphertext/IV/tag/wrapped DEK/kek_id/version. lf_app may INSERT/SELECT and UPDATE(status) only. Source is ui|api|import (never Salesforce). A trigger requires an active supplier or employee role and skips rows of another tenant, so RLS refuses those with 42501.
+  - Service: `addBankAccount`, `listBankAccounts` (masked "***" + last 3, length hidden), `revealAccountNumber` (only for ABA, T-0054).
+  - API: `GET /parties/:partyId/bank-accounts` (masked; the API has no KMS, so it cannot decrypt).
+  - Cross-tenant harness: a `PREREQUISITES` hook creates trigger-required rows (here a supplier role) as superuser, like FK parents.
+  - Follow-up card T-0108 (OpenBao/Vault transit adapter).
+- Why: Design §4.2, §6.1, §6.6; RQ-0018; ADR-0018.
+- Alternatives: see ADR-0018 (Vault BUSL, OpenBao now, pgcrypto).
+- ADR: ADR-0018 (Proposed, security) · Status: accepted for the build; awaiting the human with ADR-0018

@@ -10,6 +10,7 @@ import { SessionTenantResolver } from './auth/session-tenant-resolver.ts';
 import { SessionService, type Clock } from './auth/session.service.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
+import { PartyBankAccountsController } from './parties/bank-accounts.controller.ts';
 import { TenantInterceptor } from './tenancy/tenant.interceptor.ts';
 import {
   refuseAllResolver,
@@ -52,7 +53,12 @@ class AppModule {
   ): DynamicModule {
     return {
       module: AppModule,
-      controllers: [HealthController, CompaniesController, ...(sessions ? [AuthController] : [])],
+      controllers: [
+        HealthController,
+        CompaniesController,
+        PartyBankAccountsController,
+        ...(sessions ? [AuthController] : []),
+      ],
       providers: [
         { provide: DB, useValue: db },
         { provide: TENANT_RESOLVER, useValue: resolver },
