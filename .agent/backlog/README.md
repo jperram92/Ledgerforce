@@ -152,7 +152,7 @@ graph LR
 | [T-0059](T-0059.md) | CAMT.053 statement import | MVP | todo | T-0058 | UC-08 | 1 |
 | [T-0060](T-0060.md) | Matching rules and auto-match | MVP | todo | T-0058, T-0046, T-0057 | UC-08 | 3 |
 | [T-0061](T-0061.md) | Bank reconciliation and reconciliation report | MVP | todo | T-0060 | UC-08 | 2 |
-| [T-0062](T-0062.md) | Salesforce SFDX package: objects, fields, permission sets, platform event | MVP | todo | T-0001 | UC-12 | 1 |
+| [T-0062](T-0062.md) | Salesforce SFDX package: objects, fields, permission sets, platform event | MVP | review | T-0001 | UC-12 | 1 |
 | [T-0063](T-0063.md) | Salesforce auth: External Client App with JWT bearer and encrypted token store | MVP | todo | T-0062, T-0037 | — | 0 |
 | [T-0064](T-0064.md) | CDC subscriber via Pub/Sub API with replay-id store | MVP | todo | T-0063, T-0030 | — | 1 |
 | [T-0065](T-0065.md) | Inbound mapping: Account/Contact/Product → Party/Product with idempotency | MVP | todo | T-0064, T-0036, T-0038 | UC-01 | 1 |

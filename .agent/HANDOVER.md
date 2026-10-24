@@ -16,6 +16,9 @@ Open questions for human:
   2. Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1), ADR-0018 (envelope encryption, local keyring KMS) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
   4. Design contradictions in RQ-0012 (CDC 5-object cap, ATO GST rounding, prepayment GST, SoD gaps)
+  7. Salesforce: provide a Dev Hub (authenticated outside the repo) so T-0062's package can be deployed to a
+     scratch org and its Apex test run; confirm DL-0096/0097 interpretations (status Text(40), Currency(18,2),
+     LF_Payment__c field set, LF_Billing_Requester set, Modify-All-Data users can still delete mirror rows).
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
      (numeric + CHECK scale<=4) would make the DB refuse instead. Meanwhile the posting engine
      refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
@@ -58,6 +61,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0037 — RQ-0018; ADR-0018; packages/shared/src/crypto (envelope, LocalKeyringKms); migration 0012;
 >     packages/modules/parties/src/bank-accounts.ts; apps/api parties controller; DL-0080. Act as
 >     security-reviewer too: AAD binding, fail-closed errors, key handling, masked-only API
+>   • T-0062 — salesforce/** (SFDX metadata), salesforce/test/** (offline contract), RQ-0022, DL-0094..0097
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -128,3 +132,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T20:09:30.915Z claude: release T-0037 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review (security-relevant: ADR-0018))
 - 2026-10-24 20:1x claude: T-0037 built (RQ-0018, ADR-0018, migration 0012, shared/crypto, API masked read), SS-PLAT-22/38 green with evidence, verify 12 PASS/0 FAIL → review; T-0108 added
 - 2026-10-24 22:4x claude (lead): all four parallel agents stopped on the usage limit (HTTP 429, reset 22:40 UTC) and were resumed from their worktrees. Saved progress: T-0058 research + red tests (30095b0); T-0106 research + red tests (60ee4fe); T-0062 metadata green (447b6c3); T-0011 migration 0014 + login green (c259211). No work lost.
+- 2026-10-24T22:46:35.744Z claude: T-0062 → verifying
+- 2026-10-24T22:48:33.837Z claude: release T-0062 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; offline only — org deploy needs Dev Hub; awaiting codex cross-review)
+- 2026-10-24 22:5x claude (lead): merged T-0062 (sub-agent); gates on merged tree green (270 unit / 300 db); verify 12 PASS/0 FAIL → review. T-0011 finished (waits for T-0058's migration 0013 before merge). T-0058, T-0106 still running.
