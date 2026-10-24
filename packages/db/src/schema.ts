@@ -1,5 +1,5 @@
 /**
- * Kysely table types for the platform schema (migrations 0001–0003). Keep in step with
+ * Kysely table types for the platform schema (migrations 0001–0004). Keep in step with
  * packages/db/migrations; the db tests exercise every table through these types.
  */
 import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
@@ -32,8 +32,27 @@ export interface AppUserTable {
   email: string;
   display_name: string;
   idp_subject: string | null;
+  idp_issuer: string | null;
   status: Generated<'invited' | 'active' | 'disabled'>;
+  /** Bumped to revoke every session of the user (ADR-0016). */
+  session_epoch: Generated<number>;
   created_at: Timestamp;
+}
+
+export interface SessionTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  user_id: string;
+  secret_sha256: string;
+  created_at: Timestamp;
+  last_seen_at: Timestamp;
+  absolute_expires_at: Timestamp;
+  idle_timeout_seconds: number;
+  user_session_epoch: number;
+  amr: Generated<string[]>;
+  acr: string | null;
+  revoked_at: Timestamp | null;
+  revoke_reason: string | null;
 }
 
 export interface AuditLogTable {
@@ -56,6 +75,7 @@ export interface Database {
   'app.tenant': TenantTable;
   'app.company': CompanyTable;
   'app.app_user': AppUserTable;
+  'app.session': SessionTable;
   /** INSERT only for lf_app — do not use RETURNING (needs SELECT). */
   'audit.audit_log': AuditLogTable;
 }

@@ -5,6 +5,9 @@ import type { Database } from '@ledgerforce/db';
 import { Kysely, PostgresDialect } from 'kysely';
 import pg from 'pg';
 import type { AddressInfo } from 'node:net';
+import { AuthController, SESSION_SERVICE } from './auth/auth.controller.ts';
+import { SessionTenantResolver } from './auth/session-tenant-resolver.ts';
+import { SessionService, type Clock } from './auth/session.service.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
 import { TenantInterceptor } from './tenancy/tenant.interceptor.ts';
@@ -20,7 +23,9 @@ export interface ApiOptions {
   /** Connection string for lf_app (never a superuser or the migrator). */
   databaseUrl: string;
   poolSize?: number;
-  /** Defaults to refusing every tenant route until OIDC exists (T-0011). */
+  /** Server-side sessions (ADR-0016). When set, the session resolver is used unless `tenantResolver` is given. */
+  sessions?: { clock?: Clock };
+  /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
   tenantResolver?: TenantResolver;
   /** Test hook: called once per SQL statement. */
   onQuery?: () => void;
@@ -31,19 +36,26 @@ export interface ApiOptions {
 export interface Api {
   app: INestApplication;
   db: Kysely<Database>;
+  /** Present when `sessions` was configured. */
+  sessions: SessionService | undefined;
   url: string;
   close(): Promise<void>;
 }
 
 @Module({})
 class AppModule {
-  static forRoot(db: Kysely<Database>, resolver: TenantResolver): DynamicModule {
+  static forRoot(
+    db: Kysely<Database>,
+    resolver: TenantResolver,
+    sessions: SessionService | undefined,
+  ): DynamicModule {
     return {
       module: AppModule,
-      controllers: [HealthController, CompaniesController],
+      controllers: [HealthController, CompaniesController, ...(sessions ? [AuthController] : [])],
       providers: [
         { provide: DB, useValue: db },
         { provide: TENANT_RESOLVER, useValue: resolver },
+        { provide: SESSION_SERVICE, useValue: sessions ?? null },
         TenantTx,
         { provide: APP_INTERCEPTOR, useClass: TenantInterceptor },
       ],
@@ -65,17 +77,18 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
         }
       : {}),
   });
-  const app = await NestFactory.create(
-    AppModule.forRoot(db, opts.tenantResolver ?? refuseAllResolver),
-    {
-      logger: ['error', 'warn'],
-    },
-  );
+  const sessions = opts.sessions ? new SessionService(db, opts.sessions.clock) : undefined;
+  const resolver =
+    opts.tenantResolver ?? (sessions ? new SessionTenantResolver(sessions) : refuseAllResolver);
+  const app = await NestFactory.create(AppModule.forRoot(db, resolver, sessions), {
+    logger: ['error', 'warn'],
+  });
   await app.listen(opts.port ?? 0, opts.host ?? '127.0.0.1');
   const addr = app.getHttpServer().address() as AddressInfo;
   return {
     app,
     db,
+    sessions,
     url: `http://${opts.host ?? '127.0.0.1'}:${String(addr.port)}`,
     async close() {
       await app.close();

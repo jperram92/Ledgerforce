@@ -37,12 +37,16 @@ export class TenantInterceptor implements NestInterceptor {
     if (isPublic) return next.handle();
     const req = ctx.switchToHttp().getRequest<Request>();
     return from(this.resolver.resolve(req)).pipe(
-      mergeMap((tenantId) => {
-        if (!tenantId) throw new UnauthorizedException();
+      mergeMap((answer) => {
+        const claim = typeof answer === 'string' ? { tenantId: answer } : answer;
+        if (!claim) throw new UnauthorizedException({ error: 'unauthenticated' });
         return from(
-          withTenant(this.db, tenantId, (trx) =>
-            runInTenantTx(trx, () => lastValueFrom(next.handle(), { defaultValue: undefined })),
-          ),
+          withTenant(this.db, claim.tenantId, async (trx) => {
+            if (claim.verify) await claim.verify(trx, req);
+            return runInTenantTx(trx, () =>
+              lastValueFrom(next.handle(), { defaultValue: undefined }),
+            );
+          }),
         );
       }),
     );

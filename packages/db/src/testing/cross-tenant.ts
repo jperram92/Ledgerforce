@@ -36,6 +36,12 @@ type Overrides = Readonly<Record<string, Readonly<Record<string, () => string>>>
 export const DEFAULT_ROW_OVERRIDES: Overrides = {
   'app.app_user': { email: () => `user-${randomBytes(4).toString('hex')}@example.test` },
   'audit.audit_log': { actor_type: () => 'system' },
+  'app.session': {
+    secret_sha256: () => randomBytes(32).toString('hex'),
+    created_at: () => '2026-01-01T00:00:00Z',
+    last_seen_at: () => '2026-01-01T00:00:00Z',
+    absolute_expires_at: () => '2026-01-01T12:00:00Z',
+  },
 };
 
 export async function discoverTenantTables(db: Queryable): Promise<TableRef[]> {
