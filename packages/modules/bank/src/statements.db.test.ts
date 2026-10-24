@@ -116,12 +116,16 @@ describe('SS-PLAT-39: Company bank account bound to a bank GL account, number en
   });
 
   it('refuses a GL account that is not an active asset of subtype bank', async () => {
-    // 1200 Trade debtors: asset, subtype receivable, control account.
-    await expect(
-      inTenant((trx) =>
-        createCompanyBankAccount(trx, kms, companyId, { ...operating, glAccountId: gl('1200') }),
-      ),
-    ).rejects.toMatchObject({ code: '23514', message: expect.stringMatching(/bank/) });
+    // 1100 Undeposited funds: active, postable, non-control asset — but subtype current_asset.
+    // 1200 Trade debtors: asset, subtype receivable, and a control account.
+    for (const code of ['1100', '1200']) {
+      await expect(
+        inTenant((trx) =>
+          createCompanyBankAccount(trx, kms, companyId, { ...operating, glAccountId: gl(code) }),
+        ),
+        code,
+      ).rejects.toMatchObject({ code: '23514', message: expect.stringMatching(/subtype bank/) });
+    }
   });
 
   it('refuses a second active bank account on the same GL account', async () => {
