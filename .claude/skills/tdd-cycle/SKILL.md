@@ -21,8 +21,9 @@ Run this cycle once per acceptance criterion (or per step of the card's *Steps*)
 - Derive the expected result **only** from the card, the UC spec in `Docs/specs/`, the
   success-scenario register or the golden posting — never from running code.
 - Put it in the right layer and file (see `Docs/process/tdd.md` §"Where tests live"):
-  unit `*.spec.ts`, property `*.prop.spec.ts`, golden `*.golden.spec.ts`, DB `*.db.spec.ts`,
-  contract `*.contract.spec.ts`, E2E `apps/web/e2e/*.e2e.ts`.
+  unit `*.test.ts`, property `*.prop.test.ts`, golden `*.golden.test.ts`, DB `*.db.test.ts`,
+  contract `*.contract.test.ts` (all colocated under the package's `src/`), E2E
+  `tests/e2e/<area>/*.spec.ts`.
 - Name it with the criterion and task id: `it('AC-2 rejects an unbalanced entry [T-0042]', …)`;
   include the SS id for success scenarios: `test('SS-… <title> [T-NNNN]', …)`.
 - Money: decimal strings and `decimal.js` equality; never `toBeCloseTo` on money.
@@ -35,7 +36,7 @@ Run this cycle once per acceptance criterion (or per step of the card's *Steps*)
 
 ```bash
 pnpm test <path-to-test-file>       # unit / property / golden / contract
-pnpm test:db <path-to-test-file>     # DB integration (*.db.spec.ts)
+pnpm test:db <path-to-test-file>     # DB integration (*.db.test.ts)
 pnpm test:e2e <path-to-spec>        # Playwright
 ```
 Save the failing output (first failing assertion + summary line) into the run log and the

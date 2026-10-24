@@ -50,7 +50,7 @@ Checkpoint after every green step (skill `checkpoint`).
 
 ## Outputs
 
-- Code in `packages/ledger/src/**`, tests in `packages/ledger/test/**` (layout in
+- Code in `packages/ledger/src/**`, tests colocated beside it (layout in
   `Docs/process/tdd.md`), migrations via skill `migration` (coordinate with db-engineer).
 
 ## Definition of done

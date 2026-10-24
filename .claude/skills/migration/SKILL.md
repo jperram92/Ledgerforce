@@ -16,7 +16,7 @@ editing a migration file that has already been merged.
 
 ## Steps
 
-1. Write the DB integration test first (skill `tdd-cycle`), file `*.db.spec.ts`, e.g. "insert as
+1. Write the DB integration test first (skill `tdd-cycle`), file `*.db.test.ts`, e.g. "insert as
    tenant A, select as tenant B returns 0 rows", "UPDATE on posted journal_line raises". Run
    `pnpm test:db <file>` and capture RED.
 2. Create the next migration file in the migrations directory of the owning package (see that

@@ -11,10 +11,11 @@ identified as `GP-NNN`. It is **human-owned** (human gate `golden_postings`). Ag
 ## A. Using a golden posting (normal case)
 
 1. Find the event: `grep -n "GP-" Docs/accounting/postings.md` and read the section.
-2. Check its status line. Only **Approved** postings may be implemented. `Draft`/proposed ones
+2. Check its status: the entry's `Status:` line and its row in the file's *Index* table. Only
+   `Status: Approved (initials, date)` postings may be implemented. `Draft`/proposed ones
    may have their tests written but the criterion stays blocked for `done`.
 3. Write the golden test (skill `tdd-cycle` step 1) in
-   `packages/ledger/test/golden/<event>.golden.spec.ts` (or the module's `test/golden/`),
+   `packages/ledger/src/golden/<event>.golden.test.ts` (or the module's `src/golden/`),
    named `GP-NNN <event> [T-NNNN]`, asserting **exactly** the posting's lines: account (system
    role or profile-resolved account), debit, credit, tax code, party, in base currency, as
    decimal strings — and that the entry balances.
@@ -25,8 +26,9 @@ identified as `GP-NNN`. It is **human-owned** (human gate `golden_postings`). Ag
 1. Research the treatment (skill `research`) — ATO guidance, design §3.8, existing GP entries;
    cite sources in the RQ.
 2. On the task branch, add the proposal in `Docs/accounting/postings.md`:
-   - **new** posting → new `GP-NNN` section with status `Draft (proposed by <claude|codex>,
-     T-NNNN)`, the worked example (amounts, lines, accounts, tax) and the RQ link;
+   - **new** posting → new `GP-NNN` section (next free number) with
+     `Status: Draft (proposed by <claude|codex>, T-NNNN)`, the worked example (amounts, lines,
+     accounts, tax) and the RQ link, plus a row in the *Index* table with status `Draft`;
    - **change to an Approved** posting → do **not** edit it; add the corrected version as a new
      `GP-NNN` `Draft` section that says `Proposes to supersede GP-MMM` and explain why. List any
      doubt under the file's *Open questions for accountant* section.

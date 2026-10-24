@@ -29,7 +29,7 @@ alone. You never change product code or tests; you change only the indexes and l
    status, depends_on and claimed_by; no index row without a card; no `done` card with unchecked
    steps; no `blocked` card without a reason in its *Notes*.
 2. **Register ↔ tests ↔ evidence:** every SS id in the register is referenced by ≥1 test name and
-   by the cards that list it; every SS marked evidenced has a `pass` manifest entry whose file
+   by the cards that list it; every SS marked evidenced has a `result: "passed"` manifest entry whose file
    exists.
 3. **Decision log ↔ ADRs ↔ RQs:** every ADR has a DL entry pointing to it; every DL `ADR:` link
    resolves; superseded items link forward; RQs referenced by cards exist.

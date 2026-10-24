@@ -13,7 +13,7 @@ any mockup in `Docs/ui/mockups/` for the screen first.
    `Docs/specs/success-scenarios.md` and are listed in the card's `success_scenarios:`. If a
    scenario is missing, draft it in the register (status as the register defines for drafts) and
    link it.
-2. **RED:** write the Playwright spec `apps/web/e2e/<area>/<screen>.e2e.ts`, one `test()` per SS
+2. **RED:** write the Playwright spec `tests/e2e/<area>/<screen>.spec.ts`, one `test()` per SS
    id, titled `<SS-ID> <title> [T-NNNN]`. Assert visible outcomes by role/label
    (`getByRole`, `getByLabel`), never by CSS class. Use seeded test tenants; amounts asserted as
    the formatted decimal string the spec gives. Run `pnpm test:e2e <spec>` and capture RED.

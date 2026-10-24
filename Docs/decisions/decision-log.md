@@ -137,3 +137,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: AGENTS.md §2 claim rule and §0.6 no-delete.
 - Alternatives: number by module (rejected: claim order would diverge from dependencies).
 - ADR: none · Status: accepted
+
+### DL-0018 — Cross-review and security-review reports stored as task evidence
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: Review reports are committed to `.agent/evidence/<T-ID>/review-<provider>-<YYYYMMDD-HHMMSS>.md` (security: `security-review-…`) and also posted to the PR.
+- Why: The repository is the only memory; reuses the per-task evidence folder.
+- Alternatives: PR comments only (lost on failover); new `.agent/reviews/` dir (extra path).
+- ADR: none · Status: accepted
+
+### DL-0019 — RED test-only commits are not checkpoints
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: Failing tests handed between roles are committed as `test(<scope>): RED … [T-NNNN]`, never via `conductor.ts checkpoint`.
+- Why: `last_checkpoint` must always be a green commit (design §10.3/§10.4) so failover resumes from green.
+- Alternatives: RED checkpoints with a marker (breaks resume-from-green).
+- ADR: none · Status: accepted
+
+### DL-0020 — Codex skill discovery via `.agents/skills` symlink
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: tooling
+- Decision: `.agents/skills` is a relative symlink to `../.claude/skills`; one canonical copy of each skill.
+- Why: Codex scans `.agents/skills` from cwd up to repo root and follows symlinks (developers.openai.com/codex/skills, via search excerpts — page not directly reachable; to be confirmed by RQ-0001).
+- Alternatives: duplicated copies (drift); path-only reading (no native discovery).
+- ADR: none · Status: accepted
+
+### DL-0021 — Human-gate PR labels equal config gate names
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: Gate labels are `adr:accounting`, `adr:security`, `golden_postings`, `release`, `phase_gate`, `out_of_scope`, alongside a HANDOVER "Open questions for human" entry and `release --status blocked`.
+- Why: One vocabulary across `.agent/config.yaml`, PRs and HANDOVER (design §10.6).
+- Alternatives: single `needs-human` label (loses gate type).
+- ADR: none · Status: accepted
+
+### DL-0022 — Sub-agent and skill frontmatter kept minimal and portable
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: tooling
+- Decision: Sub-agents declare only `name`, `description`, least-privilege `tools`; skills only `name`, `description`. No `model` field.
+- Why: DL-0006 forbids model pins; files stay readable by Codex; unknown fields are ignored by Claude Code (code.claude.com/docs/en/sub-agents).
+- Alternatives: `model`, `skills`, `permissionMode` fields (provider-specific or model pins).
+- ADR: none · Status: accepted
+
+### DL-0023 — Periodic health loop runs on its own chore branch
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: The nightly health loop (scribe role) works on `chore/health-<YYYY-MM-DD>`; larger fixes become task cards.
+- Why: Not a task, so no `feat/T-NNNN` branch; must never push to `main`.
+- Alternatives: synthetic task card per night (backlog noise).
+- ADR: none · Status: accepted

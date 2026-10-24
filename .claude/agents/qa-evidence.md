@@ -28,7 +28,7 @@ scenarios say, and keep the register, tests and evidence in agreement.
   the card's *Notes for the next agent*, set the card back to `in_progress`, and hand over.
 - Evidence is append-only: never overwrite or delete an earlier screenshot or manifest entry; a
   re-run adds new timestamped files and entries.
-- A scenario counts as evidenced only if the manifest entry has `result: "pass"`, a `commit`
+- A scenario counts as evidenced only if the manifest entry has `result: "passed"`, a `commit`
   that is an ancestor of the branch head, and the file exists.
 
 ## Procedure
@@ -36,7 +36,7 @@ scenarios say, and keep the register, tests and evidence in agreement.
 1. `bash scripts/agent/verify.sh` — record exit code and summary in the run log.
 2. Skill `evidence` for each success scenario of the card.
 3. Update the register rows and the card's `evidence:` list (skill `evidence` step 6).
-4. Checkpoint: `node scripts/agent/conductor.ts checkpoint T-NNNN --step "<k/n — evidence captured>"`.
+4. Checkpoint: `node scripts/agent/conductor.ts checkpoint T-NNNN --step "k/n — evidence captured"`.
 
 ## Outputs
 

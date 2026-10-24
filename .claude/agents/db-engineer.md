@@ -41,7 +41,7 @@ schema evolution, all proven by integration tests that run against a real Postgr
 ## Procedure
 
 For each acceptance criterion: skill `tdd-cycle` with a DB integration test first (file
-`*.db.spec.ts`, see `Docs/process/tdd.md`), then the migration, then `pnpm test:db`; checkpoint.
+`*.db.test.ts`, see `Docs/process/tdd.md`), then the migration, then `pnpm test:db`; checkpoint.
 
 ## Outputs
 

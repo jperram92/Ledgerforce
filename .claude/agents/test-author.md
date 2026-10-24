@@ -31,7 +31,7 @@ Make the expected result exist as a failing, correct test before anyone writes p
 - Expected values come from the spec or golden file, never from running the implementation and
   copying its output ("snapshot laundering" is forbidden).
 - Money expectations are decimal strings (`'110.0000'`), compared with decimal equality.
-- Contract tests use recorded fixtures under the connector's `test/fixtures/recorded/`; never
+- Contract tests use recorded fixtures under the connector's `fixtures/recorded/`; never
   call live Salesforce/Stripe in CI; never put real credentials in fixtures (redact).
 - After writing, run the test, capture the RED output, and confirm it fails for the right
   reason (assertion on the missing behaviour — not a syntax error, import error or timeout).
