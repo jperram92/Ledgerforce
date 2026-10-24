@@ -40,3 +40,4 @@ Do not: change Docs/accounting golden files; delete anything; push to main.
 - 2026-10-24T08:18:05.819Z human: release T-0006 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
 - 2026-10-24T08:18:05.954Z human: release T-0008 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
 - 2026-10-24T08:18:06.103Z unknown: T-0009 → in_progress
+- 2026-10-24T08:18:48.097Z human: release T-0009 → blocked (human gate: product owner to choose UI direction from the UI/UX research agent's three options (DL-0052); evidence harness part is complete)

@@ -44,6 +44,8 @@ export default tseslint.config(
       'lf/no-float-money': ['error', { banNumberConversion: false }],
       // ...and nothing outside the posting engine writes ledger tables.
       'lf/no-direct-ledger-write': 'error',
+      // ...and the tenant context is only ever transaction-local (RQ-0013).
+      'lf/no-session-tenant-context': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
@@ -64,7 +66,17 @@ export default tseslint.config(
   {
     // The rule's own tests must contain the forbidden SQL as fixtures.
     files: ['packages/testing/eslint-rules/**/*.test.ts'],
-    rules: { 'lf/no-direct-ledger-write': 'off', 'lf/no-float-money': 'off' },
+    rules: {
+      'lf/no-direct-ledger-write': 'off',
+      'lf/no-float-money': 'off',
+      'lf/no-session-tenant-context': 'off',
+    },
+  },
+  {
+    // DB integration tests open dedicated, short-lived clients (never the app pool) and must be
+    // able to simulate a session-level context to prove withTenant fails closed (RQ-0013).
+    files: ['packages/**/*.db.test.ts'],
+    rules: { 'lf/no-session-tenant-context': 'off' },
   },
   {
     files: ['tests/e2e/**/*.ts', 'playwright.config.ts'],

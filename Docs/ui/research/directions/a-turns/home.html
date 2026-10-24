@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en-AU" data-dark="designed">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your turn: 4 things need you · Harbour &amp; Co · LedgerForce</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="turns.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="tick" viewBox="0 0 12 12"><path d="M2 6.5 5 9.2 10.2 3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+</svg>
+
+<header class="bar">
+  <div class="org">Harbour &amp; Co Pty Ltd <span>Books open: October 2026</span></div>
+  <button class="find" type="button"><span>Find a customer, invoice or amount, or type an action</span><kbd>/</kbd></button>
+  <div class="right">
+    <a href="#sync">Salesforce: <b style="color:var(--you)">3 need a person</b></a>
+    <span class="who"><b>Sam Nguyen</b> <span class="muted">Owner</span></span>
+  </div>
+</header>
+
+<div class="panes">
+  <nav class="rail" aria-label="Turns and books">
+    <div class="turns">
+      <h2>Whose turn</h2>
+      <ul>
+        <li><a href="#" aria-current="page"><span>Your turn</span><span class="n" style="color:var(--you)">4</span><small>$41,145.00 waiting on your decision</small></a></li>
+        <li><a href="#"><span>Priya Shah</span><span class="n">5</span><small>September hard lock, 3 sync issues, 1 bank rec</small></a></li>
+        <li><a href="#"><span>Jordan Lee</span><span class="n">8</span><small>Overdue follow-ups, $33,482.50</small></a></li>
+        <li><a href="#"><span>Mei Tan</span><span class="n">1</span><small>Review 2 small-team exceptions</small></a></li>
+        <li><a href="#"><span>Customers</span><span class="n">31</span><small>Invoices not yet paid</small></a></li>
+        <li><a href="#"><span>Salesforce</span><span class="n">2</span><small>Write-backs retrying on their own</small></a></li>
+      </ul>
+    </div>
+    <div class="pos">
+      <h2>Position at 23 Oct</h2>
+      <ul>
+        <li><a href="#"><span>Cash in bank</span><span class="amt">184,320.55</span><small>2 accounts, reconciled to 22 Oct</small></a></li>
+        <li><a href="#"><span>Customers owe you</span><span class="amt">96,412.80</span><small>33,482.50 of it overdue</small></a></li>
+        <li><a href="#"><span>You owe suppliers</span><span class="amt">41,870.25</span><small>22,415.00 due this week</small></a></li>
+        <li><a href="#"><span>GST, Jul to Sep</span><span class="amt">12,604.10</span><small>Due Tue 28 Oct. Tax reserve is 163.75 short</small></a></li>
+      </ul>
+    </div>
+    <div class="books">
+      <h2>Books</h2>
+      <ul>
+        <li><a href="invoice.html">Sales</a></li><li><a href="#">Purchases</a></li><li><a href="#">Bank</a></li>
+        <li><a href="#">Journals</a></li><li><a href="#">Reports</a></li><li><a href="#">Close: September 6 of 7</a></li>
+        <li><a href="#" id="sync">Salesforce sync</a></li><li><a href="#">Settings</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="queue" id="main">
+    <header>
+      <h1>Your turn: 4 things need you</h1>
+      <p>Ordered by who is blocked and when. Nothing here has been paid or posted yet.</p>
+    </header>
+    <ol>
+      <li><a class="item" href="#" aria-current="true">
+        <span class="what">Pay 11 suppliers</span><span class="amt">22,415.00</span>
+        <span class="why">Payment run PB-0087. Release by Mon 27 Oct, 5 pm to pay on Tue 28 Oct.</span>
+        <span class="chain-s"><span class="tk done"><svg aria-hidden="true"><use href="#tick"/></svg>Lena made it</span><span class="hand" aria-hidden="true">/</span><span class="tk done"><svg aria-hidden="true"><use href="#tick"/></svg>Mei released</span><span class="hand" aria-hidden="true">/</span><span class="tk you">You release</span></span>
+      </a></li>
+      <li><a class="item" href="#">
+        <span class="what">Journal: October wages owed</span><span class="amt">14,880.00</span>
+        <span class="why">MJ-0412 by Priya. Journals over $5,000 need a second person.</span>
+        <span class="chain-s"><span class="tk done"><svg aria-hidden="true"><use href="#tick"/></svg>Priya prepared</span><span class="hand" aria-hidden="true">/</span><span class="tk you">You or Mei approve</span></span>
+      </a></li>
+      <li><a class="item" href="#">
+        <span class="what">Bill: Tasman Cloud Hosting</span><span class="amt">3,190.00</span>
+        <span class="why">TCH-88213 entered by Lena. Bills over $1,000 need someone else to approve.</span>
+        <span class="chain-s"><span class="tk done"><svg aria-hidden="true"><use href="#tick"/></svg>Lena entered</span><span class="hand" aria-hidden="true">/</span><span class="tk you">You or Mei approve</span></span>
+      </a></li>
+      <li><a class="item" href="#">
+        <span class="what">Credit note: Wattle &amp; Stone Architects</span><span class="amt">660.00</span>
+        <span class="why">CN-000118 by Jordan. Partial refund for a cancelled training day.</span>
+        <span class="chain-s"><span class="tk done"><svg aria-hidden="true"><use href="#tick"/></svg>Jordan requested</span><span class="hand" aria-hidden="true">/</span><span class="tk you">You approve</span></span>
+      </a></li>
+    </ol>
+    <div class="group">Waiting on others, for you to know</div>
+    <ul>
+      <li><a class="item" href="#">
+        <span class="what">September: hard lock after BAS</span><span class="amt hide-phone"></span>
+        <span class="why">6 of 7 close steps done. Priya locks September once the BAS is lodged (due Tue 28 Oct).</span>
+        <span class="chain-s"><span class="tk oth">Priya</span></span>
+      </a></li>
+      <li><a class="item" href="#">
+        <span class="what">Salesforce: 3 updates need a person</span><span class="amt hide-phone"></span>
+        <span class="why">Oldest 3 h ago. 1,284 updates went through today; 2 more are retrying on their own.</span>
+        <span class="chain-s"><span class="tk oth">Priya</span><span class="tk oth">Salesforce retrying</span></span>
+      </a></li>
+      <li><a class="item" href="#">
+        <span class="what">Small-team exceptions this week: 2</span><span class="amt hide-phone"></span>
+        <span class="why">Where one person did both steps. Mei reviews them, then you acknowledge the weekly report.</span>
+        <span class="chain-s"><span class="tk oth">Mei</span><span class="hand" aria-hidden="true">/</span><span class="tk oth">then you</span></span>
+      </a></li>
+    </ul>
+    <p class="keys"><span><kbd>J</kbd> <kbd>K</kbd> move</span><span><kbd>Enter</kbd> open</span><span><kbd>/</kbd> find</span><span><kbd>?</kbd> all keys</span></p>
+  </main>
+
+  <section class="detail" aria-labelledby="pb-title">
+    <div class="body">
+      <p class="kind">Supplier payment run PB-0087, from Operating account (CBA, ending 4471)</p>
+      <h2 class="title" id="pb-title">Pay 11 suppliers $22,415.00 on Tue 28 Oct</h2>
+      <p class="lede">Runs over $10,000 need two people to release them, and neither can be the person who made the run. Mei has released it once. Yours is the second release.</p>
+
+      <div class="sec">
+        <h3>Who has done what</h3>
+        <ol class="chain">
+          <li><div class="who">Lena Ortiz</div><div class="role">AP Clerk</div><div class="act">Made the run from 11 approved bills</div><div class="state"><span class="tk done"><svg aria-hidden="true"><use href="#tick"/></svg>Thu 23 Oct, 4:12 pm</span></div></li>
+          <li><div class="who">Mei Tan</div><div class="role">Approver, outside accountant</div><div class="act">First release, checked the bank file</div><div class="state"><span class="tk done"><svg aria-hidden="true"><use href="#tick"/></svg>Fri 24 Oct, 8:05 am</span></div></li>
+          <li class="now"><div class="who">You</div><div class="role">Owner</div><div class="act">Second release, with your authenticator</div><div class="state"><span class="tk you">Your turn</span></div></li>
+        </ol>
+        <p class="rule-note">Lena can't release a run she made. After your release the bank file is ready to upload to CBA, and remittance emails go to all 11 suppliers.</p>
+      </div>
+
+      <div class="sec">
+        <h3>What it will post <span class="aside">Preview from the posting engine, not yet written</span></h3>
+        <p>What you owe suppliers goes down by $22,415.00, and so does the Operating account.</p>
+        <div class="scroll"><table class="tbl">
+          <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">2000</span>Trade creditors <span class="plain">what you owe suppliers</span></td><td class="num">22,415.00</td><td class="num"></td></tr>
+            <tr><td><span class="code">1010</span>Operating account, CBA <span class="plain">your bank</span></td><td class="num"></td><td class="num">22,415.00</td></tr>
+          </tbody>
+          <tfoot><tr><td>Totals</td><td class="num">22,415.00</td><td class="num">22,415.00</td></tr></tfoot>
+        </table></div>
+        <p class="balanced"><span class="tk done"><svg aria-hidden="true"><use href="#tick"/></svg>Balanced</span><span class="muted">Operating account after this run: 149,465.20 (now 171,880.20).</span></p>
+      </div>
+
+      <div class="sec">
+        <h3>11 bills in this run <span class="aside">All approved, all due by 31 Oct</span></h3>
+        <div class="scroll"><table class="tbl">
+          <thead><tr><th>Supplier</th><th>Bill</th><th>Due</th><th>Approved by</th><th class="num">Amount</th></tr></thead>
+          <tbody>
+            <tr><td>Dataweave Contractors</td><td>DW-2291</td><td>28 Oct</td><td>Mei Tan</td><td class="num">7,480.00</td></tr>
+            <tr><td>Pinpoint Recruitment</td><td>PR-10418</td><td>28 Oct</td><td>Sam Nguyen</td><td class="num">4,950.00</td></tr>
+            <tr><td>Ledgerline Legal</td><td>LL-3307</td><td>30 Oct</td><td>Mei Tan</td><td class="num">4,775.00</td></tr>
+            <tr><td>Tasman Cloud Hosting</td><td>TCH-88104</td><td>28 Oct</td><td>Mei Tan</td><td class="num">2,970.00</td></tr>
+            <tr><td>Southern Grid Energy</td><td>SGE-55120</td><td>29 Oct</td><td>auto, under $1,000</td><td class="num">642.80</td></tr>
+            <tr><td>Northside Office Supplies</td><td>NOS-7781</td><td>31 Oct</td><td>auto, under $1,000</td><td class="num">412.35</td></tr>
+            <tr><td>Bridgeline Telecom</td><td>BT-200915</td><td>28 Oct</td><td>auto, under $1,000</td><td class="num">389.00</td></tr>
+            <tr><td>Kookaburra Coffee Supply</td><td>KCS-0412</td><td>30 Oct</td><td>auto, under $1,000</td><td class="num">236.80</td></tr>
+            <tr><td>Harbour City Water</td><td>HCW-88231</td><td>31 Oct</td><td>auto, under $1,000</td><td class="num">214.20</td></tr>
+            <tr><td>Greenbin Waste Services</td><td>GW-6610</td><td>29 Oct</td><td>auto, under $1,000</td><td class="num">186.45</td></tr>
+            <tr><td>Arterial Tolls</td><td>AT-91022</td><td>31 Oct</td><td>auto, under $1,000</td><td class="num">158.40</td></tr>
+          </tbody>
+          <tfoot><tr><td colspan="4">11 bills</td><td class="num">22,415.00</td></tr></tfoot>
+        </table></div>
+        <div class="hold"><b>1 bill held back: Pinewood Electrical, $1,320.00.</b> Their bank details changed on Fri 24 Oct at 7:55 am (asked for by Lena, checked by Priya). New details can be paid after Sat 25 Oct, 7:55 am, so it joins the next run.</div>
+      </div>
+    </div>
+    <div class="act-bar">
+      <p class="say">Release sends nothing to the bank by itself. You upload the file to CBA, then confirm here and the run posts.</p>
+      <button class="btn quiet" type="button">Send back to Lena <kbd>B</kbd></button>
+      <button class="btn primary" type="button">Release, second of two <kbd>Ctrl</kbd><kbd>Enter</kbd></button>
+    </div>
+  </section>
+</div>
+</body>
+</html>

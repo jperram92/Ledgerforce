@@ -2,7 +2,7 @@
 
 Database foundation for LedgerForce (design §3.3, §6.7, §6.8): forward-only SQL migrations,
 the cluster bootstrap for the two database roles, tenant context (`withTenant`), Kysely types,
-and the integration-test harness, including the cross-tenant RLS suite (scenario SS-PLAT-RLS).
+and the integration-test harness, including the cross-tenant RLS suite (scenario SS-PLAT-04).
 
 ## Layout
 
@@ -94,7 +94,7 @@ The global setup also applies `bootstrap/01_cluster_roles.sql`. Each test file t
 - `app`: a `Kysely<Database>` connected as `lf_app`.
 - `url(role)`: a connection string for the given role.
 
-### Cross-tenant suite (SS-PLAT-RLS)
+### Cross-tenant suite (SS-PLAT-04)
 
 `src/rls.db.test.ts` checks tenant isolation in two ways:
 
@@ -111,3 +111,12 @@ The global setup also applies `bootstrap/01_cluster_roles.sql`. Each test file t
 New tables are covered without any extra registration. If a table has a CHECK constraint the
 generator cannot satisfy, add a column override to `DEFAULT_ROW_OVERRIDES` in
 `src/testing/cross-tenant.ts`.
+
+### Tenant context and pooled connections (T-0010, RQ-0013)
+
+`withTenant` sets `app.tenant_id` with `set_config(..., true)` only, so the context ends at COMMIT
+or ROLLBACK. Before setting it, `withTenant` checks the connection has **no** session-level value
+and throws `TenantContextLeakError` if it does (fail closed). The lint rule
+`lf/no-session-tenant-context` bans `SET [SESSION] app.tenant_id` and
+`set_config('app.tenant_id', ..., false)` in product code. PgBouncer, if introduced, must run in
+session or transaction pooling mode, never statement mode.

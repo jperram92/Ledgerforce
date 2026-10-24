@@ -1,5 +1,5 @@
 /**
- * SS-PLAT-RLS — reusable cross-tenant isolation checks (design §6.7, AGENTS.md §4).
+ * SS-PLAT-04 (formerly SS-PLAT-RLS) — reusable cross-tenant isolation checks (design §6.7, AGENTS.md §4).
  *
  *  - findRlsViolations(): every table with a tenant_id column, and every table in the app/audit
  *    schemas, must have RLS ENABLED + FORCED, at least one policy, a tenant_id column (unless it
@@ -338,7 +338,7 @@ export async function defineCrossTenantSuite<DB>(
     sql`INSERT INTO ${sql.table(t.qualified)} (${sql.join([...values.keys()].map((c) => sql.ref(c)))})
         VALUES (${sql.join([...values.values()])})`.execute(trx);
 
-  describe('SS-PLAT-RLS cross-tenant isolation (generated from information_schema)', () => {
+  describe('SS-PLAT-04: RLS isolates tenants on every tenant table (generated from information_schema)', () => {
     beforeAll(async () => {
       await db.admin.query(
         `INSERT INTO app.tenant (id, name) VALUES ($1, 'RLS tenant A'), ($2, 'RLS tenant B')`,

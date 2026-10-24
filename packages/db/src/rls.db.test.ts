@@ -1,5 +1,5 @@
 /**
- * SS-PLAT-RLS — tenant isolation (design §6.7).
+ * SS-PLAT-04 — tenant isolation (design §6.7).
  *
  * 1. Completeness: every table that has a tenant_id column (and every table in the app/audit
  *    schemas) has row-level security ENABLED and FORCED with at least one policy, and lf_app holds
