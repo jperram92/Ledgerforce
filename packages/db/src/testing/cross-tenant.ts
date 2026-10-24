@@ -67,6 +67,7 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   'app.dimension_set': { hash: () => '0'.repeat(64) },
   'app.journal_entry': { status: () => 'draft', source_type: () => 'manual_journal' },
   'app.journal_line': { debit: () => '1.0000' },
+  'app.number_series': { code: () => `s_${randomBytes(4).toString('hex')}` },
 };
 
 export async function discoverTenantTables(db: Queryable): Promise<TableRef[]> {

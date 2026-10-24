@@ -557,3 +557,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: The register must not overstate verification (AGENTS.md directive 3).
 - Alternatives: leave as is (contradicts the register's own rule).
 - ADR: none · Status: accepted
+
+### DL-0078 — Gapless numbering: counter row advanced in the posting transaction; guarded; never truncating
+- Date: 2026-10-24 · By: claude · Task: T-0024 · Category: data-model
+- Decision: Migration `0010_ledger_number_series.sql` adds `app.number_series` (per company and code; prefix, pad_width, next_value; RLS; lf_app SELECT/INSERT/UPDATE) and `app.next_document_number(company, series)`. That function uses UPDATE … RETURNING inside the caller's transaction, so the row lock serialises writers and a rollback returns the number. A guard trigger allows next_value to move only by +1, and keeps code and company immutable and prefix and pad_width fixed once a number is issued. Tenant moves are left to RLS. The formatter pads but never truncates; plain `lpad` truncates a wider value, and a mutation test proves the guard against it. SS-UC02-06 is proven at the numbering layer in the batch's shape (40 documents, one failing at commit). The invoice batch itself stays with T-0044.
+- Why: Design §3.4 ("sequences leave gaps; tax invoices need clean series"); RQ-0007 (d).
+- Alternatives: database sequences (gaps on rollback); allocate-then-void numbers (gaps by design); SELECT … then UPDATE (races, killed by the concurrency test as a mutant).
+- ADR: none · Status: accepted

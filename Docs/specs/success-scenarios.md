@@ -43,7 +43,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC02-03 | One failure does not roll back the others | UC-02 | MVP | db-integration | no | — | T-0044 | not-started | — | — |
 | SS-UC02-04 | PDFs emailed to Billing To and CC | UC-02 | MVP | db-integration | no | — | T-0044, T-0042 | not-started | — | — |
 | SS-UC02-05 | Re-running a crashed batch is idempotent | UC-02 | MVP | db-integration | no | — | T-0044 | not-started | — | — |
-| SS-UC02-06 | Consecutive gapless numbers; failed invoice consumes none | UC-02 | MVP | db-integration | no | — | T-0044, T-0024 | not-started | — | — |
+| SS-UC02-06 | Consecutive gapless numbers; failed invoice consumes none | UC-02 | MVP | db-integration | no | packages/ledger/src/numbering.db.test.ts | T-0044, T-0024 | green (numbering layer, T-0024; the invoice batch itself is T-0044) | — | — |
 | SS-UC02-07 | Permission required to run a batch | UC-02 | MVP | unit | no | — | T-0012, T-0043 | not-started | — | — |
 | SS-UC02-08 | Batch screens show preview and exception list | UC-02 | MVP | e2e-playwright | yes | — | T-0084 | not-started | — | — |
 | SS-UC03-01 | Invoice carries a Stripe payment link | UC-03 | MVP | contract | no | — | T-0073 | not-started | — | — |
@@ -125,7 +125,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-02 | Posted journal rows are immutable | — | MVP | db-integration | no | packages/ledger/src/journal-immutability.db.test.ts | T-0021 | green | [.agent/evidence/T-0021/manifest.json](../../.agent/evidence/T-0021/manifest.json) | 26e7823 |
 | SS-PLAT-03 | Hash chain detects tampering | — | MVP | db-integration | no | packages/ledger/src/hash-chain.db.test.ts | T-0022 | green | [.agent/evidence/T-0022/manifest.json](../../.agent/evidence/T-0022/manifest.json) | 31124c2 |
 | SS-PLAT-04 | RLS isolates tenants on every tenant table | — | MVP | db-integration | no | packages/db/src/rls.db.test.ts; packages/db/src/tenant-context.db.test.ts | T-0008, T-0010 | green | [.agent/evidence/T-0010/manifest.json](../../.agent/evidence/T-0010/manifest.json) | merge (re-verified below) |
-| SS-PLAT-05 | Gapless numbering under concurrency and rollback | — | MVP | db-integration | no | — | T-0024 | not-started | — | — |
+| SS-PLAT-05 | Gapless numbering under concurrency and rollback | — | MVP | db-integration | no | packages/ledger/src/numbering.db.test.ts | T-0024 | green | — | — |
 | SS-PLAT-06 | Period status matrix is enforced as data | — | MVP | unit | no | — | T-0023 | not-started | — | — |
 | SS-PLAT-07 | Control accounts reject manual journals, imports and rule lines | — | MVP | db-integration | no | — | T-0029 | not-started | — | — |
 | SS-PLAT-08 | Audit log is append-only | — | MVP | db-integration | no | packages/db/src/platform.db.test.ts | T-0014 | green | [.agent/evidence/T-0014/manifest.json](../../.agent/evidence/T-0014/manifest.json) | 93e3e18 |

@@ -1,5 +1,5 @@
 /**
- * Kysely table types for the platform schema (migrations 0001–0009). Keep in step with
+ * Kysely table types for the platform schema (migrations 0001–0010). Keep in step with
  * packages/db/migrations; the db tests exercise every table through these types.
  */
 import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
@@ -181,6 +181,19 @@ export interface JournalLineTable {
   memo: string | null;
 }
 
+/** Gapless per-company document counter (migration 0010). Advance via app.next_document_number(). */
+export interface NumberSeriesTable {
+  tenant_id: TenantId;
+  company_id: string;
+  code: string;
+  prefix: Generated<string>;
+  pad_width: Generated<number>;
+  /** bigint as a decimal string. */
+  next_value: ColumnType<string, string | undefined, string>;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
 export interface AuditLogTable {
   id: ColumnType<string, never, never>;
   tenant_id: TenantId;
@@ -210,6 +223,7 @@ export interface Database {
   'app.journal_entry': JournalEntryTable;
   'app.journal_line': JournalLineTable;
   'app.journal_chain_head': JournalChainHeadTable;
+  'app.number_series': NumberSeriesTable;
   /** INSERT only for lf_app — do not use RETURNING (needs SELECT). */
   'audit.audit_log': AuditLogTable;
 }
