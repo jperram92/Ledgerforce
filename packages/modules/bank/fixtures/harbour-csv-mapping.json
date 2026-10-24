@@ -1,0 +1,12 @@
+{
+  "header": true,
+  "dateFormat": "DD/MM/YYYY",
+  "columns": {
+    "date": "Date",
+    "description": ["Description"],
+    "reference": "Reference",
+    "debit": "Debit",
+    "credit": "Credit",
+    "bankTxnId": "Transaction ID"
+  }
+}
