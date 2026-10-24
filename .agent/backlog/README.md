@@ -13,10 +13,10 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 
 | Status | Cards |
 |---|---:|
-| todo | 93 |
+| todo | 94 |
 | review | 8 |
 | blocked | 2 |
-| **total** | **103** |
+| **total** | **104** |
 
 | Phase | Cards |
 |---|---:|
@@ -99,7 +99,8 @@ graph LR
 | [T-0009](T-0009.md) | Playwright evidence harness and UI principles | Sprint 0 | blocked | T-0001 | — | 1 |
 | [T-0103](T-0103.md) | Conductor: Windows provider process-tree termination on missed heartbeat | Sprint 0 | todo | T-0003 | — | 1 |
 | [T-0010](T-0010.md) | Tenancy: tenant and company tables, RLS context middleware | MVP | review | T-0008 | — | 1 |
-| [T-0011](T-0011.md) | OIDC authentication (Keycloak dev realm) and session policy | MVP | todo | T-0010 | — | 1 |
+| [T-0104](T-0104.md) | API skeleton: NestJS on SWC, health check, per-request tenant transaction | MVP | todo | T-0010 | — | 1 |
+| [T-0011](T-0011.md) | OIDC authentication (Keycloak dev realm) and session policy | MVP | todo | T-0104 | — | 1 |
 | [T-0012](T-0012.md) | Roles and permissions (role templates, permission checks) | MVP | todo | T-0011 | UC-02 | 1 |
 | [T-0013](T-0013.md) | MFA enforcement for finance roles and step-up re-authentication | MVP | todo | T-0011, T-0012 | UC-06 | 2 |
 | [T-0014](T-0014.md) | Append-only audit log (separate schema) | MVP | todo | T-0010 | — | 1 |

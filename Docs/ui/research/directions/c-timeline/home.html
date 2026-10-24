@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en-AU" data-dark="designed">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The next two weeks – Harbour &amp; Co – LedgerForce</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="timeline.css">
+</head>
+<body>
+<header class="top">
+  <div class="org">Harbour &amp; Co Pty Ltd</div>
+  <nav aria-label="Views"><ul>
+    <li><a href="#" aria-current="page">Timeline</a></li>
+    <li><a href="invoice.html">Documents</a></li>
+    <li><a href="#">Ledger</a></li>
+    <li><a href="#">Settings</a></li>
+  </ul></nav>
+  <div class="scale" role="group" aria-label="Time span">
+    <button type="button">Week</button><button type="button" aria-pressed="true">5 weeks</button><button type="button">Quarter</button><button type="button">Year</button>
+  </div>
+  <div class="me">Sam Nguyen <span>Owner</span></div>
+</header>
+
+<main id="main">
+  <div class="head">
+    <div>
+      <h1>Your money from 1 October to 7 November</h1>
+      <p>Solid is what has happened, to the bank statement of Thu 23 Oct. Dashed is what is due to happen if customers pay on their due dates and you pay on yours.</p>
+    </div>
+    <div class="low">
+      <span class="muted">Lowest point ahead</span>
+      <b>123,266.85</b>
+      <span class="muted">Thu 30 Oct, after the pay run</span>
+    </div>
+  </div>
+
+  <div class="tl-wrap"><div data-timeline="t-main"></div></div>
+  <div class="legend"><span><i></i>Happened</span><span><i class="d"></i>Expected</span><span><i class="n"></i>Today, and decisions due now</span><span><i class="h"></i>Overdue, not counted in the expected balance</span></div>
+  <script type="application/json" id="t-main">{
+    "summary": "Cash in bank from 1 Oct to 7 Nov. Actual: 158,904.20 on 1 Oct to 184,320.55 on 23 Oct. Expected: 196,500.55 on 27 Oct, 161,481.45 on 28 Oct after the BAS and supplier run, lowest 123,266.85 on 30 Oct after the pay run, 154,876.85 on 7 Nov. Overdue receivables of 33,482.50 are not counted.",
+    "from": "2026-10-01", "narrowFrom": "2026-10-17", "to": "2026-11-09", "today": "2026-10-24",
+    "cashRange": [100000, 215000], "cashGrid": [120000, 150000, 180000, 210000],
+    "cash": [["2026-10-01",158904.20],["2026-10-03",171420.00],["2026-10-06",165180.50],["2026-10-09",176930.10],["2026-10-13",184605.75],["2026-10-16",146391.15],["2026-10-20",168240.80],["2026-10-21",160410.80],["2026-10-23",184320.55],
+             ["2026-10-27",196500.55],["2026-10-28",161481.45],["2026-10-30",123266.85],["2026-10-31",144826.85],["2026-11-03",136576.85],["2026-11-05",154876.85]],
+    "cashCallouts": [
+      {"date":"2026-10-01","value":158904.20,"note":"1 Oct","dy":26},
+      {"date":"2026-10-23","value":184320.55,"note":"Thu 23 Oct, last statement","anchor":"end","dy":-24,"narrow":true},
+      {"date":"2026-10-27","value":196500.55,"future":true,"dy":-12},
+      {"date":"2026-10-30","value":123266.85,"future":true,"note":"lowest, after pay run","dy":24,"narrow":true},
+      {"date":"2026-11-05","value":154876.85,"future":true,"dy":-12,"narrow":true}
+    ],
+    "lanes": [
+      {"name":"Customers pay you","sub":"31 open invoices","items":[
+        {"span":["2026-10-01","2026-10-23"],"label":"Overdue 33,482.50","sub":"8 invoices; Jordan is following up"},
+        {"date":"2026-10-27","future":true,"label":"12,180.00","sub":"3 invoices due"},
+        {"date":"2026-10-31","future":true,"label":"21,560.00","sub":"5 invoices due"},
+        {"date":"2026-11-05","future":true,"label":"18,300.00","sub":"4 due, incl. Saltbush"}]},
+      {"name":"You pay","sub":"bills, wages, rent","items":[
+        {"date":"2026-10-16","label":"Pay run 38,214.60","sub":"paid"},
+        {"date":"2026-10-28","future":true,"label":"Suppliers 22,415.00","sub":"11 bills, run PB-0087"},
+        {"date":"2026-10-30","future":true,"level":1,"label":"Pay run 38,214.60","sub":"net wages"},
+        {"date":"2026-11-03","future":true,"label":"Rent 8,250.00","sub":"monthly"}]},
+      {"name":"Tax","sub":"ATO","items":[
+        {"date":"2026-10-28","future":true,"label":"BAS: GST 12,604.10","sub":"Jul to Sep. Reserve is 163.75 short"}]},
+      {"name":"Decisions","sub":"placed on the day they block","items":[
+        {"date":"2026-10-24","now":true,"future":true,"label":"Credit note 660.00","sub":"Wattle & Stone, asked Wed","anchor":"end"},
+        {"date":"2026-10-27","now":true,"future":true,"label":"Release suppliers 22,415.00","sub":"by Mon 5 pm, or the run misses Tue"},
+        {"date":"2026-10-31","now":true,"future":true,"level":1,"label":"Wages journal 14,880.00","sub":"then bill 3,190.00 by 3 Nov"}]},
+      {"name":"Books","sub":"close and locks","items":[
+        {"date":"2026-10-03","label":"Sales locked","sub":"Priya"},
+        {"date":"2026-10-09","label":"September soft-closed","sub":"6 of 7 steps"},
+        {"date":"2026-10-28","future":true,"label":"Lock September","sub":"after the BAS is lodged","anchor":"start"}]},
+      {"name":"Salesforce","sub":"updates written","items":[
+        {"date":"2026-10-01","tick":14},{"date":"2026-10-02","tick":18},{"date":"2026-10-03","tick":20},{"date":"2026-10-06","tick":22},{"date":"2026-10-07","tick":16},{"date":"2026-10-08","tick":19},{"date":"2026-10-09","tick":24},{"date":"2026-10-10","tick":12},{"date":"2026-10-13","tick":21},{"date":"2026-10-14","tick":17},{"date":"2026-10-15","tick":20},{"date":"2026-10-16","tick":26},{"date":"2026-10-17","tick":15},{"date":"2026-10-20","tick":23},{"date":"2026-10-21","tick":18},{"date":"2026-10-22","tick":22},{"date":"2026-10-23","tick":30},
+        {"date":"2026-10-24","now":true,"future":true,"label":"3 need a person","sub":"1,284 written today, 2 retrying","anchor":"start"}]}
+    ]}</script>
+
+  <div class="below">
+    <section aria-labelledby="h-dec">
+      <h2 id="h-dec">Decisions, by the day they block something</h2>
+      <p>Four are yours. Each shows who is waiting and what slips if it waits.</p>
+      <ul class="dl">
+        <li><div class="by">Today<small>asked Wed 22</small></div><div><div class="what">Credit note CN-000118, Wattle &amp; Stone Architects</div><div class="why">Jordan's partial refund for a cancelled training day. Refunds wait for you.</div></div><div class="amt">660.00</div>
+          <div class="act"><a class="btn" href="#">Review</a></div></li>
+        <li><div class="by">Mon 27<small>by 5 pm</small></div><div><div class="what">Release supplier run PB-0087, second of two</div><div class="why">Lena made it, Mei released it first. If it waits past Monday, 11 suppliers are paid a day late.</div></div><div class="amt">22,415.00</div>
+          <div class="act"><a class="btn now" href="#">Review and release</a></div></li>
+        <li><div class="by">Fri 31<small>month end</small></div><div><div class="what">Journal MJ-0412, October wages owed</div><div class="why">Priya's accrual. October's profit is understated until it posts. You or Mei.</div></div><div class="amt">14,880.00</div>
+          <div class="act"><a class="btn" href="#">Review</a></div></li>
+        <li><div class="by">Mon 3 Nov<small>next run</small></div><div><div class="what">Bill TCH-88213, Tasman Cloud Hosting</div><div class="why">Entered by Lena. Approve by then to join the next supplier run. You or Mei.</div></div><div class="amt">3,190.00</div>
+          <div class="act"><a class="btn" href="#">Review</a></div></li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="h-day">
+      <h2 id="h-day">Day by day</h2>
+      <p>The same timeline, read downwards. Balances after each day.</p>
+      <div class="agenda-wrap"><ol class="agenda">
+        <li class="past"><span class="d">Thu 23 Oct</span><ul><li><span class="in">Customer payments</span><b>23,909.75</b></li></ul><p class="bal">Bank 184,320.55, from the statement</p></li>
+        <li class="today"><span class="d">Today, Sat 24 Oct</span><ul><li><span>Credit note waiting for you</span><b>660.00</b></li><li><span>Salesforce: 3 updates need Priya</span><b></b></li></ul></li>
+        <li class="future"><span class="d">Mon 27 Oct</span><ul><li><span class="in">3 invoices due</span><b>12,180.00</b></li><li><span>Release supplier run by 5 pm</span><b></b></li></ul><p class="bal">Expected 196,500.55</p></li>
+        <li class="future"><span class="d">Tue 28 Oct</span><ul><li><span class="out">BAS, GST Jul to Sep</span><b>12,604.10</b></li><li><span class="out">Supplier run PB-0087</span><b>22,415.00</b></li><li><span>Priya locks September</span><b></b></li></ul><p class="bal">Expected 161,481.45</p></li>
+        <li class="future"><span class="d">Thu 30 Oct</span><ul><li><span class="out">Pay run</span><b>38,214.60</b></li></ul><p class="bal">Expected 123,266.85, the lowest point</p></li>
+        <li class="future"><span class="d">Fri 31 Oct</span><ul><li><span class="in">5 invoices due</span><b>21,560.00</b></li></ul><p class="bal">Expected 144,826.85</p></li>
+      </ol></div>
+    </section>
+  </div>
+</main>
+<script src="timeline.js"></script>
+</body>
+</html>

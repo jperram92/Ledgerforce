@@ -438,3 +438,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: The 3-second heartbeat fixture showed the next provider losing its lease during prompt construction, before it could checkpoint. Windows launcher process IDs can disappear while descendant pipes remain open.
 - Alternatives: lengthen test timeout or heartbeat fixture lease (rejected: conceals behavior); self-approve verification (rejected).
 - ADR: none · Status: accepted
+
+### DL-0061 — apps/api is compiled with SWC; tested with Vitest + unplugin-swc
+- Date: 2026-10-24 · By: claude · Task: T-0104 · Category: tooling
+- Decision: NestJS needs decorators and emitDecoratorMetadata, which Node type stripping cannot run (proved locally). apps/api alone is built with SWC and tested through Vitest with `unplugin-swc`; every other package keeps running TypeScript directly (DL-0034). Pin @nestjs/* 12.0.4 and other new deps to releases at least 14 days old.
+- Why: RQ-0015 (finding 3, NestJS SWC recipe). The alternative of dropping NestJS would contradict design §7.1 / ADR-0002.
+- Alternatives: tsc build + tests on compiled JS (kept as fallback); Fastify without Nest (rejected: changes the design); NestJS without decorators (impractical).
+- ADR: ADR-0002 (stack) · Status: accepted
+
+### DL-0062 — Keycloak bundled; oidc-provider as in-process test IdP; T-0104 split from T-0011
+- Date: 2026-10-24 · By: claude · Task: T-0011 · Category: security
+- Decision: Self-host bundles Keycloak (Apache-2.0); tokens are validated through generic OIDC discovery so hosted tenants can use any compliant IdP. Tests use panva `oidc-provider` in-process (no Docker or JVM). The API skeleton becomes T-0104, a dependency of T-0011.
+- Why: RQ-0015: Zitadel is AGPL-3.0, and the LedgerForce licence is still open (ADR-0009). Card size limit (one session).
+- Alternatives: Zitadel (licence coupling); mock JWTs without a real provider (rejected: misses discovery, PKCE and signature validation).
+- ADR: ADR-0016 (to be written in T-0011, security, human gate) · Status: proposed (awaiting human)

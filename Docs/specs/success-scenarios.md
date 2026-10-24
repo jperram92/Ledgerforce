@@ -148,6 +148,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-25 | Sync failures back off then land in the Sync issues inbox | — | MVP | db-integration | no | — | T-0071 | not-started | — | — |
 | SS-PLAT-26 | Missed Salesforce events recovered by nightly reconciliation | — | MVP | db-integration | no | — | T-0070, T-0066 | not-started | — | — |
 | SS-PLAT-27 | Replay id resume after restart | — | MVP | db-integration | no | — | T-0064 | not-started | — | — |
+| SS-PLAT-28 | Every API request runs in its own tenant transaction | — | MVP | db-integration | no | — | T-0104 | not-started | — | — |
 
 ## Platform scenarios (definitions)
 
@@ -258,3 +259,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-27 — Replay id resume after restart
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0064
 - **Given** a subscriber that committed replay id R · **When** it restarts · **Then** it resumes from R with no lost or duplicated effects
+
+### SS-PLAT-28 — Every API request runs in its own tenant transaction
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0104
+- **Given** tenants A and B, each with a company · **When** a request resolved to A lists companies, and a request with no resolvable tenant is made · **Then** only A's company is returned; the unresolved request gets 401 and runs no SQL; the pooled connection carries no tenant context afterwards; `/health` answers 200 without a tenant
