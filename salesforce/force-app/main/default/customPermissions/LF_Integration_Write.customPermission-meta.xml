@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Lets the LedgerForce integration user write mirror records and LedgerForce-owned fields; checked by the LF validation rules. Grant only through the LF_Integration_User permission set.</description>
+    <isLicensed>false</isLicensed>
+    <label>LedgerForce Integration Write</label>
+</CustomPermission>

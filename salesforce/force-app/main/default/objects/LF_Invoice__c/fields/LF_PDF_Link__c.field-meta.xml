@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LF_PDF_Link__c</fullName>
+    <description>Link to the invoice PDF in LedgerForce. Written by LedgerForce write-back; read-only in Salesforce (design §5.4).</description>
+    <label>PDF Link</label>
+    <required>false</required>
+    <type>Url</type>
+</CustomField>
