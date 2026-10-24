@@ -1,9 +1,15 @@
-# Handover - 2026-10-24 20:10 UTC
+# Handover - 2026-10-24 20:20 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: T-0037 done to review; next = `node scripts/agent/conductor.ts next`
+Task: PARALLEL BUILD in progress (DL-0081): T-0058, T-0011, T-0106, T-0062 by sub-agents in git worktrees; T-0107 by the lead. Each worktree branch is merged into this branch by the lead.
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
-In progress: nothing mid-edit. Working tree clean after the last commit.
+In progress: parallel worktrees. Pre-assigned to avoid collisions (DL-0081):
+  T-0058 → migration 0013, DL-0082..0085, RQ-0019, SS-PLAT-39..40, ADR-0019
+  T-0011 → migration 0014, DL-0086..0089, RQ-0020, SS-PLAT-41..42, ADR-0020
+  T-0106 → no migration, DL-0090..0093, RQ-0021, SS-PLAT-43..44, ADR-0021
+  T-0062 → no migration, DL-0094..0097, RQ-0022, SS-PLAT-45..46, ADR-0022
+  T-0107 (lead) → migration 0015, DL-0098.., SS-PLAT-47
+  If a worktree is lost, its card says how far it got; re-run that task from its card.
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
 Decisions taken: DL-0061..DL-0080; RQ-0017, RQ-0018; ADR-0018 (Proposed, security); RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:

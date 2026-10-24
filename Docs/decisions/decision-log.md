@@ -593,3 +593,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Design §4.2, §6.1, §6.6; RQ-0018; ADR-0018.
 - Alternatives: see ADR-0018 (Vault BUSL, OpenBao now, pgcrypto).
 - ADR: ADR-0018 (Proposed, security) · Status: accepted for the build; awaiting the human with ADR-0018
+
+### DL-0081 — Parallel build: independent tasks in separate worktrees, with pre-assigned numbers
+- Date: 2026-10-24 · By: claude (on the product owner's instruction to use parallel sub-agents) · Task: T-0058, T-0011, T-0106, T-0062, T-0107 · Category: process
+- Decision: Build the claimable tasks whose dependencies are met and whose code areas don't overlap in parallel: T-0058 (modules/bank), T-0011 (apps/api auth), T-0106 (packages/ui), T-0062 (salesforce/), each by a sub-agent in its own git worktree. The lead builds T-0107 in the main tree. To avoid collisions, each task gets a pre-assigned migration number, DL/RQ/SS/ADR id range (listed in HANDOVER). Sub-agents do not run conductor claim/release/set-status and do not edit HANDOVER.md, state.json or run logs; the lead does, at merge. Shared append-only files (decision log, register, backlog index, schema.ts, cross-tenant overrides, apps/api app.ts) are merged by the lead, followed by the full gates on the merged tree. Not in this round: T-0095 (CI security gates; AGENTS.md §5 forbids agents to edit CI security gates, so it needs the human) and T-0108 (Phase 1).
+- Why: Product owner asked for parallel sub-agents. The global migration sequence and the shared registers are the only serialisation points, so pre-assignment removes them.
+- Alternatives: sequential build (slower); parallel without pre-assignment (migration number and id collisions).
+- ADR: none · Status: accepted
