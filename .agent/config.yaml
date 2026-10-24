@@ -17,7 +17,7 @@ lease_minutes: 45
 heartbeat_minutes: 10                      # agent renews lease at every checkpoint, at least this often
 max_attempts_per_task: 3
 dependency_satisfied_by: [done, review]   # DL-0053: provisional while no codex in this environment — review = verify-green, awaiting cross-review; a FAIL reopens dependants. Set back to [done] once codex runs.                   # across providers, then status: blocked
-parallel_tasks: 1                          # design §11.2 open decision: parallel builds — 1 until human decides
+parallel_tasks: 5                          # design §11.2: human decided 2026-10-24 to allow parallel builds (DL-0081)
 budgets:
   claude: { daily_usd: 40 }
   codex: { daily_usd: 40 }
