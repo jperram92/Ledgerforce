@@ -1,0 +1,96 @@
+/*
+ * LedgerForce design tokens — v2 "Columnar" (supersedes Docs/ui/tokens.css v0.1, see DL-0051)
+ *
+ * The visual language comes from the bookkeeper's own tools, not from a SaaS template:
+ *   - Paper: the green-ruled analysis pad / columnar book. Faint green ruling, a red margin line.
+ *   - Ink:   the four inks accountants actually use. Black-green for entries, red for negatives
+ *            and overdue, green for audit ticks / reconciled / paid, blue-black for approvals.
+ *   - Stamps: document states are rubber stamps (word + border style + ink), never colour alone.
+ *   - Rules: a single rule above a total, a double rule under a grand total.
+ * No shadows, no pill shapes, no gradients. Corners are 2px — paper, not bubbles.
+ * Contrast of every text/background pair is verified by Docs/ui/v2/tools/contrast.mjs.
+ */
+
+@font-face { font-family: "Plex Sans"; src: url("fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Plex Sans"; src: url("fonts/ibm-plex-sans-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Plex Sans"; src: url("fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Plex Condensed"; src: url("fonts/ibm-plex-sans-condensed-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Plex Condensed"; src: url("fonts/ibm-plex-sans-condensed-latin-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Plex Mono"; src: url("fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Plex Mono"; src: url("fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+
+:root {
+  color-scheme: light;
+
+  /* Paper */
+  --paper: #eef1ea;          /* the desk: page background behind the sheet */
+  --sheet: #fbfcf8;          /* the ruled sheet everything is written on */
+  --sheet-2: #f3f6ef;        /* header bands, sunken wells, selected row */
+  --rule: #d6e0d3;           /* faint green ruling between rows (decorative) */
+  --rule-2: #b9c9b8;         /* column rules, section rules (decorative) */
+  --rule-ink: #2a3a32;       /* total rules, heavy header rule, T-rule */
+  --margin: #d9534a;         /* the red margin line (decorative, never carries text) */
+  --field-border: #7c8f82;   /* input borders (>= 3:1 on sheet) */
+
+  /* Inks */
+  --ink: #17221d;            /* entries and body text */
+  --ink-2: #44544b;          /* secondary text, labels */
+  --ink-3: #5c6b62;          /* captions, meta */
+  --ink-red: #b02a1f;        /* negatives, overdue, rejected */
+  --ink-green: #1f6a43;      /* audit ticks, reconciled, paid */
+  --ink-blue: #24468f;       /* approvals, posted (blue-black) */
+  --ink-amber: #8a5300;      /* awaiting, warnings */
+  --ink-violet: #5b3a8c;     /* reversed */
+
+  /* Ink washes (backgrounds behind a stamp or a highlighted row) */
+  --wash-red: #fbe9e6;
+  --wash-green: #e5f2e8;
+  --wash-blue: #e7ecf7;
+  --wash-amber: #fbf0d9;
+
+  /* The one brand colour: ledger green, used for primary actions and the active tab */
+  --brand: #1d5b46;
+  --brand-hover: #164a39;
+  --brand-ink: #ffffff;
+  --brand-wash: #e1ece5;
+  --focus: #1d5b46;
+
+  /* Type */
+  --font-sans: "Plex Sans", "IBM Plex Sans", ui-sans-serif, system-ui, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-cond: "Plex Condensed", "IBM Plex Sans Condensed", "Arial Narrow", ui-sans-serif, sans-serif;
+  --font-figs: "Plex Mono", "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --t-xs: 11.5px; --t-sm: 12.5px; --t-base: 14px; --t-md: 15px; --t-lg: 18px; --t-xl: 22px; --t-2xl: 28px; --t-fig: 30px;
+  --lead: 1.5; --lead-tight: 1.2;
+  --caps-track: 0.07em;      /* letter-spacing for condensed uppercase labels */
+
+  /* Space (4px base) and shape */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 20px; --s6: 24px; --s8: 32px; --s10: 40px;
+  --radius: 2px;
+  --margin-w: 56px;          /* width of the margin column left of the red line */
+  --row-h: 40px; --cell-px: 12px; --control-h: 34px;   /* Comfortable */
+  --content-max: 1320px;
+}
+
+[data-density="compact"] { --row-h: 30px; --cell-px: 8px; --control-h: 28px; }
+
+/* Dark: "carbon copy" — the same sheet as a dark carbon, inks lifted for contrast */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0d1210; --sheet: #141b17; --sheet-2: #1a231e;
+    --rule: #233029; --rule-2: #33443a; --rule-ink: #c9d6cc; --margin: #a8453d; --field-border: #6f8577;
+    --ink: #e8eee8; --ink-2: #bccac0; --ink-3: #9aaa9f;
+    --ink-red: #ff9b8f; --ink-green: #7fd4a2; --ink-blue: #a9bfff; --ink-amber: #f0bd5a; --ink-violet: #c9b0ff;
+    --wash-red: #3a1915; --wash-green: #12301f; --wash-blue: #18233f; --wash-amber: #33260b;
+    --brand: #7fd4a2; --brand-hover: #9fe2bb; --brand-ink: #0d1210; --brand-wash: #17301f; --focus: #9fe2bb;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0d1210; --sheet: #141b17; --sheet-2: #1a231e;
+  --rule: #233029; --rule-2: #33443a; --rule-ink: #c9d6cc; --margin: #a8453d; --field-border: #6f8577;
+  --ink: #e8eee8; --ink-2: #bccac0; --ink-3: #9aaa9f;
+  --ink-red: #ff9b8f; --ink-green: #7fd4a2; --ink-blue: #a9bfff; --ink-amber: #f0bd5a; --ink-violet: #c9b0ff;
+  --wash-red: #3a1915; --wash-green: #12301f; --wash-blue: #18233f; --wash-amber: #33260b;
+  --brand: #7fd4a2; --brand-hover: #9fe2bb; --brand-ink: #0d1210; --brand-wash: #17301f; --focus: #9fe2bb;
+}
