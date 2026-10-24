@@ -32,7 +32,7 @@ Drafting `Docs/accounting/postings.md` (T-0007) needs, for each standard event i
    Australia-based businesses" <https://support.stripe.com/questions/taxes-on-stripe-fees-for-australia-based-businesses>.
    Whether the GST is inside the per-transaction fee reported on the balance transaction (vs only on the monthly
    invoice) was **not confirmed** — the Stripe API reference for `balance_transaction.fee_details` must be checked
-   in the Stripe connector task (T-0063) before its golden test is finalised.
+   in the Stripe payout task (T-0075) before its golden test is finalised.
 3. **Deposits.** On the accruals basis GST is attributable to the earliest period in which any consideration is
    received or an invoice is issued (ATO "Identify your accounting basis"
    <https://www.ato.gov.au/businesses-and-organisations/gst-excise-and-indirect-taxes/gst/completing-your-bas-for-gst/identify-your-accounting-basis>).

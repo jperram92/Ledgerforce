@@ -109,3 +109,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Design §10.6 acceptance is by PR label; an agent labelling its own approval defeats the gate.
 - Alternatives: GitHub approvals only (rejected: can't tell gate types apart).
 - ADR: ADR-0001 · Status: accepted
+
+### DL-0014 — Golden-posting cards depend on the golden runner and approved goldens
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: Every card whose acceptance includes an MVP golden scenario depends on T-0031 (golden-posting test runner), which depends on T-0007 (human-approved golden postings).
+- Why: AGENTS.md §0.2 (expected result before code); design §10.10 (golden postings come from the human in Sprint 0).
+- Alternatives: build against Draft goldens and reconcile later (rejected: accounting logic would rest on unapproved expectations).
+- ADR: none · Status: accepted
+
+### DL-0015 — Account bindings missing from §3.2 drafted as settings, not system roles
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: accounting
+- Decision: Stripe clearing, merchant fees, bad debts and payroll expense accounts are drafted as connector/module settings (`setting:*`) pending accountant answers Q2/Q3 in `Docs/accounting/postings.md`.
+- Why: §3.2's system-role list does not include them; RQ-0090.
+- Alternatives: add new system roles (left to the human).
+- ADR: none · Status: proposed (awaiting human)
+
+### DL-0016 — Draft GST treatments in golden postings
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: accounting
+- Decision: Bad-debt GST adjustment = debit GST collected, reported at BAS 1B; Stripe receipt recognised at charge, fee + GST on fee at payout; prepayment per design (Option A); per-document rounding residue to ROUNDING. All flagged as Q1–Q11 for the accountant.
+- Why: RQ-0090 (ATO adjustments and accounting-basis pages; Stripe GST-on-fees support page); design §3.4, §3.8.
+- Alternatives: recorded per question in postings.md (e.g. Option B: GST on prepayment receipt).
+- ADR: none · Status: proposed (awaiting human)
+
+### DL-0017 — Task ids in stable dependency order; tests named by scenario id
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: Card ids follow dependency order (T-0001..T-0009 Sprint 0, T-0010+ MVP, epics for Phases 1–3). Each test title starts with its SS id so the register links tests to scenarios. SS ids are never renumbered — superseded instead.
+- Why: AGENTS.md §2 claim rule and §0.6 no-delete.
+- Alternatives: number by module (rejected: claim order would diverge from dependencies).
+- ADR: none · Status: accepted
