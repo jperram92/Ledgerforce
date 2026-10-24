@@ -1,0 +1,22 @@
+{
+  "name": "@ledgerforce/connector-salesforce",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Salesforce connector: External Client App JWT bearer auth and encrypted token store (design §5.2, ADR-0007)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "vitest": "4.1.12"
+  }
+}
