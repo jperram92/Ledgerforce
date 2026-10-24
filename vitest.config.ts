@@ -4,6 +4,7 @@ import { defineConfig } from 'vitest/config';
 /**
  * Vitest projects (apps/api has its own two, compiled by SWC for NestJS decorators — DL-0061):
  *  - `unit`: pure tests, no I/O beyond the filesystem (`pnpm test`).
+ *  - `ui`:   packages/ui React component and layout tests in jsdom (`pnpm test`; T-0106, DL-0091).
  *  - `db`:   integration tests against a real PostgreSQL (`pnpm test:db`). The global setup
  *            starts one throw-away cluster (Testcontainers when Docker is reachable, else a
  *            local initdb/pg_ctl cluster — DL-0007) and every test file creates its own
@@ -21,8 +22,23 @@ export default defineConfig({
             'packages/*/*/src/**/*.test.{ts,tsx}', // nested: packages/modules/<m>, packages/connectors/<c>
             'packages/*/eslint-rules/**/*.test.ts',
           ],
-          exclude: ['**/*.db.test.ts', '**/node_modules/**', '**/dist/**', 'apps/api/**'],
+          exclude: [
+            '**/*.db.test.ts',
+            '**/node_modules/**',
+            '**/dist/**',
+            'apps/api/**',
+            'packages/ui/**',
+          ],
           environment: 'node',
+        },
+      },
+      {
+        test: {
+          name: 'ui',
+          include: ['packages/ui/src/**/*.test.{ts,tsx}'],
+          exclude: ['**/node_modules/**', '**/dist/**'],
+          environment: 'jsdom',
+          setupFiles: ['packages/ui/src/test-setup.ts'],
         },
       },
       {
