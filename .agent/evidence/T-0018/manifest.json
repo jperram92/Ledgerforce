@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0018",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-31",
+      "file": ".agent/evidence/T-0018/20261024-141815-tests-db.json",
+      "test": "10 test(s): packages/modules/gl/src/chart.db.test.ts › SS-PLAT-31: System-role accounts are protected by the database › loading the template creates every account and binds all 17 roles once | packages/modules/gl/src/chart.db.test.ts › SS-PLAT-31: System-role accounts are protected by the database › a bound account cannot be archived | packages/modules/gl/src/chart.db.test.ts › SS-PLAT-31: System-role accounts are protected by the database › a bound account cannot be made non-postable | packages/modules/gl/src/chart.db.test.ts › SS-PLAT-31: System-role accounts are protected by the database › a bound account cannot change to a type its role does not allow | packages/modules/gl/src/chart.db.test.ts › SS-PLAT-31: System-role accounts are protected by the database › a role can only be re-bound to an account of an allowed type | packages/modules/gl/src/chart.db.test.ts › SS-PLAT-31: System-role accounts are protected by the database › a role cannot be bound twice in one company | packages/modules/gl/src/chart.db.test.ts › SS-PLAT-31: System-role accounts are protected by the database › control accounts must carry the control flag (and only control roles may bind them) | packages/modules/gl/src/chart.db.test.ts › SS-PLAT-31: System-role accounts are protected by the database › an unbound account can be archived (positive control) | packages/modules/gl/src/chart.db.test.ts › SS-PLAT-31: System-role accounts are protected by the database › lf_app cannot delete accounts or role bindings (nothing is deleted) | packages/modules/gl/src/chart.db.test.ts › SS-PLAT-31: System-role accounts are protected by the database › the database role/type rule matches the TypeScript ROLE_ACCOUNT_TYPES map",
+      "commit": "42fc3bafb8c2",
+      "provider": "claude",
+      "timestamp": "2026-10-24T14:18:15.004Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-32",
+      "file": ".agent/evidence/T-0018/20261024-141818-tests-unit.json",
+      "test": "5 test(s): packages/modules/gl/src/templates.test.ts › SS-PLAT-32: AU services SMB chart template is valid › knows exactly the 17 system roles listed in design §3.2 | packages/modules/gl/src/templates.test.ts › SS-PLAT-32: AU services SMB chart template is valid › the shipped template has no errors | packages/modules/gl/src/templates.test.ts › SS-PLAT-32: AU services SMB chart template is valid › binds every system role exactly once, to an account of an allowed type | packages/modules/gl/src/templates.test.ts › SS-PLAT-32: AU services SMB chart template is valid › flags a duplicated role, a missing role and a role on the wrong account type | packages/modules/gl/src/templates.test.ts › SS-PLAT-32: AU services SMB chart template is valid › flags duplicate codes, bad codes, control flags off the control roles and a postable CURRENT_YEAR_EARNINGS",
+      "commit": "42fc3bafb8c2",
+      "provider": "claude",
+      "timestamp": "2026-10-24T14:18:18.497Z",
+      "result": "passed"
+    }
+  ]
+}

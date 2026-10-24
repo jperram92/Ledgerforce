@@ -1,15 +1,17 @@
-# Handover - 2026-10-24 13:50 UTC
-From: claude (lead session r01)    Reason: checkpoint — T-0105 in review; waiting on product-owner decisions; T-0011 next
-Task: next is T-0011 (OIDC login/callback/logout creating T-0105 sessions; tenant slug lookup step 4a)
+# Handover - 2026-10-24 14:25 UTC
+From: claude (lead session r01)    Reason: checkpoint — T-0018 (chart of accounts) verified and in review; next claimable task follows
+Task: T-0018 done to review; next = `node scripts/agent/conductor.ts next` (expected T-0024 gapless numbering)
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
-Done today: Codex recovery merged; T-0010, T-0104 (API skeleton), T-0105 (sessions), T-0009 (UI: Timeline adopted, DL-0070), T-0014 (audit writer) all verified (exit 0) and in review; conductor race fixed (DL-0069).
+Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: nothing mid-edit. Working tree clean after the last commit.
-Next action: (codex) cross-review T-0010, T-0104, T-0105 — see prompt below. (claude or codex) claim T-0011.
-Decisions taken: DL-0061..DL-0069; ADR-0016 (Proposed, security); RQ-0015.
+Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
+Decisions taken: DL-0061..DL-0072; ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
   2. Accept/reject ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
   4. Design contradictions in RQ-0012 (CDC 5-object cap, ATO GST rounding, prepayment GST, SoD gaps)
+  5. Accountant review (not a gate) of the AU services SMB chart template and role→type map (DL-0072):
+     packages/modules/gl/templates/au-services-smb.json
 Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
 
 ## Codex continuation prompt
@@ -25,6 +27,9 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0009 — tests/e2e/evidence-harness.spec.ts; Docs/ui/principles.md v1; Docs/ui/system/ (Timeline, DL-0070)
 >   • T-0014 — apps/api/src/audit/request-id.ts; audit write in tenant.interceptor.ts; AuditTrail in tenant-tx.ts
 >   • T-0017 — packages/testing/eslint-rules/no-float-money.config.test.ts (Money itself from the scaffold)
+>   • T-0018 — packages/db/migrations/0005_gl_chart_of_accounts.sql (role guards, system_role_allows);
+>     packages/modules/gl/** (system-roles, templates validator, loadChartTemplate, au-services-smb.json);
+>     cross-tenant overrides; DL-0071/0072
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -33,7 +38,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 > THEN: on Windows take T-0103; otherwise `node scripts/agent/conductor.ts next`.
 > Tests: `pnpm test`, `pnpm test:db` (local initdb cluster or LF_TEST_DATABASE_URL), `bash scripts/agent/verify.sh --task <T-ID>`.
 
-## Log
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
 - 2026-10-24 ~07:2x 4 sub-agents stopped by usage limit; checkpointed 2089650; resumed 07:45 after reset — failover-by-repo-state worked as designed
@@ -70,3 +74,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T14:09:19.988Z claude: T-0017 → verifying
 - 2026-10-24T14:10:52.794Z claude: release T-0017 → review (verify exit 0; awaiting codex cross-review)
 - 2026-10-24 14:2x claude: T-0017 → review (verify exit 0)
+- 2026-10-24T14:19:44.096Z claude: T-0018 → verifying
+- 2026-10-24T14:21:15.031Z claude: release T-0018 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 14:2x claude: T-0018 built (migration 0005, @ledgerforce/gl), evidenced SS-PLAT-31/32, verify 12 PASS/0 FAIL → review
