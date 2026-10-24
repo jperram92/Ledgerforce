@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0106",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225155-SS-PLAT-29-ui-system-1440-light.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: fixture page @ 1440 light [T-0106]",
+      "commit": "bede6c34944f",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:51:55.355Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225155-SS-PLAT-29-ui-system-quarter-1440.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: Quarter scale aggregates and stays honest @ 1440 [T-0106]",
+      "commit": "bede6c34944f",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:51:55.561Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225158-SS-PLAT-29-ui-system-1440-dark.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: fixture page @ 1440 dark [T-0106]",
+      "commit": "bede6c34944f",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:51:58.163Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225158-SS-PLAT-29-ui-system-year-1440.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: Year scale aggregates and stays honest @ 1440 [T-0106]",
+      "commit": "bede6c34944f",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:51:58.449Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225200-SS-PLAT-29-turn-queue-keyboard-1440.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: turn queue works from the keyboard with a visible focus ring [T-0106]",
+      "commit": "bede6c34944f",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:52:00.030Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225201-SS-PLAT-29-ui-system-390-light.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: fixture page @ 390 light [T-0106]",
+      "commit": "bede6c34944f",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:52:01.085Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225204-SS-PLAT-29-ui-system-390-dark.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: fixture page @ 390 dark [T-0106]",
+      "commit": "bede6c34944f",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:52:04.065Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225435-SS-PLAT-29-ui-system-1440-light.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: fixture page @ 1440 light [T-0106]",
+      "commit": "bede6c34944f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:54:35.757Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225436-SS-PLAT-29-ui-system-quarter-1440.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: Quarter scale aggregates and stays honest @ 1440 [T-0106]",
+      "commit": "bede6c34944f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:54:36.192Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225439-SS-PLAT-29-ui-system-1440-dark.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: fixture page @ 1440 dark [T-0106]",
+      "commit": "bede6c34944f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:54:39.724Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225440-SS-PLAT-29-ui-system-year-1440.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: Year scale aggregates and stays honest @ 1440 [T-0106]",
+      "commit": "bede6c34944f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:54:40.364Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225442-SS-PLAT-29-turn-queue-keyboard-1440.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: turn queue works from the keyboard with a visible focus ring [T-0106]",
+      "commit": "bede6c34944f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:54:42.398Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225443-SS-PLAT-29-ui-system-390-light.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: fixture page @ 390 light [T-0106]",
+      "commit": "bede6c34944f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:54:43.309Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225446-SS-PLAT-29-ui-system-390-dark.png",
+      "test": "ui-system.spec.ts › SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes › SS-PLAT-29: fixture page @ 390 dark [T-0106]",
+      "commit": "bede6c34944f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:54:46.278Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-29",
+      "file": ".agent/evidence/T-0106/20261024-225536-tests-ui.json",
+      "test": "59 test(s): packages/ui/src/aggregate/aggregate.test.ts › SS-PLAT-29 buckets per scale (RQ-0021 Q2) › uses days for Week and 5 weeks, ISO weeks for Quarter, months for Year | packages/ui/src/aggregate/aggregate.test.ts › SS-PLAT-29 buckets per scale (RQ-0021 Q2) › lists contiguous buckets covering a range, with first and last day | packages/ui/src/aggregate/aggregate.test.ts › SS-PLAT-29 aggregation keeps actual and expected apart (P15) › sums each lane and bucket exactly, with separate actual and expected totals | packages/ui/src/aggregate/aggregate.test.ts › SS-PLAT-29 aggregation keeps actual and expected apart (P15) › leaves overdue out of expected and reports what was left out, per lane | packages/ui/src/aggregate/aggregate.test.ts › SS-PLAT-29 aggregation keeps actual and expected apart (P15) › refuses an item with a float amount or a mixed currency total | packages/ui/src/aggregate/aggregate.test.ts › SS-PLAT-29 aggregation keeps actual and expected apart (P15) › property: every amount lands in exactly one place and the sums are exact | packages/ui/src/aggregate/aggregate.test.ts › SS-PLAT-29 cash balance per bucket: closing balance and lowest point › splits actual (to the last statement) from expected, and keeps the trough | packages/ui/src/aggregate/aggregate.test.ts › SS-PLAT-29 cash balance per bucket: closing balance and lowest point › a bucket straddling the last statement date becomes two entries, never one mixed figure | packages/ui/src/aggregate/aggregate.test.ts › SS-PLAT-29 cash balance per bucket: closing balance and lowest point › compares balances as decimals, not as text or floats | packages/ui/src/components/CashLane.test.tsx › SS-PLAT-29 <CashLane> (P15 expected is never shown as actual) › draws actual solid up to the last statement date, and expected dashed from there | packages/ui/src/components/CashLane.test.tsx › SS-PLAT-29 <CashLane> (P15 expected is never shown as actual) › computes heights from decimal strings exactly (no float on money) | packages/ui/src/components/CashLane.test.tsx › SS-PLAT-29 <CashLane> (P15 expected is never shown as actual) › labels the expected series in words, says what it leaves out, and names the lowest point | packages/ui/src/components/CashLane.test.tsx › SS-PLAT-29 <CashLane> (P15 expected is never shown as actual) › gives the chart a text summary for screen readers | packages/ui/src/components/JournalTable.test.tsx › SS-PLAT-29 <JournalTable> (P1, P3, P12) › shows each account with its code, term and plain gloss, Dr and Cr in separate columns | packages/ui/src/components/JournalTable.test.tsx › SS-PLAT-29 <JournalTable> (P1, P3, P12) › totals the columns exactly and says it is balanced | packages/ui/src/components/JournalTable.test.tsx › SS-PLAT-29 <JournalTable> (P1, P3, P12) › says plainly when it is out of balance, and by how much | packages/ui/src/components/JournalTable.test.tsx › SS-PLAT-29 <JournalTable> (P1, P3, P12) › refuses negative or two-sided lines (Dr/Cr are always positive, one side per line) | packages/ui/src/components/Lane.test.tsx › SS-PLAT-29 <Lane> (RQ-0021 layout, P15) › draws each item on its row at its date, as a labelled list | packages/ui/src/components/Lane.test.tsx › SS-PLAT-29 <Lane> (RQ-0021 layout, P15) › labels every expected item as expected, in words and with data-series | packages/ui/src/components/Lane.test.tsx › SS-PLAT-29 <Lane> (RQ-0021 layout, P15) › puts what does not fit behind \"+n more\", which says it hides a due-now item and reveals it | packages/ui/src/components/Lane.test.tsx › SS-PLAT-29 <Lane> (RQ-0021 layout, P15) › marks overdue spans and says they are not counted | packages/ui/src/components/Money.test.tsx › SS-PLAT-29 <Money> (P3) › renders a negative in parentheses and announces it as \"minus\" | packages/ui/src/components/Money.test.tsx › SS-PLAT-29 <Money> (P3) › renders a positive amount with grouping and no sign | packages/ui/src/components/Money.test.tsx › SS-PLAT-29 <Money> (P3) › says direction in words for owner sentences | packages/ui/src/components/Money.test.tsx › SS-PLAT-29 <Money> (P3) › marks zero and accepts a Money value | packages/ui/src/components/Money.test.tsx › SS-PLAT-29 <Money> (P3) › refuses a JS float at runtime | packages/ui/src/components/Spine.test.tsx › SS-PLAT-29 <Spine> (document life story, P5, P15) › lists every event oldest first with a machine-readable date | packages/ui/src/components/Spine.test.tsx › SS-PLAT-29 <Spine> (document life story, P5, P15) › marks today as the current step and labels the future as expected | packages/ui/src/components/Spine.test.tsx › SS-PLAT-29 <Spine> (document life story, P5, P15) › shows a failure flag as a word, not only a colour (P2) | packages/ui/src/components/Spine.test.tsx › SS-PLAT-29 <Spine> (document life story, P5, P15) › offers no way to remove an event (P5) | packages/ui/src/components/Spine.test.tsx › SS-PLAT-29 <Spine> (document life story, P5, P15) › refuses events out of date order (the spine is chronological) | packages/ui/src/components/Timeline.test.tsx › SS-PLAT-29 <Timeline> (axis, scales, lanes, legend) › keeps the lane order from the prototype (P14 contract) | packages/ui/src/components/Timeline.test.tsx › SS-PLAT-29 <Timeline> (axis, scales, lanes, legend) › starts on 5 weeks: 1 Oct to 9 Nov, Mondays on the axis, today marked | packages/ui/src/components/Timeline.test.tsx › SS-PLAT-29 <Timeline> (axis, scales, lanes, legend) › switches to Quarter: weekly buckets, actual and expected kept apart | packages/ui/src/components/Timeline.test.tsx › SS-PLAT-29 <Timeline> (axis, scales, lanes, legend) › switches to Year: monthly buckets | packages/ui/src/components/Timeline.test.tsx › SS-PLAT-29 <Timeline> (axis, scales, lanes, legend) › has a legend that names happened, expected, today and overdue | packages/ui/src/components/TurnQueue.test.tsx › SS-PLAT-29 <TurnQueue> (P13 whose turn, P10 keyboard) › names who acts next and the date it blocks, on every open item | packages/ui/src/components/TurnQueue.test.tsx › SS-PLAT-29 <TurnQueue> (P13 whose turn, P10 keyboard) › refuses an open item without a turn or a due date (P13) | packages/ui/src/components/TurnQueue.test.tsx › SS-PLAT-29 <TurnQueue> (P13 whose turn, P10 keyboard) › moves with J/K and the arrow keys, jumps with Home/End, and opens with Enter | packages/ui/src/components/TurnQueue.test.tsx › SS-PLAT-29 <TurnQueue> (P13 whose turn, P10 keyboard) › shows the keyboard hints | packages/ui/src/layout/lane-layout.test.ts › SS-PLAT-29 lane collision layout (RQ-0021 Q1) › has per-scale footprints and row caps from RQ-0021 | packages/ui/src/layout/lane-layout.test.ts › SS-PLAT-29 lane collision layout (RQ-0021 Q1) › places the Harbour decisions lane on two rows without overlap | packages/ui/src/layout/lane-layout.test.ts › SS-PLAT-29 lane collision layout (RQ-0021 Q1) › hides what does not fit into one \"+n more\" marker, and says when it hides a due-now item | packages/ui/src/layout/lane-layout.test.ts › SS-PLAT-29 lane collision layout (RQ-0021 Q1) › flags a marker that hides a due-now item | packages/ui/src/layout/lane-layout.test.ts › SS-PLAT-29 lane collision layout (RQ-0021 Q1) › widens spans to at least the footprint and keeps their full length | packages/ui/src/layout/lane-layout.test.ts › SS-PLAT-29 lane collision layout (RQ-0021 Q1) › refuses duplicate ids and an end before the start | packages/ui/src/layout/lane-layout.test.ts › SS-PLAT-29 lane layout invariants (fast-check) › never overlaps two items in one row, and never overlaps two markers | packages/ui/src/layout/lane-layout.test.ts › SS-PLAT-29 lane layout invariants (fast-check) › accounts for every item exactly once (placed or behind one marker) | packages/ui/src/layout/lane-layout.test.ts › SS-PLAT-29 lane layout invariants (fast-check) › is deterministic: the same items in any order give the same layout | packages/ui/src/layout/lane-layout.test.ts › SS-PLAT-29 lane layout invariants (fast-check) › hides nothing when the items fit (depth <= row cap), and uses no more rows than needed | packages/ui/src/money/format.test.ts › SS-PLAT-29 formatMoney (P3: money is set for reading) › groups thousands and always shows two decimals for AUD | packages/ui/src/money/format.test.ts › SS-PLAT-29 formatMoney (P3: money is set for reading) › shows negatives in parentheses and speaks them as \"minus\" (accountant view) | packages/ui/src/money/format.test.ts › SS-PLAT-29 formatMoney (P3: money is set for reading) › formats zero and negative zero the same way, never as a negative | packages/ui/src/money/format.test.ts › SS-PLAT-29 formatMoney (P3: money is set for reading) › uses a leading minus for editable values and direction words for owner sentences | packages/ui/src/money/format.test.ts › SS-PLAT-29 formatMoney (P3: money is set for reading) › rounds half-up (away from zero) to the currency minor unit, exactly | packages/ui/src/money/format.test.ts › SS-PLAT-29 formatMoney (P3: money is set for reading) › accepts a Money instance | packages/ui/src/money/format.test.ts › SS-PLAT-29 formatMoney (P3: money is set for reading) › refuses floating-point and non-decimal input | packages/ui/src/money/format.test.ts › SS-PLAT-29 formatMoney (P3: money is set for reading) › property: the text is the exact decimal value, grouped, with sign shown once | packages/ui/src/money/format.test.ts › SS-PLAT-29 sumAmounts (exact decimal totals) › sums decimal strings exactly (no float drift)",
+      "commit": "bede6c34944f",
+      "provider": "claude",
+      "timestamp": "2026-10-24T22:55:36.410Z",
+      "result": "passed"
+    }
+  ]
+}

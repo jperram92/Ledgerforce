@@ -14,13 +14,14 @@
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run --project unit --project api-unit",
+    "test": "vitest run --project unit --project ui --project api-unit",
     "test:db": "vitest run --project db --project api-db",
     "test:e2e": "playwright test",
     "test:all": "pnpm test && pnpm test:db && pnpm test:e2e",
     "evidence:tests": "node packages/testing/src/evidence/record-tests.ts"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
     "@eslint/js": "10.0.1",
     "@ledgerforce/testing": "workspace:*",
     "@playwright/test": "1.63.0",

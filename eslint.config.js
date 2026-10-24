@@ -11,6 +11,8 @@ const MONEY_PATHS = [
   'packages/ledger/**/*.{ts,tsx,js}',
   'packages/modules/**/*.{ts,tsx,js}',
   'packages/shared/src/money/**/*.{ts,tsx,js}',
+  // The UI component package formats and sums money (T-0106).
+  'packages/ui/src/**/*.{ts,tsx}',
 ];
 
 export default tseslint.config(

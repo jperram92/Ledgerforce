@@ -27,6 +27,7 @@ Open questions for human:
      refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
   5. Accountant review (not a gate) of the AU services SMB chart template and role→type map (DL-0072):
      packages/modules/gl/templates/au-services-smb.json
+After any verify.sh run: move untracked .agent/evidence files of OTHER tasks out of the tree and `git checkout` their manifests before committing (DL-0098, until T-0109).
 Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
 
 ## Codex continuation prompt
