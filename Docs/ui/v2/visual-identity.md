@@ -1,5 +1,7 @@
 # LedgerForce visual identity v2: "Columnar"
 
+> **Status: Superseded by DL-0052** — rejected by the product owner as generic. Kept as history; do not build to this.
+
 Supersedes the v0.1 look in `Docs/ui/mockups` (indigo accent, rounded cards, soft shadows, sidebar),
 which the product owner rejected as generic template UI. Decision: DL-0051. The 12 UI principles in
 `Docs/ui/principles.md` still apply unchanged. This file defines how they look.

@@ -374,4 +374,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: Supersede the v0.1 look (DL-0039 accent/palette; mockups kept in `Docs/ui/mockups` for history). New identity in `Docs/ui/v2/`: ruled sheet with red margin line, binder index tabs (no sidebar), ink palette (green-black, red, green, blue-black, amber), rubber-stamp statuses, single/double total rules, T-rule journal previews, signature lines for two-person controls, printed-form boxes, statement strip, tally progress, hatched overdue. IBM Plex Sans / Condensed / Mono bundled locally (OFL). Rounded cards, shadows, pills, icon sidebars and indigo are banned (`Docs/ui/v2/visual-identity.md`).
 - Why: Product owner: v0.1 "looks vibe coded … make it look actually unique". Every device is an accounting convention, so it carries meaning (principles P2, P3, P4, P7 unchanged).
 - Alternatives: restyle v0.1 with a new accent (rejected: same template skeleton); serif "old ledger" pastiche (rejected: costume, poor density).
-- ADR: none · Status: proposed (awaiting human) · Supersedes DL-0039
+- ADR: none · Status: proposed (awaiting human) · Supersedes DL-0039 · Superseded by DL-0052
+
+### DL-0052 — UI v2 "Columnar" rejected; visual design handed to a research-led UI/UX agent
+- Date: 2026-10-24 · By: human (product owner) · Task: T-0009 · Category: ui
+- Decision: The v2 direction (DL-0051) is rejected as "another generic type". Its files stay in `Docs/ui/v2/` as history (no-delete). The visual design is reassigned to a dedicated UI/UX research agent that must ground the direction in user, competitor and pattern research, show several distinct directions, and recommend one, before any screens are ported.
+- Why: The product owner wants a design that comes out of real UI/UX research, not the lead's taste.
+- Alternatives: iterate v2 (rejected by the product owner).
+- ADR: none · Status: accepted · Supersedes DL-0051
