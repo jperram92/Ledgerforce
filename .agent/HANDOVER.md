@@ -20,6 +20,13 @@ Open questions for human:
 - Accept/reject Proposed ADRs 0003, 0004, 0005, 0006, 0007, 0009 (licence), 0010
 - Design §11.2 open decisions: product name, licence, first market, delivery model, invoice trigger default, SoD thresholds, agent budget/parallelism
 - UC-12 LWC: MVP (§8.2) vs Phase 1 (§9.1) — carded as MVP T-0072 pending confirmation
+- Research findings that contradict the design (Docs/research/RQ-0012, RQ-0004, RQ-0009) — need your call:
+  1. CDC entity cap is 5 without add-on; design §5.3 lists 8 (proposal DL-0030: poll Order/OrderItem/ACR)
+  2. ATO rounds GST at invoice total, design §3.4 says per line (proposal DL-0032)
+  3. Customer prepayment GST timing on accruals basis (postings.md Q7)
+  4. Ledger-bypass holes found in the DB pattern (proposal DL-0028)
+  5. MVP items depending on Phase 1 capabilities (UC-12 LWC, UC-05 bill capture, UC-10 BAS, Xero import in wizard)
+  6. SoD gaps: AP clerk self-approval below $1,000; nobody owns supplier creation; first-time bank details unverified
 Do not: change Docs/accounting golden files; delete anything; push to main.
 
 ## Log

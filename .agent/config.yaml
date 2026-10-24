@@ -3,10 +3,12 @@
 providers:
   - id: claude
     cli: "claude -p"                       # Claude Code headless (print) mode
+    args: ["--output-format", "stream-json", "--verbose", "--permission-mode", "acceptEdits", "--max-turns", "200"]  # RQ-0002: -p starts in Manual mode, so always pass --permission-mode
     role: [build, review]
     instructions: CLAUDE.md                # imports AGENTS.md
   - id: codex
     cli: "codex exec"                      # OpenAI Codex non-interactive mode
+    args: ["--cd", "{repo}", "-s", "workspace-write", "-c", "sandbox_workspace_write.network_access=true", "--json", "-o", "{last_message_file}"]  # RQ-0001: --full-auto removed; .git is read-only, so the conductor commits for codex
     role: [build, review]
     instructions: AGENTS.md
 failover_order: [claude, codex]            # Claude primary; Codex takes over on credit/quota/rate-limit failure
@@ -18,7 +20,7 @@ parallel_tasks: 1                          # design §11.2 open decision: parall
 budgets:
   claude: { daily_usd: 40 }
   codex: { daily_usd: 40 }
-failure_patterns:                          # stderr/stdout patterns that trigger provider failover
+failure_patterns:                          # case-insensitive regexes over stdout AND stderr that trigger provider failover (RQ-0001, RQ-0002)
   quota:
     - "429"
     - "rate.?limit"
@@ -27,6 +29,16 @@ failure_patterns:                          # stderr/stdout patterns that trigger
     - "usage limit"
     - "quota exceeded"
     - "overloaded"
+    - "hit your .* limit"                  # e.g. "You've hit your session limit · resets 7:30am (UTC)" (seen 2026-10-24)
+    - "session limit"
+    - "weekly limit"
+    - "spend limit"
+    - "credit balance is too low"
+    - "at capacity"
+    - "high demand"
+    - "exceeded retry limit"
+    - "temporarily limiting requests"
+    - "529"
 human_gates: [adr:accounting, adr:security, release, golden_postings, phase_gate, out_of_scope]
 paths:
   state: .agent/state.json

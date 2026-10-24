@@ -179,3 +179,66 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Not a task, so no `feat/T-NNNN` branch; must never push to `main`.
 - Alternatives: synthetic task card per night (backlog noise).
 - ADR: none · Status: accepted
+
+### DL-0024 — Conductor invocation flags for Codex and Claude
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: tooling
+- Decision: Codex runs `codex exec --cd <repo> -s workspace-write -c sandbox_workspace_write.network_access=true --json -o <file>`; Claude runs `claude -p --output-format stream-json --verbose --permission-mode acceptEdits --max-turns N`. The conductor makes the checkpoint commits for Codex runs. Args are recorded in `.agent/config.yaml`.
+- Why: RQ-0001 (`--full-auto` removed; `.git` read-only in workspace-write); RQ-0002 (`-p` starts in Manual mode since 2.1.302).
+- Alternatives: bypass/dangerous permission flags (rejected outside an isolated container).
+- ADR: none · Status: accepted
+
+### DL-0025 — Extend provider failure patterns (case-insensitive, stdout + stderr)
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: Added `hit your .* limit`, `session limit`, `weekly limit`, `spend limit`, `credit balance is too low`, `at capacity`, `high demand`, `exceeded retry limit`, `temporarily limiting requests`, `529` to `.agent/config.yaml`.
+- Why: RQ-0001/RQ-0002 list the real error strings, and four sub-agents of this very session stopped on "You've hit your session limit · resets 7:30am (UTC)", which the original patterns would have missed. Codex exits 1 on every failure, so exit codes alone can't classify.
+- Alternatives: exit codes only (rejected). Lead edited the human-owned config because failover is an explicit product-owner requirement; the human may revise.
+- ADR: ADR-0011 · Status: accepted
+
+### DL-0026 — Share skills with Codex via `.agents/skills`; keep AGENTS.md under 32 KiB
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: process
+- Decision: Confirms DL-0020. Add a verify gate that AGENTS.md stays under 32 KiB.
+- Why: RQ-0001 — Codex scans `.agents/skills`, follows symlinks, and truncates AGENTS.md beyond 32 KiB.
+- Alternatives: duplicate skill files (rejected: drift).
+- ADR: none · Status: accepted
+
+### DL-0027 — CEL via @marcbachmann/cel-js with a decimal type
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: architecture
+- Decision: `packages/rules` wraps `@marcbachmann/cel-js` (exact pinned version); money is a decimal.js-backed `decimal` type and `double` is rejected in rules.
+- Why: RQ-0003 (decimal behaviour tested; maintained; no deps).
+- Alternatives: `@bufbuild/cel` with scaled integers (fallback); `cel-js` (less active).
+- ADR: required (runtime dependency) — to be written by the Rules Studio task · Status: proposed
+
+### DL-0028 — RLS policy and ledger-guard SQL patterns
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: security
+- Decision: Policies use `NULLIF(current_setting('app.tenant_id', true), '')::uuid` with per-transaction `set_config(..., true)`; `journal_line` gets a BEFORE INSERT guard against adding lines to posted entries; ledger writes go through a SECURITY DEFINER `post_entry()` with INSERT revoked from `lf_app`; minimum PostgreSQL 16.15 / 17.11.
+- Why: RQ-0007 — run on 16.15; proved the app role could add lines to a posted entry and that account_balance/subledger lack DB invariants (RQ-0012 item 2 fail).
+- Alternatives: rely on grants + lint (rejected: insert hole proven).
+- ADR: addendum to ADR-0003/0004 · Status: proposed (awaiting human — security/accounting)
+
+### DL-0029 — Local-cluster test DB fallback confirmed; pg-mem rejected
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: tooling
+- Decision: Confirms DL-0007. Harness runs the cluster as a non-root user and checks `server_version_num >= 160015`; PGlite only for SQL-function smoke tests; pg-mem not used.
+- Why: RQ-0008 (all options executed).
+- Alternatives: embedded-postgres (beta builds lag security releases).
+- ADR: ADR-0013 · Status: accepted
+
+### DL-0030 — Salesforce Pub/Sub client and default CDC set (≤ 5 objects)
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: architecture
+- Decision: `salesforce-pubsub-api-client` behind a port. Default CDC: Account, Contact, Opportunity, OpportunityLineItem, Product2; Order, OrderItem, AccountContactRelation are polled. Invalid replay id triggers immediate reconciliation.
+- Why: RQ-0004 — 5-entity cap without add-on (design §5.3 lists 8), 72 h retention, Enterprise allocation 25,000/day (design quotes Unlimited's 50,000).
+- Alternatives: hand-rolled gRPC client (fallback).
+- ADR: required (dependency; changes design §5.3) · Status: proposed (awaiting human)
+
+### DL-0031 — ABA generator defaults
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: architecture
+- Decision: 120-char records, CRLF after every record, code 50 suppliers / 53 pay, per-bank profile (trailing CRLF, self-balancing record, max records).
+- Why: RQ-0006.
+- Alternatives: one hard-coded format (rejected: banks differ).
+- ADR: none · Status: accepted
+
+### DL-0032 — AU GST rounding default (proposed change to design §3.4)
+- Date: 2026-10-24 · By: claude · Task: sprint-0 · Category: accounting
+- Decision: Proposed: line GST stored to 4 dp, invoice GST total rounded half-up to cents (ATO total-invoice rule), difference to ROUNDING — replacing design §3.4 "per line, half-up to cents". Golden postings GP-018a/b show both until decided.
+- Why: RQ-0009 (ATO tax-invoice guidance, s9-90 explanatory memorandum).
+- Alternatives: design's per-line rounding.
+- ADR: accounting ADR required · Status: proposed (awaiting human)
