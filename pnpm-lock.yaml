@@ -139,6 +139,9 @@ importers:
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../db
+      '@ledgerforce/shared':
+        specifier: workspace:*
+        version: link:../shared
       kysely:
         specifier: 0.29.7
         version: 0.29.7

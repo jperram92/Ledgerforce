@@ -30,6 +30,17 @@ export interface TableRef {
 export const GLOBAL_TABLES: readonly string[] = ['app.tenant'];
 export const RLS_SCHEMAS: readonly string[] = ['app', 'audit'];
 
+/**
+ * Tables whose rows can only commit together with companion rows, because a deferred constraint
+ * trigger checks them at commit (journal: at least two balanced lines, ADR-0004). The generator
+ * seeds these as superuser with `session_replication_role = replica` in one transaction (a test
+ * harness step only; lf_app cannot do this). Their INSERT positive control checks the row inside
+ * the transaction and rolls back, so RLS WITH CHECK is still exercised at the statement.
+ */
+export const COMMIT_WITH_COMPANIONS: readonly string[] = ['app.journal_entry', 'app.journal_line'];
+
+const isPool = (q: Queryable): q is pg.Pool => 'totalCount' in q;
+
 type Overrides = Readonly<Record<string, Readonly<Record<string, () => string>>>>;
 
 /** Column values the generic generator cannot guess (CHECK constraints). */
@@ -54,6 +65,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   'app.dimension_value': { code: () => `v${randomBytes(4).toString('hex')}` },
   // Trigger-computed; the generator only needs to satisfy NOT NULL (the value is replaced).
   'app.dimension_set': { hash: () => '0'.repeat(64) },
+  'app.journal_entry': { status: () => 'draft', source_type: () => 'manual_journal' },
+  'app.journal_line': { debit: () => '1.0000' },
 };
 
 export async function discoverTenantTables(db: Queryable): Promise<TableRef[]> {
@@ -249,23 +262,35 @@ export async function buildRow(
   tenantId: string,
   overrides: Overrides = DEFAULT_ROW_OVERRIDES,
   depth = 0,
+  fixed: ReadonlyMap<string, string> = new Map(),
 ): Promise<Map<string, string>> {
   if (depth > 8) throw new Error(`cross-tenant row generator: FK chain too deep at ${t.qualified}`);
   const cols = await columnsOf(admin, t);
   const fks = await foreignKeysOf(admin, t);
-  const values = new Map<string, string>();
+  // `fixed`: values the child already chose for columns this row is referenced by (e.g.
+  // company_id shared by several composite foreign keys), so all parents agree.
+  const values = new Map<string, string>(fixed);
   const byName = new Map(cols.map((c) => [c.name, c]));
 
   if (byName.has('tenant_id')) values.set('tenant_id', tenantId);
   for (const fk of fks) {
+    // MATCH SIMPLE: a foreign key with any NULL column is not enforced, so a parent is needed
+    // only when every column will be non-null (required or already chosen) and some is unset.
     const needed =
-      fk.columns.some((c) => byName.get(c)?.required) && !fk.columns.every((c) => values.has(c));
+      fk.columns.every((c) => values.has(c) || byName.get(c)?.required) &&
+      !fk.columns.every((c) => values.has(c));
     if (!needed) continue;
     if (fk.ref.qualified === 'app.tenant') {
       for (const c of fk.columns) values.set(c, tenantId);
       continue;
     }
-    const parent = await seedRow(admin, fk.ref, tenantId, overrides, depth + 1);
+    const parentFixed = new Map<string, string>();
+    fk.columns.forEach((c, i) => {
+      const v = values.get(c);
+      const rc = fk.refColumns[i];
+      if (v !== undefined && rc !== undefined && c !== 'tenant_id') parentFixed.set(rc, v);
+    });
+    const parent = await seedRow(admin, fk.ref, tenantId, overrides, depth + 1, parentFixed);
     fk.columns.forEach((c, i) => {
       const v = parent[fk.refColumns[i] ?? ''];
       values.set(c, v instanceof Date ? v.toISOString() : String(v));
@@ -288,8 +313,24 @@ export async function seedRow(
   tenantId: string,
   overrides: Overrides = DEFAULT_ROW_OVERRIDES,
   depth = 0,
+  fixed: ReadonlyMap<string, string> = new Map(),
 ): Promise<Record<string, unknown>> {
-  const values = await buildRow(admin, t, tenantId, overrides, depth);
+  if (COMMIT_WITH_COMPANIONS.includes(t.qualified) && isPool(admin)) {
+    const client = await admin.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('SET LOCAL session_replication_role = replica');
+      const row = await seedRow(client, t, tenantId, overrides, depth, fixed);
+      await client.query('COMMIT');
+      return row;
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+  const values = await buildRow(admin, t, tenantId, overrides, depth, fixed);
   const cols = [...values.keys()];
   const { rows } = await admin.query<Record<string, unknown>>(
     `INSERT INTO ${quoteTable(t)} (${cols.map(quoteIdent).join(', ')})
@@ -466,6 +507,32 @@ export async function defineCrossTenantSuite<DB>(
         it('INSERT (positive control): tenant A can insert its own row when granted INSERT', async () => {
           const values = await buildRow(db.admin, t, A, overrides);
           const before = await count(t, A);
+          if (COMMIT_WITH_COMPANIONS.includes(t.qualified)) {
+            // Observe inside the transaction, then roll back before the deferred check runs.
+            const rollback = new Error('rollback after positive control');
+            let seen = -1;
+            const r = await attempt(() =>
+              asTenant(A, async (trx) => {
+                await insertAs(trx, t, values);
+                const n = await sql<{ n: number }>`
+                  SELECT count(*)::int AS n FROM ${sql.table(t.qualified)} WHERE tenant_id = ${A}`.execute(
+                  trx,
+                );
+                seen = n.rows[0]?.n ?? -1;
+                throw rollback;
+              }).catch((error: unknown) => {
+                if (error !== rollback) throw error;
+              }),
+            );
+            if (await privilege(t, 'INSERT')) {
+              expect(r.denied).toBe(false);
+              expect(seen).toBe(before + 1);
+            } else {
+              expect(r.denied).toBe(true);
+            }
+            expect(await count(t, A)).toBe(before);
+            return;
+          }
           const r = await attempt(() => asTenant(A, (trx) => insertAs(trx, t, values)));
           if (await privilege(t, 'INSERT')) {
             expect(r.denied).toBe(false);

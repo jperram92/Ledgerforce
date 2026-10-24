@@ -1,5 +1,5 @@
 /**
- * Kysely table types for the platform schema (migrations 0001–0006). Keep in step with
+ * Kysely table types for the platform schema (migrations 0001–0007). Keep in step with
  * packages/db/migrations; the db tests exercise every table through these types.
  */
 import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
@@ -125,6 +125,50 @@ export interface DimensionSetTable {
   created_at: Timestamp;
 }
 
+/** NUMERIC as returned by pg (string) and accepted on insert as a decimal string (ADR-0005). */
+type Numeric = ColumnType<string, string, string>;
+
+/** Journal header (migration 0007). Ledger table: SELECT/INSERT only, written by packages/ledger. */
+export interface JournalEntryTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  entry_no: string | null;
+  entry_date: ColumnType<Date, Date | string, Date | string>;
+  period_id: string | null;
+  source_type: string;
+  source_id: string | null;
+  status: 'draft' | 'posted' | 'reversed';
+  reversal_of_id: string | null;
+  idempotency_key: string;
+  memo: string | null;
+  created_by: string | null;
+  approved_by: string | null;
+  created_at: Timestamp;
+  posted_at: Timestamp | null;
+  prev_hash: string | null;
+  hash: string | null;
+}
+
+/** Journal line in base currency (migration 0007): exactly one of debit/credit > 0. */
+export interface JournalLineTable {
+  tenant_id: TenantId;
+  company_id: string;
+  entry_id: string;
+  line_no: number;
+  account_id: string;
+  debit: ColumnType<string, string | undefined, string>;
+  credit: ColumnType<string, string | undefined, string>;
+  txn_currency: string;
+  txn_amount: Numeric;
+  fx_rate: Numeric;
+  tax_code_id: string | null;
+  tax_amount: Numeric | null;
+  dimension_set_id: string;
+  party_id: string | null;
+  memo: string | null;
+}
+
 export interface AuditLogTable {
   id: ColumnType<string, never, never>;
   tenant_id: TenantId;
@@ -151,6 +195,8 @@ export interface Database {
   'app.dimension': DimensionTable;
   'app.dimension_value': DimensionValueTable;
   'app.dimension_set': DimensionSetTable;
+  'app.journal_entry': JournalEntryTable;
+  'app.journal_line': JournalLineTable;
   /** INSERT only for lf_app — do not use RETURNING (needs SELECT). */
   'audit.audit_log': AuditLogTable;
 }
