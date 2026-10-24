@@ -14,3 +14,6 @@ blob-report/
 # OS / editor noise
 .DS_Store
 *.log
+
+# Sub-agent git worktrees (parallel builds, DL-0081): each is a separate checkout, never content of this one
+.claude/worktrees/
