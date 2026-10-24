@@ -452,3 +452,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0015: Zitadel is AGPL-3.0, and the LedgerForce licence is still open (ADR-0009). Card size limit (one session).
 - Alternatives: Zitadel (licence coupling); mock JWTs without a real provider (rejected: misses discovery, PKCE and signature validation).
 - ADR: ADR-0016 (to be written in T-0011, security, human gate) · Status: proposed (awaiting human)
+
+### DL-0063 — Security patches override the 14-day version-age rule (multer 2.5.0)
+- Date: 2026-10-24 · By: claude · Task: T-0104 · Category: security
+- Decision: Root `pnpm.overrides` pins `multer` to 2.5.0 (released 2026-10-22), which patches GHSA-q7qp-rjg7-q26m (high, DoS via a pending async fileFilter). `@nestjs/platform-express` 12.1.2–12.2.0 all depend on vulnerable `multer` 2.4.0. Remove the override once a NestJS release depends on ≥ 2.5.0. Also records: NestJS pinned to 12.1.2, not 12.0.4 as DL-0061 said, so that `@nestjs/testing` matches.
+- Why: verify gate 7 (pnpm audit --prod) failed on T-0104. A same-maintainer security patch carries less risk than a known high-severity vulnerability. The 14-day rule (DL-0061) exists to reduce supply-chain risk, not to keep known vulnerabilities.
+- Alternatives: accept the risk because no upload route exists yet (rejected: the gate must stay green, and file uploads arrive with bill capture UC-05); wait for NestJS (rejected: open-ended).
+- ADR: none · Status: accepted

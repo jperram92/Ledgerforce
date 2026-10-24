@@ -2,7 +2,7 @@
   "name": "ledgerforce",
   "version": "0.0.0",
   "private": true,
-  "description": "LedgerForce — open-source double-entry SMB ERP for Salesforce (monorepo root)",
+  "description": "LedgerForce \u2014 open-source double-entry SMB ERP for Salesforce (monorepo root)",
   "license": "UNLICENSED",
   "type": "module",
   "packageManager": "pnpm@10.28.0",
@@ -35,5 +35,10 @@
     "typescript-eslint": "8.72.0",
     "unplugin-swc": "2.0.0",
     "vitest": "4.1.12"
+  },
+  "pnpm": {
+    "overrides": {
+      "multer": "2.5.0"
+    }
   }
 }

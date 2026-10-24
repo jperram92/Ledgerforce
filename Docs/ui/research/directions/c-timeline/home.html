@@ -25,7 +25,7 @@
 <main id="main">
   <div class="head">
     <div>
-      <h1>Your money from 1 October to 7 November</h1>
+      <h1>Your money from 1 October to 9 November</h1>
       <p>Solid is what has happened, to the bank statement of Thu 23 Oct. Dashed is what is due to happen if customers pay on their due dates and you pay on yours.</p>
     </div>
     <div class="low">
@@ -38,14 +38,14 @@
   <div class="tl-wrap"><div data-timeline="t-main"></div></div>
   <div class="legend"><span><i></i>Happened</span><span><i class="d"></i>Expected</span><span><i class="n"></i>Today, and decisions due now</span><span><i class="h"></i>Overdue, not counted in the expected balance</span></div>
   <script type="application/json" id="t-main">{
-    "summary": "Cash in bank from 1 Oct to 7 Nov. Actual: 158,904.20 on 1 Oct to 184,320.55 on 23 Oct. Expected: 196,500.55 on 27 Oct, 161,481.45 on 28 Oct after the BAS and supplier run, lowest 123,266.85 on 30 Oct after the pay run, 154,876.85 on 7 Nov. Overdue receivables of 33,482.50 are not counted.",
+    "summary": "Cash in bank from 1 Oct to 9 Nov. Actual: 158,904.20 on 1 Oct to 184,320.55 on 23 Oct. Expected: 196,500.55 on 27 Oct, 161,481.45 on 28 Oct after the BAS and supplier run, lowest 123,266.85 on 30 Oct after the pay run, 154,876.85 from 5 Nov. Overdue receivables of 33,482.50 are not counted.",
     "from": "2026-10-01", "narrowFrom": "2026-10-17", "to": "2026-11-09", "today": "2026-10-24",
     "cashRange": [100000, 215000], "cashGrid": [120000, 150000, 180000, 210000],
     "cash": [["2026-10-01",158904.20],["2026-10-03",171420.00],["2026-10-06",165180.50],["2026-10-09",176930.10],["2026-10-13",184605.75],["2026-10-16",146391.15],["2026-10-20",168240.80],["2026-10-21",160410.80],["2026-10-23",184320.55],
              ["2026-10-27",196500.55],["2026-10-28",161481.45],["2026-10-30",123266.85],["2026-10-31",144826.85],["2026-11-03",136576.85],["2026-11-05",154876.85]],
     "cashCallouts": [
       {"date":"2026-10-01","value":158904.20,"note":"1 Oct","dy":26},
-      {"date":"2026-10-23","value":184320.55,"note":"Thu 23 Oct, last statement","anchor":"end","dy":-24,"narrow":true},
+      {"date":"2026-10-23","value":184320.55,"note":"last statement, 23 Oct","anchor":"end","dy":-24,"narrow":true},
       {"date":"2026-10-27","value":196500.55,"future":true,"dy":-12},
       {"date":"2026-10-30","value":123266.85,"future":true,"note":"lowest, after pay run","dy":24,"narrow":true},
       {"date":"2026-11-05","value":154876.85,"future":true,"dy":-12,"narrow":true}
@@ -66,7 +66,7 @@
       {"name":"Decisions","sub":"placed on the day they block","items":[
         {"date":"2026-10-24","now":true,"future":true,"label":"Credit note 660.00","sub":"Wattle & Stone, asked Wed","anchor":"end"},
         {"date":"2026-10-27","now":true,"future":true,"label":"Release suppliers 22,415.00","sub":"by Mon 5 pm, or the run misses Tue"},
-        {"date":"2026-10-31","now":true,"future":true,"level":1,"label":"Wages journal 14,880.00","sub":"then bill 3,190.00 by 3 Nov"}]},
+        {"date":"2026-10-31","now":true,"future":true,"level":1,"label":"Wages journal 14,880.00","sub":"then a bill, 3,190.00"}]},
       {"name":"Books","sub":"close and locks","items":[
         {"date":"2026-10-03","label":"Sales locked","sub":"Priya"},
         {"date":"2026-10-09","label":"September soft-closed","sub":"6 of 7 steps"},

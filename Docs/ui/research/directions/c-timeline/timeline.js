@@ -17,14 +17,15 @@
     const x = (s) => LW + 8 + ((D(s) - from) / 864e5 / days) * (W - LW - 8 - R);
     const CASH_TOP = 44, CASH_H = narrow ? 150 : 190, LANE = 70;
     const lanes = narrow ? [] : spec.lanes;
-    const Hh = CASH_TOP + CASH_H + 26 + lanes.length * LANE + 8;
+    const Hh = CASH_TOP + CASH_H + 26 + lanes.length * LANE + 34;
     const fixes = []; const svg = el('svg', { class: 'tl', viewBox: `0 0 ${W} ${Hh}`, width: W, height: Hh, role: 'img', 'aria-label': spec.summary });
     // axis
     for (let t = new Date(from); t <= to; t = new Date(+t + 864e5)) {
       const s = t.toISOString().slice(0, 10), xx = x(s);
-      if (t.getDay() === 1 || +t === +from) {
+      if (t.getDay() === 1 || (+t === +from && ![0, 6].includes(t.getDay()) && t.getDay() !== 1)) {
+        const nearEnd = (to - t) / 864e5 < 2; if (narrow && nearEnd) continue;
         svg.appendChild(el('line', { x1: xx, x2: xx, y1: 26, y2: Hh, stroke: 'var(--line)', 'stroke-width': 1 }));
-        svg.appendChild(el('text', { x: xx + 3, y: 20, class: 'day' }, `${dayName[t.getDay()]} ${t.getDate()}${(t.getDate() <= 7 || +t === +from) ? ' ' + t.toLocaleString('en-AU', { month: 'short' }) : ''}`));
+        svg.appendChild(el('text', { x: nearEnd ? xx - 3 : xx + 3, y: 20, class: 'day', 'text-anchor': nearEnd ? 'end' : 'start' }, `${dayName[t.getDay()]} ${t.getDate()}${!narrow && (t.getDate() <= 7 || +t === +from) ? ' ' + t.toLocaleString('en-AU', { month: 'short' }) : ''}`));
       }
     }
     // lanes background and names
@@ -74,8 +75,8 @@
     // today
     const tx = x(spec.today);
     svg.appendChild(el('line', { x1: tx, x2: tx, y1: 26, y2: Hh, stroke: 'var(--now)', 'stroke-width': 3 }));
-    const tw = narrow ? 92 : 116; svg.appendChild(el('rect', { x: tx - tw + 1.5, y: 0, width: tw, height: 26, fill: 'var(--now)' }));
-    svg.appendChild(el('text', { x: tx - 6, y: 18, 'text-anchor': 'end', style: 'fill:var(--paper);font-weight:800' }, narrow ? 'Today, Sat 24' : 'Today, Sat 24 Oct'));
+    const tw = narrow ? 92 : 116; svg.appendChild(el('rect', { x: tx - 1.5, y: Hh - 26, width: tw, height: 26, fill: 'var(--now)' }));
+    svg.appendChild(el('text', { x: tx + 6, y: Hh - 8, style: 'fill:var(--paper);font-weight:800' }, narrow ? 'Today, Sat 24' : 'Today, Sat 24 Oct'));
     box.replaceChildren(svg); fixes.forEach((f) => f());
   }
   function all() { document.querySelectorAll('[data-timeline]').forEach((b) => draw(b, JSON.parse(document.getElementById(b.dataset.timeline).textContent))); }

@@ -287,7 +287,7 @@ sessions justify it.
 
 ## F. Sources
 
-All accessed 2026-10-24. **[read]** = full text read; **[summary]** = direct fetch blocked by the
+All accessed 2026-10-24. Numbers S11 and S19 are unused (sources dropped as duplicates during writing). **[read]** = full text read; **[summary]** = direct fetch blocked by the
 egress proxy, search-engine extract used; **[exp]** = experiment run in this repo.
 
 | # | Source | Kind |
