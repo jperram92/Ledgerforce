@@ -85,8 +85,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC07-03 | Liabilities in payables summary | UC-07 | Phase 1 | db-integration | no | — | T-0100 | not-started | — | — |
 | SS-UC07-04 | Duplicate pay-run import is idempotent | UC-07 | Phase 1 | db-integration | no | — | T-0100 | not-started | — | — |
 | SS-UC07-05 | Payroll Officer cannot release own net-pay batch | UC-07 | Phase 1 | db-integration | no | — | T-0100 | not-started | — | — |
-| SS-UC08-01 | CSV, OFX and CAMT.053 normalise identically | UC-08 | MVP | contract | no | — | T-0058, T-0059 | not-started | — | — |
-| SS-UC08-02 | Duplicate statement import detected | UC-08 | MVP | db-integration | no | — | T-0058 | not-started | — | — |
+| SS-UC08-01 | CSV, OFX and CAMT.053 normalise identically | UC-08 | MVP | contract | no | packages/modules/bank/src/statement-import.test.ts | T-0058, T-0059 | green | [.agent/evidence/T-0058/manifest.json](../../.agent/evidence/T-0058/manifest.json) | 540e85e |
+| SS-UC08-02 | Duplicate statement import detected | UC-08 | MVP | db-integration | no | packages/modules/bank/src/statements.db.test.ts | T-0058 | green | [.agent/evidence/T-0058/manifest.json](../../.agent/evidence/T-0058/manifest.json) | 540e85e |
 | SS-UC08-03 | Exact match auto-matches | UC-08 | MVP | db-integration | no | — | T-0060 | not-started | — | — |
 | SS-UC08-04 | Rule match is suggested, not applied | UC-08 | MVP | unit | no | — | T-0060 | not-started | — | — |
 | SS-UC08-05 | Unmatched line created as a transaction | UC-08 | MVP | db-integration | no | — | T-0060 | not-started | — | — |
@@ -159,6 +159,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-36 | One party with roles, addresses, contacts and contact roles | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | [.agent/evidence/T-0036/manifest.json](../../.agent/evidence/T-0036/manifest.json) | 481ae75 |
 | SS-PLAT-37 | An invoice cannot be approved for a customer with no Billing To contact | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | [.agent/evidence/T-0036/manifest.json](../../.agent/evidence/T-0036/manifest.json) | 481ae75 |
 | SS-PLAT-38 | Envelope encryption fails closed and survives key rotation | — | MVP | unit | no | packages/shared/src/crypto/envelope.test.ts | T-0037 | green | [.agent/evidence/T-0037/manifest.json](../../.agent/evidence/T-0037/manifest.json) | 1219bbc |
+| SS-PLAT-39 | Company bank account bound to a bank GL account, number encrypted | — | MVP | db-integration | no | packages/modules/bank/src/statements.db.test.ts | T-0058 | green | [.agent/evidence/T-0058/manifest.json](../../.agent/evidence/T-0058/manifest.json) | 540e85e |
+| SS-PLAT-40 | Statement parsers read bank files exactly and fail loudly | — | MVP | unit + property | no | packages/modules/bank/src/parsers.test.ts | T-0058 | green | [.agent/evidence/T-0058/manifest.json](../../.agent/evidence/T-0058/manifest.json) | 540e85e |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -318,4 +320,12 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-38 — Envelope encryption fails closed and survives key rotation
 - Phase: MVP · Layer: **unit** · Screenshot evidence: no · Task(s): T-0037
 - **Given** the local keyring KMS (ADR-0018) · **When** values are sealed and opened · **Then** the sealed parts never contain the plaintext; each seal uses a fresh data key and IV; a different record/field (AAD), any flipped bit, a wrong key or an unknown key id fails closed; after rotation old data still opens and new seals use the new key; malformed keyrings are refused without echoing key material
+
+### SS-PLAT-39 — Company bank account bound to a bank GL account, number encrypted
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0058
+- **Given** a company with the AU chart · **When** a bank account is set up (design §4.1 step 4) · **Then** it binds only to an active, postable, non-control asset GL account of subtype bank whose currency allows it, one active bank account per GL account; the account number is envelope-encrypted at rest and masked on read; BSB, APCA user id, ABA user name and FI mnemonic are validated by the service and by database CHECKs; lf_app cannot change payment details in place or delete accounts, statements or lines
+
+### SS-PLAT-40 — Statement parsers read bank files exactly and fail loudly
+- Phase: MVP · Layer: **unit + property** · Screenshot evidence: no · Task(s): T-0058
+- **Given** OFX 1.x/2.x, CAMT.053 and CSV inputs (RQ-0019) · **When** they are parsed · **Then** OFX dates keep the day the bank wrote whatever the offset; OFX 1.x CHARSET and entities decode; only booked CAMT entries count and balances must add up; CSV quoting, amount styles, date orders and debit/credit columns follow the stored mapping; impossible dates, inexact amounts, wrong currencies and broken mappings are refused with the row; property: CSV and OFX render → parse round-trips in order; duplicate keys are deterministic and unique within a file
 

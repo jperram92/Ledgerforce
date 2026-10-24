@@ -613,3 +613,39 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Design §5.7, UC-08 flow 1 and A1; RQ-0019; AGENTS.md §0.5 (build it ourselves) and design §10.6 (runtime dependency needs an ADR).
 - Alternatives: a third-party OFX/XML parser (runtime dependency + ADR, and OFX 1.x SGML support is uneven); file hash only (misses overlapping statements); line hash without occurrence number (drops a genuine second identical transaction on the same day); FITID-free hashing for all formats (loses the bank's own id where it exists).
 - ADR: none · Status: accepted
+
+### DL-0083 — Company bank accounts: own table bound to a bank GL account, number envelope-encrypted, payment details immutable
+- Date: 2026-10-24 · By: claude · Task: T-0058 · Category: data-model
+- Decision:
+  - Migration `0013_bank_accounts_statements.sql` adds `app.bank_account` for the company's own accounts, separate from `app.party_bank_account` (supplier/employee details, T-0037).
+  - Each is bound to one GL account; a trigger requires an active, postable, non-control asset of subtype `bank` whose currency (if set) equals the bank account's. One active bank account per GL account (partial unique index). The trigger skips rows of another tenant so RLS refuses them (42501), as in 0012.
+  - The account number is envelope-encrypted exactly like party bank details (ADR-0018, AAD `lf-field-v1|tenant|company|company_bank_account|id|account_number`); BSB, account name and last 3 stay in clear; reads are masked; `revealCompanyBankAccountNumber` is the one decrypting call, for the ABA trace account (T-0054).
+  - ABA descriptive-record fields (RQ-0006): `apca_user_id` (6 digits), `aba_user_name` (≤ 26 BECS characters), `aba_fi_mnemonic` (3 capitals), checked in the service and by CHECKs.
+  - lf_app may UPDATE only `name`, `status`, `csv_mapping`; changed payment details are a new row (no in-place edits, nothing deleted).
+- Why: Design §4.1 step 4 (BSB, account number, ABA user ID and APCA number), §6.6 ("envelope encryption for bank account numbers"), §3.2 (accounts by subtype); ADR-0018 already covers the mechanism, so no new ADR.
+- Alternatives: reuse `party_bank_account` with a "company" party (mixes supplier SoD rules with the company's own accounts); keep the company number in clear (contradicts §6.6); bind by account code instead of id (codes can change).
+- ADR: ADR-0018 (Proposed, security; mechanism reused) · Status: accepted for the build; awaiting the human with ADR-0018
+
+### DL-0084 — Statement storage: imported data, not ledger rows; per-account CSV mapping stored as data
+- Date: 2026-10-24 · By: claude · Task: T-0058 · Category: data-model
+- Decision:
+  - `app.bank_statement` (one row per imported file: format, SHA-256 unique per bank account, account ref, period, opening/closing balance, `lines_total`, status `imported|voided`) and `app.bank_statement_line` (`line_no` = position in file, `posted_on`, `amount numeric(19,4)` with + = money in, description, reference, bank id, `dedupe_key` unique per bank account, status `unmatched|matched|excluded` for T-0060). No journal table is touched; lf_app may UPDATE only `status`.
+  - Lines found to be duplicates are not stored; the number skipped is `lines_total − count(lines)`, so no counter has to be updated after insert.
+  - The statement's currency is tied to the bank account's by a composite foreign key.
+  - The import is refused (nothing written) when the file's currency differs, when the file names another account (last 3 alphanumerics of OFX ACCTID / CAMT Acct/Id vs the stored last 3; the number is never decrypted for this), or when opening + lines ≠ closing.
+  - The bank's CSV layout is a validated `CsvMapping` stored in `bank_account.csv_mapping` (jsonb) and used when no mapping is passed (configuration over code, design principle 3).
+  - The import result has `outcome` `imported | duplicate_file | duplicate_lines`, counts, and a plain-language `message` (UC-08 A1 "the user is told").
+- Why: UC-08 flow 1 and A1; design §5.7; RQ-0019; DL-0082.
+- Alternatives: storing duplicate lines with a flag (rows nobody needs, and T-0060 would have to filter them); counters updated after insert (needs UPDATE grants on counts); CHECK lists added later (a new status would need a constraint change, which forward-only migrations cannot do in place, so T-0060's statuses are included now).
+- ADR: none · Status: accepted
+
+### DL-0085 — T-0058 build details: in-house parsers, byte-exact fixtures, one CAMT statement per file
+- Date: 2026-10-24 · By: claude · Task: T-0058 · Category: tooling
+- Decision:
+  - `@ledgerforce/bank` parsers use no external library: a tolerant tag reader (SGML leaf rule: an element never closed anywhere ends at the next tag; no DTD or entity expansion beyond the XML five, `&nbsp;` and numeric references), an RFC 4180 CSV reader, and text → Money parsing that never passes through a JS number.
+  - Fixtures in `packages/modules/bank/fixtures/` carry a local `.gitattributes` (`* -text`) so CRLF, BOM and Windows-1252 bytes stay exactly as a bank sends them (the root sets `eol=lf`).
+  - A camt.053 file must hold exactly one `Stmt`; several statements in one file are refused with a clear message until a bank needs them (T-0059 can extend).
+  - CSV text is read as UTF-8 when valid, else Windows-1252.
+- Why: RQ-0019; DL-0082; AGENTS.md §0.5.
+- Alternatives: an XML/OFX npm package (runtime dependency + ADR; uneven OFX 1.x support); normalising fixture line endings (would no longer test what banks send).
+- ADR: none · Status: accepted
