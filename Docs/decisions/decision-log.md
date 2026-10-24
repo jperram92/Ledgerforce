@@ -788,3 +788,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - T-0108: Phase 1.
 - Why: Product owner's instruction to run independent tasks in parallel.
 - ADR: none · Status: accepted
+
+### DL-0105 — Salesforce JWT bearer contract (RQ-0024): RS256, aud = login or test URL only, exp ≤ 180 s, mapped error codes
+- Date: 2026-10-24 · By: claude · Task: T-0063 · Category: architecture
+- Decision: The self-host connection signs `{"alg":"RS256","typ":"JWT"}` assertions with `node:crypto` (claims `iss` consumer key, `sub` integration username, `aud`, `iat`, `exp` ≤ 180 s after `iat`, random `jti`), refuses non-RSA or < 2048-bit keys, and posts `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=…` form-encoded to `<aud>/services/oauth2/token`. `aud` and token host are one stored value, `https://login.salesforce.com` or `https://test.salesforce.com` (CHECK in migration 0017), so no row can send an assertion to another host. Token-endpoint failures map to stable codes (`not_preauthorized`, `invalid_audience`, `invalid_assertion`, `invalid_user`, `ip_restricted`, `invalid_grant`, `invalid_client`, `unsupported_grant_type`, `token_endpoint_unavailable` (retryable), `malformed_response`) by case-insensitive substring of `error_description`. The HTTP client is injected; tests use a local fake endpoint that verifies signatures.
+- Why: RQ-0024 (primary pages reachable only as search extracts — confidence medium), ADR-0007, design §5.2. No new runtime dependency.
+- Alternatives: a JWT library such as `jose` (would be a new runtime dependency needing an ADR, for ~30 lines of code); a free-form token URL (My Domain) — not needed for this flow and widens where an assertion can be sent.
+- ADR: ADR-0007 (unchanged) · Status: accepted
