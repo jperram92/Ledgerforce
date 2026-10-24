@@ -284,3 +284,52 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0008; initdb refuses root.
 - Alternatives: PGlite/pg-mem (rejected in RQ-0008).
 - ADR: ADR-0013 · Status: accepted
+
+### DL-0039 — One indigo accent, fixed status palette, designed light and dark themes
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: ui
+- Decision: Brand accent indigo (#4f46e5 light / #8b93f8 dark); four semantic colours; fixed palette for ten document statuses (Draft…Locked), always icon + word + colour; dark theme designed separately, not inverted.
+- Why: Distinct from Salesforce blue and status colours; WCAG 1.4.1/1.4.3/1.4.11 — 90 contrast pairs verified by `Docs/ui/tools/contrast.mjs` (RQ-0080 §1).
+- Alternatives: Salesforce-blue accent (looks like a Salesforce page; ambiguous with status blue); colour-only status dots (fails WCAG 1.4.1).
+- ADR: none · Status: proposed (awaiting human)
+
+### DL-0040 — Money display convention
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: ui
+- Decision: Right-aligned tabular figures, two decimals, currency once per column, negatives in parentheses (read as "minus" to screen readers), debit/credit as separate positive columns.
+- Why: Scannable, matches accountant expectations (RQ-0080 §2).
+- Alternatives: red negatives (colour alone); leading minus everywhere (kept for editable inputs only).
+- ADR: none · Status: accepted
+
+### DL-0041 — "Show journal" preview on every postable action
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: ui
+- Decision: Every posting action offers "Show journal" via posting-engine preview mode (§3.9), open by default on review screens with a Balanced indicator. Void is labelled "Void — creates reversal journal"; Delete is shown unavailable with the reason.
+- Why: Business Central's Preview Posting pattern (RQ-0080 §3); makes D2 (posted = immutable) understandable.
+- Alternatives: preview only in a separate report (too far from the decision).
+- ADR: none · Status: accepted
+
+### DL-0042 — Two density modes
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: ui
+- Decision: Comfortable (44px rows, 14px) default; Compact (32px, 13px) per-user. Only spacing tokens change.
+- Why: Owners need readability, bookkeepers throughput (RQ-0080 §4).
+- Alternatives: three modes (more test surface, little gain).
+- ADR: none · Status: accepted
+
+### DL-0043 — Controls and sync always visible in the shell
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: ui
+- Decision: Top bar always shows posting period + state and Salesforce sync health; synced records show sync state; SoD, thresholds, lock dates and cooling-off appear as sentences before the action; two-person actions show the named chain.
+- Why: §5.6, §6.5 ("weakened visibly, never silently").
+- Alternatives: errors after submit (rejected).
+- ADR: none · Status: proposed (awaiting human)
+
+### DL-0044 — Salesforce LWC uses SLDS styling, not LedgerForce tokens
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: ui
+- Decision: The UC-12 component uses only Salesforce base Lightning components / SLDS and inherits the org theme.
+- Why: Must feel native inside Lightning (RQ-0080 §5).
+- Alternatives: LedgerForce tokens inside Salesforce (looks foreign).
+- ADR: none · Status: accepted
+
+### DL-0045 — Mockups are dependency-free static HTML with scripted checks
+- Date: 2026-10-24 · By: claude · Task: T-0009 · Category: tooling
+- Decision: Shared `shell.css`/`shell.js`; `Docs/ui/tools/screenshot-mockups.mjs` serves over loopback with the global Playwright, checks one h1/title/main/lang, no console errors, no external requests, no horizontal scroll at 390px, rendered contrast, and axe-core when `AXE_PATH` is set. `@axe-core/playwright` will be added as an apps/web dev dependency with the web shell task.
+- Why: Deterministic screenshots with no install; HTTP avoids axe errors on file://.
+- Alternatives: generated static site; axe-core as a repo dependency now (deferred to apps/web).
+- ADR: none · Status: accepted

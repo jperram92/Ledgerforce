@@ -132,8 +132,9 @@
     const sync = b.dataset.sync || 'ok';
     const syncWord = { ok: 'Salesforce', warn: 'Salesforce', err: 'Salesforce' }[sync];
     return `
+      <button class="iconbtn navbtn" type="button" id="lf-navbtn" aria-label="Open navigation" aria-expanded="false" aria-controls="lf-nav">${svg('menu')}</button>
       <button class="switcher" type="button" aria-label="Switch company, current: Harbour &amp; Co Pty Ltd">
-        <span class="co-logo" aria-hidden="true">H&amp;</span>Harbour &amp; Co Pty Ltd ${svg('updown', 'i-sm')}
+        <span class="co-logo" aria-hidden="true">H&amp;</span><span class="co-name">Harbour &amp; Co Pty Ltd</span> ${svg('updown', 'i-sm')}
       </button>
       <div class="search" role="search">${svg('search')}<span>Search invoices, parties, journals…</span><span class="kbd">⌘K</span></div>
       <div class="grow"></div>
@@ -155,6 +156,27 @@
     });
   }
 
+  // Every data table scrolls inside its own keyboard-focusable region, never the page (390px rule).
+  function wrapTables(root) {
+    root.querySelectorAll('table').forEach((t) => {
+      let w = t.parentElement;
+      if (!w.classList.contains('table-wrap')) {
+        const d = document.createElement('div'); d.className = 'table-wrap';
+        t.replaceWith(d); d.appendChild(t); w = d;
+      }
+      if (!w.hasAttribute('tabindex')) w.setAttribute('tabindex', '0');
+      if (!w.hasAttribute('role')) w.setAttribute('role', 'region');
+      if (!w.hasAttribute('aria-label')) {
+        const cap = t.querySelector('caption');
+        w.setAttribute('aria-label', (cap ? cap.textContent.trim() : 'Table') + ' (scrolls sideways)');
+      }
+    });
+  }
+
+  function focusablePre(root) {
+    root.querySelectorAll('pre.code').forEach((p) => { if (!p.hasAttribute('tabindex')) p.setAttribute('tabindex', '0'); if (!p.hasAttribute('role')) p.setAttribute('role', 'region'); });
+  }
+
   function init() {
     const b = document.body;
     const nav = document.getElementById('lf-nav');
@@ -162,6 +184,13 @@
     const top = document.getElementById('lf-top');
     if (top) top.innerHTML = renderTop(b);
     expand(document);
+    wrapTables(document);
+    focusablePre(document);
+    const nb = document.getElementById('lf-navbtn');
+    if (nb) nb.addEventListener('click', () => {
+      const open = document.body.classList.toggle('nav-open');
+      nb.setAttribute('aria-expanded', String(open));
+    });
     const t = document.getElementById('lf-theme');
     if (t) t.addEventListener('click', () => {
       const r = document.documentElement;

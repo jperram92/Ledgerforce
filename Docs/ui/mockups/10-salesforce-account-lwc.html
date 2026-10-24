@@ -75,6 +75,16 @@
   .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
   .lfc footer { padding: 10px 16px; display: flex; justify-content: space-between; color: var(--slds-weak); font-size: 12px; }
   .meta { padding: 0 16px 6px; color: var(--slds-weak); font-size: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .table-wrap { overflow-x: auto; }
+  @media (max-width: 900px) {
+    .gh { gap: 8px; } .gsearch { flex: 1 1 auto; }
+    .appnav { overflow-x: auto; } .appnav .app { padding-right: 8px; }
+    .rh { flex-wrap: wrap; } .rh .btns { margin-left: 0; width: 100%; flex-wrap: wrap; }
+    .highlights { flex-wrap: wrap; gap: 12px 24px; padding-left: 16px; }
+    .cols { grid-template-columns: minmax(0, 1fr); } .cols > * { min-width: 0; }
+    .fields { grid-template-columns: 1fr; }
+    .lfc { order: -1; }
+  }
   .mock-banner { margin: 12px 12px 0; padding: 8px 12px; border: 1px dashed #939393; border-radius: 4px; background: #fff; color: var(--slds-weak); font-size: 12px; }
 </style>
 </head>

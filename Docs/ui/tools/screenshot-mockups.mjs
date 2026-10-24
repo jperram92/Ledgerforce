@@ -4,6 +4,7 @@
 //   node Docs/ui/tools/screenshot-mockups.mjs 03 05      (only names containing "03" or "05")
 // Checks per page (any failure => exit 1):
 //   - no console errors, no page errors, no network request outside the local static server (no external resources)
+//   - no horizontal page scroll: documentElement.scrollWidth <= viewport width (every page also at 390x844)
 //   - exactly one <h1>, a non-empty <title>, a <main> landmark, html[lang]
 //   - body text colour vs body background >= 4.5:1, and every visible text node vs its
 //     nearest opaque background >= 4.5:1 (>= 3:1 for large text) — WCAG 1.4.3
@@ -101,9 +102,10 @@ for (const name of pages) {
   const variants = [{ suffix: '', query: '', vp: MOBILE.has(name) ? PHONE : DESK }];
   if (DARK.has(name)) variants.push({ suffix: '-dark', query: '?theme=dark', vp: DESK });
   if (name === 'index') variants.push({ suffix: '-desktop', query: '', vp: DESK });
+  else if (!MOBILE.has(name)) variants.push({ suffix: '-390', query: '', vp: PHONE }); // every page must work on a phone
   for (const v of variants) {
     const vp = v.vp;
-    const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: vp.width < 500 ? 2 : 1, colorScheme: 'light' });
+    const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: MOBILE.has(name) && v.suffix === '' ? 2 : 1, colorScheme: 'light' });
     const page = await ctx.newPage();
     const problems = [];
     page.on('console', (m) => { if (m.type() === 'error') problems.push(`console error: ${m.text()}`); });
@@ -114,13 +116,13 @@ for (const name of pages) {
     const meta = await page.evaluate(() => ({
       title: document.title.trim(), h1: document.querySelectorAll('h1').length,
       main: document.querySelectorAll('main').length, lang: document.documentElement.lang,
-      hOverflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+      scrollWidth: document.documentElement.scrollWidth,
     }));
     if (!meta.title) problems.push('missing <title>');
     if (meta.h1 !== 1) problems.push(`expected exactly one <h1>, found ${meta.h1}`);
     if (meta.main < 1) problems.push('missing <main> landmark');
     if (!meta.lang) problems.push('missing html[lang]');
-    if (meta.hOverflow) problems.push('horizontal page overflow');
+    if (meta.scrollWidth > vp.width) problems.push(`horizontal page overflow: scrollWidth ${meta.scrollWidth} > ${vp.width}`);
     const contrast = await page.evaluate(auditContrast);
     if (contrast.body < 4.5) problems.push(`body text contrast ${contrast.body.toFixed(2)}:1 < 4.5`);
     for (const f of contrast.failures) problems.push(`contrast ${f.ratio}:1 < ${f.need} at ${f.el}`);

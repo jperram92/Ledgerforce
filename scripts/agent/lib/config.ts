@@ -10,6 +10,11 @@ export interface ProviderConfig {
   args: string[];
   role: string[];
   instructions?: string;
+  /** who makes git commits for this provider: the agent itself, or the conductor (when the
+   *  provider's sandbox cannot write .git — Codex workspace-write, RQ-0001) */
+  commits: 'agent' | 'conductor';
+  /** pass the prompt as the last argv element (default) or on stdin (no ARG_MAX limit) */
+  prompt_via: 'arg' | 'stdin';
 }
 
 export interface Config {
@@ -36,18 +41,26 @@ export interface Config {
 }
 
 /**
- * Default non-interactive flags, used when a provider entry has no `args` key.
- * - claude: `claude -p` print mode; JSON result (carries total_cost_usd for the budget check);
- *   acceptEdits auto-approves file edits. Shell commands must be allowed via the
- *   `permissions.allow` rules in .claude/settings.json (or add flags here via `args`).
- * - codex: `codex exec` with the workspace-write sandbox (the documented replacement for the
- *   deprecated `--full-auto`).
- * Both are marked to-verify in README.md until confirmed against the installed CLI versions.
+ * Default non-interactive flags, used when a provider entry has no `args` key. Placeholders:
+ * {repo} = repository root, {last_message_file} = .agent/runs/<date>-<provider>-rNN-last.md,
+ * {run_id} = rNN.
+ * - claude (RQ-0002): `-p` starts in Manual mode, so --permission-mode is always passed;
+ *   stream-json (needs --verbose) streams progress into the run log and ends with a result
+ *   object carrying is_error/subtype/total_cost_usd. Shell commands are allowed through
+ *   `permissions.allow` in .claude/settings.json.
+ * - codex (RQ-0001): `--full-auto` was removed; workspace-write sandbox with network enabled,
+ *   JSONL events, final message to a file. workspace-write protects .git, so the conductor
+ *   makes the commits for codex (commits: conductor).
  */
 export const DEFAULT_ARGS: Record<string, string[]> = {
-  claude: ['--output-format', 'json', '--permission-mode', 'acceptEdits'],
-  codex: ['--sandbox', 'workspace-write'],
+  claude: ['--output-format', 'stream-json', '--verbose', '--permission-mode', 'acceptEdits', '--max-turns', '200'],
+  codex: ['--cd', '{repo}', '-s', 'workspace-write', '-c', 'sandbox_workspace_write.network_access=true', '--json', '-o', '{last_message_file}'],
 };
+
+/** A provider whose sandbox is workspace-write cannot write .git (RQ-0001 S7). */
+function defaultCommits(args: string[]): 'agent' | 'conductor' {
+  return args.some((a) => a === 'workspace-write' || a === '--sandbox=workspace-write') ? 'conductor' : 'agent';
+}
 
 const DEFAULT_QUOTA = ['429', 'rate.?limit', 'insufficient_quota', 'credit balance', 'usage limit', 'quota exceeded', 'overloaded'];
 
@@ -60,13 +73,18 @@ export function loadConfig(root: string): Config {
   const raw: any = existsSync(file) ? (parseYaml(readFileSync(file, 'utf8')) ?? {}) : {};
   const providers: ProviderConfig[] = (Array.isArray(raw.providers) ? raw.providers : [
     { id: 'claude', cli: 'claude -p' }, { id: 'codex', cli: 'codex exec' },
-  ]).map((p: any) => ({
-    id: String(p.id),
-    cli: String(p.cli ?? p.id),
-    args: Array.isArray(p.args) ? p.args.map(String) : (DEFAULT_ARGS[String(p.id)] ?? []),
-    role: Array.isArray(p.role) ? p.role.map(String) : [],
-    instructions: p.instructions ? String(p.instructions) : undefined,
-  }));
+  ]).map((p: any) => {
+    const args: string[] = Array.isArray(p.args) ? p.args.map(String) : (DEFAULT_ARGS[String(p.id)] ?? []);
+    return {
+      id: String(p.id),
+      cli: String(p.cli ?? p.id),
+      args,
+      role: Array.isArray(p.role) ? p.role.map(String) : [],
+      instructions: p.instructions ? String(p.instructions) : undefined,
+      commits: p.commits === 'conductor' || p.commits === 'agent' ? p.commits : defaultCommits(args),
+      prompt_via: p.prompt_via === 'stdin' ? 'stdin' : 'arg',
+    };
+  });
   const order = Array.isArray(raw.failover_order) ? raw.failover_order.map(String) : providers.map((p) => p.id);
   const patterns: string[] = Array.isArray(raw.failure_patterns?.quota) ? raw.failure_patterns.quota.map(String) : DEFAULT_QUOTA;
   const paths = raw.paths ?? {};

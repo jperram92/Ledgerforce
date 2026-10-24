@@ -160,7 +160,7 @@ function logLine(ctx: Ctx, line: string): void {
 
 // ---------------- checkpoint ----------------
 
-export function checkpoint(ctx: Ctx, idArg: string | undefined, step: string): { sha: string; committed: boolean } {
+export function checkpoint(ctx: Ctx, idArg: string | undefined, step: string): { sha: string; committed: boolean; deferred: boolean } {
   const s0 = state(ctx);
   const id = idArg ?? s0.current_task;
   if (!id) throw new ExitError(EXIT.REFUSED, 'no task id given and state.json has no current_task');
@@ -169,6 +169,7 @@ export function checkpoint(ctx: Ctx, idArg: string | undefined, step: string): {
     throw new ExitError(EXIT.REFUSED, `${id} has status "${card.data.status}"; claim it before checkpointing`);
   }
   if (!isRepo(ctx.root)) throw new ExitError(EXIT.ERROR, `${ctx.root} is not a git repository`);
+  if (process.env.LF_DEFER_COMMIT === '1') return deferCheckpoint(ctx, id, card, step);
   const changed = hasChanges(ctx.root);
   // renew the lease and log the step first so they are part of the checkpoint commit
   const lease = leaseUntil(ctx);
@@ -181,7 +182,20 @@ export function checkpoint(ctx: Ctx, idArg: string | undefined, step: string): {
   const who = s.claimed_by ?? card.data.claimed_by ?? 'unknown';
   logLine(ctx, `${iso(now())} ${who}: checkpoint: ${step}`);
   let sha = headSha(ctx.root);
-  if (changed) sha = commitAll(ctx.root, `wip(${id}): ${step}`);
+  if (changed) {
+    try {
+      sha = commitAll(ctx.root, `wip(${id}): ${step}`);
+    } catch (e) {
+      // a sandbox that protects .git (Codex workspace-write): leave the commit to the conductor
+      if (/read-only|permission denied|operation not permitted|index\.lock/i.test((e as Error).message)) {
+        const s3 = state(ctx);
+        s3.pending_checkpoints = [...s3.pending_checkpoints, step];
+        saveState(ctx, s3);
+        return { sha: sha ?? '', committed: false, deferred: true };
+      }
+      throw e;
+    }
+  }
   if (!sha) throw new ExitError(EXIT.ERROR, 'repository has no commits yet');
   // last_checkpoint names the commit just made; recording it necessarily happens after the
   // commit, so these two metadata files are carried by the next checkpoint commit.
@@ -189,7 +203,38 @@ export function checkpoint(ctx: Ctx, idArg: string | undefined, step: string): {
   const s2 = state(ctx);
   s2.last_green_commit = sha;
   saveState(ctx, s2);
-  return { sha, committed: changed };
+  return { sha, committed: changed, deferred: false };
+}
+
+/** LF_DEFER_COMMIT=1: the provider cannot write .git; renew the lease, log the step and queue it. */
+function deferCheckpoint(ctx: Ctx, id: string, card: Card, step: string): { sha: string; committed: boolean; deferred: boolean } {
+  const lease = leaseUntil(ctx);
+  setCard(card, { lease_expires_at: lease });
+  const s = state(ctx);
+  s.lease_expires_at = lease;
+  s.step = step;
+  s.current_task = id;
+  s.pending_checkpoints = [...s.pending_checkpoints, step];
+  saveState(ctx, s);
+  logLine(ctx, `${iso(now())} ${s.claimed_by ?? 'unknown'}: checkpoint (commit deferred to conductor): ${step}`);
+  return { sha: headSha(ctx.root) ?? '', committed: false, deferred: true };
+}
+
+/** Conductor side of deferred checkpoints: commit queued steps, record last_checkpoint. */
+export function flushPendingCheckpoints(ctx: Ctx, id: string): string | null {
+  const s = state(ctx);
+  const steps = s.pending_checkpoints;
+  if (!steps.length) return null;
+  let sha = headSha(ctx.root);
+  if (hasChanges(ctx.root)) sha = commitAll(ctx.root, `wip(${id}): ${steps.join('; ')}`);
+  if (!sha) return null;
+  const c = cards(ctx).find((x) => x.id === id);
+  if (c) setCard(c, { last_checkpoint: sha });
+  const s2 = state(ctx); // re-read: the agent may have queued another step meanwhile
+  s2.pending_checkpoints = s2.pending_checkpoints.slice(steps.length);
+  s2.last_green_commit = sha;
+  saveState(ctx, s2);
+  return sha;
 }
 
 // ---------------- release ----------------

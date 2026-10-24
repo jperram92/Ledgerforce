@@ -15,12 +15,12 @@ import { spawn, spawnSync } from 'node:child_process';
 import { createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import {
-  type Ctx, cards, getCard, state, saveState, claim, release, handover, unlease,
+  type Ctx, cards, getCard, state, saveState, claim, release, handover, unlease, flushPendingCheckpoints,
 } from './commands.ts';
 import { latestCrossReview } from './review.ts';
 import { nextClaimable, ACTIVE_STATUSES, type Card } from './backlog.ts';
-import { type ProviderConfig } from './config.ts';
-import { ensureBranch, hasChanges, isRepo, snapshotToRef, currentBranch } from './git.ts';
+import { type ProviderConfig, type Config } from './config.ts';
+import { ensureBranch, hasChanges, isRepo, snapshotToRef, currentBranch, gitTry, commitAll } from './git.ts';
 import { now, iso, stamp, today, shellWords, shellQuote, slugify, EXIT } from './util.ts';
 
 export interface RunOptions { once: boolean; task?: string; dryRun: boolean }
@@ -76,8 +76,62 @@ export function taskBranch(card: Card): string {
   return card.data.branch ? String(card.data.branch) : `feat/${card.id}-${slugify(String(card.data.title ?? ''))}`;
 }
 
-export function providerArgv(p: ProviderConfig, prompt: string): string[] {
-  return [...shellWords(p.cli), ...p.args, prompt];
+export interface ArgVars { repo: string; last_message_file: string; run_id: string }
+
+/** argv = cli words + args (placeholders expanded) + prompt (unless the prompt goes on stdin). */
+export function providerArgv(p: ProviderConfig, prompt: string, vars: ArgVars): string[] {
+  const expand = (a: string) => a.replace(/\{(repo|last_message_file|run_id)\}/g, (_, k: keyof ArgVars) => vars[k]);
+  return [...shellWords(p.cli), ...p.args.map(expand), ...(p.prompt_via === 'stdin' ? [] : [prompt])];
+}
+
+function argVars(ctx: Ctx, provider: string, runId: string): ArgVars {
+  return {
+    repo: ctx.root,
+    last_message_file: join(ctx.root, ctx.cfg.paths.runs, `${today(now())}-${provider}-${runId}-last.md`),
+    run_id: runId,
+  };
+}
+
+// ---------------- failure classification (RQ-0001, RQ-0002) ----------------
+
+/** First line (scanning from the end) matching a quota/credit/limit pattern; patterns are case-insensitive. */
+export function quotaMatch(cfg: Config, text: string): string | null {
+  const lines = text.split('\n').reverse();
+  for (const re of cfg.quota_patterns) {
+    const hit = lines.find((l) => re.test(l));
+    if (hit) return hit.trim().slice(0, 300);
+  }
+  return null;
+}
+
+/** The final `{"type":"result",...}` object of a stream-json / json run, if any. */
+function finalResult(text: string): { is_error?: boolean; subtype?: string; result?: unknown } | null {
+  const lines = text.split('\n');
+  for (let i = lines.length - 1; i >= 0; i--) {
+    const l = lines[i].trim();
+    if (!/^\{.*"type"\s*:\s*"result"/.test(l)) continue;
+    try { return JSON.parse(l); } catch { return null; }
+  }
+  return null;
+}
+
+/**
+ * Classify a provider session from its exit code and combined stdout+stderr tail.
+ * - error_max_budget_usd → quota (the provider's own budget ran out; fail over)
+ * - non-zero exit or is_error → quota if a limit pattern appears anywhere, else failure
+ * - exit 0 without error → quota if a limit pattern appears in the last 4 KB (agent stopped on a
+ *   limit after handing over), else ok (the caller then looks at the card status)
+ */
+export function classifyOutput(cfg: Config, code: number | null, tail: string): { kind: 'ok' | 'quota' | 'failure'; detail: string } {
+  const res = finalResult(tail);
+  if (res?.subtype === 'error_max_budget_usd') return { kind: 'quota', detail: 'error_max_budget_usd (provider budget exhausted)' };
+  const errorish = code !== 0 || res?.is_error === true;
+  const q = quotaMatch(cfg, errorish ? tail : tail.slice(-4096));
+  if (q) return { kind: 'quota', detail: q };
+  if (!errorish) return { kind: 'ok', detail: '' };
+  const last = tail.trim().split('\n').slice(-1)[0] ?? '';
+  const sub = res?.subtype && res.subtype !== 'success' ? ` ${res.subtype}` : '';
+  return { kind: 'failure', detail: `exit ${code}${sub}: ${last.slice(0, 300)}` };
 }
 
 // ---------------- budget / availability ----------------
@@ -222,7 +276,7 @@ function notify(ctx: Ctx, card: Card, reason: string, logs: string[]): string {
 
 interface LaunchResult { code: number | null; signal: string | null; tail: string; heartbeatLost: boolean }
 
-function launch(ctx: Ctx, argv: string[], logFile: string, env: NodeJS.ProcessEnv, taskId: string): Promise<LaunchResult> {
+function launch(ctx: Ctx, argv: string[], logFile: string, env: NodeJS.ProcessEnv, taskId: string, stdinText: string | null, onPoll: () => void): Promise<LaunchResult> {
   return new Promise((resolve) => {
     const log = createWriteStream(logFile, { flags: 'a' });
     let tail = '';
@@ -235,7 +289,8 @@ function launch(ctx: Ctx, argv: string[], logFile: string, env: NodeJS.ProcessEn
     let heartbeatLost = false;
     let child: ReturnType<typeof spawn>;
     try {
-      child = spawn(argv[0], argv.slice(1), { cwd: ctx.root, env, detached: true, stdio: ['ignore', 'pipe', 'pipe'] });
+      child = spawn(argv[0], argv.slice(1), { cwd: ctx.root, env, detached: true, stdio: [stdinText === null ? 'ignore' : 'pipe', 'pipe', 'pipe'] });
+      if (stdinText !== null) { child.stdin!.on('error', () => { /* provider closed stdin */ }); child.stdin!.end(stdinText); }
     } catch (e) {
       log.end(`\n[conductor] failed to start ${argv[0]}: ${(e as Error).message}\n`);
       resolve({ code: 127, signal: null, tail: String(e), heartbeatLost: false });
@@ -248,6 +303,7 @@ function launch(ctx: Ctx, argv: string[], logFile: string, env: NodeJS.ProcessEn
     };
     const pollMs = Number(process.env.LF_POLL_MS) || ctx.cfg.poll_seconds * 1000;
     const timer = setInterval(() => {
+      try { onPoll(); } catch (e) { log.write(`\n[conductor] periodic commit failed: ${(e as Error).message}\n`); }
       try {
         const s = state(ctx);
         if (s.current_task !== taskId || !s.lease_expires_at) return; // released → not our concern
@@ -280,18 +336,20 @@ function classify(ctx: Ctx, card: Card, r: LaunchResult, mode: Mode, provider: s
     if (rv && rv.file !== reviewBefore && rv.provider === provider) return { kind: 'handoff', detail: `cross-review ${rv.verdict}: ${rv.file}` };
   }
   if (r.heartbeatLost) return { kind: 'failure', detail: 'heartbeat lost (lease expired without a checkpoint)' };
-  const errorish = r.code !== 0 || /"is_error"\s*:\s*true/.test(r.tail);
-  if (errorish) {
-    for (const re of ctx.cfg.quota_patterns) {
-      const line = r.tail.split('\n').reverse().find((l) => re.test(l));
-      if (line) return { kind: 'quota', detail: line.trim().slice(0, 300) };
-    }
-  }
-  if (r.code !== 0) {
-    const last = r.tail.trim().split('\n').slice(-1)[0] ?? '';
-    return { kind: 'failure', detail: `exit ${r.code}${r.signal ? ` (${r.signal})` : ''}: ${last.slice(0, 300)}` };
-  }
+  const o = classifyOutput(ctx.cfg, r.code, r.tail);
+  if (o.kind === 'quota') return { kind: 'quota', detail: o.detail };
+  if (o.kind === 'failure') return { kind: 'failure', detail: `${o.detail}${r.signal ? ` (${r.signal})` : ''}` };
   return { kind: 'failure', detail: `exited 0 but task is "${c.data.status}", not done` };
+}
+
+/** Commit leftover work of a provider that cannot commit itself, ignoring pure bookkeeping files. */
+function sessionEndCommit(ctx: Ctx, id: string, provider: string, runId: string): string | null {
+  const meta = new Set([ctx.cfg.paths.state, ctx.cfg.paths.handover, `${ctx.cfg.paths.backlog}/${id}.md`]);
+  const dirty = [gitTry(ctx.root, ['diff', '--name-only', 'HEAD']).out, gitTry(ctx.root, ['ls-files', '-o', '--exclude-standard']).out]
+    .join('\n').split('\n').filter(Boolean);
+  const isMeta = (f: string) => meta.has(f) || f.startsWith(`${ctx.cfg.paths.runs}/`) || f.startsWith(`${ctx.cfg.paths.notifications}/`);
+  if (!dirty.some((f) => !isMeta(f))) return null;
+  return commitAll(ctx.root, `wip(${id}): ${provider} ${runId} session end (committed by conductor)`);
 }
 
 // ---------------- one task ----------------
@@ -358,8 +416,9 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
       saveState(ctx, s);
     }
     const prompt = buildPrompt(ctx, getCard(ctx, id), provider, runId, branch, resumePack(ctx), note, mode, builder);
-    const argv = providerArgv(pcfg, prompt);
-    const display = [...shellWords(pcfg.cli), ...pcfg.args].map(shellQuote).join(' ') + ' "<prompt>"';
+    const argv = providerArgv(pcfg, prompt, argVars(ctx, provider, runId));
+    const shown = pcfg.prompt_via === 'stdin' ? argv : argv.slice(0, -1);
+    const display = shown.map(shellQuote).join(' ') + (pcfg.prompt_via === 'stdin' ? ' < <prompt>' : ' "<prompt>"');
     writeFileSync(join(ctx.root, logRel), [
       `# conductor run ${runId} — provider ${provider} — task ${id} — branch ${branch}`,
       `# started: ${iso(now())}`,
@@ -374,7 +433,16 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
     const r = await launch(ctx, argv, join(ctx.root, logRel), {
       ...process.env,
       LF_PROVIDER: provider, LF_TASK: id, LF_RUN_ID: runId, LF_ROOT: ctx.root, LF_CONDUCTOR: CONDUCTOR,
-    }, id);
+      ...(pcfg.commits === 'conductor' ? { LF_DEFER_COMMIT: '1' } : {}),
+    }, id, pcfg.prompt_via === 'stdin' ? prompt : null, () => {
+      // provider cannot write .git → commit its deferred checkpoints while it runs (heartbeat cadence)
+      const sha = flushPendingCheckpoints(ctx, id);
+      if (sha) ctx.out(`[${runId}] conductor committed deferred checkpoint ${sha.slice(0, 7)} for ${provider}`);
+    });
+    {
+      const sha = flushPendingCheckpoints(ctx, id);
+      if (sha) ctx.out(`[${runId}] conductor committed deferred checkpoint ${sha.slice(0, 7)} for ${provider}`);
+    }
     const outcome = classify(ctx, getCard(ctx, id), r, mode, provider, reviewBefore);
     const costs = [...r.tail.matchAll(/"total_cost_usd"\s*:\s*([0-9]+(?:\.[0-9]+)?)/g)];
     const footer = [
@@ -395,6 +463,10 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
       saveState(ctx, s);
     }
 
+    if (pcfg.commits === 'conductor' && (outcome.kind === 'done' || outcome.kind === 'handoff')) {
+      const sha = sessionEndCommit(ctx, id, provider, runId);
+      if (sha) ctx.out(`[${runId}] conductor committed ${provider}'s remaining work: ${sha.slice(0, 7)}`);
+    }
     if (outcome.kind === 'done') return EXIT.OK;
     if (outcome.kind === 'handoff') {
       unlease(ctx, id);
@@ -478,7 +550,9 @@ function dryRun(ctx: Ctx, card: Card): number {
     const runId = `r${String(runNo + k).padStart(2, '0')}`;
     ctx.out(`[${k + 1}] ${pid}${k ? ' (after quota/credit/budget failure of the previous provider)' : ''}${why ? ` — SKIPPED: ${why}` : ''}`);
     ctx.out(`    node scripts/agent/conductor.ts claim ${id} --provider ${pid}`);
-    ctx.out(`    $ ${[...shellWords(p.cli), ...p.args].map(shellQuote).join(' ')} "<prompt>"`);
+    const argv = providerArgv(p, '<prompt>', argVars(ctx, pid, runId));
+    const shown = p.prompt_via === 'stdin' ? argv : argv.slice(0, -1);
+    ctx.out(`    $ ${shown.map(shellQuote).join(' ')}${p.prompt_via === 'stdin' ? ' < <prompt>' : ' "<prompt>"'}${p.commits === 'conductor' ? '   [commits made by the conductor]' : ''}`);
     ctx.out(`    log: ${join(ctx.cfg.paths.runs, `${today(now())}-${pid}-${runId}.log`)}`);
   });
   const prompt = buildPrompt(ctx, card, candidates[0] ?? '(none)', `r${String(runNo).padStart(2, '0')}`, branch, `(resume context pack: ${pack.length} chars)`, '', mode, builder);

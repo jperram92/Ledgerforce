@@ -102,7 +102,9 @@ export async function main(argv: string[]): Promise<number> {
       const id = taskArg(pos, false);
       const step = str(flags, 'step', true, '"<what was done>"')!;
       const r = checkpoint(ctx, id, step);
-      ctx.out(r.committed ? `checkpoint ${r.sha.slice(0, 7)}: ${step}` : `no changes to commit; lease renewed, last_checkpoint=${r.sha.slice(0, 7)}`);
+      ctx.out(r.deferred
+        ? `commit deferred to the conductor (no .git access); lease renewed, step queued: ${step}`
+        : r.committed ? `checkpoint ${r.sha.slice(0, 7)}: ${step}` : `no changes to commit; lease renewed, last_checkpoint=${r.sha.slice(0, 7)}`);
       return EXIT.OK;
     }
     case 'release': {

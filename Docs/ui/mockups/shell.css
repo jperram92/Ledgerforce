@@ -150,7 +150,7 @@ hr.sep { border: 0; border-top: 1px solid var(--lf-border); margin: 14px 0; }
 .banner .body-text { color: var(--lf-text); }
 
 /* ---------- Data tables ---------- */
-.table-wrap { overflow-x: auto; }
+.table-wrap { overflow-x: auto; position: relative; }
 table.data { width: 100%; border-collapse: separate; border-spacing: 0; font-size: var(--lf-table-font); }
 table.data th { text-align: left; font-weight: 500; font-size: 12px; color: var(--lf-text-muted); background: var(--lf-surface-2); padding: 8px var(--lf-cell-px); border-bottom: 1px solid var(--lf-border); white-space: nowrap; }
 table.data td { padding: var(--lf-cell-py) var(--lf-cell-px); border-bottom: 1px solid var(--lf-border); height: var(--lf-row-h); vertical-align: middle; }
@@ -240,10 +240,44 @@ pre.code .k { color: var(--lf-accent-text); } pre.code .s { color: var(--lf-succ
 /* Mockup annotation chip (design notes; not product UI) */
 .note { display: inline-flex; gap: 6px; align-items: center; font-size: 11.5px; color: var(--lf-text-subtle); font-style: italic; }
 
+.navbtn { display: none; }
+
+/* ---------- Responsive: <= 900px collapses the nav and stacks every page grid ----------
+   Specificity "body .x" beats the single-class page styles that follow this file. */
 @media (max-width: 900px) {
-  .app { grid-template-columns: 1fr; }
+  .app { grid-template-columns: 1fr; background: none; }
   .sidenav { display: none; }
-  .g2, .g3, .g4 { grid-template-columns: 1fr; }
+  body.nav-open .sidenav { display: flex; position: fixed; inset: 0 auto 0 0; width: min(280px, 85vw); z-index: 50; box-shadow: var(--lf-shadow-overlay); }
+  .navbtn { display: grid; }
   .content { padding: 16px; }
-  .search, .pill.hide-sm { display: none; }
+  .topbar { padding: 0 8px 0 4px; gap: 4px; }
+  .search, .pill.hide-sm, #lf-theme, .userchip .who, .switcher small { display: none; }
+  .switcher { min-width: 0; flex: 0 1 auto; padding: 0 8px; }
+  .switcher .co-name { max-width: 128px; overflow: hidden; text-overflow: ellipsis; }
+  .topbar .pill { padding: 0 8px; }
+  .topbar .pill b { display: none; }
+  .page-head { align-items: flex-start; }
+  body .g2, body .g3, body .g4, body .kpis, body .lower, body .layout, body .wiz, body .inbox,
+  body .doc-head, body .balance, body .match, body .people { grid-template-columns: minmax(0, 1fr); }
+  body .grid > *, body .layout > *, body .wiz > *, body .inbox > *, body .stack > *, body .lower > * { min-width: 0; }
+  body .summary, body .kpi-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body .summary > div, body .kpi-row > div { border-bottom: 1px solid var(--lf-border); }
+  body .colhead, body .link-col, body .balance .op { display: none; }
+  body .sugg { border-left: 0; border-top: 1px dashed var(--lf-border); }
+  body .acts { flex-direction: row; }
+  body .people > .i { transform: rotate(90deg); justify-self: center; }
+  body .approvals li { grid-template-columns: 32px minmax(0, 1fr) auto; }
+  body .approvals li > .btn { grid-column: 2 / -1; justify-self: start; }
+  body .checklist > li { grid-template-columns: 36px minmax(0, 1fr); }
+  body .checklist > li > :last-child:not(div:nth-child(2)) { grid-column: 2; }
+  body .totals { width: 100%; }
+  body .wsteps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body .steps { flex-wrap: wrap; gap: 8px; }
+  body .steps li + li::before { width: 12px; margin: 0 6px 0 0; }
+  .seg, .bulkbar, .banner, .actionbar, .card-f, .card-h, .footer, .actions, .row, .case-h { flex-wrap: wrap; }
+  body .card-f .actions { flex-wrap: wrap; }
+  body .case-h .t, body .case-h .s, body .exc td:first-child, body .card-h + .table-wrap td:first-child { white-space: normal; }
+  .banner .act { margin-left: 0; }
+  .kpi .fig { font-size: 26px; }
+  pre.code { max-width: 100%; }
 }

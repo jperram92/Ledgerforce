@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-24T07:47:09.519Z",
+  "generated": "2026-10-24T07:52:45.793Z",
   "axe": true,
   "pages": [
     {
@@ -27,6 +27,18 @@
       "problems": []
     },
     {
+      "page": "01-home-dashboard-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/01-home-dashboard-390.png",
+      "title": "Home — LedgerForce",
+      "bodyContrast": 16.41,
+      "minTextContrast": 4.55,
+      "minTextAt": "span.kbd \"N\"",
+      "textNodesChecked": 82,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
       "page": "02-invoice-list",
       "viewport": "1440x900",
       "screenshot": "screenshots/02-invoice-list.png",
@@ -35,6 +47,18 @@
       "minTextContrast": 4.55,
       "minTextAt": "span.kbd \"N\"",
       "textNodesChecked": 191,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
+      "page": "02-invoice-list-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/02-invoice-list-390.png",
+      "title": "Invoices — LedgerForce",
+      "bodyContrast": 16.41,
+      "minTextContrast": 4.55,
+      "minTextAt": "span.kbd \"N\"",
+      "textNodesChecked": 166,
       "axeViolations": 0,
       "problems": []
     },
@@ -63,6 +87,18 @@
       "problems": []
     },
     {
+      "page": "03-invoice-detail-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/03-invoice-detail-390.png",
+      "title": "INV-001042 · Kestrel Logistics — LedgerForce",
+      "bodyContrast": 16.41,
+      "minTextContrast": 5.26,
+      "minTextAt": "span.sf.ok \"Synced to Salesforce\"",
+      "textNodesChecked": 135,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
       "page": "04-batch-billing-run",
       "viewport": "1440x900",
       "screenshot": "screenshots/04-batch-billing-run.png",
@@ -75,6 +111,18 @@
       "problems": []
     },
     {
+      "page": "04-batch-billing-run-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/04-batch-billing-run-390.png",
+      "title": "Batch billing BR-0032 preview — LedgerForce",
+      "bodyContrast": 16.41,
+      "minTextContrast": 5.03,
+      "minTextAt": "div.role \"Approver · you\"",
+      "textNodesChecked": 170,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
       "page": "05-payment-batch-release",
       "viewport": "1440x900",
       "screenshot": "screenshots/05-payment-batch-release.png",
@@ -83,6 +131,18 @@
       "minTextContrast": 5.03,
       "minTextAt": "div.role \"2nd release · Owner · you\"",
       "textNodesChecked": 151,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
+      "page": "05-payment-batch-release-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/05-payment-batch-release-390.png",
+      "title": "Release payment batch PB-0087 — LedgerForce",
+      "bodyContrast": 16.41,
+      "minTextContrast": 5.03,
+      "minTextAt": "div.role \"2nd release · Owner · you\"",
+      "textNodesChecked": 127,
       "axeViolations": 0,
       "problems": []
     },
@@ -111,6 +171,18 @@
       "problems": []
     },
     {
+      "page": "06-bank-reconciliation-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/06-bank-reconciliation-390.png",
+      "title": "Reconcile Operating account — LedgerForce",
+      "bodyContrast": 16.41,
+      "minTextContrast": 5.27,
+      "minTextAt": "div.crumbs \"Reconcile\"",
+      "textNodesChecked": 78,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
       "page": "07-period-close-checklist",
       "viewport": "1440x900",
       "screenshot": "screenshots/07-period-close-checklist.png",
@@ -119,6 +191,18 @@
       "minTextContrast": 5.27,
       "minTextAt": "div.crumbs \"Close\"",
       "textNodesChecked": 102,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
+      "page": "07-period-close-checklist-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/07-period-close-checklist-390.png",
+      "title": "Close September 2026 — LedgerForce",
+      "bodyContrast": 16.41,
+      "minTextContrast": 5.27,
+      "minTextAt": "div.crumbs \"Close\"",
+      "textNodesChecked": 81,
       "axeViolations": 0,
       "problems": []
     },
@@ -135,6 +219,18 @@
       "problems": []
     },
     {
+      "page": "08-setup-wizard-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/08-setup-wizard-390.png",
+      "title": "Setup step 7 · Posting profiles — LedgerForce",
+      "bodyContrast": 16.41,
+      "minTextContrast": 5.27,
+      "minTextAt": "div.crumbs \"Setup\"",
+      "textNodesChecked": 121,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
       "page": "09-sync-issues-inbox",
       "viewport": "1440x900",
       "screenshot": "screenshots/09-sync-issues-inbox.png",
@@ -147,9 +243,33 @@
       "problems": []
     },
     {
+      "page": "09-sync-issues-inbox-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/09-sync-issues-inbox-390.png",
+      "title": "Salesforce sync issues — LedgerForce",
+      "bodyContrast": 16.41,
+      "minTextContrast": 5.03,
+      "minTextAt": "span.when \"3 h\"",
+      "textNodesChecked": 80,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
       "page": "10-salesforce-account-lwc",
       "viewport": "1440x900",
       "screenshot": "screenshots/10-salesforce-account-lwc.png",
+      "title": "Salesforce Account page with LedgerForce component — LedgerForce",
+      "bodyContrast": 16,
+      "minTextContrast": 4.63,
+      "minTextAt": "button.sbtn \"+ Follow\"",
+      "textNodesChecked": 83,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
+      "page": "10-salesforce-account-lwc-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/10-salesforce-account-lwc-390.png",
       "title": "Salesforce Account page with LedgerForce component — LedgerForce",
       "bodyContrast": 16,
       "minTextContrast": 4.63,
@@ -167,6 +287,18 @@
       "minTextContrast": 5.03,
       "minTextAt": "div.role \"Author · you\"",
       "textNodesChecked": 138,
+      "axeViolations": 0,
+      "problems": []
+    },
+    {
+      "page": "11-journal-rule-studio-390",
+      "viewport": "390x844",
+      "screenshot": "screenshots/11-journal-rule-studio-390.png",
+      "title": "Rule studio · deposit-on-closed-won — LedgerForce",
+      "bodyContrast": 16.41,
+      "minTextContrast": 5.03,
+      "minTextAt": "div.role \"Author · you\"",
+      "textNodesChecked": 114,
       "axeViolations": 0,
       "problems": []
     },

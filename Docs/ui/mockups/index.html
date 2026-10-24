@@ -9,11 +9,12 @@
 <script src="shell.js" defer></script>
 <style>
   .wrap { max-width: 1240px; margin: 0 auto; padding: 32px 24px 64px; }
+  @media (max-width: 600px) { .wrap { padding: 20px 16px 48px; } footer code { word-break: break-all; } }
   .hero { display: flex; gap: 16px; align-items: center; margin-bottom: 8px; }
   .hero .brand-mark { width: 40px; height: 40px; font-size: 18px; border-radius: 10px; }
   .lead { color: var(--lf-text-muted); max-width: 760px; font-size: 15px; margin-bottom: 28px; }
   h2.sect { font-size: 18px; margin: 28px 0 12px; }
-  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 16px; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(270px, 100%), 1fr)); gap: 16px; }
   .shot { display: flex; flex-direction: column; background: var(--lf-surface); border: 1px solid var(--lf-border); border-radius: var(--lf-radius-lg); overflow: hidden; color: var(--lf-text); box-shadow: var(--lf-shadow-xs); }
   .shot:hover { text-decoration: none; box-shadow: var(--lf-shadow-md); }
   .shot .img { aspect-ratio: 16 / 10; background: var(--lf-surface-2); border-bottom: 1px solid var(--lf-border); overflow: hidden; }
@@ -23,7 +24,7 @@
   .shot .cap b { display: block; font-size: 14px; }
   .shot .cap span { font-size: 12.5px; color: var(--lf-text-muted); }
   .shot .uc { display: inline-block; margin-top: 6px; }
-  .principles { list-style: none; counter-reset: p; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 10px; }
+  .principles { list-style: none; counter-reset: p; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 10px; }
   .principles li { counter-increment: p; display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 12px 14px; background: var(--lf-surface); border: 1px solid var(--lf-border); border-radius: var(--lf-radius-lg); font-size: 13.5px; }
   .principles li::before { content: counter(p); width: 26px; height: 26px; border-radius: 50%; background: var(--lf-accent-soft); color: var(--lf-accent-text); display: grid; place-items: center; font-weight: 600; font-size: 12.5px; }
   .principles b { display: block; }

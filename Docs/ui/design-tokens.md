@@ -141,7 +141,7 @@ Result on 2026-10-24: **90 checks, 0 failures.** Lowest text pair 5.27:1 (light
 ### Rendered-page contrast
 
 `tools/screenshot-mockups.mjs` also measures every visible text node against its actual rendered
-background on all 17 screenshots (light and dark). Lowest rendered text contrast: 4.55:1 (the
+background on all 28 screenshots (desktop light and dark, and every screen at 390px). Lowest rendered text contrast: 4.55:1 (the
 `N` shortcut hint on the primary button, white at 0.16 alpha over indigo); every other node
 ≥ 4.63:1; body text 16.41:1 light, 17.12:1 dark. Details: `screenshots/check-report.json`.
 

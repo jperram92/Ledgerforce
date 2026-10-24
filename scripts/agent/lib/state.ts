@@ -25,6 +25,8 @@ export interface State {
   failures: Record<string, number>;
   providers: Record<string, ProviderState>;
   run_id: string | null;
+  /** checkpoint steps recorded by a provider that cannot write .git; the conductor commits them */
+  pending_checkpoints: string[];
   updated_at: string;
   [k: string]: unknown;
 }
@@ -45,6 +47,7 @@ export function readState(root: string, rel: string): State {
     attempts: raw.attempts ?? {},
     failures: raw.failures ?? {},
     providers: raw.providers ?? {},
+    pending_checkpoints: Array.isArray(raw.pending_checkpoints) ? raw.pending_checkpoints : [],
   };
 }
 
