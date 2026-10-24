@@ -1,11 +1,11 @@
-# Handover - 2026-10-24 14:25 UTC
-From: claude (lead session r01)    Reason: checkpoint — T-0018 (chart of accounts) verified and in review; next claimable task follows
-Task: T-0018 done to review; next = `node scripts/agent/conductor.ts next` (expected T-0024 gapless numbering)
+# Handover - 2026-10-24 14:35 UTC
+From: claude (lead session r01)    Reason: checkpoint — T-0018 (chart) and T-0019 (dimensions) verified and in review
+Task: T-0019 done to review; next = `node scripts/agent/conductor.ts next` (T-0020 journal tables needs Approved golden postings? check its card; else T-0024)
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
-Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018 verified (exit 0) and in review; conductor race fixed (DL-0069).
+Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: nothing mid-edit. Working tree clean after the last commit.
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
-Decisions taken: DL-0061..DL-0072; ADR-0016 (Proposed, security); RQ-0015.
+Decisions taken: DL-0061..DL-0073; new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
   2. Accept/reject ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
@@ -30,6 +30,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0018 — packages/db/migrations/0005_gl_chart_of_accounts.sql (role guards, system_role_allows);
 >     packages/modules/gl/** (system-roles, templates validator, loadChartTemplate, au-services-smb.json);
 >     cross-tenant overrides; DL-0071/0072
+>   • T-0019 — packages/db/migrations/0006_gl_dimensions.sql (canonicalise trigger, guards,
+>     dimension_set_missing_required); packages/ledger/** (dimensionSetId, property test); DL-0073
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -77,3 +79,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T14:19:44.096Z claude: T-0018 → verifying
 - 2026-10-24T14:21:15.031Z claude: release T-0018 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
 - 2026-10-24 14:2x claude: T-0018 built (migration 0005, @ledgerforce/gl), evidenced SS-PLAT-31/32, verify 12 PASS/0 FAIL → review
+- 2026-10-24T14:28:42.944Z claude: T-0019 → verifying
+- 2026-10-24T14:30:13.199Z claude: release T-0019 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 14:3x claude: T-0019 built (migration 0006, @ledgerforce/ledger), evidenced SS-PLAT-33/34, verify 12 PASS/0 FAIL → review

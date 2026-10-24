@@ -109,7 +109,7 @@ graph LR
 | [T-0016](T-0016.md) | User lifecycle (joiner/mover/leaver) and scoped API tokens | MVP | todo | T-0012, T-0014, T-0013 | — | 1 |
 | [T-0017](T-0017.md) | Money package (decimal.js) and no-float lint rule | MVP | review | T-0001 | — | 1 |
 | [T-0018](T-0018.md) | Chart of accounts, system roles and AU templates | MVP | review | T-0010, T-0017 | — | 0 |
-| [T-0019](T-0019.md) | Dimensions and deduplicated dimension sets | MVP | todo | T-0018 | — | 0 |
+| [T-0019](T-0019.md) | Dimensions and deduplicated dimension sets | MVP | review | T-0018 | — | 0 |
 | [T-0020](T-0020.md) | Journal tables and deferred balance constraint trigger | MVP | todo | T-0018, T-0019 | — | 1 |
 | [T-0021](T-0021.md) | Immutability triggers and privilege model for ledger tables | MVP | todo | T-0020 | — | 1 |
 | [T-0022](T-0022.md) | Hash chain per company and verification report | MVP | todo | T-0021 | — | 1 |

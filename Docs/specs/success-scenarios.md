@@ -153,8 +153,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-30 | Every successful API mutation leaves one audit row | — | MVP | db-integration | no | apps/api/src/audit/audit.db.test.ts | T-0014 | evidenced | [.agent/evidence/T-0014/manifest.json](../../.agent/evidence/T-0014/manifest.json) | 93e3e18 |
 | SS-PLAT-31 | System-role accounts are protected by the database | — | MVP | db-integration | no | packages/modules/gl/src/chart.db.test.ts | T-0018 | evidenced | [.agent/evidence/T-0018/manifest.json](../../.agent/evidence/T-0018/manifest.json) | 42fc3ba |
 | SS-PLAT-32 | AU services SMB chart template is valid | — | MVP | unit | no | packages/modules/gl/src/templates.test.ts | T-0018 | evidenced | [.agent/evidence/T-0018/manifest.json](../../.agent/evidence/T-0018/manifest.json) | 42fc3ba |
-| SS-PLAT-33 | Dimension sets are deduplicated by a hash of their sorted pairs | — | MVP | db-integration + property | no | packages/ledger/src/dimension-set.db.test.ts | T-0019 | tested | — | — |
-| SS-PLAT-34 | Required dimensions per account are enforced; dimension identity is stable | — | MVP | db-integration | no | packages/ledger/src/dimension-set.db.test.ts | T-0019 | tested | — | — |
+| SS-PLAT-33 | Dimension sets are deduplicated by a hash of their sorted pairs | — | MVP | db-integration + property | no | packages/ledger/src/dimension-set.db.test.ts | T-0019 | evidenced | [.agent/evidence/T-0019/manifest.json](../../.agent/evidence/T-0019/manifest.json) | 361b38f |
+| SS-PLAT-34 | Required dimensions per account are enforced; dimension identity is stable | — | MVP | db-integration | no | packages/ledger/src/dimension-set.db.test.ts | T-0019 | evidenced | [.agent/evidence/T-0019/manifest.json](../../.agent/evidence/T-0019/manifest.json) | 361b38f |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | evidenced | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
