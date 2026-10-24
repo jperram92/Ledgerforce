@@ -117,7 +117,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC11-07 | Credit cannot exceed the creditable amount | UC-11 | MVP | unit | no | — | T-0045 | not-started | — | — |
 | SS-UC11-08 | Credit note and refund screens | UC-11 | MVP | e2e-playwright | yes | — | T-0085 | not-started | — | — |
 | SS-UC12-01 | Component renders balance, overdue, last payment, 5 invoices | UC-12 | MVP | unit | no | — | T-0072 | not-started | — | — |
-| SS-UC12-02 | Mirror fields are read-only for sales users | UC-12 | MVP | contract | no | — | T-0062 | not-started | — | — |
+| SS-UC12-02 | Mirror fields are read-only for sales users | UC-12 | MVP | contract | no | salesforce/test/package-contract.test.ts (offline); salesforce/force-app/main/default/classes/LFReadOnlyMirrorTest.cls (org, not yet run) | T-0062 | green (metadata part, offline; org deploy needs Dev Hub) | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
 | SS-UC12-03 | Empty state with no invoices | UC-12 | MVP | unit | no | — | T-0072 | not-started | — | — |
 | SS-UC12-04 | Sales rep sees the component in a scratch org | UC-12 | MVP | e2e-playwright | yes | — | T-0072 | not-started | — | — |
 | SS-UC12-05 | Salesforce values reconcile to LedgerForce aged AR | UC-12 | MVP | db-integration | no | — | T-0067, T-0049 | not-started | — | — |
@@ -159,6 +159,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-36 | One party with roles, addresses, contacts and contact roles | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | [.agent/evidence/T-0036/manifest.json](../../.agent/evidence/T-0036/manifest.json) | 481ae75 |
 | SS-PLAT-37 | An invoice cannot be approved for a customer with no Billing To contact | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | [.agent/evidence/T-0036/manifest.json](../../.agent/evidence/T-0036/manifest.json) | 481ae75 |
 | SS-PLAT-38 | Envelope encryption fails closed and survives key rotation | — | MVP | unit | no | packages/shared/src/crypto/envelope.test.ts | T-0037 | green | [.agent/evidence/T-0037/manifest.json](../../.agent/evidence/T-0037/manifest.json) | 1219bbc |
+| SS-PLAT-45 | Salesforce package metadata matches the connector contract (offline) | — | MVP | unit | no | salesforce/test/package-contract.test.ts, salesforce/test/xml.test.ts | T-0062 | green | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
+| SS-PLAT-46 | Salesforce permission sets grant least privilege; only the integration user writes | — | MVP | unit | no | salesforce/test/package-contract.test.ts | T-0062 | green | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -319,3 +321,10 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 - Phase: MVP · Layer: **unit** · Screenshot evidence: no · Task(s): T-0037
 - **Given** the local keyring KMS (ADR-0018) · **When** values are sealed and opened · **Then** the sealed parts never contain the plaintext; each seal uses a fresh data key and IV; a different record/field (AAD), any flipped bit, a wrong key or an unknown key id fails closed; after rotation old data still opens and new seals use the new key; malformed keyrings are refused without echoing key material
 
+### SS-PLAT-45 — Salesforce package metadata matches the connector contract (offline)
+- Phase: MVP · Layer: **unit** · Screenshot evidence: no · Task(s): T-0062
+- **Given** the SFDX project in `salesforce/` (RQ-0022, DL-0094..0096) · **When** it is read offline by the strict metadata reader · **Then** `sfdx-project.json` is one unlocked-package directory on API 67.0 with no namespace; every metadata file is strict XML in the metadata namespace and named after its component; every apiVersion is 67.0; LF_Invoice__c, LF_Payment__c, Account, Opportunity and LF_Billing_Request__e carry exactly the contracted LF fields with the contracted types; `LF_Id__c` is an external ID, unique and case-insensitive; lookups never block deletion of Salesforce-owned records; mirrors are deployed and public read-only; the event is HighVolume and published after commit; no credentials are in `salesforce/`; and `sf project convert source` converts the project without warnings
+
+### SS-PLAT-46 — Salesforce permission sets grant least privilege; only the integration user writes
+- Phase: MVP · Layer: **unit** · Screenshot evidence: no · Task(s): T-0062
+- **Given** the package's permission sets (DL-0097) · **When** their grants are listed · **Then** `LF_Integration_User` has exactly create/read/edit on the mirrors, read/edit on Account and Opportunity, read on the billing-request event, edit on every LF field, `ApiEnabled` and the `LF_Integration_Write` custom permission, and no delete, view-all or modify-all; `LF_Billing_Requester` may only create the event; there are exactly three permission sets and one custom permission; none needs activation or a licence

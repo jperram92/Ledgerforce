@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Explicit billing actions published from Salesforce (Invoice this Opportunity, Send statement) for the LedgerForce connector (design §5.3). Delivered only if the publishing transaction commits.</description>
+    <eventType>HighVolume</eventType>
+    <label>LedgerForce Billing Request</label>
+    <pluralLabel>LedgerForce Billing Requests</pluralLabel>
+    <publishBehavior>PublishAfterCommit</publishBehavior>
+</CustomObject>

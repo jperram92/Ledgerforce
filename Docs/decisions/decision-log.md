@@ -601,3 +601,42 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Product owner asked for parallel sub-agents. The global migration sequence and the shared registers are the only serialisation points, so pre-assignment removes them.
 - Alternatives: sequential build (slower); parallel without pre-assignment (migration number and id collisions).
 - ADR: none · Status: accepted
+
+### DL-0094 — Salesforce package validated offline by a repo-owned contract test; sf CLI kept out of the repo
+- Date: 2026-10-24 · By: claude · Task: T-0062 · Category: tooling
+- Decision: The package metadata in `salesforce/force-app` is checked offline by Vitest tests in `salesforce/test/` (unit project). They read the XML with a small strict reader in `salesforce/test/xml.ts` (elements, text, the five predefined entities, comments, the root `xmlns`; anything else is refused) and assert the contract later tasks rely on. `@salesforce/cli` 2.155.0 (published 2026-10-08) is used only outside the repo, as a cross-check (`sf project convert source`), with its output recorded as evidence. No dependency is added. Config changes to make the test a first-class citizen: `vitest.config.ts` unit include `salesforce/test/**/*.test.ts`; `eslint.config.js`, `.prettierignore` and the root `tsconfig.json` cover `salesforce/test/` (the rest of `salesforce/` stays ignored).
+- Why: RQ-0022: `sf project deploy validate` needs an org (none until the human provides a Dev Hub); the CLI is 697 MB / ~1,470 packages, too heavy for every `pnpm install`; no published XSD exists for source format. A hand-written strict reader avoids a lockfile change while other tasks run in parallel (DL-0081), and refusing unknown XML constructs keeps the metadata simple.
+- Alternatives: `@salesforce/cli` as a devDependency (size); `fast-xml-parser` devDependency (6 transitive packages and a lockfile change, for a subset we can parse in ~100 tested lines); regex checks on raw XML (brittle).
+- ADR: none · Status: accepted
+
+### DL-0095 — Salesforce API version 67.0 for the package
+- Date: 2026-10-24 · By: claude · Task: T-0062 · Category: tooling
+- Decision: `sourceApiVersion` and every `*-meta.xml` that carries a version use **67.0** (Summer '26). The contract test enforces one version across the project.
+- Why: RQ-0022: the CLI's own project template uses 67.0; Winter '27 (68.0) is still listed as preview in the doc sets reachable; 67.0 deploys to every current org. Re-check 68.0 after 2026-11-30.
+- Alternatives: 68.0 now (preview risk); older versions (no benefit).
+- ADR: none · Status: accepted
+
+### DL-0096 — Package data contract: mirror objects, LedgerForce-owned fields and the billing-request event
+- Date: 2026-10-24 · By: claude · Task: T-0062 · Category: architecture
+- Decision (interpretation of design §5.4/§5.5 and UC-01/03/11/12; ADR-0006 governs ownership):
+  - `LF_Invoice__c` and `LF_Payment__c`: `LF_Id__c` Text(36) **external ID, unique, case-insensitive** (the LedgerForce UUID; upsert key per §5.4); Name is Text and holds the document number (invoice number / receipt number); sharing model **Read** (public read-only, records owned by the integration user); no field is required at field level (required fields cannot carry permission-set FLS).
+  - Invoice fields: `LF_Status__c`, `LF_Issue_Date__c`, `LF_Due_Date__c`, `LF_Total__c`, `LF_Amount_Due__c`, `LF_Amount_Credited__c` (UC-11), `LF_Days_Overdue__c`, `LF_Last_Payment_Date__c` (UC-03 "Paid + payment date"), `LF_PDF_Link__c`, `LF_Payment_Link__c`, lookups `LF_Account__c` and `LF_Opportunity__c`.
+  - Payment fields (design names none; minimum for UC-03): `LF_Payment_Date__c`, `LF_Amount__c`, `LF_Method__c`, `LF_Reference__c`, lookups `LF_Account__c` and `LF_Invoice__c` (the invoice when a receipt pays one invoice; blank otherwise).
+  - Account: `LF_Balance_Due__c`, `LF_Overdue_Amount__c`, `LF_Credit_Status__c`, `LF_Last_Payment_Date__c`. Opportunity: `LF_Invoice_Status__c`, `LF_Amount_Invoiced__c`, `LF_Amount_Paid__c`.
+  - Types: money as Currency(18,2) (display mirror; the ledger keeps NUMERIC(19,4) and remains the truth); statuses as Text(40) because LedgerForce owns the vocabulary and an unknown picklist value would fail a write-back; links as Url; lookups (not master-detail) with delete constraint SetNull, because Salesforce owns Accounts/Opportunities (ADR-0006) and LedgerForce must not stop their deletion — reconciliation re-links by `LF_Id__c`.
+  - `LF_Billing_Request__e`: HighVolume, PublishAfterCommit; fields `LF_Request_Id__c` (Text 36, client idempotency key, §5.6), `LF_Request_Type__c` (Text 40, e.g. `INVOICE_OPPORTUNITY`, `SEND_STATEMENT`), `LF_Record_Id__c` (Text 18), `LF_Requested_By__c` (Text 18).
+- Why: RQ-0022; design §5.4–§5.6; the connector (T-0067) and LWC (T-0072) need a fixed contract.
+- Alternatives: picklists for statuses (couples Salesforce to LedgerForce's status list); master-detail to Account (would block FLS in permission sets and cascade-delete mirrors); Currency(18,4) (Salesforce scale 4 shows odd cents to sales users; the mirror is display only).
+- ADR: none (ADR-0006 covers ownership) · Status: accepted
+
+### DL-0097 — Read-only enforcement: three permission sets, one custom permission, validation rules
+- Date: 2026-10-24 · By: claude · Task: T-0062 · Category: security
+- Decision:
+  - Custom permission `LF_Integration_Write`, granted only by permission set `LF_Integration_User` (the API-only integration user, §5.1): Create/Read/Edit on both mirror objects (no Delete, no View/Modify All), Read/Edit on Account and Opportunity, `editable` on every LF field, Read on `LF_Billing_Request__e` (subscribe), user permission `ApiEnabled`.
+  - `LF_Read_Only` (sales users, UC-12): Read on both mirror objects and `readable` (never `editable`) on every LF field; nothing on Account/Opportunity objects (their profiles already grant those); nothing on the event.
+  - `LF_Billing_Requester` (users who press "Invoice this Opportunity"/"Send statement"): Create on `LF_Billing_Request__e` only. No `fieldPermissions` on event fields (FLS does not apply, RQ-0022 S10).
+  - Validation rules: `LF_Mirror_Read_Only` on both mirror objects (`NOT($Permission.LF_Integration_Write)` — any insert or update by anyone else fails); `LF_Fields_Read_Only` on Account and Opportunity (fails when a non-integration user changes, or sets on insert, any LF field).
+- Why: Design §5.4 ("permission sets and a validation rule"); salesforce/AGENTS.md; RQ-0022 S11 (custom-permission bypass pattern). The validation rule also stops admins whose profiles give FLS edit. Least privilege is asserted by tests listing exactly what each set grants.
+- Known limits (for the human): validation rules do not fire on delete, so a user with Modify All Data can still delete mirror records; write-back/reconciliation restores them. Merging Accounts by an admin re-parents mirrors (fine).
+- Alternatives: profile-based FLS only (cannot stop admins); one permission set for both publish and read (wider than needed).
+- ADR: none · Status: accepted
