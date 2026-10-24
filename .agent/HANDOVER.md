@@ -1,15 +1,18 @@
-# Handover - 2026-10-24 14:35 UTC
-From: claude (lead session r01)    Reason: checkpoint — T-0018 (chart) and T-0019 (dimensions) verified and in review
-Task: T-0019 done to review; next = `node scripts/agent/conductor.ts next` (T-0020 journal tables needs Approved golden postings? check its card; else T-0024)
+# Handover - 2026-10-24 14:40 UTC
+From: claude (lead session r01)    Reason: checkpoint — T-0018 (chart), T-0019 (dimensions), T-0020 (journal + balance trigger) verified and in review
+Task: T-0020 done to review; next = `node scripts/agent/conductor.ts next` (T-0021 immutability + ledger privilege model)
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
-Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019 verified (exit 0) and in review; conductor race fixed (DL-0069).
+Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: nothing mid-edit. Working tree clean after the last commit.
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
-Decisions taken: DL-0061..DL-0073; new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
+Decisions taken: DL-0061..DL-0074; new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
   2. Accept/reject ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
   4. Design contradictions in RQ-0012 (CDC 5-object cap, ATO GST rounding, prepayment GST, SoD gaps)
+  6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
+     (numeric + CHECK scale<=4) would make the DB refuse instead. Meanwhile the posting engine
+     refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
   5. Accountant review (not a gate) of the AU services SMB chart template and role→type map (DL-0072):
      packages/modules/gl/templates/au-services-smb.json
 Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
@@ -32,6 +35,9 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >     cross-tenant overrides; DL-0071/0072
 >   • T-0019 — packages/db/migrations/0006_gl_dimensions.sql (canonicalise trigger, guards,
 >     dimension_set_missing_required); packages/ledger/** (dimensionSetId, property test); DL-0073
+>   • T-0020 — packages/db/migrations/0007_ledger_journal.sql (deferred balance constraint triggers);
+>     packages/ledger/src/journal-balance.db.test.ts; cross-tenant harness changes (fixed parent
+>     values, MATCH SIMPLE rule, COMMIT_WITH_COMPANIONS); DL-0074
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -82,3 +88,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T14:28:42.944Z claude: T-0019 → verifying
 - 2026-10-24T14:30:13.199Z claude: release T-0019 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
 - 2026-10-24 14:3x claude: T-0019 built (migration 0006, @ledgerforce/ledger), evidenced SS-PLAT-33/34, verify 12 PASS/0 FAIL → review
+- 2026-10-24T14:36:57.562Z claude: T-0020 → verifying
+- 2026-10-24T14:38:23.880Z claude: release T-0020 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 14:4x claude: T-0020 built (migration 0007), evidenced SS-PLAT-01, verify 12 PASS/0 FAIL → review

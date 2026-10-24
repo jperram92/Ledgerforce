@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0020",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-01",
+      "file": ".agent/evidence/T-0020/20261024-143653-tests-db.json",
+      "test": "9 test(s): packages/ledger/src/journal-balance.db.test.ts › SS-PLAT-01: Balance trigger rejects unbalanced entries › Σdebit 100.00 vs Σcredit 99.99: commit fails with the balance error and nothing is stored | packages/ledger/src/journal-balance.db.test.ts › SS-PLAT-01: Balance trigger rejects unbalanced entries › a balanced entry commits | packages/ledger/src/journal-balance.db.test.ts › SS-PLAT-01: Balance trigger rejects unbalanced entries › the check is deferred to commit: a one-sided line may exist mid-transaction | packages/ledger/src/journal-balance.db.test.ts › SS-PLAT-01: Balance trigger rejects unbalanced entries › a difference of 0.0001 is still refused (exact NUMERIC, no tolerance) | packages/ledger/src/journal-balance.db.test.ts › SS-PLAT-01: Balance trigger rejects unbalanced entries › an entry without lines is refused at commit | packages/ledger/src/journal-balance.db.test.ts › SS-PLAT-01: Balance trigger rejects unbalanced entries › every line has exactly one side > 0 | packages/ledger/src/journal-balance.db.test.ts › SS-PLAT-01: Balance trigger rejects unbalanced entries › a line cannot use another company's account | packages/ledger/src/journal-balance.db.test.ts › SS-PLAT-01: Balance trigger rejects unbalanced entries › amounts are numeric(19,4) and rates numeric(18,8), never float (ADR-0005 catalog check) | packages/ledger/src/journal-balance.db.test.ts › SS-PLAT-01: Balance trigger rejects unbalanced entries › property: any balanced entry commits; moving 0.0001 off either side makes it fail",
+      "commit": "878cfc8ae7f7",
+      "provider": "claude",
+      "timestamp": "2026-10-24T14:36:53.942Z",
+      "result": "passed"
+    }
+  ]
+}
