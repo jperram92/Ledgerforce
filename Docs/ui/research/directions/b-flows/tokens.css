@@ -1,0 +1,29 @@
+/* Direction B "Flows" tokens. Colour has one job: which way the money moves.
+   Blue = into the business, orange-brown = out of it, both colour-vision safe (RQ-0089).
+   Money that has not moved yet uses the same hue, dashed. Light only: owners read numbers at
+   reading sizes in daylight (NN/g, RQ-0089); a dark theme is not part of this direction. */
+@font-face { font-family: "Source Serif 4"; font-weight: 400; font-display: block; src: url(fonts/source-serif-4-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-weight: 400; font-style: italic; font-display: block; src: url(fonts/source-serif-4-latin-400-italic.woff2) format("woff2"); }
+@font-face { font-family: "Source Serif 4"; font-weight: 600; font-display: block; src: url(fonts/source-serif-4-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-weight: 400; font-display: block; src: url(fonts/source-sans-3-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-weight: 600; font-display: block; src: url(fonts/source-sans-3-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Source Sans 3"; font-weight: 700; font-display: block; src: url(fonts/source-sans-3-latin-700-normal.woff2) format("woff2"); }
+
+:root {
+  --say: "Source Serif 4", Georgia, serif;     /* sentences that explain: headings, ledes */
+  --ui: "Source Sans 3", "Segoe UI", sans-serif; /* controls, labels, every number */
+  --paper: #ffffff;
+  --shade: #f2f4f6;       /* section ground */
+  --ink: #17202a;
+  --ink-2: #4b5662;
+  --line: #d5dbe1;
+  --line-2: #9aa5b1;
+  --in: #11589a;  --in-band: #7fb0dc;  --in-soft: #e3eef8;   /* money coming in */
+  --out: #9a4700; --out-band: #e9a560; --out-soft: #fbeedd;  /* money going out */
+  --bank: #17202a;        /* the business itself: neutral ink */
+  --act: #11589a;         /* primary action: the same blue as money in, never a separate brand hue */
+  --focus: #11589a;
+  --r: 4px;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 40px; --s7: 64px;
+  color-scheme: light;
+}

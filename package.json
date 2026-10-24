@@ -2,7 +2,7 @@
   "name": "ledgerforce",
   "version": "0.0.0",
   "private": true,
-  "description": "LedgerForce — open-source double-entry SMB ERP for Salesforce (monorepo root)",
+  "description": "LedgerForce \u2014 open-source double-entry SMB ERP for Salesforce (monorepo root)",
   "license": "UNLICENSED",
   "type": "module",
   "packageManager": "pnpm@10.28.0",
@@ -17,7 +17,8 @@
     "test": "vitest run --project unit",
     "test:db": "vitest run --project db",
     "test:e2e": "playwright test",
-    "test:all": "pnpm test && pnpm test:db && pnpm test:e2e"
+    "test:all": "pnpm test && pnpm test:db && pnpm test:e2e",
+    "evidence:tests": "node packages/testing/src/evidence/record-tests.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
