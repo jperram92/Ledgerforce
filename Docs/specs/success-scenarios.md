@@ -142,7 +142,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-19 | Evidence harness captures screenshots | — | Sprint 0 | e2e-playwright | yes | tests/e2e/evidence-harness.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 | SS-PLAT-20 | MFA and session policy for finance roles | — | MVP | db-integration | no | apps/api/src/auth/session.db.test.ts (session part) | T-0105, T-0013, T-0011 | green (session part, T-0105; MFA part pending T-0013) | [.agent/evidence/T-0105/manifest.json](../../.agent/evidence/T-0105/manifest.json) | bc07686 |
 | SS-PLAT-21 | Leaver is disabled, never deleted | — | MVP | db-integration | no | — | T-0016 | not-started | — | — |
-| SS-PLAT-22 | Bank details encrypted and masked | — | MVP | db-integration | no | packages/modules/parties/src/bank-accounts.db.test.ts; apps/api/src/parties/bank-accounts.db.test.ts | T-0037 | green | — | — |
+| SS-PLAT-22 | Bank details encrypted and masked | — | MVP | db-integration | no | packages/modules/parties/src/bank-accounts.db.test.ts; apps/api/src/parties/bank-accounts.db.test.ts | T-0037 | green | [.agent/evidence/T-0037/manifest.json](../../.agent/evidence/T-0037/manifest.json) | 1219bbc |
 | SS-PLAT-23 | Self-hosted compose install works | — | MVP | e2e-playwright | yes | — | T-0094 | not-started | — | — |
 | SS-PLAT-24 | Outbox delivers at least once, handlers idempotent | — | MVP | db-integration | no | — | T-0030 | not-started | — | — |
 | SS-PLAT-25 | Sync failures back off then land in the Sync issues inbox | — | MVP | db-integration | no | — | T-0071 | not-started | — | — |
@@ -158,7 +158,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-35 | Party identifiers are validated and normalised | — | MVP | unit + property | no | packages/modules/parties/src/identifiers.test.ts | T-0036 | green | [.agent/evidence/T-0036/manifest.json](../../.agent/evidence/T-0036/manifest.json) | 481ae75 |
 | SS-PLAT-36 | One party with roles, addresses, contacts and contact roles | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | [.agent/evidence/T-0036/manifest.json](../../.agent/evidence/T-0036/manifest.json) | 481ae75 |
 | SS-PLAT-37 | An invoice cannot be approved for a customer with no Billing To contact | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | [.agent/evidence/T-0036/manifest.json](../../.agent/evidence/T-0036/manifest.json) | 481ae75 |
-| SS-PLAT-38 | Envelope encryption fails closed and survives key rotation | — | MVP | unit | no | packages/shared/src/crypto/envelope.test.ts | T-0037 | green | — | — |
+| SS-PLAT-38 | Envelope encryption fails closed and survives key rotation | — | MVP | unit | no | packages/shared/src/crypto/envelope.test.ts | T-0037 | green | [.agent/evidence/T-0037/manifest.json](../../.agent/evidence/T-0037/manifest.json) | 1219bbc |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)

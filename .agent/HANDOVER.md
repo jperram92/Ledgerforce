@@ -1,13 +1,13 @@
-# Handover - 2026-10-24 19:50 UTC
-From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036 (parties) verified and in review; register corrected (DL-0077)
-Task: T-0036 done to review; next = `node scripts/agent/conductor.ts next` (T-0107 company ABN is small and now claimable)
+# Handover - 2026-10-24 20:10 UTC
+From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
+Task: T-0037 done to review; next = `node scripts/agent/conductor.ts next`
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
-Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036 verified (exit 0) and in review; conductor race fixed (DL-0069).
+Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: nothing mid-edit. Working tree clean after the last commit.
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
-Decisions taken: DL-0061..DL-0079; RQ-0017; RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
+Decisions taken: DL-0061..DL-0080; RQ-0017, RQ-0018; ADR-0018 (Proposed, security); RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
-  2. Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
+  2. Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1), ADR-0018 (envelope encryption, local keyring KMS) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
   4. Design contradictions in RQ-0012 (CDC 5-object cap, ATO GST rounding, prepayment GST, SoD gaps)
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
@@ -49,6 +49,9 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >     the numbering layer only (its invoice batch is T-0044)
 >   • T-0036 — RQ-0017; packages/db/migrations/0011_parties_party_model.sql; packages/modules/parties/**
 >     (identifiers with ABR/Salesforce vectors, service, Billing To helper); DL-0079 (company-scoped parties)
+>   • T-0037 — RQ-0018; ADR-0018; packages/shared/src/crypto (envelope, LocalKeyringKms); migration 0012;
+>     packages/modules/parties/src/bank-accounts.ts; apps/api parties controller; DL-0080. Act as
+>     security-reviewer too: AAD binding, fail-closed errors, key handling, masked-only API
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -115,3 +118,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T19:45:42.609Z claude: T-0036 → verifying
 - 2026-10-24T19:47:53.403Z claude: release T-0036 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
 - 2026-10-24 19:5x claude: T-0036 built (RQ-0017, migration 0011), SS-PLAT-35/36/37 green with evidence, verify 12 PASS/0 FAIL → review; T-0107 added; run log updated
+- 2026-10-24T20:07:34.153Z claude: T-0037 → verifying
+- 2026-10-24T20:09:30.915Z claude: release T-0037 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review (security-relevant: ADR-0018))
+- 2026-10-24 20:1x claude: T-0037 built (RQ-0018, ADR-0018, migration 0012, shared/crypto, API masked read), SS-PLAT-22/38 green with evidence, verify 12 PASS/0 FAIL → review; T-0108 added

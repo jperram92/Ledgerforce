@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0037",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-38",
+      "file": ".agent/evidence/T-0037/20261024-200724-tests-unit.json",
+      "test": "8 test(s): packages/shared/src/crypto/envelope.test.ts › SS-PLAT-38: Envelope encryption fails closed and survives key rotation › seals and opens a value; the sealed form never contains the plaintext | packages/shared/src/crypto/envelope.test.ts › SS-PLAT-38: Envelope encryption fails closed and survives key rotation › two seals of the same value differ (fresh DEK and IV each time) | packages/shared/src/crypto/envelope.test.ts › SS-PLAT-38: Envelope encryption fails closed and survives key rotation › a different AAD (another record or field) fails closed | packages/shared/src/crypto/envelope.test.ts › SS-PLAT-38: Envelope encryption fails closed and survives key rotation › any flipped bit in ciphertext, tag, IV or wrapped key fails closed | packages/shared/src/crypto/envelope.test.ts › SS-PLAT-38: Envelope encryption fails closed and survives key rotation › the wrong KEK, or an unknown key id, fails closed | packages/shared/src/crypto/envelope.test.ts › SS-PLAT-38: Envelope encryption fails closed and survives key rotation › rotation: data sealed under k1 still opens after k2 becomes active; new seals use k2 | packages/shared/src/crypto/envelope.test.ts › SS-PLAT-38: Envelope encryption fails closed and survives key rotation › the keyring refuses keys that are not 32 bytes, a missing active key, and bad ids | packages/shared/src/crypto/envelope.test.ts › SS-PLAT-38: Envelope encryption fails closed and survives key rotation › loads from a key file (Docker secret), and its errors never echo key material",
+      "commit": "1219bbcf1a84",
+      "provider": "claude",
+      "timestamp": "2026-10-24T20:07:24.702Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-22",
+      "file": ".agent/evidence/T-0037/20261024-200726-tests-db.json",
+      "test": "6 test(s): packages/modules/parties/src/bank-accounts.db.test.ts › SS-PLAT-22: Bank details encrypted and masked › stores ciphertext at rest: no column of the stored row contains the account number | packages/modules/parties/src/bank-accounts.db.test.ts › SS-PLAT-22: Bank details encrypted and masked › reads are masked to the last 3 characters; only revealAccountNumber decrypts | packages/modules/parties/src/bank-accounts.db.test.ts › SS-PLAT-22: Bank details encrypted and masked › a ciphertext copied onto another party's row cannot be decrypted there | packages/modules/parties/src/bank-accounts.db.test.ts › SS-PLAT-22: Bank details encrypted and masked › lf_app cannot rewrite the encrypted columns; only the status may change | packages/modules/parties/src/bank-accounts.db.test.ts › SS-PLAT-22: Bank details encrypted and masked › bank details are never sourced from Salesforce | packages/modules/parties/src/bank-accounts.db.test.ts › SS-PLAT-22: Bank details encrypted and masked › only suppliers and employees hold bank details; formats follow ABA rules (RQ-0006)",
+      "commit": "1219bbcf1a84",
+      "provider": "claude",
+      "timestamp": "2026-10-24T20:07:26.662Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-22",
+      "file": ".agent/evidence/T-0037/20261024-200730-tests-api-db.json",
+      "test": "3 test(s): apps/api/src/parties/bank-accounts.db.test.ts › SS-PLAT-22: Bank details encrypted and masked (read via API) › returns the bank accounts masked to the last 3 characters, never the number | apps/api/src/parties/bank-accounts.db.test.ts › SS-PLAT-22: Bank details encrypted and masked (read via API) › needs a session, and another tenant sees nothing | apps/api/src/parties/bank-accounts.db.test.ts › SS-PLAT-22: Bank details encrypted and masked (read via API) › rejects a malformed party id",
+      "commit": "1219bbcf1a84",
+      "provider": "claude",
+      "timestamp": "2026-10-24T20:07:30.236Z",
+      "result": "passed"
+    }
+  ]
+}

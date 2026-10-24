@@ -127,7 +127,7 @@ graph LR
 | [T-0034](T-0034.md) | Tax codes (effective-dated) and GST engine with rounding | MVP | todo | T-0018, T-0017, T-0031 | UC-01 | 1 |
 | [T-0035](T-0035.md) | BAS box mapping and tax report query (both GST bases) | MVP | todo | T-0034, T-0027 | — | 0 |
 | [T-0036](T-0036.md) | Parties, roles, contacts and billing contact roles | MVP | review | T-0010 | — | 0 |
-| [T-0037](T-0037.md) | Party bank details with envelope encryption and masking | MVP | todo | T-0036 | — | 1 |
+| [T-0037](T-0037.md) | Party bank details with envelope encryption and masking | MVP | review | T-0036 | — | 1 |
 | [T-0038](T-0038.md) | Products, party posting profiles and product posting profiles | MVP | todo | T-0036, T-0018, T-0034 | — | 0 |
 | [T-0039](T-0039.md) | Posting-profile matrix resolution and gap check | MVP | todo | T-0038 | UC-01 | 1 |
 | [T-0040](T-0040.md) | Sales invoice lifecycle: draft → approve → post | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0015, T-0026, T-0031 | UC-01 | 3 |
