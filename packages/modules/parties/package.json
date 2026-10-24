@@ -1,0 +1,22 @@
+{
+  "name": "@ledgerforce/parties",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Parties: roles, addresses, contacts and billing contact roles (design §4.2)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "fast-check": "4.10.2",
+    "vitest": "4.1.12"
+  }
+}
