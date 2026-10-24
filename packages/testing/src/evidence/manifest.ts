@@ -14,7 +14,7 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, rename, rmdir, stat, writeFile } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, resolve, sep } from 'node:path';
 
 export interface EvidenceEntry {
   /** Success-scenario id, e.g. SS-PLAT-UI-01. */
@@ -86,7 +86,7 @@ export function evidenceFilePath(opts: {
   const taskId = assertSafeId('taskId', opts.taskId);
   const scenario = assertSafeId('scenarioId', opts.scenarioId);
   const name = `${formatTimestamp(opts.date)}-${scenario}-${slugify(opts.slug)}.png`;
-  return join(opts.evidenceRoot, taskId, name);
+  return join(opts.evidenceRoot, taskId, name).split(sep).join('/');
 }
 
 const REQUIRED: (keyof EvidenceEntry)[] = [

@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
   "current_task": "T-0010",
-  "branch": "claude/app-framework-agents-dzmkya",
+  "branch": "feat/T-0010-tenant-context",
   "step": null,
-  "claimed_by": "claude",
-  "lease_expires_at": "2026-10-24T09:03:48.251Z",
+  "claimed_by": "codex",
+  "lease_expires_at": "2026-10-24T11:15:33.949Z",
   "last_green_commit": null,
-  "run_id": null,
-  "updated_at": "2026-10-24T08:18:48.258Z",
+  "run_id": "2026-10-24-codex-r01",
+  "updated_at": "2026-10-24T10:34:55.346Z",
   "phase": "sprint-0",
   "attempts": {
-    "T-0010": 1
+    "T-0010": 2
   },
   "failures": {},
   "providers": {},

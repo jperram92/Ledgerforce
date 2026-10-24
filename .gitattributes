@@ -1,0 +1,4 @@
+# Source files use LF, matching Prettier and Linux; binary assets stay binary.
+* text=auto eol=lf
+# Bash scripts must remain executable by Git Bash and Linux after Windows checkout.
+*.sh text eol=lf
