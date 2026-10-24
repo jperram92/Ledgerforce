@@ -18,7 +18,9 @@ CLAUDE.md
 **/AGENTS.md
 **/CLAUDE.md
 scripts/agent/
-salesforce/
+# Salesforce metadata (XML, Apex) is formatted by hand; its TypeScript contract tests are not (DL-0094).
+salesforce/*
+!salesforce/test/
 
 # SQL is formatted by hand (migrations are checksummed — reformatting would break them)
 *.sql

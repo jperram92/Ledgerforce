@@ -26,7 +26,9 @@ export default tseslint.config(
       'Docs/**',
       // Agent conductor tooling is zero-dependency and owned elsewhere (DL-0005).
       'scripts/agent/**',
-      'salesforce/**',
+      // Salesforce metadata (XML, Apex) is not ours to lint; its offline contract tests are (DL-0094).
+      'salesforce/*',
+      '!salesforce/test/',
     ],
   },
   js.configs.recommended,

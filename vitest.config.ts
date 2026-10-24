@@ -20,6 +20,7 @@ export default defineConfig({
             'packages/*/src/**/*.test.{ts,tsx}',
             'packages/*/*/src/**/*.test.{ts,tsx}', // nested: packages/modules/<m>, packages/connectors/<c>
             'packages/*/eslint-rules/**/*.test.ts',
+            'salesforce/test/**/*.test.ts', // offline contract of the SFDX package (DL-0094)
           ],
           exclude: ['**/*.db.test.ts', '**/node_modules/**', '**/dist/**', 'apps/api/**'],
           environment: 'node',
