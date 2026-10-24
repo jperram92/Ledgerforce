@@ -1,8 +1,8 @@
 // HANDOVER.md (design §10.5): header fields filled from state + card, narrative placeholders
 // for the agent, and an append-only "## Log" section that survives every rewrite.
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { existsSync, readFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { iso } from './util.ts';
+import { iso, writeFileAtomic } from './util.ts';
 
 export interface HandoverInput {
   at: number;
@@ -89,7 +89,7 @@ export function writeHandover(file: string, input: HandoverInput, logLine?: stri
   let text = renderHandover(input, prev);
   if (logLine) text = text.replace(/\n*$/, '\n') + `- ${logLine}\n`;
   mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, text);
+  writeFileAtomic(file, text);
 }
 
 /** Append a line to the Log section (creating a minimal file if needed). */
@@ -98,5 +98,5 @@ export function appendHandoverLog(file: string, line: string, create: () => stri
   if (!/^## Log[ \t]*$/m.test(text)) text = text.replace(/\n*$/, '\n\n## Log\n\n');
   text = text.replace(/\n*$/, '\n') + `- ${line}\n`;
   mkdirSync(dirname(file), { recursive: true });
-  writeFileSync(file, text);
+  writeFileAtomic(file, text);
 }

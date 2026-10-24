@@ -1,5 +1,5 @@
 // claim / checkpoint / release / handover / status / next / lease-check / lint-backlog
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { loadConfig, type Config } from './config.ts';
 import { readState, writeState, type State } from './state.ts';
@@ -11,7 +11,7 @@ import { updateFrontmatter } from './frontmatter.ts';
 import { writeHandover, appendHandoverLog, renderHandover, type HandoverInput } from './handover.ts';
 import { isRepo, hasChanges, commitAll, headSha, currentBranch } from './git.ts';
 import { latestCrossReview } from './review.ts';
-import { now, iso, ExitError, EXIT } from './util.ts';
+import { now, iso, ExitError, EXIT, writeFileAtomic } from './util.ts';
 
 export interface Ctx {
   root: string;
@@ -41,7 +41,7 @@ export function getCard(ctx: Ctx, id: string): Card {
 
 export function setCard(card: Card, updates: Record<string, unknown>): void {
   const text = readFileSync(card.file, 'utf8');
-  writeFileSync(card.file, updateFrontmatter(text, updates));
+  writeFileAtomic(card.file, updateFrontmatter(text, updates));
 }
 
 export function state(ctx: Ctx): State {

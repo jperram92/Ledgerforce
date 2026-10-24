@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0105",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-20",
+      "file": ".agent/evidence/T-0105/20261024-131646-tests-api-db.json",
+      "test": "10 test(s): apps/api/src/auth/session.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — sessions › a valid session resolves to its tenant and user, and RLS still filters | apps/api/src/auth/session.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — sessions › never stores the secret, only its SHA-256 | apps/api/src/auth/session.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — sessions › expires after 30 minutes idle (session_expired), and use slides the idle window | apps/api/src/auth/session.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — sessions › expires 12 hours after login even if used continuously | apps/api/src/auth/session.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — sessions › revoke-all (session epoch bump, e.g. role change) ends every session of that user | apps/api/src/auth/session.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — sessions › logout revokes only that session | apps/api/src/auth/session.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — sessions › a tampered secret is refused (unauthenticated) | apps/api/src/auth/session.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — sessions › a forged tenant id with a real session of another tenant is refused | apps/api/src/auth/session.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — sessions › missing or malformed cookies are refused without touching tenant data | apps/api/src/auth/session.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — sessions › a disabled user’s session is refused",
+      "commit": "bc076861ebc9-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T13:16:46.545Z",
+      "result": "passed"
+    }
+  ]
+}

@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import type { Request } from 'express';
 import { TenantTx } from '../tenancy/tenant-tx.ts';
+import { principalOf } from './session-tenant-resolver.ts';
 import { SessionService } from './session.service.ts';
 
 export const SESSION_SERVICE = Symbol('SESSION_SERVICE');
@@ -25,7 +26,7 @@ export class AuthController {
   async me(
     @Req() req: Request,
   ): Promise<{ tenant_id: string; user_id: string; display_name: string }> {
-    const p = req.lfPrincipal;
+    const p = principalOf(req);
     if (!p) throw new UnauthorizedException({ error: 'unauthenticated' });
     const user = await this.tx
       .get()
@@ -40,7 +41,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(204)
   async logout(@Req() req: Request): Promise<void> {
-    const p = req.lfPrincipal;
+    const p = principalOf(req);
     if (!p) throw new UnauthorizedException({ error: 'unauthenticated' });
     await this.sessions.revokeInTx(this.tx.get(), p.sessionId, 'logout');
   }

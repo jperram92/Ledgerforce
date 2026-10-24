@@ -10,11 +10,11 @@ import {
 
 export const SESSION_COOKIE = 'lf_session';
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    /** Set by the session resolver once the session is verified under RLS. */
-    lfPrincipal?: Principal;
-  }
+/** The verified principal per request, set only after verify() succeeds under RLS. */
+const principals = new WeakMap<Request, Principal>();
+
+export function principalOf(req: Request): Principal | undefined {
+  return principals.get(req);
 }
 
 function readCookie(req: Request, name: string): string | undefined {
@@ -39,7 +39,7 @@ export class SessionTenantResolver implements TenantResolver {
       tenantId: cookie.tenantId,
       verify: async (trx, r) => {
         try {
-          r.lfPrincipal = await this.sessions.verify(trx, cookie);
+          principals.set(r, await this.sessions.verify(trx, cookie));
         } catch (e) {
           if (e instanceof SessionError) throw new UnauthorizedException({ error: e.reason });
           throw e;

@@ -1,7 +1,7 @@
 // .agent/state.json read/write. Unknown keys are preserved; updated_at is the heartbeat.
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { iso, now } from './util.ts';
+import { iso, now, writeFileAtomic } from './util.ts';
 
 export interface ProviderState {
   exhausted_until?: string | null;
@@ -55,5 +55,5 @@ export function writeState(root: string, rel: string, s: State): void {
   const file = join(root, rel);
   mkdirSync(dirname(file), { recursive: true });
   s.updated_at = iso(now());
-  writeFileSync(file, JSON.stringify(s, null, 2) + '\n');
+  writeFileAtomic(file, JSON.stringify(s, null, 2) + '\n');
 }

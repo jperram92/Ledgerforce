@@ -1,4 +1,5 @@
 // Small shared helpers: clock (overridable for tests), timestamps, shell-word splitting.
+import { renameSync, writeFileSync } from 'node:fs';
 
 /** Current time in ms. `LF_NOW` (ISO timestamp) freezes the clock — used by tests and dry runs. */
 export function now(): number {
@@ -72,3 +73,15 @@ export const EXIT = {
   EXHAUSTED: 3,  // every provider is out of quota / credit / budget
   BLOCKED: 4,    // task blocked (max attempts reached or agent marked it blocked)
 } as const;
+
+/**
+ * Write a file so concurrent readers see either the old or the new content, never a partial one:
+ * write a sibling temp file, then rename over the target (atomic on POSIX and on NTFS when the
+ * target is replaced in the same directory). Cards, state and HANDOVER are read by the agent's own
+ * conductor commands while `run` rewrites them, so every such write must go through here.
+ */
+export function writeFileAtomic(file: string, text: string): void {
+  const tmp = `${file}.${String(process.pid)}.${String(Date.now())}.${Math.random().toString(36).slice(2)}.tmp`;
+  writeFileSync(tmp, text);
+  renameSync(tmp, file);
+}

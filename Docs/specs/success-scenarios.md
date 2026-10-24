@@ -140,7 +140,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-17 | Migrations are forward-only on the previous schema | — | MVP | db-integration | no | — | T-0008 | not-started | — | — |
 | SS-PLAT-18 | Security gates fail on seeded issues | — | MVP | contract | no | — | T-0095 | not-started | — | — |
 | SS-PLAT-19 | Evidence harness captures screenshots | — | Sprint 0 | e2e-playwright | yes | — | T-0009 | not-started | — | — |
-| SS-PLAT-20 | MFA and session policy for finance roles | — | MVP | db-integration | no | — | T-0105, T-0013, T-0011 | not-started | — | — |
+| SS-PLAT-20 | MFA and session policy for finance roles | — | MVP | db-integration | no | apps/api/src/auth/session.db.test.ts (session part) | T-0105, T-0013, T-0011 | green (session part, T-0105; MFA part pending T-0013) | [.agent/evidence/T-0105/manifest.json](../../.agent/evidence/T-0105/manifest.json) | bc07686 |
 | SS-PLAT-21 | Leaver is disabled, never deleted | — | MVP | db-integration | no | — | T-0016 | not-started | — | — |
 | SS-PLAT-22 | Bank details encrypted and masked | — | MVP | db-integration | no | — | T-0037 | not-started | — | — |
 | SS-PLAT-23 | Self-hosted compose install works | — | MVP | e2e-playwright | yes | — | T-0094 | not-started | — | — |
