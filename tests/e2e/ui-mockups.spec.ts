@@ -1,7 +1,8 @@
 /**
- * SS-PLAT-UI-01 — every static UI mockup in Docs/ui/mockups/*.html loads cleanly at desktop
- * (1440) and mobile (390) widths, has a <title> and an <h1>, logs no console errors, and leaves a
- * full-page screenshot as evidence for T-0009.
+ * SS-PLAT-UI-01 — every static UI page loads cleanly at desktop (1440) and mobile (390) widths,
+ * has a <title> and an <h1>, logs no console errors, and leaves a full-page screenshot as evidence
+ * for T-0009. Covers the v0.1 mockups (history) and the chosen Timeline reference screens
+ * (Docs/ui/research/directions/c-timeline, DL-0070).
  *
  * If no mockups exist yet, the same checks run against tests/e2e/fixtures/mockup-fixture.html so
  * the harness itself is still proven (nothing is skipped) and a notice is logged.
@@ -16,12 +17,21 @@ const REPO_ROOT = resolve(import.meta.dirname, '..', '..');
 const MOCKUP_DIR = process.env['LF_MOCKUP_DIR'] ?? join(REPO_ROOT, 'Docs', 'ui', 'mockups');
 const FIXTURE = join(REPO_ROOT, 'tests', 'e2e', 'fixtures', 'mockup-fixture.html');
 
-const mockups = existsSync(MOCKUP_DIR)
-  ? readdirSync(MOCKUP_DIR)
-      .filter((f) => f.endsWith('.html'))
-      .sort()
-      .map((f) => join(MOCKUP_DIR, f))
-  : [];
+const TIMELINE_DIR = join(REPO_ROOT, 'Docs', 'ui', 'research', 'directions', 'c-timeline');
+
+function htmlIn(dir: string): string[] {
+  return existsSync(dir)
+    ? readdirSync(dir)
+        .filter((f) => f.endsWith('.html'))
+        .sort()
+        .map((f) => join(dir, f))
+    : [];
+}
+
+const mockups = [
+  ...htmlIn(MOCKUP_DIR),
+  ...(process.env['LF_MOCKUP_DIR'] ? [] : htmlIn(TIMELINE_DIR)),
+];
 
 const pages = mockups.length > 0 ? mockups : [FIXTURE];
 if (mockups.length === 0) {
@@ -39,7 +49,7 @@ test.use({ evidenceTaskId: 'T-0009' });
 
 test.describe('SS-PLAT-UI-01 static UI mockups', () => {
   for (const file of pages) {
-    const name = basename(file, '.html');
+    const name = (file.startsWith(TIMELINE_DIR) ? 'timeline-' : '') + basename(file, '.html');
     for (const vp of WIDTHS) {
       test(`${name} @ ${String(vp.width)}px`, async ({ page, evidence }) => {
         const errors: string[] = [];

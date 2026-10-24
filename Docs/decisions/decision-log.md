@@ -465,7 +465,7 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: Propose C as the UI direction: one shared date axis, each document as a life story, colour showing time state (solid happened, dashed expected, teal today). Reuse A's turn tokens, decision bar and keyboard queue for list screens, and B's flow diagram on documents for owners.
 - Why: Best genericness score (1, lower is better), a distinct page outline, and the only direction serving INS-09 ("will I have enough on Tuesday?"); 17/22 on the insights (`Docs/ui/research/03-recommendation.md`).
 - Alternatives: A Turns (18/22, but an app-shell outline close to v0.1 and queue-first for owners); B Flows (14/22, weak for operators).
-- ADR: none · Status: proposed (awaiting human: product owner chooses the direction)
+- ADR: none · Status: accepted by the product owner 2026-10-24 ("Go with C Timeline") — see DL-0070
 
 ### DL-0065 — Genericness checklist G1–G13 and probes required for UI work
 - Date: 2026-10-24 · By: claude · Task: T-0009 · Category: ui
@@ -500,4 +500,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: Task cards, state.json and HANDOVER.md are written through `writeFileAtomic` (sibling temp file, then rename). New writers of files that another process may read must use it.
 - Why: Root cause of the intermittent conductor failure: the running conductor rewrote a card while the agent's `conductor release` read it, saw an empty file ("missing frontmatter"), exited 8, and the provider was relaunched. Probe: 75,969 of 79,072 concurrent reads were partial with the old write; 0 after. Failover repro: race at iteration 16 before, 0 in 240 runs after (half under load).
 - Alternatives: file locks (heavier, platform-specific); retry-on-parse-error in readers (hides the bug).
+- ADR: none · Status: accepted
+
+### DL-0070 — Product owner chose UI direction C "Timeline"; principles v1 and design system adopted
+- Date: 2026-10-24 · By: human (product owner) · Task: T-0009 · Category: ui
+- Decision: Build the UI in direction C "Timeline" (DL-0064), reusing Direction A's turn queue for list-heavy screens and B's flow component for the owner view of documents. As part of the same recommendation: principles v1 (P3, P11, P12 revised; new P13 whose turn, P14 stability, P15 expected ≠ actual; DL-0066) are applied to `Docs/ui/principles.md`; the genericness checklist G1–G13 (DL-0065) and the font test (DL-0067) are mandatory for UI work. The prototype is promoted (copied) to `Docs/ui/system/` as the canonical design system. New card T-0106 (Timeline component package + the fixes owed before build) now precedes the web shell T-0081, and every UI card carries the direction note. The design's shadcn/ui is used only as accessible primitives restyled with Timeline tokens.
+- Why: Product owner's answer to the human gate, after the research-led comparison (`Docs/ui/research/03-recommendation.md`).
+- Alternatives: A Turns, B Flows (`Docs/ui/research/02-directions.md`).
 - ADR: none · Status: accepted

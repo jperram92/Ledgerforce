@@ -1,7 +1,15 @@
 # LedgerForce UI principles
 
-Status: v0.1 (Sprint 0) · Owner: agents + human · Mockups: [`mockups/`](mockups/index.html) ·
-Tokens: [`tokens.css`](tokens.css) · Research: [RQ-0080](../research/RQ-0080-ui-patterns-accessibility.md)
+Status: **v1 — direction C "Timeline"** (product owner, 2026-10-24, DL-0070) · Owner: agents + human ·
+Design system: [`system/`](system/README.md) · Reference prototypes:
+[`research/directions/c-timeline/`](research/directions/c-timeline/) · Research:
+[`research/`](research/README.md), [RQ-0080](../research/RQ-0080-ui-patterns-accessibility.md), RQ-0081..0089
+
+> **Version history.** v0.1 (Sprint 0) used the mockups in `mockups/` and tokens in `tokens.css`;
+> its look was rejected (DL-0052) and those files are kept as history only. v1 keeps P1–P12,
+> revises P3, P11 and P12, and adds P13–P15 from the UI research (`research/03-recommendation.md` §3,
+> DL-0066). Every new screen must also score ≤ 4 on the genericness checklist G1–G13 with no item
+> at 2 (DL-0065, `research/01-research-report.md`).
 
 LedgerForce has two audiences on the same screens:
 
@@ -27,8 +35,11 @@ Where a check exists already in the mockup harness (`tools/screenshot-mockups.mj
 | P8 | Weakened controls are visible, never silent | 01, 07 |
 | P9 | Sync is never hidden | shell, 02, 03, 09, 10 |
 | P10 | Keyboard-first data entry | 02, 06 |
-| P11 | Calm density: comfortable by default, compact on demand | 02 |
-| P12 | Plain words first, accounting words second; one primary action per view | 01, 08, 12 |
+| P11 | Density by role: compact for clerks and accountants, comfortable for owners (v1) | lists |
+| P12 | Plain words first; plain gloss beside every accounting term; one primary action per view (v1) | all |
+| P13 | Whose turn is it? Every open item names who acts next (v1) | timeline, queues |
+| P14 | Stability: positions are a contract (v1) | shell, timeline lanes |
+| P15 | Expected is never shown as actual (v1) | timeline, cash |
 
 ---
 
@@ -87,6 +98,11 @@ in the accessible name and in the column heading ("Money out").
 **Tested by.** Playwright: every `td.num`/`[data-amount]` has computed `text-align: right` and
 `font-variant-numeric` containing `tabular-nums`; regex `^\(?[\d,]+\.\d{2}\)?$` on rendered text;
 negatives have an accessible name containing "minus". Lint: no `Number()`/`parseFloat` on money.
+
+**v1 revision (INS-04).** Parentheses stay in accountant views (journals, ledgers, reports). In
+sentences written for owners, say the direction in words instead: "12,604.10 out to the ATO",
+"Saltbush owes you 10,087.00". Typefaces used for money must pass `research/tools/fonttest.mjs`
+(working tabular figures and correct parentheses; DL-0067).
 
 ## P4 — Show the journal before you post
 
@@ -230,6 +246,10 @@ colour and neutral surfaces keep screens calm.
 **Tested by.** Playwright: render list in both modes, assert row height 44±1 / 32±1 px and the
 same column headers; visual snapshot per mode.
 
+**v1 revision (INS-01).** The default follows the role: **Compact** for AR/AP clerks, bookkeepers
+and accountants; **Comfortable** for owners and approvers. Users can still switch. Professional
+users objected loudly when incumbents cut density (research §A).
+
 ## P12 — Plain words first; one primary action per view
 
 **Statement.** Headings and labels lead with plain language and keep the accounting term as
@@ -245,6 +265,51 @@ the accountant still finds their term.
 **Tested by.** Content lint over the i18n catalogue (banned-term list for headings, e.g. "posting
 group", "subledger"); Playwright: count of `.btn-primary` per `main`/dialog region ≤ 1 (list rows
 excepted — bank reconciliation's per-row Confirm is a documented exception).
+
+**v1 revision (INS-04).** On journals, every account line carries a plain gloss beside the term:
+"1200 Trade debtors — Saltbush owes you", "2310 GST collected — held for the ATO".
+
+## P13 — Whose turn is it? (v1)
+
+**Statement.** Every open item names who acts next: **you**, a **named person**, a **customer**, or
+**the system**, plus the date it blocks something.
+
+**Why.** Approvals become rubber stamps under volume, and owners can't tell waiting-on-me from
+waiting-on-others (INS-07). Direction A's turn token is reused inside Timeline for this.
+
+- **Do:** "Release supplier run PB-0087, second of two · Mon 27 Oct by 5 pm · Lena made it, Mei released it first."
+- **Don't:** an anonymous "Pending" badge.
+
+**Tested by.** Playwright: every `[data-open-item]` has a non-empty `[data-turn]` and `[data-due]`.
+
+## P14 — Stability: positions are a contract (v1)
+
+**Statement.** Navigation order, timeline lane order and column order do not change between
+releases without a migration note in the release notes. New modules add lanes and columns; they do
+not move existing ones.
+
+**Why.** Users build muscle memory; incumbents' redesigns that moved things drew strong backlash (INS-05).
+
+- **Do:** a new "Payroll" lane goes below the existing lanes.
+- **Don't:** reorder tabs to promote a feature.
+
+**Tested by.** Playwright snapshot of the shell's nav order and the timeline lane order; a change
+fails the test until the snapshot is updated in the same PR as the release note.
+
+## P15 — Expected is never shown as actual (v1)
+
+**Statement.** Projections (expected receipts, due bills, forecast balances) are dashed, labelled
+"expected", and say what they leave out (e.g. "overdue invoices not counted"). Actuals stop at the
+last bank statement date, and that date is shown.
+
+**Why.** Owners confuse profit with cash and over-trust forecasts (INS-09). The Timeline's value
+depends on this honesty.
+
+- **Do:** "Expected 123,266.85, the lowest point, Thu 30 Oct, after the pay run", drawn dashed.
+- **Don't:** one solid line through today.
+
+**Tested by.** Playwright: every `[data-series="expected"]` has `stroke-dasharray` and a visible
+"expected" label; the actual series ends at the date in `[data-last-statement]`.
 
 ---
 

@@ -59,3 +59,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T13:16:46.015Z claude: T-0105 → verifying
 - 2026-10-24T13:38:15.135Z claude: release T-0105 → review (verify exit 0, 12 PASS/0 FAIL; awaiting codex cross-review; ADR-0016 awaiting human)
 - 2026-10-24 13:4x claude: T-0105 → review (verify exit 0); conductor race fixed (DL-0069)
+- 2026-10-24T14:02:08.218Z human: release T-0009 → todo (unblocked: product owner chose direction C (DL-0070))
+- 2026-10-24T14:02:08.588Z claude: T-0009 → verifying
+- 2026-10-24T14:03:46.723Z claude: release T-0009 → review (verify exit 0; Timeline adopted; awaiting codex cross-review)
