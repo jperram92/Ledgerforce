@@ -28,7 +28,7 @@ beforeAll(async () => {
     await trx.insertInto('app.tenant').values({ id: T, name: 'Harbour & Co Pty Ltd' }).execute();
     const c = await trx
       .insertInto('app.company')
-      .values({ name: 'Harbour & Co Pty Ltd', base_currency: 'AUD', abn: '74625118903' })
+      .values({ name: 'Harbour & Co Pty Ltd', base_currency: 'AUD', abn: '51824753556' })
       .returning('id')
       .executeTakeFirstOrThrow();
     return c.id;

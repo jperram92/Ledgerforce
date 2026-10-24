@@ -766,3 +766,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Accuracy of the evidence record (AGENTS.md directive 8); found by the T-0106 agent's report.
 - Alternatives: delete the extra PNGs (forbidden by directive 6); ignore (keeps adding noise).
 - ADR: none · Status: accepted
+
+### DL-0099 — Company ABN validated by the ABR checksum (migration 0015)
+- Date: 2026-10-24 · By: claude (lead) · Task: T-0107 · Category: data-model
+- Decision: `0015_platform_company_abn_checksum.sql` adds `company_abn_checksum CHECK (app.abn_is_valid(abn))` as NOT VALID, then VALIDATEs it, so a stored invalid ABN would stop the migration loudly instead of being changed. The T-0018 test fixture ABN `74625118903` (fails the checksum, RQ-0017 Finding 4) becomes the ATO's `51824753556`.
+- Why: RQ-0017; a company ABN prints on tax invoices and must meet the same rule as a party's.
+- Alternatives: leave the pattern-only check (a mistyped ABN reaches invoices).
+- ADR: none · Status: accepted

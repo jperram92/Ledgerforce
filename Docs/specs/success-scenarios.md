@@ -165,6 +165,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-42 | Login refuses unknown users, replayed or expired state and unknown tenants | — | MVP | db-integration | no | apps/api/src/auth/oidc.db.test.ts | T-0011 | green | [.agent/evidence/T-0011/manifest.json](../../.agent/evidence/T-0011/manifest.json) | c259211 |
 | SS-PLAT-45 | Salesforce package metadata matches the connector contract (offline) | — | MVP | unit | no | salesforce/test/package-contract.test.ts, salesforce/test/xml.test.ts | T-0062 | green | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
 | SS-PLAT-46 | Salesforce permission sets grant least privilege; only the integration user writes | — | MVP | unit | no | salesforce/test/package-contract.test.ts | T-0062 | green | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
+| SS-PLAT-47 | A company ABN must pass the ABR checksum | — | MVP | db-integration | no | packages/db/src/company-abn.db.test.ts | T-0107 | green | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -348,4 +349,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-46 — Salesforce permission sets grant least privilege; only the integration user writes
 - Phase: MVP · Layer: **unit** · Screenshot evidence: no · Task(s): T-0062
 - **Given** the package's permission sets (DL-0097) · **When** their grants are listed · **Then** `LF_Integration_User` has exactly create/read/edit on the mirrors, read/edit on Account and Opportunity, read on the billing-request event, edit on every LF field, `ApiEnabled` and the `LF_Integration_Write` custom permission, and no delete, view-all or modify-all; `LF_Billing_Requester` may only create the event; there are exactly three permission sets and one custom permission; none needs activation or a licence
+
+### SS-PLAT-47 — A company ABN must pass the ABR checksum
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0107
+- **Given** RQ-0017's ABR rule · **When** a company is created or changed as lf_app · **Then** a valid ABN or none is accepted; an 11-digit ABN failing the mod-89 checksum is refused (23514) on insert and on update
 
