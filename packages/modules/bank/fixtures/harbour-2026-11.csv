@@ -1,0 +1,11 @@
+﻿Date,Description,Reference,Debit,Credit,Balance,Transaction ID
+02/11/2026,Direct credit Acme Pty Ltd,INV-000123,,"1,375.00","6,375.00",202611020001
+02/11/2026,Account fee,,10.00,,"6,365.00",202611020002
+03/11/2026,Card purchase Blue Cup Cafe,,4.50,,"6,360.50",202611030003
+03/11/2026,Card purchase Blue Cup Cafe,,4.50,,"6,356.00",202611030004
+05/11/2026,BPAY Office Rent Pty,RENT-NOV,"2,200.00",,"4,156.00",202611050005
+10/11/2026,Stripe payout,po_1Q2w3E,,550.55,"4,706.55",202611100006
+15/11/2026,Transfer to ATO,PAYG-1125,"1,234.56",,"3,471.99",202611150007
+20/11/2026,Interest,,,12.34,"3,484.33",202611200008
+28/11/2026,"Telstra direct debit November, mobile",TLS-889,89.90,,"3,394.43",202611280009
+30/11/2026,"Deposit Harbour & Co Pty Ltd",CAP-01,,"10,000.00","13,394.43",202611300010

@@ -84,6 +84,23 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     enc_version: () => '1',
     source: () => 'ui',
   },
+  'app.bank_account': {
+    id: () => randomUUID(),
+    bsb: () => '062-000',
+    account_number_last3: () => '678',
+    account_number_ct: () => '\\x01',
+    account_number_iv: () => `\\x${'00'.repeat(12)}`,
+    account_number_tag: () => `\\x${'00'.repeat(16)}`,
+    dek_wrapped: () => `\\x${'00'.repeat(60)}`,
+    kek_id: () => 'k1',
+    enc_version: () => '1',
+    currency: () => 'AUD',
+  },
+  'app.bank_statement': {
+    format: () => 'csv',
+    file_sha256: () => randomBytes(32).toString('hex'),
+  },
+  'app.bank_statement_line': { dedupe_key: () => `h:${randomBytes(32).toString('hex')}` },
 };
 
 /**
@@ -100,6 +117,13 @@ export const PREREQUISITES: Readonly<
        ON CONFLICT DO NOTHING`,
       [row.get('tenant_id'), row.get('company_id'), row.get('party_id')],
     );
+  },
+  // A company bank account needs its GL account to be an asset of subtype bank (migration 0013).
+  'app.bank_account': async (admin, row) => {
+    await admin.query(`UPDATE app.account SET subtype = 'bank' WHERE tenant_id = $1 AND id = $2`, [
+      row.get('tenant_id'),
+      row.get('gl_account_id'),
+    ]);
   },
 };
 
