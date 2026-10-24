@@ -508,3 +508,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Product owner's answer to the human gate, after the research-led comparison (`Docs/ui/research/03-recommendation.md`).
 - Alternatives: A Turns, B Flows (`Docs/ui/research/02-directions.md`).
 - ADR: none · Status: accepted
+
+### DL-0071 — Chart of accounts data model: role rules enforced in the database
+- Date: 2026-10-24 · By: claude · Task: T-0018 · Category: data-model
+- Decision: Migration `0005_gl_chart_of_accounts.sql` adds `app.account` (design §3.2 fields; codes are 3–10 digits; never deleted, `status` archives) and `app.account_system_role` (one row per company and role; re-bind by UPDATE, never unbound). The role→account-type rule is the IMMUTABLE function `app.system_role_allows(role, type)`, not a global lookup table, so no table without tenant_id is added (a global table would need a security ADR). Triggers on both tables refuse a bound account that is archived, non-postable (except CURRENT_YEAR_EARNINGS, which must be non-postable), of a disallowed type, or whose `is_control` differs from "role is AR_CONTROL / AP_CONTROL / PAYROLL_CLEARING"; the binding trigger takes FOR SHARE on the account so concurrent changes serialise. `packages/modules/gl/src/system-roles.ts` mirrors the function, and SS-PLAT-31 proves they agree for every role × type. The template validator and loader live in the new package `@ledgerforce/gl`. The cross-tenant generator got column overrides for the two tables.
+- Why: Design §3.2 ("system roles … cannot be removed while bound"; control accounts). Putting the rule in the database means no code path, including future modules, can break a role binding.
+- Alternatives: application-only checks (bypassable by any other writer); a global `system_role_type` table (cross-tenant table, security ADR).
+- ADR: none · Status: accepted
+
+### DL-0072 — AU services SMB template contents and role→type map are drafts for accountant review
+- Date: 2026-10-24 · By: claude · Task: T-0018 · Category: accounting
+- Decision: Ship `packages/modules/gl/templates/au-services-smb.json` (43 accounts) with the role→type map: AR_CONTROL, UNDEPOSITED_FUNDS, GST_PAID → asset; AP_CONTROL, GST_COLLECTED, PAYROLL_CLEARING, WAGES_PAYABLE, PAYG_WITHHOLDING, SUPER_PAYABLE, DEFERRED_REVENUE, CUSTOMER_PREPAYMENTS → liability; RETAINED_EARNINGS, CURRENT_YEAR_EARNINGS → equity; ROUNDING, FX_REALISED, FX_UNREALISED → expense or revenue; SUSPENSE → asset or liability. Stripe clearing (1210), merchant fees (6120) and bad debts (6500) are `suggestedSettings`, not roles (DL-0015). Default tax codes (GST, INP, N-T) are keys for the future tax module, not yet enforced.
+- Why: Design §3.2 lists the roles but not their types or the template's accounts. Nothing posts yet, so the template can be corrected by a new version without touching posted history.
+- Alternatives: wait for the accountant before building the chart (blocks every downstream task).
+- ADR: none · Status: proposed (awaiting human — accountant review of the template; not a gate for T-0018)

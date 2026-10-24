@@ -42,6 +42,14 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     last_seen_at: () => '2026-01-01T00:00:00Z',
     absolute_expires_at: () => '2026-01-01T12:00:00Z',
   },
+  'app.account': {
+    code: () => String(100_000 + (randomBytes(3).readUIntBE(0, 3) % 900_000)),
+    type: () => 'asset',
+    subtype: () => 'current_asset',
+    normal_balance: () => 'debit',
+  },
+  // Its generated parent account is an active, postable, non-control asset (overrides above).
+  'app.account_system_role': { role: () => 'UNDEPOSITED_FUNDS' },
 };
 
 export async function discoverTenantTables(db: Queryable): Promise<TableRef[]> {

@@ -151,6 +151,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-28 | Every API request runs in its own tenant transaction | — | MVP | db-integration | no | apps/api/src/tenancy/tenant-transaction.db.test.ts | T-0104 | evidenced | [.agent/evidence/T-0104/manifest.json](../../.agent/evidence/T-0104/manifest.json) | 3ca2bd9 |
 | SS-PLAT-29 | Timeline components honour P3, P13, P15 and the genericness probes | — | MVP | e2e-playwright | yes | — | T-0106 | not-started | — | — |
 | SS-PLAT-30 | Every successful API mutation leaves one audit row | — | MVP | db-integration | no | apps/api/src/audit/audit.db.test.ts | T-0014 | evidenced | [.agent/evidence/T-0014/manifest.json](../../.agent/evidence/T-0014/manifest.json) | 93e3e18 |
+| SS-PLAT-31 | System-role accounts are protected by the database | — | MVP | db-integration | no | packages/modules/gl/src/chart.db.test.ts | T-0018 | tested | — | — |
+| SS-PLAT-32 | AU services SMB chart template is valid | — | MVP | unit | no | packages/modules/gl/src/templates.test.ts | T-0018 | tested | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | evidenced | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -278,3 +280,12 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-30 — Every successful API mutation leaves one audit row
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0014
 - **Given** an authenticated user · **When** they make a successful mutating request (e.g. logout), a read, and a refused request · **Then** the mutation leaves exactly one audit.audit_log row in the same tenant transaction with actor_type user, actor_user_id, action (method + route), ip, user agent and the request id (echoed in `x-request-id`); reads and refused requests write none; handler-supplied entity before/after are recorded
+
+### SS-PLAT-31 — System-role accounts are protected by the database
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0018
+- **Given** a company loaded with the AU services SMB template, as lf_app in a tenant transaction · **When** someone archives a bound account, makes it non-postable, changes it to a type its role does not allow, clears the control flag of a control account, re-binds a role to an account of the wrong type, binds a role twice, or deletes an account or binding · **Then** each change is refused by the database and nothing changes; an unbound account can still be archived; all 17 roles are bound exactly once; the SQL role→type rule equals the TypeScript map
+
+### SS-PLAT-32 — AU services SMB chart template is valid
+- Phase: MVP · Layer: **unit** · Screenshot evidence: no · Task(s): T-0018
+- **Given** the shipped `au-services-smb` template · **When** it is validated · **Then** it has no errors, binds every one of the 17 system roles exactly once to an account of an allowed type; and the validator reports duplicated, missing or mistyped roles, duplicate or malformed codes, a control flag off the control roles, and a postable CURRENT_YEAR_EARNINGS
+

@@ -1,5 +1,5 @@
 /**
- * Kysely table types for the platform schema (migrations 0001–0004). Keep in step with
+ * Kysely table types for the platform schema (migrations 0001–0005). Keep in step with
  * packages/db/migrations; the db tests exercise every table through these types.
  */
 import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
@@ -55,6 +55,36 @@ export interface SessionTable {
   revoke_reason: string | null;
 }
 
+export type AccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
+
+/** Chart of accounts (migration 0005, design §3.2). Never deleted: archive instead. */
+export interface AccountTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  code: string;
+  name: string;
+  type: AccountType;
+  subtype: string;
+  normal_balance: 'debit' | 'credit';
+  currency: string | null;
+  postable: Generated<boolean>;
+  is_control: Generated<boolean>;
+  status: Generated<'active' | 'archived'>;
+  default_tax_code: string | null;
+  required_dimensions: Generated<string[]>;
+  created_at: Timestamp;
+}
+
+/** System role → account per company (migration 0005). Guarded by triggers; never deleted. */
+export interface AccountSystemRoleTable {
+  tenant_id: TenantId;
+  company_id: string;
+  role: string;
+  account_id: string;
+  bound_at: Timestamp;
+}
+
 export interface AuditLogTable {
   id: ColumnType<string, never, never>;
   tenant_id: TenantId;
@@ -76,6 +106,8 @@ export interface Database {
   'app.company': CompanyTable;
   'app.app_user': AppUserTable;
   'app.session': SessionTable;
+  'app.account': AccountTable;
+  'app.account_system_role': AccountSystemRoleTable;
   /** INSERT only for lf_app — do not use RETURNING (needs SELECT). */
   'audit.audit_log': AuditLogTable;
 }
@@ -83,4 +115,6 @@ export interface Database {
 export type Company = Selectable<CompanyTable>;
 export type NewCompany = Insertable<CompanyTable>;
 export type AppUser = Selectable<AppUserTable>;
+export type Account = Selectable<AccountTable>;
+export type NewAccount = Insertable<AccountTable>;
 export type NewAuditLog = Insertable<AuditLogTable>;
