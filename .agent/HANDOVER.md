@@ -19,6 +19,8 @@ Open questions for human:
   7. Salesforce: provide a Dev Hub (authenticated outside the repo) so T-0062's package can be deployed to a
      scratch org and its Apex test run; confirm DL-0096/0097 interpretations (status Text(40), Currency(18,2),
      LF_Payment__c field set, LF_Billing_Requester set, Modify-All-Data users can still delete mirror rows).
+  8. Company bank details: should changes to the company's own bank accounts need the same verification
+     workflow as supplier bank details (design §6.5 names suppliers only)? (T-0058 card)
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
      (numeric + CHECK scale<=4) would make the DB refuse instead. Meanwhile the posting engine
      refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
@@ -62,6 +64,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >     packages/modules/parties/src/bank-accounts.ts; apps/api parties controller; DL-0080. Act as
 >     security-reviewer too: AAD binding, fail-closed errors, key handling, masked-only API
 >   • T-0062 — salesforce/** (SFDX metadata), salesforce/test/** (offline contract), RQ-0022, DL-0094..0097
+>   • T-0058 — migration 0013; packages/modules/bank/** (OFX/CAMT/CSV readers, importStatement dedupe); RQ-0019;
+>     DL-0082..0085. Note the overlap with T-0059 (CAMT.053 already built here)
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -135,3 +139,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T22:46:35.744Z claude: T-0062 → verifying
 - 2026-10-24T22:48:33.837Z claude: release T-0062 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; offline only — org deploy needs Dev Hub; awaiting codex cross-review)
 - 2026-10-24 22:5x claude (lead): merged T-0062 (sub-agent); gates on merged tree green (270 unit / 300 db); verify 12 PASS/0 FAIL → review. T-0011 finished (waits for T-0058's migration 0013 before merge). T-0058, T-0106 still running.
+- 2026-10-24T22:55:05.585Z claude: T-0058 → verifying
+- 2026-10-24T22:56:30.398Z claude: release T-0058 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; awaiting codex cross-review)
+- 2026-10-24 23:0x claude (lead): merged T-0058 (conflicts in decision log + register, append-only, both kept in order); gates on merged tree green (304 unit / 337 db); verify 12 PASS/0 FAIL → review.
