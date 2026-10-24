@@ -5,7 +5,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-041107-SS-PLAT-UI-01-01-home-dashboard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 1440px",
       "commit": "3b4ffdf5c1ac-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T04:11:07.748Z",
@@ -14,7 +14,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-041107-SS-PLAT-UI-01-01-home-dashboard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 390px",
       "commit": "3b4ffdf5c1ac-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T04:11:07.804Z",
@@ -23,7 +23,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-041108-SS-PLAT-UI-01-02-invoice-list-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 1440px",
       "commit": "3b4ffdf5c1ac-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T04:11:08.392Z",
@@ -32,7 +32,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-041108-SS-PLAT-UI-01-02-invoice-list-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 390px",
       "commit": "3b4ffdf5c1ac-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T04:11:08.439Z",
@@ -41,7 +41,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074805-SS-PLAT-UI-01-01-home-dashboard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:05.980Z",
@@ -50,7 +50,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074806-SS-PLAT-UI-01-01-home-dashboard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:06.083Z",
@@ -59,7 +59,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074806-SS-PLAT-UI-01-02-invoice-list-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:06.553Z",
@@ -68,7 +68,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074806-SS-PLAT-UI-01-02-invoice-list-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:06.694Z",
@@ -77,7 +77,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074807-SS-PLAT-UI-01-03-invoice-detail-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:07.263Z",
@@ -86,7 +86,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074807-SS-PLAT-UI-01-03-invoice-detail-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:07.298Z",
@@ -95,7 +95,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074807-SS-PLAT-UI-01-04-batch-billing-run-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:07.873Z",
@@ -104,7 +104,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074807-SS-PLAT-UI-01-04-batch-billing-run-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:07.896Z",
@@ -113,7 +113,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074808-SS-PLAT-UI-01-05-payment-batch-release-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:08.417Z",
@@ -122,7 +122,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074808-SS-PLAT-UI-01-05-payment-batch-release-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:08.450Z",
@@ -131,7 +131,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074808-SS-PLAT-UI-01-06-bank-reconciliation-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:08.914Z",
@@ -140,7 +140,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074808-SS-PLAT-UI-01-06-bank-reconciliation-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:08.914Z",
@@ -149,7 +149,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074809-SS-PLAT-UI-01-07-period-close-checklist-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:09.387Z",
@@ -158,7 +158,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074809-SS-PLAT-UI-01-07-period-close-checklist-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:09.474Z",
@@ -167,7 +167,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074810-SS-PLAT-UI-01-08-setup-wizard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:10.047Z",
@@ -176,7 +176,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074810-SS-PLAT-UI-01-08-setup-wizard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:10.131Z",
@@ -185,7 +185,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074810-SS-PLAT-UI-01-09-sync-issues-inbox-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:10.489Z",
@@ -194,7 +194,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074810-SS-PLAT-UI-01-09-sync-issues-inbox-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:10.587Z",
@@ -203,7 +203,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074811-SS-PLAT-UI-01-10-salesforce-account-lwc-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:11.049Z",
@@ -212,7 +212,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074811-SS-PLAT-UI-01-10-salesforce-account-lwc-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:11.051Z",
@@ -221,7 +221,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074811-SS-PLAT-UI-01-11-journal-rule-studio-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:11.472Z",
@@ -230,7 +230,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074811-SS-PLAT-UI-01-11-journal-rule-studio-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:11.478Z",
@@ -239,7 +239,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074811-SS-PLAT-UI-01-12-mobile-approvals-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:11.910Z",
@@ -248,7 +248,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074811-SS-PLAT-UI-01-12-mobile-approvals-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:11.969Z",
@@ -257,7 +257,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074812-SS-PLAT-UI-01-index-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 390px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:12.674Z",
@@ -266,7 +266,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-074812-SS-PLAT-UI-01-index-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 1440px",
       "commit": "7e70defb43fb-dirty",
       "provider": "claude",
       "timestamp": "2026-10-24T07:48:12.816Z",
@@ -275,7 +275,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080343-SS-PLAT-UI-01-01-home-dashboard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:43.722Z",
@@ -284,7 +284,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080343-SS-PLAT-UI-01-01-home-dashboard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:43.962Z",
@@ -293,7 +293,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080344-SS-PLAT-UI-01-02-invoice-list-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:44.451Z",
@@ -302,7 +302,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080344-SS-PLAT-UI-01-02-invoice-list-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:44.588Z",
@@ -311,7 +311,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080345-SS-PLAT-UI-01-03-invoice-detail-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:45.155Z",
@@ -320,7 +320,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080345-SS-PLAT-UI-01-03-invoice-detail-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:45.182Z",
@@ -329,7 +329,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080345-SS-PLAT-UI-01-04-batch-billing-run-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:45.899Z",
@@ -338,7 +338,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080345-SS-PLAT-UI-01-04-batch-billing-run-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:45.983Z",
@@ -347,7 +347,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080346-SS-PLAT-UI-01-05-payment-batch-release-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:46.439Z",
@@ -356,7 +356,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080346-SS-PLAT-UI-01-05-payment-batch-release-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:46.514Z",
@@ -365,7 +365,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080347-SS-PLAT-UI-01-06-bank-reconciliation-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:47.064Z",
@@ -374,7 +374,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080347-SS-PLAT-UI-01-06-bank-reconciliation-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:47.078Z",
@@ -383,7 +383,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080347-SS-PLAT-UI-01-07-period-close-checklist-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:47.486Z",
@@ -392,7 +392,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080347-SS-PLAT-UI-01-07-period-close-checklist-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:47.586Z",
@@ -401,7 +401,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080347-SS-PLAT-UI-01-08-setup-wizard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:47.975Z",
@@ -410,7 +410,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080348-SS-PLAT-UI-01-08-setup-wizard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:48.009Z",
@@ -419,7 +419,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080348-SS-PLAT-UI-01-09-sync-issues-inbox-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:48.378Z",
@@ -428,7 +428,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080348-SS-PLAT-UI-01-09-sync-issues-inbox-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:48.382Z",
@@ -437,7 +437,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080348-SS-PLAT-UI-01-10-salesforce-account-lwc-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:48.724Z",
@@ -446,7 +446,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080348-SS-PLAT-UI-01-10-salesforce-account-lwc-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:48.784Z",
@@ -455,7 +455,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080349-SS-PLAT-UI-01-11-journal-rule-studio-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:49.125Z",
@@ -464,7 +464,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080349-SS-PLAT-UI-01-11-journal-rule-studio-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:49.171Z",
@@ -473,7 +473,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080349-SS-PLAT-UI-01-12-mobile-approvals-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:49.522Z",
@@ -482,7 +482,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080349-SS-PLAT-UI-01-12-mobile-approvals-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:49.533Z",
@@ -491,7 +491,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080349-SS-PLAT-UI-01-index-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 390px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:49.959Z",
@@ -500,7 +500,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-080350-SS-PLAT-UI-01-index-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 1440px",
       "commit": "0202bcdce4f3-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:03:50.280Z",
@@ -509,7 +509,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081733-SS-PLAT-UI-01-01-home-dashboard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:33.800Z",
@@ -518,7 +518,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081733-SS-PLAT-UI-01-01-home-dashboard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:33.805Z",
@@ -527,7 +527,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081734-SS-PLAT-UI-01-02-invoice-list-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:34.350Z",
@@ -536,7 +536,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081734-SS-PLAT-UI-01-02-invoice-list-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:34.378Z",
@@ -545,7 +545,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081734-SS-PLAT-UI-01-03-invoice-detail-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:34.776Z",
@@ -554,7 +554,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081734-SS-PLAT-UI-01-03-invoice-detail-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:34.864Z",
@@ -563,7 +563,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081735-SS-PLAT-UI-01-04-batch-billing-run-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:35.380Z",
@@ -572,7 +572,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081735-SS-PLAT-UI-01-04-batch-billing-run-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:35.414Z",
@@ -581,7 +581,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081735-SS-PLAT-UI-01-05-payment-batch-release-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:35.873Z",
@@ -590,7 +590,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081735-SS-PLAT-UI-01-05-payment-batch-release-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:35.974Z",
@@ -599,7 +599,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081736-SS-PLAT-UI-01-06-bank-reconciliation-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:36.350Z",
@@ -608,7 +608,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081736-SS-PLAT-UI-01-06-bank-reconciliation-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:36.408Z",
@@ -617,7 +617,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081736-SS-PLAT-UI-01-07-period-close-checklist-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:36.742Z",
@@ -626,7 +626,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081736-SS-PLAT-UI-01-07-period-close-checklist-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:36.785Z",
@@ -635,7 +635,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081737-SS-PLAT-UI-01-08-setup-wizard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:37.213Z",
@@ -644,7 +644,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081737-SS-PLAT-UI-01-08-setup-wizard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:37.226Z",
@@ -653,7 +653,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081737-SS-PLAT-UI-01-09-sync-issues-inbox-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:37.608Z",
@@ -662,7 +662,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081737-SS-PLAT-UI-01-09-sync-issues-inbox-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:37.669Z",
@@ -671,7 +671,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081737-SS-PLAT-UI-01-10-salesforce-account-lwc-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:37.992Z",
@@ -680,7 +680,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081738-SS-PLAT-UI-01-10-salesforce-account-lwc-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:38.026Z",
@@ -689,7 +689,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081738-SS-PLAT-UI-01-11-journal-rule-studio-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:38.417Z",
@@ -698,7 +698,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081738-SS-PLAT-UI-01-11-journal-rule-studio-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:38.419Z",
@@ -707,7 +707,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081738-SS-PLAT-UI-01-12-mobile-approvals-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:38.802Z",
@@ -716,7 +716,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081738-SS-PLAT-UI-01-12-mobile-approvals-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:38.830Z",
@@ -725,7 +725,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081739-SS-PLAT-UI-01-index-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 390px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:39.365Z",
@@ -734,7 +734,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-081739-SS-PLAT-UI-01-index-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 1440px",
       "commit": "bfe89707fc33-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:17:39.536Z",
@@ -743,7 +743,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082237-SS-PLAT-UI-01-01-home-dashboard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:37.429Z",
@@ -752,7 +752,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082237-SS-PLAT-UI-01-01-home-dashboard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:37.444Z",
@@ -761,7 +761,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082237-SS-PLAT-UI-01-02-invoice-list-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:37.959Z",
@@ -770,7 +770,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082237-SS-PLAT-UI-01-02-invoice-list-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:37.963Z",
@@ -779,7 +779,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082238-SS-PLAT-UI-01-03-invoice-detail-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:38.427Z",
@@ -788,7 +788,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082238-SS-PLAT-UI-01-03-invoice-detail-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:38.442Z",
@@ -797,7 +797,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082238-SS-PLAT-UI-01-04-batch-billing-run-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:38.944Z",
@@ -806,7 +806,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082238-SS-PLAT-UI-01-04-batch-billing-run-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:38.986Z",
@@ -815,7 +815,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082239-SS-PLAT-UI-01-05-payment-batch-release-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:39.345Z",
@@ -824,7 +824,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082239-SS-PLAT-UI-01-05-payment-batch-release-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:39.439Z",
@@ -833,7 +833,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082239-SS-PLAT-UI-01-06-bank-reconciliation-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:39.837Z",
@@ -842,7 +842,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082239-SS-PLAT-UI-01-06-bank-reconciliation-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:39.858Z",
@@ -851,7 +851,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082240-SS-PLAT-UI-01-07-period-close-checklist-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:40.259Z",
@@ -860,7 +860,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082240-SS-PLAT-UI-01-07-period-close-checklist-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:40.298Z",
@@ -869,7 +869,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082240-SS-PLAT-UI-01-08-setup-wizard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:40.681Z",
@@ -878,7 +878,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082240-SS-PLAT-UI-01-08-setup-wizard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:40.713Z",
@@ -887,7 +887,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082241-SS-PLAT-UI-01-09-sync-issues-inbox-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:41.137Z",
@@ -896,7 +896,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082241-SS-PLAT-UI-01-09-sync-issues-inbox-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:41.198Z",
@@ -905,7 +905,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082241-SS-PLAT-UI-01-10-salesforce-account-lwc-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:41.562Z",
@@ -914,7 +914,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082241-SS-PLAT-UI-01-10-salesforce-account-lwc-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:41.564Z",
@@ -923,7 +923,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082241-SS-PLAT-UI-01-11-journal-rule-studio-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:41.922Z",
@@ -932,7 +932,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082241-SS-PLAT-UI-01-11-journal-rule-studio-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:41.927Z",
@@ -941,7 +941,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082242-SS-PLAT-UI-01-12-mobile-approvals-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:42.327Z",
@@ -950,7 +950,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082242-SS-PLAT-UI-01-12-mobile-approvals-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:42.339Z",
@@ -959,7 +959,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082242-SS-PLAT-UI-01-index-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 390px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:42.892Z",
@@ -968,7 +968,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082243-SS-PLAT-UI-01-index-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 1440px",
       "commit": "2fe507319be9-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:22:43.061Z",
@@ -977,7 +977,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082454-SS-PLAT-UI-01-01-home-dashboard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:54.749Z",
@@ -986,7 +986,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082454-SS-PLAT-UI-01-01-home-dashboard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:54.814Z",
@@ -995,7 +995,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082455-SS-PLAT-UI-01-02-invoice-list-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:55.234Z",
@@ -1004,7 +1004,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082455-SS-PLAT-UI-01-02-invoice-list-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:55.259Z",
@@ -1013,7 +1013,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082455-SS-PLAT-UI-01-03-invoice-detail-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:55.763Z",
@@ -1022,7 +1022,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082455-SS-PLAT-UI-01-03-invoice-detail-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:55.780Z",
@@ -1031,7 +1031,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082456-SS-PLAT-UI-01-04-batch-billing-run-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:56.235Z",
@@ -1040,7 +1040,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082456-SS-PLAT-UI-01-04-batch-billing-run-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:56.246Z",
@@ -1049,7 +1049,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082456-SS-PLAT-UI-01-05-payment-batch-release-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:56.812Z",
@@ -1058,7 +1058,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082456-SS-PLAT-UI-01-05-payment-batch-release-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:56.878Z",
@@ -1067,7 +1067,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082457-SS-PLAT-UI-01-06-bank-reconciliation-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:57.263Z",
@@ -1076,7 +1076,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082457-SS-PLAT-UI-01-06-bank-reconciliation-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:57.266Z",
@@ -1085,7 +1085,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082457-SS-PLAT-UI-01-07-period-close-checklist-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:57.646Z",
@@ -1094,7 +1094,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082457-SS-PLAT-UI-01-07-period-close-checklist-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:57.704Z",
@@ -1103,7 +1103,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082458-SS-PLAT-UI-01-08-setup-wizard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:58.115Z",
@@ -1112,7 +1112,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082458-SS-PLAT-UI-01-08-setup-wizard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:58.135Z",
@@ -1121,7 +1121,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082458-SS-PLAT-UI-01-09-sync-issues-inbox-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:58.500Z",
@@ -1130,7 +1130,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082458-SS-PLAT-UI-01-09-sync-issues-inbox-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:58.603Z",
@@ -1139,7 +1139,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082458-SS-PLAT-UI-01-10-salesforce-account-lwc-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:58.919Z",
@@ -1148,7 +1148,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082459-SS-PLAT-UI-01-10-salesforce-account-lwc-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:59.025Z",
@@ -1157,7 +1157,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082459-SS-PLAT-UI-01-11-journal-rule-studio-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:59.317Z",
@@ -1166,7 +1166,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082459-SS-PLAT-UI-01-11-journal-rule-studio-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:24:59.407Z",
@@ -1175,7 +1175,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082500-SS-PLAT-UI-01-12-mobile-approvals-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:25:00.080Z",
@@ -1184,7 +1184,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082500-SS-PLAT-UI-01-12-mobile-approvals-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:25:00.093Z",
@@ -1193,7 +1193,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082500-SS-PLAT-UI-01-index-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 390px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:25:00.736Z",
@@ -1202,7 +1202,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-082500-SS-PLAT-UI-01-index-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 1440px",
       "commit": "b69d2290b1e1-dirty",
       "provider": "unknown",
       "timestamp": "2026-10-24T08:25:00.897Z",
@@ -1211,7 +1211,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104801-SS-PLAT-UI-01-01-home-dashboard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:01.020Z",
@@ -1220,7 +1220,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104801-SS-PLAT-UI-01-02-invoice-list-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:01.022Z",
@@ -1229,7 +1229,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104801-SS-PLAT-UI-01-02-invoice-list-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 02-invoice-list @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:01.072Z",
@@ -1238,7 +1238,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104801-SS-PLAT-UI-01-01-home-dashboard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 01-home-dashboard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:01.266Z",
@@ -1247,7 +1247,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104802-SS-PLAT-UI-01-03-invoice-detail-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:02.839Z",
@@ -1256,7 +1256,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104802-SS-PLAT-UI-01-03-invoice-detail-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 03-invoice-detail @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:02.890Z",
@@ -1265,7 +1265,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104802-SS-PLAT-UI-01-04-batch-billing-run-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:02.902Z",
@@ -1274,7 +1274,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104803-SS-PLAT-UI-01-04-batch-billing-run-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 04-batch-billing-run @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:03.396Z",
@@ -1283,7 +1283,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104804-SS-PLAT-UI-01-05-payment-batch-release-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:04.282Z",
@@ -1292,7 +1292,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104804-SS-PLAT-UI-01-06-bank-reconciliation-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:04.581Z",
@@ -1301,7 +1301,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104804-SS-PLAT-UI-01-05-payment-batch-release-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 05-payment-batch-release @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:04.586Z",
@@ -1310,7 +1310,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104805-SS-PLAT-UI-01-06-bank-reconciliation-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 06-bank-reconciliation @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:05.599Z",
@@ -1319,7 +1319,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104806-SS-PLAT-UI-01-07-period-close-checklist-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:06.122Z",
@@ -1328,7 +1328,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104806-SS-PLAT-UI-01-07-period-close-checklist-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 07-period-close-checklist @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:06.421Z",
@@ -1337,7 +1337,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104806-SS-PLAT-UI-01-08-setup-wizard-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:06.429Z",
@@ -1346,7 +1346,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104807-SS-PLAT-UI-01-08-setup-wizard-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 08-setup-wizard @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:07.523Z",
@@ -1355,7 +1355,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104808-SS-PLAT-UI-01-09-sync-issues-inbox-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:08.785Z",
@@ -1364,7 +1364,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104808-SS-PLAT-UI-01-09-sync-issues-inbox-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 09-sync-issues-inbox @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:08.893Z",
@@ -1373,7 +1373,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104809-SS-PLAT-UI-01-10-salesforce-account-lwc-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:09.244Z",
@@ -1382,7 +1382,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104809-SS-PLAT-UI-01-10-salesforce-account-lwc-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 10-salesforce-account-lwc @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:09.306Z",
@@ -1391,7 +1391,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104810-SS-PLAT-UI-01-12-mobile-approvals-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:10.850Z",
@@ -1400,7 +1400,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104811-SS-PLAT-UI-01-12-mobile-approvals-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 12-mobile-approvals @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:11.077Z",
@@ -1409,7 +1409,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104811-SS-PLAT-UI-01-11-journal-rule-studio-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:11.161Z",
@@ -1418,7 +1418,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104811-SS-PLAT-UI-01-11-journal-rule-studio-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a 11-journal-rule-studio @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:11.190Z",
@@ -1427,7 +1427,7 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104812-SS-PLAT-UI-01-index-mobile-390.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 390px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 390px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:12.414Z",
@@ -1436,10 +1436,244 @@
     {
       "scenario": "SS-PLAT-UI-01",
       "file": ".agent/evidence/T-0009/20261024-104812-SS-PLAT-UI-01-index-desktop-1440.png",
-      "test": "ui-mockups.spec.ts \u203a SS-PLAT-UI-01 static UI mockups \u203a index @ 1440px",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 1440px",
       "commit": "936b5ae78cf4-dirty",
       "provider": "codex",
       "timestamp": "2026-10-24T10:48:12.602Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125814-SS-PLAT-UI-01-01-home-dashboard-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:14.658Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125814-SS-PLAT-UI-01-01-home-dashboard-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:14.884Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125815-SS-PLAT-UI-01-02-invoice-list-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:15.400Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125815-SS-PLAT-UI-01-02-invoice-list-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:15.461Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125816-SS-PLAT-UI-01-03-invoice-detail-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:16.033Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125816-SS-PLAT-UI-01-03-invoice-detail-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:16.019Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125816-SS-PLAT-UI-01-04-batch-billing-run-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:16.588Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125816-SS-PLAT-UI-01-04-batch-billing-run-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:16.716Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125817-SS-PLAT-UI-01-05-payment-batch-release-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:17.261Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125817-SS-PLAT-UI-01-05-payment-batch-release-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:17.385Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125817-SS-PLAT-UI-01-06-bank-reconciliation-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:17.757Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125817-SS-PLAT-UI-01-06-bank-reconciliation-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:17.826Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125818-SS-PLAT-UI-01-07-period-close-checklist-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:18.265Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125818-SS-PLAT-UI-01-07-period-close-checklist-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:18.356Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125818-SS-PLAT-UI-01-08-setup-wizard-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:18.791Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125818-SS-PLAT-UI-01-08-setup-wizard-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:18.881Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125819-SS-PLAT-UI-01-09-sync-issues-inbox-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:19.347Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125819-SS-PLAT-UI-01-09-sync-issues-inbox-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:19.390Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125819-SS-PLAT-UI-01-10-salesforce-account-lwc-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:19.763Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125819-SS-PLAT-UI-01-10-salesforce-account-lwc-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:19.781Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125820-SS-PLAT-UI-01-11-journal-rule-studio-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:20.221Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125820-SS-PLAT-UI-01-11-journal-rule-studio-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:20.242Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125820-SS-PLAT-UI-01-12-mobile-approvals-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:20.693Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125820-SS-PLAT-UI-01-12-mobile-approvals-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:20.662Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125821-SS-PLAT-UI-01-index-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 1440px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:21.638Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-125821-SS-PLAT-UI-01-index-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 390px",
+      "commit": "7f014294bff1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T12:58:21.385Z",
       "result": "passed"
     }
   ]

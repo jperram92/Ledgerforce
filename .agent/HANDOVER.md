@@ -1,27 +1,27 @@
-# Handover - 2026-10-24 10:52 UTC
-From: codex (run 2026-10-24-codex-r01)    Reason: Blocked: Windows heartbeat regression remains red; recovery and evidence preserved
-Task: T-0010 Tenancy: tenant and company tables, RLS context middleware
-Branch: feat/T-0010-tenant-context   Last green commit: none
-Done: Recovery commit 936b5ae; phase-gate regressions 5/5; unit tests 170/170; PostgreSQL 17 tests 61/61; SS-PLAT-04 report and manifest; E2E 26/26 with screenshots; lint/typecheck/format and standalone audit pass.
-In progress: T-0010 blocked on unchanged Windows missed-heartbeat test returning null after 25 seconds. WIP process-tree and launch-lease fixes are not green. Original Claude RED proof absent. Cross-provider review and full verify remain incomplete.
-Next action: Reproduce scripts/agent/test/run.test.ts test named missed heartbeat, trace the spawned Windows/Git Bash process tree, and fix termination without weakening its deadline; then run full verify and obtain Claude review.
-Decisions taken: DL-0056 through DL-0060; RQ-0013 and RQ-0014.
-Open questions for human: No new questions. Existing accounting/security ADR, golden posting, phase and UI direction gates remain in their cards; none is approved by this recovery.
+# Handover - 2026-10-24 13:10 UTC
+From: claude (lead session r01)    Reason: in progress — T-0010 handed to cross-review; starting T-0011
+Task: next is T-0011 OIDC authentication (T-0010 now in review)
+Branch: claude/app-framework-agents-dzmkya (single session branch, DL-0055)   Last green commit: see `git log -1` (T-0010 review commit)
+Done: Codex recovery merged (6c7af74); T-0010 full verify on merged tree 12 PASS / 0 FAIL / 4 PENDING; Windows heartbeat split to T-0103; [phase:] markers on all cards.
+In progress: UI/UX research agent (Docs/ui/research) finishing directions B and C + recommendation; T-0009 blocked on product-owner choice.
+Next action: codex cross-reviews T-0010 (Claude-authored parts: packages/db/src/tenant.ts leak guard, packages/testing/eslint-rules/no-session-tenant-context.ts, packages/testing/src/evidence/{test-report,record-tests}.ts); claude claims T-0011.
+Decisions taken: DL-0053..DL-0060 (see decision log); RQ-0013, RQ-0014.
+Open questions for human: golden postings GP-001..019 approval (blocks T-0031); Proposed ADRs 0003-0007, 0009, 0010; UI direction choice; design contradictions listed in RQ-0012 (CDC cap, GST rounding, prepayment GST, SoD gaps).
 Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
 
 ## Codex continuation prompt
 
-> Resume T-0010 on feat/T-0010-tenant-context. Read AGENTS.md section 2, this
-> handover, the task card, and .agent/runs/2026-10-24-codex-r01.md. Inspect the
-> latest commit body; recovery baseline is 936b5ae (Claude baseline 2fe5073).
-> Run `node scripts/agent/conductor.ts status`. The task is deliberately blocked,
-> not done. Reproduce `node --test --test-name-pattern='missed heartbeat'
-> scripts/agent/test/run.test.ts` with Git usr/bin first in PATH. Windows tree
-> termination can require execution outside the sandbox. The failure is original
-> PID not found while descendants retain pipes. Do not increase the fixture's
-> lease, timeout or 20-second assertion. Preserve evidence and fix process ownership.
-> See the run log for PostgreSQL and Playwright setup, then rerun the full verifier.
-> Never invent Claude's missing RED history or self-approve Codex changes.
+> Resume LedgerForce on branch `claude/app-framework-agents-dzmkya`. Read AGENTS.md §2
+> (primary continuation prompt), this handover, `.agent/state.json`, and the body of
+> `git log -3`. Run `node scripts/agent/conductor.ts status`.
+> FIRST: cross-review T-0010 as `.claude/agents/reviewer.md` (you did not build the
+> Claude-authored parts listed under Next action). Write
+> `.agent/evidence/T-0010/review-codex-<YYYYMMDD-HHMMSS>.md` with PASS/FAIL per checklist
+> item and commit it with an explanatory body. On PASS run
+> `node scripts/agent/conductor.ts release T-0010 --status done` after ticking steps 8–9.
+> THEN: if on Windows, take T-0103 (Windows heartbeat; never weaken the test). Otherwise
+> continue with `node scripts/agent/conductor.ts next`. Every commit body: What changed /
+> Why / Validation / Next action.
 
 ## Log
 ## Log
@@ -41,3 +41,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T10:47:41.970Z codex: T-0010 → in_progress
 - 2026-10-24T10:52:32.170Z codex: handover: Blocked: Windows heartbeat regression remains red; recovery and evidence preserved
 - 2026-10-24T10:52:33.083Z codex: release T-0010 → blocked (Windows missed-heartbeat regression still times out after 25 seconds; original provider PID disappears while descendant pipes remain open. Keep test unchanged and fix process ownership before full verification and Claude review.)
+- 2026-10-24T12:57:04.526Z codex: release T-0010 → todo (unblocked: Windows heartbeat step moved to T-0103)
+- 2026-10-24T12:57:04.841Z claude: T-0010 → verifying
+- 2026-10-24T12:58:31.823Z claude: release T-0010 → review (verify 12 PASS/0 FAIL on merged tree; awaiting codex review of Claude-authored parts)
+- 2026-10-24 12:5x claude: merged Codex recovery (6c7af74); T-0010 → review after verify 12 PASS/0 FAIL; T-0103 split out
