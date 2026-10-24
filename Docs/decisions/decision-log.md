@@ -601,3 +601,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Product owner asked for parallel sub-agents. The global migration sequence and the shared registers are the only serialisation points, so pre-assignment removes them.
 - Alternatives: sequential build (slower); parallel without pre-assignment (migration number and id collisions).
 - ADR: none · Status: accepted
+
+### DL-0086 — OIDC libraries pinned: openid-client 6.8.8 (runtime), oidc-provider 9.12.2 (dev), jose overridden to 6.2.12
+- Date: 2026-10-24 · By: claude · Task: T-0011 · Category: tooling
+- Decision: `apps/api` depends on `openid-client` 6.8.8 (relying party, runtime) and `oidc-provider` 9.12.2 (in-process test IdP, dev only), both exact. The root `pnpm.overrides` pins `jose` to 6.2.12, because pnpm resolved 6.2.13, published 4 days ago. 6.2.12 satisfies both libraries' ranges. Every package these two add to the lockfile is now at least 14 days old. `pnpm audit --prod`: no known vulnerabilities.
+- Why: ADR-0016 and RQ-0015 name both libraries (DL-0062 covers the dependency). RQ-0020 records the release dates and API details. Found while doing this: the existing lockfile has `nan` 2.30.0 (6 days old, a `testcontainers` dev transitive), so `--config.minimum-release-age` cannot be used as a one-off flag. That is not changed here and is listed for the human.
+- Alternatives: accept jose 6.2.13 (breaks the 14-day rule); set `minimumReleaseAge` repo-wide (a config change outside this task, and it fails on `nan` today).
+- ADR: ADR-0016 (Proposed, security) · Status: accepted for the build; awaiting the human with ADR-0016
