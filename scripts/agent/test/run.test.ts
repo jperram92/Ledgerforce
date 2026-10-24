@@ -144,7 +144,7 @@ test('non-quota failures rotate providers and block the task after max_attempts_
 });
 
 test('missed heartbeat (lease expiry) kills the provider and fails over', () => {
-  const root = makeRepo({ config: configWith({ claudeCli: fake('fake-hang.sh'), codexCli: fake('fake-success.sh'), lease: 0.02 }) });
+  const root = makeRepo({ config: configWith({ claudeCli: fake('fake-hang.sh'), codexCli: fake('fake-success.sh'), lease: 0.05 }) });
   const log = fakeLog();
   const started = Date.now();
   const r = runCli(root, ['run', '--once'], { ...FAST, FAKE_LOG: log }, 25_000);

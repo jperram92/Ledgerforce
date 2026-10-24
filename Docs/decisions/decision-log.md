@@ -333,3 +333,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Deterministic screenshots with no install; HTTP avoids axe errors on file://.
 - Alternatives: generated static site; axe-core as a repo dependency now (deferred to apps/web).
 - ADR: none · Status: accepted
+
+### DL-0046 — Failover keeps work in the tree and snapshots it to a wip/ ref
+- Date: 2026-10-24 · By: claude · Task: T-0003 · Category: process
+- Decision: On provider failure the conductor snapshots uncommitted work to `refs/heads/wip/<T-ID>-<ts>` via a temporary index (commit-tree + update-ref) and leaves working tree, index and HEAD untouched for the next provider. No reset, no stash.
+- Why: Directive 6 (never lose or delete); design §10.4 "same branch from last_checkpoint".
+- Alternatives: `git stash` (drops untracked files, easy to lose); reset to last_checkpoint (destructive).
+- ADR: ADR-0011 · Status: accepted
+
+### DL-0047 — Conductor commits on behalf of Codex
+- Date: 2026-10-24 · By: claude · Task: T-0003 · Category: process
+- Decision: Providers with `workspace-write` default to `commits: conductor`: they run with `LF_DEFER_COMMIT=1`, `checkpoint` queues steps in `state.pending_checkpoints`, and the conductor commits them on each poll, at exit and at session end.
+- Why: RQ-0001 — `.git` is protected in Codex workspace-write.
+- Alternatives: `--dangerously-bypass-approvals-and-sandbox` (only in an external sandbox).
+- ADR: ADR-0011 · Status: accepted
+
+### DL-0048 — Quota failures switch provider without counting as attempts
+- Date: 2026-10-24 · By: claude · Task: T-0003 · Category: process
+- Decision: Quota/credit/limit/budget failures mark the provider exhausted for `quota_cooldown_minutes` (default 60) and fail over; other failures increment `state.failures` and rotate; at `max_attempts_per_task` the task is blocked with a notification in `.agent/notifications/`.
+- Why: AGENTS.md §3; running out of credit is not a failure of the task.
+- Alternatives: count every switch (blocks tasks for billing reasons).
+- ADR: none · Status: accepted
+
+### DL-0049 — verify.sh treats unavailable gates as PENDING, never pass
+- Date: 2026-10-24 · By: claude · Task: T-0003 · Category: process
+- Decision: Missing tooling prints "NOT YET AVAILABLE" and counts PENDING (loud, non-failing). Secrets scan and backlog lint also run in `--quick`; the no-skip check scans whole test files.
+- Why: Directive 3 and `Docs/process/definition-of-done.md`.
+- Alternatives: silent skip (hides gaps); fail on PENDING (blocks Sprint 0).
+- ADR: none · Status: accepted
+
+### DL-0050 — Minimal in-repo YAML subset reader
+- Date: 2026-10-24 · By: claude · Task: T-0003 · Category: tooling
+- Decision: `scripts/agent/lib/yaml.ts` parses the subset used; frontmatter edits replace lines in place to keep comments.
+- Why: DL-0005 zero dependencies.
+- Alternatives: `yaml`/`js-yaml` (need install).
+- ADR: none · Status: accepted

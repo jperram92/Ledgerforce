@@ -86,16 +86,25 @@ export function shortcutsGate(ctx: Ctx): Gate {
 
 // ---------------- gate 6: forward-only migrations (grep part) ----------------
 
+const NON_ADDITIVE: RegExp[] = [
+  /\bDROP\s+(TABLE|COLUMN|SCHEMA|INDEX|VIEW|MATERIALIZED\s+VIEW|TYPE|FUNCTION|PROCEDURE|TRIGGER|POLICY|CONSTRAINT|SEQUENCE|DOMAIN|ROLE|EXTENSION|OWNED|DATABASE|RULE|DEFAULT|NOT\s+NULL)\b/i,
+  /\bRENAME\s+(TO|COLUMN|CONSTRAINT|ATTRIBUTE|VALUE)\b|\bRENAME\s+\w+\s+TO\b/i,
+  /(^|;)\s*TRUNCATE\b/i,
+  /\bDISABLE\s+(TRIGGER|ROW\s+LEVEL\s+SECURITY)\b|\bNO\s+FORCE\s+ROW\s+LEVEL\s+SECURITY\b/i,
+];
+
 export function migrationsGate(ctx: Ctx): Gate {
   const base = baseRef(ctx.root);
-  const sql = changedFiles(ctx.root, base).filter((f) => f.endsWith('.sql') && !IGNORED(f));
+  const sql = changedFiles(ctx.root, base).filter((f) => f.endsWith('.sql') && /(^|\/)migrations\//.test(f) && !IGNORED(f));
   const lines: string[] = [];
   for (const f of sql) {
     let text = '';
     try { text = readFileSync(join(ctx.root, f), 'utf8'); } catch { continue; }
     text.split('\n').forEach((t, i) => {
-      const code = t.replace(/--.*$/, '');
-      if (/\b(DROP|RENAME|TRUNCATE)\b|\bDISABLE\s+TRIGGER\b/i.test(code)) lines.push(`${f}:${i + 1}: ${t.trim()}`);
+      // statements only: comments and string literals are ignored, so protective triggers
+      // (BEFORE TRUNCATE …) and RAISE messages do not count
+      const code = t.replace(/'(?:[^']|'')*'/g, "''").replace(/--.*$/, '');
+      if (NON_ADDITIVE.some((re) => re.test(code))) lines.push(`${f}:${i + 1}: ${t.trim()}`);
     });
   }
   return lines.length
@@ -105,6 +114,12 @@ export function migrationsGate(ctx: Ctx): Gate {
 
 // ---------------- gate 4: golden file guard ----------------
 
+/** An entry's status field ("- **Status: Approved (JP, …)**") or an index-table status cell —
+ *  not prose that merely mentions the words (e.g. inside backticks). */
+function isApprovedMarker(line: string): boolean {
+  return /^\s*(?:[-*]\s+)?\**\s*Status:\s*Approved\b/i.test(line) || /^\s*\|.*\|\s*\**Approved\b[^|`]*\|\s*$/i.test(line);
+}
+
 export function goldenGuard(ctx: Ctx): Gate {
   const base = baseRef(ctx.root);
   const changed = changedFiles(ctx.root, base, ['Docs/accounting']);
@@ -112,8 +127,8 @@ export function goldenGuard(ctx: Ctx): Gate {
   const bad: string[] = [];
   for (const f of changed) {
     const before = gitTry(ctx.root, ['show', `${base ?? 'HEAD'}:${f}`]);
-    if (before.code === 0 && /Status:\s*Approved/i.test(before.out)) bad.push(`${f}: changes a file with Approved golden postings (human-owned)`);
-    const added = addedLines(ctx.root, base, (x) => x === f).filter((a) => /Status:\s*Approved/i.test(a.text));
+    if (before.code === 0 && before.out.split('\n').some(isApprovedMarker)) bad.push(`${f}: changes a file with Approved golden postings (human-owned)`);
+    const added = addedLines(ctx.root, base, (x) => x === f).filter((a) => isApprovedMarker(a.text));
     for (const a of added) if (!(before.code === 0 && before.out.includes(a.text))) bad.push(`${f}:${a.line}: adds an Approved status — only the product owner approves golden postings`);
   }
   return bad.length

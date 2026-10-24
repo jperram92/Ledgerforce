@@ -231,3 +231,32 @@ test('verify.sh --quick: lowered numRuns and unlogged suppressions in the diff f
   assert.match(r2.stdout, /b\.ts:1/);
   assert.doesNotMatch(r2.stdout, /b\.ts:3/);
 });
+
+test('verify.sh (full): no false positives — protective TRUNCATE triggers, string literals, non-migration .sql, instructional golden text', () => {
+  const root = makeRepo();
+  mkdirSync(join(root, 'Docs/accounting'), { recursive: true });
+  writeFileSync(join(root, 'Docs/accounting/postings.md'), '# Golden\n- **Status: Draft** GP-01\n');
+  git(root, 'add', '-A');
+  git(root, 'commit', '-q', '-m', 'golden draft');
+  git(root, 'checkout', '-q', '-b', 'feat/T-0002-ledger-tables');
+  writeFileSync(join(root, 'Docs/accounting/postings.md'),
+    '# Golden\n> Approval: _pending_ — the product owner changes `Status: Draft` to `Status: Approved (initials, date)`.\n- **Status: Draft** GP-01 amended\n');
+  mkdirSync(join(root, 'packages/db/migrations'), { recursive: true });
+  writeFileSync(join(root, 'packages/db/migrations/0003_audit.sql'), [
+    "CREATE FUNCTION no_trunc() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'TRUNCATE on % is forbidden', TG_TABLE_NAME; END $$;",
+    'CREATE TRIGGER audit_no_truncate BEFORE TRUNCATE ON audit.audit_log FOR EACH STATEMENT EXECUTE FUNCTION no_trunc();',
+    '',
+  ].join('\n'));
+  mkdirSync(join(root, 'Docs/research/assets'), { recursive: true });
+  writeFileSync(join(root, 'Docs/research/assets/probe.sql'), 'TRUNCATE ledger.journal_line;\n');
+  const r = runBash(root, 'verify.sh');
+  assert.match(r.stdout, /GATE 4 golden-postings: (PASS|NOT YET AVAILABLE)/, r.stdout);
+  assert.match(r.stdout, /Draft-only changes/);
+  assert.doesNotMatch(r.stdout, /GATE 6 migrations-forward: FAIL/, r.stdout);
+  // but a real TRUNCATE / DROP statement in a migration still fails
+  writeFileSync(join(root, 'packages/db/migrations/0004_bad.sql'), 'TRUNCATE ledger.journal_line;\nALTER TABLE x DROP COLUMN y;\n');
+  const r2 = runBash(root, 'verify.sh');
+  assert.match(r2.stdout, /GATE 6 migrations-forward: FAIL/);
+  assert.match(r2.stdout, /0004_bad\.sql:1/);
+  assert.match(r2.stdout, /0004_bad\.sql:2/);
+});

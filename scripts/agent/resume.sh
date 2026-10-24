@@ -59,6 +59,7 @@ if [ -d Docs/research ]; then
   found=0
   for f in Docs/research/*.md; do
     [ -f "$f" ] || continue
+    case "$f" in *template*|*/README.md) continue ;; esac
     if grep -qiE '^(status:[[:space:]]*open|-?[[:space:]]*\**status\**:?\**[[:space:]]*open)' "$f"; then
       echo "$f  $(sed -n 's/^title:[[:space:]]*//p' "$f" | head -1)"
       found=1
