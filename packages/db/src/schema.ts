@@ -1,5 +1,5 @@
 /**
- * Kysely table types for the platform schema (migrations 0001–0005). Keep in step with
+ * Kysely table types for the platform schema (migrations 0001–0006). Keep in step with
  * packages/db/migrations; the db tests exercise every table through these types.
  */
 import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
@@ -85,6 +85,46 @@ export interface AccountSystemRoleTable {
   bound_at: Timestamp;
 }
 
+/** Analysis dimension (migration 0006). code, company and primary_slot are immutable. */
+export interface DimensionTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  code: string;
+  name: string;
+  primary_slot: 1 | 2 | null;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
+export interface DimensionValueTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  dimension_id: string;
+  code: string;
+  name: string;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
+/**
+ * Deduplicated dimension combination (migration 0006). INSERT/SELECT only for lf_app; the trigger
+ * overwrites dimension_ids, hash and the primary columns, so callers supply company_id and value_ids.
+ */
+export interface DimensionSetTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  value_ids: Generated<string[]>;
+  dimension_ids: Generated<string[]>;
+  /** Computed by trigger; any supplied value is replaced. */
+  hash: ColumnType<string, string | undefined, never>;
+  primary1_value_id: string | null;
+  primary2_value_id: string | null;
+  created_at: Timestamp;
+}
+
 export interface AuditLogTable {
   id: ColumnType<string, never, never>;
   tenant_id: TenantId;
@@ -108,6 +148,9 @@ export interface Database {
   'app.session': SessionTable;
   'app.account': AccountTable;
   'app.account_system_role': AccountSystemRoleTable;
+  'app.dimension': DimensionTable;
+  'app.dimension_value': DimensionValueTable;
+  'app.dimension_set': DimensionSetTable;
   /** INSERT only for lf_app — do not use RETURNING (needs SELECT). */
   'audit.audit_log': AuditLogTable;
 }

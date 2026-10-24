@@ -153,6 +153,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-30 | Every successful API mutation leaves one audit row | — | MVP | db-integration | no | apps/api/src/audit/audit.db.test.ts | T-0014 | evidenced | [.agent/evidence/T-0014/manifest.json](../../.agent/evidence/T-0014/manifest.json) | 93e3e18 |
 | SS-PLAT-31 | System-role accounts are protected by the database | — | MVP | db-integration | no | packages/modules/gl/src/chart.db.test.ts | T-0018 | evidenced | [.agent/evidence/T-0018/manifest.json](../../.agent/evidence/T-0018/manifest.json) | 42fc3ba |
 | SS-PLAT-32 | AU services SMB chart template is valid | — | MVP | unit | no | packages/modules/gl/src/templates.test.ts | T-0018 | evidenced | [.agent/evidence/T-0018/manifest.json](../../.agent/evidence/T-0018/manifest.json) | 42fc3ba |
+| SS-PLAT-33 | Dimension sets are deduplicated by a hash of their sorted pairs | — | MVP | db-integration + property | no | packages/ledger/src/dimension-set.db.test.ts | T-0019 | tested | — | — |
+| SS-PLAT-34 | Required dimensions per account are enforced; dimension identity is stable | — | MVP | db-integration | no | packages/ledger/src/dimension-set.db.test.ts | T-0019 | tested | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | evidenced | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -288,4 +290,12 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-32 — AU services SMB chart template is valid
 - Phase: MVP · Layer: **unit** · Screenshot evidence: no · Task(s): T-0018
 - **Given** the shipped `au-services-smb` template · **When** it is validated · **Then** it has no errors, binds every one of the 17 system roles exactly once to an account of an allowed type; and the validator reports duplicated, missing or mistyped roles, duplicate or malformed codes, a control flag off the control roles, and a postable CURRENT_YEAR_EARNINGS
+
+### SS-PLAT-33 — Dimension sets are deduplicated by a hash of their sorted pairs
+- Phase: MVP · Layer: **db-integration + property** · Screenshot evidence: no · Task(s): T-0019
+- **Given** a company with four dimensions (two primary) · **When** dimension sets are requested for any combination of values in any order (fast-check, genuine permutations) · **Then** the same pairs always give the same set id and different pairs different ids; the empty combination is one real set; the two primary values are copied into indexed columns; two values of one dimension, a value of another tenant, an unknown value or an archived value are refused; a caller cannot store a forged hash; lf_app cannot UPDATE or DELETE sets
+
+### SS-PLAT-34 — Required dimensions per account are enforced; dimension identity is stable
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0019
+- **Given** an account requiring `department` and `project` · **When** the posting engine asks which required dimensions a set lacks · **Then** it gets the missing codes in the account's order (none for a complete set or an account with no requirements); an account cannot require a dimension the company lacks; a dimension's code and primary slot never change; a primary slot is held by at most one dimension and only slots 1–2 exist; a dimension required by an active account cannot be archived
 

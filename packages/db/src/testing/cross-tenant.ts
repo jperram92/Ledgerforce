@@ -50,6 +50,10 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   },
   // Its generated parent account is an active, postable, non-control asset (overrides above).
   'app.account_system_role': { role: () => 'UNDEPOSITED_FUNDS' },
+  'app.dimension': { code: () => `dim_${randomBytes(4).toString('hex')}` },
+  'app.dimension_value': { code: () => `v${randomBytes(4).toString('hex')}` },
+  // Trigger-computed; the generator only needs to satisfy NOT NULL (the value is replaced).
+  'app.dimension_set': { hash: () => '0'.repeat(64) },
 };
 
 export async function discoverTenantTables(db: Queryable): Promise<TableRef[]> {
