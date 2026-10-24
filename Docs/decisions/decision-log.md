@@ -649,6 +649,49 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0019; DL-0082; AGENTS.md §0.5.
 - Alternatives: an XML/OFX npm package (runtime dependency + ADR; uneven OFX 1.x support); normalising fixture line endings (would no longer test what banks send).
 
+### DL-0086 — OIDC libraries pinned: openid-client 6.8.8 (runtime), oidc-provider 9.12.2 (dev), jose overridden to 6.2.12
+- Date: 2026-10-24 · By: claude · Task: T-0011 · Category: tooling
+- Decision: `apps/api` depends on `openid-client` 6.8.8 (relying party, runtime) and `oidc-provider` 9.12.2 (in-process test IdP, dev only), both exact. The root `pnpm.overrides` pins `jose` to 6.2.12, because pnpm resolved 6.2.13, published 4 days ago. 6.2.12 satisfies both libraries' ranges. Every package these two add to the lockfile is now at least 14 days old. `pnpm audit --prod`: no known vulnerabilities.
+- Why: ADR-0016 and RQ-0015 name both libraries (DL-0062 covers the dependency). RQ-0020 records the release dates and API details. Found while doing this: the existing lockfile has `nan` 2.30.0 (6 days old, a `testcontainers` dev transitive), so `--config.minimum-release-age` cannot be used as a one-off flag. That is not changed here and is listed for the human.
+- Alternatives: accept jose 6.2.13 (breaks the 14-day rule); set `minimumReleaseAge` repo-wide (a config change outside this task, and it fails on `nan` today).
+- ADR: ADR-0016 (Proposed, security) · Status: accepted for the build; awaiting the human with ADR-0016
+
+### DL-0087 — Tenant slug lookup: SECURITY DEFINER function plus an owner-only SELECT policy; app.auth_request (migration 0014)
+- Date: 2026-10-24 · By: claude · Task: T-0011 · Category: security
+- Decision:
+  - `app.tenant.slug` is nullable, lower-case DNS-label shaped and unique. Existing tenants keep NULL, so they have no login URL until a slug is set.
+  - `app.tenant_id_for_slug(text) RETURNS uuid` is SECURITY DEFINER, owned by lf_migrator, with `search_path = pg_catalog, pg_temp`, EXECUTE revoked from PUBLIC and granted to lf_app. It matches case-insensitively and returns the id of an **active** tenant only, so suspended and closed tenants cannot start a login.
+  - FORCE RLS on `app.tenant` filters the owner too, so the function needs a policy: `slug_lookup ... FOR SELECT TO lf_migrator USING (slug IS NOT NULL)`. lf_app's policies are unchanged.
+  - `app.auth_request` is tenant-scoped (RLS ENABLE + FORCE). A CHECK caps the expiry at 10 minutes, and `consumed_at` makes each row single use. lf_app gets SELECT, INSERT and UPDATE(consumed_at) only. The cross-tenant suite covers it through DEFAULT_ROW_OVERRIDES.
+  - Migration number 0014 was pre-assigned (DL-0081). This branch alone has a gap at 0013, which the runner refuses, until the 0013 task is merged.
+- Why: ADR-0016, login option (b). The card's step 4a asks for the FORCE RLS interaction to be designed deliberately. A policy scoped to the owner role is the narrowest way for a definer function to read under FORCE RLS without BYPASSRLS, which the runner and the roles forbid.
+- Alternatives: a global slug → tenant table (a GLOBAL_TABLES security exception, and the human gate); a policy on a session variable (lf_app could set it); NO FORCE on app.tenant (forbidden by the runner).
+- ADR: ADR-0016 (Proposed, security) · Status: accepted for the build; awaiting the human with ADR-0016
+
+### DL-0088 — One fixed redirect URI with an `lf_oidc` browser-binding cookie; login error contract
+- Date: 2026-10-24 · By: claude · Task: T-0011 · Category: security
+- Decision:
+  - Login is `GET /t/:slug/auth/login`. It answers 302 to the IdP and sets the cookie `lf_oidc=<tenant_id>.<state>` (HttpOnly, SameSite=Lax, Path=/auth, Max-Age 600).
+  - Every tenant shares one callback, `GET /auth/callback`. The callback requires the cookie's state to equal the `state` parameter. It then consumes the pre-auth row atomically under the cookie tenant's RLS (`UPDATE … WHERE consumed_at IS NULL AND expires_at > now`) before the code exchange. A forged tenant id finds no row.
+  - The code exchange runs with the stored PKCE verifier, the expected state and the expected nonce (`idTokenExpected`).
+  - On success: 303 to `/` and `lf_session` (HttpOnly, SameSite=Lax, Path=/, Secure when the public URL is https).
+  - Errors: 404 `not_found` (unknown, suspended, slug-less or malformed slug, all identical), 400 `invalid_request` (binding, replay, expiry), 400 `login_failed` (IdP or token validation), 403 `not_invited`.
+  - Discovery runs lazily on the first login and is retried after a failure. The IdP is configured per deployment (`ApiOptions.oidc`). Per-tenant IdPs are part of the hosted-SaaS follow-up.
+- Why: RFC 9700 asks for state/PKCE to be bound to the user agent (login CSRF), RQ-0020. One redirect URI keeps IdP client registration static. The cookie-names-tenant / row-proves-it pattern is ADR-0016's session pattern. This adds to ADR-0016 and contradicts none of it, so no new ADR.
+- Alternatives: a per-slug callback `/t/:slug/auth/callback` (every tenant's URI must be registered at the IdP); a server-side lookup by state alone (no browser binding).
+- ADR: ADR-0016 (Proposed, security) · Status: accepted for the build; awaiting the human with ADR-0016
+
+### DL-0089 — Invited users by (issuer, subject); first login activates; login audited; T-0011 scope as built
+- Date: 2026-10-24 · By: claude · Task: T-0011 · Category: scope
+- Decision:
+  - A login maps to `app.app_user` by `(idp_issuer, idp_subject)` inside the tenant. Unknown, other-issuer or disabled → 403, with no user created. `invited` becomes `active` on the first successful login (design §6.3 joiner).
+  - The user's activation, the session (amr/acr from the ID token) and an audit row (`action = 'login'`, entity `session`) commit in one transaction. SessionService gains `createInTx` for this; `create` is unchanged in behaviour.
+  - Scope: card steps 6 (session store and timeouts), 7 (revoke-all) and 7a (withTenant interceptor) were delivered by T-0105 and T-0104. T-0011 adds login, the callback and the slug lookup. No Keycloak realm JSON was added: tests use the in-process IdP, and the compose realm stays with the self-host install task (T-0094). Follow-ups: rate-limit the login route (design §6.9, ADR-0016 notes it) and IdP logout or back-channel logout (ADR-0016 follow-up).
+  - The dev-only test IdP is typed by a minimal local declaration, `apps/api/src/auth/oidc-provider.d.ts`, instead of adding `@types/oidc-provider`.
+- Why: ADR-0016 (no JIT; amr/acr captured; enforcement in T-0013). Apps/api rule: audit every mutation. A login is not an interceptor-wrapped route, so it writes its own row.
+- Alternatives: match by email (an email change or a reused address at the IdP would hand over the account); activate at invitation time (the invited state would mean nothing); a separate transaction for the audit row (a session could exist with no audit row).
+- ADR: ADR-0016 (Proposed, security) · Status: accepted for the build; awaiting the human with ADR-0016
+
 ### DL-0094 — Salesforce package validated offline by a repo-owned contract test; sf CLI kept out of the repo
 - Date: 2026-10-24 · By: claude · Task: T-0062 · Category: tooling
 - Decision: The package metadata in `salesforce/force-app` is checked offline by Vitest tests in `salesforce/test/` (unit project). They read the XML with a small strict reader in `salesforce/test/xml.ts` (elements, text, the five predefined entities, comments, the root `xmlns`; anything else is refused) and assert the contract later tasks rely on. `@salesforce/cli` 2.155.0 (published 2026-10-08) is used only outside the repo, as a cross-check (`sf project convert source`), with its output recorded as evidence. No dependency is added. Config changes to make the test a first-class citizen: `vitest.config.ts` unit include `salesforce/test/**/*.test.ts`; `eslint.config.js`, `.prettierignore` and the root `tsconfig.json` cover `salesforce/test/` (the rest of `salesforce/` stays ignored).
@@ -688,3 +731,4 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: profile-based FLS only (cannot stop admins); one permission set for both publish and read (wider than needed).
 
 - ADR: none · Status: accepted
+

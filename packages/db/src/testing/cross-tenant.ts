@@ -53,6 +53,14 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     last_seen_at: () => '2026-01-01T00:00:00Z',
     absolute_expires_at: () => '2026-01-01T12:00:00Z',
   },
+  // OIDC pre-auth (migration 0014): base64url tokens; at most 10 minutes between created and expiry.
+  'app.auth_request': {
+    state: () => randomBytes(32).toString('base64url'),
+    nonce: () => randomBytes(32).toString('base64url'),
+    code_verifier: () => randomBytes(32).toString('base64url'),
+    created_at: () => '2026-01-01T00:00:00Z',
+    expires_at: () => '2026-01-01T00:10:00Z',
+  },
   'app.account': {
     code: () => String(100_000 + (randomBytes(3).readUIntBE(0, 3) % 900_000)),
     type: () => 'asset',

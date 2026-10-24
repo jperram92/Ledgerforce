@@ -17,7 +17,7 @@ export function principalOf(req: Request): Principal | undefined {
   return principals.get(req);
 }
 
-function readCookie(req: Request, name: string): string | undefined {
+export function readCookie(req: Request, name: string): string | undefined {
   for (const part of (req.headers.cookie ?? '').split(';')) {
     const [k, ...v] = part.trim().split('=');
     if (k === name) return v.join('=');

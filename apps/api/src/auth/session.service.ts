@@ -60,33 +60,45 @@ export class SessionService {
     tenantId: string,
     opts: { userId: string; amr: string[]; acr: string | null },
   ): Promise<string> {
+    const { cookie } = await withTenant(this.db, tenantId, (trx) =>
+      this.createInTx(trx, tenantId, opts),
+    );
+    return cookie;
+  }
+
+  /**
+   * Same as `create`, inside the caller's tenant transaction (OIDC login: the user's activation,
+   * the session and the audit row commit together). `tenantId` must be the transaction's tenant.
+   */
+  async createInTx(
+    trx: Transaction<Database>,
+    tenantId: string,
+    opts: { userId: string; amr: string[]; acr: string | null },
+  ): Promise<{ cookie: string; sessionId: string }> {
     const secret = randomBytes(32).toString('base64url');
     const now = this.clock.now();
-    const id = await withTenant(this.db, tenantId, async (trx) => {
-      const user = await trx
-        .selectFrom('app.app_user')
-        .select(['session_epoch', 'status'])
-        .where('id', '=', opts.userId)
-        .executeTakeFirst();
-      if (!user || user.status !== 'active') throw new SessionError('unauthenticated');
-      const row = await trx
-        .insertInto('app.session')
-        .values({
-          user_id: opts.userId,
-          secret_sha256: sha256(secret),
-          created_at: now,
-          last_seen_at: now,
-          absolute_expires_at: new Date(now.getTime() + ABSOLUTE_LIFETIME_SECONDS * 1000),
-          idle_timeout_seconds: IDLE_TIMEOUT_SECONDS,
-          user_session_epoch: user.session_epoch,
-          amr: opts.amr,
-          acr: opts.acr,
-        })
-        .returning('id')
-        .executeTakeFirstOrThrow();
-      return row.id;
-    });
-    return `${tenantId}.${id}.${secret}`;
+    const user = await trx
+      .selectFrom('app.app_user')
+      .select(['session_epoch', 'status'])
+      .where('id', '=', opts.userId)
+      .executeTakeFirst();
+    if (!user || user.status !== 'active') throw new SessionError('unauthenticated');
+    const row = await trx
+      .insertInto('app.session')
+      .values({
+        user_id: opts.userId,
+        secret_sha256: sha256(secret),
+        created_at: now,
+        last_seen_at: now,
+        absolute_expires_at: new Date(now.getTime() + ABSOLUTE_LIFETIME_SECONDS * 1000),
+        idle_timeout_seconds: IDLE_TIMEOUT_SECONDS,
+        user_session_epoch: user.session_epoch,
+        amr: opts.amr,
+        acr: opts.acr,
+      })
+      .returning('id')
+      .executeTakeFirstOrThrow();
+    return { cookie: `${tenantId}.${row.id}.${secret}`, sessionId: row.id };
   }
 
   /**

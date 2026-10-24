@@ -1,5 +1,5 @@
 /**
- * Kysely table types for the platform schema (migrations 0001–0013). Keep in step with
+ * Kysely table types for the platform schema (migrations 0001–0014). Keep in step with
  * packages/db/migrations; the db tests exercise every table through these types.
  */
 import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
@@ -12,6 +12,8 @@ export interface TenantTable {
   id: Generated<string>;
   name: string;
   status: Generated<'active' | 'suspended' | 'closed'>;
+  /** Login URL segment /t/<slug>/ (migration 0014, ADR-0016); NULL = no login URL. */
+  slug: string | null;
   created_at: Timestamp;
 }
 
@@ -53,6 +55,18 @@ export interface SessionTable {
   acr: string | null;
   revoked_at: Timestamp | null;
   revoke_reason: string | null;
+}
+
+/** OIDC pre-auth record (migration 0014, ADR-0016): 10 minutes, single use. */
+export interface AuthRequestTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  state: string;
+  nonce: string;
+  code_verifier: string;
+  created_at: Timestamp;
+  expires_at: Timestamp;
+  consumed_at: Timestamp | null;
 }
 
 export type AccountType = 'asset' | 'liability' | 'equity' | 'revenue' | 'expense';
@@ -375,6 +389,7 @@ export interface Database {
   'app.company': CompanyTable;
   'app.app_user': AppUserTable;
   'app.session': SessionTable;
+  'app.auth_request': AuthRequestTable;
   'app.account': AccountTable;
   'app.account_system_role': AccountSystemRoleTable;
   'app.dimension': DimensionTable;
