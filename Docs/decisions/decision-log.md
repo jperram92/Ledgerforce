@@ -601,3 +601,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Product owner asked for parallel sub-agents. The global migration sequence and the shared registers are the only serialisation points, so pre-assignment removes them.
 - Alternatives: sequential build (slower); parallel without pre-assignment (migration number and id collisions).
 - ADR: none · Status: accepted
+
+### DL-0082 — Bank statements: one normalised line for CSV/OFX/CAMT.053, own parsers, two-level duplicate detection
+- Date: 2026-10-24 · By: claude · Task: T-0058 · Category: architecture
+- Decision:
+  - Every statement format normalises to `{ postedOn 'YYYY-MM-DD', amount Money (+ money in, − money out), description, reference | null, bankTxnId | null }` (the SS-UC08-01 contract). Field mapping per format as in RQ-0019 §Conclusion.
+  - OFX posting date = the first 8 digits of `DTPOSTED`, as written in the bank's offset; never converted through UTC (avoids the one-day shift seen in other importers).
+  - CAMT.053: only `BOOK` entries are imported; a batch entry stays one line (its booked amount).
+  - Parsers are written in-house (`@ledgerforce/bank`): one tolerant tag tokenizer for OFX 1.x SGML, OFX 2.x XML and CAMT.053, and an RFC 4180 CSV reader with a column mapping. No runtime dependency, so no ADR.
+  - Duplicates: (1) the file's SHA-256 is unique per bank account — a re-import creates nothing and reports `duplicate_file`; (2) each line has a `dedupe_key` unique per bank account — `id:<bankTxnId>` when given, else `h:` + SHA-256 of date | amount | description | occurrence number in the file — so overlapping statements add only new lines and the result reports how many were skipped.
+- Why: Design §5.7, UC-08 flow 1 and A1; RQ-0019; AGENTS.md §0.5 (build it ourselves) and design §10.6 (runtime dependency needs an ADR).
+- Alternatives: a third-party OFX/XML parser (runtime dependency + ADR, and OFX 1.x SGML support is uneven); file hash only (misses overlapping statements); line hash without occurrence number (drops a genuine second identical transaction on the same day); FITID-free hashing for all formats (loses the bank's own id where it exists).
+- ADR: none · Status: accepted
