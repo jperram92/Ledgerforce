@@ -15,7 +15,7 @@ import { spawn, spawnSync } from 'node:child_process';
 import { createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import {
-  type Ctx, cards, getCard, state, saveState, claim, release, handover, unlease, flushPendingCheckpoints,
+  type Ctx, cards, getCard, state, saveState, setCard, claim, release, handover, unlease, flushPendingCheckpoints,
 } from './commands.ts';
 import { latestCrossReview } from './review.ts';
 import { nextClaimable, ACTIVE_STATUSES, type Card } from './backlog.ts';
@@ -298,7 +298,21 @@ function launch(ctx: Ctx, argv: string[], logFile: string, env: NodeJS.ProcessEn
     }
     child.stdout!.on('data', keep);
     child.stderr!.on('data', keep);
+    let closed = false;
     const killGroup = (sig: NodeJS.Signals) => {
+      if (closed || !child.pid) return;
+      if (process.platform === 'win32') {
+        // RQ-0014: killing only the provider shell leaves children holding its pipes open.
+        const killed = spawnSync('taskkill.exe', ['/PID', String(child.pid), '/T', '/F'], {
+          windowsHide: true, encoding: 'utf8', timeout: 5000,
+        });
+        if (killed.status !== 0) {
+          const message = `[conductor] process-tree termination failed: ${killed.error?.message ?? killed.stderr.trim()}`;
+          log.write(message + '\n');
+          ctx.err(message);
+        }
+        return;
+      }
       try { process.kill(-child.pid!, sig); } catch { try { child.kill(sig); } catch { /* gone */ } }
     };
     const pollMs = Number(process.env.LF_POLL_MS) || ctx.cfg.poll_seconds * 1000;
@@ -319,6 +333,7 @@ function launch(ctx: Ctx, argv: string[], logFile: string, env: NodeJS.ProcessEn
     }, pollMs);
     child.on('error', (e) => { tail += `\n${e.message}`; });
     child.on('close', (code, signal) => {
+      closed = true;
       clearInterval(timer);
       log.end(() => resolve({ code: code ?? (signal ? 128 : 1), signal, tail, heartbeatLost }));
     });
@@ -408,7 +423,7 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
     const reviewBefore = mode === 'review' ? latestCrossReview(ctx.root, ctx.cfg.paths.evidence, id, builder)?.file ?? null : null;
     const runNo = nextRunNumber(ctx);
     const runId = `r${String(runNo).padStart(2, '0')}`;
-    const logRel = join(ctx.cfg.paths.runs, `${today(now())}-${provider}-${runId}.log`);
+    const logRel = join(ctx.cfg.paths.runs, `${today(now())}-${provider}-${runId}.log`).replaceAll('\\', '/');
     mkdirSync(join(ctx.root, ctx.cfg.paths.runs), { recursive: true });
     {
       const s = state(ctx);
@@ -429,6 +444,19 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
       '',
     ].join('\n'));
     logs.push(logRel);
+    // Prompt generation runs subprocesses; give the provider its full configured lease
+    // from launch, rather than spending its heartbeat budget before it can execute.
+    const launchState = state(ctx);
+    const launchCard = getCard(ctx, id);
+    if (launchState.current_task !== id || launchState.claimed_by !== provider
+      || launchState.lease_expires_at !== launchCard.data.lease_expires_at) {
+      ctx.err(`lease changed while preparing ${id}; refusing to launch ${provider}`);
+      return EXIT.REFUSED;
+    }
+    const launchLease = iso(now() + ctx.cfg.lease_minutes * 60_000);
+    setCard(launchCard, { lease_expires_at: launchLease });
+    launchState.lease_expires_at = launchLease;
+    saveState(ctx, launchState);
     ctx.out(`[${runId}] launching ${provider}: ${display}  (log: ${logRel})`);
     const r = await launch(ctx, argv, join(ctx.root, logRel), {
       ...process.env,

@@ -13,10 +13,10 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 
 | Status | Cards |
 |---|---:|
-| todo | 93 |
-| in_progress | 1 |
+| todo | 92 |
+| in_progress | 0 |
 | review | 7 |
-| blocked | 1 |
+| blocked | 3 |
 | **total** | **102** |
 
 | Phase | Cards |
@@ -97,8 +97,8 @@ graph LR
 | [T-0006](T-0006.md) | Backlog, use-case specs and success-scenario register | Sprint 0 | review | — | — | 0 |
 | [T-0007](T-0007.md) | Golden postings DRAFT (human gate: golden_postings) | Sprint 0 | blocked | — | — | 0 |
 | [T-0008](T-0008.md) | DB test harness, platform baseline migration and RLS suite skeleton | Sprint 0 | review | T-0001 | — | 2 |
-| [T-0009](T-0009.md) | Playwright evidence harness and UI principles | Sprint 0 | in_progress | T-0001 | — | 1 |
-| [T-0010](T-0010.md) | Tenancy: tenant and company tables, RLS context middleware | MVP | todo | T-0008 | — | 1 |
+| [T-0009](T-0009.md) | Playwright evidence harness and UI principles | Sprint 0 | blocked | T-0001 | — | 1 |
+| [T-0010](T-0010.md) | Tenancy: tenant and company tables, RLS context middleware | MVP | blocked | T-0008 | — | 1 |
 | [T-0011](T-0011.md) | OIDC authentication (Keycloak dev realm) and session policy | MVP | todo | T-0010 | — | 1 |
 | [T-0012](T-0012.md) | Roles and permissions (role templates, permission checks) | MVP | todo | T-0011 | UC-02 | 1 |
 | [T-0013](T-0013.md) | MFA enforcement for finance roles and step-up re-authentication | MVP | todo | T-0011, T-0012 | UC-06 | 2 |

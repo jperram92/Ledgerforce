@@ -424,3 +424,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: CRLF checkout broke Bash and format checks; two unmodified evidence assertions failed on backslashes. Windows Docker pipe access requires escalation and the harness auto-probe assumes a Unix socket.
 - Alternatives: weaken assertions, skip DB tests or change dependency versions (rejected). No runtime dependency added.
 - ADR: none · Status: accepted
+
+### DL-0059 — Windows provider tree cleanup and portable run-log links
+- Date: 2026-10-24 · By: codex · Task: T-0010, T-0003 · Category: tooling
+- Decision: Use taskkill.exe with the exact spawned provider PID, /T and /F on Windows when a heartbeat expires; retain POSIX group signalling elsewhere. Suppress late termination after close. Normalize run-log reference paths to forward slashes.
+- Why: The unchanged failover suite passed 78/80 tests; missed-heartbeat timed out because shell children held pipes, and notification link matching failed on backslashes. RQ-0014 documents Microsoft's process-tree termination semantics.
+- Alternatives: increase timeout or weaken link assertions (rejected); kill by image name (rejected: unrelated processes).
+- ADR: none · Status: accepted
+
+### DL-0060 — Start provider heartbeat allowance at launch
+- Date: 2026-10-24 · By: codex · Task: T-0010, T-0003 · Category: process
+- Decision: Refresh the same owner's lease immediately before provider launch, after resume-prompt construction; refuse launch if task/provider/lease ownership changed. Keep the configured duration and heartbeat test deadline unchanged. Use Git's usr/bin/bash.exe directly on Windows, avoiding its bin launcher.
+- Why: The 3-second heartbeat fixture showed the next provider losing its lease during prompt construction, before it could checkpoint. Windows launcher process IDs can disappear while descendant pipes remain open.
+- Alternatives: lengthen test timeout or heartbeat fixture lease (rejected: conceals behavior); self-approve verification (rejected).
+- ADR: none · Status: accepted

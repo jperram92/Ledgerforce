@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0010",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-04",
+      "file": ".agent/evidence/T-0010/20261024-103900-db-tests.json",
+      "test": "34 SS-PLAT-04 assertions; full DB suite 61 passed",
+      "commit": "936b5ae",
+      "provider": "codex",
+      "timestamp": "2026-10-24T10:37:22.310Z",
+      "result": "passed"
+    }
+  ]
+}

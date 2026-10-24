@@ -124,7 +124,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-01 | Balance trigger rejects unbalanced entries | — | MVP | db-integration | no | — | T-0020 | not-started | — | — |
 | SS-PLAT-02 | Posted journal rows are immutable | — | MVP | db-integration | no | — | T-0021 | not-started | — | — |
 | SS-PLAT-03 | Hash chain detects tampering | — | MVP | db-integration | no | — | T-0022 | not-started | — | — |
-| SS-PLAT-04 | RLS isolates tenants on every tenant table | — | MVP | db-integration | no | — | T-0008, T-0010 | not-started | — | — |
+| SS-PLAT-04 | RLS isolates tenants on every tenant table | — | MVP | db-integration | no | packages/db/src/rls.db.test.ts; packages/db/src/tenant-context.db.test.ts | T-0008, T-0010 | green (local; CI pending) | [DB report](../../.agent/evidence/T-0010/20261024-103900-db-tests.json) | 936b5ae |
 | SS-PLAT-05 | Gapless numbering under concurrency and rollback | — | MVP | db-integration | no | — | T-0024 | not-started | — | — |
 | SS-PLAT-06 | Period status matrix is enforced as data | — | MVP | unit | no | — | T-0023 | not-started | — | — |
 | SS-PLAT-07 | Control accounts reject manual journals, imports and rule lines | — | MVP | db-integration | no | — | T-0029 | not-started | — | — |
