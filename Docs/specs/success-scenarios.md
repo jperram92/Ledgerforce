@@ -140,7 +140,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-17 | Migrations are forward-only on the previous schema | — | MVP | db-integration | no | — | T-0008 | not-started | — | — |
 | SS-PLAT-18 | Security gates fail on seeded issues | — | MVP | contract | no | — | T-0095 | not-started | — | — |
 | SS-PLAT-19 | Evidence harness captures screenshots | — | Sprint 0 | e2e-playwright | yes | — | T-0009 | not-started | — | — |
-| SS-PLAT-20 | MFA and session policy for finance roles | — | MVP | db-integration | no | — | T-0013, T-0011 | not-started | — | — |
+| SS-PLAT-20 | MFA and session policy for finance roles | — | MVP | db-integration | no | — | T-0105, T-0013, T-0011 | not-started | — | — |
 | SS-PLAT-21 | Leaver is disabled, never deleted | — | MVP | db-integration | no | — | T-0016 | not-started | — | — |
 | SS-PLAT-22 | Bank details encrypted and masked | — | MVP | db-integration | no | — | T-0037 | not-started | — | — |
 | SS-PLAT-23 | Self-hosted compose install works | — | MVP | e2e-playwright | yes | — | T-0094 | not-started | — | — |
@@ -229,7 +229,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 - **Given** a sample page · **When** the evidence harness runs · **Then** PNG + manifest.json land in .agent/evidence/<task>/
 
 ### SS-PLAT-20 — MFA and session policy for finance roles
-- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0013, T-0011
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0105 (session expiry/revocation), T-0013 (MFA), T-0011 (login)
 - **Given** an Accountant without MFA, and an idle session of 31 minutes · **When** they call a finance endpoint · **Then** both are refused (mfa_required / session_expired)
 
 ### SS-PLAT-21 — Leaver is disabled, never deleted

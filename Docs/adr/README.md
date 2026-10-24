@@ -70,5 +70,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0013](0013-db-test-harness-testcontainers-local-pg.md) | Database test harness: Testcontainers with local PostgreSQL fallback | tooling | no | Accepted |
 | [0014](0014-no-delete-superseding-forward-only-migrations.md) | No-delete policy; superseding; forward-only additive migrations | process | no | Accepted |
 | [0015](0015-playwright-screenshot-evidence.md) | Playwright screenshot evidence for every UI/report success scenario | process | no | Accepted |
+| [0016](0016-oidc-login-and-server-side-sessions.md) | OIDC login with tenant-scoped server-side sessions, idle/absolute timeouts and revoke-all | security | yes | Proposed |
 
 Next free number: **0016**.

@@ -487,3 +487,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0085, experiment E1 (19 faces measured).
 - Alternatives: choose by appearance.
 - ADR: none · Status: proposed (awaiting human)
+
+### DL-0068 — Sessions designed per ADR-0016; T-0105 split from T-0011
+- Date: 2026-10-24 · By: claude · Task: T-0105 · Category: security
+- Decision: Server-side, tenant-scoped sessions (`app.session`, RLS) with cookie `<tenant_id>.<session_id>.<secret>` verified under that tenant's RLS; 30-min idle and 12-h absolute for every session until roles exist; revoke-all via `app_user.session_epoch`; tenant-specific login URL resolved by a SECURITY DEFINER slug function. New card T-0105 (sessions) sits before T-0011 (OIDC login).
+- Why: Design §6.2/§6.7. Avoids any cross-tenant table on the request path, and revocation is immediate. Card-size rule.
+- Alternatives: stateless JWT cookie; global session table; hostname tenancy (all in ADR-0016).
+- ADR: ADR-0016 · Status: proposed (awaiting human — security)
