@@ -13,7 +13,8 @@ In progress: parallel worktrees. Pre-assigned to avoid collisions (DL-0081):
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
 Decisions taken: DL-0061..DL-0080; RQ-0017, RQ-0018; ADR-0018 (Proposed, security); RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
-  2. Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1), ADR-0018 (envelope encryption, local keyring KMS) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
+  2. (incl. T-0011's additions to ADR-0016: owner-only slug_lookup policy on app.tenant, the lf_oidc login-binding
+     cookie, one fixed redirect URI — DL-0087/0088) Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1), ADR-0018 (envelope encryption, local keyring KMS) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
   4. Design contradictions in RQ-0012 (CDC 5-object cap, ATO GST rounding, prepayment GST, SoD gaps)
   7. Salesforce: provide a Dev Hub (authenticated outside the repo) so T-0062's package can be deployed to a
@@ -66,6 +67,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0062 — salesforce/** (SFDX metadata), salesforce/test/** (offline contract), RQ-0022, DL-0094..0097
 >   • T-0058 — migration 0013; packages/modules/bank/** (OFX/CAMT/CSV readers, importStatement dedupe); RQ-0019;
 >     DL-0082..0085. Note the overlap with T-0059 (CAMT.053 already built here)
+>   • T-0011 — migration 0014 (tenant slug, tenant_id_for_slug SECURITY DEFINER, owner-only slug_lookup policy,
+>     auth_request); apps/api/src/auth/{oidc.service,login.controller}.ts; RQ-0020; DL-0086..0089 (security review)
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -142,3 +145,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T22:55:05.585Z claude: T-0058 → verifying
 - 2026-10-24T22:56:30.398Z claude: release T-0058 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; awaiting codex cross-review)
 - 2026-10-24 23:0x claude (lead): merged T-0058 (conflicts in decision log + register, append-only, both kept in order); gates on merged tree green (304 unit / 337 db); verify 12 PASS/0 FAIL → review.
+- 2026-10-24T22:58:12.013Z claude: T-0011 → verifying
+- 2026-10-24T22:59:40.245Z claude: release T-0011 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0016 still Proposed; awaiting codex cross-review)
+- 2026-10-24 23:1x claude (lead): merged T-0011 (conflicts in decision log, register, schema header resolved; migrations 0013+0014 together); gates green (304 unit / 358 db, audit clean); verify 12 PASS/0 FAIL → review.

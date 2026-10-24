@@ -7030,6 +7030,285 @@
       "provider": "unknown",
       "timestamp": "2026-10-24T22:56:28.203Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-19",
+      "file": ".agent/evidence/T-0009/20261024-225921-SS-PLAT-19-harness-fixture.png",
+      "test": "evidence-harness.spec.ts › SS-PLAT-19: Evidence harness captures screenshots",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:21.579Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225921-SS-PLAT-UI-01-01-home-dashboard-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:21.729Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225922-SS-PLAT-UI-01-01-home-dashboard-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 01-home-dashboard @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:22.012Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225922-SS-PLAT-UI-01-02-invoice-list-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:22.122Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225922-SS-PLAT-UI-01-02-invoice-list-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 02-invoice-list @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:22.383Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225922-SS-PLAT-UI-01-03-invoice-detail-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:22.604Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225922-SS-PLAT-UI-01-03-invoice-detail-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 03-invoice-detail @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:22.777Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225923-SS-PLAT-UI-01-04-batch-billing-run-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:23.075Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225923-SS-PLAT-UI-01-04-batch-billing-run-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 04-batch-billing-run @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:23.152Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225923-SS-PLAT-UI-01-05-payment-batch-release-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:23.529Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225923-SS-PLAT-UI-01-05-payment-batch-release-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 05-payment-batch-release @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:23.526Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225923-SS-PLAT-UI-01-06-bank-reconciliation-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:23.886Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225923-SS-PLAT-UI-01-06-bank-reconciliation-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 06-bank-reconciliation @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:23.902Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225924-SS-PLAT-UI-01-07-period-close-checklist-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:24.201Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225924-SS-PLAT-UI-01-07-period-close-checklist-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 07-period-close-checklist @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:24.240Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225924-SS-PLAT-UI-01-08-setup-wizard-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:24.643Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225924-SS-PLAT-UI-01-08-setup-wizard-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:24.646Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225924-SS-PLAT-UI-01-09-sync-issues-inbox-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:24.981Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225925-SS-PLAT-UI-01-09-sync-issues-inbox-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 09-sync-issues-inbox @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:25.018Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225925-SS-PLAT-UI-01-10-salesforce-account-lwc-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:25.334Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225925-SS-PLAT-UI-01-10-salesforce-account-lwc-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 10-salesforce-account-lwc @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:25.413Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225925-SS-PLAT-UI-01-11-journal-rule-studio-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:25.643Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225925-SS-PLAT-UI-01-11-journal-rule-studio-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 11-journal-rule-studio @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:25.778Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225926-SS-PLAT-UI-01-12-mobile-approvals-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:26.039Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225926-SS-PLAT-UI-01-12-mobile-approvals-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › 12-mobile-approvals @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:26.127Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225926-SS-PLAT-UI-01-index-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:26.593Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225926-SS-PLAT-UI-01-index-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › index @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:26.536Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225927-SS-PLAT-UI-01-timeline-home-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › timeline-home @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:27.136Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225927-SS-PLAT-UI-01-timeline-home-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › timeline-home @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:27.091Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225927-SS-PLAT-UI-01-timeline-invoice-desktop-1440.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › timeline-invoice @ 1440px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:27.476Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-UI-01",
+      "file": ".agent/evidence/T-0009/20261024-225927-SS-PLAT-UI-01-timeline-invoice-mobile-390.png",
+      "test": "ui-mockups.spec.ts › SS-PLAT-UI-01 static UI mockups › timeline-invoice @ 390px",
+      "commit": "460e36ee877e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-24T22:59:27.535Z",
+      "result": "passed"
     }
   ]
 }
