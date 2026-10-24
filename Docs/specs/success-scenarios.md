@@ -139,7 +139,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-16 | SoD rules 1–6 evaluated as configured | — | MVP | unit | no | — | T-0015 | not-started | — | — |
 | SS-PLAT-17 | Migrations are forward-only on the previous schema | — | MVP | db-integration | no | — | T-0008 | not-started | — | — |
 | SS-PLAT-18 | Security gates fail on seeded issues | — | MVP | contract | no | — | T-0095 | not-started | — | — |
-| SS-PLAT-19 | Evidence harness captures screenshots | — | Sprint 0 | e2e-playwright | yes | tests/e2e/evidence-harness.spec.ts | T-0009 | evidenced | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | this commit |
+| SS-PLAT-19 | Evidence harness captures screenshots | — | Sprint 0 | e2e-playwright | yes | tests/e2e/evidence-harness.spec.ts | T-0009 | evidenced | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 | SS-PLAT-20 | MFA and session policy for finance roles | — | MVP | db-integration | no | apps/api/src/auth/session.db.test.ts (session part) | T-0105, T-0013, T-0011 | green (session part, T-0105; MFA part pending T-0013) | [.agent/evidence/T-0105/manifest.json](../../.agent/evidence/T-0105/manifest.json) | bc07686 |
 | SS-PLAT-21 | Leaver is disabled, never deleted | — | MVP | db-integration | no | — | T-0016 | not-started | — | — |
 | SS-PLAT-22 | Bank details encrypted and masked | — | MVP | db-integration | no | — | T-0037 | not-started | — | — |
@@ -150,7 +150,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-27 | Replay id resume after restart | — | MVP | db-integration | no | — | T-0064 | not-started | — | — |
 | SS-PLAT-28 | Every API request runs in its own tenant transaction | — | MVP | db-integration | no | apps/api/src/tenancy/tenant-transaction.db.test.ts | T-0104 | evidenced | [.agent/evidence/T-0104/manifest.json](../../.agent/evidence/T-0104/manifest.json) | 3ca2bd9 |
 | SS-PLAT-29 | Timeline components honour P3, P13, P15 and the genericness probes | — | MVP | e2e-playwright | yes | — | T-0106 | not-started | — | — |
-| SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | evidenced | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | this commit |
+| SS-PLAT-30 | Every successful API mutation leaves one audit row | — | MVP | db-integration | no | — | T-0014 | not-started | — | — |
+| SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | evidenced | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
 
@@ -273,3 +274,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-UI-01 — Static UI pages load cleanly at 1440 and 390 with evidence
 - Phase: Sprint 0 · Layer: **e2e-playwright** · Screenshot evidence: yes · Task(s): T-0009
 - **Given** the v0.1 mockups and the chosen Timeline reference screens · **When** each loads at 1440 and 390 · **Then** each has a title and an h1, logs no console errors, and leaves a full-page screenshot in .agent/evidence/T-0009/ (registered 2026-10-24: the id was already used by the spec)
+
+### SS-PLAT-30 — Every successful API mutation leaves one audit row
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0014
+- **Given** an authenticated user · **When** they make a successful mutating request (e.g. logout), a read, and a refused request · **Then** the mutation leaves exactly one audit.audit_log row in the same tenant transaction with actor_type user, actor_user_id, action (method + route), ip, user agent and the request id (echoed in `x-request-id`); reads and refused requests write none; handler-supplied entity before/after are recorded

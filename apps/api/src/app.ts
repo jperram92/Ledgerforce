@@ -16,7 +16,8 @@ import {
   TENANT_RESOLVER,
   type TenantResolver,
 } from './tenancy/tenant-resolver.ts';
-import { TenantTx } from './tenancy/tenant-tx.ts';
+import { AuditTrail, TenantTx } from './tenancy/tenant-tx.ts';
+import { requestIdMiddleware } from './audit/request-id.ts';
 import { DB } from './tokens.ts';
 
 export interface ApiOptions {
@@ -57,6 +58,7 @@ class AppModule {
         { provide: TENANT_RESOLVER, useValue: resolver },
         { provide: SESSION_SERVICE, useValue: sessions ?? null },
         TenantTx,
+        AuditTrail,
         { provide: APP_INTERCEPTOR, useClass: TenantInterceptor },
       ],
     };
@@ -83,6 +85,7 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
   const app = await NestFactory.create(AppModule.forRoot(db, resolver, sessions), {
     logger: ['error', 'warn'],
   });
+  app.use(requestIdMiddleware);
   await app.listen(opts.port ?? 0, opts.host ?? '127.0.0.1');
   const addr = app.getHttpServer().address() as AddressInfo;
   return {

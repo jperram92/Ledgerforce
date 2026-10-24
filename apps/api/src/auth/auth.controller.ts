@@ -8,7 +8,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { TenantTx } from '../tenancy/tenant-tx.ts';
+import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
 import { principalOf } from './session-tenant-resolver.ts';
 import { SessionService } from './session.service.ts';
 
@@ -18,6 +18,7 @@ export const SESSION_SERVICE = Symbol('SESSION_SERVICE');
 export class AuthController {
   constructor(
     private readonly tx: TenantTx,
+    private readonly audit: AuditTrail,
     @Inject(SESSION_SERVICE) private readonly sessions: SessionService,
   ) {}
 
@@ -44,5 +45,11 @@ export class AuthController {
     const p = principalOf(req);
     if (!p) throw new UnauthorizedException({ error: 'unauthenticated' });
     await this.sessions.revokeInTx(this.tx.get(), p.sessionId, 'logout');
+    this.audit.describe({
+      entityType: 'session',
+      entityId: p.sessionId,
+      before: { revoked: false },
+      after: { revoked: true, reason: 'logout' },
+    });
   }
 }

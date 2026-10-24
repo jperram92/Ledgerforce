@@ -184,7 +184,7 @@ describe('withTenant()', () => {
   });
 });
 
-describe('audit.audit_log is append-only (design §6.8)', () => {
+describe('SS-PLAT-08: Audit log is append-only (design §6.8)', () => {
   const insertAudit = (c: pg.Client, tenant: string) =>
     c.query(
       `INSERT INTO audit.audit_log (tenant_id, actor_type, action, entity_type, entity_id, after)
