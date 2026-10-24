@@ -27,3 +27,6 @@ salesforce/*
 
 # Markdown is prose owned by many agents/humans (templates, docs, READMEs); not auto-formatted.
 *.md
+
+# Sub-agent git worktrees are separate checkouts on their own branches (DL-0081)
+.claude/worktrees/
