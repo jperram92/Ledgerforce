@@ -33,7 +33,10 @@ export const test = base.extend<EvidenceFixtures>({
   evidenceTaskId: [process.env['LF_TASK_ID'] || 'adhoc', { option: true }],
 
   evidence: async ({ page, evidenceTaskId }, use, testInfo) => {
-    const ctx = resolveEvidenceContext({ ...process.env, LF_TASK_ID: evidenceTaskId }, process.cwd());
+    const ctx = resolveEvidenceContext(
+      { ...process.env, LF_TASK_ID: evidenceTaskId },
+      process.cwd(),
+    );
     const pending: Omit<EvidenceEntry, 'result'>[] = [];
 
     await use(async (scenarioId: string, slug: string) => {

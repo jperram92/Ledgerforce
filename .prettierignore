@@ -22,3 +22,6 @@ salesforce/
 
 # SQL is formatted by hand (migrations are checksummed — reformatting would break them)
 *.sql
+
+# Markdown is prose owned by many agents/humans (templates, docs, READMEs); not auto-formatted.
+*.md

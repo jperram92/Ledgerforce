@@ -136,11 +136,11 @@ describe('arithmetic', () => {
 
 describe('allocate / split', () => {
   it('splits 100.00 three ways without losing a cent (largest remainder, earlier wins ties)', () => {
-    expect(aud('100').split(3).map((m) => m.toNumericString())).toEqual([
-      '33.3400',
-      '33.3300',
-      '33.3300',
-    ]);
+    expect(
+      aud('100')
+        .split(3)
+        .map((m) => m.toNumericString()),
+    ).toEqual(['33.3400', '33.3300', '33.3300']);
   });
 
   it('allocates by ratio', () => {

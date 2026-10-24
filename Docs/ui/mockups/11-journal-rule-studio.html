@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rule studio · deposit-on-closed-won — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  pre.code.lined { counter-reset: ln; padding-left: 0; border: 0; border-radius: 0; background: var(--lf-surface-2); }
+  pre.code.lined .l { display: block; padding-left: 48px; position: relative; }
+  pre.code.lined .l::before { counter-increment: ln; content: counter(ln); position: absolute; left: 0; width: 34px; text-align: right; color: var(--lf-text-subtle); }
+  pre.code.lined .l.hl { background: var(--lf-accent-soft); }
+  .case { border: 1px solid var(--lf-border); border-radius: var(--lf-radius-lg); overflow: hidden; }
+  .case-h { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--lf-surface-2); border-bottom: 1px solid var(--lf-border); }
+  .case-h .t { font-weight: 600; white-space: nowrap; }
+  .case-h .s { white-space: nowrap; }
+  .case-h .s { font-size: 12px; color: var(--lf-text-subtle); }
+  .case table.data td, .case table.data th { padding-top: 6px; padding-bottom: 6px; height: auto; }
+  .case .skip-body { padding: 12px 14px; font-size: 13px; color: var(--lf-text-muted); }
+  .ver { display: flex; gap: 8px; align-items: center; }
+</style>
+</head>
+<body data-active="rules" data-user="Priya Shah" data-initials="PS" data-role="Accountant · Finance Admin" data-period="Oct 2026" data-period-state="Open" data-sync="ok" data-sync-text="Synced 1 min ago">
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <nav class="sidenav" id="lf-nav" aria-label="Primary"></nav>
+  <div class="main-col">
+    <header class="topbar" id="lf-top"></header>
+    <main id="main" class="content">
+      <div class="page-head">
+        <div>
+          <div class="crumbs"><a href="#">Accounting</a><i data-i="chevron-right" class="i-sm"></i><a href="#">Rule studio</a><i data-i="chevron-right" class="i-sm"></i>deposit-on-closed-won</div>
+          <div class="row"><h1>Deposit invoice on Closed Won</h1><span data-chip="draft">Draft v3</span><span class="tag">Phase 1 preview</span></div>
+          <p class="sub">When a won Opportunity has a deposit %, bill the deposit to customer prepayments. v2 is active until v3 is activated (effective 1 Nov 2026).</p>
+        </div>
+        <div class="actions"><button class="btn" type="button">Compare with v2</button><button class="btn primary" type="button"><i data-i="send"></i>Submit for activation</button></div>
+      </div>
+
+      <div class="layout">
+        <section class="card" aria-labelledby="def-h">
+          <div class="card-h"><h2 id="def-h">Rule definition</h2><span class="meta">Stored as YAML · sandboxed, no I/O</span></div>
+          <div class="tabs" role="tablist" aria-label="Editor mode"><a href="#" role="tab" aria-selected="false">Guided form</a><a href="#" role="tab" aria-selected="true">YAML</a></div>
+<pre class="code lined" aria-label="Rule YAML"><span class="l"><span class="k">rule</span>: deposit-on-closed-won</span><span class="l"><span class="k">version</span>: <span class="n">3</span></span><span class="l"><span class="k">effective_from</span>: <span class="n">2026-11-01</span></span><span class="l"><span class="k">trigger</span>:</span><span class="l">  <span class="k">event</span>: salesforce.opportunity.closed_won</span><span class="l hl">  <span class="k">when</span>: opportunity.Deposit_Percent__c &gt; <span class="n">0</span></span><span class="l"><span class="k">let</span>:</span><span class="l">  <span class="k">base</span>: opportunity.Amount * opportunity.Deposit_Percent__c / <span class="n">100</span></span><span class="l"><span class="k">entry</span>:</span><span class="l">  <span class="k">date</span>: event.close_date</span><span class="l">  <span class="k">memo</span>: <span class="s">"Deposit invoice {{opportunity.Name}}"</span></span><span class="l">  <span class="k">lines</span>:</span><span class="l">    - <span class="k">account</span>: system:AR_CONTROL</span><span class="l">      <span class="k">debit</span>: gross(base, tax:GST)</span><span class="l">      <span class="k">party</span>: opportunity.AccountId</span><span class="l">    - <span class="k">account</span>: system:CUSTOMER_PREPAYMENTS</span><span class="l">      <span class="k">credit</span>: base</span><span class="l">    - <span class="k">account</span>: tax:GST.collected</span><span class="l">      <span class="k">credit</span>: tax(base, tax:GST)</span><span class="l"><span class="k">dimensions</span>:</span><span class="l">  <span class="k">sales_team</span>: opportunity.Owner.Team__c</span><span class="l hl"><span class="k">approval</span>: required_above <span class="n">10000</span></span></pre>
+          <div class="card-f"><span><i data-i="check-circle" style="color:var(--lf-success-fg)"></i> Valid · 3 system accounts · lines 6 and 22 changed since v2</span><span class="xs" style="white-space:nowrap">Saved 10:14 am</span></div>
+        </section>
+
+        <div class="stack">
+          <section class="card" aria-labelledby="tc-h">
+            <div class="card-h"><h2 id="tc-h">Test cases</h2><div class="row"><span class="chip st-ok"><i data-i="check"></i>3 of 3 pass</span><button class="btn sm" type="button"><i data-i="play"></i>Run again</button></div></div>
+            <div class="card-b stack" style="gap:12px">
+              <article class="case" aria-label="Test case 1">
+                <div class="case-h"><span class="t">Southern Cross – CPQ phase 2</span><span class="s">$18,000.00 · deposit 20%</span><span style="flex:1"></span><span class="balanced"><i data-i="equal"></i>Balanced</span></div>
+                <table class="data journal"><caption class="sr-only">Preview journal, case 1</caption>
+                  <thead><tr><th scope="col">Account</th><th scope="col" class="num">Debit</th><th scope="col" class="num">Credit</th></tr></thead>
+                  <tbody>
+                    <tr><td class="acct"><span class="code">1200</span>Trade debtors</td><td class="num">3,960.00</td><td></td></tr>
+                    <tr><td class="acct"><span class="code">2400</span>Customer prepayments</td><td></td><td class="num">3,600.00</td></tr>
+                    <tr><td class="acct"><span class="code">2310</span>GST collected</td><td></td><td class="num">360.00</td></tr>
+                  </tbody>
+                </table>
+              </article>
+              <article class="case" aria-label="Test case 2">
+                <div class="case-h"><span class="t">Pinnacle – Patient portal</span><span class="s">$45,500.00 · deposit 30%</span><span style="flex:1"></span><span class="chip st-warn"><i data-i="users"></i>Needs approval</span><span class="balanced"><i data-i="equal"></i>Balanced</span></div>
+                <table class="data journal"><caption class="sr-only">Preview journal, case 2</caption>
+                  <thead><tr><th scope="col">Account</th><th scope="col" class="num">Debit</th><th scope="col" class="num">Credit</th></tr></thead>
+                  <tbody>
+                    <tr><td class="acct"><span class="code">1200</span>Trade debtors</td><td class="num">15,015.00</td><td></td></tr>
+                    <tr><td class="acct"><span class="code">2400</span>Customer prepayments</td><td></td><td class="num">13,650.00</td></tr>
+                    <tr><td class="acct"><span class="code">2310</span>GST collected</td><td></td><td class="num">1,365.00</td></tr>
+                  </tbody>
+                </table>
+              </article>
+              <article class="case" aria-label="Test case 3">
+                <div class="case-h"><span class="t">Coral Bay – booking sync</span><span class="s">$9,200.00 · deposit 0%</span><span style="flex:1"></span><span class="chip st-ok"><i data-i="check"></i>Expected: skipped</span></div>
+                <p class="skip-body">No journal: <span class="mono">when</span> is false (deposit is 0%). Matches the expected result.</p>
+              </article>
+            </div>
+          </section>
+
+          <section class="card" aria-labelledby="act-h">
+            <div class="card-h"><h2 id="act-h">Activation</h2><span class="meta">Author ≠ activator</span></div>
+            <div class="card-b stack" style="gap:12px">
+              <div class="people">
+                <div class="person me"><span class="avatar sm" aria-hidden="true">PS</span><div><div class="role">Author · you</div><div class="name">Priya Shah</div></div></div>
+                <i data-i="arrow" class="muted"></i>
+                <div class="person"><span class="avatar sm b" aria-hidden="true">?</span><div><div class="role">Activator</div><div class="name">Sam Nguyen or Mei Tan</div></div></div>
+              </div>
+              <div class="explain"><i data-i="lock"></i><span><b>You can't activate a rule you wrote.</b> Submitting sends these 3 test results to the activator. Activation is refused if any test doesn't balance. Every journal it posts records “deposit-on-closed-won v3”.</span></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

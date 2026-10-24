@@ -59,8 +59,7 @@ export const noFloatMoney: Rule.RuleModule = {
       parseFloat: 'parseFloat produces a float; parse money with Money.of / Money.fromNumeric.',
       numberCoercion:
         'Number(...) converts to a float; keep money as Money/Decimal (decimal strings at the edges).',
-      toFixed:
-        'toFixed() is float formatting; use Money#toNumericString() or Money#roundTo(...).',
+      toFixed: 'toFixed() is float formatting; use Money#toNumericString() or Money#roundTo(...).',
       moneyArithmetic:
         "Arithmetic operator on money-like value '{{name}}'; use Money methods (add/sub/mul/allocate).",
     },

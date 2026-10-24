@@ -48,8 +48,12 @@ tester.run('no-direct-ledger-write', noDirectLedgerWrite, {
       errors: [{ messageId: 'directWrite' }],
     },
     {
-      code: "db.query(`MERGE INTO account_balance b USING x ON true\n WHEN MATCHED THEN UPDATE SET debit_total = 0`);",
+      code: 'db.query(`MERGE INTO account_balance b USING x ON true\n WHEN MATCHED THEN UPDATE SET debit_total = 0`);',
       errors: [{ messageId: 'directWrite' }],
+    },
+    {
+      code: "db.query('INSERT INTO dimension_set (id, hash) VALUES ($1, $2)');",
+      errors: [{ messageId: 'directWrite', data: { table: 'dimension_set' } }],
     },
     // Kysely query builder
     {
@@ -60,7 +64,10 @@ tester.run('no-direct-ledger-write', noDirectLedgerWrite, {
       code: "db.updateTable('app.account_balance as b').set({ debit_total: x });",
       errors: [{ messageId: 'directWrite' }],
     },
-    { code: "trx.deleteFrom('allocation').where('id', '=', id);", errors: [{ messageId: 'directWrite' }] },
+    {
+      code: "trx.deleteFrom('allocation').where('id', '=', id);",
+      errors: [{ messageId: 'directWrite' }],
+    },
     { code: "trx.mergeInto('subledger_entry');", errors: [{ messageId: 'directWrite' }] },
     // custom table list
     {

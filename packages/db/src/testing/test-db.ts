@@ -31,11 +31,16 @@ function connString(database: string, role: TestRole): string {
   const user = role === 'superuser' ? info.superuser : role;
   const password = role === 'superuser' ? info.superuserPassword : info.rolePassword;
   const auth =
-    password === null ? encodeURIComponent(user) : `${encodeURIComponent(user)}:${encodeURIComponent(password)}`;
+    password === null
+      ? encodeURIComponent(user)
+      : `${encodeURIComponent(user)}:${encodeURIComponent(password)}`;
   return `postgres://${auth}@${info.host}:${String(info.port)}/${database}`;
 }
 
-export async function createTestDatabase(opts: { migrate: boolean; migrationsDir?: string }): Promise<TestDatabase> {
+export async function createTestDatabase(opts: {
+  migrate: boolean;
+  migrationsDir?: string;
+}): Promise<TestDatabase> {
   const name = `lf_test_${randomBytes(6).toString('hex')}`;
   const root = new pg.Client({ connectionString: connString('postgres', 'superuser') });
   await root.connect();

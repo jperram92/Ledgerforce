@@ -13,7 +13,15 @@
  * the process dies first, so no cluster is left running.
  */
 import { execFileSync, spawnSync } from 'node:child_process';
-import { chownSync, existsSync, mkdtempSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import {
+  chownSync,
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
 import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -46,7 +54,8 @@ export function chooseMode(env: Env, dockerAvailable: boolean): TestDbMode {
       }
       return 'external';
     case 'docker':
-      if (!dockerAvailable) throw new Error('LF_TEST_DB_MODE=docker but no Docker daemon is reachable');
+      if (!dockerAvailable)
+        throw new Error('LF_TEST_DB_MODE=docker but no Docker daemon is reachable');
       return 'docker';
     case 'local':
       return 'local';
@@ -129,8 +138,17 @@ function freePort(): Promise<number> {
   });
 }
 
-function url(host: string, port: number, database: string, user: string, password?: string): string {
-  const auth = password === undefined ? encodeURIComponent(user) : `${encodeURIComponent(user)}:${encodeURIComponent(password)}`;
+function url(
+  host: string,
+  port: number,
+  database: string,
+  user: string,
+  password?: string,
+): string {
+  const auth =
+    password === undefined
+      ? encodeURIComponent(user)
+      : `${encodeURIComponent(user)}:${encodeURIComponent(password)}`;
   return `postgres://${auth}@${host}:${String(port)}/${encodeURIComponent(database)}`;
 }
 
@@ -146,7 +164,12 @@ function osUser(env: Env): { uid: number; gid: number } | undefined {
   }
 }
 
-function run(bin: string, args: string[], cwd: string, ids: { uid: number; gid: number } | undefined): void {
+function run(
+  bin: string,
+  args: string[],
+  cwd: string,
+  ids: { uid: number; gid: number } | undefined,
+): void {
   const r = spawnSync(bin, args, {
     cwd,
     encoding: 'utf8',
@@ -154,7 +177,9 @@ function run(bin: string, args: string[], cwd: string, ids: { uid: number; gid: 
     ...(ids ?? {}),
   });
   if (r.status !== 0) {
-    throw new Error(`${bin} ${args.join(' ')} failed (${String(r.status)}):\n${r.stdout}\n${r.stderr}`);
+    throw new Error(
+      `${bin} ${args.join(' ')} failed (${String(r.status)}):\n${r.stdout}\n${r.stderr}`,
+    );
   }
 }
 
@@ -175,7 +200,10 @@ async function startLocal(env: Env): Promise<TestDatabaseServer> {
     if (stopped) return;
     stopped = true;
     if (existsSync(join(dataDir, 'postmaster.pid'))) {
-      spawnSync(pgCtl, ['stop', '-D', dataDir, '-m', 'immediate', '-w'], { cwd: base, ...(ids ?? {}) });
+      spawnSync(pgCtl, ['stop', '-D', dataDir, '-m', 'immediate', '-w'], {
+        cwd: base,
+        ...(ids ?? {}),
+      });
     }
     rmSync(base, { recursive: true, force: true });
   };
@@ -202,7 +230,12 @@ async function startLocal(env: Env): Promise<TestDatabaseServer> {
         '-c max_connections=200',
       ].join(' ');
       try {
-        run(pgCtl, ['start', '-D', dataDir, '-l', logFile, '-w', '-t', '60', '-o', opts], base, ids);
+        run(
+          pgCtl,
+          ['start', '-D', dataDir, '-l', logFile, '-w', '-t', '60', '-o', opts],
+          base,
+          ids,
+        );
         lastError = undefined;
         break;
       } catch (error) {

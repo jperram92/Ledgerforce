@@ -4,8 +4,9 @@
  *  - Files: packages/db/migrations/NNNN_snake_name.sql, numbered 0001.. without gaps/duplicates.
  *  - Ledger: public.schema_migrations(version, name, checksum sha256, applied_at, applied_by).
  *  - Refuses to run if an applied migration's file changed (checksum) or disappeared.
- *  - Refuses destructive statements (no-delete policy, DL-0004): DROP TABLE / SCHEMA / DATABASE,
- *    DROP COLUMN (incl. `ALTER TABLE t DROP c`), any RENAME, TRUNCATE, DELETE FROM.
+ *  - Refuses destructive or security-weakening statements (no-delete policy DL-0004, migration
+ *    skill): any DROP (incl. `ALTER TABLE t DROP c`; DROP DEFAULT / DROP NOT NULL allowed),
+ *    RENAME, TRUNCATE, DELETE FROM, ALTER COLUMN TYPE, DISABLE TRIGGER/RLS, NO FORCE RLS, BYPASSRLS.
  *    Comments and string literals are ignored; function bodies ($$...$$) ARE checked.
  *  - Each migration runs in its own transaction together with its ledger row; a concurrent
  *    runner waits on an advisory lock.
@@ -73,47 +74,102 @@ function stripCommentsAndStrings(sql: string): string {
   return out;
 }
 
-const RULES: { label: string; re: RegExp }[] = [
-  { label: 'DROP TABLE', re: /\bdrop\s+table\b/i },
-  { label: 'DROP SCHEMA', re: /\bdrop\s+schema\b/i },
-  { label: 'DROP DATABASE', re: /\bdrop\s+database\b/i },
-  { label: 'DROP COLUMN', re: /\bdrop\s+column\b/i },
+const DROP_KINDS = new Set([
+  'table',
+  'schema',
+  'database',
+  'column',
+  'constraint',
+  'index',
+  'trigger',
+  'policy',
+  'function',
+  'procedure',
+  'view',
+  'materialized',
+  'sequence',
+  'type',
+  'domain',
+  'role',
+  'user',
+  'extension',
+  'rule',
+  'owned',
+  'aggregate',
+  'operator',
+  'publication',
+  'subscription',
+  'identity',
+  'expression',
+]);
+
+/**
+ * Forbidden in any migration (keep in step with .claude/skills/migration/SKILL.md):
+ * DROP of anything (except ALTER COLUMN ... DROP DEFAULT / DROP NOT NULL), RENAME, TRUNCATE,
+ * DELETE FROM, ALTER COLUMN ... TYPE (possibly data-losing: add a new column instead),
+ * DISABLE TRIGGER/RULE/ROW LEVEL SECURITY, NO FORCE ROW LEVEL SECURITY, BYPASSRLS.
+ */
+const RULES: { label: (m: RegExpExecArray) => string; re: RegExp }[] = [
   {
-    // ALTER TABLE t DROP c  (COLUMN keyword is optional in PostgreSQL)
-    label: 'DROP COLUMN',
-    re: /\balter\s+table\b[^;]*?\bdrop\s+(?!constraint\b|default\b|not\s+null\b|identity\b|expression\b|column\b)\w/i,
+    re: /\bdrop\s+(?!default\b|not\s+null\b)(\w+)/i,
+    label: (m) => {
+      const kind = (m[1] ?? '').toLowerCase();
+      return DROP_KINDS.has(kind) ? `DROP ${kind.toUpperCase()}` : 'DROP COLUMN';
+    },
   },
-  { label: 'RENAME', re: /\brename\b/i },
+  { re: /\brename\b/i, label: () => 'RENAME' },
   // `TRUNCATE ON` is a trigger event / privilege name (e.g. BEFORE TRUNCATE ON t), not a TRUNCATE.
-  { label: 'TRUNCATE', re: /\btruncate\b(?!\s+on\b)/i },
-  { label: 'DELETE FROM', re: /\bdelete\s+from\b/i },
+  { re: /\btruncate\b(?!\s+on\b)/i, label: () => 'TRUNCATE' },
+  { re: /\bdelete\s+from\b/i, label: () => 'DELETE FROM' },
+  {
+    re: /\balter\s+column\s+(?:"[^"]+"|\w+)\s+(?:set\s+data\s+)?type\b/i,
+    label: () => 'ALTER COLUMN ... TYPE',
+  },
+  {
+    re: /\bdisable\s+(trigger|rule|row\s+level\s+security)\b/i,
+    label: (m) => `DISABLE ${(m[1] ?? '').toUpperCase()}`,
+  },
+  { re: /\bno\s+force\s+row\s+level\s+security\b/i, label: () => 'NO FORCE ROW LEVEL SECURITY' },
+  { re: /\bbypassrls\b/i, label: () => 'BYPASSRLS' },
 ];
 
 export function checkMigrationPolicy(sql: string, filename: string): void {
   const code = stripCommentsAndStrings(sql);
   for (const rule of RULES) {
-    if (rule.re.test(code)) {
+    const m = rule.re.exec(code);
+    if (m) {
       throw new MigrationPolicyError(
-        `${filename}: ${rule.label} is not allowed — migrations are forward-only and additive ` +
+        `${filename}: ${rule.label(m)} is not allowed — migrations are forward-only and additive ` +
           '(AGENTS.md directive 6, DL-0004). Add a new column/table, backfill, and deprecate the old one.',
       );
     }
   }
 }
 
-export const checksum = (sql: string): string => createHash('sha256').update(sql, 'utf8').digest('hex');
+export const checksum = (sql: string): string =>
+  createHash('sha256').update(sql, 'utf8').digest('hex');
 
-export async function loadMigrations(dir: string = DEFAULT_MIGRATIONS_DIR): Promise<MigrationFile[]> {
+export async function loadMigrations(
+  dir: string = DEFAULT_MIGRATIONS_DIR,
+): Promise<MigrationFile[]> {
   const names = (await readdir(dir)).filter((f) => f.endsWith('.sql')).sort();
   const files: MigrationFile[] = [];
   for (const filename of names) {
     const m = FILE_RE.exec(filename);
     if (!m) {
-      throw new MigrationSequenceError(`${filename}: migration files must be named NNNN_snake_case.sql`);
+      throw new MigrationSequenceError(
+        `${filename}: migration files must be named NNNN_snake_case.sql`,
+      );
     }
     const sql = await readFile(join(dir, filename), 'utf8');
     checkMigrationPolicy(sql, filename);
-    files.push({ version: Number.parseInt(m[1] ?? '', 10), name: m[2] ?? '', filename, sql, checksum: checksum(sql) });
+    files.push({
+      version: Number.parseInt(m[1] ?? '', 10),
+      name: m[2] ?? '',
+      filename,
+      sql,
+      checksum: checksum(sql),
+    });
   }
   files.forEach((f, idx) => {
     if (f.version !== idx + 1) {

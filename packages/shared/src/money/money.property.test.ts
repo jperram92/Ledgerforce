@@ -38,8 +38,17 @@ describe('Money properties', () => {
   it('add is associative and commutative', () => {
     fc.assert(
       fc.property(units, units, units, (a, b, c) => {
-        expect(m4(a).add(m4(b)).add(m4(c)).equals(m4(a).add(m4(b).add(m4(c))))).toBe(true);
-        expect(m4(a).add(m4(b)).equals(m4(b).add(m4(a)))).toBe(true);
+        expect(
+          m4(a)
+            .add(m4(b))
+            .add(m4(c))
+            .equals(m4(a).add(m4(b).add(m4(c)))),
+        ).toBe(true);
+        expect(
+          m4(a)
+            .add(m4(b))
+            .equals(m4(b).add(m4(a))),
+        ).toBe(true);
       }),
     );
   });
@@ -74,9 +83,9 @@ describe('Money properties', () => {
     fc.assert(
       fc.property(
         cents,
-        fc.array(fc.integer({ min: 0, max: 1_000_000 }), { minLength: 1, maxLength: 20 }).filter(
-          (r) => r.some((x) => x > 0),
-        ),
+        fc
+          .array(fc.integer({ min: 0, max: 1_000_000 }), { minLength: 1, maxLength: 20 })
+          .filter((r) => r.some((x) => x > 0)),
         (c, ratios) => {
           const total = m4(c * 100n);
           const parts = total.allocate(ratios.map(String));

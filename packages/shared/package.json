@@ -13,5 +13,8 @@
   },
   "dependencies": {
     "decimal.js": "10.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5"
   }
 }

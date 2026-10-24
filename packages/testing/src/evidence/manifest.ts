@@ -124,7 +124,8 @@ async function withLock<T>(target: string, fn: () => Promise<T>): Promise<T> {
         () => 0,
       );
       if (age > 30_000) await rmdir(lock).catch(() => undefined);
-      if (Date.now() > deadline) throw new Error(`Timed out waiting for manifest lock ${lock}`);
+      if (Date.now() > deadline)
+        throw new Error(`Timed out waiting for manifest lock ${lock}`, { cause: error });
       await sleep(5 + Math.floor(Math.random() * 20));
     }
   }

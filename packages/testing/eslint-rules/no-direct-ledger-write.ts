@@ -16,6 +16,7 @@ export const DEFAULT_LEDGER_TABLES = [
   'account_balance',
   'subledger_entry',
   'allocation',
+  'dimension_set', // ledger-owned per packages/ledger/AGENTS.md
 ] as const;
 
 const KYSELY_WRITE_METHODS = new Set([
@@ -40,7 +41,10 @@ export function buildLedgerWriteRegex(tables: readonly string[]): RegExp {
   );
 }
 
-function kyselyTarget(arg: ESTree.Node | undefined, tables: ReadonlySet<string>): string | undefined {
+function kyselyTarget(
+  arg: ESTree.Node | undefined,
+  tables: ReadonlySet<string>,
+): string | undefined {
   if (arg?.type !== 'Literal' || typeof arg.value !== 'string') return undefined;
   // 'schema.table as alias' -> table
   const first = arg.value.trim().split(/\s+/)[0] ?? '';

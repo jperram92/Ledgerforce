@@ -20,7 +20,9 @@ try {
     throw new Error(`Migrations must run as lf_migrator, not ${rows[0]?.u ?? '?'}`);
   }
   const r = await migrate(client, { log: (m) => console.log(m) });
-  console.log(`applied ${String(r.applied.length)}, already applied ${String(r.alreadyApplied.length)}`);
+  console.log(
+    `applied ${String(r.applied.length)}, already applied ${String(r.alreadyApplied.length)}`,
+  );
 } finally {
   await client.end();
 }

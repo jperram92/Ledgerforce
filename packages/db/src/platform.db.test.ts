@@ -15,13 +15,19 @@ const B = randomUUID();
 
 beforeAll(async () => {
   tdb = await createTestDatabase({ migrate: true });
-  await tdb.admin.query(`INSERT INTO app.tenant (id, name) VALUES ($1, 'Tenant A'), ($2, 'Tenant B')`, [A, B]);
+  await tdb.admin.query(
+    `INSERT INTO app.tenant (id, name) VALUES ($1, 'Tenant A'), ($2, 'Tenant B')`,
+    [A, B],
+  );
 });
 afterAll(async () => {
   await tdb.close();
 });
 
-async function asRole<T>(role: 'lf_app' | 'lf_migrator', fn: (c: pg.Client) => Promise<T>): Promise<T> {
+async function asRole<T>(
+  role: 'lf_app' | 'lf_migrator',
+  fn: (c: pg.Client) => Promise<T>,
+): Promise<T> {
   const c = new pg.Client({ connectionString: tdb.url(role) });
   await c.connect();
   try {
@@ -38,8 +44,20 @@ describe('roles', () => {
          FROM pg_roles WHERE rolname IN ('lf_app', 'lf_migrator') ORDER BY rolname`,
     );
     expect(rows).toEqual([
-      { rolname: 'lf_app', rolsuper: false, rolbypassrls: false, rolcreaterole: false, rolcreatedb: false },
-      { rolname: 'lf_migrator', rolsuper: false, rolbypassrls: false, rolcreaterole: false, rolcreatedb: false },
+      {
+        rolname: 'lf_app',
+        rolsuper: false,
+        rolbypassrls: false,
+        rolcreaterole: false,
+        rolcreatedb: false,
+      },
+      {
+        rolname: 'lf_migrator',
+        rolsuper: false,
+        rolbypassrls: false,
+        rolcreaterole: false,
+        rolcreatedb: false,
+      },
     ]);
   });
 
@@ -92,7 +110,8 @@ describe('schemas and tables', () => {
       `SELECT app.uuid_generate_v7()::text AS u FROM generate_series(1, 50)`,
     );
     const ids = rows.map((r) => r.u as string);
-    for (const id of ids) expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
+    for (const id of ids)
+      expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/);
     const prefixes = ids.map((u) => u.slice(0, 13));
     expect([...prefixes].sort()).toEqual(prefixes); // ms timestamp prefix never goes backwards
     expect(new Set(ids).size).toBe(50);
@@ -111,19 +130,24 @@ describe('schemas and tables', () => {
 describe('withTenant()', () => {
   it('sets app.tenant_id for the transaction only', async () => {
     const inside = await withTenant(tdb.app, A, async (trx) => {
-      const r = await sql<{ t: string }>`SELECT current_setting('app.tenant_id', true) AS t`.execute(trx);
+      const r = await sql<{
+        t: string;
+      }>`SELECT current_setting('app.tenant_id', true) AS t`.execute(trx);
       return r.rows[0]?.t;
     });
     expect(inside).toBe(A);
-    const after = await sql<{ t: string | null }>`SELECT nullif(current_setting('app.tenant_id', true), '') AS t`.execute(
-      tdb.app,
-    );
+    const after = await sql<{
+      t: string | null;
+    }>`SELECT nullif(current_setting('app.tenant_id', true), '') AS t`.execute(tdb.app);
     expect(after.rows[0]?.t ?? null).toBeNull();
   });
 
   it('scopes reads and defaults tenant_id on insert', async () => {
     await withTenant(tdb.app, A, async (trx) => {
-      await trx.insertInto('app.company').values({ name: 'A Pty Ltd', base_currency: 'AUD' }).execute();
+      await trx
+        .insertInto('app.company')
+        .values({ name: 'A Pty Ltd', base_currency: 'AUD' })
+        .execute();
     });
     await withTenant(tdb.app, B, async (trx) => {
       await trx.insertInto('app.company').values({ name: 'B Ltd', base_currency: 'NZD' }).execute();
@@ -142,11 +166,16 @@ describe('withTenant()', () => {
   it('rolls back on error', async () => {
     await expect(
       withTenant(tdb.app, A, async (trx) => {
-        await trx.insertInto('app.company').values({ name: 'Ghost', base_currency: 'AUD' }).execute();
+        await trx
+          .insertInto('app.company')
+          .values({ name: 'Ghost', base_currency: 'AUD' })
+          .execute();
         throw new Error('boom');
       }),
     ).rejects.toThrow('boom');
-    const { rows } = await tdb.admin.query(`SELECT count(*)::int AS n FROM app.company WHERE name = 'Ghost'`);
+    const { rows } = await tdb.admin.query(
+      `SELECT count(*)::int AS n FROM app.company WHERE name = 'Ghost'`,
+    );
     expect(rows[0].n).toBe(0);
   });
 
@@ -199,13 +228,17 @@ describe('audit.audit_log is append-only (design §6.8)', () => {
         await expect(c.query(stmt), stmt).rejects.toThrow(/append-only/);
       });
     }
-    const { rows } = await tdb.admin.query(`SELECT count(*)::int AS n FROM audit.audit_log WHERE action = 'tampered'`);
+    const { rows } = await tdb.admin.query(
+      `SELECT count(*)::int AS n FROM audit.audit_log WHERE action = 'tampered'`,
+    );
     expect(rows[0].n).toBe(0);
   });
 
   it('lf_app cannot disable the triggers or switch replication role', async () => {
     await asRole('lf_app', async (c) => {
-      await expect(c.query('ALTER TABLE audit.audit_log DISABLE TRIGGER ALL')).rejects.toMatchObject({
+      await expect(
+        c.query('ALTER TABLE audit.audit_log DISABLE TRIGGER ALL'),
+      ).rejects.toMatchObject({
         code: '42501',
       });
       await expect(c.query(`SET session_replication_role = replica`)).rejects.toMatchObject({

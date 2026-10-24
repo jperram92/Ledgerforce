@@ -14,7 +14,12 @@ import { Decimal } from 'decimal.js';
 import { CurrencyMismatchError, InvalidMoneyError, MoneyOverflowError } from '../errors.ts';
 
 /** Private decimal.js constructor so we never depend on or mutate global Decimal settings. */
-const D = Decimal.clone({ precision: 60, rounding: Decimal.ROUND_HALF_UP, toExpNeg: -60, toExpPos: 60 });
+const D = Decimal.clone({
+  precision: 60,
+  rounding: Decimal.ROUND_HALF_UP,
+  toExpNeg: -60,
+  toExpPos: 60,
+});
 type Dec = InstanceType<typeof D>;
 
 /**
@@ -45,9 +50,30 @@ const ROUNDING: Record<RoundingMode, Decimal.Rounding> = {
 const CURRENCY_RE = /^[A-Z]{3}$/;
 /** ISO 4217 exponents that differ from the default of 2. */
 const MINOR_UNIT_EXCEPTIONS: Readonly<Record<string, number>> = {
-  BIF: 0, CLP: 0, DJF: 0, GNF: 0, ISK: 0, JPY: 0, KMF: 0, KRW: 0, PYG: 0, RWF: 0, UGX: 0,
-  UYI: 0, VND: 0, VUV: 0, XAF: 0, XOF: 0, XPF: 0,
-  BHD: 3, IQD: 3, JOD: 3, KWD: 3, LYD: 3, OMR: 3, TND: 3,
+  BIF: 0,
+  CLP: 0,
+  DJF: 0,
+  GNF: 0,
+  ISK: 0,
+  JPY: 0,
+  KMF: 0,
+  KRW: 0,
+  PYG: 0,
+  RWF: 0,
+  UGX: 0,
+  UYI: 0,
+  VND: 0,
+  VUV: 0,
+  XAF: 0,
+  XOF: 0,
+  XPF: 0,
+  BHD: 3,
+  IQD: 3,
+  JOD: 3,
+  KWD: 3,
+  LYD: 3,
+  OMR: 3,
+  TND: 3,
 };
 
 export function currency(code: string): CurrencyCode {
@@ -67,7 +93,9 @@ const DECIMAL_RE = /^-?\d+(\.\d+)?$/;
 function toDec(value: MoneyInput, what: string): Dec {
   if (typeof value === 'string') {
     if (!DECIMAL_RE.test(value)) {
-      throw new InvalidMoneyError(`${what}: ${JSON.stringify(value)} is not a plain decimal string`);
+      throw new InvalidMoneyError(
+        `${what}: ${JSON.stringify(value)} is not a plain decimal string`,
+      );
     }
     return new D(value);
   }
@@ -151,10 +179,7 @@ export class Money {
   mul(factor: MoneyInput, opts: { scale: number; rounding: RoundingMode }): Money {
     checkScale(opts.scale);
     const product = this.#amount.times(toDec(factor, 'Money.mul factor'));
-    return new Money(
-      product.toDecimalPlaces(opts.scale, ROUNDING[opts.rounding]),
-      this.#currency,
-    );
+    return new Money(product.toDecimalPlaces(opts.scale, ROUNDING[opts.rounding]), this.#currency);
   }
 
   roundTo(scale: number, rounding: RoundingMode): Money {
@@ -256,7 +281,10 @@ export class Money {
     if (!Number.isSafeInteger(parts) || parts < 1) {
       throw new InvalidMoneyError(`split: parts must be a positive integer, got ${String(parts)}`);
     }
-    return this.allocate(Array.from({ length: parts }, () => 1), opts);
+    return this.allocate(
+      Array.from({ length: parts }, () => 1),
+      opts,
+    );
   }
 
   /** Canonical NUMERIC(19,4) text, e.g. "-1234.5600". Use this for DB parameters. */

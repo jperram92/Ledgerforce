@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salesforce Account page with LedgerForce component — LedgerForce</title>
+<script src="shell.js" defer></script>
+<!-- Deliberately NOT using LedgerForce tokens: inside Salesforce the component inherits SLDS styling
+     (lightning-card, lightning-datatable, lightning-badge). These local --slds-* values only imitate
+     the default Lightning theme so the product owner can judge fit. -->
+<style>
+  :root {
+    --slds-bg: #f3f3f3; --slds-card: #ffffff; --slds-border: #c9c9c9; --slds-border-soft: #e5e5e5;
+    --slds-text: #181818; --slds-weak: #444444; --slds-brand: #0176d3; --slds-brand-dark: #014486;
+    --slds-error: #ba0517; --slds-success: #2e844a; --slds-warning-bg: #fef1ee; --slds-success-bg: #ebf7e6;
+    --slds-neutral-bg: #f3f3f3; --slds-info-bg: #eef4ff;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--slds-bg); color: var(--slds-text); font-family: "Salesforce Sans", Arial, Helvetica, sans-serif; font-size: 13px; line-height: 1.5; }
+  a { color: var(--slds-brand); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  :focus-visible { outline: 2px solid var(--slds-brand); outline-offset: 2px; }
+  .i { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; vertical-align: -3px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .gh { height: 50px; background: #fff; border-bottom: 1px solid var(--slds-border-soft); display: flex; align-items: center; gap: 16px; padding: 0 16px; }
+  .waffle { width: 32px; height: 32px; display: grid; place-items: center; color: var(--slds-weak); }
+  .gsearch { flex: 0 1 560px; margin: 0 auto; height: 32px; border: 1px solid var(--slds-border); border-radius: 4px; display: flex; align-items: center; gap: 8px; padding: 0 10px; color: var(--slds-weak); }
+  .ava { width: 30px; height: 30px; border-radius: 50%; background: #3a49c9; color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+  .appnav { height: 40px; background: #fff; border-bottom: 3px solid var(--slds-brand); display: flex; align-items: stretch; gap: 0; padding: 0 12px; box-shadow: 0 2px 3px rgba(0,0,0,.08); }
+  .appnav .app { display: flex; align-items: center; font-size: 18px; padding-right: 20px; gap: 8px; }
+  .appnav a { display: flex; align-items: center; padding: 0 12px; color: var(--slds-text); border-bottom: 3px solid transparent; margin-bottom: -3px; }
+  .appnav a[aria-current="page"] { border-bottom-color: var(--slds-brand); font-weight: 700; background: #f3f3f3; }
+  .wrap { padding: 12px; }
+  .card { background: var(--slds-card); border: 1px solid var(--slds-border-soft); border-radius: 4px; box-shadow: 0 2px 2px rgba(0,0,0,.1); }
+  .rh { padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+  .rh .icon { width: 32px; height: 32px; border-radius: 4px; background: #5867e8; color: #fff; display: grid; place-items: center; }
+  .rh .kind { font-size: 12px; color: var(--slds-weak); }
+  .rh h1 { margin: 0; font-size: 18px; font-weight: 700; }
+  .rh .btns { margin-left: auto; display: flex; }
+  .sbtn { height: 32px; padding: 0 14px; border: 1px solid var(--slds-border); background: #fff; color: var(--slds-brand); font: inherit; border-radius: 0; cursor: pointer; }
+  .sbtn:first-child { border-radius: 4px 0 0 4px; } .sbtn:last-child { border-radius: 0 4px 4px 0; } .sbtn + .sbtn { margin-left: -1px; }
+  .highlights { display: flex; gap: 32px; padding: 4px 16px 14px 60px; }
+  .highlights dt { font-size: 12px; color: var(--slds-weak); } .highlights dd { margin: 0; }
+  .cols { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 12px; margin-top: 12px; align-items: start; }
+  .tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--slds-border-soft); padding: 0 16px; }
+  .tabs a { padding: 10px 0; color: var(--slds-text); border-bottom: 2px solid transparent; }
+  .tabs a[aria-selected="true"] { border-bottom-color: var(--slds-brand); font-weight: 700; }
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; padding: 8px 16px 16px; }
+  .fields div { border-bottom: 1px solid var(--slds-border-soft); padding: 8px 0; }
+  .fields dt { font-size: 12px; color: var(--slds-weak); } .fields dd { margin: 2px 0 0; min-height: 20px; }
+  .rel { padding: 12px 16px; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--slds-border-soft); }
+  .rel .ricon { width: 24px; height: 24px; border-radius: 4px; display: grid; place-items: center; color: #fff; }
+  .rel b { font-weight: 700; }
+  /* ---- LedgerForce LWC (lightning-card) ---- */
+  .lfc { border-color: var(--slds-border-soft); }
+  .lfc header { display: flex; align-items: center; gap: 10px; padding: 12px 16px 6px; }
+  .lfc header .ic { width: 28px; height: 28px; border-radius: 4px; background: #04844b; color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 12px; }
+  .lfc header h2 { margin: 0; font-size: 14px; font-weight: 700; }
+  .lfc header .act { margin-left: auto; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px 16px; }
+  .tile { border: 1px solid var(--slds-border-soft); border-radius: 4px; padding: 8px 10px; }
+  .tile .l { font-size: 12px; color: var(--slds-weak); }
+  .tile .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .tile.over { border-color: #f0b8bd; background: var(--slds-warning-bg); }
+  .tile.over .v, .tile.over .l { color: var(--slds-error); }
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 1px 8px; border-radius: 15px; font-size: 12px; font-weight: 700; background: var(--slds-neutral-bg); color: var(--slds-text); border: 1px solid var(--slds-border-soft); white-space: nowrap; }
+  .badge .i { width: 12px; height: 12px; stroke-width: 2.4; }
+  .b-err { background: var(--slds-error); color: #fff; border-color: var(--slds-error); }
+  .b-ok { background: var(--slds-success); color: #fff; border-color: var(--slds-success); }
+  .b-info { background: var(--slds-info-bg); color: var(--slds-brand-dark); border-color: #b0c7f0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; font-weight: 700; font-size: 12px; color: var(--slds-weak); background: #f3f3f3; padding: 6px 8px; border-top: 1px solid var(--slds-border-soft); border-bottom: 1px solid var(--slds-border-soft); }
+  td { padding: 8px; border-bottom: 1px solid var(--slds-border-soft); }
+  th:first-child, td:first-child { padding-left: 16px; } th:last-child, td:last-child { padding-right: 16px; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .lfc footer { padding: 10px 16px; display: flex; justify-content: space-between; color: var(--slds-weak); font-size: 12px; }
+  .meta { padding: 0 16px 6px; color: var(--slds-weak); font-size: 12px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .mock-banner { margin: 12px 12px 0; padding: 8px 12px; border: 1px dashed #939393; border-radius: 4px; background: #fff; color: var(--slds-weak); font-size: 12px; }
+</style>
+</head>
+<body>
+<header class="gh" aria-label="Salesforce global header (simulated)">
+  <span class="waffle" aria-hidden="true"><i data-i="grid"></i></span>
+  <div class="gsearch" role="search"><i data-i="search"></i>Search…</div>
+  <span class="ava" aria-hidden="true">AC</span>
+</header>
+<nav class="appnav" aria-label="App navigation (simulated)">
+  <span class="app">Sales</span>
+  <a href="#">Home</a><a href="#">Opportunities</a><a href="#" aria-current="page">Accounts</a><a href="#">Contacts</a><a href="#">Reports</a>
+</nav>
+<p class="mock-banner">Mockup: simulated Salesforce Lightning record page (SLDS look-alike). The LedgerForce part is the “Finance” card on the right (UC-12). Viewer: Alex Chen, Sales user — no LedgerForce login.</p>
+<main class="wrap" id="main">
+  <section class="card" aria-label="Record header">
+    <div class="rh">
+      <span class="icon" aria-hidden="true"><i data-i="building"></i></span>
+      <div><div class="kind">Account</div><h1>Kestrel Logistics Pty Ltd</h1></div>
+      <div class="btns"><button class="sbtn" type="button">+ Follow</button><button class="sbtn" type="button">Edit</button><button class="sbtn" type="button">New Opportunity</button></div>
+    </div>
+    <dl class="highlights">
+      <div><dt>Type</dt><dd>Customer — Direct</dd></div>
+      <div><dt>Phone</dt><dd>(03) 9012 4410</dd></div>
+      <div><dt>Account Owner</dt><dd><a href="#">Alex Chen</a></dd></div>
+      <div><dt>ABN</dt><dd>51 824 753 556</dd></div>
+    </dl>
+  </section>
+
+  <div class="cols">
+    <section class="card" aria-label="Account details">
+      <div class="tabs" role="tablist"><a href="#" role="tab" aria-selected="false">Activity</a><a href="#" role="tab" aria-selected="true">Details</a><a href="#" role="tab" aria-selected="false">Related</a></div>
+      <dl class="fields">
+        <div><dt>Account Name</dt><dd>Kestrel Logistics Pty Ltd</dd></div>
+        <div><dt>Industry</dt><dd>Transportation</dd></div>
+        <div><dt>Billing Address</dt><dd>Level 4, 120 Collins St<br>Melbourne VIC 3000</dd></div>
+        <div><dt>Employees</dt><dd>85</dd></div>
+        <div><dt>Website</dt><dd><a href="#">kestrel.example</a></dd></div>
+        <div><dt>LF Credit Status</dt><dd>Overdue</dd></div>
+        <div><dt>Billing To contact</dt><dd><a href="#">Dana Kerr</a></dd></div>
+        <div><dt>Party profile</dt><dd>Domestic customer</dd></div>
+      </dl>
+      <div class="rel"><span class="ricon" style="background:#ff5d2d" aria-hidden="true"><i data-i="flag"></i></span><b>Opportunities (4)</b></div>
+      <div class="rel"><span class="ricon" style="background:#3c97dd" aria-hidden="true"><i data-i="user"></i></span><b>Contacts (6)</b></div>
+      <div class="rel"><span class="ricon" style="background:#04844b" aria-hidden="true"><i data-i="file"></i></span><b>LF Invoices (17)</b></div>
+    </section>
+
+    <section class="card lfc" aria-labelledby="lf-h">
+      <header>
+        <span class="ic" aria-hidden="true">Lf</span>
+        <h2 id="lf-h">Finance · LedgerForce</h2>
+        <span class="act"><button class="sbtn" type="button" style="border-radius:4px">Email statement</button></span>
+      </header>
+      <div class="meta"><span class="badge b-err"><i data-i="alert"></i>Overdue</span><span>Credit status · reminder 2 sent 21 Oct</span></div>
+      <div class="tiles">
+        <div class="tile"><div class="l">Balance due</div><div class="v">$16,109.50</div></div>
+        <div class="tile over"><div class="l">Overdue</div><div class="v">$6,050.00</div></div>
+        <div class="tile"><div class="l">Last payment</div><div class="v" style="font-size:16px">18 Sep 2026</div><div class="l">$7,425.00 · INV-001039</div></div>
+        <div class="tile"><div class="l">Paid this year</div><div class="v" style="font-size:16px">$84,210.00</div><div class="l">avg 12 days late</div></div>
+      </div>
+      <table>
+        <caption class="sr-only">Five most recent invoices</caption>
+        <thead><tr><th scope="col">Invoice</th><th scope="col">Due</th><th scope="col">Status</th><th scope="col" class="num">Amount due</th></tr></thead>
+        <tbody>
+          <tr><td><a href="#">INV-001058</a></td><td>23 Nov</td><td><span class="badge">Draft</span></td><td class="num">—</td></tr>
+          <tr><td><a href="#">INV-001042</a></td><td>31 Oct</td><td><span class="badge b-info">Awaiting payment</span></td><td class="num">10,059.50</td></tr>
+          <tr><td><a href="#">INV-001048</a></td><td>24 Sep</td><td><span class="badge b-err"><i data-i="alert"></i>Overdue 30 d</span></td><td class="num">6,050.00</td></tr>
+          <tr><td><a href="#">INV-001039</a></td><td>16 Sep</td><td><span class="badge b-ok"><i data-i="check"></i>Paid</span></td><td class="num">0.00</td></tr>
+          <tr><td><a href="#">INV-001031</a></td><td>18 Aug</td><td><span class="badge b-ok"><i data-i="check"></i>Paid</span></td><td class="num">0.00</td></tr>
+        </tbody>
+      </table>
+      <footer><span>Updated by LedgerForce 2 min ago · read-only</span><a href="#">View all (17)</a></footer>
+    </section>
+  </div>
+</main>
+</body>
+</html>

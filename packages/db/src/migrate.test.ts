@@ -29,20 +29,45 @@ describe('checkMigrationPolicy (no-delete, forward-only — DL-0004)', () => {
     ['DROP SCHEMA', 'DROP SCHEMA app CASCADE;'],
     ['TRUNCATE', 'TRUNCATE app.company;'],
     ['DELETE FROM', 'DELETE FROM app.company WHERE true;'],
-    ['inside a function body', "CREATE FUNCTION f() RETURNS void LANGUAGE sql AS $$ DROP TABLE t $$;"],
+    ['DROP CONSTRAINT', 'ALTER TABLE app.company DROP CONSTRAINT company_name_check;'],
+    ['DROP POLICY', 'DROP POLICY IF EXISTS p ON app.company;'],
+    ['DROP TRIGGER', 'DROP TRIGGER IF EXISTS t ON app.company;'],
+    ['DROP INDEX', 'DROP INDEX app.company_tenant_idx;'],
+    ['DROP FUNCTION', 'DROP FUNCTION app.uuid_generate_v7();'],
+    ['DISABLE TRIGGER', 'ALTER TABLE audit.audit_log DISABLE TRIGGER ALL;'],
+    ['NO FORCE RLS', 'ALTER TABLE app.company NO FORCE ROW LEVEL SECURITY;'],
+    ['DISABLE RLS', 'ALTER TABLE app.company DISABLE ROW LEVEL SECURITY;'],
+    ['BYPASSRLS', 'ALTER ROLE lf_app BYPASSRLS;'],
+    ['data-losing type change', 'ALTER TABLE app.company ALTER COLUMN name TYPE varchar(10);'],
+    [
+      'inside a function body',
+      'CREATE FUNCTION f() RETURNS void LANGUAGE sql AS $$ DROP TABLE t $$;',
+    ],
   ])('rejects %s', (_label, sql) => {
     expect(() => checkMigrationPolicy(sql, '0009_bad.sql')).toThrow(MigrationPolicyError);
   });
 
   it.each([
-    ['DROP CONSTRAINT', 'ALTER TABLE app.company DROP CONSTRAINT company_name_check;'],
     ['DROP DEFAULT', 'ALTER TABLE app.company ALTER COLUMN name DROP DEFAULT;'],
     ['DROP NOT NULL', 'ALTER TABLE app.company ALTER COLUMN name DROP NOT NULL;'],
-    ['DROP POLICY', 'DROP POLICY IF EXISTS p ON app.company;'],
-    ['DROP TRIGGER', 'DROP TRIGGER IF EXISTS t ON app.company;'],
+    [
+      'CREATE OR REPLACE FUNCTION',
+      'CREATE OR REPLACE FUNCTION app.f() RETURNS int LANGUAGE sql AS $$ SELECT 1 $$;',
+    ],
+    [
+      'ENABLE/FORCE RLS',
+      'ALTER TABLE app.x ENABLE ROW LEVEL SECURITY; ALTER TABLE app.x FORCE ROW LEVEL SECURITY;',
+    ],
+    [
+      'trigger events',
+      'CREATE TRIGGER t BEFORE UPDATE OR DELETE OR TRUNCATE ON app.x FOR EACH STATEMENT EXECUTE FUNCTION f();',
+    ],
     ['words in comments', '-- never DROP TABLE or RENAME anything\n/* DROP COLUMN */ SELECT 1;'],
     ['words in string literals', "COMMENT ON TABLE app.company IS 'do not DROP TABLE or RENAME';"],
-    ['identifiers containing the words', 'CREATE TABLE app.renamed_items (dropped_at timestamptz);'],
+    [
+      'identifiers containing the words',
+      'CREATE TABLE app.renamed_items (dropped_at timestamptz);',
+    ],
   ])('allows %s', (_label, sql) => {
     expect(() => checkMigrationPolicy(sql, '0009_ok.sql')).not.toThrow();
   });

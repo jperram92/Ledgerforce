@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Setup step 7 · Posting profiles — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  .wiz { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 16px; align-items: start; }
+  .wsteps { list-style: none; margin: 0; padding: 8px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px 4px; }
+  .wsteps li a { display: flex; gap: 10px; align-items: center; padding: 7px 8px; border-radius: var(--lf-radius-md); color: var(--lf-text-muted); font-size: 13px; }
+  .wsteps li a:hover { background: var(--lf-surface-hover); text-decoration: none; }
+  .wsteps .n { width: 22px; height: 22px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: 11.5px; font-weight: 600; border: 1px solid var(--lf-border-strong); background: var(--lf-surface); }
+  .wsteps .done .n { background: var(--lf-success-bg); color: var(--lf-success-fg); border-color: var(--lf-success-border); }
+  .wsteps .cur a { background: var(--lf-accent-soft); color: var(--lf-nav-active-fg); font-weight: 600; }
+  .wsteps .cur .n { background: var(--lf-accent); color: var(--lf-accent-fg); border-color: var(--lf-accent); }
+  table.matrix { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+  table.matrix th, table.matrix td { border-bottom: 1px solid var(--lf-border); border-right: 1px solid var(--lf-border); padding: 10px; vertical-align: top; }
+  table.matrix th:last-child, table.matrix td:last-child { border-right: 0; }
+  table.matrix thead th { background: var(--lf-surface-2); font-weight: 600; text-align: left; font-size: 12.5px; }
+  table.matrix thead th .sec, table.matrix tbody th .sec { display: block; font-weight: 400; color: var(--lf-text-subtle); font-size: 11.5px; margin-top: 2px; }
+  table.matrix tbody th { text-align: left; font-weight: 600; background: var(--lf-surface); width: 150px; }
+  table.matrix th, table.matrix td { padding: 8px; }
+  .cell { display: flex; flex-direction: column; gap: 2px; border-radius: var(--lf-radius-md); padding: 6px 8px; min-height: 48px; }
+  .panel table.journal { font-size: 12.5px; }
+  .panel table.journal td, .panel table.journal th { padding-left: 8px; padding-right: 8px; }
+  .cell .acct { font-family: var(--lf-font-mono); font-size: 12px; }
+  .cell.def { color: var(--lf-text-muted); }
+  .cell.def .k { font-size: 11px; color: var(--lf-text-subtle); }
+  .cell.ovr { background: var(--lf-accent-soft); color: var(--lf-accent-text); border: 1px solid transparent; }
+  .cell.ovr .k { font-size: 11px; font-weight: 600; }
+  .cell.gap { background: var(--lf-danger-bg); color: var(--lf-danger-fg); border: 1px dashed var(--lf-danger-border); font-weight: 500; }
+  .cell.gap .k { font-size: 11px; }
+  .cell.sel { outline: 2px solid var(--lf-focus); outline-offset: 1px; }
+  tr.defaults td, tr.defaults th { background: var(--lf-surface-2); }
+  .legend { display: flex; gap: 14px; align-items: center; font-size: 12px; color: var(--lf-text-muted); flex-wrap: wrap; }
+  .sw { width: 14px; height: 14px; border-radius: 4px; display: inline-block; vertical-align: -2px; margin-right: 4px; }
+  .footer { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+</style>
+</head>
+<body data-active="settings" data-user="Sam Nguyen" data-initials="SN" data-role="Owner" data-period="Oct 2026" data-period-state="Open" data-sync="ok" data-sync-text="Connected">
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <nav class="sidenav" id="lf-nav" aria-label="Primary"></nav>
+  <div class="main-col">
+    <header class="topbar" id="lf-top"></header>
+    <main id="main" class="content">
+      <div class="page-head">
+        <div>
+          <div class="crumbs"><a href="#">Settings</a><i data-i="chevron-right" class="i-sm"></i>Setup</div>
+          <h1>Which accounts does each sale go to?</h1>
+          <p class="sub">Step 7 of 10 · Posting profiles. We pre-filled this from your chart and Salesforce. Fill the red gaps and you're done.</p>
+        </div>
+        <div style="width:260px"><div class="row between small muted" style="margin-bottom:6px"><span>Setup progress</span><span>6 of 10 done · ~20 min left</span></div><div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="10" aria-valuenow="6" aria-label="Setup steps done"><span style="width:60%"></span></div></div>
+      </div>
+
+      <nav class="card hsteps" aria-label="Setup steps" style="margin-bottom:16px">
+          <ol class="wsteps">
+            <li class="done"><a href="#"><span class="n"><i data-i="check" class="i-sm"></i></span>Company &amp; ABN</a></li>
+            <li class="done"><a href="#"><span class="n"><i data-i="check" class="i-sm"></i></span>Chart of accounts</a></li>
+            <li class="done"><a href="#"><span class="n"><i data-i="check" class="i-sm"></i></span>GST &amp; BAS</a></li>
+            <li class="done"><a href="#"><span class="n"><i data-i="check" class="i-sm"></i></span>Bank accounts</a></li>
+            <li class="done"><a href="#"><span class="n"><i data-i="check" class="i-sm"></i></span>Connect Salesforce</a></li>
+            <li class="done"><a href="#"><span class="n"><i data-i="check" class="i-sm"></i></span>Import customers &amp; products</a></li>
+            <li class="cur"><a href="#" aria-current="step"><span class="n">7</span>Posting profiles</a></li>
+            <li><a href="#"><span class="n">8</span>Numbering &amp; branding</a></li>
+            <li><a href="#"><span class="n">9</span>Opening balances</a></li>
+            <li><a href="#"><span class="n">10</span>Users &amp; approvals</a></li>
+          </ol>
+        </nav>
+      <div class="wiz">
+
+        <div class="stack">
+          <div class="banner danger" role="status"><i data-i="alert" class="i-lg"></i><div><b>4 gaps would block posting.</b><p class="body-text">“Freight” is a new product family from Salesforce with no revenue account, and Related parties need professional services kept separate. 9 open Opportunities use these combinations.</p></div><div class="act"><button class="btn sm" type="button">Show the 9 Opportunities</button></div></div>
+
+          <section class="card" aria-labelledby="mx-h">
+            <div class="card-h"><h2 id="mx-h">Revenue account by customer type × product type</h2><div class="legend" aria-label="Legend"><span><span class="sw" style="background:var(--lf-surface-2);border:1px solid var(--lf-border)"></span>Uses default</span><span><span class="sw" style="background:var(--lf-accent-soft)"></span>Override</span><span><span class="sw" style="background:var(--lf-danger-bg);border:1px dashed var(--lf-danger-border)"></span>Gap</span></div></div>
+            <div class="table-wrap" tabindex="0" role="region" aria-label="Posting profile matrix (scrolls sideways)">
+              <table class="matrix">
+                <caption class="sr-only">Posting profile matrix: party profile rows, product profile columns</caption>
+                <thead>
+                  <tr><th scope="col">Customer type ↓ / Product type →</th><th scope="col">Subscription<span class="sec">Family: Subscription</span></th><th scope="col">Professional services<span class="sec">Family: Services</span></th><th scope="col">Hardware<span class="sec">Family: Hardware</span></th><th scope="col">Reimbursable<span class="sec">Family: Pass-through</span></th><th scope="col">Freight<span class="sec">Family: Freight · new</span></th></tr>
+                </thead>
+                <tbody>
+                  <tr class="defaults"><th scope="row">Product default<span class="sec">applies unless overridden</span></th><td><div class="cell def"><span class="acct">4120</span>Subscriptions</div></td><td><div class="cell def"><span class="acct">4110</span>Professional services</div></td><td><div class="cell def"><span class="acct">4130</span>Hardware sales</div></td><td><div class="cell def"><span class="acct">4190</span>Recoverable costs</div></td><td><div class="cell gap"><span class="k"><i data-i="alert" class="i-sm"></i> No default</span>Choose…</div></td></tr>
+                  <tr><th scope="row">Domestic customer<span class="sec">AR 1200 · GST 10% · 34 customers</span></th><td><div class="cell def"><span class="k">default</span><span class="acct">4120</span></div></td><td><div class="cell def"><span class="k">default</span><span class="acct">4110</span></div></td><td><div class="cell def"><span class="k">default</span><span class="acct">4130</span></div></td><td><div class="cell def"><span class="k">default</span><span class="acct">4190</span></div></td><td><div class="cell gap sel"><span class="k"><i data-i="alert" class="i-sm"></i> Gap · 6 Opps</span>Choose…</div></td></tr>
+                  <tr><th scope="row">Overseas customer<span class="sec">AR 1210 · GST-free export · 4 customers</span></th><td><div class="cell ovr"><span class="k">Override</span><span class="acct">4160</span>Export subscriptions</div></td><td><div class="cell ovr"><span class="k">Override</span><span class="acct">4170</span>Export services</div></td><td><div class="cell def"><span class="k">default</span><span class="acct">4130</span></div></td><td><div class="cell def"><span class="k">default</span><span class="acct">4190</span></div></td><td><div class="cell gap"><span class="k"><i data-i="alert" class="i-sm"></i> Gap · 2 Opps</span>Choose…</div></td></tr>
+                  <tr><th scope="row">Related party<span class="sec">AR 1220 · GST 10% · explicit mapping</span></th><td><div class="cell ovr"><span class="k">Override</span><span class="acct">4180</span>Related-party revenue</div></td><td><div class="cell gap"><span class="k"><i data-i="alert" class="i-sm"></i> Gap · 1 Opp</span>Choose…</div></td><td><div class="cell def"><span class="k">not used</span>—</div></td><td><div class="cell def"><span class="k">default</span><span class="acct">4190</span></div></td><td><div class="cell gap"><span class="k"><i data-i="alert" class="i-sm"></i> Gap · 0 Opps</span>Choose…</div></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card-f"><span>3 overrides instead of 15 rows. Costs, discounts and COGS use the same grid — <a href="#">switch view</a></span></div>
+          </section>
+
+          <div class="footer">
+            <button class="btn" type="button"><i data-i="back"></i>Back</button>
+            <span style="flex:1"></span>
+            <span class="small muted">You can continue now — invoices hitting a gap stay in Draft until it's filled.</span>
+            <button class="btn primary" type="button">Save and continue<i data-i="arrow"></i></button>
+          </div>
+        </div>
+
+        <aside class="stack" aria-label="Selected combination">
+          <section class="panel" aria-labelledby="sel-h">
+            <div class="card-h"><h2 id="sel-h">Domestic × Freight</h2><span class="chip st-err"><i data-i="alert"></i>Gap</span></div>
+            <div class="card-b stack" style="gap:12px">
+              <div class="field"><label for="acct">Revenue account</label><select id="acct" class="input"><option>4140 · Freight recovered</option><option>4190 · Recoverable costs</option><option>Create new account…</option></select><span class="help">Suggested: freight charged to customers is usually income, not a cost reduction.</span></div>
+              <label class="row small"><input type="checkbox" checked> Use as default for every customer type</label>
+              <div>
+                <div class="lbl" style="margin-bottom:6px">Preview: $100 freight on a domestic invoice</div>
+                <table class="data journal">
+                  <caption class="sr-only">Journal preview</caption>
+                  <thead><tr><th scope="col">Account</th><th scope="col" class="num">Dr</th><th scope="col" class="num">Cr</th></tr></thead>
+                  <tbody>
+                    <tr><td class="acct"><span class="code">1200</span>Trade debtors</td><td class="num">110.00</td><td></td></tr>
+                    <tr><td class="acct"><span class="code">4140</span>Freight recovered</td><td></td><td class="num">100.00</td></tr>
+                    <tr><td class="acct"><span class="code">2310</span>GST collected</td><td></td><td class="num">10.00</td></tr>
+                  </tbody>
+                  <tfoot><tr><td><span class="balanced"><i data-i="equal"></i>Balanced</span></td><td class="num">110.00</td><td class="num">110.00</td></tr></tfoot>
+                </table>
+              </div>
+              <button class="btn primary" type="button"><i data-i="check"></i>Fill 3 Freight gaps</button>
+            </div>
+          </section>
+          <div class="explain"><i data-i="info"></i><span><b>Not sure?</b> Invite your accountant — they can finish this step without seeing bank passwords. <a href="#">Invite</a></span></div>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

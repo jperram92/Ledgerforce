@@ -198,3 +198,45 @@ test('run without --once keeps working the backlog until empty', () => {
   assert.deepEqual(calls(log).map((l) => l.split(' ')[2]), ['T-0002', 'T-0003', 'T-0004']);
   for (const id of ['T-0002', 'T-0003', 'T-0004']) assert.equal(cardField(root, id, 'status'), 'done');
 });
+
+// ---- cross-review routing ----
+
+function toReview(root: string, builder: string): void {
+  const p = join(root, '.agent/backlog/T-0002.md');
+  writeFileSync(p, readFileSync(p, 'utf8').replace(/^status: todo/m, 'status: review').replace(/^claimed_by: null/m, `claimed_by: ${builder}`));
+}
+
+test('run routes a card in review to the provider that did NOT build it', () => {
+  const root = makeRepo({ config: configWith({ claudeCli: fake('fake-success.sh'), codexCli: fake('fake-success.sh') }) });
+  toReview(root, 'claude');
+  const log = fakeLog();
+  const r = runCli(root, ['run', '--once', '--dry-run'], FAST);
+  assert.match(r.stdout, /cross-review/i);
+  assert.doesNotMatch(r.stdout.split('--- prompt ---')[0], /\$ bash .*claude|\[1\] claude/);
+  const r2 = runCli(root, ['run', '--once'], { ...FAST, FAKE_LOG: log });
+  assert.equal(r2.code, 0, r2.stdout + r2.stderr);
+  assert.deepEqual(calls(log).map((l) => l.split(' ')[1]), ['codex']);
+  const promptLog = readFileSync(join(root, '.agent/runs', runLogs(root)[0]), 'utf8');
+  assert.match(promptLog, /cross-review/i);
+});
+
+test('review with only the builder available → exit 3, never self-review', () => {
+  const root = makeRepo({ config: configWith({ claudeCli: fake('fake-success.sh'), codexCli: fake('fake-success.sh'), order: '[claude]' }) });
+  toReview(root, 'claude');
+  const log = fakeLog();
+  const r = runCli(root, ['run', '--once'], { ...FAST, FAKE_LOG: log });
+  assert.equal(r.code, 3, r.stdout + r.stderr);
+  assert.equal(calls(log).length, 0);
+  assert.equal(cardField(root, 'T-0002', 'status'), 'review');
+});
+
+test('builder handing the card to review counts as a successful session (not a failure)', () => {
+  const root = makeRepo({ config: configWith({ claudeCli: fake('fake-to-review.sh'), codexCli: fake('fake-fail.sh') }) });
+  const log = fakeLog();
+  const r = runCli(root, ['run', '--once'], { ...FAST, FAKE_LOG: log });
+  assert.equal(r.code, 0, r.stdout + r.stderr);
+  assert.equal(cardField(root, 'T-0002', 'status'), 'review');
+  assert.equal(cardField(root, 'T-0002', 'claimed_by'), 'claude');
+  assert.equal(cardField(root, 'T-0002', 'lease_expires_at'), 'null');
+  assert.equal(readState(root).failures['T-0002'] ?? 0, 0);
+});

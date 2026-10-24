@@ -10,6 +10,7 @@ import {
 import { updateFrontmatter } from './frontmatter.ts';
 import { writeHandover, appendHandoverLog, renderHandover, type HandoverInput } from './handover.ts';
 import { isRepo, hasChanges, commitAll, headSha, currentBranch } from './git.ts';
+import { latestCrossReview } from './review.ts';
 import { now, iso, ExitError, EXIT } from './util.ts';
 
 export interface Ctx {
@@ -88,8 +89,21 @@ export function claim(ctx: Ctx, id: string, provider: string): { lease: string; 
     throw new ExitError(EXIT.REFUSED, `another unexpired lease exists: ${holders.join(', ')}; parallel_tasks=${ctx.cfg.parallel_tasks}`);
   }
   const lease = leaseUntil(ctx);
-  const attempts = (Number(card.data.attempts) || 0) + 1;
-  setCard(card, { status: 'claimed', claimed_by: provider, lease_expires_at: lease, attempts });
+  let attempts = Number(card.data.attempts) || 0;
+  if (card.data.status === 'review') {
+    // Cross-review (AGENTS.md §2 step 8): claimed_by stays the builder; the reviewer is recorded
+    // separately. Until a PASS review exists only another provider may claim it; afterwards
+    // any provider may claim it to finish (register, run log, release done).
+    const builder = card.data.claimed_by ? String(card.data.claimed_by) : null;
+    const passed = latestCrossReview(ctx.root, ctx.cfg.paths.evidence, id, builder)?.verdict === 'PASS';
+    if (!passed && builder === provider) {
+      throw new ExitError(EXIT.REFUSED, `${id} is in review and was built by ${provider}; cross-review must be done by another provider (no review of own work)`);
+    }
+    setCard(card, passed ? { lease_expires_at: lease } : { reviewer: provider, lease_expires_at: lease });
+  } else {
+    attempts += 1;
+    setCard(card, { status: 'claimed', claimed_by: provider, lease_expires_at: lease, attempts });
+  }
   s.current_task = id;
   s.claimed_by = provider;
   s.lease_expires_at = lease;
@@ -98,6 +112,19 @@ export function claim(ctx: Ctx, id: string, provider: string): { lease: string; 
   s.branch = currentBranch(ctx.root) ?? s.branch;
   saveState(ctx, s);
   return { lease, attempts };
+}
+
+/** Clear the lease (card + state) without changing the card's status or builder. */
+export function unlease(ctx: Ctx, id: string): void {
+  setCard(getCard(ctx, id), { lease_expires_at: null });
+  const s = state(ctx);
+  if (s.current_task === id) {
+    s.current_task = null;
+    s.claimed_by = null;
+    s.lease_expires_at = null;
+    s.step = null;
+  }
+  saveState(ctx, s);
 }
 
 // ---------------- handover ----------------
@@ -167,7 +194,10 @@ export function checkpoint(ctx: Ctx, idArg: string | undefined, step: string): {
 
 // ---------------- release ----------------
 
-export const RELEASE_STATUSES = ['done', 'blocked', 'todo'];
+/** release = give up the lease and set a status. verifying/review keep claimed_by (the builder). */
+export const RELEASE_STATUSES = ['done', 'blocked', 'todo', 'verifying', 'review'];
+/** statuses that keep the lease when set with set-status */
+export const IN_FLIGHT = ['claimed', 'researching', 'in_progress', 'verifying'];
 
 export function release(ctx: Ctx, id: string, status: string, reason?: string): void {
   if (!RELEASE_STATUSES.includes(status)) throw new ExitError(EXIT.REFUSED, `--status must be one of ${RELEASE_STATUSES.join('|')}`);
@@ -189,6 +219,30 @@ export function release(ctx: Ctx, id: string, status: string, reason?: string): 
   const file = join(ctx.root, ctx.cfg.paths.handover);
   appendHandoverLog(file, `${iso(now())} ${who}: release ${id} → ${status}${reason ? ` (${reason})` : ''}`,
     () => renderHandover(handoverInput(ctx, `release ${id} → ${status}`, id), null));
+}
+
+export function setStatus(ctx: Ctx, id: string, status: string, reason?: string): void {
+  if (!IN_FLIGHT.includes(status)) {
+    if (!RELEASE_STATUSES.includes(status)) {
+      throw new ExitError(EXIT.REFUSED, `status must be one of ${[...IN_FLIGHT, ...RELEASE_STATUSES.filter((x) => x !== 'verifying')].join('|')}`);
+    }
+    release(ctx, id, status, reason);
+    return;
+  }
+  const card = getCard(ctx, id);
+  if (!ACTIVE_STATUSES.includes(String(card.data.status))) {
+    throw new ExitError(EXIT.REFUSED, `${id} has status "${card.data.status}"; claim it first`);
+  }
+  const lease = leaseUntil(ctx);
+  setCard(card, { status, lease_expires_at: lease });
+  const s = state(ctx);
+  s.current_task = id;
+  s.lease_expires_at = lease;
+  s.claimed_by = s.claimed_by ?? (card.data.claimed_by as string | null) ?? null;
+  saveState(ctx, s);
+  const file = join(ctx.root, ctx.cfg.paths.handover);
+  appendHandoverLog(file, `${iso(now())} ${s.claimed_by ?? 'unknown'}: ${id} → ${status}`,
+    () => renderHandover(handoverInput(ctx, `${id} → ${status}`, id), null));
 }
 
 // ---------------- status / next / lease-check / lint ----------------

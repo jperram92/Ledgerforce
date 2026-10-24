@@ -197,3 +197,49 @@ test('unknown subcommand prints usage and exits 1; help exits 0', () => {
   assert.equal(runCli(root, ['help']).code, 0);
   assert.ok(!exists(root, '.agent/HANDOVER.md'));
 });
+
+// ---- status model alignment (AGENTS.md §3): researching / in_progress / verifying / review ----
+
+test('set-status moves through in-flight statuses keeping (and renewing) the lease', () => {
+  const root = makeRepo();
+  runCli(root, ['claim', 'T-0002', '--provider', 'claude'], at(T0));
+  for (const st of ['researching', 'in_progress', 'verifying']) {
+    const r = runCli(root, ['set-status', 'T-0002', st], at('2026-10-24T05:10:00.000Z'));
+    assert.equal(r.code, 0, r.stderr);
+    assert.equal(cardField(root, 'T-0002', 'status'), st);
+    assert.equal(cardField(root, 'T-0002', 'lease_expires_at'), '2026-10-24T05:55:00.000Z');
+    assert.equal(readState(root).current_task, 'T-0002');
+  }
+  assert.equal(runCli(root, ['set-status', 'T-0002', 'wibble']).code, 2);
+  assert.equal(runCli(root, ['set-status', 'T-0002', 'blocked']).code, 2); // needs --reason
+  // done/todo/blocked via set-status behave like release
+  assert.equal(runCli(root, ['set-status', 'T-0002', 'blocked', '--reason', 'waiting on ADR']).code, 0);
+  assert.equal(cardField(root, 'T-0002', 'lease_expires_at'), 'null');
+  assert.equal(readState(root).current_task, null);
+});
+
+test('release accepts verifying and review, clears the lease and keeps the builder', () => {
+  const root = makeRepo();
+  runCli(root, ['claim', 'T-0002', '--provider', 'claude'], at(T0));
+  const r = runCli(root, ['release', 'T-0002', '--status', 'review'], at(T0));
+  assert.equal(r.code, 0, r.stderr);
+  assert.equal(cardField(root, 'T-0002', 'status'), 'review');
+  assert.equal(cardField(root, 'T-0002', 'claimed_by'), 'claude');
+  assert.equal(cardField(root, 'T-0002', 'lease_expires_at'), 'null');
+  assert.equal(readState(root).current_task, null);
+});
+
+test('a card in review can only be claimed by the other provider; claimed_by stays the builder', () => {
+  const root = makeRepo();
+  runCli(root, ['claim', 'T-0002', '--provider', 'claude'], at(T0));
+  runCli(root, ['release', 'T-0002', '--status', 'review'], at(T0));
+  const self = runCli(root, ['claim', 'T-0002', '--provider', 'claude'], at(T0));
+  assert.equal(self.code, 2);
+  assert.match(self.stderr, /cross-review|own work/i);
+  const r = runCli(root, ['claim', 'T-0002', '--provider', 'codex'], at(T0));
+  assert.equal(r.code, 0, r.stderr);
+  assert.equal(cardField(root, 'T-0002', 'status'), 'review');
+  assert.equal(cardField(root, 'T-0002', 'claimed_by'), 'claude');
+  assert.equal(cardField(root, 'T-0002', 'reviewer'), 'codex');
+  assert.equal(readState(root).claimed_by, 'codex');
+});

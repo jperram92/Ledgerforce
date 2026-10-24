@@ -34,7 +34,9 @@ export default async function setup(project: TestProject): Promise<() => Promise
   } finally {
     await admin.end();
   }
-  console.log(`[db] test PostgreSQL ready (${server.mode}) on ${server.host}:${String(server.port)}`);
+  console.log(
+    `[db] test PostgreSQL ready (${server.mode}) on ${server.host}:${String(server.port)}`,
+  );
   project.provide('lfTestDb', {
     mode: server.mode,
     host: server.host,

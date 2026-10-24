@@ -7,13 +7,17 @@
 //     blocked → notification, stop (exit 4)
 //     quota   → snapshot work to wip/<T>-<ts>, handover, release, mark provider exhausted, next provider
 //     failure → snapshot, failures+1; ≥ max_attempts → blocked + notification (exit 4); else rotate
+//     handoff → builder moved the card to review / reviewer gave a verdict: lease released, next task
 //   no provider left → handover "all providers exhausted", exit 3
+// A card in `review` is routed to a provider other than its builder (claimed_by) until a PASS
+// cross-review report exists; then any provider (builder first) may finish it.
 import { spawn, spawnSync } from 'node:child_process';
 import { createWriteStream, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import {
-  type Ctx, cards, getCard, state, saveState, claim, release, handover,
+  type Ctx, cards, getCard, state, saveState, claim, release, handover, unlease,
 } from './commands.ts';
+import { latestCrossReview } from './review.ts';
 import { nextClaimable, ACTIVE_STATUSES, type Card } from './backlog.ts';
 import { type ProviderConfig } from './config.ts';
 import { ensureBranch, hasChanges, isRepo, snapshotToRef, currentBranch } from './git.ts';
@@ -25,7 +29,20 @@ type Outcome =
   | { kind: 'done' }
   | { kind: 'blocked'; reason: string }
   | { kind: 'quota'; detail: string }
-  | { kind: 'failure'; detail: string };
+  | { kind: 'failure'; detail: string }
+  | { kind: 'handoff'; detail: string };
+
+/** build: normal work · review: cross-review by a non-builder · finish: review passed, close out */
+export type Mode = 'build' | 'review' | 'finish';
+
+export function taskMode(ctx: Ctx, card: Card): { mode: Mode; builder: string | null; candidates: string[] } {
+  const order = ctx.cfg.failover_order;
+  const builder = card.data.claimed_by ? String(card.data.claimed_by) : null;
+  if (card.data.status !== 'review') return { mode: 'build', builder, candidates: order };
+  const passed = latestCrossReview(ctx.root, ctx.cfg.paths.evidence, card.id, builder)?.verdict === 'PASS';
+  if (passed) return { mode: 'finish', builder, candidates: builder && order.includes(builder) ? [builder, ...order.filter((p) => p !== builder)] : order };
+  return { mode: 'review', builder, candidates: order.filter((p) => p !== builder) };
+}
 
 const AGENT_DIR = join(import.meta.dirname, '..');
 const CONDUCTOR = join(AGENT_DIR, 'conductor.ts');
@@ -113,17 +130,36 @@ function resumePack(ctx: Ctx): string {
   return text.trim() || '(resume.sh produced no output)';
 }
 
-export function buildPrompt(ctx: Ctx, card: Card, provider: string, run: string, branch: string, pack: string, note: string): string {
+export function buildPrompt(ctx: Ctx, card: Card, provider: string, run: string, branch: string, pack: string, note: string, mode: Mode = 'build', builder: string | null = null): string {
   const id = card.id;
   const max = ctx.cfg.prompt_max_chars;
   const packText = pack.length > max ? pack.slice(0, max) + `\n…(context pack truncated at ${max} chars — run bash scripts/agent/resume.sh for the rest)` : pack;
+  if (mode !== 'build') {
+    const what = mode === 'review'
+      ? [`You are resuming LedgerForce task ${id} ("${card.data.title}") as the CROSS-REVIEWER, provider "${provider}"; it was built by "${builder}". Launched non-interactively by the conductor (run ${run}).`,
+        'Follow AGENTS.md exactly. Run the resume skill/script first: `bash scripts/agent/resume.sh`.',
+        `Then run the cross-review skill (.claude/skills/cross-review/SKILL.md) acting as .claude/agents/reviewer.md: review branch ${branch} without changing product code, write .agent/evidence/${id}/review-${provider}-<YYYYMMDD-HHMMSS>.md with the verdict and commit it.`,
+        `On PASS leave status review; on FAIL set the card to in_progress with the failing items as steps (node scripts/agent/conductor.ts set-status ${id} in_progress); on NEEDS-HUMAN release it blocked with the gate as reason.`]
+      : [`You are resuming LedgerForce task ${id} ("${card.data.title}") as provider "${provider}" to FINISH it: the cross-review passed. Launched non-interactively by the conductor (run ${run}).`,
+        'Follow AGENTS.md exactly. Run the resume skill/script first: `bash scripts/agent/resume.sh`.',
+        `Follow Docs/process/definition-of-done.md "Order of finishing a task" step 5: update the success-scenario register, decision log, run log and HANDOVER, run bash scripts/agent/verify.sh, then node scripts/agent/conductor.ts release ${id} --status done.`];
+    return [
+      ...what,
+      '- Never wait for interactive input; never delete files; never skip or weaken tests; never push to main.',
+      `- If you must stop: node scripts/agent/conductor.ts handover --reason "<why>" and exit.`,
+      note ? `Note from the conductor: ${note}` : '',
+      '',
+      '--- RESUME CONTEXT PACK ---',
+      packText,
+    ].filter((l, i, a) => l !== '' || a[i - 1] !== '').join('\n');
+  }
   return [
     `You are resuming LedgerForce task ${id} ("${card.data.title}") as provider "${provider}", launched non-interactively by the conductor (run ${run}).`,
     'Follow AGENTS.md exactly; it is the canonical rule set (CLAUDE.md only adds to it).',
     `1. Run the resume skill/script first: \`bash scripts/agent/resume.sh\` (its output at launch is included below) and read .agent/HANDOVER.md.`,
     `2. The conductor has already claimed ${id} for you on branch ${branch} (lease ${ctx.cfg.lease_minutes} minutes). Do not claim or switch to another task or branch.`,
     `3. Work test-first. After every green step run \`node scripts/agent/conductor.ts checkpoint ${id} --step "step k/n — <what>"\`; it commits, renews your lease and logs the step. Checkpoint at least every ${ctx.cfg.heartbeat_minutes} minutes or the conductor treats the session as dead when the lease expires.`,
-    `4. When every acceptance criterion is green, run \`bash scripts/agent/verify.sh\`; when all gates pass, finish with \`node scripts/agent/conductor.ts release ${id} --status done\`.`,
+    `4. Follow Docs/process/definition-of-done.md: set-status verifying, run \`bash scripts/agent/verify.sh\`, capture evidence, then hand to cross-review with \`node scripts/agent/conductor.ts release ${id} --status review\` (the conductor routes it to the other provider). Status changes in flight: \`node scripts/agent/conductor.ts set-status ${id} <researching|in_progress|verifying>\`.`,
     `5. If you hit a usage, credit or rate limit, are about to run out of context, or must stop for any reason: run \`node scripts/agent/conductor.ts handover --reason "<why>"\`, fill in the narrative fields of .agent/HANDOVER.md, checkpoint, and exit. The conductor will start the next provider on the same branch.`,
     `6. Never wait for interactive input. If you need the human, write the question under "Open questions for human" in .agent/HANDOVER.md and run \`node scripts/agent/conductor.ts release ${id} --status blocked --reason "<why>"\`.`,
     '7. Never delete files, never skip or weaken tests, never push to main, never edit .env files or Approved golden postings.',
@@ -233,10 +269,16 @@ function launch(ctx: Ctx, argv: string[], logFile: string, env: NodeJS.ProcessEn
   });
 }
 
-function classify(ctx: Ctx, card: Card, r: LaunchResult): Outcome {
+function classify(ctx: Ctx, card: Card, r: LaunchResult, mode: Mode, provider: string, reviewBefore: string | null): Outcome {
   const c = getCard(ctx, card.id);
   if (c.data.status === 'done') return { kind: 'done' };
   if (c.data.status === 'blocked') return { kind: 'blocked', reason: String(c.data.blocked_reason ?? 'agent marked the task blocked') };
+  if (mode === 'build' && c.data.status === 'review') return { kind: 'handoff', detail: 'handed to cross-review' };
+  if (mode === 'review') {
+    if (c.data.status !== 'review') return { kind: 'handoff', detail: `review verdict returned the card to ${c.data.status}` };
+    const rv = latestCrossReview(ctx.root, ctx.cfg.paths.evidence, card.id, c.data.claimed_by ? String(c.data.claimed_by) : null);
+    if (rv && rv.file !== reviewBefore && rv.provider === provider) return { kind: 'handoff', detail: `cross-review ${rv.verdict}: ${rv.file}` };
+  }
   if (r.heartbeatLost) return { kind: 'failure', detail: 'heartbeat lost (lease expired without a checkpoint)' };
   const errorish = r.code !== 0 || /"is_error"\s*:\s*true/.test(r.tail);
   if (errorish) {
@@ -264,8 +306,11 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
     s.branch = branch;
     saveState(ctx, s);
   }
-  ctx.out(`Task: ${id} ${card0.data.title}\nBranch: ${branch}`);
-  const order = ctx.cfg.failover_order;
+  const { mode, builder, candidates } = taskMode(ctx, card0);
+  ctx.out(`Task: ${id} ${card0.data.title}\nBranch: ${branch}\nMode: ${modeLabel(mode, builder)}`);
+  const order = candidates;
+  // giving the card back without destroying its place in the flow
+  const giveBack = () => { if (mode === 'build') release(ctx, id, 'todo'); else unlease(ctx, id); };
   const triedOut = new Set<string>(); // exhausted during this run
   const logs: string[] = [];
   let idx = 0;
@@ -284,26 +329,25 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
       break;
     }
     if (!provider) {
-      const msg = `all providers exhausted (${order.join(', ')}): quota, credit or budget limits reached`;
+      const msg = order.length
+        ? `all providers exhausted (${order.join(', ')}): quota, credit or budget limits reached`
+        : `all providers exhausted: no provider other than the builder (${builder}) is configured to cross-review ${id}`;
       ctx.err(msg);
       const s = state(ctx);
-      if (s.current_task === id) release(ctx, id, 'todo');
+      if (s.current_task === id) giveBack();
       handover(ctx, msg, id);
       return EXIT.EXHAUSTED;
     }
     const pcfg = ctx.cfg.providers.find((p) => p.id === provider)!;
 
     // claim (refuses if somebody else holds an unexpired lease)
-    const card = getCard(ctx, id);
-    if (!(ACTIVE_STATUSES.includes(String(card.data.status)) && card.data.claimed_by === provider && state(ctx).current_task === id)) {
-      try {
-        if (ACTIVE_STATUSES.includes(String(card.data.status)) && state(ctx).current_task === id) release(ctx, id, 'todo');
-        claim(ctx, id, provider);
-      } catch (e) {
-        ctx.err(`cannot claim ${id} for ${provider}: ${(e as Error).message}`);
-        return (e as { code?: number }).code ?? EXIT.ERROR;
-      }
+    try {
+      claim(ctx, id, provider);
+    } catch (e) {
+      ctx.err(`cannot claim ${id} for ${provider}: ${(e as Error).message}`);
+      return (e as { code?: number }).code ?? EXIT.ERROR;
     }
+    const reviewBefore = mode === 'review' ? latestCrossReview(ctx.root, ctx.cfg.paths.evidence, id, builder)?.file ?? null : null;
     const runNo = nextRunNumber(ctx);
     const runId = `r${String(runNo).padStart(2, '0')}`;
     const logRel = join(ctx.cfg.paths.runs, `${today(now())}-${provider}-${runId}.log`);
@@ -313,7 +357,7 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
       s.run_id = runId;
       saveState(ctx, s);
     }
-    const prompt = buildPrompt(ctx, getCard(ctx, id), provider, runId, branch, resumePack(ctx), note);
+    const prompt = buildPrompt(ctx, getCard(ctx, id), provider, runId, branch, resumePack(ctx), note, mode, builder);
     const argv = providerArgv(pcfg, prompt);
     const display = [...shellWords(pcfg.cli), ...pcfg.args].map(shellQuote).join(' ') + ' "<prompt>"';
     writeFileSync(join(ctx.root, logRel), [
@@ -331,7 +375,7 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
       ...process.env,
       LF_PROVIDER: provider, LF_TASK: id, LF_RUN_ID: runId, LF_ROOT: ctx.root, LF_CONDUCTOR: CONDUCTOR,
     }, id);
-    const outcome = classify(ctx, getCard(ctx, id), r);
+    const outcome = classify(ctx, getCard(ctx, id), r, mode, provider, reviewBefore);
     const costs = [...r.tail.matchAll(/"total_cost_usd"\s*:\s*([0-9]+(?:\.[0-9]+)?)/g)];
     const footer = [
       '',
@@ -352,6 +396,11 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
     }
 
     if (outcome.kind === 'done') return EXIT.OK;
+    if (outcome.kind === 'handoff') {
+      unlease(ctx, id);
+      ctx.out(`${id}: ${outcome.detail}; lease released`);
+      return EXIT.OK;
+    }
     if (outcome.kind === 'blocked') {
       const n = notify(ctx, getCard(ctx, id), `blocked by ${provider}: ${outcome.reason}`, logs);
       ctx.out(`${id} is blocked: ${outcome.reason}. Notification: ${n}`);
@@ -377,7 +426,7 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
       saveState(ctx, s);
       triedOut.add(provider);
       handover(ctx, `${provider} quota/credit failure: ${outcome.detail}${saved}`);
-      release(ctx, id, 'todo');
+      giveBack();
       note = `the previous provider (${provider}) stopped on a quota/credit error${saved}. Last green commit is in HANDOVER.md; verify the uncommitted work with the tests before building on it.`;
       idx = (order.indexOf(provider) + 1) % order.length;
       continue;
@@ -398,10 +447,16 @@ async function runTask(ctx: Ctx, card0: Card): Promise<number> {
       return EXIT.BLOCKED;
     }
     handover(ctx, `${provider} failed (${outcome.detail}); attempt ${failures}/${ctx.cfg.max_attempts_per_task}${saved}`);
-    release(ctx, id, 'todo');
+    giveBack();
     note = `the previous session (${provider}) failed: ${outcome.detail}${saved}.`;
     if (ctx.cfg.retry_policy === 'rotate') idx = (order.indexOf(provider) + 1) % order.length;
   }
+}
+
+function modeLabel(mode: Mode, builder: string | null): string {
+  if (mode === 'review') return `cross-review (built by ${builder ?? 'unknown'}; reviewer must be another provider)`;
+  if (mode === 'finish') return `finish (cross-review passed; builder ${builder ?? 'unknown'} first)`;
+  return 'build';
 }
 
 // ---------------- dry run ----------------
@@ -414,8 +469,10 @@ function dryRun(ctx: Ctx, card: Card): number {
   ctx.out('DRY-RUN — nothing will be executed, committed or written.');
   ctx.out(`Task: ${id} ${card.data.title} [${card.data.status}]`);
   ctx.out(`Branch: ${branch}${currentBranch(ctx.root) === branch ? ' (current)' : ' (would be checked out / created from HEAD)'}`);
-  ctx.out(`Failover order: ${ctx.cfg.failover_order.join(' → ')}; max_attempts_per_task=${ctx.cfg.max_attempts_per_task}; lease=${ctx.cfg.lease_minutes}m`);
-  ctx.cfg.failover_order.forEach((pid, k) => {
+  const { mode, builder, candidates } = taskMode(ctx, card);
+  ctx.out(`Mode: ${modeLabel(mode, builder)}`);
+  ctx.out(`Failover order: ${candidates.join(' → ') || '(none eligible)'}; max_attempts_per_task=${ctx.cfg.max_attempts_per_task}; lease=${ctx.cfg.lease_minutes}m`);
+  candidates.forEach((pid, k) => {
     const p = ctx.cfg.providers.find((x) => x.id === pid)!;
     const why = unavailableReason(ctx, pid);
     const runId = `r${String(runNo + k).padStart(2, '0')}`;
@@ -424,7 +481,7 @@ function dryRun(ctx: Ctx, card: Card): number {
     ctx.out(`    $ ${[...shellWords(p.cli), ...p.args].map(shellQuote).join(' ')} "<prompt>"`);
     ctx.out(`    log: ${join(ctx.cfg.paths.runs, `${today(now())}-${pid}-${runId}.log`)}`);
   });
-  const prompt = buildPrompt(ctx, card, ctx.cfg.failover_order[0] ?? 'claude', `r${String(runNo).padStart(2, '0')}`, branch, `(resume context pack: ${pack.length} chars)`, '');
+  const prompt = buildPrompt(ctx, card, candidates[0] ?? '(none)', `r${String(runNo).padStart(2, '0')}`, branch, `(resume context pack: ${pack.length} chars)`, '', mode, builder);
   ctx.out('--- prompt ---');
   ctx.out(prompt);
   return EXIT.OK;

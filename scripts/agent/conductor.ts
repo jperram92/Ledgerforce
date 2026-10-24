@@ -5,7 +5,7 @@
 import { spawnSync } from 'node:child_process';
 import { relative } from 'node:path';
 import {
-  makeCtx, claim, checkpoint, release, handover, status, next, expiredLeases, lint, RELEASE_STATUSES,
+  makeCtx, claim, checkpoint, release, setStatus, handover, status, next, expiredLeases, lint, RELEASE_STATUSES,
 } from './lib/commands.ts';
 import { run } from './lib/run.ts';
 import { ExitError, EXIT } from './lib/util.ts';
@@ -15,7 +15,12 @@ const USAGE = `Usage: node scripts/agent/conductor.ts <command> [options]
 Commands:
   claim <T-ID> --provider <claude|codex>      claim a task (lease + attempts) in card and state.json
   checkpoint [T-ID] --step "<text>"           commit wip(T-ID): <text>, record sha, renew lease, log step
-  release <T-ID> --status <done|blocked|todo> [--reason "<why>"]   clear lease, set status
+  release <T-ID> --status <done|blocked|todo|verifying|review> [--reason "<why>"]
+                                              clear the lease and set status (blocked needs --reason;
+                                              review hands the card to the other provider)
+  set-status <T-ID> <status> [--reason "<why>"]
+                                              researching|in_progress|verifying keep + renew the lease;
+                                              done|blocked|todo|review behave like release
   handover --reason "<text>"                  (re)write .agent/HANDOVER.md from state + card
   status                                      state, active lease, backlog counts, next task
   next [--count N]                            next claimable task id(s) in dependency order
@@ -75,7 +80,7 @@ export async function main(argv: string[]): Promise<number> {
     process.stdout.write(USAGE + '\n');
     return EXIT.OK;
   }
-  const known = ['claim', 'checkpoint', 'release', 'handover', 'status', 'next', 'run', 'lease-check', 'lint-backlog'];
+  const known = ['claim', 'checkpoint', 'release', 'set-status', 'handover', 'status', 'next', 'run', 'lease-check', 'lint-backlog'];
   if (!known.includes(cmd)) {
     process.stderr.write(`unknown command "${cmd}"\n\n${USAGE}\n`);
     return EXIT.ERROR;
@@ -101,6 +106,14 @@ export async function main(argv: string[]): Promise<number> {
       const st = str(flags, 'status', true, `<${RELEASE_STATUSES.join('|')}>`)!;
       release(ctx, id, st, str(flags, 'reason', false));
       ctx.out(`released ${id} → ${st}`);
+      return EXIT.OK;
+    }
+    case 'set-status': {
+      const id = taskArg(pos, true)!;
+      const st = pos[1] ?? str(flags, 'status', false);
+      if (!st) throw new ExitError(EXIT.REFUSED, `missing status\n\n${USAGE}`);
+      setStatus(ctx, id, st, str(flags, 'reason', false));
+      ctx.out(`${id} → ${st}`);
       return EXIT.OK;
     }
     case 'handover': {
