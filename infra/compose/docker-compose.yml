@@ -1,0 +1,71 @@
+# LedgerForce: single-VM self-host stack (design §7.2).
+#
+# Only `postgres` is live today. The other services are placeholders, commented out until their
+# apps exist (apps/api, apps/worker, apps/web) and Keycloak is configured.
+#
+# Secrets come from the environment or an env file you keep OUTSIDE the repo. Nothing secret is
+# committed:
+#   LF_POSTGRES_PASSWORD   superuser password (bootstrap only, never used by the app)
+#   LF_MIGRATOR_PASSWORD   password for lf_migrator (runs migrations)
+#   LF_APP_PASSWORD        password for lf_app (application runtime, no BYPASSRLS)
+#
+#   docker compose -f infra/compose/docker-compose.yml up -d postgres
+#
+# Not used by the test suite: tests need no Docker (DL-0007, packages/db/README.md).
+name: ledgerforce
+
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ledgerforce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${LF_POSTGRES_PASSWORD:?set LF_POSTGRES_PASSWORD}
+      LF_MIGRATOR_PASSWORD: ${LF_MIGRATOR_PASSWORD:?set LF_MIGRATOR_PASSWORD}
+      LF_APP_PASSWORD: ${LF_APP_PASSWORD:?set LF_APP_PASSWORD}
+    ports:
+      - '127.0.0.1:5432:5432' # loopback only
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Role and grant bootstrap: one source of truth shared with the test harness.
+      - ../../packages/db/bootstrap:/lf-bootstrap:ro
+      - ./initdb/10-ledgerforce-roles.sh:/docker-entrypoint-initdb.d/10-ledgerforce-roles.sh:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d ledgerforce']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # keycloak:
+  #   # OIDC identity provider for self-host (design §6.2, §7.1). Placeholder: realm export,
+  #   # admin credentials (from a secret store) and the database are configured in a later task.
+  #   image: quay.io/keycloak/keycloak:<pinned-version>
+  #   command: start --optimized
+  #   depends_on: [postgres]
+
+  # api:
+  #   # NestJS HTTP API (apps/api). Connects as lf_app ONLY, never as postgres or lf_migrator.
+  #   build: { context: ../.., dockerfile: apps/api/Dockerfile }
+  #   environment:
+  #     DATABASE_URL: postgres://lf_app:${LF_APP_PASSWORD}@postgres:5432/ledgerforce
+  #   depends_on: { postgres: { condition: service_healthy } }
+
+  # worker:
+  #   # Outbox consumer, Salesforce sync, scheduled jobs (apps/worker). Connects as lf_app.
+  #   build: { context: ../.., dockerfile: apps/worker/Dockerfile }
+  #   depends_on: { postgres: { condition: service_healthy } }
+
+  # web:
+  #   # React app (apps/web), served as static files.
+  #   build: { context: ../.., dockerfile: apps/web/Dockerfile }
+  #   depends_on: [api]
+
+  # migrate:
+  #   # One-shot job: applies packages/db/migrations as lf_migrator before api/worker start.
+  #   command: node packages/db/src/cli/migrate.ts
+  #   environment:
+  #     DATABASE_URL: postgres://lf_migrator:${LF_MIGRATOR_PASSWORD}@postgres:5432/ledgerforce
+
+volumes:
+  pgdata:

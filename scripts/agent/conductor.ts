@@ -8,6 +8,7 @@ import {
   makeCtx, claim, checkpoint, release, setStatus, handover, status, next, expiredLeases, lint, RELEASE_STATUSES,
 } from './lib/commands.ts';
 import { run } from './lib/run.ts';
+import { shortcutsGate, migrationsGate, goldenGuard, reviewGate, evidenceGate, memoryGate, type Gate } from './lib/gates.ts';
 import { ExitError, EXIT } from './lib/util.ts';
 
 const USAGE = `Usage: node scripts/agent/conductor.ts <command> [options]
@@ -27,6 +28,9 @@ Commands:
   run [--once] [--task T-ID] [--dry-run]      the failover loop (claude → codex per config)
   lease-check                                 list expired leases (exit 1 if any)
   lint-backlog                                validate task cards (exit 1 on errors)
+  gate <name> [T-ID]                          one definition-of-done check used by verify.sh:
+                                              shortcuts | migrations | golden | review | evidence | memory
+                                              (exit 0 PASS · 1 FAIL · 10 PENDING)
   help                                        this text
 
 Exit codes: 0 ok · 1 error/usage/lint/expired leases · 2 refused · 3 all providers exhausted · 4 task blocked`;
@@ -80,7 +84,7 @@ export async function main(argv: string[]): Promise<number> {
     process.stdout.write(USAGE + '\n');
     return EXIT.OK;
   }
-  const known = ['claim', 'checkpoint', 'release', 'set-status', 'handover', 'status', 'next', 'run', 'lease-check', 'lint-backlog'];
+  const known = ['claim', 'checkpoint', 'release', 'set-status', 'handover', 'status', 'next', 'run', 'lease-check', 'lint-backlog', 'gate'];
   if (!known.includes(cmd)) {
     process.stderr.write(`unknown command "${cmd}"\n\n${USAGE}\n`);
     return EXIT.ERROR;
@@ -144,6 +148,22 @@ export async function main(argv: string[]): Promise<number> {
       for (const e of errors) ctx.out(`ERROR ${e}`);
       ctx.err(`${errors.length} backlog error(s)`);
       return EXIT.ERROR;
+    }
+    case 'gate': {
+      const name = pos[0];
+      const id = taskArg(pos.slice(1), false) ?? null;
+      const needsTask = ['review', 'evidence'];
+      let g: Gate;
+      if (needsTask.includes(name) && !id) g = { result: 'PENDING', lines: ['no task id (pass T-NNNN, or set state.json current_task)'] };
+      else if (name === 'shortcuts') g = shortcutsGate(ctx);
+      else if (name === 'migrations') g = migrationsGate(ctx);
+      else if (name === 'golden') g = goldenGuard(ctx);
+      else if (name === 'review') g = reviewGate(ctx, id!);
+      else if (name === 'evidence') g = evidenceGate(ctx, id!);
+      else if (name === 'memory') g = memoryGate(ctx, id);
+      else throw new ExitError(EXIT.REFUSED, `unknown gate "${name}" (shortcuts|migrations|golden|review|evidence|memory)`);
+      ctx.out(`${g.result}: ${g.lines.join('\n  ')}`);
+      return g.result === 'PASS' ? EXIT.OK : g.result === 'FAIL' ? EXIT.ERROR : 10;
     }
     case 'run': {
       const task = taskArg(flags.task === undefined || flags.task === true ? [] : [String(flags.task)], false);

@@ -15,6 +15,9 @@ migrations, permissions, posting rules, event subscriptions, UI routes and setti
   UI but never deletes posted history.
 - New tenant-owned tables: `tenant_id`, RLS ENABLE + FORCE, cross-tenant tests (skill
   `migration`).
+- Migrations: a module's manifest *declares* its tables, but the SQL files live in the single
+  global sequence `packages/db/migrations/NNNN_<module>_<name>.sql` (DL-0037) so cross-module
+  foreign keys apply in one deterministic order.
 - Configuration over code (design principle 3): accounts, tax codes, mappings, posting profiles
   and billing formats are data, not hard-coded constants.
 - Posting-producing features require an **Approved** golden posting first (skill

@@ -4,7 +4,9 @@ import assert from 'node:assert/strict';
 import { mkdirSync, readdirSync, readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { makeRepo, runCli, git, cardField, readState, readText, configWith, fake } from './helpers.ts';
+import { makeRepo, runCli, git, cardField, readState, readText, configWith, fake, AGENT_DIR } from './helpers.ts';
+import { loadConfig } from '../lib/config.ts';
+import { quotaMatch, classifyOutput } from '../lib/run.ts';
 
 const FAST = { LF_POLL_MS: '100' };
 
@@ -29,9 +31,10 @@ test('run --dry-run prints the provider commands in failover order and changes n
   assert.ok(claudeLine, r.stdout);
   assert.ok(codexLine, r.stdout);
   assert.ok(r.stdout.indexOf('claude -p') < r.stdout.indexOf('codex exec'), 'claude before codex');
-  assert.match(claudeLine!, /--output-format json/);
-  assert.match(claudeLine!, /--permission-mode acceptEdits/);
-  assert.match(codexLine!, /--sandbox workspace-write/);
+  // defaults from RQ-0002 / RQ-0001 (the fixture config has no `args`)
+  assert.match(claudeLine!, /--output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200/);
+  assert.match(codexLine!, new RegExp(`--cd ${root.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} -s workspace-write -c sandbox_workspace_write.network_access=true --json -o \\S+-codex-r02-last\\.md`));
+  assert.doesNotMatch(r.stdout, /--full-auto/);
   assert.match(r.stdout, /You are resuming LedgerForce task T-0002/);
   assert.match(r.stdout, /claim T-0002 --provider claude/);
   assert.equal(readText(root, '.agent/backlog/T-0002.md'), before);
@@ -239,4 +242,75 @@ test('builder handing the card to review counts as a successful session (not a f
   assert.equal(cardField(root, 'T-0002', 'claimed_by'), 'claude');
   assert.equal(cardField(root, 'T-0002', 'lease_expires_at'), 'null');
   assert.equal(readState(root).failures['T-0002'] ?? 0, 0);
+});
+
+// ---- provider failure classification (RQ-0001, RQ-0002) ----
+
+test('the real config matches the session-limit message that stopped a session, case-insensitively', () => {
+  const cfg = loadConfig(join(AGENT_DIR, '../..'));
+  for (const msg of [
+    "You've hit your session limit · resets 7:30am (UTC)",
+    "YOU'VE HIT YOUR SESSION LIMIT · RESETS 7:30AM (UTC)",
+    "You've hit your weekly limit · resets Mon",
+    'Credit balance is too low',
+    'API Error: Request rejected (429) · rate limited',
+    'API Error: Repeated 529 Overloaded errors.',
+    'Server is temporarily limiting requests (not your usage limit)',
+    "You've hit your monthly spend limit",
+    'stream error: exceeded retry limit, last status: 429 Too Many Requests',
+  ]) assert.ok(quotaMatch(cfg, msg), msg);
+  assert.equal(quotaMatch(cfg, 'TypeError: cannot read properties of undefined'), null);
+});
+
+test('classifyOutput: stdout and stderr, is_error/subtype from the final result', () => {
+  const cfg = loadConfig(join(AGENT_DIR, '../..'));
+  assert.equal(classifyOutput(cfg, 1, '{"type":"result","is_error":true,"result":"You\'ve hit your session limit · resets 7:30am (UTC)"}').kind, 'quota');
+  assert.equal(classifyOutput(cfg, 0, '{"type":"result","subtype":"error_max_budget_usd","is_error":true}').kind, 'quota');
+  const mt = classifyOutput(cfg, 0, '{"type":"result","subtype":"error_max_turns","is_error":true}');
+  assert.equal(mt.kind, 'failure');
+  assert.match(mt.detail, /error_max_turns/);
+  assert.equal(classifyOutput(cfg, 1, 'boom: segfault').kind, 'failure');
+  // exit 0, task not done, limit message at the end of the output → quota
+  assert.equal(classifyOutput(cfg, 0, 'did some work\nYou\'ve hit your session limit · resets 7:30am (UTC)\n').kind, 'quota');
+});
+
+test('FAILOVER on the real session-limit message printed to stdout', () => {
+  const root = makeRepo({ config: configWith({ claudeCli: fake('fake-session-limit.sh'), codexCli: fake('fake-success.sh') }) });
+  const log = fakeLog();
+  const r = runCli(root, ['run', '--once'], { ...FAST, FAKE_LOG: log });
+  assert.equal(r.code, 0, r.stdout + r.stderr);
+  assert.deepEqual(calls(log).map((l) => l.split(' ')[1]), ['claude', 'codex']);
+  assert.equal(readState(root).providers.claude.last_failure, 'quota');
+  assert.match(readText(root, '.agent/HANDOVER.md'), /session limit/);
+});
+
+// ---- codex cannot write .git: the conductor commits for it ----
+
+test('commits: conductor — deferred checkpoints are committed by the conductor during and after the run', () => {
+  const root = makeRepo({ config: configWith({ claudeCli: fake('fake-quota.sh'), codexCli: fake('fake-nogit.sh'), codexCommits: 'conductor' }) });
+  const log = fakeLog();
+  const r = runCli(root, ['run', '--once'], { ...FAST, FAKE_LOG: log }, 30_000);
+  assert.equal(r.code, 0, r.stdout + r.stderr);
+  assert.ok(calls(log).some((l) => l.startsWith('fake-nogit codex T-0002 saw-commit')), calls(log).join('\n'));
+  const subjects = git(root, 'log', '--format=%s').split('\n');
+  assert.ok(subjects.includes('wip(T-0002): codex step 1 (no .git access)'), subjects.join('\n'));
+  assert.ok(subjects.some((x) => /^wip\(T-0002\): codex r\d+ session end \(committed by conductor\)$/.test(x)), subjects.join('\n'));
+  assert.match(git(root, 'show', '--name-only', '--format=', 'HEAD~1'), /codex-step1\.txt/);
+  assert.match(git(root, 'show', '--name-only', '--format=', 'HEAD'), /codex-final\.txt/);
+  assert.equal(cardField(root, 'T-0002', 'status'), 'done');
+  const s = readState(root);
+  assert.deepEqual(s.pending_checkpoints ?? [], []);
+  assert.equal(cardField(root, 'T-0002', 'last_checkpoint'), git(root, 'rev-parse', 'HEAD~1'));
+});
+
+test('checkpoint with LF_DEFER_COMMIT=1 records the step instead of touching .git', () => {
+  const root = makeRepo();
+  runCli(root, ['claim', 'T-0002', '--provider', 'codex']);
+  writeFileSync(join(root, 'x.txt'), 'x');
+  const before = git(root, 'rev-parse', 'HEAD');
+  const r = runCli(root, ['checkpoint', 'T-0002', '--step', 'deferred step'], { LF_DEFER_COMMIT: '1' });
+  assert.equal(r.code, 0, r.stderr);
+  assert.match(r.stdout, /deferred/i);
+  assert.equal(git(root, 'rev-parse', 'HEAD'), before);
+  assert.deepEqual(readState(root).pending_checkpoints, ['deferred step']);
 });

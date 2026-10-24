@@ -242,3 +242,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0009 (ATO tax-invoice guidance, s9-90 explanatory memorandum).
 - Alternatives: design's per-line rounding.
 - ADR: accounting ADR required · Status: proposed (awaiting human)
+
+### DL-0033 — Dev tooling versions for the monorepo
+- Date: 2026-10-24 · By: claude · Task: T-0008 · Category: tooling
+- Decision: typescript 6.0.3, vitest 4.1.12, eslint 10.13 + typescript-eslint 8.72, prettier 3.9.10, fast-check 4.10.2, testcontainers 12.2.1, @playwright/test 1.63.0 (pinned to match preinstalled Chromium build).
+- Why: typescript-eslint supports TS < 6.1 (rules out TS 7); vitest 4.x is the stable line with the `projects` API; Playwright must match the installed browser.
+- Alternatives: TS 7 (no lint support); vitest 5 (new major).
+- ADR: none · Status: accepted
+
+### DL-0034 — Run TypeScript source directly (no build step)
+- Date: 2026-10-24 · By: claude · Task: T-0008 · Category: tooling
+- Decision: Packages export `src/*.ts` with `.ts` import extensions and `erasableSyntaxOnly`; Node ≥ 22.18 required.
+- Why: Consistent with DL-0005; one code path for Node, Vitest and Playwright.
+- Alternatives: tsc build or tsx (extra step that can drift).
+- ADR: none · Status: accepted
+
+### DL-0035 — Superuser role bootstrap separate from migrations
+- Date: 2026-10-24 · By: claude · Task: T-0008 · Category: security
+- Decision: `lf_migrator` and `lf_app` are created by idempotent `packages/db/bootstrap/*.sql` run once by a DBA/superuser (passwords from env). Migrations run as `lf_migrator`, which has no CREATEROLE.
+- Why: Least privilege (design §6.7).
+- Alternatives: create roles in migration 0001 (needs CREATEROLE).
+- ADR: security ADR if the human wants one · Status: proposed (awaiting human)
+
+### DL-0036 — lf_app privileges: no DELETE/TRUNCATE; audit log INSERT-only
+- Date: 2026-10-24 · By: claude · Task: T-0008 · Category: security
+- Decision: `lf_app` gets SELECT/INSERT/UPDATE on tenant tables and INSERT only on `audit.audit_log`; statement-level triggers block UPDATE/DELETE/TRUNCATE on the audit log even for its owner.
+- Why: Directive 6 (no delete); TRUNCATE bypasses RLS; design §6.8.
+- Alternatives: soft-delete with DELETE grant (rejected).
+- ADR: none · Status: proposed (awaiting human)
+
+### DL-0037 — Single global migration sequence with stricter policy
+- Date: 2026-10-24 · By: claude · Task: T-0008 · Category: architecture
+- Decision: All migrations live in `packages/db/migrations` (NNNN, gapless, checksummed); module manifests declare tables but SQL lives in the global sequence (packages/modules/AGENTS.md updated). Runner rejects DROP (except DROP DEFAULT/NOT NULL), RENAME, TRUNCATE, DELETE, ALTER COLUMN TYPE, DISABLE TRIGGER/RLS, NO FORCE RLS, BYPASSRLS.
+- Why: Cross-package FKs need one deterministic order; enforces DL-0004 mechanically.
+- Alternatives: per-package migration dirs (ordering conflicts).
+- ADR: ADR-0014 · Status: accepted
+
+### DL-0038 — Test DB harness modes (implements DL-0007)
+- Date: 2026-10-24 · By: claude · Task: T-0008 · Category: tooling
+- Decision: Harness order: `LF_TEST_DATABASE_URL` (CI service) → Testcontainers → local initdb cluster as a non-root OS user; one database per test file.
+- Why: RQ-0008; initdb refuses root.
+- Alternatives: PGlite/pg-mem (rejected in RQ-0008).
+- ADR: ADR-0013 · Status: accepted

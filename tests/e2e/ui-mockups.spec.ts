@@ -12,7 +12,8 @@ import { pathToFileURL } from 'node:url';
 import { test, expect } from '@ledgerforce/testing/evidence';
 
 const REPO_ROOT = resolve(import.meta.dirname, '..', '..');
-const MOCKUP_DIR = join(REPO_ROOT, 'Docs', 'ui', 'mockups');
+// LF_MOCKUP_DIR lets the fallback path be exercised (point it at an empty directory).
+const MOCKUP_DIR = process.env['LF_MOCKUP_DIR'] ?? join(REPO_ROOT, 'Docs', 'ui', 'mockups');
 const FIXTURE = join(REPO_ROOT, 'tests', 'e2e', 'fixtures', 'mockup-fixture.html');
 
 const mockups = existsSync(MOCKUP_DIR)

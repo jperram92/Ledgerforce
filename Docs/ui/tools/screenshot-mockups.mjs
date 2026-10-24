@@ -31,7 +31,7 @@ let axeSource = null;
 const axePath = process.env.AXE_PATH || (() => { try { return require.resolve('axe-core/axe.min.js'); } catch { return null; } })();
 if (axePath && existsSync(axePath)) axeSource = readFileSync(axePath, 'utf8');
 
-const MOBILE = new Set(['12-mobile-approvals', 'index']);
+const MOBILE = new Set(['12-mobile-approvals', 'index']); // 390x844 (index also at 1440x900 as index-desktop)
 const DARK = new Set(['01-home-dashboard', '03-invoice-detail', '06-bank-reconciliation']);
 const filters = process.argv.slice(2);
 const pages = readdirSync(mockDir).filter((f) => f.endsWith('.html')).map((f) => f.replace(/\.html$/, ''))
@@ -97,11 +97,13 @@ const report = { generated: new Date().toISOString(), axe: Boolean(axeSource), p
 let failed = 0;
 
 for (const name of pages) {
-  const variants = [{ suffix: '', query: '' }];
-  if (DARK.has(name)) variants.push({ suffix: '-dark', query: '?theme=dark' });
+  const DESK = { width: 1440, height: 900 }, PHONE = { width: 390, height: 844 };
+  const variants = [{ suffix: '', query: '', vp: MOBILE.has(name) ? PHONE : DESK }];
+  if (DARK.has(name)) variants.push({ suffix: '-dark', query: '?theme=dark', vp: DESK });
+  if (name === 'index') variants.push({ suffix: '-desktop', query: '', vp: DESK });
   for (const v of variants) {
-    const vp = MOBILE.has(name) ? { width: 390, height: 844 } : { width: 1440, height: 900 };
-    const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: MOBILE.has(name) ? 2 : 1, colorScheme: 'light' });
+    const vp = v.vp;
+    const ctx = await browser.newContext({ viewport: vp, deviceScaleFactor: vp.width < 500 ? 2 : 1, colorScheme: 'light' });
     const page = await ctx.newPage();
     const problems = [];
     page.on('console', (m) => { if (m.type() === 'error') problems.push(`console error: ${m.text()}`); });

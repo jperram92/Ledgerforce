@@ -70,10 +70,19 @@ export function cardField(root: string, id: string, key: string): string | undef
   return m ? m[1].replace(/^"(.*)"$/, '$1') : undefined;
 }
 
+/** The failure_patterns block of the real .agent/config.yaml, so tests track the human-owned list. */
+export function realFailurePatterns(): string {
+  const text = readFileSync(join(AGENT_DIR, '../../.agent/config.yaml'), 'utf8');
+  const m = text.match(/^failure_patterns:[^\n]*\n(?:[ \t]+[^\n]*\n)+/m);
+  if (!m) throw new Error('no failure_patterns block in .agent/config.yaml');
+  return m[0].trimEnd();
+}
+
 /** Build a config.yaml for a temp repo with the given provider CLIs. */
 export function configWith(o: {
   claudeCli?: string; codexCli?: string; claudeArgs?: string; codexArgs?: string;
   lease?: number; maxAttempts?: number; order?: string; budgetClaude?: number; extra?: string;
+  codexCommits?: string;
 }): string {
   const claudeArgs = o.claudeArgs !== undefined ? `\n    args: ${o.claudeArgs}` : '';
   const codexArgs = o.codexArgs !== undefined ? `\n    args: ${o.codexArgs}` : '';
@@ -82,7 +91,7 @@ export function configWith(o: {
     cli: "${o.claudeCli ?? 'claude -p'}"${claudeArgs}
     role: [build, review]
   - id: codex
-    cli: "${o.codexCli ?? 'codex exec'}"${codexArgs}
+    cli: "${o.codexCli ?? 'codex exec'}"${codexArgs}${o.codexCommits ? `\n    commits: ${o.codexCommits}` : ''}
     role: [build, review]
 failover_order: ${o.order ?? '[claude, codex]'}
 lease_minutes: ${o.lease ?? 45}
@@ -92,15 +101,7 @@ parallel_tasks: 1
 budgets:
   claude: { daily_usd: ${o.budgetClaude ?? 40} }
   codex: { daily_usd: 40 }
-failure_patterns:
-  quota:
-    - "429"
-    - "rate.?limit"
-    - "insufficient_quota"
-    - "credit balance"
-    - "usage limit"
-    - "quota exceeded"
-    - "overloaded"
+${realFailurePatterns()}
 ${o.extra ?? ''}
 `;
 }
