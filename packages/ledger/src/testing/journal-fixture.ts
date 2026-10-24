@@ -22,6 +22,10 @@ export interface EntryOptions {
   status?: 'draft' | 'posted';
   reversalOf?: string;
   memo?: string;
+  entryNo?: string;
+  sourceId?: string;
+  /** Line memo applied to every line. */
+  lineMemo?: string;
 }
 
 export interface LedgerFixture {
@@ -36,6 +40,10 @@ export interface LedgerFixture {
   emptySet: string;
   inTenant<R>(fn: (trx: Transaction<Database>) => Promise<R>): Promise<R>;
   insertEntry(trx: Transaction<Database>, lines: Line[], opts?: EntryOptions): Promise<string>;
+  /** A further company on the same chart template; insertEntry({ company }) then uses its chart. */
+  addCompany(name: string): Promise<string>;
+  /** A company's chart (code → account id) and its empty dimension set. */
+  chart(company: string): { acct: Record<string, string>; emptySet: string };
   countEntries(): Promise<number>;
   close(): Promise<void>;
 }
@@ -71,12 +79,35 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
     };
   });
 
+  /** company id → its chart (code → account id) and empty dimension set. */
+  const charts = new Map<string, { acct: Record<string, string>; emptySet: string }>([
+    [seeded.companyId, { acct: seeded.acct, emptySet: seeded.emptySet }],
+    [seeded.otherCompanyId, { acct: seeded.otherAcct, emptySet: '' }],
+  ]);
+
+  async function addCompany(name: string): Promise<string> {
+    return inTenant(async (trx) => {
+      const c = await trx
+        .insertInto('app.company')
+        .values({ name, base_currency: 'AUD' })
+        .returning('id')
+        .executeTakeFirstOrThrow();
+      const chart = await loadChartTemplate(trx, c.id, auServicesSmb);
+      charts.set(c.id, {
+        acct: Object.fromEntries(chart.accounts),
+        emptySet: await dimensionSetId(trx, c.id, []),
+      });
+      return c.id;
+    });
+  }
+
   async function insertEntry(
     trx: Transaction<Database>,
     lines: Line[],
     opts: EntryOptions = {},
   ): Promise<string> {
     const company = opts.company ?? seeded.companyId;
+    const chart = charts.get(company) ?? { acct: seeded.acct, emptySet: seeded.emptySet };
     const status = opts.status ?? 'posted';
     const entry = await trx
       .insertInto('app.journal_entry')
@@ -87,6 +118,8 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
         status,
         reversal_of_id: opts.reversalOf ?? null,
         memo: opts.memo ?? null,
+        entry_no: opts.entryNo ?? null,
+        source_id: opts.sourceId ?? null,
         idempotency_key: randomUUID(),
         posted_at: status === 'posted' ? new Date('2026-10-24T09:00:00Z') : null,
       })
@@ -100,13 +133,14 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
             company_id: company,
             entry_id: entry.id,
             line_no: i + 1,
-            account_id: seeded.acct[l.code] ?? l.code,
+            account_id: chart.acct[l.code] ?? l.code,
             debit: l.debit ?? '0',
             credit: l.credit ?? '0',
             txn_currency: 'AUD',
             txn_amount: l.debit ?? l.credit ?? '0',
             fx_rate: '1',
-            dimension_set_id: seeded.emptySet,
+            dimension_set_id: chart.emptySet,
+            memo: opts.lineMemo ?? null,
           })),
         )
         .execute();
@@ -121,6 +155,12 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
     ...seeded,
     inTenant,
     insertEntry,
+    addCompany,
+    chart(company: string) {
+      const c = charts.get(company);
+      if (!c) throw new Error(`fixture: unknown company ${company}`);
+      return c;
+    },
     countEntries: () =>
       inTenant((trx) =>
         trx

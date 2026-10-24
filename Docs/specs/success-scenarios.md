@@ -123,7 +123,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC12-05 | Salesforce values reconcile to LedgerForce aged AR | UC-12 | MVP | db-integration | no | — | T-0067, T-0049 | not-started | — | — |
 | SS-PLAT-01 | Balance trigger rejects unbalanced entries | — | MVP | db-integration | no | packages/ledger/src/journal-balance.db.test.ts | T-0020 | evidenced | [.agent/evidence/T-0020/manifest.json](../../.agent/evidence/T-0020/manifest.json) | 878cfc8 |
 | SS-PLAT-02 | Posted journal rows are immutable | — | MVP | db-integration | no | packages/ledger/src/journal-immutability.db.test.ts | T-0021 | evidenced | [.agent/evidence/T-0021/manifest.json](../../.agent/evidence/T-0021/manifest.json) | 26e7823 |
-| SS-PLAT-03 | Hash chain detects tampering | — | MVP | db-integration | no | — | T-0022 | not-started | — | — |
+| SS-PLAT-03 | Hash chain detects tampering | — | MVP | db-integration | no | packages/ledger/src/hash-chain.db.test.ts | T-0022 | tested | — | — |
 | SS-PLAT-04 | RLS isolates tenants on every tenant table | — | MVP | db-integration | no | packages/db/src/rls.db.test.ts; packages/db/src/tenant-context.db.test.ts | T-0008, T-0010 | evidenced | [.agent/evidence/T-0010/manifest.json](../../.agent/evidence/T-0010/manifest.json) | merge (re-verified below) |
 | SS-PLAT-05 | Gapless numbering under concurrency and rollback | — | MVP | db-integration | no | — | T-0024 | not-started | — | — |
 | SS-PLAT-06 | Period status matrix is enforced as data | — | MVP | unit | no | — | T-0023 | not-started | — | — |

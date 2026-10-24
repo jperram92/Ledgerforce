@@ -1,5 +1,5 @@
 /**
- * Kysely table types for the platform schema (migrations 0001–0007). Keep in step with
+ * Kysely table types for the platform schema (migrations 0001–0009). Keep in step with
  * packages/db/migrations; the db tests exercise every table through these types.
  */
 import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
@@ -146,8 +146,20 @@ export interface JournalEntryTable {
   approved_by: string | null;
   created_at: Timestamp;
   posted_at: Timestamp | null;
-  prev_hash: string | null;
-  hash: string | null;
+  /** Hash-chain fields (migration 0009): written only by the database at commit. */
+  chain_seq: ColumnType<string | null, null | undefined, never>;
+  prev_hash: ColumnType<string | null, null | undefined, never>;
+  hash: ColumnType<string | null, null | undefined, never>;
+}
+
+/** Tip of a company's hash chain (migration 0009). SELECT only for lf_app. */
+export interface JournalChainHeadTable {
+  tenant_id: TenantId;
+  company_id: string;
+  last_seq: ColumnType<string, never, never>;
+  last_hash: ColumnType<string | null, never, never>;
+  last_entry_id: ColumnType<string | null, never, never>;
+  updated_at: ColumnType<Date, never, never>;
 }
 
 /** Journal line in base currency (migration 0007): exactly one of debit/credit > 0. */
@@ -197,6 +209,7 @@ export interface Database {
   'app.dimension_set': DimensionSetTable;
   'app.journal_entry': JournalEntryTable;
   'app.journal_line': JournalLineTable;
+  'app.journal_chain_head': JournalChainHeadTable;
   /** INSERT only for lf_app — do not use RETURNING (needs SELECT). */
   'audit.audit_log': AuditLogTable;
 }
