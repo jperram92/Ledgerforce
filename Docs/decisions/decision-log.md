@@ -550,3 +550,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Design §3.3 invariant 4 and §6.8; ADR-0004 rule 5; ADR-0017. Found during build: `ORDER BY chain_seq` bound to the text output column ("10" < "2") — fixed by ordering on `e.chain_seq`; the 100-entry test caught it.
 - Alternatives: application-computed hash (ADR-0017 option 3); a verifier that calls the SQL canonical function (not independent).
 - ADR: ADR-0017 (Proposed, accounting) · Status: accepted for the build; the canonical form awaits the human with ADR-0017
+
+### DL-0077 — Correction: register rows set back from `evidenced` to `green` until cross-review passes
+- Date: 2026-10-24 · By: claude · Task: register hygiene (found while claiming T-0024) · Category: process
+- Decision: The register's rule is that a row may only be `evidenced` if its task's cross-provider review passed. 14 rows (SS-PLAT-01, 02, 03, 04, 08, 13, 19, 28, 30, 31, 32, 33, 34, UI-01) had been marked `evidenced` while their tasks were still in `review`. They are now `green`, keeping their evidence links and last-verified commits. Commit bodies and the HANDOVER that said "evidenced" meant "evidence recorded", not the register status. From now on, the reviewer (Codex) flips a task's rows to `evidenced` when its review passes; the HANDOVER continuation prompt says so.
+- Why: The register must not overstate verification (AGENTS.md directive 3).
+- Alternatives: leave as is (contradicts the register's own rule).
+- ADR: none · Status: accepted

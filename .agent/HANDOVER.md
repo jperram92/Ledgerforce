@@ -47,7 +47,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
-> commit with a What/Why/Validation/Next body, and on PASS tick steps 8–9 then
+> commit with a What/Why/Validation/Next body, and on PASS flip that task's register rows from `green`
+> to `evidenced` (DL-0077), tick the review/finish steps, then
 > `node scripts/agent/conductor.ts release <T-ID> --status done`.
 > THEN: on Windows take T-0103; otherwise `node scripts/agent/conductor.ts next`.
 > Tests: `pnpm test`, `pnpm test:db` (local initdb cluster or LF_TEST_DATABASE_URL), `bash scripts/agent/verify.sh --task <T-ID>`.
