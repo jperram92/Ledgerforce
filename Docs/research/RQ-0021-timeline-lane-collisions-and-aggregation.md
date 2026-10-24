@@ -84,7 +84,8 @@ engine's extract was used.
 - Sort by start, then priority (`now` items before others), then id. Assign each item to the
   lowest row whose last footprint ends at or before the item's start (greedy first-fit).
 - Rows per lane are capped per scale: Week 3, 5 weeks 2 (the prototype's two levels), Quarter 2,
-  Year 1. An item that finds no free row is hidden.
+  Year 2 (the month holding the last statement date carries an actual and an expected mark,
+  which must both stay visible; see Q2). An item that finds no free row is hidden.
 - Hidden items are gathered into "+n more" markers on an overflow strip under the lane. A marker
   starts at its first hidden item and absorbs every following hidden item whose start is inside
   its footprint, so markers never overlap. A marker that hides a `now` item is drawn in the now

@@ -12,7 +12,7 @@ describe('SS-PLAT-29 lane collision layout (RQ-0021 Q1)', () => {
     expect(SCALES.week).toMatchObject({ bucket: 'day', footprintDays: 1, maxRows: 3 });
     expect(SCALES['5w']).toMatchObject({ bucket: 'day', footprintDays: 4, maxRows: 2 });
     expect(SCALES.quarter).toMatchObject({ bucket: 'week', footprintDays: 14, maxRows: 2 });
-    expect(SCALES.year).toMatchObject({ bucket: 'month', footprintDays: 31, maxRows: 1 });
+    expect(SCALES.year).toMatchObject({ bucket: 'month', footprintDays: 31, maxRows: 2 });
   });
 
   it('places the Harbour decisions lane on two rows without overlap', () => {
