@@ -73,6 +73,15 @@ export default tseslint.config(
     },
   },
   {
+    // NestJS (DL-0061): constructor-injected classes are runtime values for decorator metadata, so
+    // the type-import rule must know decorators emit metadata; Nest modules are decorated classes.
+    files: ['apps/api/**/*.ts'],
+    languageOptions: {
+      parserOptions: { emitDecoratorMetadata: true, experimentalDecorators: true },
+    },
+    rules: { '@typescript-eslint/no-extraneous-class': ['error', { allowWithDecorator: true }] },
+  },
+  {
     // DB integration tests open dedicated, short-lived clients (never the app pool) and must be
     // able to simulate a session-level context to prove withTenant fails closed (RQ-0013).
     files: ['packages/**/*.db.test.ts'],

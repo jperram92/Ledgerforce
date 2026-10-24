@@ -2,7 +2,7 @@
   "name": "ledgerforce",
   "version": "0.0.0",
   "private": true,
-  "description": "LedgerForce \u2014 open-source double-entry SMB ERP for Salesforce (monorepo root)",
+  "description": "LedgerForce — open-source double-entry SMB ERP for Salesforce (monorepo root)",
   "license": "UNLICENSED",
   "type": "module",
   "packageManager": "pnpm@10.28.0",
@@ -14,8 +14,8 @@
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run --project unit",
-    "test:db": "vitest run --project db",
+    "test": "vitest run --project unit --project api-unit",
+    "test:db": "vitest run --project db --project api-db",
     "test:e2e": "playwright test",
     "test:all": "pnpm test && pnpm test:db && pnpm test:e2e",
     "evidence:tests": "node packages/testing/src/evidence/record-tests.ts"
@@ -24,6 +24,7 @@
     "@eslint/js": "10.0.1",
     "@ledgerforce/testing": "workspace:*",
     "@playwright/test": "1.63.0",
+    "@swc/core": "1.16.13",
     "@types/node": "22.20.5",
     "@vitest/coverage-v8": "4.1.12",
     "eslint": "10.13.0",
@@ -32,6 +33,7 @@
     "prettier": "3.9.10",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.0",
+    "unplugin-swc": "2.0.0",
     "vitest": "4.1.12"
   }
 }

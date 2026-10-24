@@ -1,7 +1,8 @@
+import swc from 'unplugin-swc';
 import { defineConfig } from 'vitest/config';
 
 /**
- * Two Vitest projects:
+ * Vitest projects (apps/api has its own two, compiled by SWC for NestJS decorators — DL-0061):
  *  - `unit`: pure tests, no I/O beyond the filesystem (`pnpm test`).
  *  - `db`:   integration tests against a real PostgreSQL (`pnpm test:db`). The global setup
  *            starts one throw-away cluster (Testcontainers when Docker is reachable, else a
@@ -20,7 +21,7 @@ export default defineConfig({
             'packages/*/*/src/**/*.test.{ts,tsx}', // nested: packages/modules/<m>, packages/connectors/<c>
             'packages/*/eslint-rules/**/*.test.ts',
           ],
-          exclude: ['**/*.db.test.ts', '**/node_modules/**', '**/dist/**'],
+          exclude: ['**/*.db.test.ts', '**/node_modules/**', '**/dist/**', 'apps/api/**'],
           environment: 'node',
         },
       },
@@ -32,7 +33,28 @@ export default defineConfig({
             'packages/*/src/**/*.db.test.ts',
             'packages/*/*/src/**/*.db.test.ts',
           ],
-          exclude: ['**/node_modules/**'],
+          exclude: ['**/node_modules/**', 'apps/api/**'],
+          environment: 'node',
+          globalSetup: ['packages/db/src/testing/global-setup.ts'],
+          testTimeout: 60_000,
+          hookTimeout: 120_000,
+        },
+      },
+      {
+        plugins: [swc.vite({ tsconfigFile: 'apps/api/tsconfig.json' })],
+        test: {
+          name: 'api-unit',
+          include: ['apps/api/src/**/*.test.ts'],
+          exclude: ['**/*.db.test.ts', '**/node_modules/**', '**/dist/**'],
+          environment: 'node',
+        },
+      },
+      {
+        plugins: [swc.vite({ tsconfigFile: 'apps/api/tsconfig.json' })],
+        test: {
+          name: 'api-db',
+          include: ['apps/api/src/**/*.db.test.ts'],
+          exclude: ['**/node_modules/**', '**/dist/**'],
           environment: 'node',
           globalSetup: ['packages/db/src/testing/global-setup.ts'],
           testTimeout: 60_000,
