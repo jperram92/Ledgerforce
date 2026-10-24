@@ -322,7 +322,11 @@ describe('SS-PLAT-40: statement parsers', () => {
   describe('properties', () => {
     const lineArb = fc.record({
       postedOn: fc
-        .date({ min: new Date('2000-01-01T00:00:00Z'), max: new Date('2099-12-31T00:00:00Z') })
+        .date({
+          min: new Date('2000-01-01T00:00:00Z'),
+          max: new Date('2099-12-31T00:00:00Z'),
+          noInvalidDate: true,
+        })
         .map((d) => d.toISOString().slice(0, 10)),
       cents: fc.bigInt({ min: -99_999_999_999n, max: 99_999_999_999n }),
       description: fc

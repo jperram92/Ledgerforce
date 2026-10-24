@@ -367,28 +367,26 @@ describe('SS-UC08-02: Duplicate statement import detected', () => {
   });
 
   it('two concurrent imports of the same new file: one imports, the other is told it is a duplicate', async () => {
-    const fresh = await inTenant((trx) =>
-      createCompanyBankAccount(trx, kms, companyId, {
+    const fresh = await inTenant(async (trx) => {
+      const gl1030 = await trx
+        .insertInto('app.account')
+        .values({
+          company_id: companyId,
+          code: '1030',
+          name: 'Card clearing',
+          type: 'asset',
+          subtype: 'bank',
+          normal_balance: 'debit',
+        })
+        .returning('id')
+        .executeTakeFirstOrThrow();
+      return createCompanyBankAccount(trx, kms, companyId, {
         ...operating,
         name: 'Card clearing',
         accountNumber: '55500011',
-        glAccountId: await(async () => {
-          const a = await trx
-            .insertInto('app.account')
-            .values({
-              company_id: companyId,
-              code: '1030',
-              name: 'Card clearing',
-              type: 'asset',
-              subtype: 'bank',
-              normal_balance: 'debit',
-            })
-            .returning('id')
-            .executeTakeFirstOrThrow();
-          return a.id;
-        })(),
-      }),
-    );
+        glAccountId: gl1030.id,
+      });
+    });
     const content = Buffer.from('2026-11-01,1.00,A\n2026-11-02,2.00,B\n');
     const mapping: CsvMapping = {
       header: false,
