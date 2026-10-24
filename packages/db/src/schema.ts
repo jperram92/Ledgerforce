@@ -1,5 +1,5 @@
 /**
- * Kysely table types for the platform schema (migrations 0001–0010). Keep in step with
+ * Kysely table types for the platform schema (migrations 0001–0011). Keep in step with
  * packages/db/migrations; the db tests exercise every table through these types.
  */
 import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
@@ -194,6 +194,75 @@ export interface NumberSeriesTable {
   created_at: Timestamp;
 }
 
+/** Party (migration 0011, design §4.2). Company-scoped; archive, never delete. */
+export interface PartyTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  legal_name: string;
+  trading_name: string | null;
+  abn: string | null;
+  tax_id: string | null;
+  tax_status: string | null;
+  currency: string | null;
+  credit_limit: string | null;
+  default_dimension_set_id: string | null;
+  delivery_preference: Generated<'email' | 'peppol' | 'post'>;
+  /** 18-character form only. */
+  salesforce_account_id: string | null;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
+export type PartyRole = 'customer' | 'supplier' | 'employee';
+export type ContactRole = 'billing_to' | 'billing_cc' | 'statements' | 'remittance' | 'ap_contact';
+
+export interface PartyRoleTable {
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  role: PartyRole;
+  active: Generated<boolean>;
+  created_at: Timestamp;
+}
+
+export interface PartyAddressTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  kind: 'billing' | 'shipping';
+  line1: string;
+  line2: string | null;
+  city: string | null;
+  state: string | null;
+  postcode: string | null;
+  country: Generated<string>;
+}
+
+export interface PartyContactTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  salesforce_contact_id: string | null;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
+export interface PartyContactRoleTable {
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  contact_id: string;
+  role: ContactRole;
+  active: Generated<boolean>;
+  created_at: Timestamp;
+}
+
 export interface AuditLogTable {
   id: ColumnType<string, never, never>;
   tenant_id: TenantId;
@@ -224,6 +293,11 @@ export interface Database {
   'app.journal_line': JournalLineTable;
   'app.journal_chain_head': JournalChainHeadTable;
   'app.number_series': NumberSeriesTable;
+  'app.party': PartyTable;
+  'app.party_role': PartyRoleTable;
+  'app.party_address': PartyAddressTable;
+  'app.party_contact': PartyContactTable;
+  'app.party_contact_role': PartyContactRoleTable;
   /** INSERT only for lf_app — do not use RETURNING (needs SELECT). */
   'audit.audit_log': AuditLogTable;
 }

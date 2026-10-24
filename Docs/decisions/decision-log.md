@@ -564,3 +564,19 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Design §3.4 ("sequences leave gaps; tax invoices need clean series"); RQ-0007 (d).
 - Alternatives: database sequences (gaps on rollback); allocate-then-void numbers (gaps by design); SELECT … then UPDATE (races, killed by the concurrency test as a mutant).
 - ADR: none · Status: accepted
+
+### DL-0079 — Party model: company-scoped; identifiers validated per RQ-0017; contact roles tied to party roles
+- Date: 2026-10-24 · By: claude · Task: T-0036 · Category: data-model
+- Decision:
+  - Migration `0011_parties_party_model.sql` adds app.party, party_role, party_address, party_contact and party_contact_role (RLS; lf_app SELECT/INSERT/UPDATE; nothing deleted).
+  - A party is scoped to a company, not the tenant. Currency, payment terms, credit limit and posting profile are per company (design §4.2), and MVP has one company per tenant (§3.1). Sharing parties across companies is a Phase 2 intercompany question.
+  - ABN: app.abn_is_valid (the ABR mod-89 rule) as a CHECK, with a TypeScript twin, proven to agree by fast-check on random and generated-valid ABNs.
+  - Peppol delivery needs an ABN; the participant ID 0151:<ABN> is derived, not stored.
+  - Salesforce Ids are stored 18-char only and are unique per company.
+  - Contact roles: remittance needs an active supplier role; billing_to, billing_cc, statements and ap_contact need an active customer role. Design §4.2 marks remittance "(suppliers)" and Billing To as required for customers. Treating CC, Statements and AP contact as customer-side is an inference from the AR context they serve.
+  - The Billing To rule is a helper, `invoiceApprovalBlockers` and `billingRecipients`, which T-0040 and T-0044 call.
+  - Out of scope here: bank details (T-0053, verification workflow), posting profile (T-0038), payment terms (T-0039).
+  - Follow-up card T-0107: company ABN checksum and the T-0018 fixture ABN that fails it.
+- Why: Design §4.2; RQ-0017.
+- Alternatives: tenant-scoped parties (would need per-company settings tables now, for no MVP benefit); storing both 15- and 18-char Ids (duplicate risk).
+- ADR: none · Status: accepted

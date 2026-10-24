@@ -155,6 +155,9 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-32 | AU services SMB chart template is valid | — | MVP | unit | no | packages/modules/gl/src/templates.test.ts | T-0018 | green | [.agent/evidence/T-0018/manifest.json](../../.agent/evidence/T-0018/manifest.json) | 42fc3ba |
 | SS-PLAT-33 | Dimension sets are deduplicated by a hash of their sorted pairs | — | MVP | db-integration + property | no | packages/ledger/src/dimension-set.db.test.ts | T-0019 | green | [.agent/evidence/T-0019/manifest.json](../../.agent/evidence/T-0019/manifest.json) | 361b38f |
 | SS-PLAT-34 | Required dimensions per account are enforced; dimension identity is stable | — | MVP | db-integration | no | packages/ledger/src/dimension-set.db.test.ts | T-0019 | green | [.agent/evidence/T-0019/manifest.json](../../.agent/evidence/T-0019/manifest.json) | 361b38f |
+| SS-PLAT-35 | Party identifiers are validated and normalised | — | MVP | unit + property | no | packages/modules/parties/src/identifiers.test.ts | T-0036 | green | — | — |
+| SS-PLAT-36 | One party with roles, addresses, contacts and contact roles | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | — | — |
+| SS-PLAT-37 | An invoice cannot be approved for a customer with no Billing To contact | — | MVP | db-integration | no | packages/modules/parties/src/parties.db.test.ts | T-0036 | green | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -298,4 +301,16 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-34 — Required dimensions per account are enforced; dimension identity is stable
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0019
 - **Given** an account requiring `department` and `project` · **When** the posting engine asks which required dimensions a set lacks · **Then** it gets the missing codes in the account's order (none for a complete set or an account with no requirements); an account cannot require a dimension the company lacks; a dimension's code and primary slot never change; a primary slot is held by at most one dimension and only slots 1–2 exist; a dimension required by an active account cannot be archived
+
+### SS-PLAT-35 — Party identifiers are validated and normalised
+- Phase: MVP · Layer: **unit + property** · Screenshot evidence: no · Task(s): T-0036
+- **Given** RQ-0017's rules · **When** ABNs, Peppol IDs and Salesforce Ids are checked · **Then** the ATO's ABN 51 824 753 556 passes and any single-digit change fails; spaces are stripped; the Peppol participant ID is 0151:<ABN> and needs a valid ABN; a 15-character Salesforce Id becomes 18 characters (003G000001SUbc4 → …IAD), an 18-character Id with a wrong suffix is refused, and case-only differences give different 18-character Ids
+
+### SS-PLAT-36 — One party with roles, addresses, contacts and contact roles
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0036
+- **Given** a company · **When** parties are created and changed as lf_app · **Then** one party holds customer and supplier roles with billing and shipping addresses; the database refuses an ABN failing the checksum even when written directly (SQL and TS checks agree, fast-check); Peppol delivery needs an ABN; the Salesforce Account Id is stored 18-char and unique per company; remittance needs a supplier, billing roles need a customer; a contact role can only name a contact of the same party; lf_app cannot delete from any party table
+
+### SS-PLAT-37 — An invoice cannot be approved for a customer with no Billing To contact
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0036 (helper; the approval itself is T-0040, SS-UC01-05)
+- **Given** a party · **When** invoice approval asks for blockers and recipients · **Then** a customer without an active Billing To contact gets `no_billing_to_contact`, cleared by adding one; an inactive role or archived contact does not count; a non-customer gets `not_a_customer`, an archived party `party_archived`; recipients are active Billing To (To) and Billing CC (CC) contacts with email, sorted
 

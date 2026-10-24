@@ -68,6 +68,10 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   'app.journal_entry': { status: () => 'draft', source_type: () => 'manual_journal' },
   'app.journal_line': { debit: () => '1.0000' },
   'app.number_series': { code: () => `s_${randomBytes(4).toString('hex')}` },
+  'app.party_role': { role: () => 'customer' },
+  'app.party_address': { kind: () => 'billing' },
+  // An active contact role needs an active party role (trigger); a generated party has none.
+  'app.party_contact_role': { role: () => 'billing_to', active: () => 'false' },
 };
 
 export async function discoverTenantTables(db: Queryable): Promise<TableRef[]> {
