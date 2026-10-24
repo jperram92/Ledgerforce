@@ -1,9 +1,13 @@
 # Handover - 2026-10-24 23:10 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: parallel round 1 COMPLETE (DL-0081): T-0058, T-0011, T-0106, T-0062 merged and in review; T-0107 in review. Next: `node scripts/agent/conductor.ts next --count 12` and choose the next parallel round (pre-assign migration numbers and id ranges again).
+Task: PARALLEL ROUND 2 in progress (DL-0100): T-0012, T-0063, T-0081 by sub-agents in worktrees; the lead merges. Afterwards the lead does T-0109; T-0059 needs re-scoping (CAMT.053 built in T-0058).
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
-In progress: nothing. Working tree clean after the last commit. Agent worktrees under .claude/worktrees/ are finished (git-ignored).
+In progress: round 2 worktrees. Pre-assigned (DL-0100):
+  T-0012 → migration 0016, DL-0101..0104, RQ-0023, SS-PLAT-48..49, ADR-0023
+  T-0063 → migration 0017, DL-0105..0108, RQ-0024, SS-PLAT-50..51, ADR-0024
+  T-0081 → no migration, DL-0109..0112, RQ-0025, SS-PLAT-52..53, ADR-0025
+  Lead → DL-0113+, SS-PLAT-54+
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
 Decisions taken: DL-0061..DL-0099; RQ-0017, RQ-0018; ADR-0018 (Proposed, security); RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:

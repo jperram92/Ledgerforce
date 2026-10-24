@@ -773,3 +773,18 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0017; a company ABN prints on tax invoices and must meet the same rule as a party's.
 - Alternatives: leave the pattern-only check (a mistyped ABN reaches invoices).
 - ADR: none · Status: accepted
+
+### DL-0100 — Parallel round 2: T-0012, T-0063, T-0081; same protocol as DL-0081
+- Date: 2026-10-24 · By: claude (lead) · Task: T-0012, T-0063, T-0081 · Category: process
+- Decision: Round 2 of the parallel build runs T-0012 (roles/permissions: apps/api + migration 0016), T-0063 (Salesforce JWT bearer + encrypted token store: packages/connectors/salesforce + migration 0017) and T-0081 (web app shell: apps/web, no migration) in sub-agent worktrees with pre-assigned numbers (HANDOVER). Same protocol as DL-0081, plus three lessons from round 1:
+  - each agent creates its branch from the stated base commit, because worktrees may start at an old commit;
+  - a migration numbered above a not-yet-merged one is tested with a temporary placeholder, removed before committing (as T-0011 did);
+  - gate runs must not commit other tasks' evidence (DL-0098).
+  Not in this round:
+  - T-0059: CAMT.053 was built inside T-0058, so the card needs re-scoping to batch entries, multi-statement files and camt.052/054.
+  - T-0109: the lead does it after the merges, because it touches the shared e2e evidence fixture T-0081 uses.
+  - T-0095: needs the human (AGENTS.md §5).
+  - T-0103: Windows only.
+  - T-0108: Phase 1.
+- Why: Product owner's instruction to run independent tasks in parallel.
+- ADR: none · Status: accepted
