@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "phase": "sprint-0",
+  "current_task": null,
+  "branch": "main",
+  "step": null,
+  "claimed_by": null,
+  "lease_expires_at": null,
+  "last_green_commit": null,
+  "attempts": {},
+  "updated_at": "2026-10-24T04:00:00Z"
+}

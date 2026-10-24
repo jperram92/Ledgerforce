@@ -1,0 +1,24 @@
+# Generated / vendored
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+.tmp/
+pnpm-lock.yaml
+
+# Human- and agent-owned prose and state: formatting is not this tool's business
+# (directive 6 — never rewrite other owners' files).
+Docs/
+.agent/
+.claude/
+.agents/
+AGENTS.md
+CLAUDE.md
+**/AGENTS.md
+**/CLAUDE.md
+scripts/agent/
+salesforce/
+
+# SQL is formatted by hand (migrations are checksummed — reformatting would break them)
+*.sql

@@ -1,0 +1,37 @@
+# Fixture config (mirrors the real .agent/config.yaml shape)
+providers:
+  - id: claude
+    cli: "claude -p"                       # Claude Code headless
+    role: [build, review]
+    instructions: CLAUDE.md
+  - id: codex
+    cli: "codex exec"
+    role: [build, review]
+    instructions: AGENTS.md
+failover_order: [claude, codex]
+review: cross_provider
+lease_minutes: 45
+heartbeat_minutes: 10
+max_attempts_per_task: 3
+parallel_tasks: 1
+budgets:
+  claude: { daily_usd: 40 }
+  codex: { daily_usd: 40 }
+failure_patterns:
+  quota:
+    - "429"
+    - "rate.?limit"
+    - "insufficient_quota"
+    - "credit balance"
+    - "usage limit"
+    - "quota exceeded"
+    - "overloaded"
+human_gates: [adr:accounting, adr:security, release, golden_postings, phase_gate, out_of_scope]
+paths:
+  state: .agent/state.json
+  handover: .agent/HANDOVER.md
+  backlog: .agent/backlog
+  runs: .agent/runs
+  evidence: .agent/evidence
+  decision_log: Docs/decisions/decision-log.md
+  research: Docs/research

@@ -1,0 +1,16 @@
+# Dependencies and build output (regenerable — safe to ignore)
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Test output (regenerable). NOTE: .agent/evidence/ is deliberately NOT ignored —
+# Playwright evidence is committed (AGENTS.md directive 8).
+test-results/
+playwright-report/
+blob-report/
+.tmp/
+
+# OS / editor noise
+.DS_Store
+*.log

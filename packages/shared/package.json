@@ -1,0 +1,17 @@
+{
+  "name": "@ledgerforce/shared",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared kernel: Money (decimal.js), Result and domain error types",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./money": "./src/money/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "decimal.js": "10.6.0"
+  }
+}
