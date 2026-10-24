@@ -24,6 +24,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >     eslint apps/api block, pnpm override multer 2.5.0 (DL-0063)
 >   • T-0009 — tests/e2e/evidence-harness.spec.ts; Docs/ui/principles.md v1; Docs/ui/system/ (Timeline, DL-0070)
 >   • T-0014 — apps/api/src/audit/request-id.ts; audit write in tenant.interceptor.ts; AuditTrail in tenant-tx.ts
+>   • T-0017 — packages/testing/eslint-rules/no-float-money.config.test.ts (Money itself from the scaffold)
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -66,3 +67,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T14:06:31.727Z claude: T-0014 → verifying
 - 2026-10-24T14:08:14.888Z claude: release T-0014 → review (verify exit 0; awaiting codex cross-review)
 - 2026-10-24 14:1x claude: product owner chose UI direction C (DL-0070); T-0009 and T-0014 → review (verify exit 0)
+- 2026-10-24T14:09:19.988Z claude: T-0017 → verifying
+- 2026-10-24T14:10:52.794Z claude: release T-0017 → review (verify exit 0; awaiting codex cross-review)
+- 2026-10-24 14:2x claude: T-0017 → review (verify exit 0)
