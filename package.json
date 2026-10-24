@@ -40,7 +40,9 @@
   "pnpm": {
     "overrides": {
       "multer": "2.5.0",
-      "jose": "6.2.12"
+      "jose": "6.2.12",
+      "seroval": "1.6.9",
+      "seroval-plugins": "1.6.9"
     }
   }
 }

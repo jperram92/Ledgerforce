@@ -788,3 +788,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - T-0108: Phase 1.
 - Why: Product owner's instruction to run independent tasks in parallel.
 - ADR: none · Status: accepted
+
+### DL-0109 — apps/web dependencies: TanStack Router 1.170.41 and Query 5.104.1, Radix DropdownMenu 2.1.25, Vite 8.3.4; seroval pinned to 1.6.9
+- Date: 2026-10-24 · By: claude · Task: T-0081 · Category: tooling
+- Decision: New workspace package `apps/web` (`@ledgerforce/web`). Runtime: `@tanstack/react-router` 1.170.41 (2026-09-30), `@tanstack/react-query` 5.104.1 (2026-10-02), `@radix-ui/react-dropdown-menu` 2.1.25 (2026-10-05), `react`/`react-dom` 19.3.0 (as packages/ui), `@ledgerforce/ui`. Dev: `vite` 8.3.4 (2026-10-08; 8.3.5, already in the lockfile through Vitest, is 3 days old) for `dev`/`build`/`preview`, plus the same Testing Library, jsdom and `@types/*` versions as packages/ui (DL-0091). Root `pnpm.overrides` pins `seroval` and `seroval-plugins` to 1.6.9 (2026-10-09): `@tanstack/router-core` asks for `^1.6.7` and pnpm resolved 1.7.2, published today. All 51 new lockfile packages were dated with `npm view` (RQ-0025 E1): none younger than 14 days. `pnpm audit --prod` clean.
+- Why: Design §7.1 / ADR-0002 name React, Vite, TanStack and shadcn/ui; Radix is the primitive layer shadcn/ui's dropdown is built on, used unstyled and dressed in Timeline tokens (DL-0070; deferred to this task by DL-0092). No ADR: nothing outside the design's stack. 14-day rule: DL-0061.
+- Alternatives: file-based routing with `@tanstack/router-plugin` (extra dependency and code generation, RQ-0025 F1); a hand-written menu button (re-implements the keyboard and focus rules Radix already tests); no direct `vite` dependency (the app could not be built or run outside tests); taking seroval 1.7.2 (breaks the 14-day rule).
+- ADR: none (ADR-0002 stack) · Status: accepted
+
+### DL-0110 — Web shell routing and auth flow: code-based routes, same origin as the API, 401 → sign-in
+- Date: 2026-10-24 · By: claude · Task: T-0081 · Category: architecture
+- Decision: Resolve RQ-0025. Code-based TanStack Router routes: `/sign-in` outside the shell; a pathless layout route with `/` (Timeline), `/sales`, `/purchases`, `/bank`, `/reports`, `/settings`. The SPA is served on the API's origin (dev: Vite proxy for `/auth` and `/t`) and never uses paths under `/auth` or `/t/`. Sign-in validates the slug against migration 0014's pattern and navigates the whole page to `/t/<slug>/auth/login`; the shell reads `GET /auth/me` through TanStack Query; a 401 anywhere sends the user to `/sign-in?reason=expired`; other failures show an error with Retry. Sign-out is `POST /auth/logout`; 204 or 401 both clear the query cache and land on `/sign-in?reason=signed-out`. The API base, `fetch` and full-page navigation are injected (app environment) so components are tested without a browser.
+- Why: The callback sets an `HttpOnly`, `SameSite=Lax`, `path=/` cookie and redirects to `/` (T-0011, ADR-0016), so only a same-origin SPA receives the session; full-page navigation is needed for the IdP redirect; never looping on errors other than 401.
+- Alternatives: file-based routing (RQ-0025 F1); a bearer token in browser storage (ADR-0016 chose server-side sessions); `fetch` to the login URL (cannot follow a cross-origin IdP redirect as a page).
+- ADR: none (follows ADR-0016) · Status: accepted
