@@ -16,8 +16,10 @@
  *    all-caps labels, no purple/indigo, no middle-dot meta strings, no arrows.
  * Screenshots go to .agent/evidence/T-0106/ through the evidence fixture.
  */
-import { resolve } from 'node:path';
-import AxeBuilder from '@axe-core/playwright';
+import { mkdtempSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
+import { AxeBuilder } from '@axe-core/playwright';
 import type { Page } from '@playwright/test';
 import { createViteServer } from 'vitest/node';
 import { test, expect } from '@ledgerforce/testing/evidence';
@@ -33,6 +35,8 @@ test.beforeAll(async () => {
   server = await createViteServer({
     root: HARNESS,
     configFile: false,
+    // One dependency cache per worker: parallel workers must not race on a shared .vite folder.
+    cacheDir: mkdtempSync(join(tmpdir(), 'lf-ui-harness-')),
     logLevel: 'error',
     server: { host: '127.0.0.1', port: 0, strictPort: false, hmr: false },
   });
@@ -151,15 +155,23 @@ async function assertPage(page: Page, width: number) {
     if (m.style === 'words') expect(m.shown).toMatch(/^[\d,]+\.\d{2}( in| out)?$/);
     else expect(m.shown, `${m.amount} pattern`).toMatch(/^\(?[\d,]+\.\d{2}\)?$/);
     if (m.amount.startsWith('-')) {
-      expect(m.spoken).toMatch(/^minus /);
-      if (m.style !== 'words') expect(m.shown.startsWith('(')).toBe(true);
+      // Accountant views: "(389.00)" spoken "minus …"; owner sentences (P3 v1): "… out" in words.
+      if (m.style === 'words') {
+        expect(m.shown).toMatch(/ out$/);
+        expect(m.spoken).toMatch(/ out$/);
+      } else {
+        expect(m.spoken).toMatch(/^minus /);
+        expect(m.shown.startsWith('(')).toBe(true);
+      }
     }
   }
 
   // P13 whose turn
-  const open = await page.locator('[data-open-item]').evaluateAll((els) =>
-    els.map((e) => [e.getAttribute('data-turn') ?? '', e.getAttribute('data-due') ?? '']),
-  );
+  const open = await page
+    .locator('[data-open-item]')
+    .evaluateAll((els) =>
+      els.map((e) => [e.getAttribute('data-turn') ?? '', e.getAttribute('data-due') ?? '']),
+    );
   expect(open.length).toBeGreaterThanOrEqual(6);
   for (const [turn, due] of open) {
     expect(turn).not.toBe('');
@@ -200,7 +212,9 @@ async function assertPage(page: Page, width: number) {
   const axe = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
     .analyze();
-  expect(axe.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
+  expect(
+    axe.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
+  ).toEqual([]);
 
   // genericness probes
   const probe = await page.evaluate(genericnessProbe);
@@ -216,7 +230,10 @@ const THEMES = ['light', 'dark'] as const;
 test.describe('SS-PLAT-29 Timeline components honour P3, P13, P15 and the genericness probes', () => {
   for (const vp of VIEWPORTS) {
     for (const theme of THEMES) {
-      test(`SS-PLAT-29: fixture page @ ${String(vp.width)} ${theme} [T-0106]`, async ({ page, evidence }) => {
+      test(`SS-PLAT-29: fixture page @ ${String(vp.width)} ${theme} [T-0106]`, async ({
+        page,
+        evidence,
+      }) => {
         const { errors, external } = await open(page, vp.width, vp.height, theme);
         await assertPage(page, vp.width);
         expect(errors, 'no console errors').toEqual([]);
@@ -227,10 +244,16 @@ test.describe('SS-PLAT-29 Timeline components honour P3, P13, P15 and the generi
   }
 
   for (const scale of ['Quarter', 'Year'] as const) {
-    test(`SS-PLAT-29: ${scale} scale aggregates and stays honest @ 1440 [T-0106]`, async ({ page, evidence }) => {
+    test(`SS-PLAT-29: ${scale} scale aggregates and stays honest @ 1440 [T-0106]`, async ({
+      page,
+      evidence,
+    }) => {
       const { errors } = await open(page, 1440, 900, 'light');
       await page.getByRole('button', { name: scale, exact: true }).click();
-      await expect(page.getByRole('button', { name: scale, exact: true })).toHaveAttribute('aria-pressed', 'true');
+      await expect(page.getByRole('button', { name: scale, exact: true })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
       const buckets = await page.locator('[data-lane="customers"] [data-bucket]').count();
       expect(buckets).toBeGreaterThan(0);
       await assertPage(page, 1440);
@@ -239,7 +262,10 @@ test.describe('SS-PLAT-29 Timeline components honour P3, P13, P15 and the generi
     });
   }
 
-  test('SS-PLAT-29: turn queue works from the keyboard with a visible focus ring [T-0106]', async ({ page, evidence }) => {
+  test('SS-PLAT-29: turn queue works from the keyboard with a visible focus ring [T-0106]', async ({
+    page,
+    evidence,
+  }) => {
     await open(page, 1440, 900, 'light');
     const queue = page.getByRole('list', { name: 'Decisions waiting on someone' });
     const buttons = queue.getByRole('button');

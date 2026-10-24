@@ -93,7 +93,5 @@ export function formatMoney(value: string | Money, opts: FormatOptions = {}): Fo
 
 /** Exact sum of decimal strings, as NUMERIC(19,4) text. */
 export function sumAmounts(values: readonly string[], code: string): string {
-  return values
-    .reduce((acc, v) => acc.add(toMoney(v, code)), Money.zero(code))
-    .toNumericString();
+  return values.reduce((acc, v) => acc.add(toMoney(v, code)), Money.zero(code)).toNumericString();
 }

@@ -69,8 +69,16 @@ describe('SS-PLAT-29 lane collision layout (RQ-0021 Q1)', () => {
       ],
       { footprintDays: 4, maxRows: 2 },
     );
-    expect(l.placed.find((p) => p.id === 'overdue')).toMatchObject({ from: D0, to: D0 + 23, row: 0 });
-    expect(l.placed.find((p) => p.id === 'due')).toMatchObject({ from: D0 + 26, to: D0 + 30, row: 0 });
+    expect(l.placed.find((p) => p.id === 'overdue')).toMatchObject({
+      from: D0,
+      to: D0 + 23,
+      row: 0,
+    });
+    expect(l.placed.find((p) => p.id === 'due')).toMatchObject({
+      from: D0 + 26,
+      to: D0 + 30,
+      row: 0,
+    });
   });
 
   it('refuses duplicate ids and an end before the start', () => {
@@ -94,16 +102,14 @@ const itemArb = fc.record({
   len: fc.option(fc.integer({ min: 0, max: 20 }), { nil: undefined }),
   now: fc.boolean(),
 });
-const itemsArb = fc
-  .array(itemArb, { maxLength: 40 })
-  .map((xs): LaneLayoutItem[] =>
-    xs.map((x, i) => ({
-      id: `i${String(i).padStart(2, '0')}`,
-      start: at(x.start),
-      ...(x.len === undefined ? {} : { end: at(x.start + x.len) }),
-      now: x.now,
-    })),
-  );
+const itemsArb = fc.array(itemArb, { maxLength: 40 }).map((xs): LaneLayoutItem[] =>
+  xs.map((x, i) => ({
+    id: `i${String(i).padStart(2, '0')}`,
+    start: at(x.start),
+    ...(x.len === undefined ? {} : { end: at(x.start + x.len) }),
+    now: x.now,
+  })),
+);
 const optsArb = fc.record({
   footprintDays: fc.integer({ min: 1, max: 31 }),
   maxRows: fc.integer({ min: 1, max: 4 }),
@@ -141,9 +147,9 @@ describe('SS-PLAT-29 lane layout invariants (fast-check)', () => {
           }
         }
         const ms = [...l.overflow].sort((a, b) => a.from - b.from);
-        for (let i = 1; i < ms.length; i++) {
-          expect(ms[i - 1]!.to).toBeLessThanOrEqual(ms[i]!.from);
-        }
+        ms.slice(1).forEach((m, i) => {
+          expect(ms[i]?.to ?? -Infinity).toBeLessThanOrEqual(m.from);
+        });
       }),
     );
   });
@@ -164,7 +170,12 @@ describe('SS-PLAT-29 lane layout invariants (fast-check)', () => {
   it('is deterministic: the same items in any order give the same layout', () => {
     fc.assert(
       fc.property(
-        itemsArb.chain((items) => fc.tuple(fc.constant(items), fc.shuffledSubarray(items, { minLength: items.length, maxLength: items.length }))),
+        itemsArb.chain((items) =>
+          fc.tuple(
+            fc.constant(items),
+            fc.shuffledSubarray(items, { minLength: items.length, maxLength: items.length }),
+          ),
+        ),
         optsArb,
         ([items, shuffled], opts) => {
           expect(layoutLane(shuffled, opts)).toEqual(layoutLane(items, opts));

@@ -105,7 +105,10 @@ export function bucketsBetween(scale: ScaleId, from: string, to: string): Bucket
   let b = bucketAt(scale, from);
   while (dayNumber(b.first) <= end) {
     out.push(b);
-    b = bucketAt(scale, SCALES[scale].bucket === 'month' ? addMonths(b.first, 1) : addDays(b.last, 1));
+    b = bucketAt(
+      scale,
+      SCALES[scale].bucket === 'month' ? addMonths(b.first, 1) : addDays(b.last, 1),
+    );
   }
   return out;
 }
@@ -118,7 +121,10 @@ export function aggregateAmounts(
   currency: string,
 ): AmountAggregation {
   const laneOrder: string[] = [];
-  const cells = new Map<string, { lane: string; bucket: string; actual: Money[]; expected: Money[] }>();
+  const cells = new Map<
+    string,
+    { lane: string; bucket: string; actual: Money[]; expected: Money[] }
+  >();
   const left = new Map<string, Money[]>();
   for (const it of items) {
     if (typeof it.amount !== 'string') {
@@ -141,8 +147,15 @@ export function aggregateAmounts(
     count: xs.length,
   });
   const out = [...cells.values()]
-    .sort((a, b) => laneOrder.indexOf(a.lane) - laneOrder.indexOf(b.lane) || cmp(a.bucket, b.bucket))
-    .map((c) => ({ lane: c.lane, bucket: c.bucket, actual: sum(c.actual), expected: sum(c.expected) }));
+    .sort(
+      (a, b) => laneOrder.indexOf(a.lane) - laneOrder.indexOf(b.lane) || cmp(a.bucket, b.bucket),
+    )
+    .map((c) => ({
+      lane: c.lane,
+      bucket: c.bucket,
+      actual: sum(c.actual),
+      expected: sum(c.expected),
+    }));
   const leftOut: Record<string, StateTotal> = {};
   for (const lane of laneOrder) {
     const xs = left.get(lane);

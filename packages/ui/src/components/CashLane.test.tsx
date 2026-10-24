@@ -35,9 +35,9 @@ describe('SS-PLAT-29 <CashLane> (P15 expected is never shown as actual)', () => 
     const actualD = actual?.getAttribute('d') ?? '';
     expect(actualD.trim().endsWith('H550')).toBe(true);
     expect(expected?.getAttribute('d')?.startsWith('M550,')).toBe(true);
-    expect(container.querySelector('[data-last-statement]')?.getAttribute('data-last-statement')).toBe(
-      '2026-10-23',
-    );
+    expect(
+      container.querySelector('[data-last-statement]')?.getAttribute('data-last-statement'),
+    ).toBe('2026-10-23');
   });
 
   it('computes heights from decimal strings exactly (no float on money)', () => {

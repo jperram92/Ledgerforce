@@ -35,7 +35,9 @@ describe('SS-PLAT-29 <JournalTable> (P1, P3, P12)', () => {
   it('totals the columns exactly and says it is balanced', () => {
     render(<JournalTable journal="JNL-004231" lines={lines} />);
     const foot = screen.getByRole('row', { name: /balanced/i });
-    const totals = [...foot.querySelectorAll('[data-amount]')].map((a) => a.getAttribute('data-amount'));
+    const totals = [...foot.querySelectorAll('[data-amount]')].map((a) =>
+      a.getAttribute('data-amount'),
+    );
     expect(totals).toEqual(['10087.00', '10087.00']);
   });
 
@@ -55,11 +57,19 @@ describe('SS-PLAT-29 <JournalTable> (P1, P3, P12)', () => {
 
   it('refuses negative or two-sided lines (Dr/Cr are always positive, one side per line)', () => {
     expect(() =>
-      render(<JournalTable journal="J" lines={[{ code: '1', account: 'a', gloss: 'g', debit: '-1.00' }]} />),
+      render(
+        <JournalTable
+          journal="J"
+          lines={[{ code: '1', account: 'a', gloss: 'g', debit: '-1.00' }]}
+        />,
+      ),
     ).toThrow();
     expect(() =>
       render(
-        <JournalTable journal="J" lines={[{ code: '1', account: 'a', gloss: 'g', debit: '1.00', credit: '1.00' }]} />,
+        <JournalTable
+          journal="J"
+          lines={[{ code: '1', account: 'a', gloss: 'g', debit: '1.00', credit: '1.00' }]}
+        />,
       ),
     ).toThrow();
   });

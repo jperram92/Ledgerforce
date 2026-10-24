@@ -56,10 +56,7 @@ interface Norm {
   now: boolean;
 }
 
-export function layoutLane(
-  items: readonly LaneLayoutItem[],
-  opts: LaneLayoutOptions,
-): LaneLayout {
+export function layoutLane(items: readonly LaneLayoutItem[], opts: LaneLayoutOptions): LaneLayout {
   if (!Number.isSafeInteger(opts.footprintDays) || opts.footprintDays < 1) {
     throw new RangeError('footprintDays must be a whole number of days >= 1');
   }
@@ -83,7 +80,9 @@ export function layoutLane(
   });
   norm.sort(
     (a, b) =>
-      a.from - b.from || (b.now ? 1 : 0) - (a.now ? 1 : 0) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+      a.from - b.from ||
+      (b.now ? 1 : 0) - (a.now ? 1 : 0) ||
+      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
   );
 
   const rowEnds: number[] = [];
@@ -108,7 +107,12 @@ export function layoutLane(
       m.ids.push(it.id);
       m.hasNow ||= it.now;
     } else {
-      overflow.push({ from: it.from, to: it.from + opts.footprintDays, ids: [it.id], hasNow: it.now });
+      overflow.push({
+        from: it.from,
+        to: it.from + opts.footprintDays,
+        ids: [it.id],
+        hasNow: it.now,
+      });
     }
   }
   return { placed, overflow, rows: rowEnds.length };

@@ -90,7 +90,8 @@ export function monthStart(iso: string): string {
 /** Last day of the month holding `iso`. */
 export function monthEnd(iso: string): string {
   const { y, m } = parts(iso);
-  const next = m === 12 ? `${String(y + 1)}-01-01` : `${String(y)}-${String(m + 1).padStart(2, '0')}-01`;
+  const next =
+    m === 12 ? `${String(y + 1)}-01-01` : `${String(y)}-${String(m + 1).padStart(2, '0')}-01`;
   return addDays(next, -1);
 }
 

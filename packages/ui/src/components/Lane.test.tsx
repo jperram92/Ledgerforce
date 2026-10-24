@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { SCALES } from '../time/scale.ts';
 import { Lane } from './Lane.tsx';
@@ -12,10 +12,37 @@ const decisions: TimelineLane = {
   name: 'Decisions',
   sub: 'placed on the day they block',
   items: [
-    { id: 'cn', date: '2026-10-24', label: 'Credit note', amount: '660.00', state: 'expected', now: true },
-    { id: 'pb', date: '2026-10-24', label: 'Release suppliers', amount: '22415.00', state: 'expected', now: true },
-    { id: 'mj', date: '2026-10-24', label: 'Wages journal', amount: '14880.00', state: 'expected', now: true },
-    { id: 'tch', date: '2026-11-03', label: 'Bill TCH-88213', amount: '3190.00', state: 'expected' },
+    {
+      id: 'cn',
+      date: '2026-10-24',
+      label: 'Credit note',
+      amount: '660.00',
+      state: 'expected',
+      now: true,
+    },
+    {
+      id: 'pb',
+      date: '2026-10-24',
+      label: 'Release suppliers',
+      amount: '22415.00',
+      state: 'expected',
+      now: true,
+    },
+    {
+      id: 'mj',
+      date: '2026-10-24',
+      label: 'Wages journal',
+      amount: '14880.00',
+      state: 'expected',
+      now: true,
+    },
+    {
+      id: 'tch',
+      date: '2026-11-03',
+      label: 'Bill TCH-88213',
+      amount: '3190.00',
+      state: 'expected',
+    },
   ],
 };
 
@@ -61,7 +88,15 @@ describe('SS-PLAT-29 <Lane> (RQ-0021 layout, P15)', () => {
           id: 'customers',
           name: 'Customers pay you',
           items: [
-            { id: 'od', date: '2026-10-01', end: '2026-10-23', label: 'Overdue', amount: '33482.50', state: 'overdue', sub: '8 invoices' },
+            {
+              id: 'od',
+              date: '2026-10-01',
+              end: '2026-10-23',
+              label: 'Overdue',
+              amount: '33482.50',
+              state: 'overdue',
+              sub: '8 invoices',
+            },
           ],
         }}
         scale={SCALES['5w']}

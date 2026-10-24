@@ -20,7 +20,13 @@ describe('SS-PLAT-29 buckets per scale (RQ-0021 Q2)', () => {
 
   it('lists contiguous buckets covering a range, with first and last day', () => {
     const q = bucketsBetween('quarter', '2026-10-01', '2026-10-31');
-    expect(q.map((b) => b.key)).toEqual(['2026-W40', '2026-W41', '2026-W42', '2026-W43', '2026-W44']);
+    expect(q.map((b) => b.key)).toEqual([
+      '2026-W40',
+      '2026-W41',
+      '2026-W42',
+      '2026-W43',
+      '2026-W44',
+    ]);
     expect(q[0]).toMatchObject({ first: '2026-09-28', last: '2026-10-04', label: 'w/c 28 Sep' });
     const y = bucketsBetween('year', '2026-10-15', '2027-01-02');
     expect(y.map((b) => [b.key, b.first, b.last, b.label])).toEqual([
@@ -53,7 +59,9 @@ describe('SS-PLAT-29 aggregation keeps actual and expected apart (P15)', () => {
       actual: { total: '0.0000', count: 0 },
       expected: { total: '33740.0000', count: 2 },
     });
-    const pay = r.cells.filter((c) => c.lane === 'pay').map((c) => [c.bucket, c.actual, c.expected]);
+    const pay = r.cells
+      .filter((c) => c.lane === 'pay')
+      .map((c) => [c.bucket, c.actual, c.expected]);
     expect(pay).toEqual([
       ['2026-W42', { total: '-38214.6000', count: 1 }, { total: '0.0000', count: 0 }],
       ['2026-W44', { total: '0.0000', count: 0 }, { total: '-38214.6000', count: 1 }],
@@ -69,7 +77,8 @@ describe('SS-PLAT-29 aggregation keeps actual and expected apart (P15)', () => {
   });
 
   it('refuses an item with a float amount or a mixed currency total', () => {
-    const bad = [{ ...harbourCustomers[0]!, amount: 0.1 as unknown as string }];
+    const first = harbourCustomers[0] as AmountItem;
+    const bad = [{ ...first, amount: 0.1 as unknown as string }];
     expect(() => aggregateAmounts(bad, 'year', 'AUD')).toThrow();
   });
 
@@ -83,7 +92,9 @@ describe('SS-PLAT-29 aggregation keeps actual and expected apart (P15)', () => {
     fc.assert(
       fc.property(
         fc.array(itemArb, { maxLength: 60 }),
-        fc.constantFrom('week', '5w', 'quarter', 'year') as fc.Arbitrary<'week' | '5w' | 'quarter' | 'year'>,
+        fc.constantFrom('week', '5w', 'quarter', 'year') as fc.Arbitrary<
+          'week' | '5w' | 'quarter' | 'year'
+        >,
         (raw, scale) => {
           const base = dayNumber('2026-01-01');
           const items: AmountItem[] = raw.map((x, i) => ({
@@ -103,19 +114,26 @@ describe('SS-PLAT-29 aggregation keeps actual and expected apart (P15)', () => {
                 .filter((c) => c.lane === lane)
                 .reduce((acc, c) => acc.add(Money.of(c[state].total, 'AUD')), Money.zero('AUD'));
               expect(got.toNumericString()).toBe(want.toNumericString());
-              const n = r.cells.filter((c) => c.lane === lane).reduce((k, c) => k + c[state].count, 0);
+              const n = r.cells
+                .filter((c) => c.lane === lane)
+                .reduce((k, c) => k + c[state].count, 0);
               expect(n).toBe(items.filter((i) => i.lane === lane && i.state === state).length);
             }
           }
           for (const lane of ['a', 'b', 'c']) {
             const od = items.filter((i) => i.lane === lane && i.state === 'overdue');
-            const want = od.reduce((acc, i) => acc.add(Money.of(i.amount, 'AUD')), Money.zero('AUD'));
+            const want = od.reduce(
+              (acc, i) => acc.add(Money.of(i.amount, 'AUD')),
+              Money.zero('AUD'),
+            );
             if (od.length === 0) expect(r.leftOut[lane]).toBeUndefined();
-            else expect(r.leftOut[lane]).toEqual({ total: want.toNumericString(), count: od.length });
+            else
+              expect(r.leftOut[lane]).toEqual({ total: want.toNumericString(), count: od.length });
           }
           for (const c of r.cells) {
             const inCell = items.filter(
-              (i) => i.lane === c.lane && i.state !== 'overdue' && bucketKey(scale, i.date) === c.bucket,
+              (i) =>
+                i.lane === c.lane && i.state !== 'overdue' && bucketKey(scale, i.date) === c.bucket,
             );
             expect(inCell.length).toBe(c.actual.count + c.expected.count);
             expect(inCell.length).toBeGreaterThan(0);
@@ -148,10 +166,30 @@ describe('SS-PLAT-29 cash balance per bucket: closing balance and lowest point',
   it('splits actual (to the last statement) from expected, and keeps the trough', () => {
     const r = aggregateCash(cash, 'quarter', '2026-10-23');
     expect(r).toEqual([
-      { bucket: '2026-W42', state: 'actual', closing: '146391.15', lowest: { date: '2026-10-16', balance: '146391.15' } },
-      { bucket: '2026-W43', state: 'actual', closing: '184320.55', lowest: { date: '2026-10-21', balance: '160410.80' } },
-      { bucket: '2026-W44', state: 'expected', closing: '144826.85', lowest: { date: '2026-10-30', balance: '123266.85' } },
-      { bucket: '2026-W45', state: 'expected', closing: '136576.85', lowest: { date: '2026-11-03', balance: '136576.85' } },
+      {
+        bucket: '2026-W42',
+        state: 'actual',
+        closing: '146391.15',
+        lowest: { date: '2026-10-16', balance: '146391.15' },
+      },
+      {
+        bucket: '2026-W43',
+        state: 'actual',
+        closing: '184320.55',
+        lowest: { date: '2026-10-21', balance: '160410.80' },
+      },
+      {
+        bucket: '2026-W44',
+        state: 'expected',
+        closing: '144826.85',
+        lowest: { date: '2026-10-30', balance: '123266.85' },
+      },
+      {
+        bucket: '2026-W45',
+        state: 'expected',
+        closing: '136576.85',
+        lowest: { date: '2026-11-03', balance: '136576.85' },
+      },
     ]);
   });
 
@@ -159,8 +197,18 @@ describe('SS-PLAT-29 cash balance per bucket: closing balance and lowest point',
     const r = aggregateCash(cash, 'quarter', '2026-10-21');
     const w43 = r.filter((e) => e.bucket === '2026-W43');
     expect(w43).toEqual([
-      { bucket: '2026-W43', state: 'actual', closing: '160410.80', lowest: { date: '2026-10-21', balance: '160410.80' } },
-      { bucket: '2026-W43', state: 'expected', closing: '184320.55', lowest: { date: '2026-10-23', balance: '184320.55' } },
+      {
+        bucket: '2026-W43',
+        state: 'actual',
+        closing: '160410.80',
+        lowest: { date: '2026-10-21', balance: '160410.80' },
+      },
+      {
+        bucket: '2026-W43',
+        state: 'expected',
+        closing: '184320.55',
+        lowest: { date: '2026-10-23', balance: '184320.55' },
+      },
     ]);
   });
 

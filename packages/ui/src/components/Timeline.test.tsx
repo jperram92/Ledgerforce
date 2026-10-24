@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import {
   HARBOUR_LAST_STATEMENT,
@@ -26,7 +26,9 @@ function renderHarbour() {
 describe('SS-PLAT-29 <Timeline> (axis, scales, lanes, legend)', () => {
   it('keeps the lane order from the prototype (P14 contract)', () => {
     const { container } = renderHarbour();
-    const ids = [...container.querySelectorAll('[data-lane]')].map((l) => l.getAttribute('data-lane'));
+    const ids = [...container.querySelectorAll('[data-lane]')].map((l) =>
+      l.getAttribute('data-lane'),
+    );
     expect(ids).toEqual(['cash', 'customers', 'pay', 'tax', 'decisions', 'books', 'salesforce']);
   });
 
@@ -46,7 +48,9 @@ describe('SS-PLAT-29 <Timeline> (axis, scales, lanes, legend)', () => {
     const user = userEvent.setup();
     const { container } = renderHarbour();
     await user.click(screen.getByRole('button', { name: 'Quarter' }));
-    expect(screen.getByRole('button', { name: 'Quarter' }).getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Quarter' }).getAttribute('aria-pressed')).toBe(
+      'true',
+    );
     const ticks = [...container.querySelectorAll('.axis .tick')].map((t) => t.textContent);
     expect(ticks[0]).toMatch(/^w\/c /);
     const customers = screen.getByRole('list', { name: 'Customers pay you' });
@@ -74,7 +78,10 @@ describe('SS-PLAT-29 <Timeline> (axis, scales, lanes, legend)', () => {
     const oct = within(pay)
       .getAllByRole('listitem')
       .filter((li) => li.getAttribute('data-bucket') === '2026-10')
-      .map((li) => [li.getAttribute('data-series'), li.querySelector('[data-amount]')?.getAttribute('data-amount')]);
+      .map((li) => [
+        li.getAttribute('data-series'),
+        li.querySelector('[data-amount]')?.getAttribute('data-amount'),
+      ]);
     expect(oct).toEqual([
       ['actual', '-38214.60'],
       ['expected', '-60629.60'],

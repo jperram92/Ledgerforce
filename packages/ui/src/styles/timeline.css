@@ -1,0 +1,745 @@
+/* @ledgerforce/ui — Timeline component styles (T-0106). Rebuilt for the React components from
+   Docs/ui/system/timeline.css (the prototype, DL-0070), with the fixes owed before build:
+   collision rows and "+n more" (RQ-0021), explicit marks instead of pseudo-elements so the
+   expected/actual state is testable, and a phone layout where lanes become lists.
+   Colour encodes time only: solid = happened, dashed = expected, teal = today. No shadows, radius
+   2px, no all-caps (genericness checklist G1–G13, DL-0065). Requires tokens.css first. */
+* {
+  box-sizing: border-box;
+}
+html {
+  background: var(--paper);
+}
+body {
+  margin: 0;
+  font: 400 15px/1.45 var(--font);
+  color: var(--ink);
+  background: var(--paper);
+  font-variant-numeric: tabular-nums;
+}
+a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+a:hover {
+  color: var(--now);
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+h1,
+h2,
+h3,
+p,
+figure {
+  margin: 0;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.num {
+  text-align: right;
+  white-space: nowrap;
+}
+.muted {
+  color: var(--ink-2);
+}
+
+/* Money (P3) */
+.money {
+  text-align: right;
+  font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+}
+
+/* Timeline frame */
+.timeline {
+  --name-w: 150px;
+  --row-h: 54px;
+}
+.tl-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 0 var(--s3);
+}
+.scale {
+  display: flex;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+}
+.scale button {
+  font: 600 13.5px/1 var(--font);
+  padding: 8px 10px;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  cursor: pointer;
+}
+.scale button[aria-pressed='true'] {
+  background: var(--now-soft);
+  outline: 1px solid var(--now);
+}
+.scale button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.tl-body {
+  position: relative;
+}
+.tl-axis-row,
+.cash,
+.lane {
+  display: grid;
+  grid-template-columns: var(--name-w) minmax(0, 1fr);
+}
+.lane-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  padding: 8px 8px 8px 0;
+}
+.lane-sub {
+  display: block;
+  font-weight: 400;
+  font-size: 13px;
+  color: var(--ink-2);
+}
+
+/* Axis */
+.axis {
+  position: relative;
+  height: 46px;
+  border-bottom: 1px solid var(--line);
+}
+.axis .tick {
+  position: absolute;
+  left: var(--x);
+  top: 0;
+  padding-left: 4px;
+  border-left: 1px solid var(--line-2);
+  font-size: 12px;
+  color: var(--ink-2);
+  white-space: nowrap;
+  line-height: 18px;
+}
+.axis .today {
+  position: absolute;
+  left: var(--x);
+  top: 22px;
+  padding: 2px 6px;
+  background: var(--now);
+  color: var(--paper);
+  font-weight: 800;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.rule-layer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--name-w);
+  right: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+/* Labels sit above today's rule on their own ground, so the rule never runs through text. */
+.lane-track,
+.cash-plot {
+  z-index: 1;
+}
+.lane-items > .lane-item .txt {
+  background: var(--paper);
+  padding-right: 2px;
+}
+.lane:nth-of-type(odd) .lane-items > .lane-item .txt {
+  background: var(--lane);
+}
+.today-rule {
+  position: absolute;
+  top: 22px;
+  bottom: 0;
+  left: var(--x);
+  border-left: 3px solid var(--now);
+}
+
+/* Cash lane */
+.cash {
+  border-bottom: 1px solid var(--line);
+}
+.cash-plot {
+  position: relative;
+  height: 200px;
+  margin: 16px 0 24px;
+}
+.cash-plot svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.cash .grid {
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.cash .grid-label {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-100%, -120%);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.callout {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  font-size: 13px;
+  white-space: nowrap;
+  transform: translate(8px, -130%);
+}
+.callout .money {
+  font-weight: 600;
+}
+.callout .note {
+  color: var(--ink-2);
+}
+.callout.end {
+  transform: translate(calc(-100% - 8px), -130%);
+}
+.callout.low {
+  transform: translate(8px, 30%);
+}
+.callout .pt {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+}
+.callout.end .pt {
+  right: -13px;
+  bottom: -9px;
+}
+.callout.low .pt {
+  left: -13px;
+  top: -11px;
+  background: var(--paper);
+  border-style: dashed;
+}
+.leaves-out {
+  grid-column: 2;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  padding-bottom: var(--s3);
+}
+
+/* Lanes */
+.lane {
+  border-bottom: 1px solid var(--line);
+}
+.lane:nth-of-type(odd) {
+  background: var(--lane);
+}
+.lane-track {
+  position: relative;
+  min-height: calc(12px + var(--rows) * var(--row-h));
+  overflow-x: clip;
+}
+.lane.has-more .lane-track {
+  min-height: calc(40px + var(--rows) * var(--row-h));
+}
+.lane-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.lane-items > .lane-item {
+  position: absolute;
+  left: var(--x);
+  top: calc(8px + var(--row) * var(--row-h));
+  max-width: min(var(--fw), calc(100% - var(--x)));
+}
+.lane-item {
+  display: flex;
+  gap: 6px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.3;
+}
+.lane-item .mark {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  margin-top: 3px;
+  background: var(--ink);
+  border: 2px solid var(--ink);
+}
+.lane-item[data-series='expected'] .mark {
+  background: var(--paper);
+  border-style: dashed;
+}
+.lane-item[data-now] .mark {
+  border-color: var(--now);
+}
+.lane-item[data-now] .lab {
+  color: var(--now);
+}
+.lane-item .txt {
+  min-width: 0;
+  overflow: hidden;
+}
+.lane-item .txt > * {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lane-item .amt {
+  font-weight: 600;
+  text-align: left;
+}
+.lane-item .amt .money {
+  display: inline;
+}
+.lane-item .lab {
+  font-weight: 600;
+}
+.lane-item .meta {
+  color: var(--ink-2);
+  font-size: 12.5px;
+}
+.lane-item .tag {
+  font-weight: 600;
+  margin-right: 6px;
+}
+.lane-item .when {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+.lane-items > .lane-item.span {
+  width: var(--w);
+  max-width: calc(100% - var(--x));
+}
+.lane-item.span .mark {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  width: auto;
+  height: 46px;
+  margin: 0;
+  border: 1px solid var(--ink);
+  background: repeating-linear-gradient(135deg, transparent 0 4px, var(--ink-2) 4px 5.5px);
+}
+.lane-item.span .txt {
+  position: relative;
+  margin: 4px 6px;
+  padding: 0 4px;
+  background: var(--paper);
+}
+.more-wrap {
+  position: absolute;
+  left: var(--x);
+  top: calc(10px + var(--rows) * var(--row-h));
+  max-width: calc(100% - var(--x));
+  z-index: 1;
+}
+.more {
+  font: 600 12.5px/1 var(--font);
+  padding: 4px 6px;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.more.now {
+  border-color: var(--now);
+  color: var(--now);
+}
+.more-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 6px 8px;
+  background: var(--paper);
+  border: 1px solid var(--line-2);
+  min-width: 180px;
+}
+.more-list .lane-item {
+  padding: 3px 0;
+}
+.more-list .lane-item .txt > * {
+  white-space: normal;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s5);
+  list-style: none;
+  margin: var(--s3) 0 0;
+  padding: 0;
+  font-size: 13.5px;
+  color: var(--ink-2);
+}
+.legend i {
+  display: inline-block;
+  width: 26px;
+  height: 0;
+  border-top: 2px solid var(--ink);
+  vertical-align: 4px;
+  margin-right: 6px;
+}
+.legend i.dashed {
+  border-top-style: dashed;
+}
+.legend i.today {
+  border-top: 3px solid var(--now);
+}
+.legend i.hatch {
+  height: 12px;
+  border: 1px solid var(--ink);
+  vertical-align: -1px;
+  background: repeating-linear-gradient(135deg, transparent 0 4px, var(--ink) 4px 5px);
+}
+
+/* Turn queue (Direction A inside the Timeline, P13) */
+.queue {
+  list-style: none;
+  margin: var(--s3) 0 0;
+  padding: 0;
+}
+.queue > li {
+  border-top: 1px solid var(--line);
+}
+.queue button {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr) auto;
+  gap: var(--s3);
+  width: 100%;
+  padding: var(--s3) 4px;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.queue .by b {
+  display: block;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.queue li.yours .by b {
+  color: var(--now);
+}
+.queue .by small {
+  display: block;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.queue .body > span {
+  display: block;
+}
+.queue .what {
+  font-weight: 600;
+}
+.queue .why {
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.queue .turn {
+  display: inline-block !important;
+  margin-top: 4px;
+  padding: 1px 6px;
+  border: 1.5px solid var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+.queue li.yours .turn {
+  border-color: var(--now);
+  color: var(--now);
+}
+.queue .amt {
+  font-weight: 800;
+}
+.keys {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-top: var(--s2);
+  font-size: 13px;
+  color: var(--ink-2);
+}
+kbd {
+  font: 600 12px/1 var(--font);
+  color: var(--ink-2);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  padding: 2px 5px;
+}
+
+/* Journal table (P12 gloss, P3) */
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--s3);
+  font-size: 14.5px;
+}
+.tbl th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ink-2);
+  padding: 6px 8px;
+  border-bottom: 2px solid var(--ink);
+}
+.tbl td {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.tbl th.num,
+.tbl td.num {
+  text-align: right;
+}
+.tbl tfoot td {
+  font-weight: 800;
+  border-bottom: 0;
+  border-top: 2px solid var(--ink);
+}
+.tbl .code {
+  color: var(--ink-2);
+  margin-right: 8px;
+}
+.tbl .sm {
+  display: block;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.scroll {
+  overflow-x: auto;
+}
+
+/* Spine: a document's life, top = oldest */
+.spine {
+  list-style: none;
+  margin: var(--s4) 0 0;
+  padding: 0;
+}
+.spine > li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  gap: var(--s4);
+  padding-bottom: var(--s4);
+}
+.spine > li::before {
+  content: '';
+  position: absolute;
+  left: 117px;
+  top: 6px;
+  bottom: -6px;
+  border-left: 2px solid var(--ink);
+}
+.spine > li.future::before,
+.spine > li.now::before {
+  border-left-style: dashed;
+}
+.spine > li:last-child::before {
+  display: none;
+}
+.spine .mark {
+  position: absolute;
+  left: 112px;
+  top: 4px;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--ink);
+  background: var(--ink);
+}
+.spine li.future .mark {
+  background: var(--paper);
+  border-style: dashed;
+}
+.spine li.now .mark {
+  background: var(--now);
+  border-color: var(--now);
+}
+.spine li.warn .mark {
+  background: var(--paper);
+}
+.spine time {
+  text-align: right;
+  font-size: 13.5px;
+  color: var(--ink-2);
+  line-height: 1.3;
+  padding-top: 1px;
+}
+.spine time b {
+  display: block;
+  color: var(--ink);
+}
+.spine .ev {
+  padding-left: var(--s4);
+}
+.spine .ev > b {
+  font-weight: 800;
+}
+.spine .ev p {
+  margin-top: 2px;
+  color: var(--ink-2);
+  font-size: 14.5px;
+}
+.spine .tag {
+  margin-left: 8px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.spine li.now time,
+.spine li.now .ev > b {
+  color: var(--now);
+}
+.flag {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 800;
+  border: 1.5px solid var(--ink);
+  padding: 1px 5px;
+  margin-right: 6px;
+}
+
+/* Phones: time runs down. Lanes become lists; the axis and today rule give way to dates in text. */
+@media (max-width: 900px) {
+  .tl-axis-row,
+  .rule-layer {
+    display: none;
+  }
+  .tl-bar {
+    justify-content: flex-start;
+  }
+  .cash,
+  .lane {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .lane-name {
+    padding: 8px 0 2px;
+  }
+  .cash-plot {
+    height: 160px;
+    margin: 8px 0;
+  }
+  .callout,
+  .callout.end,
+  .callout.low {
+    position: static;
+    transform: none;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+  .callout .pt {
+    display: none;
+  }
+  .cash-plot .callout:first-of-type {
+    margin-top: 12px;
+  }
+  .cash-plot {
+    height: auto;
+  }
+  .cash-plot svg {
+    height: 160px;
+  }
+  .cash .grid-label {
+    display: none;
+  }
+  .leaves-out {
+    grid-column: 1;
+  }
+  .lane-track,
+  .lane.has-more .lane-track {
+    min-height: 0;
+    overflow: visible;
+  }
+  .lane-items > .lane-item,
+  .lane-items > .lane-item.span {
+    position: static;
+    max-width: none;
+    width: auto;
+    padding: 6px 0;
+    border-top: 1px solid var(--line);
+  }
+  .lane-item .txt > * {
+    white-space: normal;
+  }
+  .lane-item.span .mark {
+    position: static;
+    width: 10px;
+    height: 10px;
+    margin-top: 3px;
+    border-width: 2px;
+  }
+  .lane-item.span .txt {
+    margin: 0;
+    padding: 0;
+    background: none;
+  }
+  .lane-item .when {
+    position: static;
+    width: auto;
+    height: auto;
+    clip: auto;
+    overflow: visible;
+    color: var(--ink-2);
+  }
+  .more-wrap {
+    position: static;
+    max-width: none;
+    padding: 6px 0 8px;
+  }
+  .queue button {
+    grid-template-columns: 74px minmax(0, 1fr);
+  }
+  .queue .amt {
+    grid-column: 2;
+    text-align: left;
+  }
+  .spine > li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+    padding-left: 22px;
+  }
+  .spine > li::before {
+    left: 5px;
+  }
+  .spine .mark {
+    left: 0;
+  }
+  .spine time {
+    text-align: left;
+  }
+  .spine time b {
+    display: inline;
+    margin-right: 6px;
+  }
+  .spine .ev {
+    padding-left: 0;
+  }
+  .tbl .hide-phone {
+    display: none;
+  }
+}

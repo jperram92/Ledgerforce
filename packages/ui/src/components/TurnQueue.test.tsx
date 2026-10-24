@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { TurnQueue, type OpenItem } from './TurnQueue.tsx';
 
@@ -39,7 +39,9 @@ const items: OpenItem[] = [
 
 describe('SS-PLAT-29 <TurnQueue> (P13 whose turn, P10 keyboard)', () => {
   it('names who acts next and the date it blocks, on every open item', () => {
-    render(<TurnQueue label="Decisions" items={items} today="2026-10-24" onOpen={() => undefined} />);
+    render(
+      <TurnQueue label="Decisions" items={items} today="2026-10-24" onOpen={() => undefined} />,
+    );
     const list = screen.getByRole('list', { name: 'Decisions' });
     const rows = within(list).getAllByRole('listitem');
     expect(rows).toHaveLength(4);
@@ -57,10 +59,14 @@ describe('SS-PLAT-29 <TurnQueue> (P13 whose turn, P10 keyboard)', () => {
   });
 
   it('refuses an open item without a turn or a due date (P13)', () => {
-    const bad = { ...items[0]!, turn: undefined } as unknown as OpenItem;
-    expect(() => render(<TurnQueue label="Q" items={[bad]} today="2026-10-24" onOpen={() => undefined} />)).toThrow(/turn/i);
-    const noDue = { ...items[0]!, due: undefined } as unknown as OpenItem;
-    expect(() => render(<TurnQueue label="Q" items={[noDue]} today="2026-10-24" onOpen={() => undefined} />)).toThrow(/due/i);
+    const bad = { ...(items[0] as OpenItem), turn: undefined } as unknown as OpenItem;
+    expect(() =>
+      render(<TurnQueue label="Q" items={[bad]} today="2026-10-24" onOpen={() => undefined} />),
+    ).toThrow(/turn/i);
+    const noDue = { ...(items[0] as OpenItem), due: undefined } as unknown as OpenItem;
+    expect(() =>
+      render(<TurnQueue label="Q" items={[noDue]} today="2026-10-24" onOpen={() => undefined} />),
+    ).toThrow(/due/i);
   });
 
   it('moves with J/K and the arrow keys, jumps with Home/End, and opens with Enter', async () => {
@@ -93,7 +99,11 @@ describe('SS-PLAT-29 <TurnQueue> (P13 whose turn, P10 keyboard)', () => {
   });
 
   it('shows the keyboard hints', () => {
-    render(<TurnQueue label="Decisions" items={items} today="2026-10-24" onOpen={() => undefined} />);
-    expect(screen.getByText(/move/).closest('p')?.querySelectorAll('kbd').length).toBeGreaterThanOrEqual(3);
+    render(
+      <TurnQueue label="Decisions" items={items} today="2026-10-24" onOpen={() => undefined} />,
+    );
+    expect(
+      screen.getByText(/move/).closest('p')?.querySelectorAll('kbd').length,
+    ).toBeGreaterThanOrEqual(3);
   });
 });
