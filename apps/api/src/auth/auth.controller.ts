@@ -14,8 +14,9 @@ import {
 } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { DEFAULT_STEP_UP_MAX_AGE_SECONDS, isValidMaxAge } from '../authz/mfa.ts';
+import { loadRoles } from '../authz/authz.ts';
 import { AnyMember } from '../authz/permission.decorator.ts';
-import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
+import { AuditTrail, scope, TenantTx } from '../tenancy/tenant-tx.ts';
 import { OIDC_COOKIE, OIDC_COOKIE_PATH, OIDC_SERVICE } from './login.controller.ts';
 import { AUTH_REQUEST_TTL_SECONDS, type OidcService } from './oidc.service.ts';
 import { principalOf } from './session-tenant-resolver.ts';
@@ -51,6 +52,21 @@ export class AuthController {
       .where('id', '=', p.userId)
       .executeTakeFirstOrThrow();
     return { tenant_id: p.tenantId, user_id: user.id, display_name: user.display_name };
+  }
+
+  /**
+   * What the caller may do (T-0093, ADR-0034): active role ids and the request's effective
+   * permissions (role permissions ∩ token scopes), sorted. The browser only hides or disables
+   * actions with it; every route still checks its own permission.
+   */
+  @Get('me/access')
+  @AnyMember()
+  async access(): Promise<{ roles: string[]; permissions: string[] }> {
+    // A session or an API token: both set the acting user (TenantInterceptor).
+    const userId = scope().access.userId;
+    if (!userId) throw new UnauthorizedException({ error: 'unauthenticated' });
+    const roles = await loadRoles(this.tx.get(), userId);
+    return { roles: roles.sort(), permissions: [...scope().access.permissions].sort() };
   }
 
   /**
