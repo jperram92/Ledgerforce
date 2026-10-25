@@ -231,3 +231,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25 claude (lead): merged T-0015 (conflicts in decision log/register resolved by id; totals 156/16); gates green (603 unit / 612 db); verify 13 PASS/0 FAIL/3 PENDING → review. Round 4 complete.
 - 2026-10-25 claude (lead): round 5 claimed (T-0016, T-0027, T-0030, T-0053; DL-0140).
 - 2026-10-25 18:4x claude (lead): all four round-5 agents stopped by the usage limit (~14:4x); WIP was committed on their branches (T-0016 2, T-0027 2, T-0030 2, T-0053 3 commits); resumed after the reset.
+- 2026-10-25T18:48:09.195Z claude: T-0016 → verifying

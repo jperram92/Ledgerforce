@@ -1134,3 +1134,39 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: design §6.2 (which roles need MFA) and §6.3 joiner steps 1–4.
 - Alternatives: MFA for every joiner (rejected: contradicts §6.2's role list; ADR-0025 enforces per role).
 - ADR: ADR-0027 · Status: accepted
+
+### DL-0146 — account_balance is maintained by the database in the writer's transaction
+- Date: 2026-10-25 · By: claude · Task: T-0027 · Category: architecture
+- Decision: Migration 0023 creates `app.account_balance` (lf_app: SELECT only) and keeps it with an AFTER INSERT FOR EACH STATEMENT trigger on `journal_line` (`REFERENCING NEW TABLE`), SECURITY DEFINER owned by lf_migrator: the inserted lines of non-draft entries are summed per key and upserted with `INSERT … ON CONFLICT DO UPDATE SET x = account_balance.x + EXCLUDED.x`, rows in key order. The engine inserts an entry's lines in one statement inside its `lf_posting` savepoint, so the balance update is part of the post and a failed post leaves no change. The engine's write step only gains a comment (T-0030 edits the same function).
+- Why: RQ-0032 findings 2–6: atomic add under concurrency (no lost update, E1/E1b), deterministic lock order (no deadlock within an entry, E5), no `lf_app` write path at all (E6), and a write path that cannot be forgotten by future code. Proven by SS-PLAT-66/67.
+- Alternatives: an explicit engine call to a SECURITY DEFINER function (callable by any lf_app code, needs its own "applied once" guard); granting lf_app UPDATE and upserting from TypeScript (gives lf_app a direct write path); read-then-write (loses updates, E2).
+- ADR: none · Status: accepted
+
+### DL-0147 — account_balance key includes the transaction currency
+- Date: 2026-10-25 · By: claude · Task: T-0027 · Category: architecture
+- Decision: The key is (tenant, company, account, period, dimension set, transaction currency). `debit_total`/`credit_total` are base-currency sums as in design §3.3; `txn_debit_total`/`txn_credit_total` add Σ `txn_amount` per side. A company's base balance per (account, period, dimension set) is the sum over currencies. No ADR: the table is in the design; the extra key column refines it without changing any accounting treatment. Flagged to the lead in the T-0027 report in case the product owner wants an ADR.
+- Why: the lead's T-0027 brief ("per company/account/period/dimension set/currency"); design §3.7 (foreign-currency balances are needed for revaluation and multi-currency reports); RQ-0032 finding 1.
+- Alternatives: base totals only (the design's minimum; a foreign-currency balance would then need a full scan of the journal).
+- ADR: none · Status: accepted
+
+### DL-0148 — Which lines count, and the accumulate-only guard
+- Date: 2026-10-25 · By: claude · Task: T-0027 · Category: architecture
+- Decision: Only lines of non-draft entries count. A row trigger (AFTER UPDATE OF status, draft → non-draft; owner only today) adds an entry's lines when it leaves draft. posted → reversed changes nothing (the reversal is its own entry). Lines of another tenant, or written with no tenant set, are skipped (the functions run under FORCE RLS; superuser writes are outside the application). A BEFORE UPDATE/DELETE trigger lets an update only increase totals with the key unchanged and refuses DELETE; TRUNCATE is refused (`app.ledger_no_truncate`). This binds the owner too.
+- Why: posted lines are immutable (0008), so a balance can only grow; RQ-0032 findings 7–8; the cross-tenant protocol (triggers skip other-tenant rows).
+- Alternatives: count drafts and subtract on change (drafts are not in the ledger); no guard (the owner could silently rewrite a balance).
+- ADR: none · Status: accepted
+
+### DL-0149 — Reading balances: trialBalance() and the accountBalanceDrift() verifier
+- Date: 2026-10-25 · By: claude · Task: T-0027 · Category: architecture
+- Decision: `packages/ledger/src/account-balance.ts` adds `trialBalance(trx, companyId)` (one row per account, base debit/credit summed over periods, sets and currencies) and `accountBalanceDrift(trx, companyId)` (every key where account_balance differs from the sum of posted lines, either side missing included), both plain read-only SQL with exact NUMERIC text. `packages/db/src/schema.ts` gets `AccountBalanceTable` with every column non-insertable and non-updatable, and the cross-tenant generator gets a currency override for the new table (`DEFAULT_ROW_OVERRIDES`).
+- Why: reports read from account_balance (design §3.3); the verifier is the property test's oracle (INV-balance-table) and an audit tool that detects tampering (proved by SS-PLAT-66).
+- Alternatives: a SQL function for the verifier (one more database object, no benefit); period-filtered trial balance now (no report task yet; added with the TB report task).
+- ADR: none · Status: accepted
+
+### DL-0150 — The concurrency test spreads postings over eight number series
+- Date: 2026-10-25 · By: claude · Task: T-0027 · Category: process
+- Decision: SS-PLAT-67 posts 36 entries on 12 connections across eight source types (eight `je_<source>` series), half debiting A and crediting B, half the reverse, each holding its row locks 20 ms before commit. The mutation check records that a read-then-write balance update survives a one-series test (numbering serialises a series) but is killed with eight series.
+- Why: RQ-0032 finding 9: a single-series test cannot see a lost update, so it would prove nothing about the balance upsert.
+- Alternatives: several companies (no shared balance rows, so no contention); a test-only hook inside the trigger (production code for tests).
+- ADR: none · Status: accepted
+
