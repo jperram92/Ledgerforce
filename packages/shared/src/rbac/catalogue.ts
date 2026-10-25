@@ -28,6 +28,7 @@ export const PERMISSIONS = P({
   'subscription.manage': 'write',
   'audit_log.read': 'read',
   'settings.read': 'read',
+  'settings.sod.manage': 'write', // SoD thresholds and small-team mode; Owner only (T-0015, ADR-0026)
   // Configuration (Finance Admin)
   'settings.chart.manage': 'write',
   'settings.tax.manage': 'write',

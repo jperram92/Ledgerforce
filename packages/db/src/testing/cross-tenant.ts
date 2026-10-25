@@ -116,6 +116,17 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   'app.period_override': { source_type: () => 'manual_journal' },
   'app.period_reopen_request': { to_status: () => 'soft_closed' },
   'app.period_status_change': { from_status: () => 'open', to_status: () => 'ar_locked' },
+  // SoD (migration 0021): known step and rule ids; a recorded exception has no reviewer; a
+  // Monday week start. Settings and acknowledgements need an Owner (prerequisites below).
+  'app.sod_action': { subject_type: () => 'bill', step: () => 'bill.enter' },
+  'app.sod_exception': {
+    rule: () => 'SOD_BILL_SELF_APPROVAL',
+    subject_type: () => 'bill',
+    step: () => 'bill.approve',
+    kind: () => 'recorded_exception',
+  },
+  'app.sod_exception_ack': { week_start: () => '2026-10-19' },
+  'app.sod_settings': { report_timezone: () => 'Australia/Sydney' },
   // Salesforce JWT bearer connection (migration 0017): a complete sealed key and certificate facts.
   'app.salesforce_connection': {
     id: () => randomUUID(),
@@ -160,6 +171,13 @@ export const PREREQUISITES: Readonly<
   'app.period_settings': async (admin, row) => {
     await grantFinanceAdmin(admin, row.get('tenant_id'), row.get('set_by'));
   },
+  // SoD settings and weekly acknowledgements need an active Owner (migration 0021).
+  'app.sod_settings': async (admin, row) => {
+    await grantRole(admin, row.get('tenant_id'), row.get('set_by'), 'owner');
+  },
+  'app.sod_exception_ack': async (admin, row) => {
+    await grantRole(admin, row.get('tenant_id'), row.get('acknowledged_by'), 'owner');
+  },
   // A company bank account needs its GL account to be an asset of subtype bank (migration 0013).
   'app.bank_account': async (admin, row) => {
     await admin.query(`UPDATE app.account SET subtype = 'bank' WHERE tenant_id = $1 AND id = $2`, [
@@ -175,16 +193,26 @@ async function grantFinanceAdmin(
   tenantId: string | undefined,
   userId: string | undefined,
 ): Promise<void> {
+  await grantRole(admin, tenantId, userId, 'finance_admin');
+}
+
+/** Activate a generated user and give it `role` (unless it already holds it). */
+async function grantRole(
+  admin: Queryable,
+  tenantId: string | undefined,
+  userId: string | undefined,
+  role: string,
+): Promise<void> {
   await admin.query(`UPDATE app.app_user SET status = 'active' WHERE tenant_id = $1 AND id = $2`, [
     tenantId,
     userId,
   ]);
   await admin.query(
     `INSERT INTO app.user_role (tenant_id, user_id, role)
-     SELECT $1, $2, 'finance_admin'
+     SELECT $1, $2, $3
       WHERE NOT EXISTS (SELECT 1 FROM app.user_role WHERE tenant_id = $1 AND user_id = $2
-                          AND role = 'finance_admin' AND revoked_at IS NULL)`,
-    [tenantId, userId],
+                          AND role = $3 AND revoked_at IS NULL)`,
+    [tenantId, userId, role],
   );
 }
 
