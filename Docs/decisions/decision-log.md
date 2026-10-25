@@ -993,6 +993,41 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Product owner's instruction to keep building independent tasks in parallel; golden-posting gate respected.
 - ADR: none · Status: accepted
 
+### DL-0129 — SoD engine: rules as data, evaluated in TenantInterceptor after MFA, permission and step-up
+- Date: 2026-10-25 · By: claude · Task: T-0015 · Category: security
+- Decision: Segregation of duties (design §6.5 rules 1–6 and the SoD cells of §6.4) is a table of rules in `packages/shared/src/sod/rules.ts` and a pure `evaluateSod` returning allow | deny(rule) | allow_with_exception. Routes declare `@SoD('<subject>.<step>', subjectFrom)`; `TenantInterceptor` evaluates it after the MFA, permission and step-up checks and refuses with 403 `{error:'sod_violation', rule}`, audited as `sod_violation` in its own transaction. A route declares a step id, not a rule id (deviation from the task brief's `@SoD('rule-id', …)`): every rule of that step is evaluated, so a route cannot omit one. Unknown subject amounts fail closed (treated as above the threshold). The 403 body also carries `small_team_exception_required`. The admin routes `/sod/settings` and `/sod/exceptions/weekly/acknowledge` are naturally idempotent (posting unchanged settings, or acknowledging a week with nothing new, returns 200 and writes no row), because no idempotency-key infrastructure exists yet.
+- Why: one central, reviewable check (apps/api/AGENTS.md; ADR-0023 hook point); same refusal path as T-0012/T-0013.
+- Alternatives: checks in module services (forgettable); database triggers per business table (tables do not exist yet; rules written twice); rule-id decorators (a route could forget a rule).
+- ADR: ADR-0026 · Status: proposed (awaiting human)
+
+### DL-0130 — Append-only SoD action ledger, settings history, exceptions and weekly acknowledgements (migration 0021)
+- Date: 2026-10-25 · By: claude · Task: T-0015 · Category: security
+- Decision: Migration `0021_auth_sod.sql` adds `app.sod_action` (who did which step on which subject, with amount and request id), `app.sod_settings` (history, latest wins), `app.sod_exception` (small-team exceptions) and `app.sod_exception_ack` (Owner's weekly acknowledgement). All tenant-owned with RLS ENABLE + FORCE, `tenant_isolation`, `lf_app` SELECT/INSERT only, and triggers refusing UPDATE/DELETE for every role. Settings, exceptions and acknowledgements are checked (Owner via `settings.sod.manage`; reviewer active and not the actor) and audited by trigger; triggers skip rows of another tenant so RLS refuses them with 42501. The interceptor takes a transaction advisory lock per subject before reading its history.
+- Why: SoD evidence must outlive edits to business rows and be impossible for the application to rewrite (directive 6, design §6.8); `lf_app` cannot read `audit.audit_log`.
+- Alternatives: derive history from the audit log (no SELECT; request-shaped); columns on future business tables (do not exist yet; editable).
+- ADR: ADR-0026 · Status: proposed (awaiting human)
+
+### DL-0131 — SoD thresholds are tenant settings with the design's placeholder defaults (open decision §11.2)
+- Date: 2026-10-25 · By: claude · Task: T-0015 · Category: scope
+- Decision: Defaults: bill self-approval above 1,000.0000; credit-note self-approval above 1,000.0000 (§6.4 names no number — placeholder chosen equal to bills); manual-journal approval above 5,000.0000; two releasers above 10,000.0000; small-team mode off; weekly report time zone Australia/Sydney. "Above" means strictly greater. Only the Owner (new permission `settings.sod.manage`) changes them, with a reason. These values are placeholders and are listed for the product owner.
+- Why: design §6.5 shows defaults; §11.2 lists SoD thresholds as an open decision, so they must be configurable and flagged, not decided by an agent.
+- Alternatives: hard-coded constants (not configurable); Finance Admin may change them (an adviser weakening the controls that bind them — left for the human).
+- ADR: ADR-0026 · Status: proposed (awaiting human)
+
+### DL-0132 — Small-team mode: only when no other eligible person exists; external reviewer or recorded exception; period reopen never excepted
+- Date: 2026-10-25 · By: claude · Task: T-0015 · Category: security
+- Decision: A rule that would deny is excepted only when small-team mode is on, the rule allows exceptions, and no other active user of the tenant holds the route's permission. The request must then carry `sod_exception` with a reason and either an external reviewer (another active user, named) or none (recorded exception); one `app.sod_exception` row is written with the action, and it appears on the weekly report until and after the Owner acknowledges the week. Without it: 403 sod_violation with `small_team_exception_required: true`. If another eligible person exists, the conflict is denied even in small-team mode. Rule 6 (period reopen) allows no exception, matching migration 0018. Interpretation of "external reviewer" (a named reviewer, not a second approver) is listed for the product owner.
+- Why: design §6.5 "the control is weakened visibly, never silently"; §6.3 small-team mode for fewer than 3 users.
+- Alternatives: exceptions whenever small-team mode is on (weakens controls that can be satisfied); require the reviewer to hold the approving permission (then they are eligible and no exception is needed).
+- ADR: ADR-0026 · Status: proposed (awaiting human)
+
+### DL-0133 — Business endpoints get SoD by declaration; stand-in routes prove the contract
+- Date: 2026-10-25 · By: claude · Task: T-0015 · Category: process
+- Decision: Bills, payment batches, bank-detail changes and credit notes do not exist yet. `apps/api/src/sod/sod.db.test.ts` mounts test controllers declared exactly as the owning tasks must (`@RequirePermission` + `@SoD('bill.enter'| 'bill.approve', …)` etc.); the checks, refusals, ledger rows, exceptions and audit rows are the real ones (as T-0012/T-0013, DL-0104). Owning tasks must apply: T-0052 (`bill.enter`, `bill.approve`), T-0054 (`payment_batch.create`, `.approve`, `.release`, and `releasersRequired` for two releasers), T-0037 (`bank_detail_change.request`, `.verify`), T-0045 (`credit_note.create`, `.approve`), the manual-journal and posting-rule tasks (`manual_journal.post`/`.approve`, `posting_rule`/`tax_code` `.author`/`.activate`), payroll (`net_pay_batch.create`/`.release`). Register rows are green for the SoD layer only, naming the owning task.
+- Why: prove the engine end to end now; keep the business tasks' contract explicit.
+- Alternatives: wait for the business endpoints (blocks T-0016 and leaves the engine unproven).
+- ADR: ADR-0026 · Status: accepted
+
 ### DL-0134 — T-0025 builds the generic posting pipeline only; no event posting rules while golden postings are Draft
 - Date: 2026-10-25 · By: claude · Task: T-0025 · Category: scope
 - Decision:
@@ -1045,3 +1080,4 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: DL-0136 decides which source types may post to each control account: AR control ← every AR-class source type, including the Stripe charge; AP control ← ap.*; payroll clearing ← payroll.*. It is logged as accepted, but it is an accounting choice, so treat it as proposed (awaiting human) until the product owner confirms it; the engine enforces it meanwhile. DL-0135 (one entry-number series per source type, `je_<source type>`, rather than one per company) is likewise put to the human. Neither changes any golden posting.
 - Why: AGENTS.md §6: accounting-category choices go to the product owner; design §3.2 says control accounts accept postings only from their subledger but doesn't list the source types.
 - ADR: none · Status: proposed (awaiting human)
+

@@ -23,6 +23,7 @@ const WRITE_HOLDERS: Record<string, readonly RoleId[]> = {
   'users.roles.assign': ['owner', 'finance_admin'],
   'users.roles.assign_owner': ['owner'],
   'subscription.manage': ['owner'],
+  'settings.sod.manage': ['owner'], // T-0015, ADR-0026
   'settings.chart.manage': ['owner', 'finance_admin'],
   'settings.tax.manage': ['owner', 'finance_admin'],
   'settings.posting_rules.author': ['owner', 'finance_admin'],

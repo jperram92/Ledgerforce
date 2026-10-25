@@ -76,5 +76,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0023](0023-role-templates-and-permission-checks.md) | Role templates as code, tenant-scoped role assignments, fail-closed permission checks | security | yes | Proposed |
 | [0024](0024-period-control-matrix-and-lock-policy.md) | Period control: §3.5 matrix as data, invariant 3 in the database, personal overrides, two-approver reopen, lock-date policy | accounting | yes | Proposed |
 | [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Proposed |
+| [0026](0026-segregation-of-duties-engine-and-small-team-mode.md) | Segregation-of-duties engine: rules as data, append-only action ledger, tenant thresholds, visible small-team exceptions | security | yes | Proposed |
 
-Next free number: **0026**.
+Next free number: **0027**.

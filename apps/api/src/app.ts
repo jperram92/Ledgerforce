@@ -13,6 +13,7 @@ import { SessionService, systemClock, type Clock } from './auth/session.service.
 import { Authz } from './authz/authz.ts';
 import { defaultMfaPolicy, type MfaPolicy } from './authz/mfa.ts';
 import { UserRolesController } from './authz/user-roles.controller.ts';
+import { SodController } from './sod/sod.controller.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
 import { PartyBankAccountsController } from './parties/bank-accounts.controller.ts';
@@ -61,6 +62,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   CompaniesController,
   PartyBankAccountsController,
   UserRolesController,
+  SodController,
   AuthController,
   LoginController,
 ];
@@ -83,6 +85,7 @@ class AppModule {
         CompaniesController,
         PartyBankAccountsController,
         UserRolesController,
+        SodController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,
