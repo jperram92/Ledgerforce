@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 4 in progress (DL-0128): T-0015 (SoD) and T-0025 (posting engine pipeline, generic only — no event posting rules until golden postings are Approved) by sub-agents; the lead merges. T-0016 waits (same roles code as T-0015).
+Task: PARALLEL ROUND 4 COMPLETE (DL-0128): T-0025 and T-0015 merged, verified (13 PASS/0 FAIL/3 PENDING) and in review. Next: plan round 5 (T-0016 user lifecycle is now unblocked).
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -45,6 +45,10 @@ Open questions for human:
       charge; AP ← ap.*; payroll clearing ← payroll.*) and DL-0135 journal numbering (one series per source type
       `je_<type>` vs one per company; company setup must create the series). DL-0137: also reject a repeat key
       whose LINES differ (needs a stored command hash column)?
+  16. SoD (T-0015, ADR-0026 Proposed, security): confirm the threshold placeholders (§11.2); Owner-only SoD settings;
+      meaning of "external reviewer" (another active user of the tenant); is rule 2 exceptable in small-team mode;
+      rule 6 (period reopen) never excepted; AP Clerk cells §6.4 vs rules §6.5; weekly report in the tenant time
+      zone (Australia/Sydney default). Details: T-0015 card *Report* questions 1–8.
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
      (numeric + CHECK scale<=4) would make the DB refuse instead. Meanwhile the posting engine
      refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
@@ -109,6 +113,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0059 — packages/modules/bank camt053/dedupe/statements/account-match; migration 0020; RQ-0028; DL-0125..0127
 >   • T-0025 — packages/ledger/src/{posting-command,posting-engine}.ts + invariant properties; RQ-0030; DL-0134..0138
 >     (golden-posting gate: generic pipeline only)
+>   • T-0015 — packages/shared/src/sod/**, migration 0021, apps/api SoD decorator/interceptor step and /sod routes; ADR-0026;
+>     DL-0129..0133 (security review: advisory lock, exception audit, Owner-only settings)
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -220,3 +226,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T13:42:19.197Z claude: T-0025 → verifying
 - 2026-10-25T13:46:22.202Z claude: release T-0025 → review (verify 13 PASS/0 FAIL/3 PENDING on merged tree (gate 3 invariants now PASS); awaiting codex cross-review)
 - 2026-10-25 13:4x claude (lead): merged T-0025 (clean; no migration); gates green (561 unit / 550 db); verify 13 PASS/0 FAIL/3 PENDING (gate 3 invariants now PASS) → review. Usage-limit stop/worker restart mid-merge: staged merge was intact; committed.
+- 2026-10-25T13:49:21.522Z claude: T-0015 → verifying
+- 2026-10-25T13:53:05.528Z claude: release T-0015 → review
+- 2026-10-25 claude (lead): merged T-0015 (conflicts in decision log/register resolved by id; totals 156/16); gates green (603 unit / 612 db); verify 13 PASS/0 FAIL/3 PENDING → review. Round 4 complete.
