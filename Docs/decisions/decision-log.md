@@ -788,3 +788,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - T-0108: Phase 1.
 - Why: Product owner's instruction to run independent tasks in parallel.
 - ADR: none · Status: accepted
+
+### DL-0101 — Role templates and permissions as a code constant; tenant-scoped role assignments
+- Date: 2026-10-24 · By: claude · Task: T-0012 · Category: security
+- Decision: The ten §6.4 role templates and the permission catalogue live in `packages/shared/src/rbac/catalogue.ts` (`@ledgerforce/shared/rbac`). The database knows only the role ids, through the IMMUTABLE function `app.role_template_exists` (migration 0016, mirrored and tested like `app.system_role_allows` in 0005). Assignments are rows in the tenant table `app.user_role` (RLS, no DELETE; revoke by setting `revoked_at`). Readings of the design that the human should check are listed in ADR-0023 *Open points*.
+- Why: `packages/db/AGENTS.md` (no table without tenant_id without a security ADR); the mapping is reviewed and versioned with the code that enforces it.
+- Alternatives: global template tables (GLOBAL_TABLES entry, mutable data changed only by releases); per-tenant seeded copies (drift, per-tenant data migrations for every new permission).
+- ADR: ADR-0023 · Status: proposed (awaiting human)
+
+### DL-0102 — Permission check runs in the tenant interceptor, fail-closed, denials audited separately
+- Date: 2026-10-24 · By: claude · Task: T-0012 · Category: security
+- Decision: `@RequirePermission(p)` / `@AnyMember()` are metadata; the check runs in `TenantInterceptor` right after the session is verified inside the tenant transaction. A tenant route with neither decorator is refused (403, `permission: null`); a permission route without a verified user principal is refused. A denial (403 `{error:'forbidden', permission}`) rolls back the request transaction and is audited in its own tenant transaction (`action = 'permission_denied'`).
+- Why: NestJS runs guards before interceptors (https://docs.nestjs.com/faq/request-lifecycle), and the principal exists only after verification under RLS (ADR-0016). SS-UC02-07 requires the refusal to be audited, but a refused request's transaction never commits.
+- Alternatives: a Nest guard that verifies the session again (two verifications, two transactions); default-open routes (a forgotten decorator would expose data).
+- ADR: ADR-0023 · Status: proposed (awaiting human)
+
+### DL-0103 — Role change bumps session_epoch in a database trigger
+- Date: 2026-10-24 · By: claude · Task: T-0012 · Category: security
+- Decision: An AFTER INSERT/UPDATE trigger on `app.user_role` increments `app.app_user.session_epoch` of the affected user in the same transaction (revoke-all, ADR-0016). The API audits the change (before/after) through the request's audit row. Owner grants/revokes need `users.roles.assign_owner` (Owner only); other roles need `users.roles.assign` (Owner, Finance Admin — design §6.3 mover). The last active Owner cannot be revoked (409 `last_owner`).
+- Why: Design §6.2 "revoke-all on … role change" must hold for every writer, not only the API; least privilege for granting Owner; a tenant must not lock itself out.
+- Alternatives: bump in the service only (another writer could forget it).
+- ADR: ADR-0023 · Status: proposed (awaiting human)
+
+### DL-0104 — SS-UC02-07 proven through a stand-in for T-0043's route; SS-PLAT-48/49 added
+- Date: 2026-10-25 · By: claude · Task: T-0012 · Category: process
+- Decision: The AR batch-run endpoint belongs to T-0043. `apps/api/src/authz/permissions.db.test.ts` mounts a test controller through the new `ApiOptions.testControllers` hook, declared exactly as T-0043 must declare its route (`@RequirePermission('ar.batch.run')`); the check, the 403 and the audit row are the real ones. T-0043 must add its own SS-UC02-07 test on the real route. New scenarios SS-PLAT-48 (role matrix) and SS-PLAT-49 (permission on every endpoint, role-change audit/revoke-all/no delete) cover the card's goal, which SS-UC02-07 alone does not. The bank-accounts API test now grants its users the Accountant role, because the endpoint requires `parties.bank_account.read`; its assertions are unchanged.
+- Why: TDD needs an observable route now; the card's goal ("a guard used by every endpoint") had no AC.
+- Alternatives: a stub batch endpoint in production code (would pre-empt T-0043); unit-only proof (would not show the 403 or the audit row).
+- ADR: ADR-0023 · Status: accepted

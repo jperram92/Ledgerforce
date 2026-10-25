@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24. Totals: 121 scenarios (12 need screenshots).
+- Generated on 2026-10-24. Totals: 123 scenarios (12 need screenshots).
 
 ## How to update (who, when)
 
@@ -44,7 +44,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC02-04 | PDFs emailed to Billing To and CC | UC-02 | MVP | db-integration | no | — | T-0044, T-0042 | not-started | — | — |
 | SS-UC02-05 | Re-running a crashed batch is idempotent | UC-02 | MVP | db-integration | no | — | T-0044 | not-started | — | — |
 | SS-UC02-06 | Consecutive gapless numbers; failed invoice consumes none | UC-02 | MVP | db-integration | no | packages/ledger/src/numbering.db.test.ts | T-0044, T-0024 | green (numbering layer, T-0024; the invoice batch itself is T-0044) | [.agent/evidence/T-0024/manifest.json](../../.agent/evidence/T-0024/manifest.json) | 57c4d8c |
-| SS-UC02-07 | Permission required to run a batch | UC-02 | MVP | unit | no | — | T-0012, T-0043 | not-started | — | — |
+| SS-UC02-07 | Permission required to run a batch | UC-02 | MVP | unit + db-integration | no | packages/shared/src/rbac/rbac.matrix.test.ts, apps/api/src/authz/permissions.db.test.ts | T-0012, T-0043 | green | [.agent/evidence/T-0012/manifest.json](../../.agent/evidence/T-0012/manifest.json) | 052231e |
 | SS-UC02-08 | Batch screens show preview and exception list | UC-02 | MVP | e2e-playwright | yes | — | T-0084 | not-started | — | — |
 | SS-UC03-01 | Invoice carries a Stripe payment link | UC-03 | MVP | contract | no | — | T-0073 | not-started | — | — |
 | SS-UC03-02 | Stripe payment posts GP-003 and marks invoice Paid | UC-03 | MVP | golden | no | — | T-0074 | not-started | — | — |
@@ -166,6 +166,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-45 | Salesforce package metadata matches the connector contract (offline) | — | MVP | unit | no | salesforce/test/package-contract.test.ts, salesforce/test/xml.test.ts | T-0062 | green | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
 | SS-PLAT-46 | Salesforce permission sets grant least privilege; only the integration user writes | — | MVP | unit | no | salesforce/test/package-contract.test.ts | T-0062 | green | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
 | SS-PLAT-47 | A company ABN must pass the ABR checksum | — | MVP | db-integration | no | packages/db/src/company-abn.db.test.ts | T-0107 | green | [.agent/evidence/T-0107/manifest.json](../../.agent/evidence/T-0107/manifest.json) | 3ec79cd |
+| SS-PLAT-48 | Role templates grant exactly the design §6.4 matrix | — | MVP | unit | no | packages/shared/src/rbac/rbac.matrix.test.ts | T-0012 | green | [.agent/evidence/T-0012/manifest.json](../../.agent/evidence/T-0012/manifest.json) | 052231e |
+| SS-PLAT-49 | Every endpoint checks a permission; role changes are audited, never deleted and revoke sessions | — | MVP | unit + db-integration | no | apps/api/src/authz/routes.test.ts, apps/api/src/authz/permissions.db.test.ts, packages/db/src/user-role.db.test.ts | T-0012 | green | [.agent/evidence/T-0012/manifest.json](../../.agent/evidence/T-0012/manifest.json) | 052231e |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -353,4 +355,12 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-47 — A company ABN must pass the ABR checksum
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0107
 - **Given** RQ-0017's ABR rule · **When** a company is created or changed as lf_app · **Then** a valid ABN or none is accepted; an 11-digit ABN failing the mod-89 checksum is refused (23514) on insert and on update
+
+### SS-PLAT-48 — Role templates grant exactly the design §6.4 matrix
+- Phase: MVP · Layer: **unit** · Screenshot evidence: no · Task(s): T-0012 (ADR-0023)
+- **Given** the permission catalogue and the ten role templates (`@ledgerforce/shared/rbac`) · **When** each role's permissions are listed · **Then** every write permission has exactly the holders the test lists; each role can and cannot what §6.4 says; Owner holds everything; Auditor every read permission and no write; Sales user and Integration nothing and no interactive login; MFA is flagged for Owner, Finance Admin, Accountant, AP Clerk and Payroll Officer (§6.2); several roles give the union, unknown roles nothing; templates are frozen
+
+### SS-PLAT-49 — Every endpoint checks a permission; role changes are audited, never deleted and revoke sessions
+- Phase: MVP · Layer: **unit + db-integration** · Screenshot evidence: no · Task(s): T-0012 (ADR-0023)
+- **Given** the API with real sessions and `app.user_role` (migration 0016) · **When** routes are called and roles granted or revoked · **Then** every route declares public, any-member or a catalogue permission, and an undeclared route gets 403 `permission: null`; a permission route without a verified user gets 403; a missing permission gets 403 `{error:'forbidden', permission}` with a `permission_denied` audit row; bank details need `parties.bank_account.read`; a grant (201, or 200 if already active) or revoke (200) is audited and bumps `session_epoch` in the same transaction, so the user's sessions end; Owner grants need `users.roles.assign_owner`; the last Owner cannot be revoked (409); unknown roles 400; other tenants' users 404; grants are never deleted, edited or un-revoked (42501/23514), one active grant per user and role (23505)
 
