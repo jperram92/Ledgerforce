@@ -74,5 +74,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0017](0017-journal-hash-chain-canonical-form-v1.md) | Journal hash chain: canonical form v1 (netstrings), computed in the database at commit | accounting | yes | Proposed |
 | [0018](0018-envelope-encryption-local-keyring-kms.md) | Envelope encryption of bank account numbers with a pluggable KMS; local keyring for self-host MVP | security | yes | Proposed |
 | [0023](0023-role-templates-and-permission-checks.md) | Role templates as code, tenant-scoped role assignments, fail-closed permission checks | security | yes | Proposed |
+| [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Proposed |
 
 Next free number: **0024**.
