@@ -8,12 +8,15 @@ import type { AddressInfo } from 'node:net';
 import { AuthController, SESSION_SERVICE } from './auth/auth.controller.ts';
 import { LoginController, OIDC_SERVICE } from './auth/login.controller.ts';
 import { OidcService, type OidcOptions } from './auth/oidc.service.ts';
+import { ApiTokenService } from './auth/api-token.service.ts';
 import { SessionTenantResolver } from './auth/session-tenant-resolver.ts';
 import { SessionService, systemClock, type Clock } from './auth/session.service.ts';
 import { Authz } from './authz/authz.ts';
 import { defaultMfaPolicy, type MfaPolicy } from './authz/mfa.ts';
 import { UserRolesController } from './authz/user-roles.controller.ts';
 import { SodController } from './sod/sod.controller.ts';
+import { ApiTokensController, UserApiTokensController } from './tokens/api-tokens.controller.ts';
+import { UsersController } from './users/users.controller.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
 import { PartyBankAccountsController } from './parties/bank-accounts.controller.ts';
@@ -63,6 +66,9 @@ export const API_CONTROLLERS: readonly Type[] = [
   PartyBankAccountsController,
   UserRolesController,
   SodController,
+  UsersController,
+  ApiTokensController,
+  UserApiTokensController,
   AuthController,
   LoginController,
 ];
@@ -86,6 +92,9 @@ class AppModule {
         PartyBankAccountsController,
         UserRolesController,
         SodController,
+        UsersController,
+        ApiTokensController,
+        UserApiTokensController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,
@@ -138,7 +147,10 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
         )
       : undefined;
   const resolver =
-    opts.tenantResolver ?? (sessions ? new SessionTenantResolver(sessions) : refuseAllResolver);
+    opts.tenantResolver ??
+    (sessions
+      ? new SessionTenantResolver(sessions, new ApiTokenService(clock))
+      : refuseAllResolver);
   const app = await NestFactory.create(
     AppModule.forRoot(db, resolver, sessions, oidc, opts.testControllers ?? [], clock, mfa),
     {

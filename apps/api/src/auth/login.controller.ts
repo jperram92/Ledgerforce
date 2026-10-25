@@ -16,6 +16,7 @@ const STATUS: Record<LoginError['reason'], number> = {
   not_invited: 403,
   step_up_mismatch: 403,
   mfa_required: 403,
+  mfa_enrolment_required: 403,
 };
 
 function refuse(e: unknown): never {

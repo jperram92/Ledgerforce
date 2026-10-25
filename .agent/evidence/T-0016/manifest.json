@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0016",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-21",
+      "file": ".agent/evidence/T-0016/20261025-141925-tests-db.json",
+      "test": "5 test(s): packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-21: Leaver is disabled, never deleted › disabling revokes every open session, token and role grant in the same statement and keeps every row | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-21: Leaver is disabled, never deleted › a disabled user never becomes active again; lf_app cannot delete users, sessions or tokens | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-21: Leaver is disabled, never deleted › the disable columns cannot be rewritten later | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-21: Leaver is disabled, never deleted › the successor must be another active user of the tenant | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-21: Leaver is disabled, never deleted › approval_assignee follows the successor chain to an active user (pending approvals are routed)",
+      "commit": "a60876f7a8ae-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:19:25.107Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-71",
+      "file": ".agent/evidence/T-0016/20261025-141925-tests-db.json",
+      "test": "2 test(s): packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-71: Joiner and mover controls (database) › nobody grants a role to themselves | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-71: Joiner and mover controls (database) › no role is granted to a disabled user",
+      "commit": "a60876f7a8ae-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:19:25.107Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-70",
+      "file": ".agent/evidence/T-0016/20261025-141925-tests-db.json",
+      "test": "7 test(s): packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-70: API tokens are hashed, scoped, expiring and tenant-bound (database) › stores only a SHA-256 of the secret: anything else is refused | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-70: API tokens are hashed, scoped, expiring and tenant-bound (database) › scopes are known, token-allowed permissions, at least one, no duplicates | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-70: API tokens are hashed, scoped, expiring and tenant-bound (database) › the database mirrors the permission catalogue and the token deny-list | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-70: API tokens are hashed, scoped, expiring and tenant-bound (database) › expiry is mandatory, after creation and at most 366 days; created_at is the database clock | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-70: API tokens are hashed, scoped, expiring and tenant-bound (database) › only an active user owns a new token, and it is inserted active | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-70: API tokens are hashed, scoped, expiring and tenant-bound (database) › the only changes are last_used_at (forward) and one revoke | packages/db/src/user-lifecycle.db.test.ts › SS-PLAT-70: API tokens are hashed, scoped, expiring and tenant-bound (database) › is tenant-bound: another tenant neither sees nor creates rows for this tenant",
+      "commit": "a60876f7a8ae-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:19:25.107Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-41",
+      "file": ".agent/evidence/T-0016/20261025-141930-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/auth/oidc.db.test.ts › SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) › login redirects to the IdP with code + PKCE S256 + state + nonce, kept server-side and bound to the browser | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) › the callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) › nonce: an ID token whose nonce differs from the stored one is refused (400), no session | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) › PKCE: a code redeemed with the wrong verifier is refused (400), no session | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) › app.tenant_id_for_slug returns only an id, and lf_app still cannot read other tenants",
+      "commit": "a60876f7a8ae-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:19:30.206Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-42",
+      "file": ".agent/evidence/T-0016/20261025-141930-tests-api-db.json",
+      "test": "6 test(s): apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › an authenticated but unknown subject gets 403 and no session (no just-in-time accounts) | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › another tenant's user, a user at another issuer, or a disabled user gets 403 | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › a replayed callback (state already used) gets 400 and creates no second session | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › a state older than 10 minutes gets 400 and no session | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › a callback without the browser binding, with another login’s cookie, or with a forged tenant gets 400 | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › an unknown, suspended, slug-less or malformed tenant slug gets the same 404, with nothing leaked",
+      "commit": "a60876f7a8ae-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:19:30.206Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-20",
+      "file": ".agent/evidence/T-0016/20261025-141930-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/auth/oidc.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — login › a session created by OIDC login stores amr/acr and follows the 30-min idle / 12-h absolute policy | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — login › a password-only login is captured as such, so T-0013 can demand MFA",
+      "commit": "a60876f7a8ae-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:19:30.206Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-71",
+      "file": ".agent/evidence/T-0016/20261025-141930-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/auth/oidc.db.test.ts › SS-PLAT-71: A joiner whose role needs MFA is activated only by an MFA login › a password-only first login is refused, the user stays invited, and the refusal is audited | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-71: A joiner whose role needs MFA is activated only by an MFA login › an MFA first login activates the user and writes the welcome audit event | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-71: A joiner whose role needs MFA is activated only by an MFA login › a joiner whose roles need no MFA is activated by a password login | apps/api/src/users/users.lifecycle.db.test.ts › SS-PLAT-71: Joiner is invited with roles; mover cannot grant themselves roles › invite creates an invited user with role grants, audited; needs users.manage | apps/api/src/users/users.lifecycle.db.test.ts › SS-PLAT-71: Joiner is invited with roles; mover cannot grant themselves roles › nobody grants a role to themselves; nobody grants a role to a disabled user",
+      "commit": "a60876f7a8ae-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:19:30.206Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-70",
+      "file": ".agent/evidence/T-0016/20261025-141930-tests-api-db.json",
+      "test": "9 test(s): apps/api/src/tokens/tokens.scope.db.test.ts › SS-PLAT-70: Scoped API tokens are hashed, expire and cannot exceed their owner › issuing needs a fresh MFA step-up; the secret is returned once and only its SHA-256 is stored | apps/api/src/tokens/tokens.scope.db.test.ts › SS-PLAT-70: Scoped API tokens are hashed, expire and cannot exceed their owner › scopes must be known, token-allowed and held by the owner; expiry is 1–366 days | apps/api/src/tokens/tokens.scope.db.test.ts › SS-PLAT-70: Scoped API tokens are hashed, expire and cannot exceed their owner › a token acts as its owner, only within its scopes, and every use is attributed to it | apps/api/src/tokens/tokens.scope.db.test.ts › SS-PLAT-70: Scoped API tokens are hashed, expire and cannot exceed their owner › a mover who loses a role loses it on every token at once | apps/api/src/tokens/tokens.scope.db.test.ts › SS-PLAT-70: Scoped API tokens are hashed, expire and cannot exceed their owner › a token never satisfies a step-up, cannot issue tokens and is not a session | apps/api/src/tokens/tokens.scope.db.test.ts › SS-PLAT-70: Scoped API tokens are hashed, expire and cannot exceed their owner › an MFA role uses a token issued under step-up without per-request MFA | apps/api/src/tokens/tokens.scope.db.test.ts › SS-PLAT-70: Scoped API tokens are hashed, expire and cannot exceed their owner › segregation of duties applies to the token owner | apps/api/src/tokens/tokens.scope.db.test.ts › SS-PLAT-70: Scoped API tokens are hashed, expire and cannot exceed their owner › revoked, expired, forged, foreign-tenant and malformed tokens are refused with 401 | apps/api/src/tokens/tokens.scope.db.test.ts › SS-PLAT-70: Scoped API tokens are hashed, expire and cannot exceed their owner › owners revoke only their own tokens; an administrator (users.manage) revokes anyone’s",
+      "commit": "a60876f7a8ae-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:19:30.206Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-21",
+      "file": ".agent/evidence/T-0016/20261025-141930-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/users/users.lifecycle.db.test.ts › SS-PLAT-21: Leaver is disabled, never deleted › offboarding disables the user, revokes sessions, tokens and roles, keeps history and reassigns pending approvals | apps/api/src/users/users.lifecycle.db.test.ts › SS-PLAT-21: Leaver is disabled, never deleted › needs users.manage and a reason; refuses oneself, bad successors, unknown and foreign users",
+      "commit": "a60876f7a8ae-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:19:30.206Z",
+      "result": "passed"
+    }
+  ]
+}

@@ -39,6 +39,32 @@ export interface AppUserTable {
   /** Bumped to revoke every session of the user (ADR-0016). */
   session_epoch: Generated<number>;
   created_at: Timestamp;
+  /** Migration 0022 (ADR-0027): joiner — who invited the user; NULL = provisioning. */
+  invited_by: string | null;
+  /** Migration 0022 (ADR-0027): leaver — set by the database when the status becomes disabled. */
+  disabled_at: ColumnType<Date | null, never, never>;
+  disabled_by: string | null;
+  disable_reason: string | null;
+  /** Active user who inherits the leaver's pending approvals (app.approval_assignee). */
+  successor_user_id: string | null;
+}
+
+/** Personal API token (migration 0022, ADR-0027). Only the SHA-256 of the secret is stored. */
+export interface ApiTokenTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  user_id: string;
+  name: string;
+  /** Permission ids; effective permissions = scopes ∩ the owner's current role permissions. */
+  scopes: string[];
+  secret_sha256: string;
+  /** The database clock (trigger), whatever is sent. */
+  created_at: Timestamp;
+  expires_at: Timestamp;
+  last_used_at: Timestamp | null;
+  revoked_at: Timestamp | null;
+  revoked_by: string | null;
+  revoke_reason: string | null;
 }
 
 export interface SessionTable {
@@ -442,6 +468,8 @@ export interface AuditLogTable {
   ip: string | null;
   user_agent: string | null;
   request_id: string | null;
+  /** Migration 0022 (ADR-0027): the API token a request was made with. */
+  api_token_id: string | null;
 }
 
 export interface Database {
@@ -451,6 +479,7 @@ export interface Database {
   'app.session': SessionTable;
   'app.auth_request': AuthRequestTable;
   'app.user_role': UserRoleTable;
+  'app.api_token': ApiTokenTable;
   'app.account': AccountTable;
   'app.account_system_role': AccountSystemRoleTable;
   'app.dimension': DimensionTable;

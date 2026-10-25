@@ -500,3 +500,80 @@ describe('SS-PLAT-20: MFA and session policy for finance roles — login', () =>
     expect(rows).toEqual([{ amr: ['pwd'], acr: 'urn:ledgerforce:loa:pwd' }]);
   });
 });
+
+describe('SS-PLAT-71: A joiner whose role needs MFA is activated only by an MFA login', () => {
+  const JOE = '01900000-0000-7000-8000-00000000a271'; // invited Accountant (MFA role)
+  const ANA = '01900000-0000-7000-8000-00000000a272'; // invited AR Clerk (no MFA role)
+
+  beforeAll(async () => {
+    for (const [uid, sub, role] of [
+      [JOE, 'sub-joe', 'accountant'],
+      [ANA, 'sub-ana', 'ar_clerk'],
+    ] as const) {
+      await tdb.admin.query(
+        `INSERT INTO app.app_user (id, tenant_id, email, display_name, idp_subject, idp_issuer, status)
+         VALUES ($1, $2, $3, 'Joiner', $4, $5, 'invited')`,
+        [uid, A, `${sub}@harbour.test`, sub, issuer],
+      );
+      await tdb.admin.query(
+        `INSERT INTO app.user_role (tenant_id, user_id, role) VALUES ($1, $2, $3)`,
+        [A, uid, role],
+      );
+    }
+  });
+
+  const statusOf = async (uid: string) =>
+    (
+      await tdb.admin.query<{ status: string }>('SELECT status FROM app.app_user WHERE id = $1', [
+        uid,
+      ])
+    ).rows[0]?.status;
+  const audit = async (uid: string) =>
+    (
+      await tdb.admin.query<{ action: string; after: unknown }>(
+        `SELECT action, after FROM audit.audit_log
+          WHERE tenant_id = $1 AND actor_user_id = $2 AND action <> 'login' ORDER BY id`,
+        [A, uid],
+      )
+    ).rows;
+
+  it('a password-only first login is refused, the user stays invited, and the refusal is audited', async () => {
+    const before = await sessionCount(A);
+    const res = await login('harbour', {
+      sub: 'sub-joe',
+      amr: ['pwd'],
+      acr: 'urn:ledgerforce:loa:pwd',
+    });
+    expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({ error: 'mfa_enrolment_required' });
+    expect(cookieValue(res, 'lf_session')).toBeUndefined();
+    expect(await sessionCount(A)).toBe(before);
+    expect(await statusOf(JOE)).toBe('invited');
+    expect(await audit(JOE)).toEqual([
+      { action: 'login_refused', after: { reason: 'mfa_enrolment_required' } },
+    ]);
+  });
+
+  it('an MFA first login activates the user and writes the welcome audit event', async () => {
+    const res = await login('harbour', { sub: 'sub-joe' });
+    expect(res.status).toBe(303);
+    expect(await statusOf(JOE)).toBe('active');
+    expect(await audit(JOE)).toEqual([
+      { action: 'login_refused', after: { reason: 'mfa_enrolment_required' } },
+      { action: 'user.joined', after: { roles: ['accountant'], amr: ['pwd', 'otp'] } },
+    ]);
+  });
+
+  it('a joiner whose roles need no MFA is activated by a password login', async () => {
+    const res = await login('harbour', {
+      sub: 'sub-ana',
+      amr: ['pwd'],
+      acr: 'urn:ledgerforce:loa:pwd',
+    });
+    expect(res.status).toBe(303);
+    expect(await statusOf(ANA)).toBe('active');
+    expect(await audit(ANA)).toEqual([
+      { action: 'user.joined', after: { roles: ['ar_clerk'], amr: ['pwd'] } },
+    ]);
+  });
+});

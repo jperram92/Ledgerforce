@@ -1099,3 +1099,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   T-0027 and T-0030 change only the generic engine (no event posting rule) while golden postings are Draft.
 - Why: Product owner's instruction to build independent tasks in parallel. One engine-touching pair per round keeps merge conflicts small.
 - ADR: none · Status: accepted
+
+### DL-0141 — Scoped personal API tokens: split-token, SHA-256, scopes ∩ owner, never step-up (ADR-0027)
+- Date: 2026-10-25 · By: claude · Task: T-0016 · Category: security
+- Decision: Personal API tokens `lfpat.<tenant>.<id>.<secret>` (32 random bytes), stored as SHA-256 only, sent only as `Authorization: Bearer` (a cookie plus an Authorization header is refused). Scopes are catalogue permissions minus `TOKEN_FORBIDDEN_SCOPES` (every step-up permission, user/role administration, SoD settings, subscription), a subset of the owner's permissions at issue; at each request permissions = scopes ∩ the owner's current role permissions. Issuing needs a session with a fresh MFA step-up (300 s), so the MFA-role rule is met by the token later; a token never satisfies a step-up and cannot mint tokens. SoD treats the owner as the actor. Expiry 1–366 days (default 90), last use tracked, revoke once, never deleted. Audit rows of token requests carry `audit.audit_log.api_token_id` (new nullable column). App tokens for the Integration role are left to the connector tasks.
+- Why: RQ-0031 (OWASP Session Management, Password Storage, REST, Authorization cheat sheets; ASVS 5.0 V7; GitHub fine-grained PATs); design §6.2.
+- Alternatives: JWT tokens (rejected: revocation list needed anyway, scope frozen at issue); argon2/bcrypt hash (rejected: 256-bit secret, slow hash only adds latency); tokens without step-up at issue (rejected: an MFA bypass for finance roles).
+- ADR: ADR-0027 · Status: proposed (awaiting human)
+
+### DL-0142 — Leaver revocation is a database trigger; disabled is never re-activated
+- Date: 2026-10-25 · By: claude · Task: T-0016 · Category: security
+- Decision: When `app.app_user.status` becomes `disabled`, trigger `app_user_offboard` revokes every open session (`user_disabled`), every active API token and every active role grant (`leaver`, revoked_by = disabled_by), the guard bumps `session_epoch` and stamps `disabled_at`, and one `user.disabled` audit row records the counts. `disabled → active` is refused for every role; `disabled → invited` (re-invite through the joiner gate) is allowed. `disabled_by` and the reason are required by the API, not the database, so an older path that only sets the status (session.db.test.ts does) still revokes everything. A disabled user gets no role grant, except from a superuser (test data, as 0021). Offboarding needs no step-up (it only removes access). Session and token verification also check that the owner is active, which covers a session or token committed concurrently with the offboard.
+- Why: ASVS 7.4.2; directive 6 (nothing deleted); "no path can forget it" as 0016 did for role changes.
+- Alternatives: revoke in the controller only (rejected: forgettable); make disabled terminal (rejected: the unique e-mail index would block a rehire).
+- ADR: ADR-0027 · Status: accepted
+
+### DL-0143 — "Reassign pending approvals": successor + `app.approval_assignee`, report what exists
+- Date: 2026-10-25 · By: claude · Task: T-0016 · Category: scope
+- Decision: No table yet assigns an approval to a named person (bills T-0052, payment batches T-0054 are not built; period-reopen requests wait for *any* other `period.reopen` holder and are immutable; SoD exceptions are recorded after the fact). T-0016 therefore records an optional successor on offboarding (an active user of the tenant, not the leaver), provides `app.approval_assignee(user)` that follows successors of disabled users to an active user (NULL if none), and reports the leaver's pending period-reopen requests in the offboard response. T-0052 and T-0054 must route approvals through `app.approval_assignee`.
+- Why: RQ-0031 finding 8; design §6.3 leaver step 3.
+- Alternatives: a generic approval-assignment table now (rejected: speculative, no consumer); cancelling the leaver's reopen requests (rejected: immutable history, and another holder can still approve).
+- ADR: ADR-0027 · Status: accepted
+
+### DL-0144 — Mover SoD: no self-grant; no forbidden role combinations (question for the product owner)
+- Date: 2026-10-25 · By: claude · Task: T-0016 · Category: security
+- Decision: The SoD check on a role change is requester ≠ beneficiary: nobody grants a role to themselves (API 403 `self_grant`, audited `self_grant_refused`; database trigger 42501). No combination of roles is blocked, because design §6.4 defines none, the Owner holds every permission, and per-item SoD (ADR-0026) already stops self-approval. Whether some combinations (e.g. AP Clerk + Approver) should be blocked or need a documented exception is put to the product owner.
+- Why: design §6.3 mover step 2, §6.5 (requester ≠ verifier); RQ-0031 finding 7.
+- Alternatives: block AP Clerk + Approver and similar (rejected for now: not in the design, breaks small teams; human decision).
+- ADR: ADR-0027 · Status: proposed (awaiting human) — for the combinations question only
+
+### DL-0145 — Joiner details: MFA before first access for MFA roles, welcome event, invite shape
+- Date: 2026-10-25 · By: claude · Task: T-0016 · Category: security
+- Decision: `POST /users` (users.manage, plus the permission to assign each role) creates an `invited` user bound to (idp_issuer, idp_subject) — no just-in-time accounts (ADR-0016) — with role grants by the inviter (`invited_by`). At the first OIDC login a user whose roles need MFA (ADR-0025 list) is activated only by an MFA authentication; otherwise 403 `mfa_enrolment_required`, audited `login_refused`, user stays invited. Activation writes `user.joined` (roles, amr). Users whose roles need no MFA are activated by any login. A "last Owner" check on offboarding is not needed: only the Owner holds `users.manage`, and self-offboarding is refused, so an active Owner always remains.
+- Why: design §6.2 (which roles need MFA) and §6.3 joiner steps 1–4.
+- Alternatives: MFA for every joiner (rejected: contradicts §6.2's role list; ADR-0025 enforces per role).
+- ADR: ADR-0027 · Status: accepted
