@@ -35,6 +35,11 @@ Open questions for human:
       payout_under_ar_lock, default `override` (treated as AR) vs `allow`; (b) payroll source types classed as AP;
       (c) reversals need an override under any lock; (d) default lock-date policy `reject` (RQ-0012 suggested
       "first open date" for automated feeds). Accept ADR-0024.
+  13. MFA (ADR-0025, Proposed, security): accept/amend which amr/acr count as MFA, the 300 s step-up default, the
+      fail-closed step-up permission list, one step-up covering all step-up actions within max_age; confirm that
+      Approver-role releasers (no MFA at sign-in) must use MFA at step-up; CHECK an unverified 2026 Keycloak step-up
+      bypass CVE mentioned in RQ-0027 search results before release. Follow-ups: apps/web must route
+      step_up_required to /auth/step-up; Keycloak realm ACR/AMR mapping (T-0094).
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
      (numeric + CHECK scale<=4) would make the DB refuse instead. Meanwhile the posting engine
      refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
@@ -94,6 +99,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0109 — packages/testing/src/evidence/destination.ts + fixture wiring; verify.sh gate 9 env var; SS-PLAT-19 change; DL-0115
 >   • T-0023 — migration 0018 (periods, invariant-3 trigger, SECURITY DEFINER status functions, two-approver reopen);
 >     packages/ledger/src/{period-matrix,period}.ts; RQ-0026; ADR-0024; DL-0117..0120
+>   • T-0013 — migration 0019; apps/api/src/authz/mfa.ts, step-up in auth/*, interceptor MFA/step-up steps; RQ-0027; ADR-0025;
+>     DL-0121..0124 (security review)
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -196,3 +203,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T09:02:58.126Z claude: T-0023 → verifying
 - 2026-10-25T09:05:33.649Z claude: release T-0023 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0024 Proposed (accounting); awaiting codex cross-review)
 - 2026-10-25 09:1x claude (lead): merged T-0023 (clean); gates green (519 unit / 484 db / 82 agent-script); verify 12 PASS/0 FAIL → review.
+- 2026-10-25T09:08:08.732Z claude: T-0013 → verifying
+- 2026-10-25T09:10:37.030Z claude: release T-0013 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0025 Proposed (security); awaiting codex cross-review)
+- 2026-10-25 09:2x claude (lead): merged T-0013 (ADR index + registers resolved; totals 152); gates green (530 unit / 517 db); verify 12 PASS/0 FAIL → review.
