@@ -9,8 +9,9 @@ import { AuthController, SESSION_SERVICE } from './auth/auth.controller.ts';
 import { LoginController, OIDC_SERVICE } from './auth/login.controller.ts';
 import { OidcService, type OidcOptions } from './auth/oidc.service.ts';
 import { SessionTenantResolver } from './auth/session-tenant-resolver.ts';
-import { SessionService, type Clock } from './auth/session.service.ts';
+import { SessionService, systemClock, type Clock } from './auth/session.service.ts';
 import { Authz } from './authz/authz.ts';
+import { defaultMfaPolicy, type MfaPolicy } from './authz/mfa.ts';
 import { UserRolesController } from './authz/user-roles.controller.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
@@ -23,7 +24,7 @@ import {
 } from './tenancy/tenant-resolver.ts';
 import { AuditTrail, TenantTx } from './tenancy/tenant-tx.ts';
 import { requestIdMiddleware } from './audit/request-id.ts';
-import { DB } from './tokens.ts';
+import { CLOCK, DB, MFA_POLICY } from './tokens.ts';
 
 export interface ApiOptions {
   /** Connection string for lf_app (never a superuser or the migrator). */
@@ -33,6 +34,8 @@ export interface ApiOptions {
   sessions?: { clock?: Clock };
   /** OIDC login (ADR-0016, T-0011): GET /t/:slug/auth/login and GET /auth/callback. Needs `sessions`. */
   oidc?: OidcOptions;
+  /** MFA policy (ADR-0025): which `acr` values mean MFA here. Default `urn:ledgerforce:loa:mfa`. */
+  mfa?: Partial<MfaPolicy>;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
   tenantResolver?: TenantResolver;
   /** Test hook: extra controllers (stand-ins for routes of later tasks, e.g. SS-UC02-07). */
@@ -70,6 +73,8 @@ class AppModule {
     sessions: SessionService | undefined,
     oidc: OidcService | undefined,
     testControllers: Type[],
+    clock: Clock,
+    mfa: MfaPolicy,
   ): DynamicModule {
     return {
       module: AppModule,
@@ -87,6 +92,8 @@ class AppModule {
         { provide: TENANT_RESOLVER, useValue: resolver },
         { provide: SESSION_SERVICE, useValue: sessions ?? null },
         { provide: OIDC_SERVICE, useValue: oidc ?? null },
+        { provide: CLOCK, useValue: clock },
+        { provide: MFA_POLICY, useValue: mfa },
         TenantTx,
         AuditTrail,
         Authz,
@@ -110,7 +117,9 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
         }
       : {}),
   });
-  const sessions = opts.sessions ? new SessionService(db, opts.sessions.clock) : undefined;
+  const clock = opts.sessions?.clock ?? systemClock;
+  const mfa: MfaPolicy = { acrValues: opts.mfa?.acrValues ?? defaultMfaPolicy.acrValues };
+  const sessions = opts.sessions ? new SessionService(db, clock) : undefined;
   if (opts.oidc && !sessions) throw new Error('createApi: oidc login needs sessions');
   // The listen URL is known only after listen(); the redirect URI is first needed at login.
   let listenUrl = '';
@@ -121,13 +130,14 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
           sessions,
           opts.oidc,
           () => opts.oidc?.publicUrl ?? listenUrl,
-          opts.sessions?.clock,
+          clock,
+          mfa,
         )
       : undefined;
   const resolver =
     opts.tenantResolver ?? (sessions ? new SessionTenantResolver(sessions) : refuseAllResolver);
   const app = await NestFactory.create(
-    AppModule.forRoot(db, resolver, sessions, oidc, opts.testControllers ?? []),
+    AppModule.forRoot(db, resolver, sessions, oidc, opts.testControllers ?? [], clock, mfa),
     {
       logger: ['error', 'warn'],
     },

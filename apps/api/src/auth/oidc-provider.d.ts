@@ -7,7 +7,8 @@ declare module 'oidc-provider' {
   import type { IncomingMessage, ServerResponse } from 'node:http';
 
   export interface LoginResult {
-    login: { accountId: string; acr?: string; amr?: string[]; remember?: boolean };
+    /** `ts`: authentication time in seconds (becomes the ID token's auth_time; default now). */
+    login: { accountId: string; acr?: string; amr?: string[]; remember?: boolean; ts?: number };
   }
 
   export interface GrantInstance {

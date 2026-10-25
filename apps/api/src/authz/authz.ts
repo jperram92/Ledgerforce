@@ -5,18 +5,23 @@ import type { Transaction } from 'kysely';
 import { scope } from '../tenancy/tenant-tx.ts';
 import { PermissionDenied } from './permission.decorator.ts';
 
-/** The user's permissions: the union over their active role grants (ADR-0023), read under RLS. */
-export async function loadPermissions(
-  trx: Transaction<Database>,
-  userId: string,
-): Promise<ReadonlySet<Permission>> {
+/** The user's active role grants (ADR-0023), read under RLS. */
+export async function loadRoles(trx: Transaction<Database>, userId: string): Promise<string[]> {
   const rows = await trx
     .selectFrom('app.user_role')
     .select('role')
     .where('user_id', '=', userId)
     .where('revoked_at', 'is', null)
     .execute();
-  return permissionsOf(rows.map((r) => r.role));
+  return rows.map((r) => r.role);
+}
+
+/** The user's permissions: the union over their active role grants (ADR-0023), read under RLS. */
+export async function loadPermissions(
+  trx: Transaction<Database>,
+  userId: string,
+): Promise<ReadonlySet<Permission>> {
+  return permissionsOf(await loadRoles(trx, userId));
 }
 
 /**

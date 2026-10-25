@@ -929,3 +929,32 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Design §2, §5.6 rule 5; honest evidence (DL-0077).
 - Alternatives: redirecting only for hard locks (AR/AP locks would still reject automated feeds); hard-coding 1 July.
 - ADR: ADR-0024 · Status: accepted
+
+### DL-0121 — What counts as MFA, who must have it, and the mfa_required / step_up_required error contract
+- Date: 2026-10-25 · By: claude · Task: T-0013 · Category: security
+- Decision: Resolve RQ-0027. A session is MFA when its `amr` contains `mfa`, `otp` or `hwk`, or its `acr` is one of the configured MFA values (`createApi({ mfa: { acrValues } })`, default `urn:ledgerforce:loa:mfa`). A user holding any role whose template has `mfaRequired` (Owner, Finance Admin, Accountant, AP Clerk, Payroll Officer) gets 403 `{"error":"mfa_required"}` on every permission route until the session is MFA. Member routes (`/auth/me`, `/auth/logout`, `/auth/step-up`) stay open. A step-up route answers 401 `{"error":"step_up_required","max_age":N}` unless the session is MFA and `auth_time` is no older than N seconds (and no more than 60 s in the future). Both refusals roll back the request and are audited in their own transaction (`mfa_required`, `step_up_required`, entity `session`). Order in TenantInterceptor: session → undeclared → roles → MFA → permission → step-up.
+- Why: Design §6.2; the IdP may ignore `acr_values` and `prompt=login`, so LedgerForce checks the asserted claims itself (RQ-0027 findings 1, 2, 6). MFA comes before the permission check so that a finance user without MFA can use no permission route at all. The permission check comes before step-up so that nobody is asked to re-authenticate for something they may not do.
+- Alternatives: trust `acr_values` (voluntary, RQ-0027 S1); accept every RFC 8176 second-factor value (`sms`, `swk`, `fpt` are often a single factor; a deployment can map them to the MFA `acr`); a Nest guard (guards run before the tenant transaction, DL-0102).
+- ADR: ADR-0025 · Status: proposed (awaiting human)
+
+### DL-0122 — Step-up re-authenticates the existing session; auth_time from the ID token; 300 s default; fail-closed step-up permissions
+- Date: 2026-10-25 · By: claude · Task: T-0013 · Category: security
+- Decision: Migration `0019_auth_mfa_step_up.sql` adds `app.session.auth_time` (from the ID token's `auth_time`, NULL if not asserted, and NULL for older sessions: never fresh), plus `session_id` (composite FK to the same tenant's session), `max_age_seconds` (1..3600) and `return_to` (a same-origin path) on `app.auth_request`. Grants unchanged, nothing dropped. `GET /auth/step-up?max_age&return_to` (member route) sends the browser to the IdP with `prompt=login`, `max_age` and `acr_values`, using the login's PKCE, state, nonce and `lf_oidc` binding. The shared `/auth/callback` passes `maxAge` to `openid-client`. It requires the same valid `lf_session`, the same `(iss, sub)` user and an MFA answer, then updates `auth_time`/`amr`/`acr` on that session and audits `step_up`. A wrong user or a non-MFA answer → 403 `step_up_mismatch` / `mfa_required`, audited as `step_up_refused`, session untouched. No new session and no new cookie. `@RequireStepUp(maxAge = 300)` marks routes. Every route whose permission is in `STEP_UP_PERMISSIONS` (payment batch and net-pay release, bank-account change request and verify, period reopen and lock override) needs step-up even without the decorator.
+- Why: Design §6.2 names those three actions; a session-level step-up keeps the session id stable and cannot swap the signed-in user (ADR-0025 option 2). 300 s matches the RQ-0027 inference for the IdP's LoA max age.
+- Alternatives: re-login creating a new session (changes the cookie mid-task; user swap risk); per-action step-up tokens (more plumbing, can be layered on later); taking the callback time instead of the IdP's `auth_time` (would turn an SSO-cookie answer into a "fresh" step-up).
+- ADR: ADR-0025 · Status: proposed (awaiting human)
+
+### DL-0123 — T-0013 test set-up: stand-in routes, MFA fixtures in the T-0012/T-0037 tests, SS-PLAT-58/59
+- Date: 2026-10-25 · By: claude · Task: T-0013 · Category: process
+- Decision: The payment-batch release (T-0054), bank-detail change (T-0037) and period reopen (T-0023) endpoints do not exist yet. `mfa-step-up.db.test.ts` mounts test controllers declared exactly as those tasks must declare them (`@RequirePermission(...)` + `@RequireStepUp(300)`), as DL-0104 did for T-0043. `permissions.db.test.ts` and `bank-accounts.db.test.ts` now create their sessions with `amr ['pwd','otp']`. Their Owner, Finance Admin, Accountant and AP Clerk users need MFA since T-0013; the tests are about permissions and masking, and no assertion changed. New scenarios SS-PLAT-58 (step-up on the existing session) and SS-PLAT-59 (fail closed). SS-UC06-03 is green for its step-up part only; the real release stays with T-0054. The test IdP stamps logins with the test clock (`ts`) so `auth_time` and the API agree.
+- Why: Test-first without the later tasks' endpoints; the fixtures had to follow the new policy rather than weaken it.
+- Alternatives: exempt test sessions from MFA (would hide the policy); wait for T-0054/T-0037/T-0023 (blocks the security control the design requires before money moves).
+- ADR: none · Status: accepted
+
+### DL-0124 — ADR-0025 written for T-0013; local placeholder for migration 0018
+- Date: 2026-10-25 · By: claude · Task: T-0013 · Category: process
+- Decision: ADR-0025 (security, Proposed, human gate) records the MFA and step-up model. The brief said to write it only if ADR-0016/0023 had to change, and they did not: both left enforcement to T-0013. But the security-reviewer role requires a security ADR for a security-model change, and a new public auth endpoint and error contract also need an ADR (apps/api/AGENTS.md). ADR-0016 and ADR-0023 are extended, not superseded. Another branch owns migration 0018, so all local test runs used an untracked `packages/db/migrations/0018_placeholder.sql` (`SELECT 1;`), deleted before every commit and never committed.
+- Why: AGENTS.md wins over a brief; parallel numbering (DL-0116).
+- Alternatives: DL entries only (would skip the human gate for a security-model change); renumber to 0018 (collides with T-0023).
+- ADR: ADR-0025 · Status: accepted
+

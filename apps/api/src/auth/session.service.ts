@@ -26,6 +26,18 @@ export interface Principal {
   tenantId: string;
   userId: string;
   sessionId: string;
+  /** How the session last authenticated (ID token amr/acr/auth_time), for MFA and step-up (ADR-0025). */
+  amr: string[];
+  acr: string | null;
+  authTime: Date | null;
+}
+
+/** What the IdP asserted about an authentication (login or step-up). */
+export interface Authentication {
+  amr: string[];
+  acr: string | null;
+  /** The ID token's auth_time; null when the IdP did not assert one (never fresh, ADR-0025). */
+  authTime?: Date | null;
 }
 
 export interface SessionCookie {
@@ -56,10 +68,7 @@ export class SessionService {
   ) {}
 
   /** Creates a session and returns the cookie value. The secret is returned once, never stored. */
-  async create(
-    tenantId: string,
-    opts: { userId: string; amr: string[]; acr: string | null },
-  ): Promise<string> {
+  async create(tenantId: string, opts: { userId: string } & Authentication): Promise<string> {
     const { cookie } = await withTenant(this.db, tenantId, (trx) =>
       this.createInTx(trx, tenantId, opts),
     );
@@ -73,7 +82,7 @@ export class SessionService {
   async createInTx(
     trx: Transaction<Database>,
     tenantId: string,
-    opts: { userId: string; amr: string[]; acr: string | null },
+    opts: { userId: string } & Authentication,
   ): Promise<{ cookie: string; sessionId: string }> {
     const secret = randomBytes(32).toString('base64url');
     const now = this.clock.now();
@@ -95,6 +104,7 @@ export class SessionService {
         user_session_epoch: user.session_epoch,
         amr: opts.amr,
         acr: opts.acr,
+        auth_time: opts.authTime ?? null,
       })
       .returning('id')
       .executeTakeFirstOrThrow();
@@ -120,6 +130,9 @@ export class SessionService {
         's.idle_timeout_seconds',
         's.user_session_epoch',
         's.revoked_at',
+        's.amr',
+        's.acr',
+        's.auth_time',
         'u.session_epoch',
         'u.status',
       ])
@@ -149,7 +162,32 @@ export class SessionService {
         .where('id', '=', row.id)
         .execute();
     }
-    return { tenantId: c.tenantId, userId: row.user_id, sessionId: row.id };
+    return {
+      tenantId: c.tenantId,
+      userId: row.user_id,
+      sessionId: row.id,
+      amr: row.amr,
+      acr: row.acr,
+      authTime: row.auth_time === null ? null : new Date(row.auth_time),
+    };
+  }
+
+  /**
+   * Step-up (ADR-0025): records a new authentication on an existing session. The session id,
+   * secret, lifetime and epoch stay the same; no new session is created.
+   */
+  async reauthenticateInTx(
+    trx: Transaction<Database>,
+    sessionId: string,
+    a: Required<Authentication>,
+  ): Promise<void> {
+    const r = await trx
+      .updateTable('app.session')
+      .set({ amr: a.amr, acr: a.acr, auth_time: a.authTime })
+      .where('id', '=', sessionId)
+      .where('revoked_at', 'is', null)
+      .executeTakeFirst();
+    if (r.numUpdatedRows !== 1n) throw new SessionError('session_expired');
   }
 
   /** Logout: ends one session (kept as history, never deleted). */

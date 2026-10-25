@@ -75,5 +75,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0018](0018-envelope-encryption-local-keyring-kms.md) | Envelope encryption of bank account numbers with a pluggable KMS; local keyring for self-host MVP | security | yes | Proposed |
 | [0023](0023-role-templates-and-permission-checks.md) | Role templates as code, tenant-scoped role assignments, fail-closed permission checks | security | yes | Proposed |
 | [0024](0024-period-control-matrix-and-lock-policy.md) | Period control: §3.5 matrix as data, invariant 3 in the database, personal overrides, two-approver reopen, lock-date policy | accounting | yes | Proposed |
+| [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Proposed |
 
-Next free number: **0025**.
+Next free number: **0026**.

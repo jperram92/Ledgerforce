@@ -68,8 +68,9 @@ beforeAll(async () => {
   await seed.destroy();
   api = await createApi({ databaseUrl: tdb.url('lf_app'), sessions: {} });
   if (!api.sessions) throw new Error('sessions not configured');
-  cookieA = await api.sessions.create(A, { userId: USER_A, amr: [], acr: null });
-  cookieB = await api.sessions.create(B, { userId: USER_B, amr: [], acr: null });
+  // The Accountant role requires MFA since T-0013 (DL-0123).
+  cookieA = await api.sessions.create(A, { userId: USER_A, amr: ['pwd', 'otp'], acr: null });
+  cookieB = await api.sessions.create(B, { userId: USER_B, amr: ['pwd', 'otp'], acr: null });
 });
 
 afterAll(async () => {

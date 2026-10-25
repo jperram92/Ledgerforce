@@ -7,13 +7,15 @@ import { SESSION_COOKIE, readCookie } from './session-tenant-resolver.ts';
 
 export const OIDC_SERVICE = Symbol('OIDC_SERVICE');
 export const OIDC_COOKIE = 'lf_oidc';
-const OIDC_COOKIE_PATH = '/auth';
+export const OIDC_COOKIE_PATH = '/auth';
 
 const STATUS: Record<LoginError['reason'], number> = {
   not_found: 404,
   invalid_request: 400,
   login_failed: 400,
   not_invited: 403,
+  step_up_mismatch: 403,
+  mfa_required: 403,
 };
 
 function refuse(e: unknown): never {
@@ -51,15 +53,25 @@ export class LoginController {
     // The token request must name the registered redirect URI, so rebuild it from the public URL.
     const q = req.originalUrl.indexOf('?');
     const callbackUrl = new URL(this.oidc.redirectUri + (q >= 0 ? req.originalUrl.slice(q) : ''));
-    const session = await this.oidc
-      .complete(readCookie(req, OIDC_COOKIE), callbackUrl, {
-        ip: req.ip ? req.ip.replace(/^::ffff:/, '') : null,
-        userAgent: req.headers['user-agent'] ?? null,
-        requestId: requestIdOf(req) ?? null,
-      })
+    const result = await this.oidc
+      .complete(
+        readCookie(req, OIDC_COOKIE),
+        callbackUrl,
+        {
+          ip: req.ip ? req.ip.replace(/^::ffff:/, '') : null,
+          userAgent: req.headers['user-agent'] ?? null,
+          requestId: requestIdOf(req) ?? null,
+        },
+        readCookie(req, SESSION_COOKIE),
+      )
       .catch(refuse);
     res.clearCookie(OIDC_COOKIE, this.cookie({ path: OIDC_COOKIE_PATH }));
-    res.cookie(SESSION_COOKIE, session, this.cookie({ path: '/' }));
+    if (result.kind === 'step_up') {
+      // ADR-0025: the existing session was re-authenticated; its cookie stays as it is.
+      res.redirect(303, result.returnTo);
+      return;
+    }
+    res.cookie(SESSION_COOKIE, result.cookie, this.cookie({ path: '/' }));
     res.redirect(303, '/');
   }
 }
