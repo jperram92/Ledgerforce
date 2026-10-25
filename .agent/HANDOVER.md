@@ -23,6 +23,10 @@ Open questions for human:
   9. UI (T-0106): DL-0091 makes @axe-core/playwright a dev dependency (supersedes part of DL-0067, still awaiting
      you); RQ-0021 lane/aggregation thresholds come from prototype geometry (validate in the user test);
      Radix/shadcn deferred to T-0081 (DL-0092) — confirm.
+  10. Roles (ADR-0023, Proposed, security): accept, and confirm its open points — Finance Admin = Accountant + assign
+      roles except Owner + audit-log read; payment-batch release Owner+Approver, net-pay release and supplier bank
+      verification Owner only; Auditor reads everything incl. employee bank details; Sales user/Integration get no
+      LedgerForce permissions. Provisioning must grant the first Owner.
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
      (numeric + CHECK scale<=4) would make the DB refuse instead. Meanwhile the posting engine
      refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
@@ -74,6 +78,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0106 — packages/ui/** (Timeline components, lane layout, aggregation, Money), tests/e2e/ui-system.spec.ts,
 >     RQ-0021, DL-0090..0093; screenshots in .agent/evidence/T-0106/
 >   • T-0107 — packages/db/migrations/0015_platform_company_abn_checksum.sql; company-abn.db.test.ts; DL-0099
+>   • T-0012 — ADR-0023; migration 0016 (user_role, epoch-bump trigger); packages/shared/src/rbac; apps/api/src/authz/**
+>     and the permission step in tenant.interceptor.ts; DL-0101..0104 (security review)
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -160,3 +166,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T23:07:47.662Z claude: release T-0107 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
 - 2026-10-24 23:1x claude (lead): T-0107 built (migration 0015), SS-PLAT-47 green with evidence, verify 12 PASS/0 FAIL → review. Parallel round 1 complete.
 - 2026-10-25 03:4x claude (lead): round-2 agents stopped on the usage limit (HTTP 429, reset 03:40 UTC); resumed from their worktrees. Saved: T-0012 ADR-0023 + red tests + migration 0016 green (7389163); T-0063 RQ-0024 + JWT signer/exchange (604a4b4); T-0081 RQ-0025 (e5f09d1). No work lost.
+- 2026-10-25T03:51:21.647Z claude: T-0012 → verifying
+- 2026-10-25T03:54:28.494Z claude: release T-0012 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0023 Proposed (security); awaiting codex cross-review)
+- 2026-10-25 04:0x claude (lead): merged T-0012 (clean); interceptor reviewed (public/undeclared/permission order fails closed); gates green (447 unit / 393 db, audit clean); verify 12 PASS/0 FAIL → review.
