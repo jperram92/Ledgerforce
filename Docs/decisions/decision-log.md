@@ -809,3 +809,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Design §6.2 "revoke-all on … role change" must hold for every writer, not only the API; least privilege for granting Owner; a tenant must not lock itself out.
 - Alternatives: bump in the service only (another writer could forget it).
 - ADR: ADR-0023 · Status: proposed (awaiting human)
+
+### DL-0104 — SS-UC02-07 proven through a stand-in for T-0043's route; SS-PLAT-48/49 added
+- Date: 2026-10-25 · By: claude · Task: T-0012 · Category: process
+- Decision: The AR batch-run endpoint belongs to T-0043. `apps/api/src/authz/permissions.db.test.ts` mounts a test controller through the new `ApiOptions.testControllers` hook, declared exactly as T-0043 must declare its route (`@RequirePermission('ar.batch.run')`); the check, the 403 and the audit row are the real ones. T-0043 must add its own SS-UC02-07 test on the real route. New scenarios SS-PLAT-48 (role matrix) and SS-PLAT-49 (permission on every endpoint, role-change audit/revoke-all/no delete) cover the card's goal, which SS-UC02-07 alone does not. The bank-accounts API test now grants its users the Accountant role, because the endpoint requires `parties.bank_account.read`; its assertions are unchanged.
+- Why: TDD needs an observable route now; the card's goal ("a guard used by every endpoint") had no AC.
+- Alternatives: a stub batch endpoint in production code (would pre-empt T-0043); unit-only proof (would not show the 403 or the audit row).
+- ADR: ADR-0023 · Status: accepted
