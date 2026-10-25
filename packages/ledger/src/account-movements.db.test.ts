@@ -11,6 +11,7 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { accountMovements, type AccountMovementQuery } from './account-balance.ts';
+import { findPeriod } from './period.ts';
 import type { PostingLineInput } from './posting-command.ts';
 import { post } from './posting-engine.ts';
 import { createLedgerFixture, type LedgerFixture } from './testing/journal-fixture.ts';
@@ -87,6 +88,18 @@ beforeAll(async () => {
         { code: '1010', credit: '999.0000' },
       ],
       { status: 'draft', entryDate: '2026-10-06' },
+    ),
+  );
+  // A draft may already carry its period: it still must not count.
+  const october = await f.inTenant((trx) => findPeriod(trx, f.companyId, '2026-10-06'));
+  await f.inTenant((trx) =>
+    f.insertEntry(
+      trx,
+      [
+        { code: '6200', debit: '888.0000' },
+        { code: '1010', credit: '888.0000' },
+      ],
+      { status: 'draft', entryDate: '2026-10-07', periodId: october?.id ?? '' },
     ),
   );
   await postLines(

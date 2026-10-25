@@ -1280,3 +1280,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - T-0095 is human-only; T-0103 needs Windows; T-0108 is Phase 1.
 - Why: Product owner's instruction to build independent tasks in parallel, with one engine-touching task per round.
 - ADR: none · Status: accepted
+
+### DL-0172 — Reports live in a new module `packages/modules/reporting`; ledger figures come from a read API in `packages/ledger`
+- Date: 2026-10-25 · By: claude · Task: T-0076 · Category: architecture
+- Decision: The TB, P&L and BS are in a new workspace package `@ledgerforce/reporting` (`packages/modules/reporting`), the *Reporting* module of design §8.1. It reads company, chart, system roles, fiscal years and periods itself, but every ledger figure comes from `accountMovements()` in `packages/ledger/src/account-balance.ts` (read-only, next to `trialBalance()`), so no SQL outside `packages/ledger` touches `journal_*`, `account_balance` or `dimension_set`. Statement shaping is pure (`statements.ts`); the database part is `reports.ts`. No migration (0028 unused) and no ADR (ADR-0033 unused): the package adds no third-party dependency (it uses `@ledgerforce/db`, `ledger`, `shared` and `kysely`, already in the workspace).
+- Why: `packages/ledger/AGENTS.md` ("any SQL touching these tables outside this package is a defect"); design §7.3 module layout and §8.1 module catalogue; RQ-0037.
+- Alternatives: reports inside `packages/modules/gl` (gl cannot depend on ledger — ledger already depends on gl for its fixture; a cycle); report SQL functions in a migration (more surface, no need: lf_app already has SELECT).
+- ADR: none · Status: accepted
+
+### DL-0173 — Report data source: whole periods from account_balance, cut periods from posted lines
+- Date: 2026-10-25 · By: claude · Task: T-0076 · Category: architecture
+- Decision: `accountMovements({ companyId, from?, to, dimensionValueIds? })` sums base-currency debit and credit per account. Periods wholly inside [from, to] are read from `account_balance`; a period the range cuts is read from its posted (non-draft) lines filtered by `entry_date`. `from` omitted = from the first period. A dimension filter keeps the dimension sets that contain **every** requested value (`value_ids @> filter`). The CTEs are `MATERIALIZED` and movements are aggregated per account before the account join: with freshly grown tables (no planner statistics yet) the first form ran 1-row-estimate nested loops of 9k–17k iterations (287 ms per call, up to ~1 s); the new form keeps the property test at ~8 s instead of ~80 s.
+- Why: account_balance is keyed by period (migration 0023) but reports need dates (design §8.1); each entry lies in the one period holding its date (0018), so each line counts once (RQ-0037 Q1, Q5).
+- Alternatives: dates restricted to period boundaries (would refuse a mid-month balance sheet); read everything from journal_line (ignores the design's "reports read from here").
+- ADR: none · Status: accepted
+
+### DL-0174 — Statement definitions; presentation choices left open for the product owner
+- Date: 2026-10-25 · By: claude · Task: T-0076 · Category: accounting
+- Decision: (1) TB: one row per account with posted activity in the range, its net balance on the debit or credit side, totals and `netsToZero`; real ledger balances only (no computed roll-up). (2) P&L for [from, to]: revenue then expenses, grouped by subtype, groups ordered by their lowest account code and lines by code (the chart decides the layout); revenue credit-positive, expenses debit-positive, net profit = revenue − expenses. (3) BS at a date D: needs the fiscal year holding D (`NO_FISCAL_YEAR` otherwise); assets debit-positive, liabilities and equity credit-positive by subtype; RETAINED_EARNINGS line = its posted balance + all P&L dated before the fiscal-year start; CURRENT_YEAR_EARNINGS line = its posted balance + P&L from the year start to D; both always shown, flagged `computed`; `balanced` = assets equal liabilities + equity. A year-end closing entry needs no special case. All amounts in the company's base currency as `Money`. No dimension filter on the BS. Presentation questions the design does not settle go to the product owner (RQ-0037 follow-ups): TB roll-up of prior-year P&L into retained earnings like Xero; a Gross Profit subtotal; AASB 18 categories from 2027; current/non-current split on the BS; a BS by dimension.
+- Why: Design §3.5 (retained earnings computed at report time, optional closing entry), §8.1; RQ-0037 (AASB 101/IAS 1, AASB 18, Xero conventions); AGENTS.md §6 (presentation the design leaves open is a human choice). No posting behaviour is defined.
+- Alternatives: copy Xero's layout (Gross Profit, TB roll-up) now — a presentation choice the design leaves open; hard-coded subtype order (configuration over code, modules AGENTS.md).
+- ADR: none · Status: accepted (computation per design §3.5); presentation items proposed (awaiting human)
+
+### DL-0175 — SS-UC10-08 scope: TB nets to zero now; subledger = control waits for T-0028
+- Date: 2026-10-25 · By: claude · Task: T-0076 · Category: scope
+- Decision: `trialBalanceReview({ companyId, periodId })` returns the TB as at the period end, `netsToZero`, and for AR_CONTROL and AP_CONTROL the control balance on its normal side with `subledgerBalance: null` and `status: 'subledger_not_available'`. The status values `reconciled` / `difference` are reserved for when `subledger_entry` exists (T-0028); T-0028 or T-0078 (close checklist) must fill them and extend the SS-UC10-08 test. The register row says "green (TB layer; subledger = control pending T-0028)".
+- Why: No `subledger_entry` table exists in the base (T-0028 is `todo`); the task brief asks to implement and test what exists and record the scope. Reporting "reconciled" without a subledger would be a false check.
+- Alternatives: compare the control with itself (vacuous); block the task (the TB part is buildable now).
+- ADR: none · Status: accepted
+
+### DL-0176 — T-0076 build process: RED captures, property test, mutation run
+- Date: 2026-10-25 · By: claude · Task: T-0076 · Category: process
+- Decision: RED was captured for `account-movements.db.test.ts`, `statements.test.ts` and `reports.tb-pl-bs.db.test.ts` against stubs that throw "not implemented" (fixtures and postings succeeded first; for the db reports test the stub file was put back temporarily from the previous commit). The database property test `reports.prop.db.test.ts` (SS-PLAT-77, default numRuns) was written after the implementation; its power is shown by the mutation run instead. Ten hand mutants (drafts counted, ANY instead of ALL dimension filter, cut period without date filter, CYE including prior years, netsToZero always true, expenses credit-positive, RE without prior profit, AR control sign, date round-trip check, prior years ending on the FY start day) were all killed; the first run left "drafts counted" alive because drafts normally have no period, so a draft carrying its October period was added to the movements test. Tests post raw journals through the engine only (AR/AP lines with `ar_invoice` / `ap_bill` source types so the control accounts accept them); no event posting rule.
+- Why: Round-6 protocol (TDD, mutation check); AGENTS.md §0.2–0.3.
+- Alternatives: none.
+- ADR: none · Status: accepted
