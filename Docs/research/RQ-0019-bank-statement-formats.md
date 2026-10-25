@@ -140,4 +140,7 @@ secondary sources and parser code) — the fixtures cover offsets on both sides 
 - Voiding an imported statement (status) and re-importing the same file is not in T-0058; the
   file-hash rule blocks it until a void flow exists (note on the card).
 
+- 2026-10-25: the batch rule ("stay one line") and the one-statement-per-file rule are
+  replaced by [RQ-0028](RQ-0028-camt-batches-multi-statement-052-054.md) (T-0059); the rest stands.
+
 **Affects:** packages/modules/bank, migration 0013, T-0059, T-0060, T-0061.
