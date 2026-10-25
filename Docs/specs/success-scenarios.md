@@ -72,7 +72,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC05-08 | Bill entry and approval screens | UC-05 | MVP | e2e-playwright | yes | — | T-0086 | not-started | — | — |
 | SS-UC06-01 | Batch created from 12 due bills | UC-06 | MVP | db-integration | no | — | T-0054 | not-started | — | — |
 | SS-UC06-02 | Creator cannot release own batch | UC-06 | MVP | db-integration | no | — | T-0054, T-0015 | not-started | — | — |
-| SS-UC06-03 | Release requires step-up MFA | UC-06 | MVP | db-integration | no | — | T-0054, T-0013 | not-started | — | — |
+| SS-UC06-03 | Release requires step-up MFA | UC-06 | MVP | db-integration | no | apps/api/src/authz/mfa-step-up.db.test.ts (stand-in release route; the real one is T-0054) | T-0054, T-0013 | green (step-up part, T-0013; the batch release itself pending T-0054) | [.agent/evidence/T-0013/manifest.json](../../.agent/evidence/T-0013/manifest.json) | e48639b |
 | SS-UC06-04 | Batch over $10,000 needs two releasers | UC-06 | MVP | db-integration | no | — | T-0054 | not-started | — | — |
 | SS-UC06-05 | Recently changed bank details excluded with reason | UC-06 | MVP | db-integration | no | — | T-0054, T-0053 | not-started | — | — |
 | SS-UC06-06 | ABA file is byte-exact | UC-06 | MVP | contract | no | — | T-0056 | not-started | — | — |
@@ -140,7 +140,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-17 | Migrations are forward-only on the previous schema | — | MVP | db-integration | no | — | T-0008 | not-started | — | — |
 | SS-PLAT-18 | Security gates fail on seeded issues | — | MVP | contract | no | — | T-0095 | not-started | — | — |
 | SS-PLAT-19 | Evidence harness captures screenshots | — | Sprint 0 | e2e-playwright | yes | tests/e2e/evidence-harness.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
-| SS-PLAT-20 | MFA and session policy for finance roles | — | MVP | db-integration | no | apps/api/src/auth/session.db.test.ts (session part); apps/api/src/auth/oidc.db.test.ts (login part) | T-0105, T-0013, T-0011 | green (session part, T-0105; login part, T-0011: amr/acr captured, policy applied to login sessions; MFA enforcement pending T-0013) | [.agent/evidence/T-0105/manifest.json](../../.agent/evidence/T-0105/manifest.json); [.agent/evidence/T-0011/manifest.json](../../.agent/evidence/T-0011/manifest.json) | bc07686 (session); c259211 (login) |
+| SS-PLAT-20 | MFA and session policy for finance roles | — | MVP | db-integration | no | apps/api/src/auth/session.db.test.ts (session part); apps/api/src/auth/oidc.db.test.ts (login part); apps/api/src/authz/mfa-step-up.db.test.ts, apps/api/src/authz/mfa.test.ts, apps/api/src/authz/routes.test.ts (MFA part) | T-0105, T-0013, T-0011 | green (session part, T-0105; login part, T-0011; MFA enforcement, T-0013) | [.agent/evidence/T-0105/manifest.json](../../.agent/evidence/T-0105/manifest.json); [.agent/evidence/T-0011/manifest.json](../../.agent/evidence/T-0011/manifest.json); [.agent/evidence/T-0013/manifest.json](../../.agent/evidence/T-0013/manifest.json) | bc07686 (session); c259211 (login); e48639b (MFA) |
 | SS-PLAT-21 | Leaver is disabled, never deleted | — | MVP | db-integration | no | — | T-0016 | not-started | — | — |
 | SS-PLAT-22 | Bank details encrypted and masked | — | MVP | db-integration | no | packages/modules/parties/src/bank-accounts.db.test.ts; apps/api/src/parties/bank-accounts.db.test.ts | T-0037 | green | [.agent/evidence/T-0037/manifest.json](../../.agent/evidence/T-0037/manifest.json) | 1219bbc |
 | SS-PLAT-23 | Self-hosted compose install works | — | MVP | e2e-playwright | yes | — | T-0094 | not-started | — | — |
@@ -174,6 +174,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-53 | Authenticated web shell: navigation, states, keyboard path, WCAG 2.2 AA, genericness | — | MVP | e2e-playwright + component | yes | tests/e2e/web/shell.spec.ts; apps/web/src/App.test.tsx | T-0081 | green | [.agent/evidence/T-0081/manifest.json](../../.agent/evidence/T-0081/manifest.json) | ae91f61 |
 | SS-PLAT-54 | CAMT batch entries, multi-statement files and camt.052/054 import correctly | — | MVP | unit + db | no | — | T-0059 | not-started | — | — |
 | SS-PLAT-55 | A verify run writes evidence only for the task being verified | — | MVP | unit + e2e | no | packages/testing/src/evidence/destination.test.ts; tests/e2e/evidence-harness.spec.ts | T-0109 | green | [.agent/evidence/T-0109/manifest.json](../../.agent/evidence/T-0109/manifest.json) | 2b04331 |
+| SS-PLAT-58 | Step-up re-authenticates on the existing session (prompt=login, max_age, MFA acr_values; same session, no new cookie; audited) | — | MVP | db-integration | no | apps/api/src/authz/mfa-step-up.db.test.ts | T-0013 | green | [.agent/evidence/T-0013/manifest.json](../../.agent/evidence/T-0013/manifest.json) | e48639b |
+| SS-PLAT-59 | Step-up and MFA fail closed (other user, non-MFA or stale answer, wrong session, missing auth_time, step-up permissions without the decorator) | — | MVP | unit + db-integration | no | apps/api/src/authz/mfa-step-up.db.test.ts; apps/api/src/authz/mfa.test.ts | T-0013 | green | [.agent/evidence/T-0013/manifest.json](../../.agent/evidence/T-0013/manifest.json) | e48639b |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -394,4 +396,12 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-55 — A verify run writes evidence only for the task being verified
 - Phase: MVP · Layer: **unit + e2e** · Screenshot evidence: no · Task(s): T-0109
 - **Given** `verify.sh --task X` (LF_EVIDENCE_ONLY_TASK=X) · **When** the whole e2e suite runs · **Then** specs filed under X write evidence into `.agent/evidence/X/` as before, every other task's specs still run and screenshot but into a temp dir, so no other task's evidence folder changes; without the variable, behaviour is unchanged
+
+### SS-PLAT-58 — Step-up re-authenticates on the existing session
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0013
+- **Given** a signed-in user whose last authentication is older than a route's step-up maximum age · **When** they open `/auth/step-up` and authenticate again at the IdP with MFA · **Then** the IdP is asked for `prompt=login`, `max_age` and the MFA `acr_values` (with PKCE, state and nonce) and re-authenticates even with an SSO session; the callback updates `auth_time`, `amr` and `acr` of the same session, creates no session and sets no session cookie, writes an audit row `step_up`, redirects to `return_to`, and refuses a replay
+
+### SS-PLAT-59 — Step-up and MFA fail closed
+- Phase: MVP · Layer: **unit + db-integration** · Screenshot evidence: no · Task(s): T-0013
+- **Given** a step-up in progress or a step-up route · **When** the IdP authenticates another user, answers without MFA or with a stale `auth_time`, the callback comes with no or another session cookie, the session has ended or has no recorded `auth_time`, or a route holds a step-up permission without `@RequireStepUp` · **Then** each is refused (403 step_up_mismatch / mfa_required, 400 login_failed / invalid_request, 401 step_up_required) and the session is left unchanged; refusals at the callback are audited as `step_up_refused`
 
