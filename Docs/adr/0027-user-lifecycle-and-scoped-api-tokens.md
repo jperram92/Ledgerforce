@@ -72,7 +72,7 @@ a privilege-escalation path, or a credential that outlives its owner.
   `step_up_required`), and a token cannot issue tokens.
 - **SoD:** the token's owner is the actor; every ADR-0026 rule applies unchanged.
 - **Audit:** requests made with a token are audited as `actor_type = 'user'` with the owner's id
-  and `token_id` in the audit row's `after`/denial details where the interceptor writes them.
+  and the token in the new `audit.audit_log.api_token_id` column (success and refusal rows).
 
 ### Joiner
 
@@ -95,8 +95,8 @@ change to `disabled` fires a database trigger that, in the same transaction: rev
 session (`revoke_reason = 'user_disabled'`) and bumps `session_epoch`; revokes every active token;
 revokes every active role grant (`revoke_reason = 'leaver'`, `revoked_by` = the administrator).
 Rows are kept; `lf_app` has no DELETE. A disabled user can never become `active` directly (only
-re-invited, which goes through the joiner gate again). Self-offboarding and offboarding the last
-active Owner are refused. The successor is recorded; `app.approval_assignee(user)` follows the
+re-invited, which goes through the joiner gate again). Self-offboarding is refused; since only
+the Owner holds `users.manage`, an active Owner always remains (DL-0145). The successor is recorded; `app.approval_assignee(user)` follows the
 successor chain to an active user so approval tables (T-0052, T-0054) route a disabled
 assignee's items. Pending period-reopen requests raised by the leaver are reported in the
 response (they are immutable and approvable by any other holder).
