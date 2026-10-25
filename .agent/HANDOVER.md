@@ -15,7 +15,8 @@ Open questions for human:
      cookie, one fixed redirect URI — DL-0087/0088) Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1), ADR-0018 (envelope encryption, local keyring KMS) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
   4. Design contradictions in RQ-0012 (CDC 5-object cap, ATO GST rounding, prepayment GST, SoD gaps)
-  7. Salesforce: provide a Dev Hub (authenticated outside the repo) so T-0062's package can be deployed to a
+  7. Salesforce (T-0062, T-0063): a 15-minute access-token cache window OK (DL-0106)? Who authorises a scratch-org run
+     to record real token-endpoint fixtures (RQ-0024)? Also: provide a Dev Hub (authenticated outside the repo) so T-0062's package can be deployed to a
      scratch org and its Apex test run; confirm DL-0096/0097 interpretations (status Text(40), Currency(18,2),
      LF_Payment__c field set, LF_Billing_Requester set, Modify-All-Data users can still delete mirror rows).
   8. Company bank details: should changes to the company's own bank accounts need the same verification
@@ -80,6 +81,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0107 — packages/db/migrations/0015_platform_company_abn_checksum.sql; company-abn.db.test.ts; DL-0099
 >   • T-0012 — ADR-0023; migration 0016 (user_role, epoch-bump trigger); packages/shared/src/rbac; apps/api/src/authz/**
 >     and the permission step in tenant.interceptor.ts; DL-0101..0104 (security review)
+>   • T-0063 — packages/connectors/salesforce/** (JWT bearer, token client, certificate, connection store); migration 0017;
+>     RQ-0024; DL-0105..0108 (security review: encrypted key/token, AAD binding, row lock)
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -169,3 +172,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T03:51:21.647Z claude: T-0012 → verifying
 - 2026-10-25T03:54:28.494Z claude: release T-0012 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0023 Proposed (security); awaiting codex cross-review)
 - 2026-10-25 04:0x claude (lead): merged T-0012 (clean); interceptor reviewed (public/undeclared/permission order fails closed); gates green (447 unit / 393 db, audit clean); verify 12 PASS/0 FAIL → review.
+- 2026-10-25T03:56:39.509Z claude: T-0063 → verifying
+- 2026-10-25T03:59:18.724Z claude: release T-0063 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; offline only (real token endpoint needs a scratch org); awaiting codex cross-review)
+- 2026-10-25 04:1x claude (lead): merged T-0063 (registers resolved by id, totals recomputed: 144); gates green (473 unit / 413 db, audit clean); verify 12 PASS/0 FAIL → review. DL-0113 (per-agent scratchpad folders). Waiting for T-0081.
