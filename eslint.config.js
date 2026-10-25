@@ -13,6 +13,8 @@ const MONEY_PATHS = [
   'packages/shared/src/money/**/*.{ts,tsx,js}',
   // The UI component package formats and sums money (T-0106).
   'packages/ui/src/**/*.{ts,tsx}',
+  // The web app only displays decimal strings from the API (apps/web/AGENTS.md, T-0081).
+  'apps/web/src/**/*.{ts,tsx}',
 ];
 
 export default tseslint.config(
@@ -92,6 +94,11 @@ export default tseslint.config(
     // able to simulate a session-level context to prove withTenant fails closed (RQ-0013).
     files: ['packages/**/*.db.test.ts'],
     rules: { 'lf/no-session-tenant-context': 'off' },
+  },
+  {
+    // The web app runs in the browser (T-0081); its Vite config runs in Node.
+    files: ['apps/web/src/**/*.{ts,tsx}'],
+    languageOptions: { globals: { ...globals.browser } },
   },
   {
     files: ['tests/e2e/**/*.ts', 'playwright.config.ts'],

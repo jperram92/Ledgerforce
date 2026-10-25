@@ -14,7 +14,7 @@
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "vitest run --project unit --project ui --project api-unit",
+    "test": "vitest run --project unit --project ui --project web --project api-unit",
     "test:db": "vitest run --project db --project api-db",
     "test:e2e": "playwright test",
     "test:all": "pnpm test && pnpm test:db && pnpm test:e2e",
@@ -40,7 +40,9 @@
   "pnpm": {
     "overrides": {
       "multer": "2.5.0",
-      "jose": "6.2.12"
+      "jose": "6.2.12",
+      "seroval": "1.6.9",
+      "seroval-plugins": "1.6.9"
     }
   }
 }
