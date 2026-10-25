@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 156 scenarios (16 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 158 scenarios (16 need screenshots).
 
 ## How to update (who, when)
 
@@ -144,7 +144,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-21 | Leaver is disabled, never deleted | — | MVP | db-integration | no | — | T-0016 | not-started | — | — |
 | SS-PLAT-22 | Bank details encrypted and masked | — | MVP | db-integration | no | packages/modules/parties/src/bank-accounts.db.test.ts; apps/api/src/parties/bank-accounts.db.test.ts | T-0037 | green | [.agent/evidence/T-0037/manifest.json](../../.agent/evidence/T-0037/manifest.json) | 1219bbc |
 | SS-PLAT-23 | Self-hosted compose install works | — | MVP | e2e-playwright | yes | — | T-0094 | not-started | — | — |
-| SS-PLAT-24 | Outbox delivers at least once, handlers idempotent | — | MVP | db-integration | no | — | T-0030 | not-started | — | — |
+| SS-PLAT-24 | Outbox delivers at least once, handlers idempotent | — | MVP | db-integration | no | apps/worker/src/outbox.delivery.db.test.ts; packages/outbox/src/deliver.test.ts | T-0030 | green | [.agent/evidence/T-0030/manifest.json](../../.agent/evidence/T-0030/manifest.json) | ceaac00 |
 | SS-PLAT-25 | Sync failures back off then land in the Sync issues inbox | — | MVP | db-integration | no | — | T-0071 | not-started | — | — |
 | SS-PLAT-26 | Missed Salesforce events recovered by nightly reconciliation | — | MVP | db-integration | no | — | T-0070, T-0066 | not-started | — | — |
 | SS-PLAT-27 | Replay id resume after restart | — | MVP | db-integration | no | — | T-0064 | not-started | — | — |
@@ -182,6 +182,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-63 | SoD runs after MFA, permission and step-up; 403 sod_violation audited; @SoD without a permission fails closed; SoD settings Owner-only, report and acknowledgement permission-checked | — | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts | T-0015 | green | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
 | SS-PLAT-64 | The posting engine refuses an invalid command with a typed error and writes nothing (shape, >4/>8 decimals, unbalanced before SQL; accounts, control accounts, party, dimensions, series, period) | — | MVP | unit + db-integration | no | packages/ledger/src/posting-command.test.ts; packages/ledger/src/posting-balance.prop.test.ts; packages/ledger/src/engine.pipeline.db.test.ts | T-0025 | green | [.agent/evidence/T-0025/manifest.json](../../.agent/evidence/T-0025/manifest.json) | afb5dad |
 | SS-PLAT-65 | A valid command posts as one numbered, chained entry in one transaction; preview writes nothing | — | MVP | db-integration | no | packages/ledger/src/engine.pipeline.db.test.ts; packages/ledger/src/posting-invariants.prop.db.test.ts | T-0025 | green | [.agent/evidence/T-0025/manifest.json](../../.agent/evidence/T-0025/manifest.json) | afb5dad |
+| SS-PLAT-68 | The outbox event and its delivery job commit atomically with the posting (job id = event id, ids-only payload; rollback, failed job insert or replay leaves no extra event or job) | — | MVP | db-integration | no | packages/outbox/src/outbox.db.test.ts | T-0030 | green | [.agent/evidence/T-0030/manifest.json](../../.agent/evidence/T-0030/manifest.json) | ceaac00 |
+| SS-PLAT-69 | Outbox rows are append-only for every role; pg-boss schema owned by lf_migrator, lf_app DML only (no DDL, TRUNCATE, TRIGGER); queue install refuses any role but lf_migrator | — | MVP | db-integration | no | packages/outbox/src/outbox.db.test.ts; apps/worker/src/queue-admin.db.test.ts | T-0030 | green | [.agent/evidence/T-0030/manifest.json](../../.agent/evidence/T-0030/manifest.json) | ceaac00 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -436,5 +438,10 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0025
 - **Given** a valid raw posting command (accounts by system role or id, base or foreign currency lines, party, dimensions) · **When** it is posted · **Then** one posted entry with the next gapless number of its source type's series is written with its lines exactly as built (rate 1 for base-currency lines, transaction currency, amount and rate carried as given), the hash chain verifies, the lock-date policy and recorded overrides apply, and the outbox hook runs inside the same transaction; a failure anywhere in the write leaves nothing, even if the caller commits; **and** preview of the same command returns the same journal inside a read-only transaction without writing anything
 
+### SS-PLAT-68 — The outbox event and its delivery job commit atomically with the posting
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0030
+- **Given** a raw posting command posted with the outbox (`ledgerOutbox`) · **When** the post commits, is rolled back by its caller, cannot insert its pg-boss job, or is replayed with the same idempotency key · **Then** a committed post has exactly one `ledger.entry.posted` event and one job whose id is the event id and whose payload is only `{ tenantId, eventId }`; otherwise no entry, event or job is added
 
-
+### SS-PLAT-69 — Outbox and queue privileges
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0030
+- **Given** migration 0024 and pg-boss installed by `installQueue` · **When** lf_app or the owner try to change or delete an outbox event, and installation is attempted as lf_app · **Then** lf_app gets 42501 and the owner the append-only refusal; schema `pgboss` and its tables are owned by lf_migrator with lf_app holding only SELECT/INSERT/UPDATE/DELETE (no CREATE, TRUNCATE, TRIGGER); installation as lf_app is refused and creates nothing; installing twice as lf_migrator is idempotent
