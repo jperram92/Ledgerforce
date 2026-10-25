@@ -149,7 +149,7 @@ graph LR
 | [T-0056](T-0056.md) | ABA (Cemtex) file export | MVP | todo | T-0054 | UC-06 | 1 |
 | [T-0057](T-0057.md) | Payment confirmation posting and remittance advices | MVP | todo | T-0056, T-0042, T-0031 | UC-06 | 2 |
 | [T-0058](T-0058.md) | Bank accounts and statement import (CSV, OFX) | MVP | review | T-0018 | UC-08 | 2 |
-| [T-0059](T-0059.md) | CAMT.053 statement import | MVP | todo | T-0058 | UC-08 | 1 |
+| [T-0059](T-0059.md) | CAMT extensions: batch entries (TxDtls), several statements per file, camt.052/054 | MVP | todo | T-0058 | UC-08 | 1 |
 | [T-0060](T-0060.md) | Matching rules and auto-match | MVP | todo | T-0058, T-0046, T-0057 | UC-08 | 3 |
 | [T-0061](T-0061.md) | Bank reconciliation and reconciliation report | MVP | todo | T-0060 | UC-08 | 2 |
 | [T-0062](T-0062.md) | Salesforce SFDX package: objects, fields, permission sets, platform event | MVP | review | T-0001 | UC-12 | 1 |

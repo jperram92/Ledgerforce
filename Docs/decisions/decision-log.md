@@ -853,3 +853,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - Lead merge tooling for the append-only registers (sort blocks by id, then a line check against both parents) is kept as a scratch helper. If it is promoted into the repo later, that is a decision-log item.
 - Why: Parallel builds share the session scratchpad. The totals line was stale (agents correctly left it, one adjusted it by hand).
 - ADR: none · Status: accepted
+
+### DL-0114 — T-0059 re-scoped: its CAMT.053 core was delivered by T-0058
+- Date: 2026-10-25 · By: claude (lead) · Task: T-0059 · Category: scope
+- Decision: T-0058's own acceptance criterion (SS-UC08-01) required CAMT.053, so CAMT.053 parsing was built there. T-0059 keeps its id and dependency but is re-scoped to what T-0058 left out: batch entries split into TxDtls, several `Stmt` per file, camt.052/054 if AU banks use them. New scenario SS-PLAT-54 replaces SS-UC08-01 on this card. The original goal is quoted in a dated note on the card (nothing deleted).
+- Why: Avoid duplicate work and a misleading card (T-0058 report, HANDOVER).
+- Alternatives: mark T-0059 done (would hide the remaining gaps); supersede with a new card (more churn for the same content).
+- ADR: none · Status: accepted

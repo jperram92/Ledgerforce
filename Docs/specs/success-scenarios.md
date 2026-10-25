@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 144 scenarios (14 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 145 scenarios (14 need screenshots).
 
 ## How to update (who, when)
 
@@ -85,7 +85,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC07-03 | Liabilities in payables summary | UC-07 | Phase 1 | db-integration | no | — | T-0100 | not-started | — | — |
 | SS-UC07-04 | Duplicate pay-run import is idempotent | UC-07 | Phase 1 | db-integration | no | — | T-0100 | not-started | — | — |
 | SS-UC07-05 | Payroll Officer cannot release own net-pay batch | UC-07 | Phase 1 | db-integration | no | — | T-0100 | not-started | — | — |
-| SS-UC08-01 | CSV, OFX and CAMT.053 normalise identically | UC-08 | MVP | contract | no | packages/modules/bank/src/statement-import.test.ts | T-0058, T-0059 | green | [.agent/evidence/T-0058/manifest.json](../../.agent/evidence/T-0058/manifest.json) | 540e85e |
+| SS-UC08-01 | CSV, OFX and CAMT.053 normalise identically | UC-08 | MVP | contract | no | packages/modules/bank/src/statement-import.test.ts | T-0058 (T-0059 re-scoped, DL-0114) | green | [.agent/evidence/T-0058/manifest.json](../../.agent/evidence/T-0058/manifest.json) | 540e85e |
 | SS-UC08-02 | Duplicate statement import detected | UC-08 | MVP | db-integration | no | packages/modules/bank/src/statements.db.test.ts | T-0058 | green | [.agent/evidence/T-0058/manifest.json](../../.agent/evidence/T-0058/manifest.json) | 540e85e |
 | SS-UC08-03 | Exact match auto-matches | UC-08 | MVP | db-integration | no | — | T-0060 | not-started | — | — |
 | SS-UC08-04 | Rule match is suggested, not applied | UC-08 | MVP | unit | no | — | T-0060 | not-started | — | — |
@@ -170,6 +170,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-49 | Every endpoint checks a permission; role changes are audited, never deleted and revoke sessions | — | MVP | unit + db-integration | no | apps/api/src/authz/routes.test.ts, apps/api/src/authz/permissions.db.test.ts, packages/db/src/user-role.db.test.ts | T-0012 | green | [.agent/evidence/T-0012/manifest.json](../../.agent/evidence/T-0012/manifest.json) | 052231e |
 | SS-PLAT-50 | Salesforce JWT bearer assertion is signed and exchanged per contract; failures map to clear codes; certificate expiry alerts 30 days ahead | — | MVP | unit + contract | no | packages/connectors/salesforce/src/jwt.test.ts; packages/connectors/salesforce/src/certificate.test.ts; packages/connectors/salesforce/src/jwt-bearer.contract.test.ts | T-0063 | green | [.agent/evidence/T-0063/manifest.json](../../.agent/evidence/T-0063/manifest.json) | 5e35f74 |
 | SS-PLAT-51 | Salesforce connection secrets are envelope-encrypted at rest and never returned by reads | — | MVP | db-integration | no | packages/connectors/salesforce/src/connection-store.db.test.ts | T-0063 | green | [.agent/evidence/T-0063/manifest.json](../../.agent/evidence/T-0063/manifest.json) | 5e35f74 |
+| SS-PLAT-54 | CAMT batch entries, multi-statement files and camt.052/054 import correctly | — | MVP | unit + db | no | — | T-0059 | not-started | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -374,4 +375,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0063 (ADR-0018, migration 0017)
 - **Given** a tenant company with a JWT bearer connection saved as lf_app via `withTenant` · **When** tokens are obtained and the connection is read · **Then** no stored column (text, hex or base64) nor the row dump contains the private-key PEM or the access token; the token is cached sealed and reused for 15 minutes, then re-signed, and after a 401 invalidation the next call re-signs; two concurrent callers share one exchange (row lock); `getConnection`/`listConnections` return login URL, username, consumer key, instance URL, certificate status and fingerprint but no key, token or encryption column; a ciphertext copied onto another connection (other company, or a newer row of the same company) fails to decrypt; a refused exchange stores no token; a new connection supersedes the previous one (one active per company) and superseded rows give no token; lf_app cannot change key, identity or certificate columns nor delete; the database refuses other login URLs and half-written token columns; the SS-PLAT-04 cross-tenant suite covers the table
 
+
+### SS-PLAT-54 — CAMT batch entries, multi-statement files and camt.052/054 import correctly
+- Phase: MVP · Layer: **unit + db** · Screenshot evidence: no · Task(s): T-0059
+- **Given** a camt.053 batch entry with 3 TxDtls, a file with 2 statements, and camt.052/054 fixtures · **When** imported · **Then** the batch becomes 3 lines summing exactly to the entry amount, each statement lands on its own bank account, duplicate detection holds across re-imports, and unsupported variants fail loudly
 
