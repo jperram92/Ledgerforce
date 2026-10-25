@@ -4,3 +4,5 @@ export * from './hash-chain.ts';
 export * from './numbering.ts';
 export * from './period-matrix.ts';
 export * from './period.ts';
+export * from './posting-command.ts';
+export * from './posting-engine.ts';

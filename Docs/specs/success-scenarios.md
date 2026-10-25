@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 152 scenarios (16 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 154 scenarios (16 need screenshots).
 
 ## How to update (who, when)
 
@@ -134,7 +134,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-11 | Invariants hold over 10,000 random documents | — | MVP | property | no | — | T-0033 | not-started | — | — |
 | SS-PLAT-12 | Every Approved golden posting is reproduced exactly | — | MVP | golden | no | — | T-0031 | not-started | — | — |
 | SS-PLAT-13 | Float arithmetic on money is a lint error | — | MVP | unit | no | packages/testing/eslint-rules/no-float-money.config.test.ts; packages/shared/src/money/*.test.ts | T-0017 | green | [.agent/evidence/T-0017/manifest.json](../../.agent/evidence/T-0017/manifest.json) | 5385095 |
-| SS-PLAT-14 | Same idempotency key posts once | — | MVP | db-integration | no | — | T-0025 | not-started | — | — |
+| SS-PLAT-14 | Same idempotency key posts once | — | MVP | db-integration | no | packages/ledger/src/engine.idempotency.db.test.ts; packages/ledger/src/posting-invariants.prop.db.test.ts | T-0025 | green | [.agent/evidence/T-0025/manifest.json](../../.agent/evidence/T-0025/manifest.json) | afb5dad |
 | SS-PLAT-15 | Preview writes nothing | — | MVP | db-integration | no | — | T-0026 | not-started | — | — |
 | SS-PLAT-16 | SoD rules 1–6 evaluated as configured | — | MVP | unit | no | — | T-0015 | not-started | — | — |
 | SS-PLAT-17 | Migrations are forward-only on the previous schema | — | MVP | db-integration | no | — | T-0008 | not-started | — | — |
@@ -178,6 +178,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-57 | Fiscal years are generated from a convention held as data (AU 1 July) with contiguous, non-overlapping monthly periods | — | MVP | unit + db-integration | no | packages/ledger/src/period-matrix.test.ts; packages/ledger/src/period-control.db.test.ts | T-0023 | green | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-PLAT-58 | Step-up re-authenticates on the existing session (prompt=login, max_age, MFA acr_values; same session, no new cookie; audited) | — | MVP | db-integration | no | apps/api/src/authz/mfa-step-up.db.test.ts | T-0013 | green | [.agent/evidence/T-0013/manifest.json](../../.agent/evidence/T-0013/manifest.json) | e48639b |
 | SS-PLAT-59 | Step-up and MFA fail closed (other user, non-MFA or stale answer, wrong session, missing auth_time, step-up permissions without the decorator) | — | MVP | unit + db-integration | no | apps/api/src/authz/mfa-step-up.db.test.ts; apps/api/src/authz/mfa.test.ts | T-0013 | green | [.agent/evidence/T-0013/manifest.json](../../.agent/evidence/T-0013/manifest.json) | e48639b |
+| SS-PLAT-64 | The posting engine refuses an invalid command with a typed error and writes nothing (shape, >4/>8 decimals, unbalanced before SQL; accounts, control accounts, party, dimensions, series, period) | — | MVP | unit + db-integration | no | packages/ledger/src/posting-command.test.ts; packages/ledger/src/posting-balance.prop.test.ts; packages/ledger/src/engine.pipeline.db.test.ts | T-0025 | green | [.agent/evidence/T-0025/manifest.json](../../.agent/evidence/T-0025/manifest.json) | afb5dad |
+| SS-PLAT-65 | A valid command posts as one numbered, chained entry in one transaction; preview writes nothing | — | MVP | db-integration | no | packages/ledger/src/engine.pipeline.db.test.ts; packages/ledger/src/posting-invariants.prop.db.test.ts | T-0025 | green | [.agent/evidence/T-0025/manifest.json](../../.agent/evidence/T-0025/manifest.json) | afb5dad |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -415,5 +417,13 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-59 — Step-up and MFA fail closed
 - Phase: MVP · Layer: **unit + db-integration** · Screenshot evidence: no · Task(s): T-0013
 - **Given** a step-up in progress or a step-up route · **When** the IdP authenticates another user, answers without MFA or with a stale `auth_time`, the callback comes with no or another session cookie, the session has ended or has no recorded `auth_time`, or a route holds a step-up permission without `@RequireStepUp` · **Then** each is refused (403 step_up_mismatch / mfa_required, 400 login_failed / invalid_request, 401 step_up_required) and the session is left unchanged; refusals at the callback are audited as `step_up_refused`
+
+### SS-PLAT-64 — The posting engine refuses an invalid command with a typed error and writes nothing
+- Phase: MVP · Layer: **unit + db-integration** · Screenshot evidence: no · Task(s): T-0025
+- **Given** a raw posting command · **When** it has fewer than two lines, a line with both or no side, an amount with more than 4 decimals or a rate with more than 8, is unbalanced, names an unknown source type, an unknown company or account, an unbound system role, an archived, non-postable or currency-restricted account, a control account outside its subledger, an inactive or foreign party, an invalid dimension value, lacks a required dimension, has no entry number series, or is dated where the period does not allow its source type · **Then** it is refused with a typed error (code and line) — the shape, decimal and balance checks before any SQL — and no entry, line, dimension set, override or number is written
+
+### SS-PLAT-65 — A valid command posts as one numbered, chained entry in one transaction; preview writes nothing
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0025
+- **Given** a valid raw posting command (accounts by system role or id, base or foreign currency lines, party, dimensions) · **When** it is posted · **Then** one posted entry with the next gapless number of its source type's series is written with its lines exactly as built (rate 1 for base-currency lines, transaction currency, amount and rate carried as given), the hash chain verifies, the lock-date policy and recorded overrides apply, and the outbox hook runs inside the same transaction; a failure anywhere in the write leaves nothing, even if the caller commits; **and** preview of the same command returns the same journal inside a read-only transaction without writing anything
 
 
