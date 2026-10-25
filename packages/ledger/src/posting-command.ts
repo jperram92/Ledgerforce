@@ -38,19 +38,28 @@ export type PostingErrorCode =
   | 'MISSING_DIMENSION'
   | 'NO_NUMBER_SERIES'
   | 'IDEMPOTENCY_CONFLICT'
-  | 'IDEMPOTENCY_RACE';
+  | 'IDEMPOTENCY_RACE'
+  | 'UNKNOWN_USER'
+  | 'OVERRIDE_NOT_PERMITTED'
+  /** preview() only: the key already posted this document; post() would replay it (T-0026). */
+  | 'ALREADY_POSTED';
 
 /** A posting command refused by the engine. Nothing was written. `line` is 1-based. */
 export class PostingError extends DomainError {
   declare readonly code: PostingErrorCode;
   readonly line: number | undefined;
+  /** ALREADY_POSTED: the entry the key posted. */
+  readonly entryId: string | undefined;
+  readonly entryNo: string | undefined;
   constructor(
     code: PostingErrorCode,
     message: string,
-    opts: { line?: number; cause?: unknown } = {},
+    opts: { line?: number; cause?: unknown; entryId?: string; entryNo?: string } = {},
   ) {
     super(code, message, opts.cause === undefined ? undefined : { cause: opts.cause });
     this.line = opts.line;
+    this.entryId = opts.entryId;
+    this.entryNo = opts.entryNo;
   }
 }
 

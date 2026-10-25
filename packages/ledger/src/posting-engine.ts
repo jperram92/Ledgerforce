@@ -12,7 +12,10 @@
  *   6. write    — one savepoint in the caller's transaction: period override (if any), gapless
  *      entry number, entry, dimension sets, lines, outbox hook. Any failure rolls the savepoint
  *      back, so nothing is written.
- * preview() runs 1, 3, 4, 5 and writes nothing.
+ * preview() runs 1, the key lookup of 2 (without the lock), 3, 4 and 5, and writes nothing
+ * (T-0026, RQ-0035): it returns the journal post() would write, or the error post() would throw.
+ * Every check post() relies on is made before the write, in memory or by a read, so preview has
+ * no database-only check to miss (the database keeps its own checks as the last line of defence).
  *
  * account_balance is maintained by the database from the line insert in step 6, inside the same
  * savepoint (migration 0023, T-0027, RQ-0032); lf_app cannot write it.
@@ -149,6 +152,17 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     .executeTakeFirst();
   if (!company) fail('UNKNOWN_COMPANY', `company ${c.companyId} does not exist in this tenant`);
   const base = company.base_currency;
+
+  // The created_by foreign key, checked before the write (T-0026: preview must refuse it too).
+  const createdBy = c.createdBy === undefined ? null : lc(c.createdBy);
+  if (createdBy !== null) {
+    const user = await trx
+      .selectFrom('app.app_user')
+      .select('id')
+      .where('id', '=', createdBy)
+      .executeTakeFirst();
+    if (!user) fail('UNKNOWN_USER', `user ${createdBy} is not a user of this tenant`);
+  }
 
   // Resolve system roles to the company's bound accounts.
   const roles = uniq(checked.lines.flatMap((l) => ('role' in l.account ? [l.account.role] : [])));
@@ -337,6 +351,19 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     sourceType: c.sourceType,
     withOverride: c.periodOverride !== undefined,
   });
+  if (date.needsOverride) {
+    // The period_override_check trigger's rule, checked before the write (T-0026).
+    const r = await sql<{ ok: boolean }>`
+      SELECT app.user_has_period_permission(
+        nullif(current_setting('app.tenant_id', true), '')::uuid, ${createdBy}::uuid,
+        'period.lock.override') AS ok`.execute(trx);
+    if (r.rows[0]?.ok !== true) {
+      fail(
+        'OVERRIDE_NOT_PERMITTED',
+        `user ${String(createdBy)} does not hold period.lock.override`,
+      );
+    }
+  }
   const memo =
     date.note === undefined ? (c.memo ?? null) : c.memo ? `${c.memo}\n${date.note}` : date.note;
 
@@ -352,7 +379,7 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     sourceId: c.sourceId ?? null,
     memo,
     idempotencyKey: c.idempotencyKey,
-    createdBy: c.createdBy === undefined ? null : lc(c.createdBy),
+    createdBy,
     numberSeries,
     lines,
     total: checked.total,
@@ -534,9 +561,26 @@ async function write(
   }
 }
 
-/** Steps 1, 3, 4, 5: the journal the command would post. Reads, never writes. */
+/**
+ * "Show me the journal" (design §3.9): the journal post() would write for this command, built by
+ * the same steps, or the same typed error post() would throw. Reads only: no row, counter,
+ * sequence or lock-protected head changes, and no lock is taken, so it is safe in a READ ONLY
+ * transaction. A key that has already posted this document → ALREADY_POSTED with that entry
+ * (post() would replay it and write nothing); a key used by another document →
+ * IDEMPOTENCY_CONFLICT, as post().
+ */
 export async function preview(trx: Trx, command: PostingCommand): Promise<BuiltEntry> {
   const checked = checkCommand(command);
+  const existing = await findByKey(trx, lc(command.companyId), command.idempotencyKey);
+  if (existing) {
+    const first = replay(existing, command);
+    throw new PostingError(
+      'ALREADY_POSTED',
+      `idempotency key ${JSON.stringify(command.idempotencyKey)} already posted this document ` +
+        `as entry ${first.entryNo}; posting it again returns that entry and writes nothing`,
+      { entryId: first.entryId, entryNo: first.entryNo },
+    );
+  }
   return checkBuilt(await validateAndBuild(trx, checked));
 }
 
