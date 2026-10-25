@@ -15,7 +15,7 @@ import { isRoleId, permissionToAssign, type RoleId } from '@ledgerforce/shared/r
 import type { Response } from 'express';
 import { sql } from 'kysely';
 import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
-import { Authz } from './authz.ts';
+import { Authz, SelfGrantRefused } from './authz.ts';
 import { RequirePermission } from './permission.decorator.ts';
 
 interface GrantView {
@@ -60,14 +60,15 @@ export class UserRolesController {
     private readonly authz: Authz,
   ) {}
 
-  private async assertUser(userId: string): Promise<void> {
+  private async assertUser(userId: string): Promise<{ status: string }> {
     const u = await this.tx
       .get()
       .selectFrom('app.app_user')
-      .select('id')
+      .select('status')
       .where('id', '=', userId)
       .executeTakeFirst();
     if (!u) throw new NotFoundException({ error: 'not_found' });
+    return u;
   }
 
   @Get()
@@ -102,7 +103,10 @@ export class UserRolesController {
   ): Promise<{ id: string; user_id: string; role: string; granted_at: Date }> {
     const role = roleOf((body as { role?: unknown } | undefined)?.role);
     this.authz.require(permissionToAssign(role));
-    await this.assertUser(userId);
+    // Mover rule (ADR-0027): nobody grants a role to themselves (also refused by the database).
+    if (userId === this.authz.userId()) throw new SelfGrantRefused(userId);
+    const target = await this.assertUser(userId);
+    if (target.status === 'disabled') throw new ConflictException({ error: 'user_disabled' });
     const trx = this.tx.get();
     const inserted = await trx
       .insertInto('app.user_role')

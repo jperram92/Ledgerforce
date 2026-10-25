@@ -1,9 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import type { Database } from '@ledgerforce/db';
 import { permissionsOf, type Permission } from '@ledgerforce/shared/rbac';
 import type { Transaction } from 'kysely';
 import { scope } from '../tenancy/tenant-tx.ts';
 import { PermissionDenied } from './permission.decorator.ts';
+
+/**
+ * 403 `{error:'self_grant'}` (ADR-0027 mover rule): nobody grants a role to themselves. Audited
+ * by TenantInterceptor in its own transaction, like the other access refusals.
+ */
+export class SelfGrantRefused extends ForbiddenException {
+  constructor(readonly userId: string) {
+    super({ error: 'self_grant' });
+  }
+}
+
+/** Permissions a request may use: the role permissions, cut down to a token's scopes (ADR-0027). */
+export function effectivePermissions(
+  rolePermissions: ReadonlySet<Permission>,
+  tokenScopes: readonly Permission[] | null,
+): ReadonlySet<Permission> {
+  if (tokenScopes === null) return rolePermissions;
+  return new Set(tokenScopes.filter((p) => rolePermissions.has(p)));
+}
 
 /** The user's active role grants (ADR-0023), read under RLS. */
 export async function loadRoles(trx: Transaction<Database>, userId: string): Promise<string[]> {

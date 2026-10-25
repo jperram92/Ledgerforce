@@ -1,6 +1,8 @@
 import { withTenant, type Database } from '@ledgerforce/db';
 import { sql, type Kysely, type Transaction } from 'kysely';
 import * as client from 'openid-client';
+import { rolesRequireMfa } from '@ledgerforce/shared/rbac';
+import { loadRoles } from '../authz/authz.ts';
 import { defaultMfaPolicy, isMfa, type MfaPolicy } from '../authz/mfa.ts';
 import {
   parseSessionCookie,
@@ -34,7 +36,9 @@ export type LoginFailure =
   /** Step-up (ADR-0025): the IdP authenticated a different user than the session's. */
   | 'step_up_mismatch'
   /** Step-up (ADR-0025): the IdP's answer shows no MFA. */
-  | 'mfa_required';
+  | 'mfa_required'
+  /** Joiner (ADR-0027): an invited user whose roles need MFA logged in without it. */
+  | 'mfa_enrolment_required';
 
 export class LoginError extends Error {
   constructor(readonly reason: LoginFailure) {
@@ -254,22 +258,47 @@ export class OidcService {
       return { kind: 'step_up', returnTo: stepUp.returnTo };
     }
 
-    const cookie = await withTenant(this.db, tenantId, async (trx) => {
+    const outcome = await withTenant(this.db, tenantId, async (trx) => {
       const user = await trx
         .selectFrom('app.app_user')
         .select(['id', 'status'])
         .where('idp_issuer', '=', iss)
         .where('idp_subject', '=', sub)
+        .forUpdate()
         .executeTakeFirst();
       if (!user || user.status === 'disabled') throw new LoginError('not_invited');
       const activated = user.status === 'invited';
       if (activated) {
-        // First login completes the invitation (design §6.3 joiner flow).
+        // First login completes the invitation (design §6.3 joiner flow): a user whose roles
+        // need MFA must enrol and use it before first access (ADR-0027). The refusal is audited
+        // and committed; the user stays invited.
+        const roles = (await loadRoles(trx, user.id)).sort();
+        const audit = (action: string, after: unknown) =>
+          trx
+            .insertInto('audit.audit_log')
+            .values({
+              actor_type: 'user',
+              actor_user_id: user.id,
+              action,
+              entity_type: 'app_user',
+              entity_id: user.id,
+              before: null,
+              after: JSON.stringify(after),
+              ip: ctx.ip,
+              user_agent: ctx.userAgent,
+              request_id: ctx.requestId,
+            })
+            .execute();
+        if (rolesRequireMfa(roles) && !isMfa({ amr, acr }, this.mfa)) {
+          await audit('login_refused', { reason: 'mfa_enrolment_required' });
+          return { refused: 'mfa_enrolment_required' as const };
+        }
         await trx
           .updateTable('app.app_user')
           .set({ status: 'active' })
           .where('id', '=', user.id)
           .execute();
+        await audit('user.joined', { roles, amr });
       }
       const session = await this.sessions.createInTx(trx, tenantId, {
         userId: user.id,
@@ -292,9 +321,10 @@ export class OidcService {
           request_id: ctx.requestId,
         })
         .execute();
-      return session.cookie;
+      return { cookie: session.cookie };
     });
-    return { kind: 'login', cookie };
+    if ('refused' in outcome) throw new LoginError(outcome.refused);
+    return { kind: 'login', cookie: outcome.cookie };
   }
 
   /**

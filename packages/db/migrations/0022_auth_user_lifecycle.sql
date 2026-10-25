@@ -328,3 +328,10 @@ END
 $$;
 CREATE TRIGGER user_role_grant_check BEFORE INSERT ON app.user_role
   FOR EACH ROW EXECUTE FUNCTION app.user_role_grant_check();
+
+-- ---------------------------------------------------------------------------------------------
+-- Audit attribution: a request made with an API token names the token (its owner stays the actor)
+
+ALTER TABLE audit.audit_log ADD COLUMN api_token_id uuid;
+COMMENT ON COLUMN audit.audit_log.api_token_id IS
+  'The API token the request was made with (ADR-0027); NULL for sessions and the database itself.';

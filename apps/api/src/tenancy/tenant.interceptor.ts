@@ -14,9 +14,9 @@ import type { Kysely } from 'kysely';
 import { catchError, from, lastValueFrom, mergeMap, type Observable } from 'rxjs';
 import { CLOCK, DB, MFA_POLICY } from '../tokens.ts';
 import { TENANT_RESOLVER, type TenantResolver } from './tenant-resolver.ts';
-import { principalOf } from '../auth/session-tenant-resolver.ts';
+import { principalOf, tokenPrincipalOf } from '../auth/session-tenant-resolver.ts';
 import { requestIdOf } from '../audit/request-id.ts';
-import { loadRoles } from '../authz/authz.ts';
+import { effectivePermissions, loadRoles, SelfGrantRefused } from '../authz/authz.ts';
 import {
   isMfa,
   MfaRequired,
@@ -33,12 +33,23 @@ import { checkSod, recordSod, SodViolation, type SodCheck } from '../sod/sod.ser
 const READ_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 /** Refusals of the access checks: each rolls back the request and is audited on its own. */
-type AccessRefusal = PermissionDenied | MfaRequired | StepUpRequired | SodViolation;
+type AccessRefusal =
+  PermissionDenied | MfaRequired | StepUpRequired | SodViolation | SelfGrantRefused;
 const isAccessRefusal = (e: unknown): e is AccessRefusal =>
   e instanceof PermissionDenied ||
   e instanceof MfaRequired ||
   e instanceof StepUpRequired ||
-  e instanceof SodViolation;
+  e instanceof SodViolation ||
+  e instanceof SelfGrantRefused;
+
+/** Who acts: the session's user or the API token's owner (ADR-0027), and the token if any. */
+function actorOf(req: Request): { userId: string | null; tokenId: string | null } {
+  const token = tokenPrincipalOf(req);
+  return {
+    userId: principalOf(req)?.userId ?? token?.userId ?? null,
+    tokenId: token?.tokenId ?? null,
+  };
+}
 
 const routeOf = (req: Request): string =>
   (req.route as { path?: string } | undefined)?.path ?? req.path;
@@ -86,11 +97,15 @@ export class TenantInterceptor implements NestInterceptor {
           withTenant(this.db, claim.tenantId, async (trx) => {
             if (claim.verify) await claim.verify(trx, req);
             if (access.kind === 'undeclared') throw new PermissionDenied(null);
+            // A session (principal) or an API token (ADR-0027), never both (resolver).
             const principal = principalOf(req);
-            const userId = principal?.userId ?? null;
+            const token = tokenPrincipalOf(req);
+            const userId = principal?.userId ?? token?.userId ?? null;
             const roles = userId ? await loadRoles(trx, userId) : [];
-            const permissions = permissionsOf(roles);
+            const permissions = effectivePermissions(permissionsOf(roles), token?.scopes ?? null);
             if (access.kind === 'permission') {
+              // A token was issued under a fresh MFA step-up, so it satisfies the MFA-role rule;
+              // it never satisfies a step-up (below: no session principal → step_up_required).
               if (principal && rolesRequireMfa(roles) && !isMfa(principal, this.mfa)) {
                 throw new MfaRequired();
               }
@@ -121,12 +136,13 @@ export class TenantInterceptor implements NestInterceptor {
               const result = await lastValueFrom(next.handle(), { defaultValue: undefined });
               if (sodCheck) await recordSod(trx, sodCheck, requestIdOf(req) ?? null);
               if (!READ_METHODS.has(req.method)) {
-                const actor = principalOf(req);
+                const actor = actorOf(req);
                 await trx
                   .insertInto('audit.audit_log')
                   .values({
-                    actor_type: actor ? 'user' : 'system',
-                    actor_user_id: actor?.userId ?? null,
+                    actor_type: actor.userId ? 'user' : 'system',
+                    actor_user_id: actor.userId,
+                    api_token_id: actor.tokenId,
                     action: `${req.method} ${routeOf(req)}`,
                     entity_type: scope.audit?.entityType ?? 'request',
                     entity_id: scope.audit?.entityId ?? null,
@@ -159,42 +175,51 @@ export class TenantInterceptor implements NestInterceptor {
 
   /** The request transaction rolled back; the refusal is recorded in its own transaction. */
   private async auditDenial(tenantId: string, req: Request, e: AccessRefusal): Promise<void> {
-    const actor = principalOf(req);
+    const session = principalOf(req);
+    const actor = actorOf(req);
     const where = { method: req.method, route: routeOf(req) };
     const row =
-      e instanceof PermissionDenied
+      e instanceof SelfGrantRefused
         ? {
-            action: 'permission_denied',
-            entity_type: 'permission',
-            entity_id: e.permission,
-            after: { ...where, permission: e.permission },
+            action: 'self_grant_refused',
+            entity_type: 'app_user',
+            entity_id: e.userId,
+            after: where,
           }
-        : e instanceof SodViolation
+        : e instanceof PermissionDenied
           ? {
-              action: 'sod_violation',
-              entity_type: subjectTypeOf(e.step),
-              entity_id: e.subjectId,
-              after: { ...where, step: e.step, rule: e.rule },
+              action: 'permission_denied',
+              entity_type: 'permission',
+              entity_id: e.permission,
+              after: { ...where, permission: e.permission },
             }
-          : e instanceof MfaRequired
+          : e instanceof SodViolation
             ? {
-                action: 'mfa_required',
-                entity_type: 'session',
-                entity_id: actor?.sessionId ?? null,
-                after: where,
+                action: 'sod_violation',
+                entity_type: subjectTypeOf(e.step),
+                entity_id: e.subjectId,
+                after: { ...where, step: e.step, rule: e.rule },
               }
-            : {
-                action: 'step_up_required',
-                entity_type: 'session',
-                entity_id: actor?.sessionId ?? null,
-                after: { ...where, max_age: e.maxAge },
-              };
+            : e instanceof MfaRequired
+              ? {
+                  action: 'mfa_required',
+                  entity_type: 'session',
+                  entity_id: session?.sessionId ?? null,
+                  after: where,
+                }
+              : {
+                  action: 'step_up_required',
+                  entity_type: 'session',
+                  entity_id: session?.sessionId ?? null,
+                  after: { ...where, max_age: e.maxAge },
+                };
     await withTenant(this.db, tenantId, (trx) =>
       trx
         .insertInto('audit.audit_log')
         .values({
-          actor_type: actor ? 'user' : 'system',
-          actor_user_id: actor?.userId ?? null,
+          actor_type: actor.userId ? 'user' : 'system',
+          actor_user_id: actor.userId,
+          api_token_id: actor.tokenId,
           action: row.action,
           entity_type: row.entity_type,
           entity_id: row.entity_id,

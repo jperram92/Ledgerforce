@@ -468,6 +468,8 @@ export interface AuditLogTable {
   ip: string | null;
   user_agent: string | null;
   request_id: string | null;
+  /** Migration 0022 (ADR-0027): the API token a request was made with. */
+  api_token_id: string | null;
 }
 
 export interface Database {
