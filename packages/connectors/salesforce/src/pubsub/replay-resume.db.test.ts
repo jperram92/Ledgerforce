@@ -273,6 +273,28 @@ describe('SS-PLAT-27: Replay id resume after restart', () => {
     await run2.stop();
   });
 
+  it('an outage inside the 72 h retention: the backlog replays from R in ≤ 100-event batches, each record once', async () => {
+    fake.setMaxBatch(100);
+    const from = (await cursor(TA, companyA))?.replayId;
+    const before = await effects(TA);
+    // Subscriber down: 250 changes accumulate (records 1000..1249) inside the retention window.
+    const ids = publish(...Array.from({ length: 250 }, (_, i) => ({ id: acc(1000 + i) })));
+    const s = nextStream();
+    const run = start(TA, companyA);
+    await fake.waitForStreams(s + 1);
+    expect(fake.streams[s]?.requests[0]?.replayId).toBe(from?.toString('hex'));
+    await run.committed(3);
+    await run.stop();
+    const added = (await effects(TA)).slice(before.length);
+    expect(added).toHaveLength(250);
+    expect(new Set(added).size).toBe(250);
+    expect((await cursor(TA, companyA))?.replayId?.equals(ids[249] as Buffer)).toBe(true);
+    expect(fake.streams[s]?.requests.map((q) => q.numRequested).slice(0, 3)).toEqual([
+      100, 100, 100,
+    ]);
+    fake.setMaxBatch(3);
+  });
+
   it('a stale cursor (another subscriber moved it) aborts the batch: compare-and-set', async () => {
     const before = await cursor(TA, companyA);
     await expect(
