@@ -97,7 +97,8 @@ describe('SS-PLAT-06: Period status matrix is enforced as data (database)', () =
         const date = `${months[i] ?? ''}-15`;
         const p = await findPeriod(trx, company, date);
         if (!p) throw new Error(`no period ${date}`);
-        if (status !== 'open') await setPeriodStatus(trx, { periodId: p.id, status, actorId: FA() });
+        if (status !== 'open')
+          await setPeriodStatus(trx, { periodId: p.id, status, actorId: FA() });
         byStatus.set(status, { id: p.id, date });
       }
     });
@@ -137,7 +138,8 @@ describe('SS-PLAT-06: Period status matrix is enforced as data (database)', () =
         });
       } catch (error) {
         if (error === rollback) return 'posted';
-        if (error instanceof Error && error.message === 'override refused') return 'override refused';
+        if (error instanceof Error && error.message === 'override refused')
+          return 'override refused';
         if (toPeriodError(error)) return 'refused';
         throw error;
       }
@@ -369,11 +371,18 @@ describe('SS-PLAT-57: Fiscal years are generated from a convention held as data 
       [company],
     );
     expect(rows.rows).toHaveLength(12);
-    expect(rows.rows[0]).toEqual({ name: '2026-07', start: '2026-07-01', end: '2026-07-31', status: 'open' });
+    expect(rows.rows[0]).toEqual({
+      name: '2026-07',
+      start: '2026-07-01',
+      end: '2026-07-31',
+      status: 'open',
+    });
     expect(rows.rows[11]?.end).toBe('2027-06-30');
 
     await expect(
-      f.inTenant((trx) => generateFiscalYear(trx, { companyId: company, convention: 'calendar', startYear: 2027 })),
+      f.inTenant((trx) =>
+        generateFiscalYear(trx, { companyId: company, convention: 'calendar', startYear: 2027 }),
+      ),
     ).rejects.toThrow(/overlap/);
     const next = await f.inTenant((trx) =>
       generateFiscalYear(trx, { companyId: company, convention: 'AU', startYear: 2027 }),
@@ -398,7 +407,9 @@ describe('SS-PLAT-57: Fiscal years are generated from a convention held as data 
     await expect(
       f.inTenant((trx) =>
         sql`INSERT INTO app.fiscal_period (company_id, fiscal_year_id, period_no, name, start_date, end_date, status)
-            VALUES (${company}, ${fyId}, 13, 'adj', '2027-06-30', '2027-06-30', 'hard_locked')`.execute(trx),
+            VALUES (${company}, ${fyId}, 13, 'adj', '2027-06-30', '2027-06-30', 'hard_locked')`.execute(
+          trx,
+        ),
       ),
     ).rejects.toThrow(/inserted open/);
   });

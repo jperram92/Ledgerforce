@@ -173,7 +173,11 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
       const tag = randomUUID().slice(0, 8);
       const user = await trx
         .insertInto('app.app_user')
-        .values({ email: `${role}-${tag}@example.test`, display_name: `${role} ${tag}`, status: 'active' })
+        .values({
+          email: `${role}-${tag}@example.test`,
+          display_name: `${role} ${tag}`,
+          status: 'active',
+        })
         .returning('id')
         .executeTakeFirstOrThrow();
       await trx.insertInto('app.user_role').values({ user_id: user.id, role }).execute();

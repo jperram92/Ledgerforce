@@ -36,7 +36,7 @@ const AR_LINES: Line[] = [
 ];
 const AP_LINES: Line[] = [
   { code: '6200', debit: '50.0000' },
-  { code: '2100', credit: '50.0000' },
+  { code: '2000', credit: '50.0000' },
 ];
 const JOURNAL_LINES: Line[] = [
   { code: '6200', debit: '20.0000' },
@@ -44,7 +44,7 @@ const JOURNAL_LINES: Line[] = [
 ];
 const PAYOUT_LINES: Line[] = [
   { code: '1010', debit: '95.0000' },
-  { code: '1100', credit: '95.0000' },
+  { code: '1210', credit: '95.0000' },
 ];
 const LINES: Record<string, Line[]> = {
   ar_invoice: AR_LINES,
@@ -60,7 +60,7 @@ interface PostInput {
   by: string;
   /** Record a period override by `by` first (the override user posts). */
   override?: boolean;
-  memo?: string;
+  memo?: string | undefined;
 }
 
 /** Writes the entry the way the posting engine will; returns its id or a mapped period error. */
@@ -104,7 +104,11 @@ async function companyWith(statuses: Record<string, PeriodStatus>): Promise<stri
     for (const [month, status] of Object.entries(statuses)) {
       const period = await findPeriod(trx, company, `${month}-15`);
       if (!period) throw new Error(`no period ${month}`);
-      await setPeriodStatus(trx, { periodId: period.id, status, actorId: users.financeAdmin ?? '' });
+      await setPeriodStatus(trx, {
+        periodId: period.id,
+        status,
+        actorId: users.financeAdmin ?? '',
+      });
     }
   });
   return company;
@@ -334,9 +338,17 @@ describe('SS-UC10-05: Hard lock rejects or redirects per policy', () => {
 
     await setPolicy('post_to_first_open_date_with_note');
     const resolved = await f.inTenant((trx) =>
-      resolvePostingDate(trx, { companyId: company, entryDate: '2026-10-15', sourceType: 'ar_invoice' }),
+      resolvePostingDate(trx, {
+        companyId: company,
+        entryDate: '2026-10-15',
+        sourceType: 'ar_invoice',
+      }),
     );
-    expect(resolved).toMatchObject({ entryDate: '2026-11-01', redirected: true, needsOverride: false });
+    expect(resolved).toMatchObject({
+      entryDate: '2026-11-01',
+      redirected: true,
+      needsOverride: false,
+    });
     expect(resolved.note).toBe(
       'Dated 2026-10-15 in period 2026-10 (hard_locked); posted on the first open date 2026-11-01 under the tenant lock-date policy.',
     );
@@ -399,12 +411,20 @@ describe('SS-UC01-08: Closed Won dated in a hard-locked period follows lock poli
     });
     await setPolicy('post_to_first_open_date_with_note');
     const r = await f.inTenant((trx) =>
-      resolvePostingDate(trx, { companyId: company, entryDate: '2026-10-30', sourceType: 'ar_invoice' }),
+      resolvePostingDate(trx, {
+        companyId: company,
+        entryDate: '2026-10-30',
+        sourceType: 'ar_invoice',
+      }),
     );
     expect(r.entryDate).toBe('2027-01-01');
     // AP bill: AR lock allows AP, so November is the first open date for it.
     const bill = await f.inTenant((trx) =>
-      resolvePostingDate(trx, { companyId: company, entryDate: '2026-10-30', sourceType: 'ap_bill' }),
+      resolvePostingDate(trx, {
+        companyId: company,
+        entryDate: '2026-10-30',
+        sourceType: 'ap_bill',
+      }),
     );
     expect(bill.entryDate).toBe('2026-11-01');
     await setPolicy('reject');
@@ -484,7 +504,9 @@ describe('SS-UC08-07: Reconciled lines locked after hard lock', () => {
       );
       const st = await sql<{ id: string }>`
         INSERT INTO app.bank_statement (company_id, bank_account_id, currency, format, file_sha256, lines_total)
-        VALUES (${company}, ${bankAccountId}, 'AUD', 'csv', ${'a'.repeat(64)}, 2) RETURNING id`.execute(trx);
+        VALUES (${company}, ${bankAccountId}, 'AUD', 'csv', ${'a'.repeat(64)}, 2) RETURNING id`.execute(
+        trx,
+      );
       const statementId = st.rows[0]?.id ?? '';
       const line = async (no: number, on: string) =>
         (
