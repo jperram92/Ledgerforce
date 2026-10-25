@@ -13,6 +13,9 @@ import { randomUUID } from 'node:crypto';
 import { dimensionSetId } from '../dimension-set.ts';
 import { generateFiscalYear } from '../period.ts';
 
+export { databaseFingerprint, type DatabaseFingerprint } from './db-fingerprint.ts';
+export { expectedJournal, storedJournal, type JournalView } from './stored-journal.ts';
+
 export interface Line {
   /** Account code in the main company's chart, or an account id. */
   code: string;
