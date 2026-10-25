@@ -895,3 +895,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: DL-0098 — each verify run added about 30 PNGs to T-0009's evidence.
 - Alternatives: skip other tasks' specs during verify (would hide regressions); stop screenshotting (loses the report attachments).
 - ADR: none · Status: accepted
+
+### DL-0116 — Parallel round 3: T-0023, T-0013, T-0059
+- Date: 2026-10-25 · By: claude (lead) · Task: T-0023, T-0013, T-0059 · Category: process
+- Decision: Round 3 runs T-0023 (periods, close matrix and lock dates: ledger + db, migration 0018), T-0013 (MFA for finance roles and step-up: apps/api auth, migration 0019) and T-0059 (CAMT extensions, re-scoped by DL-0114: modules/bank, migration 0020 only if needed) in sub-agent worktrees with pre-assigned numbers and per-agent scratchpad folders (HANDOVER; DL-0081, DL-0100, DL-0113). If T-0059 needs no migration, numbering stays gapless because 0020 is the highest. Gate-run evidence is now redirected automatically (DL-0115). T-0015 (SoD) waits for round 4: it changes the same authorisation code as T-0013 and needs a security ADR.
+- Why: Product owner's instruction to keep building independent tasks in parallel.
+- ADR: none · Status: accepted
