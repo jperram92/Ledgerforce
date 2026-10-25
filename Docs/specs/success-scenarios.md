@@ -173,7 +173,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-52 | Web sign-in, session check and sign-out follow the T-0011 auth contract | — | MVP | e2e-playwright + component | yes | tests/e2e/web/shell.spec.ts; apps/web/src/App.test.tsx, api.test.ts, slug.test.ts | T-0081 | green | [.agent/evidence/T-0081/manifest.json](../../.agent/evidence/T-0081/manifest.json) | ae91f61 |
 | SS-PLAT-53 | Authenticated web shell: navigation, states, keyboard path, WCAG 2.2 AA, genericness | — | MVP | e2e-playwright + component | yes | tests/e2e/web/shell.spec.ts; apps/web/src/App.test.tsx | T-0081 | green | [.agent/evidence/T-0081/manifest.json](../../.agent/evidence/T-0081/manifest.json) | ae91f61 |
 | SS-PLAT-54 | CAMT batch entries, multi-statement files and camt.052/054 import correctly | — | MVP | unit + db | no | — | T-0059 | not-started | — | — |
-| SS-PLAT-55 | A verify run writes evidence only for the task being verified | — | MVP | unit + e2e | no | packages/testing/src/evidence/destination.test.ts; tests/e2e/evidence-harness.spec.ts | T-0109 | green | — | — |
+| SS-PLAT-55 | A verify run writes evidence only for the task being verified | — | MVP | unit + e2e | no | packages/testing/src/evidence/destination.test.ts; tests/e2e/evidence-harness.spec.ts | T-0109 | green | [.agent/evidence/T-0109/manifest.json](../../.agent/evidence/T-0109/manifest.json) | 2b04331 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)

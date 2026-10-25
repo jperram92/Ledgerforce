@@ -174,7 +174,7 @@ graph LR
 | [T-0106](T-0106.md) | Timeline design system: component fixes and @ledgerforce/ui package | MVP | review | T-0009 | UC-10, UC-12 | 1 |
 | [T-0107](T-0107.md) | Company ABN checksum: validate app.company.abn with app.abn_is_valid; fix test fixtures | MVP | review | T-0036 | — | 0 |
 | [T-0108](T-0108.md) | OpenBao/Vault transit KMS adapter (HTTP, no SDK) for envelope encryption | Phase 1 | todo | T-0037 | — | 1 |
-| [T-0109](T-0109.md) | verify.sh gate 9: e2e runs must not write evidence into other tasks' folders | MVP | todo | T-0009 | — | 0 |
+| [T-0109](T-0109.md) | verify.sh gate 9: e2e runs must not write evidence into other tasks' folders | MVP | review | T-0009 | — | 0 |
 | [T-0081](T-0081.md) | Web app shell (React, Vite, TanStack, shadcn/ui) with auth and navigation | MVP | review | T-0011, T-0009, T-0106 | — | 0 |
 | [T-0082](T-0082.md) | UI: chart of accounts, manual journal and "show me the journal" preview | MVP | todo | T-0081, T-0026, T-0029 | — | 0 |
 | [T-0083](T-0083.md) | UI: invoices list, detail, approve and post | MVP | todo | T-0081, T-0040, T-0041 | UC-01 | 1 |
