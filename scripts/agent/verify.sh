@@ -207,7 +207,8 @@ if [ "$QUICK" = 1 ]; then record 9 e2e-evidence SKIPPED "--quick"
 else
   e2e_r=PENDING; e2e="no package.json script \"test:e2e\""
   if has_pkg_script "test:e2e" && [ -d node_modules ]; then
-    if run_pkg_script "test:e2e" >"$TMP/9.log" 2>&1; then e2e_r=PASS; e2e="pnpm test:e2e"; else e2e_r=FAIL; e2e="pnpm test:e2e failed"; show_tail "$TMP/9.log"; fi
+    # Only the verified task's specs write into .agent/evidence; others go to a temp dir (T-0109, DL-0098).
+    if LF_EVIDENCE_ONLY_TASK="$TASK" run_pkg_script "test:e2e" >"$TMP/9.log" 2>&1; then e2e_r=PASS; e2e="pnpm test:e2e"; else e2e_r=FAIL; e2e="pnpm test:e2e failed"; show_tail "$TMP/9.log"; fi
   fi
   if [ -n "$TASK" ]; then
     node "$CONDUCTOR" gate evidence "$TASK" >"$TMP/9m.log" 2>&1; c=$?

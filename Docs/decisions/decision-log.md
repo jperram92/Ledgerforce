@@ -888,3 +888,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: mark T-0059 done (would hide the remaining gaps); supersede with a new card (more churn for the same content).
 
 - ADR: none · Status: accepted
+
+### DL-0115 — verify gate 9 redirects other tasks' e2e evidence to a temp dir (T-0109)
+- Date: 2026-10-25 · By: claude (lead) · Task: T-0109 · Category: tooling
+- Decision: `verify.sh` gate 9 runs `pnpm test:e2e` with `LF_EVIDENCE_ONLY_TASK=$TASK`. The Playwright evidence fixture resolves its environment through `evidenceEnvFor()` (packages/testing/src/evidence/destination.ts): specs filed under the verified task write to `.agent/evidence/` as before; specs of any other task still run and screenshot, but into `<tmp>/lf-evidence-gate/<task>/other-tasks/`. SS-PLAT-19 (the harness test) asserts whichever location is in effect: strict `.agent/evidence/T-0009/` normally and when T-0009 itself is verified, the temp location otherwise. Without the variable nothing changes. The manual cleanup rule in HANDOVER (DL-0098) is retired.
+- Why: DL-0098 — each verify run added about 30 PNGs to T-0009's evidence.
+- Alternatives: skip other tasks' specs during verify (would hide regressions); stop screenshotting (loses the report attachments).
+- ADR: none · Status: accepted

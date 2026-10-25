@@ -13,7 +13,9 @@
  * the Playwright HTML report.
  */
 import { test as base, expect } from '@playwright/test';
-import { relative, sep } from 'node:path';
+import { tmpdir } from 'node:os';
+import { join, relative, sep } from 'node:path';
+import { evidenceEnvFor } from './destination.ts';
 import {
   appendManifestEntries,
   evidenceFilePath,
@@ -33,8 +35,9 @@ export const test = base.extend<EvidenceFixtures>({
   evidenceTaskId: [process.env['LF_TASK_ID'] || 'adhoc', { option: true }],
 
   evidence: async ({ page, evidenceTaskId }, use, testInfo) => {
+    // Under `verify.sh --task X` (LF_EVIDENCE_ONLY_TASK=X), other tasks' specs write to a temp dir.
     const ctx = resolveEvidenceContext(
-      { ...process.env, LF_TASK_ID: evidenceTaskId },
+      evidenceEnvFor(process.env, evidenceTaskId, join(tmpdir(), 'lf-evidence-gate')),
       process.cwd(),
     );
     const pending: Omit<EvidenceEntry, 'result'>[] = [];

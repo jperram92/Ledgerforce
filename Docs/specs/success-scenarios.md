@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 147 scenarios (16 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 148 scenarios (16 need screenshots).
 
 ## How to update (who, when)
 
@@ -173,6 +173,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-52 | Web sign-in, session check and sign-out follow the T-0011 auth contract | — | MVP | e2e-playwright + component | yes | tests/e2e/web/shell.spec.ts; apps/web/src/App.test.tsx, api.test.ts, slug.test.ts | T-0081 | green | [.agent/evidence/T-0081/manifest.json](../../.agent/evidence/T-0081/manifest.json) | ae91f61 |
 | SS-PLAT-53 | Authenticated web shell: navigation, states, keyboard path, WCAG 2.2 AA, genericness | — | MVP | e2e-playwright + component | yes | tests/e2e/web/shell.spec.ts; apps/web/src/App.test.tsx | T-0081 | green | [.agent/evidence/T-0081/manifest.json](../../.agent/evidence/T-0081/manifest.json) | ae91f61 |
 | SS-PLAT-54 | CAMT batch entries, multi-statement files and camt.052/054 import correctly | — | MVP | unit + db | no | — | T-0059 | not-started | — | — |
+| SS-PLAT-55 | A verify run writes evidence only for the task being verified | — | MVP | unit + e2e | no | packages/testing/src/evidence/destination.test.ts; tests/e2e/evidence-harness.spec.ts | T-0109 | green | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -389,4 +390,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 - Phase: MVP · Layer: **unit + db** · Screenshot evidence: no · Task(s): T-0059
 - **Given** a camt.053 batch entry with 3 TxDtls, a file with 2 statements, and camt.052/054 fixtures · **When** imported · **Then** the batch becomes 3 lines summing exactly to the entry amount, each statement lands on its own bank account, duplicate detection holds across re-imports, and unsupported variants fail loudly
 
+
+### SS-PLAT-55 — A verify run writes evidence only for the task being verified
+- Phase: MVP · Layer: **unit + e2e** · Screenshot evidence: no · Task(s): T-0109
+- **Given** `verify.sh --task X` (LF_EVIDENCE_ONLY_TASK=X) · **When** the whole e2e suite runs · **Then** specs filed under X write evidence into `.agent/evidence/X/` as before, every other task's specs still run and screenshot but into a temp dir, so no other task's evidence folder changes; without the variable, behaviour is unchanged
 
