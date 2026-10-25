@@ -78,5 +78,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Proposed |
 | [0026](0026-segregation-of-duties-engine-and-small-team-mode.md) | Segregation-of-duties engine: rules as data, append-only action ledger, tenant thresholds, visible small-team exceptions | security | yes | Proposed |
 | [0027](0027-user-lifecycle-and-scoped-api-tokens.md) | User lifecycle (joiner/mover/leaver) and scoped personal API tokens | security | yes | Proposed |
+| [0029](0029-job-queue-privileges-and-supervision.md) | Job queue (pg-boss) privileges: lf_app DML on the shared pgboss schema, owner-run supervision | security | yes | Proposed |
 
 Next free number: **0027**.

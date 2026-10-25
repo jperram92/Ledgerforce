@@ -1209,3 +1209,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: heartbeats (`heartbeatSeconds`, which must be at least 10 s) instead of the lease (deferred until long handlers exist); the default 15-minute lease (rejected: a slower recovery for short jobs).
 - ADR: none · Status: accepted
 
+
+### DL-0161 — DL-0153 (pg-boss privileges) raised to a security ADR (ADR-0029, Proposed)
+- Date: 2026-10-25 · By: claude (lead, at the T-0030 merge) · Task: T-0030 · Category: security
+- Decision: The lead wrote ADR-0029 (Proposed, security, human gate) to record the job-queue privilege model built in migration 0024: lf_app gets DML (including DELETE) on the shared, non-RLS pgboss schema; job payloads hold ids only; supervision runs with lf_migrator credentials. The T-0030 agent had logged this as a decision against ADR-0008. T-0030 is merged and in review; the model stays Proposed until the product owner accepts it. A dedicated queue-owner role is the proposed narrowing.
+- Why: AGENTS.md §6 and design §10.6: a change to the security model needs a security ADR, and the "no DELETE for lf_app" rule had applied everywhere until now.
+- ADR: ADR-0029 · Status: proposed (awaiting human)
