@@ -295,3 +295,23 @@ export function rolesAllow(roles: Iterable<string>, permission: Permission): boo
 export function permissionToAssign(role: RoleId): Permission {
   return role === 'owner' ? 'users.roles.assign_owner' : 'users.roles.assign';
 }
+
+/** Design §6.2 / ADR-0025: true when any of the roles has a template with `mfaRequired`. */
+export function rolesRequireMfa(roles: Iterable<string>): boolean {
+  for (const r of roles) if (isRoleId(r) && ROLE_TEMPLATES[r].mfaRequired) return true;
+  return false;
+}
+
+/**
+ * Design §6.2 / ADR-0025: actions that need a fresh step-up re-authentication — releasing payment
+ * batches, changing bank details, reopening a locked period. A route whose permission is listed
+ * here needs step-up even if it forgot `@RequireStepUp` (fail closed, T-0013).
+ */
+export const STEP_UP_PERMISSIONS: readonly Permission[] = Object.freeze([
+  'ap.payment_batch.release',
+  'payroll.net_pay_batch.release',
+  'parties.bank_account.change_request',
+  'parties.bank_account.verify',
+  'period.reopen',
+  'period.lock.override',
+]);

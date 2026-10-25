@@ -53,6 +53,8 @@ export interface SessionTable {
   user_session_epoch: number;
   amr: Generated<string[]>;
   acr: string | null;
+  /** Migration 0019 (ADR-0025): last active IdP authentication; NULL = never fresh. */
+  auth_time: Timestamp | null;
   revoked_at: Timestamp | null;
   revoke_reason: string | null;
 }
@@ -67,6 +69,10 @@ export interface AuthRequestTable {
   created_at: Timestamp;
   expires_at: Timestamp;
   consumed_at: Timestamp | null;
+  /** Migration 0019 (ADR-0025): set for a step-up of that session; NULL for a login. */
+  session_id: string | null;
+  max_age_seconds: number | null;
+  return_to: string | null;
 }
 
 /** Role grant (migration 0016, ADR-0023). Never deleted: revoked once by setting revoked_at. */
