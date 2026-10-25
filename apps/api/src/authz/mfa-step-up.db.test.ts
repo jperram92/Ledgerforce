@@ -686,8 +686,10 @@ describe('SS-PLAT-59: Step-up fails closed', () => {
     const second = await directSession(PEOPLE.apr.id, ['pwd', 'otp'], null); // same user, other session
     const before = [await sessionRow(session), await sessionRow(second)];
     now += MIN;
-    const s = await stepUpAtIdp(session, 'apr');
+    // A fresh step-up for each case: the pre-auth row is single use, so one attempt must not
+    // hide the next.
     for (const cookie of [undefined, second, 'garbage']) {
+      const s = await stepUpAtIdp(session, 'apr');
       const res = await finishStepUp(s, cookie);
       expect(res.status, String(cookie)).toBe(400);
       expect(await res.json()).toEqual({ error: 'invalid_request' });
