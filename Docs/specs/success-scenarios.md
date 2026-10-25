@@ -66,12 +66,12 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC05-02 | Suggested coding from past bills | UC-05 | MVP | unit | no | — | T-0050 | not-started | — | — |
 | SS-UC05-03 | Coded bill routes to Approver; nothing posts before approval | UC-05 | MVP | db-integration | no | — | T-0052 | not-started | — | — |
 | SS-UC05-04 | Approved bill posts GP-008 | UC-05 | MVP | golden | no | — | T-0050, T-0052 | not-started | — | — |
-| SS-UC05-05 | SoD: clerk cannot approve own bill above $1,000 | UC-05 | MVP | db-integration | no | — | T-0052, T-0015 | not-started | — | — |
-| SS-UC05-06 | Small-team mode records a visible exception | UC-05 | MVP | db-integration | no | — | T-0015, T-0052 | not-started | — | — |
+| SS-UC05-05 | SoD: clerk cannot approve own bill above $1,000 | UC-05 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts | T-0052, T-0015 | green (SoD layer; bill endpoint in T-0052) | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
+| SS-UC05-06 | Small-team mode records a visible exception | UC-05 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts; packages/db/src/sod.db.test.ts | T-0015, T-0052 | green (SoD layer; bill endpoint in T-0052) | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
 | SS-UC05-07 | Bill in AP-locked period rejected | UC-05 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0050, T-0023 | green (period/matrix layer; bill posting in T-0050) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC05-08 | Bill entry and approval screens | UC-05 | MVP | e2e-playwright | yes | — | T-0086 | not-started | — | — |
 | SS-UC06-01 | Batch created from 12 due bills | UC-06 | MVP | db-integration | no | — | T-0054 | not-started | — | — |
-| SS-UC06-02 | Creator cannot release own batch | UC-06 | MVP | db-integration | no | — | T-0054, T-0015 | not-started | — | — |
+| SS-UC06-02 | Creator cannot release own batch | UC-06 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts | T-0054, T-0015 | green (SoD layer; batch endpoint in T-0054) | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
 | SS-UC06-03 | Release requires step-up MFA | UC-06 | MVP | db-integration | no | apps/api/src/authz/mfa-step-up.db.test.ts (stand-in release route; the real one is T-0054) | T-0054, T-0013 | green (step-up part, T-0013; the batch release itself pending T-0054) | [.agent/evidence/T-0013/manifest.json](../../.agent/evidence/T-0013/manifest.json) | e48639b |
 | SS-UC06-04 | Batch over $10,000 needs two releasers | UC-06 | MVP | db-integration | no | — | T-0054 | not-started | — | — |
 | SS-UC06-05 | Recently changed bank details excluded with reason | UC-06 | MVP | db-integration | no | — | T-0054, T-0053 | not-started | — | — |
@@ -113,7 +113,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC11-03 | Refund via payment batch posts GP-006 | UC-11 | MVP | golden | no | — | T-0055 | not-started | — | — |
 | SS-UC11-04 | Refund via Stripe calls the refund API | UC-11 | MVP | contract | no | — | T-0055, T-0074 | not-started | — | — |
 | SS-UC11-05 | Salesforce shows net amount paid | UC-11 | MVP | contract | no | — | T-0055, T-0067 | not-started | — | — |
-| SS-UC11-06 | Clerk cannot approve own credit note above threshold | UC-11 | MVP | db-integration | no | — | T-0045, T-0015 | not-started | — | — |
+| SS-UC11-06 | Clerk cannot approve own credit note above threshold | UC-11 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts | T-0045, T-0015 | green (SoD layer; credit-note endpoint in T-0045) | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
 | SS-UC11-07 | Credit cannot exceed the creditable amount | UC-11 | MVP | unit | no | — | T-0045 | not-started | — | — |
 | SS-UC11-08 | Credit note and refund screens | UC-11 | MVP | e2e-playwright | yes | — | T-0085 | not-started | — | — |
 | SS-UC12-01 | Component renders balance, overdue, last payment, 5 invoices | UC-12 | MVP | unit | no | — | T-0072 | not-started | — | — |
@@ -136,7 +136,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-13 | Float arithmetic on money is a lint error | — | MVP | unit | no | packages/testing/eslint-rules/no-float-money.config.test.ts; packages/shared/src/money/*.test.ts | T-0017 | green | [.agent/evidence/T-0017/manifest.json](../../.agent/evidence/T-0017/manifest.json) | 5385095 |
 | SS-PLAT-14 | Same idempotency key posts once | — | MVP | db-integration | no | — | T-0025 | not-started | — | — |
 | SS-PLAT-15 | Preview writes nothing | — | MVP | db-integration | no | — | T-0026 | not-started | — | — |
-| SS-PLAT-16 | SoD rules 1–6 evaluated as configured | — | MVP | unit | no | — | T-0015 | not-started | — | — |
+| SS-PLAT-16 | SoD rules 1–6 evaluated as configured | — | MVP | unit | no | packages/shared/src/sod/sod.rules.test.ts | T-0015 | green | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
 | SS-PLAT-17 | Migrations are forward-only on the previous schema | — | MVP | db-integration | no | — | T-0008 | not-started | — | — |
 | SS-PLAT-18 | Security gates fail on seeded issues | — | MVP | contract | no | — | T-0095 | not-started | — | — |
 | SS-PLAT-19 | Evidence harness captures screenshots | — | Sprint 0 | e2e-playwright | yes | tests/e2e/evidence-harness.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
@@ -178,6 +178,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-57 | Fiscal years are generated from a convention held as data (AU 1 July) with contiguous, non-overlapping monthly periods | — | MVP | unit + db-integration | no | packages/ledger/src/period-matrix.test.ts; packages/ledger/src/period-control.db.test.ts | T-0023 | green | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-PLAT-58 | Step-up re-authenticates on the existing session (prompt=login, max_age, MFA acr_values; same session, no new cookie; audited) | — | MVP | db-integration | no | apps/api/src/authz/mfa-step-up.db.test.ts | T-0013 | green | [.agent/evidence/T-0013/manifest.json](../../.agent/evidence/T-0013/manifest.json) | e48639b |
 | SS-PLAT-59 | Step-up and MFA fail closed (other user, non-MFA or stale answer, wrong session, missing auth_time, step-up permissions without the decorator) | — | MVP | unit + db-integration | no | apps/api/src/authz/mfa-step-up.db.test.ts; apps/api/src/authz/mfa.test.ts | T-0013 | green | [.agent/evidence/T-0013/manifest.json](../../.agent/evidence/T-0013/manifest.json) | e48639b |
+| SS-PLAT-62 | SoD action ledger, settings, small-team exceptions and weekly acknowledgements are tenant-scoped, append-only, Owner-only, audited, not back-datable; the weekly report cuts weeks in the tenant time zone | — | MVP | db-integration | no | packages/db/src/sod.db.test.ts | T-0015 | green | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
+| SS-PLAT-63 | SoD runs after MFA, permission and step-up; 403 sod_violation audited; @SoD without a permission fails closed; SoD settings Owner-only, report and acknowledgement permission-checked | — | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts | T-0015 | green | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -415,5 +417,13 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-59 — Step-up and MFA fail closed
 - Phase: MVP · Layer: **unit + db-integration** · Screenshot evidence: no · Task(s): T-0013
 - **Given** a step-up in progress or a step-up route · **When** the IdP authenticates another user, answers without MFA or with a stale `auth_time`, the callback comes with no or another session cookie, the session has ended or has no recorded `auth_time`, or a route holds a step-up permission without `@RequireStepUp` · **Then** each is refused (403 step_up_mismatch / mfa_required, 400 login_failed / invalid_request, 401 step_up_required) and the session is left unchanged; refusals at the callback are audited as `step_up_refused`
+
+### SS-PLAT-62 — SoD store is append-only, checked and audited
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0015
+- **Given** migration 0021 and users of two tenants (Owner, Finance Admin, clerk, reviewer, a disabled user) · **When** lf_app records steps, changes settings, records exceptions and acknowledges weeks — including unknown steps or rules, non-Owners, blank reasons, negative thresholds, unknown time zones, self or disabled reviewers, back-dated times, rows for another tenant, and UPDATE/DELETE by lf_app and by the superuser · **Then** only the valid inserts succeed (others 23514 / 42501), nothing can be changed or deleted, settings/exception/acknowledgement inserts are audited, time columns are the database clock, the SQL step/rule/role mirrors equal the TypeScript constants and the setting defaults equal the placeholders; `app.sod_exception_report(monday)` lists exactly the exceptions of that week in the report time zone with their acknowledgement status and none of another tenant
+
+### SS-PLAT-63 — SoD check order, contract and administration
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0015
+- **Given** routes declaring `@SoD` · **When** they are called by a user without the permission, a finance user without MFA, a user with a stale step-up, on a route declaring `@SoD` without a permission, without a subject id, and SoD settings / the weekly report are used by users with and without settings.sod.manage, settings.read and audit_log.read · **Then** permission, MFA and step-up refusals come first (forbidden / mfa_required / step_up_required), a misdeclared route is refused (forbidden, permission null), a missing subject is 400 invalid_sod_subject, settings change only for the Owner with valid values (unchanged values add no row), and the report needs audit_log.read and a Monday
 
 
