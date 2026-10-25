@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { withTenant, type Database } from '@ledgerforce/db';
 import { permissionsOf, rolesRequireMfa } from '@ledgerforce/shared/rbac';
+import { subjectTypeOf } from '@ledgerforce/shared/sod';
 import type { Request } from 'express';
 import type { Kysely } from 'kysely';
 import { catchError, from, lastValueFrom, mergeMap, type Observable } from 'rxjs';
@@ -26,13 +27,18 @@ import {
 import { PermissionDenied, routeAccess, stepUpOf } from '../authz/permission.decorator.ts';
 import type { Clock } from '../auth/session.service.ts';
 import { runInTenantTx } from './tenant-tx.ts';
+import { sodOf } from '../sod/sod.decorator.ts';
+import { checkSod, recordSod, SodViolation, type SodCheck } from '../sod/sod.service.ts';
 
 const READ_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 
 /** Refusals of the access checks: each rolls back the request and is audited on its own. */
-type AccessRefusal = PermissionDenied | MfaRequired | StepUpRequired;
+type AccessRefusal = PermissionDenied | MfaRequired | StepUpRequired | SodViolation;
 const isAccessRefusal = (e: unknown): e is AccessRefusal =>
-  e instanceof PermissionDenied || e instanceof MfaRequired || e instanceof StepUpRequired;
+  e instanceof PermissionDenied ||
+  e instanceof MfaRequired ||
+  e instanceof StepUpRequired ||
+  e instanceof SodViolation;
 
 const routeOf = (req: Request): string =>
   (req.route as { path?: string } | undefined)?.path ?? req.path;
@@ -44,12 +50,14 @@ const ipOf = (req: Request): string | null => (req.ip ? req.ip.replace(/^::ffff:
  * RQ-0013) → verify the session → on permission routes: MFA for finance roles (ADR-0025:
  * 403 mfa_required) → permission check (ADR-0023: the route's declared permission against the
  * user's active role grants; undeclared routes refused) → step-up (ADR-0025: 401
- * step_up_required when the route needs a fresher MFA authentication) → handler runs with the
- * transaction in async-local storage → for a successful mutation, one audit row in the same
- * transaction (design §6.8, SS-PLAT-30) → commit or roll back.
+ * step_up_required when the route needs a fresher MFA authentication) → segregation of duties
+ * on routes declaring `@SoD` (ADR-0026: 403 sod_violation, or a small-team exception) → handler
+ * runs with the transaction in async-local storage → the SoD step (and any exception) is
+ * recorded → for a successful mutation, one audit row in the same transaction (design §6.8,
+ * SS-PLAT-30) → commit or roll back.
  * Refused or failed requests write no audit row in the request transaction (it never commits);
- * a permission, MFA or step-up refusal is audited in its own transaction (SS-UC02-07,
- * SS-PLAT-20, SS-UC06-03). Member routes (who am I, logout, step-up) need no MFA, so a finance
+ * a permission, MFA, step-up or SoD refusal is audited in its own transaction (SS-UC02-07,
+ * SS-PLAT-20, SS-UC06-03, SS-UC05-05). Member routes (who am I, logout, step-up) need no MFA, so a finance
  * user without MFA can still step up.
  *
  * The permission check lives here, not in a Nest guard, because guards run before interceptors
@@ -68,6 +76,7 @@ export class TenantInterceptor implements NestInterceptor {
     const access = routeAccess(ctx.getHandler(), ctx.getClass());
     if (access.kind === 'public') return next.handle();
     const stepUp = stepUpOf(ctx.getHandler(), ctx.getClass(), access);
+    const sod = sodOf(ctx.getHandler());
     const req = ctx.switchToHttp().getRequest<Request>();
     return from(this.resolver.resolve(req)).pipe(
       mergeMap((answer) => {
@@ -95,8 +104,22 @@ export class TenantInterceptor implements NestInterceptor {
             ) {
               throw new StepUpRequired(stepUp);
             }
+            let sodCheck: SodCheck | null = null;
+            if (sod) {
+              // SoD needs a permission route and an acting user (ADR-0026); otherwise fail closed.
+              if (access.kind !== 'permission') throw new PermissionDenied(null);
+              if (!userId) throw new PermissionDenied(access.permission);
+              sodCheck = await checkSod(trx, {
+                step: sod.step,
+                actorId: userId,
+                permission: access.permission,
+                subject: await sod.subjectFrom(req, trx, sod.step),
+                body: req.body as unknown,
+              });
+            }
             return runInTenantTx(trx, { userId, permissions }, async (scope) => {
               const result = await lastValueFrom(next.handle(), { defaultValue: undefined });
+              if (sodCheck) await recordSod(trx, sodCheck, requestIdOf(req) ?? null);
               if (!READ_METHODS.has(req.method)) {
                 const actor = principalOf(req);
                 await trx
@@ -146,19 +169,26 @@ export class TenantInterceptor implements NestInterceptor {
             entity_id: e.permission,
             after: { ...where, permission: e.permission },
           }
-        : e instanceof MfaRequired
+        : e instanceof SodViolation
           ? {
-              action: 'mfa_required',
-              entity_type: 'session',
-              entity_id: actor?.sessionId ?? null,
-              after: where,
+              action: 'sod_violation',
+              entity_type: subjectTypeOf(e.step),
+              entity_id: e.subjectId,
+              after: { ...where, step: e.step, rule: e.rule },
             }
-          : {
-              action: 'step_up_required',
-              entity_type: 'session',
-              entity_id: actor?.sessionId ?? null,
-              after: { ...where, max_age: e.maxAge },
-            };
+          : e instanceof MfaRequired
+            ? {
+                action: 'mfa_required',
+                entity_type: 'session',
+                entity_id: actor?.sessionId ?? null,
+                after: where,
+              }
+            : {
+                action: 'step_up_required',
+                entity_type: 'session',
+                entity_id: actor?.sessionId ?? null,
+                after: { ...where, max_age: e.maxAge },
+              };
     await withTenant(this.db, tenantId, (trx) =>
       trx
         .insertInto('audit.audit_log')
