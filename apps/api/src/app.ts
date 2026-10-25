@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { type DynamicModule, Module, type INestApplication } from '@nestjs/common';
+import { type DynamicModule, Module, type INestApplication, type Type } from '@nestjs/common';
 import { APP_INTERCEPTOR, NestFactory } from '@nestjs/core';
 import type { Database } from '@ledgerforce/db';
 import { Kysely, PostgresDialect } from 'kysely';
@@ -10,6 +10,8 @@ import { LoginController, OIDC_SERVICE } from './auth/login.controller.ts';
 import { OidcService, type OidcOptions } from './auth/oidc.service.ts';
 import { SessionTenantResolver } from './auth/session-tenant-resolver.ts';
 import { SessionService, type Clock } from './auth/session.service.ts';
+import { Authz } from './authz/authz.ts';
+import { UserRolesController } from './authz/user-roles.controller.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
 import { PartyBankAccountsController } from './parties/bank-accounts.controller.ts';
@@ -33,6 +35,8 @@ export interface ApiOptions {
   oidc?: OidcOptions;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
   tenantResolver?: TenantResolver;
+  /** Test hook: extra controllers (stand-ins for routes of later tasks, e.g. SS-UC02-07). */
+  testControllers?: Type[];
   /** Test hook: called once per SQL statement. */
   onQuery?: () => void;
   port?: number;
@@ -48,6 +52,16 @@ export interface Api {
   close(): Promise<void>;
 }
 
+/** Every controller the API can mount (routes.test.ts checks each declares its access, ADR-0023). */
+export const API_CONTROLLERS: readonly Type[] = [
+  HealthController,
+  CompaniesController,
+  PartyBankAccountsController,
+  UserRolesController,
+  AuthController,
+  LoginController,
+];
+
 @Module({})
 class AppModule {
   static forRoot(
@@ -55,6 +69,7 @@ class AppModule {
     resolver: TenantResolver,
     sessions: SessionService | undefined,
     oidc: OidcService | undefined,
+    testControllers: Type[],
   ): DynamicModule {
     return {
       module: AppModule,
@@ -62,8 +77,10 @@ class AppModule {
         HealthController,
         CompaniesController,
         PartyBankAccountsController,
+        UserRolesController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
+        ...testControllers,
       ],
       providers: [
         { provide: DB, useValue: db },
@@ -72,6 +89,7 @@ class AppModule {
         { provide: OIDC_SERVICE, useValue: oidc ?? null },
         TenantTx,
         AuditTrail,
+        Authz,
         { provide: APP_INTERCEPTOR, useClass: TenantInterceptor },
       ],
     };
@@ -108,9 +126,12 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
       : undefined;
   const resolver =
     opts.tenantResolver ?? (sessions ? new SessionTenantResolver(sessions) : refuseAllResolver);
-  const app = await NestFactory.create(AppModule.forRoot(db, resolver, sessions, oidc), {
-    logger: ['error', 'warn'],
-  });
+  const app = await NestFactory.create(
+    AppModule.forRoot(db, resolver, sessions, oidc, opts.testControllers ?? []),
+    {
+      logger: ['error', 'warn'],
+    },
+  );
   app.use(requestIdMiddleware);
   await app.listen(opts.port ?? 0, opts.host ?? '127.0.0.1');
   const addr = app.getHttpServer().address() as AddressInfo;

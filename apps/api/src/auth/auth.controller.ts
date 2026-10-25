@@ -8,6 +8,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import type { Request } from 'express';
+import { AnyMember } from '../authz/permission.decorator.ts';
 import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
 import { principalOf } from './session-tenant-resolver.ts';
 import { SessionService } from './session.service.ts';
@@ -24,6 +25,7 @@ export class AuthController {
 
   /** Who am I: read under RLS, so it can only ever return the session's own tenant and user. */
   @Get('me')
+  @AnyMember()
   async me(
     @Req() req: Request,
   ): Promise<{ tenant_id: string; user_id: string; display_name: string }> {
@@ -40,6 +42,7 @@ export class AuthController {
 
   /** Logout ends this session only. Naturally idempotent: a second call finds it already revoked. */
   @Post('logout')
+  @AnyMember()
   @HttpCode(204)
   async logout(@Req() req: Request): Promise<void> {
     const p = principalOf(req);

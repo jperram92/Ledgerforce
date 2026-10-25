@@ -1,5 +1,6 @@
 import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
 import { listBankAccounts } from '@ledgerforce/parties';
+import { RequirePermission } from '../authz/permission.decorator.ts';
 import { TenantTx } from '../tenancy/tenant-tx.ts';
 
 /**
@@ -11,6 +12,7 @@ export class PartyBankAccountsController {
   constructor(private readonly tx: TenantTx) {}
 
   @Get()
+  @RequirePermission('parties.bank_account.read')
   async list(
     @Param('partyId', new ParseUUIDPipe()) partyId: string,
   ): Promise<

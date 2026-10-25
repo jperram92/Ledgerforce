@@ -49,6 +49,8 @@ beforeAll(async () => {
         .insertInto('app.app_user')
         .values({ id: user, email: `${user}@example.test`, display_name: 'User', status: 'active' })
         .execute();
+      // T-0012: reading bank details needs parties.bank_account.read (Accountant holds it).
+      await trx.insertInto('app.user_role').values({ user_id: user, role: 'accountant' }).execute();
       if (tenant === A) {
         supplier = await createParty(trx, c.id, {
           legalName: 'Office Supplies Pty Ltd',

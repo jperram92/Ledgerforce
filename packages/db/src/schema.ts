@@ -75,7 +75,7 @@ export interface UserRoleTable {
   tenant_id: TenantId;
   user_id: string;
   role: string;
-  granted_at: Generated<Timestamp>;
+  granted_at: Timestamp;
   granted_by: string | null;
   revoked_at: Timestamp | null;
   revoked_by: string | null;
