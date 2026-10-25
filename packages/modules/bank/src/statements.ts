@@ -5,14 +5,19 @@
  *  2. A line whose dedupe key is already stored for the bank account is skipped
  *     (INSERT … ON CONFLICT DO NOTHING), so overlapping statements add only new lines.
  * Statement lines are imported data, not ledger rows: nothing here touches journal tables.
+ *
+ * importStatementFile (T-0059, RQ-0028): a camt.053 file with one statement per bank account is
+ * imported for the company. Every statement is matched to its bank account and fully checked
+ * before anything is written, so the file is imported as a whole or not at all.
  */
 import type { Database } from '@ledgerforce/db';
 import { createHash } from 'node:crypto';
 import type { Transaction } from 'kysely';
+import { matchStatementAccount } from './account-match.ts';
 import { validateCsvMapping, type CsvMapping } from './csv.ts';
 import { dedupeKeys } from './dedupe.ts';
 import { StatementImportError } from './errors.ts';
-import { assertBalances, detectFormat, parseStatement } from './parse.ts';
+import { assertBalances, detectFormat, parseStatement, splitCamt053 } from './parse.ts';
 import type { ParsedStatement, StatementFormat } from './types.ts';
 
 export { StatementImportError } from './errors.ts';
@@ -79,8 +84,29 @@ export async function importStatement(
   const parsed = parseStatement(input.content, { format, currency: account.currency, csv });
   assertBalances(parsed);
   checkAccount(parsed, account.account_number_last3);
+  return store(trx, account, parsed, {
+    format,
+    sha: createHash('sha256').update(input.content).digest('hex'),
+    fileName: input.fileName,
+    importedBy: input.importedBy,
+  });
+}
 
-  const sha = createHash('sha256').update(input.content).digest('hex');
+interface StoreMeta {
+  format: StatementFormat;
+  sha: string;
+  fileName: string | undefined;
+  importedBy: string | undefined;
+}
+
+/** Write one checked statement and its new lines (file- and line-level duplicates skipped). */
+async function store(
+  trx: Transaction<Database>,
+  account: { id: string; company_id: string; currency: string },
+  parsed: ParsedStatement,
+  meta: StoreMeta,
+): Promise<ImportResult> {
+  const { format, sha } = meta;
   const linesInFile = parsed.lines.length;
   const inserted = await trx
     .insertInto('app.bank_statement')
@@ -89,7 +115,7 @@ export async function importStatement(
       bank_account_id: account.id,
       currency: account.currency,
       format,
-      file_name: input.fileName ?? null,
+      file_name: meta.fileName ?? null,
       file_sha256: sha,
       account_ref: parsed.accountRef,
       period_start: parsed.periodStart,
@@ -97,7 +123,7 @@ export async function importStatement(
       opening_balance: parsed.openingBalance?.toNumericString() ?? null,
       closing_balance: parsed.closingBalance?.toNumericString() ?? null,
       lines_total: linesInFile,
-      imported_by: input.importedBy ?? null,
+      imported_by: meta.importedBy ?? null,
     })
     .onConflict((oc) => oc.columns(['tenant_id', 'bank_account_id', 'file_sha256']).doNothing())
     .returning('id')
@@ -132,6 +158,8 @@ export async function importStatement(
     reference: l.reference,
     bank_txn_id: l.bankTxnId,
     dedupe_key: keys[i] ?? '',
+    entry_ref: l.batch?.entryRef ?? null,
+    entry_tx_no: l.batch?.part ?? null,
   }));
   let linesCreated = 0;
   for (let from = 0; from < rows.length; from += BATCH) {
@@ -155,5 +183,106 @@ export async function importStatement(
       ? `All ${plural(linesInFile, 'line')} in this file were already imported: no new lines.`
       : `${String(linesCreated)} new ${linesCreated === 1 ? 'line' : 'lines'} imported; ` +
         `${plural(linesDuplicate, 'line')} already imported and skipped.`,
+  };
+}
+
+export interface ImportStatementFileInput {
+  companyId: string;
+  /** The file exactly as received (its bytes are hashed). */
+  content: Uint8Array;
+  fileName?: string;
+  /** Detected from the content when omitted; only camt.053 names each statement's account. */
+  format?: StatementFormat;
+  importedBy?: string;
+}
+
+export interface FileImportResult {
+  /**
+   * imported: at least one statement added lines (or was empty and new);
+   * duplicate_file: every statement of this file was imported before;
+   * duplicate_lines: otherwise nothing new.
+   */
+  outcome: ImportResult['outcome'];
+  /** One per statement, in file order. */
+  statements: (ImportResult & { bankAccountId: string; bankAccountName: string })[];
+  message: string;
+}
+
+/**
+ * Import a camt.053 file for the company: each statement onto the bank account its Acct names
+ * (account-match.ts). Atomic: an unknown, ambiguous or repeated account, a currency mismatch, a
+ * broken balance or a batch that does not add up refuses the whole file before anything is written;
+ * the caller's transaction covers the writes.
+ */
+export async function importStatementFile(
+  trx: Transaction<Database>,
+  input: ImportStatementFileInput,
+): Promise<FileImportResult> {
+  const format = input.format ?? detectFormat(input.content);
+  if (format !== 'camt053') {
+    throw new StatementImportError(
+      'only camt.053 files name the bank account of each statement: choose the bank account ' +
+        'and import this file into it',
+    );
+  }
+  const stmts = splitCamt053(input.content);
+  if (stmts.length === 0) throw new StatementImportError('the camt.053 file holds no statement');
+  const accounts = await trx
+    .selectFrom('app.bank_account')
+    .select(['id', 'company_id', 'name', 'bsb', 'account_number_last3', 'currency', 'status'])
+    .where('company_id', '=', input.companyId)
+    .orderBy('created_at')
+    .execute();
+  const candidates = accounts.map((a) => ({
+    id: a.id,
+    name: a.name,
+    bsb: a.bsb,
+    last3: a.account_number_last3,
+    currency: a.currency,
+    status: a.status,
+  }));
+
+  const plan = stmts.map((st) => {
+    const match = matchStatementAccount(st, candidates);
+    const account = accounts.find((a) => a.id === match.id);
+    if (!account) throw new StatementImportError('bank account not found');
+    return { st, account };
+  });
+  plan.forEach((p, i) => {
+    const earlier = plan.findIndex((q) => q.account.id === p.account.id);
+    if (earlier < i) {
+      throw new StatementImportError(
+        `statements ${String(earlier + 1)} and ${String(i + 1)} of this file are for the same bank ` +
+          `account (${p.account.name}): the bank should send one statement per account`,
+      );
+    }
+  });
+  const checked = plan.map(({ st, account }) => {
+    const parsed = st.read(account.currency);
+    assertBalances(parsed);
+    checkAccount(parsed, account.account_number_last3);
+    return { account, parsed };
+  });
+
+  const sha = createHash('sha256').update(input.content).digest('hex');
+  const statements: FileImportResult['statements'] = [];
+  for (const { account, parsed } of checked) {
+    const r = await store(trx, account, parsed, {
+      format,
+      sha,
+      fileName: input.fileName,
+      importedBy: input.importedBy,
+    });
+    statements.push({ ...r, bankAccountId: account.id, bankAccountName: account.name });
+  }
+  const outcome: ImportResult['outcome'] = statements.every((s) => s.outcome === 'duplicate_file')
+    ? 'duplicate_file'
+    : statements.some((s) => s.outcome === 'imported')
+      ? 'imported'
+      : 'duplicate_lines';
+  return {
+    outcome,
+    statements,
+    message: statements.map((s) => `${s.bankAccountName}: ${s.message}`).join(' '),
   };
 }
