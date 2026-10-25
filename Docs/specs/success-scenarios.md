@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 148 scenarios (16 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 150 scenarios (16 need screenshots).
 
 ## How to update (who, when)
 
@@ -34,7 +34,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC01-05 | No Billing To contact blocks approval | UC-01 | MVP | db-integration | no | — | T-0040 | not-started | — | — |
 | SS-UC01-06 | Posting-profile gap flagged, not posted | UC-01 | MVP | unit | no | — | T-0039, T-0069 | not-started | — | — |
 | SS-UC01-07 | Duplicate CDC event is idempotent | UC-01 | MVP | db-integration | no | — | T-0065, T-0069 | not-started | — | — |
-| SS-UC01-08 | Closed Won dated in a hard-locked period follows lock policy | UC-01 | MVP | db-integration | no | — | T-0069, T-0023 | not-started | — | — |
+| SS-UC01-08 | Closed Won dated in a hard-locked period follows lock policy | UC-01 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0069, T-0023 | green (period/policy layer; Closed Won draft invoice and Sync issue in T-0069) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC01-09 | Salesforce outage does not block accounting | UC-01 | MVP | db-integration | no | — | T-0067 | not-started | — | — |
 | SS-UC01-10 | Invoice detail shows mapped lines and journal preview | UC-01 | MVP | e2e-playwright | yes | — | T-0083 | not-started | — | — |
 | SS-UC01-11 | Tax-inclusive rounding follows company setting | UC-01 | MVP | golden | no | — | T-0034, T-0040 | not-started | — | — |
@@ -54,7 +54,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC03-06 | Invalid or replayed webhook rejected | UC-03 | MVP | unit | no | — | T-0074 | not-started | — | — |
 | SS-UC03-07 | Bank-transfer receipt posts GP-002 | UC-03 | MVP | golden | no | — | T-0046 | not-started | — | — |
 | SS-UC03-08 | Partial payment leaves the correct open amount | UC-03 | MVP | db-integration | no | — | T-0046 | not-started | — | — |
-| SS-UC03-09 | Late payout in an AR-locked period follows the period matrix | UC-03 | MVP | db-integration | no | — | T-0075, T-0023 | not-started | — | — |
+| SS-UC03-09 | Late payout in an AR-locked period follows the period matrix | UC-03 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0075, T-0023 | green (period/matrix layer; payout cell is tenant setting `payout_under_ar_lock` awaiting product owner, RQ-0026; payout posting in T-0075) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC03-10 | Receipt allocation screen | UC-03 | MVP | e2e-playwright | yes | — | T-0085 | not-started | — | — |
 | SS-UC04-01 | Reminder 1 at 7 days overdue | UC-04 | MVP | db-integration | no | — | T-0068 | not-started | — | — |
 | SS-UC04-02 | Credit status "Overdue" written back | UC-04 | MVP | contract | no | — | T-0068, T-0067 | not-started | — | — |
@@ -68,7 +68,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC05-04 | Approved bill posts GP-008 | UC-05 | MVP | golden | no | — | T-0050, T-0052 | not-started | — | — |
 | SS-UC05-05 | SoD: clerk cannot approve own bill above $1,000 | UC-05 | MVP | db-integration | no | — | T-0052, T-0015 | not-started | — | — |
 | SS-UC05-06 | Small-team mode records a visible exception | UC-05 | MVP | db-integration | no | — | T-0015, T-0052 | not-started | — | — |
-| SS-UC05-07 | Bill in AP-locked period rejected | UC-05 | MVP | db-integration | no | — | T-0050, T-0023 | not-started | — | — |
+| SS-UC05-07 | Bill in AP-locked period rejected | UC-05 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0050, T-0023 | green (period/matrix layer; bill posting in T-0050) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC05-08 | Bill entry and approval screens | UC-05 | MVP | e2e-playwright | yes | — | T-0086 | not-started | — | — |
 | SS-UC06-01 | Batch created from 12 due bills | UC-06 | MVP | db-integration | no | — | T-0054 | not-started | — | — |
 | SS-UC06-02 | Creator cannot release own batch | UC-06 | MVP | db-integration | no | — | T-0054, T-0015 | not-started | — | — |
@@ -91,7 +91,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC08-04 | Rule match is suggested, not applied | UC-08 | MVP | unit | no | — | T-0060 | not-started | — | — |
 | SS-UC08-05 | Unmatched line created as a transaction | UC-08 | MVP | db-integration | no | — | T-0060 | not-started | — | — |
 | SS-UC08-06 | Statement balance equals book balance | UC-08 | MVP | db-integration | no | — | T-0061 | not-started | — | — |
-| SS-UC08-07 | Reconciled lines locked after hard lock | UC-08 | MVP | db-integration | no | — | T-0061, T-0023 | not-started | — | — |
+| SS-UC08-07 | Reconciled lines locked after hard lock | UC-08 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0061, T-0023 | green (database layer; unmatch action in T-0061) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC08-08 | Reconciliation screens | UC-08 | MVP | e2e-playwright | yes | — | T-0088 | not-started | — | — |
 | SS-UC09-01 | Three sample previews balance | UC-09 | Phase 1 | unit | no | — | T-0100 | not-started | — | — |
 | SS-UC09-02 | Unbalanced rule cannot be activated | UC-09 | Phase 1 | unit | no | — | T-0100 | not-started | — | — |
@@ -99,10 +99,10 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC09-04 | Activated rule produces GP-014 tagged with rule id and version | UC-09 | Phase 1 | golden | no | — | T-0100 | not-started | — | — |
 | SS-UC09-05 | Rule cannot hit a control account without a party | UC-09 | Phase 1 | unit | no | — | T-0100 | not-started | — | — |
 | SS-UC10-01 | Checklist steps recorded with user and time | UC-10 | MVP | db-integration | no | — | T-0078 | not-started | — | — |
-| SS-UC10-02 | AR lock blocks AR posting except with override | UC-10 | MVP | db-integration | no | — | T-0023, T-0078 | not-started | — | — |
-| SS-UC10-03 | AP lock allows journals only | UC-10 | MVP | db-integration | no | — | T-0023 | not-started | — | — |
-| SS-UC10-04 | Soft close: Finance Admin override only | UC-10 | MVP | db-integration | no | — | T-0023 | not-started | — | — |
-| SS-UC10-05 | Hard lock rejects or redirects per policy | UC-10 | MVP | db-integration | no | — | T-0023, T-0078 | not-started | — | — |
+| SS-UC10-02 | AR lock blocks AR posting except with override | UC-10 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0023, T-0078 | green (period/matrix layer; close checklist in T-0078) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
+| SS-UC10-03 | AP lock allows journals only | UC-10 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0023 | green (period/matrix layer) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
+| SS-UC10-04 | Soft close: Finance Admin override only | UC-10 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0023 | green (period/matrix layer) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
+| SS-UC10-05 | Hard lock rejects or redirects per policy | UC-10 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0023, T-0078 | green (period/policy layer; close checklist in T-0078) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC10-06 | Reopen needs two approvers and a reason | UC-10 | MVP | db-integration | no | — | T-0079 | not-started | — | — |
 | SS-UC10-07 | Close cannot pass with unreconciled bank | UC-10 | MVP | db-integration | no | — | T-0078 | not-started | — | — |
 | SS-UC10-08 | TB review step shows TB nets to zero | UC-10 | MVP | db-integration | no | — | T-0078, T-0076 | not-started | — | — |
@@ -126,7 +126,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-03 | Hash chain detects tampering | — | MVP | db-integration | no | packages/ledger/src/hash-chain.db.test.ts | T-0022 | green | [.agent/evidence/T-0022/manifest.json](../../.agent/evidence/T-0022/manifest.json) | 31124c2 |
 | SS-PLAT-04 | RLS isolates tenants on every tenant table | — | MVP | db-integration | no | packages/db/src/rls.db.test.ts; packages/db/src/tenant-context.db.test.ts | T-0008, T-0010 | green | [.agent/evidence/T-0010/manifest.json](../../.agent/evidence/T-0010/manifest.json) | merge (re-verified below) |
 | SS-PLAT-05 | Gapless numbering under concurrency and rollback | — | MVP | db-integration | no | packages/ledger/src/numbering.db.test.ts | T-0024 | green | [.agent/evidence/T-0024/manifest.json](../../.agent/evidence/T-0024/manifest.json) | 57c4d8c |
-| SS-PLAT-06 | Period status matrix is enforced as data | — | MVP | unit | no | — | T-0023 | not-started | — | — |
+| SS-PLAT-06 | Period status matrix is enforced as data | — | MVP | unit | no | packages/ledger/src/period-matrix.test.ts; packages/ledger/src/period-control.db.test.ts | T-0023 | green | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-PLAT-07 | Control accounts reject manual journals, imports and rule lines | — | MVP | db-integration | no | — | T-0029 | not-started | — | — |
 | SS-PLAT-08 | Audit log is append-only | — | MVP | db-integration | no | packages/db/src/platform.db.test.ts | T-0014 | green | [.agent/evidence/T-0014/manifest.json](../../.agent/evidence/T-0014/manifest.json) | 93e3e18 |
 | SS-PLAT-09 | Failover resume works | — | Sprint 0 | unit | no | — | T-0003 | not-started | — | — |
@@ -174,6 +174,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-53 | Authenticated web shell: navigation, states, keyboard path, WCAG 2.2 AA, genericness | — | MVP | e2e-playwright + component | yes | tests/e2e/web/shell.spec.ts; apps/web/src/App.test.tsx | T-0081 | green | [.agent/evidence/T-0081/manifest.json](../../.agent/evidence/T-0081/manifest.json) | ae91f61 |
 | SS-PLAT-54 | CAMT batch entries, multi-statement files and camt.052/054 import correctly | — | MVP | unit + db | no | — | T-0059 | not-started | — | — |
 | SS-PLAT-55 | A verify run writes evidence only for the task being verified | — | MVP | unit + e2e | no | packages/testing/src/evidence/destination.test.ts; tests/e2e/evidence-harness.spec.ts | T-0109 | green | [.agent/evidence/T-0109/manifest.json](../../.agent/evidence/T-0109/manifest.json) | 2b04331 |
+| SS-PLAT-56 | Period status changes only through guarded functions by permission holders; hard-locked reopen needs two different approvers and a reason; history and audit, nothing deleted | — | MVP | db-integration | no | packages/ledger/src/period-control.db.test.ts | T-0023 | green | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
+| SS-PLAT-57 | Fiscal years are generated from a convention held as data (AU 1 July) with contiguous, non-overlapping monthly periods | — | MVP | unit + db-integration | no | packages/ledger/src/period-matrix.test.ts; packages/ledger/src/period-control.db.test.ts | T-0023 | green | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -394,4 +396,12 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-55 — A verify run writes evidence only for the task being verified
 - Phase: MVP · Layer: **unit + e2e** · Screenshot evidence: no · Task(s): T-0109
 - **Given** `verify.sh --task X` (LF_EVIDENCE_ONLY_TASK=X) · **When** the whole e2e suite runs · **Then** specs filed under X write evidence into `.agent/evidence/X/` as before, every other task's specs still run and screenshot but into a temp dir, so no other task's evidence folder changes; without the variable, behaviour is unchanged
+
+### SS-PLAT-56 — Period status changes are guarded, audited history; hard-locked reopen needs two approvers and a reason
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0023
+- **Given** periods of a company and users holding different roles · **When** lf_app tries UPDATE/DELETE on period tables, users without period.lock/period.close/period.reopen change a status, a soft-closed period is moved back without a reason, a hard-locked period is changed directly, and a reopen is requested and approved by the same user, by a user without period.reopen, then by a second holder · **Then** every attempt but the last is refused; the last reopens the period; each change is a period_status_change row (user, time, reason, request) and an audit_log row; app.role_allows_period_permission equals the role catalogue; the owner can change nothing but status and nothing is deleted
+
+### SS-PLAT-57 — Fiscal years are generated from a convention held as data
+- Phase: MVP · Layer: **unit + db-integration** · Screenshot evidence: no · Task(s): T-0023
+- **Given** the AU convention (start month 7) and the calendar convention · **When** a fiscal year is generated for any start month and year · **Then** FY2027 (AU) is 2026-07-01 … 2027-06-30 in 12 monthly periods, every plan is 12 contiguous months covering exactly one year (property), periods are inserted open inside their fiscal year, and an overlapping year or period is refused
 
