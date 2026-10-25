@@ -6,8 +6,9 @@
  *   table in every non-system schema: row count + content hash; every sequence's last value) is
  *   the same before and after preview, so no journal row, line, dimension set, account_balance,
  *   number-series counter, hash-chain head, period override, audit row or outbox row was
- *   written. Then post() stores exactly the previewed journal. A refused preview refuses with the
- *   same typed error as post().
+ *   written. Then post() stores exactly the previewed journal.
+ * SS-PLAT-72 — preview and post agree on refusals: the same typed error (including an unknown
+ *   createdBy, an override without period.lock.override, a used key), and neither writes.
  *
  * Commands are raw journals written by the test (no event posting rule: every golden posting is
  * still Draft). Source types such as ar_invoice only label the subledger.
@@ -260,7 +261,7 @@ describe('SS-PLAT-15 preview writes nothing [T-0026]', () => {
     }
   });
 
-  it('SS-PLAT-15 a refused preview refuses with the same typed error as post, and neither changes anything [T-0026]', async () => {
+  it('SS-PLAT-72 a refused preview refuses with the same typed error as post, and neither changes anything [T-0026]', async () => {
     const suspense = (credit: string): PostingLineInput => ({
       account: { role: 'SUSPENSE' },
       credit,
@@ -313,7 +314,7 @@ describe('SS-PLAT-15 preview writes nothing [T-0026]', () => {
     );
   });
 
-  it('SS-PLAT-15 preview of a key that has posted: same document → ALREADY_POSTED with the entry, other document → IDEMPOTENCY_CONFLICT; nothing changes [T-0026]', async () => {
+  it('SS-PLAT-72 preview of a key that has posted: same document → ALREADY_POSTED with the entry, other document → IDEMPOTENCY_CONFLICT; nothing changes [T-0026]', async () => {
     const command = cmd(
       [
         { account: A('6200'), debit: '9.0000' },
