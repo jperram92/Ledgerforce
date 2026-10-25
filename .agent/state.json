@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0093",
+  "current_task": "T-0026",
   "branch": "claude/app-framework-agents-dzmkya",
   "step": null,
   "claimed_by": "claude",
-  "lease_expires_at": "2026-10-25T20:00:34.448Z",
+  "lease_expires_at": "2026-10-26T00:33:29.067Z",
   "last_green_commit": null,
   "run_id": "2026-10-24-codex-r01",
-  "updated_at": "2026-10-25T19:15:34.460Z",
+  "updated_at": "2026-10-25T23:48:29.072Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
