@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 162 scenarios (16 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 164 scenarios (16 need screenshots).
 
 ## How to update (who, when)
 
@@ -147,7 +147,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-24 | Outbox delivers at least once, handlers idempotent | — | MVP | db-integration | no | apps/worker/src/outbox.delivery.db.test.ts; packages/outbox/src/deliver.test.ts | T-0030 | green | [.agent/evidence/T-0030/manifest.json](../../.agent/evidence/T-0030/manifest.json) | ceaac00 |
 | SS-PLAT-25 | Sync failures back off then land in the Sync issues inbox | — | MVP | db-integration | no | — | T-0071 | not-started | — | — |
 | SS-PLAT-26 | Missed Salesforce events recovered by nightly reconciliation | — | MVP | db-integration | no | — | T-0070, T-0066 | not-started | — | — |
-| SS-PLAT-27 | Replay id resume after restart | — | MVP | db-integration | no | — | T-0064 | not-started | — | — |
+| SS-PLAT-27 | Replay id resume after restart | — | MVP | db-integration | no | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts | T-0064 | green | [.agent/evidence/T-0064/manifest.json](../../.agent/evidence/T-0064/manifest.json) | COMMIT |
 | SS-PLAT-28 | Every API request runs in its own tenant transaction | — | MVP | db-integration | no | apps/api/src/tenancy/tenant-transaction.db.test.ts | T-0104 | green | [.agent/evidence/T-0104/manifest.json](../../.agent/evidence/T-0104/manifest.json) | 3ca2bd9 |
 | SS-PLAT-29 | Timeline components honour P3, P13, P15 and the genericness probes | — | MVP | e2e-playwright | yes | tests/e2e/ui-system.spec.ts; packages/ui/src/**/*.test.{ts,tsx} | T-0106 | green | [.agent/evidence/T-0106/manifest.json](../../.agent/evidence/T-0106/manifest.json) | bede6c3 |
 | SS-PLAT-30 | Every successful API mutation leaves one audit row | — | MVP | db-integration | no | apps/api/src/audit/audit.db.test.ts | T-0014 | green | [.agent/evidence/T-0014/manifest.json](../../.agent/evidence/T-0014/manifest.json) | 93e3e18 |
@@ -188,6 +188,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-69 | Outbox rows are append-only for every role; pg-boss schema owned by lf_migrator, lf_app DML only (no DDL, TRUNCATE, TRIGGER); queue install refuses any role but lf_migrator | — | MVP | db-integration | no | packages/outbox/src/outbox.db.test.ts; apps/worker/src/queue-admin.db.test.ts | T-0030 | green | [.agent/evidence/T-0030/manifest.json](../../.agent/evidence/T-0030/manifest.json) | ceaac00 |
 | SS-PLAT-70 | Scoped API tokens: hashed at rest, issued under fresh MFA step-up, scopes ∩ owner permissions, never step-up, SoD as owner, expire, revocable, last use tracked, tenant-bound | — | MVP | db-integration | no | packages/db/src/user-lifecycle.db.test.ts; apps/api/src/tokens/tokens.scope.db.test.ts | T-0016 | green | [.agent/evidence/T-0016/manifest.json](../../.agent/evidence/T-0016/manifest.json) | a60876f |
 | SS-PLAT-71 | Joiner activated only after MFA for MFA roles, with a welcome audit event; invite needs users.manage; nobody grants themselves a role or grants one to a disabled user | — | MVP | db-integration | no | apps/api/src/auth/oidc.db.test.ts; apps/api/src/users/users.lifecycle.db.test.ts; packages/db/src/user-lifecycle.db.test.ts | T-0016 | green | [.agent/evidence/T-0016/manifest.json](../../.agent/evidence/T-0016/manifest.json) | a60876f |
+| SS-PLAT-74 | CDC subscriber: a rejected (expired/invalid) replay id resets the cursor and requests a reconcile since the last commit, then resubscribes at LATEST; gap and overflow events are never applied but become resync requests; cursor, inbox and resync rows are per tenant and company | — | MVP | db-integration | no | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts | T-0064 | green | [.agent/evidence/T-0064/manifest.json](../../.agent/evidence/T-0064/manifest.json) | COMMIT |
+| SS-PLAT-75 | Pub/Sub API contract: vendored proto byte-identical to the published one; CDC Avro payloads decode losslessly (BigInt longs, field bitmaps, gap/overflow kinds); idempotency keys per record; error-code trailer classified | — | MVP | contract | no | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts | T-0064 | green | [.agent/evidence/T-0064/manifest.json](../../.agent/evidence/T-0064/manifest.json) | COMMIT |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -465,3 +467,11 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-71 — Joiner and mover controls
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0016
 - **Given** an administrator and invited users · **When** users are invited, log in for the first time and receive roles · **Then** an invite needs users.manage (and the right to assign each role) and creates an invited user with grants; a joiner whose roles need MFA is activated only by an MFA login (otherwise 403 mfa_enrolment_required, audited, still invited) and activation writes `user.joined`; nobody grants a role to themselves (API 403 self_grant, audited; database 42501) and no role is granted to a disabled user
+
+### SS-PLAT-74 — Rejected replay id, gap and overflow events become resync requests
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0064
+- **Given** a CDC subscriber with a stored replay id · **When** Salesforce rejects that id (INVALID_ARGUMENT, `error-code` …fetch.replayid.corrupted, e.g. older than 72 h), or the stream delivers `GAP_*` or `GAP_OVERFLOW` events · **Then** the cursor is cleared and a `replay_id_invalid` resync request records the last commit time and the next run subscribes at LATEST; gap events record their records and overflow events their entity for the reconcile job, and neither is applied; another tenant sees none of these rows and keeps its own cursor and inbox
+
+### SS-PLAT-75 — Pub/Sub API contract and CDC decoding
+- Phase: MVP · Layer: **contract** · Screenshot evidence: no · Task(s): T-0064
+- **Given** the vendored `pubsub_api.proto` and documented AccountChangeEvent fixtures (RQ-0036) · **When** the contract test runs · **Then** the proto's SHA-256 matches the published file, Subscribe is a bidi stream with the documented field numbers and presets, payloads decode with BigInt commit numbers and expanded field bitmaps, gap/overflow are classified, idempotency keys are per record (entity, id, commit number, sequence), and Pub/Sub errors are classified from the `error-code` trailer

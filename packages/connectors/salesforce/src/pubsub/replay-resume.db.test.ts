@@ -226,7 +226,12 @@ describe('SS-PLAT-27: Replay id resume after restart', () => {
 
   it('drops a redelivered event by its idempotency key but still advances the cursor', async () => {
     const s = nextStream();
-    const run = start(TA, companyA);
+    const calls: string[] = [];
+    const record = recordingHandler();
+    const run = start(TA, companyA, async (trx, event, recordIds) => {
+      calls.push(event.eventId);
+      await record(trx, event, recordIds);
+    });
     await fake.waitForStreams(s + 1);
     const before = (await effects(TA)).length;
     const [a] = publish({ id: acc(7) });
@@ -237,6 +242,8 @@ describe('SS-PLAT-27: Replay id resume after restart', () => {
     const after = await effects(TA);
     expect(after.length - before).toBe(1);
     expect(after.filter((e) => e.startsWith(acc(7)))).toHaveLength(1);
+    // The duplicate never reaches the handler at all (not even with an empty record list).
+    expect(calls).toHaveLength(1);
     expect((await cursor(TA, companyA))?.eventsCommitted).toBeGreaterThanOrEqual(8);
   });
 
