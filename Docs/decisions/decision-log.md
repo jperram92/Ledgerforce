@@ -987,3 +987,8 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: import camt.054 as notifications (needs a new format column or table, and dedupe across message types); import booked camt.052 entries (puts provisional data into reconciliation). Revisit with a new card when a customer's bank sends only camt.054.
 - ADR: none · Status: accepted
 
+### DL-0128 — Parallel round 4: T-0015 (SoD) and T-0025 (generic posting pipeline)
+- Date: 2026-10-25 · By: claude (lead) · Task: T-0015, T-0025 · Category: process
+- Decision: Round 4 runs T-0015 (segregation-of-duties engine and small-team mode: apps/api authz + migration 0021, security ADR Proposed) and T-0025 (posting engine pipeline: packages/ledger, migration 0022 only if needed) in worktrees with pre-assigned numbers and per-agent scratchpads. T-0025 builds only the generic single write path (idempotent command, validation, resolve by system role/account, in-memory invariants, >4-decimal refusal from DL-0074, one transaction writing journal + lines + outbox placeholder). It implements no event-specific posting rule (invoice, receipt …), because every golden posting in Docs/accounting/postings.md is still Draft (AGENTS.md: posting behaviours need an Approved golden posting). T-0016 waits for T-0015 (same roles/authz code).
+- Why: Product owner's instruction to keep building independent tasks in parallel; golden-posting gate respected.
+- ADR: none · Status: accepted
