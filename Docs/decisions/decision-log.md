@@ -1081,3 +1081,21 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: AGENTS.md §6: accounting-category choices go to the product owner; design §3.2 says control accounts accept postings only from their subledger but doesn't list the source types.
 - ADR: none · Status: proposed (awaiting human)
 
+
+### DL-0140 — Parallel round 5: T-0016, T-0027, T-0030, T-0053
+- Date: 2026-10-25 · By: claude (lead) · Task: T-0016, T-0027, T-0030, T-0053 · Category: process
+- Decision: Round 5 runs four tasks in worktrees branched from the round-4 head. Each has pre-assigned numbers:
+  - T-0016 (user lifecycle and scoped API tokens): migration 0022, DL-0141..0145, RQ-0031, ADR-0027, SS-PLAT-70..71.
+  - T-0027 (account_balance maintenance): migration 0023, DL-0146..0150, RQ-0032, ADR-0028, SS-PLAT-66..67.
+  - T-0030 (transactional outbox + pg-boss worker): migration 0024, DL-0151..0155, RQ-0033, ADR-0029, SS-PLAT-68..69.
+  - T-0053 (bank-detail change verification + cooling-off): migration 0025, DL-0156..0160, RQ-0034, ADR-0030.
+  - Lead: DL-0161+, SS-PLAT-72+.
+
+  Skipped this round:
+  - T-0095: CI security gates are human-only (AGENTS.md §5).
+  - T-0103: needs Windows.
+  - T-0026, T-0028 and T-0029: they edit the same posting-engine code as T-0027/T-0030. They go next round.
+  - T-0108: Phase 1; MVP tasks first.
+  T-0027 and T-0030 change only the generic engine (no event posting rule) while golden postings are Draft.
+- Why: Product owner's instruction to build independent tasks in parallel. One engine-touching pair per round keeps merge conflicts small.
+- ADR: none · Status: accepted

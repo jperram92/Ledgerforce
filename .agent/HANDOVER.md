@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 4 COMPLETE (DL-0128): T-0025 and T-0015 merged, verified (13 PASS/0 FAIL/3 PENDING) and in review. Next: plan round 5 (T-0016 user lifecycle is now unblocked).
+Task: PARALLEL ROUND 5 in progress (DL-0140): T-0016, T-0027, T-0030, T-0053 by sub-agents in worktrees (numbers pre-assigned in DL-0140); the lead merges in migration order 0022→0025. Round 4 (T-0025, T-0015) is complete and in review.
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -229,3 +229,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T13:49:21.522Z claude: T-0015 → verifying
 - 2026-10-25T13:53:05.528Z claude: release T-0015 → review
 - 2026-10-25 claude (lead): merged T-0015 (conflicts in decision log/register resolved by id; totals 156/16); gates green (603 unit / 612 db); verify 13 PASS/0 FAIL/3 PENDING → review. Round 4 complete.
+- 2026-10-25 claude (lead): round 5 claimed (T-0016, T-0027, T-0030, T-0053; DL-0140).
