@@ -166,10 +166,12 @@ describe('SS-PLAT-51: Salesforce connection secrets encrypted at rest, never ret
   it('concurrent callers share one exchange (row lock, single flight)', async () => {
     await inTenant((trx) => invalidateAccessToken(trx, id));
     const before = fake.requests.length;
+    fake.delayMs = 300; // without the row lock both callers would read "no token" and exchange
     const [a, b] = await Promise.all([
       inTenant((trx) => getAccessToken(trx, kms, id, { http: fake.http, now })),
       inTenant((trx) => getAccessToken(trx, kms, id, { http: fake.http, now })),
     ]);
+    fake.delayMs = 0;
     expect(fake.requests.length).toBe(before + 1);
     expect(a).toEqual(b);
   });
@@ -344,5 +346,20 @@ describe('SS-PLAT-51: Salesforce connection secrets encrypted at rest, never ret
         ),
       ),
     ).rejects.toMatchObject({ code: '23514' });
+  });
+
+  // Last: it supersedes the connection the tests above use.
+  it('a ciphertext copied to a newer connection of the same company cannot be decrypted (row-bound AAD)', async () => {
+    const newer = await inTenant((trx) => createJwtConnection(trx, kms, companyId, input));
+    await sql`
+      UPDATE app.salesforce_connection v
+         SET private_key_ct = s.private_key_ct, private_key_iv = s.private_key_iv,
+             private_key_tag = s.private_key_tag, private_key_dek_wrapped = s.private_key_dek_wrapped,
+             private_key_kek_id = s.private_key_kek_id
+        FROM app.salesforce_connection s
+       WHERE v.id = ${newer} AND s.id = ${id}`.execute(su);
+    await expect(
+      inTenant((trx) => getAccessToken(trx, kms, newer, { http: fake.http, now })),
+    ).rejects.toBeInstanceOf(DecryptionError);
   });
 });

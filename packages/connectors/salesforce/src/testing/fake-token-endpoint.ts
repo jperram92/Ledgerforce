@@ -40,6 +40,8 @@ export interface FakeTokenEndpoint {
   issued: string[];
   /** Answer the next requests with a raw status/body instead of evaluating them. */
   override: { status: number; body: string } | null;
+  /** Delay every answer (to make concurrent callers overlap). */
+  delayMs: number;
   close(): Promise<void>;
 }
 
@@ -63,6 +65,7 @@ export async function startFakeTokenEndpoint(
     requests: [],
     issued: [],
     override: null,
+    delayMs: 0,
     close: () => Promise.resolve(),
   };
 
@@ -96,7 +99,8 @@ export async function startFakeTokenEndpoint(
   };
 
   const server = createServer((req, res) => {
-    void read(req).then((raw) => {
+    void read(req).then(async (raw) => {
+      if (state.delayMs > 0) await new Promise((r) => setTimeout(r, state.delayMs));
       const form = Object.fromEntries(new URLSearchParams(raw));
       state.requests.push({
         url: req.url ?? '',
