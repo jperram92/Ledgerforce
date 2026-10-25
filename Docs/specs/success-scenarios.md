@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 162 scenarios (16 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 164 scenarios (16 need screenshots).
 
 ## How to update (who, when)
 
@@ -105,7 +105,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC10-05 | Hard lock rejects or redirects per policy | UC-10 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0023, T-0078 | green (period/policy layer; close checklist in T-0078) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC10-06 | Reopen needs two approvers and a reason | UC-10 | MVP | db-integration | no | — | T-0079 | not-started | — | — |
 | SS-UC10-07 | Close cannot pass with unreconciled bank | UC-10 | MVP | db-integration | no | — | T-0078 | not-started | — | — |
-| SS-UC10-08 | TB review step shows TB nets to zero | UC-10 | MVP | db-integration | no | — | T-0078, T-0076 | not-started | — | — |
+| SS-UC10-08 | TB review step shows TB nets to zero | UC-10 | MVP | db-integration | no | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts | T-0078, T-0076 | green (TB layer; subledger = control pending T-0028, DL-0175) | [.agent/evidence/T-0076/manifest.json](../../.agent/evidence/T-0076/manifest.json) | fdc062f |
 | SS-UC10-09 | Void posts a reversal, never an edit | UC-10 | MVP | golden | no | — | T-0032 | not-started | — | — |
 | SS-UC10-10 | Close checklist screen | UC-10 | MVP | e2e-playwright | yes | — | T-0090 | not-started | — | — |
 | SS-UC11-01 | Partial credit note posts GP-005 | UC-11 | MVP | golden | no | — | T-0045 | not-started | — | — |
@@ -188,6 +188,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-69 | Outbox rows are append-only for every role; pg-boss schema owned by lf_migrator, lf_app DML only (no DDL, TRUNCATE, TRIGGER); queue install refuses any role but lf_migrator | — | MVP | db-integration | no | packages/outbox/src/outbox.db.test.ts; apps/worker/src/queue-admin.db.test.ts | T-0030 | green | [.agent/evidence/T-0030/manifest.json](../../.agent/evidence/T-0030/manifest.json) | ceaac00 |
 | SS-PLAT-70 | Scoped API tokens: hashed at rest, issued under fresh MFA step-up, scopes ∩ owner permissions, never step-up, SoD as owner, expire, revocable, last use tracked, tenant-bound | — | MVP | db-integration | no | packages/db/src/user-lifecycle.db.test.ts; apps/api/src/tokens/tokens.scope.db.test.ts | T-0016 | green | [.agent/evidence/T-0016/manifest.json](../../.agent/evidence/T-0016/manifest.json) | a60876f |
 | SS-PLAT-71 | Joiner activated only after MFA for MFA roles, with a welcome audit event; invite needs users.manage; nobody grants themselves a role or grants one to a disabled user | — | MVP | db-integration | no | apps/api/src/auth/oidc.db.test.ts; apps/api/src/users/users.lifecycle.db.test.ts; packages/db/src/user-lifecycle.db.test.ts | T-0016 | green | [.agent/evidence/T-0016/manifest.json](../../.agent/evidence/T-0016/manifest.json) | a60876f |
+| SS-PLAT-76 | Trial balance, P&L and balance sheet from the ledger for any period, date range or balance-sheet date: base currency, sections by type/subtype, optional dimension filter (TB, P&L), retained earnings = prior-year P&L, current-year earnings on its own line, assets = liabilities + equity | — | MVP | unit + db-integration | no | packages/modules/reporting/src/statements.test.ts; packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts; packages/ledger/src/account-movements.db.test.ts | T-0076 | green | [.agent/evidence/T-0076/manifest.json](../../.agent/evidence/T-0076/manifest.json) | fdc062f |
+| SS-PLAT-77 | For random posted ledgers the trial balance nets to zero and matches the postings, the balance sheet balances, current-year and prior-year earnings equal the P&L, and a P&L for any range matches the postings | — | MVP | property + db-integration | no | packages/modules/reporting/src/statements.test.ts; packages/modules/reporting/src/reports.prop.db.test.ts | T-0076 | green | [.agent/evidence/T-0076/manifest.json](../../.agent/evidence/T-0076/manifest.json) | fdc062f |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -465,3 +467,11 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-71 — Joiner and mover controls
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0016
 - **Given** an administrator and invited users · **When** users are invited, log in for the first time and receive roles · **Then** an invite needs users.manage (and the right to assign each role) and creates an invited user with grants; a joiner whose roles need MFA is activated only by an MFA login (otherwise 403 mfa_enrolment_required, audited, still invited) and activation writes `user.joined`; nobody grants a role to themselves (API 403 self_grant, audited; database 42501) and no role is granted to a disabled user
+
+### SS-PLAT-76 — Trial balance, profit and loss and balance sheet
+- Phase: MVP · Layer: **unit + db-integration** · Screenshot evidence: no · Task(s): T-0076
+- **Given** postings through the engine over two fiscal years, including drafts, another company, a foreign-currency line and dimension values · **When** the trial balance (date range, optional dimension filter), the P&L (range) and the balance sheet (date) are run · **Then** amounts are in base currency; whole periods come from account_balance and cut periods from posted lines; drafts and other companies are left out; the TB shows each account's net balance on its side and its totals; the P&L groups revenue and expenses by subtype; the BS shows prior-year profit in retained earnings and the year to date on the current-year earnings line, both computed, and balances (also after an optional closing entry); bad dates, unknown companies and dates without a fiscal year are refused
+
+### SS-PLAT-77 — Report invariants over random ledgers
+- Phase: MVP · Layer: **property + db-integration** · Screenshot evidence: no · Task(s): T-0076
+- **Given** random balanced entries posted through the engine on random days of FY2026–FY2027 · **When** the TB to a random date, the BS at a random date and the P&L for a random range are run · **Then** the TB nets to zero and equals a model of the postings; the BS balances, its current-year earnings equal the model's profit for the year to date and its prior-year earnings the profit before; the P&L equals the model's profit for the range
