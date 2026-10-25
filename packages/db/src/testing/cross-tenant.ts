@@ -127,6 +127,9 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   },
   'app.sod_exception_ack': { week_start: () => '2026-10-19' },
   'app.sod_settings': { report_timezone: () => 'Australia/Sydney' },
+  // Transactional outbox (migration 0024): dotted topic, snake_case aggregate and handler names.
+  'app.outbox_event': { topic: () => 'ledger.entry.posted', aggregate_type: () => 'journal_entry' },
+  'app.outbox_inbox': { handler: () => 'test.handler' },
   // Salesforce JWT bearer connection (migration 0017): a complete sealed key and certificate facts.
   'app.salesforce_connection': {
     id: () => randomUUID(),
