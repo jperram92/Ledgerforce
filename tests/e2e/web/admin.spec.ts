@@ -20,7 +20,7 @@ import { AxeBuilder } from '@axe-core/playwright';
 import type { Page, Route } from '@playwright/test';
 import { createViteServer } from 'vitest/node';
 import { test, expect } from '@ledgerforce/testing/evidence';
-import { ALL_PERMISSIONS, ROLE_TEMPLATES } from '@ledgerforce/shared/rbac';
+import { ALL_PERMISSIONS, ROLE_TEMPLATES } from '../../../packages/shared/src/rbac/index.ts';
 import { genericnessProbe } from '../fixtures/genericness.ts';
 
 const WEB = resolve(import.meta.dirname, '..', '..', '..', 'apps', 'web');

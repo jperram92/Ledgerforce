@@ -155,12 +155,8 @@ export function createAdminClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Admin
           : { accept: 'application/json', 'content-type': 'application/json' },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
-    let data: unknown = null;
-    try {
-      data = await res.json();
-    } catch {
-      data = null;
-    }
+    // A body that is not JSON (e.g. a proxy's error page) is treated as no body.
+    const data: unknown = await res.json().catch(() => null);
     if (!res.ok) throw new AdminApiError(res.status, data);
     return data as T;
   }

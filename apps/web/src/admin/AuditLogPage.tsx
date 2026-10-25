@@ -177,8 +177,8 @@ export function AuditLogPage({ search }: { search: AuditQuery }) {
                       {nameOf(e)}
                       {e.api_token_id ? <span className="muted"> (by API token)</span> : null}
                     </td>
-                    <td data-label="Action" className="code">
-                      {e.action}
+                    <td data-label="Action">
+                      <span className="code">{e.action}</span>
                     </td>
                     <td data-label="Record">
                       {e.entity_type}

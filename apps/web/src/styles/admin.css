@@ -312,15 +312,17 @@
     border-bottom: 2px solid var(--line-2);
   }
   .admin-table td {
-    display: grid;
-    grid-template-columns: 8.5rem 1fr;
-    gap: var(--s2);
+    display: block;
+    position: relative;
     border-bottom: 0;
-    padding: var(--s1) 0;
+    padding: var(--s1) 0 var(--s1) 8.5rem;
   }
   .admin-table td::before {
     content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 8rem;
     color: var(--ink-2);
-    font-weight: 600;
+    font: 600 14px/1.45 var(--font);
   }
 }
