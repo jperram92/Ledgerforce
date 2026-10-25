@@ -316,3 +316,23 @@ export const STEP_UP_PERMISSIONS: readonly Permission[] = Object.freeze([
   'period.reopen',
   'period.lock.override',
 ]);
+
+/**
+ * ADR-0027 / RQ-0031: permissions an API token may never carry. A token is a bearer credential
+ * that skips the interactive login, so it gets nothing that needs a fresh step-up, and nothing
+ * that administers users, roles, SoD settings or the subscription. Mirrored by
+ * `app.token_scope_allowed` (migration 0022).
+ */
+export const TOKEN_FORBIDDEN_SCOPES: readonly Permission[] = Object.freeze([
+  ...STEP_UP_PERMISSIONS,
+  'users.manage',
+  'users.roles.assign',
+  'users.roles.assign_owner',
+  'settings.sod.manage',
+  'subscription.manage',
+]);
+
+/** A permission an API token may carry as a scope (ADR-0027). */
+export function isTokenScope(p: string): p is Permission {
+  return isPermission(p) && !TOKEN_FORBIDDEN_SCOPES.includes(p);
+}

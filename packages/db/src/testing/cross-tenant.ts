@@ -127,6 +127,13 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   },
   'app.sod_exception_ack': { week_start: () => '2026-10-19' },
   'app.sod_settings': { report_timezone: () => 'Australia/Sydney' },
+  // API tokens (migration 0022): a token-allowed scope, a SHA-256 digest, an expiry within 366
+  // days of created_at, which is the database clock (default, and forced for lf_app).
+  'app.api_token': {
+    scopes: () => '{ar.read}',
+    secret_sha256: () => randomBytes(32).toString('hex'),
+    expires_at: () => new Date(Date.now() + 30 * 86_400_000).toISOString(),
+  },
   // Salesforce JWT bearer connection (migration 0017): a complete sealed key and certificate facts.
   'app.salesforce_connection': {
     id: () => randomUUID(),
@@ -177,6 +184,13 @@ export const PREREQUISITES: Readonly<
   },
   'app.sod_exception_ack': async (admin, row) => {
     await grantRole(admin, row.get('tenant_id'), row.get('acknowledged_by'), 'owner');
+  },
+  // An API token's owner must be an active user (migration 0022).
+  'app.api_token': async (admin, row) => {
+    await admin.query(
+      `UPDATE app.app_user SET status = 'active' WHERE tenant_id = $1 AND id = $2`,
+      [row.get('tenant_id'), row.get('user_id')],
+    );
   },
   // A company bank account needs its GL account to be an asset of subtype bank (migration 0013).
   'app.bank_account': async (admin, row) => {
