@@ -15,6 +15,12 @@ export interface StatementLine {
   reference: string | null;
   /** The bank's own id for the transaction (OFX FITID, CAMT AcctSvcrRef, a CSV id column). */
   bankTxnId: string | null;
+  /**
+   * Only on a line split from a CAMT batch entry (RQ-0028): the entry's bank reference
+   * (AcctSvcrRef, else NtryRef, or null) and this part's position among the entry's parts.
+   * The parts of one entry add up exactly to its booked amount.
+   */
+  batch?: { entryRef: string | null; part: number; parts: number };
 }
 
 export interface ParsedStatement {
@@ -31,4 +37,4 @@ export interface ParsedStatement {
   lines: StatementLine[];
 }
 
-export const LIMITS = { description: 2000, reference: 255, bankTxnId: 255 } as const;
+export const LIMITS = { description: 2000, reference: 255, bankTxnId: 255, entryRef: 255 } as const;

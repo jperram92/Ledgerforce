@@ -43,7 +43,15 @@ const TWO = 'harbour-2027-01-02-two-accounts.camt053.xml';
 const linesOf = (bankAccountId: string) =>
   su
     .selectFrom('app.bank_statement_line')
-    .select(['line_no', 'posted_on', 'amount', 'reference', 'bank_txn_id', 'entry_ref', 'entry_tx_no'])
+    .select([
+      'line_no',
+      'posted_on',
+      'amount',
+      'reference',
+      'bank_txn_id',
+      'entry_ref',
+      'entry_tx_no',
+    ])
     .where('bank_account_id', '=', bankAccountId)
     .orderBy('created_at')
     .orderBy('line_no')
@@ -100,7 +108,14 @@ describe('SS-PLAT-54: CAMT batch entries and multi-statement files (db)', () => 
     expect(r).toMatchObject({ outcome: 'imported', linesInFile: 7, linesCreated: 7 });
     const rows = await linesOf(operatingId);
     expect(
-      rows.map((x) => [x.line_no, x.amount, x.reference, x.bank_txn_id, x.entry_ref, x.entry_tx_no]),
+      rows.map((x) => [
+        x.line_no,
+        x.amount,
+        x.reference,
+        x.bank_txn_id,
+        x.entry_ref,
+        x.entry_tx_no,
+      ]),
     ).toEqual([
       [1, '1000.0000', 'INV-000130', 'BPAY-778201', '202612020001', 1],
       [2, '450.0000', 'INV-000131', null, '202612020001', 2],
@@ -135,7 +150,9 @@ describe('SS-PLAT-54: CAMT batch entries and multi-statement files (db)', () => 
 
   it('the single-account import refuses a multi-statement file and points to the file import', async () => {
     await expect(
-      inTenant((trx) => importStatement(trx, { bankAccountId: operatingId, content: fixture(TWO) })),
+      inTenant((trx) =>
+        importStatement(trx, { bankAccountId: operatingId, content: fixture(TWO) }),
+      ),
     ).rejects.toThrow(/2 statements/);
   });
 
@@ -161,7 +178,9 @@ describe('SS-PLAT-54: CAMT batch entries and multi-statement files (db)', () => 
     expect(r.message).toMatch(/Operating.*2 new lines.*Business saver.*2 new lines/);
     const stored = await statementsWithSha(sha256(fixture(TWO)));
     expect(stored).toHaveLength(2);
-    expect(new Set(stored.map((s) => s.bank_account_id))).toEqual(new Set([operatingId, savingsId]));
+    expect(new Set(stored.map((s) => s.bank_account_id))).toEqual(
+      new Set([operatingId, savingsId]),
+    );
     expect((await linesOf(savingsId)).map((x) => x.amount)).toEqual(['-1000.0000', '41.1000']);
     const op = await linesOf(operatingId);
     expect(op.slice(7).map((x) => [x.amount, x.entry_ref, x.entry_tx_no])).toEqual([
@@ -171,7 +190,9 @@ describe('SS-PLAT-54: CAMT batch entries and multi-statement files (db)', () => 
   });
 
   it('re-importing the multi-account file adds nothing on either account', async () => {
-    const r = await inTenant((trx) => importStatementFile(trx, { companyId, content: fixture(TWO) }));
+    const r = await inTenant((trx) =>
+      importStatementFile(trx, { companyId, content: fixture(TWO) }),
+    );
     expect(r.outcome).toBe('duplicate_file');
     expect(r.statements.map((s) => s.outcome)).toEqual(['duplicate_file', 'duplicate_file']);
     const re = await inTenant((trx) =>

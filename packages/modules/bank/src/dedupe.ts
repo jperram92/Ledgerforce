@@ -6,6 +6,9 @@
  *    that exact combination in the file: two identical coffees on one day are both kept, and the
  *    same file (or an overlapping one) produces the same keys again.
  * The reference is left out on purpose: a re-export may add or drop it.
+ *  - A part split from a CAMT batch entry (RQ-0028) without its own bank id: the hash also covers
+ *    the entry reference and the part's position, so parts never share a key with each other or
+ *    with an unsplit line, and the same file keys them identically again.
  */
 import { createHash } from 'node:crypto';
 import type { StatementLine } from './types.ts';
@@ -22,7 +25,13 @@ export function dedupeKeys(lines: readonly StatementLine[]): string[] {
       const n = occurrence(JSON.stringify(['id', l.bankTxnId]));
       return n === 1 ? `id:${l.bankTxnId}` : `id#${String(n)}:${l.bankTxnId}`;
     }
-    const base = [l.postedOn, l.amount.toNumericString(), l.amount.currency, l.description];
+    const base: (string | number | null)[] = [
+      l.postedOn,
+      l.amount.toNumericString(),
+      l.amount.currency,
+      l.description,
+    ];
+    if (l.batch) base.push('batch', l.batch.entryRef, l.batch.part);
     const n = occurrence(JSON.stringify(['h', ...base]));
     const digest = createHash('sha256')
       .update(JSON.stringify([...base, n]))

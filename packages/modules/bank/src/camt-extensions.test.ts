@@ -216,7 +216,12 @@ describe('SS-PLAT-54: CAMT batch entries, multi-statement files and camt.052/054
   });
 
   describe('which bank account a statement is for', () => {
-    const acct = (id: string, bsb: string, last3: string, extra: Partial<AccountCandidate> = {}) => ({
+    const acct = (
+      id: string,
+      bsb: string,
+      last3: string,
+      extra: Partial<AccountCandidate> = {},
+    ) => ({
       id,
       name: id,
       bsb,
@@ -236,8 +241,12 @@ describe('SS-PLAT-54: CAMT batch entries, multi-statement files and camt.052/054
     });
 
     it('BSB and last 3 of the number pick the account; without a BSB the last 3 must be unique', () => {
-      expect(matchStatementAccount(stmt('062000-12345678'), [ops, sav, other]).id).toBe('operating');
-      expect(matchStatementAccount(stmt('083170 12345678'), [ops, sav, other]).id).toBe('other-bank');
+      expect(matchStatementAccount(stmt('062000-12345678'), [ops, sav, other]).id).toBe(
+        'operating',
+      );
+      expect(matchStatementAccount(stmt('083170 12345678'), [ops, sav, other]).id).toBe(
+        'other-bank',
+      );
       expect(matchStatementAccount(stmt('12345678', '083170'), [ops, sav, other]).id).toBe(
         'other-bank',
       );
@@ -273,9 +282,9 @@ describe('SS-PLAT-54: CAMT batch entries, multi-statement files and camt.052/054
       if (!part2) throw new Error('fixture');
       const { batch: _b, ...unsplit } = part2;
       expect(dedupeKeys([unsplit])[0]).not.toBe(keys[1]);
-      expect(dedupeKeys([{ ...part2, batch: { entryRef: 'OTHER', part: 2, parts: 3 } }])[0]).not.toBe(
-        keys[1],
-      );
+      expect(
+        dedupeKeys([{ ...part2, batch: { entryRef: 'OTHER', part: 2, parts: 3 } }])[0],
+      ).not.toBe(keys[1]);
     });
   });
 
@@ -302,7 +311,11 @@ describe('SS-PLAT-54: CAMT batch entries, multi-statement files and camt.052/054
         )
         .join('');
       const amt = entry.isNegative() ? entry.negate() : entry;
-      return { signed, total, xml: doc(batch(amt.toNumericString(), entry.isNegative() ? 'DBIT' : 'CRDT', body)) };
+      return {
+        signed,
+        total,
+        xml: doc(batch(amt.toNumericString(), entry.isNegative() ? 'DBIT' : 'CRDT', body)),
+      };
     };
 
     it('any split of an entry into k parts gives k lines with those exact amounts, summing to the entry', () => {

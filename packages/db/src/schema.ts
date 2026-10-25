@@ -377,6 +377,10 @@ export interface BankStatementLineTable {
   reference: ColumnType<string | null, string | null | undefined, never>;
   bank_txn_id: ColumnType<string | null, string | null | undefined, never>;
   dedupe_key: ColumnType<string, string, never>;
+  /** Split CAMT batch entry: the entry's bank reference (migration 0020, RQ-0028). */
+  entry_ref: ColumnType<string | null, string | null | undefined, never>;
+  /** Split CAMT batch entry: the part's position inside its entry, 1..n (migration 0020). */
+  entry_tx_no: ColumnType<number | null, number | null | undefined, never>;
   status: Generated<'unmatched' | 'matched' | 'excluded'>;
   created_at: Timestamp;
 }
