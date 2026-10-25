@@ -14,7 +14,9 @@
  *      back, so nothing is written.
  * preview() runs 1, 3, 4, 5 and writes nothing.
  *
- * Not here yet: subledger entries (AR/AP tasks), account_balance (T-0027), the real outbox
+ * account_balance is maintained by the database from the line insert in step 6, inside the same
+ * savepoint (migration 0023, T-0027, RQ-0032); lf_app cannot write it.
+ * Not here yet: subledger entries (AR/AP tasks), the real outbox
  * (T-0030 — PostingOutbox is the hook), approvals, event posting rules (golden postings Draft).
  */
 import type { Database } from '@ledgerforce/db';
@@ -491,7 +493,8 @@ async function write(
       });
     }
     await trx.insertInto('app.journal_line').values(rows).execute();
-    // Subledger entries (AR/AP tasks) and account_balance (T-0027) will be written here.
+    // account_balance: added by the journal_line statement trigger above (migration 0023).
+    // Subledger entries (AR/AP tasks) will be written here.
     await outbox.enqueue(trx, {
       companyId: built.companyId,
       entryId: entry.id,

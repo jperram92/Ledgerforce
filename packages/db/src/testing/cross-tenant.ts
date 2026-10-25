@@ -77,6 +77,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   'app.dimension_set': { hash: () => '0'.repeat(64) },
   'app.journal_entry': { status: () => 'draft', source_type: () => 'manual_journal' },
   'app.journal_line': { debit: () => '1.0000' },
+  // Balance rows (migration 0023): an ISO currency code.
+  'app.account_balance': { currency: () => 'AUD' },
   'app.number_series': { code: () => `s_${randomBytes(4).toString('hex')}` },
   'app.party_role': { role: () => 'customer' },
   'app.party_address': { kind: () => 'billing' },

@@ -195,6 +195,24 @@ export interface JournalChainHeadTable {
   updated_at: ColumnType<Date, never, never>;
 }
 
+/**
+ * Posted totals per company/account/period/dimension set/currency (migration 0023, T-0027).
+ * Maintained by the database from journal_line; SELECT only for lf_app.
+ */
+export interface AccountBalanceTable {
+  tenant_id: ColumnType<string, never, never>;
+  company_id: ColumnType<string, never, never>;
+  account_id: ColumnType<string, never, never>;
+  period_id: ColumnType<string, never, never>;
+  dimension_set_id: ColumnType<string, never, never>;
+  currency: ColumnType<string, never, never>;
+  debit_total: ColumnType<string, never, never>;
+  credit_total: ColumnType<string, never, never>;
+  txn_debit_total: ColumnType<string, never, never>;
+  txn_credit_total: ColumnType<string, never, never>;
+  updated_at: ColumnType<Date, never, never>;
+}
+
 /** Journal line in base currency (migration 0007): exactly one of debit/credit > 0. */
 export interface JournalLineTable {
   tenant_id: TenantId;
@@ -459,6 +477,7 @@ export interface Database {
   'app.journal_entry': JournalEntryTable;
   'app.journal_line': JournalLineTable;
   'app.journal_chain_head': JournalChainHeadTable;
+  'app.account_balance': AccountBalanceTable;
   'app.number_series': NumberSeriesTable;
   'app.party': PartyTable;
   'app.party_role': PartyRoleTable;
