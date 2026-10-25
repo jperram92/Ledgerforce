@@ -1,0 +1,348 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0093",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235311-SS-PLAT-78-people-list-owner-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner sees people with roles and status @ 1440 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:11.713Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235312-SS-PLAT-78-disabled-person-1440-dark.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: a disabled person shows when, why and who took over [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:12.739Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235311-SS-PLAT-78-people-loading-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: loading and error states, with Try again [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:11.826Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235314-SS-PLAT-78-people-error-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: loading and error states, with Try again [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:14.834Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235315-SS-PLAT-78-people-list-owner-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner sees people with roles and status @ 390 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:15.160Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235315-SS-PLAT-78-step-up-redirect-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: a step-up challenge goes to /auth/step-up and returns here [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:15.627Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261025-235312-SS-PLAT-79-exceptions-empty-week-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: an empty week, an error and the forbidden state [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:12.043Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261025-235314-SS-PLAT-79-exceptions-error-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: an empty week, an error and the forbidden state [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:14.603Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261025-235318-SS-PLAT-79-exceptions-forbidden-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: an empty week, an error and the forbidden state [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:18.327Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235319-SS-PLAT-78-self-grant-refused-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner tries to give themselves a role and sees the refusal [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:19.325Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235318-SS-PLAT-78-invite-form-filled-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner invites someone by keyboard [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:18.827Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235321-SS-PLAT-78-invite-sent-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner invites someone by keyboard [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:21.164Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261025-235320-SS-PLAT-79-exceptions-week-owner-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 1440 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:20.309Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261025-235321-SS-PLAT-79-exceptions-acknowledged-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 1440 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:21.829Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261025-235322-SS-PLAT-80-audit-log-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: newest entries first, with details @ 1440 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:22.939Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235323-SS-PLAT-78-role-removed-finance-admin-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: a Finance Admin gives and removes a role, but not the Owner role [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:23.769Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235324-SS-PLAT-78-people-list-auditor-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: an Auditor reads the list but is told who can change it [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:24.443Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261025-235325-SS-PLAT-79-exceptions-week-owner-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 390 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:25.583Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261025-235326-SS-PLAT-79-exceptions-acknowledged-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 390 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:26.634Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261025-235327-SS-PLAT-80-audit-log-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: newest entries first, with details @ 390 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:27.956Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235327-SS-PLAT-78-offboard-confirm-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner offboards a leaver with a successor @ 1440 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:27.600Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235329-SS-PLAT-78-offboard-done-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner offboards a leaver with a successor @ 1440 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:29.010Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235328-SS-PLAT-78-people-forbidden-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: a clerk without users.read sees the forbidden state [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:28.340Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235330-SS-PLAT-78-people-forbidden-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: a clerk without users.read sees the forbidden state [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:30.652Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261025-235330-SS-PLAT-79-exceptions-auditor-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: an Auditor sees whose turn it is, with no button [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:30.850Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261025-235331-SS-PLAT-80-audit-log-older-page-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: filters live in the address; older entries page by keyset [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:31.475Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261025-235332-SS-PLAT-80-audit-log-filtered-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: filters live in the address; older entries page by keyset [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:32.833Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235332-SS-PLAT-78-offboard-confirm-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner offboards a leaver with a successor @ 390 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:32.463Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235333-SS-PLAT-78-offboard-done-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner offboards a leaver with a successor @ 390 [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:33.405Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261025-235335-SS-PLAT-80-audit-log-empty-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: no match, an invalid filter and the forbidden state [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:35.307Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261025-235336-SS-PLAT-80-audit-log-invalid-filter-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: no match, an invalid filter and the forbidden state [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:36.910Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261025-235338-SS-PLAT-80-audit-log-forbidden-390-dark.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: no match, an invalid filter and the forbidden state [T-0093]",
+      "commit": "ecdd62e7223c",
+      "provider": "unknown",
+      "timestamp": "2026-10-25T23:53:38.398Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261025-235347-tests-db.json",
+      "test": "9 test(s): packages/db/src/audit-read.db.test.ts › SS-PLAT-80: the audit log is read only through audit.read_log › lf_app still cannot SELECT the table directly (42501) | packages/db/src/audit-read.db.test.ts › SS-PLAT-80: the audit log is read only through audit.read_log › the reader is SECURITY DEFINER, owned by lf_migrator, pinned search_path, EXECUTE for lf_app only | packages/db/src/audit-read.db.test.ts › SS-PLAT-80: the audit log is read only through audit.read_log › an Owner reads only the tenant's rows, newest first, with every column | packages/db/src/audit-read.db.test.ts › SS-PLAT-80: the audit log is read only through audit.read_log › the Auditor and the Finance Admin may read; other roles, disabled and foreign users may not (42501) | packages/db/src/audit-read.db.test.ts › SS-PLAT-80: the audit log is read only through audit.read_log › refuses without a tenant context (42501) | packages/db/src/audit-read.db.test.ts › SS-PLAT-80: the audit log is read only through audit.read_log › page size must be 1..100 (22023); 1 and 100 are accepted | packages/db/src/audit-read.db.test.ts › SS-PLAT-80: the audit log is read only through audit.read_log › keyset pages: before=<id> continues strictly after the last row seen | packages/db/src/audit-read.db.test.ts › SS-PLAT-80: the audit log is read only through audit.read_log › filters: actor, action (case-insensitive substring), entity type and id, from inclusive, to exclusive | packages/db/src/audit-read.db.test.ts › SS-PLAT-80: the audit log is read only through audit.read_log › app.role_allows_audit_read mirrors the role templates holding audit_log.read",
+      "commit": "ecdd62e7223c",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:53:47.425Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261025-235350-tests-api-db.json",
+      "test": "6 test(s): apps/api/src/audit/audit-log.db.test.ts › SS-PLAT-80: GET /audit-log reads the tenant audit trail, read-only › returns the tenant's rows newest first with every field, and none of another tenant's | apps/api/src/audit/audit-log.db.test.ts › SS-PLAT-80: GET /audit-log reads the tenant audit trail, read-only › keyset pages: limit and before, with next_before null exactly on the last page | apps/api/src/audit/audit-log.db.test.ts › SS-PLAT-80: GET /audit-log reads the tenant audit trail, read-only › filters by actor, action (case-insensitive part), entity id and dates in the report time zone | apps/api/src/audit/audit-log.db.test.ts › SS-PLAT-80: GET /audit-log reads the tenant audit trail, read-only › the Finance Admin and the Auditor may read; a clerk gets 403; no session gets 401 | apps/api/src/audit/audit-log.db.test.ts › SS-PLAT-80: GET /audit-log reads the tenant audit trail, read-only › refuses malformed filters with 400 invalid_filter | apps/api/src/audit/audit-log.db.test.ts › SS-PLAT-80: GET /audit-log reads the tenant audit trail, read-only › nothing can change it: no write method exists on /audit-log",
+      "commit": "ecdd62e7223c",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:53:50.691Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235350-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/users/users.list.db.test.ts › SS-PLAT-78: GET /users lists the tenant users with status and active roles › an Owner sees every user of their own tenant, by name, with active roles; nothing of another tenant's | apps/api/src/users/users.list.db.test.ts › SS-PLAT-78: GET /users lists the tenant users with status and active roles › the Finance Admin and the Auditor may list (users.read); a clerk gets 403; no session gets 401 | apps/api/src/users/users.list.db.test.ts › SS-PLAT-78: GET /auth/me/access tells the browser what the caller may do › returns the active roles and the effective permissions, sorted | apps/api/src/users/users.list.db.test.ts › SS-PLAT-78: GET /auth/me/access tells the browser what the caller may do › is a member route: no session gets 401 | apps/api/src/users/users.list.db.test.ts › SS-PLAT-78: GET /auth/me/access tells the browser what the caller may do › for an API token the permissions are its scopes ∩ the role permissions",
+      "commit": "ecdd62e7223c",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:53:50.691Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261025-235355-tests-web.json",
+      "test": "34 test(s): apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › self_grant maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › last_owner maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › user_disabled maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › user_exists maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › invalid_user maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › invalid_role maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › invalid_reason maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › invalid_successor maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › cannot_offboard_self maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › not_found maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › invalid_week_start maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › invalid_note maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › invalid_filter maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › forbidden maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › mfa_required maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › step_up_required maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › step_up_mismatch maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › unauthenticated maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › session_expired maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › sod_violation maps to its own sentence | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › a self-grant refusal says why and who can do it instead | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › a permission refusal names what was needed | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › an unknown code still says something useful, with the code for support | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: every API refusal has a plain-word message (P6) › every role and every SoD rule has a name in plain words | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: step-up challenges go to the step-up flow (ADR-0025) › builds /auth/step-up with max_age and the current path as return_to | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: step-up challenges go to the step-up flow (ADR-0025) › a missing or invalid max_age falls back to the default 300 seconds | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-78: step-up challenges go to the step-up flow (ADR-0025) › never sends an off-site return_to: anything not starting with one \"/\" becomes \"/\" | apps/web/src/admin/admin.test.tsx › SS-PLAT-78: people and roles › lists people with roles and status, and the Owner can invite someone | apps/web/src/admin/admin.test.tsx › SS-PLAT-78: people and roles › an Auditor sees the list but no invite form, and is told who can invite | apps/web/src/admin/admin.test.tsx › SS-PLAT-78: people and roles › a clerk without users.read sees a forbidden state that names who can | apps/web/src/admin/admin.test.tsx › SS-PLAT-78: people and roles › shows loading, then an error with Try again that recovers | apps/web/src/admin/admin.test.tsx › SS-PLAT-78: people and roles › a self-grant is refused by the API and its message is shown | apps/web/src/admin/admin.test.tsx › SS-PLAT-78: people and roles › offboarding names a successor and reports what was revoked | apps/web/src/admin/admin.test.tsx › SS-PLAT-78: people and roles › a step-up challenge sends the browser to /auth/step-up and back here",
+      "commit": "ecdd62e7223c",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:53:55.081Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261025-235355-tests-web.json",
+      "test": "6 test(s): apps/web/src/admin/admin-logic.test.ts › SS-PLAT-79: weeks of the exceptions report › adds days to a calendar date across month and year ends | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-79: weeks of the exceptions report › finds the Monday of any date | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-79: weeks of the exceptions report › labels a day in Australian English | apps/web/src/admin/admin.test.tsx › SS-PLAT-79: weekly control exceptions › the Owner sees the week and acknowledges it | apps/web/src/admin/admin.test.tsx › SS-PLAT-79: weekly control exceptions › an Auditor sees that the Owner must acknowledge, with no button | apps/web/src/admin/admin.test.tsx › SS-PLAT-79: weekly control exceptions › an empty week says so; the week links move by seven days",
+      "commit": "ecdd62e7223c",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:53:55.081Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261025-235355-tests-web.json",
+      "test": "6 test(s): apps/web/src/admin/admin-logic.test.ts › SS-PLAT-80: audit-log queries › sends only non-empty filters, trimmed, in a fixed order | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-80: audit-log queries › keeps the API error code and body on a refusal | apps/web/src/admin/admin-logic.test.ts › SS-PLAT-80: audit-log queries › a refusal without a JSON body still has a code | apps/web/src/admin/admin.test.tsx › SS-PLAT-80: audit log viewer › shows entries with names, filters through the URL and pages to older entries | apps/web/src/admin/admin.test.tsx › SS-PLAT-80: audit log viewer › a caller without audit_log.read gets the forbidden state and no request | apps/web/src/admin/admin.test.tsx › SS-PLAT-80: audit log viewer › no matching entries shows the empty state",
+      "commit": "ecdd62e7223c",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:53:55.081Z",
+      "result": "passed"
+    }
+  ]
+}
