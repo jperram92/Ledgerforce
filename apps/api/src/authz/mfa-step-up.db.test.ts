@@ -536,7 +536,7 @@ describe('SS-UC06-03: Release requires step-up MFA', () => {
 
   it('the step-up lasts its maximum age: 301 seconds later the release is refused again', async () => {
     const session = await login('apr');
-    now += 10 * MIN;
+    now = Math.floor((now + 10 * MIN) / 1000) * 1000; // auth_time has whole seconds
     const s = await stepUpAtIdp(session, 'apr');
     expect((await finishStepUp(s, session)).status).toBe(303);
     now += 300_000;

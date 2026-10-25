@@ -1,7 +1,15 @@
 import { withTenant, type Database } from '@ledgerforce/db';
-import { sql, type Kysely } from 'kysely';
+import { sql, type Kysely, type Transaction } from 'kysely';
 import * as client from 'openid-client';
-import { systemClock, type Clock, type SessionService } from './session.service.ts';
+import { defaultMfaPolicy, isMfa, type MfaPolicy } from '../authz/mfa.ts';
+import {
+  parseSessionCookie,
+  SessionError,
+  systemClock,
+  type Clock,
+  type Principal,
+  type SessionService,
+} from './session.service.ts';
 
 /** ADR-0016: the pre-auth record lives 10 minutes and is used once. */
 export const AUTH_REQUEST_TTL_SECONDS = 10 * 60;
@@ -18,7 +26,15 @@ export interface OidcOptions {
   allowInsecureIssuer?: boolean;
 }
 
-export type LoginFailure = 'not_found' | 'invalid_request' | 'login_failed' | 'not_invited';
+export type LoginFailure =
+  | 'not_found'
+  | 'invalid_request'
+  | 'login_failed'
+  | 'not_invited'
+  /** Step-up (ADR-0025): the IdP authenticated a different user than the session's. */
+  | 'step_up_mismatch'
+  /** Step-up (ADR-0025): the IdP's answer shows no MFA. */
+  | 'mfa_required';
 
 export class LoginError extends Error {
   constructor(readonly reason: LoginFailure) {
@@ -26,6 +42,10 @@ export class LoginError extends Error {
     this.name = 'LoginError';
   }
 }
+
+/** What the callback did: a login made a new session; a step-up refreshed the existing one. */
+export type CallbackResult =
+  { kind: 'login'; cookie: string } | { kind: 'step_up'; returnTo: string };
 
 /** Request facts for the login audit row. */
 export interface LoginContext {
@@ -63,6 +83,7 @@ export class OidcService {
     private readonly opts: OidcOptions,
     private readonly publicUrl: () => string,
     private readonly clock: Clock = systemClock,
+    private readonly mfa: MfaPolicy = defaultMfaPolicy,
   ) {}
 
   get redirectUri(): string {
@@ -101,22 +122,51 @@ export class OidcService {
     if (!tenantId) throw new LoginError('not_found');
 
     const config = await this.configuration();
+    return withTenant(this.db, tenantId, (trx) => this.authorize(trx, tenantId, config, null));
+  }
+
+  /**
+   * Step-up (ADR-0025, RQ-0027): a new authorization request for the signed-in `principal`,
+   * inside the request's tenant transaction. It asks the IdP to re-authenticate now
+   * (`prompt=login`, `max_age`) with MFA (`acr_values`); the callback checks the answer itself.
+   */
+  async beginStepUp(
+    trx: Transaction<Database>,
+    principal: Principal,
+    opts: { maxAgeSeconds: number; returnTo: string },
+  ): Promise<{ location: string; cookie: string }> {
+    const config = await this.configuration();
+    return this.authorize(trx, principal.tenantId, config, {
+      sessionId: principal.sessionId,
+      ...opts,
+    });
+  }
+
+  /** Stores the pre-auth row (state, nonce, PKCE verifier; step-up link) and builds the IdP URL. */
+  private async authorize(
+    trx: Transaction<Database>,
+    tenantId: string,
+    config: client.Configuration,
+    stepUp: { sessionId: string; maxAgeSeconds: number; returnTo: string } | null,
+  ): Promise<{ location: string; cookie: string }> {
     const state = client.randomState();
     const nonce = client.randomNonce();
     const verifier = client.randomPKCECodeVerifier();
     const now = this.clock.now();
-    await withTenant(this.db, tenantId, (trx) =>
-      trx
-        .insertInto('app.auth_request')
-        .values({
-          state,
-          nonce,
-          code_verifier: verifier,
-          created_at: now,
-          expires_at: new Date(now.getTime() + AUTH_REQUEST_TTL_SECONDS * 1000),
-        })
-        .execute(),
-    );
+    await trx
+      .insertInto('app.auth_request')
+      .values({
+        state,
+        nonce,
+        code_verifier: verifier,
+        created_at: now,
+        expires_at: new Date(now.getTime() + AUTH_REQUEST_TTL_SECONDS * 1000),
+        session_id: stepUp?.sessionId ?? null,
+        max_age_seconds: stepUp?.maxAgeSeconds ?? null,
+        return_to: stepUp?.returnTo ?? null,
+      })
+      .execute();
+    const acrValues = this.mfa.acrValues[0];
     const url = client.buildAuthorizationUrl(config, {
       redirect_uri: this.redirectUri,
       scope: 'openid',
@@ -124,21 +174,31 @@ export class OidcService {
       nonce,
       code_challenge: await client.calculatePKCECodeChallenge(verifier),
       code_challenge_method: 'S256',
+      ...(stepUp
+        ? {
+            prompt: 'login',
+            max_age: String(stepUp.maxAgeSeconds),
+            ...(acrValues ? { acr_values: acrValues } : {}),
+          }
+        : {}),
     });
     return { location: url.href, cookie: `${tenantId}.${state}` };
   }
 
   /**
    * Step 2: the IdP redirected back to `/auth/callback` (`callbackUrl` = redirect URI + query).
-   * Returns the session cookie value. Order: browser binding → single-use consume of the
-   * pre-auth row (unexpired) → code exchange with PKCE verifier, state and nonce → invited user
-   * by (iss, sub) → session + audit row in one transaction.
+   * Order: browser binding → single-use consume of the pre-auth row (unexpired) → code exchange
+   * with PKCE verifier, state and nonce (and, for a step-up, `maxAge` on `auth_time`) → then
+   * either a login (invited user by (iss, sub) → session + audit row in one transaction) or a
+   * step-up of the session named by the row (`sessionCookie` must be that session, the user
+   * the same, the answer MFA → the session's auth_time/amr/acr updated + audit row).
    */
   async complete(
     oidcCookie: string | undefined,
     callbackUrl: URL,
     ctx: LoginContext,
-  ): Promise<string> {
+    sessionCookie?: string,
+  ): Promise<CallbackResult> {
     const bound = parseOidcCookie(oidcCookie);
     const state = callbackUrl.searchParams.get('state');
     if (!bound || state !== bound.state) throw new LoginError('invalid_request');
@@ -152,10 +212,18 @@ export class OidcService {
         .where('state', '=', state)
         .where('consumed_at', 'is', null)
         .where('expires_at', '>', now)
-        .returning(['nonce', 'code_verifier'])
+        .returning(['nonce', 'code_verifier', 'session_id', 'max_age_seconds', 'return_to'])
         .executeTakeFirst(),
     );
     if (!pending) throw new LoginError('invalid_request');
+    const stepUp =
+      pending.session_id !== null && pending.max_age_seconds !== null
+        ? {
+            sessionId: pending.session_id,
+            maxAge: pending.max_age_seconds,
+            returnTo: pending.return_to ?? '/',
+          }
+        : null;
 
     let claims: client.IDToken | undefined;
     try {
@@ -164,6 +232,8 @@ export class OidcService {
         expectedState: state,
         expectedNonce: pending.nonce,
         idTokenExpected: true,
+        // Step-up: openid-client requires auth_time and rejects it if older than max_age (RQ-0027).
+        ...(stepUp ? { maxAge: stepUp.maxAge } : {}),
       });
       claims = tokens.claims();
     } catch {
@@ -174,9 +244,17 @@ export class OidcService {
       ? claims.amr.filter((m): m is string => typeof m === 'string')
       : [];
     const acr = typeof claims.acr === 'string' ? claims.acr : null;
+    const authTime =
+      typeof claims.auth_time === 'number' ? new Date(claims.auth_time * 1000) : null;
     const { iss, sub } = claims;
 
-    return withTenant(this.db, tenantId, async (trx) => {
+    if (stepUp) {
+      const auth = { amr, acr, authTime };
+      await this.completeStepUp(tenantId, stepUp.sessionId, sessionCookie, { iss, sub }, auth, ctx);
+      return { kind: 'step_up', returnTo: stepUp.returnTo };
+    }
+
+    const cookie = await withTenant(this.db, tenantId, async (trx) => {
       const user = await trx
         .selectFrom('app.app_user')
         .select(['id', 'status'])
@@ -193,7 +271,12 @@ export class OidcService {
           .where('id', '=', user.id)
           .execute();
       }
-      const session = await this.sessions.createInTx(trx, tenantId, { userId: user.id, amr, acr });
+      const session = await this.sessions.createInTx(trx, tenantId, {
+        userId: user.id,
+        amr,
+        acr,
+        authTime,
+      });
       await trx
         .insertInto('audit.audit_log')
         .values({
@@ -211,5 +294,79 @@ export class OidcService {
         .execute();
       return session.cookie;
     });
+    return { kind: 'login', cookie };
+  }
+
+  /**
+   * The step-up half of the callback. The browser must still present the session the step-up was
+   * started for (a valid one); the IdP must have authenticated that same user, with MFA. Only then
+   * the session's authentication facts change. A wrong user or a non-MFA answer is refused and
+   * audited, with the session untouched.
+   */
+  private async completeStepUp(
+    tenantId: string,
+    sessionId: string,
+    sessionCookie: string | undefined,
+    idp: { iss: string; sub: string },
+    auth: { amr: string[]; acr: string | null; authTime: Date | null },
+    ctx: LoginContext,
+  ): Promise<void> {
+    const cookie = parseSessionCookie(sessionCookie);
+    if (!cookie || cookie.tenantId !== tenantId || cookie.sessionId !== sessionId) {
+      throw new LoginError('invalid_request');
+    }
+    const refused = await withTenant(this.db, tenantId, async (trx) => {
+      let principal: Principal;
+      try {
+        principal = await this.sessions.verify(trx, cookie);
+      } catch (e) {
+        if (e instanceof SessionError) return 'invalid_request' as const;
+        throw e;
+      }
+      const user = await trx
+        .selectFrom('app.app_user')
+        .select('id')
+        .where('idp_issuer', '=', idp.iss)
+        .where('idp_subject', '=', idp.sub)
+        .executeTakeFirst();
+      const reason: LoginFailure | null =
+        user?.id !== principal.userId
+          ? 'step_up_mismatch'
+          : !isMfa(auth, this.mfa) || auth.authTime === null
+            ? 'mfa_required'
+            : null;
+      const audit = (action: string, after: unknown) =>
+        trx
+          .insertInto('audit.audit_log')
+          .values({
+            actor_type: 'user',
+            actor_user_id: principal.userId,
+            action,
+            entity_type: 'session',
+            entity_id: sessionId,
+            before: null,
+            after: JSON.stringify(after),
+            ip: ctx.ip,
+            user_agent: ctx.userAgent,
+            request_id: ctx.requestId,
+          })
+          .execute();
+      if (reason) {
+        await audit('step_up_refused', { reason });
+        return reason;
+      }
+      await this.sessions.reauthenticateInTx(trx, sessionId, {
+        amr: auth.amr,
+        acr: auth.acr,
+        authTime: auth.authTime,
+      });
+      await audit('step_up', {
+        amr: auth.amr,
+        acr: auth.acr,
+        auth_time: auth.authTime?.toISOString() ?? null,
+      });
+      return null;
+    });
+    if (refused) throw new LoginError(refused);
   }
 }

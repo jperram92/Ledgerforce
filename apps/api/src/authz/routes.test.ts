@@ -62,4 +62,11 @@ describe('SS-PLAT-49: Every endpoint checks a permission', () => {
       permission: 'users.roles.assign',
     });
   });
+
+  it('SS-PLAT-20: step-up and who-am-I are member routes, so a finance user without MFA can step up', () => {
+    const byName = new Map(routes().map((r) => [r.name, r.access]));
+    expect(byName.get('AuthController.stepUp')).toEqual({ kind: 'member' });
+    expect(byName.get('AuthController.me')).toEqual({ kind: 'member' });
+    expect(byName.get('AuthController.logout')).toEqual({ kind: 'member' });
+  });
 });

@@ -57,7 +57,8 @@ const cookies = new Map<string, string>();
 
 async function login(user: string, tenant = A): Promise<string> {
   if (!api.sessions) throw new Error('sessions not configured');
-  const c = await api.sessions.create(tenant, { userId: user, amr: [], acr: null });
+  // Signed in with MFA: these tests are about permissions, not MFA (T-0013 enforces it, DL-0123).
+  const c = await api.sessions.create(tenant, { userId: user, amr: ['pwd', 'otp'], acr: null });
   cookies.set(user, c);
   return c;
 }
