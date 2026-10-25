@@ -1280,3 +1280,42 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - T-0095 is human-only; T-0103 needs Windows; T-0108 is Phase 1.
 - Why: Product owner's instruction to build independent tasks in parallel, with one engine-touching task per round.
 - ADR: none · Status: accepted
+
+### DL-0177 — Audit log read path: a permission-checked SECURITY DEFINER reader, not SELECT for lf_app (ADR-0034, Proposed)
+- Date: 2026-10-25 · By: claude · Task: T-0093 · Category: security
+- Decision: Migration 0029 adds `audit.read_log(...)` (owner lf_migrator, STABLE, `search_path = pg_catalog, pg_temp`, EXECUTE for lf_app only) and `app.role_allows_audit_read(role)` (mirror of the role templates holding `audit_log.read`). The reader needs a tenant context, re-checks that the acting user is active and holds an audit-reading role (42501 otherwise), filters `tenant_id` explicitly under FORCE RLS, returns at most 100 rows newest first with keyset pages (`id < before`). lf_app keeps INSERT only on `audit.audit_log`. `GET /audit-log` (`audit_log.read`) is the only route reading it; dates are calendar days in the tenant's report time zone, `to` inclusive; `next_before` is exact (probe for one older row).
+- Why: design §6.4 (Auditor reads the audit log) and §6.8 (insert, never update); least privilege for lf_app; project pattern of migration 0018 ([RQ-0038](../research/RQ-0038-admin-ui-audit-read-path.md)).
+- Alternatives: `GRANT SELECT` to lf_app (rejected: every code path could read the whole trail, guarded by one decorator); a reporting role or replica (later, for exports).
+- ADR: ADR-0034 · Status: proposed (awaiting human)
+
+### DL-0178 — Admin read routes `GET /users` and `GET /auth/me/access`; `/auth/me` unchanged
+- Date: 2026-10-25 · By: claude · Task: T-0093 · Category: architecture
+- Decision: `GET /users` (`users.read`) lists the tenant's users by name with status and active roles. `GET /auth/me/access` (any member) returns the active role ids and the request's effective permissions (role permissions ∩ token scopes), sorted, so the web app hides or disables actions it may not take; the API stays the authority. `/auth/me` keeps its exact body.
+- Why: the users screen had no list endpoint; existing tests assert `/auth/me` with `toEqual`, and the round protocol forbids changing existing assertions (RQ-0038 Q2, Q3). Recorded in ADR-0034 as public API changes.
+- Alternatives: add `roles`/`permissions` to `/auth/me` (rejected, above); compute permissions in the browser from roles (rejected: ignores token scopes, duplicates the server's rule).
+- ADR: ADR-0034 · Status: proposed (awaiting human)
+
+### DL-0179 — Admin screens: routes, permission-aware actions, step-up routing
+- Date: 2026-10-25 · By: claude · Task: T-0093 · Category: ui
+- Decision: Routes `/settings/users`, `/settings/users/$userId`, `/reports/control-exceptions?week=`, `/reports/audit-log?<filters>` inside the shell (IA §2, S19); the Settings and Reports pages list them. Every screen has loading, error with Try again, forbidden (naming who can) and empty states. Actions the caller lacks are hidden and a sentence says who can (P6). A self-grant is explained before it is tried and the API's `self_grant` refusal is shown if it is tried anyway. Offboarding needs a reason and a confirmation and reports what was revoked and who takes over approvals. A `401 step_up_required` from any admin call leaves the app for `/auth/step-up?max_age=<n>&return_to=<this page>` (same-origin path only); another 401 goes to sign-in. Router search params are plain text both ways (no JSON quoting of numeric-looking values such as `before=54`). Tables become labelled stacks below 900 px. apps/web now depends on the workspace package `@ledgerforce/shared` (role templates, SoD rule ids) — internal, no third-party dependency added.
+- Why: design §6.3–6.5, §6.8; ui-engineer rules; principles P2, P6, P8, P12, P13; ADR-0025.
+- Alternatives: a modal for offboarding (rejected: a second focus context for one step); OFFSET paging (rejected, RQ-0038 Q5); copying role names into the web app (rejected: drift from the catalogue).
+- ADR: none · Status: accepted
+
+### DL-0180 — T-0093 build process: placeholders, fake API in e2e, mutation run
+- Date: 2026-10-25 · By: claude · Task: T-0093 · Category: process
+- Decision:
+  - Migrations 0026..0028 belong to other round-6 tasks; local `SELECT 1` placeholders from the scratchpad were copied in for `pnpm test:db` and never committed.
+  - `tests/e2e/web/admin.spec.ts` serves the app with Vite and fakes the API with `page.route`, as shell.spec.ts does; the faked contracts are proven against the real API by `users.lifecycle`, `users.list`, `permissions`, `sod` and `audit-log` db tests. The spec imports the role catalogue by relative path because the repo root does not depend on `@ledgerforce/shared`.
+  - Mutation check: 14 hand mutants; 13 killed (M10, revoked roles listed, first survived and was killed after the seed gained a revoked grant). M6 (reader without its explicit tenant filter) survives as an equivalent mutant: FORCE RLS still confines the definer; the filter is defence in depth.
+  - `apps/web/src/admin/client.ts` was drafted before its unit test (the test was written and run before the other admin modules); recorded here for honesty.
+- Why: round-6 protocol (DL-0162); AGENTS.md §0 (prove it with evidence).
+- Alternatives: none.
+- ADR: none · Status: accepted
+
+### DL-0181 — T-0093 scope: quarterly access review not built; reading the audit log not audited
+- Date: 2026-10-25 · By: claude · Task: T-0093 · Category: scope
+- Decision: The card's goal mentions the quarterly access review (design §6.3 item 4: every user, role, last login and exception, signed off in-app). The lead's assignment for this round lists four screens without it, and it needs a sign-off record and a last-login source that do not exist. It is not built here; the lead should add a follow-up card. Reading the audit log is not itself audited (GET requests are not audited today); whether it should be is left to the product owner (design §6.9 mentions alerts on mass export).
+- Why: keep T-0093 to its assigned screens; both items need data or decisions outside this task.
+- Alternatives: build an unsigned review page now (rejected: no storage for the sign-off).
+- ADR: none · Status: accepted

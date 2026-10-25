@@ -71,6 +71,16 @@ beforeAll(async () => {
       }
     });
   }
+  // A revoked grant is history, not a role: Lena held Accountant once (mover, ADR-0023).
+  await withTenant(seed, A, async (trx) => {
+    await trx.insertInto('app.user_role').values({ user_id: CLERK, role: 'accountant' }).execute();
+    await trx
+      .updateTable('app.user_role')
+      .set({ revoked_at: new Date(), revoke_reason: 'moved to sales' })
+      .where('user_id', '=', CLERK)
+      .where('role', '=', 'accountant')
+      .execute();
+  });
   await seed.destroy();
   api = await createApi({ databaseUrl: tdb.url('lf_app'), sessions: {} });
   if (!api.sessions) throw new Error('sessions not configured');
