@@ -10,6 +10,11 @@ import {
   Outlet,
   type RouterHistory,
 } from '@tanstack/react-router';
+import { AuditLogPage } from './admin/AuditLogPage.tsx';
+import { AUDIT_FILTER_KEYS, type AuditQuery } from './admin/client.ts';
+import { ControlExceptionsPage } from './admin/ControlExceptionsPage.tsx';
+import { UserPage } from './admin/UserPage.tsx';
+import { UsersPage } from './admin/UsersPage.tsx';
 import { NotFoundPage, SectionPage } from './pages.tsx';
 import { SECTIONS } from './sections.ts';
 import { Shell } from './Shell.tsx';
@@ -40,6 +45,52 @@ const sectionRoutes = SECTIONS.map((section) =>
   }),
 );
 
+// Administration (T-0093): people and roles under Settings; the control-exceptions report and
+// the audit log under Reports (IA §2, S19).
+const usersRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/users',
+  component: UsersPage,
+});
+
+const userRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/users/$userId',
+  component: function UserRoute() {
+    const { userId } = userRoute.useParams();
+    return <UserPage key={userId} userId={userId} />;
+  },
+});
+
+const DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+const exceptionsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'reports/control-exceptions',
+  validateSearch: (search: Record<string, unknown>): { week?: string } =>
+    typeof search['week'] === 'string' && DAY.test(search['week']) ? { week: search['week'] } : {},
+  component: function ExceptionsRoute() {
+    const { week } = exceptionsRoute.useSearch();
+    return <ControlExceptionsPage week={week} />;
+  },
+});
+
+const auditRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'reports/audit-log',
+  validateSearch: (search: Record<string, unknown>): AuditQuery => {
+    const out: AuditQuery = {};
+    for (const k of AUDIT_FILTER_KEYS) {
+      const v = search[k];
+      if (typeof v === 'string' && v !== '') out[k] = v;
+    }
+    return out;
+  },
+  component: function AuditRoute() {
+    return <AuditLogPage search={auditRoute.useSearch()} />;
+  },
+});
+
 const notFoundRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: '$',
@@ -48,11 +99,40 @@ const notFoundRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   signInRoute,
-  shellRoute.addChildren([...sectionRoutes, notFoundRoute]),
+  shellRoute.addChildren([
+    ...sectionRoutes,
+    usersRoute,
+    userRoute,
+    exceptionsRoute,
+    auditRoute,
+    notFoundRoute,
+  ]),
 ]);
 
+/**
+ * Search params are plain text both ways (T-0093): every parameter of this app is a string, so
+ * `before=7` stays `before=7` instead of TanStack's JSON default (`before=%227%22`).
+ */
+export function parsePlainSearch(searchStr: string): Record<string, string> {
+  return Object.fromEntries(new URLSearchParams(searchStr));
+}
+
+export function stringifyPlainSearch(search: Record<string, unknown>): string {
+  const p = new URLSearchParams();
+  for (const [k, v] of Object.entries(search)) {
+    if (typeof v === 'string' && v !== '') p.set(k, v);
+  }
+  const s = p.toString();
+  return s === '' ? '' : `?${s}`;
+}
+
 export function createAppRouter(history?: RouterHistory) {
-  return createRouter({ routeTree, ...(history ? { history } : {}) });
+  return createRouter({
+    routeTree,
+    parseSearch: parsePlainSearch,
+    stringifySearch: stringifyPlainSearch,
+    ...(history ? { history } : {}),
+  });
 }
 
 declare module '@tanstack/react-router' {

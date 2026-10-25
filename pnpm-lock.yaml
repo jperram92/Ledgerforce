@@ -126,6 +126,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@ledgerforce/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@ledgerforce/ui':
         specifier: workspace:*
         version: link:../../packages/ui
