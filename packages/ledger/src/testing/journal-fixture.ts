@@ -1,7 +1,9 @@
 /**
  * Test fixture for ledger db tests: a fresh database, one tenant with two companies on the AU
  * services SMB chart, the empty dimension set, and a helper that writes an entry with lines the
- * way the posting engine will (as lf_app, inside a tenant transaction). Test-only.
+ * way the posting engine will (as lf_app, inside a tenant transaction). Every company gets the
+ * AU fiscal year FY2027 (2026-07-01 … 2027-06-30, all periods open), because a posted entry must
+ * fall in a period whose status allows its source type (invariant 3, T-0023). Test-only.
  */
 import { createDb, withTenant, type Database } from '@ledgerforce/db';
 import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
@@ -9,6 +11,7 @@ import { auServicesSmb, loadChartTemplate } from '@ledgerforce/gl';
 import { sql, type Kysely, type Transaction } from 'kysely';
 import { randomUUID } from 'node:crypto';
 import { dimensionSetId } from '../dimension-set.ts';
+import { generateFiscalYear } from '../period.ts';
 
 export interface Line {
   /** Account code in the main company's chart, or an account id. */
@@ -21,8 +24,16 @@ export interface EntryOptions {
   company?: string;
   status?: 'draft' | 'posted';
   reversalOf?: string;
-  memo?: string;
+  memo?: string | null;
   entryNo?: string;
+  /** Default 2026-10-24 (inside the fixture's FY2027). */
+  entryDate?: string;
+  /** Default 'manual_journal'. */
+  sourceType?: string;
+  createdBy?: string;
+  idempotencyKey?: string;
+  /** Normally left out: the database fills it from entry_date. */
+  periodId?: string;
   sourceId?: string;
   /** Line memo applied to every line. */
   lineMemo?: string;
@@ -31,6 +42,8 @@ export interface EntryOptions {
 export interface LedgerFixture {
   tdb: TestDatabase;
   db: Kysely<Database>;
+  /** Superuser pool on the test database (verification only; bypasses RLS). */
+  admin: TestDatabase['admin'];
   tenantId: string;
   companyId: string;
   otherCompanyId: string;
@@ -45,6 +58,8 @@ export interface LedgerFixture {
   /** A company's chart (code → account id) and its empty dimension set. */
   chart(company: string): { acct: Record<string, string>; emptySet: string };
   countEntries(): Promise<number>;
+  /** An active user holding one role template; returns the user id. */
+  addUser(role: string): Promise<string>;
   close(): Promise<void>;
 }
 
@@ -70,6 +85,8 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
     if (!c1 || !c2) throw new Error('fixture: company seed failed');
     const main = await loadChartTemplate(trx, c1.id, auServicesSmb);
     const other = await loadChartTemplate(trx, c2.id, auServicesSmb);
+    await generateFiscalYear(trx, { companyId: c1.id, convention: 'AU', startYear: 2026 });
+    await generateFiscalYear(trx, { companyId: c2.id, convention: 'AU', startYear: 2026 });
     return {
       companyId: c1.id,
       otherCompanyId: c2.id,
@@ -93,6 +110,7 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
         .returning('id')
         .executeTakeFirstOrThrow();
       const chart = await loadChartTemplate(trx, c.id, auServicesSmb);
+      await generateFiscalYear(trx, { companyId: c.id, convention: 'AU', startYear: 2026 });
       charts.set(c.id, {
         acct: Object.fromEntries(chart.accounts),
         emptySet: await dimensionSetId(trx, c.id, []),
@@ -113,14 +131,16 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
       .insertInto('app.journal_entry')
       .values({
         company_id: company,
-        entry_date: '2026-10-24',
-        source_type: 'manual_journal',
+        entry_date: opts.entryDate ?? '2026-10-24',
+        source_type: opts.sourceType ?? 'manual_journal',
         status,
+        period_id: opts.periodId ?? null,
+        created_by: opts.createdBy ?? null,
         reversal_of_id: opts.reversalOf ?? null,
         memo: opts.memo ?? null,
         entry_no: opts.entryNo ?? null,
         source_id: opts.sourceId ?? null,
-        idempotency_key: randomUUID(),
+        idempotency_key: opts.idempotencyKey ?? randomUUID(),
         posted_at: status === 'posted' ? new Date('2026-10-24T09:00:00Z') : null,
       })
       .returning('id')
@@ -148,9 +168,24 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
     return entry.id;
   }
 
+  async function addUser(role: string): Promise<string> {
+    return inTenant(async (trx) => {
+      const tag = randomUUID().slice(0, 8);
+      const user = await trx
+        .insertInto('app.app_user')
+        .values({ email: `${role}-${tag}@example.test`, display_name: `${role} ${tag}`, status: 'active' })
+        .returning('id')
+        .executeTakeFirstOrThrow();
+      await trx.insertInto('app.user_role').values({ user_id: user.id, role }).execute();
+      return user.id;
+    });
+  }
+
   return {
     tdb,
     db,
+    admin: tdb.admin,
+    addUser,
     tenantId,
     ...seeded,
     inTenant,
