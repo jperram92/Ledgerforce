@@ -80,5 +80,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0027](0027-user-lifecycle-and-scoped-api-tokens.md) | User lifecycle (joiner/mover/leaver) and scoped personal API tokens | security | yes | Proposed |
 | [0029](0029-job-queue-privileges-and-supervision.md) | Job queue (pg-boss) privileges: lf_app DML on the shared pgboss schema, owner-run supervision | security | yes | Proposed |
 | [0030](0030-bank-detail-change-verification-and-cooling-off.md) | Bank-detail change verification: database-enforced workflow, requester ≠ verifier at commit, step-up proof, cooling-off eligibility, durable notices | security | yes | Proposed |
+| [0032](0032-salesforce-pubsub-grpc-client-and-avro-decoding.md) | Salesforce Pub/Sub API client: grpc-js + proto-loader on the vendored proto, avsc for Avro, replay id committed with the batch | integration | no | Proposed |
 
 Next free number: **0031** (0028 unused: T-0027 needed no ADR).
