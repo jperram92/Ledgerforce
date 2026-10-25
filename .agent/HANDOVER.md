@@ -159,3 +159,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-24T23:05:56.678Z claude: T-0107 → verifying
 - 2026-10-24T23:07:47.662Z claude: release T-0107 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
 - 2026-10-24 23:1x claude (lead): T-0107 built (migration 0015), SS-PLAT-47 green with evidence, verify 12 PASS/0 FAIL → review. Parallel round 1 complete.
+- 2026-10-25 03:4x claude (lead): round-2 agents stopped on the usage limit (HTTP 429, reset 03:40 UTC); resumed from their worktrees. Saved: T-0012 ADR-0023 + red tests + migration 0016 green (7389163); T-0063 RQ-0024 + JWT signer/exchange (604a4b4); T-0081 RQ-0025 (e5f09d1). No work lost.
