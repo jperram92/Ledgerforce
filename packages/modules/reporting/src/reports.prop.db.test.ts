@@ -170,5 +170,5 @@ describe('SS-PLAT-77 reports hold for random posted ledgers [T-0076]', () => {
         },
       ),
     );
-  }, 600_000);
+  });
 });

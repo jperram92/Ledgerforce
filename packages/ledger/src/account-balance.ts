@@ -121,7 +121,7 @@ export async function accountMovements(
   const from = q.from ?? null;
   const values = (q.dimensionValueIds ?? []).map((v) => v.toLowerCase());
   const r = await sql<AccountMovementRow>`
-    WITH per AS (
+    WITH per AS MATERIALIZED (
       SELECT id,
              start_date >= coalesce(${from}::date, '-infinity'::date)
                AND end_date <= ${q.to}::date AS whole
@@ -129,28 +129,29 @@ export async function accountMovements(
        WHERE company_id = ${company}
          AND end_date >= coalesce(${from}::date, '-infinity'::date)
          AND start_date <= ${q.to}::date),
-    sets AS (
+    sets AS MATERIALIZED (
       SELECT id FROM app.dimension_set
        WHERE company_id = ${company} AND value_ids @> ${values}::uuid[]),
-    mv AS (
+    mv AS MATERIALIZED (
       SELECT b.account_id, b.debit_total AS d, b.credit_total AS c
         FROM app.account_balance b
-        JOIN per p ON p.id = b.period_id AND p.whole
        WHERE b.company_id = ${company}
+         AND b.period_id IN (SELECT id FROM per WHERE whole)
          AND b.dimension_set_id IN (SELECT id FROM sets)
       UNION ALL
       SELECT l.account_id, l.debit, l.credit
-        FROM app.journal_line l
-        JOIN app.journal_entry e ON e.tenant_id = l.tenant_id AND e.id = l.entry_id
-        JOIN per p ON p.id = e.period_id AND NOT p.whole
-       WHERE l.company_id = ${company} AND e.status <> 'draft'
+        FROM app.journal_entry e
+        JOIN app.journal_line l ON l.tenant_id = e.tenant_id AND l.entry_id = e.id
+       WHERE e.company_id = ${company} AND e.status <> 'draft'
+         AND e.period_id IN (SELECT id FROM per WHERE NOT whole)
          AND e.entry_date BETWEEN coalesce(${from}::date, '-infinity'::date) AND ${q.to}::date
-         AND l.dimension_set_id IN (SELECT id FROM sets))
+         AND l.dimension_set_id IN (SELECT id FROM sets)),
+    agg AS MATERIALIZED (
+      SELECT account_id, sum(d) AS d, sum(c) AS c FROM mv GROUP BY account_id)
     SELECT a.id::text AS "accountId", a.code, a.name, a.type, a.subtype,
-           sum(mv.d)::numeric(19,4)::text AS debit, sum(mv.c)::numeric(19,4)::text AS credit
-      FROM mv
-      JOIN app.account a ON a.company_id = ${company} AND a.id = mv.account_id
-     GROUP BY a.id, a.code, a.name, a.type, a.subtype
+           agg.d::numeric(19,4)::text AS debit, agg.c::numeric(19,4)::text AS credit
+      FROM agg
+      JOIN app.account a ON a.company_id = ${company} AND a.id = agg.account_id
      ORDER BY a.code`.execute(trx);
   return r.rows;
 }
