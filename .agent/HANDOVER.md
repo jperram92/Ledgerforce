@@ -186,3 +186,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T04:14:31.207Z claude: T-0109 → verifying
 - 2026-10-25T04:16:50.703Z claude: release T-0109 → review (verify 12 PASS/0 FAIL/4 PENDING; verify run left no other task's evidence; awaiting codex cross-review)
 - 2026-10-25 04:1x claude (lead): T-0109 built — verify gate 9 no longer writes other tasks' evidence (proven by a real verify run); SS-PLAT-55 green; → review. DL-0098 cleanup rule retired.
+- 2026-10-25 08:4x claude (lead): round-3 agents stopped on the usage limit (HTTP 429, reset 08:40 UTC); resumed from their worktrees. Saved: T-0023 RQ-0026 + red tests (9958715); T-0013 RQ-0027 + ADR-0025 + red tests + migration 0019 (9ec2ac4); T-0059 green (2e8fca8). No work lost.
