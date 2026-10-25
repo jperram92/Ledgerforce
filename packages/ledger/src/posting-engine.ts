@@ -96,7 +96,11 @@ export interface PostingOutbox {
   enqueue(trx: Trx, event: PostedEvent): Promise<void>;
 }
 
-/** Until T-0030: no outbox row is written. */
+/**
+ * Writes no outbox event (tests, previews of tooling). Production callers pass
+ * `ledgerOutbox(boss)` from @ledgerforce/outbox (T-0030), which writes the event and its delivery
+ * job inside this write.
+ */
 export const NO_OUTBOX: PostingOutbox = Object.freeze({
   enqueue: async () => {},
 });

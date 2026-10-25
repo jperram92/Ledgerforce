@@ -2,7 +2,7 @@
   "name": "@ledgerforce/ledger",
   "version": "0.0.0",
   "private": true,
-  "description": "Posting engine and the only writer of ledger tables (design \u00a73.3, \u00a73.9)",
+  "description": "Posting engine and the only writer of ledger tables (design §3.3, §3.9)",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
