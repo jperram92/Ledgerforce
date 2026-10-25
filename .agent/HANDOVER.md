@@ -1,15 +1,11 @@
-# Handover - 2026-10-25 04:30 UTC
+# Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 3 in progress (DL-0116): T-0023, T-0013, T-0059 by sub-agents in worktrees; the lead merges in migration order. T-0015 (SoD) is round 4 (same authz code as T-0013; security ADR).
+Task: parallel round 3 COMPLETE (DL-0116): T-0023, T-0013, T-0059 merged and in review. Next: `node scripts/agent/conductor.ts next --count 12`; plan round 4 (T-0015 SoD first; pre-assign numbers from migration 0021, DL-0129+, SS-PLAT-62+, ADR-0026+).
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
-In progress: round 3 worktrees. Pre-assigned (DL-0116):
-  T-0023 → migration 0018, DL-0117..0120, RQ-0026, SS-PLAT-56..57, ADR-0024, scratchpad/t0023/
-  T-0013 → migration 0019, DL-0121..0124, RQ-0027, SS-PLAT-58..59, ADR-0025, scratchpad/t0013/
-  T-0059 → migration 0020 only if needed, DL-0125..0128, RQ-0028, SS-PLAT-60..61, ADR-0026, scratchpad/t0059/
-  Lead → DL-0129+, SS-PLAT-62+
+In progress: nothing. Working tree clean after the last commit. Round-3 worktrees under .claude/worktrees/ are finished (git-ignored).
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
-Decisions taken: DL-0061..DL-0115; RQ-0017, RQ-0018; ADR-0018 (Proposed, security); RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
+Decisions taken: DL-0061..DL-0127; RQ-0017, RQ-0018; ADR-0018 (Proposed, security); RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
   2. (incl. T-0011's additions to ADR-0016: owner-only slug_lookup policy on app.tenant, the lf_oidc login-binding
      cookie, one fixed redirect URI — DL-0087/0088) Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1), ADR-0018 (envelope encryption, local keyring KMS) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
@@ -40,6 +36,8 @@ Open questions for human:
       Approver-role releasers (no MFA at sign-in) must use MFA at step-up; CHECK an unverified 2026 Keycloak step-up
       bypass CVE mentioned in RQ-0027 search results before release. Follow-ups: apps/web must route
       step_up_required to /auth/step-up; Keycloak realm ACR/AMR mapping (T-0094).
+  14. Bank (T-0059): CAMT camt.052/054 refused (no SMB availability found; 054 has no balances) — confirm; does CBA
+      (CommBiz) offer camt.053? Statements imported before T-0059 kept batches as one line (no production data yet).
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
      (numeric + CHECK scale<=4) would make the DB refuse instead. Meanwhile the posting engine
      refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
@@ -101,6 +99,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >     packages/ledger/src/{period-matrix,period}.ts; RQ-0026; ADR-0024; DL-0117..0120
 >   • T-0013 — migration 0019; apps/api/src/authz/mfa.ts, step-up in auth/*, interceptor MFA/step-up steps; RQ-0027; ADR-0025;
 >     DL-0121..0124 (security review)
+>   • T-0059 — packages/modules/bank camt053/dedupe/statements/account-match; migration 0020; RQ-0028; DL-0125..0127
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -206,3 +205,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T09:08:08.732Z claude: T-0013 → verifying
 - 2026-10-25T09:10:37.030Z claude: release T-0013 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0025 Proposed (security); awaiting codex cross-review)
 - 2026-10-25 09:2x claude (lead): merged T-0013 (ADR index + registers resolved; totals 152); gates green (530 unit / 517 db); verify 12 PASS/0 FAIL → review.
+- 2026-10-25T09:12:06.868Z claude: T-0059 → verifying
+- 2026-10-25T09:14:31.636Z claude: release T-0059 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; awaiting codex cross-review)
+- 2026-10-25 09:3x claude (lead): merged T-0059 (DL resolved by id; totals 152); migrations 0018–0020 in sequence; gates green (545 unit / 526 db); verify 12 PASS/0 FAIL → review. Round 3 complete.
