@@ -252,3 +252,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T19:15:00.994Z claude: release T-0053 → review
 - 2026-10-25 claude (lead): round 5 merged (T-0016, T-0027, T-0030 + ADR-0029, T-0053); final tree gates green (628 unit / 739 db / 82 agent); verify 13/0/3 each → review. First T-0016 verify had one intermittent gate-2a failure (likely the Salesforce test-key DER flake fixed in T-0030); six reruns and all later verifies green.
 - 2026-10-25 claude (lead): round 6 claimed (T-0026, T-0064, T-0076, T-0093; DL-0162).
+- 2026-10-25 23:4x claude (lead): all four round-6 agents stopped by the usage limit (~20:0x); their WIP commits are on the feat/T-0026, T-0064, T-0076, T-0093 branches; resumed after the reset.
