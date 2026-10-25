@@ -1,15 +1,11 @@
-# Handover - 2026-10-24 23:10 UTC
+# Handover - 2026-10-25 04:30 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 2 in progress (DL-0100): T-0012, T-0063, T-0081 by sub-agents in worktrees; the lead merges. Afterwards the lead does T-0109; T-0059 needs re-scoping (CAMT.053 built in T-0058).
+Task: parallel round 2 COMPLETE (DL-0100): T-0012, T-0063, T-0081 merged and in review. Next: the lead does T-0109; then `node scripts/agent/conductor.ts next --count 12` and plan round 3 (pre-assign numbers; give each agent its own scratchpad subfolder, DL-0113).
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
-In progress: round 2 worktrees. Pre-assigned (DL-0100):
-  T-0012 → migration 0016, DL-0101..0104, RQ-0023, SS-PLAT-48..49, ADR-0023
-  T-0063 → migration 0017, DL-0105..0108, RQ-0024, SS-PLAT-50..51, ADR-0024
-  T-0081 → no migration, DL-0109..0112, RQ-0025, SS-PLAT-52..53, ADR-0025
-  Lead → DL-0113+, SS-PLAT-54+
+In progress: nothing. Working tree clean after the last commit. Round-2 worktrees under .claude/worktrees/ are finished (git-ignored).
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
-Decisions taken: DL-0061..DL-0099; RQ-0017, RQ-0018; ADR-0018 (Proposed, security); RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
+Decisions taken: DL-0061..DL-0114; RQ-0017, RQ-0018; ADR-0018 (Proposed, security); RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
   2. (incl. T-0011's additions to ADR-0016: owner-only slug_lookup policy on app.tenant, the lf_oidc login-binding
      cookie, one fixed redirect URI — DL-0087/0088) Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1), ADR-0018 (envelope encryption, local keyring KMS) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
@@ -28,6 +24,9 @@ Open questions for human:
       roles except Owner + audit-log read; payment-batch release Owner+Approver, net-pay release and supplier bank
       verification Owner only; Auditor reads everything incl. employee bank details; Sales user/Integration get no
       LedgerForce permissions. Provisioning must grant the first Owner.
+  11. Web (T-0081): the SPA must be served on the API's origin (cookie path=/, SameSite=Lax, callback → /); move API
+      resource routes under a prefix such as /api before production? (deployment task). /auth/me has no organisation
+      name or roles yet (roles exist since T-0012; organisation name needs a field).
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
      (numeric + CHECK scale<=4) would make the DB refuse instead. Meanwhile the posting engine
      refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
@@ -83,6 +82,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >     and the permission step in tenant.interceptor.ts; DL-0101..0104 (security review)
 >   • T-0063 — packages/connectors/salesforce/** (JWT bearer, token client, certificate, connection store); migration 0017;
 >     RQ-0024; DL-0105..0108 (security review: encrypted key/token, AAD binding, row lock)
+>   • T-0081 — apps/web/** (TanStack Router shell, sign-in/out, session handling), tests/e2e/web/shell.spec.ts,
+>     RQ-0025, DL-0109..0112; 19 screenshots in .agent/evidence/T-0081/
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -175,3 +176,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T03:56:39.509Z claude: T-0063 → verifying
 - 2026-10-25T03:59:18.724Z claude: release T-0063 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; offline only (real token endpoint needs a scratch org); awaiting codex cross-review)
 - 2026-10-25 04:1x claude (lead): merged T-0063 (registers resolved by id, totals recomputed: 144); gates green (473 unit / 413 db, audit clean); verify 12 PASS/0 FAIL → review. DL-0113 (per-agent scratchpad folders). Waiting for T-0081.
+- 2026-10-25T04:07:01.032Z claude: T-0081 → verifying
+- 2026-10-25T04:09:26.560Z claude: release T-0081 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; awaiting codex cross-review)
+- 2026-10-25 04:3x claude (lead): merged T-0081 (registers by id, lockfile regenerated by pnpm, totals 147); gates green (506 unit / 413 db / 51 e2e, audit clean); verify 12 PASS/0 FAIL → review. Round 2 complete. T-0059 re-scoped (DL-0114).
