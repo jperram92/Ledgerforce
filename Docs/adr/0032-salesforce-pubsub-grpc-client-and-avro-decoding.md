@@ -86,7 +86,7 @@ Rules:
    (`accesstoken`, `instanceurl`, `tenantid`); plaintext only to a loopback address (tests).
 4. Avro `long` decodes to BigInt; replay ids are opaque bytes, stored as `bytea`, never parsed.
 5. The replay id moves by compare-and-set in the same tenant transaction as the batch's effects,
-   idempotency keys and resync requests (migration 0027). More events are requested only after
+   idempotency keys and resync requests (migration 0026). More events are requested only after
    the commit, never more than 100 outstanding.
 6. Idempotency key per record: `cdc:<entity>:<record id>:<commit number>:<sequence number>`;
    overflow: `cdc:<entity>:overflow:<transaction key>:<sequence>`; platform event:

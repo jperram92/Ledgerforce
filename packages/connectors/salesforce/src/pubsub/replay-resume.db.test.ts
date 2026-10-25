@@ -1,6 +1,6 @@
 /**
  * SS-PLAT-27 / SS-PLAT-74 — the CDC subscriber commits each batch's effects, idempotency keys and
- * replay id in one tenant transaction (design §5.3, §5.6; RQ-0036; migration 0027), so a restart
+ * replay id in one tenant transaction (design §5.3, §5.6; RQ-0036; migration 0026), so a restart
  * resumes from the stored replay id R with nothing lost and nothing applied twice. An invalid or
  * expired replay id, a gap event and an overflow event become resync requests for the reconcile
  * job. Salesforce is the local fake Pub/Sub server built from the vendored proto (no org).

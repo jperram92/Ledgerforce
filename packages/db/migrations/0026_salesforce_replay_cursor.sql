@@ -1,4 +1,4 @@
--- 0027 — Salesforce Pub/Sub subscriber state: replay-id cursor, event inbox, resync requests
+-- 0026 — Salesforce Pub/Sub subscriber state: replay-id cursor, event inbox, resync requests
 -- (T-0064, design §5.3, §5.6, RQ-0036, ADR-0032, DL-0167..DL-0171).
 -- Owner: packages/connectors/salesforce.
 --

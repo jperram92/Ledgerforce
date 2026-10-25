@@ -1,5 +1,5 @@
 /**
- * Replay-id cursor, event inbox and resync requests (migration 0027, design §5.3, §5.6, RQ-0036).
+ * Replay-id cursor, event inbox and resync requests (migration 0026, design §5.3, §5.6, RQ-0036).
  * Every function runs in the caller's tenant transaction, so the subscriber commits a batch's
  * effects, its idempotency keys and the new replay id together.
  */

@@ -124,5 +124,5 @@ real schema with more fields decodes the same way.
 - The reconcile job that consumes resync requests (design §5.3) and the supervisor that runs
   one subscriber per channel with back-off belong to later connector tasks.
 
-**Affects:** `packages/connectors/salesforce`, migration 0027, ADR-0032, ADR-0008 (idempotent
+**Affects:** `packages/connectors/salesforce`, migration 0026, ADR-0032, ADR-0008 (idempotent
 consumers), design §5.3, §5.6.

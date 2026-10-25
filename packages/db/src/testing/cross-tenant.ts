@@ -142,7 +142,7 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   // Bank-detail changes (migration 0025): a generated notice has no recipient email, which
   // the table allows only as 'no_recipient'. Settings need an Owner (prerequisite below).
   'app.bank_detail_change_notice': { status: () => 'no_recipient' },
-  // Salesforce Pub/Sub subscriber state (migration 0027): a CDC channel name, a cdc:/event: key,
+  // Salesforce Pub/Sub subscriber state (migration 0026): a CDC channel name, a cdc:/event: key,
   // an opaque replay id; a resync request for a rejected replay id has no entity or records.
   'app.salesforce_replay_cursor': { channel: () => '/data/AccountChangeEvent' },
   'app.salesforce_event_inbox': {
