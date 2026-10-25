@@ -992,3 +992,50 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: Round 4 runs T-0015 (segregation-of-duties engine and small-team mode: apps/api authz + migration 0021, security ADR Proposed) and T-0025 (posting engine pipeline: packages/ledger, migration 0022 only if needed) in worktrees with pre-assigned numbers and per-agent scratchpads. T-0025 builds only the generic single write path (idempotent command, validation, resolve by system role/account, in-memory invariants, >4-decimal refusal from DL-0074, one transaction writing journal + lines + outbox placeholder). It implements no event-specific posting rule (invoice, receipt …), because every golden posting in Docs/accounting/postings.md is still Draft (AGENTS.md: posting behaviours need an Approved golden posting). T-0016 waits for T-0015 (same roles/authz code).
 - Why: Product owner's instruction to keep building independent tasks in parallel; golden-posting gate respected.
 - ADR: none · Status: accepted
+
+### DL-0134 — T-0025 builds the generic posting pipeline only; no event posting rules while golden postings are Draft
+- Date: 2026-10-25 · By: claude · Task: T-0025 · Category: scope
+- Decision:
+  - `packages/ledger` gets `post(trx, command, { outbox })` and `preview(trx, command)` (posting-engine.ts) over a **raw** posting command (posting-command.ts): company, idempotency key, date, source type, optional source id, memo, `createdBy`, `periodOverride`, and lines that already name the account (system role or account id), debit or credit in base currency, transaction currency/amount/rate, tax code id and tax amount, dimension values, party and memo.
+  - Every golden posting in `Docs/accounting/postings.md` is still **Draft**, so nothing here decides debits and credits for an event: no invoice/receipt/bill/payout/payroll/reversal rule, no tax calculation, no FX conversion (the given rate is carried), no rounding to ROUNDING. `Docs/accounting/postings.md` is not edited. The event rules are built by their own tasks once each GP is Approved.
+  - `preview` takes the transaction as well (`preview(trx, command)`), because validation and resolution read the chart, parties, dimensions and periods; it runs steps 1, 3, 4, 5 and never writes (proved in a READ ONLY transaction).
+  - No migration: `journal_entry` already has `UNIQUE (tenant_id, company_id, idempotency_key)` (0007), so 0022 is not used.
+  - Errors are typed: `PostingError` (code + 1-based line) for command, account, party, dimension, series and idempotency refusals; `PeriodLockedError` (T-0023) for NO_PERIOD / PERIOD_LOCKED.
+  - Left as named hooks: `PostingOutbox` / `NO_OUTBOX` (T-0030 transactional outbox; runs inside the write and a throw undoes the post); subledger entries and `account_balance` (T-0027) are marked in the write step; approvals are not checked (no approval model yet).
+- Why: design §3.9 single write path; AGENTS.md and packages/ledger/AGENTS.md (posting behaviour only with an Approved GP); DL-0128 round-4 scope.
+- Alternatives: implement GP-001 etc. as "proposed" behaviour (rejected: human gate); `preview(command)` opening its own connection (rejected: the caller owns tenant context and transaction).
+- ADR: none · Status: accepted
+
+### DL-0135 — Journal entry numbers come from a per-source-type series `je_<source type>`
+- Date: 2026-10-25 · By: claude · Task: T-0025 · Category: architecture
+- Decision: The engine numbers each entry with `nextNumber(trx, company, entrySeriesFor(sourceType))`, where `entrySeriesFor(st) = 'je_' + st` (e.g. `je_manual_journal`, `je_ar_invoice`). A command whose series is missing or archived is refused (`NO_NUMBER_SERIES`) before anything is written. The number is taken inside the write savepoint, so a failed post returns it (gapless, T-0024). Document numbers (INV-…) stay the modules' own series, stored in `source_id`. Because `entry_no` is unique per company, the series of one company need distinct prefixes; creating them (with prefixes) belongs to company setup (wizard), not to the engine.
+- Why: the task asks for "the series for the source type"; per-source-type series keep each journal type's numbers consecutive (auditors check gaps per journal), and the `je_` namespace cannot collide with document series codes.
+- Alternatives: one `journal` series per company (simpler, one global sequence — open question for the product owner, see HANDOVER via the lead); auto-creating series on first post (rejected: prefixes are a setup decision; silent defaults collide on `entry_no`).
+- ADR: none · Status: accepted (open question to the human: one series per company vs per source type, and default prefixes)
+
+### DL-0136 — Control accounts: which subledger may post to each control role
+- Date: 2026-10-25 · By: claude · Task: T-0025 · Category: accounting
+- Decision: A line on an account with `is_control` is accepted only if a control role bound to that account accepts the command's source type: `AR_CONTROL` ← every AR-class source type of the period matrix (`ar_*` and `payments_stripe_charge`, which credits AR in GP-003 Draft); `AP_CONTROL` ← `ap_*`; `PAYROLL_CLEARING` ← `payroll_*`. Anything else, including `manual_journal`, `payments_stripe_payout`, and a control account with no bound control role, is refused (`CONTROL_ACCOUNT`). `ledger_reversal` cannot be posted through a raw command at all (`SOURCE_TYPE_NOT_SUPPORTED`) until the reversal flow (GP-019, Draft) is built; reversals of AR/AP entries will need their own rule there.
+- Why: design §3.2 ("control accounts accept postings only from their subledger, never from manual journals"); the period matrix (RQ-0026) is the existing list of source types and their classes.
+- Alternatives: allow `ledger_reversal` on control accounts now (rejected: the original's subledger must be checked, which is GP-019 work); key the rule on the period class only (rejected: payroll is class `ap` for period purposes but must not post to AP control).
+- ADR: none · Status: accepted (mapping reviewable by the product owner with the golden postings)
+
+### DL-0137 — Idempotency: advisory lock on the key, replay the first result, conflict on reuse
+- Date: 2026-10-25 · By: claude · Task: T-0025 · Category: architecture
+- Decision: Per RQ-0030, `post` takes `pg_advisory_xact_lock(hashtextextended('lf.posting_idem:<tenant>:<company>:<key>', 0))` after the pure checks, then looks the key up. Found → the stored entry is returned as the result (`replayed: true`) **without validating or writing again** (a retry still gets its answer after a period is locked). If the stored entry has a different `source_type` or `source_id`, the key was reused for another document → `IDEMPOTENCY_CONFLICT`. If the write hits 23505 on the key (a writer outside the lock), the savepoint is rolled back and the winner replayed, or `IDEMPOTENCY_RACE` is raised outside Read Committed. The key is scoped per company (the existing unique key). A full payload fingerprint (same key, different lines) is not compared: it needs a stored command hash (an additive column) — left for the product owner / a follow-up card.
+- Why: SS-PLAT-14; connectors redeliver (design §5.6). RQ-0030 experiment E1–E4.
+- Alternatives: rely on the unique key alone (second caller gets an error, not the first result); SELECT … FOR UPDATE on a key table (needs a new table and migration).
+- ADR: none · Status: accepted
+
+### DL-0138 — Posting validation details and write atomicity
+- Date: 2026-10-25 · By: claude · Task: T-0025 · Category: architecture
+- Decision:
+  - Amounts are plain non-negative decimal strings (no JS numbers, signs or exponents); at most 4 **significant** decimals, so `1.23450` is accepted as 1.2345 and `1.00005` is refused (`AMOUNT_SCALE`). Rates: at most 8 significant decimals (`RATE_SCALE`), at most 10 integer digits, greater than zero. Sums use `Money` (decimal.js); the in-memory balance check runs before the first SQL statement (proved with a transaction stand-in that throws on use).
+  - A base-currency line (no `txnCurrency`, or the base currency) is stored with rate 1 and `txn_amount` = the base amount; a different rate or amount is refused. A foreign-currency line needs both `txnAmount` and `fxRate`; the engine stores them as given and does not recompute base amounts. An account with a currency restriction takes only lines in that currency.
+  - Party: must be an active party of the same company. Dimensions: values of the company, active, one per dimension; the account's required dimensions are checked in the validate step (also in preview) and again with `app.dimension_set_missing_required` after the set is created.
+  - Period: `resolvePostingDate` (T-0023) with `withOverride` when the command has `periodOverride`; the engine then records the override (`recordPeriodOverride`, granted by `createdBy`, who must hold `period.lock.override`, else the database refuses). Under the lock-date policy `post_to_first_open_date_with_note` the entry is dated on the first open date and the policy note is appended to the memo (new line).
+  - The write runs under `SAVEPOINT lf_posting` in the caller's transaction: on any error it is rolled back and released, so nothing is written even if the caller catches the error and commits.
+  - Step 5 (check on the built lines) re-checks lines and balance. Today build copies the checked amounts unchanged, so this check cannot fail; it is kept for the tax/FX/rounding line builders that will change amounts (an equivalent mutant in the T-0025 mutation run).
+- Why: design §3.3, §3.4, §3.5, §3.9; DL-0074; ADR-0005 (money).
+- Alternatives: accept JS numbers that are safe integers (rejected: one input type); reject trailing zeros beyond 4 decimals (rejected: no value is lost); compute base = txn × rate (rejected: FX conversion and its rounding are not specified until the FX golden postings are approved).
+- ADR: none · Status: accepted

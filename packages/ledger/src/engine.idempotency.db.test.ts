@@ -105,6 +105,36 @@ describe('SS-PLAT-14 same idempotency key posts once [T-0025]', () => {
     for (const r of results) expect(r).toEqual({ ...firstResult, replayed: r.replayed });
   });
 
+  it('SS-PLAT-14 a concurrent repeat waits for the first post and replays it, even if it would now be refused [T-0025]', async () => {
+    const key = randomUUID();
+    let release!: () => void;
+    const gate = new Promise<void>((r) => {
+      release = r;
+    });
+    let writing!: () => void;
+    const inWrite = new Promise<void>((r) => {
+      writing = r;
+    });
+    const holdOpen: PostingOutbox = {
+      async enqueue() {
+        writing();
+        await gate;
+      },
+    };
+    const t1 = withTenant(wide, f.tenantId, (trx) => post(trx, command(key), { outbox: holdOpen }));
+    await inWrite; // T1 has written its entry and holds the transaction open
+    // The repeat carries a date with no period: validated on its own it would be NO_PERIOD.
+    const t2 = withTenant(wide, f.tenantId, (trx) =>
+      post(trx, command(key, { entryDate: '2030-01-01' })),
+    );
+    await new Promise((r) => setTimeout(r, 300));
+    release();
+    const [r1, r2] = await Promise.all([t1, t2]);
+    expect(r1.replayed).toBe(false);
+    expect(r2).toEqual({ ...r1, replayed: true });
+    expect(await entriesWithKey(key)).toHaveLength(1);
+  });
+
   it('SS-PLAT-14 a key committed concurrently outside the engine lock is replayed, not an error [T-0025]', async () => {
     const key = randomUUID();
     let release!: () => void;

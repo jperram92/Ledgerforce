@@ -543,6 +543,10 @@ describe('SS-PLAT-64 refusals are typed and write nothing [T-0025]', () => {
       ]);
     const err = await refused(on6220(), 'MISSING_DIMENSION', 1);
     expect(err.message).toMatch(/6220.*department/);
+    // Preview applies the same rule (it has no write step to fall back on).
+    await expect(f.inTenant((trx) => preview(trx, on6220()))).rejects.toMatchObject({
+      code: 'MISSING_DIMENSION',
+    });
     await refused(on6220([randomUUID()]), 'INVALID_DIMENSION', 1);
     await refused(on6220([dim.OLD ?? '']), 'INVALID_DIMENSION', 1);
     await refused(on6220([dim.SALES ?? '', dim.OPS ?? '']), 'INVALID_DIMENSION', 1);

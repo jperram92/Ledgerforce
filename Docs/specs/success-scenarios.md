@@ -416,4 +416,12 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 - Phase: MVP · Layer: **unit + db-integration** · Screenshot evidence: no · Task(s): T-0013
 - **Given** a step-up in progress or a step-up route · **When** the IdP authenticates another user, answers without MFA or with a stale `auth_time`, the callback comes with no or another session cookie, the session has ended or has no recorded `auth_time`, or a route holds a step-up permission without `@RequireStepUp` · **Then** each is refused (403 step_up_mismatch / mfa_required, 400 login_failed / invalid_request, 401 step_up_required) and the session is left unchanged; refusals at the callback are audited as `step_up_refused`
 
+### SS-PLAT-64 — The posting engine refuses an invalid command with a typed error and writes nothing
+- Phase: MVP · Layer: **unit + db-integration** · Screenshot evidence: no · Task(s): T-0025
+- **Given** a raw posting command · **When** it has fewer than two lines, a line with both or no side, an amount with more than 4 decimals or a rate with more than 8, is unbalanced, names an unknown source type, an unknown company or account, an unbound system role, an archived, non-postable or currency-restricted account, a control account outside its subledger, an inactive or foreign party, an invalid dimension value, lacks a required dimension, has no entry number series, or is dated where the period does not allow its source type · **Then** it is refused with a typed error (code and line) — the shape, decimal and balance checks before any SQL — and no entry, line, dimension set, override or number is written
+
+### SS-PLAT-65 — A valid command posts as one numbered, chained entry in one transaction; preview writes nothing
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0025
+- **Given** a valid raw posting command (accounts by system role or id, base or foreign currency lines, party, dimensions) · **When** it is posted · **Then** one posted entry with the next gapless number of its source type's series is written with its lines exactly as built (rate 1 for base-currency lines, transaction currency, amount and rate carried as given), the hash chain verifies, the lock-date policy and recorded overrides apply, and the outbox hook runs inside the same transaction; a failure anywhere in the write leaves nothing, even if the caller commits; **and** preview of the same command returns the same journal inside a read-only transaction without writing anything
+
 
