@@ -37,7 +37,7 @@ const SECTIONS = ['Timeline', 'Sales', 'Purchases', 'Bank', 'Reports', 'Settings
 describe('SS-PLAT-52 sign-in and session handling', () => {
   it('shows a loading state while the session is checked', async () => {
     start('/', { '/auth/me': () => new Promise<Response>(() => undefined) });
-    expect(await screen.findByRole('status').textContent).toContain('Checking your sign-in');
+    expect((await screen.findByRole('status')).textContent).toContain('Checking your sign-in');
   });
 
   it('sends a visitor without a session (401) to the sign-in page', async () => {
@@ -49,6 +49,22 @@ describe('SS-PLAT-52 sign-in and session handling', () => {
     ).toBeTruthy();
     expect(history.location.pathname).toBe('/sign-in');
     expect(screen.queryByRole('navigation', { name: 'Sections' })).toBeNull();
+  });
+
+  it('a session that ends while the shell is open sends the person to sign-in on the next check', async () => {
+    let signedIn = true;
+    const { history } = start('/bank', {
+      '/auth/me': () => (signedIn ? json(200, SAM) : json(401, { error: 'unauthenticated' })),
+    });
+    await screen.findByRole('navigation', { name: 'Sections' });
+    signedIn = false;
+    // TanStack Query re-checks a stale query when the page becomes visible again.
+    window.dispatchEvent(new Event('visibilitychange'));
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Sign in to LedgerForce' }),
+    ).toBeTruthy();
+    expect(history.location.pathname).toBe('/sign-in');
+    expect(screen.getByRole('status').textContent).toContain('your session has ended');
   });
 
   it('sign-in sends the browser to the tenant login URL of the API', async () => {
@@ -100,7 +116,7 @@ describe('SS-PLAT-52 sign-in and session handling', () => {
     });
     await user.click(await screen.findByRole('button', { name: /Sam Nguyen/ }));
     await user.click(await screen.findByRole('menuitem', { name: 'Sign out' }));
-    expect(await screen.findByRole('alert').textContent).toContain('Sign-out did not finish');
+    expect((await screen.findByRole('alert')).textContent).toContain('Sign-out did not finish');
     expect(screen.getByRole('navigation', { name: 'Sections' })).toBeTruthy();
   });
 });
@@ -111,13 +127,17 @@ describe('SS-PLAT-53 authenticated shell, navigation and states', () => {
     const nav = await screen.findByRole('navigation', { name: 'Sections' });
     const links = within(nav).getAllByRole('link');
     expect(links.map((l) => l.textContent)).toEqual(SECTIONS);
-    expect(within(nav).getByRole('link', { name: 'Timeline' }).getAttribute('aria-current')).toBe('page');
+    expect(within(nav).getByRole('link', { name: 'Timeline' }).getAttribute('aria-current')).toBe(
+      'page',
+    );
     for (const name of SECTIONS.slice(1)) {
       expect(within(nav).getByRole('link', { name }).getAttribute('aria-current')).toBeNull();
     }
     expect(screen.getByRole('button', { name: /Sam Nguyen/ })).toBeTruthy();
     expect(screen.getByRole('heading', { level: 1 }).textContent).toContain('Your money over time');
-    expect(screen.getByRole('link', { name: 'Skip to main content' }).getAttribute('href')).toBe('#main');
+    expect(screen.getByRole('link', { name: 'Skip to main content' }).getAttribute('href')).toBe(
+      '#main',
+    );
   });
 
   it('moves the current section, the heading, the title and focus when navigating', async () => {
@@ -127,8 +147,12 @@ describe('SS-PLAT-53 authenticated shell, navigation and states', () => {
     await user.click(within(nav).getByRole('link', { name: 'Sales' }));
     const h1 = await screen.findByRole('heading', { level: 1, name: 'Sales' });
     expect(history.location.pathname).toBe('/sales');
-    expect(within(nav).getByRole('link', { name: 'Sales' }).getAttribute('aria-current')).toBe('page');
-    expect(within(nav).getByRole('link', { name: 'Timeline' }).getAttribute('aria-current')).toBeNull();
+    expect(within(nav).getByRole('link', { name: 'Sales' }).getAttribute('aria-current')).toBe(
+      'page',
+    );
+    expect(
+      within(nav).getByRole('link', { name: 'Timeline' }).getAttribute('aria-current'),
+    ).toBeNull();
     await waitFor(() => expect(document.activeElement).toBe(h1));
     expect(document.title).toBe('Sales – LedgerForce');
   });
@@ -145,7 +169,7 @@ describe('SS-PLAT-53 authenticated shell, navigation and states', () => {
     const h2 = await screen.findByRole('heading', { level: 2, name: heading });
     const region = h2.closest('section');
     expect(region).not.toBeNull();
-    expect(region.getAttribute('data-state')).toBe('empty');
+    expect(region?.getAttribute('data-state')).toBe('empty');
     expect(region?.querySelector('p')?.textContent ?? '').not.toBe('');
   });
 
@@ -166,6 +190,8 @@ describe('SS-PLAT-53 authenticated shell, navigation and states', () => {
   it('shows a not-found page inside the shell for an unknown path', async () => {
     start('/no-such-page', { '/auth/me': () => json(200, SAM) });
     expect(await screen.findByRole('heading', { level: 1, name: 'Page not found' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Go to your timeline' }).getAttribute('href')).toBe('/');
+    expect(screen.getByRole('link', { name: 'Go to your timeline' }).getAttribute('href')).toBe(
+      '/',
+    );
   });
 });

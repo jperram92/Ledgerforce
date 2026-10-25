@@ -16,14 +16,19 @@ describe('SS-PLAT-52 checkSlug (migration 0014 slug rule, RQ-0025)', () => {
     });
   });
 
-  it.each(['-harbour', 'harbour-', 'harbour co', 'harbour_co', 'härbour', 'a'.repeat(64), 'x/../y'])(
-    'refuses %j with a plain explanation',
-    (input) => {
-      expect(checkSlug(input)).toEqual({
-        ok: false,
-        message:
-          'Use lower-case letters, numbers and hyphens only (up to 63), with no hyphen at the start or end.',
-      });
-    },
-  );
+  it.each([
+    '-harbour',
+    'harbour-',
+    'harbour co',
+    'harbour_co',
+    'härbour',
+    'a'.repeat(64),
+    'x/../y',
+  ])('refuses %j with a plain explanation', (input) => {
+    expect(checkSlug(input)).toEqual({
+      ok: false,
+      message:
+        'Use lower-case letters, numbers and hyphens only (up to 63), with no hyphen at the start or end.',
+    });
+  });
 });

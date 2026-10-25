@@ -1,0 +1,277 @@
+/* apps/web shell (T-0081) in the Timeline direction (DL-0070). Requires @ledgerforce/ui tokens.css
+   and timeline.css first. One top bar with the organisation, the sections and the person, as in
+   Docs/ui/system's reference screens: no icon sidebar, no search/bell/avatar (G5), no shadows, radius
+   2px, no all-caps (G3, G10). Colour still means time only; the shell itself uses ink and lines,
+   and teal only for focus. Dashed outlines mark what is not there yet (empty states). */
+
+body {
+  min-height: 100vh;
+}
+
+/* Skip link: off-screen until focused, then a solid block in the corner. */
+.skip {
+  position: absolute;
+  left: var(--s2);
+  top: -100px;
+  z-index: 10;
+  padding: var(--s2) var(--s3);
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: var(--r);
+  font-weight: 600;
+}
+.skip:focus {
+  top: var(--s2);
+}
+
+/* Top bar */
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--s5);
+  padding: 0 var(--s5);
+  min-height: 52px;
+  border-bottom: 2px solid var(--ink);
+}
+.top .org {
+  font-weight: 800;
+  white-space: nowrap;
+}
+.top nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 2px;
+}
+.top nav a {
+  display: block;
+  padding: 6px 12px;
+  text-decoration: none;
+  border-radius: var(--r);
+}
+.top nav a:hover {
+  color: inherit;
+  background: var(--lane);
+}
+.top nav a[aria-current='page'] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* The person, and the menu that holds Sign out */
+.me {
+  margin-left: auto;
+  font: 600 14px/1 var(--font);
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  padding: 8px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.me[data-state='open'] {
+  border-color: var(--ink);
+  background: var(--lane);
+}
+.menu {
+  min-width: 220px;
+  max-width: calc(100vw - 32px);
+  padding: var(--s1);
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: var(--r);
+  font: 400 15px/1.45 var(--font);
+  z-index: 20;
+}
+.menu-label {
+  padding: var(--s2) var(--s3);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.menu-sep {
+  height: 1px;
+  margin: var(--s1) 0;
+  background: var(--line);
+}
+.menu-item {
+  padding: var(--s2) var(--s3);
+  border-radius: var(--r);
+  cursor: pointer;
+  font-weight: 600;
+  outline: none;
+}
+.menu-item[data-highlighted] {
+  background: var(--now-soft);
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+.menu-item[data-disabled] {
+  color: var(--ink-2);
+  cursor: default;
+}
+
+/* Page */
+main {
+  display: block;
+}
+main:focus,
+h1[tabindex='-1']:focus {
+  outline: none;
+}
+.head {
+  padding: var(--s5) var(--s5) var(--s3);
+}
+.head h1 {
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  max-width: 26ch;
+}
+.head p {
+  margin-top: var(--s2);
+  color: var(--ink-2);
+  max-width: 70ch;
+}
+.head .next {
+  color: var(--ink);
+}
+
+/* Empty state: a dashed outline, the timeline's mark for what is not there yet. */
+.empty {
+  margin: var(--s3) var(--s5) var(--s5);
+  padding: var(--s5);
+  border: 1px dashed var(--line-2);
+  border-radius: var(--r);
+  max-width: 70ch;
+}
+.empty h2 {
+  font-size: 20px;
+  font-weight: 800;
+}
+.empty p {
+  margin-top: var(--s2);
+  color: var(--ink-2);
+}
+
+/* Loading and error states, and the sign-out problem banner */
+.state {
+  padding: var(--s6) var(--s5);
+  max-width: 70ch;
+}
+.state h1 {
+  font-size: 26px;
+  font-weight: 800;
+}
+.state p {
+  margin-top: var(--s2);
+}
+.banner {
+  margin: 0;
+  padding: var(--s3) var(--s5);
+  border-bottom: 2px solid var(--ink);
+  background: var(--lane);
+  font-weight: 600;
+}
+
+/* Buttons */
+.primary {
+  margin-top: var(--s4);
+  font: 600 15px/1 var(--font);
+  padding: 12px 16px;
+  color: var(--paper);
+  background: var(--ink);
+  border: 2px solid var(--ink);
+  border-radius: var(--r);
+  cursor: pointer;
+}
+.primary:hover {
+  background: var(--ink-2);
+  border-color: var(--ink-2);
+}
+
+/* Sign-in */
+.signin {
+  padding: var(--s6) var(--s5);
+  max-width: 38rem;
+}
+.signin h1 {
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.signin > p {
+  margin-top: var(--s3);
+  color: var(--ink-2);
+}
+.signin .notice {
+  color: var(--ink);
+  font-weight: 600;
+  padding: var(--s2) var(--s3);
+  border-left: 4px solid var(--now);
+  background: var(--now-soft);
+}
+.signin form {
+  margin-top: var(--s5);
+}
+.signin label {
+  display: block;
+  font-weight: 600;
+}
+.signin .hint {
+  margin-top: var(--s1);
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.signin input {
+  display: block;
+  margin-top: var(--s2);
+  width: 100%;
+  max-width: 24rem;
+  font: 400 16px/1.4 var(--font);
+  padding: 10px 12px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink-2);
+  border-radius: var(--r);
+}
+.signin input[aria-invalid='true'] {
+  border: 2px solid var(--ink);
+}
+.signin .error {
+  margin-top: var(--s2);
+  font-weight: 600;
+  padding-left: var(--s3);
+  border-left: 4px solid var(--ink);
+}
+
+@media (max-width: 900px) {
+  .top {
+    flex-wrap: wrap;
+    gap: var(--s2) var(--s3);
+    padding: var(--s2) var(--s4);
+  }
+  .top nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+  .head,
+  .state,
+  .signin {
+    padding: var(--s4);
+  }
+  .head h1,
+  .signin h1 {
+    font-size: 26px;
+  }
+  .empty {
+    margin: var(--s2) var(--s4) var(--s4);
+    padding: var(--s4);
+  }
+}

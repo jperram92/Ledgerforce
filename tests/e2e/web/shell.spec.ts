@@ -25,7 +25,12 @@ import { genericnessProbe } from '../fixtures/genericness.ts';
 const WEB = resolve(import.meta.dirname, '..', '..', '..', 'apps', 'web');
 const SAM = { tenant_id: 't-harbour', user_id: 'u-sam', display_name: 'Sam Nguyen' };
 const SECTIONS = [
-  { name: 'Timeline', path: '/', h1: 'Your money over time', empty: 'Nothing on your timeline yet' },
+  {
+    name: 'Timeline',
+    path: '/',
+    h1: 'Your money over time',
+    empty: 'Nothing on your timeline yet',
+  },
   { name: 'Sales', path: '/sales', h1: 'Sales', empty: 'No invoices yet' },
   { name: 'Purchases', path: '/purchases', h1: 'Purchases', empty: 'No bills yet' },
   { name: 'Bank', path: '/bank', h1: 'Bank', empty: 'No bank statements yet' },
@@ -139,7 +144,9 @@ test.describe('SS-PLAT-52 sign-in and session handling', () => {
   }) => {
     const api = await fakeApi(page, 'signed-out');
     await open(page, '/sales', 1440, 'light');
-    await expect(page.getByRole('heading', { level: 1, name: 'Sign in to LedgerForce' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Sign in to LedgerForce' }),
+    ).toBeVisible();
     expect(new URL(page.url()).pathname).toBe('/sign-in');
     await expect(page.getByRole('navigation', { name: 'Sections' })).toHaveCount(0);
     await assertPage(page, 1440);
@@ -156,7 +163,9 @@ test.describe('SS-PLAT-52 sign-in and session handling', () => {
 
     await box.fill('Harbour-Co');
     await page.getByRole('button', { name: 'Continue to sign in' }).click();
-    await expect(page.getByRole('heading', { name: 'Identity provider (test stand-in)' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: 'Identity provider (test stand-in)' }),
+    ).toBeVisible();
     expect(api.loginCalls).toEqual(['/t/harbour-co/auth/login']);
     expect(api.errors).toEqual([]);
     expect(api.external).toEqual([]);
@@ -166,7 +175,9 @@ test.describe('SS-PLAT-52 sign-in and session handling', () => {
     test(`SS-PLAT-52: sign-in page @ 390 ${scheme} [T-0081]`, async ({ page, evidence }) => {
       const api = await fakeApi(page, 'signed-out');
       await open(page, '/sign-in', 390, scheme);
-      await expect(page.getByRole('textbox', { name: "Your organisation's sign-in name" })).toBeVisible();
+      await expect(
+        page.getByRole('textbox', { name: "Your organisation's sign-in name" }),
+      ).toBeVisible();
       await assertPage(page, 390);
       await evidence('SS-PLAT-52', `sign-in-390-${scheme}`);
       expect(api.errors).toEqual([]);
@@ -193,7 +204,9 @@ test.describe('SS-PLAT-52 sign-in and session handling', () => {
     await evidence('SS-PLAT-52', 'signed-out-1440');
     // The back button must not show the shell again: the session check now answers 401.
     await page.goBack();
-    await expect(page.getByRole('heading', { level: 1, name: 'Sign in to LedgerForce' })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Sign in to LedgerForce' }),
+    ).toBeVisible();
     expect(api.errors).toEqual([]);
   });
 
@@ -226,9 +239,14 @@ test.describe('SS-PLAT-53 authenticated shell, navigation and states', () => {
         await open(page, '/', width, scheme);
         const nav = page.getByRole('navigation', { name: 'Sections' });
         await expect(nav.getByRole('link')).toHaveText(SECTIONS.map((s) => s.name));
-        await expect(nav.getByRole('link', { name: 'Timeline' })).toHaveAttribute('aria-current', 'page');
+        await expect(nav.getByRole('link', { name: 'Timeline' })).toHaveAttribute(
+          'aria-current',
+          'page',
+        );
         await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your money over time');
-        await expect(page.getByRole('heading', { level: 2, name: 'Nothing on your timeline yet' })).toBeVisible();
+        await expect(
+          page.getByRole('heading', { level: 2, name: 'Nothing on your timeline yet' }),
+        ).toBeVisible();
         await expect(page.getByRole('button', { name: /Sam Nguyen/ })).toBeVisible();
         await assertPage(page, width);
         await evidence('SS-PLAT-53', `shell-home-${String(width)}-${scheme}`);
@@ -252,9 +270,12 @@ test.describe('SS-PLAT-53 authenticated shell, navigation and states', () => {
       await expect(nav.locator('[aria-current="page"]')).toHaveText([s.name]);
       const empty = page.getByRole('heading', { level: 2, name: s.empty });
       await expect(empty).toBeVisible();
-      await expect(page).toHaveTitle(s.name === 'Timeline' ? 'Timeline – LedgerForce' : `${s.name} – LedgerForce`);
+      await expect(page).toHaveTitle(
+        s.name === 'Timeline' ? 'Timeline – LedgerForce' : `${s.name} – LedgerForce`,
+      );
       await assertPage(page, 1440);
-      if (s.name !== 'Timeline') await evidence('SS-PLAT-53', `section-${s.name.toLowerCase()}-1440`);
+      if (s.name !== 'Timeline')
+        await evidence('SS-PLAT-53', `section-${s.name.toLowerCase()}-1440`);
     }
     expect(api.errors).toEqual([]);
   });
