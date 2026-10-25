@@ -268,6 +268,17 @@ test.describe('SS-PLAT-53 authenticated shell, navigation and states', () => {
       await expect(page.getByRole('heading', { level: 1 })).toHaveText(s.h1);
       expect(new URL(page.url()).pathname).toBe(s.path);
       await expect(nav.locator('[aria-current="page"]')).toHaveText([s.name]);
+      // The current section is also marked visually (ink block), not by the attribute alone.
+      // Move the pointer off the links first so a hover background cannot pass for it.
+      await page.mouse.move(1, 880);
+      const looks = await nav
+        .getByRole('link')
+        .evaluateAll((links) => links.map((l) => getComputedStyle(l).backgroundColor));
+      const current = SECTIONS.findIndex((x) => x.name === s.name);
+      for (const [i, bg] of looks.entries()) {
+        if (i === current) expect(bg, `${s.name} looks current`).not.toBe('rgba(0, 0, 0, 0)');
+        else expect(bg, `link ${String(i)} does not look current`).toBe('rgba(0, 0, 0, 0)');
+      }
       const empty = page.getByRole('heading', { level: 2, name: s.empty });
       await expect(empty).toBeVisible();
       await expect(page).toHaveTitle(

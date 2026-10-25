@@ -69,13 +69,9 @@ export function Shell() {
           <ul>
             {SECTIONS.map((s) => (
               <li key={s.path}>
-                <Link
-                  to={s.path}
-                  activeOptions={{ exact: s.path === '/' }}
-                  activeProps={{ 'aria-current': 'page' }}
-                >
-                  {s.name}
-                </Link>
+                {/* TanStack Link marks the current section with aria-current="page"; "/" is only
+                    current at "/" (its path match requires a "/" boundary). shell.css styles it. */}
+                <Link to={s.path}>{s.name}</Link>
               </li>
             ))}
           </ul>
