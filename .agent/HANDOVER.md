@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 5 COMPLETE (DL-0140): T-0016, T-0027, T-0030, T-0053 merged in migration order 0022→0025, each verify.sh 13 PASS/0 FAIL/3 PENDING, all in review. Next: plan round 6 (candidates T-0026 preview, T-0028 subledger, T-0029 manual journals — one engine-touching task per round — plus T-0108).
+Task: PARALLEL ROUND 6 in progress (DL-0162): T-0026, T-0064, T-0076, T-0093 by sub-agents in worktrees (numbers in DL-0162). Round 5 (T-0016, T-0027, T-0030, T-0053) complete and in review.
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -251,3 +251,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T19:15:00.778Z claude: release T-0030 → review
 - 2026-10-25T19:15:00.994Z claude: release T-0053 → review
 - 2026-10-25 claude (lead): round 5 merged (T-0016, T-0027, T-0030 + ADR-0029, T-0053); final tree gates green (628 unit / 739 db / 82 agent); verify 13/0/3 each → review. First T-0016 verify had one intermittent gate-2a failure (likely the Salesforce test-key DER flake fixed in T-0030); six reruns and all later verifies green.
+- 2026-10-25 claude (lead): round 6 claimed (T-0026, T-0064, T-0076, T-0093; DL-0162).

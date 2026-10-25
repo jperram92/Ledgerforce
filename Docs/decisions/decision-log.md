@@ -1263,3 +1263,20 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: AGENTS.md §6 and design §10.6: a change to the security model needs a security ADR, and the "no DELETE for lf_app" rule had applied everywhere until now.
 - ADR: ADR-0029 · Status: proposed (awaiting human)
 
+
+### DL-0162 — Parallel round 6: T-0026, T-0064, T-0076, T-0093
+- Date: 2026-10-25 · By: claude (lead) · Task: T-0026, T-0064, T-0076, T-0093 · Category: process
+- Decision: Round 6 runs four tasks in worktrees branched from the round-5 head, with pre-assigned numbers. A migration number is used only if needed; the lead closes any gap by renumbering unmerged files before merge.
+  - T-0026 (posting preview): migration 0026, DL-0163..0166, RQ-0035, ADR-0031, SS-PLAT-15 (existing) and SS-PLAT-72..73.
+  - T-0064 (CDC subscriber with a replay-id store): migration 0027, DL-0167..0171, RQ-0036, ADR-0032, SS-PLAT-27 (existing) and SS-PLAT-74..75.
+  - T-0076 (TB, P&L and BS): migration 0028, DL-0172..0176, RQ-0037, ADR-0033, SS-UC10-08 (existing) and SS-PLAT-76..77.
+  - T-0093 (UI for users, roles, SoD report and audit viewer): migration 0029, DL-0177..0181, RQ-0038, ADR-0034, SS-PLAT-78..80.
+  - Lead: DL-0182+, SS-PLAT-81+.
+
+  Not in this round:
+  - T-0028 and T-0029 edit the engine alongside T-0026; they go next round.
+  - T-0067 needs a scratch org for its e2e and shares the connector with T-0064.
+  - T-0094 needs Docker.
+  - T-0095 is human-only; T-0103 needs Windows; T-0108 is Phase 1.
+- Why: Product owner's instruction to build independent tasks in parallel, with one engine-touching task per round.
+- ADR: none · Status: accepted
