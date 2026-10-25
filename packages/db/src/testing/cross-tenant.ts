@@ -111,6 +111,21 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     file_sha256: () => randomBytes(32).toString('hex'),
   },
   'app.bank_statement_line': { dedupe_key: () => `h:${randomBytes(32).toString('hex')}` },
+  // Salesforce JWT bearer connection (migration 0017): a complete sealed key and certificate facts.
+  'app.salesforce_connection': {
+    id: () => randomUUID(),
+    login_url: () => 'https://test.salesforce.com',
+    username: () => `integration-${randomBytes(4).toString('hex')}@example.test`,
+    consumer_key: () => `3MVG9${randomBytes(8).toString('hex')}`,
+    private_key_ct: () => '\\x01',
+    private_key_iv: () => `\\x${'00'.repeat(12)}`,
+    private_key_tag: () => `\\x${'00'.repeat(16)}`,
+    private_key_dek_wrapped: () => `\\x${'00'.repeat(60)}`,
+    private_key_kek_id: () => 'k1',
+    private_key_enc_version: () => '1',
+    cert_not_after: () => '2027-01-01T00:00:00Z',
+    cert_sha256: () => randomBytes(32).toString('hex'),
+  },
 };
 
 /**

@@ -816,3 +816,40 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: TDD needs an observable route now; the card's goal ("a guard used by every endpoint") had no AC.
 - Alternatives: a stub batch endpoint in production code (would pre-empt T-0043); unit-only proof (would not show the 403 or the audit row).
 - ADR: ADR-0023 · Status: accepted
+
+### DL-0105 — Salesforce JWT bearer contract (RQ-0024): RS256, aud = login or test URL only, exp ≤ 180 s, mapped error codes
+- Date: 2026-10-24 · By: claude · Task: T-0063 · Category: architecture
+- Decision: The self-host connection signs `{"alg":"RS256","typ":"JWT"}` assertions with `node:crypto` (claims `iss` consumer key, `sub` integration username, `aud`, `iat`, `exp` ≤ 180 s after `iat`, random `jti`), refuses non-RSA or < 2048-bit keys, and posts `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=…` form-encoded to `<aud>/services/oauth2/token`. `aud` and token host are one stored value, `https://login.salesforce.com` or `https://test.salesforce.com` (CHECK in migration 0017), so no row can send an assertion to another host. Token-endpoint failures map to stable codes (`not_preauthorized`, `invalid_audience`, `invalid_assertion`, `invalid_user`, `ip_restricted`, `invalid_grant`, `invalid_client`, `unsupported_grant_type`, `token_endpoint_unavailable` (retryable), `malformed_response`) by case-insensitive substring of `error_description`. The HTTP client is injected; tests use a local fake endpoint that verifies signatures.
+- Why: RQ-0024 (primary pages reachable only as search extracts — confidence medium), ADR-0007, design §5.2. No new runtime dependency.
+- Alternatives: a JWT library such as `jose` (would be a new runtime dependency needing an ADR, for ~30 lines of code); a free-form token URL (My Domain) — not needed for this flow and widens where an assertion can be sent.
+- ADR: ADR-0007 (unchanged) · Status: accepted
+
+### DL-0106 — Salesforce access-token cache: sealed, reused for 15 minutes, re-signed after a 401, single flight by row lock
+- Date: 2026-10-25 · By: claude · Task: T-0063 · Category: architecture
+- Decision: `getAccessToken()` locks the connection row (`SELECT … FOR UPDATE`), returns the cached token if it is younger than 15 minutes (configurable `maxAgeSeconds`), otherwise opens the private key, signs a new assertion, exchanges it and stores the sealed token in the same transaction. Callers that get a 401 from Salesforce call `invalidateAccessToken()`. The HTTP exchange runs while the row lock is held, so concurrent callers wait for one exchange instead of each signing.
+- Why: The JWT bearer response has no `expires_in` and no refresh token (RQ-0024 F3); the token lives as long as the org's session timeout, whose shortest setting is 15 minutes, so a 15-minute window avoids most 401s without a token call per request. RQ-0005 asks for single-flight refresh per org.
+- Alternatives: sign per request (needless token-endpoint load); cache until a 401 only (every expiry costs a failed API call); an in-process mutex (does not cover several workers).
+- ADR: none (within ADR-0007 and ADR-0018) · Status: accepted
+
+### DL-0107 — app.salesforce_connection (migration 0017): write-once key and identity, rotation by new row, column grants
+- Date: 2026-10-25 · By: claude · Task: T-0063 · Category: security
+- Decision: One row per connection. The private key, login URL, username, consumer key and certificate facts are write-once (no UPDATE grant); lf_app may UPDATE only the token-cache columns, `instance_url` and `status`; no DELETE. Rotating the key or certificate inserts a new row and marks the previous active row `superseded`; a partial unique index keeps one active row per company. Private key and token use ADR-0018 envelope encryption with AAD `lf-field-v1|tenant|company|app.salesforce_connection|row|field`; each set of encryption columns is all-or-nothing by CHECK. Only the certificate's notAfter and SHA-256 fingerprint are stored (the certificate is public). `auth_flow` already admits `authorization_code_pkce` so the hosted flow can add columns later without replacing a constraint (the migration runner refuses DROP).
+- Why: Design §6.1 (integration token theft), §6.6; ADR-0018; same pattern as party bank accounts (migration 0012). Read paths select named non-secret columns only.
+- Alternatives: store the certificate PEM (not needed for the alert); update the key in place (loses history; directive 6); a generic secrets table (an indirection with no second user yet).
+- ADR: ADR-0018 (Proposed; this adds two sealed fields under it — security gate applies to ADR-0018 itself) · Status: accepted
+
+### DL-0108 — Test-only certificate builder and documented (not recorded) token fixtures
+- Date: 2026-10-25 · By: claude · Task: T-0063 · Category: tooling
+- Decision: Tests generate RSA keys at runtime and build a minimal self-signed X.509 v3 certificate in DER by hand (`packages/connectors/salesforce/src/testing/keys.ts`, node:crypto only), because Node has no certificate-creation API and openssl is not guaranteed on every developer machine. No key or certificate is committed. Token-endpoint fixtures live in `packages/connectors/salesforce/fixtures/documented/` and state that they were written from RQ-0024, not recorded, because agents may not contact a Salesforce org; `fixtures/recorded/` waits for a human-authorised scratch-org spike.
+- Why: packages/connectors/AGENTS.md asks for recorded, redacted fixtures; that is impossible offline, and labelling the substitute honestly keeps the evidence truthful.
+- Alternatives: shell out to openssl (platform-dependent); a certificate library (new dev dependency for one helper); commit a test key (forbidden by the salesforce-engineer rules).
+- ADR: none · Status: accepted
+
+### DL-0113 — Parallel agents each get their own scratchpad subfolder; register totals recomputed from rows
+- Date: 2026-10-25 · By: claude (lead) · Task: process (found during round 2) · Category: process
+- Decision:
+  - Every parallel sub-agent brief names its own scratchpad subfolder (`scratchpad/<task-id>/`). In round 2, one agent's helper script overwrote another's at the same scratchpad path. Only scripts collided, no repository files, and results were unaffected (T-0063 report).
+  - The success-scenario register's "Totals" line is recomputed from the rows at each merge, not edited by hand by agents: 144 scenarios (14 need screenshots) after merging T-0063.
+  - Lead merge tooling for the append-only registers (sort blocks by id, then a line check against both parents) is kept as a scratch helper. If it is promoted into the repo later, that is a decision-log item.
+- Why: Parallel builds share the session scratchpad. The totals line was stale (agents correctly left it, one adjusted it by hand).
+- ADR: none · Status: accepted
