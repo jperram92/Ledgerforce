@@ -74,11 +74,11 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC06-02 | Creator cannot release own batch | UC-06 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts | T-0054, T-0015 | green (SoD layer; batch endpoint in T-0054) | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
 | SS-UC06-03 | Release requires step-up MFA | UC-06 | MVP | db-integration | no | apps/api/src/authz/mfa-step-up.db.test.ts (stand-in release route; the real one is T-0054) | T-0054, T-0013 | green (step-up part, T-0013; the batch release itself pending T-0054) | [.agent/evidence/T-0013/manifest.json](../../.agent/evidence/T-0013/manifest.json) | e48639b |
 | SS-UC06-04 | Batch over $10,000 needs two releasers | UC-06 | MVP | db-integration | no | — | T-0054 | not-started | — | — |
-| SS-UC06-05 | Recently changed bank details excluded with reason | UC-06 | MVP | db-integration | no | — | T-0054, T-0053 | not-started | — | — |
+| SS-UC06-05 | Recently changed bank details excluded with reason | UC-06 | MVP | db-integration | no | packages/modules/parties/src/bank-change.workflow.db.test.ts (eligibility check; the batch itself is T-0054, DL-0157) | T-0054, T-0053 | green | [.agent/evidence/T-0053/manifest.json](../../.agent/evidence/T-0053/manifest.json) | 1434ee7 |
 | SS-UC06-06 | ABA file is byte-exact | UC-06 | MVP | contract | no | — | T-0056 | not-started | — | — |
 | SS-UC06-07 | Batch posts GP-009 on confirmation only | UC-06 | MVP | golden | no | — | T-0057 | not-started | — | — |
 | SS-UC06-08 | Remittance advices emailed | UC-06 | MVP | db-integration | no | — | T-0057, T-0042 | not-started | — | — |
-| SS-UC06-09 | Bank-detail change needs a different verifier and notifies the old contact | UC-06 | MVP | db-integration | no | — | T-0053 | not-started | — | — |
+| SS-UC06-09 | Bank-detail change needs a different verifier and notifies the old contact | UC-06 | MVP | db-integration | no | packages/modules/parties/src/bank-change.workflow.db.test.ts, apps/api/src/parties/bank-change.workflow.db.test.ts | T-0053 | green | [.agent/evidence/T-0053/manifest.json](../../.agent/evidence/T-0053/manifest.json) | 1434ee7 |
 | SS-UC06-10 | Release screen with step-up prompt | UC-06 | MVP | e2e-playwright | yes | — | T-0087 | not-started | — | — |
 | SS-UC07-01 | Pay run import posts GP-010 | UC-07 | Phase 1 | golden | no | — | T-0100 | not-started | — | — |
 | SS-UC07-02 | Net-pay batch released by second user posts GP-011 | UC-07 | Phase 1 | golden | no | — | T-0100 | not-started | — | — |
