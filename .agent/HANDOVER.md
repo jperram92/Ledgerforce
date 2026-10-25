@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 5 in progress (DL-0140): T-0016, T-0027, T-0030, T-0053 by sub-agents in worktrees (numbers pre-assigned in DL-0140); the lead merges in migration order 0022→0025. Round 4 (T-0025, T-0015) is complete and in review.
+Task: PARALLEL ROUND 5 COMPLETE (DL-0140): T-0016, T-0027, T-0030, T-0053 merged in migration order 0022→0025, each verify.sh 13 PASS/0 FAIL/3 PENDING, all in review. Next: plan round 6 (candidates T-0026 preview, T-0028 subledger, T-0029 manual journals — one engine-touching task per round — plus T-0108).
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -45,6 +45,12 @@ Open questions for human:
       charge; AP ← ap.*; payroll clearing ← payroll.*) and DL-0135 journal numbering (one series per source type
       `je_<type>` vs one per company; company setup must create the series). DL-0137: also reject a repeat key
       whose LINES differ (needs a stored command hash column)?
+  17. Round 5 security ADRs (all Proposed): ADR-0027 (user lifecycle + API tokens: token deny-list, 90 d default /
+      366 d max, role-combination blocks? DL-0141/0144); ADR-0029 (pg-boss: lf_app DML incl. DELETE on non-RLS pgboss
+      schema; supervision with lf_migrator credentials — or add a queue-owner role?; DL-0153/0161); ADR-0030 (bank-
+      detail change: DB-enforced workflow; first bank details also need verification — DL-0157; cooling-off 24 h
+      default, 1–720 h, Owner-only — DL-0158). T-0027: DL-0147 adds currency to the account_balance key (ADR wanted?).
+      T-0030 DL-0152: should post() require an outbox rather than default to none?
   16. SoD (T-0015, ADR-0026 Proposed, security): confirm the threshold placeholders (§11.2); Owner-only SoD settings;
       meaning of "external reviewer" (another active user of the tenant); is rule 2 exceptable in small-team mode;
       rule 6 (period reopen) never excepted; AP Clerk cells §6.4 vs rules §6.5; weekly report in the tenant time
@@ -113,6 +119,11 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0059 — packages/modules/bank camt053/dedupe/statements/account-match; migration 0020; RQ-0028; DL-0125..0127
 >   • T-0025 — packages/ledger/src/{posting-command,posting-engine}.ts + invariant properties; RQ-0030; DL-0134..0138
 >     (golden-posting gate: generic pipeline only)
+>   • T-0016 — migration 0022, apps/api/src/{users,tokens}/**, interceptor token principal; ADR-0027; DL-0141..0145
+>   • T-0027 — migration 0023 (account_balance trigger), packages/ledger/src/account-balance.ts; DL-0146..0150
+>     (confirm the DB trigger satisfies "upsert in writer")
+>   • T-0030 — migration 0024, packages/outbox, apps/worker; ADR-0029; DL-0151..0155, DL-0161 (security review)
+>   • T-0053 — migration 0025, packages/modules/parties bank-detail-changes, apps/api parties routes; ADR-0030; DL-0156..0160
 >   • T-0015 — packages/shared/src/sod/**, migration 0021, apps/api SoD decorator/interceptor step and /sod routes; ADR-0026;
 >     DL-0129..0133 (security review: advisory lock, exception audit, Owner-only settings)
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
@@ -235,3 +246,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T19:06:02.529Z claude: T-0027 → verifying
 - 2026-10-25T19:09:04.302Z claude: T-0030 → verifying
 - 2026-10-25T19:11:59.436Z claude: T-0053 → verifying
+- 2026-10-25T19:15:00.427Z claude: release T-0016 → review
+- 2026-10-25T19:15:00.594Z claude: release T-0027 → review
+- 2026-10-25T19:15:00.778Z claude: release T-0030 → review
+- 2026-10-25T19:15:00.994Z claude: release T-0053 → review
+- 2026-10-25 claude (lead): round 5 merged (T-0016, T-0027, T-0030 + ADR-0029, T-0053); final tree gates green (628 unit / 739 db / 82 agent); verify 13/0/3 each → review. First T-0016 verify had one intermittent gate-2a failure (likely the Salesforce test-key DER flake fixed in T-0030); six reruns and all later verifies green.

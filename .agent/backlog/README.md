@@ -106,7 +106,7 @@ graph LR
 | [T-0013](T-0013.md) | MFA enforcement for finance roles and step-up re-authentication | MVP | review | T-0011, T-0012 | UC-06 | 2 |
 | [T-0014](T-0014.md) | Append-only audit log (separate schema) | MVP | review | T-0010 | — | 1 |
 | [T-0015](T-0015.md) | Segregation-of-duties engine and small-team mode | MVP | review | T-0012, T-0014 | UC-05, UC-06, UC-11 | 5 |
-| [T-0016](T-0016.md) | User lifecycle (joiner/mover/leaver) and scoped API tokens | MVP | todo | T-0012, T-0014, T-0013 | — | 1 |
+| [T-0016](T-0016.md) | User lifecycle (joiner/mover/leaver) and scoped API tokens | MVP | review | T-0012, T-0014, T-0013 | — | 1 |
 | [T-0017](T-0017.md) | Money package (decimal.js) and no-float lint rule | MVP | review | T-0001 | — | 1 |
 | [T-0018](T-0018.md) | Chart of accounts, system roles and AU templates | MVP | review | T-0010, T-0017 | — | 0 |
 | [T-0019](T-0019.md) | Dimensions and deduplicated dimension sets | MVP | review | T-0018 | — | 0 |
@@ -117,10 +117,10 @@ graph LR
 | [T-0024](T-0024.md) | Gapless document numbering series | MVP | review | T-0010 | UC-02 | 2 |
 | [T-0025](T-0025.md) | Posting engine pipeline (command → validate → resolve → build → check → write) | MVP | review | T-0021, T-0023, T-0024, T-0014, T-0022 | — | 1 |
 | [T-0026](T-0026.md) | Posting engine preview mode ("show me the journal") | MVP | todo | T-0025 | — | 1 |
-| [T-0027](T-0027.md) | account_balance maintenance in the posting transaction | MVP | todo | T-0025 | — | 0 |
+| [T-0027](T-0027.md) | account_balance maintenance in the posting transaction | MVP | review | T-0025 | — | 0 |
 | [T-0028](T-0028.md) | Subledger entries and allocations | MVP | todo | T-0025 | — | 0 |
 | [T-0029](T-0029.md) | Manual journals with approval rule; control accounts reject manual journals | MVP | todo | T-0025, T-0015 | — | 1 |
-| [T-0030](T-0030.md) | Transactional outbox and pg-boss worker | MVP | todo | T-0025 | — | 1 |
+| [T-0030](T-0030.md) | Transactional outbox and pg-boss worker | MVP | review | T-0025 | — | 1 |
 | [T-0031](T-0031.md) | Golden-posting test runner | MVP | todo | T-0025, T-0007 | — | 1 |
 | [T-0032](T-0032.md) | Reversal (void) of posted entries | MVP | todo | T-0025, T-0027, T-0028, T-0031 | UC-10 | 1 |
 | [T-0033](T-0033.md) | Accounting invariant property suite (10,000 random documents) | MVP | todo | T-0027, T-0028, T-0032, T-0029 | — | 1 |
@@ -143,7 +143,7 @@ graph LR
 | [T-0050](T-0050.md) | Supplier bills entry and suggested coding | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0031 | UC-05 | 3 |
 | [T-0051](T-0051.md) | Bills inbox: inbound email PDF → draft bill | MVP | todo | T-0050 | UC-05 | 1 |
 | [T-0052](T-0052.md) | Bill approval workflow with SoD | MVP | todo | T-0050, T-0015, T-0031 | UC-05 | 4 |
-| [T-0053](T-0053.md) | Supplier/employee bank-detail change verification with cooling-off | MVP | todo | T-0037, T-0015, T-0013 | UC-06 | 2 |
+| [T-0053](T-0053.md) | Supplier/employee bank-detail change verification with cooling-off | MVP | review | T-0037, T-0015, T-0013 | UC-06 | 2 |
 | [T-0054](T-0054.md) | Payment batches with maker-checker and step-up release | MVP | todo | T-0052, T-0053, T-0013 | UC-06 | 5 |
 | [T-0055](T-0055.md) | Customer refunds (bank payment batch and Stripe) | MVP | todo | T-0046, T-0045, T-0054, T-0031 | UC-11 | 3 |
 | [T-0056](T-0056.md) | ABA (Cemtex) file export | MVP | todo | T-0054 | UC-06 | 1 |
