@@ -1280,3 +1280,42 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - T-0095 is human-only; T-0103 needs Windows; T-0108 is Phase 1.
 - Why: Product owner's instruction to build independent tasks in parallel, with one engine-touching task per round.
 - ADR: none · Status: accepted
+
+### DL-0167 — Pub/Sub API client stack: grpc-js + proto-loader on the vendored proto, avsc for Avro
+- Date: 2026-10-25 · By: claude · Task: T-0064 · Category: architecture
+- Decision: The CDC subscriber talks gRPC with `@grpc/grpc-js` 1.14.6 and `@grpc/proto-loader` 0.8.1, loading `packages/connectors/salesforce/proto/pubsub_api.proto`, which is the forcedotcom file byte for byte (CC0-1.0, SHA-256 pinned by a contract test). Payloads decode with `avsc` 5.7.9 (no dependencies), Avro `long` as BigInt. All three are pinned exact, at least two weeks old, and `pnpm audit --prod` is clean. The local fake server used by tests is built from the same proto.
+- Why: RQ-0036 F1, F5, F7. It is the reference stack (pozil/pub-sub-api-node-client), it is pure JS, and it decodes losslessly. A new runtime dependency needs an ADR (design §10.6).
+- Alternatives: avro-js (Apache's avsc fork; older); protoc-generated code plus a hand-written Avro decoder; polling only (rejected, design §5.3).
+- ADR: ADR-0032 · Status: proposed (Accepted on green CI + cross-review)
+
+### DL-0168 — Replay cursor per (company, channel), moved by compare-and-set in the batch transaction
+- Date: 2026-10-25 · By: claude · Task: T-0064 · Category: architecture
+- Decision: Migration 0027 adds `app.salesforce_replay_cursor` keyed by (tenant, company, channel). It is not keyed by connection, so a key rotation keeps the cursor. The subscriber moves `replay_id` from the value this run last committed to the batch's last replay id in the same tenant transaction as the effects (row lock and compare-and-set; a mismatch raises `ReplayCursorConflict` and rolls the batch back). It requests more events only after the commit, at most `batchSize` (≤ 100) outstanding. With no stored id it subscribes from `LATEST`; an initial load is the reconcile job's work, not a 72 h `EARLIEST` replay that spends the event allocation. A keepalive with nothing in flight stores `latest_replay_id`, so a quiet channel stays inside the 72 h retention.
+- Why: SS-PLAT-27 (resume from R with no loss or duplication), design §5.3; RQ-0036 F2, F3; the allocation limit (design §5.3).
+- Alternatives: commit the replay id after the effects in a separate transaction (a crash between the two repeats or loses effects); key by connection id (rotation would lose the position); `EARLIEST` on first start (spends up to 72 h of the allocation).
+- ADR: ADR-0032 · Status: accepted
+
+### DL-0169 — Inbound idempotency key includes the sequence number; a separate Salesforce event inbox
+- Date: 2026-10-25 · By: claude · Task: T-0064 · Category: architecture
+- Decision: For each record, the CDC idempotency key is `cdc:<entity>:<record id>:<commit number>:<sequence number>`. An overflow event's key is `cdc:<entity>:overflow:<transaction key>:<sequence>`, and a platform event's key is `event:<uuid>`. Keys are stored in a new append-only table `app.salesforce_event_inbox`. `app.outbox_inbox` is not reused, because it references `app.outbox_event` ids. The handler only receives the event's records that it has not seen before.
+- Why: Design §5.6 rule 1 says "record Id + commit number". One transaction can produce two events for the same record (for example, a create followed by an update), and these share a commit number but differ in `sequenceNumber` (RQ-0036 S7). Without the sequence number the second, legitimate event would be dropped. The inbox catches at-least-once redelivery and overlapping replays after a reset.
+- Alternatives: record id + commit number only (would drop a legitimate second event); key by replay id (a re-published or replayed event gets a new replay id); rely on the cursor alone (does not cover redelivery).
+- ADR: ADR-0032 · Status: accepted
+
+### DL-0170 — Rejected replay id, gap and overflow events become resync requests, never guesses
+- Date: 2026-10-25 · By: claude · Task: T-0064 · Category: architecture
+- Decision: A Subscribe error whose `error-code` trailer is in the `sfdc.platform.eventbus.grpc.subscription.fetch.replayid.*` family (documented: `…replayid.corrupted`, INVALID_ARGUMENT) clears the stored replay id and inserts a `replay_id_invalid` row into `app.salesforce_resync_request` with `since` set to the last commit time. The run then ends with status `replay_reset`, and the next run starts at `LATEST`. A `GAP_*` event inserts a `gap_event` row with its records. A `GAP_OVERFLOW` event inserts an `overflow` row for its entity, because its record id is a placeholder. Neither kind of gap event is passed to the handler. The reconcile job (design §5.3, SystemModstamp delta) consumes these rows and sets only `resolved_at`. Auth, transient and other errors are thrown as `PubSubError` with a `kind` for the supervisor.
+- Why: RQ-0036 F4 and F6. A gap event has no field data to apply, and the events between the last commit and a fresh `LATEST` are gone from the stream. Only a re-read from Salesforce can close the gap.
+- Alternatives: resubscribe with `EARLIEST` (still loses anything older than 72 h and spends the allocation); retry the same replay id (it can never succeed); apply gap events as empty updates (wrong data).
+- ADR: ADR-0032 · Status: accepted
+
+### DL-0171 — T-0064 build notes: documented fixtures, 0026 placeholder, cross-tenant overrides, mutation check
+- Date: 2026-10-25 · By: claude · Task: T-0064 · Category: process
+- Decision:
+  - The Pub/Sub fixtures are *documented*, not recorded: `fixtures/documented/pubsub-account-change-events.json`. They were generated by the committed script `pubsub-account-change-events.gen.mjs` from the documented `ChangeEventHeader` (RQ-0036 S7) and use 18-character test ids only. They will be replaced by scratch-org recordings later.
+  - Migration 0026 does not exist on the round base. Tests used a `SELECT 1` placeholder from the scratchpad, which was never committed (round protocol).
+  - The cross-tenant generator gained overrides for the three 0027 tables.
+  - The mutation check is recorded on the card.
+- Why: Round-6 protocol (DL-0162). AGENTS.md §0 directive 8.
+- Alternatives: none.
+- ADR: none · Status: accepted
