@@ -1127,3 +1127,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: reports read from account_balance (design §3.3); the verifier is the property test's oracle (INV-balance-table) and an audit tool that detects tampering (proved by SS-PLAT-66).
 - Alternatives: a SQL function for the verifier (one more database object, no benefit); period-filtered trial balance now (no report task yet; added with the TB report task).
 - ADR: none · Status: accepted
+
+### DL-0150 — The concurrency test spreads postings over eight number series
+- Date: 2026-10-25 · By: claude · Task: T-0027 · Category: process
+- Decision: SS-PLAT-67 posts 36 entries on 12 connections across eight source types (eight `je_<source>` series), half debiting A and crediting B, half the reverse, each holding its row locks 20 ms before commit. The mutation check records that a read-then-write balance update survives a one-series test (numbering serialises a series) but is killed with eight series.
+- Why: RQ-0032 finding 9: a single-series test cannot see a lost update, so it would prove nothing about the balance upsert.
+- Alternatives: several companies (no shared balance rows, so no contention); a test-only hook inside the trigger (production code for tests).
+- ADR: none · Status: accepted

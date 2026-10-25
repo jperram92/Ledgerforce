@@ -93,6 +93,15 @@ S5 results (verbatim summary of the run output):
    triggers anyway). Rows of another tenant cannot be inserted by `lf_app` (RLS WITH CHECK runs
    before AFTER triggers). *(fact)*
 
+9. Observed while testing (SS-PLAT-67 and its mutation check): gapless numbering (0010) locks
+   one counter row per (company, series) until commit, so postings of the *same* source type in a
+   company already run one at a time; a read-then-write balance mutant survived a test that used
+   one series. Balance rows are still contended by postings of different source types (one
+   series each) and by any future writer, so the atomic upsert remains necessary; the concurrency
+   test uses eight series. With eight series the read-then-write mutant loses updates (and the
+   accumulate-only guard also refuses its stale writes as decreases), and a mutant that orders
+   rows by side instead of key deadlocks (40P01). *(fact, from the run)*
+
 ## Conclusion / decision
 
 - Key (Q1): (tenant, company, account, period, dimension set, **transaction currency**). Base

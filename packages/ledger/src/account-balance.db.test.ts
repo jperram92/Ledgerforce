@@ -348,10 +348,29 @@ describe('SS-PLAT-67 concurrent postings lose no balance update [T-0027]', () =>
   it('SS-PLAT-67 many concurrent postings to the same accounts all count, with no deadlock [T-0027]', async () => {
     const company = await f.addCompany(`Concurrency ${randomUUID().slice(0, 8)} Pty Ltd`);
     const chart = f.chart(company);
+    // Gapless numbering locks one counter row per (company, series) until commit, so postings of
+    // one source type run one at a time. Eight source types (eight series; labels only, no
+    // posting rule) let up to eight postings reach the balance upsert at the same time.
+    const SOURCES = [
+      'manual_journal',
+      'ar_invoice',
+      'ar_credit_note',
+      'ar_receipt',
+      'ar_refund',
+      'ar_write_off',
+      'ap_bill',
+      'ap_payment',
+    ];
     await f.inTenant((trx) =>
       trx
         .insertInto('app.number_series')
-        .values({ company_id: company, code: 'je_manual_journal', prefix: 'MJ-' })
+        .values(
+          SOURCES.map((s, i) => ({
+            company_id: company,
+            code: `je_${s}`,
+            prefix: `C${String(i)}-`,
+          })),
+        )
         .execute(),
     );
     const X = chart.acct['1010'] ?? '';
@@ -371,7 +390,7 @@ describe('SS-PLAT-67 concurrent postings lose no balance update [T-0027]', () =>
               companyId: company,
               idempotencyKey: randomUUID(),
               entryDate: '2026-10-24',
-              sourceType: 'manual_journal',
+              sourceType: SOURCES[i % SOURCES.length] ?? 'manual_journal',
               lines: [
                 { account: { id: dr }, debit: fmt(u) },
                 { account: { id: cr }, credit: fmt(u) },
