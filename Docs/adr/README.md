@@ -77,5 +77,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0024](0024-period-control-matrix-and-lock-policy.md) | Period control: §3.5 matrix as data, invariant 3 in the database, personal overrides, two-approver reopen, lock-date policy | accounting | yes | Proposed |
 | [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Proposed |
 | [0026](0026-segregation-of-duties-engine-and-small-team-mode.md) | Segregation-of-duties engine: rules as data, append-only action ledger, tenant thresholds, visible small-team exceptions | security | yes | Proposed |
+| [0030](0030-bank-detail-change-verification-and-cooling-off.md) | Bank-detail change verification: database-enforced workflow, requester ≠ verifier at commit, step-up proof, cooling-off eligibility, durable notices | security | yes | Proposed |
 
 Next free number: **0027**.

@@ -1099,3 +1099,51 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   T-0027 and T-0030 change only the generic engine (no event posting rule) while golden postings are Draft.
 - Why: Product owner's instruction to build independent tasks in parallel. One engine-touching pair per round keeps merge conflicts small.
 - ADR: none · Status: accepted
+
+### DL-0156 — Bank-detail change workflow enforced in the database (RQ-0034, ADR-0030)
+- Date: 2026-10-25 · By: claude · Task: T-0053 · Category: security
+- Decision: RQ-0034 is resolved. Migration 0025 adds `app.bank_detail_change` (requested → verified | rejected), written only by SECURITY DEFINER functions; `lf_app` has SELECT only. Requester ≠ verifier (`SOD_BANK_DETAIL_SELF_VERIFY`) is checked again at COMMIT by a deferred constraint trigger, which accepts a self-verification only with small-team mode on and a recorded `app.sod_exception` for that change and actor. The request and verify functions also check the acting session's step-up (own, live, current epoch, MFA, `auth_time` ≤ 300 s by the database clock). A guard on `app.party_bank_account` makes new rows `pending_verification`, allows `active` only with a verified change, keeps `superseded`/`archived` final, and allows one active account per party.
+- Why: design §6.1, §6.2 and §6.5 rule 2. Migration 0012 let `lf_app` insert or switch an account to `active` with no verification (the T-0053 RED test proved it). The PostgreSQL 16.15 spike in RQ-0034 S6 showed that the deferred check sees the exception row written after the handler, and that FORCE RLS still applies to the definer.
+- Alternatives: API-only checks (rejected: any other code path could activate an account); checking requester ≠ verifier inside the verify function (rejected: it would break the small-team exception, whose row is written after the handler).
+- ADR: ADR-0030 · Status: proposed (awaiting human)
+
+### DL-0157 — T-0053 scope: eligibility function for SS-UC06-05, durable notices, first account verified too
+- Date: 2026-10-25 · By: claude · Task: T-0053 · Category: scope
+- Decision:
+  - Payment batches do not exist yet (T-0054). SS-UC06-05 is proven at database/service level with `app.party_payment_eligibility(uuid[])` and `paymentEligibility()`, which T-0054 must call; the exclusion reason is `BANK_DETAILS_COOLING_OFF` (or `NO_VERIFIED_BANK_DETAILS`). The SS-UC06-05 row keeps T-0054 as a task.
+  - There is no notification channel yet, and T-0030 (outbox) is being built in parallel. Verification writes durable `app.bank_detail_change_notice` rows (masked details, `pending`, or `no_recipient` when no remittance contact had an email), in the same transaction. A later dispatcher may only record delivery.
+  - "Previous remittance contact" means the contacts holding an active remittance role, with an email, when the change is **requested** (snapshot), notified when it is verified.
+  - The first bank details of a party also need a verified change and the cooling-off.
+- Why: lead's brief; RQ-0034 findings 3–5; RQ-0012 item 7 (b).
+- Alternatives: depending on T-0030's outbox (rejected: not on this base); notifying contacts as they are at verification (rejected: whoever made the change may have edited the contact, and the M8 mutant proves the test catches it); verifying only changes, not first details (rejected: an unverified first account would be payable at once). Product owner to confirm the first-details reading.
+- ADR: ADR-0030 · Status: proposed (awaiting human)
+
+### DL-0158 — Cooling-off length is tenant configuration, frozen at verification
+- Date: 2026-10-25 · By: claude · Task: T-0053 · Category: security
+- Decision: `app.bank_detail_settings` (insert-only history, latest row wins) holds `cooling_off_hours`, default 24, allowed 1–720. Only a user holding `settings.sod.manage` (Owner) may set it; each change is audited (`bank_detail.settings_changed`). Verification copies the hours in force onto the change and sets `payable_from = verified_at + hours` with the database clock, so a later change does not shorten a running cooling-off. Module: `setBankDetailCoolingOff`. No API route yet.
+- Why: design §6.5 ("configurable thresholds, default values shown"), and the lead's brief ("configuration, not a constant; use the database clock"). SoD thresholds are an open decision of design §11.2 (DL-0131), so the 1 h minimum and the 24 h default are placeholders for the product owner.
+- Alternatives: a column on `app.sod_settings` (rejected: it would change T-0015's settings trigger and API shapes in a parallel round); recomputing from the current setting at payment time (rejected: an Owner could shorten a running cooling-off); allowing 0 h (rejected: it switches the control off silently).
+- ADR: ADR-0030 · Status: proposed (awaiting human)
+
+### DL-0159 — Bank-detail change API: routes, request path and optional KMS
+- Date: 2026-10-25 · By: claude · Task: T-0053 · Category: architecture
+- Decision: The API has three routes:
+  - `POST /parties/:partyId/bank-accounts`: request. Needs `change_request`, step-up 300 s, and the SoD step `bank_detail_change.request`, whose subject is a change id chosen by the server before the handler runs.
+  - `POST /bank-detail-changes/:changeId/verify`: needs `verify`, step-up 300 s, and the SoD step `bank_detail_change.verify`.
+  - `POST /bank-detail-changes/:changeId/reject`: needs `verify`.
+
+  Database refusals map to 400/401/403/404/409 as listed in ADR-0030. `createApi` takes an optional `kms` (`KMS` token). Without it, the request route answers 503 `kms_not_configured`. `main.ts` is unchanged.
+- Why: The request is not at `/parties/:partyId/bank-detail-changes` because T-0013's `mfa-step-up.db.test.ts` mounts a stand-in route there. The real route would shadow it: the full run returned 503 instead of < 300, and existing tests are not changed. Adding a bank account always opens a change, so POST on the bank-accounts collection fits. The verify route declares `@RequireStepUp(300)` explicitly, although `STEP_UP_PERMISSIONS` would add it anyway (equivalent mutant M11).
+- Alternatives: registering test controllers before the real ones in `app.ts` (rejected: it changes a shared test hook for every suite); a client-chosen change id (rejected: the server chooses ids).
+- ADR: ADR-0030 · Status: proposed (awaiting human)
+
+### DL-0160 — T-0053 build process: placeholders, harness edits, mutation run
+- Date: 2026-10-25 · By: claude · Task: T-0053 · Category: process
+- Decision:
+  - Test runs used untracked scratchpad placeholders (`SELECT 1;`) for migrations 0022–0024, which belong to other round-5 branches. They were never committed.
+  - The cross-tenant harness gained an override (`app.bank_detail_change_notice.status = 'no_recipient'`) and an Owner prerequisite for `app.bank_detail_settings`.
+  - Mutation check: 11 hand mutants; 10 killed, and M11 (verify route without `@RequireStepUp`) survived as an equivalent mutant (the step-up permission default and the database check still refuse).
+  - The RQ-0034 spike ran as an untracked vitest file, deleted after the run.
+- Why: round-5 protocol (DL-0140); AGENTS.md §0 (prove it with evidence).
+- Alternatives: none.
+- ADR: none · Status: accepted
