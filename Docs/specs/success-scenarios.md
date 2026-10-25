@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 162 scenarios (16 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 163 scenarios (16 need screenshots).
 
 ## How to update (who, when)
 
@@ -135,7 +135,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-12 | Every Approved golden posting is reproduced exactly | — | MVP | golden | no | — | T-0031 | not-started | — | — |
 | SS-PLAT-13 | Float arithmetic on money is a lint error | — | MVP | unit | no | packages/testing/eslint-rules/no-float-money.config.test.ts; packages/shared/src/money/*.test.ts | T-0017 | green | [.agent/evidence/T-0017/manifest.json](../../.agent/evidence/T-0017/manifest.json) | 5385095 |
 | SS-PLAT-14 | Same idempotency key posts once | — | MVP | db-integration | no | packages/ledger/src/engine.idempotency.db.test.ts; packages/ledger/src/posting-invariants.prop.db.test.ts | T-0025 | green | [.agent/evidence/T-0025/manifest.json](../../.agent/evidence/T-0025/manifest.json) | afb5dad |
-| SS-PLAT-15 | Preview writes nothing | — | MVP | db-integration | no | — | T-0026 | not-started | — | — |
+| SS-PLAT-15 | Preview writes nothing | — | MVP | db-integration + property | no | packages/ledger/src/engine.preview.db.test.ts; packages/ledger/src/engine.preview.prop.db.test.ts; packages/outbox/src/preview.db.test.ts | T-0026 | green | [.agent/evidence/T-0026/manifest.json](../../.agent/evidence/T-0026/manifest.json) | fa6e6a5 |
 | SS-PLAT-16 | SoD rules 1–6 evaluated as configured | — | MVP | unit | no | packages/shared/src/sod/sod.rules.test.ts | T-0015 | green | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
 | SS-PLAT-17 | Migrations are forward-only on the previous schema | — | MVP | db-integration | no | — | T-0008 | not-started | — | — |
 | SS-PLAT-18 | Security gates fail on seeded issues | — | MVP | contract | no | — | T-0095 | not-started | — | — |
@@ -188,6 +188,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-69 | Outbox rows are append-only for every role; pg-boss schema owned by lf_migrator, lf_app DML only (no DDL, TRUNCATE, TRIGGER); queue install refuses any role but lf_migrator | — | MVP | db-integration | no | packages/outbox/src/outbox.db.test.ts; apps/worker/src/queue-admin.db.test.ts | T-0030 | green | [.agent/evidence/T-0030/manifest.json](../../.agent/evidence/T-0030/manifest.json) | ceaac00 |
 | SS-PLAT-70 | Scoped API tokens: hashed at rest, issued under fresh MFA step-up, scopes ∩ owner permissions, never step-up, SoD as owner, expire, revocable, last use tracked, tenant-bound | — | MVP | db-integration | no | packages/db/src/user-lifecycle.db.test.ts; apps/api/src/tokens/tokens.scope.db.test.ts | T-0016 | green | [.agent/evidence/T-0016/manifest.json](../../.agent/evidence/T-0016/manifest.json) | a60876f |
 | SS-PLAT-71 | Joiner activated only after MFA for MFA roles, with a welcome audit event; invite needs users.manage; nobody grants themselves a role or grants one to a disabled user | — | MVP | db-integration | no | apps/api/src/auth/oidc.db.test.ts; apps/api/src/users/users.lifecycle.db.test.ts; packages/db/src/user-lifecycle.db.test.ts | T-0016 | green | [.agent/evidence/T-0016/manifest.json](../../.agent/evidence/T-0016/manifest.json) | a60876f |
+| SS-PLAT-72 | Preview and post agree: a command preview accepts posts exactly the previewed journal, and a command post refuses is refused by preview with the same typed error (incl. unknown createdBy, override without period.lock.override, a used idempotency key → ALREADY_POSTED / IDEMPOTENCY_CONFLICT) | — | MVP | db-integration + property | no | packages/ledger/src/engine.preview.db.test.ts; packages/ledger/src/engine.preview.prop.db.test.ts | T-0026 | green | [.agent/evidence/T-0026/manifest.json](../../.agent/evidence/T-0026/manifest.json) | fa6e6a5 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -251,6 +252,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-15 — Preview writes nothing
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0026
 - **Given** any document · **When** preview is requested · **Then** journal, balance, subledger and outbox row counts are unchanged
+- Proven (T-0026, RQ-0035) with a whole-database fingerprint taken before and after preview: every table in every non-system schema (row count and content hash, so journal, lines, dimension sets, account_balance, number-series counters, the hash-chain head, period overrides, audit rows, outbox_event and pgboss.job are all covered) and every sequence's last value; for manual journals, new dimension combinations, foreign-currency lines, control accounts from their subledger, period overrides and lock-date redirects, inside a read-write and a READ ONLY transaction, with pg-boss installed; plus a property (default numRuns) that preview changes nothing and equals the journal post() then stores
 
 ### SS-PLAT-16 — SoD rules 1–6 evaluated as configured
 - Phase: MVP · Layer: **unit** · Screenshot evidence: no · Task(s): T-0015
@@ -465,3 +467,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-71 — Joiner and mover controls
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0016
 - **Given** an administrator and invited users · **When** users are invited, log in for the first time and receive roles · **Then** an invite needs users.manage (and the right to assign each role) and creates an invited user with grants; a joiner whose roles need MFA is activated only by an MFA login (otherwise 403 mfa_enrolment_required, audited, still invited) and activation writes `user.joined`; nobody grants a role to themselves (API 403 self_grant, audited; database 42501) and no role is granted to a disabled user
+
+### SS-PLAT-72 — Preview and post agree
+- Phase: MVP · Layer: **db-integration + property** · Screenshot evidence: no · Task(s): T-0026
+- **Given** a raw posting command · **When** it is previewed and then posted · **Then** either both succeed and post stores exactly the previewed journal, or both refuse with the same typed error code and nothing is written; the shared validate step refuses an unknown createdBy (UNKNOWN_USER) and an override by a user without period.lock.override (OVERRIDE_NOT_PERMITTED) before any write; preview of a key that already posted this document is ALREADY_POSTED with that entry's id and number (post would replay it), of a key used by another document IDEMPOTENCY_CONFLICT; over random commands with at most one fault each (property, default numRuns) every fault gives its expected code in both

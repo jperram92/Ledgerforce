@@ -1280,3 +1280,24 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - T-0095 is human-only; T-0103 needs Windows; T-0108 is Phase 1.
 - Why: Product owner's instruction to build independent tasks in parallel, with one engine-touching task per round.
 - ADR: none · Status: accepted
+
+### DL-0163 — Preview refuses what post refuses: createdBy and override permission checked before the write
+- Date: 2026-10-25 · By: claude · Task: T-0026 · Category: architecture
+- Decision: The engine's shared validate step now checks that `createdBy` is a user of the tenant (`UNKNOWN_USER`) and, when the date needs a period override, that the user holds `period.lock.override` (`OVERRIDE_NOT_PERMITTED`, message names the permission), before any write. Both are new `PostingErrorCode`s; post() therefore throws typed errors where it used to surface raw 23503 / 42501 from the write. The database foreign key and the `period_override_check` trigger stay as the last line of defence.
+- Why: RQ-0035 findings 2a–2b: these were checked only by the database during the write, so preview (which has no write) accepted commands post refused. Design §3.9: preview powers "show me the journal"; it must not show a journal that cannot post.
+- Alternatives: preview writes inside a savepoint and rolls back to reuse the database checks (rejected: sequences such as audit_log's identity are never rolled back, and it would take the number-series and chain-head locks; RQ-0035 finding 4); leave the gap and document it (rejected: the task requires the same errors).
+- ADR: none (no accounting treatment, data model or security model change; additive error codes) · Status: accepted
+
+### DL-0164 — Preview of a used idempotency key: ALREADY_POSTED or IDEMPOTENCY_CONFLICT
+- Date: 2026-10-25 · By: claude · Task: T-0026 · Category: architecture
+- Decision: preview() looks the key up as post() does, without the advisory lock (it writes nothing). A key that already posted this document → `PostingError('ALREADY_POSTED')` carrying `entryId` and `entryNo` (post() would replay that entry and write nothing, so there is no new journal to show; the caller shows the stored entry). A key used by another document → `IDEMPOTENCY_CONFLICT`, as post(). `PostingError` gained optional `entryId`/`entryNo`.
+- Why: RQ-0035 findings 2c–2d: the base preview built a fresh journal for a key whose post() would replay or refuse.
+- Alternatives: return the stored entry in preview's shape (rejected: requested date, redirect and override flags are not stored, so it would be an approximation, and it doubles the read path); return the built journal with an `alreadyPosted` flag (rejected: a replay does not validate again, so the built journal could carry errors the replay never raises).
+- ADR: none · Status: accepted
+
+### DL-0165 — "Writes nothing" is proven by a whole-database fingerprint, and parity by single-fault properties
+- Date: 2026-10-25 · By: claude · Task: T-0026 · Category: process
+- Decision: SS-PLAT-15 tests compare `databaseFingerprint` (packages/ledger/src/testing/db-fingerprint.ts: every ordinary/partitioned table in every non-system schema → count + order-independent md5 of the rows; every sequence → last_value; tables read from the catalogue) before and after preview, as the superuser. The pg-boss case lives in packages/outbox/src/preview.db.test.ts because packages/ledger cannot depend on packages/outbox (cycle). The parity property (SS-PLAT-72) generates valid commands with at most one fault each and asserts the expected code per fault. Test helpers `storedJournal`/`expectedJournal` are exported from `@ledgerforce/ledger/testing`.
+- Why: RQ-0035 finding 6: a list of named tables goes stale when subledger_entry/allocation arrive and misses UPDATEs; a multi-fault generator let a mutant survive (only the first check is ever reached).
+- Alternatives: per-table counts as in T-0025's snapshot (rejected: misses counter/head UPDATEs and future tables); pg_stat_xact counters (rejected: per-backend and not visible across connections).
+- ADR: none · Status: accepted
