@@ -94,23 +94,139 @@ export interface BalanceSheet {
   balanced: boolean;
 }
 
-/** Subtype order of the AU templates; others follow alphabetically. */
-export const SUBTYPE_ORDER: readonly string[] = [];
+const money = (text: string, currency: string): Money => Money.fromNumeric(text, currency);
+
+/** Net balance on the debit side (debit − credit). */
+const netDebit = (r: AccountMovementRow, currency: string): Money =>
+  money(r.debit, currency).sub(money(r.credit, currency));
+
+const isProfitAndLoss = (r: AccountMovementRow): boolean =>
+  r.type === 'revenue' || r.type === 'expense';
+
+/** Σ (credit − debit) of the revenue and expense rows: profit, negative for a loss. */
+export function profitOf(currency: string, rows: readonly AccountMovementRow[]): Money {
+  return rows
+    .filter(isProfitAndLoss)
+    .reduce((sum, r) => sum.sub(netDebit(r, currency)), Money.zero(currency));
+}
+
+type SectionLine = StatementLine & { subtype: string };
+
+/**
+ * One section: lines grouped by subtype; groups ordered by their lowest account code and lines
+ * by code, so the chart's numbering (data, not code) decides the layout.
+ */
+function section(
+  type: AccountType,
+  currency: string,
+  lines: readonly SectionLine[],
+): StatementSection {
+  const sorted = [...lines].sort((a, b) => a.code.localeCompare(b.code));
+  const groups: StatementGroup[] = [];
+  for (const { subtype, ...line } of sorted) {
+    let g = groups.find((x) => x.subtype === subtype);
+    if (!g) {
+      g = { subtype, lines: [], total: Money.zero(currency) };
+      groups.push(g);
+    }
+    g.lines.push(line);
+    g.total = g.total.add(line.amount);
+  }
+  const total = groups.reduce((sum, g) => sum.add(g.total), Money.zero(currency));
+  return { type, groups, total };
+}
+
+/** Rows of one type as lines: assets and expenses debit-positive, the rest credit-positive. */
+function linesOf(
+  type: AccountType,
+  currency: string,
+  rows: readonly AccountMovementRow[],
+): SectionLine[] {
+  const debitPositive = type === 'asset' || type === 'expense';
+  return rows
+    .filter((r) => r.type === type)
+    .map((r) => {
+      const net = netDebit(r, currency);
+      return {
+        accountId: r.accountId,
+        code: r.code,
+        name: r.name,
+        subtype: r.subtype,
+        amount: debitPositive ? net : net.negate(),
+      };
+    });
+}
 
 export function shapeTrialBalance(
-  _currency: string,
-  _rows: readonly AccountMovementRow[],
+  currency: string,
+  rows: readonly AccountMovementRow[],
 ): TrialBalance {
-  throw new Error('shapeTrialBalance: not implemented');
+  const zero = Money.zero(currency);
+  const out: TrialBalanceRow[] = [...rows]
+    .sort((a, b) => a.code.localeCompare(b.code))
+    .map((r) => {
+      const net = netDebit(r, currency);
+      return {
+        accountId: r.accountId,
+        code: r.code,
+        name: r.name,
+        type: r.type,
+        subtype: r.subtype,
+        debit: net.isPositive() ? net : zero,
+        credit: net.isNegative() ? net.negate() : zero,
+      };
+    });
+  const totalDebit = out.reduce((s, r) => s.add(r.debit), zero);
+  const totalCredit = out.reduce((s, r) => s.add(r.credit), zero);
+  return {
+    currency,
+    rows: out,
+    totalDebit,
+    totalCredit,
+    netsToZero: totalDebit.equals(totalCredit),
+  };
 }
 
 export function shapeProfitAndLoss(
-  _currency: string,
-  _rows: readonly AccountMovementRow[],
+  currency: string,
+  rows: readonly AccountMovementRow[],
 ): ProfitAndLoss {
-  throw new Error('shapeProfitAndLoss: not implemented');
+  const revenue = section('revenue', currency, linesOf('revenue', currency, rows));
+  const expenses = section('expense', currency, linesOf('expense', currency, rows));
+  return { currency, revenue, expenses, netProfit: revenue.total.sub(expenses.total) };
 }
 
-export function shapeBalanceSheet(_input: BalanceSheetInput): BalanceSheet {
-  throw new Error('shapeBalanceSheet: not implemented');
+export function shapeBalanceSheet(input: BalanceSheetInput): BalanceSheet {
+  const { currency, toDate, beforeYear, retainedEarnings: re, currentYearEarnings: cye } = input;
+  const priorYearsEarnings = profitOf(currency, beforeYear);
+  const currentYearEarnings = profitOf(currency, toDate).sub(priorYearsEarnings);
+  const equityLines = linesOf('equity', currency, toDate);
+  const posted = (id: string): Money =>
+    equityLines.find((l) => l.accountId === id)?.amount ?? Money.zero(currency);
+  const computed = (a: EarningsAccount, add: Money): SectionLine => ({
+    accountId: a.accountId,
+    code: a.code,
+    name: a.name,
+    subtype: a.subtype,
+    amount: posted(a.accountId).add(add),
+    computed: true,
+  });
+  const assets = section('asset', currency, linesOf('asset', currency, toDate));
+  const liabilities = section('liability', currency, linesOf('liability', currency, toDate));
+  const equity = section('equity', currency, [
+    ...equityLines.filter((l) => l.accountId !== re.accountId && l.accountId !== cye.accountId),
+    computed(re, priorYearsEarnings),
+    computed(cye, currentYearEarnings),
+  ]);
+  const totalLiabilitiesAndEquity = liabilities.total.add(equity.total);
+  return {
+    currency,
+    assets,
+    liabilities,
+    equity,
+    totalLiabilitiesAndEquity,
+    priorYearsEarnings,
+    currentYearEarnings,
+    balanced: assets.total.equals(totalLiabilitiesAndEquity),
+  };
 }
