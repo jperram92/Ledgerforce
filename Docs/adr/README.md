@@ -79,5 +79,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0026](0026-segregation-of-duties-engine-and-small-team-mode.md) | Segregation-of-duties engine: rules as data, append-only action ledger, tenant thresholds, visible small-team exceptions | security | yes | Proposed |
 | [0027](0027-user-lifecycle-and-scoped-api-tokens.md) | User lifecycle (joiner/mover/leaver) and scoped personal API tokens | security | yes | Proposed |
 | [0029](0029-job-queue-privileges-and-supervision.md) | Job queue (pg-boss) privileges: lf_app DML on the shared pgboss schema, owner-run supervision | security | yes | Proposed |
+| [0030](0030-bank-detail-change-verification-and-cooling-off.md) | Bank-detail change verification: database-enforced workflow, requester ≠ verifier at commit, step-up proof, cooling-off eligibility, durable notices | security | yes | Proposed |
 
-Next free number: **0027**.
+Next free number: **0031** (0028 unused: T-0027 needed no ADR).

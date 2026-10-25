@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0053",
+  "entries": [
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0053/20261025-142114-tests-db.json",
+      "test": "8 test(s): packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact (database layer) › A requests; A cannot verify; B verifies with step-up; the old contact is notified; cooling-off starts | packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact (database layer) › the requester cannot verify their own change, even holding the verify permission (Owner too) | packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact (database layer) › small-team mode: a self-verification commits only with small-team mode on and a recorded SOD_BANK_DETAIL_SELF_VERIFY exception | packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact (database layer) › the verifier needs a fresh MFA step-up (≤ 300 s, own, unrevoked session) and an out-of-band note | packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact (database layer) › the requester needs the change_request permission and a fresh step-up; one open change per party | packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact (database layer) › a rejected change archives the new account and frees the party for a new request | packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact (database layer) › nothing bypasses the workflow: no active account without a verified change, no direct writes | packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact (database layer) › the SQL permission mirror equals the role catalogue for change_request and verify",
+      "commit": "1434ee7b4683",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:21:14.791Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-05",
+      "file": ".agent/evidence/T-0053/20261025-142114-tests-db.json",
+      "test": "3 test(s): packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-05: Recently changed bank details excluded with reason › a supplier verified 3 hours ago is excluded with BANK_DETAILS_COOLING_OFF; 25 hours ago is payable | packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-05: Recently changed bank details excluded with reason › the cooling-off length is tenant configuration (Owner only, audited), frozen per change at verification | packages/modules/parties/src/bank-change.workflow.db.test.ts › SS-UC06-05: Recently changed bank details excluded with reason › refusals are typed",
+      "commit": "1434ee7b4683",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:21:14.791Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0053/20261025-142120-tests-api-db.json",
+      "test": "6 test(s): apps/api/src/parties/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact › the first bank details are requested by the AP clerk and verified by an Owner | apps/api/src/parties/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact › A requests a change; A verifying it is denied with SOD_BANK_DETAIL_SELF_VERIFY | apps/api/src/parties/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact › B without a fresh step-up gets step_up_required; an AP clerk may not verify at all | apps/api/src/parties/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact › B verifies with step-up: the previous remittance contact is notified and cooling-off starts | apps/api/src/parties/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact › a change can be rejected; it is never verified afterwards | apps/api/src/parties/bank-change.workflow.db.test.ts › SS-UC06-09: Bank-detail change needs a different verifier and notifies the old contact › refuses bad input, other tenants and a missing key service",
+      "commit": "1434ee7b4683",
+      "provider": "claude",
+      "timestamp": "2026-10-25T14:21:20.446Z",
+      "result": "passed"
+    }
+  ]
+}

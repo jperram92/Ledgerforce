@@ -4,3 +4,5 @@ export const DB = Symbol('DB');
 export const CLOCK = Symbol('CLOCK');
 /** Injection token for the MFA policy (ADR-0025: which acr values mean MFA). */
 export const MFA_POLICY = Symbol('MFA_POLICY');
+/** Injection token for the key service sealing bank details (ADR-0018); null when not configured. */
+export const KMS = Symbol('KMS');

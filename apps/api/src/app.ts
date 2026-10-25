@@ -20,6 +20,8 @@ import { UsersController } from './users/users.controller.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
 import { PartyBankAccountsController } from './parties/bank-accounts.controller.ts';
+import { BankDetailChangesController } from './parties/bank-detail-changes.controller.ts';
+import type { Kms } from '@ledgerforce/shared/crypto';
 import { TenantInterceptor } from './tenancy/tenant.interceptor.ts';
 import {
   refuseAllResolver,
@@ -28,7 +30,7 @@ import {
 } from './tenancy/tenant-resolver.ts';
 import { AuditTrail, TenantTx } from './tenancy/tenant-tx.ts';
 import { requestIdMiddleware } from './audit/request-id.ts';
-import { CLOCK, DB, MFA_POLICY } from './tokens.ts';
+import { CLOCK, DB, KMS, MFA_POLICY } from './tokens.ts';
 
 export interface ApiOptions {
   /** Connection string for lf_app (never a superuser or the migrator). */
@@ -40,6 +42,11 @@ export interface ApiOptions {
   oidc?: OidcOptions;
   /** MFA policy (ADR-0025): which `acr` values mean MFA here. Default `urn:ledgerforce:loa:mfa`. */
   mfa?: Partial<MfaPolicy>;
+  /**
+   * Key service that seals bank account numbers (ADR-0018). Without it, routes that store bank
+   * details answer 503 `{error:'kms_not_configured'}` (ADR-0030).
+   */
+  kms?: Kms;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
   tenantResolver?: TenantResolver;
   /** Test hook: extra controllers (stand-ins for routes of later tasks, e.g. SS-UC02-07). */
@@ -64,6 +71,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   HealthController,
   CompaniesController,
   PartyBankAccountsController,
+  BankDetailChangesController,
   UserRolesController,
   SodController,
   UsersController,
@@ -83,6 +91,7 @@ class AppModule {
     testControllers: Type[],
     clock: Clock,
     mfa: MfaPolicy,
+    kms: Kms | null,
   ): DynamicModule {
     return {
       module: AppModule,
@@ -90,6 +99,7 @@ class AppModule {
         HealthController,
         CompaniesController,
         PartyBankAccountsController,
+        BankDetailChangesController,
         UserRolesController,
         SodController,
         UsersController,
@@ -106,6 +116,7 @@ class AppModule {
         { provide: OIDC_SERVICE, useValue: oidc ?? null },
         { provide: CLOCK, useValue: clock },
         { provide: MFA_POLICY, useValue: mfa },
+        { provide: KMS, useValue: kms },
         TenantTx,
         AuditTrail,
         Authz,
@@ -152,7 +163,16 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
       ? new SessionTenantResolver(sessions, new ApiTokenService(clock))
       : refuseAllResolver);
   const app = await NestFactory.create(
-    AppModule.forRoot(db, resolver, sessions, oidc, opts.testControllers ?? [], clock, mfa),
+    AppModule.forRoot(
+      db,
+      resolver,
+      sessions,
+      oidc,
+      opts.testControllers ?? [],
+      clock,
+      mfa,
+      opts.kms ?? null,
+    ),
     {
       logger: ['error', 'warn'],
     },

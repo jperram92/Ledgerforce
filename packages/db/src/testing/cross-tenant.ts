@@ -139,6 +139,9 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   // Transactional outbox (migration 0024): dotted topic, snake_case aggregate and handler names.
   'app.outbox_event': { topic: () => 'ledger.entry.posted', aggregate_type: () => 'journal_entry' },
   'app.outbox_inbox': { handler: () => 'test.handler' },
+  // Bank-detail changes (migration 0025): a generated notice has no recipient email, which
+  // the table allows only as 'no_recipient'. Settings need an Owner (prerequisite below).
+  'app.bank_detail_change_notice': { status: () => 'no_recipient' },
   // Salesforce JWT bearer connection (migration 0017): a complete sealed key and certificate facts.
   'app.salesforce_connection': {
     id: () => randomUUID(),
@@ -196,6 +199,10 @@ export const PREREQUISITES: Readonly<
       `UPDATE app.app_user SET status = 'active' WHERE tenant_id = $1 AND id = $2`,
       [row.get('tenant_id'), row.get('user_id')],
     );
+  },
+  // The bank-detail cooling-off setting needs an active Owner too (migration 0025).
+  'app.bank_detail_settings': async (admin, row) => {
+    await grantRole(admin, row.get('tenant_id'), row.get('set_by'), 'owner');
   },
   // A company bank account needs its GL account to be an asset of subtype bank (migration 0013).
   'app.bank_account': async (admin, row) => {
