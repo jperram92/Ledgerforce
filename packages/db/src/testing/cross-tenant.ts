@@ -136,6 +136,9 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     secret_sha256: () => randomBytes(32).toString('hex'),
     expires_at: () => new Date(Date.now() + 30 * 86_400_000).toISOString(),
   },
+  // Transactional outbox (migration 0024): dotted topic, snake_case aggregate and handler names.
+  'app.outbox_event': { topic: () => 'ledger.entry.posted', aggregate_type: () => 'journal_entry' },
+  'app.outbox_inbox': { handler: () => 'test.handler' },
   // Salesforce JWT bearer connection (migration 0017): a complete sealed key and certificate facts.
   'app.salesforce_connection': {
     id: () => randomUUID(),

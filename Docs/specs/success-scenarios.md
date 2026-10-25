@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 160 scenarios (16 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 162 scenarios (16 need screenshots).
 
 ## How to update (who, when)
 
@@ -144,7 +144,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-21 | Leaver is disabled, never deleted | — | MVP | db-integration | no | packages/db/src/user-lifecycle.db.test.ts; apps/api/src/users/users.lifecycle.db.test.ts | T-0016 | green | [.agent/evidence/T-0016/manifest.json](../../.agent/evidence/T-0016/manifest.json) | a60876f |
 | SS-PLAT-22 | Bank details encrypted and masked | — | MVP | db-integration | no | packages/modules/parties/src/bank-accounts.db.test.ts; apps/api/src/parties/bank-accounts.db.test.ts | T-0037 | green | [.agent/evidence/T-0037/manifest.json](../../.agent/evidence/T-0037/manifest.json) | 1219bbc |
 | SS-PLAT-23 | Self-hosted compose install works | — | MVP | e2e-playwright | yes | — | T-0094 | not-started | — | — |
-| SS-PLAT-24 | Outbox delivers at least once, handlers idempotent | — | MVP | db-integration | no | — | T-0030 | not-started | — | — |
+| SS-PLAT-24 | Outbox delivers at least once, handlers idempotent | — | MVP | db-integration | no | apps/worker/src/outbox.delivery.db.test.ts; packages/outbox/src/deliver.test.ts | T-0030 | green | [.agent/evidence/T-0030/manifest.json](../../.agent/evidence/T-0030/manifest.json) | ceaac00 |
 | SS-PLAT-25 | Sync failures back off then land in the Sync issues inbox | — | MVP | db-integration | no | — | T-0071 | not-started | — | — |
 | SS-PLAT-26 | Missed Salesforce events recovered by nightly reconciliation | — | MVP | db-integration | no | — | T-0070, T-0066 | not-started | — | — |
 | SS-PLAT-27 | Replay id resume after restart | — | MVP | db-integration | no | — | T-0064 | not-started | — | — |
@@ -184,6 +184,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-65 | A valid command posts as one numbered, chained entry in one transaction; preview writes nothing | — | MVP | db-integration | no | packages/ledger/src/engine.pipeline.db.test.ts; packages/ledger/src/posting-invariants.prop.db.test.ts | T-0025 | green | [.agent/evidence/T-0025/manifest.json](../../.agent/evidence/T-0025/manifest.json) | afb5dad |
 | SS-PLAT-66 | Every posting maintains account_balance per company/account/period/dimension set/currency in the same transaction; lf_app cannot write it; a failed post changes no balance | — | MVP | db-integration + property | no | packages/ledger/src/account-balance.db.test.ts; packages/ledger/src/account-balance.prop.db.test.ts | T-0027 | green | [.agent/evidence/T-0027/manifest.json](../../.agent/evidence/T-0027/manifest.json) | 0cc1eb5 |
 | SS-PLAT-67 | Concurrent postings to the same accounts lose no balance update | — | MVP | db-integration | no | packages/ledger/src/account-balance.db.test.ts | T-0027 | green | [.agent/evidence/T-0027/manifest.json](../../.agent/evidence/T-0027/manifest.json) | 0cc1eb5 |
+| SS-PLAT-68 | The outbox event and its delivery job commit atomically with the posting (job id = event id, ids-only payload; rollback, failed job insert or replay leaves no extra event or job) | — | MVP | db-integration | no | packages/outbox/src/outbox.db.test.ts | T-0030 | green | [.agent/evidence/T-0030/manifest.json](../../.agent/evidence/T-0030/manifest.json) | ceaac00 |
+| SS-PLAT-69 | Outbox rows are append-only for every role; pg-boss schema owned by lf_migrator, lf_app DML only (no DDL, TRUNCATE, TRIGGER); queue install refuses any role but lf_migrator | — | MVP | db-integration | no | packages/outbox/src/outbox.db.test.ts; apps/worker/src/queue-admin.db.test.ts | T-0030 | green | [.agent/evidence/T-0030/manifest.json](../../.agent/evidence/T-0030/manifest.json) | ceaac00 |
 | SS-PLAT-70 | Scoped API tokens: hashed at rest, issued under fresh MFA step-up, scopes ∩ owner permissions, never step-up, SoD as owner, expire, revocable, last use tracked, tenant-bound | — | MVP | db-integration | no | packages/db/src/user-lifecycle.db.test.ts; apps/api/src/tokens/tokens.scope.db.test.ts | T-0016 | green | [.agent/evidence/T-0016/manifest.json](../../.agent/evidence/T-0016/manifest.json) | a60876f |
 | SS-PLAT-71 | Joiner activated only after MFA for MFA roles, with a welcome audit event; invite needs users.manage; nobody grants themselves a role or grants one to a disabled user | — | MVP | db-integration | no | apps/api/src/auth/oidc.db.test.ts; apps/api/src/users/users.lifecycle.db.test.ts; packages/db/src/user-lifecycle.db.test.ts | T-0016 | green | [.agent/evidence/T-0016/manifest.json](../../.agent/evidence/T-0016/manifest.json) | a60876f |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
@@ -448,10 +450,17 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0027
 - **Given** one company and two accounts with no balance row yet · **When** many postings to the same accounts, period and dimension set run at the same time on separate connections (some debiting A and crediting B, some the reverse, so lock order varies) · **Then** every posting commits, the balance rows equal the sum of all posted lines (no lost update, no deadlock), and the drift report is empty
 
+### SS-PLAT-68 — The outbox event and its delivery job commit atomically with the posting
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0030
+- **Given** a raw posting command posted with the outbox (`ledgerOutbox`) · **When** the post commits, is rolled back by its caller, cannot insert its pg-boss job, or is replayed with the same idempotency key · **Then** a committed post has exactly one `ledger.entry.posted` event and one job whose id is the event id and whose payload is only `{ tenantId, eventId }`; otherwise no entry, event or job is added
+
+### SS-PLAT-69 — Outbox and queue privileges
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0030
+- **Given** migration 0024 and pg-boss installed by `installQueue` · **When** lf_app or the owner try to change or delete an outbox event, and installation is attempted as lf_app · **Then** lf_app gets 42501 and the owner the append-only refusal; schema `pgboss` and its tables are owned by lf_migrator with lf_app holding only SELECT/INSERT/UPDATE/DELETE (no CREATE, TRUNCATE, TRIGGER); installation as lf_app is refused and creates nothing; installing twice as lf_migrator is idempotent
+
 ### SS-PLAT-70 — Scoped API tokens are hashed, expire and cannot exceed their owner
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0016
 - **Given** users with sessions · **When** they issue personal API tokens and use them as `Authorization: Bearer` · **Then** issuing needs a fresh MFA step-up and returns the secret once (`Cache-Control: no-store`) while the database stores only its SHA-256; scopes must be known, token-allowed (no step-up, user/role administration, SoD-settings or subscription permission) and held by the owner; at each request the token's permissions are its scopes ∩ the owner's current role permissions; a token never satisfies a step-up, cannot mint tokens and is not a session; SoD treats the owner as the actor; revoked, expired, forged, foreign-tenant, malformed or cookie-plus-bearer requests are 401; last use is tracked; every audit row names the token; rows are tenant-isolated, never deleted, and only usage and one revoke can change
-
 
 ### SS-PLAT-71 — Joiner and mover controls
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0016

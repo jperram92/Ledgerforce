@@ -63,9 +63,11 @@ export function selfSignedCertificate(
   notBefore: Date,
   notAfter: Date,
   commonName = 'ledgerforce-test-integration',
+  random: Buffer = randomBytes(8),
 ): string {
-  const serial = randomBytes(8);
-  serial[0] = (serial[0] ?? 0) & 0x7f; // positive INTEGER
+  const serial = Buffer.from(random);
+  // DER INTEGER: positive (top bit clear) and minimal (no leading 0x00 byte), so first byte 1..7f.
+  serial[0] = (serial[0] ?? 0) & 0x7f || 0x01;
   const spki = keys.publicKey.export({ type: 'spki', format: 'der' });
   const tbs = seq(
     tlv(0xa0, tlv(0x02, Buffer.from([0x02]))), // [0] EXPLICIT version v3
