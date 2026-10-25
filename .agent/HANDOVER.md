@@ -31,6 +31,10 @@ Open questions for human:
   11. Web (T-0081): the SPA must be served on the API's origin (cookie path=/, SameSite=Lax, callback → /); move API
       resource routes under a prefix such as /api before production? (deployment task). /auth/me has no organisation
       name or roles yet (roles exist since T-0012; organisation name needs a field).
+  12. Periods (ADR-0024, Proposed, accounting): (a) bank/Stripe payout under AR lock — tenant setting
+      payout_under_ar_lock, default `override` (treated as AR) vs `allow`; (b) payroll source types classed as AP;
+      (c) reversals need an override under any lock; (d) default lock-date policy `reject` (RQ-0012 suggested
+      "first open date" for automated feeds). Accept ADR-0024.
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
      (numeric + CHECK scale<=4) would make the DB refuse instead. Meanwhile the posting engine
      refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
@@ -88,6 +92,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0081 — apps/web/** (TanStack Router shell, sign-in/out, session handling), tests/e2e/web/shell.spec.ts,
 >     RQ-0025, DL-0109..0112; 19 screenshots in .agent/evidence/T-0081/
 >   • T-0109 — packages/testing/src/evidence/destination.ts + fixture wiring; verify.sh gate 9 env var; SS-PLAT-19 change; DL-0115
+>   • T-0023 — migration 0018 (periods, invariant-3 trigger, SECURITY DEFINER status functions, two-approver reopen);
+>     packages/ledger/src/{period-matrix,period}.ts; RQ-0026; ADR-0024; DL-0117..0120
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -187,3 +193,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T04:16:50.703Z claude: release T-0109 → review (verify 12 PASS/0 FAIL/4 PENDING; verify run left no other task's evidence; awaiting codex cross-review)
 - 2026-10-25 04:1x claude (lead): T-0109 built — verify gate 9 no longer writes other tasks' evidence (proven by a real verify run); SS-PLAT-55 green; → review. DL-0098 cleanup rule retired.
 - 2026-10-25 08:4x claude (lead): round-3 agents stopped on the usage limit (HTTP 429, reset 08:40 UTC); resumed from their worktrees. Saved: T-0023 RQ-0026 + red tests (9958715); T-0013 RQ-0027 + ADR-0025 + red tests + migration 0019 (9ec2ac4); T-0059 green (2e8fca8). No work lost.
+- 2026-10-25T09:02:58.126Z claude: T-0023 → verifying
+- 2026-10-25T09:05:33.649Z claude: release T-0023 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0024 Proposed (accounting); awaiting codex cross-review)
+- 2026-10-25 09:1x claude (lead): merged T-0023 (clean); gates green (519 unit / 484 db / 82 agent-script); verify 12 PASS/0 FAIL → review.

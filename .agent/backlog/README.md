@@ -113,7 +113,7 @@ graph LR
 | [T-0020](T-0020.md) | Journal tables and deferred balance constraint trigger | MVP | review | T-0018, T-0019 | — | 1 |
 | [T-0021](T-0021.md) | Immutability triggers and privilege model for ledger tables | MVP | review | T-0020 | — | 1 |
 | [T-0022](T-0022.md) | Hash chain per company and verification report | MVP | review | T-0021 | — | 1 |
-| [T-0023](T-0023.md) | Periods, close status matrix and lock-date policy | MVP | todo | T-0020, T-0012 | UC-01, UC-03, UC-05, UC-08, UC-10 | 9 |
+| [T-0023](T-0023.md) | Periods, close status matrix and lock-date policy | MVP | review | T-0020, T-0012 | UC-01, UC-03, UC-05, UC-08, UC-10 | 9 |
 | [T-0024](T-0024.md) | Gapless document numbering series | MVP | review | T-0010 | UC-02 | 2 |
 | [T-0025](T-0025.md) | Posting engine pipeline (command → validate → resolve → build → check → write) | MVP | todo | T-0021, T-0023, T-0024, T-0014, T-0022 | — | 1 |
 | [T-0026](T-0026.md) | Posting engine preview mode ("show me the journal") | MVP | todo | T-0025 | — | 1 |
