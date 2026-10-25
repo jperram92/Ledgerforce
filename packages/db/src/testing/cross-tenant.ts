@@ -127,6 +127,9 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   },
   'app.sod_exception_ack': { week_start: () => '2026-10-19' },
   'app.sod_settings': { report_timezone: () => 'Australia/Sydney' },
+  // Bank-detail changes (migration 0025): a generated notice has no recipient email, which
+  // the table allows only as 'no_recipient'. Settings need an Owner (prerequisite below).
+  'app.bank_detail_change_notice': { status: () => 'no_recipient' },
   // Salesforce JWT bearer connection (migration 0017): a complete sealed key and certificate facts.
   'app.salesforce_connection': {
     id: () => randomUUID(),
@@ -177,6 +180,10 @@ export const PREREQUISITES: Readonly<
   },
   'app.sod_exception_ack': async (admin, row) => {
     await grantRole(admin, row.get('tenant_id'), row.get('acknowledged_by'), 'owner');
+  },
+  // The bank-detail cooling-off setting needs an active Owner too (migration 0025).
+  'app.bank_detail_settings': async (admin, row) => {
+    await grantRole(admin, row.get('tenant_id'), row.get('set_by'), 'owner');
   },
   // A company bank account needs its GL account to be an asset of subtype bank (migration 0013).
   'app.bank_account': async (admin, row) => {
