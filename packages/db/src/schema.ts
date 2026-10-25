@@ -368,6 +368,43 @@ export interface BankStatementLineTable {
   created_at: Timestamp;
 }
 
+/**
+ * Salesforce connection (migration 0017, T-0063, ADR-0007). Private key and access token
+ * envelope-encrypted (ADR-0018); lf_app may update the token cache, instance_url and status only.
+ */
+export interface SalesforceConnectionTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: ColumnType<string, string, never>;
+  auth_flow: ColumnType<
+    'jwt_bearer' | 'authorization_code_pkce',
+    'jwt_bearer' | 'authorization_code_pkce' | undefined,
+    never
+  >;
+  login_url: ColumnType<string, string, never>;
+  username: ColumnType<string, string, never>;
+  consumer_key: ColumnType<string, string, never>;
+  private_key_ct: ColumnType<Buffer | null, Buffer | null | undefined, never>;
+  private_key_iv: ColumnType<Buffer | null, Buffer | null | undefined, never>;
+  private_key_tag: ColumnType<Buffer | null, Buffer | null | undefined, never>;
+  private_key_dek_wrapped: ColumnType<Buffer | null, Buffer | null | undefined, never>;
+  private_key_kek_id: ColumnType<string | null, string | null | undefined, never>;
+  private_key_enc_version: ColumnType<number | null, number | null | undefined, never>;
+  cert_not_after: ColumnType<Date | null, Date | string | null | undefined, never>;
+  cert_sha256: ColumnType<string | null, string | null | undefined, never>;
+  instance_url: string | null;
+  access_token_ct: Buffer | null;
+  access_token_iv: Buffer | null;
+  access_token_tag: Buffer | null;
+  access_token_dek_wrapped: Buffer | null;
+  access_token_kek_id: string | null;
+  access_token_enc_version: number | null;
+  access_token_obtained_at: ColumnType<Date | null, Date | string | null, Date | string | null>;
+  status: Generated<'active' | 'superseded' | 'disabled'>;
+  created_by: ColumnType<string | null, string | null | undefined, never>;
+  created_at: Timestamp;
+}
+
 export interface AuditLogTable {
   id: ColumnType<string, never, never>;
   tenant_id: TenantId;
@@ -408,6 +445,7 @@ export interface Database {
   'app.bank_account': BankAccountTable;
   'app.bank_statement': BankStatementTable;
   'app.bank_statement_line': BankStatementLineTable;
+  'app.salesforce_connection': SalesforceConnectionTable;
   /** INSERT only for lf_app — do not use RETURNING (needs SELECT). */
   'audit.audit_log': AuditLogTable;
 }
