@@ -41,6 +41,10 @@ Open questions for human:
       step_up_required to /auth/step-up; Keycloak realm ACR/AMR mapping (T-0094).
   14. Bank (T-0059): CAMT camt.052/054 refused (no SMB availability found; 054 has no balances) — confirm; does CBA
       (CommBiz) offer camt.053? Statements imported before T-0059 kept batches as one line (no production data yet).
+  15. Posting engine (T-0025, DL-0139): confirm DL-0136 control-account source types (AR ← AR-class incl. Stripe
+      charge; AP ← ap.*; payroll clearing ← payroll.*) and DL-0135 journal numbering (one series per source type
+      `je_<type>` vs one per company; company setup must create the series). DL-0137: also reject a repeat key
+      whose LINES differ (needs a stored command hash column)?
   6. ADR-0005 amendment? numeric(19,4) silently rounds a 5th decimal on insert. A domain type
      (numeric + CHECK scale<=4) would make the DB refuse instead. Meanwhile the posting engine
      refuses at its boundary (DL-0074, T-0025 AC). Accept the domain, or keep engine-only?
@@ -103,6 +107,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0013 — migration 0019; apps/api/src/authz/mfa.ts, step-up in auth/*, interceptor MFA/step-up steps; RQ-0027; ADR-0025;
 >     DL-0121..0124 (security review)
 >   • T-0059 — packages/modules/bank camt053/dedupe/statements/account-match; migration 0020; RQ-0028; DL-0125..0127
+>   • T-0025 — packages/ledger/src/{posting-command,posting-engine}.ts + invariant properties; RQ-0030; DL-0134..0138
+>     (golden-posting gate: generic pipeline only)
 >   • T-0105 — packages/db/migrations/0004_sessions.sql; apps/api/src/auth/** (SessionService, SessionTenantResolver,
 >     AuthController); ADR-0016; scripts/agent/lib/util.ts writeFileAtomic (DL-0069)
 > For each write `.agent/evidence/<T-ID>/review-codex-<YYYYMMDD-HHMMSS>.md` (PASS/FAIL per checklist item),
@@ -211,3 +217,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25T09:12:06.868Z claude: T-0059 → verifying
 - 2026-10-25T09:14:31.636Z claude: release T-0059 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; awaiting codex cross-review)
 - 2026-10-25 09:3x claude (lead): merged T-0059 (DL resolved by id; totals 152); migrations 0018–0020 in sequence; gates green (545 unit / 526 db); verify 12 PASS/0 FAIL → review. Round 3 complete.
+- 2026-10-25T13:42:19.197Z claude: T-0025 → verifying
+- 2026-10-25T13:46:22.202Z claude: release T-0025 → review (verify 13 PASS/0 FAIL/3 PENDING on merged tree (gate 3 invariants now PASS); awaiting codex cross-review)
+- 2026-10-25 13:4x claude (lead): merged T-0025 (clean; no migration); gates green (561 unit / 550 db); verify 13 PASS/0 FAIL/3 PENDING (gate 3 invariants now PASS) → review. Usage-limit stop/worker restart mid-merge: staged merge was intact; committed.
