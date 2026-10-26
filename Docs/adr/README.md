@@ -83,5 +83,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0032](0032-salesforce-pubsub-grpc-client-and-avro-decoding.md) | Salesforce Pub/Sub API client: grpc-js + proto-loader on the vendored proto, avsc for Avro, replay id committed with the batch | integration | no | Proposed |
 | [0034](0034-audit-log-read-path-and-admin-read-routes.md) | Audit log read path: permission-checked SECURITY DEFINER reader instead of SELECT for lf_app; admin read routes (users, caller access, audit log) | security | yes | Proposed |
 | [0036](0036-salesforce-writeback-collections-contract.md) | Salesforce write-back: outbox handler with a versioned writeBack snapshot, mirrors upserted by LF_Id__c, Account/Opportunity updated by Salesforce id | integration | no | Proposed |
+| [0038](0038-openbao-transit-kms-adapter.md) | OpenBao/Vault transit KMS adapter: derived-key context binding, 60-byte wrapped key with versioned key id, HTTPS-only fetch without redirects, strict key policy | security | yes | Proposed |
 
 Next free number: **0035** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; none needed an ADR).

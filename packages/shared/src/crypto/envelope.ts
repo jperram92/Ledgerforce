@@ -26,6 +26,11 @@ export interface Kms {
   readonly activeKeyId: string;
   wrap(dek: Buffer, aad: string): Promise<{ keyId: string; wrapped: Buffer }>;
   unwrap(wrapped: Buffer, keyId: string, aad: string): Promise<Buffer>;
+  /**
+   * Optional: re-wrap under the active key without exposing the DEK to the caller (the transit
+   * adapter does this inside OpenBao, ADR-0038). Without it, `rewrapField` unwraps and wraps.
+   */
+  rewrap?(wrapped: Buffer, keyId: string, aad: string): Promise<{ keyId: string; wrapped: Buffer }>;
 }
 
 export interface SealedField {
@@ -142,6 +147,29 @@ export async function openField(kms: Kms, sealed: SealedField, aad: string): Pro
   const dek = await kms.unwrap(sealed.wrappedDek, sealed.keyId, aad);
   try {
     return gcmOpen(dek, sealed.iv, sealed.ciphertext, sealed.tag, aad).toString('utf8');
+  } finally {
+    dek.fill(0);
+  }
+}
+
+/**
+ * Move a sealed field's data key to the KMS's active key (after rotation) without touching the
+ * data ciphertext, IV or tag. Fails closed like `openField` for a wrong AAD or tampering.
+ */
+export async function rewrapField(
+  kms: Kms,
+  sealed: SealedField,
+  aad: string,
+): Promise<SealedField> {
+  if (sealed.version !== ENVELOPE_VERSION) throw new DecryptionError();
+  if (kms.rewrap) {
+    const { keyId, wrapped } = await kms.rewrap(sealed.wrappedDek, sealed.keyId, aad);
+    return { ...sealed, keyId, wrappedDek: wrapped };
+  }
+  const dek = await kms.unwrap(sealed.wrappedDek, sealed.keyId, aad);
+  try {
+    const { keyId, wrapped } = await kms.wrap(dek, aad);
+    return { ...sealed, keyId, wrappedDek: wrapped };
   } finally {
     dek.fill(0);
   }
