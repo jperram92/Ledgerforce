@@ -4,10 +4,10 @@
   "branch": "claude/app-framework-agents-dzmkya",
   "step": null,
   "claimed_by": "claude",
-  "lease_expires_at": "2026-10-26T10:34:15.836Z",
+  "lease_expires_at": "2026-10-26T10:59:18.714Z",
   "last_green_commit": null,
   "run_id": "2026-10-24-codex-r01",
-  "updated_at": "2026-10-26T09:49:15.843Z",
+  "updated_at": "2026-10-26T10:14:18.722Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

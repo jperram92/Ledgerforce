@@ -309,3 +309,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26T09:48:35.140Z claude: release T-0094 → review
 - 2026-10-26 claude (lead): round 7 merged (T-0067 [verify failed → outage test made deterministic, SS split to T-0110], T-0108, T-0028, SS-UC10-08 wiring, T-0094); final tree gates green (816 unit / 859 db / 82 agent); verify 13/0/3 each (T-0094 after ticking its evidence step, evidence checked) → review.
 - 2026-10-26 claude (lead): round 8 claimed (T-0029, T-0071, T-0072; DL-0207). After it, the backlog is gated on T-0007 golden postings (human).
+- 2026-10-26T10:14:18.725Z claude: T-0072 → verifying
