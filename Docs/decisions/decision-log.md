@@ -1773,3 +1773,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0046 finding 3. The six sections are asserted exactly by T-0081's tests and positions are a contract (P14); adding the IA's "Accounting" section is a navigation change for the product owner. Keeping the edit to `sections.ts` and `router.tsx` small also eases the merge with T-0092.
 - Alternatives: a new "Accounting" section (rejected here: changes asserted navigation; raised as an open question); sub-pages under Settings (rejected: journals are not settings).
 - ADR: none · Status: accepted
+
+### DL-0227 — GL screen behaviour: save, then show the engine's journal; refusals mapped from the engine's own code list
+- Date: 2026-10-26 · By: claude · Task: T-0082 · Category: ui
+- Decision: (1) A manual journal is saved as a draft first ("Save draft and show the journal"); its page then shows the posting engine's preview (`GET /manual-journals/:id/preview`) in `JournalTable` from @ledgerforce/ui, open by default, with "Balanced" (P4). Submit is offered only when the preview succeeds; a refused preview shows the draft's lines with the refused one marked "Refused" in words and a dashed rule (P2) and the reason in plain words (P6), with "Change the draft" as the one primary action. (2) Every `PostingErrorCode` has a sentence in `apps/web/src/gl/gl-logic.ts`; the unit test reads the union from `packages/ledger/src/posting-command.ts`, so a new engine code without words fails `pnpm test`. (3) The form sends amounts exactly as typed (digits, up to 4 decimals, no commas; checked by a regular expression, never converted to a number) and never sums them: balance is the engine's to check. (4) An approver who also submitted the journal still sees Approve, with a note that small-team mode records it for the Owner's weekly review; the API's SoD check decides (ADR-0026). (5) A new draft gets one `Idempotency-Key` per form (`mj-<uuid>`), so a double click saves one draft. (6) The journal list formats amounts as AUD (two decimals) because the list row has no currency; base currency is AUD until multi-entity (Phase 2). (7) No " · " separators in the screens (the genericness probe counts them; DL-0065).
+- Why: RQ-0046 findings 2 and 4; design §3.9; principles P2–P7, P12, P13; AGENTS.md §4.
+- Alternatives: a live preview of the unsaved form (deferred, ADR-0042 follow-up); hiding Approve from the preparer (rejected: would block small-team owners whom the API allows with a recorded exception).
+- ADR: ADR-0042 · Status: accepted
+
+### DL-0228 — T-0082 evidence keeps the screenshots of the partial e2e runs
+- Date: 2026-10-26 · By: claude · Task: T-0082 · Category: process
+- Decision: `.agent/evidence/T-0082/` holds every screenshot the fixture wrote, including those of the first two e2e runs (11/15 failed on the genericness probe and a date-input keyboard step). The run that counts is the one at commit 6dda4cd (27 screenshots, all `passed`, 15/15 tests); the earlier files keep their own manifest entries (commit 2eab76745601, uncommitted UI at the time).
+- Why: evidence is append-only (AGENTS.md §0.6, evidence skill); deleting them would be the shortcut directive 6 forbids.
+- Alternatives: delete the earlier files (rejected: directive 6).
+- ADR: none · Status: accepted
