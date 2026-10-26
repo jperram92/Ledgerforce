@@ -5,7 +5,12 @@
  */
 /** A page inside a section, listed on the section's page (T-0093). */
 export interface SubPage {
-  to: '/settings/users' | '/reports/control-exceptions' | '/reports/audit-log';
+  to:
+    | '/settings/users'
+    | '/reports/control-exceptions'
+    | '/reports/audit-log'
+    | '/accounting/journals'
+    | '/accounting/chart';
   name: string;
   text: string;
 }
@@ -75,6 +80,16 @@ export const SECTIONS: readonly Section[] = [
         to: '/reports/audit-log',
         name: 'Audit log',
         text: 'Every change: who did what, to which record, and when.',
+      },
+      {
+        to: '/accounting/journals',
+        name: 'Manual journals',
+        text: 'Accruals, corrections and adjustments written by hand, with the journal shown before it posts.',
+      },
+      {
+        to: '/accounting/chart',
+        name: 'Chart of accounts',
+        text: 'The accounts your books are kept in, by number and type.',
       },
     ],
   },

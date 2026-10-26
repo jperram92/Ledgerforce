@@ -6,6 +6,7 @@
 import { createContext, useContext } from 'react';
 import type { AdminClient } from './admin/client.ts';
 import type { ApiClient } from './api.ts';
+import type { GlClient } from './gl/client.ts';
 
 export interface AppEnv {
   /** Prefix for API paths; '' means the page's own origin. */
@@ -30,6 +31,8 @@ export interface Services {
   api: ApiClient;
   /** Administration routes (T-0093). */
   admin: AdminClient;
+  /** Chart of accounts and manual journals (T-0082). */
+  gl: GlClient;
 }
 
 export const ServicesContext = createContext<Services | null>(null);

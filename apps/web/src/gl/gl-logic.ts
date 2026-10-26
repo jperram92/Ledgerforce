@@ -43,7 +43,8 @@ const REFUSALS: Record<string, Words> = {
       : `${l} uses ${a || 'an account'}, a control account. ${CONTROL}`,
   INVALID_PARTY: (l) => `${l} names a customer or supplier that cannot be used here.`,
   INVALID_DIMENSION: (l) => `${l} has a tracking value that does not fit this account.`,
-  MISSING_DIMENSION: (l) => `${l} needs a tracking value (for example a department) for its account.`,
+  MISSING_DIMENSION: (l) =>
+    `${l} needs a tracking value (for example a department) for its account.`,
   NO_NUMBER_SERIES: () =>
     'There is no numbering set up for manual journals yet. Ask your administrator to set one up.',
   IDEMPOTENCY_CONFLICT: () =>

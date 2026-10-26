@@ -15,6 +15,11 @@ import { AUDIT_FILTER_KEYS, type AuditQuery } from './admin/client.ts';
 import { ControlExceptionsPage } from './admin/ControlExceptionsPage.tsx';
 import { UserPage } from './admin/UserPage.tsx';
 import { UsersPage } from './admin/UsersPage.tsx';
+import { ChartPage } from './gl/ChartPage.tsx';
+import { JournalFormPage } from './gl/JournalFormPage.tsx';
+import { JournalPage } from './gl/JournalPage.tsx';
+import { isJournalStatus, JournalsPage } from './gl/JournalsPage.tsx';
+import type { JournalStatus } from './gl/client.ts';
 import { NotFoundPage, SectionPage } from './pages.tsx';
 import { SECTIONS } from './sections.ts';
 import { Shell } from './Shell.tsx';
@@ -91,6 +96,48 @@ const auditRoute = createRoute({
   },
 });
 
+// GL (T-0082, DL-0226): chart of accounts and manual journals under /accounting, listed on Reports.
+const chartRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'accounting/chart',
+  component: ChartPage,
+});
+
+const journalsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'accounting/journals',
+  validateSearch: (search: Record<string, unknown>): { status?: JournalStatus } =>
+    isJournalStatus(search['status']) ? { status: search['status'] } : {},
+  component: function JournalsRoute() {
+    const { status } = journalsRoute.useSearch();
+    return <JournalsPage status={status} />;
+  },
+});
+
+const newJournalRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'accounting/journals/new',
+  component: () => <JournalFormPage />,
+});
+
+const journalRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'accounting/journals/$journalId',
+  component: function JournalRoute() {
+    const { journalId } = journalRoute.useParams();
+    return <JournalPage key={journalId} journalId={journalId} />;
+  },
+});
+
+const editJournalRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'accounting/journals/$journalId/edit',
+  component: function EditJournalRoute() {
+    const { journalId } = editJournalRoute.useParams();
+    return <JournalFormPage key={journalId} journalId={journalId} />;
+  },
+});
+
 const notFoundRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: '$',
@@ -105,6 +152,11 @@ const routeTree = rootRoute.addChildren([
     userRoute,
     exceptionsRoute,
     auditRoute,
+    chartRoute,
+    journalsRoute,
+    newJournalRoute,
+    journalRoute,
+    editJournalRoute,
     notFoundRoute,
   ]),
 ]);

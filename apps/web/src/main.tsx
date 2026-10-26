@@ -3,6 +3,7 @@ import '@ledgerforce/ui/tokens.css';
 import '@ledgerforce/ui/timeline.css';
 import './styles/shell.css';
 import './styles/admin.css';
+import './styles/gl.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App.tsx';
