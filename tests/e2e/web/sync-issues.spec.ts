@@ -308,7 +308,8 @@ async function fakeApi(page: Page, who: Who): Promise<Fake> {
           { id: MEI, display_name: 'Mei Tan', email: 'mei@harbour.example', status: 'active' },
         ]);
       }
-      const may = (p: string) => f.who === 'owner' || permissionsOf(ME[f.who].roles).includes(p);
+      const may = (p: string) =>
+        f.who === 'owner' || (permissionsOf(ME[f.who].roles) as readonly string[]).includes(p);
       if (path === '/sync-issues' && method === 'GET') {
         f.gets.push(url.search);
         if (!may('sync.issues.read'))

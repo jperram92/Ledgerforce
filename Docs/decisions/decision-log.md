@@ -1759,3 +1759,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   Both edit apps/web routing; the lead merges T-0082 first, then T-0092.
 - Why: Product owner's parallel-build instruction.
 - ADR: none · Status: accepted
+
+### DL-0230 — Sync issues inbox lives under Settings at /settings/sync-issues
+- Date: 2026-10-26 · By: claude · Task: T-0092 · Category: ui
+- Decision: The inbox lives at `/settings/sync-issues` (list) and `/settings/sync-issues/:issueId` (one issue). It is listed as a page on Settings, so Settings is the current section. This departs from the IA's S17 route `/salesforce/issues` until a "Salesforce sync" area joins the navigation. That move will redirect the Settings path.
+- Why: RQ-0047 F1. A new nav section changes the order that P14 and the existing shell tests fix, which makes it a release-note change. Settings already names "the Salesforce connection".
+- Alternatives: (1) Add a Salesforce section now (rejected: changes the nav contract and existing test assertions). (2) Use `/salesforce/issues` with no current section (rejected: no nav anchor, and the shell would mark nothing as current).
+- ADR: none · Status: accepted
+
+### DL-0231 — Inbox list: default "Needs a person", status filter as links, 20 per page, forward keyset
+- Date: 2026-10-26 · By: claude · Task: T-0092 · Category: ui
+- Decision: The list asks `GET /sync-issues` for 20 issues a page. The default status is `open` ("Needs a person"), and "All" sends no status. The filter is a row of links (`?status=`) with `aria-current`. Paging is "Next page" (`after` = the API's `next_after`) and "First page". Unknown statuses and non-UUID cursors in the address are dropped.
+- Why: RQ-0047 F2. Twenty rows stay readable on a phone, and the API allows 1–200. Links avoid a select that navigates on change (WCAG 3.2.2) and keep each view shareable. The API pages forward only.
+- Alternatives: the API default of 50 (rejected: very long pages at 390 px); a select with an Apply button (rejected: an extra step for five fixed choices).
+- ADR: none · Status: accepted
+
+### DL-0232 — Retry and Ignore: confirm inline, offered by status, disabled with a reason without permission
+- Date: 2026-10-26 · By: claude · Task: T-0092 · Category: ui
+- Decision: The issue page offers Retry for `open` and `ignored` issues, and Ignore for `open` only, mirroring `retrySyncIssue` and `ignoreSyncIssue`. Otherwise a sentence says why there is nothing to do. Each action opens an inline confirmation group ("Confirm retry" / "Confirm ignore"; Ignore takes an optional note of up to 500 characters) and sends nothing until "Yes" is pressed. Focus moves into the group, and goes back to the button on Cancel. Callers without `sync.issues.manage` (the Auditor) see both buttons disabled with `aria-describedby` text naming who can act. A 409 reloads the issue and says it changed elsewhere. A 503 `queue_not_configured` is said in plain words. A 401 step-up uses the admin screens' routing.
+- Why: RQ-0047 F3–F4; P6 (a disabled control explains itself), P12 (Retry is the one primary action), and the IA's "◐ view + retry" for read-only roles.
+- Alternatives: hide the actions from the Auditor (rejected: the task asks for hidden or disabled with an explanation, and P6 prefers explained); a modal dialog (rejected: an inline group follows the T-0093 pattern and needs no focus trap).
+- ADR: none · Status: accepted
+
+### DL-0233 — Sync errors in plain words: every connector kind mapped, known Salesforce codes add a step
+- Date: 2026-10-26 · By: claude · Task: T-0092 · Category: ui
+- Decision: `explainError` maps every failure kind to a heading and a next step: the Salesforce connector's seven kinds, plus the outbox's `abandoned`, a `WriteBackRecordError` and an unknown failure. A unit test pins the list of kinds. A known Salesforce status code (ENTITY_IS_LOCKED, UNABLE_TO_LOCK_ROW, FIELD_CUSTOM_VALIDATION_EXCEPTION, INVALID_FIELD, INSUFFICIENT_ACCESS_ON_CROSS_REFERENCE_ENTITY, REQUEST_LIMIT_EXCEEDED) is read from `error.code` or the message, and replaces the step with a specific one. The raw code, HTTP status, message and error name stay visible, as does whether retrying alone can help (`retryable`).
+- Why: P9 ("inbox translating ENTITY_IS_LOCKED into an action"), P6; RQ-0047 F5, S4–S6. The code meanings are secondary sources, so Salesforce's own message is always shown too.
+- Alternatives: show the raw message only (rejected: P9); a server-side message catalogue (rejected: no API change needed, and the API stays the source of the raw facts).
+- ADR: none · Status: accepted
+
+### DL-0234 — T-0092 scope: own sync client in apps/web/src/sync, SS-PLAT-97..99, no migration or ADR
+- Date: 2026-10-26 · By: claude · Task: T-0092 · Category: scope
+- Decision: The screens use a client of their own (`apps/web/src/sync/client.ts`), built from the injected environment with `useMemo`. `App.tsx` and `env.tsx` are unchanged. The screens reuse the admin screens' access hook, states and step-up routing, so refusals stay `AdminApiError`s. Shared files touched: `router.tsx` (two routes), `sections.ts` (one Settings sub-page), `main.tsx` (one stylesheet import). The card had no scenarios, so SS-PLAT-97 (list), SS-PLAT-98 (detail) and SS-PLAT-99 (actions) were added to the register with screenshots required. No migration (0032 unused), ADR (ADR-0043 unused) or dependency is needed.
+- Why: The parallel round asked for minimal, local router and nav edits to ease the merge with T-0082. The API from T-0071 already offers everything (RQ-0047).
+- Alternatives: add `sync` to `Services` in env.tsx/App.tsx (rejected: more shared-file edits for no gain).
+- ADR: none · Status: accepted
