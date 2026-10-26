@@ -276,3 +276,5 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26 claude (lead): round 7 claimed (T-0028, T-0067, T-0094, T-0108; DL-0184).
 - 2026-10-26 04:4x claude (lead): all four round-7 agents stopped by the usage limit (~01:0x); T-0028 and T-0094 had uncommitted work only (still in their worktrees), T-0067 and T-0108 one commit each; resumed after the reset.
 - 2026-10-26T04:56:53.864Z claude: T-0067 → verifying
+- 2026-10-26T05:04:46.411Z claude: T-0067 → in_progress
+- 2026-10-26 05:0x claude (lead): verify T-0067 FAILED (8 PASS/5 FAIL): (a) the outage db test timed out at 60 s under load, and the next test then failed on leaked state; (b) SS-UC01-02/UC11-05/UC12-05 can't be built yet (gate 9 manifest, gate 12 step 7). T-0067 is back to in_progress; the agent is fixing the test (deterministic, no timeout or assertion changes) and splitting those SS into T-0110 (DL-0205).
