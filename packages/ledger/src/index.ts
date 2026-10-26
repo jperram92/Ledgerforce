@@ -7,3 +7,4 @@ export * from './period-matrix.ts';
 export * from './period.ts';
 export * from './posting-command.ts';
 export * from './posting-engine.ts';
+export * from './subledger.ts';

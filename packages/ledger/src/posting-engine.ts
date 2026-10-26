@@ -19,11 +19,14 @@
  *
  * account_balance is maintained by the database from the line insert in step 6, inside the same
  * savepoint (migration 0023, T-0027, RQ-0032); lf_app cannot write it.
- * Not here yet: subledger entries (AR/AP tasks), the real outbox
- * (T-0030 — PostingOutbox is the hook), approvals, event posting rules (golden postings Draft).
+ * Open items (T-0028, RQ-0039): every line on an AR_CONTROL or AP_CONTROL account gets one
+ * subledger_entry, built in step 4 (BuiltEntry.subledgerItems, so preview shows them) and
+ * written in step 6 after the lines; the database fills it from its line (migration 0028).
+ * Not here yet: approvals, event posting rules (golden postings Draft).
  */
 import type { Database } from '@ledgerforce/db';
 import { sql, type Transaction } from 'kysely';
+import { Money } from '@ledgerforce/shared/money';
 import { dimensionSetId, missingRequiredDimensions } from './dimension-set.ts';
 import { nextNumber } from './numbering.ts';
 import { recordPeriodOverride, resolvePostingDate, toPeriodError } from './period.ts';
@@ -56,6 +59,27 @@ export interface BuiltLine {
   memo: string | null;
 }
 
+/** Subledger roles whose control-account lines become AR/AP open items (design §3.3). */
+export const SUBLEDGER_ROLES = ['AR_CONTROL', 'AP_CONTROL'] as const;
+export type SubledgerRole = (typeof SUBLEDGER_ROLES)[number];
+const isSubledgerRole = (role: string): role is SubledgerRole =>
+  (SUBLEDGER_ROLES as readonly string[]).includes(role);
+
+/** The open item post() writes for a line on an AR/AP control account (T-0028). */
+export interface BuiltSubledgerItem {
+  lineNo: number;
+  controlRole: SubledgerRole;
+  accountId: string;
+  partyId: string | null;
+  currency: string;
+  /** Transaction currency, signed like the GL: debit +, credit −. */
+  originalAmount: string;
+  /** Base currency: debit − credit. */
+  baseOriginalAmount: string;
+  documentDate: string;
+  dueDate: string;
+}
+
 export interface BuiltEntry {
   companyId: string;
   baseCurrency: string;
@@ -73,6 +97,8 @@ export interface BuiltEntry {
   numberSeries: string;
   lines: BuiltLine[];
   total: string;
+  /** One per line on an AR_CONTROL / AP_CONTROL account, in line order. */
+  subledgerItems: BuiltSubledgerItem[];
 }
 
 export interface PostResult {
@@ -250,6 +276,7 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     ).map((v): [string, DimensionValueRow] => [v.id, v]),
   );
 
+  const subledgerOf = new Map<number, SubledgerRole>();
   const lines: BuiltLine[] = checked.lines.map((l, i) => {
     const n = l.lineNo;
     const accountId = accountIds[i] ?? '';
@@ -257,8 +284,13 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     if (!a) fail('UNKNOWN_ACCOUNT', `account ${accountId} is not an account of this company`, n);
     if (a.status !== 'active') fail('ACCOUNT_INACTIVE', `account ${a.code} is ${a.status}`, n);
     if (!a.postable) fail('ACCOUNT_NOT_POSTABLE', `account ${a.code} is not postable`, n);
+    const own = controlRoles.filter((r) => r.account_id === a.id).map((r) => r.role);
+    const subledgerRole = own.find(isSubledgerRole);
+    if (subledgerRole !== undefined) subledgerOf.set(n, subledgerRole);
+    if (l.dueDate !== undefined && subledgerRole === undefined) {
+      fail('INVALID_COMMAND', `dueDate is only for a line on an AR or AP control account`, n);
+    }
     if (a.is_control) {
-      const own = controlRoles.filter((r) => r.account_id === a.id).map((r) => r.role);
       if (!own.some((role) => controlAccountAccepts(role, c.sourceType))) {
         fail(
           'CONTROL_ACCOUNT',
@@ -288,6 +320,9 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
       }
       txnAmount = l.txnAmount;
       fxRate = l.fxRate;
+    }
+    if (subledgerOf.has(n) && Money.of(txnAmount, 'XXX').isZero()) {
+      fail('INVALID_COMMAND', 'a line on an AR or AP control account needs a txnAmount > 0', n);
     }
     if (a.currency !== null && a.currency !== txnCurrency) {
       fail('ACCOUNT_CURRENCY', `account ${a.code} takes ${a.currency} only, not ${txnCurrency}`, n);
@@ -367,6 +402,27 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
   const memo =
     date.note === undefined ? (c.memo ?? null) : c.memo ? `${c.memo}\n${date.note}` : date.note;
 
+  const subledgerItems = lines.flatMap((l): BuiltSubledgerItem[] => {
+    const role = subledgerOf.get(l.lineNo);
+    if (role === undefined) return [];
+    const debit = l.debit !== '0.0000';
+    return [
+      {
+        lineNo: l.lineNo,
+        controlRole: role,
+        accountId: l.accountId,
+        partyId: l.partyId,
+        currency: l.txnCurrency,
+        originalAmount: debit
+          ? l.txnAmount
+          : Money.of(l.txnAmount, 'XXX').negate().toNumericString(),
+        baseOriginalAmount: debit ? l.debit : Money.of(l.credit, 'XXX').negate().toNumericString(),
+        documentDate: date.entryDate,
+        dueDate: checked.lines.find((x) => x.lineNo === l.lineNo)?.dueDate ?? date.entryDate,
+      },
+    ];
+  });
+
   return {
     companyId,
     baseCurrency: base,
@@ -383,6 +439,7 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     numberSeries,
     lines,
     total: checked.total,
+    subledgerItems,
   };
 }
 
@@ -525,7 +582,20 @@ async function write(
     }
     await trx.insertInto('app.journal_line').values(rows).execute();
     // account_balance: added by the journal_line statement trigger above (migration 0023).
-    // Subledger entries (AR/AP tasks) will be written here.
+    // Open items: the database fills each from its line (migration 0028, T-0028).
+    if (built.subledgerItems.length > 0) {
+      await trx
+        .insertInto('app.subledger_entry')
+        .values(
+          built.subledgerItems.map((i) => ({
+            company_id: built.companyId,
+            entry_id: entry.id,
+            line_no: i.lineNo,
+            due_date: i.dueDate,
+          })),
+        )
+        .execute();
+    }
     await outbox.enqueue(trx, {
       companyId: built.companyId,
       entryId: entry.id,

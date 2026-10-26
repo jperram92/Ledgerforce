@@ -239,6 +239,55 @@ export interface AccountBalanceTable {
   updated_at: ColumnType<Date, never, never>;
 }
 
+/**
+ * AR/AP open item (migration 0028, T-0028): one per journal line on an AR_CONTROL/AP_CONTROL
+ * account. The writer gives company, entry, line and optionally due date; the database fills
+ * the rest from the line. Amounts signed like the GL (debit +). SELECT/INSERT for lf_app.
+ */
+export interface SubledgerEntryTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  entry_id: string;
+  line_no: number;
+  due_date: ColumnType<string, string | null | undefined, never>;
+  control_role: ColumnType<'AR_CONTROL' | 'AP_CONTROL', never, never>;
+  account_id: ColumnType<string, never, never>;
+  party_id: ColumnType<string | null, never, never>;
+  source_type: ColumnType<string, never, never>;
+  document_id: ColumnType<string | null, never, never>;
+  document_date: ColumnType<string, never, never>;
+  currency: ColumnType<string, never, never>;
+  original_amount: ColumnType<string, never, never>;
+  open_amount: ColumnType<string, never, never>;
+  base_original_amount: ColumnType<string, never, never>;
+  base_open_amount: ColumnType<string, never, never>;
+  created_at: ColumnType<Date, never, never>;
+}
+
+/**
+ * Allocation between two open items (migration 0028, T-0028). Append-only; the database
+ * computes currency, base releases and fx_difference and maintains the items' open amounts.
+ */
+export interface AllocationTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  from_entry_id: string;
+  to_entry_id: string;
+  amount: string;
+  currency: ColumnType<string, never, never>;
+  from_base_amount: ColumnType<string, never, never>;
+  to_base_amount: ColumnType<string, never, never>;
+  fx_difference: ColumnType<string, never, never>;
+  allocation_date: string;
+  reversal_of_id: ColumnType<string | null, string | null | undefined, never>;
+  idempotency_key: string;
+  memo: ColumnType<string | null, string | null | undefined, never>;
+  created_by: ColumnType<string | null, string | null | undefined, never>;
+  created_at: ColumnType<Date, never, never>;
+}
+
 /** Journal line in base currency (migration 0007): exactly one of debit/credit > 0. */
 export interface JournalLineTable {
   tenant_id: TenantId;
@@ -507,6 +556,8 @@ export interface Database {
   'app.journal_line': JournalLineTable;
   'app.journal_chain_head': JournalChainHeadTable;
   'app.account_balance': AccountBalanceTable;
+  'app.subledger_entry': SubledgerEntryTable;
+  'app.allocation': AllocationTable;
   'app.number_series': NumberSeriesTable;
   'app.party': PartyTable;
   'app.party_role': PartyRoleTable;
