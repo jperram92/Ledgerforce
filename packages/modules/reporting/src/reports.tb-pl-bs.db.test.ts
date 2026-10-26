@@ -3,7 +3,7 @@
  * (T-0076, design §8.1, §3.5, UC-10, RQ-0037).
  *
  * SS-UC10-08 — the TB review step for October: total debits = total credits, and the AR/AP
- *   control balances are listed (the subledger side waits for T-0028, DL-0175).
+ *   control balances equal their subledgers (T-0028 open items; DL-0175 superseded by DL-0206).
  * SS-PLAT-76 — reports for a period, a date range (cut periods included), a dimension filter and
  *   a balance-sheet date: base currency, sections by type/subtype, retained earnings computed
  *   from prior years, current-year earnings on the CURRENT_YEAR_EARNINGS line,
@@ -220,12 +220,58 @@ describe('SS-UC10-08 TB review step shows TB nets to zero [T-0076]', () => {
         c.role,
         c.code,
         c.controlBalance.toNumericString(),
-        c.subledgerBalance,
+        c.subledgerBalance?.toNumericString() ?? null,
         c.status,
       ]),
     ).toEqual([
-      ['AR_CONTROL', '1200', '1100.0000', null, 'subledger_not_available'],
-      ['AP_CONTROL', '2000', '220.0000', null, 'subledger_not_available'],
+      // Subledger side from T-0028 (DL-0206): open items on each control's normal side.
+      ['AR_CONTROL', '1200', '1100.0000', '1100.0000', 'reconciled'],
+      ['AP_CONTROL', '2000', '220.0000', '220.0000', 'reconciled'],
+    ]);
+  });
+
+  it('SS-UC10-08 a control line without an open item shows a difference [T-0028]', async () => {
+    // A control line written outside the posting engine gets no open item (T-0028 report), so
+    // the review must flag the AR control as not matching its subledger (DL-0206).
+    const company = await f.addCompany('Drifted Pty Ltd');
+    const { acct } = f.chart(company);
+    const periodId = await f.inTenant(async (trx) => {
+      await f.insertEntry(
+        trx,
+        [
+          { code: acct['1200'] ?? 'missing 1200', debit: '75.0000' },
+          { code: acct['4110'] ?? 'missing 4110', credit: '75.0000' },
+        ],
+        { company, sourceType: 'ar_invoice', entryDate: '2026-10-24' },
+      );
+      const period = await findPeriod(trx, company, '2026-10-24');
+      if (!period) throw new Error('test fixture: no October 2026 period for the new company');
+      return period.id;
+    });
+    // A November invoice through the engine has an open item, but is after October's end.
+    await prepareCompany(company);
+    await postIn(company)(
+      '2026-11-03',
+      [
+        ['D1200', '50.00'],
+        ['C4110', '50.00'],
+      ],
+      'ar_invoice',
+    );
+    const review = await f.inTenant((trx) =>
+      trialBalanceReview(trx, { companyId: company, periodId }),
+    );
+    expect(review.netsToZero).toBe(true);
+    expect(
+      review.controls.map((c) => [
+        c.role,
+        c.controlBalance.toNumericString(),
+        c.subledgerBalance?.toNumericString() ?? null,
+        c.status,
+      ]),
+    ).toEqual([
+      ['AR_CONTROL', '75.0000', '0.0000', 'difference'],
+      ['AP_CONTROL', '0.0000', '0.0000', 'reconciled'],
     ]);
   });
 

@@ -5,7 +5,7 @@
  * reads the company, chart, system roles and periods, and never touches ledger tables.
  */
 import type { Database } from '@ledgerforce/db';
-import { accountMovements } from '@ledgerforce/ledger';
+import { accountMovements, subledgerReconciliation } from '@ledgerforce/ledger';
 import { Money } from '@ledgerforce/shared';
 import { sql, type Transaction } from 'kysely';
 import {
@@ -67,8 +67,13 @@ export interface ControlCheck {
   name: string;
   /** Control account balance on its normal side (AR debit, AP credit) at the period end. */
   controlBalance: Money;
-  /** Null until subledger_entry exists (T-0028); see DL-0175. */
+  /**
+   * Open items of the control's role on the same normal side, at the period end (T-0028,
+   * DL-0206). Null only when the role has no reconciliation row.
+   */
   subledgerBalance: Money | null;
+  /** Realised FX on allocations not yet posted (DL-0187), included in the comparison. */
+  unpostedFxDifference: Money | null;
   status: 'subledger_not_available' | 'reconciled' | 'difference';
 }
 
@@ -221,8 +226,8 @@ export async function balanceSheetReport(
 
 /**
  * The close checklist's TB review (UC-10 step "review TB", SS-UC10-08): the trial balance as at
- * the period end, whether it nets to zero, and the AR/AP control balances. The subledger side
- * is reported as not available until subledger_entry exists (T-0028, DL-0175).
+ * the period end, whether it nets to zero, and the AR/AP control balances checked against their
+ * subledgers (subledger = control + unposted FX; T-0028, DL-0206, superseding DL-0175).
  */
 export async function trialBalanceReview(
   trx: Trx,
@@ -239,6 +244,7 @@ export async function trialBalanceReview(
   if (!p) throw new ReportError('UNKNOWN_PERIOD', `no period ${q.periodId} in this company`);
   const trialBalance = await trialBalanceReport(trx, { companyId: q.companyId, to: p.end });
   const controls = await roleAccounts(trx, q.companyId, ['AR_CONTROL', 'AP_CONTROL'] as const);
+  const recs = await subledgerReconciliation(trx, { companyId: q.companyId, asOf: p.end });
   const currency = trialBalance.currency;
   return {
     companyId: q.companyId,
@@ -248,14 +254,18 @@ export async function trialBalanceReview(
     controls: controls.map((c) => {
       const row = trialBalance.rows.find((r) => r.accountId === c.accountId);
       const debitNet = row ? row.debit.sub(row.credit) : Money.zero(currency);
+      // Reconciliation amounts are debit-positive; AP is shown on its credit side.
+      const side = (m: Money) => (c.role === 'AR_CONTROL' ? m : m.negate());
+      const rec = recs.find((r) => r.controlRole === c.role);
       return {
         role: c.role,
         accountId: c.accountId,
         code: c.code,
         name: c.name,
-        controlBalance: c.role === 'AR_CONTROL' ? debitNet : debitNet.negate(),
-        subledgerBalance: null,
-        status: 'subledger_not_available',
+        controlBalance: side(debitNet),
+        subledgerBalance: rec ? side(Money.of(rec.subledgerBalance, currency)) : null,
+        unpostedFxDifference: rec ? side(Money.of(rec.unpostedFxDifference, currency)) : null,
+        status: rec ? (rec.reconciled ? 'reconciled' : 'difference') : 'subledger_not_available',
       };
     }),
   };

@@ -1565,3 +1565,12 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: building from source with Go (rejected: slow, large toolchain download); Docker image (rejected: no Docker daemon in this environment); `describe.skipIf(!env)` in the default suite (rejected: a silent skip).
 
 - ADR: none · Status: accepted
+
+### DL-0206 — SS-UC10-08 subledger = control wired into trialBalanceReview (supersedes DL-0175's placeholder)
+- Date: 2026-10-26 · By: claude (lead, after the T-0028 merge) · Task: T-0076, T-0028 · Category: accounting
+- Decision: `trialBalanceReview` now calls `subledgerReconciliation({ companyId, asOf: period end })` from T-0028. For each control it reports `subledgerBalance` and `unpostedFxDifference` on the control's normal side (AP negated from the debit-positive reconciliation), and status `reconciled` or `difference` from the reconciliation (subledger = control + unposted FX, DL-0187). `subledger_not_available` remains only for a role with no reconciliation row.
+  - The SS-UC10-08 assertion moves from the DL-0175 placeholder (`null`, `subledger_not_available`) to the real values (`1100`/`220`, `reconciled`). This is a stronger expectation, not a weaker one.
+  - A new test covers a control line written outside the engine (no open item), which must show `difference`, plus a November engine invoice after the October period end.
+  - Done test-first (RED captured). 3 hand mutants killed: status always reconciled; AP side not negated; asOf dropped. The last survived until the post-period invoice was added.
+- Why: Design §10.8 item 3 and UC-10 ("AR/AP subledgers = controls"); T-0028 provided the read API (DL-0188). DL-0175 deferred this explicitly until then.
+- ADR: ADR-0035 (Proposed) · Status: accepted (DL-0175 superseded for this point)
