@@ -139,6 +139,24 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   // Transactional outbox (migration 0024): dotted topic, snake_case aggregate and handler names.
   'app.outbox_event': { topic: () => 'ledger.entry.posted', aggregate_type: () => 'journal_entry' },
   'app.outbox_inbox': { handler: () => 'test.handler' },
+  // Delivery failures and Sync issues (migration 0030): handler/connector names, an error name
+  // and kind, an open issue.
+  'app.outbox_delivery_failure': {
+    handler: () => 'test.handler',
+    error_name: () => 'Error',
+    error_kind: () => 'unavailable',
+    error_code: () => 'SERVER_UNAVAILABLE',
+    http_status: () => '503',
+  },
+  'app.sync_issue': {
+    handler: () => 'test.handler',
+    connector: () => 'test',
+    status: () => 'open',
+    error_name: () => 'Error',
+    error_kind: () => 'unavailable',
+    error_code: () => 'SERVER_UNAVAILABLE',
+    http_status: () => '503',
+  },
   // Bank-detail changes (migration 0025): a generated notice has no recipient email, which
   // the table allows only as 'no_recipient'. Settings need an Owner (prerequisite below).
   'app.bank_detail_change_notice': { status: () => 'no_recipient' },

@@ -13,6 +13,9 @@ pg-boss queue options and install, and a test harness with a pg-boss `TestClock`
   never through the pg-boss pool: they commit or roll back with the caller's work.
 - The job id is the event id; the job payload is exactly `{ tenantId, eventId }`. pg-boss tables
   have no RLS, so **no tenant data goes into a job**. Consumers read the event under RLS.
+  (A Sync issues retry sends a new job for the event with its own id; ADR-0040, DL-0214.)
+- Failed attempts: the worker logs the error in `app.outbox_delivery_failure` and stores only
+  `{ handler, failureId }` as the job output — never error text (ADR-0040, DL-0213).
 - `app.outbox_event` and `app.outbox_inbox` are append-only (directive 6). There is no
   "delivered" flag to update: the inbox row is the record.
 - A handler does its effect in the `trx` it is given, so the effect and the inbox row commit

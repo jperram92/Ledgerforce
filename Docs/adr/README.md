@@ -87,5 +87,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0037](0037-self-hosted-install-owner-bootstrap-and-realm-mfa.md) | Self-hosted install: first Owner with a one-time IdP password, realm-wide MFA via the ACR mapping, file secrets, one public origin | security | yes | Proposed |
 | [0038](0038-openbao-transit-kms-adapter.md) | OpenBao/Vault transit KMS adapter: derived-key context binding, 60-byte wrapped key with versioned key id, HTTPS-only fetch without redirects, strict key policy | security | yes | Proposed |
 | [0039](0039-manual-journal-document-and-approval.md) | Manual journals as approvable documents posted only through the engine (approval above the threshold or on control/tax/equity accounts, preparer ≠ approver in API and database); control accounts closed to manual, imported and rule journals | security | yes | Proposed |
+| [0040](0040-sync-issues-inbox-dead-letters-and-api-budget-share.md) | Sync issues inbox: dead letters become tenant issues, failure log outside pg-boss, one-click retry as a new delivery job, API budget share as connection data | security | yes | Proposed |
 
-Next free number: **0042** (0040 reserved for T-0071; unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).
+Next free number: **0042** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

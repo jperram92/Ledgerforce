@@ -13,6 +13,7 @@ import { HandlerRegistry, runtimeBossOptions } from '@ledgerforce/outbox';
 import { sql } from 'kysely';
 import { PgBoss } from 'pg-boss';
 import { startOutboxWorker } from './outbox-worker.ts';
+import { startSyncIssueWorker } from './sync-issue-worker.ts';
 
 let url: string;
 try {
@@ -29,6 +30,8 @@ boss.on('error', (error: Error) => console.error(`pg-boss: ${error.message}`));
 await boss.start();
 // No outbox handlers are registered yet: events are delivered to none and recorded as such.
 await startOutboxWorker({ boss, db, registry: new HandlerRegistry() });
+// Dead-lettered deliveries become Sync issues (design §5.6 rule 2, T-0071).
+await startSyncIssueWorker({ boss, db });
 
 async function beat(): Promise<void> {
   try {

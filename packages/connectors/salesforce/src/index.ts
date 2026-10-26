@@ -86,8 +86,10 @@ export {
   type SfValue,
   type WriteBackRecord,
 } from './writeback/batch.ts';
+export { getApiBudgetShare, setApiBudgetShare } from './writeback/budget.ts';
 export {
   ApiUsageGate,
+  shareBasisPoints,
   classifyHttpError,
   fetchHttpRequest,
   MAX_COLLECTION_RECORDS,
