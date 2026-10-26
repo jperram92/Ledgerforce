@@ -169,7 +169,8 @@ services:
       # Inside the network nginx listens on the same port as the public URL, so the API reaches
       # the OIDC issuer through the `ledgerforce.localhost` alias on a local install.
       NGINX_PORT: ${LF_HTTP_PORT:-8080}
-    tmpfs: [/tmp, /etc/nginx/conf.d]
+    # Read-only root: nginx renders its config template into a tmpfs owned by its user (101).
+    tmpfs: [/tmp, '/etc/nginx/conf.d:uid=101,gid=101,mode=0755']
     ports:
       - '${LF_HTTP_BIND:-127.0.0.1}:${LF_HTTP_PORT:-8080}:${LF_HTTP_PORT:-8080}'
     networks:

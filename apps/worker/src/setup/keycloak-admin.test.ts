@@ -118,7 +118,9 @@ describe('SS-PLAT-85 Keycloak admin client for the first Owner', () => {
     expect(JSON.parse(create?.body ?? '{}')).toEqual({
       username: 'owner@example.test',
       email: 'owner@example.test',
-      firstName: 'Olivia Owner',
+      // Keycloak 26's user profile requires both names (else VERIFY_PROFILE at first login).
+      firstName: 'Olivia',
+      lastName: 'Owner',
       enabled: true,
       emailVerified: true,
       requiredActions: [...FIRST_LOGIN_ACTIONS],
@@ -132,6 +134,19 @@ describe('SS-PLAT-85 Keycloak admin client for the first Owner', () => {
     const again = await a.ensureUser({ email: 'owner@example.test', displayName: 'Olivia Owner' });
     expect(again).toEqual({ subject: '00000001-aaaa-4bbb-8ccc-dddddddddddd', created: false });
     expect(seen.filter((s) => s.method === 'POST' && s.url.endsWith('/users'))).toEqual([]);
+  });
+
+  it('SS-PLAT-85 splits the display name at the last space; a single name is the first name only', async () => {
+    const a = admin();
+    await a.ensureUser({ email: 'a@example.test', displayName: '  Mary Jane van Dyke ' });
+    await a.ensureUser({ email: 'b@example.test', displayName: 'Prince' });
+    const bodies = seen
+      .filter((s) => s.method === 'POST' && s.url.endsWith('/users'))
+      .map((s) => JSON.parse(s.body) as { firstName?: string; lastName?: string });
+    expect(bodies.map((b) => [b.firstName, b.lastName])).toEqual([
+      ['Mary Jane van', 'Dyke'],
+      ['Prince', undefined],
+    ]);
   });
 
   it('SS-PLAT-85 sets a temporary password and re-applies MFA enrolment and password change', async () => {

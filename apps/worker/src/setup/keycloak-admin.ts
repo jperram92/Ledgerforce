@@ -21,6 +21,16 @@ export interface KeycloakAdminOptions {
   fetch?: typeof fetch;
 }
 
+/**
+ * Keycloak 26's user profile requires first and last name, or it asks at first login
+ * (VERIFY_PROFILE). Split at the last space; a single name becomes the first name only.
+ */
+export function splitName(displayName: string): { firstName: string; lastName?: string } {
+  const name = displayName.trim().replace(/\s+/g, ' ');
+  const i = name.lastIndexOf(' ');
+  return i < 0 ? { firstName: name } : { firstName: name.slice(0, i), lastName: name.slice(i + 1) };
+}
+
 export class KeycloakAdminError extends Error {
   readonly call: string;
   readonly status: number;
@@ -96,7 +106,7 @@ export class KeycloakAdmin implements IdentityAdmin {
     const res = await this.#call('create user', 'POST', '/users', {
       username,
       email: username,
-      firstName: u.displayName,
+      ...splitName(u.displayName),
       enabled: true,
       emailVerified: true,
       requiredActions: [...FIRST_LOGIN_ACTIONS],

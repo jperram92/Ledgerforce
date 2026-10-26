@@ -160,6 +160,11 @@ test.describe('SS-PLAT-23 self-hosted compose install', () => {
 
     // Keycloak runs the first-login actions: MFA enrolment, then the Owner's own password.
     await expect(page.locator('#totp')).toBeVisible();
+    // The evidence must not carry the authenticator secret: blur the QR code and the key.
+    await page.addStyleTag({
+      content:
+        '#kc-totp-secret-qr-code, #kc-totp-secret-key, img[src^="data:image"] { filter: blur(12px) !important; }',
+    });
     await evidence('SS-PLAT-23', 'owner-mfa-enrolment');
     await page.locator('#mode-manual').click();
     mfaSecret = ((await page.locator('#kc-totp-secret-key').textContent()) ?? '').trim();

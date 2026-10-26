@@ -37,7 +37,7 @@ cleanup() {
   if [[ $status -ne 0 ]]; then
     echo "--- smoke failed (exit $status): service status and recent logs ---" >&2
     "${compose[@]}" ps -a >&2 || true
-    "${compose[@]}" logs --no-color --tail 80 >&2 || true
+    "${compose[@]}" logs --no-color --tail 80 2>&1 | sed -E 's/(One-time password: ).*/\1[redacted]/' >&2 || true
   fi
   if [[ "${LF_SMOKE_KEEP:-0}" != 1 ]]; then
     "${compose[@]}" down -v --remove-orphans >/dev/null 2>&1 || true
@@ -60,8 +60,9 @@ docker build -f "$root/infra/docker/keycloak.Dockerfile" -t "${project}-keycloak
 echo "--- starting the stack"
 "${compose[@]}" up -d --no-build
 
-# setup is one-shot: wait for it and require exit code 0.
-setup_status="$("${compose[@]}" wait setup)"
+# setup is one-shot: wait for it and require exit code 0 (`compose wait` exits with its code).
+setup_status=0
+"${compose[@]}" wait setup >/dev/null || setup_status=$?
 "${compose[@]}" logs --no-color --no-log-prefix setup >"$work/setup.log"
 if [[ "$setup_status" != 0 ]]; then
   cat "$work/setup.log" >&2
