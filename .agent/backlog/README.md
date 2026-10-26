@@ -178,7 +178,7 @@ graph LR
 | [T-0108](T-0108.md) | OpenBao/Vault transit KMS adapter (HTTP, no SDK) for envelope encryption | Phase 1 | review | T-0037 | — | 1 |
 | [T-0109](T-0109.md) | verify.sh gate 9: e2e runs must not write evidence into other tasks' folders | MVP | review | T-0009 | — | 0 |
 | [T-0081](T-0081.md) | Web app shell (React, Vite, TanStack, shadcn/ui) with auth and navigation | MVP | review | T-0011, T-0009, T-0106 | — | 0 |
-| [T-0082](T-0082.md) | UI: chart of accounts, manual journal and "show me the journal" preview | MVP | todo | T-0081, T-0026, T-0029 | — | 0 |
+| [T-0082](T-0082.md) | UI: chart of accounts, manual journal and "show me the journal" preview | MVP | review | T-0081, T-0026, T-0029 | — | 0 |
 | [T-0083](T-0083.md) | UI: invoices list, detail, approve and post | MVP | todo | T-0081, T-0040, T-0041 | UC-01 | 1 |
 | [T-0084](T-0084.md) | UI: batch billing preview, approval and exception list | MVP | todo | T-0081, T-0044 | UC-02 | 1 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | todo | T-0081, T-0046, T-0045, T-0055 | UC-03, UC-11 | 2 |
@@ -188,7 +188,7 @@ graph LR
 | [T-0089](T-0089.md) | UI: TB, P&L, balance sheet, GL detail, aged AR/AP | MVP | todo | T-0081, T-0077 | — | 0 |
 | [T-0090](T-0090.md) | UI: close checklist and period status | MVP | todo | T-0081, T-0078, T-0079 | UC-10 | 1 |
 | [T-0091](T-0091.md) | UI: setup wizard | MVP | todo | T-0081, T-0080 | — | 0 |
-| [T-0092](T-0092.md) | UI: Salesforce sync issues inbox | MVP | todo | T-0081, T-0071 | — | 0 |
+| [T-0092](T-0092.md) | UI: Salesforce sync issues inbox | MVP | review | T-0081, T-0071 | — | 0 |
 | [T-0093](T-0093.md) | UI: users, roles, SoD exceptions report and audit log viewer | MVP | review | T-0081, T-0016, T-0015 | — | 0 |
 | [T-0094](T-0094.md) | Self-hosted Docker Compose install (api, worker, web, postgres, keycloak) | MVP | review | T-0081, T-0030, T-0011 | — | 1 |
 | [T-0095](T-0095.md) | CI security gates: SAST, dependency, container and secret scanning, SBOM | MVP | todo | T-0001 | — | 1 |

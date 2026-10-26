@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 9 in progress (DL-0224): T-0082 (UI: chart, manual journal, journal preview) and T-0092 (UI: sync issues inbox) by sub-agents. Rounds 4–8 complete and in review. After round 9 the backlog waits on T-0007 golden postings (human gate) — see open question 0.
+Task: PARALLEL ROUND 9 COMPLETE (DL-0224): T-0092 and T-0082 merged, each verify 13 PASS/0 FAIL/3 PENDING, in review. Rounds 4–9 complete and in review. See `conductor next` for anything newly claimable; otherwise the CRITICAL PATH is T-0007 golden postings (human gate) — open question 0 — and the Codex cross-reviews.
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -79,6 +79,9 @@ Open questions for human:
       - Follow-up cards to create when convenient: Sync issues screen, api_budget_share settings
         route, register outbox handlers in the worker (needs KMS), the quarterly access review
         (T-0093).
+  21. Round 9 UI placement: should "Accounting" (T-0082, DL-0226) and "Salesforce sync" (T-0092, DL-0230) become
+      their own navigation sections? Either changes the six-section nav contract (P14) and needs a release note. For
+      now the GL screens are linked from Reports and the sync inbox sits under Settings.
   16. SoD (T-0015, ADR-0026 Proposed, security): confirm the threshold placeholders (§11.2); Owner-only SoD settings;
       meaning of "external reviewer" (another active user of the tenant); is rule 2 exceptable in small-team mode;
       rule 6 (period reopen) never excepted; AP Clerk cells §6.4 vs rules §6.5; weekly report in the tenant time
@@ -147,6 +150,9 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0059 — packages/modules/bank camt053/dedupe/statements/account-match; migration 0020; RQ-0028; DL-0125..0127
 >   • T-0025 — packages/ledger/src/{posting-command,posting-engine}.ts + invariant properties; RQ-0030; DL-0134..0138
 >     (golden-posting gate: generic pipeline only)
+>   • T-0082 — apps/web/src/gl/**, GET /accounts, GET /manual-journals(+/:id/preview), tests/e2e/web/gl.spec.ts;
+>     ADR-0042; DL-0225..0228
+>   • T-0092 — apps/web/src/sync/**, tests/e2e/web/sync-issues.spec.ts; DL-0230..0234
 >   • T-0029 — migration 0029 (manual_journal guard), packages/modules/journals, engine approvedBy, apps/api
 >     /manual-journals; ADR-0039; DL-0208..0212
 >   • T-0071 — migration 0030 (sync_issue, outbox_delivery_failure, permission_known), packages/outbox
@@ -336,3 +342,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26 14:4x claude (lead): both round-9 agents stopped by the usage limit (~11:3x); T-0082 has 1 commit, T-0092 uncommitted work only (kept in its worktree); resumed after the reset.
 - 2026-10-26T15:08:42.545Z claude: T-0082 → verifying
 - 2026-10-26T15:08:42.691Z claude: T-0092 → verifying
+- 2026-10-26T15:18:10.447Z claude: release T-0082 → review
+- 2026-10-26T15:18:10.589Z claude: release T-0092 → review
+- 2026-10-26 claude (lead): round 9 merged (T-0092, T-0082; web router/sections/main conflicts resolved by keeping both sides); gates green (905 unit + LWC / 921 db / 82 agent); verify 13/0/3 each, including gate-9 e2e on the merged router → review.
