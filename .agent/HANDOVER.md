@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 8 COMPLETE (DL-0207): T-0072, T-0029, T-0071 merged, each verify 13 PASS/0 FAIL/3 PENDING, all in review. Rounds 4–8 complete and in review. NOTHING ELSE IS CLAIMABLE: `conductor next` lists only T-0095 (human-only CI gates) and T-0103 (Windows). CRITICAL PATH: T-0007 golden postings (human gate) — see open question 0. Next agent action: Codex cross-review of the review list below.
+Task: PARALLEL ROUND 9 in progress (DL-0224): T-0082 (UI: chart, manual journal, journal preview) and T-0092 (UI: sync issues inbox) by sub-agents. Rounds 4–8 complete and in review. After round 9 the backlog waits on T-0007 golden postings (human gate) — see open question 0.
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -332,3 +332,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26T10:35:26.537Z claude: T-0071 → verifying
 - 2026-10-26T10:39:35.286Z claude: release T-0071 → review
 - 2026-10-26 claude (lead): round 8 merged (T-0072, T-0029, T-0071); final tree gates green (845 unit + LWC Jest / 916 db / 82 agent); verify 13/0/3 each (T-0072 after ticking its n/a evidence step) → review. No further claimable tasks: the backlog waits on T-0007 golden postings (human) and the Codex cross-reviews.
+- 2026-10-26 claude (lead): correction — T-0082 and T-0092 became claimable once T-0029/T-0071 merged; round 9 claimed (DL-0224).

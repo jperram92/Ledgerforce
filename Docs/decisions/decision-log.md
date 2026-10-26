@@ -1748,3 +1748,14 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Directive 3 (no "flake" without a cause); keeps the investigation in the repository.
 
 - ADR: none · Status: accepted
+
+### DL-0224 — Parallel round 9: T-0082 and T-0092 (UI), unblocked by round 8
+- Date: 2026-10-26 · By: claude (lead) · Task: T-0082, T-0092 · Category: process
+- Decision: Merging T-0071 and T-0029 made T-0082 (UI: chart of accounts, manual journal, "show me the journal" preview) and T-0092 (UI: Salesforce sync issues inbox) claimable. This corrects the HANDOVER note written minutes earlier that nothing else was claimable. Round 9 runs both in worktrees:
+  - T-0082: migration 0031 only if needed, DL-0225..0229, RQ-0046, ADR-0042, SS-PLAT-93..96.
+  - T-0092: migration 0032 only if needed, DL-0230..0234, RQ-0047, ADR-0043, SS-PLAT-97..99.
+  - Lead: DL-0235+, SS-PLAT-100+.
+
+  Both edit apps/web routing; the lead merges T-0082 first, then T-0092.
+- Why: Product owner's parallel-build instruction.
+- ADR: none · Status: accepted
