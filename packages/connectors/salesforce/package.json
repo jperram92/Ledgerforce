@@ -2,10 +2,11 @@
   "name": "@ledgerforce/connector-salesforce",
   "version": "0.0.0",
   "private": true,
-  "description": "Salesforce connector: External Client App JWT bearer auth and encrypted token store (design §5.2, ADR-0007); Pub/Sub API CDC subscriber with a replay-id store (design §5.3, ADR-0032)",
+  "description": "Salesforce connector: External Client App JWT bearer auth and encrypted token store (design §5.2, ADR-0007); Pub/Sub API CDC subscriber with a replay-id store (design §5.3, ADR-0032); sObject Collections write-back from the outbox (design §5.4, ADR-0036)",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/index.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

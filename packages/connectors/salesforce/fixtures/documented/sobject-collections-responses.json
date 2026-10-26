@@ -1,0 +1,81 @@
+{
+  "source": "Documented, NOT recorded: written from RQ-0040 Findings 1-8 and their sources (S1-S6), no Salesforce org was contacted. Replace with redacted recordings in fixtures/recorded/ from a scratch org (RQ-0040 follow-up). Ids are made up; no real token, id or key appears here.",
+  "apiVersion": "67.0",
+  "maxRecords": 200,
+  "maxUpdateChunks": 10,
+  "upsertResult": {
+    "created": { "id": "a01TEST00000001AAA", "success": true, "errors": [], "created": true },
+    "updated": { "id": "a01TEST00000001AAA", "success": true, "errors": [], "created": false }
+  },
+  "saveResult": {
+    "updated": { "id": "001TEST00000001AAA", "success": true, "errors": [] }
+  },
+  "recordErrors": {
+    "malformedId": {
+      "success": false,
+      "errors": [
+        { "statusCode": "MALFORMED_ID", "message": "malformed id 001TESTBAD", "fields": ["Id"] }
+      ]
+    },
+    "notFound": {
+      "success": false,
+      "errors": [
+        {
+          "statusCode": "INVALID_CROSS_REFERENCE_KEY",
+          "message": "invalid cross reference id",
+          "fields": []
+        }
+      ]
+    },
+    "duplicateValue": {
+      "success": false,
+      "errors": [
+        {
+          "statusCode": "DUPLICATE_VALUE",
+          "message": "Duplicate external id specified: LF_Id__c",
+          "fields": []
+        }
+      ]
+    },
+    "rolledBack": {
+      "success": false,
+      "errors": [
+        {
+          "statusCode": "ALL_OR_NONE_OPERATION_ROLLED_BACK",
+          "message": "Record rolled back because not all records were valid and the request was using AllOrNone header",
+          "fields": []
+        }
+      ]
+    }
+  },
+  "httpErrors": {
+    "sessionExpired": {
+      "status": 401,
+      "body": [{ "message": "Session expired or invalid", "errorCode": "INVALID_SESSION_ID" }]
+    },
+    "requestLimitExceeded": {
+      "status": 403,
+      "body": [
+        { "message": "TotalRequests Limit exceeded.", "errorCode": "REQUEST_LIMIT_EXCEEDED" }
+      ]
+    },
+    "invalidField": {
+      "status": 400,
+      "body": [{ "message": "No such column on entity", "errorCode": "INVALID_FIELD" }]
+    },
+    "tooManyRecords": {
+      "status": 400,
+      "body": [
+        {
+          "message": "Maximum number of records exceeded: 200",
+          "errorCode": "EXCEEDED_ID_LIMIT"
+        }
+      ]
+    },
+    "unavailable": {
+      "status": 503,
+      "body": [{ "message": "Server unavailable", "errorCode": "SERVER_UNAVAILABLE" }]
+    }
+  },
+  "limitInfoHeader": "api-usage=10018/100000; api-bursts=1/750"
+}

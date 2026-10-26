@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 170 scenarios (19 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 172 scenarios (19 need screenshots).
 
 ## How to update (who, when)
 
@@ -35,7 +35,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC01-06 | Posting-profile gap flagged, not posted | UC-01 | MVP | unit | no | — | T-0039, T-0069 | not-started | — | — |
 | SS-UC01-07 | Duplicate CDC event is idempotent | UC-01 | MVP | db-integration | no | — | T-0065, T-0069 | not-started | — | — |
 | SS-UC01-08 | Closed Won dated in a hard-locked period follows lock policy | UC-01 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0069, T-0023 | green (period/policy layer; Closed Won draft invoice and Sync issue in T-0069) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
-| SS-UC01-09 | Salesforce outage does not block accounting | UC-01 | MVP | db-integration | no | — | T-0067 | not-started | — | — |
+| SS-UC01-09 | Salesforce outage does not block accounting | UC-01 | MVP | db-integration | no | apps/worker/src/salesforce-writeback.outage.db.test.ts | T-0067 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | 5d25612 |
 | SS-UC01-10 | Invoice detail shows mapped lines and journal preview | UC-01 | MVP | e2e-playwright | yes | — | T-0083 | not-started | — | — |
 | SS-UC01-11 | Tax-inclusive rounding follows company setting | UC-01 | MVP | golden | no | — | T-0034, T-0040 | not-started | — | — |
 | SS-UC02-01 | Preview lists all invoices, posts nothing | UC-02 | MVP | db-integration | no | — | T-0043 | not-started | — | — |
@@ -49,7 +49,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC03-01 | Invoice carries a Stripe payment link | UC-03 | MVP | contract | no | — | T-0073 | not-started | — | — |
 | SS-UC03-02 | Stripe payment posts GP-003 and marks invoice Paid | UC-03 | MVP | golden | no | — | T-0074 | not-started | — | — |
 | SS-UC03-03 | Stripe payout posts GP-004 net settlement | UC-03 | MVP | golden | no | — | T-0075 | not-started | — | — |
-| SS-UC03-04 | Salesforce shows Paid with payment date | UC-03 | MVP | contract | no | — | T-0067, T-0074 | not-started | — | — |
+| SS-UC03-04 | Salesforce shows Paid with payment date | UC-03 | MVP | contract | no | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts | T-0067, T-0074 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | 5d25612 |
 | SS-UC03-05 | Duplicate webhook is idempotent | UC-03 | MVP | db-integration | no | — | T-0074 | not-started | — | — |
 | SS-UC03-06 | Invalid or replayed webhook rejected | UC-03 | MVP | unit | no | — | T-0074 | not-started | — | — |
 | SS-UC03-07 | Bank-transfer receipt posts GP-002 | UC-03 | MVP | golden | no | — | T-0046 | not-started | — | — |
@@ -57,7 +57,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC03-09 | Late payout in an AR-locked period follows the period matrix | UC-03 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0075, T-0023 | green (period/matrix layer; payout cell is tenant setting `payout_under_ar_lock` awaiting product owner, RQ-0026; payout posting in T-0075) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC03-10 | Receipt allocation screen | UC-03 | MVP | e2e-playwright | yes | — | T-0085 | not-started | — | — |
 | SS-UC04-01 | Reminder 1 at 7 days overdue | UC-04 | MVP | db-integration | no | — | T-0068 | not-started | — | — |
-| SS-UC04-02 | Credit status "Overdue" written back | UC-04 | MVP | contract | no | — | T-0068, T-0067 | not-started | — | — |
+| SS-UC04-02 | Credit status "Overdue" written back | UC-04 | MVP | contract | no | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts | T-0068, T-0067 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | 5d25612 |
 | SS-UC04-03 | Reminders are idempotent per step | UC-04 | MVP | db-integration | no | — | T-0068 | not-started | — | — |
 | SS-UC04-04 | Paid invoice gets no reminder | UC-04 | MVP | unit | no | — | T-0068 | not-started | — | — |
 | SS-UC04-05 | Salesforce Task logged for the Account owner | UC-04 | Phase 1 | contract | no | — | T-0100 | not-started | — | — |
@@ -196,6 +196,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-78 | Users and roles screens: list with roles and status, invite, offboard with a successor, grant and revoke roles; self-grant refused with its message; actions hidden or disabled with a reason when the caller lacks the permission; loading, empty, error and forbidden states; step-up challenges go to the step-up flow | — | MVP | e2e-playwright | yes | tests/e2e/web/admin.spec.ts; apps/api/src/users/users.list.db.test.ts; apps/web/src/admin/admin.test.tsx; apps/web/src/admin/admin-logic.test.ts | T-0093 | green | [.agent/evidence/T-0093/manifest.json](../../.agent/evidence/T-0093/manifest.json) | ecdd62e |
 | SS-PLAT-79 | SoD weekly exceptions report screen: the week's exceptions with rule, person and reason in plain words; the Owner acknowledges the week; others see who must acknowledge; states and week navigation | — | MVP | e2e-playwright | yes | tests/e2e/web/admin.spec.ts; apps/web/src/admin/admin.test.tsx | T-0093 | green | [.agent/evidence/T-0093/manifest.json](../../.agent/evidence/T-0093/manifest.json) | ecdd62e |
 | SS-PLAT-80 | Audit log viewer: read-only, newest first, filter by actor, action, entity and date, keyset pages; read through `audit.read_log` (tenant-scoped, audit-reading roles only, lf_app still INSERT-only on the table) | — | MVP | e2e-playwright | yes | tests/e2e/web/admin.spec.ts; packages/db/src/audit-read.db.test.ts; apps/api/src/audit/audit-log.db.test.ts | T-0093 | green | [.agent/evidence/T-0093/manifest.json](../../.agent/evidence/T-0093/manifest.json) | ecdd62e |
+| SS-PLAT-83 | Salesforce write-back mapping is data and batched: only package fields that LedgerForce owns (mirrors upserted by LF_Id__c, Account/Opportunity updated by Salesforce id), status words from tables, strict versioned `writeBack` payload, money as exact two-decimal numbers, ≤ 200 records per request, each key once | — | MVP | contract | no | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts | T-0067 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | 5d25612 |
+| SS-PLAT-84 | Salesforce write-back failures are classified and stay queued: 503/5xx/network, 429, 403 REQUEST_LIMIT_EXCEEDED and the 25 % API-usage gate are retryable with Retry-After reported; other 4xx are rejected; per-record failures in a 200 fail the delivery; 401 re-signs once | — | MVP | contract | no | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts; apps/worker/src/salesforce-writeback.outage.db.test.ts | T-0067 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | 5d25612 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -506,3 +508,11 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-80 — Audit log viewer, read-only and permissioned
 - Phase: MVP · Layer: **e2e-playwright** + **db-integration** · Screenshot evidence: yes · Task(s): T-0093
 - **Given** audit rows in two tenants · **When** an Owner, Finance Admin or Auditor opens `/reports/audit-log`, filters by actor, action, entity and date range and pages back · **Then** rows come newest first, 50 per page with a "Older entries" cursor, each with time, actor, action, entity and before/after on demand; nothing on the screen can change a row; the API reads through `audit.read_log` (SECURITY DEFINER, owner lf_migrator), which requires a tenant, re-checks that the actor holds an audit-reading role, returns only the tenant's rows and at most 100 per call; lf_app still gets 42501 on a direct SELECT; a caller without `audit_log.read` gets 403 and a forbidden state; axe clean at 1440 and 390
+
+### SS-PLAT-83 — Salesforce write-back mapping and batching
+- Phase: MVP · Layer: **contract** · Screenshot evidence: no · Task(s): T-0067
+- **Given** synthetic outbox events carrying the `writeBack` v1 snapshot (invoices, payments, accounts, opportunities) · **When** they are mapped and planned · **Then** every mapped field exists in the SFDX package and Account/Opportunity get only the LedgerForce-owned fields in `salesforce/AGENTS.md`; mirrors are upserted by `LF_Id__c` (invoice before payment), Account/Opportunity updated by Salesforce id; 450 invoices + 260 updates go out as 200/200/50 and 200/60; a record repeated in one event is sent once with the later values; unknown sections, keys and statuses, float money and money with non-zero digits beyond the cent are refused; money goes out as `1375.00`
+
+### SS-PLAT-84 — Salesforce write-back failure handling
+- Phase: MVP · Layer: **contract** + **db-integration** · Screenshot evidence: no · Task(s): T-0067
+- **Given** the fake sObject Collections endpoint answering 503 (with Retry-After), 500, 429, 403 REQUEST_LIMIT_EXCEEDED, other 403/400, 401, a network error, or 200 with a per-record failure · **When** the write-back runs · **Then** each is classified (`unavailable`, `rate_limited`, `request_limit` retryable; `rejected` not), Retry-After is parsed (seconds or HTTP-date), a per-record failure fails the delivery with its errors while valid records are written, the API-usage gate stops sending at 25 % of the daily allocation until the reading is older than five minutes, and an expired token is re-signed once through the connection store

@@ -1441,3 +1441,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - Most other remaining cards wait on Draft golden postings or on these tasks.
 - Why: Product owner's instruction to build independent tasks in parallel.
 - ADR: none · Status: accepted
+
+### DL-0190 — Salesforce write-back contract: mirrors upserted by LF_Id__c, Account/Opportunity updated by Salesforce id
+- Date: 2026-10-26 · By: claude · Task: T-0067 · Category: architecture
+- Decision: The write-back is the outbox handler `salesforce.writeback`. It upserts `LF_Invoice__c` and `LF_Payment__c` by `LF_Id__c` and updates Account and Opportunity by Salesforce id through sObject Collections, `allOrNone: false`, ≤ 200 records and each key once per request, money as exact two-decimal JSON numbers, API 67.0. Any request-level or per-record failure throws so the delivery retries with the queue backoff. This refines design §5.4's "upsert by LF_Id__c", which can't apply to objects without that field.
+- Why: RQ-0040 F1–F4: the package has `LF_Id__c` only on the mirrors. An upsert that misses on a Salesforce-owned object would create a stray record, while an update by id fails instead. Both are idempotent when the values are absolute.
+- Alternatives: add external IDs to Account/Opportunity (rejected: new fields on Salesforce-owned objects, a backfill, and stray records on a miss). A staging table that coalesces events across deliveries (deferred: not needed at MVP volume, ADR-0036 option 3). `allOrNone: true` (rejected: one bad record would block every other record's status).
+- ADR: ADR-0036 · Status: proposed (accepted on green CI + cross-review)
+
+### DL-0191 — Write-back scope: synthetic events against a versioned `writeBack` payload contract
+- Date: 2026-10-26 · By: claude · Task: T-0067 · Category: scope
+- Decision: Invoice and payment documents don't exist yet (T-0040+), so T-0067 defines the producer contract `payload.writeBack = { version: 1, invoices?, payments?, accounts?, opportunities? }` (current-state snapshots, not deltas) and tests the mapping with synthetic events. SS-UC03-04 and SS-UC04-02 prove the payload side only: the upstream "Given" steps (SS-UC03-02, SS-UC04-01) belong to T-0074 and T-0068. SS-UC01-09 uses a balanced manual journal as a stand-in for the invoice journal (GP-001 is Draft). SS-UC01-02 (scratch-org e2e) stays not-started, and so do SS-UC11-05 and SS-UC12-05 (no refunds or aged AR yet). The handler also subscribes to `invoice.drafted`, because SS-UC01-02 needs the Draft status written back.
+- Why: The product owner's instruction for T-0067. Snapshots make replays idempotent and give producers one shape to emit.
+- Alternatives: wait for T-0040 (rejected: blocks the connector). Map from each topic's own payload (rejected: N producer-specific shapes, harder to keep strict).
+- ADR: ADR-0036 · Status: accepted
+
+### DL-0192 — Write-back no-op for companies without an active Salesforce connection; status words as data
+- Date: 2026-10-26 · By: claude · Task: T-0067 · Category: architecture
+- Decision: If the event's company has no active `app.salesforce_connection`, the handler records the delivery (inbox row) and sends nothing. Status words are data: invoice `draft→Draft, awaiting_approval→Awaiting approval, approved→Approved, posted→Posted, part_paid→Part paid, paid→Paid, overdue→Overdue, void→Void, reversed→Reversed`; credit `current→Current, overdue→Overdue, on_hold→On hold`. These follow Docs/ui/principles.md P2 and UC-04.
+- Why: Not every company uses Salesforce, and retrying until dead-letter would fill the Sync issues inbox with noise. If a connection is added later, the nightly reconciliation (design §5.3) brings Salesforce up to date. The labels are text fields in the package (T-0062), so changing a word is a data change.
+- Alternatives: throw until a connection exists (rejected: dead-letters every event of non-Salesforce companies). Picklists in the package (deferred: a package change).
+- ADR: none · Status: accepted
+
+### DL-0193 — Outage and throttle handling: queue backoff governs, Retry-After reported, Sforce-Limit-Info gate
+- Date: 2026-10-26 · By: claude · Task: T-0067 · Category: architecture
+- Decision: `401` invalidates the cached token and re-signs once. `503`/5xx/network → `unavailable`, `429` → `rate_limited`, `403 REQUEST_LIMIT_EXCEEDED` → `request_limit`, and the gate's own refusal → `throttled` are retryable. Other 4xx (`rejected`) and an unparseable 2xx (`malformed_response`) aren't, but they still fail the delivery, so after the retry limit they reach the dead-letter queue (Sync issues follow-up). `Retry-After` is parsed (seconds or HTTP-date) and carried on the error. The pg-boss queue backoff (1 min → 6 h) decides the retry time, because `fail()` has no per-call delay. The `ApiUsageGate` keeps the last `Sforce-Limit-Info` reading per org. While a reading younger than 5 minutes is at or above the share (default 25 %), it refuses to send. A stale reading lets one call through to refresh it.
+- Why: RQ-0040 F6–F8 and S12. The gate costs no extra API calls, which a `/limits` call per delivery would.
+- Alternatives: call `/limits` before each delivery (rejected: spends the allocation it protects). Schedule a new job at Retry-After (rejected: a second retry path beside the outbox's).
+- ADR: ADR-0036 · Status: accepted
+
+### DL-0194 — Write-back test layout: contract tests in the connector, outage db test in apps/worker; workspace devDeps
+- Date: 2026-10-26 · By: claude · Task: T-0067 · Category: tooling
+- Decision: The card's `writeback.payload.spec.ts` / `writeback.outage.spec.ts` follow repo conventions as `packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts` and `apps/worker/src/salesforce-writeback.outage.db.test.ts`. The connector exports test-only helpers at `@ledgerforce/connector-salesforce/testing` (fake sObject Collections server, fake token endpoint, test keys). `apps/worker` gains devDependencies on the workspace packages `@ledgerforce/connector-salesforce` and `@ledgerforce/shared` (no third-party package added). The fake validates every field against the SFDX metadata in `salesforce/force-app`, and on purpose it's stricter than Salesforce about money types. No migration was needed (0029 unused).
+- Why: packages/connectors AGENTS.md (contract tests `*.contract.test.ts`), vitest projects (`*.db.test.ts`), apps/worker AGENTS.md (the Salesforce write-back lives with the outbox consumer's tests).
+- Alternatives: db test inside the connector package (rejected: it would need the ledger fixture and the outbox harness as new devDeps there).
+- ADR: none · Status: accepted

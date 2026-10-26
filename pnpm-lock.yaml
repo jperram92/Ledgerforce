@@ -191,9 +191,15 @@ importers:
         specifier: 12.37.1
         version: 12.37.1(@opentelemetry/api@1.9.1)
     devDependencies:
+      '@ledgerforce/connector-salesforce':
+        specifier: workspace:*
+        version: link:../../packages/connectors/salesforce
       '@ledgerforce/ledger':
         specifier: workspace:*
         version: link:../../packages/ledger
+      '@ledgerforce/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@types/node':
         specifier: 22.20.5
         version: 22.20.5

@@ -78,3 +78,51 @@ export {
   type SubscriberOptions,
   type SubscriptionOutcome,
 } from './pubsub/subscriber.ts';
+export {
+  planBatches,
+  SfNumber,
+  SfReference,
+  type CollectionRequest,
+  type SfValue,
+  type WriteBackRecord,
+} from './writeback/batch.ts';
+export {
+  ApiUsageGate,
+  classifyHttpError,
+  fetchHttpRequest,
+  MAX_COLLECTION_RECORDS,
+  parseLimitInfo,
+  parseRetryAfter,
+  SALESFORCE_REST_API_VERSION,
+  SalesforceApiError,
+  sendCollection,
+  type ApiUsageGateOptions,
+  type HttpRequest,
+  type RecordError,
+  type RecordResult,
+  type RestSession,
+  type SalesforceApiErrorKind,
+} from './writeback/collections.ts';
+export {
+  CREDIT_STATUS_LABELS,
+  FIELD_MAP,
+  INVOICE_STATUS_LABELS,
+  mapToRecords,
+  parseWriteBackPayload,
+  WRITEBACK_TOPICS,
+  type FieldKind,
+  type FieldRule,
+  type SectionMap,
+  type WriteBackPayloadV1,
+} from './writeback/mapping.ts';
+export {
+  SALESFORCE_WRITEBACK_HANDLER,
+  salesforceWriteBackHandler,
+  writeBack,
+  WriteBackRecordError,
+  type RecordFailure,
+  type WriteBackEvent,
+  type WriteBackHandler,
+  type WriteBackHandlerDeps,
+  type WriteBackReport,
+} from './writeback/writeback.ts';
