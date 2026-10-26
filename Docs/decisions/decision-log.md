@@ -1633,3 +1633,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   Most remaining MVP cards (T-0031 golden-posting runner → tax, invoices, bills, payments, Stripe …) depend on T-0007 "Golden postings DRAFT", which is `blocked` on the human gate. After this round, the build cannot advance materially until the product owner approves golden postings. This is raised as the top open question in HANDOVER.
 - Why: Product owner's parallel-build instruction; AGENTS.md §6 golden-postings human gate.
 - ADR: none · Status: accepted
+
+### DL-0213 — Sync issues come from the dead-letter queue; failures are logged in a tenant table, pg-boss keeps ids only
+- Date: 2026-10-26 · By: claude · Task: T-0071 · Category: architecture
+- Decision: The outbox worker settles each job itself (pg-boss `perJobResults`): `completed`; `failed` for a retryable error (pg-boss backs off 1 min → 6 h, ten retries, then dead-letters); `deadletter` at once for a permanent error (`retryable === false`, e.g. Salesforce `rejected`). Every failed attempt is logged in `app.outbox_delivery_failure` (migration 0030) and the job output is only `{ handler, failureId }`. A dead-letter worker (`apps/worker/src/sync-issue-worker.ts`) turns each dead letter into one `app.sync_issue` per (event, handler); a redelivered dead letter changes nothing, a new one re-opens the issue with the new error and summed attempts. A dead letter without our output (worker crashed) becomes a `DeliveryAbandoned` issue on pseudo-handler `outbox.deliver`.
+- Why: RQ-0044 findings 1–2 (pg-boss 12.37.1 dead letters carry `sourceOutput`/`sourceRetryCount`; `deadletter` disposition skips retries). pg-boss tables have no RLS (ADR-0008), so error text stays in the tenant's table.
+- Alternatives: worker detects its own last attempt (misses expired jobs); error text in pg-boss output (tenant data outside RLS); retrying permanent errors ten times (a day before anyone sees it).
+- ADR: ADR-0040 · Status: proposed (awaiting human, security)
+
+### DL-0214 — One-click retry sends a new delivery job in the request transaction; a good delivery resolves the issue
+- Date: 2026-10-26 · By: claude · Task: T-0071 · Category: architecture
+- Decision: `retrySyncIssue` locks the issue, sends a new `{ tenantId, eventId }` job with `fromKysely(trx)` and marks the issue `retried` in the same transaction; a second click on a `retried` issue returns it unchanged (no second job). `deliver` resolves the event's `retried` issues after every handler succeeded. Status model enforced by a trigger: open → retried/ignored, ignored → retried, retried → resolved, any → open only with a new dead letter. The job id of a re-queued delivery is pg-boss-generated (packages/outbox AGENTS.md updated).
+- Why: RQ-0044 finding 4 — `retry()` adds one attempt only and needs the original job row; `redrive()` moves dead letters we already completed. The per-handler inbox keeps effects exactly-once.
+- Alternatives: `boss.retry` (one attempt, retention-dependent); a "retry requested" flag polled by the worker (latency, more code).
+- ADR: ADR-0040 · Status: proposed (awaiting human, security)
+
+### DL-0215 — Permissions sync.issues.read and sync.issues.manage; manage held by Owner, Finance Admin and Accountant
+- Date: 2026-10-26 · By: claude · Task: T-0071 · Category: security
+- Decision: Two new catalogue permissions: `sync.issues.read` (read: so the Auditor and Owner hold it) and `sync.issues.manage` (write: retry, ignore). Both go to the Accountant template (and so Finance Admin, which extends it); Owner holds all. Mirrored in `app.permission_known` (migration 0030) and the RBAC matrix test. Allowed as API-token scopes.
+- Why: Design §5.6 needs someone to act on sync failures; the Accountant does day-to-day bookkeeping and connector follow-up; retry re-sends unchanged data, ignore only parks an issue. Design §6.4 has no row for it, so the holders are an open question for the product owner.
+- Alternatives: reuse `settings.read` / a settings write permission (too broad); Owner/Finance Admin only (slows routine fixes).
+- ADR: ADR-0040 · Status: proposed (awaiting human — role holders)
+
+### DL-0216 — The API budget share is connection data (default 25 %); the write-back always throttles; exact integer compare
+- Date: 2026-10-26 · By: claude · Task: T-0071 · Category: integration
+- Decision: `app.salesforce_connection.api_budget_share NUMERIC(5,4) NOT NULL DEFAULT 0.2500 CHECK (> 0 AND ≤ 1)`, lf_app may update it; `getApiBudgetShare`/`setApiBudgetShare` read and write it as decimal text. The write-back handler reads it per delivery and passes it to the `ApiUsageGate`, which compares `used · 10 000 ≥ max · basis points` in integers. A handler built without a gate now builds a default one (before, no gate meant no throttle). A throttled delivery is an ordinary retry (no issue unless the retries run out). No settings route yet.
+- Why: Design §5.6 rule 3 "configurable share"; AGENTS.md no-float rule in spirit (ratios compared exactly); RQ-0040 finding 8 (usage from `Sforce-Limit-Info`).
+- Alternatives: environment variable (one value for every tenant); float compare (boundary errors on large allocations, see budget.test.ts).
+- ADR: ADR-0040 · Status: proposed (awaiting human, security)
+
+### DL-0217 — T-0071 tests jump the pg-boss TestClock with setTime; apps/api uses pg-boss and the outbox package; no Sync issues UI this round
+- Date: 2026-10-26 · By: claude · Task: T-0071 · Category: process
+- Decision: (1) The worker db test moves time with `TestClock.setTime(startAfter + 1 s)` per retry (no timer storm): eleven attempts, the dead letter and the retry run in about 1 s; each test cancels the jobs it leaves queued and stops its workers; jobs that must be due are sent on the harness's clock-aware pool. (2) `apps/api` depends on `@ledgerforce/outbox` and `pg-boss` 12.37.1 (already a project runtime dependency, ADR-0008; no new third-party package) and `main.ts` starts a runtime lf_app instance for the retry; `ApiOptions.syncRequeue` injects it (503 without). nginx proxies `/sync-issues`. (3) The Sync issues screen is deferred to a follow-up card (no UI this round, per the round instruction).
+- Why: RQ-0044 finding 6 and DL-0205 (tick-based tests were CPU-bound and flaky); the retry must commit with the status change.
+- Alternatives: `tick` through 20 h of timers (slow, flaky); a fake requeue in API tests (would not prove the job exists).
+- ADR: none · Status: accepted
