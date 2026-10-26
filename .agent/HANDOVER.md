@@ -312,3 +312,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26T10:14:18.725Z claude: T-0072 → verifying
 - 2026-10-26T10:24:08.696Z claude: release T-0072 → review
 - 2026-10-26T10:28:04.344Z claude: T-0029 → verifying
+- 2026-10-26T10:31:59.138Z claude: release T-0029 → review
