@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 8 in progress (DL-0207): T-0029, T-0071, T-0072 by sub-agents. Rounds 4–7 complete and in review. CRITICAL PATH: T-0007 golden postings (human gate) blocks T-0031 and nearly all remaining MVP cards — see open question 0.
+Task: PARALLEL ROUND 8 COMPLETE (DL-0207): T-0072, T-0029, T-0071 merged, each verify 13 PASS/0 FAIL/3 PENDING, all in review. Rounds 4–8 complete and in review. NOTHING ELSE IS CLAIMABLE: `conductor next` lists only T-0095 (human-only CI gates) and T-0103 (Windows). CRITICAL PATH: T-0007 golden postings (human gate) — see open question 0. Next agent action: Codex cross-review of the review list below.
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -69,6 +69,16 @@ Open questions for human:
       - ADR-0036 (integration, FYI): only LF_Invoice__c/LF_Payment__c upsert by LF_Id__c; Account/Opportunity
         updated by Salesforce id.
       - Environment: T-0094 started dockerd as root in the container; while it runs, pnpm test:db uses Testcontainers.
+  20. Round 8:
+      - ADR-0039 (security): manual journals. What counts as a "tax account" (GST collected/paid,
+        PAYG withholding, any tax-coded line)? The 5,000 threshold is a §11.2 placeholder. Should CSV
+        import and rule journals get their own source types and series (DL-0210)?
+      - ADR-0040 (security): Sync issues inbox. Confirm sync.issues.manage holders (Owner, Finance
+        Admin, Accountant; DL-0215).
+      - T-0072: is UC-12 MVP (§8.2) or Phase 1 (§9.1)? Built now (DL-0222).
+      - Follow-up cards to create when convenient: Sync issues screen, api_budget_share settings
+        route, register outbox handlers in the worker (needs KMS), the quarterly access review
+        (T-0093).
   16. SoD (T-0015, ADR-0026 Proposed, security): confirm the threshold placeholders (§11.2); Owner-only SoD settings;
       meaning of "external reviewer" (another active user of the tenant); is rule 2 exceptable in small-team mode;
       rule 6 (period reopen) never excepted; AP Clerk cells §6.4 vs rules §6.5; weekly report in the tenant time
@@ -137,6 +147,12 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0059 — packages/modules/bank camt053/dedupe/statements/account-match; migration 0020; RQ-0028; DL-0125..0127
 >   • T-0025 — packages/ledger/src/{posting-command,posting-engine}.ts + invariant properties; RQ-0030; DL-0134..0138
 >     (golden-posting gate: generic pipeline only)
+>   • T-0029 — migration 0029 (manual_journal guard), packages/modules/journals, engine approvedBy, apps/api
+>     /manual-journals; ADR-0039; DL-0208..0212
+>   • T-0071 — migration 0030 (sync_issue, outbox_delivery_failure, permission_known), packages/outbox
+>     sync-issues/backoff, apps/worker outcome/dead-letter workers, apps/api /sync-issues, write-back budget;
+>     ADR-0040; DL-0213..0217
+>   • T-0072 — salesforce/force-app/.../lwc/lfAccountSummary, LWC Jest in `pnpm test`; DL-0218..0222
 >   • T-0028 — migration 0028 (subledger_entry, allocation triggers), packages/ledger/src/subledger.ts, engine
 >     subledgerItems; ADR-0035; DL-0185..0189; check the two eslint-disable comments in cross-tenant.ts (DL-0189)
 >   • T-0067 — packages/connectors/salesforce/src/writeback/**, apps/worker outage test (made deterministic);
@@ -314,3 +330,5 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26T10:28:04.344Z claude: T-0029 → verifying
 - 2026-10-26T10:31:59.138Z claude: release T-0029 → review
 - 2026-10-26T10:35:26.537Z claude: T-0071 → verifying
+- 2026-10-26T10:39:35.286Z claude: release T-0071 → review
+- 2026-10-26 claude (lead): round 8 merged (T-0072, T-0029, T-0071); final tree gates green (845 unit + LWC Jest / 916 db / 82 agent); verify 13/0/3 each (T-0072 after ticking its n/a evidence step) → review. No further claimable tasks: the backlog waits on T-0007 golden postings (human) and the Codex cross-reviews.
