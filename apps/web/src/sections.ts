@@ -3,6 +3,13 @@
  * plain words first, the accounting term as a gloss in brackets. Nothing here invents data: each
  * empty state says what will appear and what has to happen first.
  */
+/** A page inside a section, listed on the section's page (T-0093). */
+export interface SubPage {
+  to: '/settings/users' | '/reports/control-exceptions' | '/reports/audit-log';
+  name: string;
+  text: string;
+}
+
 export interface Section {
   /** Navigation label and page title. */
   name: string;
@@ -11,6 +18,7 @@ export interface Section {
   gloss: string;
   emptyHeading: string;
   emptyText: string;
+  pages?: readonly SubPage[];
 }
 
 export const SECTIONS: readonly Section[] = [
@@ -57,6 +65,18 @@ export const SECTIONS: readonly Section[] = [
       'Trial balance, profit and loss, balance sheet and who owes what, built from posted journals.',
     emptyHeading: 'No reports to show yet',
     emptyText: 'Reports are built from posted journals, and there are none yet.',
+    pages: [
+      {
+        to: '/reports/control-exceptions',
+        name: 'Weekly control exceptions',
+        text: 'When a separation-of-duties rule was relaxed for a small team, and the Owner’s acknowledgement.',
+      },
+      {
+        to: '/reports/audit-log',
+        name: 'Audit log',
+        text: 'Every change: who did what, to which record, and when.',
+      },
+    ],
   },
   {
     name: 'Settings',
@@ -66,6 +86,13 @@ export const SECTIONS: readonly Section[] = [
     emptyHeading: 'Nothing to set up here yet',
     emptyText:
       'Company details, users and roles, and the Salesforce connection will be set up from here.',
+    pages: [
+      {
+        to: '/settings/users',
+        name: 'People and roles',
+        text: 'Invite people, give and remove roles, and disable people who leave.',
+      },
+    ],
   },
 ];
 

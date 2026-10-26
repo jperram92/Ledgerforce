@@ -29,6 +29,7 @@ import {
   type TenantResolver,
 } from './tenancy/tenant-resolver.ts';
 import { AuditTrail, TenantTx } from './tenancy/tenant-tx.ts';
+import { AuditLogController } from './audit/audit-log.controller.ts';
 import { requestIdMiddleware } from './audit/request-id.ts';
 import { CLOCK, DB, KMS, MFA_POLICY } from './tokens.ts';
 
@@ -77,6 +78,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   UsersController,
   ApiTokensController,
   UserApiTokensController,
+  AuditLogController,
   AuthController,
   LoginController,
 ];
@@ -105,6 +107,7 @@ class AppModule {
         UsersController,
         ApiTokensController,
         UserApiTokensController,
+        AuditLogController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,

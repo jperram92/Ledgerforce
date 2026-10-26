@@ -19,6 +19,18 @@ export function SectionPage({ section }: { section: Section }) {
         <h1 tabIndex={-1}>{section.heading}</h1>
         <p>{section.gloss}</p>
       </div>
+      {section.pages ? (
+        <nav className="subpages" aria-label={`In ${section.name}`}>
+          <ul>
+            {section.pages.map((p) => (
+              <li key={p.to}>
+                <Link to={p.to}>{p.name}</Link>
+                <p>{p.text}</p>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : null}
       <section className="empty" data-state="empty" aria-labelledby={id}>
         <h2 id={id}>{section.emptyHeading}</h2>
         <p>{section.emptyText}</p>

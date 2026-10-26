@@ -81,5 +81,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0029](0029-job-queue-privileges-and-supervision.md) | Job queue (pg-boss) privileges: lf_app DML on the shared pgboss schema, owner-run supervision | security | yes | Proposed |
 | [0030](0030-bank-detail-change-verification-and-cooling-off.md) | Bank-detail change verification: database-enforced workflow, requester ≠ verifier at commit, step-up proof, cooling-off eligibility, durable notices | security | yes | Proposed |
 | [0032](0032-salesforce-pubsub-grpc-client-and-avro-decoding.md) | Salesforce Pub/Sub API client: grpc-js + proto-loader on the vendored proto, avsc for Avro, replay id committed with the batch | integration | no | Proposed |
+| [0034](0034-audit-log-read-path-and-admin-read-routes.md) | Audit log read path: permission-checked SECURITY DEFINER reader instead of SELECT for lf_app; admin read routes (users, caller access, audit log) | security | yes | Proposed |
 
-Next free number: **0031** (0028 unused: T-0027 needed no ADR).
+Next free number: **0035** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; none needed an ADR).

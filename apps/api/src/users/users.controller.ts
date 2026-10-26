@@ -141,6 +141,39 @@ export class UsersController {
     };
   }
 
+  /**
+   * Every user of the tenant with status and active roles, by name (T-0093 admin screens,
+   * ADR-0034). RLS confines it to the caller's tenant.
+   */
+  @Get()
+  @RequirePermission('users.read')
+  async list(): Promise<Record<string, unknown>[]> {
+    const trx = this.tx.get();
+    const users = await trx
+      .selectFrom('app.app_user')
+      .select([
+        'id',
+        'email',
+        'display_name',
+        'status',
+        'created_at',
+        'disabled_at',
+        'successor_user_id',
+      ])
+      .orderBy('display_name')
+      .orderBy('id')
+      .execute();
+    const grants = await trx
+      .selectFrom('app.user_role')
+      .select(['user_id', 'role'])
+      .where('revoked_at', 'is', null)
+      .orderBy('role')
+      .execute();
+    const roles = new Map<string, string[]>();
+    for (const g of grants) roles.set(g.user_id, [...(roles.get(g.user_id) ?? []), g.role]);
+    return users.map((u) => ({ ...u, roles: roles.get(u.id) ?? [] }));
+  }
+
   @Get(':userId')
   @RequirePermission('users.read')
   async get(

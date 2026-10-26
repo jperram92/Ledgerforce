@@ -4,6 +4,7 @@
  * (sign-in must leave the SPA for the API's login redirect).
  */
 import { createContext, useContext } from 'react';
+import type { AdminClient } from './admin/client.ts';
 import type { ApiClient } from './api.ts';
 
 export interface AppEnv {
@@ -27,6 +28,8 @@ export function browserEnv(): AppEnv {
 export interface Services {
   env: AppEnv;
   api: ApiClient;
+  /** Administration routes (T-0093). */
+  admin: AdminClient;
 }
 
 export const ServicesContext = createContext<Services | null>(null);
