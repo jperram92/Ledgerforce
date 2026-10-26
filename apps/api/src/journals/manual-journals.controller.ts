@@ -11,6 +11,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UnprocessableEntityException,
 } from '@nestjs/common';
@@ -19,12 +20,17 @@ import {
   approveManualJournal,
   createManualJournal,
   getManualJournal,
+  listManualJournals,
+  MANUAL_JOURNAL_STATUSES,
+  peopleOf,
   postManualJournal,
+  previewManualJournal,
   rejectManualJournal,
   submitManualJournal,
   updateManualJournal,
   type ManualJournal,
   type ManualJournalInput,
+  type ManualJournalStatus,
 } from '@ledgerforce/journals';
 import { PeriodLockedError, PostingError, type PostingLineInput } from '@ledgerforce/ledger';
 import type { Request } from 'express';
@@ -149,6 +155,10 @@ function refusal(e: unknown): never {
       code: e.code,
       line: e instanceof PostingError ? (e.line ?? null) : null,
       message: e.message,
+      // ALREADY_POSTED (preview only): the entry this document posted as.
+      ...(e instanceof PostingError && e.entryNo !== undefined
+        ? { entry_id: e.entryId ?? null, entry_no: e.entryNo }
+        : {}),
     });
   }
   throw e;
@@ -218,10 +228,79 @@ export class ManualJournalsController {
     return { ...viewOf(doc), replayed };
   }
 
+  /** The newest manual journals (at most 200), optionally of one status (T-0082). */
+  @Get()
+  @RequirePermission('gl.journal.read')
+  async list(@Query('status') status: unknown) {
+    if (
+      status !== undefined &&
+      !(typeof status === 'string' && (MANUAL_JOURNAL_STATUSES as string[]).includes(status))
+    ) {
+      throw new BadRequestException({
+        error: 'invalid_filter',
+        message: `status must be one of ${MANUAL_JOURNAL_STATUSES.join(', ')}`,
+      });
+    }
+    const rows = await listManualJournals(
+      this.tx.get(),
+      status === undefined ? {} : { status: status as ManualJournalStatus },
+    );
+    return {
+      journals: rows.map((r) => ({
+        id: r.id,
+        company_id: r.companyId,
+        status: r.status,
+        entry_date: r.entryDate,
+        memo: r.memo,
+        line_count: r.lineCount,
+        amount: r.amount,
+        total: r.total,
+        approval_required: r.approvalRequired,
+        created_by: r.createdBy,
+        created_by_name: r.createdByName,
+        submitted_by_name: r.submittedByName,
+        approved_by_name: r.approvedByName,
+        posted_by_name: r.postedByName,
+        entry_no: r.entryNo,
+      })),
+    };
+  }
+
   @Get(':id')
   @RequirePermission('gl.journal.read')
   async get(@Param('id') id: string) {
-    return viewOf(await getManualJournal(this.tx.get(), id).catch(refusal));
+    const trx = this.tx.get();
+    const doc = await getManualJournal(trx, id).catch(refusal);
+    return { ...viewOf(doc), people: await peopleOf(trx, doc) };
+  }
+
+  /**
+   * "Show me the journal" (design §3.9, T-0082): the posting engine's preview of this journal,
+   * exactly what submit and post would run, with account names. Writes nothing; a refusal is
+   * the same 422 posting_refused submit would answer.
+   */
+  @Get(':id/preview')
+  @RequirePermission('gl.journal.read')
+  async preview(@Param('id') id: string) {
+    const p = await previewManualJournal(this.tx.get(), id).catch(refusal);
+    return {
+      entry_date: p.entryDate,
+      requested_date: p.requestedDate,
+      redirected: p.redirected,
+      needs_override: p.needsOverride,
+      base_currency: p.baseCurrency,
+      total: p.total,
+      lines: p.lines.map((l) => ({
+        line_no: l.lineNo,
+        account_id: l.accountId,
+        account_code: l.accountCode,
+        account_name: l.accountName,
+        account_type: l.accountType,
+        debit: l.debit,
+        credit: l.credit,
+        memo: l.memo,
+      })),
+    };
   }
 
   @Put(':id')

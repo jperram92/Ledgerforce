@@ -1760,6 +1760,33 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Product owner's parallel-build instruction.
 - ADR: none · Status: accepted
 
+### DL-0225 — GL read routes for the web screens (ADR-0042); @ledgerforce/gl becomes an apps/api runtime workspace dependency
+- Date: 2026-10-26 · By: claude · Task: T-0082 · Category: architecture
+- Decision: Add, test-first, `GET /accounts` (gl.account.read: companies with ids and the chart with system roles), `GET /manual-journals` (gl.journal.read: newest 200, optional `status`, amounts summed by PostgreSQL as NUMERIC(19,4) text, people as names), `GET /manual-journals/:id/preview` (gl.journal.read: the posting engine's `preview()` of the stored document's own command, with account names; 422 `posting_refused` unchanged, `ALREADY_POSTED` also carries `entry_id`/`entry_no`), and `people` (id → display name) on `GET /manual-journals/:id`. The reads live in the modules (`listChart` in packages/modules/gl, `listManualJournals`, `peopleOf`, `previewManualJournal` in packages/modules/journals); controllers stay thin. nginx proxies the new `accounts` prefix. `@ledgerforce/gl` moves from devDependencies to dependencies of apps/api (internal workspace package, no third-party dependency).
+- Why: RQ-0046 findings 1, 2 and 6. The UI must show the engine's journal, not compute one (design §3.9, P4); `GET /companies` cannot gain an id without changing a pinned test.
+- Alternatives: a preview of an unsaved body (rejected for now: needs gl.journal.post, so Approvers could not use it, and a dummy key); a browser-built preview (rejected: accounting in the browser); adding `id` to `GET /companies` (rejected: changes an existing test's assertion).
+- ADR: ADR-0042 · Status: accepted
+
+### DL-0226 — GL screens are sub-pages of Reports at /accounting/...; no new navigation section
+- Date: 2026-10-26 · By: claude · Task: T-0082 · Category: ui
+- Decision: The chart of accounts (`/accounting/chart`) and manual journals (`/accounting/journals`, `/accounting/journals/new`, `/accounting/journals/$id`) are listed as sub-pages on the Reports section page, the pattern T-0093 used for the audit log. The six-link section navigation is unchanged. Paths follow the IA's proposed `/accounting/...` (S12); `accounting` is not an API prefix.
+- Why: RQ-0046 finding 3. The six sections are asserted exactly by T-0081's tests and positions are a contract (P14); adding the IA's "Accounting" section is a navigation change for the product owner. Keeping the edit to `sections.ts` and `router.tsx` small also eases the merge with T-0092.
+- Alternatives: a new "Accounting" section (rejected here: changes asserted navigation; raised as an open question); sub-pages under Settings (rejected: journals are not settings).
+- ADR: none · Status: accepted
+
+### DL-0227 — GL screen behaviour: save, then show the engine's journal; refusals mapped from the engine's own code list
+- Date: 2026-10-26 · By: claude · Task: T-0082 · Category: ui
+- Decision: (1) A manual journal is saved as a draft first ("Save draft and show the journal"); its page then shows the posting engine's preview (`GET /manual-journals/:id/preview`) in `JournalTable` from @ledgerforce/ui, open by default, with "Balanced" (P4). Submit is offered only when the preview succeeds; a refused preview shows the draft's lines with the refused one marked "Refused" in words and a dashed rule (P2) and the reason in plain words (P6), with "Change the draft" as the one primary action. (2) Every `PostingErrorCode` has a sentence in `apps/web/src/gl/gl-logic.ts`; the unit test reads the union from `packages/ledger/src/posting-command.ts`, so a new engine code without words fails `pnpm test`. (3) The form sends amounts exactly as typed (digits, up to 4 decimals, no commas; checked by a regular expression, never converted to a number) and never sums them: balance is the engine's to check. (4) An approver who also submitted the journal still sees Approve, with a note that small-team mode records it for the Owner's weekly review; the API's SoD check decides (ADR-0026). (5) A new draft gets one `Idempotency-Key` per form (`mj-<uuid>`), so a double click saves one draft. (6) The journal list formats amounts as AUD (two decimals) because the list row has no currency; base currency is AUD until multi-entity (Phase 2). (7) No " · " separators in the screens (the genericness probe counts them; DL-0065).
+- Why: RQ-0046 findings 2 and 4; design §3.9; principles P2–P7, P12, P13; AGENTS.md §4.
+- Alternatives: a live preview of the unsaved form (deferred, ADR-0042 follow-up); hiding Approve from the preparer (rejected: would block small-team owners whom the API allows with a recorded exception).
+- ADR: ADR-0042 · Status: accepted
+
+### DL-0228 — T-0082 evidence keeps the screenshots of the partial e2e runs
+- Date: 2026-10-26 · By: claude · Task: T-0082 · Category: process
+- Decision: `.agent/evidence/T-0082/` holds every screenshot the fixture wrote, including those of the first two e2e runs (11/15 failed on the genericness probe and a date-input keyboard step). The run that counts is the one at commit 6dda4cd (27 screenshots, all `passed`, 15/15 tests); the earlier files keep their own manifest entries (commit 2eab76745601, uncommitted UI at the time).
+- Why: evidence is append-only (AGENTS.md §0.6, evidence skill); deleting them would be the shortcut directive 6 forbids.
+- Alternatives: delete the earlier files (rejected: directive 6).
+
 ### DL-0230 — Sync issues inbox lives under Settings at /settings/sync-issues
 - Date: 2026-10-26 · By: claude · Task: T-0092 · Category: ui
 - Decision: The inbox lives at `/settings/sync-issues` (list) and `/settings/sync-issues/:issueId` (one issue). It is listed as a page on Settings, so Settings is the current section. This departs from the IA's S17 route `/salesforce/issues` until a "Salesforce sync" area joins the navigation. That move will redirect the Settings path.
@@ -1793,4 +1820,5 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: The screens use a client of their own (`apps/web/src/sync/client.ts`), built from the injected environment with `useMemo`. `App.tsx` and `env.tsx` are unchanged. The screens reuse the admin screens' access hook, states and step-up routing, so refusals stay `AdminApiError`s. Shared files touched: `router.tsx` (two routes), `sections.ts` (one Settings sub-page), `main.tsx` (one stylesheet import). The card had no scenarios, so SS-PLAT-97 (list), SS-PLAT-98 (detail) and SS-PLAT-99 (actions) were added to the register with screenshots required. No migration (0032 unused), ADR (ADR-0043 unused) or dependency is needed.
 - Why: The parallel round asked for minimal, local router and nav edits to ease the merge with T-0082. The API from T-0071 already offers everything (RQ-0047).
 - Alternatives: add `sync` to `Services` in env.tsx/App.tsx (rejected: more shared-file edits for no gain).
+
 - ADR: none · Status: accepted
