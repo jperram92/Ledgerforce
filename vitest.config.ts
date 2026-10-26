@@ -26,6 +26,7 @@ export default defineConfig({
             'packages/*/*/src/**/*.test.{ts,tsx}', // nested: packages/modules/<m>, packages/connectors/<c>
             'packages/*/eslint-rules/**/*.test.ts',
             'salesforce/test/**/*.test.ts', // offline contract of the SFDX package (DL-0094)
+            'infra/test/**/*.test.ts', // self-host install contract (T-0094, SS-PLAT-86)
           ],
           exclude: [
             '**/*.db.test.ts',

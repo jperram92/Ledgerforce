@@ -1509,6 +1509,41 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: packages/connectors AGENTS.md (contract tests `*.contract.test.ts`), vitest projects (`*.db.test.ts`), apps/worker AGENTS.md (the Salesforce write-back lives with the outbox consumer's tests).
 - Alternatives: db test inside the connector package (rejected: it would need the ledger fixture and the outbox harness as new devDeps there).
 
+### DL-0195 — Agent sandboxes start their own Docker daemon; images from Docker Hub; optional build CA
+- Date: 2026-10-26 · By: claude · Task: T-0094 · Category: tooling
+- Decision: When the Docker CLI is present but no daemon runs, agents start `dockerd` (it runs as root in the sandbox VM) and prove compose work locally. Keycloak is pulled from Docker Hub (`keycloak/keycloak`, the official image's mirror) because quay.io is refused by the sandbox egress proxy. Image builds accept an optional BuildKit secret `extra_ca` (a CA for networks that inspect TLS), used only by the corepack and `pnpm fetch` steps and never stored in a layer; `infra/compose/smoke.sh` passes it from `LF_BUILD_CA_FILE`.
+- Why: RQ-0041 S1–S2 (dockerd 29.9.2 starts; quay.io 403; containers see a TLS-inspecting CA). Directive 5: solve the block instead of stopping. Corporate networks have the same TLS inspection.
+- Alternatives: leave SS-PLAT-23 to CI only (the daemon works here, so this would leave it unproven for no reason); bake the CA into images (it would ship to every install).
+- ADR: none · Status: accepted
+
+### DL-0196 — One multi-stage Dockerfile with four targets, digest-pinned bases, workspace layout at runtime; compose.yaml supersedes docker-compose.yml
+- Date: 2026-10-26 · By: claude · Task: T-0094 · Category: architecture
+- Decision: `infra/docker/Dockerfile` builds `api`, `worker`, `setup` (node:22.23.4-bookworm-slim, USER node) and `web` (nginxinc/nginx-unprivileged:1.30.6-alpine, USER 101) from shared fetch/build/prod stages; `infra/docker/keycloak.Dockerfile` makes an optimized Keycloak 26.8.1 (uid 1000). Bases are `tag@sha256:<index digest>`. The runtime keeps the pnpm workspace layout (symlinked packages) rather than `pnpm deploy`. `infra/compose/compose.yaml` is the stack; `docker-compose.yml` is kept as an `include:` of it (never deleted). `yaml` 2.9.1 (already in the lockfile) becomes a root devDependency for the compose contract test.
+- Why: RQ-0041 S3–S4: Node refuses to strip types under node_modules, so `pnpm deploy` would break the TypeScript-source workspace packages; one build shares the dependency layers.
+- Alternatives: one Dockerfile per app (duplicated dependency stages); compiling every package (a second build system); Keycloak `start` without build (slower start, build options at runtime).
+- ADR: none · Status: accepted
+
+### DL-0197 — First Owner: Keycloak account with a one-time temporary password, invited as Owner by the setup service
+- Date: 2026-10-26 · By: claude · Task: T-0094 · Category: security
+- Decision: The compose `setup` one-shot (apps/worker/src/setup) checks roles (lf_migrator / lf_app, no superuser, no BYPASSRLS), migrates and installs the queue as lf_migrator, creates the tenant and an invited Owner bound to the Keycloak subject as lf_app under RLS, sets a unique 25-character temporary password with CONFIGURE_TOTP + UPDATE_PASSWORD, and prints the sign-in link with it once. Re-runs print nothing; `LF_SETUP_REISSUE=1` reissues only while the Owner is invited.
+- Why: RQ-0041 findings 4–5 (no admin API returns an action link; this reuses the ADR-0027 invite model with no migration). Design §6.3 "no default passwords": the credential is unique, random and single use.
+- Alternatives: SMTP + mail catcher; a third-party Keycloak extension; forged action tokens; open self-registration with a setup token (all in ADR-0037).
+- ADR: ADR-0037 · Status: proposed (awaiting human)
+
+### DL-0198 — Self-host realm: LoA flow with default ACR = MFA for every login (HANDOVER Q13)
+- Date: 2026-10-26 · By: claude · Task: T-0094 · Category: security
+- Decision: The `ledgerforce` realm uses a two-level browser flow (password; OTP), `acr.loa.map` {urn:ledgerforce:loa:pwd: 1, urn:ledgerforce:loa:mfa: 2} and client `default.acr.values` = urn:ledgerforce:loa:mfa; no registration, no e-mail reset, no direct grants, PKCE S256, brute-force protection, password length 12+.
+- Why: RQ-0041 S11: first login (after enrolment) and step-up both return `acr = urn:ledgerforce:loa:mfa`, which ADR-0025's default policy accepts; without it the Owner's first login is refused (`mfa_enrolment_required`).
+- Alternatives: per-role conditional MFA in Keycloak (needs role data in the IdP); relying on `amr` (Keycloak sends none without extra mappers).
+- ADR: ADR-0037 · Status: proposed (awaiting human)
+
+### DL-0199 — Secrets as compose file secrets; one public origin through nginx; local host `ledgerforce.localhost`
+- Date: 2026-10-26 · By: claude · Task: T-0094 · Category: security
+- Decision: Six secrets generated by `infra/compose/init-secrets.sh` into the git-ignored `infra/compose/secrets/` and mounted only into the services that need them; Node services read `<NAME>_FILE` (packages/db `readSecret`), Keycloak through its entrypoint. nginx (the only published service, loopback by default) serves the SPA, proxies the API's prefixes (kept equal to `API_CONTROLLERS` by a test) and Keycloak's `/realms/`, `/resources/`, and returns 404 for `/admin/` and `/realms/master/`. Local installs use `http://ledgerforce.localhost:<port>` with that name as the web service's network alias, so the API reaches the same issuer; the API allows http only for loopback/`*.localhost` hosts.
+- Why: RQ-0041 findings 7–9; Keycloak's exposed-path guidance; RQ-0025 same-origin cookies.
+- Alternatives: env-var secrets (visible in `docker inspect`); publishing Keycloak on its own port (two origins, issuer mismatch between browser and API); an `/api` prefix (public API change, left as the RQ-0025 follow-up).
+- ADR: ADR-0037 · Status: proposed (awaiting human)
+
 ### DL-0200 — Transit KMS binds the record through a derived key's context, stores the 60-byte body and a versioned key id (RQ-0042)
 - Date: 2026-10-26 · By: claude · Task: T-0108 · Category: security
 - Decision:

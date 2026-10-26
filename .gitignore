@@ -17,3 +17,7 @@ blob-report/
 
 # Sub-agent git worktrees (parallel builds, DL-0081): each is a separate checkout, never content of this one
 .claude/worktrees/
+
+# Self-hosted install: the operator's settings file (T-0094); generated secrets are ignored by
+# infra/compose/secrets/.gitignore
+infra/compose/ledgerforce.env
