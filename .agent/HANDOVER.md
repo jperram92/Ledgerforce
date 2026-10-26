@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 7 COMPLETE (DL-0184): T-0028, T-0067 (after a test fix; scenarios split to T-0110), T-0108, T-0094 merged, each verify 13 PASS/0 FAIL/3 PENDING, all in review; SS-UC10-08 subledger = control wired by the lead (DL-0206). Next: plan round 8 from `conductor next` (T-0029 manual journals is now unblocked). Rounds 4–6 in review. Known: DL-0183 run.test.ts:104 failed once unexplained — root-cause it.
+Task: PARALLEL ROUND 8 in progress (DL-0207): T-0029, T-0071, T-0072 by sub-agents. Rounds 4–7 complete and in review. CRITICAL PATH: T-0007 golden postings (human gate) blocks T-0031 and nearly all remaining MVP cards — see open question 0.
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -10,6 +10,9 @@ In progress: round 4 worktrees. Pre-assigned (DL-0128):
 Next action: (codex) cross-review the list below. (claude or codex) `node scripts/agent/conductor.ts next` and claim it.
 Decisions taken: DL-0061..DL-0127; RQ-0017, RQ-0018; ADR-0018 (Proposed, security); RQ-0016; ADR-0017 (Proposed, accounting); new package @ledgerforce/ledger (dimension-set writer); ADR-0016 (Proposed, security); RQ-0015.
 Open questions for human:
+  0. **Golden postings (T-0007, human gate) are the critical path.** All GP-001..019 in Docs/accounting/postings.md are
+     Draft. T-0031 (golden-posting runner) and through it tax, invoices, bills, payments, Stripe, payroll and close
+     cannot start until you review and mark them Approved. Please prioritise this review.
   2. (incl. T-0011's additions to ADR-0016: owner-only slug_lookup policy on app.tenant, the lf_oidc login-binding
      cookie, one fixed redirect URI — DL-0087/0088) Accept/reject ADR-0004 (immutable ledger; DB side of reversal now built, DL-0075), ADR-0017 (hash-chain canonical form v1), ADR-0018 (envelope encryption, local keyring KMS) and ADR-0016 (sessions + OIDC), and earlier Proposed ADRs 0003-0007, 0009, 0010
   3. Golden postings GP-001..019 + accountant questions Q1-Q11 (blocks T-0031 and all posting work)
@@ -305,3 +308,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26T09:42:21.351Z claude: release T-0108 → review
 - 2026-10-26T09:48:35.140Z claude: release T-0094 → review
 - 2026-10-26 claude (lead): round 7 merged (T-0067 [verify failed → outage test made deterministic, SS split to T-0110], T-0108, T-0028, SS-UC10-08 wiring, T-0094); final tree gates green (816 unit / 859 db / 82 agent); verify 13/0/3 each (T-0094 after ticking its evidence step, evidence checked) → review.
+- 2026-10-26 claude (lead): round 8 claimed (T-0029, T-0071, T-0072; DL-0207). After it, the backlog is gated on T-0007 golden postings (human).

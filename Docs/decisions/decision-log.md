@@ -1621,3 +1621,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Design §10.8 item 3 and UC-10 ("AR/AP subledgers = controls"); T-0028 provided the read API (DL-0188). DL-0175 deferred this explicitly until then.
 - ADR: ADR-0035 (Proposed) · Status: accepted (DL-0175 superseded for this point)
 
+
+### DL-0207 — Parallel round 8: T-0029, T-0071, T-0072; T-0007 golden postings is now the critical path
+- Date: 2026-10-26 · By: claude (lead) · Task: T-0029, T-0071, T-0072 · Category: process
+- Decision: Round 8 runs the only three remaining claimable cards in worktrees, with pre-assigned numbers:
+  - T-0029 (manual journals with approval rule; control accounts reject manual journals): migration 0029, DL-0208..0212, RQ-0043, ADR-0039, SS-PLAT-07 (existing), SS-PLAT-89..90.
+  - T-0071 (Sync issues inbox, retry/backoff, API-limit throttling): migration 0030, DL-0213..0217, RQ-0044, ADR-0040, SS-PLAT-25 (existing), SS-PLAT-91..92.
+  - T-0072 (LWC Account component): no migration expected (0031 if needed), DL-0218..0222, RQ-0045, ADR-0041, SS-UC12-01/03 (existing). SS-UC12-04 (scratch-org e2e) stays not-started.
+  - Lead: DL-0223+, SS-PLAT-95+.
+
+  Most remaining MVP cards (T-0031 golden-posting runner → tax, invoices, bills, payments, Stripe …) depend on T-0007 "Golden postings DRAFT", which is `blocked` on the human gate. After this round, the build cannot advance materially until the product owner approves golden postings. This is raised as the top open question in HANDOVER.
+- Why: Product owner's parallel-build instruction; AGENTS.md §6 golden-postings human gate.
+- ADR: none · Status: accepted
