@@ -41,7 +41,7 @@ be proven offline and the org check deferred honestly.
 `developer.salesforce.com` is blocked by this environment's egress proxy (`CONNECT tunnel failed,
 response 403`; WebFetch `ENOTFOUND`, the same as RQ-0022). Primary documentation was reached
 through search-result extracts; the authoritative offline behaviour comes from the source code of
-the pinned `@salesforce/sfdx-lwc-jest@8.0.0` and an executed spike.
+the pinned `@salesforce/sfdx-lwc-jest@7.9.0` and an executed spike.
 
 | # | Source (URL or command) | Accessed | Kind | What it says (short quote or paraphrase) |
 |---|---|---|---|---|
@@ -52,10 +52,11 @@ the pinned `@salesforce/sfdx-lwc-jest@8.0.0` and an executed spike.
 | S5 | https://developer.salesforce.com/docs/atlas.en-us.222.0.lightning.meta/lightning/apex_crud_fls.htm (search extract) and https://www.apexhours.com/lightning-data-service/ | 2026-10-26 | primary (older version) + secondary | Lightning Data Service is built on UI API and handles sharing, CRUD and FLS for you; Apex does not enforce them by default, so Apex controllers must enforce them themselves. |
 | S6 | https://developer.salesforce.com/docs/atlas.en-us.232.0.api_meta.meta/api_meta/meta_lightningcomponentbundle.htm (search extract) | 2026-10-26 | primary (older version) | `<component>.js-meta.xml`, root `LightningComponentBundle`; `isExposed` + at least one `target` makes it available in Lightning App Builder; `targetConfig` for `lightning__RecordPage` with `<objects><object>…</object></objects>` restricts it to those record pages. |
 | S7 | https://developer.salesforce.com/docs/platform/lwc/guide/unit-testing-using-wire-utility.html (search extract) | 2026-10-26 | primary (search summary) | Wire adapters are mocked in Jest by test adapters that "emit data on demand" via `emit()`; fixtures live in `__tests__/data/*.json`. |
-| S8 | `node_modules/@salesforce/sfdx-lwc-jest` 8.0.0 source (`src/config.js`, `src/utils/project.js`, `src/utils/test-runner.js`, `src/lightning-stubs/uiRecordApi`, `uiRelatedListApi`, `formattedNumber`) | 2026-10-26 | source code | Must run from the SFDX project root (reads `sfdx-project.json`, finds `<packageDir>/**/lwc`); without a `jest.config.*` it passes its own config (`@lwc/jest-preset`, jsdom, LWC transformer, lightning stubs). `getRecord`, `getRelatedListRecords` are `createLdsTestWireAdapter(jest.fn())`; `getFieldValue` / `getFieldDisplayValue` are real implementations. Lightning base components are stubs with `@api` properties and an empty template. Depends on jest 29.7.0. |
+| S8 | `node_modules/@salesforce/sfdx-lwc-jest` 8.0.0 and 7.9.0 source (`src/config.js`, `src/utils/project.js`, `src/utils/test-runner.js`, `src/lightning-stubs/uiRecordApi`, `uiRelatedListApi`, `formattedNumber`) | 2026-10-26 | source code | Must run from the SFDX project root (reads `sfdx-project.json`, finds `<packageDir>/**/lwc`); without a `jest.config.*` it passes its own config (`@lwc/jest-preset`, jsdom, LWC transformer, lightning stubs). `getRecord`, `getRelatedListRecords` are `createLdsTestWireAdapter(jest.fn())`; `getFieldValue` / `getFieldDisplayValue` are real implementations. Lightning base components are stubs with `@api` properties and an empty template. Depends on jest 29.7.0. |
 | S9 | `node_modules/@salesforce/wire-service-jest-util` 4.1.6 source | 2026-10-26 | source code | LDS test adapter: `emit(data)`, `emitError(...)`, `getLastConfig()` (the resolved config the component passed, including `$recordId`). |
-| S10 | `npm view @salesforce/sfdx-lwc-jest time` | 2026-10-26 | experiment | 8.0.0 published 2026-06-26 (four months old, meets the ≥ 2-week rule); `pnpm audit` and `pnpm audit --prod` clean after adding it. |
-| S11 | Spike: `pnpm test:lwc` (cd salesforce && sfdx-lwc-jest -- --ci) with an empty `__tests__` | 2026-10-26 | experiment | Jest 29 exits 1 with "No tests found" when no spec matches; `--passWithNoTests` is not set, so a missing spec fails the gate rather than passing silently. |
+| S10 | `npm view @salesforce/sfdx-lwc-jest time` / `dependencies` | 2026-10-26 | experiment | 8.0.0 published 2026-06-26 (deps `@lwc/engine-dom` 9.3.4); 7.9.0 published 2026-04-01 (deps `@lwc/engine-dom` 8.28.2, jest 29.7.0). Both well over 2 weeks old. `pnpm audit` and `pnpm audit --prod` clean with 7.9.0. |
+| S11 | Spike: `pnpm test:lwc` (cd salesforce && sfdx-lwc-jest -- --ci) before any spec existed | 2026-10-26 | experiment | Without `jest.config.cjs` Jest also picked up `salesforce/test/*.test.ts` (Vitest files) and failed; with `testMatch` limited to `force-app/**/lwc/**/__tests__/**/*.test.js` it exits 1 with "No tests found, exiting with code 1" — `--passWithNoTests` is not set, so a missing spec fails the gate rather than passing silently. |
+| S13 | Spike: first spec run with 8.0.0 | 2026-10-26 | experiment | `SyntaxError: Unexpected token 'export'` in `@lwc/engine-dom/dist/index.js`: the 8.0.0 resolver returns `require.resolve('@lwc/engine-dom')`, whose 9.3.4 `main` is an ESM file that Jest 29 does not transform. With 7.9.0 (engine-dom 8.28.2, CJS `main`) the same spec compiles and runs. |
 | S12 | Design §5.4, §8.2 UC-12, §9.1; `Docs/specs/UC-12.md`; `salesforce/AGENTS.md`; RQ-0088 (SLDS 2 hooks only) | 2026-10-26 | primary (project) | UC-12 reads Account `LF_Balance_Due__c`, `LF_Overdue_Amount__c`, `LF_Credit_Status__c`, `LF_Last_Payment_Date__c` and `LF_Invoice__c`; the package never computes accounting. |
 
 ## Findings
@@ -104,7 +105,7 @@ the pinned `@salesforce/sfdx-lwc-jest@8.0.0` and an executed spike.
   parse, add or compare money in JavaScript. Lint the LWC JavaScript with the repo's
   `lf/no-float-money` rule including the number-conversion ban.
 - States: loading (spinner), error (message, no partial money), empty (no invoices), data.
-- Test with `@salesforce/sfdx-lwc-jest@8.0.0` (dev dependency, DL entry); `pnpm test:lwc`
+- Test with `@salesforce/sfdx-lwc-jest@7.9.0` (dev dependency, DL-0218); `pnpm test:lwc`
   chained into `pnpm test`; an offline Vitest contract guard proves the chain, the bundle
   metadata, and that every field read is granted by `LF_Read_Only`.
 - The scratch-org e2e (SS-UC12-04) and the `sortBy` `-` syntax check move to T-0111.
