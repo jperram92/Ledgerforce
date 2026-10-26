@@ -118,7 +118,7 @@ graph LR
 | [T-0025](T-0025.md) | Posting engine pipeline (command → validate → resolve → build → check → write) | MVP | review | T-0021, T-0023, T-0024, T-0014, T-0022 | — | 1 |
 | [T-0026](T-0026.md) | Posting engine preview mode ("show me the journal") | MVP | review | T-0025 | — | 1 |
 | [T-0027](T-0027.md) | account_balance maintenance in the posting transaction | MVP | review | T-0025 | — | 0 |
-| [T-0028](T-0028.md) | Subledger entries and allocations | MVP | todo | T-0025 | — | 0 |
+| [T-0028](T-0028.md) | Subledger entries and allocations | MVP | review | T-0025 | — | 0 |
 | [T-0029](T-0029.md) | Manual journals with approval rule; control accounts reject manual journals | MVP | todo | T-0025, T-0015 | — | 1 |
 | [T-0030](T-0030.md) | Transactional outbox and pg-boss worker | MVP | review | T-0025 | — | 1 |
 | [T-0031](T-0031.md) | Golden-posting test runner | MVP | todo | T-0025, T-0007 | — | 1 |
@@ -157,7 +157,7 @@ graph LR
 | [T-0064](T-0064.md) | CDC subscriber via Pub/Sub API with replay-id store | MVP | review | T-0063, T-0030 | — | 1 |
 | [T-0065](T-0065.md) | Inbound mapping: Account/Contact/Product → Party/Product with idempotency | MVP | todo | T-0064, T-0036, T-0038 | UC-01 | 1 |
 | [T-0066](T-0066.md) | Polling fallback (SystemModstamp delta) per object | MVP | todo | T-0065 | — | 1 |
-| [T-0067](T-0067.md) | Write-back to Salesforce via sObject Collections from the outbox | MVP | todo | T-0063, T-0030 | UC-01, UC-03, UC-04, UC-11, UC-12 | 6 |
+| [T-0067](T-0067.md) | Write-back to Salesforce via sObject Collections from the outbox | MVP | review | T-0063, T-0030 | UC-01, UC-03, UC-04, UC-11, UC-12 | 6 |
 | [T-0068](T-0068.md) | Basic overdue reminders (UC-04 MVP scope) | MVP | todo | T-0049, T-0042, T-0067 | UC-04 | 4 |
 | [T-0069](T-0069.md) | Closed Won / Order activated → draft invoice (UC-01) with auto-approve | MVP | todo | T-0065, T-0040, T-0067, T-0031 | UC-01 | 7 |
 | [T-0110](T-0110.md) | Salesforce write-back: scratch-org e2e and refund/aged-AR write-back scenarios | MVP | todo | T-0067, T-0069, T-0055, T-0049 | UC-01, UC-11, UC-12 | 3 |
@@ -174,7 +174,7 @@ graph LR
 | [T-0080](T-0080.md) | Setup wizard backend (10 steps) and opening balances | MVP | todo | T-0018, T-0034, T-0058, T-0063, T-0039, T-0046, T-0050 | — | 0 |
 | [T-0106](T-0106.md) | Timeline design system: component fixes and @ledgerforce/ui package | MVP | review | T-0009 | UC-10, UC-12 | 1 |
 | [T-0107](T-0107.md) | Company ABN checksum: validate app.company.abn with app.abn_is_valid; fix test fixtures | MVP | review | T-0036 | — | 0 |
-| [T-0108](T-0108.md) | OpenBao/Vault transit KMS adapter (HTTP, no SDK) for envelope encryption | Phase 1 | todo | T-0037 | — | 1 |
+| [T-0108](T-0108.md) | OpenBao/Vault transit KMS adapter (HTTP, no SDK) for envelope encryption | Phase 1 | review | T-0037 | — | 1 |
 | [T-0109](T-0109.md) | verify.sh gate 9: e2e runs must not write evidence into other tasks' folders | MVP | review | T-0009 | — | 0 |
 | [T-0081](T-0081.md) | Web app shell (React, Vite, TanStack, shadcn/ui) with auth and navigation | MVP | review | T-0011, T-0009, T-0106 | — | 0 |
 | [T-0082](T-0082.md) | UI: chart of accounts, manual journal and "show me the journal" preview | MVP | todo | T-0081, T-0026, T-0029 | — | 0 |
@@ -189,7 +189,7 @@ graph LR
 | [T-0091](T-0091.md) | UI: setup wizard | MVP | todo | T-0081, T-0080 | — | 0 |
 | [T-0092](T-0092.md) | UI: Salesforce sync issues inbox | MVP | todo | T-0081, T-0071 | — | 0 |
 | [T-0093](T-0093.md) | UI: users, roles, SoD exceptions report and audit log viewer | MVP | review | T-0081, T-0016, T-0015 | — | 0 |
-| [T-0094](T-0094.md) | Self-hosted Docker Compose install (api, worker, web, postgres, keycloak) | MVP | todo | T-0081, T-0030, T-0011 | — | 1 |
+| [T-0094](T-0094.md) | Self-hosted Docker Compose install (api, worker, web, postgres, keycloak) | MVP | review | T-0081, T-0030, T-0011 | — | 1 |
 | [T-0095](T-0095.md) | CI security gates: SAST, dependency, container and secret scanning, SBOM | MVP | todo | T-0001 | — | 1 |
 | [T-0096](T-0096.md) | DAST smoke test against the compose stack | MVP | todo | T-0094, T-0095 | — | 0 |
 | [T-0097](T-0097.md) | Pilot hardening: backups, restore drill, security headers, rate limits | MVP | todo | T-0094, T-0096 | — | 0 |

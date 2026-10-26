@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 7 in progress (DL-0184): T-0028, T-0067, T-0094, T-0108 by sub-agents. Round 6 COMPLETE (DL-0162): T-0026, T-0064, T-0076, T-0093 in review. Known: DL-0183 run.test.ts:104 failed once unexplained — root-cause it.
+Task: PARALLEL ROUND 7 COMPLETE (DL-0184): T-0028, T-0067 (after a test fix; scenarios split to T-0110), T-0108, T-0094 merged, each verify 13 PASS/0 FAIL/3 PENDING, all in review; SS-UC10-08 subledger = control wired by the lead (DL-0206). Next: plan round 8 from `conductor next` (T-0029 manual journals is now unblocked). Rounds 4–6 in review. Known: DL-0183 run.test.ts:104 failed once unexplained — root-cause it.
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -56,6 +56,16 @@ Open questions for human:
       Reports (T-0076, RQ-0037, DL-0174): as-at TB roll prior-year profit into retained earnings (Xero style)? Gross
       Profit subtotal / AASB 18 categories from 2027? Current vs non-current BS split (needs a chart flag)?
       ADR-0032 (integration, no gate): grpc-js / proto-loader / avsc runtime deps — FYI.
+  19. Round 7:
+      - ADR-0035 (accounting): open-item sign convention, base split, meaning of fx_difference. Realised-FX journal
+        waits for its golden posting (DL-0187). Should every AR/AP control line carry a party?
+      - ADR-0037 (security, install): is a sign-in link plus a one-time password acceptable as the "one-time owner
+        setup link" (§6.3)? Should MFA be required for ALL self-hosted users (stricter than §6.2)? Keep the Keycloak
+        bootstrap admin after setup?
+      - ADR-0038 (security): OpenBao transit — derived-key context binding, refuse exportable keys, aes256-gcm96 only.
+      - ADR-0036 (integration, FYI): only LF_Invoice__c/LF_Payment__c upsert by LF_Id__c; Account/Opportunity
+        updated by Salesforce id.
+      - Environment: T-0094 started dockerd as root in the container; while it runs, pnpm test:db uses Testcontainers.
   16. SoD (T-0015, ADR-0026 Proposed, security): confirm the threshold placeholders (§11.2); Owner-only SoD settings;
       meaning of "external reviewer" (another active user of the tenant); is rule 2 exceptable in small-team mode;
       rule 6 (period reopen) never excepted; AP Clerk cells §6.4 vs rules §6.5; weekly report in the tenant time
@@ -124,6 +134,14 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0059 — packages/modules/bank camt053/dedupe/statements/account-match; migration 0020; RQ-0028; DL-0125..0127
 >   • T-0025 — packages/ledger/src/{posting-command,posting-engine}.ts + invariant properties; RQ-0030; DL-0134..0138
 >     (golden-posting gate: generic pipeline only)
+>   • T-0028 — migration 0028 (subledger_entry, allocation triggers), packages/ledger/src/subledger.ts, engine
+>     subledgerItems; ADR-0035; DL-0185..0189; check the two eslint-disable comments in cross-tenant.ts (DL-0189)
+>   • T-0067 — packages/connectors/salesforce/src/writeback/**, apps/worker outage test (made deterministic);
+>     ADR-0036; DL-0190..0194, DL-0205 (split to T-0110)
+>   • T-0108 — packages/shared/src/crypto/{transit-kms,kms-config}.ts, scripts/test/openbao.sh; ADR-0038; DL-0200..0204
+>   • T-0094 — infra/docker/**, infra/compose/**, apps/worker/src/setup/**, packages/db/src/env.ts,
+>     .github/workflows/install-smoke.yml, tests/install/**; ADR-0037; DL-0195..0199 (security review)
+>   • lead — packages/modules/reporting trialBalanceReview subledger check (DL-0206)
 >   • T-0026 — packages/ledger posting-engine preview parity (UNKNOWN_USER, OVERRIDE_NOT_PERMITTED, ALREADY_POSTED),
 >     testing/databaseFingerprint; RQ-0035; DL-0163..0165
 >   • T-0064 — migration 0026, packages/connectors/salesforce/src/pubsub/**, fake Pub/Sub server; ADR-0032; RQ-0036; DL-0167..0171
@@ -282,3 +300,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26T05:30:10.311Z claude: T-0067 → verifying
 - 2026-10-26T05:30:10.460Z claude: T-0108 → verifying
 - 2026-10-26T05:30:10.647Z claude: T-0094 → verifying
+- 2026-10-26T09:42:20.989Z claude: release T-0028 → review
+- 2026-10-26T09:42:21.199Z claude: release T-0067 → review
+- 2026-10-26T09:42:21.351Z claude: release T-0108 → review
+- 2026-10-26T09:48:35.140Z claude: release T-0094 → review
+- 2026-10-26 claude (lead): round 7 merged (T-0067 [verify failed → outage test made deterministic, SS split to T-0110], T-0108, T-0028, SS-UC10-08 wiring, T-0094); final tree gates green (816 unit / 859 db / 82 agent); verify 13/0/3 each (T-0094 after ticking its evidence step, evidence checked) → review.
