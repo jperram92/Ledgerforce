@@ -9,6 +9,10 @@
 # Workspace packages are TypeScript source run by Node's type stripping, which Node refuses under
 # node_modules; so the runtime keeps the pnpm workspace layout (symlinks), not `pnpm deploy`.
 # Base images are pinned by digest; bump tag and digest together.
+#
+# Networks that inspect TLS: pass the inspecting CA as a build secret, used only by the two
+# download steps and never stored in a layer:
+#   docker build --secret id=extra_ca,src=/path/to/ca.pem -f infra/docker/Dockerfile --target api .
 
 FROM node:22.23.4-bookworm-slim@sha256:de170b39439eb0e5a3444ad7d60b015614a381e10fecae2e30ec9e735122f38d AS base
 ENV CI=true \
@@ -19,11 +23,15 @@ ENV PATH=$PNPM_HOME:$PATH
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # pnpm version from package.json "packageManager"; prepared once, readable by every user.
-RUN corepack enable && corepack prepare --activate && chmod -R a+rX /corepack
+RUN --mount=type=secret,id=extra_ca,required=false \
+    if [ -f /run/secrets/extra_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/extra_ca; fi \
+ && corepack enable && corepack prepare --activate && chmod -R a+rX /corepack
 
 # Every package's dependencies, fetched by lockfile only (cached until the lockfile changes).
 FROM base AS fetch
-RUN pnpm fetch --frozen-lockfile
+RUN --mount=type=secret,id=extra_ca,required=false \
+    if [ -f /run/secrets/extra_ca ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/extra_ca; fi \
+ && pnpm fetch --frozen-lockfile
 
 # Full install and build: the API with SWC, the SPA with Vite.
 FROM fetch AS build

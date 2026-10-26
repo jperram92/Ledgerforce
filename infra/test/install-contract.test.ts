@@ -77,11 +77,17 @@ describe('SS-PLAT-86 images', () => {
 
   it('SS-PLAT-86 no image bakes a secret (no ENV/ARG secret, no secrets folder copied)', () => {
     for (const f of DOCKERFILES) {
-      for (const line of read(f).split('\n')) {
+      const lines = read(f).split('\n');
+      lines.forEach((line, i) => {
         const m = /^\s*(ENV|ARG)\s+([A-Za-z0-9_]+)/i.exec(line);
         if (m?.[2]) expect(m[2], `${f}: ${line}`).not.toMatch(SECRET_NAME);
-        expect(line).not.toMatch(/secrets\//);
-      }
+        expect(line, `${f}: ${line}`).not.toMatch(/^\s*(COPY|ADD)\b.*secrets/i);
+        if (line.includes('/run/secrets/') && !line.trimStart().startsWith('#')) {
+          // Only a BuildKit secret mount (never written to a layer) may read /run/secrets.
+          const run = lines.slice(Math.max(0, i - 1), i + 1).join('\n');
+          expect(run, `${f}: ${line}`).toMatch(/--mount=type=secret,id=[a-z_]+,required=false/);
+        }
+      });
     }
     const ignore = read('.dockerignore');
     for (const p of ['**/.env*', 'infra/compose/secrets', '.git', '**/node_modules', '.agent']) {

@@ -68,13 +68,14 @@ services:
     depends_on:
       postgres: { condition: service_healthy }
     healthcheck:
-      # The image has no curl: plain HTTP over bash /dev/tcp to the management port.
+      # The image has no curl: plain HTTP over bash /dev/tcp to the management port. Ready means
+      # HTTP 200 (503 while any check, e.g. "Keycloak Initialized", is still DOWN).
       test:
         - CMD-SHELL
         - >-
           exec 3<>/dev/tcp/127.0.0.1/9000 &&
           printf 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
-          grep -q '"UP"' <&3
+          head -n 1 <&3 | grep -q ' 200 '
       interval: 10s
       timeout: 5s
       retries: 30
