@@ -155,6 +155,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   // inserted by lf_app is filled and checked by triggers (prerequisites below).
   'app.subledger_entry': { control_role: () => 'AR_CONTROL' },
   'app.allocation': { fx_difference: () => '0' },
+  // Manual journals (migration 0029): a draft holds a JSON array of at least two lines.
+  'app.manual_journal': { status: () => 'draft', lines: () => '[{}, {}]' },
   // Salesforce JWT bearer connection (migration 0017): a complete sealed key and certificate facts.
   'app.salesforce_connection': {
     id: () => randomUUID(),

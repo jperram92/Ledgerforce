@@ -1,0 +1,24 @@
+{
+  "name": "@ledgerforce/journals",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Manual journals: draft, submit, approve, post through the posting engine (design §3.2, §6.5 rule 4)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@ledgerforce/gl": "workspace:*",
+    "@types/node": "22.20.5",
+    "vitest": "4.1.12"
+  }
+}
