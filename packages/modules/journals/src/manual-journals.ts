@@ -401,3 +401,126 @@ export async function postManualJournal(
     replayed: false,
   };
 }
+
+export interface ManualJournalSummary {
+  id: string;
+  companyId: string;
+  status: ManualJournalStatus;
+  entryDate: string;
+  memo: string | null;
+  lineCount: number;
+  /** Σ debit of the lines as written, NUMERIC(19,4) text, summed by the database. */
+  amount: string;
+  total: string | null;
+  approvalRequired: boolean | null;
+  createdBy: string;
+  createdByName: string;
+  submittedByName: string | null;
+  approvedByName: string | null;
+  postedByName: string | null;
+  entryNo: string | null;
+}
+
+export const MANUAL_JOURNAL_STATUSES: readonly ManualJournalStatus[] = Object.freeze([
+  'draft',
+  'submitted',
+  'approved',
+  'posted',
+]);
+
+/** The most recent manual journals (newest first, at most 200), optionally of one status. */
+export async function listManualJournals(
+  trx: Trx,
+  opts: { status?: ManualJournalStatus } = {},
+): Promise<ManualJournalSummary[]> {
+  const r = await sql<ManualJournalSummary>`
+    SELECT m.id::text AS "id", m.company_id::text AS "companyId", m.status AS "status",
+           to_char(m.entry_date, 'YYYY-MM-DD') AS "entryDate", m.memo AS "memo",
+           jsonb_array_length(m.lines)::int AS "lineCount",
+           (SELECT coalesce(sum((l->>'debit')::numeric), 0)::numeric(19,4)::text
+              FROM jsonb_array_elements(m.lines) l) AS "amount",
+           m.total::text AS "total", m.approval_required AS "approvalRequired",
+           m.created_by::text AS "createdBy",
+           cu.display_name AS "createdByName", su.display_name AS "submittedByName",
+           au.display_name AS "approvedByName", pu.display_name AS "postedByName",
+           (SELECT e.entry_no FROM app.journal_entry e
+             WHERE e.tenant_id = m.tenant_id AND e.id = m.journal_entry_id) AS "entryNo"
+      FROM app.manual_journal m
+      JOIN app.app_user cu ON cu.tenant_id = m.tenant_id AND cu.id = m.created_by
+      LEFT JOIN app.app_user su ON su.tenant_id = m.tenant_id AND su.id = m.submitted_by
+      LEFT JOIN app.app_user au ON au.tenant_id = m.tenant_id AND au.id = m.approved_by
+      LEFT JOIN app.app_user pu ON pu.tenant_id = m.tenant_id AND pu.id = m.posted_by
+     WHERE ${opts.status === undefined ? sql`true` : sql`m.status = ${opts.status}`}
+     ORDER BY m.created_at DESC, m.id DESC
+     LIMIT 200`.execute(trx);
+  return r.rows;
+}
+
+/** Display names of the people on a document, keyed by user id. */
+export async function peopleOf(trx: Trx, doc: ManualJournal): Promise<Record<string, string>> {
+  const ids = [
+    ...new Set(
+      [doc.createdBy, doc.submittedBy, doc.approvedBy, doc.rejectedBy, doc.postedBy].filter(
+        (v): v is string => v !== null,
+      ),
+    ),
+  ];
+  const r = await sql<{ id: string; display_name: string }>`
+    SELECT id::text, display_name FROM app.app_user
+     WHERE id = ANY(${sql.val(ids)}::uuid[])`.execute(trx);
+  return Object.fromEntries(r.rows.map((u) => [u.id, u.display_name]));
+}
+
+export interface PreviewLine {
+  lineNo: number;
+  accountId: string;
+  accountCode: string;
+  accountName: string;
+  accountType: string;
+  debit: string;
+  credit: string;
+  memo: string | null;
+}
+
+export interface ManualJournalPreview {
+  entryDate: string;
+  requestedDate: string;
+  redirected: boolean;
+  needsOverride: boolean;
+  baseCurrency: string;
+  total: string;
+  lines: PreviewLine[];
+}
+
+/**
+ * "Show me the journal" for a stored manual journal (design §3.9, T-0082): the posting engine's
+ * preview of the same command submit and post use, with account names added. Writes nothing.
+ * Refusals are the engine's PostingError (CONTROL_ACCOUNT with its line, ALREADY_POSTED …).
+ */
+export async function previewManualJournal(trx: Trx, id: string): Promise<ManualJournalPreview> {
+  const doc = await load(trx, id, false);
+  const built = await preview(trx, commandOf(doc, doc.lines));
+  const ids = [...new Set(built.lines.map((l) => l.accountId))];
+  const r = await sql<{ id: string; name: string; type: string }>`
+    SELECT id::text, name, type FROM app.account
+     WHERE company_id = ${built.companyId} AND id = ANY(${sql.val(ids)}::uuid[])`.execute(trx);
+  const accounts = new Map(r.rows.map((a) => [a.id, a]));
+  return {
+    entryDate: built.entryDate,
+    requestedDate: built.requestedDate,
+    redirected: built.redirected,
+    needsOverride: built.needsOverride,
+    baseCurrency: built.baseCurrency,
+    total: built.total,
+    lines: built.lines.map((l) => ({
+      lineNo: l.lineNo,
+      accountId: l.accountId,
+      accountCode: l.accountCode,
+      accountName: accounts.get(l.accountId)?.name ?? l.accountCode,
+      accountType: accounts.get(l.accountId)?.type ?? '',
+      debit: l.debit,
+      credit: l.credit,
+      memo: l.memo,
+    })),
+  };
+}

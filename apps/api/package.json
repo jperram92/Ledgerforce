@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/gl": "workspace:*",
     "@ledgerforce/journals": "workspace:*",
     "@ledgerforce/ledger": "workspace:*",
     "@ledgerforce/outbox": "workspace:*",
@@ -28,7 +29,6 @@
     "rxjs": "7.8.2"
   },
   "devDependencies": {
-    "@ledgerforce/gl": "workspace:*",
     "@nestjs/testing": "12.1.2",
     "@swc/cli": "0.8.1",
     "@swc/core": "1.16.13",

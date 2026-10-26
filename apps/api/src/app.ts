@@ -17,6 +17,7 @@ import { UserRolesController } from './authz/user-roles.controller.ts';
 import { SodController } from './sod/sod.controller.ts';
 import { ApiTokensController, UserApiTokensController } from './tokens/api-tokens.controller.ts';
 import { UsersController } from './users/users.controller.ts';
+import { AccountsController } from './gl/accounts.controller.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
 import { PartyBankAccountsController } from './parties/bank-accounts.controller.ts';
@@ -83,6 +84,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   PartyBankAccountsController,
   BankDetailChangesController,
   ManualJournalsController,
+  AccountsController,
   UserRolesController,
   SodController,
   UsersController,
@@ -115,6 +117,7 @@ class AppModule {
         PartyBankAccountsController,
         BankDetailChangesController,
         ManualJournalsController,
+        AccountsController,
         UserRolesController,
         SodController,
         UsersController,

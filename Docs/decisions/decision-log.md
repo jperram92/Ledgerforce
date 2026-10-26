@@ -1759,3 +1759,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   Both edit apps/web routing; the lead merges T-0082 first, then T-0092.
 - Why: Product owner's parallel-build instruction.
 - ADR: none · Status: accepted
+
+### DL-0225 — GL read routes for the web screens (ADR-0042); @ledgerforce/gl becomes an apps/api runtime workspace dependency
+- Date: 2026-10-26 · By: claude · Task: T-0082 · Category: architecture
+- Decision: Add, test-first, `GET /accounts` (gl.account.read: companies with ids and the chart with system roles), `GET /manual-journals` (gl.journal.read: newest 200, optional `status`, amounts summed by PostgreSQL as NUMERIC(19,4) text, people as names), `GET /manual-journals/:id/preview` (gl.journal.read: the posting engine's `preview()` of the stored document's own command, with account names; 422 `posting_refused` unchanged, `ALREADY_POSTED` also carries `entry_id`/`entry_no`), and `people` (id → display name) on `GET /manual-journals/:id`. The reads live in the modules (`listChart` in packages/modules/gl, `listManualJournals`, `peopleOf`, `previewManualJournal` in packages/modules/journals); controllers stay thin. nginx proxies the new `accounts` prefix. `@ledgerforce/gl` moves from devDependencies to dependencies of apps/api (internal workspace package, no third-party dependency).
+- Why: RQ-0046 findings 1, 2 and 6. The UI must show the engine's journal, not compute one (design §3.9, P4); `GET /companies` cannot gain an id without changing a pinned test.
+- Alternatives: a preview of an unsaved body (rejected for now: needs gl.journal.post, so Approvers could not use it, and a dummy key); a browser-built preview (rejected: accounting in the browser); adding `id` to `GET /companies` (rejected: changes an existing test's assertion).
+- ADR: ADR-0042 · Status: accepted
+
+### DL-0226 — GL screens are sub-pages of Reports at /accounting/...; no new navigation section
+- Date: 2026-10-26 · By: claude · Task: T-0082 · Category: ui
+- Decision: The chart of accounts (`/accounting/chart`) and manual journals (`/accounting/journals`, `/accounting/journals/new`, `/accounting/journals/$id`) are listed as sub-pages on the Reports section page, the pattern T-0093 used for the audit log. The six-link section navigation is unchanged. Paths follow the IA's proposed `/accounting/...` (S12); `accounting` is not an API prefix.
+- Why: RQ-0046 finding 3. The six sections are asserted exactly by T-0081's tests and positions are a contract (P14); adding the IA's "Accounting" section is a navigation change for the product owner. Keeping the edit to `sections.ts` and `router.tsx` small also eases the merge with T-0092.
+- Alternatives: a new "Accounting" section (rejected here: changes asserted navigation; raised as an open question); sub-pages under Settings (rejected: journals are not settings).
+- ADR: none · Status: accepted
