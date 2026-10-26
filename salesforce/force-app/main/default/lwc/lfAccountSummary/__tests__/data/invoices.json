@@ -1,0 +1,240 @@
+[
+  {
+    "apiName": "LF_Invoice__c",
+    "id": "a01000000000003AAA",
+    "fields": {
+      "Name": {
+        "displayValue": null,
+        "value": "INV-0003"
+      },
+      "LF_Issue_Date__c": {
+        "displayValue": null,
+        "value": "2026-06-10"
+      },
+      "LF_Due_Date__c": {
+        "displayValue": null,
+        "value": "2026-07-10"
+      },
+      "LF_Status__c": {
+        "displayValue": null,
+        "value": "Paid"
+      },
+      "LF_Total__c": {
+        "displayValue": "$1,100.00",
+        "value": 1100
+      },
+      "LF_Amount_Due__c": {
+        "displayValue": "$0.00",
+        "value": 0
+      },
+      "LF_Days_Overdue__c": {
+        "displayValue": null,
+        "value": 0
+      }
+    }
+  },
+  {
+    "apiName": "LF_Invoice__c",
+    "id": "a01000000000007AAA",
+    "fields": {
+      "Name": {
+        "displayValue": null,
+        "value": "INV-0007"
+      },
+      "LF_Issue_Date__c": {
+        "displayValue": null,
+        "value": "2026-10-05"
+      },
+      "LF_Due_Date__c": {
+        "displayValue": null,
+        "value": "2026-11-04"
+      },
+      "LF_Status__c": {
+        "displayValue": null,
+        "value": "Open"
+      },
+      "LF_Total__c": {
+        "displayValue": "$2,750.00",
+        "value": 2750
+      },
+      "LF_Amount_Due__c": {
+        "displayValue": "$2,750.00",
+        "value": 2750
+      },
+      "LF_Days_Overdue__c": {
+        "displayValue": null,
+        "value": 0
+      }
+    }
+  },
+  {
+    "apiName": "LF_Invoice__c",
+    "id": "a01000000000001AAA",
+    "fields": {
+      "Name": {
+        "displayValue": null,
+        "value": "INV-0001"
+      },
+      "LF_Issue_Date__c": {
+        "displayValue": null,
+        "value": "2026-04-02"
+      },
+      "LF_Due_Date__c": {
+        "displayValue": null,
+        "value": "2026-05-02"
+      },
+      "LF_Status__c": {
+        "displayValue": null,
+        "value": "Paid"
+      },
+      "LF_Total__c": {
+        "displayValue": "$900.00",
+        "value": 900
+      },
+      "LF_Amount_Due__c": {
+        "displayValue": "$0.00",
+        "value": 0
+      },
+      "LF_Days_Overdue__c": {
+        "displayValue": null,
+        "value": 0
+      }
+    }
+  },
+  {
+    "apiName": "LF_Invoice__c",
+    "id": "a01000000000005AAA",
+    "fields": {
+      "Name": {
+        "displayValue": null,
+        "value": "INV-0005"
+      },
+      "LF_Issue_Date__c": {
+        "displayValue": null,
+        "value": "2026-08-15"
+      },
+      "LF_Due_Date__c": {
+        "displayValue": null,
+        "value": "2026-09-14"
+      },
+      "LF_Status__c": {
+        "displayValue": null,
+        "value": "Overdue"
+      },
+      "LF_Total__c": {
+        "displayValue": "$4,200.00",
+        "value": 4200
+      },
+      "LF_Amount_Due__c": {
+        "displayValue": "$4,200.00",
+        "value": 4200
+      },
+      "LF_Days_Overdue__c": {
+        "displayValue": null,
+        "value": 42
+      }
+    }
+  },
+  {
+    "apiName": "LF_Invoice__c",
+    "id": "a01000000000006AAA",
+    "fields": {
+      "Name": {
+        "displayValue": null,
+        "value": "INV-0006"
+      },
+      "LF_Issue_Date__c": {
+        "displayValue": null,
+        "value": "2026-09-20"
+      },
+      "LF_Due_Date__c": {
+        "displayValue": null,
+        "value": "2026-10-20"
+      },
+      "LF_Status__c": {
+        "displayValue": null,
+        "value": "Part paid"
+      },
+      "LF_Total__c": {
+        "displayValue": "$3,000.00",
+        "value": 3000
+      },
+      "LF_Amount_Due__c": {
+        "displayValue": "$1,500.00",
+        "value": 1500
+      },
+      "LF_Days_Overdue__c": {
+        "displayValue": null,
+        "value": 6
+      }
+    }
+  },
+  {
+    "apiName": "LF_Invoice__c",
+    "id": "a01000000000002AAA",
+    "fields": {
+      "Name": {
+        "displayValue": null,
+        "value": "INV-0002"
+      },
+      "LF_Issue_Date__c": {
+        "displayValue": null,
+        "value": "2026-05-12"
+      },
+      "LF_Due_Date__c": {
+        "displayValue": null,
+        "value": "2026-06-11"
+      },
+      "LF_Status__c": {
+        "displayValue": null,
+        "value": "Paid"
+      },
+      "LF_Total__c": {
+        "displayValue": "$650.00",
+        "value": 650
+      },
+      "LF_Amount_Due__c": {
+        "displayValue": "$0.00",
+        "value": 0
+      },
+      "LF_Days_Overdue__c": {
+        "displayValue": null,
+        "value": 0
+      }
+    }
+  },
+  {
+    "apiName": "LF_Invoice__c",
+    "id": "a01000000000004AAA",
+    "fields": {
+      "Name": {
+        "displayValue": null,
+        "value": "INV-0004"
+      },
+      "LF_Issue_Date__c": {
+        "displayValue": null,
+        "value": "2026-07-01"
+      },
+      "LF_Due_Date__c": {
+        "displayValue": null,
+        "value": "2026-07-31"
+      },
+      "LF_Status__c": {
+        "displayValue": null,
+        "value": "Paid"
+      },
+      "LF_Total__c": {
+        "displayValue": "$1,895.67",
+        "value": 1895.67
+      },
+      "LF_Amount_Due__c": {
+        "displayValue": "$0.00",
+        "value": 0
+      },
+      "LF_Days_Overdue__c": {
+        "displayValue": null,
+        "value": 0
+      }
+    }
+  }
+]

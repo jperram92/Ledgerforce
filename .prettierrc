@@ -3,5 +3,8 @@
   "singleQuote": true,
   "trailingComma": "all",
   "semi": true,
-  "endOfLine": "lf"
+  "endOfLine": "lf",
+  "overrides": [
+    { "files": "salesforce/force-app/**/lwc/**/*.html", "options": { "parser": "lwc" } }
+  ]
 }
