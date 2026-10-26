@@ -285,3 +285,19 @@ describe('Entry numbering series (DL-0135) [T-0025]', () => {
     expect(entrySeriesFor('payments_stripe_charge')).toBe('je_payments_stripe_charge');
   });
 });
+
+describe('Open-item due date on a line (T-0028)', () => {
+  const [debit, credit] = ok as [PostingLineInput, PostingLineInput];
+  it('SS-PLAT-81 a malformed dueDate is refused before any SQL; a valid one is carried [T-0028]', async () => {
+    for (const bad of ['2026-02-30', '26-10-01', '', 20261001]) {
+      await refusedBeforeSql(
+        cmd([{ ...debit, dueDate: bad as string }, credit]),
+        'INVALID_COMMAND',
+        1,
+      );
+    }
+    const checked = checkCommand(cmd([{ ...debit, dueDate: '2026-11-30' }, credit]));
+    expect(checked.lines[0]?.dueDate).toBe('2026-11-30');
+    expect(checked.lines[1]?.dueDate).toBeUndefined();
+  });
+});

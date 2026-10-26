@@ -1441,3 +1441,37 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - Most other remaining cards wait on Draft golden postings or on these tasks.
 - Why: Product owner's instruction to build independent tasks in parallel.
 - ADR: none · Status: accepted
+
+### DL-0185 — Open items: one per AR/AP control line, signed like the GL, filled by the database
+- Date: 2026-10-26 · By: claude · Task: T-0028 · Category: accounting
+- Decision: The posting engine writes one `subledger_entry` for every line on an account bound to AR_CONTROL or AP_CONTROL, in its write savepoint after the lines; preview returns the same items (`BuiltEntry.subledgerItems`) and writes nothing. A BEFORE INSERT trigger fills each item from its line (role, account, party, document, dates, currency, amounts), so the writer gives only company, entry, line and due date. Amounts are signed like the GL (debit +, credit −) in transaction currency (`original_amount`, `open_amount`, `currency`, as design §3.3) and base currency (`base_original_amount`, `base_open_amount`). `PostingLineInput.dueDate` is allowed only on such lines (default: the entry date). A control line with txnAmount 0 is refused. PAYROLL_CLEARING lines get no item (design §3.3 says AR/AP open items).
+- Why: RQ-0039 findings 1–3: the sum of items equals the control balance by construction.
+- Alternatives: unsigned amounts with a side flag; computing open amounts on read (ADR-0035 options 2–3).
+- ADR: ADR-0035 · Status: proposed (awaiting human)
+
+### DL-0186 — Allocations: append-only, priced and applied by SECURITY DEFINER triggers; advisory locks in the engine
+- Date: 2026-10-26 · By: claude · Task: T-0028 · Category: architecture
+- Decision: `allocate` / `reverseAllocation` (packages/ledger/src/subledger.ts) take an advisory lock on the idempotency key (a repeat returns the first result; another payload under the key is IDEMPOTENCY_CONFLICT), then advisory locks on both items in id order (lf_app cannot SELECT … FOR UPDATE, RQ-0039 E2), check every rule with a typed AllocationError, and insert in a savepoint. In the database, a BEFORE INSERT trigger locks both items FOR UPDATE in id order, re-checks, and computes the base released from each item (proportional, half-up to 4 decimals; the whole remainder when the item closes) and fx_difference; an AFTER INSERT trigger updates both items' open amounts. CHECKs keep 0 ≤ |open| ≤ |original| on the original's side, so even a writer that bypasses the engine cannot over-allocate (proved with two concurrent lf_app transactions). A guard lets an item change only its open amounts and only from that trigger (`pg_trigger_depth() > 1`); allocations never change; no DELETE/TRUNCATE. Reversal = a new row with `reversal_of_id` and the original's amounts negated; one per allocation; a reversal is never reversed. Allocations are not period-checked (they post no journal).
+- Why: RQ-0039 findings 5–7; AGENTS.md: posted = immutable, corrections by reversal.
+- Alternatives: a SECURITY DEFINER `allocate()` function doing everything in SQL (rejected: the engine gives typed errors and idempotency like post()); row locks only (impossible for lf_app).
+- ADR: ADR-0035 · Status: accepted (mechanics; the accounting meaning is in ADR-0035, proposed)
+
+### DL-0187 — fx_difference is recorded as data; no realised FX journal is posted
+- Date: 2026-10-26 · By: claude · Task: T-0028 · Category: accounting
+- Decision: The design lists `fx_difference` on allocation and says realised FX "posts at allocation" (§3.7). The FX journal is a posting behaviour whose golden posting is Draft, so T-0028 only stores `fx_difference = base released from the credit item − base released from the debit item` (the base debit to the control account the FX journal would post) and posts nothing. `subledgerReconciliation` reports it as `unpostedFxDifference` and reconciles `subledger = control + unposted FX`. Open question for the product owner: approve the realised-FX golden posting (and confirm the sign convention) so a follow-up can post it at allocation.
+- Why: AGENTS.md golden-posting gate; RQ-0039 finding 4.
+- Alternatives: refuse cross-rate allocations until FX posting exists (rejected: blocks foreign-currency receipts entirely); post FX now (forbidden: Draft golden posting).
+- ADR: ADR-0035 · Status: proposed (awaiting human)
+
+### DL-0188 — Subledger read API for the close checklist (SS-UC10-08) lives in packages/ledger
+- Date: 2026-10-26 · By: claude · Task: T-0028 · Category: architecture
+- Decision: `subledgerReconciliation(trx, { companyId, asOf? })` returns, for AR_CONTROL and AP_CONTROL, the accounts (bound now or carrying items), the control balance (Σ debit − credit of posted lines), the subledger balance (Σ base open; as at a date: items dated ≤ D less base released by allocations dated ≤ D), the unposted FX difference, the difference and `reconciled`. All amounts debit-positive NUMERIC text. `subledgerDrift` lists control lines without an item and items whose open amounts differ from original − allocations. packages/modules/reporting (T-0076, merged) is not edited: the lead or a follow-up wires `trialBalanceReview` to it (pass `asOf = period end`; its controlBalance is on the normal side, so negate for AP).
+- Why: Lead's instruction; DL-0175 reserved `reconciled` / `difference` for this.
+- ADR: none · Status: accepted
+
+### DL-0189 — Cross-tenant suite: seed steps for subledger_entry and allocation; inline lint exemption for them
+- Date: 2026-10-26 · By: claude · Task: T-0028 · Category: process
+- Decision: The generated cross-tenant suite needs consistent rows for the two new tables when lf_app inserts them (positive control): PREREQUISITES give the generated entry a journal line on an AR_CONTROL-bound account, and turn the generated "to" item of an allocation into a credit on the "from" item's account, both as a superuser seed step with `session_replication_role = replica`. Those two literal SQL statements in packages/db/src/testing/cross-tenant.ts carry `eslint-disable-next-line lf/no-direct-ledger-write` with a reason (precedent: money.ts); the generic seeder writes the same tables through a dynamic table name. Product code is unaffected.
+- Why: AGENTS.md: every tenant table must pass the cross-tenant suite.
+- Alternatives: move the prerequisites into packages/ledger (rejected: packages/db cannot depend on the ledger); build the SQL with a dynamic table name to avoid the rule (rejected: hides the write from the lint rule).
+- ADR: none · Status: accepted
