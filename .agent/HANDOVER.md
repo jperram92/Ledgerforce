@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 6 in progress (DL-0162): T-0026, T-0064, T-0076, T-0093 by sub-agents in worktrees (numbers in DL-0162). Round 5 (T-0016, T-0027, T-0030, T-0053) complete and in review.
+Task: PARALLEL ROUND 6 COMPLETE (DL-0162): T-0026, T-0064, T-0076, T-0093 merged (migrations renumbered 0026/0027, DL-0182), each verify 13 PASS/0 FAIL/3 PENDING, all in review. Next: plan round 7 (candidates T-0028 subledger, T-0029 manual journals — one engine task —, T-0067 write-back contract parts, T-0108). Known: DL-0183 run.test.ts:104 failed once unexplained — root-cause it.
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -51,6 +51,11 @@ Open questions for human:
       detail change: DB-enforced workflow; first bank details also need verification — DL-0157; cooling-off 24 h
       default, 1–720 h, Owner-only — DL-0158). T-0027: DL-0147 adds currency to the account_balance key (ADR wanted?).
       T-0030 DL-0152: should post() require an outbox rather than default to none?
+  18. Round 6: ADR-0034 (security, audit.read_log read path + /users, /auth/me/access, /audit-log) — accept? Should
+      audit-log reads themselves be audited (§6.9 mass-export alerts)? Quarterly access review (§6.3 item 4) needs a card.
+      Reports (T-0076, RQ-0037, DL-0174): as-at TB roll prior-year profit into retained earnings (Xero style)? Gross
+      Profit subtotal / AASB 18 categories from 2027? Current vs non-current BS split (needs a chart flag)?
+      ADR-0032 (integration, no gate): grpc-js / proto-loader / avsc runtime deps — FYI.
   16. SoD (T-0015, ADR-0026 Proposed, security): confirm the threshold placeholders (§11.2); Owner-only SoD settings;
       meaning of "external reviewer" (another active user of the tenant); is rule 2 exceptable in small-team mode;
       rule 6 (period reopen) never excepted; AP Clerk cells §6.4 vs rules §6.5; weekly report in the tenant time
@@ -119,6 +124,12 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 >   • T-0059 — packages/modules/bank camt053/dedupe/statements/account-match; migration 0020; RQ-0028; DL-0125..0127
 >   • T-0025 — packages/ledger/src/{posting-command,posting-engine}.ts + invariant properties; RQ-0030; DL-0134..0138
 >     (golden-posting gate: generic pipeline only)
+>   • T-0026 — packages/ledger posting-engine preview parity (UNKNOWN_USER, OVERRIDE_NOT_PERMITTED, ALREADY_POSTED),
+>     testing/databaseFingerprint; RQ-0035; DL-0163..0165
+>   • T-0064 — migration 0026, packages/connectors/salesforce/src/pubsub/**, fake Pub/Sub server; ADR-0032; RQ-0036; DL-0167..0171
+>   • T-0076 — packages/modules/reporting, ledger accountMovements(); RQ-0037; DL-0172..0176
+>   • T-0093 — migration 0027 (audit.read_log, security review), apps/api audit/users routes, apps/web admin screens,
+>     tests/e2e/web/admin.spec.ts; ADR-0034; RQ-0038; DL-0177..0181
 >   • T-0016 — migration 0022, apps/api/src/{users,tokens}/**, interceptor token principal; ADR-0027; DL-0141..0145
 >   • T-0027 — migration 0023 (account_balance trigger), packages/ledger/src/account-balance.ts; DL-0146..0150
 >     (confirm the DB trigger satisfies "upsert in writer")
@@ -258,3 +269,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26T00:04:36.583Z claude: T-0064 → verifying
 - 2026-10-26T00:04:36.696Z claude: T-0076 → verifying
 - 2026-10-26T00:04:36.840Z claude: T-0093 → verifying
+- 2026-10-26T00:14:04.017Z claude: release T-0064 → review
+- 2026-10-26T00:14:04.146Z claude: release T-0076 → review
+- 2026-10-26T00:14:04.276Z claude: release T-0093 → review
+- 2026-10-26 claude (lead): round 6 merged (T-0026, T-0064 [0027→0026], T-0076, T-0093 [0029→0027]); final tree gates green (697 unit / 815 db / 82 agent); verify 13/0/3 each → review. run.test.ts:104 failed once at the T-0076 merge, 5 reruns green (DL-0183, unexplained).

@@ -154,7 +154,7 @@ graph LR
 | [T-0061](T-0061.md) | Bank reconciliation and reconciliation report | MVP | todo | T-0060 | UC-08 | 2 |
 | [T-0062](T-0062.md) | Salesforce SFDX package: objects, fields, permission sets, platform event | MVP | review | T-0001 | UC-12 | 1 |
 | [T-0063](T-0063.md) | Salesforce auth: External Client App with JWT bearer and encrypted token store | MVP | review | T-0062, T-0037 | — | 0 |
-| [T-0064](T-0064.md) | CDC subscriber via Pub/Sub API with replay-id store | MVP | todo | T-0063, T-0030 | — | 1 |
+| [T-0064](T-0064.md) | CDC subscriber via Pub/Sub API with replay-id store | MVP | review | T-0063, T-0030 | — | 1 |
 | [T-0065](T-0065.md) | Inbound mapping: Account/Contact/Product → Party/Product with idempotency | MVP | todo | T-0064, T-0036, T-0038 | UC-01 | 1 |
 | [T-0066](T-0066.md) | Polling fallback (SystemModstamp delta) per object | MVP | todo | T-0065 | — | 1 |
 | [T-0067](T-0067.md) | Write-back to Salesforce via sObject Collections from the outbox | MVP | todo | T-0063, T-0030 | UC-01, UC-03, UC-04, UC-11, UC-12 | 6 |
@@ -166,7 +166,7 @@ graph LR
 | [T-0073](T-0073.md) | Stripe payment links on invoices | MVP | todo | T-0042 | UC-03 | 1 |
 | [T-0074](T-0074.md) | Stripe webhooks (signed, replay-protected) → receipt into clearing | MVP | todo | T-0073, T-0046, T-0031 | UC-03, UC-11 | 5 |
 | [T-0075](T-0075.md) | Stripe payout reconciliation (net settlement, fees, GST on fees) | MVP | todo | T-0074, T-0060, T-0031 | UC-03 | 2 |
-| [T-0076](T-0076.md) | Trial balance, profit & loss and balance sheet | MVP | todo | T-0027 | UC-10 | 1 |
+| [T-0076](T-0076.md) | Trial balance, profit & loss and balance sheet | MVP | review | T-0027 | UC-10 | 1 |
 | [T-0077](T-0077.md) | GL detail and aged AR/AP reports | MVP | todo | T-0076, T-0028, T-0049 | — | 0 |
 | [T-0078](T-0078.md) | Month-end close checklist (UC-10) | MVP | todo | T-0023, T-0061, T-0076 | UC-10 | 5 |
 | [T-0079](T-0079.md) | Hard-lock reopen with two approvers and audit reason | MVP | todo | T-0078, T-0015, T-0013 | UC-10 | 1 |
@@ -187,7 +187,7 @@ graph LR
 | [T-0090](T-0090.md) | UI: close checklist and period status | MVP | todo | T-0081, T-0078, T-0079 | UC-10 | 1 |
 | [T-0091](T-0091.md) | UI: setup wizard | MVP | todo | T-0081, T-0080 | — | 0 |
 | [T-0092](T-0092.md) | UI: Salesforce sync issues inbox | MVP | todo | T-0081, T-0071 | — | 0 |
-| [T-0093](T-0093.md) | UI: users, roles, SoD exceptions report and audit log viewer | MVP | todo | T-0081, T-0016, T-0015 | — | 0 |
+| [T-0093](T-0093.md) | UI: users, roles, SoD exceptions report and audit log viewer | MVP | review | T-0081, T-0016, T-0015 | — | 0 |
 | [T-0094](T-0094.md) | Self-hosted Docker Compose install (api, worker, web, postgres, keycloak) | MVP | todo | T-0081, T-0030, T-0011 | — | 1 |
 | [T-0095](T-0095.md) | CI security gates: SAST, dependency, container and secret scanning, SBOM | MVP | todo | T-0001 | — | 1 |
 | [T-0096](T-0096.md) | DAST smoke test against the compose stack | MVP | todo | T-0094, T-0095 | — | 0 |
