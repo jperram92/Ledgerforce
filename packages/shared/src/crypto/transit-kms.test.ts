@@ -177,7 +177,10 @@ describe('SS-PLAT-87: transit key versions', () => {
     const kms = await connect();
     const sealed = await sealField(kms, 'x', AAD);
     const before = fake.requests.length;
-    for (const wrappedDek of [sealed.wrappedDek.subarray(0, 59), Buffer.concat([sealed.wrappedDek, Buffer.alloc(1)])]) {
+    for (const wrappedDek of [
+      sealed.wrappedDek.subarray(0, 59),
+      Buffer.concat([sealed.wrappedDek, Buffer.alloc(1)]),
+    ]) {
       await expect(openField(kms, { ...sealed, wrappedDek }, AAD)).rejects.toBeInstanceOf(
         DecryptionError,
       );
@@ -241,7 +244,9 @@ describe('SS-PLAT-88: transit adapter transport is safe', () => {
     await new Promise<void>((r) => target.listen(0, '127.0.0.1', r));
     try {
       const kms = await connect();
-      fake.inject({ redirect: `http://127.0.0.1:${String((target.address() as AddressInfo).port)}` });
+      fake.inject({
+        redirect: `http://127.0.0.1:${String((target.address() as AddressInfo).port)}`,
+      });
       const before = fake.requests.length;
       await expect(kms.wrap(randomBytes(32), AAD)).rejects.toMatchObject({
         kind: 'redirect_refused',
@@ -264,7 +269,13 @@ describe('SS-PLAT-88: transit adapter transport is safe', () => {
         return Promise.resolve();
       },
     });
-    fake.inject({ status: 503 }, { status: 500 }, { reset: true }, { status: 502 }, { status: 429 });
+    fake.inject(
+      { status: 503 },
+      { status: 500 },
+      { reset: true },
+      { status: 502 },
+      { status: 429 },
+    );
     const before = fake.count('/encrypt/' + kms.keyName);
     const sealed = await sealField(kms, '123', AAD);
     expect(fake.count('/encrypt/' + kms.keyName) - before).toBe(6);
@@ -300,7 +311,11 @@ describe('SS-PLAT-88: transit adapter transport is safe', () => {
         return Promise.resolve();
       },
     });
-    fake.inject({ status: 429, retryAfter: '1' }, { status: 503, retryAfter: '30' }, { status: 503, retryAfter: 'soon' });
+    fake.inject(
+      { status: 429, retryAfter: '1' },
+      { status: 503, retryAfter: '30' },
+      { status: 503, retryAfter: 'soon' },
+    );
     await kms.wrap(randomBytes(32), AAD);
     expect(delays).toEqual([1000, 2000, 0]);
   });
@@ -316,6 +331,10 @@ describe('SS-PLAT-88: transit adapter transport is safe', () => {
       op: 'encrypt',
     });
     expect(fake.count('/encrypt/' + kms.keyName) - before).toBe(3);
+    fake.inject({ status: 500 });
+    await expect(kms.wrap(randomBytes(32), AAD)).resolves.toMatchObject({ keyId: kms.activeKeyId });
+    fake.inject({ status: 502 }, { status: 502 }, { status: 502 });
+    await expect(kms.wrap(randomBytes(32), AAD)).rejects.toBeInstanceOf(TransitKmsError);
   });
 
   it('never retries 4xx: 400 on encrypt, 403 with a static token, 404, 405', async () => {
@@ -409,15 +428,18 @@ describe('SS-PLAT-88: transit key policy is checked at start', () => {
     });
     const keyName = uniq('lf-kek');
     fake.createKey(keyName);
-    await expect(
-      TransitKms.connect(opts({ keyName, namespace: 'nope' })),
-    ).rejects.toMatchObject({ kind: 'not_found', status: 404 });
+    await expect(TransitKms.connect(opts({ keyName, namespace: 'nope' }))).rejects.toMatchObject({
+      kind: 'not_found',
+      status: 404,
+    });
   });
 
   it('sends X-Vault-Namespace on every request when configured', async () => {
     const keyName = uniq('lf-kek');
     fake.createKey(keyName);
-    const kms = await TransitKms.connect(opts({ keyName, namespace: 'finance', auth: { appRole: APPROLE } }));
+    const kms = await TransitKms.connect(
+      opts({ keyName, namespace: 'finance', auth: { appRole: APPROLE } }),
+    );
     const sealed = await sealField(kms, 'x', AAD);
     await openField(kms, sealed, AAD);
     const mine = fake.requests.filter(
@@ -457,7 +479,8 @@ describe('SS-PLAT-88: transit authentication', () => {
     const logins = fake.appRoleLogins;
     await kms.wrap(randomBytes(32), AAD);
     expect(fake.appRoleLogins - logins).toBe(1);
-    fake.inject({ status: 403 }, { status: 403 });
+    const only = `/encrypt/${kms.keyName}`;
+    fake.inject({ status: 403, only }, { status: 403, only });
     await expect(kms.wrap(randomBytes(32), AAD)).rejects.toMatchObject({
       kind: 'permission_denied',
       status: 403,
@@ -485,7 +508,11 @@ describe('SS-PLAT-88: no secret ever appears in errors or logs', () => {
     const events: TransitKmsLogEvent[] = [];
     const errors: unknown[] = [];
     const catchIt = (p: Promise<unknown>) => p.catch((e: unknown) => errors.push(e));
-    const kms = await connect({ auth: { appRole: APPROLE }, log: (e) => events.push(e), maxAttempts: 2 });
+    const kms = await connect({
+      auth: { appRole: APPROLE },
+      log: (e) => events.push(e),
+      maxAttempts: 2,
+    });
     const dek = randomBytes(32);
     const { wrapped, keyId } = await kms.wrap(dek, AAD);
     await kms.unwrap(wrapped, keyId, AAD);
@@ -499,7 +526,9 @@ describe('SS-PLAT-88: no secret ever appears in errors or logs', () => {
     await catchIt(connect({ auth: { appRole: { ...APPROLE, secretId: 'wrong-secret-31x' } } }));
     await catchIt(connect({ auth: { token: 'bad-static-token-99' } }));
     fake.inject({ hang: true });
-    await catchIt(TransitKms.connect(opts({ keyName: kms.keyName, timeoutMs: 50, maxAttempts: 1 })));
+    await catchIt(
+      TransitKms.connect(opts({ keyName: kms.keyName, timeoutMs: 50, maxAttempts: 1 })),
+    );
 
     expect(errors.length).toBeGreaterThanOrEqual(6);
     expect(events.length).toBeGreaterThan(5);
@@ -520,7 +549,9 @@ describe('SS-PLAT-88: no secret ever appears in errors or logs', () => {
     const text = [
       JSON.stringify(events),
       ...errors.map((e) =>
-        e instanceof Error ? `${e.name} ${e.message} ${e.stack ?? ''} ${JSON.stringify(e)} ${String((e as { cause?: unknown }).cause)}` : String(e),
+        e instanceof Error
+          ? `${e.name} ${e.message} ${e.stack ?? ''} ${JSON.stringify(e)} ${String((e as { cause?: unknown }).cause)}`
+          : String(e),
       ),
     ].join('\n');
     for (const s of secrets) expect(text, 'leaked a secret').not.toContain(s);

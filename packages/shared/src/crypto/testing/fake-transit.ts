@@ -53,13 +53,17 @@ interface FakeKey {
   minEncryption: number;
 }
 
-export type FakeFault =
+export type FakeFault = (
   | { status: number; retryAfter?: string; errors?: string[] }
   | { hang: true }
   | { reset: true }
   | { redirect: string }
   /** A 200 whose `data` is whatever the test supplies (to prove the client validates it). */
-  | { okData: unknown };
+  | { okData: unknown }
+) & {
+  /** Apply only to a request whose path ends with this (default: the next request). */
+  only?: string;
+};
 
 export interface RecordedRequest {
   method: string;
@@ -88,7 +92,9 @@ function deriveKey(key: FakeKey, version: number, context: Buffer | undefined): 
   const v = key.versions.get(version);
   if (!v) throw new Error('no such version');
   if (!key.derived) return v.material;
-  return Buffer.from(hkdfSync('sha256', v.material, Buffer.alloc(0), context ?? Buffer.alloc(0), 32));
+  return Buffer.from(
+    hkdfSync('sha256', v.material, Buffer.alloc(0), context ?? Buffer.alloc(0), 32),
+  );
 }
 
 export class FakeTransitServer {
@@ -167,7 +173,8 @@ export class FakeTransitServer {
     const namespace = header(req, 'x-vault-namespace');
     this.requests.push({ method: req.method ?? 'GET', path: url.pathname, token, namespace, body });
 
-    const fault = this.#faults.shift();
+    const at = this.#faults.findIndex((f) => f.only === undefined || url.pathname.endsWith(f.only));
+    const fault = at >= 0 ? this.#faults.splice(at, 1)[0] : undefined;
     if (fault) {
       if ('hang' in fault) {
         this.#hung.add(res);
@@ -202,7 +209,8 @@ export class FakeTransitServer {
       return this.#error(res, 403, [TRANSIT_ERR.permissionDenied]);
     }
     const mountPrefix = `${this.#mount}/`;
-    if (!path.startsWith(mountPrefix)) return this.#error(res, 404, [`no handler for route "${path}"`]);
+    if (!path.startsWith(mountPrefix))
+      return this.#error(res, 404, [`no handler for route "${path}"`]);
     const parts = path.slice(mountPrefix.length).split('/');
     try {
       return this.#transit(req.method ?? 'GET', parts, body ?? {}, res);
@@ -263,7 +271,8 @@ export class FakeTransitServer {
       }
       return this.#ok(res, this.#keyInfo(key));
     }
-    if (method !== 'POST' || a === undefined) return this.#error(res, 405, ['unsupported operation']);
+    if (method !== 'POST' || a === undefined)
+      return this.#error(res, 405, ['unsupported operation']);
     const key = this.#need(a);
     const context = decodeOptional(body['context'], 'context');
     if (op === 'encrypt') {
@@ -328,9 +337,12 @@ export class FakeTransitServer {
 
   #encryptVersion(key: FakeKey, requested: unknown): number {
     const v = typeof requested === 'number' && requested > 0 ? requested : key.latest;
-    if (v > key.latest) throw new UserError('requested version for encryption is higher than the latest key version');
+    if (v > key.latest)
+      throw new UserError('requested version for encryption is higher than the latest key version');
     if (key.minEncryption > 0 && v < key.minEncryption) {
-      throw new UserError('requested version for encryption is less than the minimum encryption key version');
+      throw new UserError(
+        'requested version for encryption is less than the minimum encryption key version',
+      );
     }
     return v;
   }
@@ -368,7 +380,10 @@ export class FakeTransitServer {
         { authTagLength: TAG },
       );
       decipher.setAuthTag(blob.subarray(blob.length - TAG));
-      return Buffer.concat([decipher.update(blob.subarray(NONCE, blob.length - TAG)), decipher.final()]);
+      return Buffer.concat([
+        decipher.update(blob.subarray(NONCE, blob.length - TAG)),
+        decipher.final(),
+      ]);
     } catch {
       throw new UserError(TRANSIT_ERR.authFailed);
     }
@@ -419,7 +434,12 @@ export class FakeTransitServer {
     res.end(payload);
   }
 
-  #error(res: ServerResponse, status: number, errors: string[], headers: Record<string, string> = {}) {
+  #error(
+    res: ServerResponse,
+    status: number,
+    errors: string[],
+    headers: Record<string, string> = {},
+  ) {
     res.writeHead(status, { 'content-type': 'application/json', ...headers });
     res.end(JSON.stringify({ errors }));
   }
