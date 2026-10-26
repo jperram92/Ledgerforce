@@ -1441,3 +1441,59 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - Most other remaining cards wait on Draft golden postings or on these tasks.
 - Why: Product owner's instruction to build independent tasks in parallel.
 - ADR: none · Status: accepted
+
+### DL-0200 — Transit KMS binds the record through a derived key's context, stores the 60-byte body and a versioned key id (RQ-0042)
+- Date: 2026-10-26 · By: claude · Task: T-0108 · Category: security
+- Decision:
+  - `TransitKms` wraps each data key with `POST /v1/<mount>/encrypt/<key>` on an `aes256-gcm96` key created with `derived=true`.
+  - It sends `context = base64("lf-kek-transit-v1|" + record aad)` on encrypt, decrypt and rewrap, and never sends `associated_data`.
+  - `wrapped` is the 60 bytes decoded from after `vault:v<N>:`, and `keyId` is `tr.<key>.v<N>`. Both fit the existing `dek_wrapped`/`kek_id` CHECKs, so no migration is needed (0031 unused).
+  - The adapter does not use the `datakey` endpoint: the `Kms` interface and `sealField` are unchanged.
+- Why: RQ-0042 checked the source and ran experiments against OpenBao 2.7.1. Rewrap drops `associated_data` (path_rewrap.go), so AAD-bound ciphertexts cannot be re-keyed on the server. A derived context gives the same per-record binding (wrong context → 400 auth failure) and keeps rewrap working.
+- Alternatives: `associated_data` (rejected: no server-side rewrap); storing the whole `vault:v1:…` string (rejected: violates the 60-byte CHECK and needs a migration); `datakey` (no security gain; interface change).
+- ADR: ADR-0038 · Status: proposed (awaiting human)
+
+### DL-0201 — Transit transport: HTTPS-only fetch, no redirects, per-attempt timeout, retry only 429/5xx/network
+- Date: 2026-10-26 · By: claude · Task: T-0108 · Category: security
+- Decision:
+  - Node's built-in `fetch` only; the address must be `https:`.
+  - `http:` is allowed only for loopback hosts and only with `allowInsecureLoopbackHttp: true` (tests, `bao server -dev`). A private CA is given via `NODE_EXTRA_CA_CERTS`.
+  - `redirect: 'manual'`, and any 3xx is a non-retried `redirect_refused` error.
+  - Each attempt has `AbortSignal.timeout(timeoutMs)` (default 5 s).
+  - 429, 5xx, network errors and timeouts are retried up to `maxAttempts` (default 3) with exponential full-jitter backoff (base 100 ms, cap 2 s). `Retry-After` is honoured up to the cap.
+  - 4xx is never retried.
+  - Errors carry op, kind and status only; log events carry op, status, attempt, ms, outcome and reason, never values, tokens or server bodies.
+- Why: RQ-0042 Finding 9 — with the default `redirect: 'follow'`, Node forwards `X-Vault-Token` to the redirect target (experiment). Findings 6 and 8 — OpenBao docs class 500/502/503 as "try again later" and 429 as rate limit or standby, while 4xx do not change on retry. Encrypt, decrypt and rewrap are stateless, so retries are safe.
+- Alternatives: retrying 5xx only (rejected: a connection reset during failover is the most common transient); following redirects to the active node (rejected: token leak; OpenBao standbys forward requests themselves); an SDK (rejected: no new runtime dependency, ADR-0018).
+- ADR: ADR-0038 · Status: proposed (awaiting human)
+
+### DL-0202 — Transit adapter refuses to start on a key that would weaken binding or allow KEK export
+- Date: 2026-10-26 · By: claude · Task: T-0108 · Category: security
+- Decision: `TransitKms.connect` reads `GET /v1/<mount>/keys/<key>` and throws unless all of these hold: `type=aes256-gcm96`, `derived=true`, `convergent_encryption` not true, `supports_encryption` and `supports_decryption`, `exportable=false`, `allow_plaintext_backup=false`, and `latest_version ≥ 1`. The app token's minimum ACL policy (RQ-0042) has no `create` on encrypt and no rotate.
+- Why: RQ-0042 Finding 4 — `context` sent to a non-derived key is silently ignored, so a misconfigured key would lose record binding with no error. An exportable key, or a plaintext backup, lets the KEK leave OpenBao, which defeats the purpose of the adapter. Any type other than aes256-gcm96 changes the wrapped size.
+- Alternatives: a warning only (rejected: fail closed); allowing chacha20-poly1305, which is also 60 bytes (deferred: one tested type).
+- ADR: ADR-0038 · Status: proposed (awaiting human)
+
+### DL-0203 — Configuration selects the KMS (`LF_KMS_PROVIDER`); MVP boot path unchanged
+- Date: 2026-10-26 · By: claude · Task: T-0108 · Category: architecture
+- Decision: `kmsFromEnv(env)` in `@ledgerforce/shared/crypto` returns the KMS that `LF_KMS_PROVIDER` selects:
+  - `local` → `LocalKeyringKms.fromFile(LF_KMS_KEYRING_FILE)`.
+  - `transit` → `TransitKms.connect`, configured from `LF_KMS_TRANSIT_*`. Secrets come only from files: `_TOKEN_FILE`, or `_APPROLE_ROLE_ID_FILE` + `_APPROLE_SECRET_ID_FILE`.
+  - Unset → `null` (no KMS; bank-detail routes answer 503 as today).
+  - Any other value → an error.
+
+  `apps/api/src/main.ts` is not changed in T-0108; wiring it is a follow-up.
+- Why: The task requires that nothing in the MVP depends on the transit adapter and that config chooses the KMS. Keeping `main.ts` untouched leaves the MVP boot path exactly as it was.
+- Alternatives: wiring `main.ts` now (deferred: outside the card, and not needed for any MVP flow); tokens in environment variables (rejected: secrets in files, the same as the keyring, ADR-0018).
+- ADR: ADR-0038 · Status: proposed (awaiting human)
+
+### DL-0204 — Real-OpenBao integration run is opt-in (`pnpm test:openbao`), uses the pinned 2.7.1 release binary, and has no skip path
+- Date: 2026-10-26 · By: claude · Task: T-0108 · Category: tooling
+- Decision:
+  - `scripts/test/openbao.sh` downloads `openbao_2.7.1_linux_amd64.tar.gz` into `node_modules/.cache/openbao/`, pinned by SHA-256 `0e2f1ce1…2243` (checked against the release `checksums.txt`). It refuses to run on a mismatch or on any other platform.
+  - It starts `bao server -dev-tls` on loopback, creates a derived aes256-gcm96 key and an AppRole, sets `NODE_EXTRA_CA_CERTS` to the generated CA, and runs the Vitest project `openbao` (`*.openbao.itest.ts`).
+  - The project is not part of `pnpm test` or `pnpm test:db`, so the default suites never skip it. Inside the run, a missing `LF_OPENBAO_*` variable fails the test; it is never skipped.
+  - This is dev-only tooling: no package is added.
+- Why: The task asks for an optional real-server test only if the binary can be obtained legally and safely, and without Docker. OpenBao is MPL-2.0; the official release verifies against published checksums; `-dev-tls` runs in memory (RQ-0042 Finding 11). Being opt-in by command (not by a skip flag) means AGENTS.md §5 "never skip a test" holds.
+- Alternatives: building from source with Go (rejected: slow, large toolchain download); Docker image (rejected: no Docker daemon in this environment); `describe.skipIf(!env)` in the default suite (rejected: a silent skip).
+- ADR: none · Status: accepted
