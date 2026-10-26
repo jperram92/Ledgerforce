@@ -43,12 +43,11 @@ export type ManualJournalErrorCode = 'NOT_FOUND' | 'WRONG_STATUS' | 'APPROVAL_RE
 /** A workflow refusal. Engine refusals (CONTROL_ACCOUNT, UNBALANCED …) stay PostingError. */
 export class ManualJournalError extends DomainError {
   declare readonly code: ManualJournalErrorCode;
-  constructor(
-    code: ManualJournalErrorCode,
-    message: string,
-    readonly status?: ManualJournalStatus,
-  ) {
+  /** The document's status when the action was refused. */
+  readonly status: ManualJournalStatus | undefined;
+  constructor(code: ManualJournalErrorCode, message: string, status?: ManualJournalStatus) {
     super(code, message);
+    this.status = status;
   }
 }
 

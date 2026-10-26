@@ -21,6 +21,7 @@ import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
 import { PartyBankAccountsController } from './parties/bank-accounts.controller.ts';
 import { BankDetailChangesController } from './parties/bank-detail-changes.controller.ts';
+import { ManualJournalsController } from './journals/manual-journals.controller.ts';
 import type { Kms } from '@ledgerforce/shared/crypto';
 import { TenantInterceptor } from './tenancy/tenant.interceptor.ts';
 import {
@@ -73,6 +74,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   CompaniesController,
   PartyBankAccountsController,
   BankDetailChangesController,
+  ManualJournalsController,
   UserRolesController,
   SodController,
   UsersController,
@@ -102,6 +104,7 @@ class AppModule {
         CompaniesController,
         PartyBankAccountsController,
         BankDetailChangesController,
+        ManualJournalsController,
         UserRolesController,
         SodController,
         UsersController,

@@ -187,7 +187,7 @@ describe('Posting engine records the approver of a journal (RQ-0043 finding 6) [
       { approvedBy: randomUUID() },
     );
     for (const run of [preview, post] as const) {
-      const err = await f.inTenant((trx) => run(trx, c)).catch((e: unknown) => e);
+      const err = await f.inTenant((trx): Promise<unknown> => run(trx, c)).catch((e: unknown) => e);
       expect((err as PostingError).code).toBe('UNKNOWN_USER');
     }
     expect(await ledgerRows()).toEqual(before);
