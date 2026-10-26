@@ -82,6 +82,11 @@ export interface PostingLineInput {
   readonly dimensions?: readonly string[];
   readonly partyId?: string;
   readonly memo?: string;
+  /**
+   * YYYY-MM-DD; only on a line to an AR_CONTROL or AP_CONTROL account, whose open item it
+   * dates (T-0028). Default: the entry date.
+   */
+  readonly dueDate?: string;
 }
 
 export interface PostingCommand {
@@ -114,6 +119,7 @@ export interface CheckedLine {
   readonly dimensions: readonly string[];
   readonly partyId: string | undefined;
   readonly memo: string | undefined;
+  readonly dueDate: string | undefined;
 }
 
 export interface CheckedCommand {
@@ -257,6 +263,13 @@ function checkLine(l: PostingLineInput, lineNo: number): CheckedLine {
   if (l.memo !== undefined && typeof l.memo !== 'string') {
     fail('INVALID_COMMAND', 'memo must be a string', lineNo);
   }
+  if (l.dueDate !== undefined && (typeof l.dueDate !== 'string' || !validDate(l.dueDate))) {
+    fail(
+      'INVALID_COMMAND',
+      `dueDate ${JSON.stringify(l.dueDate)} is not a YYYY-MM-DD date`,
+      lineNo,
+    );
+  }
   return {
     lineNo,
     account: l.account,
@@ -270,6 +283,7 @@ function checkLine(l: PostingLineInput, lineNo: number): CheckedLine {
     dimensions,
     partyId: l.partyId,
     memo: l.memo,
+    dueDate: l.dueDate,
   };
 }
 

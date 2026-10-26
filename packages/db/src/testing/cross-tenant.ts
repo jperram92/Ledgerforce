@@ -150,6 +150,11 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     replay_id: () => '\\x01',
   },
   'app.salesforce_resync_request': { reason: () => 'replay_id_invalid' },
+  // Open items and allocations (migration 0028). Seeded rows (superuser, no tenant set) are
+  // stored as generated: an AR item of +1, an allocation of 1 with no FX difference. A row
+  // inserted by lf_app is filled and checked by triggers (prerequisites below).
+  'app.subledger_entry': { control_role: () => 'AR_CONTROL' },
+  'app.allocation': { fx_difference: () => '0' },
   // Salesforce JWT bearer connection (migration 0017): a complete sealed key and certificate facts.
   'app.salesforce_connection': {
     id: () => randomUUID(),
@@ -212,6 +217,66 @@ export const PREREQUISITES: Readonly<
   'app.bank_detail_settings': async (admin, row) => {
     await grantRole(admin, row.get('tenant_id'), row.get('set_by'), 'owner');
   },
+  // An open item is filled from its journal line, which must be on an account bound to
+  // AR_CONTROL (migration 0028): give the generated entry line 1 on the generated account and
+  // bind it (re-binding the company's AR_CONTROL if a sibling row bound another account).
+  'app.subledger_entry': async (admin, row) => {
+    const tenant = row.get('tenant_id');
+    const company = row.get('company_id');
+    const account = row.get('account_id');
+    await admin.query(
+      `UPDATE app.account SET is_control = true, postable = true, status = 'active'
+        WHERE tenant_id = $1 AND id = $2`,
+      [tenant, account],
+    );
+    await admin.query(
+      `INSERT INTO app.account_system_role (tenant_id, company_id, role, account_id)
+       VALUES ($1, $2, 'AR_CONTROL', $3)
+       ON CONFLICT (tenant_id, company_id, role) DO UPDATE SET account_id = EXCLUDED.account_id`,
+      [tenant, company, account],
+    );
+    // The company's dimension set if it has one (sets are unique per company and hash).
+    const existing = await admin.query<{ id: string }>(
+      `SELECT id::text FROM app.dimension_set WHERE tenant_id = $1 AND company_id = $2 LIMIT 1`,
+      [tenant, company],
+    );
+    const set =
+      existing.rows[0] ??
+      (await seedRow(
+        admin,
+        { schema: 'app', table: 'dimension_set', qualified: 'app.dimension_set' },
+        tenant ?? '',
+        DEFAULT_ROW_OVERRIDES,
+        1,
+        new Map([['company_id', company ?? '']]),
+      ));
+    await asReplica(admin, (q) =>
+      q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `INSERT INTO app.journal_line (tenant_id, company_id, entry_id, line_no, account_id, debit,
+                                       credit, txn_currency, txn_amount, fx_rate, dimension_set_id)
+         VALUES ($1, $2, $3, $4, $5, 1, 0, 'AAA', 1, 1, $6)`,
+        [tenant, company, row.get('entry_id'), row.get('line_no'), account, set.id],
+      ),
+    );
+  },
+  // An allocation pairs a debit item with a credit item of one account, party and currency:
+  // turn the generated "to" item into a credit on the "from" item's account (as a seed step,
+  // with triggers off; the item guard refuses such an UPDATE otherwise).
+  'app.allocation': async (admin, row) => {
+    await asReplica(admin, (q) =>
+      q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `UPDATE app.subledger_entry t
+            SET account_id = f.account_id, party_id = f.party_id, currency = f.currency,
+                document_date = f.document_date,
+                original_amount = -1, open_amount = -1, base_original_amount = -1, base_open_amount = -1
+           FROM app.subledger_entry f
+          WHERE t.tenant_id = $1 AND t.id = $2 AND f.tenant_id = $1 AND f.id = $3`,
+        [row.get('tenant_id'), row.get('to_entry_id'), row.get('from_entry_id')],
+      ),
+    );
+  },
   // A company bank account needs its GL account to be an asset of subtype bank (migration 0013).
   'app.bank_account': async (admin, row) => {
     await admin.query(`UPDATE app.account SET subtype = 'bank' WHERE tenant_id = $1 AND id = $2`, [
@@ -220,6 +285,22 @@ export const PREREQUISITES: Readonly<
     ]);
   },
 };
+
+/** Run `fn` in one transaction with triggers off (superuser seed step only; lf_app cannot). */
+async function asReplica(admin: Queryable, fn: (q: Queryable) => Promise<unknown>): Promise<void> {
+  const client = isPool(admin) ? await admin.connect() : admin;
+  try {
+    await client.query('BEGIN');
+    await client.query('SET LOCAL session_replication_role = replica');
+    await fn(client);
+    await client.query('COMMIT');
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    if (isPool(admin)) (client as pg.PoolClient).release();
+  }
+}
 
 /** Activate a generated user and give it the Finance Admin role (period permissions). */
 async function grantFinanceAdmin(
