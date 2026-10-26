@@ -278,3 +278,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26T04:56:53.864Z claude: T-0067 → verifying
 - 2026-10-26T05:04:46.411Z claude: T-0067 → in_progress
 - 2026-10-26 05:0x claude (lead): verify T-0067 FAILED (8 PASS/5 FAIL): (a) the outage db test timed out at 60 s under load, and the next test then failed on leaked state; (b) SS-UC01-02/UC11-05/UC12-05 can't be built yet (gate 9 manifest, gate 12 step 7). T-0067 is back to in_progress; the agent is fixing the test (deterministic, no timeout or assertion changes) and splitting those SS into T-0110 (DL-0205).
+- 2026-10-26T05:30:10.156Z claude: T-0028 → verifying
+- 2026-10-26T05:30:10.311Z claude: T-0067 → verifying
+- 2026-10-26T05:30:10.460Z claude: T-0108 → verifying
+- 2026-10-26T05:30:10.647Z claude: T-0094 → verifying
