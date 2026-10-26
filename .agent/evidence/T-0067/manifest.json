@@ -46,6 +46,15 @@
       "provider": "claude",
       "timestamp": "2026-10-26T04:45:42.448Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-09",
+      "file": ".agent/evidence/T-0067/20261026-053000-tests-db.json",
+      "test": "4 test(s): apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09: Salesforce outage does not block accounting | apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09 an expired token is re-signed once and the write-back goes through | apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09 a company without a Salesforce connection posts and has nothing to write back | apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09 no pg-boss instance reported an error",
+      "commit": "af03e2046880",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:19:32.394Z",
+      "result": "passed"
     }
   ]
 }

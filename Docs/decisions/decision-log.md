@@ -1566,6 +1566,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 
 - ADR: none · Status: accepted
 
+### DL-0205 — T-0067 verify fix: deterministic outage test; e2e and refund/aged-AR write-back scenarios move to T-0110
+- Date: 2026-10-26 · By: claude · Task: T-0067 · Category: scope
+- Decision:
+  - (1) `apps/worker/src/salesforce-writeback.outage.db.test.ts` moves the pg-boss TestClock only to each failed job's own `startAfter`, and no further. It awaits the worker's start and stops the worker gracefully before asserting `completed`. Each test uses its own invoice, Account and Opportunity, and asserts on the fake's requests for those records only. The re-sign test primes and revokes its own cached token. Every runtime a test starts is stopped in `afterEach`. No timeout was raised and no assertion weakened.
+  - (2) SS-UC01-02 (scratch-org e2e with screenshot), SS-UC11-05 (refund net paid) and SS-UC12-05 (aged-AR reconcile) move from T-0067 to the new card T-0110. T-0110 depends on T-0067, T-0069, T-0055 and T-0049. T-0067's step 7 (Playwright evidence) is n/a: the task has no UI, and its contract and db evidence are in the manifest.
+- Why:
+  - (1) Verify on the lead branch timed out at 60 s. `TestClock.tick` fires every due timer in order and settles pg-boss after each, so ticking 6 h of simulated time cost about 13 s of CPU per tick. The test took 7 to 31 s unloaded and more than 60 s under load. The next test depended on a token cached by that test. After the fix, test 1 takes 0.6 to 1.8 s, 10 of 10 runs pass, 3 of 3 pass while `pnpm test` and `pnpm test:db` run in parallel, and each test passes alone.
+  - (2) Those scenarios need a scratch org, refunds and aged AR, none of which exist yet. Verify gates 9 and 12 cannot pass while T-0067 lists them (DL-0191).
+- Alternatives: raise the test timeout (rejected: it hides a CPU-bound wait and the protocol forbids it). Keep the scenarios on T-0067 as blocked (rejected: T-0067's own scope is done, and blocking it would hold back T-0068, T-0069, T-0070 and T-0071, which depend on it).
+- ADR: none · Status: accepted
+
 ### DL-0206 — SS-UC10-08 subledger = control wired into trialBalanceReview (supersedes DL-0175's placeholder)
 - Date: 2026-10-26 · By: claude (lead, after the T-0028 merge) · Task: T-0076, T-0028 · Category: accounting
 - Decision: `trialBalanceReview` now calls `subledgerReconciliation({ companyId, asOf: period end })` from T-0028. For each control it reports `subledgerBalance` and `unpostedFxDifference` on the control's normal side (AP negated from the debit-positive reconciliation), and status `reconciled` or `difference` from the reconciliation (subledger = control + unposted FX, DL-0187). `subledger_not_available` remains only for a role with no reconciliation row.
@@ -1574,3 +1585,4 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - Done test-first (RED captured). 3 hand mutants killed: status always reconciled; AP side not negated; asOf dropped. The last survived until the post-period invoice was added.
 - Why: Design §10.8 item 3 and UC-10 ("AR/AP subledgers = controls"); T-0028 provided the read API (DL-0188). DL-0175 deferred this explicitly until then.
 - ADR: ADR-0035 (Proposed) · Status: accepted (DL-0175 superseded for this point)
+
