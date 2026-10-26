@@ -1425,3 +1425,19 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: At the T-0076 merge, `node --test scripts/agent/test` failed once on the main checkout. The test "a provider that is still exhausted is skipped on the next run" saw one extra `fake-success T-0002` call. Five immediate reruns, and the final round-6 tree, gave 82/82. The merged branches did not touch `scripts/`. The cause is not yet found. The test stays unchanged (no skip, no weakening). It is listed in HANDOVER for the next session to root-cause; one possibility is the second run picking T-0002 again before `--task T-0004`, depending on timing.
 - Why: "Flake" is not a root cause (AGENTS.md directive 3); the evidence must be kept rather than hidden.
 - ADR: none · Status: accepted
+
+### DL-0184 — Parallel round 7: T-0028, T-0067, T-0094, T-0108
+- Date: 2026-10-26 · By: claude (lead) · Task: T-0028, T-0067, T-0094, T-0108 · Category: process
+- Decision: Round 7 runs four tasks in worktrees branched from the round-6 head. Migrations are numbered only if needed; the lead renumbers unmerged files to keep the sequence gapless (DL-0182).
+  - T-0028 (subledger entries and allocations): migration 0028, DL-0185..0189, RQ-0039, ADR-0035, SS-PLAT-81..82. Mechanics only: open items and allocation records. A realised-FX journal on allocation is a posting behaviour that needs an Approved golden posting, so it is deferred and recorded.
+  - T-0067 (Salesforce write-back via sObject Collections): migration 0029, DL-0190..0194, RQ-0040, ADR-0036, SS-UC01-09/UC03-04/UC04-02 (existing), SS-PLAT-83..84. The contract and db parts are built; scratch-org e2e rows stay not-started.
+  - T-0094 (Docker Compose self-hosted install): migration 0030 only if needed, DL-0195..0199, RQ-0041, ADR-0037, SS-PLAT-23 (existing), SS-PLAT-85..86. There is no Docker daemon in this container, so the agent must try to run one (directive 5), or else prove what it can (compose config validation, image build files) and leave SS-PLAT-23 not proven.
+  - T-0108 (OpenBao/Vault transit KMS adapter, Phase 1, nothing in MVP depends on it): migration 0031 only if needed, DL-0200..0204, RQ-0042, ADR-0038, SS-PLAT-87..88.
+  - Lead: DL-0205+, SS-PLAT-89+.
+
+  Not in this round:
+  - T-0029 shares engine code with T-0028.
+  - T-0095 is human-only; T-0103 needs Windows.
+  - Most other remaining cards wait on Draft golden postings or on these tasks.
+- Why: Product owner's instruction to build independent tasks in parallel.
+- ADR: none · Status: accepted

@@ -1,6 +1,6 @@
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
-Task: PARALLEL ROUND 6 COMPLETE (DL-0162): T-0026, T-0064, T-0076, T-0093 merged (migrations renumbered 0026/0027, DL-0182), each verify 13 PASS/0 FAIL/3 PENDING, all in review. Next: plan round 7 (candidates T-0028 subledger, T-0029 manual journals — one engine task —, T-0067 write-back contract parts, T-0108). Known: DL-0183 run.test.ts:104 failed once unexplained — root-cause it.
+Task: PARALLEL ROUND 7 in progress (DL-0184): T-0028, T-0067, T-0094, T-0108 by sub-agents. Round 6 COMPLETE (DL-0162): T-0026, T-0064, T-0076, T-0093 in review. Next: plan round 7 (candidates T-0028 subledger, T-0029 manual journals — one engine task —, T-0067 write-back contract parts, T-0108). Known: DL-0183 run.test.ts:104 failed once unexplained — root-cause it.
 Branch: claude/app-framework-agents-dzmkya (DL-0055)   Last green commit: see `git log -1`
 Done today: Codex recovery merged; T-0010, T-0104, T-0105, T-0009 (Timeline, DL-0070), T-0014, T-0017, T-0018, T-0019, T-0020, T-0021, T-0022, T-0024, T-0036, T-0037 verified (exit 0) and in review; conductor race fixed (DL-0069).
 In progress: round 4 worktrees. Pre-assigned (DL-0128):
@@ -273,3 +273,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26T00:14:04.146Z claude: release T-0076 → review
 - 2026-10-26T00:14:04.276Z claude: release T-0093 → review
 - 2026-10-26 claude (lead): round 6 merged (T-0026, T-0064 [0027→0026], T-0076, T-0093 [0029→0027]); final tree gates green (697 unit / 815 db / 82 agent); verify 13/0/3 each → review. run.test.ts:104 failed once at the T-0076 merge, 5 reruns green (DL-0183, unexplained).
+- 2026-10-26 claude (lead): round 7 claimed (T-0028, T-0067, T-0094, T-0108; DL-0184).
