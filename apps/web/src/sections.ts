@@ -5,7 +5,11 @@
  */
 /** A page inside a section, listed on the section's page (T-0093). */
 export interface SubPage {
-  to: '/settings/users' | '/reports/control-exceptions' | '/reports/audit-log';
+  to:
+    | '/settings/users'
+    | '/reports/control-exceptions'
+    | '/reports/audit-log'
+    | '/settings/sync-issues';
   name: string;
   text: string;
 }
@@ -91,6 +95,11 @@ export const SECTIONS: readonly Section[] = [
         to: '/settings/users',
         name: 'People and roles',
         text: 'Invite people, give and remove roles, and disable people who leave.',
+      },
+      {
+        to: '/settings/sync-issues',
+        name: 'Salesforce sync issues',
+        text: 'Changes that could not be sent to Salesforce: what went wrong, and retry or ignore them.',
       },
     ],
   },
