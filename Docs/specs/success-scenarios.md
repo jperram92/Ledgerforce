@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 165 scenarios (16 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-25. Totals: 167 scenarios (16 need screenshots).
 
 ## How to update (who, when)
 
@@ -105,7 +105,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC10-05 | Hard lock rejects or redirects per policy | UC-10 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0023, T-0078 | green (period/policy layer; close checklist in T-0078) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC10-06 | Reopen needs two approvers and a reason | UC-10 | MVP | db-integration | no | — | T-0079 | not-started | — | — |
 | SS-UC10-07 | Close cannot pass with unreconciled bank | UC-10 | MVP | db-integration | no | — | T-0078 | not-started | — | — |
-| SS-UC10-08 | TB review step shows TB nets to zero | UC-10 | MVP | db-integration | no | — | T-0078, T-0076 | not-started | — | — |
+| SS-UC10-08 | TB review step shows TB nets to zero | UC-10 | MVP | db-integration | no | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts | T-0078, T-0076 | green (TB layer; subledger = control pending T-0028, DL-0175) | [.agent/evidence/T-0076/manifest.json](../../.agent/evidence/T-0076/manifest.json) | fdc062f |
 | SS-UC10-09 | Void posts a reversal, never an edit | UC-10 | MVP | golden | no | — | T-0032 | not-started | — | — |
 | SS-UC10-10 | Close checklist screen | UC-10 | MVP | e2e-playwright | yes | — | T-0090 | not-started | — | — |
 | SS-UC11-01 | Partial credit note posts GP-005 | UC-11 | MVP | golden | no | — | T-0045 | not-started | — | — |
@@ -191,6 +191,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-72 | Preview and post agree: a command preview accepts posts exactly the previewed journal, and a command post refuses is refused by preview with the same typed error (incl. unknown createdBy, override without period.lock.override, a used idempotency key → ALREADY_POSTED / IDEMPOTENCY_CONFLICT) | — | MVP | db-integration + property | no | packages/ledger/src/engine.preview.db.test.ts; packages/ledger/src/engine.preview.prop.db.test.ts | T-0026 | green | [.agent/evidence/T-0026/manifest.json](../../.agent/evidence/T-0026/manifest.json) | fa6e6a5 |
 | SS-PLAT-74 | CDC subscriber: a rejected (expired/invalid) replay id resets the cursor and requests a reconcile since the last commit, then resubscribes at LATEST; gap and overflow events are never applied but become resync requests; cursor, inbox and resync rows are per tenant and company | — | MVP | db-integration | no | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts | T-0064 | green | [.agent/evidence/T-0064/manifest.json](../../.agent/evidence/T-0064/manifest.json) | 5c70899 |
 | SS-PLAT-75 | Pub/Sub API contract: vendored proto byte-identical to the published one; CDC Avro payloads decode losslessly (BigInt longs, field bitmaps, gap/overflow kinds); idempotency keys per record; error-code trailer classified | — | MVP | contract | no | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts | T-0064 | green | [.agent/evidence/T-0064/manifest.json](../../.agent/evidence/T-0064/manifest.json) | 5c70899 |
+| SS-PLAT-76 | Trial balance, P&L and balance sheet from the ledger for any period, date range or balance-sheet date: base currency, sections by type/subtype, optional dimension filter (TB, P&L), retained earnings = prior-year P&L, current-year earnings on its own line, assets = liabilities + equity | — | MVP | unit + db-integration | no | packages/modules/reporting/src/statements.test.ts; packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts; packages/ledger/src/account-movements.db.test.ts | T-0076 | green | [.agent/evidence/T-0076/manifest.json](../../.agent/evidence/T-0076/manifest.json) | fdc062f |
+| SS-PLAT-77 | For random posted ledgers the trial balance nets to zero and matches the postings, the balance sheet balances, current-year and prior-year earnings equal the P&L, and a P&L for any range matches the postings | — | MVP | property + db-integration | no | packages/modules/reporting/src/statements.test.ts; packages/modules/reporting/src/reports.prop.db.test.ts | T-0076 | green | [.agent/evidence/T-0076/manifest.json](../../.agent/evidence/T-0076/manifest.json) | fdc062f |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -481,3 +483,11 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-75 — Pub/Sub API contract and CDC decoding
 - Phase: MVP · Layer: **contract** · Screenshot evidence: no · Task(s): T-0064
 - **Given** the vendored `pubsub_api.proto` and documented AccountChangeEvent fixtures (RQ-0036) · **When** the contract test runs · **Then** the proto's SHA-256 matches the published file, Subscribe is a bidi stream with the documented field numbers and presets, payloads decode with BigInt commit numbers and expanded field bitmaps, gap/overflow are classified, idempotency keys are per record (entity, id, commit number, sequence), and Pub/Sub errors are classified from the `error-code` trailer
+
+### SS-PLAT-76 — Trial balance, profit and loss and balance sheet
+- Phase: MVP · Layer: **unit + db-integration** · Screenshot evidence: no · Task(s): T-0076
+- **Given** postings through the engine over two fiscal years, including drafts, another company, a foreign-currency line and dimension values · **When** the trial balance (date range, optional dimension filter), the P&L (range) and the balance sheet (date) are run · **Then** amounts are in base currency; whole periods come from account_balance and cut periods from posted lines; drafts and other companies are left out; the TB shows each account's net balance on its side and its totals; the P&L groups revenue and expenses by subtype; the BS shows prior-year profit in retained earnings and the year to date on the current-year earnings line, both computed, and balances (also after an optional closing entry); bad dates, unknown companies and dates without a fiscal year are refused
+
+### SS-PLAT-77 — Report invariants over random ledgers
+- Phase: MVP · Layer: **property + db-integration** · Screenshot evidence: no · Task(s): T-0076
+- **Given** random balanced entries posted through the engine on random days of FY2026–FY2027 · **When** the TB to a random date, the BS at a random date and the P&L for a random range are run · **Then** the TB nets to zero and equals a model of the postings; the BS balances, its current-year earnings equal the model's profit for the year to date and its prior-year earnings the profit before; the P&L equals the model's profit for the range
