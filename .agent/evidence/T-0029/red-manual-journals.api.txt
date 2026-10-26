@@ -1,0 +1,158 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a8c111121651182b1
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44325
+ ❯ |api-db| apps/api/src/journals/manual-journals.db.test.ts (8 tests | 7 failed) 878ms
+     × SS-PLAT-90 creating needs gl.journal.post and an Idempotency-Key; a repeat returns the same draft 59ms
+     × SS-PLAT-90 submit above the threshold needs approval; posting before it is 409 approval_required 6ms
+     × SS-PLAT-90 an Approver approves without step-up; the entry posts once with approved_by; a repeat replays 4ms
+     × SS-PLAT-90 an Owner who submitted a journal needing approval cannot approve it: SOD_JOURNAL_SELF_APPROVAL 3ms
+     × SS-PLAT-90 below the threshold on ordinary accounts the preparer posts without approval 4ms
+     × SS-PLAT-90 small-team mode: the only user approves their own journal with a recorded exception 4ms
+     × SS-PLAT-07 a manual journal with an AR_CONTROL line is refused with CONTROL_ACCOUNT at submit and never posts 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/journals/manual-journals.db.test.ts > SS-PLAT-90: Manual journal routes enforce permission, approval and SoD > SS-PLAT-90 creating needs gl.journal.post and an Idempotency-Key; a repeat returns the same draft
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/journals/manual-journals.db.test.ts:160:26
+    158|       'idempotency-key': 'clerk-1',
+    159|     });
+    160|     expect(clerk.status).toBe(403);
+       |                          ^
+    161|     expect(await clerk.json()).toEqual({ error: 'forbidden', permissio…
+    162|     const noKey = await call('POST', '/manual-journals', 'accountant',…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  |api-db| apps/api/src/journals/manual-journals.db.test.ts > SS-PLAT-90: Manual journal routes enforce permission, approval and SoD > SS-PLAT-90 submit above the threshold needs approval; posting before it is 409 approval_required
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/journals/manual-journals.db.test.ts:205:22
+    203|   it('SS-PLAT-90 submit above the threshold needs approval; posting be…
+    204|     const s = await call('POST', `/manual-journals/${id}/submit`, 'acc…
+    205|     expect(s.status).toBe(200);
+       |                      ^
+    206|     expect(await s.json()).toEqual({
+    207|       id,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  |api-db| apps/api/src/journals/manual-journals.db.test.ts > SS-PLAT-90: Manual journal routes enforce permission, approval and SoD > SS-PLAT-90 an Approver approves without step-up; the entry posts once with approved_by; a repeat replays
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/journals/manual-journals.db.test.ts:224:22
+    222|   it('SS-PLAT-90 an Approver approves without step-up; the entry posts…
+    223|     const a = await call('POST', `/manual-journals/${id}/approve`, 'ap…
+    224|     expect(a.status).toBe(200);
+       |                      ^
+    225|     expect(await a.json()).toEqual({ id, status: 'approved' });
+    226|     const p = await call('POST', `/manual-journals/${id}/post`, 'accou…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  |api-db| apps/api/src/journals/manual-journals.db.test.ts > SS-PLAT-90: Manual journal routes enforce permission, approval and SoD > SS-PLAT-90 an Owner who submitted a journal needing approval cannot approve it: SOD_JOURNAL_SELF_APPROVAL
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ create apps/api/src/journals/manual-journals.db.test.ts:79:22
+     77|     'idempotency-key': `mj-test-${String(keyNo)}`,
+     78|   });
+     79|   expect(res.status).toBe(201);
+       |                      ^
+     80|   return ((await res.json()) as { id: string }).id;
+     81| }
+ ❯ apps/api/src/journals/manual-journals.db.test.ts:262:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  |api-db| apps/api/src/journals/manual-journals.db.test.ts > SS-PLAT-90: Manual journal routes enforce permission, approval and SoD > SS-PLAT-90 below the threshold on ordinary accounts the preparer posts without approval
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ create apps/api/src/journals/manual-journals.db.test.ts:79:22
+     77|     'idempotency-key': `mj-test-${String(keyNo)}`,
+     78|   });
+     79|   expect(res.status).toBe(201);
+       |                      ^
+     80|   return ((await res.json()) as { id: string }).id;
+     81| }
+ ❯ apps/api/src/journals/manual-journals.db.test.ts:288:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  |api-db| apps/api/src/journals/manual-journals.db.test.ts > SS-PLAT-90: Manual journal routes enforce permission, approval and SoD > SS-PLAT-90 small-team mode: the only user approves their own journal with a recorded exception
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ create apps/api/src/journals/manual-journals.db.test.ts:79:22
+     77|     'idempotency-key': `mj-test-${String(keyNo)}`,
+     78|   });
+     79|   expect(res.status).toBe(201);
+       |                      ^
+     80|   return ((await res.json()) as { id: string }).id;
+     81| }
+ ❯ apps/api/src/journals/manual-journals.db.test.ts:297:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  |api-db| apps/api/src/journals/manual-journals.db.test.ts > SS-PLAT-07: Control accounts reject manual journals, imports and rule lines (API) > SS-PLAT-07 a manual journal with an AR_CONTROL line is refused with CONTROL_ACCOUNT at submit and never posts
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ create apps/api/src/journals/manual-journals.db.test.ts:79:22
+     77|     'idempotency-key': `mj-test-${String(keyNo)}`,
+     78|   });
+     79|   expect(res.status).toBe(201);
+       |                      ^
+     80|   return ((await res.json()) as { id: string }).id;
+     81| }
+ ❯ apps/api/src/journals/manual-journals.db.test.ts:335:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 1 passed (8)
+   Start at  10:02:57
+   Duration  4.11s (transform 1.46s, setup 0ms, import 2.08s, tests 878ms, environment 0ms)
+

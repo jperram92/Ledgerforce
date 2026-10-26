@@ -101,6 +101,11 @@ export interface PostingCommand {
   readonly memo?: string;
   /** The posting user (app_user id). Required with periodOverride. */
   readonly createdBy?: string;
+  /**
+   * The user who approved the document (app_user id), e.g. a manual journal above the approval
+   * threshold (T-0029). Written to journal_entry.approved_by; the document enforces the approval.
+   */
+  readonly approvedBy?: string;
   /** Post into a period whose cell is "override"; createdBy must hold period.lock.override. */
   readonly periodOverride?: { readonly reason: string };
   readonly lines: readonly PostingLineInput[];
@@ -316,6 +321,7 @@ export function checkCommand(command: PostingCommand): CheckedCommand {
   }
   checkUuid(command.companyId ?? null, 'companyId');
   checkUuid(command.createdBy, 'createdBy');
+  checkUuid(command.approvedBy, 'approvedBy');
   const cls = sourceClassOf(command.sourceType);
   if (cls === undefined) {
     fail(

@@ -22,7 +22,8 @@
  * Open items (T-0028, RQ-0039): every line on an AR_CONTROL or AP_CONTROL account gets one
  * subledger_entry, built in step 4 (BuiltEntry.subledgerItems, so preview shows them) and
  * written in step 6 after the lines; the database fills it from its line (migration 0028).
- * Not here yet: approvals, event posting rules (golden postings Draft).
+ * Approvals are the documents' business (manual journals, T-0029); the engine records the
+ * approver it is given (approved_by). Not here yet: event posting rules (golden postings Draft).
  */
 import type { Database } from '@ledgerforce/db';
 import { sql, type Transaction } from 'kysely';
@@ -94,6 +95,8 @@ export interface BuiltEntry {
   memo: string | null;
   idempotencyKey: string;
   createdBy: string | null;
+  /** The approver of the document (T-0029); null when it needed none. */
+  approvedBy: string | null;
   numberSeries: string;
   lines: BuiltLine[];
   total: string;
@@ -180,14 +183,17 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
   const base = company.base_currency;
 
   // The created_by foreign key, checked before the write (T-0026: preview must refuse it too).
+  // So is approved_by (T-0029).
   const createdBy = c.createdBy === undefined ? null : lc(c.createdBy);
-  if (createdBy !== null) {
+  const approvedBy = c.approvedBy === undefined ? null : lc(c.approvedBy);
+  for (const userId of [createdBy, approvedBy]) {
+    if (userId === null) continue;
     const user = await trx
       .selectFrom('app.app_user')
       .select('id')
-      .where('id', '=', createdBy)
+      .where('id', '=', userId)
       .executeTakeFirst();
-    if (!user) fail('UNKNOWN_USER', `user ${createdBy} is not a user of this tenant`);
+    if (!user) fail('UNKNOWN_USER', `user ${userId} is not a user of this tenant`);
   }
 
   // Resolve system roles to the company's bound accounts.
@@ -436,6 +442,7 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     memo,
     idempotencyKey: c.idempotencyKey,
     createdBy,
+    approvedBy,
     numberSeries,
     lines,
     total: checked.total,
@@ -540,6 +547,7 @@ async function write(
         idempotency_key: built.idempotencyKey,
         memo: built.memo,
         created_by: built.createdBy,
+        approved_by: built.approvedBy,
         posted_at: sql<Date>`now()`,
       })
       .returning('id')

@@ -71,6 +71,12 @@ importers:
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@ledgerforce/journals':
+        specifier: workspace:*
+        version: link:../../packages/modules/journals
+      '@ledgerforce/ledger':
+        specifier: workspace:*
+        version: link:../../packages/ledger
       '@ledgerforce/parties':
         specifier: workspace:*
         version: link:../../packages/modules/parties
@@ -102,6 +108,9 @@ importers:
         specifier: 7.8.2
         version: 7.8.2
     devDependencies:
+      '@ledgerforce/gl':
+        specifier: workspace:*
+        version: link:../../packages/modules/gl
       '@nestjs/testing':
         specifier: 12.1.2
         version: 12.1.2(@nestjs/common@12.1.2(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.1.2)(@nestjs/platform-express@12.1.2)
@@ -331,6 +340,31 @@ importers:
         specifier: 0.29.7
         version: 0.29.7
     devDependencies:
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.5(@types/node@22.20.5)(yaml@2.9.1))
+
+  packages/modules/journals:
+    dependencies:
+      '@ledgerforce/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@ledgerforce/ledger':
+        specifier: workspace:*
+        version: link:../../ledger
+      '@ledgerforce/shared':
+        specifier: workspace:*
+        version: link:../../shared
+      kysely:
+        specifier: 0.29.7
+        version: 0.29.7
+    devDependencies:
+      '@ledgerforce/gl':
+        specifier: workspace:*
+        version: link:../gl
       '@types/node':
         specifier: 22.20.5
         version: 22.20.5
