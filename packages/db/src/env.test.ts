@@ -53,7 +53,11 @@ describe('SS-PLAT-86 secrets from env or file', () => {
 describe('SS-PLAT-86 database URL per role', () => {
   it('SS-PLAT-86 composes host, port, database, role and the URL-encoded password file', () => {
     const url = databaseUrlFromEnv(
-      { LF_DB_HOST: 'postgres', LF_DB_NAME: 'ledgerforce', LF_APP_DB_PASSWORD_FILE: '/run/secrets/odd' },
+      {
+        LF_DB_HOST: 'postgres',
+        LF_DB_NAME: 'ledgerforce',
+        LF_APP_DB_PASSWORD_FILE: '/run/secrets/odd',
+      },
       'lf_app',
       readFile,
     );
@@ -80,7 +84,12 @@ describe('SS-PLAT-86 database URL per role', () => {
         readFile,
       ),
     );
-    expect([u.username, u.password, u.port, u.pathname]).toEqual(['lf_migrator', 'm-pw', '6543', '/lf']);
+    expect([u.username, u.password, u.port, u.pathname]).toEqual([
+      'lf_migrator',
+      'm-pw',
+      '6543',
+      '/lf',
+    ]);
   });
 
   it('SS-PLAT-86 accepts a full URL only when it names the expected role', () => {
@@ -107,6 +116,12 @@ describe('SS-PLAT-86 database URL per role', () => {
     expect(() => databaseUrlFromEnv({ LF_DB_HOST: 'h' }, 'lf_app', readFile)).toThrow(
       /LF_APP_DB_PASSWORD or LF_APP_DB_PASSWORD_FILE is required/,
     );
-    expect(() => databaseUrlFromEnv({ LF_DB_HOST: 'h', LF_DB_PORT: '0x10', LF_APP_DB_PASSWORD: 'p' }, 'lf_app', readFile)).toThrow(/LF_DB_PORT/);
+    expect(() =>
+      databaseUrlFromEnv(
+        { LF_DB_HOST: 'h', LF_DB_PORT: '0x10', LF_APP_DB_PASSWORD: 'p' },
+        'lf_app',
+        readFile,
+      ),
+    ).toThrow(/LF_DB_PORT/);
   });
 });

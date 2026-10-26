@@ -88,7 +88,9 @@ describe('SS-PLAT-86 one origin: SPA, API and IdP routes through nginx', () => {
   it('SS-PLAT-86 the SPA falls back to index.html and sends basic security headers', () => {
     expect(conf).toMatch(/try_files \$uri \/index\.html;/);
     expect(conf).toMatch(/add_header X-Content-Type-Options "nosniff" always;/);
-    expect(conf).toMatch(/add_header Content-Security-Policy "[^"]*frame-ancestors 'none'[^"]*" always;/);
+    expect(conf).toMatch(
+      /add_header Content-Security-Policy "[^"]*frame-ancestors 'none'[^"]*" always;/,
+    );
     expect(conf).toMatch(/listen \$\{NGINX_PORT\};/);
   });
 });

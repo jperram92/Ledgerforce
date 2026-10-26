@@ -12,7 +12,13 @@ import { randomBytes } from 'node:crypto';
 import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
 import { OUTBOX_QUEUE } from '@ledgerforce/outbox';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { assertRole, oneTimePassword, runSetup, type IdentityAdmin, type SetupOptions } from './setup.ts';
+import {
+  assertRole,
+  oneTimePassword,
+  runSetup,
+  type IdentityAdmin,
+  type SetupOptions,
+} from './setup.ts';
 
 const MIGRATIONS = readdirSync(
   resolve(import.meta.dirname, '..', '..', '..', '..', 'packages', 'db', 'migrations'),
@@ -80,9 +86,9 @@ describe('SS-PLAT-85 first-start setup', () => {
       u.username = role;
       u.password = pw;
       await expect(assertRole(u.href, role)).rejects.toThrow(/BYPASSRLS/);
-      await expect(assertRole(tdb.url('superuser'), new URL(tdb.url('superuser')).username)).rejects.toThrow(
-        /superuser/i,
-      );
+      await expect(
+        assertRole(tdb.url('superuser'), new URL(tdb.url('superuser')).username),
+      ).rejects.toThrow(/superuser/i);
       await expect(assertRole(tdb.url('lf_app'), 'lf_app')).resolves.toBeUndefined();
     } finally {
       await tdb.admin.query(`DROP ROLE ${role}`);
@@ -101,7 +107,9 @@ describe('SS-PLAT-85 first-start setup', () => {
       `SELECT DISTINCT tableowner AS owner FROM pg_tables WHERE schemaname IN ('app','audit','pgboss')`,
     );
     expect(owners.rows.map((r) => r.owner)).toEqual(['lf_migrator']);
-    const q = await tdb.admin.query(`SELECT name FROM pgboss.queue WHERE name = $1`, [OUTBOX_QUEUE]);
+    const q = await tdb.admin.query(`SELECT name FROM pgboss.queue WHERE name = $1`, [
+      OUTBOX_QUEUE,
+    ]);
     expect(q.rowCount).toBe(1);
 
     const t = await tdb.admin.query<{ id: string; name: string; status: string }>(
@@ -142,7 +150,9 @@ describe('SS-PLAT-85 first-start setup', () => {
     expect(idp.passwords).toHaveLength(1);
     const pw = idp.passwords[0]?.password ?? '';
     expect(idp.passwords[0]?.subject).toBe('kc-1');
-    expect(out).toContain('Owner setup link: http://ledgerforce.localhost:8080/t/harbour-co/auth/login');
+    expect(out).toContain(
+      'Owner setup link: http://ledgerforce.localhost:8080/t/harbour-co/auth/login',
+    );
     expect(out).toContain('Sign in as: owner@example.test');
     expect(out).toContain(`One-time password: ${pw}`);
     expect(out).toMatch(/authenticator app/);
@@ -185,7 +195,9 @@ describe('SS-PLAT-85 first-start setup', () => {
   });
 
   it('SS-PLAT-85 refuses bad input before touching anything', async () => {
-    await expect(run({ tenant: { slug: 'Bad Slug!', name: 'x' } })).rejects.toThrow(/LF_TENANT_SLUG/);
+    await expect(run({ tenant: { slug: 'Bad Slug!', name: 'x' } })).rejects.toThrow(
+      /LF_TENANT_SLUG/,
+    );
     await expect(run({ owner: { email: 'not-an-email', displayName: 'x' } })).rejects.toThrow(
       /LF_OWNER_EMAIL/,
     );
@@ -203,5 +215,4 @@ describe('SS-PLAT-85 one-time password', () => {
     }
     expect(seen.size).toBe(200);
   });
-
 });

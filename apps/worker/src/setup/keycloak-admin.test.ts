@@ -50,7 +50,10 @@ function route(s: Seen): Reply {
     users.push({ id, username: b.username });
     return { status: 201, headers: { location: `${base}/admin/realms/ledgerforce/users/${id}` } };
   }
-  if (s.method === 'PUT' && /^\/admin\/realms\/ledgerforce\/users\/[^/]+(\/reset-password)?$/.test(s.url)) {
+  if (
+    s.method === 'PUT' &&
+    /^\/admin\/realms\/ledgerforce\/users\/[^/]+(\/reset-password)?$/.test(s.url)
+  ) {
     return { status: 204 };
   }
   return { status: 404, body: { error: 'not stubbed' } };
@@ -150,9 +153,7 @@ describe('SS-PLAT-85 Keycloak admin client for the first Owner', () => {
   });
 
   it('SS-PLAT-85 refuses a subject that is not a UUID (no path injection)', async () => {
-    await expect(admin().setOneTimePassword('../../x', 'pw-1234567890')).rejects.toThrow(
-      /subject/,
-    );
+    await expect(admin().setOneTimePassword('../../x', 'pw-1234567890')).rejects.toThrow(/subject/);
     expect(seen).toEqual([]);
   });
 

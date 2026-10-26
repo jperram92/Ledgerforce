@@ -105,8 +105,12 @@ describe('SS-PLAT-86 API configuration from the environment', () => {
   });
 
   it('SS-PLAT-86 without an issuer the API runs with sessions but no login routes', () => {
-    const { LF_OIDC_ISSUER: _i, LF_OIDC_CLIENT_ID: _c, LF_OIDC_CLIENT_SECRET_FILE: _s, ...rest } =
-      base;
+    const {
+      LF_OIDC_ISSUER: _i,
+      LF_OIDC_CLIENT_ID: _c,
+      LF_OIDC_CLIENT_SECRET_FILE: _s,
+      ...rest
+    } = base;
     const o = apiOptionsFromEnv(rest, readFile);
     expect(o.oidc).toBeUndefined();
     expect(o.sessions).toEqual({});
