@@ -255,3 +255,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-25 23:4x claude (lead): all four round-6 agents stopped by the usage limit (~20:0x); their WIP commits are on the feat/T-0026, T-0064, T-0076, T-0093 branches; resumed after the reset.
 - 2026-10-25T23:48:29.073Z claude: T-0026 → verifying
 - 2026-10-25T23:52:22.104Z claude: release T-0026 → review
+- 2026-10-26T00:04:36.583Z claude: T-0064 → verifying
+- 2026-10-26T00:04:36.696Z claude: T-0076 → verifying
+- 2026-10-26T00:04:36.840Z claude: T-0093 → verifying
