@@ -16,6 +16,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run --project unit --project ui --project web --project api-unit",
     "test:db": "vitest run --project db --project api-db",
+    "test:openbao": "bash scripts/test/openbao.sh",
     "test:e2e": "playwright test",
     "test:all": "pnpm test && pnpm test:db && pnpm test:e2e",
     "evidence:tests": "node packages/testing/src/evidence/record-tests.ts"

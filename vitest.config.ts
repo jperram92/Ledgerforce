@@ -10,6 +10,9 @@ import { defineConfig } from 'vitest/config';
  *            starts one throw-away cluster (Testcontainers when Docker is reachable, else a
  *            local initdb/pg_ctl cluster — DL-0007) and every test file creates its own
  *            database inside it. See packages/db/README.md.
+ *  - `openbao`: opt-in run of the transit KMS adapter against a real, pinned OpenBao
+ *            (`pnpm test:openbao` → scripts/test/openbao.sh; T-0108, DL-0204). Never part of
+ *            `pnpm test` or `pnpm test:db`; its files fail, not skip, without the server.
  */
 export default defineConfig({
   test: {
@@ -87,6 +90,15 @@ export default defineConfig({
           globalSetup: ['packages/db/src/testing/global-setup.ts'],
           testTimeout: 60_000,
           hookTimeout: 120_000,
+        },
+      },
+      {
+        test: {
+          name: 'openbao',
+          include: ['packages/*/src/**/*.openbao.itest.ts'],
+          exclude: ['**/node_modules/**', '**/dist/**'],
+          environment: 'node',
+          testTimeout: 30_000,
         },
       },
     ],
