@@ -164,7 +164,7 @@ graph LR
 | [T-0111](T-0111.md) | LWC Account component: scratch-org e2e with screenshot (sales rep sees the money) | MVP | todo | T-0072, T-0110 | UC-12 | 1 |
 | [T-0070](T-0070.md) | Nightly reconciliation with Salesforce | MVP | todo | T-0066, T-0067 | — | 1 |
 | [T-0071](T-0071.md) | Sync issues inbox, retry/backoff and API-limit throttling | MVP | todo | T-0067 | — | 1 |
-| [T-0072](T-0072.md) | LWC Account component (balance, overdue, last payment, 5 recent invoices) | MVP | todo | T-0067, T-0062 | UC-12 | 3 |
+| [T-0072](T-0072.md) | LWC Account component (balance, overdue, last payment, 5 recent invoices) | MVP | review | T-0067, T-0062 | UC-12 | 3 |
 | [T-0073](T-0073.md) | Stripe payment links on invoices | MVP | todo | T-0042 | UC-03 | 1 |
 | [T-0074](T-0074.md) | Stripe webhooks (signed, replay-protected) → receipt into clearing | MVP | todo | T-0073, T-0046, T-0031 | UC-03, UC-11 | 5 |
 | [T-0075](T-0075.md) | Stripe payout reconciliation (net settlement, fees, GST on fees) | MVP | todo | T-0074, T-0060, T-0031 | UC-03 | 2 |
