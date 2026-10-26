@@ -334,3 +334,5 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26 claude (lead): round 8 merged (T-0072, T-0029, T-0071); final tree gates green (845 unit + LWC Jest / 916 db / 82 agent); verify 13/0/3 each (T-0072 after ticking its n/a evidence step) → review. No further claimable tasks: the backlog waits on T-0007 golden postings (human) and the Codex cross-reviews.
 - 2026-10-26 claude (lead): correction — T-0082 and T-0092 became claimable once T-0029/T-0071 merged; round 9 claimed (DL-0224).
 - 2026-10-26 14:4x claude (lead): both round-9 agents stopped by the usage limit (~11:3x); T-0082 has 1 commit, T-0092 uncommitted work only (kept in its worktree); resumed after the reset.
+- 2026-10-26T15:08:42.545Z claude: T-0082 → verifying
+- 2026-10-26T15:08:42.691Z claude: T-0092 → verifying
