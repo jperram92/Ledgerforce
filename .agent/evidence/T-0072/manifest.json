@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0072",
+  "entries": [
+    {
+      "scenario": "SS-UC12-01",
+      "file": ".agent/evidence/T-0072/20261026-100301-tests-lwc-jest.json",
+      "test": "4 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-a38b179e9ef478654/salesforce/force-app/main/default/lwc/lfAccountSummary/__tests__/lfAccountSummary.test.js › SS-UC12-01: Component renders balance, overdue, last payment, 5 invoices › SS-UC12-01: shows balance due, overdue amount, last payment and the 5 most recent of 7 invoices | /home/user/Ledgerforce/.claude/worktrees/agent-a38b179e9ef478654/salesforce/force-app/main/default/lwc/lfAccountSummary/__tests__/lfAccountSummary.test.js › SS-UC12-01: Component renders balance, overdue, last payment, 5 invoices › SS-UC12-01: asks UI API for the five newest invoices by issue date, sorted on the server | /home/user/Ledgerforce/.claude/worktrees/agent-a38b179e9ef478654/salesforce/force-app/main/default/lwc/lfAccountSummary/__tests__/lfAccountSummary.test.js › SS-UC12-01: Component renders balance, overdue, last payment, 5 invoices › SS-UC12-01: money without a displayValue is formatted by lightning-formatted-number, never computed | /home/user/Ledgerforce/.claude/worktrees/agent-a38b179e9ef478654/salesforce/force-app/main/default/lwc/lfAccountSummary/__tests__/lfAccountSummary.test.js › SS-UC12-01: Component renders balance, overdue, last payment, 5 invoices › SS-UC12-01: table is accessible (caption, column headers, row header per invoice)",
+      "commit": "6df7df2f0442",
+      "provider": "claude",
+      "timestamp": "2026-10-26T10:03:01.541Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC12-03",
+      "file": ".agent/evidence/T-0072/20261026-100301-tests-lwc-jest.json",
+      "test": "1 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-a38b179e9ef478654/salesforce/force-app/main/default/lwc/lfAccountSummary/__tests__/lfAccountSummary.test.js › SS-UC12-03: Empty state with no invoices › SS-UC12-03: an Account without invoices shows the empty state and no table",
+      "commit": "6df7df2f0442",
+      "provider": "claude",
+      "timestamp": "2026-10-26T10:03:01.541Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC12-01",
+      "file": ".agent/evidence/T-0072/20261026-100301-mutation-checks.txt",
+      "test": "hand mutation check of lfAccountSummary (12 mutants, pnpm test:lwc per mutant): all killed",
+      "commit": "6df7df2f0442",
+      "provider": "claude",
+      "timestamp": "2026-10-26T10:03:01.541Z",
+      "result": "passed"
+    }
+  ]
+}

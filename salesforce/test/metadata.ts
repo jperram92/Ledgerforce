@@ -39,6 +39,8 @@ export interface LoadedPackage {
   objects: Map<string, ObjectMeta>;
   permissionSets: Map<string, XmlElement>;
   customPermissions: Set<string>;
+  /** Lightning web component bundles by name (`lwc/<name>/<name>.js-meta.xml`, T-0072). */
+  lwcBundles: Map<string, XmlElement>;
 }
 
 /** Suffix → expected root element, for every metadata kind the package may contain. */
@@ -49,6 +51,7 @@ const KINDS: [suffix: string, root: string][] = [
   ['.permissionset-meta.xml', 'PermissionSet'],
   ['.customPermission-meta.xml', 'CustomPermission'],
   ['.cls-meta.xml', 'ApexClass'],
+  ['.js-meta.xml', 'LightningComponentBundle'],
 ];
 
 const SKIP_DIRS = new Set(['node_modules', '.sf', '.sfdx', 'test']);
@@ -72,6 +75,7 @@ export async function loadPackage(root: string): Promise<LoadedPackage> {
     objects: new Map(),
     permissionSets: new Map(),
     customPermissions: new Set(),
+    lwcBundles: new Map(),
   };
   const objectOf = (name: string): ObjectMeta => {
     let o = pkg.objects.get(name);
@@ -123,6 +127,12 @@ export async function loadPackage(root: string): Promise<LoadedPackage> {
       pkg.customPermissions.add(componentName);
     } else if (kindDir === 'classes' && expectedRoot === 'ApexClass') {
       // Apex classes: checked through allFiles and the apiVersion rule.
+    } else if (kindDir === 'lwc' && expectedRoot === 'LightningComponentBundle') {
+      // force-app/main/default/lwc/<bundle>/<bundle>.js-meta.xml
+      if (parts.length !== 6 || parts[4] !== componentName) {
+        throw new Error(`LWC metadata misplaced: ${path}`);
+      }
+      pkg.lwcBundles.set(componentName, xml);
     } else {
       throw new Error(`file in the wrong folder for its kind: ${path}`);
     }

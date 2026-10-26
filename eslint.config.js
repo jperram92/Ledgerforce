@@ -32,9 +32,11 @@ export default tseslint.config(
       'scripts/agent/**',
       // Sub-agent git worktrees are separate checkouts on their own branches (DL-0081).
       '.claude/worktrees/**',
-      // Salesforce metadata (XML, Apex) is not ours to lint; its offline contract tests are (DL-0094).
+      // Salesforce metadata (XML, Apex) is not ours to lint; its offline contract tests are
+      // (DL-0094), and so is the Lightning web component JavaScript (T-0072, DL-0220).
       'salesforce/*',
       '!salesforce/test/',
+      '!salesforce/force-app/',
     ],
   },
   js.configs.recommended,
@@ -99,6 +101,20 @@ export default tseslint.config(
     // The web app runs in the browser (T-0081); its Vite config runs in Node.
     files: ['apps/web/src/**/*.{ts,tsx}'],
     languageOptions: { globals: { ...globals.browser } },
+  },
+  {
+    // Lightning web components (T-0072, DL-0220) run in the browser and only display mirrored
+    // money: number conversions are banned there too. The TypeScript parser reads the LWC
+    // decorators (@api, @wire); espree does not.
+    files: ['salesforce/force-app/**/lwc/**/*.js'],
+    languageOptions: { globals: { ...globals.browser } },
+    rules: { 'lf/no-float-money': ['error', { banNumberConversion: true }] },
+  },
+  {
+    // LWC Jest specs (sfdx-lwc-jest): Jest globals, and fixtures loaded with require().
+    files: ['salesforce/force-app/**/lwc/**/__tests__/**/*.js'],
+    languageOptions: { globals: { ...globals.jest, ...globals.node } },
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
   },
   {
     files: ['tests/e2e/**/*.ts', 'playwright.config.ts'],

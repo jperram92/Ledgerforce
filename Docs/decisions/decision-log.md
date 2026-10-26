@@ -1634,6 +1634,40 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Product owner's parallel-build instruction; AGENTS.md §6 golden-postings human gate.
 - ADR: none · Status: accepted
 
+### DL-0218 — Dev dependency @salesforce/sfdx-lwc-jest 7.9.0 (pinned) for LWC Jest tests
+- Date: 2026-10-26 · By: claude · Task: T-0072 · Category: tooling
+- Decision: Add `@salesforce/sfdx-lwc-jest` 7.9.0 (exact pin, published 2026-04-01) as a root dev dependency. It brings Jest 29.7.0, the LWC compiler/transformer and the `lightning/*` stubs and LDS test wire adapters. `salesforce/jest.config.cjs` reuses its config and limits `testMatch` to `force-app/**/lwc/**/__tests__/**/*.test.js` (the `salesforce/test/*.test.ts` files stay Vitest). New script `pnpm test:lwc` (`cd salesforce && sfdx-lwc-jest -- --ci`).
+- Why: RQ-0045 Q5. LWC templates need the LWC compiler and Salesforce's stubs; sfdx-lwc-jest is the vendor's supported harness. 8.0.0 (2026-06-26) was tried first and rejected by experiment: its resolver maps `lwc` to `@lwc/engine-dom` 9.3.4's ESM `dist/index.js`, which Jest 29 cannot load ("Unexpected token 'export'") without patching its transform rules. 7.9.0 uses engine-dom 8.28.2 (CJS main) and works unmodified. `pnpm audit` and `pnpm audit --prod` are clean.
+- Alternatives: 8.0.0 plus a custom `transformIgnorePatterns` for `@lwc/engine-dom` (rejected: works around the vendor's harness; revisit when a fixed 8.x ships); run LWC under Vitest with a hand-built compiler plugin (rejected: rebuilds sfdx-lwc-jest).
+- ADR: none (dev-only) · Status: accepted
+
+### DL-0219 — UC-12 component is pure LWC on Lightning Data Service; money shown from displayValue
+- Date: 2026-10-26 · By: claude · Task: T-0072 · Category: architecture
+- Decision: `lfAccountSummary` uses two read wires and no Apex. `getRecord` reads the Account fields (`LF_Balance_Due__c`, `LF_Overdue_Amount__c`, `LF_Last_Payment_Date__c`, `LF_Credit_Status__c`) through `@salesforce/schema` imports. `getRelatedListRecords` reads `LF_Invoices__r` with `pageSize: 5` and `sortBy: ['-LF_Invoice__c.LF_Issue_Date__c']`; UI API sorts and pages on the server, the browser does neither. Money is shown as UI API's server-formatted `displayValue`; without one, `lightning-formatted-number` (currency) formats the raw value. Dates without a `displayValue` go to `lightning-formatted-date-time` in UTC. A null mirror shows "—", never 0. Either wire error shows an alert and no partial money. An offline contract test pins that every LF field read is readable and not editable in `LF_Read_Only`, and that the component imports only the read adapters.
+- Why: RQ-0045 Q1–Q4. LDS enforces CRUD, FLS and sharing for the user. Apex would have to enforce them itself and would need an org-only test class. Displaying server strings keeps floating-point money out of the browser (AGENTS.md §4).
+- Alternatives: Apex `@AuraEnabled(cacheable=true)` with `WITH USER_MODE` (rejected: more code, untestable here, no gain); `optionalFields` for the Account fields (rejected: a missing grant would silently hide the balance instead of saying so).
+- ADR: none (ADR-0041 not needed: no data model, contract or runtime-dependency change) · Status: accepted
+
+### DL-0220 — LWC JavaScript and templates are linted and formatted
+- Date: 2026-10-26 · By: claude · Task: T-0072 · Category: tooling
+- Decision: ESLint now lints `salesforce/force-app/**` JavaScript (`!salesforce/force-app/` in the ignores). LWC files get browser globals and `lf/no-float-money` with `banNumberConversion: true`; LWC Jest specs get Jest and Node globals and may `require()` fixtures. The TypeScript parser reads the `@api`/`@wire` decorators. Prettier now formats `salesforce/force-app/**` except XML; templates use Prettier's `lwc` parser (`.prettierrc` override), so `{expr}` attributes stay unquoted. Salesforce metadata XML stays hand-formatted (DL-0094).
+- Why: The money rule must cover the one place in the product that renders LedgerForce money outside apps/web. Shown by a mutant: a `parseFloat` added to the component fails `pnpm lint`.
+- Alternatives: leave `salesforce/*` unlinted (rejected: the money ban would not reach the LWC).
+- ADR: none · Status: accepted
+
+### DL-0221 — SS-UC12-04 (scratch-org e2e) split from T-0072 to T-0111
+- Date: 2026-10-26 · By: claude · Task: T-0072, T-0111 · Category: scope
+- Decision: SS-UC12-04 ("Sales rep sees the component in a scratch org", screenshot) moves to the new card T-0111. T-0111 depends on T-0072 and T-0110 (write-back scratch-org path). It also confirms the RQ-0045 org-only facts: the descending `sortBy` string, `displayValue` for currency and date fields, and multi-currency. T-0072 step 5 (scratch-org e2e) and step 7 (Playwright screenshots) are n/a for T-0072. Its unit evidence (LWC Jest report) is in the manifest.
+- Why: No Dev Hub or scratch org exists in this environment (RQ-0022). Same pattern as T-0067 → T-0110 (DL-0205). Keeping the scenario would leave verify gates 9/12 unpassable for a card whose offline scope is done.
+- Alternatives: keep SS-UC12-04 on T-0072 as blocked (rejected: blocks a finished card on an environment gap).
+- ADR: none · Status: accepted
+
+### DL-0222 — UC-12 interpretation: built in MVP; "last payment" is the mirrored date; "most recent" is issue date
+- Date: 2026-10-26 · By: claude · Task: T-0072 · Category: scope
+- Decision: (1) T-0072 is built now, as the backlog and DL-0207 schedule it. Design §8.2 puts UC-12 in MVP and §9.1 lists the LWC in Phase 1; building earlier stays inside scope, and the human confirms placement (open question). (2) "Last payment" shows `Account.LF_Last_Payment_Date__c`, the only last-payment field in the data contract (DL-0096); no amount. (3) "Five most recent invoices" means the latest `LF_Issue_Date__c`. The component also shows `LF_Credit_Status__c`, which UC-12 lists under fields read.
+- Why: RQ-0045 Q2, Q7; UC-12 "Salesforce fields touched".
+- Alternatives: a last-payment amount from `LF_Payment__c` (rejected: not in UC-12's fields; would add a third wire for no stated need).
+
 ### DL-0223 — DL-0183 investigation: not reproduced in 25 runs under CPU load; mechanisms ruled out
 - Date: 2026-10-26 · By: claude (lead) · Task: — (conductor tooling) · Category: process
 - Decision: The DL-0183 extra `fake-success T-0002` call is still unexplained, and the test stays unchanged. Findings so far:
@@ -1644,4 +1678,5 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - Next step if it recurs: capture the conductor's stdout (the outcome line says why the first attempt was not "done").
   - A cheap aid is to print `r.stdout` in that test's assertion message. That only adds a diagnostic message and weakens nothing; it needs a small follow-up.
 - Why: Directive 3 (no "flake" without a cause); keeps the investigation in the repository.
+
 - ADR: none · Status: accepted
