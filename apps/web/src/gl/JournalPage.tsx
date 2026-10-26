@@ -160,7 +160,7 @@ function Detail({
           {doc.total ? (
             <>
               {' '}
-              · total <Money value={doc.total} />
+              , total <Money value={doc.total} />
             </>
           ) : null}
         </p>
@@ -325,7 +325,7 @@ function DraftLines({
               <td data-label="Line">{i + 1}</td>
               <td data-label="Account">
                 {a ? accountLabel(a) : (l.account.role ?? l.account.id ?? '')}
-                {l.memo ? <span className="sm"> · {l.memo}</span> : null}
+                {l.memo ? <span className="sm"> ({l.memo})</span> : null}
               </td>
               <td data-label="Debit" className="num">
                 {l.debit ? <Money value={l.debit} /> : null}

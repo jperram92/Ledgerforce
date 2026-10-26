@@ -182,7 +182,7 @@ describe('SS-PLAT-93: chart of accounts', () => {
     const rows = within(assets).getAllByRole('row').slice(1);
     expect(rows.map((r) => r.textContent)).toEqual([
       '1010Operating accountx—',
-      '1200Trade debtorsxControl account: only its ledger posts here · AR_CONTROL',
+      '1200Trade debtorsxControl account: only its ledger posts here; AR_CONTROL',
     ]);
     expect(within(screen.getByRole('table', { name: 'Equity' })).getByText(/Not postable/));
     expect(screen.getByRole('heading', { level: 2, name: /Expenses/ }).textContent).toBe(

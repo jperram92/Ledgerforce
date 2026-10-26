@@ -101,7 +101,7 @@ export function JournalsPage({ status }: { status?: JournalStatus | undefined })
                   <td data-label="Date">{j.entry_date}</td>
                   <td data-label="Journal">
                     <Link to="/accounting/journals/$journalId" params={{ journalId: j.id }}>
-                      {j.entry_no ? `${j.entry_no} · ` : ''}
+                      {j.entry_no ? `${j.entry_no}: ` : ''}
                       {j.memo ?? 'Manual journal'}
                     </Link>
                   </td>

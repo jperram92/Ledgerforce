@@ -44,7 +44,7 @@ function notes(a: ChartAccount): string {
   if (a.status === 'archived') out.push('Archived');
   if (a.currency) out.push(`Only ${a.currency}`);
   out.push(...a.system_roles);
-  return out.length ? out.join(' · ') : '—';
+  return out.length ? out.join('; ') : '—';
 }
 
 export function ChartPage() {
@@ -89,7 +89,7 @@ export function ChartPage() {
       <>
         {chart.data.companies.map((c) => (
           <p key={c.id} className="admin-note">
-            {c.name} · amounts in {c.base_currency}
+            {c.name}, amounts in {c.base_currency}
           </p>
         ))}
         {TYPE_ORDER.map((type) => {
