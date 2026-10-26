@@ -1,0 +1,19 @@
+T-0071 mutation check (2026-10-26, claude). Each mutant applied by hand to the code at e0742f8,
+the named tests run, the file restored with `git checkout -- <file>`. 8 mutants, 8 killed.
+
+M1 packages/outbox/src/backoff.ts: drop the min(16, …) exponent cap (2 ** retryCount)
+   → backoff.test.ts "retryBounds follows the pg-boss formula": 1 failed / 3. KILLED
+M2 apps/worker/src/outbox-worker.ts: permanent failures answered 'failed' instead of 'deadletter'
+   → sync-issues.db.test.ts SS-PLAT-91 failed. KILLED
+M3 packages/outbox/src/sync-issues.ts recordSyncIssue: re-open even when the dead-letter job id is
+   the same (no idempotency) → SS-PLAT-25 failed (redelivered dead letter). KILLED
+M4 packages/connectors/salesforce/src/writeback/collections.ts gate: >= became >
+   → budget.test.ts SS-PLAT-92 and the T-0067 SS-PLAT-84 contract test failed. KILLED
+M5 packages/outbox/src/deliver.ts: retried issues not resolved after a good delivery
+   → SS-PLAT-25 failed. KILLED
+M6 packages/outbox/src/sync-issues.ts retrySyncIssue: any status retryable (resolved too)
+   → api sync-issues.db.test.ts "a resolved issue can be neither retried nor ignored" failed. KILLED
+M7 packages/db/migrations/0030_sync_issues.sql guard: any status may become 'ignored'
+   → SS-PLAT-91 (resolved → ignored refused by the database) failed. KILLED
+M8 packages/connectors/salesforce/src/writeback/writeback.ts: connection share not passed to
+   the gate (default 25 % used) → SS-PLAT-92 db test failed. KILLED
