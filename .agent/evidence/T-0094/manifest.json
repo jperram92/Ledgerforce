@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0094",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051409-SS-PLAT-23-sign-in-page.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the sign-in page renders",
+      "commit": "07361dae8097-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:14:09.618Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051411-SS-PLAT-23-owner-setup-link-sign-in.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the setup link opens the organisation sign-in page",
+      "commit": "07361dae8097-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:14:11.312Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051412-SS-PLAT-23-owner-mfa-enrolment.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the Owner signs in once with the one-time password, enrols MFA and lands in LedgerForce",
+      "commit": "07361dae8097-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:14:12.815Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051415-SS-PLAT-23-owner-signed-in.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the Owner signs in once with the one-time password, enrols MFA and lands in LedgerForce",
+      "commit": "07361dae8097-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:14:15.315Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051417-SS-PLAT-23-one-time-password-spent.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the one-time password no longer works",
+      "commit": "07361dae8097-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:14:17.018Z",
+      "result": "passed"
+    }
+  ]
+}
