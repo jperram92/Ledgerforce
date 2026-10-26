@@ -46,7 +46,7 @@ server {
     }
 
     # LedgerForce API.
-    location ~ ^/(auth|t|health|companies|users|parties|bank-detail-changes|api-tokens|audit-log|sod)(/|$) { # lf:api-prefixes
+    location ~ ^/(auth|t|health|companies|users|parties|bank-detail-changes|api-tokens|audit-log|sod|sync-issues)(/|$) { # lf:api-prefixes
         proxy_pass http://api:3000;
     }
 

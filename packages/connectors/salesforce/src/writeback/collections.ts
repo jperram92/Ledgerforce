@@ -93,12 +93,29 @@ export interface ApiUsageGateOptions {
 }
 
 /**
+ * A budget share as integer basis points (1..10 000): `0.2500` → 2500. Accepts the database's
+ * NUMERIC(5,4) text (at most four decimals).
+ */
+export function shareBasisPoints(share: string): number {
+  const text = share.trim();
+  const m = /^([01])(?:\.(\d{1,4}))?$/.exec(text);
+  if (!m) throw new RangeError(`API budget share must be in (0, 1] with ≤ 4 decimals: ${text}`);
+  const bp =
+    Number.parseInt(m[1] ?? '0', 10) * 10_000 + Number.parseInt((m[2] ?? '').padEnd(4, '0'), 10);
+  if (bp < 1 || bp > 10_000) throw new RangeError(`API budget share must be in (0, 1]: ${text}`);
+  return bp;
+}
+
+/**
  * Self-throttle per org from the usage Salesforce reports on every answer. It never spends an
  * extra API call: when the last reading is at or above the share, sending is refused until the
- * reading goes stale, then one call goes out and brings a fresh reading.
+ * reading goes stale, then one call goes out and brings a fresh reading. The share is the
+ * connection's configured one when the caller passes it (data, migration 0030; T-0071), else the
+ * gate's default. Compared in integers: used · 10 000 ≥ max · basis points.
  */
 export class ApiUsageGate {
   readonly share: number;
+  readonly #basisPoints: number;
   readonly #staleAfterMs: number;
   readonly #now: () => Date;
   readonly #readings = new Map<string, { used: number; max: number; at: number }>();
@@ -107,6 +124,7 @@ export class ApiUsageGate {
     const share = opts.share ?? 0.25;
     if (!(share > 0 && share <= 1)) throw new RangeError('ApiUsageGate share must be in (0, 1]');
     this.share = share;
+    this.#basisPoints = Math.max(1, Math.round(share * 10_000));
     this.#staleAfterMs = opts.staleAfterMs ?? 5 * 60_000;
     this.#now = opts.now ?? (() => new Date());
   }
@@ -116,15 +134,16 @@ export class ApiUsageGate {
     if (r) this.#readings.set(instanceUrl, { ...r, at: this.#now().getTime() });
   }
 
-  assertWithinBudget(instanceUrl: string): void {
+  assertWithinBudget(instanceUrl: string, share?: string): void {
     const r = this.#readings.get(instanceUrl);
     if (!r || this.#now().getTime() - r.at > this.#staleAfterMs) return;
-    if (r.used >= r.max * this.share) {
+    const bp = share === undefined ? this.#basisPoints : shareBasisPoints(share);
+    if (r.used * 10_000 >= r.max * bp) {
       throw new SalesforceApiError(
         'throttled',
         null,
         null,
-        `daily API usage ${String(r.used)}/${String(r.max)} reached the ${String(this.share * 100)} % share`,
+        `daily API usage ${String(r.used)}/${String(r.max)} reached the ${String(bp / 100)} % share`,
       );
     }
   }
@@ -137,6 +156,8 @@ export interface RestSession {
   accessToken: string;
   apiVersion?: string;
   gate?: ApiUsageGate;
+  /** The connection's configured share (NUMERIC text, e.g. `0.2500`); else the gate's default. */
+  budgetShare?: string;
   now?: () => Date;
 }
 
@@ -227,7 +248,7 @@ export async function sendCollection(
   if (request.body.records.length > MAX_COLLECTION_RECORDS) {
     throw new RangeError(`at most ${String(MAX_COLLECTION_RECORDS)} records per request`);
   }
-  session.gate?.assertWithinBudget(session.instanceUrl);
+  session.gate?.assertWithinBudget(session.instanceUrl, session.budgetShare);
   const url = `${session.instanceUrl}/services/data/v${version}${request.path}`;
   let res: Awaited<ReturnType<HttpRequest>>;
   let text: string;

@@ -80,6 +80,9 @@ export const PERMISSIONS = P({
   'payroll.pay_run.import': 'write',
   'payroll.net_pay_batch.create': 'write',
   'payroll.net_pay_batch.release': 'write',
+  // Integrations: the Sync issues inbox (design §5.6 rule 2, T-0071)
+  'sync.issues.read': 'read',
+  'sync.issues.manage': 'write', // one-click retry, ignore
 });
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -122,6 +125,8 @@ export interface RoleTemplate {
 
 const ACCOUNTANT: readonly Permission[] = [
   'company.read',
+  'sync.issues.read',
+  'sync.issues.manage',
   'settings.read',
   'gl.account.read',
   'gl.journal.read',

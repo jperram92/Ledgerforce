@@ -56,6 +56,7 @@ const WRITE_HOLDERS: Record<string, readonly RoleId[]> = {
   'payroll.pay_run.import': ['owner', 'payroll_officer'],
   'payroll.net_pay_batch.create': ['owner', 'payroll_officer'],
   'payroll.net_pay_batch.release': ['owner'],
+  'sync.issues.manage': ['owner', 'finance_admin', 'accountant'], // T-0071, DL-0215
 };
 
 /** Design §6.4 "Can" and "Cannot (by default)" columns, as permissions. */

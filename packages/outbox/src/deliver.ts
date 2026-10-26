@@ -11,6 +11,7 @@
  */
 import { withTenant, type Database } from '@ledgerforce/db';
 import { sql, type Kysely, type Transaction } from 'kysely';
+import { resolveRetriedIssues } from './sync-issues.ts';
 
 export interface DeliveryJob {
   tenantId: string;
@@ -115,11 +116,20 @@ async function loadEvent(trx: Transaction<Database>, eventId: string): Promise<O
   };
 }
 
-/** Deliver one event to every handler of its topic, each effect at most once. */
+export interface DeliverHooks {
+  /** Called when a handler's transaction rolled back, before the error is rethrown. */
+  onHandlerError?: (handler: string, error: unknown) => void;
+}
+
+/**
+ * Deliver one event to every handler of its topic, each effect at most once. When every handler
+ * has succeeded (now or before), the event's `retried` Sync issues are resolved (T-0071).
+ */
 export async function deliver(
   db: Kysely<Database>,
   registry: HandlerRegistry,
   job: DeliveryJob,
+  hooks: DeliverHooks = {},
 ): Promise<DeliveryResult> {
   const { tenantId, eventId } = parseDeliveryJob(job);
   const event = await withTenant(db, tenantId, (trx) => loadEvent(trx, eventId));
@@ -132,8 +142,12 @@ export async function deliver(
       if (rows.length === 0) return false;
       await handler.handle(trx, event);
       return true;
+    }).catch((error: unknown) => {
+      hooks.onHandlerError?.(handler.name, error);
+      throw error;
     });
     (ran ? result.handled : result.skipped).push(handler.name);
   }
+  await withTenant(db, tenantId, (trx) => resolveRetriedIssues(trx, eventId));
   return result;
 }

@@ -16,10 +16,11 @@ import type { Transaction } from 'kysely';
 import { getAccessToken, invalidateAccessToken, listConnections } from '../connection-store.ts';
 import type { HttpPost } from '../token-client.ts';
 import { planBatches, type WriteBackRecord } from './batch.ts';
+import { getApiBudgetShare } from './budget.ts';
 import {
+  ApiUsageGate,
   SalesforceApiError,
   sendCollection,
-  type ApiUsageGate,
   type HttpRequest,
   type RecordError,
   type RestSession,
@@ -110,6 +111,8 @@ export interface WriteBackHandler {
 
 /** The outbox handler (structurally an `OutboxHandler` of @ledgerforce/outbox). */
 export function salesforceWriteBackHandler(deps: WriteBackHandlerDeps): WriteBackHandler {
+  // Always throttled (design §5.6 rule 3): one gate per handler, i.e. per worker process.
+  const gate = deps.gate ?? new ApiUsageGate(deps.now ? { now: deps.now } : {});
   return {
     name: SALESFORCE_WRITEBACK_HANDLER,
     topics: WRITEBACK_TOPICS,
@@ -122,6 +125,8 @@ export function salesforceWriteBackHandler(deps: WriteBackHandlerDeps): WriteBac
       );
       // A company without Salesforce has nothing to write back (DL-0192).
       if (!connection) return;
+      // The connection's share of the daily API allocation (data, migration 0030; T-0071).
+      const budgetShare = await getApiBudgetShare(trx, connection.id);
       const session = async (): Promise<RestSession> => {
         const t = await getAccessToken(trx, deps.kms, connection.id, {
           http: deps.tokenHttp,
@@ -132,7 +137,8 @@ export function salesforceWriteBackHandler(deps: WriteBackHandlerDeps): WriteBac
           instanceUrl: t.instanceUrl,
           accessToken: t.accessToken,
           ...(deps.apiVersion ? { apiVersion: deps.apiVersion } : {}),
-          ...(deps.gate ? { gate: deps.gate } : {}),
+          gate,
+          budgetShare,
           ...(deps.now ? { now: deps.now } : {}),
         };
       };

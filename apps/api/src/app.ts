@@ -31,7 +31,9 @@ import {
 import { AuditTrail, TenantTx } from './tenancy/tenant-tx.ts';
 import { AuditLogController } from './audit/audit-log.controller.ts';
 import { requestIdMiddleware } from './audit/request-id.ts';
-import { CLOCK, DB, KMS, MFA_POLICY } from './tokens.ts';
+import { SyncIssuesController } from './sync/sync-issues.controller.ts';
+import { CLOCK, DB, KMS, MFA_POLICY, SYNC_REQUEUE } from './tokens.ts';
+import type { DeliveryRequeue } from '@ledgerforce/outbox';
 
 export interface ApiOptions {
   /** Connection string for lf_app (never a superuser or the migrator). */
@@ -48,6 +50,12 @@ export interface ApiOptions {
    * details answer 503 `{error:'kms_not_configured'}` (ADR-0030).
    */
   kms?: Kms;
+  /**
+   * Re-queues an outbox delivery for the Sync issues one-click retry (T-0071), e.g.
+   * `bossRequeue(runtime pg-boss)`. Without it, POST /sync-issues/:id/retry answers 503
+   * `{error:'queue_not_configured'}`.
+   */
+  syncRequeue?: DeliveryRequeue;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
   tenantResolver?: TenantResolver;
   /** Test hook: extra controllers (stand-ins for routes of later tasks, e.g. SS-UC02-07). */
@@ -79,6 +87,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ApiTokensController,
   UserApiTokensController,
   AuditLogController,
+  SyncIssuesController,
   AuthController,
   LoginController,
 ];
@@ -94,6 +103,7 @@ class AppModule {
     clock: Clock,
     mfa: MfaPolicy,
     kms: Kms | null,
+    syncRequeue: DeliveryRequeue | null,
   ): DynamicModule {
     return {
       module: AppModule,
@@ -108,6 +118,7 @@ class AppModule {
         ApiTokensController,
         UserApiTokensController,
         AuditLogController,
+        SyncIssuesController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,
@@ -120,6 +131,7 @@ class AppModule {
         { provide: CLOCK, useValue: clock },
         { provide: MFA_POLICY, useValue: mfa },
         { provide: KMS, useValue: kms },
+        { provide: SYNC_REQUEUE, useValue: syncRequeue },
         TenantTx,
         AuditTrail,
         Authz,
@@ -175,6 +187,7 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
       clock,
       mfa,
       opts.kms ?? null,
+      opts.syncRequeue ?? null,
     ),
     {
       logger: ['error', 'warn'],
