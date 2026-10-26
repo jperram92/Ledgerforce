@@ -1633,3 +1633,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   Most remaining MVP cards (T-0031 golden-posting runner → tax, invoices, bills, payments, Stripe …) depend on T-0007 "Golden postings DRAFT", which is `blocked` on the human gate. After this round, the build cannot advance materially until the product owner approves golden postings. This is raised as the top open question in HANDOVER.
 - Why: Product owner's parallel-build instruction; AGENTS.md §6 golden-postings human gate.
 - ADR: none · Status: accepted
+
+### DL-0223 — DL-0183 investigation: not reproduced in 25 runs under CPU load; mechanisms ruled out
+- Date: 2026-10-26 · By: claude (lead) · Task: — (conductor tooling) · Category: process
+- Decision: The DL-0183 extra `fake-success T-0002` call is still unexplained, and the test stays unchanged. Findings so far:
+  - The extra call can only come from the first `run --once`. With `--task T-0004`, `pickTask` returns the explicit card only, so a second fake-success launch on T-0002 means the first codex attempt was classified as not done, then retried after claude was skipped as exhausted.
+  - A stale card write is ruled out: `setCard` re-reads the file before writing.
+  - A git `index.lock` clash is unlikely: the conductor only commits deferred checkpoints, and the test providers commit themselves.
+  - A scratch repro (`scratchpad/dl0183/repro.ts`) ran the scenario 25 times with 6 busy CPU loops and three sub-agents running: 0 failures.
+  - Next step if it recurs: capture the conductor's stdout (the outcome line says why the first attempt was not "done").
+  - A cheap aid is to print `r.stdout` in that test's assertion message. That only adds a diagnostic message and weakens nothing; it needs a small follow-up.
+- Why: Directive 3 (no "flake" without a cause); keeps the investigation in the repository.
+- ADR: none · Status: accepted
