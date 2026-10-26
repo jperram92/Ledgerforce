@@ -94,7 +94,7 @@ what the product does.
 
 ## Conclusion
 
-Build `audit.read_log` (migration 0029) under ADR-0034 (security, Proposed) and the three read
+Build `audit.read_log` (migration 0027) under ADR-0034 (security, Proposed) and the three read
 routes `GET /users`, `GET /auth/me/access`, `GET /audit-log`. The screens use them, route
 step-up challenges to `/auth/step-up`, and hide or disable what the caller's effective
 permissions do not allow, with the reason shown.
@@ -105,5 +105,5 @@ quarterly access review sign-off (design §6.3 item 4), which this task does not
 
 **Confidence:** high for Q1–Q3 and Q5 (project code, design and this task's tests); medium for the
 wording of S6, S7 and S10, which could not be re-read on 2026-10-25.
-**Affects:** T-0093; migration 0029; ADR-0034; any later screen that reads the audit log (e.g.
+**Affects:** T-0093; migration 0027; ADR-0034; any later screen that reads the audit log (e.g.
 the invoice detail's audit panel, S03) should reuse `GET /audit-log` with an entity filter.

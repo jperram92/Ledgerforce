@@ -1,6 +1,6 @@
 /**
  * SS-PLAT-80 (API part) — GET /audit-log (T-0093, ADR-0034, RQ-0038): read-only, needs
- * audit_log.read, reads through audit.read_log (migration 0029), filters by actor, action,
+ * audit_log.read, reads through audit.read_log (migration 0027), filters by actor, action,
  * entity and calendar dates in the tenant's report time zone, newest first, keyset pages with an
  * exact "more" signal. Real sessions, real database, lf_app only.
  */

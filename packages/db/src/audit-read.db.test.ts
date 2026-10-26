@@ -1,5 +1,5 @@
 /**
- * SS-PLAT-80 (database part) — the audit log read path (migration 0029, T-0093, ADR-0034,
+ * SS-PLAT-80 (database part) — the audit log read path (migration 0027, T-0093, ADR-0034,
  * RQ-0038). lf_app keeps INSERT only on audit.audit_log; the only read is audit.read_log(), a
  * SECURITY DEFINER function owned by lf_migrator that needs a tenant context, re-checks that the
  * acting user holds an audit-reading role, returns only that tenant's rows, newest first, at most

@@ -85,7 +85,7 @@ export function auditFilterOf(q: Record<string, unknown>): AuditFilter {
 
 /**
  * The audit log viewer's read route (design §6.4, §6.8; T-0093, ADR-0034). Read-only: there is no
- * write method. Reads only through `audit.read_log` (migration 0029), which re-checks the actor's
+ * write method. Reads only through `audit.read_log` (migration 0027), which re-checks the actor's
  * audit-reading role and the tenant; lf_app has no SELECT on the table. Dates are calendar days in
  * the tenant's report time zone (as the weekly SoD report); `to` includes its whole day. Newest
  * first; `next_before` is the cursor for older entries, null when there are none.

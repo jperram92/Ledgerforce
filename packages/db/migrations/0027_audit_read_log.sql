@@ -1,4 +1,4 @@
--- 0029 — audit log read path (T-0093, design §6.4 and §6.8, ADR-0034, RQ-0038). Owner: apps/api
+-- 0027 — audit log read path (T-0093, design §6.4 and §6.8, ADR-0034, RQ-0038). Owner: apps/api
 -- audit (GET /audit-log).
 --
 -- * lf_app keeps INSERT only on audit.audit_log (migration 0003): no SELECT grant is added, so no

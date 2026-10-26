@@ -58,7 +58,7 @@ Right for large exports later; too much machinery for one screen now.
 
 Option B, plus three read routes.
 
-1. **`audit.read_log`** (migration 0029):
+1. **`audit.read_log`** (migration 0027):
    - refuses without a tenant context (`app.tenant_id` unset → 42501);
    - refuses unless `p_actor` is an active user of the tenant holding a role whose template
      includes `audit_log.read` — `app.role_allows_audit_read(role)`, a mirror of the catalogue
