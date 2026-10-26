@@ -1633,3 +1633,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   Most remaining MVP cards (T-0031 golden-posting runner → tax, invoices, bills, payments, Stripe …) depend on T-0007 "Golden postings DRAFT", which is `blocked` on the human gate. After this round, the build cannot advance materially until the product owner approves golden postings. This is raised as the top open question in HANDOVER.
 - Why: Product owner's parallel-build instruction; AGENTS.md §6 golden-postings human gate.
 - ADR: none · Status: accepted
+
+### DL-0208 — Manual journals: a document in a new module, posted by the generic engine (no golden posting)
+- Date: 2026-10-26 · By: claude · Task: T-0029 · Category: architecture
+- Decision: Manual journals are documents in `app.manual_journal` (migration 0029) owned by a new workspace package `@ledgerforce/journals` (`packages/modules/journals`). They post only through `post()` of the posting engine with source type `manual_journal`, `source_id` = document id and the idempotency key `manual_journal:<id>`. `Docs/accounting/postings.md` has no golden posting for manual journals (GP-001…GP-019 are event postings, all Draft), so nothing beyond the generic engine is implemented: the engine posts exactly the user's lines. A separate package (not `@ledgerforce/gl`) avoids a dependency cycle, because `@ledgerforce/ledger` uses `@ledgerforce/gl` for its test chart. No new third-party dependency.
+- Why: design §3 intro, §3.9, §6.5 rule 4; RQ-0043 findings 1, 3; ledger AGENTS.md (only the engine writes journals).
+- Alternatives: `draft` rows in `journal_entry` (rejected: lf_app has no UPDATE on ledger tables, ADR-0004); putting the document in `@ledgerforce/gl` (rejected: package cycle with ledger's test fixture).
+- ADR: ADR-0039 · Status: proposed (awaiting human)
+
+### DL-0209 — Manual-journal approval rule: strict threshold on Σdebit, or a control/tax/equity line; re-checked at posting
+- Date: 2026-10-26 · By: claude · Task: T-0029 · Category: security
+- Decision: Approval is required when Σdebit in base currency is strictly greater than the tenant's `journal_approval` threshold (default 5,000.0000, a §11.2 placeholder, DL-0131), or any line is on a control account (`is_control`), an equity account (`type = 'equity'`), an account bound to GST_COLLECTED, GST_PAID or PAYG_WITHHOLDING, or carries a tax code or tax amount (it feeds the BAS). The facts are computed from the engine preview at submit and frozen on the document; posting re-evaluates the rule with the settings in force then (fail closed if the threshold was lowered). The evaluator is the existing `journalApprovalRequired` (T-0015).
+- Why: design §6.5 rule 4 names "control, tax or equity" accounts but not which accounts are tax accounts; RQ-0043 finding 2.
+- Alternatives: tax = GST roles only (rejected: PAYG withholding is a tax liability too); amount measured on the largest line (rejected: the design and the SoD evaluator use the journal amount); evaluate only at submit (rejected: a lowered threshold would be bypassed).
+- ADR: ADR-0039 · Status: proposed (awaiting human: the tax-account list and the threshold)
+
+### DL-0210 — SS-PLAT-07 scope: the engine's control-account rule covers manual, imported and rule journals; no new source types
+- Date: 2026-10-26 · By: claude · Task: T-0029 · Category: scope
+- Decision: The control-account refusal stays where DL-0136 put it (engine validate step, so preview and post); it is not duplicated in the document or the database. Neither the CSV journal import nor custom rules (§4.5) exist yet: an import creates manual journals (source type `manual_journal`, as Xero's manual-journal import), and a rule journal without a subledger document has no subledger source type; a rule line *with* a subledger source is an AR/AP document (the §4.5 deposit is an AR invoice). SS-PLAT-07 is proven (a) at the engine boundary for the three labelled paths on AR_CONTROL, (b) exhaustively for every catalogued source type × control role × (role | id) reference, in preview and post, nothing written, (c) through the document (submit refused, never posts) and (d) through the API (422 `CONTROL_ACCOUNT`). No import or rule source type is added: that would change the SS-PLAT-06 source-type catalogue tests and is a control-mapping decision for the product owner. When the import and rule tasks add their own source types, the exhaustive test covers them automatically.
+- Why: RQ-0043 finding 5; the lead's instruction to prove existing enforcement rather than duplicate it.
+- Alternatives: add `gl_journal_import` / `rules_custom_journal` source types now (rejected: changes approved catalogue tests, accounting choice); a database trigger on journal_line for control accounts (rejected for this task: duplicates DL-0136, which still awaits human confirmation — DL-0139; worth a follow-up once DL-0136 is accepted).
+- ADR: ADR-0039 · Status: proposed (awaiting human: own source types for imports and rules)
+
+### DL-0211 — Manual-journal workflow, SoD steps, permissions, no step-up, idempotency
+- Date: 2026-10-26 · By: claude · Task: T-0029 · Category: security
+- Decision: States `draft → submitted → (approved) → posted`, `submitted → draft` on rejection (with reason; the last rejection is kept). Submitting is the existing SoD step `manual_journal.post` (the preparer asks for the journal to be posted); approving is `manual_journal.approve` (rule `SOD_JOURNAL_SELF_APPROVAL`, condition `journal_approval_required`, subject facts = frozen total and control/tax/equity flag). Create/edit/submit/post need `gl.journal.post`; approve/reject `gl.journal.approve`; read `gl.journal.read`. No step-up: design §6.2 lists step-up only for payment release, bank details and period reopen. The database (0029) guards the transitions, freezes content after submit and posted rows entirely, stamps times from its clock, requires a posted document to name the engine's manual_journal entry for it (with the same approver), and checks preparer ≠ approver at commit unless small-team mode is on and the SoD exception row exists (as 0025). Drafts must already be well-formed and balanced (engine `checkCommand`). Create needs an `Idempotency-Key` header (unique per company); posting is idempotent through the engine key.
+- Why: design §6.4, §6.5, §6.2, apps/api AGENTS.md (idempotency key on mutations); RQ-0043 finding 3, 4.
+- Alternatives: a new SoD step `manual_journal.submit` (rejected: changes the SoD catalogue and migration 0021's step list; `post` already names the preparer's step); allow unbalanced drafts (rejected for now: simpler, one validation path; UI may relax later); step-up on approve (rejected: not in the design).
+- ADR: ADR-0039 · Status: proposed (awaiting human)
+
+### DL-0212 — Engine records the approver (approvedBy → journal_entry.approved_by); API posts carry no outbox yet
+- Date: 2026-10-26 · By: claude · Task: T-0029 · Category: architecture
+- Decision: `PostingCommand` gets an optional `approvedBy` (uuid, must be a user of the tenant, else `UNKNOWN_USER`, checked before any write and in preview), written to `journal_entry.approved_by` (design §3.3; part of the hash chain since 0009) and shown as `BuiltEntry.approvedBy`. The API has no pg-boss handle, so manual journals posted through the API pass no outbox and emit no `ledger.entry.posted` event yet; wiring `ledgerOutbox(boss)` into the API is a follow-up for the lead.
+- Why: RQ-0043 finding 6; the column existed but was never filled.
+- Alternatives: keep the approver only on the document (rejected: the hash-chained entry should name it); start pg-boss in the API in this task (rejected: out of scope, process/infra change).
+- ADR: none · Status: accepted

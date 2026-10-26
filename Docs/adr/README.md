@@ -86,5 +86,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0036](0036-salesforce-writeback-collections-contract.md) | Salesforce write-back: outbox handler with a versioned writeBack snapshot, mirrors upserted by LF_Id__c, Account/Opportunity updated by Salesforce id | integration | no | Proposed |
 | [0037](0037-self-hosted-install-owner-bootstrap-and-realm-mfa.md) | Self-hosted install: first Owner with a one-time IdP password, realm-wide MFA via the ACR mapping, file secrets, one public origin | security | yes | Proposed |
 | [0038](0038-openbao-transit-kms-adapter.md) | OpenBao/Vault transit KMS adapter: derived-key context binding, 60-byte wrapped key with versioned key id, HTTPS-only fetch without redirects, strict key policy | security | yes | Proposed |
+| [0039](0039-manual-journal-document-and-approval.md) | Manual journals as approvable documents posted only through the engine (approval above the threshold or on control/tax/equity accounts, preparer ≠ approver in API and database); control accounts closed to manual, imported and rule journals | security | yes | Proposed |
 
 Next free number: **0039** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; none needed an ADR).
