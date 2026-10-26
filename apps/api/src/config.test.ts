@@ -88,6 +88,10 @@ describe('SS-PLAT-86 API configuration from the environment', () => {
     expect(() =>
       apiOptionsFromEnv({ ...base, LF_PUBLIC_URL: 'http://localhost.example.com' }, readFile),
     ).toThrow(/https/);
+    // A name that merely ends in "localhost" is not under the reserved .localhost domain.
+    expect(() =>
+      apiOptionsFromEnv({ ...base, LF_PUBLIC_URL: 'http://evillocalhost:8080' }, readFile),
+    ).toThrow(/https/);
   });
 
   it('SS-PLAT-86 OIDC needs a client id and secret, and refuses a database role other than lf_app', () => {
