@@ -19,6 +19,9 @@ import { NotFoundPage, SectionPage } from './pages.tsx';
 import { SECTIONS } from './sections.ts';
 import { Shell } from './Shell.tsx';
 import { SignInPage, type SignInReason } from './SignIn.tsx';
+import { inboxSearch } from './sync/logic.ts';
+import { SyncIssuePage } from './sync/SyncIssuePage.tsx';
+import { SyncIssuesPage } from './sync/SyncIssuesPage.tsx';
 
 const rootRoute = createRootRoute({ component: Outlet });
 
@@ -91,6 +94,26 @@ const auditRoute = createRoute({
   },
 });
 
+// Salesforce sync issues inbox (T-0092, RQ-0047 F1): under Settings until a Salesforce sync area
+// joins the navigation (P14).
+const syncIssuesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/sync-issues',
+  validateSearch: inboxSearch,
+  component: function SyncIssuesRoute() {
+    return <SyncIssuesPage search={syncIssuesRoute.useSearch()} />;
+  },
+});
+
+const syncIssueRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/sync-issues/$issueId',
+  component: function SyncIssueRoute() {
+    const { issueId } = syncIssueRoute.useParams();
+    return <SyncIssuePage key={issueId} issueId={issueId} />;
+  },
+});
+
 const notFoundRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: '$',
@@ -105,6 +128,8 @@ const routeTree = rootRoute.addChildren([
     userRoute,
     exceptionsRoute,
     auditRoute,
+    syncIssuesRoute,
+    syncIssueRoute,
     notFoundRoute,
   ]),
 ]);
