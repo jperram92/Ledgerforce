@@ -28,14 +28,14 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS id | Scenario | UC | Phase | Test layer | Screenshot | Test file | Task(s) | Status | Evidence | Last verified commit |
 |---|---|---|---|---|---|---|---|---|---|---|
 | SS-UC01-01 | Closed Won creates a draft invoice from the template | UC-01 | MVP | db-integration | no | — | T-0069 | not-started | — | — |
-| SS-UC01-02 | Salesforce shows "Draft" within 60 seconds | UC-01 | MVP | e2e-playwright | yes | — | T-0069, T-0067 | not-started | — | — |
+| SS-UC01-02 | Salesforce shows "Draft" within 60 seconds | UC-01 | MVP | e2e-playwright | yes | — | T-0069, T-0110 | not-started | — | — |
 | SS-UC01-03 | Auto-approve under threshold posts GP-001 and emails | UC-01 | MVP | golden | no | — | T-0069, T-0040, T-0042 | not-started | — | — |
 | SS-UC01-04 | Above threshold stays Draft | UC-01 | MVP | unit | no | — | T-0069 | not-started | — | — |
 | SS-UC01-05 | No Billing To contact blocks approval | UC-01 | MVP | db-integration | no | — | T-0040 | not-started | — | — |
 | SS-UC01-06 | Posting-profile gap flagged, not posted | UC-01 | MVP | unit | no | — | T-0039, T-0069 | not-started | — | — |
 | SS-UC01-07 | Duplicate CDC event is idempotent | UC-01 | MVP | db-integration | no | — | T-0065, T-0069 | not-started | — | — |
 | SS-UC01-08 | Closed Won dated in a hard-locked period follows lock policy | UC-01 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0069, T-0023 | green (period/policy layer; Closed Won draft invoice and Sync issue in T-0069) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
-| SS-UC01-09 | Salesforce outage does not block accounting | UC-01 | MVP | db-integration | no | apps/worker/src/salesforce-writeback.outage.db.test.ts | T-0067 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | 5d25612 |
+| SS-UC01-09 | Salesforce outage does not block accounting | UC-01 | MVP | db-integration | no | apps/worker/src/salesforce-writeback.outage.db.test.ts | T-0067 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | af03e20 |
 | SS-UC01-10 | Invoice detail shows mapped lines and journal preview | UC-01 | MVP | e2e-playwright | yes | — | T-0083 | not-started | — | — |
 | SS-UC01-11 | Tax-inclusive rounding follows company setting | UC-01 | MVP | golden | no | — | T-0034, T-0040 | not-started | — | — |
 | SS-UC02-01 | Preview lists all invoices, posts nothing | UC-02 | MVP | db-integration | no | — | T-0043 | not-started | — | — |
@@ -112,7 +112,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC11-02 | Credit on a paid invoice is held as customer credit | UC-11 | MVP | db-integration | no | — | T-0045 | not-started | — | — |
 | SS-UC11-03 | Refund via payment batch posts GP-006 | UC-11 | MVP | golden | no | — | T-0055 | not-started | — | — |
 | SS-UC11-04 | Refund via Stripe calls the refund API | UC-11 | MVP | contract | no | — | T-0055, T-0074 | not-started | — | — |
-| SS-UC11-05 | Salesforce shows net amount paid | UC-11 | MVP | contract | no | — | T-0055, T-0067 | not-started | — | — |
+| SS-UC11-05 | Salesforce shows net amount paid | UC-11 | MVP | contract | no | — | T-0055, T-0110 | not-started | — | — |
 | SS-UC11-06 | Clerk cannot approve own credit note above threshold | UC-11 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts | T-0045, T-0015 | green (SoD layer; credit-note endpoint in T-0045) | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
 | SS-UC11-07 | Credit cannot exceed the creditable amount | UC-11 | MVP | unit | no | — | T-0045 | not-started | — | — |
 | SS-UC11-08 | Credit note and refund screens | UC-11 | MVP | e2e-playwright | yes | — | T-0085 | not-started | — | — |
@@ -120,7 +120,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC12-02 | Mirror fields are read-only for sales users | UC-12 | MVP | contract | no | salesforce/test/package-contract.test.ts (offline); salesforce/force-app/main/default/classes/LFReadOnlyMirrorTest.cls (org, not yet run) | T-0062 | green (metadata part, offline; org deploy needs Dev Hub) | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
 | SS-UC12-03 | Empty state with no invoices | UC-12 | MVP | unit | no | — | T-0072 | not-started | — | — |
 | SS-UC12-04 | Sales rep sees the component in a scratch org | UC-12 | MVP | e2e-playwright | yes | — | T-0072 | not-started | — | — |
-| SS-UC12-05 | Salesforce values reconcile to LedgerForce aged AR | UC-12 | MVP | db-integration | no | — | T-0067, T-0049 | not-started | — | — |
+| SS-UC12-05 | Salesforce values reconcile to LedgerForce aged AR | UC-12 | MVP | db-integration | no | — | T-0110, T-0049 | not-started | — | — |
 | SS-PLAT-01 | Balance trigger rejects unbalanced entries | — | MVP | db-integration | no | packages/ledger/src/journal-balance.db.test.ts | T-0020 | green | [.agent/evidence/T-0020/manifest.json](../../.agent/evidence/T-0020/manifest.json) | 878cfc8 |
 | SS-PLAT-02 | Posted journal rows are immutable | — | MVP | db-integration | no | packages/ledger/src/journal-immutability.db.test.ts | T-0021 | green | [.agent/evidence/T-0021/manifest.json](../../.agent/evidence/T-0021/manifest.json) | 26e7823 |
 | SS-PLAT-03 | Hash chain detects tampering | — | MVP | db-integration | no | packages/ledger/src/hash-chain.db.test.ts | T-0022 | green | [.agent/evidence/T-0022/manifest.json](../../.agent/evidence/T-0022/manifest.json) | 31124c2 |
