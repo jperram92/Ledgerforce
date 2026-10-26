@@ -311,3 +311,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26 claude (lead): round 8 claimed (T-0029, T-0071, T-0072; DL-0207). After it, the backlog is gated on T-0007 golden postings (human).
 - 2026-10-26T10:14:18.725Z claude: T-0072 → verifying
 - 2026-10-26T10:24:08.696Z claude: release T-0072 → review
+- 2026-10-26T10:28:04.344Z claude: T-0029 → verifying
