@@ -603,3 +603,13 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-99 — Retry and ignore with confirmation, permission- and status-aware
 - Phase: MVP · Layer: **e2e-playwright** + component · Screenshot evidence: yes · Task(s): T-0092 (RQ-0047)
 - **Given** an open, an ignored, a retried and a resolved issue · **When** an Owner, Finance Admin or Accountant chooses Retry or Ignore, and an Auditor views the same issue · **Then** nothing is sent until the confirmation is accepted (Cancel sends nothing); Retry is offered for open and ignored issues and posts `POST /sync-issues/:id/retry`; Ignore is offered for open issues and posts the optional note (≤ 500 characters); the new status is shown; for retried and resolved issues a sentence says why there is nothing to do; the Auditor sees both actions disabled, each described by text naming who can act; a 409 (changed elsewhere), 503 (queue not configured) or 403 is shown in plain words; a `401 step_up_required` goes to `/auth/step-up`; keyboard-only path works with a visible focus ring; axe clean at 1440 and 390
+
+## T-0112 PR integration regression evidence (2026-10-28)
+
+Additional evidence at repair commit 653bb06; earlier records retained. This is not task completion or whole-PR approval.
+
+| Scenario | Regression | Evidence | Result |
+|---|---|---|---|
+| SS-PLAT-68 | HTTP posting event/job, replay, missing producer, real queue-write rollback | [.agent/evidence/T-0112/manifest.json](../../.agent/evidence/T-0112/manifest.json) | passed |
+| SS-PLAT-86 | Native Linux/WSL install fixture; permissions and paths with spaces | [.agent/evidence/T-0112/manifest.json](../../.agent/evidence/T-0112/manifest.json) | passed |
+| SS-PLAT-90 | Real journal API with transactional producer | [.agent/evidence/T-0112/manifest.json](../../.agent/evidence/T-0112/manifest.json) | passed |
