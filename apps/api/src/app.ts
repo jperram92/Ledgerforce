@@ -36,6 +36,8 @@ import { requestIdMiddleware } from './audit/request-id.ts';
 import { SyncIssuesController } from './sync/sync-issues.controller.ts';
 import { CLOCK, DB, KMS, MFA_POLICY, SYNC_REQUEUE } from './tokens.ts';
 import type { DeliveryRequeue } from '@ledgerforce/outbox';
+import type { PostingOutbox } from '@ledgerforce/ledger';
+import { POSTING_OUTBOX } from './tokens.ts';
 
 export interface ApiOptions {
   /** Connection string for lf_app (never a superuser or the migrator). */
@@ -58,6 +60,8 @@ export interface ApiOptions {
    * `{error:'queue_not_configured'}`.
    */
   syncRequeue?: DeliveryRequeue;
+  /** Atomic ledger event/job producer. Posting fails closed when it is absent. */
+  postingOutbox?: PostingOutbox;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
   tenantResolver?: TenantResolver;
   /** Test hook: extra controllers (stand-ins for routes of later tasks, e.g. SS-UC02-07). */
@@ -108,6 +112,7 @@ class AppModule {
     mfa: MfaPolicy,
     kms: Kms | null,
     syncRequeue: DeliveryRequeue | null,
+    postingOutbox: PostingOutbox | null,
   ): DynamicModule {
     return {
       module: AppModule,
@@ -138,6 +143,7 @@ class AppModule {
         { provide: MFA_POLICY, useValue: mfa },
         { provide: KMS, useValue: kms },
         { provide: SYNC_REQUEUE, useValue: syncRequeue },
+        { provide: POSTING_OUTBOX, useValue: postingOutbox },
         TenantTx,
         AuditTrail,
         Authz,
@@ -194,6 +200,7 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
       mfa,
       opts.kms ?? null,
       opts.syncRequeue ?? null,
+      opts.postingOutbox ?? null,
     ),
     {
       logger: ['error', 'warn'],

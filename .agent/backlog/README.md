@@ -206,3 +206,9 @@ graph LR
   Salesforce/Stripe → reports/close/wizard → UI screens (each with Playwright evidence) → pilot hardening → MVP gate.
 - Phase 1–3 are single epic cards that depend on the previous gate; they are split only after the human signs the gate (§9).
 - UC-12 (LWC Account component) is MVP per §8.2/§9.1 use-case list but §9.1 Phase-1 scope also lists it — flagged for the product owner; carded as MVP.
+
+## PR review follow-up
+
+| Task | Title | Phase | Status | Depends on |
+|---|---|---|---|---|
+| [T-0112](T-0112.md) | Repair PR review build and outbox integration failures | MVP | in_progress | none (owner-requested repair) |

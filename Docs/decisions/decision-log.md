@@ -1822,3 +1822,12 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: add `sync` to `Services` in env.tsx/App.tsx (rejected: more shared-file edits for no gain).
 
 - ADR: none · Status: accepted
+
+### DL-0236 — Repair PR #1 integration without changing posting rules or CI gates
+- Date: 2026-10-28 · By: codex · Task: T-0112 · Category: implementation
+- Decision: connect the API's existing runtime pg-boss to ledgerOutbox and inject the producer into manual posting; refuse posting with the established queue_not_configured 503 when absent. Reuse the real queue harness for API fixtures. No ledger rules, migrations, dependencies or golden expectations change; this restores ADR-0008's existing atomic posting/outbox contract.
+- Test-first proof: API post/replay produced zero events; missing producer returned 200; queue-failure path returned 200. After wiring, real event/job, replay, missing configuration and rollback tests pass. Revoke INSERT on all pg-boss tables in the isolated test DB because send targets a partition directly; restore grants in finally.
+- Windows install evidence runs the exact shell script on WSL's native Linux temp filesystem, retaining 0700, random/distinct values, no stdout disclosure and repeat-run preservation assertions. Git Bash/NTFS could run it but could not prove Linux permissions. Paths include spaces. Linux uses bash directly.
+- Owner explicitly authorized moving only LF_EVIDENCE_DIR to consuming step env in both workflows. Checks and permissions are unchanged. New context-placement regressions failed first, then passed.
+- DL-0235 is reserved by the review commit fa47f56 on the preserved original local branch.
+- Status: accepted. Cross-provider review and whole-PR CI still required.

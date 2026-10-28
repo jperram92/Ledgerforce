@@ -1,4 +1,4 @@
-import { bossRequeue, runtimeBossOptions } from '@ledgerforce/outbox';
+import { bossRequeue, ledgerOutbox, runtimeBossOptions } from '@ledgerforce/outbox';
 import { PgBoss } from 'pg-boss';
 import { createApi } from './app.ts';
 import { apiOptionsFromEnv } from './config.ts';
@@ -19,7 +19,11 @@ try {
 const boss = new PgBoss(runtimeBossOptions(options.databaseUrl));
 boss.on('error', (error: Error) => console.error(`pg-boss: ${error.message}`));
 await boss.start();
-const api = await createApi({ ...options, syncRequeue: bossRequeue(boss) });
+const api = await createApi({
+  ...options,
+  syncRequeue: bossRequeue(boss),
+  postingOutbox: ledgerOutbox(boss),
+});
 console.log(`LedgerForce API listening on ${api.url}`);
 
 for (const signal of ['SIGTERM', 'SIGINT'] as const) {

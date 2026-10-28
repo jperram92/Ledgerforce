@@ -7,12 +7,14 @@ import {
   Get,
   Headers,
   HttpCode,
+  Inject,
   NotFoundException,
   Param,
   Post,
   Put,
   Query,
   Req,
+  ServiceUnavailableException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import {
@@ -33,6 +35,8 @@ import {
   type ManualJournalStatus,
 } from '@ledgerforce/journals';
 import { PeriodLockedError, PostingError, type PostingLineInput } from '@ledgerforce/ledger';
+import type { PostingOutbox } from '@ledgerforce/ledger';
+import { POSTING_OUTBOX } from '../tokens.ts';
 import type { Request } from 'express';
 import { principalOf, tokenPrincipalOf } from '../auth/session-tenant-resolver.ts';
 import { RequirePermission } from '../authz/permission.decorator.ts';
@@ -201,6 +205,7 @@ export class ManualJournalsController {
   constructor(
     private readonly tx: TenantTx,
     private readonly audit: AuditTrail,
+    @Inject(POSTING_OUTBOX) private readonly outbox: PostingOutbox | null,
   ) {}
 
   @Post()
@@ -387,6 +392,7 @@ export class ManualJournalsController {
   @HttpCode(200)
   @RequirePermission('gl.journal.post')
   async post(@Req() req: Request, @Param('id') id: string, @Body() body: unknown) {
+    if (!this.outbox) throw new ServiceUnavailableException({ error: 'queue_not_configured' });
     const raw = (body as { period_override?: unknown } | null)?.period_override;
     let periodOverride: { reason: string } | undefined;
     if (raw !== undefined && raw !== null) {
@@ -399,6 +405,7 @@ export class ManualJournalsController {
     const trx = this.tx.get();
     const { settings } = await loadSodSettings(trx);
     const r = await postManualJournal(trx, {
+      outbox: this.outbox,
       id: id.toLowerCase(),
       postedBy: actorOf(req),
       settings,

@@ -8,3 +8,5 @@ export const MFA_POLICY = Symbol('MFA_POLICY');
 export const KMS = Symbol('KMS');
 /** Injection token for the outbox re-queue of the Sync issues retry (T-0071); null without a queue. */
 export const SYNC_REQUEUE = Symbol('SYNC_REQUEUE');
+/** Transactional posting outbox; null makes manual posting unavailable. */
+export const POSTING_OUTBOX = Symbol('POSTING_OUTBOX');

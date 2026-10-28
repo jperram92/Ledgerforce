@@ -10,6 +10,8 @@ import { createDb, withTenant } from '@ledgerforce/db';
 import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
 import { auServicesSmb, loadChartTemplate } from '@ledgerforce/gl';
 import { generateFiscalYear } from '@ledgerforce/ledger';
+import { ledgerOutbox } from '@ledgerforce/outbox';
+import { createOutboxHarness, type OutboxHarness } from '@ledgerforce/outbox/testing';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApi, type Api } from '../app.ts';
 
@@ -27,6 +29,7 @@ type Who = keyof typeof PEOPLE;
 
 let tdb: TestDatabase;
 let api: Api;
+let outboxHarness: OutboxHarness;
 const companies: Record<string, { id: string; acct: Record<string, string> }> = {};
 const cookies = new Map<string, string>();
 let keyNo = 0;
@@ -107,7 +110,12 @@ beforeAll(async () => {
     });
   }
   await seed.destroy();
-  api = await createApi({ databaseUrl: tdb.url('lf_app'), sessions: {} });
+  outboxHarness = await createOutboxHarness(tdb);
+  api = await createApi({
+    databaseUrl: tdb.url('lf_app'),
+    sessions: {},
+    postingOutbox: ledgerOutbox(await outboxHarness.startRuntime()),
+  });
   if (!api.sessions) throw new Error('sessions not configured');
   for (const [who, p] of Object.entries(PEOPLE)) {
     cookies.set(
@@ -123,6 +131,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
+  await (outboxHarness as OutboxHarness | undefined)?.close();
   await (api as Api | undefined)?.close();
   await (tdb as TestDatabase | undefined)?.close();
 });

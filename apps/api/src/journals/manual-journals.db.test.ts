@@ -12,6 +12,8 @@ import { createDb, withTenant } from '@ledgerforce/db';
 import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
 import { auServicesSmb, loadChartTemplate } from '@ledgerforce/gl';
 import { generateFiscalYear } from '@ledgerforce/ledger';
+import { ledgerOutbox, OUTBOX_QUEUE } from '@ledgerforce/outbox';
+import { createOutboxHarness, type OutboxHarness } from '@ledgerforce/outbox/testing';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApi, type Api } from '../app.ts';
 
@@ -30,6 +32,7 @@ const PEOPLE = {
 
 let tdb: TestDatabase;
 let api: Api;
+let outboxHarness: OutboxHarness;
 const companies: Record<string, { id: string; acct: Record<string, string> }> = {};
 const cookies = new Map<string, string>();
 let keyNo = 0;
@@ -129,7 +132,14 @@ beforeAll(async () => {
      VALUES ($1, true, $2, 'One-person company')`,
     [SMALL, PEOPLE.soloOwner.id],
   );
-  api = await createApi({ databaseUrl: tdb.url('lf_app'), sessions: {} });
+  outboxHarness = await createOutboxHarness(tdb);
+  const boss = await outboxHarness.startRuntime();
+  const options = {
+    databaseUrl: tdb.url('lf_app'),
+    sessions: {},
+    postingOutbox: ledgerOutbox(boss),
+  };
+  api = await createApi(options);
   if (!api.sessions) throw new Error('sessions not configured');
   for (const [who, p] of Object.entries(PEOPLE)) {
     // Signed in with MFA 30 minutes ago: no fresh step-up (none is needed for journals).
@@ -147,11 +157,57 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await (api as Api | undefined)?.close();
+  await (outboxHarness as OutboxHarness | undefined)?.close();
   await (tdb as TestDatabase | undefined)?.close();
 });
 
 describe('SS-PLAT-90: Manual journal routes enforce permission, approval and SoD', () => {
   let id: string;
+
+  it('SS-PLAT-68 [T-0112] missing outbox configuration refuses posting without writing a journal', async () => {
+    const draft = await create('accountant', journal('accountant', '100.0000', { code: '6200' }));
+    expect((await call('POST', `/manual-journals/${draft}/submit`, 'accountant', {})).status).toBe(
+      200,
+    );
+    const unconfigured = await createApi({ databaseUrl: tdb.url('lf_app'), sessions: {} });
+    try {
+      const response = await fetch(`${unconfigured.url}/manual-journals/${draft}/post`, {
+        method: 'POST',
+        headers: { cookie: `lf_session=${cookies.get('accountant')}` },
+      });
+      expect(response.status).toBe(503);
+      expect(await response.json()).toEqual({ error: 'queue_not_configured' });
+      expect(await rows('SELECT id FROM app.journal_entry WHERE source_id = $1', [draft])).toEqual(
+        [],
+      );
+    } finally {
+      await unconfigured.close();
+    }
+  });
+
+  it('SS-PLAT-68 [T-0112] real queue insert failure rolls back posting and its outbox event', async () => {
+    const draft = await create('accountant', journal('accountant', '100.0000', { code: '6200' }));
+    expect((await call('POST', `/manual-journals/${draft}/submit`, 'accountant', {})).status).toBe(
+      200,
+    );
+    const before = await rows('SELECT id FROM app.outbox_event ORDER BY id', []);
+    // pg-boss sends directly to the queue's partition, not only the parent job table.
+    await tdb.admin.query('REVOKE INSERT ON ALL TABLES IN SCHEMA pgboss FROM lf_app');
+    try {
+      expect((await call('POST', `/manual-journals/${draft}/post`, 'accountant', {})).status).toBe(
+        500,
+      );
+      expect(await rows('SELECT id FROM app.journal_entry WHERE source_id = $1', [draft])).toEqual(
+        [],
+      );
+      expect(await rows('SELECT id FROM app.outbox_event ORDER BY id', [])).toEqual(before);
+      expect(await rows('SELECT status FROM app.manual_journal WHERE id = $1', [draft])).toEqual([
+        { status: 'submitted' },
+      ]);
+    } finally {
+      await tdb.admin.query('GRANT INSERT ON ALL TABLES IN SCHEMA pgboss TO lf_app');
+    }
+  });
 
   it('SS-PLAT-90 creating needs gl.journal.post and an Idempotency-Key; a repeat returns the same draft', async () => {
     const clerk = await call(
@@ -258,6 +314,20 @@ describe('SS-PLAT-90: Manual journal routes enforce permission, approval and SoD
     expect(posted.entry_no).toMatch(/^MJ-/);
     const again = await call('POST', `/manual-journals/${id}/post`, 'accountant', {});
     expect(await again.json()).toMatchObject({ entry_id: posted.entry_id, replayed: true });
+    const events = await rows<{ id: string }>(
+      `SELECT id FROM app.outbox_event WHERE tenant_id = $1 AND aggregate_id = $2 AND topic = 'ledger.entry.posted'`,
+      [A, posted.entry_id],
+    );
+    expect(
+      events,
+      'SS-PLAT-68 [T-0112]: API post and replay produce exactly one event',
+    ).toHaveLength(1);
+    expect(
+      await rows(`SELECT data FROM pgboss.job WHERE id = $1 AND name = $2`, [
+        events[0]?.id,
+        OUTBOX_QUEUE,
+      ]),
+    ).toEqual([{ data: { tenantId: A, eventId: events[0]?.id } }]);
     expect(
       await rows(
         `SELECT source_type, source_id, created_by::text, approved_by::text

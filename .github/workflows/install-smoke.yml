@@ -29,7 +29,6 @@ jobs:
     timeout-minutes: 40
     env:
       CI: 'true'
-      LF_EVIDENCE_DIR: ${{ runner.temp }}/evidence
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -40,6 +39,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
       - run: bash infra/compose/smoke.sh
+        env:
+          LF_EVIDENCE_DIR: ${{ runner.temp }}/evidence
       - uses: actions/upload-artifact@v4
         if: always()
         with:

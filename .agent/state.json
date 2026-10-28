@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "claude/app-framework-agents-dzmkya",
+  "current_task": "T-0112",
+  "branch": "feat/T-0112-pr-build-repairs",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "codex",
+  "lease_expires_at": "2026-10-28T12:39:14.345Z",
   "last_green_commit": null,
   "run_id": "2026-10-24-codex-r01",
-  "updated_at": "2026-10-26T15:18:10.588Z",
+  "updated_at": "2026-10-28T11:54:14.365Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -54,7 +54,8 @@
     "T-0071": 1,
     "T-0072": 1,
     "T-0082": 1,
-    "T-0092": 1
+    "T-0092": 1,
+    "T-0112": 2
   },
   "failures": {},
   "providers": {},

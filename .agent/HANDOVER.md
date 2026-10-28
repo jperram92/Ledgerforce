@@ -1,3 +1,15 @@
+# T-0112 build repair checkpoint — 2026-10-28
+
+## Codex continuation prompt
+> Resume T-0112 on feat/T-0112-pr-build-repairs in C:/Users/james/Ledgerforce/.tmp/pr1-review. Read AGENTS.md, the task and run 2026-10-28-codex-r02.md. Run `git log -1 --format=full` and `node scripts/agent/conductor.ts status`. Base PR head is 8bce763; original local review fa47f56 remains on feat/T-0010-tenant-context. Focused tests pass: 19 install/workflow and 15 API/DB. Quick verification is running; its initial lint failure was fixed without suppressions. Finish verification and evidence, obtain Claude review, then integrate into PR #1. Do not merge failed CI or approve draft goldens.
+
+Done: authorized CI environment-context repair; native Linux/WSL install fixture; real production posting outbox wiring and fail-closed configuration. No posting rules or security permissions changed.
+Validation: RED captured for all three findings; focused GREEN recorded. Typecheck passes. Initial lint failure (new test non-null assertions) corrected and focused lint passes. Full verification is not yet green.
+Next action: finish the running quick verifier, inspect failures, capture committed test evidence and run required checks.
+Open human gates: no new question; existing accounting/security/golden approvals remain pending.
+Decision: DL-0236. Task remains in_progress. No PR merge or push yet.
+
+## Historical build handover (retained)
 # Handover - 2026-10-25 09:35 UTC
 From: claude (lead session r01)    Reason: checkpoint — T-0018..T-0022, T-0024, T-0036, T-0037 (encrypted bank details) verified and in review; register corrected (DL-0077)
 Task: PARALLEL ROUND 9 COMPLETE (DL-0224): T-0092 and T-0082 merged, each verify 13 PASS/0 FAIL/3 PENDING, in review. Rounds 4–9 complete and in review. See `conductor next` for anything newly claimable; otherwise the CRITICAL PATH is T-0007 golden postings (human gate) — open question 0 — and the Codex cross-reviews.
@@ -345,3 +357,5 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26T15:18:10.447Z claude: release T-0082 → review
 - 2026-10-26T15:18:10.589Z claude: release T-0092 → review
 - 2026-10-26 claude (lead): round 9 merged (T-0092, T-0082; web router/sections/main conflicts resolved by keeping both sides); gates green (905 unit + LWC / 921 db / 82 agent); verify 13/0/3 each, including gate-9 e2e on the merged router → review.
+- 2026-10-28T10:42:13.278Z codex: T-0112 → in_progress
+- 2026-10-28T11:54:14.368Z codex: T-0112 → in_progress

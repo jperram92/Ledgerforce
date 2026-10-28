@@ -7,9 +7,8 @@
  * The running stack is proven by SS-PLAT-23 (tests/install/install.smoke.spec.ts).
  */
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
 
@@ -308,23 +307,41 @@ describe('SS-PLAT-86 generated secrets stay out of git', () => {
   });
 
   it('SS-PLAT-86 init-secrets.sh writes six distinct random secrets once and never overwrites', () => {
-    const dir = join(mkdtempSync(join(tmpdir(), 'lf-secrets-')), 'secrets');
-    const run = () =>
-      spawnSync('bash', [resolve(ROOT, 'infra/compose/init-secrets.sh'), dir], {
-        encoding: 'utf8',
-      });
-    const first = run();
-    expect(first.status, first.stderr).toBe(0);
-    const names = readdirSync(dir).sort();
+    // The install targets Linux. Use its native filesystem even from Windows: NTFS's
+    // synthetic stat mode cannot prove chmod 0700. Pipe the exact script bytes to WSL,
+    // avoiding Windows path conversion; all original permission/idempotency checks remain.
+    const script = read('infra/compose/init-secrets.sh').replaceAll('\r\n', '\n');
+    const fixture = `set -euo pipefail
+work=$(mktemp -d)
+cat > "$work/init-secrets.sh" <<'LF_INSTALL_SCRIPT'
+${script}
+LF_INSTALL_SCRIPT
+dir="$work/secrets with spaces"
+bash "$work/init-secrets.sh" "$dir" > "$work/first-output"
+printf 'MODE:%s\\n' "$(stat -c %a "$dir")"
+cat "$work/first-output"
+printf 'FIRST_VALUES\\n'
+for file in "$dir"/*; do printf '%s:%s\\n' "$(basename "$file")" "$(cat "$file")"; done
+bash "$work/init-secrets.sh" "$dir" > "$work/second-output"
+printf 'SECOND_VALUES\\n'
+for file in "$dir"/*; do printf '%s:%s\\n' "$(basename "$file")" "$(cat "$file")"; done
+`;
+    const result = spawnSync(
+      process.platform === 'win32' ? 'wsl.exe' : 'bash',
+      process.platform === 'win32' ? ['--exec', 'bash', '-s'] : ['-s'],
+      { input: fixture, encoding: 'utf8' },
+    );
+    expect(result.status, result.stderr).toBe(0);
+    const [output = '', snapshots = ''] = result.stdout.split('FIRST_VALUES\n');
+    const [first = '', second = ''] = snapshots.split('SECOND_VALUES\n');
+    const records = first.trim().split('\n');
+    const names = records.map((r) => r.split(':')[0]).sort();
     expect(names).toEqual(Object.keys(compose.secrets).sort());
-    const values = names.map((n) => readFileSync(join(dir, n), 'utf8').trim());
+    const values = records.map((r) => r.split(':')[1] ?? '');
     for (const v of values) expect(v).toMatch(/^[A-Za-z0-9]{40,}$/);
     expect(new Set(values).size).toBe(values.length);
-    expect(statSync(dir).mode & 0o777).toBe(0o700);
-    expect(first.stdout).not.toContain(values[0] ?? '-');
-
-    const second = run();
-    expect(second.status).toBe(0);
-    expect(names.map((n) => readFileSync(join(dir, n), 'utf8').trim())).toEqual(values);
+    expect(output.split('\n')[0]).toBe('MODE:700');
+    expect(output).not.toContain(values[0] ?? '-');
+    expect(second.trim().split('\n')).toEqual(records);
   });
 });
