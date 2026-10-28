@@ -1823,6 +1823,14 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 
 - ADR: none · Status: accepted
 
+### DL-0235 � Preserve local baseline and withhold PR #1 merge pending review fixes
+- Date: 2026-10-28 � By: codex � Task: PR #1 / T-0010 comparison � Category: process
+- Decision: inspect exact PR head 8bce763 in an isolated worktree; retain local branch and commit a merge-readiness report. Do not merge while CI fails and required reviews remain incomplete. No production or protected CI changes made by the reviewer.
+- Why: PR contains all local baseline commits, so reconciliation is unnecessary; review identified invalid CI expression contexts, unwired posting outbox and a reproducible Windows test failure. AGENTS.md requires green CI and independent review.
+- Evidence: .agent/evidence/PR-1/review-codex-20261028.md and .agent/runs/2026-10-28-codex-r01.md.
+- Numbering: reserved after DL-0234 at reviewed PR head; local baseline ends at DL-0060. Intervening entries remain on the PR branch and are not duplicated here.
+- ADR: none � Status: accepted
+
 ### DL-0236 — Repair PR #1 integration without changing posting rules or CI gates
 - Date: 2026-10-28 · By: codex · Task: T-0112 · Category: implementation
 - Decision: connect the API's existing runtime pg-boss to ledgerOutbox and inject the producer into manual posting; refuse posting with the established queue_not_configured 503 when absent. Reuse the real queue harness for API fixtures. No ledger rules, migrations, dependencies or golden expectations change; this restores ADR-0008's existing atomic posting/outbox contract.
@@ -1831,3 +1839,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Owner explicitly authorized moving only LF_EVIDENCE_DIR to consuming step env in both workflows. Checks and permissions are unchanged. New context-placement regressions failed first, then passed.
 - DL-0235 is reserved by the review commit fa47f56 on the preserved original local branch.
 - Status: accepted. Cross-provider review and whole-PR CI still required.
+
+### DL-0237 — Role test fixtures use the production database clock
+- Date: 2026-10-28 · By: codex · Task: T-0112 · Category: testing
+- Finding: full DB sweep passed 920 tests and failed three role-revocation tests on user_role_check2; isolated rerun repeated all three. Positive fixtures mixed host new Date() with DB now() grant timestamps.
+- Decision: use sql<Date>`now()` for the three positive revocations, exactly as the production role controller already does. Preserve constraints and every existing assertion; add a direct negative test that a revocation one millisecond before its grant is rejected. No migration, production behavior, permissions or expectations relaxed.
+- Result: focused suite 10/10. Full DB sweep not repeated after fixture correction. LWC passed 8/8 from primary checkout; preserve older worktree discovery failure as environment evidence.
+- Status: accepted; full verifier and independent review remain required.

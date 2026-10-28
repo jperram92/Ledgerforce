@@ -74,7 +74,7 @@ describe('SS-PLAT-49: Role assignments are tenant-scoped, never deleted, and rev
     await inTenant((trx) =>
       trx
         .updateTable('app.user_role')
-        .set({ revoked_at: new Date(), revoked_by: OWNER, revoke_reason: 'mover' })
+        .set({ revoked_at: sql<Date>`now()`, revoked_by: OWNER, revoke_reason: 'mover' })
         .where('id', '=', id)
         .execute(),
     );
@@ -98,6 +98,23 @@ describe('SS-PLAT-49: Role assignments are tenant-scoped, never deleted, and rev
     expect(await epoch(CLERK)).toBe(e0);
   });
 
+  it('refuses a revocation before its grant even when both timestamps use the database clock [T-0112]', async () => {
+    const { id } = await grant(CLERK, 'ap_clerk');
+    await expect(
+      inTenant((trx) =>
+        trx
+          .updateTable('app.user_role')
+          .set({
+            revoked_at: sql<Date>`granted_at - interval '1 millisecond'`,
+            revoked_by: OWNER,
+            revoke_reason: 'invalid chronology',
+          })
+          .where('id', '=', id)
+          .execute(),
+      ),
+    ).rejects.toMatchObject({ code: '23514' });
+  });
+
   it('refuses a role that is not one of the ten templates', async () => {
     await expect(grant(CLERK, 'superuser')).rejects.toMatchObject({ code: '23514' });
     await expect(grant(CLERK, 'OWNER')).rejects.toMatchObject({ code: '23514' });
@@ -109,7 +126,7 @@ describe('SS-PLAT-49: Role assignments are tenant-scoped, never deleted, and rev
     await inTenant((trx) =>
       trx
         .updateTable('app.user_role')
-        .set({ revoked_at: new Date(), revoked_by: OWNER, revoke_reason: 'test' })
+        .set({ revoked_at: sql<Date>`now()`, revoked_by: OWNER, revoke_reason: 'test' })
         .where('user_id', '=', CLERK)
         .where('role', '=', 'approver')
         .where('revoked_at', 'is', null)
@@ -135,7 +152,7 @@ describe('SS-PLAT-49: Role assignments are tenant-scoped, never deleted, and rev
     await inTenant((trx) =>
       trx
         .updateTable('app.user_role')
-        .set({ revoked_at: new Date(), revoked_by: OWNER, revoke_reason: 'leaver' })
+        .set({ revoked_at: sql<Date>`now()`, revoked_by: OWNER, revoke_reason: 'leaver' })
         .where('id', '=', id)
         .execute(),
     );

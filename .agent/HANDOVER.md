@@ -1,3 +1,18 @@
+# Handover — T-0112 repair milestone, 2026-10-28 UTC
+
+## Codex continuation prompt
+> Resume from C:/Users/james/Ledgerforce on feat/T-0112-pr-build-repairs. Read AGENTS.md, T-0112, run 2026-10-28-codex-r02.md and `git log -1 --format=full`. Implementation: 653bb06; evidence: ef0b4fc; final fixture correction is in this commit. PR baseline 8bce763 and original review fa47f56 remain preserved. Next command: `node --test --test-name-pattern='missed heartbeat' scripts/agent/test/run.test.ts` with Git usr/bin first in PATH. Read T-0103 and RQ-0014 before fixing Windows process ownership; also reproduce atomic-write.test.ts's EPERM rename. Work on a task branch and keep deadlines/assertions intact. Then finish T-0112 full verification and Claude cross-review. Do not infer whole-build completion from focused passing tests.
+
+From: codex, run r02. Reason: review findings repaired; verification follow-ups remain.
+Task: T-0112 in_progress; lease released; no whole-build green checkpoint.
+Done: authorized CI context repair; Linux/WSL install contract; real posting outbox, replay, rollback and missing-producer refusal; role test-clock fixture correction. No new accounting rules or security policy changes.
+Validation: 907 Vitest tests passed; LWC 8/8 passed at primary root; focused repair evidence 34/34; role tests 10/10. Typecheck, lint and formatting checked. Full DB sweep before fixture correction: 920 passed/3 failed; affected suite then passes. Full sweep not repeated.
+Remaining: Windows conductor atomic rename and heartbeat failures; recorder CLI Windows pnpm spawning; full verifier, remote CI and independent Claude review. No push or PR merge.
+Next action: reproduce and resolve T-0103 Windows conductor failure, then rerun required gates. Branch now lives in the primary checkout; .tmp/pr1-review is detached, not the active build tree.
+Decisions: DL-0235 preserved, DL-0236 and DL-0237 added. No new human question; original accounting/security/golden approvals remain pending.
+Do not: self-approve Codex work, weaken tests, label failed/pending gates green, edit secrets or approved goldens, or merge failed CI.
+
+## Historical continuation notes (superseded above, retained)
 # T-0112 build repair checkpoint — 2026-10-28
 
 ## Codex continuation prompt
@@ -359,3 +374,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-26 claude (lead): round 9 merged (T-0092, T-0082; web router/sections/main conflicts resolved by keeping both sides); gates green (905 unit + LWC / 921 db / 82 agent); verify 13/0/3 each, including gate-9 e2e on the merged router → review.
 - 2026-10-28T10:42:13.278Z codex: T-0112 → in_progress
 - 2026-10-28T11:54:14.368Z codex: T-0112 → in_progress
+- 2026-10-28T21:57:40.724Z codex: T-0112 → in_progress
