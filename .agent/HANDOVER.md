@@ -1,3 +1,13 @@
+# Build-loop handover — 2026-10-29
+
+## Primary Codex continuation prompt
+> Resume from repository state and `git log -1 --format=full`. T-0113 is in review: all checks pass at 405f794, full verifier 13 PASS/0 FAIL/3 PENDING, handover commit 78f6e77. PR #1 remains unmerged without independent Claude review. T-0095 research is on feat/T-0095-security-gates: RQ-0092 resolved, ADR-0043 Proposed, task blocked pending explicit human acceptance and scoped security-workflow authorization. Do not edit protected workflows before that answer. Continue the Windows evidence-recorder follow-up (packages/testing/src/evidence/record-tests.ts) test-first on its own task branch; current launcher uses spawnSync('pnpm') and fails on Windows. T-0103 remains blocked on unchanged atomic throughput; do not weaken assertions.
+
+## Open questions for human
+- [adr:security] T-0095: accept ADR-0043 and authorize the exact new security workflow/configuration/runner/test scope? Recommendation: local fail-closed scanners with read-only CI permissions; preserve current checks. See Docs/adr/0043-ci-security-scanners.md and RQ-0092. Async question pending; no acceptance inferred.
+- Independent Claude review is required for Codex repairs before merging PR #1. Pending request: .agent/evidence/PR-1/review-request-claude-20261029.md. Existing accounting/security/golden gates remain unchanged.
+
+## Prior install handover (retained)
 # Handover — install-smoke repair, 2026-10-29
 
 ## Current Codex continuation prompt
@@ -191,3 +201,5 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-29T03:04:33.810Z codex: T-0113 → in_progress
 - 2026-10-29T03:13:23.110Z codex: T-0113 → verifying
 - 2026-10-29T07:41:19.208Z codex: release T-0113 → review (All CI checks pass at 405f794; full verifier 13 PASS/0 FAIL/3 PENDING. Await independent Claude review, no merge.)
+- 2026-10-29T07:41:35.528Z codex: T-0095 → researching
+- 2026-10-29T07:45:59.170Z codex: release T-0095 → blocked (human gate adr:security: accept ADR-0043 and explicitly authorize scoped new security workflow; no protected workflow changed)
