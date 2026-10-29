@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
+  "current_task": "T-0113",
   "branch": "feat/T-0103-windows-heartbeat",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "codex",
+  "lease_expires_at": "2026-10-29T03:49:33.797Z",
   "last_green_commit": null,
   "run_id": "2026-10-28-codex-r02",
-  "updated_at": "2026-10-29T02:44:47.521Z",
+  "updated_at": "2026-10-29T03:04:33.807Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -56,7 +56,8 @@
     "T-0082": 1,
     "T-0092": 1,
     "T-0112": 3,
-    "T-0103": 1
+    "T-0103": 2,
+    "T-0113": 1
   },
   "failures": {},
   "providers": {},

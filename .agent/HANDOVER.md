@@ -175,3 +175,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-28T22:18:24.677Z codex: T-0103 → in_progress
 - 2026-10-29T02:42:54.132Z codex: handover: Preparing requested independent review packet; validation failures remain
 - 2026-10-29T02:44:47.523Z codex: release T-0103 → todo (WIP preserved for continuation: atomic throughput and full verification remain; independent review request prepared)
+- 2026-10-29T02:58:02.525Z codex: T-0103 → in_progress
+- 2026-10-29T03:04:15.041Z codex: release T-0103 → blocked (Pinned Windows atomic-reader test remains below unchanged >100 write threshold; immediate-retry experiments unreliable and reverted. Heartbeat fix preserved; full verification not green.)
+- 2026-10-29T03:04:33.810Z codex: T-0113 → in_progress
