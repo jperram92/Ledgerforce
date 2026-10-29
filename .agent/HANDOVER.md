@@ -3,8 +3,9 @@
 ## Current Codex continuation prompt
 > Resume on feat/T-0113-install-setup-wait. Read AGENTS.md, T-0113, run 2026-10-29-codex-r01.md and `git log -1 --format=full`. Base repair is c312393; diagnosis/task split is f861278; the commit containing this prompt fixes the setup wait race. Next: inspect PR #1 checks after pushing, and `.tmp/t0103-pinned-unrestricted.txt` for the still-running Windows conductor rerun. T-0113 real-Docker regression tests passed 3/3 after RED 1/3; full install smoke and full verification still required. T-0103 is blocked on atomic-reader throughput; no test expectations may be relaxed. Independent Claude review request remains pending, not an approval. Do not merge before green CI and cross-review.
 
-Done: T-0113 selects stopped setup containers, uses Docker wait stdout as the actual exit code, rejects missing/ambiguous setup, and redacts failure logs. Explicit real Docker regression tests and RED/GREEN logs committed with the repair. No CI gates edited.
-In progress: full install/verification, unrestricted pinned-runtime conductor rerun, and independent review. Windows retry experiments were reverted after unreliable results.
+Done: e32bad1 pushed to PR #1; full install CI 40810531406 PASS (7/7), static/unit, DB/RLS and browser CI PASS. T-0113's stopped-container wait and redaction fixes also pass 3/3 real-Docker regressions. Imported signed-in screenshot retains CI merge-checkout f232188 metadata. Evidence and memory gates PASS; T-0113 verifying. No CI gates edited.
+In progress: full definition-of-done jobs 40810531408/40810526850 and independent review. Unrestricted pinned Windows conductor finished 81/82 (atomic-reader throughput 27 writes; all run/failover tests PASS). Retry experiments were reverted. T-0103 remains blocked; sandbox-only PowerShell denials do not reproduce unrestricted.
+Latest verifier result: e32bad1 gave 11 PASS / 2 FAIL / 3 PENDING. Only failures were missing T-0113 manifest and in_progress status. The evidence checkpoint corrects both; local evidence and memory gates pass. Rerun CI on this checkpoint before declaring review-ready. Coverage baseline, draft golden tests and independent review remain pending; no merge approval exists.
 Decisions: DL-0239, RQ-0091. No new human decision needed. Existing design/golden approvals remain outstanding as previously recorded.
 
 ## Superseded T-0103 continuation (retained)
@@ -188,3 +189,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-29T02:58:02.525Z codex: T-0103 → in_progress
 - 2026-10-29T03:04:15.041Z codex: release T-0103 → blocked (Pinned Windows atomic-reader test remains below unchanged >100 write threshold; immediate-retry experiments unreliable and reverted. Heartbeat fix preserved; full verification not green.)
 - 2026-10-29T03:04:33.810Z codex: T-0113 → in_progress
+- 2026-10-29T03:13:23.110Z codex: T-0113 → verifying
