@@ -213,3 +213,4 @@ graph LR
 |---|---|---|---|---|
 | [T-0112](T-0112.md) | Repair PR review build and outbox integration failures | MVP | in_progress | none (owner-requested repair) |
 | [T-0113](T-0113.md) | Install smoke: wait for completed setup reliably | MVP | todo | T-0094 |
+| [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | todo | T-0010 |

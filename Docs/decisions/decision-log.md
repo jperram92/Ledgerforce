@@ -1867,3 +1867,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Research RQ-0092 supports local Semgrep/Gitleaks, existing pnpm audit, and Syft/Grype with fail-closed outcomes, immutable verified pins and read-only PR jobs. Existing checks stay intact. No workflow or policy implemented yet.
 - Prepared ADR-0043 and security proposal assessment NEEDS-HUMAN, then requested explicit acceptance and scoped workflow authorization under AGENTS §5/§6. Prior evidence-path repair approval does not cover this change. Scanner version selection and seeded real-tool proof follow acceptance.
 - T-0113 at 405f794 has all CI checks passing, full verify 13/0/3 and is in independent review; preserve Windows T-0103 blocker. Continue authorized tooling work while security approval is pending.
+
+### DL-0241 — Owner accepts security-gate scope; repair recorder without a shell
+- Date: 2026-10-29 · By: human (security acceptance), codex (tooling) · Tasks: T-0095 / T-0114
+- Owner explicitly answered: "Accept ADR-0043 and authorize the scoped addition." ADR-0043 is Accepted; its exact scope is authorized, preserving existing gates/permissions. No repeat approval needed for implementation within that scope. Draft PR #3 contains the proposal; no scanner proof claimed yet.
+- T-0114 splits the known Windows evidence recorder defect from T-0112. RQ-0093 resolves Node CLI launch: use installed Vitest JS with process.execPath and literal argv; no package-manager cmd shim or shell interpretation. Resolve vitest/package.json because vitest.mjs is not an exported package subpath. No new dependency.
+- Four real-recorder tests initially fail on Windows because pnpm never launches and report reading throws ENOENT. Fixture import initially selected Vitest's CommonJS rejection entry; correct fixture to use Vitest globals and record the correction. Production launcher also reports missing JSON cleanly without fabricated evidence.

@@ -1,7 +1,7 @@
 ---
 adr: 0043
 title: "Fail-closed CI scans with local rules and verified tooling"
-status: Proposed
+status: Accepted
 date: 2026-10-29
 author: codex
 category: security
@@ -13,7 +13,7 @@ superseded_by: none
 # ADR-0043: Fail-closed CI scans with local rules and verified tooling
 
 ## Status
-Proposed — awaiting product-owner acceptance and explicit authorization for protected CI additions. No security workflow has been changed.
+Accepted 2026-10-29 by the product owner: "Accept ADR-0043 and authorize the scoped addition." Authorization covers the exact Decision outcome scope below and preserves existing gates. No implementation or scanner proof is implied by acceptance.
 
 ## Context and problem statement
 Design §6.9/§10.8 requires SAST, dependency, container and secret scanning plus release SBOMs. T-0095 covers those scans. Current CI's verifier acknowledges missing SAST. RQ-0092 verifies available tool behavior. AGENTS.md §5 protects security gates; the earlier approval only covered LF_EVIDENCE_DIR and does not authorize this change.
@@ -41,7 +41,7 @@ Design §6.9/§10.8 requires SAST, dependency, container and secret scanning plu
 - Bad: does not satisfy container/SAST/SBOM requirements; cannot be represented as complete.
 
 ## Decision outcome
-Propose option A with these checkable rules:
+Chosen option A, accepted by the owner, with these checkable rules:
 1. Add `.github/workflows/security.yml`, repository-owned scanner configuration under `infra/security/`, a runner under `scripts/security/`, and real-scanner contracts under `tests/security/`. Retain ci.yml/install-smoke.yml checks and permissions. Any change to existing security-gate behavior requires further explicit authorization.
 2. Use Semgrep CE with local reviewed rules, `--metrics=off --error --strict`; Gitleaks CLI history/working-tree scans with full redaction; existing pnpm audit at high severity for production dependencies; Syft CycloneDX JSON for each shipped image and Grype with a high-or-critical failure threshold. Report lower severities without declaring them absent. Include dev-dependency audit reporting.
 3. Pin actions to verified full SHAs and scanner binaries/images to checked hashes/digests. No mutable latest tags or pipe-to-shell installs. Record versions, image digests and vulnerability DB metadata in artifacts.

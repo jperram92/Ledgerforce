@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0095-security-gates",
+  "current_task": "T-0114",
+  "branch": "feat/T-0114-windows-evidence-recorder",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "codex",
+  "lease_expires_at": "2026-10-29T08:49:07.158Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-10-29T07:45:59.169Z",
+  "updated_at": "2026-10-29T08:04:07.165Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -58,7 +58,8 @@
     "T-0112": 3,
     "T-0103": 2,
     "T-0113": 1,
-    "T-0095": 1
+    "T-0095": 1,
+    "T-0114": 1
   },
   "failures": {},
   "providers": {},

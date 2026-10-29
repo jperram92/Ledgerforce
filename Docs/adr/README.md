@@ -90,6 +90,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0040](0040-sync-issues-inbox-dead-letters-and-api-budget-share.md) | Sync issues inbox: dead letters become tenant issues, failure log outside pg-boss, one-click retry as a new delivery job, API budget share as connection data | security | yes | Proposed |
 | [0042](0042-gl-read-routes-chart-journal-list-preview.md) | GL read routes for the web screens: chart of accounts, manual-journal list and the engine preview of a stored journal | architecture | no | Proposed |
 
-| [0043](0043-ci-security-scanners.md) | Fail-closed CI scans with local rules and verified tooling | security | yes | Proposed |
+| [0043](0043-ci-security-scanners.md) | Fail-closed CI scans with local rules and verified tooling | security | yes | Accepted |
 
 Next free number: **0044** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

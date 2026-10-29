@@ -7,8 +7,9 @@
  * Exit code: Vitest's, or 1 if a --require'd scenario is missing or did not pass.
  */
 import { spawnSync } from 'node:child_process';
-import { mkdirSync, readFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { dirname, join, relative } from 'node:path';
 import { appendManifestEntries, formatTimestamp, resolveEvidenceContext } from './manifest.ts';
 import { reportEntries, scenarioResults, type VitestJsonReport } from './test-report.ts';
 
@@ -33,12 +34,14 @@ const dir = join(ctx.evidenceRoot, ctx.taskId);
 mkdirSync(dir, { recursive: true });
 const reportPath = join(dir, `${formatTimestamp(now)}-tests-${project}.json`);
 
+// Launch the installed JavaScript CLI directly; Windows package-manager shims
+// require a shell, which would also reinterpret literal test paths/arguments.
+const require = createRequire(import.meta.url);
+const vitestCli = join(dirname(require.resolve('vitest/package.json')), 'vitest.mjs');
 const run = spawnSync(
-  'pnpm',
+  process.execPath,
   [
-    '-s',
-    'exec',
-    'vitest',
+    vitestCli,
     'run',
     '--project',
     project,
@@ -50,6 +53,14 @@ const run = spawnSync(
   { cwd: ctx.repoRoot, stdio: 'inherit' },
 );
 
+if (run.error) {
+  console.error(`record-tests: could not launch Vitest: ${run.error.message}`);
+  process.exit(1);
+}
+if (!existsSync(reportPath)) {
+  console.error('record-tests: Vitest did not produce a JSON report');
+  process.exit(run.status || 1);
+}
 const report = JSON.parse(readFileSync(reportPath, 'utf8')) as VitestJsonReport;
 const results = scenarioResults(report);
 const file = relative(ctx.repoRoot, reportPath).split('\\').join('/');

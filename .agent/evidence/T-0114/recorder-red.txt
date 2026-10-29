@@ -1,0 +1,163 @@
+﻿
+ RUN  v4.1.12 C:/Users/james/Ledgerforce
+
+ â¯ |unit| packages/testing/src/evidence/record-tests.test.ts (4 tests | 4 failed) 2065ms
+     Ã— records a passing scenario with literal spaces and shell metacharacters in paths 550ms
+     Ã— preserves real failed-test evidence and returns failure 545ms
+     Ã— rejects a missing required scenario without inventing a pass 432ms
+     Ã— reports runner failure without a report and creates no manifest 534ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  19:01:28
+   Duration  2.67s (transform 48ms, setup 0ms, import 109ms, tests 2.06s, environment 0ms)
+
+
+âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯ Failed Tests 4 âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯
+
+ FAIL  |unit| packages/testing/src/evidence/record-tests.test.ts > real Vitest evidence recorder [T-0114] > records a passing scenario with literal spaces and shell metacharacters in paths
+AssertionError: node:fs:484
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\james\AppData\Local\Temp\lf recorder & literal-OHaLYF\evidence\T-0114\20261029-080129-tests-unit.json'
+    at readFileSync (node:fs:484:20)
+    at file:///C:/Users/james/Ledgerforce/packages/testing/src/evidence/record-tests.ts:53:27
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\james\\AppData\\Local\\Temp\\lf recorder & literal-OHaLYF\\evidence\\T-0114\\20261029-080129-tests-unit.json'
+}
+
+Node.js v24.19.0
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ â¯ packages/testing/src/evidence/record-tests.ts:53:27
+ â¯ packages/testing/src/evidence/record-tests.test.ts:56:58
+     54|   it('records a passing scenario with literal spaces and shell metachaâ€¦
+     55|     const { result, manifestPath } = runRecorder();
+     56|     expect(result.status, result.stdout + result.stderr).toBe(0);
+       |                                                          ^
+     57|     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) asâ€¦
+     58|     expect(manifest.entries).toHaveLength(1);
+
+âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯[1/4]âŽ¯
+
+ FAIL  |unit| packages/testing/src/evidence/record-tests.test.ts > real Vitest evidence recorder [T-0114] > preserves real failed-test evidence and returns failure
+AssertionError: node:fs:484
+    return binding.readFileUtf8(path, stringToFlags(options.flag));
+                   ^
+
+Error: ENOENT: no such file or directory, open 'C:\Users\james\AppData\Local\Temp\lf recorder & literal-0ORL8t\evidence\T-0114\20261029-080130-tests-unit.json'
+    at readFileSync (node:fs:484:20)
+    at file:///C:/Users/james/Ledgerforce/packages/testing/src/evidence/record-tests.ts:53:27
+    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
+    at async node:internal/modules/esm/loader:643:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\james\\AppData\\Local\\Temp\\lf recorder & literal-0ORL8t\\evidence\\T-0114\\20261029-080130-tests-unit.json'
+}
+
+Node.js v24.19.0
+: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ â¯ packages/testing/src/evidence/record-tests.ts:53:27
+ â¯ packages/testing/src/evidence/record-tests.test.ts:69:69
+     67|     const { result, manifestPath } = runRecorder({ failing: true });
+     68|     expect(result.status).toBe(1);
+     69|     expect(existsSync(manifestPath), result.stdout + result.stderr).toâ€¦
+       |                                                                     ^
+     70|     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) asâ€¦
+     71|     expect(manifest.entries).toHaveLength(1);
+
+âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯[2/4]âŽ¯
+
+ FAIL  |unit| packages/testing/src/evidence/record-tests.test.ts > real Vitest evidence recorder [T-0114] > rejects a missing required scenario without inventing a pass
+AssertionError: expected 'node:fs:484\r\n    return binding.reaâ€¦' to contain 'required scenario SS-PLAT-TEST-02 is â€¦'
+
+- Expected
++ Received
+
+- required scenario SS-PLAT-TEST-02 is not found
++ node:fs:484
++     return binding.readFileUtf8(path, stringToFlags(options.flag));
++                    ^
++ 
++ Error: ENOENT: no such file or directory, open 'C:\Users\james\AppData\Local\Temp\lf recorder & literal-9INHVI\evidence\T-0114\20261029-080130-tests-unit.json'
++     at readFileSync (node:fs:484:20)
++     at file:///C:/Users/james/Ledgerforce/packages/testing/src/evidence/record-tests.ts:53:27
++     at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
++     at async node:internal/modules/esm/loader:643:26
++     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
++   errno: -4058,
++   code: 'ENOENT',
++   syscall: 'open',
++   path: 'C:\\Users\\james\\AppData\\Local\\Temp\\lf recorder & literal-9INHVI\\evidence\\T-0114\\20261029-080130-tests-unit.json'
++ }
++ 
++ Node.js v24.19.0
++
+
+ â¯ packages/testing/src/evidence/record-tests.test.ts:78:27
+     76|     const { result, manifestPath } = runRecorder({ missing: true });
+     77|     expect(result.status).toBe(1);
+     78|     expect(result.stderr).toContain('required scenario SS-PLAT-TEST-02â€¦
+       |                           ^
+     79|     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) asâ€¦
+     80|     expect(manifest.entries.map((entry) => entry.scenario)).toEqual(['â€¦
+
+âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯[3/4]âŽ¯
+
+ FAIL  |unit| packages/testing/src/evidence/record-tests.test.ts > real Vitest evidence recorder [T-0114] > reports runner failure without a report and creates no manifest
+AssertionError: expected 'node:fs:484\r\n    return binding.reaâ€¦' to contain 'record-tests: Vitest did not produce â€¦'
+
+- Expected
++ Received
+
+- record-tests: Vitest did not produce a JSON report
++ node:fs:484
++     return binding.readFileUtf8(path, stringToFlags(options.flag));
++                    ^
++ 
++ Error: ENOENT: no such file or directory, open 'C:\Users\james\AppData\Local\Temp\lf recorder & literal-NeUb7x\evidence\T-0114\20261029-080131-tests-unit.json'
++     at readFileSync (node:fs:484:20)
++     at file:///C:/Users/james/Ledgerforce/packages/testing/src/evidence/record-tests.ts:53:27
++     at ModuleJob.run (node:internal/modules/esm/module_job:439:25)
++     at async node:internal/modules/esm/loader:643:26
++     at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
++   errno: -4058,
++   code: 'ENOENT',
++   syscall: 'open',
++   path: 'C:\\Users\\james\\AppData\\Local\\Temp\\lf recorder & literal-NeUb7x\\evidence\\T-0114\\20261029-080131-tests-unit.json'
++ }
++ 
++ Node.js v24.19.0
++
+
+ â¯ packages/testing/src/evidence/record-tests.test.ts:86:27
+     84|     const { result, manifestPath } = runRecorder({ invalidConfig: trueâ€¦
+     85|     expect(result.status).toBe(1);
+     86|     expect(result.stderr).toContain('record-tests: Vitest did not prodâ€¦
+       |                           ^
+     87|     expect(result.stderr).not.toContain('ENOENT');
+     88|     expect(existsSync(manifestPath)).toBe(false);
+
+âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯[4/4]âŽ¯
+
