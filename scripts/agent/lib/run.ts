@@ -289,8 +289,17 @@ function launch(ctx: Ctx, argv: string[], logFile: string, env: NodeJS.ProcessEn
     let heartbeatLost = false;
     let child: ReturnType<typeof spawn>;
     try {
-      child = spawn(argv[0], argv.slice(1), { cwd: ctx.root, env, detached: true, stdio: [stdinText === null ? 'ignore' : 'pipe', 'pipe', 'pipe'] });
-      if (stdinText !== null) { child.stdin!.on('error', () => { /* provider closed stdin */ }); child.stdin!.end(stdinText); }
+      if (process.platform === 'win32') {
+        const launchFile = `${logFile}.launch.json`;
+        writeFileSync(launchFile, JSON.stringify({ argv, stdinText }));
+        child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-File',
+          join(import.meta.dirname, '../windows-job.ps1'), '-NodePath', process.execPath,
+          '-RunnerPath', join(import.meta.dirname, '../windows-provider.mjs'), '-LaunchFile', launchFile],
+        { cwd: ctx.root, env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+      } else {
+        child = spawn(argv[0], argv.slice(1), { cwd: ctx.root, env, detached: true, stdio: [stdinText === null ? 'ignore' : 'pipe', 'pipe', 'pipe'] });
+        if (stdinText !== null) { child.stdin!.on('error', () => { /* provider closed stdin */ }); child.stdin!.end(stdinText); }
+      }
     } catch (e) {
       log.end(`\n[conductor] failed to start ${argv[0]}: ${(e as Error).message}\n`);
       resolve({ code: 127, signal: null, tail: String(e), heartbeatLost: false });
@@ -302,7 +311,7 @@ function launch(ctx: Ctx, argv: string[], logFile: string, env: NodeJS.ProcessEn
     const killGroup = (sig: NodeJS.Signals) => {
       if (closed || !child.pid) return;
       if (process.platform === 'win32') {
-        // RQ-0014: killing only the provider shell leaves children holding its pipes open.
+        // RQ-0014: this PID owns the kill-on-close Job Object, not a transient shell.
         const killed = spawnSync('taskkill.exe', ['/PID', String(child.pid), '/T', '/F'], {
           windowsHide: true, encoding: 'utf8', timeout: 5000,
         });

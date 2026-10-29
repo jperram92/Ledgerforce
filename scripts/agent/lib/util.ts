@@ -83,5 +83,14 @@ export const EXIT = {
 export function writeFileAtomic(file: string, text: string): void {
   const tmp = `${file}.${String(process.pid)}.${String(Date.now())}.${Math.random().toString(36).slice(2)}.tmp`;
   writeFileSync(tmp, text);
-  renameSync(tmp, file);
+  for (let attempt = 0; ; attempt++) {
+    try { renameSync(tmp, file); return; }
+    catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (process.platform !== 'win32' || attempt >= 50 || !['EPERM', 'EACCES', 'EBUSY'].includes(code ?? '')) throw error;
+      // A reader/virus scanner may briefly deny replacement on Windows. Keep the
+      // original destination intact; retry the same atomic rename, never unlink it.
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2);
+    }
+  }
 }

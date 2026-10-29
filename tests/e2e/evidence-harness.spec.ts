@@ -4,7 +4,8 @@
  * manifest entry is appended when the test finishes and is checked by verify gate 9.
  */
 import { readFileSync, statSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { basename, dirname, join, resolve } from 'node:path';
+import { tmpdir } from 'node:os';
 import { pathToFileURL } from 'node:url';
 import { test, expect } from '@ledgerforce/testing/evidence';
 
@@ -18,14 +19,15 @@ test('SS-PLAT-19: Evidence harness captures screenshots', async ({ page, evidenc
   await page.goto(pathToFileURL(FIXTURE).href, { waitUntil: 'load' });
   const file = await evidence('SS-PLAT-19', 'harness-fixture');
   const only = process.env['LF_EVIDENCE_ONLY_TASK'];
-  // Normally (and when T-0009 itself is verified) evidence lands in the repository. When verify.sh
-  // runs for another task, this spec's evidence must go to the temp dir instead (T-0109, DL-0098).
+  // CI can explicitly choose an evidence root. Verification of another task takes
+  // precedence and isolates this spec's output (T-0109, DL-0098).
   const root =
-    only && only !== 'T-0009' ? `lf-evidence-gate\\/${only}\\/other-tasks` : '\\.agent\\/evidence';
-  expect(file.replaceAll('\\', '/')).toMatch(
-    new RegExp(`${root}\\/T-0009\\/\\d{8}-\\d{6}-SS-PLAT-19-harness-fixture\\.png$`),
-  );
-  const abs = file.startsWith('/') || /^[A-Za-z]:/.test(file) ? file : join(REPO_ROOT, file);
+    only && only !== 'T-0009'
+      ? join(tmpdir(), 'lf-evidence-gate', only, 'other-tasks')
+      : process.env['LF_EVIDENCE_DIR'] || join(REPO_ROOT, '.agent', 'evidence');
+  const abs = resolve(REPO_ROOT, file);
+  expect(dirname(abs)).toBe(resolve(root, 'T-0009'));
+  expect(basename(abs)).toMatch(/^\d{8}-\d{6}-SS-PLAT-19-harness-fixture\.png$/);
   expect(statSync(abs).size).toBeGreaterThan(1000);
   expect(readFileSync(abs).subarray(0, 8).equals(PNG_SIGNATURE)).toBe(true);
 });

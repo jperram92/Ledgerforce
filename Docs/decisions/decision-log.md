@@ -1846,3 +1846,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: use sql<Date>`now()` for the three positive revocations, exactly as the production role controller already does. Preserve constraints and every existing assertion; add a direct negative test that a revocation one millisecond before its grant is rejected. No migration, production behavior, permissions or expectations relaxed.
 - Result: focused suite 10/10. Full DB sweep not repeated after fixture correction. LWC passed 8/8 from primary checkout; preserve older worktree discovery failure as environment evidence.
 - Status: accepted; full verifier and independent review remain required.
+
+### DL-0238 — Contain Windows providers and preserve honest review readiness
+- Date: 2026-10-29 · By: codex · Task: T-0103 / T-0112 · Category: implementation
+- Decision: use a built-in PowerShell/C# Windows Job Object host, assigning itself before provider launch, retaining a non-inheritable kill-on-close handle with no breakaway. Relay both output streams concurrently; use a JSON launch record for argv/stdin. No new package dependency. POSIX path unchanged. RQ-0014 records primary-source research and the taskkill orphan-pipe reproduction.
+- Retry only transient Windows EPERM/EACCES/EBUSY atomic rename failures, bounded to 50 retries with 2ms requested sleeps. Never unlink/truncate the destination. Heartbeat and failover tests pass, but atomic throughput remains below the unchanged threshold: this is WIP, not a completed task.
+- Browser evidence assertion now independently derives the expected directory from the configured root/isolation settings. Preserve the timestamp/ID, byte size and PNG-signature assertions; explicit-root and isolation RED/GREEN evidence retained.
+- User requested a new independent review. Create a pending request with exact scope, known failures and continuation prompt; do not manufacture a Claude report or claim existing October 24 approval covers new code. Formal review waits for verification and review status. Main remains unmerged.
+- Investigated test-module loading as a throughput cause; wrapping registration did not fix the failure and was reverted. Preserve all existing test assertions.
