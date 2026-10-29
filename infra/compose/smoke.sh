@@ -60,12 +60,20 @@ docker build -f "$root/infra/docker/keycloak.Dockerfile" -t "${project}-keycloak
 echo "--- starting the stack"
 "${compose[@]}" up -d --no-build
 
-# setup is one-shot: wait for it and require exit code 0 (`compose wait` exits with its code).
-setup_status=0
-"${compose[@]}" wait setup >/dev/null || setup_status=$?
+# setup is one-shot: include containers that stopped before service startup completed.
+setup_id="$("${compose[@]}" ps --all --quiet setup)"
+if [[ ! "$setup_id" =~ ^[a-f0-9]{12,64}$ ]]; then
+  echo "expected exactly one setup container" >&2
+  exit 1
+fi
+# docker wait prints the container exit code; its own exit status describes the API call.
+if ! setup_status="$(docker wait "$setup_id")"; then
+  echo "could not wait for setup container" >&2
+  exit 1
+fi
 "${compose[@]}" logs --no-color --no-log-prefix setup >"$work/setup.log"
 if [[ "$setup_status" != 0 ]]; then
-  cat "$work/setup.log" >&2
+  sed -E 's/(One-time password: ).*/\1[redacted]/' "$work/setup.log" >&2
   echo "setup exited with $setup_status" >&2
   exit 1
 fi

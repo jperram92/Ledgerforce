@@ -1854,3 +1854,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Browser evidence assertion now independently derives the expected directory from the configured root/isolation settings. Preserve the timestamp/ID, byte size and PNG-signature assertions; explicit-root and isolation RED/GREEN evidence retained.
 - User requested a new independent review. Create a pending request with exact scope, known failures and continuation prompt; do not manufacture a Claude report or claim existing October 24 approval covers new code. Formal review waits for verification and review status. Main remains unmerged.
 - Investigated test-module loading as a throughput cause; wrapping registration did not fix the failure and was reverted. Preserve all existing test assertions.
+
+### DL-0239 — Isolate the completed-setup wait repair from Windows verification
+- Date: 2026-10-29 · By: codex · Tasks: T-0103 / T-0113 · Category: implementation
+- Pinned Node 22.22.0 reproduces Windows atomic throughput failures. Immediate-retry and module-registration experiments were unreliable and reverted. Mark T-0103 blocked per TDD workflow; no user decision or test relaxation requested. Sandbox full run 69/82 also contains PowerShell UnauthorizedAccess failures; rerun unrestricted before attributing those to code.
+- Create T-0113 for the independent install-smoke race, researched in RQ-0091. Select exactly one setup container including stopped containers, capture Docker wait's printed exit code and reject command failures separately. Redact the existing password line on failure as on success.
+- Prove the actual smoke-script wait section against real Docker success/failure/missing services. Keep these explicit install tests outside the Docker-independent unit suite. Tests reproduce failed successful setup and disclosed synthetic password before repair, then pass 3/3. Full install CI still required; no full scenario completion claimed.

@@ -1,3 +1,13 @@
+# Handover — install-smoke repair, 2026-10-29
+
+## Current Codex continuation prompt
+> Resume on feat/T-0113-install-setup-wait. Read AGENTS.md, T-0113, run 2026-10-29-codex-r01.md and `git log -1 --format=full`. Base repair is c312393; diagnosis/task split is f861278; the commit containing this prompt fixes the setup wait race. Next: inspect PR #1 checks after pushing, and `.tmp/t0103-pinned-unrestricted.txt` for the still-running Windows conductor rerun. T-0113 real-Docker regression tests passed 3/3 after RED 1/3; full install smoke and full verification still required. T-0103 is blocked on atomic-reader throughput; no test expectations may be relaxed. Independent Claude review request remains pending, not an approval. Do not merge before green CI and cross-review.
+
+Done: T-0113 selects stopped setup containers, uses Docker wait stdout as the actual exit code, rejects missing/ambiguous setup, and redacts failure logs. Explicit real Docker regression tests and RED/GREEN logs committed with the repair. No CI gates edited.
+In progress: full install/verification, unrestricted pinned-runtime conductor rerun, and independent review. Windows retry experiments were reverted after unreliable results.
+Decisions: DL-0239, RQ-0091. No new human decision needed. Existing design/golden approvals remain outstanding as previously recorded.
+
+## Superseded T-0103 continuation (retained)
 # Handover - 2026-10-29 02:42 UTC
 ## Codex continuation prompt
 > Resume T-0103 on feat/T-0103-windows-heartbeat. Read AGENTS.md, this handover, run 2026-10-28-codex-r03.md and `git log -1 --format=full` (the WIP commit containing this prompt follows feabf92). Run `bash scripts/agent/resume.sh`, reclaim T-0103, then `node --test scripts/agent/test/atomic-write.test.ts`. Diagnose the unchanged throughput assertion using pinned Node 22.22.0; host shells currently differ (24.19.0 / 24.7.0). Keep >100 reads/writes and all deadlines intact. Windows heartbeat implementation passes, but whole conductor is 81/82. After fixing verification, address install-smoke's already-stopped setup wait race in a separate task with real Docker RED/GREEN tests. Read .agent/evidence/PR-1/review-request-claude-20261029.md for the requested independent review. Push final fixes to the PR branch and merge only after green CI and valid cross-provider review. Never infer approval from the pending request.
