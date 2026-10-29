@@ -1,0 +1,933 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0082",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145253-SS-PLAT-95-journal-preview-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: the draft's journal from the engine, before submitting @ 1440 [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:52:53.601Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145300-SS-PLAT-95-journal-preview-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: the draft's journal from the engine, before submitting @ 390 [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:53:00.078Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145254-SS-PLAT-93-chart-loading-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:52:54.122Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145255-SS-PLAT-93-chart-error-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:52:55.814Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145257-SS-PLAT-93-chart-empty-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:52:57.365Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145258-SS-PLAT-93-chart-forbidden-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:52:58.880Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145300-SS-PLAT-93-chart-forbidden-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:53:00.264Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145310-SS-PLAT-94-journal-form-filled-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Accountant writes a draft by keyboard and sees its journal [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:53:10.397Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145319-SS-PLAT-94-journal-form-problems-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the draft form at 390, with the problems shown before saving [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:53:19.412Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145354-SS-PLAT-95-journal-preview-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: the draft's journal from the engine, before submitting @ 1440 [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:53:54.492Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145352-SS-PLAT-93-chart-loading-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:53:52.390Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145354-SS-PLAT-93-chart-error-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:53:54.909Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145358-SS-PLAT-93-chart-empty-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:53:58.009Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145400-SS-PLAT-93-chart-forbidden-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:54:00.175Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145402-SS-PLAT-93-chart-forbidden-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:54:02.984Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145407-SS-PLAT-95-journal-preview-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: the draft's journal from the engine, before submitting @ 390 [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:54:07.499Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145426-SS-PLAT-94-journal-form-filled-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Accountant writes a draft by keyboard and sees its journal [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:54:26.456Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145438-SS-PLAT-94-journal-form-problems-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the draft form at 390, with the problems shown before saving [T-0082]",
+      "commit": "2eab76745601",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:54:38.941Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145512-SS-PLAT-93-chart-of-accounts-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: an Accountant reads the chart by type @ 1440 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:12.299Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145512-SS-PLAT-94-journal-approver-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 390 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:12.999Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145515-SS-PLAT-94-journal-posted-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 390 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:15.146Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145515-SS-PLAT-93-chart-of-accounts-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: an Accountant reads the chart by type @ 390 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:15.079Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145516-SS-PLAT-93-chart-loading-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:16.786Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145518-SS-PLAT-93-chart-error-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:18.754Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145520-SS-PLAT-93-chart-empty-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:20.713Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145522-SS-PLAT-93-chart-forbidden-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:22.883Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145524-SS-PLAT-93-chart-forbidden-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:24.794Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145517-SS-PLAT-94-journal-list-auditor-1440-dark.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:17.964Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145520-SS-PLAT-94-journal-auditor-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:20.273Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145521-SS-PLAT-94-journal-list-loading-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:21.622Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145523-SS-PLAT-94-journal-list-error-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:23.431Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145525-SS-PLAT-94-journal-list-empty-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:25.176Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145526-SS-PLAT-94-journal-list-forbidden-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:26.964Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145527-SS-PLAT-94-journal-list-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the journal list, newest first @ 1440 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:27.880Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145529-SS-PLAT-95-journal-preview-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: the draft's journal from the engine, before submitting @ 1440 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:29.634Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145530-SS-PLAT-94-journal-list-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the journal list, newest first @ 390 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:30.676Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145532-SS-PLAT-95-journal-refused-control-account-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: a control-account line is refused with the reason @ 1440 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:32.339Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145534-SS-PLAT-95-journal-preview-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: the draft's journal from the engine, before submitting @ 390 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:34.728Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145534-SS-PLAT-94-journal-form-filled-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Accountant writes a draft by keyboard and sees its journal [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:34.545Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145535-SS-PLAT-94-journal-submitted-waiting-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Accountant writes a draft by keyboard and sees its journal [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:35.819Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145537-SS-PLAT-95-journal-refused-control-account-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: a control-account line is refused with the reason @ 390 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:37.323Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145538-SS-PLAT-94-journal-form-problems-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the draft form at 390, with the problems shown before saving [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:38.853Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145540-SS-PLAT-95-journal-posted-entry-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: a posted journal shows the entry it posted [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:40.483Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145541-SS-PLAT-94-journal-approver-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 1440 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:41.477Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145543-SS-PLAT-94-journal-posted-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 1440 [T-0082]",
+      "commit": "2eab76745601-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:55:43.565Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145636-SS-PLAT-93-chart-of-accounts-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: an Accountant reads the chart by type @ 1440 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:36.968Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145637-SS-PLAT-94-journal-approver-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 390 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:37.112Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145639-SS-PLAT-94-journal-posted-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 390 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:39.261Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145639-SS-PLAT-93-chart-of-accounts-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: an Accountant reads the chart by type @ 390 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:39.453Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145640-SS-PLAT-93-chart-loading-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:40.784Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145642-SS-PLAT-93-chart-error-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:42.475Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145643-SS-PLAT-93-chart-empty-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:43.945Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145645-SS-PLAT-93-chart-forbidden-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:45.813Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145647-SS-PLAT-93-chart-forbidden-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:47.510Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145641-SS-PLAT-94-journal-list-auditor-1440-dark.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:41.638Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145643-SS-PLAT-94-journal-auditor-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:43.740Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145645-SS-PLAT-94-journal-list-loading-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:45.063Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145646-SS-PLAT-94-journal-list-error-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:46.826Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145648-SS-PLAT-94-journal-list-empty-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:48.405Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145649-SS-PLAT-94-journal-list-forbidden-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:49.960Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145649-SS-PLAT-94-journal-list-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the journal list, newest first @ 1440 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:49.941Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145652-SS-PLAT-95-journal-preview-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: the draft's journal from the engine, before submitting @ 1440 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:52.317Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145652-SS-PLAT-94-journal-list-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the journal list, newest first @ 390 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:52.335Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145654-SS-PLAT-95-journal-refused-control-account-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: a control-account line is refused with the reason @ 1440 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:54.289Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145655-SS-PLAT-94-journal-form-filled-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Accountant writes a draft by keyboard and sees its journal [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:55.019Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145656-SS-PLAT-94-journal-submitted-waiting-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Accountant writes a draft by keyboard and sees its journal [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:56.412Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145656-SS-PLAT-95-journal-preview-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: the draft's journal from the engine, before submitting @ 390 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:56.575Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145659-SS-PLAT-94-journal-form-problems-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the draft form at 390, with the problems shown before saving [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:59.009Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145659-SS-PLAT-95-journal-refused-control-account-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: a control-account line is refused with the reason @ 390 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:56:59.141Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145701-SS-PLAT-95-journal-posted-entry-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: a posted journal shows the entry it posted [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:57:01.152Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145701-SS-PLAT-94-journal-approver-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 1440 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:57:01.113Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145702-SS-PLAT-94-journal-posted-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 1440 [T-0082]",
+      "commit": "6dda4cd5aba4",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T14:57:02.867Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-96",
+      "file": ".agent/evidence/T-0082/20261026-145720-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/journals/gl-screens.db.test.ts › SS-PLAT-96: GL screen read routes (chart, journal list, journal preview) › SS-PLAT-96 GET /accounts lists the companies and their chart in code order, with system roles; needs gl.account.read | apps/api/src/journals/gl-screens.db.test.ts › SS-PLAT-96: GL screen read routes (chart, journal list, journal preview) › SS-PLAT-96 GET /manual-journals lists newest first with amounts as decimal strings and names; filters by status; needs gl.journal.read | apps/api/src/journals/gl-screens.db.test.ts › SS-PLAT-96: GL screen read routes (chart, journal list, journal preview) › SS-PLAT-96 GET /manual-journals/:id names the people involved | apps/api/src/journals/gl-screens.db.test.ts › SS-PLAT-96: GL screen read routes (chart, journal list, journal preview) › SS-PLAT-96 GET /manual-journals/:id/preview shows the journal the engine would post and writes nothing | apps/api/src/journals/gl-screens.db.test.ts › SS-PLAT-96: GL screen read routes (chart, journal list, journal preview) › SS-PLAT-96 a control-account line is refused by the preview with CONTROL_ACCOUNT and its line; a posted journal answers ALREADY_POSTED",
+      "commit": "6dda4cd5aba4",
+      "provider": "claude",
+      "timestamp": "2026-10-26T14:57:20.240Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-145726-tests-web.json",
+      "test": "5 test(s): apps/web/src/gl/gl-logic.test.ts › SS-PLAT-95: refusals in plain words › has a sentence for every posting-engine refusal code, and no stale ones | apps/web/src/gl/gl-logic.test.ts › SS-PLAT-95: refusals in plain words › CONTROL_ACCOUNT names the line and the account and says who posts there | apps/web/src/gl/gl-logic.test.ts › SS-PLAT-95: refusals in plain words › an unknown code still gets words and the code for support | apps/web/src/gl/gl.test.tsx › SS-PLAT-95: show me the journal › shows the engine preview, balanced, before submitting; Submit sends the draft | apps/web/src/gl/gl.test.tsx › SS-PLAT-95: show me the journal › marks the refused CONTROL_ACCOUNT line, explains it and withholds Submit",
+      "commit": "6dda4cd5aba4",
+      "provider": "claude",
+      "timestamp": "2026-10-26T14:57:26.307Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-145726-tests-web.json",
+      "test": "12 test(s): apps/web/src/gl/gl-logic.test.ts › SS-PLAT-94: manual journal form rules › accepts decimal strings with up to four decimals, above zero | apps/web/src/gl/gl-logic.test.ts › SS-PLAT-94: manual journal form rules › builds the API body with the amounts exactly as typed (strings, never numbers) | apps/web/src/gl/gl-logic.test.ts › SS-PLAT-94: manual journal form rules › says what is wrong with each line before anything is sent | apps/web/src/gl/gl-logic.test.ts › SS-PLAT-94: manual journal form rules › turns a stored journal back into the form, resolving system-role lines to accounts | apps/web/src/gl/gl-logic.test.ts › SS-PLAT-94: status words, glosses and whose turn › names each status in words | apps/web/src/gl/gl-logic.test.ts › SS-PLAT-94: status words, glosses and whose turn › glosses every account type in plain words | apps/web/src/gl/gl-logic.test.ts › SS-PLAT-94: status words, glosses and whose turn › says whose turn it is for each status and role | apps/web/src/gl/gl.test.tsx › SS-PLAT-94: manual journals › lists journals with status words and right-set amounts; preparers get New | apps/web/src/gl/gl.test.tsx › SS-PLAT-94: manual journals › an Auditor reads the list but cannot start a journal | apps/web/src/gl/gl.test.tsx › SS-PLAT-94: manual journals › creates a draft with an Idempotency-Key and decimal-string amounts, then opens it | apps/web/src/gl/gl.test.tsx › SS-PLAT-94: manual journals › shows the problems with the form before sending anything | apps/web/src/gl/gl.test.tsx › SS-PLAT-94: manual journals › an Approver approves a journal that needs approval, naming the preparer",
+      "commit": "6dda4cd5aba4",
+      "provider": "claude",
+      "timestamp": "2026-10-26T14:57:26.307Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-145726-tests-web.json",
+      "test": "3 test(s): apps/web/src/gl/gl.test.tsx › SS-PLAT-93: chart of accounts › is listed on Reports and shows accounts by type with roles and controls in words | apps/web/src/gl/gl.test.tsx › SS-PLAT-93: chart of accounts › a clerk without gl.account.read sees the forbidden state and no request is made | apps/web/src/gl/gl.test.tsx › SS-PLAT-93: chart of accounts › shows the empty state when the company has no chart yet",
+      "commit": "6dda4cd5aba4",
+      "provider": "claude",
+      "timestamp": "2026-10-26T14:57:26.307Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-151652-SS-PLAT-93-chart-of-accounts-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: an Accountant reads the chart by type @ 1440 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:16:52.270Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-151654-SS-PLAT-93-chart-of-accounts-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: an Accountant reads the chart by type @ 390 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:16:54.317Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-151655-SS-PLAT-93-chart-loading-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:16:55.336Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-151656-SS-PLAT-93-chart-error-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:16:56.785Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-151658-SS-PLAT-93-chart-empty-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:16:58.214Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-151659-SS-PLAT-93-chart-forbidden-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:16:59.658Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-93",
+      "file": ".agent/evidence/T-0082/20261026-151701-SS-PLAT-93-chart-forbidden-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-93 chart of accounts › SS-PLAT-93: loading, error, empty and forbidden states [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:01.108Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151700-SS-PLAT-94-journal-approver-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 390 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:00.578Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151702-SS-PLAT-94-journal-posted-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 390 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:02.464Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151703-SS-PLAT-94-journal-list-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the journal list, newest first @ 1440 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:03.195Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151705-SS-PLAT-94-journal-list-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the journal list, newest first @ 390 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:05.249Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151707-SS-PLAT-94-journal-form-filled-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Accountant writes a draft by keyboard and sees its journal [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:07.706Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151708-SS-PLAT-94-journal-submitted-waiting-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Accountant writes a draft by keyboard and sees its journal [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:08.710Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151710-SS-PLAT-94-journal-form-problems-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: the draft form at 390, with the problems shown before saving [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:10.668Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151704-SS-PLAT-94-journal-list-auditor-1440-dark.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:04.401Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151705-SS-PLAT-94-journal-auditor-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:05.850Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151706-SS-PLAT-94-journal-list-loading-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:06.760Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151708-SS-PLAT-94-journal-list-error-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:08.072Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151709-SS-PLAT-94-journal-list-empty-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:09.402Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151710-SS-PLAT-94-journal-list-forbidden-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Auditor reads but cannot act; loading, empty, error and forbidden [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:10.765Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-151712-SS-PLAT-95-journal-preview-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: the draft's journal from the engine, before submitting @ 1440 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:12.794Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151712-SS-PLAT-94-journal-approver-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 1440 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:12.816Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-94",
+      "file": ".agent/evidence/T-0082/20261026-151714-SS-PLAT-94-journal-posted-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-94 manual journals › SS-PLAT-94: an Approver approves, then the Accountant posts @ 1440 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:14.620Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-151714-SS-PLAT-95-journal-refused-control-account-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: a control-account line is refused with the reason @ 1440 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:14.728Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-151716-SS-PLAT-95-journal-preview-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: the draft's journal from the engine, before submitting @ 390 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:16.658Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-151718-SS-PLAT-95-journal-refused-control-account-390.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: a control-account line is refused with the reason @ 390 [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:18.445Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-95",
+      "file": ".agent/evidence/T-0082/20261026-151720-SS-PLAT-95-journal-posted-entry-1440.png",
+      "test": "web/gl.spec.ts › SS-PLAT-95 show me the journal › SS-PLAT-95: a posted journal shows the entry it posted [T-0082]",
+      "commit": "ed7c60f64b2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-10-26T15:17:20.380Z",
+      "result": "passed"
+    }
+  ]
+}

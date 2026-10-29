@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.054.001.04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <BkToCstmrDbtCdtNtfctn>
+    <GrpHdr><MsgId>HARBOUR-NTF-20270104-0001</MsgId><CreDtTm>2027-01-04T10:12:30+11:00</CreDtTm></GrpHdr>
+    <Ntfctn>
+      <Id>NTF-20270104-0001</Id>
+      <CreDtTm>2027-01-04T10:12:30+11:00</CreDtTm>
+      <Acct>
+        <Id><Othr><Id>062000-12345678</Id></Othr></Id>
+        <Ccy>AUD</Ccy>
+      </Acct>
+      <Ntry>
+        <Amt Ccy="AUD">50.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt><Dt>2027-01-04</Dt></BookgDt>
+        <AcctSvcrRef>202701040001</AcctSvcrRef>
+        <NtryDtls><TxDtls><RmtInf><Ustrd>Osko Acme Pty Ltd</Ustrd></RmtInf></TxDtls></NtryDtls>
+      </Ntry>
+    </Ntfctn>
+  </BkToCstmrDbtCdtNtfctn>
+</Document>

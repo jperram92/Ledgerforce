@@ -1,0 +1,114 @@
+/* GL screens (T-0082) in the Timeline direction (DL-0070): reuses admin.css blocks and tables;
+   adds the journal-line editor, money cells and the refused-line marker (word + dashed rule, never
+   colour alone, P2). Requires tokens.css, timeline.css, shell.css and admin.css first. */
+
+.admin-table th.num,
+.admin-table td.num,
+.gl-form input.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.gl-bar {
+  grid-template-columns: minmax(11rem, 16rem) 1fr;
+}
+.gl-bar .actions {
+  justify-content: flex-end;
+}
+a.primary,
+a.secondary {
+  display: inline-block;
+  text-decoration: none;
+}
+
+.gl-form {
+  max-width: 60rem;
+}
+.gl-form > label,
+.gl-form > input {
+  max-width: 34rem;
+}
+.gl-form fieldset.gl-lines {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--s3);
+}
+.gl-line {
+  display: grid;
+  grid-template-columns: minmax(14rem, 2fr) minmax(7rem, 1fr) minmax(7rem, 1fr) minmax(9rem, 1.5fr);
+  gap: var(--s2) var(--s3);
+  align-items: end;
+  padding-bottom: var(--s3);
+  border-bottom: 1px solid var(--line);
+}
+.gl-line > button {
+  justify-self: start;
+}
+.gl-field {
+  display: grid;
+  gap: var(--s1);
+}
+.gl-lines > button {
+  justify-self: start;
+}
+
+.gl-facts p {
+  margin: var(--s2) 0;
+}
+.gl-people {
+  list-style: none;
+  padding: 0;
+  margin: var(--s2) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1) var(--s4);
+  color: var(--ink-2);
+}
+.gl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  align-items: center;
+}
+.gl-actions-col {
+  display: grid;
+  gap: var(--s3);
+}
+
+.gl-draft tr[data-refused='yes'] td {
+  border-top: 2px dashed var(--ink);
+  border-bottom: 2px dashed var(--ink);
+  font-weight: 600;
+}
+.word[data-status='refused'] {
+  border-width: 2px;
+  border-style: dashed;
+  border-color: var(--ink);
+}
+.word[data-status='draft'] {
+  border-style: dotted;
+}
+.refusal ul {
+  margin: var(--s1) 0 0;
+  padding-left: var(--s4);
+  font-weight: 400;
+}
+
+@media (max-width: 900px) {
+  .gl-bar {
+    grid-template-columns: 1fr;
+  }
+  .gl-bar .actions {
+    justify-content: flex-start;
+  }
+  .gl-line {
+    grid-template-columns: 1fr 1fr;
+  }
+  .gl-line .gl-account,
+  .gl-line .gl-memo {
+    grid-column: 1 / -1;
+  }
+  .admin-table td.num {
+    text-align: left;
+  }
+}

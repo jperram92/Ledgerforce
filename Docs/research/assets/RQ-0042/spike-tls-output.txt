@@ -1,0 +1,10 @@
+vault-ca.pem
+vault-cert.pem
+vault-key.pem
+== without extra CA
+error TypeError fetch failed UNABLE_TO_VERIFY_LEAF_SIGNATURE
+== with NODE_EXTRA_CA_CERTS=vault-ca.pem
+status 200
+== redirect manual
+manual -> status 307 type basic leaked false
+follow -> status 200 leaked (cross-port custom header forwarded?) true

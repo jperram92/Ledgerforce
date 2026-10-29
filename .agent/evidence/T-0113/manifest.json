@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0113",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0113/20261029-031157-SS-PLAT-23-owner-signed-in.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the Owner signs in once with the one-time password, enrols MFA and lands in LedgerForce",
+      "commit": "f2321880c5b20915df864b50dd41705eba0e9dd6",
+      "provider": "unknown",
+      "timestamp": "2026-10-29T03:11:57.627Z",
+      "result": "passed"
+    }
+  ]
+}

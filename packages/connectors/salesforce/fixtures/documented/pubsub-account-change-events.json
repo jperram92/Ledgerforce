@@ -1,0 +1,157 @@
+{
+  "source": "Documented, NOT recorded: written from RQ-0036 findings 5 and 6 and their sources (S7, S8); payloads are Avro binary produced by avsc 5.7.9 from the schema below. No Salesforce org was contacted. Replace with redacted recordings in fixtures/recorded/ from a scratch org (RQ-0036 follow-up). No real id, user or token appears here.",
+  "topic": "/data/AccountChangeEvent",
+  "schemaId": "TESTaccountChangeEventSchema01",
+  "schema": {
+    "type": "record",
+    "name": "AccountChangeEvent",
+    "namespace": "com.sforce.eventbus",
+    "fields": [
+      {
+        "name": "ChangeEventHeader",
+        "type": {
+          "type": "record",
+          "name": "ChangeEventHeader",
+          "fields": [
+            {
+              "name": "entityName",
+              "type": "string"
+            },
+            {
+              "name": "recordIds",
+              "type": {
+                "type": "array",
+                "items": "string"
+              }
+            },
+            {
+              "name": "changeType",
+              "type": {
+                "type": "enum",
+                "name": "ChangeType",
+                "symbols": [
+                  "CREATE",
+                  "UPDATE",
+                  "DELETE",
+                  "UNDELETE",
+                  "GAP_CREATE",
+                  "GAP_UPDATE",
+                  "GAP_DELETE",
+                  "GAP_UNDELETE",
+                  "GAP_OVERFLOW",
+                  "SNAPSHOT"
+                ]
+              }
+            },
+            {
+              "name": "changeOrigin",
+              "type": "string"
+            },
+            {
+              "name": "transactionKey",
+              "type": "string"
+            },
+            {
+              "name": "sequenceNumber",
+              "type": "int"
+            },
+            {
+              "name": "commitTimestamp",
+              "type": "long"
+            },
+            {
+              "name": "commitNumber",
+              "type": "long"
+            },
+            {
+              "name": "commitUser",
+              "type": "string"
+            },
+            {
+              "name": "nulledFields",
+              "type": {
+                "type": "array",
+                "items": "string"
+              }
+            },
+            {
+              "name": "diffFields",
+              "type": {
+                "type": "array",
+                "items": "string"
+              }
+            },
+            {
+              "name": "changedFields",
+              "type": {
+                "type": "array",
+                "items": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Name",
+        "type": ["null", "string"],
+        "default": null
+      },
+      {
+        "name": "Type",
+        "type": ["null", "string"],
+        "default": null
+      },
+      {
+        "name": "BillingCity",
+        "type": ["null", "string"],
+        "default": null
+      },
+      {
+        "name": "Phone",
+        "type": ["null", "string"],
+        "default": null
+      },
+      {
+        "name": "OwnerId",
+        "type": ["null", "string"],
+        "default": null
+      },
+      {
+        "name": "CreatedDate",
+        "type": ["null", "long"],
+        "default": null
+      },
+      {
+        "name": "LastModifiedDate",
+        "type": ["null", "long"],
+        "default": null
+      }
+    ]
+  },
+  "events": [
+    {
+      "name": "create",
+      "replayIdHex": "0000000000004e21",
+      "eventId": "e0000000-0000-4000-8000-000000000001",
+      "payloadBase64": "DkFjY291bnQCJDAwMVRFU1QwMDAwMDAwMUFBQQAAaGNvbS9zYWxlc2ZvcmNlL2FwaS9zb2FwLzYyLjA7Y2xpZW50PVNmZGNJbnRlcm5hbEFQSS8eMDAwMWEtdHgtY3JlYXRlAoD2oIrDZoaerO+EPyQwMDVURVNUMDAwMDAwMDFBQUEAAAACLkhhcmJvdXIgRnJlaWdodCBQdHkgTHRkAiJDdXN0b21lciAtIERpcmVjdAIMU3lkbmV5AAIkMDA1VEVTVDAwMDAwMDAxQUFBAoD2oIrDZgKA9qCKw2Y="
+    },
+    {
+      "name": "update",
+      "replayIdHex": "0000000000004e22",
+      "eventId": "e0000000-0000-4000-8000-000000000002",
+      "payloadBase64": "DkFjY291bnQEJDAwMVRFU1QwMDAwMDAwMUFBQSQwMDFURVNUMDAwMDAwMDJBQUEAAmhjb20vc2FsZXNmb3JjZS9hcGkvc29hcC82Mi4wO2NsaWVudD1TZmRjSW50ZXJuYWxBUEkvHjAwMDFiLXR4LXVwZGF0ZQLAn6iKw2aCgICAgICAICQwMDVURVNUMDAwMDAwMDFBQUECCDB4MTAAAAIIMHg4QQACKkhhcmJvdXIgRnJlaWdodCBHcm91cAACEk5ld2Nhc3RsZQAAAALAn6iKw2Y="
+    },
+    {
+      "name": "gap_update",
+      "replayIdHex": "0000000000004e23",
+      "eventId": "e0000000-0000-4000-8000-000000000003",
+      "payloadBase64": "DkFjY291bnQCJDAwMVRFU1QwMDAwMDAwMkFBQQAKaGNvbS9zYWxlc2ZvcmNlL2FwaS9zb2FwLzYyLjA7Y2xpZW50PVNmZGNJbnRlcm5hbEFQSS8YMDAwMWMtdHgtZ2FwAoDJr4rDZrifrO+EPyQwMDVURVNUMDAwMDAwMDFBQUEAAAAAAAAAAAAA"
+    },
+    {
+      "name": "gap_overflow",
+      "replayIdHex": "0000000000004e24",
+      "eventId": "e0000000-0000-4000-8000-000000000004",
+      "payloadBase64": "DkFjY291bnQCJDAwMDAwMDAwMDAwMDAwMEFBQQAQaGNvbS9zYWxlc2ZvcmNlL2FwaS9zb2FwLzYyLjA7Y2xpZW50PVNmZGNJbnRlcm5hbEFQSS8iMDAwMWQtdHgtb3ZlcmZsb3cCwPK2isNmgKGs74Q/JDAwNVRFU1QwMDAwMDAwMUFBQQAAAAAAAAAAAAA="
+    }
+  ]
+}

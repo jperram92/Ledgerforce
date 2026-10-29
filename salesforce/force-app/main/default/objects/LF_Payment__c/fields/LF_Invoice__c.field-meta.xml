@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LF_Invoice__c</fullName>
+    <deleteConstraint>SetNull</deleteConstraint>
+    <description>Invoice paid, when the payment is applied to a single invoice; blank otherwise. Written by LedgerForce write-back; read-only in Salesforce (design §5.4).</description>
+    <label>Invoice</label>
+    <referenceTo>LF_Invoice__c</referenceTo>
+    <relationshipLabel>LedgerForce Payments</relationshipLabel>
+    <relationshipName>LF_Payments</relationshipName>
+    <required>false</required>
+    <type>Lookup</type>
+</CustomField>

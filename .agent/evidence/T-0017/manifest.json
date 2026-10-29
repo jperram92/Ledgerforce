@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0017",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-13",
+      "file": ".agent/evidence/T-0017/20261024-140920-tests-unit.json",
+      "test": "3 test(s): packages/testing/eslint-rules/no-float-money.config.test.ts › SS-PLAT-13: Float arithmetic on money is a lint error › reports lf/no-float-money in a money package (packages/ledger) under the real config | packages/testing/eslint-rules/no-float-money.config.test.ts › SS-PLAT-13: Float arithmetic on money is a lint error › reports arithmetic on money-named values anywhere in the repo (apps/api) | packages/testing/eslint-rules/no-float-money.config.test.ts › SS-PLAT-13: Float arithmetic on money is a lint error › decimal.js-based Money code is clean (negative control)",
+      "commit": "53850953ec40-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T14:09:20.426Z",
+      "result": "passed"
+    }
+  ]
+}

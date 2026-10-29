@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0094",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051409-SS-PLAT-23-sign-in-page.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the sign-in page renders",
+      "commit": "07361dae8097-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:14:09.618Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051411-SS-PLAT-23-owner-setup-link-sign-in.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the setup link opens the organisation sign-in page",
+      "commit": "07361dae8097-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:14:11.312Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051412-SS-PLAT-23-owner-mfa-enrolment.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the Owner signs in once with the one-time password, enrols MFA and lands in LedgerForce",
+      "commit": "07361dae8097-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:14:12.815Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051415-SS-PLAT-23-owner-signed-in.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the Owner signs in once with the one-time password, enrols MFA and lands in LedgerForce",
+      "commit": "07361dae8097-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:14:15.315Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051417-SS-PLAT-23-one-time-password-spent.png",
+      "test": "install.smoke.spec.ts › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the one-time password no longer works",
+      "commit": "07361dae8097-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:14:17.018Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-86",
+      "file": ".agent/evidence/T-0094/20261026-051501-tests-unit.json",
+      "test": "24 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 every base image is pinned by tag and digest | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 every runtime target runs as a non-root user | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 no image bakes a secret (no ENV/ARG secret, no secrets folder copied) | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 images are pinned; app services build the shared Dockerfile targets | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 secrets are files in the ignored secrets folder, never values in the file | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 each secret reaches only the services that need it | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 the runtime connects as lf_app; only setup holds the migrator password | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 only the web origin is published, on loopback by default; the database and IdP are not | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 start order: setup waits for a healthy database and IdP; api and worker wait for setup | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 every service drops privileges it does not need | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 the old compose path includes the new file instead of being deleted | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 no self-registration, no e-mail reset, brute-force protection, strong password policy | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 the client: confidential, code flow + PKCE S256 only, secret from the environment | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 the ACR mapping names the MFA level the API accepts (ADR-0025, HANDOVER Q13) | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 generated secrets stay out of git › SS-PLAT-86 the secrets folder and the install env file are ignored; examples only are tracked | /home/user/Ledgerforce/.claude/worktrees/agent-a0bf6fdb8b334e86f/infra/test/install-contract.test.ts › SS-PLAT-86 generated secrets stay out of git › SS-PLAT-86 init-secrets.sh writes six distinct random secrets once and never overwrites | packages/db/src/env.test.ts › SS-PLAT-86 secrets from env or file › SS-PLAT-86 reads a secret from the variable or, trimmed, from the _FILE path | packages/db/src/env.test.ts › SS-PLAT-86 secrets from env or file › SS-PLAT-86 refuses both forms at once, an empty file and a missing required secret | packages/db/src/env.test.ts › SS-PLAT-86 secrets from env or file › SS-PLAT-86 never puts the secret value in an error message | packages/db/src/env.test.ts › SS-PLAT-86 database URL per role › SS-PLAT-86 composes host, port, database, role and the URL-encoded password file | packages/db/src/env.test.ts › SS-PLAT-86 database URL per role › SS-PLAT-86 uses the migrator password for lf_migrator and a given port | packages/db/src/env.test.ts › SS-PLAT-86 database URL per role › SS-PLAT-86 accepts a full URL only when it names the expected role | packages/db/src/env.test.ts › SS-PLAT-86 database URL per role › SS-PLAT-86 names what is missing",
+      "commit": "a175874f1bb0",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:15:01.120Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-85",
+      "file": ".agent/evidence/T-0094/20261026-051501-tests-unit.json",
+      "test": "9 test(s): apps/worker/src/setup/keycloak-admin.test.ts › SS-PLAT-85 Keycloak admin client for the first Owner › SS-PLAT-85 gets a token with the bootstrap admin client (client_credentials, master realm) | apps/worker/src/setup/keycloak-admin.test.ts › SS-PLAT-85 Keycloak admin client for the first Owner › SS-PLAT-85 creates the user once, with the first-login actions, and returns the subject | apps/worker/src/setup/keycloak-admin.test.ts › SS-PLAT-85 Keycloak admin client for the first Owner › SS-PLAT-85 splits the display name at the last space; a single name is the first name only | apps/worker/src/setup/keycloak-admin.test.ts › SS-PLAT-85 Keycloak admin client for the first Owner › SS-PLAT-85 sets a temporary password and re-applies MFA enrolment and password change | apps/worker/src/setup/keycloak-admin.test.ts › SS-PLAT-85 Keycloak admin client for the first Owner › SS-PLAT-85 refuses a subject that is not a UUID (no path injection) | apps/worker/src/setup/keycloak-admin.test.ts › SS-PLAT-85 Keycloak admin client for the first Owner › SS-PLAT-85 a failed call throws with status and path, never the secret or the password | apps/worker/src/setup/setup-config.test.ts › SS-PLAT-85 setup configuration › SS-PLAT-85 reads both roles, the tenant, the Owner and the Keycloak admin client | apps/worker/src/setup/setup-config.test.ts › SS-PLAT-85 setup configuration › SS-PLAT-85 honours LF_OIDC_ISSUER, LF_KEYCLOAK_REALM and LF_SETUP_REISSUE=1 only | apps/worker/src/setup/setup-config.test.ts › SS-PLAT-85 setup configuration › SS-PLAT-85 names each missing setting and has no credential default",
+      "commit": "a175874f1bb0",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:15:01.120Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-86",
+      "file": ".agent/evidence/T-0094/20261026-051503-tests-api-unit.json",
+      "test": "11 test(s): apps/api/src/config.test.ts › SS-PLAT-86 API configuration from the environment › SS-PLAT-86 a local install: lf_app, sessions, OIDC with the secret from its file | apps/api/src/config.test.ts › SS-PLAT-86 API configuration from the environment › SS-PLAT-86 HOST and PORT are honoured and a bad port is refused | apps/api/src/config.test.ts › SS-PLAT-86 API configuration from the environment › SS-PLAT-86 an https deployment does not allow insecure requests | apps/api/src/config.test.ts › SS-PLAT-86 API configuration from the environment › SS-PLAT-86 plain http is refused for any host that is not loopback | apps/api/src/config.test.ts › SS-PLAT-86 API configuration from the environment › SS-PLAT-86 OIDC needs a client id and secret, and refuses a database role other than lf_app | apps/api/src/config.test.ts › SS-PLAT-86 API configuration from the environment › SS-PLAT-86 without an issuer the API runs with sessions but no login routes | apps/api/src/deploy/nginx-routes.test.ts › SS-PLAT-86 one origin: SPA, API and IdP routes through nginx › SS-PLAT-86 every API controller route is proxied to the api service | apps/api/src/deploy/nginx-routes.test.ts › SS-PLAT-86 one origin: SPA, API and IdP routes through nginx › SS-PLAT-86 the proxied API prefixes are exactly the API routes (no stale entries) | apps/api/src/deploy/nginx-routes.test.ts › SS-PLAT-86 one origin: SPA, API and IdP routes through nginx › SS-PLAT-86 no SPA route is shadowed by the API or by Keycloak | apps/api/src/deploy/nginx-routes.test.ts › SS-PLAT-86 one origin: SPA, API and IdP routes through nginx › SS-PLAT-86 only the tenant realm paths of Keycloak are public; /admin and the master realm are refused | apps/api/src/deploy/nginx-routes.test.ts › SS-PLAT-86 one origin: SPA, API and IdP routes through nginx › SS-PLAT-86 the SPA falls back to index.html and sends basic security headers",
+      "commit": "a175874f1bb0-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:15:03.317Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-85",
+      "file": ".agent/evidence/T-0094/20261026-051505-tests-db.json",
+      "test": "8 test(s): apps/worker/src/setup/setup.db.test.ts › SS-PLAT-85 first-start setup › SS-PLAT-85 refuses to run with the roles swapped or with a superuser | apps/worker/src/setup/setup.db.test.ts › SS-PLAT-85 first-start setup › SS-PLAT-85 refuses a role with BYPASSRLS or SUPERUSER, even under the expected name | apps/worker/src/setup/setup.db.test.ts › SS-PLAT-85 first-start setup › SS-PLAT-85 first run: migrations and queue as lf_migrator, owner invited, one-time link printed | apps/worker/src/setup/setup.db.test.ts › SS-PLAT-85 first-start setup › SS-PLAT-85 run again: nothing changes and no password is printed | apps/worker/src/setup/setup.db.test.ts › SS-PLAT-85 first-start setup › SS-PLAT-85 reissue while the Owner is still invited: a new, different one-time password | apps/worker/src/setup/setup.db.test.ts › SS-PLAT-85 first-start setup › SS-PLAT-85 once the Owner has signed in, reissue is refused and nothing is printed | apps/worker/src/setup/setup.db.test.ts › SS-PLAT-85 first-start setup › SS-PLAT-85 refuses bad input before touching anything | apps/worker/src/setup/setup.db.test.ts › SS-PLAT-85 one-time password › SS-PLAT-85 is long, random and meets the realm policy (12+ chars, not the e-mail)",
+      "commit": "a175874f1bb0-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:15:05.985Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-23",
+      "file": ".agent/evidence/T-0094/20261026-051533-SS-PLAT-23-install-smoke-run.txt",
+      "test": "infra/compose/smoke.sh › tests/install/install.smoke.spec.ts (7 tests)",
+      "commit": "a175874f1bb0-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:15:33.979Z",
+      "result": "passed"
+    }
+  ]
+}

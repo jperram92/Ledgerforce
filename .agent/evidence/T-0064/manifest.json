@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0064",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-75",
+      "file": ".agent/evidence/T-0064/20261025-234834-tests-unit.json",
+      "test": "12 test(s): packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: Pub/Sub API proto pinned to the published contract › vendors pubsub_api.proto byte for byte (SHA-256 of the forcedotcom file, RQ-0036 S1) | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: Pub/Sub API proto pinned to the published contract › exposes Subscribe as a bidi stream and GetSchema as unary, with the documented fields | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: CDC payloads decode from Avro with the GetSchema schema › decodes a CREATE change event: header, record fields, opaque replay id | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: CDC payloads decode from Avro with the GetSchema schema › keeps a commitNumber above 2^53 exact and expands the field bitmaps to names | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: CDC payloads decode from Avro with the GetSchema schema › classifies gap and overflow events (they carry no field data to apply) | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: CDC payloads decode from Avro with the GetSchema schema › rejects a payload that does not match its schema rather than guessing | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: CDC payloads decode from Avro with the GetSchema schema › bitmaps: bit i names field i; compound entries \"<index>-0x..\" name child fields | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: idempotency keys (design §5.6 rule 1) › one key per record: entity, record id, commit number and sequence number | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: idempotency keys (design §5.6 rule 1) › overflow: one key per entity and transaction (the record id is a placeholder) | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: idempotency keys (design §5.6 rule 1) › a non-CDC event (platform event) is keyed by its event uuid | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: Pub/Sub errors are classified from the error-code trailer (RQ-0036 F4) › the replay-id family means \"resubscribe elsewhere and reconcile\" | packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts › SS-PLAT-75: Pub/Sub errors are classified from the error-code trailer (RQ-0036 F4) › auth, transient and other failures",
+      "commit": "5c7089998232",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:48:34.855Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-27",
+      "file": ".agent/evidence/T-0064/20261025-234837-tests-db.json",
+      "test": "6 test(s): packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts › SS-PLAT-27: Replay id resume after restart › resumes from the committed replay id R with no lost or duplicated effects | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts › SS-PLAT-27: Replay id resume after restart › drops a redelivered event by its idempotency key but still advances the cursor | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts › SS-PLAT-27: Replay id resume after restart › asks for at most 100 events, and more only after a batch commits (flow control) | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts › SS-PLAT-27: Replay id resume after restart › a keepalive with nothing in flight stores latest_replay_id, and a restart resumes there | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts › SS-PLAT-27: Replay id resume after restart › an outage inside the 72 h retention: the backlog replays from R in ≤ 100-event batches, each record once | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts › SS-PLAT-27: Replay id resume after restart › a stale cursor (another subscriber moved it) aborts the batch: compare-and-set",
+      "commit": "5c7089998232",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:48:37.353Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-74",
+      "file": ".agent/evidence/T-0064/20261025-234837-tests-db.json",
+      "test": "4 test(s): packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts › SS-PLAT-74: invalid replay id, gap and overflow events become resync requests › an expired replay id resets the cursor, signals reconcile since the last commit, then LATEST | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts › SS-PLAT-74: invalid replay id, gap and overflow events become resync requests › gap and overflow events are not applied: they request a resync of records / the entity | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts › SS-PLAT-74: invalid replay id, gap and overflow events become resync requests › cursors, inbox and resync requests are per tenant: tenant B starts at its own tip | packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts › SS-PLAT-74: invalid replay id, gap and overflow events become resync requests › the inbox is append-only and lf_app cannot rewrite a cursor key",
+      "commit": "5c7089998232",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:48:37.353Z",
+      "result": "passed"
+    }
+  ]
+}

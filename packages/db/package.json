@@ -1,0 +1,27 @@
+{
+  "name": "@ledgerforce/db",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Database foundation: forward-only migrations, tenant context, RLS test harness",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "migrate": "node src/cli/migrate.ts"
+  },
+  "dependencies": {
+    "@ledgerforce/shared": "workspace:*",
+    "kysely": "0.29.7",
+    "pg": "8.23.1"
+  },
+  "devDependencies": {
+    "@testcontainers/postgresql": "12.2.1",
+    "@types/node": "22.20.5",
+    "@types/pg": "8.23.1",
+    "testcontainers": "12.2.1",
+    "vitest": "4.1.12"
+  }
+}

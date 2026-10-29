@@ -1,0 +1,68 @@
+# LedgerForce public origin (T-0094, RQ-0041 findings 7-8, RQ-0025): one origin for the SPA,
+# the API and the Keycloak tenant realm. Rendered by the nginx image's envsubst entrypoint.
+# TLS is terminated in front of this (your reverse proxy / load balancer): see Docs/ops/install.md.
+#
+# The API has no global prefix, so its route prefixes are listed explicitly. The unit test
+# apps/api/src/deploy/nginx-routes.test.ts keeps this list equal to the API's controllers and
+# checks that no SPA route is shadowed.
+
+map $http_x_forwarded_proto $lf_forwarded_proto {
+    default $http_x_forwarded_proto;
+    ''      $scheme;
+}
+
+server {
+    listen ${NGINX_PORT};
+    server_name _;
+    server_tokens off;
+    client_max_body_size 10m;
+
+    proxy_http_version 1.1;
+    proxy_set_header Host $http_host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $lf_forwarded_proto;
+    proxy_set_header X-Forwarded-Host $http_host;
+    proxy_buffer_size 16k;
+    proxy_buffers 8 16k;
+
+    # Liveness of this proxy itself (compose healthcheck).
+    location = /healthz {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
+    }
+
+    # Keycloak: never public — the admin console and the administrative realm (RQ-0041 S8).
+    location ^~ /admin/ {
+        return 404;
+    }
+    location ^~ /realms/master/ {
+        return 404;
+    }
+
+    # Keycloak tenant realm and its static resources.
+    location ~ ^/(realms|resources)/ { # lf:idp-prefixes
+        proxy_pass http://keycloak:8080;
+    }
+
+    # LedgerForce API.
+    location ~ ^/(auth|t|health|companies|users|parties|bank-detail-changes|api-tokens|audit-log|sod|manual-journals|accounts|sync-issues)(/|$) { # lf:api-prefixes
+        proxy_pass http://api:3000;
+    }
+
+    # The SPA: static files, and index.html for every client-side route.
+    location / {
+        root /usr/share/nginx/html;
+        try_files $uri /index.html;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "same-origin" always;
+        add_header Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+    }
+    location = /index.html {
+        root /usr/share/nginx/html;
+        add_header Cache-Control "no-store" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header Referrer-Policy "same-origin" always;
+        add_header Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
+    }
+}

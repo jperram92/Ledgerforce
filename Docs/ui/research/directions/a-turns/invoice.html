@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en-AU" data-dark="designed">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INV-001061 Saltbush Health – Harbour &amp; Co – LedgerForce</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="turns.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="tick" viewBox="0 0 12 12"><path d="M2 6.5 5 9.2 10.2 3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  <symbol id="bang" viewBox="0 0 12 12"><path d="M6 2v5M6 9.2v.8" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+</svg>
+
+<header class="bar">
+  <div class="org">Harbour &amp; Co Pty Ltd <span>Books open: October 2026</span></div>
+  <button class="find" type="button"><span>Find a customer, invoice or amount, or type an action</span><kbd>/</kbd></button>
+  <div class="right">
+    <a href="#">Salesforce: <b style="color:var(--you)">3 need a person</b></a>
+    <span class="who"><b>Jordan Lee</b> <span class="muted">AR Clerk</span></span>
+  </div>
+</header>
+
+<div class="panes">
+  <nav class="rail" aria-label="Turns and books">
+    <div class="turns">
+      <h2>Whose turn</h2>
+      <ul>
+        <li><a href="#"><span>Your turn</span><span class="n" style="color:var(--you)">8</span><small>Overdue follow-ups, $33,482.50</small></a></li>
+        <li><a href="#"><span>Sam Nguyen</span><span class="n">1</span><small>Your credit note CN-000118</small></a></li>
+        <li><a href="#" aria-current="page"><span>Customers</span><span class="n">31</span><small>Invoices sent, not yet paid</small></a></li>
+        <li><a href="#"><span>Salesforce</span><span class="n">2</span><small>Write-backs retrying on their own</small></a></li>
+      </ul>
+    </div>
+    <div class="pos">
+      <h2>Sales at 23 Oct</h2>
+      <ul>
+        <li><a href="#"><span>Customers owe you</span><span class="amt">96,412.80</span><small>31 invoices</small></a></li>
+        <li><a href="#"><span>Overdue</span><span class="amt">33,482.50</span><small>8 invoices, oldest 64 days</small></a></li>
+        <li><a href="#"><span>Invoiced in October</span><span class="amt">118,904.00</span><small>42 invoices incl. GST</small></a></li>
+        <li><a href="#"><span>Paid in October</span><span class="amt">112,640.35</span><small>Bank and Stripe</small></a></li>
+      </ul>
+    </div>
+    <div class="books">
+      <h2>Books</h2>
+      <ul>
+        <li><a href="#" aria-current="page"><b>Sales</b></a></li><li><a href="#">Purchases</a></li><li><a href="#">Bank</a></li>
+        <li><a href="#">Journals</a></li><li><a href="#">Reports</a></li><li><a href="#">Close</a></li>
+        <li><a href="#">Salesforce sync</a></li><li><a href="#">Settings</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="queue" aria-labelledby="q-title">
+    <header>
+      <h2 class="h1" id="q-title">Customers' turn: 31 invoices</h2>
+      <p>Sent and posted, waiting for payment. Earliest due first.</p>
+    </header>
+    <ol>
+      <li><a class="item" href="#">
+        <span class="what">Kestrel Logistics</span><span class="amt">6,855.00</span>
+        <span class="why">INV-000988, 64 days overdue. On credit hold since 21 Oct.</span>
+        <span class="chain-s"><span class="tk you">You: call, reminder 3 sent</span></span></a></li>
+      <li><a class="item" href="#">
+        <span class="what">Bluegum Freight Co</span><span class="amt">11,385.00</span>
+        <span class="why">INV-001004, 38 days overdue. Promise to pay 31 Oct.</span>
+        <span class="chain-s"><span class="tk oth">Customer promised 31 Oct</span></span></a></li>
+      <li><a class="item" href="#">
+        <span class="what">Wattle &amp; Stone Architects</span><span class="amt">4,620.00</span>
+        <span class="why">INV-001039, due Mon 27 Oct.</span>
+        <span class="chain-s"><span class="tk oth">Customer</span></span></a></li>
+      <li><a class="item" href="#" aria-current="true">
+        <span class="what">Saltbush Health</span><span class="amt">10,087.00</span>
+        <span class="why">INV-001061, due Wed 5 Nov. Viewed 8 Oct.</span>
+        <span class="chain-s"><span class="tk oth">Customer</span><span class="hand" aria-hidden="true">/</span><span class="tk oth">then you, reminder 12 Nov</span></span></a></li>
+      <li><a class="item" href="#">
+        <span class="what">Coastline Dental Group</span><span class="amt">2,640.00</span>
+        <span class="why">INV-001066, due Fri 7 Nov. Stripe link sent.</span>
+        <span class="chain-s"><span class="tk oth">Customer</span></span></a></li>
+    </ol>
+    <p class="keys"><span><kbd>J</kbd> <kbd>K</kbd> move</span><span><kbd>Enter</kbd> open</span><span><kbd>F</kbd> filter</span><span><kbd>N</kbd> new invoice</span></p>
+  </section>
+
+  <main class="detail" id="main">
+    <div class="body">
+      <p class="kind">Sales invoice INV-001061, posted 6 Oct 2026 from a Salesforce opportunity</p>
+      <h1 class="title">Saltbush Health owes $10,087.00 by Wed 5 Nov</h1>
+      <p class="lede">The customer's turn. If it's unpaid on Wed 12 Nov, reminder 1 goes to Ruth Adeyemi and the turn comes back to you.</p>
+      <div class="act-bar">
+        <button class="btn primary" type="button">Record a payment <span class="k">P</span></button>
+        <button class="btn quiet" type="button">Send reminder now <kbd>R</kbd></button>
+        <button class="btn quiet" type="button">Correct <kbd>C</kbd></button>
+        <p class="say">Stripe payments record themselves. Use this for a bank transfer you can see on the statement.</p>
+      </div>
+
+      <dl class="facts">
+        <div><dt>Customer</dt><dd><a href="#">Saltbush Health Pty Ltd</a></dd></div>
+        <div><dt>Billing to</dt><dd>Ruth Adeyemi</dd></div>
+        <div><dt>Issued</dt><dd>Tue 6 Oct 2026</dd></div>
+        <div><dt>Terms</dt><dd>30 days</dd></div>
+        <div><dt>Their reference</dt><dd>PO 4471-SH</dd></div>
+        <div><dt>Opportunity</dt><dd><a href="#">Health Cloud Sprint 4</a></dd></div>
+        <div><dt>Approved and sent by</dt><dd>Jordan Lee</dd></div>
+        <div><dt>Payment link</dt><dd>Stripe, card or PayTo</dd></div>
+      </dl>
+
+      <div class="sec">
+        <h3>Lines</h3>
+        <div class="scroll"><table class="tbl">
+          <thead><tr><th>Item</th><th class="num">Qty</th><th class="num hide-phone">Unit price</th><th class="hide-phone">GST</th><th class="num">Amount ex GST</th></tr></thead>
+          <tbody>
+            <tr><td>Health Cloud configuration, Sprint 4 <span class="plain">22 Sep to 3 Oct</span></td><td class="num">36</td><td class="num hide-phone">190.00</td><td class="hide-phone">GST 10%</td><td class="num">6,840.00</td></tr>
+            <tr><td>Managed support, October</td><td class="num">1</td><td class="num hide-phone">1,450.00</td><td class="hide-phone">GST 10%</td><td class="num">1,450.00</td></tr>
+            <tr><td>Training workshop, Parramatta <span class="plain">half day</span></td><td class="num">1</td><td class="num hide-phone">880.00</td><td class="hide-phone">GST 10%</td><td class="num">880.00</td></tr>
+          </tbody>
+          <tfoot>
+            <tr><td colspan="2">Subtotal</td><td class="hide-phone" colspan="2"></td><td class="num">9,170.00</td></tr>
+            <tr><td colspan="2" style="font-weight:400">GST 10%</td><td class="hide-phone" colspan="2"></td><td class="num" style="font-weight:400">917.00</td></tr>
+            <tr><td colspan="2">Total, paid 0.00, due</td><td class="hide-phone" colspan="2"></td><td class="num">10,087.00</td></tr>
+          </tfoot>
+        </table></div>
+      </div>
+
+      <div class="sec">
+        <h3>What it posted <span class="aside">Journal JNL-004231, 6 Oct 2026, by the posting engine</span></h3>
+        <p>Saltbush owes you $10,087.00. $9,170.00 of that is income you earned, and $917.00 is GST you hold for the ATO until the BAS.</p>
+        <div class="scroll"><table class="tbl">
+          <thead><tr><th>Account</th><th class="num">Debit</th><th class="num">Credit</th></tr></thead>
+          <tbody>
+            <tr><td><span class="code">1200</span>Trade debtors <span class="plain">Saltbush owes you</span></td><td class="num">10,087.00</td><td class="num"></td></tr>
+            <tr><td><span class="code">4110</span>Professional services <span class="plain">earned</span></td><td class="num"></td><td class="num">6,840.00</td></tr>
+            <tr><td><span class="code">4120</span>Support subscriptions <span class="plain">earned</span></td><td class="num"></td><td class="num">1,450.00</td></tr>
+            <tr><td><span class="code">4130</span>Training <span class="plain">earned</span></td><td class="num"></td><td class="num">880.00</td></tr>
+            <tr><td><span class="code">2310</span>GST collected <span class="plain">held for the ATO, BAS 1A</span></td><td class="num"></td><td class="num">917.00</td></tr>
+          </tbody>
+          <tfoot><tr><td>Totals</td><td class="num">10,087.00</td><td class="num">10,087.00</td></tr></tfoot>
+        </table></div>
+        <p class="balanced"><span class="tk done"><svg aria-hidden="true"><use href="#tick"/></svg>Balanced</span><span class="muted">Accounts chosen by profile Health client and Services, rule set v4.</span><a href="#">Why these accounts?</a></p>
+      </div>
+
+      <div class="sec">
+        <h3>Salesforce <span class="aside"><span class="tk done"><svg aria-hidden="true"><use href="#tick"/></svg>In sync, checked 2 min ago</span></span></h3>
+        <div class="scroll"><table class="tbl">
+          <thead><tr><th>Field on the Opportunity and Account</th><th>Value written</th><th class="hide-phone">When</th></tr></thead>
+          <tbody>
+            <tr><td>Invoice status</td><td>Awaiting payment</td><td class="hide-phone">6 Oct, 10:16 am</td></tr>
+            <tr><td>Amount due</td><td>10,087.00</td><td class="hide-phone">6 Oct, 10:16 am</td></tr>
+            <tr><td>Account balance due</td><td>14,487.00</td><td class="hide-phone">6 Oct, 10:16 am</td></tr>
+          </tbody>
+        </table></div>
+        <p class="rule-note">These fields belong to LedgerForce. If someone edits them in Salesforce, the next write puts them back and the change is logged here.</p>
+      </div>
+
+      <div class="sec">
+        <h3>History</h3>
+        <ol class="log">
+          <li><time>6 Oct, 8:47 am</time><span>Opportunity <b>Health Cloud Sprint 4</b> moved to Closed Won in Salesforce. Draft created.</span></li>
+          <li><time>6 Oct, 10:14 am</time><span><b>Jordan Lee</b> approved and posted it as JNL-004231. Under the $15,000 limit for AR clerks.</span></li>
+          <li><time>6 Oct, 10:15 am</time><span>Emailed to Ruth Adeyemi (Billing To), copy to accounts@saltbush.example. Delivered.</span></li>
+          <li><time>6 Oct, 10:15 am</time><span><span class="tk you"><svg aria-hidden="true"><use href="#bang"/></svg>Salesforce write failed</span> The Opportunity was locked by an approval process (UNABLE_TO_LOCK_ROW). Retried on its own.</span></li>
+          <li><time>6 Oct, 10:16 am</time><span>Salesforce updated on the second try.</span></li>
+          <li><time>8 Oct, 2:31 pm</time><span>Ruth Adeyemi opened the payment link.</span></li>
+        </ol>
+      </div>
+
+      <div class="sec">
+        <h3>If this invoice is wrong</h3>
+        <p>Posted invoices are never edited or deleted, so the BAS, the ledger and Salesforce always agree. You correct them with a new document that you can see next to this one.</p>
+        <div class="fix">
+          <div><b>Credit note</b><p>Takes back part or all of it, including the GST. Use it for a discount, a cancelled line or a refund. Over $500 needs Sam to approve.</p><button class="btn" type="button">Start a credit note</button></div>
+          <div><b>Void with a reversal</b><p>Posts a journal dated today that exactly reverses JNL-004231. Use it when the invoice should never have been sent. You see the reversal before it posts.</p><button class="btn" type="button">Void…</button></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

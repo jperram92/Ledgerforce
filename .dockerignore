@@ -1,0 +1,23 @@
+# Build context for infra/docker/Dockerfile (T-0094). Keep secrets, history and build output out
+# of every image layer.
+.git
+**/.env*
+infra/compose/secrets
+infra/compose/ledgerforce.env
+**/node_modules
+**/dist
+**/coverage
+**/*.tsbuildinfo
+.agent
+.agents
+.claude
+Docs
+salesforce
+tests
+test-results
+playwright-report
+blob-report
+.tmp
+**/*.test.ts
+**/*.test.tsx
+**/*.db.test.ts

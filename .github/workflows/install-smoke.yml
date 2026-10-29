@@ -1,0 +1,51 @@
+# SS-PLAT-23 self-hosted install smoke (T-0094): build the compose stack on a runner with Docker,
+# start it and run tests/install/install.smoke.spec.ts against it. Separate from ci.yml (whose
+# gates are human-owned); evidence is uploaded, not committed.
+name: install-smoke
+
+on:
+  pull_request:
+    paths:
+      - 'infra/**'
+      - 'apps/**'
+      - 'packages/**'
+      - 'tests/install/**'
+      - 'pnpm-lock.yaml'
+      - '.dockerignore'
+      - '.github/workflows/install-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: install-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: compose install (SS-PLAT-23)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      CI: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: bash infra/compose/smoke.sh
+        env:
+          LF_EVIDENCE_DIR: ${{ runner.temp }}/evidence
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: install-smoke-evidence
+          path: |
+            test-results/install/
+            ${{ runner.temp }}/evidence/
+          if-no-files-found: ignore

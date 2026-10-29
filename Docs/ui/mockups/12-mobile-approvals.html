@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Approve bill TCH-88213 (mobile) — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  body { font-size: 15px; }
+  .mbar { position: sticky; top: 0; z-index: 10; height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 8px; background: var(--lf-surface); border-bottom: 1px solid var(--lf-border); }
+  .mbar .ttl { flex: 1; font-weight: 600; font-size: 16px; }
+  .mbar .ttl small { display: block; font-weight: 400; font-size: 12px; color: var(--lf-text-subtle); }
+  .iconbtn.lg { width: 44px; height: 44px; }
+  .m { padding: 16px 16px 120px; display: flex; flex-direction: column; gap: 12px; }
+  .hero { text-align: left; padding: 18px 16px; }
+  .hero .sup { font-size: 13px; color: var(--lf-text-muted); }
+  .hero h1 { font-size: 20px; margin: 2px 0 10px; }
+  .hero .amt { font-size: 34px; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: var(--lf-numeric); }
+  .hero .amt small { font-size: 14px; color: var(--lf-text-muted); font-weight: 500; letter-spacing: 0; }
+  .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; font-size: 13px; }
+  .facts dt { color: var(--lf-text-muted); font-size: 12px; } .facts dd { margin: 0; font-weight: 500; }
+  .sec-h { font-size: 13px; font-weight: 600; color: var(--lf-text-muted); text-transform: uppercase; letter-spacing: .04em; margin: 8px 4px 0; }
+  .line { display: flex; justify-content: space-between; gap: 12px; padding: 12px 16px; border-bottom: 1px solid var(--lf-border); font-size: 14px; }
+  .line:last-child { border-bottom: 0; }
+  .line .num { font-weight: 500; }
+  .pdf { display: flex; gap: 12px; align-items: center; padding: 12px 16px; }
+  .pdf .thumb { width: 44px; height: 56px; border: 1px solid var(--lf-border); border-radius: 4px; background: repeating-linear-gradient(var(--lf-surface) 0 6px, var(--lf-surface-2) 6px 8px); }
+  details summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 14px 16px; font-weight: 500; min-height: 48px; }
+  details summary::-webkit-details-marker { display: none; }
+  .who-row { display: flex; gap: 10px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--lf-border); font-size: 14px; }
+  .who-row:last-child { border-bottom: 0; }
+  .who-row .r { font-size: 12px; color: var(--lf-text-subtle); }
+  .bottom { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--lf-surface); border-top: 1px solid var(--lf-border); box-shadow: var(--lf-shadow-lg); display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+  .bottom .btn { height: 48px; font-size: 16px; }
+</style>
+</head>
+<body data-active="bills">
+<header class="mbar">
+  <a class="iconbtn lg" href="01-home-dashboard.html" aria-label="Back to approvals"><i data-i="back" class="i-lg"></i></a>
+  <div class="ttl">Approvals<small>1 of 4 waiting for you</small></div>
+  <button class="iconbtn lg" type="button" aria-label="Next approval"><i data-i="chevron-right" class="i-lg"></i></button>
+</header>
+<main class="m" id="main">
+  <section class="card hero" aria-labelledby="bill-h">
+    <div class="row between"><span class="sup">Bill · Tasman Cloud Hosting</span><span data-chip="awaiting">Awaiting you</span></div>
+    <h1 id="bill-h">TCH-88213 · October hosting</h1>
+    <div class="amt">$3,190.00 <small>inc GST</small></div>
+    <dl class="facts">
+      <div><dt>Due</dt><dd>Wed 5 Nov 2026</dd></div>
+      <div><dt>Entered by</dt><dd>Lena Ortiz · AP Clerk</dd></div>
+      <div><dt>Pays to</dt><dd>···448 <span class="chip st-ok"><i data-i="check"></i>Verified</span></dd></div>
+      <div><dt>Last 6 months</dt><dd>$2,860–$3,190 / month</dd></div>
+    </dl>
+  </section>
+
+  <div class="explain"><i data-i="users"></i><span><b>Why you:</b> bills over $1,000 need someone other than the person who entered them. Lena can't approve this one.</span></div>
+
+  <h2 class="sec-h">Coding</h2>
+  <section class="card" aria-label="Bill lines">
+    <div class="line"><span>6310 Hosting &amp; cloud<span class="sec" style="display:block;font-size:12px;color:var(--lf-text-subtle)">Team: Delivery · same as last 5 bills</span></span><span class="num">2,900.00</span></div>
+    <div class="line"><span>GST paid 10%</span><span class="num">290.00</span></div>
+    <div class="line"><b>Total</b><b class="num">3,190.00</b></div>
+  </section>
+
+  <section class="card" aria-label="Journal preview">
+    <details open>
+      <summary><i data-i="book"></i>Journal on approval<span style="flex:1"></span><span class="balanced"><i data-i="equal"></i>Balanced</span></summary>
+      <table class="data journal">
+        <caption class="sr-only">Journal that posts when you approve</caption>
+        <thead><tr><th scope="col">Account</th><th scope="col" class="num">Dr</th><th scope="col" class="num">Cr</th></tr></thead>
+        <tbody>
+          <tr><td class="acct"><span class="code">6310</span>Hosting</td><td class="num">2,900.00</td><td></td></tr>
+          <tr><td class="acct"><span class="code">1820</span>GST paid</td><td class="num">290.00</td><td></td></tr>
+          <tr><td class="acct"><span class="code">2100</span>Trade creditors</td><td></td><td class="num">3,190.00</td></tr>
+        </tbody>
+      </table>
+    </details>
+  </section>
+
+  <section class="card pdf" aria-label="Attachment">
+    <span class="thumb" aria-hidden="true"></span>
+    <div style="flex:1"><b>TCH-88213.pdf</b><div class="small subtle">Emailed to bills@ 22 Oct · 1 page</div></div>
+    <a class="btn sm" href="#">View</a>
+  </section>
+
+  <h2 class="sec-h">History</h2>
+  <section class="card" aria-label="History">
+    <div class="who-row"><span class="avatar sm c" aria-hidden="true">LO</span><div><b>Lena Ortiz</b> coded and submitted<div class="r">22 Oct, 3:41 pm</div></div></div>
+    <div class="who-row"><span class="avatar sm" aria-hidden="true">SN</span><div><b>You</b> · Owner<div class="r">waiting since 22 Oct</div></div></div>
+  </section>
+</main>
+<nav class="bottom" aria-label="Decision">
+  <button class="btn" type="button"><i data-i="x"></i>Reject</button>
+  <button class="btn primary" type="button"><i data-i="check"></i>Approve $3,190.00</button>
+</nav>
+</body>
+</html>

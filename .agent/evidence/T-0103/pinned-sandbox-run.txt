@@ -1,0 +1,1002 @@
+﻿TAP version 13
+# Subtest: writeFileAtomic replaces content and leaves no temp files behind
+ok 1 - writeFileAtomic replaces content and leaves no temp files behind
+  ---
+  duration_ms: 26.9518
+  type: 'test'
+  ...
+# Subtest: a concurrent reader never sees a partial or empty file while writes are in progress
+not ok 2 - a concurrent reader never sees a partial or empty file while writes are in progress
+  ---
+  duration_ms: 1633.2044
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\atomic-write.test.ts:22:1'
+  failureType: 'testCodeFailure'
+  error: 'too few iterations to be meaningful (reads 736, writes 22)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/atomic-write.test.ts:45:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: loadCards reads only T-NNNN.md cards
+ok 3 - loadCards reads only T-NNNN.md cards
+  ---
+  duration_ms: 57.9316
+  type: 'test'
+  ...
+# Subtest: topoOrder respects depends_on, ties broken by id
+ok 4 - topoOrder respects depends_on, ties broken by id
+  ---
+  duration_ms: 47.5549
+  type: 'test'
+  ...
+# Subtest: nextClaimable picks first todo whose deps are done
+ok 5 - nextClaimable picks first todo whose deps are done
+  ---
+  duration_ms: 57.3555
+  type: 'test'
+  ...
+# Subtest: a claimed card with an expired lease is claimable again; an unexpired one is not
+ok 6 - a claimed card with an expired lease is claimable again; an unexpired one is not
+  ---
+  duration_ms: 56.7982
+  type: 'test'
+  ...
+# Subtest: lintBacklog passes on the fixture
+ok 7 - lintBacklog passes on the fixture
+  ---
+  duration_ms: 39.2407
+  type: 'test'
+  ...
+# Subtest: lintBacklog reports duplicate ids, missing deps, cycles, bad status, unknown scenarios, id/filename mismatch
+ok 8 - lintBacklog reports duplicate ids, missing deps, cycles, bad status, unknown scenarios, id/filename mismatch
+  ---
+  duration_ms: 67.7911
+  type: 'test'
+  ...
+# Subtest: lintBacklog skips the scenario check when the register does not exist
+ok 9 - lintBacklog skips the scenario check when the register does not exist
+  ---
+  duration_ms: 90.1139
+  type: 'test'
+  ...
+# Subtest: unmetDeps treats review as unmet by default and as met when satisfiedBy includes review
+ok 10 - unmetDeps treats review as unmet by default and as met when satisfiedBy includes review
+  ---
+  duration_ms: 32.8611
+  type: 'test'
+  ...
+# Subtest: a card in review is never offered to a builder by nextClaimable
+ok 11 - a card in review is never offered to a builder by nextClaimable
+  ---
+  duration_ms: 32.2599
+  type: 'test'
+  ...
+# Subtest: next prints the next claimable task in dependency order
+ok 12 - next prints the next claimable task in dependency order
+  ---
+  duration_ms: 1422.5392
+  type: 'test'
+  ...
+# Subtest: claim writes the lease to card and state.json
+ok 13 - claim writes the lease to card and state.json
+  ---
+  duration_ms: 1196.3741
+  type: 'test'
+  ...
+# Subtest: claim refuses: unknown provider, unmet deps, done task, missing task
+ok 14 - claim refuses: unknown provider, unmet deps, done task, missing task
+  ---
+  duration_ms: 2229.5175
+  type: 'test'
+  ...
+# Subtest: claim refuses while another unexpired lease exists; allows takeover after expiry
+ok 15 - claim refuses while another unexpired lease exists; allows takeover after expiry
+  ---
+  duration_ms: 2068.1368
+  type: 'test'
+  ...
+# Subtest: checkpoint commits work, records the sha, renews the lease and logs the step
+ok 16 - checkpoint commits work, records the sha, renews the lease and logs the step
+  ---
+  duration_ms: 3031.7818
+  type: 'test'
+  ...
+# Subtest: checkpoint does not create an empty commit when nothing changed
+ok 17 - checkpoint does not create an empty commit when nothing changed
+  ---
+  duration_ms: 2815.8851
+  type: 'test'
+  ...
+# Subtest: checkpoint refuses a task that is not claimed
+ok 18 - checkpoint refuses a task that is not claimed
+  ---
+  duration_ms: 1408.6203
+  type: 'test'
+  ...
+# Subtest: release: blocked needs a reason; done/blocked/todo clear the lease
+ok 19 - release: blocked needs a reason; done/blocked/todo clear the lease
+  ---
+  duration_ms: 4054.7103
+  type: 'test'
+  ...
+# Subtest: handover writes the §10.5 template from state + card and keeps the Log
+ok 20 - handover writes the §10.5 template from state + card and keeps the Log
+  ---
+  duration_ms: 3437.1166
+  type: 'test'
+  ...
+# Subtest: handover works with no active task and no git remote/network
+ok 21 - handover works with no active task and no git remote/network
+  ---
+  duration_ms: 1582.2631
+  type: 'test'
+  ...
+# Subtest: status prints state, lease, counts and next task
+ok 22 - status prints state, lease, counts and next task
+  ---
+  duration_ms: 1470.5759
+  type: 'test'
+  ...
+# Subtest: lease-check lists expired leases with exit 1, none with exit 0
+ok 23 - lease-check lists expired leases with exit 1, none with exit 0
+  ---
+  duration_ms: 1616.637
+  type: 'test'
+  ...
+# Subtest: lint-backlog passes on the fixture and fails on a broken card
+ok 24 - lint-backlog passes on the fixture and fails on a broken card
+  ---
+  duration_ms: 1285.4518
+  type: 'test'
+  ...
+# Subtest: unknown subcommand prints usage and exits 1; help exits 0
+ok 25 - unknown subcommand prints usage and exits 1; help exits 0
+  ---
+  duration_ms: 1076.6384
+  type: 'test'
+  ...
+# Subtest: set-status moves through in-flight statuses keeping (and renewing) the lease
+ok 26 - set-status moves through in-flight statuses keeping (and renewing) the lease
+  ---
+  duration_ms: 3379.0481
+  type: 'test'
+  ...
+# Subtest: release accepts verifying and review, clears the lease and keeps the builder
+ok 27 - release accepts verifying and review, clears the lease and keeps the builder
+  ---
+  duration_ms: 5170.1808
+  type: 'test'
+  ...
+# Subtest: a card in review can only be claimed by the other provider; claimed_by stays the builder
+ok 28 - a card in review can only be claimed by the other provider; claimed_by stays the builder
+  ---
+  duration_ms: 2699.6243
+  type: 'test'
+  ...
+# Subtest: parseFrontmatter splits data and body
+ok 29 - parseFrontmatter splits data and body
+  ---
+  duration_ms: 0.5139
+  type: 'test'
+  ...
+# Subtest: parseFrontmatter rejects files without frontmatter
+ok 30 - parseFrontmatter rejects files without frontmatter
+  ---
+  duration_ms: 0.8578
+  type: 'test'
+  ...
+# Subtest: updateFrontmatter replaces in place, keeps comments and body, appends new keys
+ok 31 - updateFrontmatter replaces in place, keeps comments and body, appends new keys
+  ---
+  duration_ms: 1.0322
+  type: 'test'
+  ...
+# Subtest: updateFrontmatter quotes values that need it
+ok 32 - updateFrontmatter quotes values that need it
+  ---
+  duration_ms: 0.3858
+  type: 'test'
+  ...
+# Subtest: verifying permits explicitly marked current and later workflow steps [T-0010]
+ok 33 - verifying permits explicitly marked current and later workflow steps [T-0010]
+  ---
+  duration_ms: 723.9852
+  type: 'test'
+  ...
+# Subtest: review requires completed verification but permits review and finish [T-0010]
+ok 34 - review requires completed verification but permits review and finish [T-0010]
+  ---
+  duration_ms: 1432.3173
+  type: 'test'
+  ...
+# Subtest: done requires every workflow step completed [T-0010]
+ok 35 - done requires every workflow step completed [T-0010]
+  ---
+  duration_ms: 1613.3573
+  type: 'test'
+  ...
+# Subtest: implementation and unmarked steps remain mandatory during verification [T-0010]
+ok 36 - implementation and unmarked steps remain mandatory during verification [T-0010]
+  ---
+  duration_ms: 1355.2509
+  type: 'test'
+  ...
+# Subtest: unknown and non-terminal phase markers cannot waive a step [T-0010]
+ok 37 - unknown and non-terminal phase markers cannot waive a step [T-0010]
+  ---
+  duration_ms: 1238.847
+  type: 'test'
+  ...
+# Subtest: run --dry-run prints the provider commands in failover order and changes nothing
+ok 38 - run --dry-run prints the provider commands in failover order and changes nothing
+  ---
+  duration_ms: 4059.9696
+  type: 'test'
+  ...
+# Subtest: run --dry-run honours configured args and --task
+ok 39 - run --dry-run honours configured args and --task
+  ---
+  duration_ms: 4309.2116
+  type: 'test'
+  ...
+# Subtest: FAILOVER: claude hits a credit/quota error, codex resumes on the same branch and finishes
+not ok 40 - FAILOVER: claude hits a credit/quota error, codex resumes on the same branch and finishes
+  ---
+  duration_ms: 14574.1148
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:56:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Task: T-0002 Ledger tables
+    Branch: feat/T-0002-ledger-tables
+    Mode: build
+    [r01] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-quota.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r01.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r01] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030038Z (d9828dd)
+    [r02] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-W308WE -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-W308WE\.agent\runs\2026-10-29-codex-r02-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r02.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r02] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030043Z (82eb5be)
+    [r03] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-quota.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r03.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r03] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030046Z (c126f24)
+    T-0002 blocked after 3 failed attempts. Notification: .agent\notifications\20261029T030047Z-T-0002.md
+    
+    
+    4 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 4
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:60:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: a provider that is still exhausted is skipped on the next run
+not ok 41 - a provider that is still exhausted is skipped on the next run
+  ---
+  duration_ms: 13706.7673
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:104:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    4 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 4
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:107:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: all providers out of quota → exit 3, work saved, handover written, lease released
+not ok 42 - all providers out of quota → exit 3, work saved, handover written, lease released
+  ---
+  duration_ms: 11236.7756
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:113:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Task: T-0002 Ledger tables
+    Branch: feat/T-0002-ledger-tables
+    Mode: build
+    [r01] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-quota.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r01.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r01] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030105Z (f2eef56)
+    [r02] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-quota.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-1ZC0rM -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-1ZC0rM\.agent\runs\2026-10-29-codex-r02-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r02.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r02] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030109Z (fb25e3f)
+    [r03] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-quota.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r03.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r03] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030112Z (b28d7a4)
+    T-0002 blocked after 3 failed attempts. Notification: .agent\notifications\20261029T030112Z-T-0002.md
+    
+    
+    4 !== 3
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 3
+  actual: 4
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:116:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: non-quota failures rotate providers and block the task after max_attempts_per_task
+not ok 43 - non-quota failures rotate providers and block the task after max_attempts_per_task
+  ---
+  duration_ms: 11624.3773
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:128:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+    + []
+    - [
+    -   'claude',
+    -   'codex',
+    -   'claude'
+    - ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'claude'
+    1: 'codex'
+    2: 'claude'
+  actual:
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:133:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: missed heartbeat (lease expiry) kills the provider and fails over
+not ok 44 - missed heartbeat (lease expiry) kills the provider and fails over
+  ---
+  duration_ms: 12829.4369
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:146:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Task: T-0002 Ledger tables
+    Branch: feat/T-0002-ledger-tables
+    Mode: build
+    [r01] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-hang.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r01.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r01] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030128Z (267525d)
+    [r02] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-gyTvFE -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-gyTvFE\.agent\runs\2026-10-29-codex-r02-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r02.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r02] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030132Z (e2afead)
+    [r03] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-hang.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r03.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r03] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030136Z (5d9e3e2)
+    T-0002 blocked after 3 failed attempts. Notification: .agent\notifications\20261029T030137Z-T-0002.md
+    
+    
+    4 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 4
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:151:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: agent marking the task blocked stops the loop with a notification
+not ok 45 - agent marking the task blocked stops the loop with a notification
+  ---
+  duration_ms: 16285.5243
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:158:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    0 !== 1
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 1
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:163:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: daily budget: a provider whose run logs today exceed daily_usd is skipped
+not ok 46 - daily budget: a provider whose run logs today exceed daily_usd is skipped
+  ---
+  duration_ms: 14359.9733
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:168:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Task: T-0002 Ledger tables
+    Branch: feat/T-0002-ledger-tables
+    Mode: build
+    Skipping claude: daily budget reached ($5.50 of $5)
+    [r03] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-AvSSjf -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-AvSSjf\.agent\runs\2026-10-29-codex-r03-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r03.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r03] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030158Z (bfcbe29)
+    [r04] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-AvSSjf -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-AvSSjf\.agent\runs\2026-10-29-codex-r04-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r04.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r04] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030202Z (6bb82dc)
+    [r05] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-AvSSjf -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-AvSSjf\.agent\runs\2026-10-29-codex-r05-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r05.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r05] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030206Z (a9fe0bb)
+    T-0002 blocked after 3 failed attempts. Notification: .agent\notifications\20261029T030207Z-T-0002.md
+    
+    
+    4 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 4
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:176:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: run with nothing to do exits 0
+ok 47 - run with nothing to do exits 0
+  ---
+  duration_ms: 1369.1349
+  type: 'test'
+  ...
+# Subtest: run without --once keeps working the backlog until empty
+not ok 48 - run without --once keeps working the backlog until empty
+  ---
+  duration_ms: 13874.6256
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:196:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Task: T-0002 Ledger tables
+    Branch: feat/T-0002-ledger-tables
+    Mode: build
+    [r01] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r01.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r01] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030214Z (47bee13)
+    [r02] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-GfoxvE -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-GfoxvE\.agent\runs\2026-10-29-codex-r02-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r02.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r02] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030218Z (6d6ed11)
+    [r03] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r03.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r03] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030222Z (633d8e0)
+    T-0002 blocked after 3 failed attempts. Notification: .agent\notifications\20261029T030223Z-T-0002.md
+    
+    
+    4 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 4
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:200:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: run routes a card in review to the provider that did NOT build it
+not ok 49 - run routes a card in review to the provider that did NOT build it
+  ---
+  duration_ms: 16539.7033
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:212:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Task: T-0002 Ledger tables
+    Branch: feat/T-0002-ledger-tables
+    Mode: cross-review (built by claude; reviewer must be another provider)
+    [r01] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-JUZecC -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-JUZecC\.agent\runs\2026-10-29-codex-r01-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r01.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r01] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030231Z (3b96a71)
+    [r02] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-JUZecC -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-JUZecC\.agent\runs\2026-10-29-codex-r02-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r02.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r02] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030234Z (79863ca)
+    [r03] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-JUZecC -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-JUZecC\.agent\runs\2026-10-29-codex-r03-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r03.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r03] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030238Z (592a97c)
+    T-0002 blocked after 3 failed attempts. Notification: .agent\notifications\20261029T030239Z-T-0002.md
+    
+    
+    4 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 4
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:220:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: review with only the builder available → exit 3, never self-review
+ok 50 - review with only the builder available → exit 3, never self-review
+  ---
+  duration_ms: 1469.6199
+  type: 'test'
+  ...
+# Subtest: builder handing the card to review counts as a successful session (not a failure)
+not ok 51 - builder handing the card to review counts as a successful session (not a failure)
+  ---
+  duration_ms: 12466.7171
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:236:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Task: T-0002 Ledger tables
+    Branch: feat/T-0002-ledger-tables
+    Mode: build
+    [r01] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-to-review.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r01.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r01] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030245Z (d411b89)
+    [r02] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-fail.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-TSHuCr -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-TSHuCr\.agent\runs\2026-10-29-codex-r02-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r02.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r02] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030248Z (0763b25)
+    [r03] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-to-review.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r03.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r03] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030252Z (99434f6)
+    T-0002 blocked after 3 failed attempts. Notification: .agent\notifications\20261029T030253Z-T-0002.md
+    
+    
+    4 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 4
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:240:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: the real config matches the session-limit message that stopped a session, case-insensitively
+ok 52 - the real config matches the session-limit message that stopped a session, case-insensitively
+  ---
+  duration_ms: 2.979
+  type: 'test'
+  ...
+# Subtest: classifyOutput: stdout and stderr, is_error/subtype from the final result
+ok 53 - classifyOutput: stdout and stderr, is_error/subtype from the final result
+  ---
+  duration_ms: 2.3559
+  type: 'test'
+  ...
+# Subtest: FAILOVER on the real session-limit message printed to stdout
+not ok 54 - FAILOVER on the real session-limit message printed to stdout
+  ---
+  duration_ms: 14609.4759
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:277:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Task: T-0002 Ledger tables
+    Branch: feat/T-0002-ledger-tables
+    Mode: build
+    [r01] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-session-limit.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r01.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r01] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030259Z (70dee9e)
+    [r02] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-success.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-pBaL96 -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-pBaL96\.agent\runs\2026-10-29-codex-r02-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r02.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r02] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030303Z (f8db3e3)
+    [r03] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-session-limit.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r03.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r03] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030307Z (4450853)
+    T-0002 blocked after 3 failed attempts. Notification: .agent\notifications\20261029T030308Z-T-0002.md
+    
+    
+    4 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 4
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:281:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: commits: conductor — deferred checkpoints are committed by the conductor during and after the run
+not ok 55 - commits: conductor — deferred checkpoints are committed by the conductor during and after the run
+  ---
+  duration_ms: 14156.1123
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\run.test.ts:289:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Task: T-0002 Ledger tables
+    Branch: feat/T-0002-ledger-tables
+    Mode: build
+    [r01] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-quota.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r01.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r01] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030313Z (1635a98)
+    [r02] launching codex: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-nogit.sh --cd C:/Users/james/AppData/Local/Temp/lf-conductor-3tbY6T -s workspace-write -c sandbox_workspace_write.network_access=true --json -o 'C:\Users\james\AppData\Local\Temp\lf-conductor-3tbY6T\.agent\runs\2026-10-29-codex-r02-last.md' "<prompt>"  (log: .agent/runs/2026-10-29-codex-r02.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r02] codex → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030317Z (aedd0bf)
+    [r03] launching claude: bash C:/Users/james/Ledgerforce/scripts/agent/test/fixtures/bin/fake-quota.sh --output-format stream-json --verbose --permission-mode acceptEdits --max-turns 200 "<prompt>"  (log: .agent/runs/2026-10-29-claude-r03.log)
+    File C:\Users\james\Ledgerforce\scripts\agent\windows-job.ps1 cannot be loaded because running scripts is disabled on 
+    this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170.
+        + CategoryInfo          : SecurityError: (:) [], ParentContainsErrorRecordException
+        + FullyQualifiedErrorId : UnauthorizedAccess
+    [r03] claude → failure: exit 1:     + FullyQualifiedErrorId : UnauthorizedAccess
+    Saved uncommitted work to wip/T-0002-20261029T030321Z (54bcd89)
+    T-0002 blocked after 3 failed attempts. Notification: .agent\notifications\20261029T030322Z-T-0002.md
+    
+    
+    4 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 4
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/run.test.ts:293:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: checkpoint with LF_DEFER_COMMIT=1 records the step instead of touching .git
+ok 56 - checkpoint with LF_DEFER_COMMIT=1 records the step instead of touching .git
+  ---
+  duration_ms: 1656.8789
+  type: 'test'
+  ...
+# Subtest: resume.sh prints every section of the context pack
+ok 57 - resume.sh prints every section of the context pack
+  ---
+  duration_ms: 3304.2025
+  type: 'test'
+  ...
+# Subtest: resume.sh survives an empty directory that is not a git repo
+ok 58 - resume.sh survives an empty directory that is not a git repo
+  ---
+  duration_ms: 623.4477
+  type: 'test'
+  ...
+# Subtest: verify.sh --quick: unavailable gates are PENDING, not PASS, and do not fail
+ok 59 - verify.sh --quick: unavailable gates are PENDING, not PASS, and do not fail
+  ---
+  duration_ms: 3967.713
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the no-skip guard on skipped/focused tests
+ok 60 - verify.sh fails the no-skip guard on skipped/focused tests
+  ---
+  duration_ms: 4107.2322
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the no-delete guard on a deleted tracked file (working tree, staged or committed)
+ok 61 - verify.sh fails the no-delete guard on a deleted tracked file (working tree, staged or committed)
+  ---
+  duration_ms: 8703.3391
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the secrets scan on a committed key pattern
+ok 62 - verify.sh fails the secrets scan on a committed key pattern
+  ---
+  duration_ms: 3811.3058
+  type: 'test'
+  ...
+# Subtest: verify.sh fails backlog consistency on a broken card
+ok 63 - verify.sh fails backlog consistency on a broken card
+  ---
+  duration_ms: 4003.5433
+  type: 'test'
+  ...
+# Subtest: verify.sh runs a package.json gate when its tooling exists
+ok 64 - verify.sh runs a package.json gate when its tooling exists
+  ---
+  duration_ms: 23477.2903
+  type: 'test'
+  ...
+# Subtest: checkpoint.sh and handover.sh wrap the conductor
+ok 65 - checkpoint.sh and handover.sh wrap the conductor
+  ---
+  duration_ms: 4214.2851
+  type: 'test'
+  ...
+# Subtest: gate review: PENDING without a report, PASS with a non-builder PASS, FAIL on FAIL, self-review ignored
+ok 66 - gate review: PENDING without a report, PASS with a non-builder PASS, FAIL on FAIL, self-review ignored
+  ---
+  duration_ms: 3071.0023
+  type: 'test'
+  ...
+# Subtest: gate memory: unticked steps, wrong status, open linked RQ and missing HANDOVER fail
+ok 67 - gate memory: unticked steps, wrong status, open linked RQ and missing HANDOVER fail
+  ---
+  duration_ms: 2531.3296
+  type: 'test'
+  ...
+# Subtest: gate evidence: each success scenario needs a passed manifest entry whose file exists
+ok 68 - gate evidence: each success scenario needs a passed manifest entry whose file exists
+  ---
+  duration_ms: 3159.8037
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): migration DROP/RENAME grep fails gate 6
+ok 69 - verify.sh (full): migration DROP/RENAME grep fails gate 6
+  ---
+  duration_ms: 8368.2902
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): a change under Docs/accounting versus main fails gate 4
+ok 70 - verify.sh (full): a change under Docs/accounting versus main fails gate 4
+  ---
+  duration_ms: 7975.8563
+  type: 'test'
+  ...
+# Subtest: verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+ok 71 - verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+  ---
+  duration_ms: 6753.709
+  type: 'test'
+  ...
+# Subtest: verify.sh --quick: lowered numRuns and unlogged suppressions in the diff fail gate 10
+ok 72 - verify.sh --quick: lowered numRuns and unlogged suppressions in the diff fail gate 10
+  ---
+  duration_ms: 10764.0208
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): no false positives — protective TRUNCATE triggers, string literals, non-migration .sql, instructional golden text
+ok 73 - verify.sh (full): no false positives — protective TRUNCATE triggers, string literals, non-migration .sql, instructional golden text
+  ---
+  duration_ms: 13684.9026
+  type: 'test'
+  ...
+# Subtest: scalars: strings, numbers, booleans, null
+ok 74 - scalars: strings, numbers, booleans, null
+  ---
+  duration_ms: 0.6055
+  type: 'test'
+  ...
+# Subtest: comments: full-line and trailing, but not inside quotes or words
+ok 75 - comments: full-line and trailing, but not inside quotes or words
+  ---
+  duration_ms: 0.307
+  type: 'test'
+  ...
+# Subtest: nested maps and block lists
+ok 76 - nested maps and block lists
+  ---
+  duration_ms: 0.3342
+  type: 'test'
+  ...
+# Subtest: list of maps (providers shape)
+ok 77 - list of maps (providers shape)
+  ---
+  duration_ms: 0.4093
+  type: 'test'
+  ...
+# Subtest: inline flow maps and lists, nested and empty
+ok 78 - inline flow maps and lists, nested and empty
+  ---
+  duration_ms: 0.4039
+  type: 'test'
+  ...
+# Subtest: literal block scalar
+ok 79 - literal block scalar
+  ---
+  duration_ms: 0.5466
+  type: 'test'
+  ...
+# Subtest: errors carry a line number
+ok 80 - errors carry a line number
+  ---
+  duration_ms: 0.5682
+  type: 'test'
+  ...
+# Subtest: parses the real .agent/config.yaml
+ok 81 - parses the real .agent/config.yaml
+  ---
+  duration_ms: 1.2588
+  type: 'test'
+  ...
+# Subtest: formatScalar round-trips through parseYaml
+ok 82 - formatScalar round-trips through parseYaml
+  ---
+  duration_ms: 1.3867
+  type: 'test'
+  ...
+1..82
+# tests 82
+# suites 0
+# pass 69
+# fail 13
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 340413.1112

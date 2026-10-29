@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0023",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-06",
+      "file": ".agent/evidence/T-0023/20261025-085546-tests-unit.json",
+      "test": "5 test(s): packages/ledger/src/period-matrix.test.ts › SS-PLAT-06: Period status matrix is enforced as data › the source-type catalogue is exactly the RQ-0026 classification | packages/ledger/src/period-matrix.test.ts › SS-PLAT-06: Period status matrix is enforced as data › every status × source type × override × payout setting equals the §3.5 table | packages/ledger/src/period-matrix.test.ts › SS-PLAT-06: Period status matrix is enforced as data › the payout cell under AR lock defaults to \"override\" (safe) until the product owner decides | packages/ledger/src/period-matrix.test.ts › SS-PLAT-06: Period status matrix is enforced as data › unknown source types are refused in every status, even with an override (fail closed) | packages/ledger/src/period-matrix.test.ts › SS-PLAT-06: Period status matrix is enforced as data › the matrix is frozen data",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:46.798Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-57",
+      "file": ".agent/evidence/T-0023/20261025-085546-tests-unit.json",
+      "test": "4 test(s): packages/ledger/src/period-matrix.test.ts › SS-PLAT-57: Fiscal years are generated from a convention held as data › AU convention: FY2027 runs 2026-07-01 to 2027-06-30 in 12 calendar months | packages/ledger/src/period-matrix.test.ts › SS-PLAT-57: Fiscal years are generated from a convention held as data › calendar convention and leap years: FY2028 is January to December 2028 with 29 February | packages/ledger/src/period-matrix.test.ts › SS-PLAT-57: Fiscal years are generated from a convention held as data › property: any start month and year gives 12 contiguous months covering exactly one year | packages/ledger/src/period-matrix.test.ts › SS-PLAT-57: Fiscal years are generated from a convention held as data › refuses an invalid convention",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:46.798Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-06",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period-control.db.test.ts › SS-PLAT-06: Period status matrix is enforced as data (database) › property: app.period_decision(status, app.source_type_class(st), setting) equals the TypeScript matrix | packages/ledger/src/period-control.db.test.ts › SS-PLAT-06: Period status matrix is enforced as data (database) › the trigger enforces every status × source type cell, with and without an override",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-56",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "6 test(s): packages/ledger/src/period-control.db.test.ts › SS-PLAT-56: Period status changes are guarded, audited history; hard-locked reopen needs two approvers and a reason › app.role_allows_period_permission mirrors the role catalogue for every role × period permission | packages/ledger/src/period-control.db.test.ts › SS-PLAT-56: Period status changes are guarded, audited history; hard-locked reopen needs two approvers and a reason › lf_app cannot UPDATE or DELETE periods, history, overrides, settings or reopen requests | packages/ledger/src/period-control.db.test.ts › SS-PLAT-56: Period status changes are guarded, audited history; hard-locked reopen needs two approvers and a reason › even the table owner cannot change a period except its status, nor delete one | packages/ledger/src/period-control.db.test.ts › SS-PLAT-56: Period status changes are guarded, audited history; hard-locked reopen needs two approvers and a reason › status changes need the period permission; each is history with user, time and reason, and audited | packages/ledger/src/period-control.db.test.ts › SS-PLAT-56: Period status changes are guarded, audited history; hard-locked reopen needs two approvers and a reason › hard locked: no direct change; reopen needs a reason and a second, different approver holding period.reopen | packages/ledger/src/period-control.db.test.ts › SS-PLAT-56: Period status changes are guarded, audited history; hard-locked reopen needs two approvers and a reason › another tenant's period is invisible to the guarded functions",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-57",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period-control.db.test.ts › SS-PLAT-57: Fiscal years are generated from a convention held as data (database) › generates FY2027 as 12 open periods; a second, overlapping year is refused | packages/ledger/src/period-control.db.test.ts › SS-PLAT-57: Fiscal years are generated from a convention held as data (database) › a period must lie inside its fiscal year and be inserted open",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-02",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-02: AR lock blocks AR posting except with override › AR Clerk rejected; override user succeeds and is audited; AP bills still post",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-03",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-03: AP lock allows journals only › bill and invoice rejected, manual journal accepted",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-07",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC05-07: Bill in AP-locked period rejected › a bill dated 2026-10-20 without override is rejected with PERIOD_LOCKED and nothing is stored",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-04",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-04: Soft close: Finance Admin override only › the Accountant is rejected (with or without asking for an override); the Finance Admin with override succeeds | packages/ledger/src/period.enforce.db.test.ts › SS-UC10-04: Soft close: Finance Admin override only › an override is personal: another user cannot post on the Finance Admin’s override",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-05",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-05: Hard lock rejects or redirects per policy › \"reject\" → PERIOD_LOCKED (even for a Finance Admin); \"first open date\" → dated 2026-11-01 with a note",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-08",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy › Closed Won on 2026-10-30: \"reject\" → PERIOD_LOCKED, nothing posted; \"first open date\" → invoice dated 2026-11-01 with a note | packages/ledger/src/period.enforce.db.test.ts › SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy › \"first open date\" skips every later period that does not allow the source type",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-09",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC03-09: Late payout in an AR-locked period follows the period matrix › a payout dated 2026-11-30 posts exactly when the matrix (with the tenant payout setting) allows it | packages/ledger/src/period.enforce.db.test.ts › SS-UC03-09: Late payout in an AR-locked period follows the period matrix › settings are history: every change is a new row; the latest wins; a user without period.lock cannot change them",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-07",
+      "file": ".agent/evidence/T-0023/20261025-085548-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC08-07: Reconciled lines locked after hard lock › unmatching a November line after November is hard-locked is rejected; December still can be",
+      "commit": "0296919b2f7d",
+      "provider": "claude",
+      "timestamp": "2026-10-25T08:55:48.988Z",
+      "result": "passed"
+    }
+  ]
+}

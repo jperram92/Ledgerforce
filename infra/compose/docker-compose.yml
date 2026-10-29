@@ -1,0 +1,4 @@
+# Superseded by compose.yaml (T-0094, DL-0196). Kept so the old path keeps working (directive 6):
+# it includes the full stack. Use compose.yaml directly; see Docs/ops/install.md.
+include:
+  - compose.yaml

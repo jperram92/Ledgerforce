@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INV-001042 · Kestrel Logistics — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../shell.css">
+<script src="../shell.js" defer></script>
+<style>
+  .doc { --aside: 420px; }
+  .parties { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--rule); margin-bottom: 4px; }
+  .parties address { font-style: normal; font-size: var(--t-sm); color: var(--ink-2); line-height: 1.45; }
+  .parties address b { color: var(--ink); font-size: var(--t-base); }
+  .title-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .totals { width: min(340px, 100%); margin-left: auto; margin-top: 6px; }
+  .totals td { height: 34px; }
+  .due-line { display: flex; justify-content: space-between; align-items: baseline; margin-top: 14px; padding: 10px 0 0; border-top: 1px solid var(--rule-ink); }
+  .due-line .fig { font-size: 24px; font-weight: 500; }
+  .corrections p { font-size: var(--t-sm); color: var(--ink-2); }
+  .corrections .opt { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  .corrections .opt:last-of-type { border-bottom: 0; }
+  .sfrow { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--rule); font-size: var(--t-sm); }
+  .sfrow code { font-family: var(--font-figs); font-size: 12px; color: var(--ink-2); }
+  @media (max-width: 900px) { .parties { grid-template-columns: minmax(0, 1fr); gap: 12px; } }
+</style>
+</head>
+<body data-tab="sales" data-sub="invoices" data-user="Priya Shah" data-role="Accountant" data-period="Oct 2026" data-period-state="Open" data-sync="ok" data-sync-text="in sync · 2 min">
+<a class="skip" href="#main">Skip to content</a>
+<header class="masthead" id="lf-masthead"></header>
+<nav class="tabs-wrap" aria-label="Primary"><div class="tabs" id="lf-tabs"></div></nav>
+<div class="sheet-wrap">
+  <div class="sheet">
+    <nav class="subnav" id="lf-subnav" aria-label="Sales"></nav>
+    <main id="main">
+      <div class="page-head">
+        <div>
+          <div class="folio-line"><a href="02-invoice-list.html">Invoices</a> · Folio JNL-004188 · from Salesforce Opportunity</div>
+          <div class="title-row">
+            <h1>Invoice INV-001042</h1>
+            <span class="stamp big posted">Posted</span>
+          </div>
+          <p class="sub">Kestrel Logistics Pty Ltd · Due Fri 31 Oct 2026, <b>in 7 days</b></p>
+        </div>
+        <div class="actions">
+          <button class="btn" type="button">Resend</button>
+          <button class="btn" type="button">PDF</button>
+          <button class="btn primary" type="button">Record payment <span class="key">P</span></button>
+        </div>
+      </div>
+
+      <div class="cols doc">
+        <div class="stack">
+          <section aria-labelledby="doc-h">
+            <h2 id="doc-h" class="sr-only">Invoice</h2>
+            <div class="parties">
+              <address><span class="caps">Bill to</span><br><b>Kestrel Logistics Pty Ltd</b><br>ABN 51 824 753 556<br>Level 4, 120 Collins St, Melbourne VIC 3000<br>Billing To: Dana Kerr · accounts@kestrel.example</address>
+              <dl class="kv"><dt>Issued</dt><dd class="fig">01 Oct 2026</dd><dt>Due</dt><dd class="fig">31 Oct 2026</dd><dt>Terms</dt><dd>Net 30</dd></dl>
+              <dl class="kv"><dt>Your ref</dt><dd class="fig">PO-77120</dd><dt>Template</dt><dd>Standard invoice</dd><dt>Currency</dt><dd>AUD</dd></dl>
+            </div>
+            <div class="scroll">
+              <table class="ledger margined">
+                <caption class="sr-only">Invoice lines</caption>
+                <thead><tr><th class="mk" scope="col"><span class="sr-only">Line</span></th><th scope="col">Item</th><th scope="col" class="n">Qty</th><th scope="col" class="n">Unit</th><th scope="col">Tax</th><th scope="col" class="n">Amount ex GST</th></tr></thead>
+                <tbody>
+                  <tr><td class="mk fig meta">1</td><td>Salesforce implementation — Sprint 3<span class="sub">40 hours · 1–30 Sep 2026 · Professional services</span></td><td class="n">40</td><td class="n">185.00</td><td>GST 10%</td><td class="n">7,400.00</td></tr>
+                  <tr><td class="mk fig meta">2</td><td>Managed support — October<span class="sub">Monthly plan · Subscription</span></td><td class="n">1</td><td class="n">1,250.00</td><td>GST 10%</td><td class="n">1,250.00</td></tr>
+                  <tr><td class="mk fig meta">3</td><td>Sales Cloud licences, pass-through<span class="sub">5 users · October · Reimbursable</span></td><td class="n">5</td><td class="n">99.00</td><td>GST 10%</td><td class="n">495.00</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <table class="ledger totals" aria-label="Invoice totals">
+              <tbody>
+                <tr><td>Subtotal</td><td class="n">9,145.00</td></tr>
+                <tr><td>GST 10%</td><td class="n">914.50</td></tr>
+                <tr class="grand"><td>Total AUD</td><td class="n">10,059.50</td></tr>
+                <tr><td class="muted">Paid</td><td class="n">0.00</td></tr>
+              </tbody>
+            </table>
+            <div class="due-line totals"><span class="caps">Amount due</span><span class="fig">$10,059.50</span></div>
+          </section>
+
+          <section class="sec" aria-labelledby="log-h">
+            <div class="sec-h"><h2 id="log-h">Audit trail</h2><a class="meta" href="#">Full audit log</a></div>
+            <ol class="log">
+              <li><time>01 Oct 09:02</time><span><b>Created from Salesforce</b>: Opportunity “Kestrel – Sprint 3 delivery” moved to Closed Won. Integration user, replay 1440213.</span></li>
+              <li><time>01 Oct 10:41</time><span><b>Approved and posted</b> by Priya Shah (Accountant) as journal <a href="#">JNL-004188</a>. Hash 9f3c…e21a verified.</span></li>
+              <li><time>01 Oct 10:42</time><span><b>Emailed</b> to Dana Kerr (Billing To), cc ops@kestrel.example. Delivered.</span></li>
+              <li><time>01 Oct 10:43</time><span><b>Salesforce updated</b>: invoice mirror, Opportunity and Account balance. First attempt.</span></li>
+              <li><time>08 Oct 14:15</time><span><b>Viewed by customer</b> through the payment link.</span></li>
+            </ol>
+          </section>
+        </div>
+
+        <aside class="stack" aria-label="Journal and sync">
+          <section class="sec" aria-labelledby="jr-h">
+            <div class="sec-h"><h2 id="jr-h">Journal JNL-004188</h2><span class="meta">dated 01 Oct 2026</span></div>
+            <div class="scroll" aria-label="Journal (scrolls sideways)"><table class="tee">
+              <caption class="sr-only">Journal lines for INV-001042</caption>
+              <thead><tr><th scope="col">Account</th><th scope="col" class="n dr">Dr</th><th scope="col" class="n">Cr</th></tr></thead>
+              <tbody>
+                <tr><td class="acct"><span class="code">1200</span>Trade debtors<span class="sub">Kestrel Logistics · AR control</span></td><td class="n dr">10,059.50</td><td class="n"></td></tr>
+                <tr><td class="acct cr-side"><span class="code">4110</span>Professional services<span class="sub">Team: Delivery</span></td><td class="n dr"></td><td class="n">7,400.00</td></tr>
+                <tr><td class="acct cr-side"><span class="code">4120</span>Subscriptions<span class="sub">Team: Support</span></td><td class="n dr"></td><td class="n">1,250.00</td></tr>
+                <tr><td class="acct cr-side"><span class="code">4190</span>Recoverable costs</td><td class="n dr"></td><td class="n">495.00</td></tr>
+                <tr><td class="acct cr-side"><span class="code">2310</span>GST collected<span class="sub">BAS 1A</span></td><td class="n dr"></td><td class="n">914.50</td></tr>
+                <tr class="sum"><td>Totals</td><td class="n dr">10,059.50</td><td class="n">10,059.50</td></tr>
+              </tbody>
+            </table></div>
+            <p class="proof"><span aria-hidden="true">✓</span> Dr − Cr = 0.00 · balanced</p>
+            <p class="meta" style="margin-top:8px">Accounts chosen by posting profile <b>Domestic customer</b> × product type, rule set v4. <a href="#">Why these accounts?</a></p>
+          </section>
+
+          <section class="sec" aria-labelledby="sf-h">
+            <div class="sec-h"><h2 id="sf-h">Salesforce</h2><span class="tick meta">✓ in sync 2 min ago</span></div>
+            <div class="sfrow"><span>Opportunity</span><a href="#">Kestrel – Sprint 3 delivery</a></div>
+            <div class="sfrow"><code>LF_Invoice_Status__c</code><span>Awaiting payment</span></div>
+            <div class="sfrow"><code>LF_Invoice__c</code><a href="#" class="fig">a0X5g00000Qz1Ab</a></div>
+            <div class="sfrow"><span>Account balance due</span><span class="fig">16,109.50</span></div>
+            <p class="meta" style="margin-top:8px">These fields belong to LedgerForce. An edit made in Salesforce is overwritten and logged.</p>
+          </section>
+
+          <div class="form-box corrections">
+            <span class="legend">To correct a posted invoice</span>
+            <div class="opt"><div><b>Credit note</b><p>Reverses part or all of it. The invoice stays as issued.</p></div><button class="btn sm" type="button">Credit note</button></div>
+            <div class="opt"><div><b>Void, creating a reversal journal</b><p>Posts a journal dated today that exactly reverses JNL-004188. You see it before confirming.</p></div><button class="btn sm danger" type="button">Void…</button></div>
+            <p style="margin-top:8px">There is no delete. Posted documents are never edited or removed, so the books and the BAS always agree.</p>
+          </div>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

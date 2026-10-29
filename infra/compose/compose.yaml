@@ -1,0 +1,197 @@
+# LedgerForce single-VM self-hosted install (design §6.3, §7.2; T-0094, RQ-0041, ADR-0037).
+#
+#   bash infra/compose/init-secrets.sh                      # once: random secrets, never committed
+#   cp infra/compose/ledgerforce.env.example infra/compose/ledgerforce.env   # then edit it
+#   docker compose -f infra/compose/compose.yaml --env-file infra/compose/ledgerforce.env up -d --build
+#   docker compose -f infra/compose/compose.yaml --env-file infra/compose/ledgerforce.env logs setup
+#
+# The `setup` service prints the one-time owner setup link. Full guide: Docs/ops/install.md.
+#
+# Roles: setup applies migrations and installs the queue as lf_migrator; api and worker run as
+# lf_app (no superuser, no BYPASSRLS — setup refuses to run otherwise). Keycloak has its own
+# database and role. Only the web origin is published; postgres, keycloak and api are internal.
+name: ledgerforce
+
+x-hardening: &hardening
+  security_opt: ['no-new-privileges:true']
+  restart: unless-stopped
+
+x-app: &app
+  <<: *hardening
+  cap_drop: [ALL]
+  read_only: true
+  tmpfs: [/tmp]
+
+services:
+  postgres:
+    <<: *hardening
+    image: postgres:17.11-bookworm@sha256:858bb5e98eed02eb8cafbcdc007f9a65d1b613972028944a8ec2133ccaf80d27
+    environment:
+      POSTGRES_DB: ledgerforce
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      LF_MIGRATOR_PASSWORD_FILE: /run/secrets/lf_migrator_password
+      LF_APP_PASSWORD_FILE: /run/secrets/lf_app_password
+      KEYCLOAK_DB_PASSWORD_FILE: /run/secrets/keycloak_db_password
+    secrets: [postgres_password, lf_migrator_password, lf_app_password, keycloak_db_password]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Role and grant bootstrap: one source of truth shared with the test harness.
+      - ../../packages/db/bootstrap:/lf-bootstrap:ro
+      - ./initdb/10-ledgerforce-roles.sh:/docker-entrypoint-initdb.d/10-ledgerforce-roles.sh:ro
+      - ./initdb/20-keycloak-db.sh:/docker-entrypoint-initdb.d/20-keycloak-db.sh:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d ledgerforce']
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  keycloak:
+    <<: *hardening
+    build:
+      context: ../..
+      dockerfile: infra/docker/keycloak.Dockerfile
+    environment:
+      KC_HOSTNAME: ${LF_PUBLIC_URL:?set LF_PUBLIC_URL}
+      KC_PROXY_HEADERS: xforwarded
+      KC_HTTP_ENABLED: 'true'
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD_FILE: /run/secrets/keycloak_db_password
+      # Temporary admin service account, created only on the very first start (setup uses it).
+      KC_BOOTSTRAP_ADMIN_CLIENT_ID: lf-setup
+      KC_BOOTSTRAP_ADMIN_CLIENT_SECRET_FILE: /run/secrets/keycloak_admin_client_secret
+      # Realm import placeholders (infra/compose/keycloak/ledgerforce-realm.json).
+      LF_PUBLIC_URL: ${LF_PUBLIC_URL}
+      LF_OIDC_CLIENT_SECRET_FILE: /run/secrets/oidc_client_secret
+    secrets: [keycloak_db_password, keycloak_admin_client_secret, oidc_client_secret]
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      # The image has no curl: plain HTTP over bash /dev/tcp to the management port. Ready means
+      # HTTP 200 (503 while any check, e.g. "Keycloak Initialized", is still DOWN).
+      test:
+        - CMD-SHELL
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/9000 &&
+          printf 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+          head -n 1 <&3 | grep -q ' 200 '
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  setup:
+    <<: *app
+    restart: 'no'
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      target: setup
+    environment:
+      LF_DB_HOST: postgres
+      LF_DB_NAME: ledgerforce
+      LF_MIGRATOR_DB_PASSWORD_FILE: /run/secrets/lf_migrator_password
+      LF_APP_DB_PASSWORD_FILE: /run/secrets/lf_app_password
+      LF_PUBLIC_URL: ${LF_PUBLIC_URL}
+      LF_TENANT_SLUG: ${LF_TENANT_SLUG:?set LF_TENANT_SLUG}
+      LF_TENANT_NAME: ${LF_TENANT_NAME:?set LF_TENANT_NAME}
+      LF_OWNER_EMAIL: ${LF_OWNER_EMAIL:?set LF_OWNER_EMAIL}
+      LF_OWNER_NAME: ${LF_OWNER_NAME:?set LF_OWNER_NAME}
+      LF_SETUP_REISSUE: ${LF_SETUP_REISSUE:-0}
+      LF_KEYCLOAK_URL: http://keycloak:8080
+      LF_KEYCLOAK_ADMIN_CLIENT_ID: lf-setup
+      LF_KEYCLOAK_ADMIN_CLIENT_SECRET_FILE: /run/secrets/keycloak_admin_client_secret
+    secrets: [lf_migrator_password, lf_app_password, keycloak_admin_client_secret]
+    depends_on:
+      postgres: { condition: service_healthy }
+      keycloak: { condition: service_healthy }
+
+  api:
+    <<: *app
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      target: api
+    environment:
+      HOST: 0.0.0.0
+      PORT: '3000'
+      LF_DB_HOST: postgres
+      LF_DB_NAME: ledgerforce
+      LF_APP_DB_PASSWORD_FILE: /run/secrets/lf_app_password
+      LF_PUBLIC_URL: ${LF_PUBLIC_URL}
+      LF_OIDC_ISSUER: ${LF_PUBLIC_URL}/realms/ledgerforce
+      LF_OIDC_CLIENT_ID: ledgerforce
+      LF_OIDC_CLIENT_SECRET_FILE: /run/secrets/oidc_client_secret
+    secrets: [lf_app_password, oidc_client_secret]
+    depends_on:
+      setup: { condition: service_completed_successfully }
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  worker:
+    <<: *app
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      target: worker
+    environment:
+      LF_DB_HOST: postgres
+      LF_DB_NAME: ledgerforce
+      LF_APP_DB_PASSWORD_FILE: /run/secrets/lf_app_password
+    secrets: [lf_app_password]
+    depends_on:
+      setup: { condition: service_completed_successfully }
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "const s = require('node:fs').statSync('/tmp/lf-worker-heartbeat'); process.exit(Date.now() - s.mtimeMs < 30000 ? 0 : 1)"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+  web:
+    <<: *app
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      target: web
+    environment:
+      # Inside the network nginx listens on the same port as the public URL, so the API reaches
+      # the OIDC issuer through the `ledgerforce.localhost` alias on a local install.
+      NGINX_PORT: ${LF_HTTP_PORT:-8080}
+    # Read-only root: nginx renders its config template into a tmpfs owned by its user (101).
+    tmpfs: [/tmp, '/etc/nginx/conf.d:uid=101,gid=101,mode=0755']
+    ports:
+      - '${LF_HTTP_BIND:-127.0.0.1}:${LF_HTTP_PORT:-8080}:${LF_HTTP_PORT:-8080}'
+    networks:
+      default:
+        aliases: [ledgerforce.localhost]
+    depends_on:
+      api: { condition: service_healthy }
+      keycloak: { condition: service_healthy }
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O /dev/null "http://127.0.0.1:$${NGINX_PORT}/healthz"']
+      interval: 10s
+      timeout: 5s
+      retries: 6
+
+secrets:
+  postgres_password: { file: ./secrets/postgres_password }
+  lf_migrator_password: { file: ./secrets/lf_migrator_password }
+  lf_app_password: { file: ./secrets/lf_app_password }
+  keycloak_db_password: { file: ./secrets/keycloak_db_password }
+  oidc_client_secret: { file: ./secrets/oidc_client_secret }
+  keycloak_admin_client_secret: { file: ./secrets/keycloak_admin_client_secret }
+
+volumes:
+  pgdata:

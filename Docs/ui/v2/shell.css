@@ -1,0 +1,228 @@
+/* LedgerForce v2 "Columnar" — shared components. Uses ONLY tokens from tokens.css.
+   Reference for the apps/web implementation (Tailwind theme + shadcn/ui restyled to these rules). */
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--font-sans); font-size: var(--t-base); line-height: var(--lead); }
+h1, h2, h3, p { margin: 0; }
+a { color: var(--ink-blue); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 8px; top: -40px; background: var(--brand); color: var(--brand-ink); padding: 6px 10px; z-index: 100; }
+.skip:focus { top: 8px; }
+
+/* ---------- Type helpers ---------- */
+.caps { font-family: var(--font-cond); font-weight: 600; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: var(--caps-track); color: var(--ink-2); }
+.fig, .n { font-family: var(--font-figs); font-variant-numeric: tabular-nums; }
+.muted { color: var(--ink-2); } .meta { color: var(--ink-3); font-size: var(--t-sm); }
+.red { color: var(--ink-red); } .green { color: var(--ink-green); } .blue { color: var(--ink-blue); } .amber { color: var(--ink-amber); }
+.key { font-family: var(--font-figs); font-size: 11px; padding: 0 4px; border: 1px solid var(--rule-2); border-bottom-width: 2px; color: var(--ink-2); border-radius: var(--radius); }
+
+/* ---------- Masthead (letterhead) ---------- */
+.masthead { display: flex; align-items: center; gap: var(--s4); padding: 10px max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); max-width: var(--content-max); margin: 0 auto; }
+.wordmark { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); text-decoration: none; font-family: var(--font-cond); font-weight: 600; font-size: 15px; letter-spacing: 0.02em; }
+.wordmark .folio { width: 28px; height: 28px; border: 3px double var(--rule-ink); display: grid; place-items: center; font-family: var(--font-figs); font-size: 12px; font-weight: 500; }
+.letterhead { padding-left: var(--s4); border-left: 1px solid var(--rule-2); line-height: 1.25; }
+.letterhead b { display: block; font-weight: 600; }
+.letterhead span { font-size: var(--t-xs); color: var(--ink-3); font-family: var(--font-figs); }
+.masthead .grow { flex: 1; }
+.datestamp { display: inline-flex; flex-direction: column; align-items: center; padding: 2px 10px; border: 1.5px solid var(--rule-ink); font-family: var(--font-cond); text-transform: uppercase; line-height: 1.15; }
+.datestamp small { font-size: 10px; letter-spacing: var(--caps-track); color: var(--ink-3); font-weight: 600; }
+.datestamp b { font-size: 13px; letter-spacing: 0.04em; }
+.datestamp.locked { border-style: double; border-width: 3px; }
+.syncmark { display: inline-flex; align-items: center; gap: 6px; font-size: var(--t-sm); color: var(--ink-2); text-decoration: none; }
+.syncmark .lamp { width: 9px; height: 9px; border: 1.5px solid currentColor; }
+.syncmark.ok { color: var(--ink-green); } .syncmark.ok .lamp { background: currentColor; }
+.syncmark.warn { color: var(--ink-amber); } .syncmark.warn .lamp { background: linear-gradient(135deg, currentColor 50%, transparent 50%); }
+.syncmark.err { color: var(--ink-red); }
+.who { text-align: right; line-height: 1.2; font-size: var(--t-sm); }
+.who small { display: block; color: var(--ink-3); font-size: var(--t-xs); }
+.navbtn { display: none; }
+
+/* ---------- Index tabs (binder dividers) ---------- */
+.tabs-wrap { max-width: var(--content-max); margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); }
+.tabs { display: flex; align-items: flex-end; gap: 0; overflow-x: auto; scrollbar-width: none; }
+.tabs a { position: relative; flex: none; padding: 9px 14px 8px; margin-right: -1px; border: 1px solid var(--rule-2); border-bottom: 0; background: var(--sheet-2); color: var(--ink-2); text-decoration: none; font-family: var(--font-cond); font-weight: 600; font-size: 12.5px; text-transform: uppercase; letter-spacing: var(--caps-track); }
+.tabs a:hover { color: var(--ink); background: var(--sheet); }
+.tabs a[aria-current="page"] { background: var(--sheet); color: var(--ink); border-color: var(--rule-ink); border-top: 3px solid var(--brand); padding-top: 7px; z-index: 1; margin-bottom: -1px; padding-bottom: 9px; }
+.tabs a .ct { font-family: var(--font-figs); font-weight: 500; font-size: 11px; margin-left: 6px; color: var(--ink-3); letter-spacing: 0; }
+.tabs a .ct.alert { color: var(--ink-red); }
+
+/* ---------- The sheet ---------- */
+.sheet-wrap { max-width: var(--content-max); margin: 0 auto 48px; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); }
+.sheet { position: relative; background: var(--sheet); border: 1px solid var(--rule-ink); padding: 0 var(--s6) var(--s8) calc(var(--margin-w) + var(--s5)); min-height: 70vh; }
+.sheet::before, .sheet::after { content: ""; position: absolute; top: 0; bottom: 0; left: var(--margin-w); border-left: 1.5px solid var(--margin); pointer-events: none; }
+.sheet::after { left: calc(var(--margin-w) + 4px); border-left-width: 1px; }
+.subnav { display: flex; gap: var(--s5); padding: 10px 0; border-bottom: 1px solid var(--rule); margin-bottom: var(--s6); font-size: var(--t-sm); flex-wrap: wrap; }
+.subnav a { color: var(--ink-2); text-decoration: none; }
+.subnav a[aria-current="page"] { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 6px; }
+.subnav .ct { font-family: var(--font-figs); font-size: 11px; color: var(--ink-3); margin-left: 4px; }
+
+/* Margin notes sit left of the red line, like an auditor's marks */
+.mnote { position: absolute; left: 0; width: var(--margin-w); text-align: center; font-family: var(--font-figs); font-size: 11px; color: var(--ink-3); line-height: 1.3; }
+
+/* ---------- Page head ---------- */
+.page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s4); flex-wrap: wrap; margin-bottom: var(--s6); padding-top: var(--s2); }
+.folio-line { font-family: var(--font-cond); font-weight: 600; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: var(--caps-track); color: var(--ink-3); margin-bottom: 6px; }
+.folio-line a { color: var(--ink-3); }
+.page-head h1 { font-size: var(--t-2xl); font-weight: 600; letter-spacing: -0.01em; line-height: var(--lead-tight); text-wrap: balance; }
+.page-head .sub { color: var(--ink-2); margin-top: 6px; max-width: 70ch; }
+.actions { display: flex; gap: var(--s2); align-items: center; flex-wrap: wrap; }
+
+/* Section heading: condensed caps over a rule, like a ledger division */
+.sec { margin-bottom: var(--s3); }
+.sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s3); border-bottom: 1.5px solid var(--rule-ink); padding-bottom: 5px; margin-bottom: var(--s3); flex-wrap: wrap; }
+.sec-h h2 { font-family: var(--font-cond); font-weight: 600; font-size: 13.5px; text-transform: uppercase; letter-spacing: var(--caps-track); }
+.sec-h .meta { font-size: var(--t-xs); }
+
+/* ---------- Buttons ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: var(--control-h); padding: 0 14px; border: 1px solid var(--rule-ink); border-radius: var(--radius); background: var(--sheet); color: var(--ink); font: inherit; font-weight: 500; font-size: 13.5px; cursor: pointer; white-space: nowrap; text-decoration: none; }
+.btn:hover { background: var(--sheet-2); }
+.btn.primary { background: var(--brand); border-color: var(--brand); color: var(--brand-ink); }
+.btn.primary:hover { background: var(--brand-hover); }
+.btn.primary .key { border-color: currentColor; color: inherit; opacity: .85; }
+.btn.danger { color: var(--ink-red); border-color: var(--ink-red); }
+.btn.quiet { border-color: transparent; background: transparent; color: var(--ink-blue); text-decoration: underline; text-underline-offset: 3px; padding: 0 6px; }
+.btn.sm { height: 28px; padding: 0 10px; font-size: 12.5px; }
+.btn.lg { height: 44px; padding: 0 20px; font-size: 15px; }
+.btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+
+/* ---------- Stamps (document state: word + border style + ink) ---------- */
+.stamp { display: inline-flex; align-items: center; gap: 5px; padding: 1px 7px; border: 1.5px solid currentColor; border-radius: var(--radius); font-family: var(--font-cond); font-weight: 600; font-size: 11px; line-height: 1.45; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+.stamp.draft { color: var(--ink-3); border-style: dashed; }
+.stamp.awaiting { color: var(--ink-amber); }
+.stamp.approved { color: var(--ink-blue); }
+.stamp.posted { color: var(--ink-blue); border-style: double; border-width: 3px; padding: 0 6px; }
+.stamp.partpaid { color: var(--ink-green); border-style: dashed; }
+.stamp.paid { color: var(--ink-green); background: var(--wash-green); }
+.stamp.overdue { color: var(--ink-red); background: var(--wash-red); }
+.stamp.void { color: var(--ink-3); text-decoration: line-through; }
+.stamp.reversed { color: var(--ink-violet); border-style: double; border-width: 3px; padding: 0 6px; }
+.stamp.locked { color: var(--sheet); background: var(--ink); border-color: var(--ink); }
+.stamp.excluded { color: var(--ink-red); border-style: dashed; }
+.stamp.big { font-size: 17px; padding: 3px 12px; border-width: 2.5px; transform: rotate(-4deg); letter-spacing: 0.12em; }
+.stamp.big.posted { border-width: 5px; padding: 1px 10px; }
+
+/* Audit marks: ticks and flags in the margin column */
+.tick { color: var(--ink-green); font-family: var(--font-figs); font-weight: 500; }
+.flag { color: var(--ink-red); font-family: var(--font-figs); font-weight: 500; }
+.query { color: var(--ink-amber); font-family: var(--font-figs); font-weight: 500; }
+
+/* ---------- Ledger tables ---------- */
+.scroll { overflow-x: auto; }
+table.ledger { width: 100%; border-collapse: collapse; font-size: var(--t-base); }
+table.ledger caption { text-align: left; }
+table.ledger th { font-family: var(--font-cond); font-weight: 600; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: var(--caps-track); color: var(--ink-2); text-align: left; padding: 6px var(--cell-px); border-bottom: 1.5px solid var(--rule-ink); white-space: nowrap; vertical-align: bottom; }
+table.ledger td { padding: 0 var(--cell-px); height: var(--row-h); border-bottom: 1px solid var(--rule); vertical-align: middle; }
+table.ledger td.n, table.ledger th.n { text-align: right; font-family: var(--font-figs); white-space: nowrap; border-left: 1px solid var(--rule); }
+table.ledger th.n { font-family: var(--font-cond); }
+table.ledger tbody tr:hover td { background: var(--sheet-2); }
+table.ledger tr.sel td { background: var(--brand-wash); }
+table.ledger td .sub { display: block; font-size: var(--t-xs); color: var(--ink-3); line-height: 1.3; }
+table.ledger tr.total td { border-top: 1px solid var(--rule-ink); border-bottom: 0; font-weight: 600; }
+table.ledger tr.grand td { border-top: 1px solid var(--rule-ink); border-bottom: 3px double var(--rule-ink); font-weight: 600; }
+table.ledger tr.void td { color: var(--ink-3); }
+table.ledger tr.void td:nth-child(2) { text-decoration: line-through; }
+/* A table whose first column sits in the margin (ticks left of the red line) */
+.scroll:has(> table.margined), table.ledger.margined:not(.scroll > table) { margin-left: calc(-1 * (var(--margin-w) + var(--s5))); width: calc(100% + var(--margin-w) + var(--s5)); }
+table.ledger.totals { width: min(340px, 100%); margin-left: auto; }
+table.ledger.margined th.mk, table.ledger.margined td.mk { width: var(--margin-w); min-width: var(--margin-w); padding: 0; text-align: center; border-bottom-color: transparent; }
+table.ledger.margined th:nth-child(2), table.ledger.margined td:nth-child(2) { padding-left: var(--s5); }
+table.ledger.margined tr.total td.mk, table.ledger.margined tr.grand td.mk { border-color: transparent; }
+
+/* The T: journal entries drawn as Dr | Cr with a heavy T rule */
+table.tee { width: 100%; border-collapse: collapse; font-size: var(--t-base); }
+table.tee th { font-family: var(--font-cond); font-weight: 600; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: var(--caps-track); color: var(--ink-2); padding: 4px 10px 6px; border-bottom: 2px solid var(--rule-ink); text-align: left; }
+table.tee th.n { text-align: right; }
+table.tee td { padding: 7px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.tee td.n { text-align: right; font-family: var(--font-figs); white-space: nowrap; width: 1%; }
+table.tee .dr { border-right: 2px solid var(--rule-ink); }
+table.tee td.acct .code { font-family: var(--font-figs); color: var(--ink-3); margin-right: 8px; font-size: 12.5px; }
+table.tee td.acct .sub { display: block; font-size: var(--t-xs); color: var(--ink-3); margin-left: 0; }
+table.tee td.acct.cr-side { padding-left: 34px; }   /* credits indented, as a journal is written */
+table.tee tr.sum td { border-top: 1px solid var(--rule-ink); border-bottom: 3px double var(--rule-ink); font-weight: 600; }
+.proof { display: flex; align-items: center; gap: 10px; font-family: var(--font-figs); font-size: var(--t-sm); color: var(--ink-green); padding: 8px 10px 0; }
+.proof.off { color: var(--ink-red); }
+
+/* ---------- Statement strip (key figures, like the head of a bank statement) ---------- */
+.statement { display: grid; grid-template-columns: repeat(var(--cols, 4), minmax(0, 1fr)); border-top: 1.5px solid var(--rule-ink); border-bottom: 1px solid var(--rule-ink); margin-bottom: var(--s8); }
+.statement > * { padding: 12px 16px 14px; border-left: 1px solid var(--rule-2); color: inherit; text-decoration: none; display: block; }
+.statement > *:first-child { border-left: 0; padding-left: 0; }
+.statement > a:hover { background: var(--sheet-2); }
+.statement .lbl { font-family: var(--font-cond); font-weight: 600; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: var(--caps-track); color: var(--ink-2); }
+.statement .v { font-family: var(--font-figs); font-size: var(--t-fig); font-weight: 500; letter-spacing: -0.02em; line-height: 1.15; margin: 6px 0 4px; }
+.statement .v .c { font-size: 0.55em; color: var(--ink-3); letter-spacing: 0; }
+.statement .ft { font-size: var(--t-sm); color: var(--ink-3); }
+
+/* ---------- Printed-form boxes (controls, explanations, inputs) ---------- */
+.form-box { position: relative; border: 1px solid var(--rule-ink); padding: 16px 14px 12px; margin-top: 10px; }
+.form-box > .legend { position: absolute; top: -0.75em; left: 10px; background: var(--sheet); padding: 0 6px; font-family: var(--font-cond); font-weight: 600; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: var(--caps-track); color: var(--ink-2); }
+.form-box.control > .legend { color: var(--ink-blue); }
+.form-box.control { border-color: var(--ink-blue); }
+.form-box.warn { border-color: var(--ink-amber); } .form-box.warn > .legend { color: var(--ink-amber); }
+.form-box.err { border-color: var(--ink-red); } .form-box.err > .legend { color: var(--ink-red); }
+.form-box p + p { margin-top: 6px; }
+.field { display: grid; gap: 4px; }
+.field label { font-family: var(--font-cond); font-weight: 600; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: var(--caps-track); color: var(--ink-2); }
+.input { height: var(--control-h); border: 0; border-bottom: 1.5px solid var(--field-border); background: transparent; color: var(--ink); font: inherit; padding: 0 2px; border-radius: 0; }
+.input:focus { outline: none; border-bottom-color: var(--focus); box-shadow: 0 2px 0 0 var(--focus); }
+select.input { padding-right: 18px; }
+
+/* Signature chain for two-person actions: names written on signature lines */
+.signoff { display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: var(--s4); }
+.signoff .line { border-bottom: 1px solid var(--rule-ink); padding-bottom: 4px; min-height: 44px; display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.signoff .name { font-weight: 600; }
+.signoff .when { font-family: var(--font-figs); font-size: var(--t-xs); color: var(--ink-3); }
+.signoff .role { font-family: var(--font-cond); font-weight: 600; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: var(--caps-track); color: var(--ink-3); margin-top: 4px; }
+.signoff .you .line { border-bottom: 2px solid var(--brand); }
+.signoff .pending .name { color: var(--ink-3); font-weight: 400; font-style: italic; }
+
+/* Audit log: mono timestamps down a ruled column */
+.log { list-style: none; margin: 0; padding: 0; font-size: var(--t-sm); }
+.log li { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--rule); }
+.log time { font-family: var(--font-figs); font-size: var(--t-xs); color: var(--ink-3); padding-top: 2px; }
+
+/* Ageing bars: overdue hatched (red ink AND pattern, never colour alone) */
+.age { display: grid; grid-template-columns: 96px minmax(0, 1fr) 110px; gap: 10px; align-items: center; font-size: var(--t-sm); padding: 5px 0; border-bottom: 1px solid var(--rule); }
+.age .bar { height: 12px; border: 1px solid var(--rule-ink); background: var(--ink-blue); }
+.age.over .bar { background: repeating-linear-gradient(45deg, var(--ink-red) 0 2px, var(--wash-red) 2px 6px); border-color: var(--ink-red); }
+.age .n { text-align: right; }
+
+/* Step tally: progress as tally boxes, not a bar */
+.tally { display: inline-flex; gap: 3px; vertical-align: middle; }
+.tally i { width: 12px; height: 12px; border: 1.5px solid var(--rule-ink); }
+.tally i.on { background: var(--ink-green); border-color: var(--ink-green); }
+
+/* Layout helpers */
+.cols { display: grid; gap: var(--s8); grid-template-columns: minmax(0, 1fr) var(--aside, 380px); align-items: start; }
+.stack { display: grid; gap: var(--s6); align-content: start; }
+.cols > *, .stack > * { min-width: 0; }
+.row { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+.between { justify-content: space-between; }
+dl.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 0; font-size: var(--t-sm); }
+dl.kv dt { font-family: var(--font-cond); font-weight: 600; font-size: var(--t-xs); text-transform: uppercase; letter-spacing: var(--caps-track); color: var(--ink-3); padding-top: 2px; }
+dl.kv dd { margin: 0; }
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 900px) {
+  :root { --margin-w: 26px; }
+  .letterhead, .who, .syncmark .txt, .datestamp small { display: none; }
+  .datestamp { padding: 2px 6px; } .datestamp b { font-size: 11.5px; }
+  .masthead { gap: var(--s3); }
+  .sheet { padding: 0 var(--s4) var(--s6) calc(var(--margin-w) + var(--s3)); }
+  .scroll:has(> table.margined), table.ledger.margined:not(.scroll > table) { margin-left: calc(-1 * (var(--margin-w) + var(--s3))); width: calc(100% + var(--margin-w) + var(--s3)); }
+  table.ledger.margined th:nth-child(2), table.ledger.margined td:nth-child(2) { padding-left: var(--s3); }
+  .cols { grid-template-columns: minmax(0, 1fr); }
+  .statement { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .statement > * { border-bottom: 1px solid var(--rule); }
+  .statement > *:nth-child(odd) { border-left: 0; padding-left: 0; }
+  .statement .v { font-size: 24px; }
+  .signoff { grid-template-columns: minmax(0, 1fr); }
+  .page-head h1 { font-size: 23px; }
+  .age { grid-template-columns: 78px minmax(0, 1fr) 96px; }
+  table.tee { font-size: 13px; }
+  table.tee td, table.tee th { padding-left: 6px; padding-right: 6px; }
+  table.tee td.acct.cr-side { padding-left: 16px; }
+  table.tee td.acct .code { display: block; margin: 0; }
+}

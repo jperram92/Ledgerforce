@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0024",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-05",
+      "file": ".agent/evidence/T-0024/20261024-193056-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/numbering.db.test.ts › SS-PLAT-05: Gapless numbering under concurrency and rollback › 50 concurrent postings, 5 rolling back, leave 45 consecutive numbers | packages/ledger/src/numbering.db.test.ts › SS-PLAT-05: Gapless numbering under concurrency and rollback › a number is returned when the transaction fails at commit (deferred balance check)",
+      "commit": "57c4d8cbda1b",
+      "provider": "claude",
+      "timestamp": "2026-10-24T19:30:56.220Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-06",
+      "file": ".agent/evidence/T-0024/20261024-193056-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/numbering.db.test.ts › SS-UC02-06: Consecutive gapless numbers; failed invoice consumes none › a batch of 40, each in its own transaction, the 13th failing: the 39 posted are consecutive",
+      "commit": "57c4d8cbda1b",
+      "provider": "claude",
+      "timestamp": "2026-10-24T19:30:56.220Z",
+      "result": "passed"
+    }
+  ]
+}

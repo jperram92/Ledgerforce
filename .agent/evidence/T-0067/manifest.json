@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0067",
+  "entries": [
+    {
+      "scenario": "SS-UC01-09",
+      "file": ".agent/evidence/T-0067/20261026-044540-tests-db.json",
+      "test": "4 test(s): apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09: Salesforce outage does not block accounting | apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09 an expired token is re-signed once and the write-back goes through | apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09 a company without a Salesforce connection posts and has nothing to write back | apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09 no pg-boss instance reported an error",
+      "commit": "5d256127eafa",
+      "provider": "claude",
+      "timestamp": "2026-10-26T04:45:44.056Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-04",
+      "file": ".agent/evidence/T-0067/20261026-044540-tests-unit.json",
+      "test": "2 test(s): packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-UC03-04 write-back of a paid invoice SS-UC03-04: Salesforce shows Paid with payment date | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-UC03-04 write-back of a paid invoice SS-UC03-04 a replay sends the same values and creates nothing new (upsert is idempotent)",
+      "commit": "5d256127eafa",
+      "provider": "claude",
+      "timestamp": "2026-10-26T04:45:42.448Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC04-02",
+      "file": ".agent/evidence/T-0067/20261026-044540-tests-unit.json",
+      "test": "1 test(s): packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-UC04-02 credit status write-back SS-UC04-02: Credit status \"Overdue\" written back",
+      "commit": "5d256127eafa",
+      "provider": "claude",
+      "timestamp": "2026-10-26T04:45:42.448Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-83",
+      "file": ".agent/evidence/T-0067/20261026-044540-tests-unit.json",
+      "test": "4 test(s): packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-PLAT-83 field map, ownership and batches of at most 200 SS-PLAT-83 the field map is data, names only package fields, and only LedgerForce-owned ones | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-PLAT-83 field map, ownership and batches of at most 200 SS-PLAT-83 450 invoices and 260 account/opportunity updates go out in requests of at most 200 | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-PLAT-83 field map, ownership and batches of at most 200 SS-PLAT-83 the same record twice in one event is sent once, last value wins | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-PLAT-83 field map, ownership and batches of at most 200 SS-PLAT-83 the payload contract is strict: unknown statuses, fields and float money are refused",
+      "commit": "5d256127eafa",
+      "provider": "claude",
+      "timestamp": "2026-10-26T04:45:42.448Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-84",
+      "file": ".agent/evidence/T-0067/20261026-044540-tests-unit.json",
+      "test": "5 test(s): packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-PLAT-84 outage, limits and per-record failures SS-PLAT-84 503 is a retryable outage and carries Retry-After; nothing is written | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-PLAT-84 outage, limits and per-record failures SS-PLAT-84 429, 403 REQUEST_LIMIT_EXCEEDED, 400 and 401 are classified | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-PLAT-84 outage, limits and per-record failures SS-PLAT-84 a per-record failure in a 200 answer fails the delivery with the record errors | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-PLAT-84 outage, limits and per-record failures SS-PLAT-84 Retry-After and Sforce-Limit-Info are parsed | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts › SS-PLAT-84 outage, limits and per-record failures SS-PLAT-84 the worker stops sending at 25 % of the daily allocation and resumes when the reading is stale",
+      "commit": "5d256127eafa",
+      "provider": "claude",
+      "timestamp": "2026-10-26T04:45:42.448Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-09",
+      "file": ".agent/evidence/T-0067/20261026-053000-tests-db.json",
+      "test": "4 test(s): apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09: Salesforce outage does not block accounting | apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09 an expired token is re-signed once and the write-back goes through | apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09 a company without a Salesforce connection posts and has nothing to write back | apps/worker/src/salesforce-writeback.outage.db.test.ts › SS-UC01-09 Salesforce outage SS-UC01-09 no pg-boss instance reported an error",
+      "commit": "af03e2046880",
+      "provider": "claude",
+      "timestamp": "2026-10-26T05:19:32.394Z",
+      "result": "passed"
+    }
+  ]
+}

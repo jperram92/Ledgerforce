@@ -1,0 +1,52 @@
+{
+  "name": "ledgerforce",
+  "version": "0.0.0",
+  "private": true,
+  "description": "LedgerForce — open-source double-entry SMB ERP for Salesforce (monorepo root)",
+  "license": "UNLICENSED",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r --if-present typecheck && tsc -p tsconfig.json",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run --project unit --project ui --project web --project api-unit && pnpm test:lwc",
+    "test:lwc": "cd salesforce && sfdx-lwc-jest -- --ci",
+    "test:db": "vitest run --project db --project api-db",
+    "test:openbao": "bash scripts/test/openbao.sh",
+    "test:e2e": "playwright test",
+    "test:all": "pnpm test && pnpm test:db && pnpm test:e2e",
+    "evidence:tests": "node packages/testing/src/evidence/record-tests.ts"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@eslint/js": "10.0.1",
+    "@ledgerforce/testing": "workspace:*",
+    "@playwright/test": "1.63.0",
+    "@salesforce/sfdx-lwc-jest": "7.9.0",
+    "@swc/core": "1.16.13",
+    "@types/node": "22.20.5",
+    "@vitest/coverage-v8": "4.1.12",
+    "eslint": "10.13.0",
+    "fast-check": "4.10.2",
+    "globals": "17.13.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.0",
+    "unplugin-swc": "2.0.0",
+    "vitest": "4.1.12",
+    "yaml": "2.9.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "multer": "2.5.0",
+      "jose": "6.2.12",
+      "seroval": "1.6.9",
+      "seroval-plugins": "1.6.9"
+    }
+  }
+}

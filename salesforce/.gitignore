@@ -1,0 +1,6 @@
+# Salesforce CLI state and org auth: never commit (salesforce/AGENTS.md, "No secrets")
+.sf/
+.sfdx/
+.localdevserver/
+# Output of a local `sf project convert source` run
+mdapi-out/

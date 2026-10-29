@@ -1,0 +1,35 @@
+# Generated / vendored
+node_modules/
+dist/
+coverage/
+test-results/
+playwright-report/
+.tmp/
+pnpm-lock.yaml
+
+# Human- and agent-owned prose and state: formatting is not this tool's business
+# (directive 6 — never rewrite other owners' files).
+Docs/
+.agent/
+.claude/
+.agents/
+AGENTS.md
+CLAUDE.md
+**/AGENTS.md
+**/CLAUDE.md
+scripts/agent/
+# Salesforce metadata (XML, Apex) is formatted by hand; its TypeScript contract tests are not (DL-0094).
+salesforce/*
+!salesforce/test/
+# Lightning web components are ours to format (T-0072, DL-0220); templates use the lwc parser.
+!salesforce/force-app/
+salesforce/force-app/**/*.xml
+
+# SQL is formatted by hand (migrations are checksummed — reformatting would break them)
+*.sql
+
+# Markdown is prose owned by many agents/humans (templates, docs, READMEs); not auto-formatted.
+*.md
+
+# Sub-agent git worktrees are separate checkouts on their own branches (DL-0081)
+.claude/worktrees/

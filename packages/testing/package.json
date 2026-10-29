@@ -1,0 +1,23 @@
+{
+  "name": "@ledgerforce/testing",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Test tooling: Playwright evidence fixture, local ESLint rules (no-float-money, no-direct-ledger-write)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./evidence": "./src/evidence/index.ts",
+    "./eslint-rules": "./eslint-rules/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/estree": "1.0.9",
+    "@types/node": "22.20.5",
+    "@typescript-eslint/parser": "8.72.0",
+    "eslint": "10.13.0",
+    "vitest": "4.1.12"
+  }
+}
