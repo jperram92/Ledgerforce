@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0113",
+  "current_task": null,
   "branch": "feat/T-0113-install-setup-wait",
   "step": null,
-  "claimed_by": "codex",
-  "lease_expires_at": "2026-10-29T03:58:23.101Z",
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-10-29T03:13:23.108Z",
+  "updated_at": "2026-10-29T07:41:19.203Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

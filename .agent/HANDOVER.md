@@ -190,3 +190,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-29T03:04:15.041Z codex: release T-0103 → blocked (Pinned Windows atomic-reader test remains below unchanged >100 write threshold; immediate-retry experiments unreliable and reverted. Heartbeat fix preserved; full verification not green.)
 - 2026-10-29T03:04:33.810Z codex: T-0113 → in_progress
 - 2026-10-29T03:13:23.110Z codex: T-0113 → verifying
+- 2026-10-29T07:41:19.208Z codex: release T-0113 → review (All CI checks pass at 405f794; full verifier 13 PASS/0 FAIL/3 PENDING. Await independent Claude review, no merge.)

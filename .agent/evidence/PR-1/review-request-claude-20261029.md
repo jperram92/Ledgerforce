@@ -2,6 +2,8 @@
 
 Status: PENDING. This is a review request prepared by the builder (codex), not an independent review or approval.
 
+Latest readiness: 405f794 has all CI checks passing, full verifier 13 PASS / 0 FAIL / 3 PENDING; T-0113 is ready for formal Claude review. Review its smoke repair and evidence separately from T-0103's unresolved Windows throughput issue. Re-run verify on the exact reviewed head and record pending gates honestly. The original combined-repair review request remains pending.
+
 Update 2026-10-29: include e32bad1 (T-0113 setup-wait repair), its real-Docker RED/GREEN tests and subsequent evidence commit. Full install CI passed 7/7, static/unit, DB/RLS and e2e passed. Review scope now includes smoke.sh stopped-container selection, Docker exit-code handling and failure-log redaction. T-0113 is verifying with imported source CI evidence; full DoD still tracked separately. Pinned Windows conductor unrestricted run is 81/82 (atomic throughput 27 writes), all run/failover tests pass. Do not carry forward the superseded install failure below as a current failure; do retain the unresolved Windows issue. Still no independent approval.
 
 ## Copyable Claude continuation prompt
