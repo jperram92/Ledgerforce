@@ -1,0 +1,45 @@
+LedgerForce verify — 2026-10-31T23:02:13Z — task T-0095
+GATE 1 typecheck: PASS (pnpm typecheck)
+GATE 1 lint: PASS (pnpm lint)
+GATE 1 format: PASS (pnpm format:check)
+GATE 2a unit-tests: PASS (pnpm test + node --test scripts/agent/test)
+GATE 2b db-tests: PASS (pnpm test:db)
+GATE 2c coverage: NOT YET AVAILABLE (lines 80.75% — no baseline .agent/coverage-baseline.json on main yet)
+GATE 3 accounting-invariants: PASS (1 property test file(s) ran in gate 2a)
+GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; Docs/accounting unchanged vs HEAD)
+GATE 5 cross-tenant-rls: PASS (1 cross-tenant RLS test file(s) ran in gate 2b)
+GATE 6 migrations-forward: PASS (applied in 2b; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+GATE 7 security: PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep — runs in CI))
+GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (claude) in .agent/evidence/T-0095/review-*.md)
+GATE 9 e2e-evidence: FAIL (pnpm test:e2e; missing .agent/evidence/T-0095/manifest.json for SS-PLAT-18)
+GATE 10 no-shortcuts: PASS (159 test file(s) scanned; diff vs HEAD clean)
+GATE 11 no-delete: PASS (staged + working tree)
+GATE 12 memory: FAIL (T-0095: status "in_progress" (expected verifying, review or done when verifying))
+  T-0095: unticked step: - [ ] 6. seeded-failure proof — local real scanners 5/6 PASS; vulnerability gate (test 5) exits 2 locally because grype.anchore.io is network-policy denied here; must pass in GitHub Actions `security / scanner-contracts`
+  T-0095: unticked step: - [ ] 6a. HUMAN GATE: owner decides the Gitleaks exception proposal (`.agent/evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md`); `security / secrets` is red on this repo until then
+  T-0095: unticked step: - [ ] 7. `bash scripts/agent/verify.sh` green (definition of done) [phase: verify]
+  T-0095: unticked step: - [ ] 8. Cross-provider review (`cross-review`) [phase: review]
+  T-0095: unticked step: - [ ] 9. Update success-scenario register rows (SS-PLAT-18), decision log, run log, HANDOVER; release lease [phase: finish]
+
+=== SUMMARY ===
+ #   | gate                  | result
+ 1   | typecheck             | PASS (pnpm typecheck)
+ 1   | lint                  | PASS (pnpm lint)
+ 1   | format                | PASS (pnpm format:check)
+ 2a  | unit-tests            | PASS (pnpm test + node --test scripts/agent/test)
+ 2b  | db-tests              | PASS (pnpm test:db)
+ 2c  | coverage              | PENDING (lines 80.75% — no baseline .agent/coverage-baseline.json on main yet)
+ 3   | accounting-invariants | PASS (1 property test file(s) ran in gate 2a)
+ 4   | golden-postings       | PENDING (no golden test file(s) yet; Docs/accounting unchanged vs HEAD)
+ 5   | cross-tenant-rls      | PASS (1 cross-tenant RLS test file(s) ran in gate 2b)
+ 6   | migrations-forward    | PASS (applied in 2b; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+ 7   | security              | PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep — runs in CI))
+ 8   | cross-review          | PENDING (no review report by a provider other than the builder (claude) in .agent/evidence/T-0095/review-*.md)
+ 9   | e2e-evidence          | FAIL (pnpm test:e2e; missing .agent/evidence/T-0095/manifest.json for SS-PLAT-18)
+ 10  | no-shortcuts          | PASS (159 test file(s) scanned; diff vs HEAD clean)
+ 11  | no-delete             | PASS (staged + working tree)
+ 12  | memory                | FAIL (T-0095: status "in_progress" (expected verifying, review or done when verifying))
+PASS: 11   FAIL: 2   PENDING: 3
+!!! 3 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+VERIFY: FAIL
+verify exit=1

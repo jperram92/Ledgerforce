@@ -4,10 +4,10 @@
 
 From: claude (run 2026-10-31-claude-r01). Reason: user-requested continuation; WIP commit, not a green checkpoint.
 Done: `.github/workflows/security.yml` added (new file only; ci.yml/install-smoke.yml untouched), actions pinned to full SHAs, runners ubuntu-24.04, contents: read. Workflow contract extended, RED (2 fail/1 pass) then GREEN 3/3. Scanner fixture corrected (Syft dir sources use lockfiles) and history-scan test added. All four scanner image digests verified by pull. Real scanners locally: 5/6 PASS. Repo: Semgrep clean; Gitleaks 12 history + 8 tree generic-api-key hits (apparent false positives).
-In progress: scanner test 5 (vulnerable package → Grype exit 1) exits 2 here because grype.anchore.io is denied by this cloud session's network policy; must be proven in GitHub Actions. Full verify.sh result: see run log 2026-10-31-claude-r01 (was running at commit time).
+In progress: scanner test 5 (vulnerable package → Grype exit 1) exits 2 here because grype.anchore.io is denied by this cloud session's network policy; must be proven in GitHub Actions. Full verify.sh on d49ad4f: 11 PASS / 2 FAIL / 3 PENDING (FAIL 9: no SS-PLAT-18 manifest, scenario unproven; FAIL 12: card not in verifying). Task released as blocked (human gate). PR #3 is already merged and no open PR exists, so security.yml has never run on GitHub.
 Next action: push → read the `security` run on GitHub → fix any non-secrets red → owner decides exception → verify.sh → codex cross-review → register SS-PLAT-18.
 Decisions taken: DL-0243.
-Open questions for human: (1) Gitleaks exception for 20 fingerprints listed in `.agent/evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md` — accept option 1, 2 or 3? Until then `security / secrets` fails on every PR. (2) Optional: allow `grype.anchore.io`, `pkg-containers.githubusercontent.com` and Docker Hub in the cloud environment's network settings so the vulnerability gate can be proven locally.
+Open questions for human: (0) Open a new PR for feat/T-0095-security-gates (which base?) so the security workflow runs. (1) Gitleaks exception for 20 fingerprints listed in `.agent/evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md` — accept option 1, 2 or 3? Until then `security / secrets` fails on every PR. (2) Optional: allow `grype.anchore.io`, `pkg-containers.githubusercontent.com` and Docker Hub in the cloud environment's network settings so the vulnerability gate can be proven locally.
 Do not: add suppressions/exceptions, weaken tests, edit ci.yml/install-smoke.yml/verify.sh, claim green, delete tracked files, push to main or merge without green CI and cross-provider review.
 
 ## Log
@@ -189,3 +189,4 @@ Do not: add suppressions/exceptions, weaken tests, edit ci.yml/install-smoke.yml
 - 2026-11-01 codex: reviewed pending T-0095 changes; released to todo for WIP continuation; workflow contract 1 PASS / 1 FAIL.
 - 2026-10-31T23:03:26.689Z claude: T-0095 → in_progress
 - 2026-10-31 claude: T-0095 workflow implemented (DL-0243); secrets gate red pending owner exception decision; vulnerability gate proof deferred to GitHub Actions.
+- 2026-10-31T23:09:58.592Z claude: release T-0095 → blocked (human gate: owner to decide Gitleaks exception (evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md) and to open a PR so security.yml runs in Actions (vulnerability gate unproven locally: grype.anchore.io denied). verify 11 PASS/2 FAIL/3 PENDING.)
