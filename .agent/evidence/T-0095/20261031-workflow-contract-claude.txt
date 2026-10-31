@@ -1,0 +1,10 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  23:02:45
+   Duration  390ms (transform 49ms, setup 0ms, import 104ms, tests 36ms, environment 0ms)
+
+exit=0

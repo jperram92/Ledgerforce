@@ -1,14 +1,14 @@
-# Handover — T-0095 WIP saved, 2026-11-01
+# Handover — T-0095 security workflow implemented (WIP, not green), 2026-10-31
 ## Codex continuation prompt
-> Resume T-0095 on feat/T-0095-security-gates. The WIP commit containing this handover follows c1dfbca; inspect git log -1 --format=full. Next command: node scripts/agent/conductor.ts claim T-0095 --provider codex. Then implement the accepted security workflow and run corepack pnpm exec vitest run infra/test/security-workflow.contract.test.ts, followed by node --test tests/security/scanners.contract.test.mjs. Preserve failing assertions and complete verification/review before claiming green.
+> Resume T-0095 on feat/T-0095-security-gates. Inspect `git log -3 --format=full` (claude WIP commits after 29e3def). Next command: `node scripts/agent/conductor.ts claim T-0095 --provider codex` only if the claude lease has expired. Read DL-0243 and `.agent/evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md`. Check the GitHub Actions `security` workflow run for this branch's PR (jobs: scanner-contracts, sast, secrets, dependencies, images x4). Expected: secrets RED until the owner decides the Gitleaks exception; everything else must be green — any other red is a real defect to fix test-first. Then `bash scripts/agent/verify.sh`, and cross-review Claude's workflow (`cross-review`). Never add a .gitleaksignore or other suppression without the owner's written decision (ADR-0043 rule 5).
 
-From: codex (run 2026-11-01-codex-r01). Reason: user requested explanation and commit of existing changes.
-Done: inspected five new security files; JavaScript syntax checks pass. Task list updated. Previous handover preserved in .agent/runs/2026-11-01-codex-r01-prior-handover.md.
-In progress: workflow contract 1 PASS / 1 FAIL: security workflow triggers must exist. Workflow missing; Docker scanner tests, digest verification, full verifier and independent review not run. Original RED sequence unverified.
-Next action: reclaim T-0095 with the command above, then finish workflow and seeded scanner proof. Task released to todo, not completed.
-Decisions taken: DL-0242. ADR-0043 already Accepted under DL-0241; no repeat approval needed.
-Open questions for human: none new.
-Do not: weaken tests, claim a green checkpoint, edit approved golden files or .env files, delete tracked files, push to main or merge without green CI and cross-provider review.
+From: claude (run 2026-10-31-claude-r01). Reason: user-requested continuation; WIP commit, not a green checkpoint.
+Done: `.github/workflows/security.yml` added (new file only; ci.yml/install-smoke.yml untouched), actions pinned to full SHAs, runners ubuntu-24.04, contents: read. Workflow contract extended, RED (2 fail/1 pass) then GREEN 3/3. Scanner fixture corrected (Syft dir sources use lockfiles) and history-scan test added. All four scanner image digests verified by pull. Real scanners locally: 5/6 PASS. Repo: Semgrep clean; Gitleaks 12 history + 8 tree generic-api-key hits (apparent false positives).
+In progress: scanner test 5 (vulnerable package → Grype exit 1) exits 2 here because grype.anchore.io is denied by this cloud session's network policy; must be proven in GitHub Actions. Full verify.sh result: see run log 2026-10-31-claude-r01 (was running at commit time).
+Next action: push → read the `security` run on GitHub → fix any non-secrets red → owner decides exception → verify.sh → codex cross-review → register SS-PLAT-18.
+Decisions taken: DL-0243.
+Open questions for human: (1) Gitleaks exception for 20 fingerprints listed in `.agent/evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md` — accept option 1, 2 or 3? Until then `security / secrets` fails on every PR. (2) Optional: allow `grype.anchore.io`, `pkg-containers.githubusercontent.com` and Docker Hub in the cloud environment's network settings so the vulnerability gate can be proven locally.
+Do not: add suppressions/exceptions, weaken tests, edit ci.yml/install-smoke.yml/verify.sh, claim green, delete tracked files, push to main or merge without green CI and cross-provider review.
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -187,3 +187,5 @@ Do not: weaken tests, claim a green checkpoint, edit approved golden files or .e
 - 2026-10-29T08:05:37.577Z codex: T-0095 → in_progress
 
 - 2026-11-01 codex: reviewed pending T-0095 changes; released to todo for WIP continuation; workflow contract 1 PASS / 1 FAIL.
+- 2026-10-31T23:03:26.689Z claude: T-0095 → in_progress
+- 2026-10-31 claude: T-0095 workflow implemented (DL-0243); secrets gate red pending owner exception decision; vulnerability gate proof deferred to GitHub Actions.
