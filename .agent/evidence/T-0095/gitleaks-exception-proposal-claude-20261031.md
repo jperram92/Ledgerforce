@@ -14,14 +14,14 @@
 
 | File:line (tree) | Content kind | Why it is not a credential |
 |---|---|---|
-| `Docs/ops/install.md:74` | example one-time password in install docs | documentation sample output |
-| `packages/connectors/salesforce/src/jwt.test.ts:14` | `consumerKey: '3MVG9TEST.consumer.key'` | literal test placeholder |
+| `packages/connectors/salesforce/src/jwt.test.ts:14` | Salesforce consumer-key test placeholder | literal test placeholder |
+| `Docs/ops/install.md:74` | example one-time password (sample setup output) in install docs | documentation sample output |
 | `packages/connectors/salesforce/src/jwt-bearer.contract.test.ts:24` | same placeholder | test |
 | `packages/connectors/salesforce/src/connection-store.db.test.ts:29` | same placeholder | test |
 | `apps/worker/src/salesforce-writeback.outage.db.test.ts:56` | same placeholder | test |
 | `apps/worker/src/sync-issues.db.test.ts:64` | same placeholder | test |
-| `packages/shared/src/crypto/transit-kms.test.ts:526` | `secretId: 'wrong-secret-31x'` | deliberately wrong test value |
-| `salesforce/.../LFReadOnlyMirrorTest.cls:26` | `TimeZoneSidKey = 'Australia/Sydney'` | Salesforce time-zone field |
+| `packages/shared/src/crypto/transit-kms.test.ts:526` | deliberately wrong AppRole secret-id test value | test |
+| `salesforce/.../LFReadOnlyMirrorTest.cls:26` | Salesforce `TimeZoneSidKey` field set to a time-zone name | Salesforce time-zone field |
 
 The human should confirm by reading those lines (the agent cannot vouch for itself — that is the
 point of the gate).

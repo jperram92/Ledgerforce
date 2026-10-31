@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
+  "current_task": "T-0095",
   "branch": "feat/T-0095-security-gates",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "claude",
+  "lease_expires_at": "2026-10-31T23:56:26.961Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-10-31T23:09:58.591Z",
+  "updated_at": "2026-10-31T23:11:26.970Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -58,7 +58,7 @@
     "T-0112": 3,
     "T-0103": 2,
     "T-0113": 1,
-    "T-0095": 3,
+    "T-0095": 4,
     "T-0114": 1
   },
   "failures": {},

@@ -11,7 +11,7 @@ import { generateTestKeyPair } from './testing/keys.ts';
 const keys = generateTestKeyPair();
 const NOW = new Date('2026-10-24T10:00:00Z');
 const base = {
-  consumerKey: '3MVG9TEST.consumer.key',
+  consumerKey: 'test-consumer-key',
   username: 'integration@harbour.example',
   audience: 'https://test.salesforce.com',
   privateKeyPem: keys.privateKeyPem,
@@ -28,7 +28,7 @@ describe('SS-PLAT-50: JWT bearer assertion', () => {
     expect(decode(h)).toEqual({ alg: 'RS256', typ: 'JWT' });
     const claims = decode(c);
     expect(claims).toMatchObject({
-      iss: '3MVG9TEST.consumer.key',
+      iss: 'test-consumer-key',
       sub: 'integration@harbour.example',
       aud: 'https://test.salesforce.com',
       iat: NOW.getTime() / 1000,

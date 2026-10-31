@@ -12,6 +12,8 @@
  */
 @IsTest
 private class LFReadOnlyMirrorTest {
+    private static final String SYDNEY_TIME_ZONE = 'Australia/Sydney';
+
     private static User newUser(String profileName, String alias) {
         Profile p = [SELECT Id FROM Profile WHERE Name = :profileName LIMIT 1];
         String unique = alias + String.valueOf(Crypto.getRandomInteger()).replace('-', '');
@@ -23,7 +25,7 @@ private class LFReadOnlyMirrorTest {
             LanguageLocaleKey = 'en_US',
             LocaleSidKey = 'en_AU',
             ProfileId = p.Id,
-            TimeZoneSidKey = 'Australia/Sydney',
+            TimeZoneSidKey = SYDNEY_TIME_ZONE,
             Username = unique + '@ledgerforce.invalid'
         );
     }

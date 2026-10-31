@@ -523,7 +523,7 @@ describe('SS-PLAT-88: no secret ever appears in errors or logs', () => {
     await catchIt(kms.wrap(dek, AAD));
     fake.inject({ status: 403 }, { status: 403 });
     await catchIt(kms.wrap(dek, AAD));
-    await catchIt(connect({ auth: { appRole: { ...APPROLE, secretId: 'wrong-secret-31x' } } }));
+    await catchIt(connect({ auth: { appRole: { ...APPROLE, secretId: 'wrong-secret-id' } } }));
     await catchIt(connect({ auth: { token: 'bad-static-token-99' } }));
     fake.inject({ hang: true });
     await catchIt(
@@ -539,7 +539,7 @@ describe('SS-PLAT-88: no secret ever appears in errors or logs', () => {
       fake.rootToken,
       APPROLE.secretId,
       APPROLE.roleId,
-      'wrong-secret-31x',
+      'wrong-secret-id',
       'bad-static-token-99',
       dek.toString('base64'),
       dek.toString('hex'),

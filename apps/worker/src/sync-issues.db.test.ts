@@ -61,7 +61,7 @@ import { startSyncIssueWorker } from './sync-issue-worker.ts';
 const T = '01900000-0000-7000-8000-000000007101';
 const AUD = 'https://test.salesforce.com';
 const INSTANCE = 'https://harbour-dev-ed.develop.my.salesforce.com';
-const KEY = '3MVG9TEST.consumer.key';
+const KEY = 'test-consumer-key';
 const USER = 'integration@harbour.example';
 const DAY = 86_400_000;
 const HANDLER = 'salesforce.writeback';

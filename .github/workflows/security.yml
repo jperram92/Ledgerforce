@@ -7,6 +7,8 @@
 name: security
 
 on:
+  push:
+    branches-ignore: [main] # same as ci.yml: task branches are scanned without needing a PR
   pull_request:
   workflow_dispatch:
 

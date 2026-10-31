@@ -26,7 +26,7 @@ import { generateTestKeyPair, selfSignedCertificate } from './testing/keys.ts';
 const T = '01900000-0000-7000-8000-00000000063a';
 const DAY = 86_400_000;
 const AUD = 'https://test.salesforce.com';
-const KEY = '3MVG9TEST.consumer.key';
+const KEY = 'test-consumer-key';
 const USER = 'integration@harbour.example';
 let tdb: TestDatabase;
 let db: Kysely<Database>;

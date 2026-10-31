@@ -41,6 +41,24 @@ describe('approved security workflow contract [T-0095]', () => {
     }
   });
 
+  it('excuses only past commits in .gitleaksignore, never the working tree (DL-0244)', () => {
+    const file = resolve(root, '.gitleaksignore');
+    expect(existsSync(file), '.gitleaksignore lists the reviewed historical findings').toBe(true);
+    const entries = readFileSync(file, 'utf8')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith('#'));
+    expect(entries.length).toBeGreaterThan(0);
+    for (const entry of entries) {
+      // <commit sha>:<path>:<rule>:<line> — a bare path:rule:line entry would excuse the tree.
+      expect(entry).toMatch(/^[a-f0-9]{40}:[^:\s]+:[a-z0-9-]+:\d+$/);
+      expect(entry, 'only the generic rule has reviewed false positives').toContain(
+        ':generic-api-key:',
+      );
+    }
+    expect(new Set(entries).size, 'no duplicate entries').toBe(entries.length);
+  });
+
   it('covers every ADR-0043 scan kind, the production audit and each shipped image', () => {
     const file = resolve(root, '.github/workflows/security.yml');
     const text = existsSync(file) ? readFileSync(file, 'utf8') : '';

@@ -90,6 +90,59 @@ test('SS-PLAT-18 history scan fails on a secret committed then removed, and reda
   assert.equal(run('secrets', repo, fixture()).status, 0, 'the working tree alone is clean');
 });
 
+function gitRepo() {
+  const repo = fixture();
+  const git = (...args) => {
+    const r = spawnSync(
+      'git',
+      ['-c', 'user.name=fixture', '-c', 'user.email=fixture@example.invalid', ...args],
+      { cwd: repo, encoding: 'utf8' },
+    );
+    assert.equal(r.status, 0, `git ${args[0]} failed: ${r.stderr}`);
+    return r.stdout.trim();
+  };
+  git('init', '-q');
+  return { repo, git };
+}
+// Generated non-authentic text in disposable repositories, never a real token.
+const syntheticToken = () => ['ghp', randomBytes(18).toString('hex')].join('_');
+
+test('SS-PLAT-18 a commit-scoped .gitleaksignore entry excuses only that historical finding', () => {
+  const { repo, git } = gitRepo();
+  writeFileSync(join(repo, 'settings.txt'), `github_token = "${syntheticToken()}"`);
+  git('add', '.');
+  git('commit', '-qm', 'old');
+  const old = git('rev-parse', 'HEAD');
+  writeFileSync(join(repo, 'settings.txt'), 'public_setting = "ordinary"');
+  writeFileSync(join(repo, '.gitleaksignore'), `${old}:settings.txt:github-pat:1\n`);
+  git('add', '.');
+  git('commit', '-qm', 'remove and excuse');
+  assert.equal(run('history', repo, fixture()).status, 0, 'the excused finding is ignored');
+
+  writeFileSync(join(repo, 'other.txt'), `github_token = "${syntheticToken()}"`);
+  git('add', '.');
+  git('commit', '-qm', 'new secret');
+  const out = fixture();
+  assert.equal(run('history', repo, out).status, 1, 'a new secret still fails');
+  assert.deepEqual(
+    report(out, 'gitleaks.json').map((f) => f.File),
+    ['other.txt'],
+    'only the new finding is reported',
+  );
+});
+
+test('SS-PLAT-18 working-tree scans ignore .gitleaksignore and gitleaks:allow comments', () => {
+  const target = fixture();
+  writeFileSync(
+    join(target, 'settings.txt'),
+    `github_token = "${syntheticToken()}" # gitleaks:allow\n`,
+  );
+  writeFileSync(join(target, '.gitleaksignore'), 'settings.txt:github-pat:1\n');
+  const out = fixture();
+  assert.equal(run('secrets', target, out).status, 1, 'no in-tree suppression is honoured');
+  assert.equal(report(out, 'gitleaks.json').length, 1);
+});
+
 // Syft catalogs directory sources from declared lockfiles; installed node_modules/*/package.json
 // is catalogued only for image sources (`syft cataloger list`, DL-0243). The fixture is a lockfile.
 function vulnerableLockfileFixture() {

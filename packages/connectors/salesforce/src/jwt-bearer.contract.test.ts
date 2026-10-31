@@ -21,7 +21,7 @@ import {
 import { generateTestKeyPair, selfSignedCertificate } from './testing/keys.ts';
 
 const AUD = 'https://test.salesforce.com';
-const KEY = '3MVG9TEST.consumer.key';
+const KEY = 'test-consumer-key';
 const USER = 'integration@harbour.example';
 const keys = generateTestKeyPair();
 const cert = selfSignedCertificate(

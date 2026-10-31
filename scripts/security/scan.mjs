@@ -93,6 +93,12 @@ try {
       '--exit-code=1',
       '--report-format=json',
       '--report-path=/out/gitleaks.json',
+      // Inline `gitleaks:allow` comments are never honoured (ADR-0043 rule 5: no self-service
+      // suppressions). Only history scans read the repository's .gitleaksignore, whose entries the
+      // workflow contract limits to commit-scoped fingerprints of past commits (DL-0244); the
+      // working tree must be clean, so tree scans read an ignore path that never exists.
+      '--ignore-gitleaks-allow',
+      `--gitleaks-ignore-path=${kind === 'history' ? inputPath : '/nonexistent-gitleaksignore'}`,
     ]);
     reportName = 'gitleaks.json';
     if (!Array.isArray(json(reportName))) throw new Error('invalid secret report');

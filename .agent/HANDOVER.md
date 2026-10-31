@@ -190,3 +190,4 @@ Do not: add suppressions/exceptions, weaken tests, edit ci.yml/install-smoke.yml
 - 2026-10-31T23:03:26.689Z claude: T-0095 → in_progress
 - 2026-10-31 claude: T-0095 workflow implemented (DL-0243); secrets gate red pending owner exception decision; vulnerability gate proof deferred to GitHub Actions.
 - 2026-10-31T23:09:58.592Z claude: release T-0095 → blocked (human gate: owner to decide Gitleaks exception (evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md) and to open a PR so security.yml runs in Actions (vulnerability gate unproven locally: grype.anchore.io denied). verify 11 PASS/2 FAIL/3 PENDING.)
+- 2026-10-31T23:11:26.758Z claude: release T-0095 → todo

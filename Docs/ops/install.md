@@ -71,7 +71,7 @@ Setup prints:
 LedgerForce owner setup
 Owner setup link: https://ledger.example.com/t/harbour-co/auth/login
 Sign in as: owner@example.com
-One-time password: Ab3dE-fG7hJ-kM9nP-qR2sT-uV4wX
+One-time password: XXXXX-XXXXX-XXXXX-XXXXX-XXXXX   (yours is printed here, once)
 At first sign-in you set up an authenticator app (MFA) and choose your own password;
 the one-time password stops working then. Keep this output private until you have signed in.
 ========================================================================
