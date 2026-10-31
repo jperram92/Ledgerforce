@@ -1,0 +1,20 @@
+rules:
+  - id: lf-no-dynamic-eval
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Parse data instead of executing it as JavaScript.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+  - id: lf-no-shell-command-exec
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: Use executable plus literal argv instead of shell command interpolation.
+    pattern-either:
+      - pattern: require('child_process').exec(...)
+      - pattern: require('node:child_process').exec(...)
+  - id: lf-no-disabled-tls-verification
+    languages: [javascript, typescript]
+    severity: ERROR
+    message: TLS peer verification must remain enabled.
+    pattern: 'rejectUnauthorized: false'

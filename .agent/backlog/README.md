@@ -214,3 +214,13 @@ graph LR
 | [T-0112](T-0112.md) | Repair PR review build and outbox integration failures | MVP | in_progress | none (owner-requested repair) |
 | [T-0113](T-0113.md) | Install smoke: wait for completed setup reliably | MVP | todo | T-0094 |
 | [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | todo | T-0010 |
+
+## Latest update — 2026-11-01
+Existing T-0095 work saved as WIP at user request:
+- Added digest-pinned Semgrep, Gitleaks, Syft and Grype inventory and three SAST rules.
+- Added Docker runner for SAST, secrets/history, SBOM and vulnerabilities, with read-only source mounts, offline scans, redacted secret reports and separate advisory updates.
+- Added four real-scanner test cases and two workflow contract tests.
+- Validation: both JavaScript files pass node --check. Focused Vitest contract outside sandbox: 1 passed / 1 failed (security workflow triggers must exist; .github/workflows/security.yml is absent). Sandbox attempt failed to resolve unplugin-swc.
+- Not run: real Docker scanner tests, digest verification, full verifier, independent review. Original RED-before-implementation sequence is not established.
+- Next: reclaim T-0095, implement authorized workflow and prove seeded failures before full verification/review. Released to todo; no green checkpoint or completed acceptance criteria.
+- ADR-0043 was accepted in DL-0241; historical approval blockers below are superseded.

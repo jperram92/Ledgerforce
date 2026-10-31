@@ -1873,3 +1873,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Owner explicitly answered: "Accept ADR-0043 and authorize the scoped addition." ADR-0043 is Accepted; its exact scope is authorized, preserving existing gates/permissions. No repeat approval needed for implementation within that scope. Draft PR #3 contains the proposal; no scanner proof claimed yet.
 - T-0114 splits the known Windows evidence recorder defect from T-0112. RQ-0093 resolves Node CLI launch: use installed Vitest JS with process.execPath and literal argv; no package-manager cmd shim or shell interpretation. Resolve vitest/package.json because vitest.mjs is not an exported package subpath. No new dependency.
 - Four real-recorder tests initially fail on Windows because pnpm never launches and report reading throws ENOENT. Fixture import initially selected Vitest's CommonJS rejection entry; correct fixture to use Vitest globals and record the correction. Production launcher also reports missing JSON cleanly without fabricated evidence.
+
+### DL-0242 — Save security implementation as explicit WIP
+- Date: 2026-11-01 · By: codex · Task: T-0095 · Category: process
+- Decision: commit existing scanner files and tests with accurate task-list notes; release to todo without advancing the green checkpoint.
+- Why: user requested review and commit. Focused workflow contract is 1 PASS / 1 FAIL because the workflow is missing.
+- Alternatives: declaring completion rejected; scanner proof and full verification remain outstanding.
+- ADR: ADR-0043 (Accepted, DL-0241) · Status: accepted

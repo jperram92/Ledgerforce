@@ -1,41 +1,14 @@
-# Build-loop handover — 2026-10-29
-
-## Primary Codex continuation prompt
-> Current build loop: T-0114 on feat/T-0114-windows-evidence-recorder fixes Windows pnpm spawn in the evidence recorder. Corrected real tests RED 4/4 against old code, GREEN 4/4 on Node 22.22.0; whole evidence suite 30/30, typecheck/lint pass. Full verify and review pending. Owner ACCEPTED ADR-0043 and authorized scoped security additions (DL-0241); T-0095 is unblocked, no repeat approval needed. After checkpointing/verifying T-0114, resume T-0095 on its task branch and implement accepted scanners test-first. T-0113 is in review with all checks passing at 405f794; PR #1 remains unmerged without independent Claude review. Read git log -1 body and current state rather than the superseded prompt below.
-
-### Superseded prompt (retained)
-> Resume from repository state and `git log -1 --format=full`. T-0113 is in review: all checks pass at 405f794, full verifier 13 PASS/0 FAIL/3 PENDING, handover commit 78f6e77. PR #1 remains unmerged without independent Claude review. T-0095 research is on feat/T-0095-security-gates: RQ-0092 resolved, ADR-0043 Proposed, task blocked pending explicit human acceptance and scoped security-workflow authorization. Do not edit protected workflows before that answer. Continue the Windows evidence-recorder follow-up (packages/testing/src/evidence/record-tests.ts) test-first on its own task branch; current launcher uses spawnSync('pnpm') and fails on Windows. T-0103 remains blocked on unchanged atomic throughput; do not weaken assertions.
-
-## Open questions for human
-- **Resolved 2026-10-29:** owner accepted ADR-0043 and authorized its scoped addition (DL-0241). The historical pending question below is superseded. Implement T-0095 within that scope after T-0114; no repeat approval needed.
-- [adr:security] T-0095: accept ADR-0043 and authorize the exact new security workflow/configuration/runner/test scope? Recommendation: local fail-closed scanners with read-only CI permissions; preserve current checks. See Docs/adr/0043-ci-security-scanners.md and RQ-0092. Async question pending; no acceptance inferred.
-- Independent Claude review is required for Codex repairs before merging PR #1. Pending request: .agent/evidence/PR-1/review-request-claude-20261029.md. Existing accounting/security/golden gates remain unchanged.
-
-## Prior install handover (retained)
-# Handover — install-smoke repair, 2026-10-29
-
-## Current Codex continuation prompt
-> Resume on feat/T-0113-install-setup-wait. Read AGENTS.md, T-0113, run 2026-10-29-codex-r01.md and `git log -1 --format=full`. Base repair is c312393; diagnosis/task split is f861278; the commit containing this prompt fixes the setup wait race. Next: inspect PR #1 checks after pushing, and `.tmp/t0103-pinned-unrestricted.txt` for the still-running Windows conductor rerun. T-0113 real-Docker regression tests passed 3/3 after RED 1/3; full install smoke and full verification still required. T-0103 is blocked on atomic-reader throughput; no test expectations may be relaxed. Independent Claude review request remains pending, not an approval. Do not merge before green CI and cross-review.
-
-Done: e32bad1 pushed to PR #1; full install CI 40810531406 PASS (7/7), static/unit, DB/RLS and browser CI PASS. T-0113's stopped-container wait and redaction fixes also pass 3/3 real-Docker regressions. Imported signed-in screenshot retains CI merge-checkout f232188 metadata. Evidence and memory gates PASS; T-0113 verifying. No CI gates edited.
-In progress: full definition-of-done jobs 40810531408/40810526850 and independent review. Unrestricted pinned Windows conductor finished 81/82 (atomic-reader throughput 27 writes; all run/failover tests PASS). Retry experiments were reverted. T-0103 remains blocked; sandbox-only PowerShell denials do not reproduce unrestricted.
-Latest verifier result: e32bad1 gave 11 PASS / 2 FAIL / 3 PENDING. Only failures were missing T-0113 manifest and in_progress status. The evidence checkpoint corrects both; local evidence and memory gates pass. Rerun CI on this checkpoint before declaring review-ready. Coverage baseline, draft golden tests and independent review remain pending; no merge approval exists.
-Decisions: DL-0239, RQ-0091. No new human decision needed. Existing design/golden approvals remain outstanding as previously recorded.
-
-## Superseded T-0103 continuation (retained)
-# Handover - 2026-10-29 02:42 UTC
+# Handover — T-0095 WIP saved, 2026-11-01
 ## Codex continuation prompt
-> Resume T-0103 on feat/T-0103-windows-heartbeat. Read AGENTS.md, this handover, run 2026-10-28-codex-r03.md and `git log -1 --format=full` (the WIP commit containing this prompt follows feabf92). Run `bash scripts/agent/resume.sh`, reclaim T-0103, then `node --test scripts/agent/test/atomic-write.test.ts`. Diagnose the unchanged throughput assertion using pinned Node 22.22.0; host shells currently differ (24.19.0 / 24.7.0). Keep >100 reads/writes and all deadlines intact. Windows heartbeat implementation passes, but whole conductor is 81/82. After fixing verification, address install-smoke's already-stopped setup wait race in a separate task with real Docker RED/GREEN tests. Read .agent/evidence/PR-1/review-request-claude-20261029.md for the requested independent review. Push final fixes to the PR branch and merge only after green CI and valid cross-provider review. Never infer approval from the pending request.
+> Resume T-0095 on feat/T-0095-security-gates. The WIP commit containing this handover follows c1dfbca; inspect git log -1 --format=full. Next command: node scripts/agent/conductor.ts claim T-0095 --provider codex. Then implement the accepted security workflow and run corepack pnpm exec vitest run infra/test/security-workflow.contract.test.ts, followed by node --test tests/security/scanners.contract.test.mjs. Preserve failing assertions and complete verification/review before claiming green.
 
-From: codex (run 2026-10-28-codex-r03)    Reason: Requested independent review packet prepared; validation failures remain
-Task: T-0103 Conductor: Windows provider process-tree termination on missed heartbeat
-Branch: feat/T-0103-windows-heartbeat   Last green commit: none
-Done: Windows Job Object containment and concurrent output relay pass unchanged heartbeat (~13 seconds); configured browser evidence destination passes both explicit-root and task-isolation tests. Earlier repairs pushed to PR head feabf92; static/unit and DB CI passed there.
-In progress: scripts/agent/test/atomic-write.test.ts throughput remains below >100 writes; full conductor 81/82. Full verification incomplete. Install smoke CI fails because compose wait misses stopped setup, though setup exited 0. Do not commit raw smoke failure logs: they expose disposable generated setup credentials.
-Next action: reclaim T-0103 and diagnose unchanged atomic-write throughput before completing verification. Lease released to todo for continuation, not marked done. New review request is pending, not a report or approval. Claude CLI is unavailable here; use the request in a Claude session once ready.
-Decisions taken: DL-0238; RQ-0014 Windows containment follow-up. Rejected and reverted a test-module-registration wrapper after it did not fix throughput.
-Open questions for human: no new design decision. Existing accounting/security/golden gates remain recorded in the prior handover at feabf92. No main merge; independent Claude review still required.
-Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
+From: codex (run 2026-11-01-codex-r01). Reason: user requested explanation and commit of existing changes.
+Done: inspected five new security files; JavaScript syntax checks pass. Task list updated. Previous handover preserved in .agent/runs/2026-11-01-codex-r01-prior-handover.md.
+In progress: workflow contract 1 PASS / 1 FAIL: security workflow triggers must exist. Workflow missing; Docker scanner tests, digest verification, full verifier and independent review not run. Original RED sequence unverified.
+Next action: reclaim T-0095 with the command above, then finish workflow and seeded scanner proof. Task released to todo, not completed.
+Decisions taken: DL-0242. ADR-0043 already Accepted under DL-0241; no repeat approval needed.
+Open questions for human: none new.
+Do not: weaken tests, claim a green checkpoint, edit approved golden files or .env files, delete tracked files, push to main or merge without green CI and cross-provider review.
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -211,3 +184,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-29T07:58:34.868Z codex: T-0114 → in_progress
 - 2026-10-29T08:00:53.105Z codex: release T-0095 → todo (Owner accepted ADR-0043 and explicitly authorized scoped addition (DL-0241); continue after active T-0114.)
 - 2026-10-29T08:04:07.167Z codex: T-0114 → verifying
+- 2026-10-29T08:05:37.577Z codex: T-0095 → in_progress
+
+- 2026-11-01 codex: reviewed pending T-0095 changes; released to todo for WIP continuation; workflow contract 1 PASS / 1 FAIL.
