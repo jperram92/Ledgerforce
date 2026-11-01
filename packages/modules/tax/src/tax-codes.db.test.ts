@@ -44,14 +44,14 @@ afterAll(async () => {
 });
 
 describe('SS-PLAT-100: Tax codes per company, effective-dated, enforced by the engine (T-0118)', () => {
-  it('seeds every AU code once per company; a second seed adds nothing', async () => {
+  it('SS-PLAT-100 seeds every AU code once per company; a second seed adds nothing', async () => {
     const first = await f.inTenant((trx) => seedTaxCodes(trx, f.companyId));
     expect(first).toBe(AU_TAX_CODES.length);
     expect(await f.inTenant((trx) => seedTaxCodes(trx, f.companyId))).toBe(0);
     expect(await f.inTenant((trx) => seedTaxCodes(trx, other))).toBe(AU_TAX_CODES.length);
   });
 
-  it('looks a code up by date, consistent with the catalogue', async () => {
+  it('SS-PLAT-100 looks a code up by date, consistent with the catalogue', async () => {
     const id = await f.inTenant((trx) => taxCodeIdOn(trx, f.companyId, 'GST', '2026-11-05'));
     expect(id).toMatch(/^[0-9a-f-]{36}$/);
     const row = await f.inTenant((trx) =>
@@ -69,7 +69,7 @@ describe('SS-PLAT-100: Tax codes per company, effective-dated, enforced by the e
     );
   });
 
-  it('refuses an overlapping effective range for the same code; a closed range can be followed', async () => {
+  it('SS-PLAT-100 refuses an overlapping effective range for the same code; a closed range can be followed', async () => {
     const overlap = await errorOf(
       f.inTenant((trx) =>
         trx
@@ -111,7 +111,7 @@ describe('SS-PLAT-100: Tax codes per company, effective-dated, enforced by the e
     expect(later).not.toBe(earlier);
   });
 
-  it('a tax code may name its own collected account, only from its own company', async () => {
+  it('SS-PLAT-100 a tax code may name its own collected account, only from its own company', async () => {
     const gst = await f.inTenant((trx) => taxCodeIdOn(trx, f.companyId, 'GST', '2026-11-05'));
     const set = (account: string) =>
       f.inTenant((trx) =>
@@ -133,7 +133,7 @@ describe('SS-PLAT-100: Tax codes per company, effective-dated, enforced by the e
     expect((await errorOf(set(theirs)))?.message).toMatch(/foreign key/);
   });
 
-  it('company tax_rounding defaults to total_invoice and accepts only the two rules', async () => {
+  it('SS-PLAT-100 company tax_rounding defaults to total_invoice and accepts only the two rules', async () => {
     const c = await f.inTenant((trx) =>
       trx
         .selectFrom('app.company')
@@ -157,7 +157,7 @@ describe('SS-PLAT-100: Tax codes per company, effective-dated, enforced by the e
     expect(bad?.message).toMatch(/tax_rounding|check/);
   });
 
-  it('the engine refuses a tax code of another company, or one not in force on the entry date', async () => {
+  it('SS-PLAT-100 the engine refuses a tax code of another company, or one not in force on the entry date', async () => {
     const gstHere = await f.inTenant((trx) => taxCodeIdOn(trx, f.companyId, 'GST', '2026-11-05'));
     const gstOther = await f.inTenant((trx) => taxCodeIdOn(trx, other, 'GST', '2026-11-05'));
     const gst2030 = await f.inTenant((trx) => taxCodeIdOn(trx, f.companyId, 'GST', '2030-07-01'));
@@ -184,7 +184,7 @@ describe('SS-PLAT-100: Tax codes per company, effective-dated, enforced by the e
     }
   });
 
-  it('a reversal keeps the tax code its original was taxed at, even after that code ended', async () => {
+  it('SS-PLAT-100 a reversal keeps the tax code its original was taxed at, even after that code ended', async () => {
     await f.inTenant((trx) =>
       trx
         .insertInto('app.number_series')
