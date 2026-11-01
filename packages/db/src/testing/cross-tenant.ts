@@ -148,6 +148,13 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0048: write-off record (gross = allowance + expense + GST adjustment).
+  'app.bad_debt_write_off': {
+    gross: () => '1',
+    allowance: () => '1',
+    expense: () => '0',
+    gst_adjustment: () => '0',
+  },
   // T-0047: prepayments and deposits (supply type CHECK; gross = net + tax; amounts > 0).
   'app.customer_prepayment': {
     supply_type: () => 'progressive_periodic',

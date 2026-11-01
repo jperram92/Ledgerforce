@@ -664,6 +664,27 @@ export interface ArSettingsTable {
   auto_approve: Generated<boolean>;
   auto_approve_threshold: string | null;
   updated_at: Timestamp;
+  /** Migration 0043 (T-0048). */
+  ecl_allowance_account_id: Generated<string | null>;
+  bad_debt_account_id: Generated<string | null>;
+}
+
+/** Migration 0043 (T-0048): written write-off record (GP-024). */
+export interface BadDebtWriteOffTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  invoice_id: string;
+  party_id: string;
+  write_off_date: ColumnType<Date, string, never>;
+  reason: string;
+  gross: string;
+  allowance: string;
+  expense: string;
+  gst_adjustment: string;
+  entry_id: string;
+  created_by: string | null;
+  created_at: Timestamp;
 }
 
 /** Migration 0034 (T-0039): party × product profile overrides; NULL = product default. */
@@ -925,6 +946,7 @@ export interface Database {
   'app.ar_settings': ArSettingsTable;
   'app.credit_note': CreditNoteTable;
   'app.customer_receipt': CustomerReceiptTable;
+  'app.bad_debt_write_off': BadDebtWriteOffTable;
   'app.customer_prepayment': CustomerPrepaymentTable;
   'app.prepayment_application': PrepaymentApplicationTable;
   'app.sales_invoice_deposit': SalesInvoiceDepositTable;

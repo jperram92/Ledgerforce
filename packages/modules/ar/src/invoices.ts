@@ -706,7 +706,13 @@ export async function creditHold(
 export async function setArSettings(
   trx: Trx,
   companyId: string,
-  s: { autoApprove: boolean; autoApproveThreshold?: string | null },
+  s: {
+    autoApprove: boolean;
+    autoApproveThreshold?: string | null;
+    /** Expected-credit-loss allowance and bad-debt expense accounts (GP-024, T-0048). */
+    eclAllowanceAccountId?: string | null;
+    badDebtAccountId?: string | null;
+  },
 ): Promise<void> {
   if (s.autoApproveThreshold != null && !DECIMAL_RE.test(s.autoApproveThreshold)) {
     throw new InvoiceError(
@@ -719,6 +725,10 @@ export async function setArSettings(
     ...(s.autoApproveThreshold !== undefined
       ? { auto_approve_threshold: s.autoApproveThreshold }
       : {}),
+    ...(s.eclAllowanceAccountId !== undefined
+      ? { ecl_allowance_account_id: s.eclAllowanceAccountId }
+      : {}),
+    ...(s.badDebtAccountId !== undefined ? { bad_debt_account_id: s.badDebtAccountId } : {}),
   };
   await trx
     .insertInto('app.ar_settings')
