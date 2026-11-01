@@ -21,7 +21,7 @@ export interface ScenarioResult {
   tests: string[];
 }
 
-const SCENARIO_RE = /\bSS-(?:[A-Z0-9]+-)*\d{2}\b/g;
+const SCENARIO_RE = /\bSS-(?:[A-Z0-9]+-)*\d{2,3}\b/g;
 
 export function scenarioIdsIn(text: string): string[] {
   return [...new Set(text.match(SCENARIO_RE) ?? [])];

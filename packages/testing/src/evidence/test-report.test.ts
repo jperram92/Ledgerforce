@@ -40,6 +40,9 @@ describe('scenarioIdsIn', () => {
       'SS-PLAT-04',
     ]);
     expect(scenarioIdsIn('no scenario here, SSN-12')).toEqual([]);
+    // The platform series passed 99 (T-0118); three-digit ids count too, one digit does not.
+    expect(scenarioIdsIn('SS-PLAT-100 seeds codes')).toEqual(['SS-PLAT-100']);
+    expect(scenarioIdsIn('SS-PLAT-1 too short')).toEqual([]);
   });
 });
 
