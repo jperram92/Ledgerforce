@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0047",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-105",
+      "file": ".agent/evidence/T-0047/20261101-210957-tests-db.json",
+      "test": "4 test(s): packages/modules/ar/src/prepayments.db.test.ts › Prepayment received, then applied to the final invoice (GP-020, GP-022) › SS-PLAT-105 a progressive-supply prepayment of 3,300.00 posts GP-020 (GST at receipt) | packages/modules/ar/src/prepayments.db.test.ts › Prepayment received, then applied to the final invoice (GP-020, GP-022) › SS-PLAT-105 the final invoice posts GP-022a and the application posts GP-022b; the invoice is left 7,700.00 open | packages/modules/ar/src/prepayments.db.test.ts › Prepayment received, then applied to the final invoice (GP-020, GP-022) › SS-PLAT-105 the BAS reports the project GST once: 300.00 in November, 700.00 in December | packages/modules/ar/src/prepayments.db.test.ts › Deposit invoice, then the final invoice net of the deposit (GP-014, GP-015) › SS-PLAT-105 a 30 % deposit invoice posts GP-014; once paid, the final invoice posts GP-015 and is 7,700.00 open",
+      "commit": "5d659677043d",
+      "provider": "claude",
+      "timestamp": "2026-11-01T21:09:57.624Z",
+      "result": "passed"
+    }
+  ]
+}

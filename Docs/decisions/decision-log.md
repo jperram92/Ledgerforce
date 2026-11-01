@@ -2099,3 +2099,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Refusals: OVER_ALLOCATED (more than the receipt's unallocated or the invoice's open amount), INVALID_RECEIPT (another customer's or an unposted invoice) — the whole receipt rolls back.
 - API under `/ar` (already proxied): POST /ar/receipts (ar.receipt.record, idempotency key), POST /ar/receipts/:id/allocations, GET /ar/invoices/:id/payment-status (ar.read). Deposits of undeposited funds to the bank are a bank-module flow (T-0060/T-0061).
 
+### DL-0275 — Prepayments with GST at receipt; deposit invoices to the contract liability; BAS treats contract liabilities as supplies
+- Date: 2026-11-01 · By: claude · Task: T-0047 · Category: implementation (AR, tax; data model additive)
+- Q7 and Q10 are answered (RQ-0096, DL-0256). `recordPrepayment` attributes GST on receipt for progressive/periodic supplies and unknown totals (GP-020), untaxed only for GST-free supplies and Div 99 security deposits; a single supply with a known total is refused with the advice to issue a deposit tax invoice (GP-021/GP-014). `applyPrepayment` posts GP-022b and allocates to the final invoice (advisory lock: lf_app cannot row-lock the immutable prepayment table).
+- Deposit invoices are sales invoices with kind 'deposit' that credit CUSTOMER_PREPAYMENTS (GP-014); a final invoice lists the posted deposit invoices it nets (`sales_invoice_deposit`, each deposit once) and posts GP-015 (Dr prepayments with GST, AR and GST collected reduced).
+- BAS query change: a base line on a liability account (customer prepayments, deferred revenue) is a supply like revenue, so prepayment GST lands at G1/1A on receipt and the application reverses it — the project's GST is reported once (asserted 300.00 then 700.00). GST collected/paid lines remain tax lines; W labels are unaffected.
+- Registered SS-PLAT-105 (the card had no scenario id).
+
