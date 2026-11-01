@@ -40,7 +40,9 @@ failure_patterns:                          # case-insensitive regexes over stdou
     - "exceeded retry limit"
     - "temporarily limiting requests"
     - "529"
-human_gates: [adr:accounting, adr:security, release, golden_postings, phase_gate, out_of_scope]
+human_gates: [adr:security, release, phase_gate, out_of_scope]
+# adr:accounting and golden_postings are delegated to the building agent (AGENTS.md §6, DL-0263).
+delegated_gates: [adr:accounting, golden_postings]
 paths:
   state: .agent/state.json
   handover: .agent/HANDOVER.md
