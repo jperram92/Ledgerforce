@@ -213,3 +213,4 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01T09:07:11.967Z claude: T-0116 → verifying
 - 2026-11-01T09:30:58.010Z claude: release T-0116 → review (verify 14/0/2; golden runner replays 35/36 Approved tables (GP-019 → T-0032); migration 0031; awaiting codex review)
 - 2026-11-01 claude: T-0116 → review (verify 14/0/2; 35/36 golden tables replay; DL-0258).
+- 2026-11-01T09:32:28.424Z claude: T-0032 → in_progress

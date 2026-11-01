@@ -42,7 +42,11 @@ export type PostingErrorCode =
   | 'UNKNOWN_USER'
   | 'OVERRIDE_NOT_PERMITTED'
   /** preview() only: the key already posted this document; post() would replay it (T-0026). */
-  | 'ALREADY_POSTED';
+  | 'ALREADY_POSTED'
+  /** reverse(): the entry is not posted, already reversed, or itself a reversal (T-0032). */
+  | 'NOT_REVERSIBLE'
+  /** reverse(): the document has allocations — issue a credit note instead (postings.md Q11). */
+  | 'ALLOCATED';
 
 /** A posting command refused by the engine. Nothing was written. `line` is 1-based. */
 export class PostingError extends DomainError {
@@ -308,7 +312,14 @@ export function lineTotals(lines: readonly { debit: string; credit: string }[]):
 }
 
 /** Pure checks of a command (no I/O). Throws PostingError. */
-export function checkCommand(command: PostingCommand): CheckedCommand {
+/**
+ * `reversal: true` is set only by reverse() (reversal.ts), which builds the mirror of a posted
+ * entry; raw commands can never carry the reversal source type.
+ */
+export function checkCommand(
+  command: PostingCommand,
+  opts: { readonly reversal?: boolean } = {},
+): CheckedCommand {
   const key: unknown = command.idempotencyKey;
   if (typeof key !== 'string' || key.length < 1 || key.length > 200) {
     fail('INVALID_COMMAND', 'idempotencyKey must be 1..200 characters');
@@ -329,10 +340,10 @@ export function checkCommand(command: PostingCommand): CheckedCommand {
       `source type ${JSON.stringify(command.sourceType)} is not in the period matrix`,
     );
   }
-  if (cls === 'reversal') {
+  if (cls === 'reversal' && opts.reversal !== true) {
     fail(
       'SOURCE_TYPE_NOT_SUPPORTED',
-      `${command.sourceType} is not posted through raw commands (reversals wait for GP-019)`,
+      `${command.sourceType} is not posted through raw commands (use reverse(), T-0032)`,
     );
   }
   if (command.periodOverride !== undefined) {
@@ -362,10 +373,15 @@ const goldenOf = (sourceType: string): string | undefined =>
 /** Which subledger posts to each control role (design §3.2; DL-0136). */
 const CONTROL_SUBLEDGERS: Readonly<Record<string, (sourceType: string) => boolean>> = Object.freeze(
   {
-    // Every AR-class source: ar.* and the Stripe charge, which settles AR (GP-003, Draft).
-    AR_CONTROL: (st: string) => sourceClassOf(st) === 'ar',
-    AP_CONTROL: (st: string) => goldenOf(st)?.startsWith('ap.') === true,
-    PAYROLL_CLEARING: (st: string) => goldenOf(st)?.startsWith('payroll.') === true,
+    // Every AR-class source: ar.* and the Stripe charge, which settles AR (GP-003).
+    // A reversal mirrors a document that already posted to the control account; it is built
+    // only by reverse() from the original's lines (raw commands cannot use it) and the database
+    // checks the mirror (app.journal_mark_reversed, migration 0008) — T-0032, DL-0259.
+    AR_CONTROL: (st: string) => sourceClassOf(st) === 'ar' || sourceClassOf(st) === 'reversal',
+    AP_CONTROL: (st: string) =>
+      goldenOf(st)?.startsWith('ap.') === true || sourceClassOf(st) === 'reversal',
+    PAYROLL_CLEARING: (st: string) =>
+      goldenOf(st)?.startsWith('payroll.') === true || sourceClassOf(st) === 'reversal',
   },
 );
 

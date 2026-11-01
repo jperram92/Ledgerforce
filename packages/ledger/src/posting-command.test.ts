@@ -264,15 +264,29 @@ describe('Control accounts accept only their subledger (design §3.2) [T-0025]',
       'ar_prepayment',
       'ar_prepayment_application',
       'payments_stripe_charge',
+      'ar_recovery',
     ];
     const ap = ['ap_bill', 'ap_payment'];
-    const payroll = ['payroll_pay_run', 'payroll_net_pay_batch'];
-    const others = ['manual_journal', 'payments_stripe_payout', 'ledger_reversal', 'unknown'];
-    for (const st of [...ar, ...ap, ...payroll, ...others]) {
-      expect(controlAccountAccepts('AR_CONTROL', st), `AR_CONTROL ${st}`).toBe(ar.includes(st));
-      expect(controlAccountAccepts('AP_CONTROL', st), `AP_CONTROL ${st}`).toBe(ap.includes(st));
+    const payroll = [
+      'payroll_pay_run',
+      'payroll_net_pay_batch',
+      'payroll_super_payment',
+      'payroll_sgc_assessment',
+    ];
+    // A reversal mirrors a subledger document, so every control account accepts it; it is built
+    // only by reverse() — raw commands with ledger_reversal are refused (test above) — T-0032.
+    const everyControl = ['ledger_reversal'];
+    const others = ['manual_journal', 'payments_stripe_payout', 'ledger_accrual', 'unknown'];
+    for (const st of [...ar, ...ap, ...payroll, ...everyControl, ...others]) {
+      const all = everyControl.includes(st);
+      expect(controlAccountAccepts('AR_CONTROL', st), `AR_CONTROL ${st}`).toBe(
+        all || ar.includes(st),
+      );
+      expect(controlAccountAccepts('AP_CONTROL', st), `AP_CONTROL ${st}`).toBe(
+        all || ap.includes(st),
+      );
       expect(controlAccountAccepts('PAYROLL_CLEARING', st), `PAYROLL ${st}`).toBe(
-        payroll.includes(st),
+        all || payroll.includes(st),
       );
       expect(controlAccountAccepts('SUSPENSE', st)).toBe(false);
     }

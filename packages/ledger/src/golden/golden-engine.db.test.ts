@@ -16,7 +16,8 @@ import { auServicesSmb } from '@ledgerforce/gl';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { entrySeriesFor } from '../posting-command.ts';
 import { SOURCE_TYPES, sourceClassOf, storedSourceType } from '../period-matrix.ts';
-import { preview } from '../posting-engine.ts';
+import { post, preview } from '../posting-engine.ts';
+import { reverse } from '../reversal.ts';
 import { createLedgerFixture, type LedgerFixture } from '../testing/journal-fixture.ts';
 import { AU_SERVICES_BINDINGS, approvedTables, parsePostings, toCommand } from './postings.ts';
 
@@ -25,11 +26,9 @@ const tables = approvedTables(parsePostings(readFileSync(FILE, 'utf8')));
 
 /**
  * Golden tables the engine cannot replay yet, with the reason and owning task. Shrinks to empty;
- * never grows silently. T-0116 emptied everything except the reversal (T-0032).
+ * never grows silently. Empty since T-0032 (reversals replay through reverse()).
  */
-const PENDING: Record<string, string> = {
-  'GP-019': 'reversal API (T-0032: reversals are posted from the original entry, not as raw lines)',
-};
+const PENDING: Record<string, string> = {};
 
 /**
  * What each golden binding means on the AU services template, by account name — an expectation
@@ -76,11 +75,11 @@ const parties = new Map<string, string>();
 beforeAll(async () => {
   f = await createLedgerFixture('01900000-0000-7000-8000-000000003101');
   await f.inTenant(async (trx) => {
-    const series = new Set(Object.keys(SOURCE_TYPES).map((st) => entrySeriesFor(st)));
-    for (const code of series) {
+    const series = [...new Set(Object.keys(SOURCE_TYPES).map((st) => entrySeriesFor(st)))];
+    for (const [i, code] of series.entries()) {
       await trx
         .insertInto('app.number_series')
-        .values({ company_id: f.companyId, code, prefix: 'GP-' })
+        .values({ company_id: f.companyId, code, prefix: `G${String(i)}-` })
         .onConflict((oc) => oc.doNothing())
         .execute();
     }
@@ -104,14 +103,65 @@ function pendingReason(t: (typeof tables)[number]): string | undefined {
   if (!Object.hasOwn(SOURCE_TYPES, storedSourceType(t.sourceType))) {
     return `source type ${t.sourceType}`;
   }
-  if (sourceClassOf(storedSourceType(t.sourceType)) === 'reversal') {
-    return 'reversal API';
+  if (sourceClassOf(storedSourceType(t.sourceType)) === 'reversal' && !t.reversalOf) {
+    return 'reversal without an original';
   }
   const missing = t.lines.find((l) => AU_SERVICES_BINDINGS[l.binding] == null);
   return missing ? `binding ${missing.binding}` : undefined;
 }
 
 const amt = (v: string) => Money.of(v, 'AUD').toNumericString();
+
+const resolveAccount = (label: string) => (binding: string) => {
+  const b = AU_SERVICES_BINDINGS[binding];
+  if (!b) throw new Error(`${label}: unresolved ${binding}`);
+  return 'role' in b ? { role: b.role } : { id: f.acct[b.code] ?? `missing ${b.code}` };
+};
+
+/** A reversal golden: post its original, reverse() it, compare the stored reversal lines. */
+async function replayReversal(t: (typeof tables)[number]): Promise<number> {
+  const label = `${t.entryId}${t.label}`;
+  const original = tables.find((x) => x.entryId === t.reversalOf);
+  if (!original) throw new Error(`${label}: original ${String(t.reversalOf)} not Approved`);
+  const posted = await f.inTenant((trx) =>
+    post(
+      trx,
+      toCommand(original, {
+        companyId: f.companyId,
+        entryDate: '2026-11-15',
+        idempotencyKey: randomUUID(),
+        account: resolveAccount(label),
+        party: (name) => parties.get(name) ?? `missing party ${name}`,
+      }),
+    ),
+  );
+  const r = await f.inTenant((trx) =>
+    reverse(trx, {
+      companyId: f.companyId,
+      entryId: posted.entryId,
+      idempotencyKey: randomUUID(),
+      entryDate: '2026-11-16',
+    }),
+  );
+  const stored = await f.inTenant((trx) =>
+    trx
+      .selectFrom('app.journal_line as l')
+      .innerJoin('app.account as a', 'a.id', 'l.account_id')
+      .select(['a.code', 'l.debit', 'l.credit', 'l.party_id'])
+      .where('l.entry_id', '=', r.entryId)
+      .orderBy('l.line_no')
+      .execute(),
+  );
+  expect(stored, label).toHaveLength(t.lines.length);
+  t.lines.forEach((g, i) => {
+    const at = `${label} line ${String(i + 1)} (${g.binding})`;
+    expect(nameOfCode.get(stored[i]?.code ?? ''), at).toBe(MEANS[g.binding]);
+    expect(amt(stored[i]?.debit ?? '0'), at).toBe(amt(g.debit));
+    expect(amt(stored[i]?.credit ?? '0'), at).toBe(amt(g.credit));
+    expect(stored[i]?.party_id ?? null, at).toBe(g.party ? (parties.get(g.party) ?? '?') : null);
+  });
+  return 1;
+}
 
 describe('SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay', () => {
   it('the tables that cannot be replayed yet are exactly the pinned PENDING list', () => {
@@ -129,6 +179,10 @@ describe('SS-PLAT-12: Every Approved golden posting is reproduced exactly — en
     for (const t of tables) {
       if (pendingReason(t)) continue;
       const label = `${t.entryId}${t.label}`;
+      if (t.reversalOf) {
+        replayed += await replayReversal(t);
+        continue;
+      }
       const command = toCommand(t, {
         companyId: f.companyId,
         entryDate: '2026-11-15',

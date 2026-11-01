@@ -42,6 +42,8 @@ export interface GoldenEntry {
   readonly supersededBy: string | null;
   /** Golden source types in the order the entry names them. */
   readonly sourceTypes: readonly string[];
+  /** A reversal's original (`reversal_of_id = GP-NNN entry` in the source-type note), else null. */
+  readonly reversalOf: string | null;
   readonly tables: readonly GoldenTable[];
 }
 
@@ -51,6 +53,8 @@ export interface GoldenJournal extends GoldenTable {
   /** '' for a single-table entry, else 'a', 'b', 'c' in table order. */
   readonly label: string;
   readonly sourceType: string;
+  /** For a reversal: the entry whose journal it reverses (replayed through reverse()). */
+  readonly reversalOf: string | null;
 }
 
 export class GoldenDraftError extends Error {
@@ -147,6 +151,7 @@ export function parsePostings(markdown: string): GoldenEntry[] {
       status,
       supersededBy: sup?.[1] ?? null,
       sourceTypes,
+      reversalOf: /reversal_of_id = (GP-\d{3})/.exec(text)?.[1] ?? null,
       tables,
     });
   }
@@ -173,6 +178,7 @@ export function approvedTables(entries: readonly GoldenEntry[]): GoldenJournal[]
         entryId: e.id,
         label: e.tables.length > 1 ? String.fromCharCode(97 + i) : '',
         sourceType: sourceType ?? '',
+        reversalOf: e.reversalOf,
       });
     });
   }

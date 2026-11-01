@@ -520,6 +520,7 @@ async function write(
   built: BuiltEntry,
   command: PostingCommand,
   outbox: PostingOutbox,
+  reversalOfId: string | null = null,
 ): Promise<PostResult> {
   await sql`SAVEPOINT lf_posting`.execute(trx);
   try {
@@ -543,6 +544,7 @@ async function write(
         period_id: built.periodId,
         source_type: built.sourceType,
         source_id: built.sourceId,
+        reversal_of_id: reversalOfId,
         status: 'posted',
         idempotency_key: built.idempotencyKey,
         memo: built.memo,
@@ -681,4 +683,26 @@ export async function post(
   if (existing) return replay(existing, command);
   const built = checkBuilt(await validateAndBuild(trx, checked));
   return write(trx, built, command, opts.outbox ?? NO_OUTBOX);
+}
+
+/**
+ * Post the mirror of entry `reversalOfId` as source type ledger_reversal (T-0032). Used only by
+ * reverse() in reversal.ts, which builds the command from the original's lines; the database
+ * function app.journal_mark_reversed then refuses to mark the original unless every line mirrors.
+ */
+export async function postReversal(
+  trx: Trx,
+  command: PostingCommand,
+  reversalOfId: string,
+  opts: PostOptions = {},
+): Promise<PostResult> {
+  const checked = checkCommand(command, { reversal: true });
+  const companyId = lc(command.companyId);
+  await sql`SELECT pg_advisory_xact_lock(hashtextextended(
+      'lf.posting_idem:' || current_setting('app.tenant_id', true) || ':' || ${companyId}::text
+        || ':' || ${command.idempotencyKey}::text, 0))`.execute(trx);
+  const existing = await findByKey(trx, companyId, command.idempotencyKey);
+  if (existing) return replay(existing, command);
+  const built = checkBuilt(await validateAndBuild(trx, checked));
+  return write(trx, built, command, opts.outbox ?? NO_OUTBOX, lc(reversalOfId));
 }

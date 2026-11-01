@@ -1979,3 +1979,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Source types added to the period matrix (design §3.5 classes): ar.recovery → ar; ar.ecl_adjustment, ledger.accrual, ledger.prepayment_release, ledger.recurring.depreciation, ledger.prior_period_adjustment, revrec.release → journal; payments.stripe.tax_invoice → payout; payroll.super_payment, payroll.sgc_assessment → ap (as net pay batches, conservative).
 - GP-035 credited AP_CONTROL from a ledger source type; the engine (correctly) refuses control-account lines outside their subledger. Superseded by GP-036: the late bill posts as ap.bill tagged prior_period_adjustment; same journal.
 - Golden runner: 35/36 Approved tables replay line for line; GP-019 waits for the reversal API (T-0032). Mutation check on a new binding fails as expected.
+
+### DL-0259 — Reversal (void) API: mirror entry, allocation, guarded status change
+- Date: 2026-11-01 · By: claude · Task: T-0032 · Category: implementation (ledger)
+- `reverse()` (packages/ledger/src/reversal.ts) posts the mirror of a posted entry as `ledger_reversal` (source_id and reversal_of_id = original) through the normal engine path (`postReversal`, period rules on the reversal's own date), allocates each mirrored AR/AP open item to the original's so both close at zero, then marks the original `reversed` via app.journal_mark_reversed (which re-checks the mirror in the database).
+- Refusals: NOT_REVERSIBLE (not posted, already reversed, or itself a reversal); ALLOCATED when any open item ≠ its original amount — issue a credit note instead (postings.md Q11, resolved DL-0256).
+- Control accounts accept `ledger_reversal` (it mirrors a subledger document); raw commands still cannot carry it (`checkCommand` refuses unless called by reverse()). SS-PLAT-64 unit test updated to pin this.
+- Concurrency: lf_app has no UPDATE on journal tables, so `SELECT … FOR UPDATE` is refused; reversal serialises on a transaction advisory lock per entry.
+- Golden runner: GP-019 replays by posting GP-001 and reversing it — all 36 Approved tables now replay; PENDING is empty. Mutation (unswapped lines) fails 4 tests.
