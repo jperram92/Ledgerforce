@@ -1904,3 +1904,8 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: `docker run --user <uid>:<gid> --env HOME=/tmp` (stricter than root; no capability added back). Missing reports now print the scanner's last 20 stderr lines (secret scans are fully redacted).
 - Result: non-root 7/8, root 7/8 (8th = Grype DB download, network-denied in this sandbox only); repo SAST/history/tree scans PASS as non-root.
 - Alternatives: chmod 777 the output directory (rejected: wider permissions); add CAP_DAC_OVERRIDE (rejected: more privilege).
+
+### DL-0246 — Scanner containers get a caller-owned scratch /tmp; readable failures
+- Date: 2026-11-01 · By: claude · Task: T-0095 · Category: security (implementation)
+- CI run 5 (after DL-0245): all image jobs failed "Unexpected end of JSON input": as a non-root user Syft cannot create its unpack directory in the image's /tmp ("mkdir /tmp/stereoscope-…: permission denied") and writes an empty SBOM. Reproduced locally as uid 1001; new test "a saved image archive is inventoried" RED (2 !== 0) then GREEN.
+- Decision: each scan.mjs process creates a host scratch dir (mkdtemp) mounted at /tmp with TMPDIR/HOME=/tmp, removed in `finally`; disk-backed so large images fit. Empty/invalid reports and unparsable `grype db status` output fail with the scanner's stderr tail. Secret scans print each finding's rule, file, line and commit (never the value) so failing CI jobs are diagnosable — run 5's history failure could not be read because artifact downloads are blocked from this sandbox.

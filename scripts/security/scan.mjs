@@ -1,6 +1,15 @@
 // ADR-0043: actual pinned scanners; tool errors and missing/malformed output fail closed.
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
 import { basename, dirname, join, resolve } from 'node:path';
 
 const root = resolve(import.meta.dirname, '../..');
@@ -23,6 +32,10 @@ const mounts = [
   '--mount',
   `type=bind,source=${out},target=/out`,
 ];
+// Scanner images are minimal and their /tmp is not writable by an unprivileged user, yet Syft
+// unpacks image archives and Grype stages database downloads there. Every container gets this
+// caller-owned scratch directory as /tmp (on disk, not tmpfs, so large images fit); removed at exit.
+const scratch = mkdtempSync(join(tmpdir(), 'lf-security-'));
 
 function docker(tool, args, { network = false, source = true, extras = [] } = {}) {
   const result = spawnSync(
@@ -40,6 +53,10 @@ function docker(tool, args, { network = false, source = true, extras = [] } = {}
         : []),
       '--env',
       'HOME=/tmp',
+      '--env',
+      'TMPDIR=/tmp',
+      '--mount',
+      `type=bind,source=${scratch},target=/tmp`,
       ...(network ? [] : ['--network=none']),
       ...(source ? mounts : []),
       ...extras,
@@ -59,10 +76,18 @@ function json(name) {
   if (!existsSync(file)) {
     // A missing report is a tool failure: show the tool's own diagnostics (tail only). Secret
     // scans run with --redact=100, so their diagnostics never carry a finding's value.
-    const tail = lastStderr.trim().split('\n').slice(-20).join('\n');
-    throw new Error(`scanner did not produce ${name}${tail ? `\n${tail}` : ''}`);
+    throw new Error(`scanner did not produce ${name}${stderrTail()}`);
   }
-  return JSON.parse(readFileSync(file, 'utf8'));
+  try {
+    return JSON.parse(readFileSync(file, 'utf8'));
+  } catch {
+    // An empty or truncated report is as much a tool failure as a missing one.
+    throw new Error(`scanner wrote an empty or invalid ${name}${stderrTail()}`);
+  }
+}
+function stderrTail() {
+  const tail = lastStderr.trim().split('\n').slice(-20).join('\n');
+  return tail ? `\n${tail}` : '';
 }
 
 try {
@@ -116,7 +141,11 @@ try {
       `--gitleaks-ignore-path=${kind === 'history' ? inputPath : '/nonexistent-gitleaksignore'}`,
     ]);
     reportName = 'gitleaks.json';
-    if (!Array.isArray(json(reportName))) throw new Error('invalid secret report');
+    const findings = json(reportName);
+    if (!Array.isArray(findings)) throw new Error('invalid secret report');
+    // Where each finding is (never its value: the report is redacted) so a failing job is readable.
+    for (const f of findings)
+      console.log(`security: finding ${f.RuleID} ${f.File}:${f.StartLine} ${f.Commit || '(tree)'}`);
   } else if (kind === 'sbom') {
     const source = inputDirectory ? `dir:${inputPath}` : `docker-archive:${inputPath}`;
     result = docker('syft', [source, '-o', 'cyclonedx-json=/out/sbom.cdx.json']);
@@ -135,8 +164,14 @@ try {
     const update = docker('grype', ['db', 'update'], { network: true, source: false, extras });
     if (update.status !== 0) throw new Error(`vulnerability DB update failed: ${update.stderr}`);
     const status = docker('grype', ['db', 'status', '-o', 'json'], { source: false, extras });
-    if (status.status !== 0) throw new Error('cannot record vulnerability DB metadata');
-    JSON.parse(status.stdout);
+    lastStderr = status.stderr || '';
+    if (status.status !== 0)
+      throw new Error(`cannot record vulnerability DB metadata${stderrTail()}`);
+    try {
+      JSON.parse(status.stdout);
+    } catch {
+      throw new Error(`vulnerability DB metadata is not JSON${stderrTail()}`);
+    }
     writeFileSync(join(out, 'grype-db.json'), status.stdout);
     result = docker(
       'grype',
@@ -168,4 +203,6 @@ try {
 } catch (error) {
   console.error(`security: ${error.message}`);
   process.exitCode = 2;
+} finally {
+  rmSync(scratch, { recursive: true, force: true });
 }

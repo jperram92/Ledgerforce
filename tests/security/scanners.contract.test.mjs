@@ -174,6 +174,20 @@ test('SS-PLAT-18 inventory is real CycloneDX listing the seeded package', () => 
   assert.ok(inventory.components.some((c) => c.name === 'lodash' && c.version === '4.17.20'));
 });
 
+test('SS-PLAT-18 a saved image archive is inventoried (the path the images job uses)', () => {
+  // Any local image works; the pinned Gitleaks image is small and already present for test 2.
+  const { images } = JSON.parse(readFileSync(join(root, 'infra/security/tools.json'), 'utf8'));
+  const dir = fixture();
+  const tar = join(dir, 'image.tar');
+  const saved = spawnSync('docker', ['save', '-o', tar, images.gitleaks], { encoding: 'utf8' });
+  assert.equal(saved.status, 0, `docker save failed: ${saved.stderr}`);
+  const out = fixture();
+  assert.equal(run('sbom', tar, out).status, 0);
+  const inventory = report(out, 'sbom.cdx.json');
+  assert.equal(inventory.bomFormat, 'CycloneDX');
+  assert.ok(inventory.components.length > 0, 'the image inventory lists packages');
+});
+
 test('SS-PLAT-18 vulnerable packages in the inventory fail the high-severity gate', () => {
   const out = fixture();
   assert.equal(run('sbom', vulnerableLockfileFixture(), out).status, 0);
