@@ -195,3 +195,4 @@ Do not: add bare-path or inline gitleaks suppressions, lower the Grype threshold
 - 2026-11-01T03:53:44.822Z claude: T-0095 → verifying
 - 2026-11-01T04:02:01.598Z claude: release T-0095 → review (verify 13 PASS/0 FAIL/3 PENDING on 8f74387; security workflow run 41270568508 8/8 green; awaiting codex cross-review (security-relevant: ADR-0043, .gitleaksignore DL-0244/0247, runtime images DL-0248))
 - 2026-11-01 claude: T-0095 → review (security run 41270568508 8/8 green; verify 13/0/3).
+- 2026-11-01T04:03:48.203Z codex: release T-0113 → done (cross-review PASS by claude (.agent/evidence/T-0113/review-claude-20261101-040347.md))
