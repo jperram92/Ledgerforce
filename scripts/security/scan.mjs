@@ -15,11 +15,25 @@ import { basename, dirname, join, resolve } from 'node:path';
 const root = resolve(import.meta.dirname, '../..');
 const { images } = JSON.parse(readFileSync(join(root, 'infra/security/tools.json'), 'utf8'));
 const [kind, input, output, ...options] = process.argv.slice(2);
-const target = input && resolve(input);
+// DAST (ADR-0044) scans a running origin: its input is an http(s) URL, not a path.
+const dastUrl = kind === 'dast' ? parseHttpUrl(input) : null;
+const target = kind === 'dast' ? root : input && resolve(input);
 const out = output && resolve(output);
+if (kind === 'dast' && !dastUrl) {
+  console.error('security: dast needs an http(s) URL to scan');
+  process.exit(2);
+}
 if (!target || !out || !existsSync(target)) {
   console.error('security: supply scan kind, existing input and output directory');
   process.exit(2);
+}
+function parseHttpUrl(value) {
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? url : null;
+  } catch {
+    return null;
+  }
 }
 mkdirSync(out, { recursive: true });
 const cache = resolve(process.env.LF_SECURITY_CACHE || join(root, '.tmp/security-cache'));
@@ -37,7 +51,11 @@ const mounts = [
 // caller-owned scratch directory as /tmp (on disk, not tmpfs, so large images fit); removed at exit.
 const scratch = mkdtempSync(join(tmpdir(), 'lf-security-'));
 
-function docker(tool, args, { network = false, source = true, extras = [] } = {}) {
+function docker(
+  tool,
+  args,
+  { network = false, source = true, extras = [], timeout = 240_000 } = {},
+) {
   const result = spawnSync(
     'docker',
     [
@@ -63,7 +81,7 @@ function docker(tool, args, { network = false, source = true, extras = [] } = {}
       images[tool],
       ...args,
     ],
-    { encoding: 'utf8', timeout: 240_000, maxBuffer: 20 * 1024 * 1024 },
+    { encoding: 'utf8', timeout, maxBuffer: 20 * 1024 * 1024 },
   );
   if (result.error || result.signal)
     throw new Error(`scanner ${tool} failed to execute: ${result.error?.message || result.signal}`);
@@ -71,6 +89,13 @@ function docker(tool, args, { network = false, source = true, extras = [] } = {}
   return result;
 }
 let lastStderr = '';
+/** The report names the scanned site (ZAP lists every site it reached in `site[]`). */
+function dastSeenTarget(report, url) {
+  return report.site.some((site) => {
+    const name = String(site['@name'] || '');
+    return name === url.origin || name.startsWith(url.origin);
+  });
+}
 function json(name) {
   const file = join(out, name);
   if (!existsSync(file)) {
@@ -195,6 +220,59 @@ try {
       }
     }
     console.log(`security: vulnerability counts ${JSON.stringify(counts)}`);
+  } else if (kind === 'dast') {
+    // ADR-0044: passive baseline only (spider + passive rules, no attacks). The container shares
+    // the host network so it reaches the started stack (published on 127.0.0.1); a *.localhost
+    // name resolves to the host loopback. Reports go to the output directory as /zap/wrk.
+    const extras = ['--network=host', '--mount', `type=bind,source=${out},target=/zap/wrk`];
+    if (dastUrl.hostname.endsWith('.localhost')) {
+      extras.push(`--add-host=${dastUrl.hostname}:127.0.0.1`);
+    }
+    result = docker(
+      'zap',
+      [
+        'zap-baseline.py',
+        '-t',
+        dastUrl.href,
+        '-I', // warnings alone do not fail the scan; the gate below decides on High alerts
+        '-m',
+        '1', // spider minutes
+        '-T',
+        '10', // overall cap, minutes
+        '-J',
+        'zap.json',
+        '-r',
+        'zap.html',
+      ],
+      { network: true, source: false, extras, timeout: 900_000 },
+    );
+    // zap-baseline.py exit 3 = scanner error (e.g. target unreachable): fail closed.
+    if (result.status === 3 || result.status === null) {
+      throw new Error(`ZAP baseline failed (exit ${result.status})${stderrTail()}`);
+    }
+    reportName = 'zap.json';
+    const report = json(reportName);
+    if (!Array.isArray(report.site)) throw new Error('invalid DAST report');
+    const alerts = report.site.flatMap((site) => (Array.isArray(site.alerts) ? site.alerts : []));
+    // ZAP riskcode: 0 informational, 1 low, 2 medium, 3 high.
+    const names = { 0: 'Informational', 1: 'Low', 2: 'Medium', 3: 'High' };
+    const counts = {};
+    let high = 0;
+    for (const a of alerts) {
+      const risk = names[a.riskcode] || 'Unknown';
+      counts[risk] = (counts[risk] || 0) + 1;
+      if (a.riskcode === '3') {
+        high += 1;
+        const n = Array.isArray(a.instances) ? a.instances.length : 0;
+        console.log(`security: dast High ${a.pluginid} ${a.alert} (${n} URL(s))`);
+      }
+    }
+    if (!dastSeenTarget(report, dastUrl)) {
+      throw new Error(`ZAP did not reach ${dastUrl.origin}${stderrTail()}`);
+    }
+    console.log(`security: dast counts ${JSON.stringify(counts)}`);
+    // The gate is the report, not ZAP's own exit code (which -I relaxes): any High fails.
+    result = { ...result, status: high > 0 ? 1 : 0 };
   } else {
     throw new Error(`unknown scan kind ${kind}`);
   }

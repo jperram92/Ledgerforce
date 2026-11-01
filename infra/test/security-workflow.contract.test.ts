@@ -14,7 +14,7 @@ describe('approved security workflow contract [T-0095]', () => {
     const policy = document('infra/security/tools.json');
     const images = policy['images'] as Record<string, string> | undefined;
     expect(images, 'security tool inventory must exist').toBeDefined();
-    for (const tool of ['semgrep', 'gitleaks', 'syft', 'grype']) {
+    for (const tool of ['semgrep', 'gitleaks', 'syft', 'grype', 'zap']) {
       expect(images?.[tool]).toMatch(/^[a-z0-9./_-]+:[A-Za-z0-9._-]+@sha256:[a-f0-9]{64}$/);
     }
   });
@@ -115,5 +115,24 @@ describe('approved security workflow contract [T-0095]', () => {
     ]) {
       expect(text, `security workflow must not contain ${forbidden}`).not.toContain(forbidden);
     }
+  });
+
+  it('runs the ADR-0044 DAST baseline against the started stack, contract-tested [T-0096]', () => {
+    const file = resolve(root, '.github/workflows/security.yml');
+    const text = existsSync(file) ? readFileSync(file, 'utf8') : '';
+    const workflow = document('.github/workflows/security.yml');
+    const jobs = (workflow['jobs'] ?? {}) as Record<string, { steps?: Record<string, unknown>[] }>;
+    const dast = jobs['dast'];
+    expect(dast, 'a dast job exists').toBeDefined();
+    const run = (dast?.steps ?? []).map((s) => String(s['run'] ?? '')).join('\n');
+    expect(run, 'the stack is started without the install spec').toMatch(/LF_SMOKE_SPEC=0/);
+    expect(run, 'the gate is the repository runner').toMatch(/scripts\/security\/scan\.mjs dast /);
+    expect(run, 'the stack is removed afterwards').toMatch(/down -v/);
+    expect(text, 'the DAST contract tests run in CI').toContain(
+      'node --test tests/security/dast.contract.test.mjs',
+    );
+    // ADR-0044 rule 2: no issue writing or SARIF upload; the official action is not used.
+    expect(text).not.toContain('zaproxy/action-');
+    expect(text).not.toContain('upload-sarif');
   });
 });

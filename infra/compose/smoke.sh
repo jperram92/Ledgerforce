@@ -6,7 +6,8 @@
 #
 # Needs Docker with compose v2, pnpm dependencies installed and Playwright's Chromium.
 # Environment: LF_SMOKE_PROJECT (default lf-smoke), LF_SMOKE_PORT (default 18080),
-# LF_SMOKE_KEEP=1 keeps the stack running afterwards; LF_BUILD_CA_FILE names a CA certificate for
+# LF_SMOKE_KEEP=1 keeps the stack running afterwards; LF_SMOKE_SPEC=0 only starts the stack and
+# skips the browser spec (the DAST job, ADR-0044, scans the running stack instead); LF_BUILD_CA_FILE names a CA certificate for
 # networks that inspect TLS (passed to the image builds as a build secret, never stored). Secrets are generated into
 # infra/compose/secrets (git-ignored) if missing. The stack's volumes are removed at the end.
 set -euo pipefail
@@ -96,6 +97,11 @@ done
 
 echo "--- setup output (one-time password redacted)"
 sed -E 's/(One-time password: ).*/\1[redacted]/' "$work/setup.log"
+
+if [[ "${LF_SMOKE_SPEC:-1}" == 0 ]]; then
+  echo "--- stack is up at ${public_url} (LF_SMOKE_SPEC=0: install spec skipped)"
+  exit 0
+fi
 
 echo "--- SS-PLAT-23 install smoke spec"
 compose_json="$(node -e 'console.log(JSON.stringify(process.argv.slice(1)))' "${compose[@]}")"

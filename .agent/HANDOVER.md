@@ -225,3 +225,4 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01T10:43:09.286Z claude: release T-0118 → review (verify 14 PASS/0 FAIL/2 PENDING (coverage baseline, cross-review); awaiting codex cross-review)
 - 2026-11-01T11:10:36.066Z claude: T-0033 → verifying
 - 2026-11-01T11:18:39.042Z claude: release T-0033 → review (verify 14 PASS/0 FAIL/2 PENDING; awaiting codex cross-review)
+- 2026-11-01T11:18:46.732Z claude: release T-0096 → todo (unblocked: owner accepted ADR-0044 (DL-0263))

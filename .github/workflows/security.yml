@@ -34,6 +34,9 @@ jobs:
         with:
           node-version-file: .nvmrc
       - run: node --test tests/security/scanners.contract.test.mjs
+      # ADR-0044 rule 5: the DAST gate against disposable local pages (High fails, clean passes,
+      # unreachable fails closed), with the pinned ZAP image.
+      - run: node --test tests/security/dast.contract.test.mjs
 
   sast:
     name: SAST (Semgrep CE, local rules)
@@ -137,4 +140,29 @@ jobs:
         with:
           name: security-image-${{ matrix.target }}
           path: ${{ runner.temp }}/security/${{ matrix.target }}/
+          if-no-files-found: error
+
+  # ADR-0044 (Accepted, DL-0263): passive ZAP baseline against the self-hosted stack started as
+  # infra/compose/smoke.sh starts it. Fails on any High alert; Medium/Low are in the report only.
+  dast:
+    name: DAST (ZAP baseline, compose stack)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+      - name: start the compose stack (no install spec)
+        run: LF_SMOKE_KEEP=1 LF_SMOKE_SPEC=0 LF_SMOKE_PROJECT=lf-dast bash infra/compose/smoke.sh
+      - name: ZAP baseline (fails on High)
+        run: node scripts/security/scan.mjs dast http://ledgerforce.localhost:18080/ "$RUNNER_TEMP/security/dast"
+      - name: stop the stack
+        if: always()
+        run: docker compose -p lf-dast -f infra/compose/compose.yaml down -v --remove-orphans || true
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: security-dast
+          path: ${{ runner.temp }}/security/dast/
           if-no-files-found: error
