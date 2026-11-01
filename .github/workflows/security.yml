@@ -157,9 +157,16 @@ jobs:
         run: LF_SMOKE_KEEP=1 LF_SMOKE_SPEC=0 LF_SMOKE_PROJECT=lf-dast bash infra/compose/smoke.sh
       - name: ZAP baseline (fails on High)
         run: node scripts/security/scan.mjs dast http://ledgerforce.localhost:18080/ "$RUNNER_TEMP/security/dast"
+      # compose interpolates its required settings even for `down`; placeholders suffice.
       - name: stop the stack
         if: always()
-        run: docker compose -p lf-dast -f infra/compose/compose.yaml down -v --remove-orphans || true
+        env:
+          LF_PUBLIC_URL: http://ledgerforce.localhost:18080
+          LF_TENANT_SLUG: harbour-co
+          LF_TENANT_NAME: Harbour Co
+          LF_OWNER_EMAIL: owner@example.test
+          LF_OWNER_NAME: Olivia Owner
+        run: docker compose -p lf-dast -f infra/compose/compose.yaml down -v --remove-orphans
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: always()
         with:
