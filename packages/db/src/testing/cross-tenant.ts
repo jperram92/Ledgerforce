@@ -148,6 +148,30 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0038: posting profiles, products and Salesforce mapping hooks (CHECK-constrained codes).
+  'app.party_posting_profile': {
+    code: () => `P_${randomBytes(4).toString('hex').toUpperCase()}`,
+    kind: () => 'customer',
+    default_tax_code: () => 'GST',
+    status: () => 'active',
+  },
+  'app.product_posting_profile': {
+    code: () => `R_${randomBytes(4).toString('hex').toUpperCase()}`,
+    default_tax_code: () => 'GST',
+    status: () => 'active',
+  },
+  'app.product': {
+    sku: () => `SKU-${randomBytes(4).toString('hex')}`,
+    unit_price: () => '1.0000',
+    currency: () => 'AUD',
+    tax_code: () => 'GST',
+    salesforce_product2_id: () => `01t${randomBytes(8).toString('hex').slice(0, 15)}`,
+    status: () => 'active',
+  },
+  'app.salesforce_profile_mapping': {
+    kind: () => 'product_family',
+    source_value: () => `family-${randomBytes(4).toString('hex')}`,
+  },
   // T-0118: a fresh code per row, so generated rows never overlap another range of the same code.
   'app.tax_code': {
     code: () => `T${randomBytes(4).toString('hex').toUpperCase()}`,
@@ -206,8 +230,24 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
  * parents, because a trigger checks for them (the rule itself stays intact).
  */
 export const PREREQUISITES: Readonly<
-  Record<string, (admin: Queryable, row: ReadonlyMap<string, string>) => Promise<void>>
+  // A hook may also fill a value the generic generator leaves empty (e.g. a nullable foreign key
+  // a CHECK constraint requires), by setting it on the row before insert.
+  Record<string, (admin: Queryable, row: Map<string, string>) => Promise<void>>
 > = {
+  // A Salesforce mapping row must name exactly one target profile (migration 0033): seed a
+  // product posting profile of the same company and point the product_family mapping at it.
+  'app.salesforce_profile_mapping': async (admin, row) => {
+    const tenant = row.get('tenant_id') ?? '';
+    const profile = await seedRow(
+      admin,
+      { schema: 'app', table: 'product_posting_profile', qualified: 'app.product_posting_profile' },
+      tenant,
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([['company_id', row.get('company_id') ?? '']]),
+    );
+    row.set('product_profile_id', String(profile['id']));
+  },
   // Bank details need an active supplier or employee role on the party (migration 0012).
   'app.party_bank_account': async (admin, row) => {
     await admin.query(

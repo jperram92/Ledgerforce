@@ -294,6 +294,16 @@
       "defaultTaxCode": "GST"
     },
     {
+      "code": "4140",
+      "name": "Hardware sales",
+      "type": "revenue",
+      "subtype": "operating_revenue",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
       "code": "4190",
       "name": "Recoverable costs income",
       "type": "revenue",
@@ -316,6 +326,16 @@
     {
       "code": "5000",
       "name": "Subcontractors",
+      "type": "expense",
+      "subtype": "direct_cost",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "5100",
+      "name": "Cost of hardware sold",
       "type": "expense",
       "subtype": "direct_cost",
       "normalBalance": "debit",
@@ -502,5 +522,90 @@
     "sgc_payable_account": "2370",
     "sgc_expense_account": "6420",
     "prior_period_adjustments_account": "3400"
+  },
+  "partyProfiles": [
+    {
+      "code": "DOMESTIC_CUSTOMER",
+      "name": "Domestic customer",
+      "kind": "customer",
+      "controlAccount": "1200",
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "OVERSEAS_CUSTOMER",
+      "name": "Overseas customer",
+      "kind": "customer",
+      "controlAccount": "1200",
+      "defaultTaxCode": "GST-FREE-EXPORT"
+    },
+    {
+      "code": "DOMESTIC_SUPPLIER",
+      "name": "Domestic supplier",
+      "kind": "supplier",
+      "controlAccount": "2000",
+      "defaultTaxCode": "GST"
+    }
+  ],
+  "productProfiles": [
+    {
+      "code": "PROFESSIONAL_SERVICES",
+      "name": "Professional services",
+      "revenueAccount": "4110",
+      "expenseAccount": "5000",
+      "cogsAccount": null,
+      "discountAccount": null,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "SUBSCRIPTION",
+      "name": "Subscription",
+      "revenueAccount": "4120",
+      "expenseAccount": "6310",
+      "cogsAccount": null,
+      "discountAccount": null,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "TRAINING",
+      "name": "Training",
+      "revenueAccount": "4130",
+      "expenseAccount": "5000",
+      "cogsAccount": null,
+      "discountAccount": null,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "REIMBURSABLE_EXPENSE",
+      "name": "Reimbursable expense",
+      "revenueAccount": "4190",
+      "expenseAccount": "6230",
+      "cogsAccount": null,
+      "discountAccount": null,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "HARDWARE",
+      "name": "Hardware",
+      "revenueAccount": "4140",
+      "expenseAccount": null,
+      "cogsAccount": "5100",
+      "discountAccount": null,
+      "defaultTaxCode": "GST"
+    }
+  ],
+  "profileMappings": {
+    "productFamily": {
+      "Professional Services": "PROFESSIONAL_SERVICES",
+      "Subscription": "SUBSCRIPTION",
+      "Training": "TRAINING",
+      "Reimbursable": "REIMBURSABLE_EXPENSE",
+      "Hardware": "HARDWARE"
+    },
+    "accountType": {
+      "Customer - Direct": "DOMESTIC_CUSTOMER",
+      "Customer - Channel": "DOMESTIC_CUSTOMER",
+      "Overseas Customer": "OVERSEAS_CUSTOMER",
+      "Supplier": "DOMESTIC_SUPPLIER"
+    }
   }
 }

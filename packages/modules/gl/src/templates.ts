@@ -27,6 +27,28 @@ export interface TemplateAccount {
   defaultTaxCode?: string | undefined;
 }
 
+/** Who (design §4.4): decides the control account and the default tax code. */
+export interface TemplatePartyProfile {
+  code: string;
+  name: string;
+  kind: 'customer' | 'supplier';
+  /** Account code; must be the AR_CONTROL (customer) or AP_CONTROL (supplier) account. */
+  controlAccount: string;
+  /** Tax-code catalogue code (packages/modules/tax AU_TAX_CODES). */
+  defaultTaxCode: string;
+}
+
+/** What (design §4.4): decides revenue, expense, COGS and discount accounts. */
+export interface TemplateProductProfile {
+  code: string;
+  name: string;
+  revenueAccount: string;
+  expenseAccount: string | null;
+  cogsAccount: string | null;
+  discountAccount: string | null;
+  defaultTaxCode: string;
+}
+
 export interface ChartTemplate {
   id: string;
   name: string;
@@ -35,7 +57,13 @@ export interface ChartTemplate {
   accounts: TemplateAccount[];
   /** Accounts for settings that are not system roles yet (postings.md Q2/Q3, DL-0015). */
   suggestedSettings: Record<string, string>;
+  partyProfiles: TemplatePartyProfile[];
+  productProfiles: TemplateProductProfile[];
+  /** Salesforce Product2.Family → product profile; Account.Type → party profile (design §4.4). */
+  profileMappings: { productFamily: Record<string, string>; accountType: Record<string, string> };
 }
+
+export const PROFILE_CODE_RE = /^[A-Z][A-Z0-9_]{0,39}$/;
 
 export const CODE_RE = /^[0-9]{3,10}$/;
 const SUBTYPE_RE = /^[a-z][a-z0-9_]*$/;
@@ -83,6 +111,56 @@ export function validateTemplate(t: ChartTemplate): string[] {
   }
   for (const [key, code] of Object.entries(t.suggestedSettings)) {
     if (!seen.has(code)) errors.push(`setting ${key} names unknown account ${code}`);
+  }
+  errors.push(...validateProfiles(t));
+  return errors;
+}
+
+/** Posting-profile rules (design §4.4, SS-PLAT-103); [] means valid. */
+export function validateProfiles(t: ChartTemplate): string[] {
+  const errors: string[] = [];
+  const account = new Map(t.accounts.map((a) => [a.code, a]));
+  const party = new Set<string>();
+  for (const p of t.partyProfiles) {
+    if (!PROFILE_CODE_RE.test(p.code))
+      errors.push(`party profile ${p.code}: code must be UPPER_SNAKE`);
+    if (party.has(p.code)) errors.push(`duplicate party profile ${p.code}`);
+    party.add(p.code);
+    const role = p.kind === 'customer' ? 'AR_CONTROL' : 'AP_CONTROL';
+    if (account.get(p.controlAccount)?.systemRole !== role) {
+      errors.push(
+        `party profile ${p.code}: control account ${p.controlAccount} must be the ${role} account`,
+      );
+    }
+  }
+  const product = new Set<string>();
+  for (const p of t.productProfiles) {
+    if (!PROFILE_CODE_RE.test(p.code))
+      errors.push(`product profile ${p.code}: code must be UPPER_SNAKE`);
+    if (product.has(p.code)) errors.push(`duplicate product profile ${p.code}`);
+    product.add(p.code);
+    const want: [string, string | null, AccountType[]][] = [
+      ['revenue', p.revenueAccount, ['revenue']],
+      ['expense', p.expenseAccount, ['expense']],
+      ['cogs', p.cogsAccount, ['expense']],
+      ['discount', p.discountAccount, ['revenue', 'expense']],
+    ];
+    for (const [what, code, types] of want) {
+      if (code === null) continue;
+      const a = account.get(code);
+      if (!a || !types.includes(a.type) || !a.postable || a.control) {
+        errors.push(
+          `product profile ${p.code}: ${what} account ${code} must be a postable ${types.join(' or ')} account`,
+        );
+      }
+    }
+  }
+  for (const [value, target] of Object.entries(t.profileMappings.productFamily)) {
+    if (!product.has(target))
+      errors.push(`Product2.Family ${value} maps to unknown profile ${target}`);
+  }
+  for (const [value, target] of Object.entries(t.profileMappings.accountType)) {
+    if (!party.has(target)) errors.push(`Account.Type ${value} maps to unknown profile ${target}`);
   }
   return errors;
 }

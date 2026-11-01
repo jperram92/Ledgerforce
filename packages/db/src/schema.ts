@@ -364,6 +364,70 @@ export interface PartyTable {
   salesforce_account_id: string | null;
   status: Generated<'active' | 'archived'>;
   created_at: Timestamp;
+  /** Migration 0033 (T-0038): posting profiles when the party buys / sells to us. */
+  customer_profile_id: Generated<string | null>;
+  supplier_profile_id: Generated<string | null>;
+}
+
+/** Migration 0033 (T-0038, design §4.4): who — control account and default tax code. */
+export interface PartyPostingProfileTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  code: string;
+  name: string;
+  kind: 'customer' | 'supplier';
+  control_account_id: string;
+  default_tax_code: string;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
+/** Migration 0033 (T-0038, design §4.4): what — revenue, expense, COGS, discount accounts. */
+export interface ProductPostingProfileTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  code: string;
+  name: string;
+  revenue_account_id: string;
+  expense_account_id: string | null;
+  cogs_account_id: string | null;
+  discount_account_id: string | null;
+  default_tax_code: string;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
+/** Migration 0033 (T-0038): a sellable item. */
+export interface ProductTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  sku: string;
+  name: string;
+  description: string | null;
+  product_profile_id: string;
+  /** NUMERIC(19,4) text. */
+  unit_price: string | null;
+  currency: string | null;
+  tax_code: string | null;
+  /** 18-character form only. */
+  salesforce_product2_id: string | null;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
+/** Migration 0033 (T-0038): Product2.Family / Account.Type → profile. */
+export interface SalesforceProfileMappingTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  kind: 'product_family' | 'account_type';
+  source_value: string;
+  product_profile_id: string | null;
+  party_profile_id: string | null;
+  created_at: Timestamp;
 }
 
 export type PartyRole = 'customer' | 'supplier' | 'employee';
@@ -587,6 +651,10 @@ export interface Database {
   'app.allocation': AllocationTable;
   'app.number_series': NumberSeriesTable;
   'app.party': PartyTable;
+  'app.party_posting_profile': PartyPostingProfileTable;
+  'app.product_posting_profile': ProductPostingProfileTable;
+  'app.product': ProductTable;
+  'app.salesforce_profile_mapping': SalesforceProfileMappingTable;
   'app.party_role': PartyRoleTable;
   'app.party_address': PartyAddressTable;
   'app.party_contact': PartyContactTable;
