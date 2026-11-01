@@ -59,6 +59,31 @@ describe('approved security workflow contract [T-0095]', () => {
     expect(new Set(entries).size, 'no duplicate entries').toBe(entries.length);
   });
 
+  it('ships runtime images without build tooling the gate flags (DL-0248)', () => {
+    const dockerfile = readFileSync(resolve(root, 'infra/docker/Dockerfile'), 'utf8');
+    const stage = (name: string) => {
+      const start = dockerfile.search(new RegExp(`^FROM .* AS ${name}$`, 'm'));
+      expect(start, `stage ${name} exists`).toBeGreaterThanOrEqual(0);
+      const rest = dockerfile.slice(start + 1);
+      const next = rest.search(/^FROM /m);
+      return dockerfile.slice(start, next < 0 ? undefined : start + 1 + next);
+    };
+    const runtime = stage('node-runtime');
+    // Alpine runtime, pinned by digest: a minimal OS package set that receives fixes.
+    expect(runtime).toMatch(/^FROM node:[\d.]+-alpine[\d.]*@sha256:[a-f0-9]{64} AS node-runtime$/m);
+    // Node's image bundles npm, corepack and yarn; the app runs with node alone.
+    for (const tool of [
+      '/usr/local/lib/node_modules',
+      '/usr/local/bin/npm',
+      '/usr/local/bin/corepack',
+      '/opt/yarn-v',
+    ]) {
+      expect(runtime, `node-runtime removes ${tool}`).toContain(tool);
+    }
+    // The web healthcheck uses busybox wget; curl is not needed at runtime.
+    expect(stage('web')).toMatch(/apk del --no-cache curl/);
+  });
+
   it('covers every ADR-0043 scan kind, the production audit and each shipped image', () => {
     const file = resolve(root, '.github/workflows/security.yml');
     const text = existsSync(file) ? readFileSync(file, 'utf8') : '';

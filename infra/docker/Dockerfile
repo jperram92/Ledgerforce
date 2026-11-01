@@ -46,7 +46,15 @@ COPY . .
 RUN pnpm install --frozen-lockfile --offline --prod --ignore-scripts \
  && rm -rf apps/web packages/ui
 
-FROM base AS node-runtime
+# Runtime: Alpine (a minimal OS package set that receives fixes) with node only. The Node image
+# bundles npm, corepack and yarn, whose dependencies the security gate flags (T-0095, DL-0248);
+# the app never runs them, so they are removed. Production dependencies have no native modules,
+# so the workspace installed in the Debian build stages runs unchanged on musl.
+FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS node-runtime
+ENV NODE_ENV=production
+RUN rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx \
+      /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg /opt/yarn-v*
+WORKDIR /app
 COPY --from=prod /app /app
 COPY --from=build /app/apps/api/dist /app/apps/api/dist
 # Files belong to root and are read-only for the runtime user.
@@ -67,6 +75,9 @@ CMD ["node", "apps/worker/src/cli/setup.ts"]
 FROM nginxinc/nginx-unprivileged:1.30.6-alpine@sha256:f5116ed4606f3eb015dd4a8e28cb9b351476dc0ad4bc6e9f93b19cec130cdf03 AS web
 COPY infra/docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/apps/web/dist /usr/share/nginx/html
+# curl (and libcurl) are not used at runtime: the healthcheck uses busybox wget (DL-0248).
+USER root
+RUN apk del --no-cache curl
 ENV NGINX_PORT=8080
 EXPOSE 8080
 USER 101
