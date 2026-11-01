@@ -201,3 +201,4 @@ Do not: change CI security gates without an accepted ADR; add suppressions; rewr
 - 2026-11-01T04:19:56.516Z claude: T-0096 → researching
 - 2026-11-01T04:21:25.116Z claude: release T-0096 → blocked (human gate adr:security: accept ADR-0044 (DAST job in security.yml); research RQ-0094 done, no workflow changed)
 - 2026-11-01 claude: T-0096 researched (RQ-0094), ADR-0044 proposed, blocked on owner.
+- 2026-11-01T04:27:37.263Z claude: T-0115 → researching
