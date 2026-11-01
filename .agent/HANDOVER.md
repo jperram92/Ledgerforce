@@ -210,3 +210,4 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01T05:29:17.010Z claude: release T-0031 → review (verify 14 PASS/0 FAIL/2 PENDING (gate 4 golden PASS first time); SS-PLAT-12 evidenced; 15 tables pinned for T-0116; awaiting codex review)
 - 2026-11-01 claude: golden postings Approved (DL-0256); T-0031 runner → review (verify 14/0/2); T-0116 created.
 - 2026-11-01T05:29:45.265Z claude: T-0116 → in_progress
+- 2026-11-01T09:07:11.967Z claude: T-0116 → verifying

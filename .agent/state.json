@@ -4,10 +4,10 @@
   "branch": "feat/T-0116-golden-bindings",
   "step": null,
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-01T06:14:45.262Z",
+  "lease_expires_at": "2026-11-01T09:52:11.964Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T05:29:45.264Z",
+  "updated_at": "2026-11-01T09:07:11.966Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

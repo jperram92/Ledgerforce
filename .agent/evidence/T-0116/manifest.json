@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0116",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-12",
+      "file": ".agent/evidence/T-0116/20261101-090707-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/golden/golden-engine.db.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay › the tables that cannot be replayed yet are exactly the pinned PENDING list | packages/ledger/src/golden/golden-engine.db.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay › preview() reproduces every other Approved table line for line",
+      "commit": "334a3f90997a",
+      "provider": "claude",
+      "timestamp": "2026-11-01T09:07:07.163Z",
+      "result": "passed"
+    }
+  ]
+}
