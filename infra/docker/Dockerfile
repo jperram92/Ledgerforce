@@ -75,9 +75,10 @@ CMD ["node", "apps/worker/src/cli/setup.ts"]
 FROM nginxinc/nginx-unprivileged:1.30.6-alpine@sha256:f5116ed4606f3eb015dd4a8e28cb9b351476dc0ad4bc6e9f93b19cec130cdf03 AS web
 COPY infra/docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY --from=build /app/apps/web/dist /usr/share/nginx/html
-# curl (and libcurl) are not used at runtime: the healthcheck uses busybox wget (DL-0248).
+# curl (and libcurl) are not used at runtime: the healthcheck uses busybox wget. Packages with
+# security fixes newer than the pinned base are upgraded (DL-0248).
 USER root
-RUN apk del --no-cache curl
+RUN apk del --no-cache curl && apk upgrade --no-cache
 ENV NGINX_PORT=8080
 EXPOSE 8080
 USER 101

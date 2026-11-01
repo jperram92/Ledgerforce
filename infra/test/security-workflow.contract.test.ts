@@ -82,6 +82,8 @@ describe('approved security workflow contract [T-0095]', () => {
     }
     // The web healthcheck uses busybox wget; curl is not needed at runtime.
     expect(stage('web')).toMatch(/apk del --no-cache curl/);
+    // Fixed Alpine packages newer than the pinned base (brotli-libs, zlib in run 41270094206).
+    expect(stage('web')).toMatch(/apk upgrade --no-cache/);
   });
 
   it('covers every ADR-0043 scan kind, the production audit and each shipped image', () => {
