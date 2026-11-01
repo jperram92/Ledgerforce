@@ -5,6 +5,12 @@
 # The working tree was fixed in 2391410; history cannot be rewritten (AGENTS.md §0.6).
 # Only commit-scoped entries are allowed (infra/test/security-workflow.contract.test.ts);
 # working-tree scans never read this file and inline gitleaks:allow is never honoured.
+# Added 2026-11-01: the same placeholders in older commits that a shallow local clone did not
+# contain but CI's full checkout does (DL-0247).
+4305330e352b6f3c1b191a9b1dd9796a8bb1fb9c:packages/connectors/salesforce/src/connection-store.db.test.ts:generic-api-key:29
+447b6c3423a2e4ef91494c3e2e75908644cc209a:salesforce/force-app/main/default/classes/LFReadOnlyMirrorTest.cls:generic-api-key:26
+604a4b4e1b25a40c4cdcc720b42054fc5f5065b4:packages/connectors/salesforce/src/jwt-bearer.contract.test.ts:generic-api-key:24
+604a4b4e1b25a40c4cdcc720b42054fc5f5065b4:packages/connectors/salesforce/src/jwt.test.ts:generic-api-key:14
 1434ee7b4683aaeff721561205c3be15eb375933:packages/connectors/salesforce/src/connection-store.db.test.ts:generic-api-key:29
 1434ee7b4683aaeff721561205c3be15eb375933:packages/connectors/salesforce/src/jwt-bearer.contract.test.ts:generic-api-key:24
 1434ee7b4683aaeff721561205c3be15eb375933:packages/connectors/salesforce/src/jwt.test.ts:generic-api-key:14

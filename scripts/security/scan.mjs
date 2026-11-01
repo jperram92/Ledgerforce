@@ -179,7 +179,22 @@ try {
       { extras: [...extras, '-e', 'GRYPE_DB_AUTO_UPDATE=false'] },
     );
     reportName = 'grype.json';
-    if (!Array.isArray(json(reportName).matches)) throw new Error('invalid vulnerability report');
+    const { matches } = json(reportName);
+    if (!Array.isArray(matches)) throw new Error('invalid vulnerability report');
+    // Summarise every high/critical match (what fails the gate) and count the rest, so a failing
+    // job says what to remediate without downloading the artifact.
+    const counts = {};
+    for (const m of matches) {
+      const severity = m.vulnerability?.severity || 'Unknown';
+      counts[severity] = (counts[severity] || 0) + 1;
+      if (['High', 'Critical'].includes(severity)) {
+        const fixed = m.vulnerability?.fix?.versions?.join(', ') || 'no fix';
+        console.log(
+          `security: vulnerability ${m.vulnerability.id} ${severity} ${m.artifact?.name}@${m.artifact?.version} (${m.artifact?.type}) fixed in: ${fixed}`,
+        );
+      }
+    }
+    console.log(`security: vulnerability counts ${JSON.stringify(counts)}`);
   } else {
     throw new Error(`unknown scan kind ${kind}`);
   }
