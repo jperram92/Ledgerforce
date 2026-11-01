@@ -207,3 +207,4 @@ Do not: change CI security gates without an accepted ADR; add suppressions; rewr
 - 2026-11-01T04:35:49.708Z claude: T-0115 → verifying
 - 2026-11-01T04:35:50.114Z claude: release T-0115 → review (docs-only: AASB research (RQ-0095, report), design §3.10/§12, postings research note; awaiting codex review and owner decisions)
 - 2026-11-01T05:14:37.014Z human: release T-0007 → review (owner approved golden postings by instruction (DL-0256); codex cross-review of drafting pending)
+- 2026-11-01T05:16:39.158Z claude: T-0031 → in_progress
