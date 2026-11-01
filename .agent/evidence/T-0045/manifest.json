@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0045",
+  "entries": [
+    {
+      "scenario": "SS-UC11-01",
+      "file": ".agent/evidence/T-0045/20261101-204036-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/credit-note.db.test.ts › SS-UC11-01 / SS-UC11-02: credit note on a paid invoice › SS-UC11-01 a $200 ex GST credit note on paid INV posts exactly GP-005 | packages/modules/ar/src/credit-note.db.test.ts › SS-UC11-01 / SS-UC11-02: credit note on a paid invoice › SS-UC11-02 the credit on the paid invoice is held as customer credit; AR subledger = AR control",
+      "commit": "467f2a741e4e",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:40:36.774Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-02",
+      "file": ".agent/evidence/T-0045/20261101-204036-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/credit-note.db.test.ts › SS-UC11-01 / SS-UC11-02: credit note on a paid invoice › SS-UC11-01 a $200 ex GST credit note on paid INV posts exactly GP-005 | packages/modules/ar/src/credit-note.db.test.ts › SS-UC11-01 / SS-UC11-02: credit note on a paid invoice › SS-UC11-02 the credit on the paid invoice is held as customer credit; AR subledger = AR control",
+      "commit": "467f2a741e4e",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:40:36.774Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-07",
+      "file": ".agent/evidence/T-0045/20261101-204036-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/credit-note.db.test.ts › Credit notes on unpaid invoices and limits (T-0045) › SS-UC11-07 refuses a credit beyond the creditable amount, an unknown line and an unknown reason",
+      "commit": "467f2a741e4e",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:40:36.774Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-07",
+      "file": ".agent/evidence/T-0045/20261101-204041-tests-unit.json",
+      "test": "3 test(s): packages/modules/ar/src/credit-notes.test.ts › SS-UC11-07: Credit cannot exceed the creditable amount › SS-UC11-07 a 1,500.00 credit on a 1,375.00 invoice fails with CREDIT_EXCEEDS_INVOICE | packages/modules/ar/src/credit-notes.test.ts › SS-UC11-07: Credit cannot exceed the creditable amount › SS-UC11-07 earlier credits reduce what remains; the exact remainder is allowed | packages/modules/ar/src/credit-notes.test.ts › SS-UC11-07: Credit cannot exceed the creditable amount › refuses a zero or negative credit",
+      "commit": "467f2a741e4e",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:40:41.397Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-06",
+      "file": ".agent/evidence/T-0045/20261101-204042-tests-api-db.json",
+      "test": "3 test(s): apps/api/src/ar/credit-notes.db.test.ts › SS-UC11-06: Clerk cannot approve own credit note above threshold › SS-UC11-06 the Clerk who created a 1,650.00 credit note is refused approval; another approver posts it | apps/api/src/ar/credit-notes.db.test.ts › SS-UC11-06: Clerk cannot approve own credit note above threshold › SS-UC11-06 at or below the threshold the Clerk may approve their own credit note | apps/api/src/ar/credit-notes.db.test.ts › SS-UC11-06: Clerk cannot approve own credit note above threshold › SS-UC11-07 a credit beyond what is left on the invoice is refused with CREDIT_EXCEEDS_INVOICE",
+      "commit": "467f2a741e4e",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:40:42.735Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-07",
+      "file": ".agent/evidence/T-0045/20261101-204042-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ar/credit-notes.db.test.ts › SS-UC11-06: Clerk cannot approve own credit note above threshold › SS-UC11-07 a credit beyond what is left on the invoice is refused with CREDIT_EXCEEDS_INVOICE",
+      "commit": "467f2a741e4e",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:40:42.735Z",
+      "result": "passed"
+    }
+  ]
+}

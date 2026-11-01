@@ -2086,3 +2086,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - `batchSummary` is the batch summary journal report (item, party, invoice no, entry no, gross, status, reason).
 - Running the job when a batch is approved, and delivering the invoice email from the outbox, are worker wiring — new card T-0120 (queues are installed by lf_migrator; ADR-0029).
 
+### DL-0273 — Credit notes reverse what the invoice line posted; applied while open, else customer credit
+- Date: 2026-11-01 · By: claude · Task: T-0045 · Category: implementation (AR, data model additive, public API)
+- Invoice lines now keep the revenue account and tax code they posted to (migration 0040, set at approval), so a credit note reverses exactly that line even if posting profiles change later; GST is proportional at that line's own rate (computeTax, invoice pricing, company rounding). Q4 is answered (RQ-0096/DL-0256): credit notes net into G1/1A (the BAS query already treats Dr revenue with a tax code as a negative sale); reason codes per GP-029, `credit_loss` refused (write-off, GP-024).
+- Approval posts GP-005 (Dr revenue / Dr GST collected / Cr AR, party on revenue and AR) and allocates the credit to the invoice's open item while any is left; a paid invoice leaves the credit open as customer credit (refund T-0055). Creditable = invoice gross − posted credit notes (CREDIT_EXCEEDS_INVOICE), checked at draft and again at approval.
+- API: `PUT /ar/credit-notes/:id` with a client-chosen id — the SoD step `credit_note.create` must name its subject before the handler runs, so the id is chosen by the caller (idempotent); `POST /ar/credit-notes/:id/approve` runs SOD_CREDIT_NOTE_SELF_APPROVAL with the stored gross. The T-0015 stand-in controller in sod.db.test.ts moved to `/test/ar/credit-notes` (unchanged otherwise) so it does not shadow the real routes.
+
