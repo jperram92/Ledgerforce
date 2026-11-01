@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0096",
+  "current_task": "T-0035",
   "branch": "feat/T-0096-dast-smoke",
   "step": null,
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-01T12:03:46.893Z",
+  "lease_expires_at": "2026-11-01T12:08:44.260Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T11:18:46.900Z",
+  "updated_at": "2026-11-01T11:23:44.266Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -67,7 +67,8 @@
     "T-0032": 1,
     "T-0034": 1,
     "T-0118": 1,
-    "T-0033": 1
+    "T-0033": 1,
+    "T-0035": 1
   },
   "failures": {},
   "providers": {},

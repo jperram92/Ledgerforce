@@ -1,6 +1,7 @@
 // ADR-0043: actual pinned scanners; tool errors and missing/malformed output fail closed.
 import { spawnSync } from 'node:child_process';
 import {
+  chmodSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -54,7 +55,7 @@ const scratch = mkdtempSync(join(tmpdir(), 'lf-security-'));
 function docker(
   tool,
   args,
-  { network = false, source = true, extras = [], timeout = 240_000 } = {},
+  { network = false, source = true, extras = [], timeout = 240_000, imageUser = false } = {},
 ) {
   const result = spawnSync(
     'docker',
@@ -66,15 +67,21 @@ function docker(
       // Run as the calling user: with every capability dropped, container root cannot write into
       // an output directory owned by another user (the GitHub runner is uid 1001). HOME=/tmp gives
       // the tools a writable home for their caches.
-      ...(typeof process.getuid === 'function'
-        ? ['--user', `${process.getuid()}:${process.getgid()}`]
-        : []),
-      '--env',
-      'HOME=/tmp',
-      '--env',
-      'TMPDIR=/tmp',
-      '--mount',
-      `type=bind,source=${scratch},target=/tmp`,
+      // ZAP (imageUser) instead runs as its image's own unprivileged user with its own home and
+      // /tmp, where it keeps its state; it is given only a writable work directory (see dast).
+      ...(imageUser
+        ? []
+        : [
+            ...(typeof process.getuid === 'function'
+              ? ['--user', `${process.getuid()}:${process.getgid()}`]
+              : []),
+            '--env',
+            'HOME=/tmp',
+            '--env',
+            'TMPDIR=/tmp',
+            '--mount',
+            `type=bind,source=${scratch},target=/tmp`,
+          ]),
       ...(network ? [] : ['--network=none']),
       ...(source ? mounts : []),
       ...extras,
@@ -85,7 +92,10 @@ function docker(
   );
   if (result.error || result.signal)
     throw new Error(`scanner ${tool} failed to execute: ${result.error?.message || result.signal}`);
-  lastStderr = result.stderr || '';
+  // ZAP reports start-up failures on stdout; other scanners' stdout is never echoed (ADR-0043).
+  lastStderr = imageUser
+    ? [result.stdout, result.stderr].filter(Boolean).join('\n')
+    : result.stderr || '';
   return result;
 }
 let lastStderr = '';
@@ -224,6 +234,8 @@ try {
     // ADR-0044: passive baseline only (spider + passive rules, no attacks). The container shares
     // the host network so it reaches the started stack (published on 127.0.0.1); a *.localhost
     // name resolves to the host loopback. Reports go to the output directory as /zap/wrk.
+    // The work directory must be writable by the image's zap user (ZAP docker documentation).
+    chmodSync(out, 0o777);
     const extras = ['--network=host', '--mount', `type=bind,source=${out},target=/zap/wrk`];
     if (dastUrl.hostname.endsWith('.localhost')) {
       extras.push(`--add-host=${dastUrl.hostname}:127.0.0.1`);
@@ -244,7 +256,7 @@ try {
         '-r',
         'zap.html',
       ],
-      { network: true, source: false, extras, timeout: 900_000 },
+      { network: true, source: false, extras, timeout: 900_000, imageUser: true },
     );
     // zap-baseline.py exit 3 = scanner error (e.g. target unreachable): fail closed.
     if (result.status === 3 || result.status === null) {
