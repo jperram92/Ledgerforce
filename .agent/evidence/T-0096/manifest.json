@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0096",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-101",
+      "file": ".agent/evidence/T-0096/20261101-114508-tests-unit.json",
+      "test": "1 test(s): /home/user/Ledgerforce/infra/test/security-workflow.contract.test.ts › approved security workflow contract [T-0095] › SS-PLAT-101 runs the ADR-0044 DAST baseline against the started stack, contract-tested [T-0096]",
+      "commit": "a138fe5ee264",
+      "provider": "claude",
+      "timestamp": "2026-11-01T11:45:08.213Z",
+      "result": "passed"
+    }
+  ]
+}

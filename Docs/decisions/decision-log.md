@@ -2023,4 +2023,12 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - W1/W2 come from new catalogue codes BAS-W1/BAS-W2 used by GP-010 (W1 = debits, W2 = credits). G2/G3/G4 and G13/G14 confirmed; `verify` cleared for GST-free, export and input-taxed codes (imports stay unverified).
 - Not yet: the company GST-basis setting and the `credit_note_bas = ato_adjustment` presentation (GP-029 alternative) belong to the Phase 1 BAS report; the query takes the basis as a parameter and implements the default `net` presentation.
 - Note: RQ-0097 was committed on the T-0096 branch tip before branching T-0035 (stacked branches; no effect on T-0096's content).
+### DL-0265 — DAST gate (ADR-0044) implemented: ZAP as its image user, host network, report-driven gate
+- Date: 2026-11-01 · By: claude · Task: T-0096 · Category: implementation (security, under accepted ADR-0044)
+- `scan.mjs dast <url> <out>` runs `zap-baseline.py -I -m 1 -T 10 -J zap.json -r zap.html` from ghcr.io/zaproxy/zaproxy:2.17.0 pinned by index digest (the `stable` tag's digest on 2026-11-01). The gate reads zap.json: any `riskcode "3"` alert → exit 1 (each listed by plugin id, name and URL count); ZAP exit 3, a missing/invalid report or a report that does not name the target → exit 2.
+- ZAP runs as its image's own `zap` user (no --user/HOME//tmp override): run 1 (41301550801) showed ZAP cannot start as the runner uid ("Failed to access summary file /tmp/zap_out.json"). The output directory is made writable for it (0777), as ZAP's docker documentation prescribes; capabilities are still dropped and no-new-privileges set. Only for ZAP, stdout is included in failure diagnostics (ZAP prints start-up errors there); other scanners' stdout stays unechoed (ADR-0043).
+- Host network (ADR-0044 rule 2 "reaching the stack"): the stack publishes on 127.0.0.1; `*.localhost` targets get an explicit /etc/hosts entry.
+- The `dast` job starts the stack with `smoke.sh` (`LF_SMOKE_SPEC=0`: stack only, no browser spec) and stops it with compose's required settings as placeholders (run 2 showed `down` failing silently under `|| true`; now surfaced).
+- First real result on the app: 0 High, 1 Medium, 4 Low, 3 informational (run 41301970626) — the Medium/Low findings are triage input for T-0097 (pilot hardening: security headers).
+- The ZAP image cannot be pulled in the agent sandbox; validation is by the CI runs listed in .agent/evidence/T-0096/20261101-ci-dast.md.
 
