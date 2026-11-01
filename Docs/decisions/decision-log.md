@@ -1930,3 +1930,7 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 ### DL-0250 — Cross-review T-0114 PASS; task done
 - Date: 2026-11-01 · By: claude (reviewer; builder codex) · Task: T-0114 · Category: process
 - Verified the codex-built recorder fix without claiming the task (verify.sh --task T-0114: 13/0/3; evidence tests 30/30 on Linux) and reviewed it: PASS. Report .agent/evidence/T-0114/review-claude-*.md. Verification by the reviewer does not make claude a builder: no code was changed.
+
+### DL-0251 — Cross-review T-0112 PASS; task done; Windows failures stay in T-0103
+- Date: 2026-11-01 · By: claude (reviewer; builder codex) · Task: T-0112 · Category: process
+- verify.sh --task T-0112 on Linux: every substantive gate PASS; only gate 12 bookkeeping failed (in_progress, steps unticked), PASS after the review. Outbox wiring, fail-closed posting and owner-authorized LF_EVIDENCE_DIR placement checked. The Windows atomic-write and missed-heartbeat failures are not T-0112 criteria and remain tracked in blocked T-0103. Report .agent/evidence/T-0112/review-claude-*.md.

@@ -7,6 +7,7 @@ Done: security.yml with SAST, secrets (history + tree), dependencies, image SBOM
 In progress: nothing; status review.
 Next action: Codex cross-review (above). Then merge with green CI. Next build work is gated: 53 cards await Codex cross-review and T-0007 golden postings await the product owner (blocks T-0031 and 14 dependants).
 Decisions taken: DL-0243 (workflow), DL-0244 (history-only ignore, owner instruction), DL-0245 (container user), DL-0246 (scratch /tmp), DL-0247 (full-history parity), DL-0248 (runtime images).
+Also done this session: Claude cross-reviewed and closed codex tasks T-0113, T-0114, T-0112 (DL-0249..0251).
 Open questions for human: (1) Approve the golden postings in T-0007 to unblock the accounting backlog. (2) Run Codex (`node scripts/agent/conductor.ts run` on a machine with the codex CLI) to clear the 53 pending cross-reviews.
 Do not: add bare-path or inline gitleaks suppressions, lower the Grype threshold or use ignore-unfixed, edit ci.yml/verify.sh, rewrite history, merge without cross-review.
 
@@ -197,3 +198,4 @@ Do not: add bare-path or inline gitleaks suppressions, lower the Grype threshold
 - 2026-11-01 claude: T-0095 → review (security run 41270568508 8/8 green; verify 13/0/3).
 - 2026-11-01T04:03:48.203Z codex: release T-0113 → done (cross-review PASS by claude (.agent/evidence/T-0113/review-claude-20261101-040347.md))
 - 2026-11-01T04:11:51.663Z codex: release T-0114 → done (verify 13/0/3; cross-review PASS by claude (.agent/evidence/T-0114/review-claude-20261101-041151.md))
+- 2026-11-01T04:19:31.519Z codex: release T-0112 → done (cross-review PASS by claude (.agent/evidence/T-0112/review-claude-20261101-041931.md); Windows-only failures tracked in T-0103)
