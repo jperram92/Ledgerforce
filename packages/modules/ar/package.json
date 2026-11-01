@@ -2,10 +2,11 @@
   "name": "@ledgerforce/ar",
   "version": "0.0.0",
   "private": true,
-  "description": "Accounts receivable: sales invoices (draft → approve → post), design §3.8 row 1, UC-01",
+  "description": "Accounts receivable: sales invoices (draft \u2192 approve \u2192 post), design \u00a73.8 row 1, UC-01",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/batch-fixture.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

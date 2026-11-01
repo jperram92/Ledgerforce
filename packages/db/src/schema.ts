@@ -482,6 +482,9 @@ export interface BillingBatchTable {
   gross_total: string;
   created_by: string | null;
   created_at: Timestamp;
+  /** Migration 0039 (T-0044). */
+  approved_by: Generated<string | null>;
+  approved_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
 }
 
 export interface BillingBatchItemTable {
@@ -497,6 +500,10 @@ export interface BillingBatchItemTable {
   warnings: ColumnType<unknown, string | undefined, string>;
   status: Generated<'preview' | 'posted' | 'failed'>;
   invoice_id: string | null;
+  /** Migration 0039 (T-0044): the exception list. */
+  failure_code: Generated<string | null>;
+  failure_message: Generated<string | null>;
+  attempts: Generated<number>;
 }
 
 /** Migration 0037 (T-0042, ADR-0046): sent document emails, deduped per document. */

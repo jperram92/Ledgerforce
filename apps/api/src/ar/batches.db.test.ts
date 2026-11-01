@@ -19,6 +19,7 @@ const uid = (n: number) => `01900000-0000-7000-8000-${n.toString(16).padStart(12
 const PEOPLE = {
   arClerk: { id: uid(0x43a1), roles: ['ar_clerk'] },
   auditor: { id: uid(0x43a2), roles: ['auditor'] },
+  approver: { id: uid(0x43a3), roles: ['approver'] },
 } as const;
 type Who = keyof typeof PEOPLE;
 
@@ -179,5 +180,27 @@ describe('SS-UC02-01 / SS-UC02-07: batch preview over HTTP', () => {
     );
     expect(res.status).toBe(422);
     expect(await res.json()).toMatchObject({ error: 'INVALID_BATCH' });
+  });
+
+  it('SS-UC02-02 approval needs ar.batch.approve: the AR Clerk is refused, the Approver approves once', async () => {
+    const created = await call('POST', '/ar/batches/preview', 'arClerk', body(), 'nov-2026');
+    const { id } = (await created.json()) as { id: string };
+    const clerk = await call(
+      'POST',
+      `/ar/batches/${id}/approve?company_id=${companyId}`,
+      'arClerk',
+    );
+    expect(clerk.status).toBe(403);
+    expect(await clerk.json()).toEqual({ error: 'forbidden', permission: 'ar.batch.approve' });
+    const ok = await call('POST', `/ar/batches/${id}/approve?company_id=${companyId}`, 'approver');
+    expect(ok.status).toBe(200);
+    expect(await ok.json()).toMatchObject({ id, status: 'approved' });
+    const again = await call(
+      'POST',
+      `/ar/batches/${id}/approve?company_id=${companyId}`,
+      'approver',
+    );
+    expect(again.status).toBe(422);
+    expect(await again.json()).toMatchObject({ error: 'BATCH_STATE' });
   });
 });

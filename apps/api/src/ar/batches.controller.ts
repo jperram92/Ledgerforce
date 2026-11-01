@@ -2,7 +2,8 @@
  * Batch billing run over HTTP (T-0043, UC-02, DL-0271). Thin: validates the request and calls
  * @ledgerforce/ar. POST /ar/batches/preview needs ar.batch.run and an idempotency key (a repeat
  * returns the stored preview with 200); GET /ar/batches/:id needs ar.read. Money is returned as
- * decimal strings. Approval and posting of a batch are T-0044.
+ * decimal strings. POST /ar/batches/:id/approve needs ar.batch.approve (T-0044); the job that
+ * posts an approved batch (runBatch) runs in the worker (T-0120).
  */
 import {
   BadRequestException,
@@ -18,7 +19,13 @@ import {
   Res,
   UnprocessableEntityException,
 } from '@nestjs/common';
-import { BatchError, loadBatchPreview, previewBatch, type BatchPreview } from '@ledgerforce/ar';
+import {
+  approveBatch,
+  BatchError,
+  loadBatchPreview,
+  previewBatch,
+  type BatchPreview,
+} from '@ledgerforce/ar';
 import type { Request, Response } from 'express';
 import { principalOf, tokenPrincipalOf } from '../auth/session-tenant-resolver.ts';
 import { RequirePermission } from '../authz/permission.decorator.ts';
@@ -118,5 +125,33 @@ export class ArBatchesController {
       refusal,
     );
     return viewOf(p);
+  }
+
+  @Post(':id/approve')
+  @HttpCode(200)
+  @RequirePermission('ar.batch.approve')
+  async approve(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Query('company_id') companyId: string | undefined,
+  ) {
+    if (!UUID.test(id)) bad('id must be a uuid');
+    if (typeof companyId !== 'string' || !UUID.test(companyId)) bad('company_id must be a uuid');
+    const approvedBy = principalOf(req)?.userId ?? tokenPrincipalOf(req)?.userId;
+    if (!approvedBy) bad('an approving user is required');
+    const trx = this.tx.get();
+    const company = (companyId as string).toLowerCase();
+    await approveBatch(trx, {
+      companyId: company,
+      batchId: id,
+      approvedBy: approvedBy as string,
+    }).catch(refusal);
+    const p = await loadBatchPreview(trx, company, id).catch(refusal);
+    this.audit.describe({
+      entityType: 'billing_batch',
+      entityId: id,
+      after: { status: 'approved' },
+    });
+    return { ...viewOf(p), status: 'approved' };
   }
 }

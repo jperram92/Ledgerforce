@@ -11,15 +11,23 @@
  * previewed; nothing is written to the ledger and no invoice or number is created. A repeated
  * request with the same idempotency key returns the stored preview.
  */
-import type { Database } from '@ledgerforce/db';
+import { withTenant, type Database } from '@ledgerforce/db';
 import { Money } from '@ledgerforce/shared/money';
 import { Decimal } from 'decimal.js';
-import { sql, type Transaction } from 'kysely';
-import { creditHold, InvoiceError, priceInvoiceLines, type LineRow } from './invoices.ts';
+import { sql, type Kysely, type Transaction } from 'kysely';
+import {
+  approveInvoice,
+  createDraftInvoice,
+  creditHold,
+  InvoiceError,
+  priceInvoiceLines,
+  type InvoiceDeps,
+  type LineRow,
+} from './invoices.ts';
 
 type Trx = Transaction<Database>;
 
-export type BatchErrorCode = 'INVALID_BATCH' | 'NOTHING_TO_BILL';
+export type BatchErrorCode = 'INVALID_BATCH' | 'NOTHING_TO_BILL' | 'BATCH_STATE';
 
 export class BatchError extends Error {
   readonly code: BatchErrorCode;
@@ -350,6 +358,246 @@ export async function loadBatchPreview(
       net: b.net_total,
       tax: b.tax_total,
       gross: b.gross_total,
+    },
+  };
+}
+
+/** Approve a previewed batch (UC-02 step 3). The job (runBatch) then posts it. */
+export async function approveBatch(
+  trx: Trx,
+  c: { companyId: string; batchId: string; approvedBy: string },
+): Promise<void> {
+  const r = await trx
+    .updateTable('app.billing_batch')
+    .set({
+      status: 'approved',
+      approved_by: c.approvedBy,
+      approved_at: sql<Date>`clock_timestamp()`,
+    })
+    .where('company_id', '=', c.companyId.toLowerCase())
+    .where('id', '=', c.batchId)
+    .where('status', '=', 'preview')
+    .executeTakeFirst();
+  if (r.numUpdatedRows !== 1n) {
+    throw new BatchError('BATCH_STATE', `batch ${c.batchId} is not a preview awaiting approval`);
+  }
+}
+
+export interface BatchRunResult {
+  readonly posted: number;
+  readonly failed: number;
+  /** Items still to post (a run stopped by `limit` or a crash). */
+  readonly remaining: number;
+  readonly status: 'approved' | 'posted';
+}
+
+const errorCode = (e: unknown): string => {
+  const code = (e as { code?: unknown }).code;
+  return typeof code === 'string' && /^[A-Z][A-Z0-9_]{0,63}$/.test(code) ? code : 'ERROR';
+};
+
+/**
+ * The batch job (UC-02 steps 4–5): posts each previewed item in its own tenant transaction —
+ * draft invoice from the item's billing lines, approval through the posting engine, lines marked
+ * invoiced. A failure rolls back only that item (no invoice, no number consumed) and is recorded
+ * in the exception list. Items are keyed `batch:<id>:<item>` (sales_invoice.source_key) and
+ * skipped once posted, so a re-run after a crash continues without duplicates. `limit` bounds a
+ * run (tests use it to stop a job half way).
+ */
+export async function runBatch(
+  db: Kysely<Database>,
+  tenantId: string,
+  c: { companyId: string; batchId: string; limit?: number },
+  deps: InvoiceDeps,
+): Promise<BatchRunResult> {
+  const companyId = c.companyId.toLowerCase();
+  const batch = await withTenant(db, tenantId, (trx) =>
+    sql<{ status: string; issue_date: string }>`
+      SELECT status, to_char(issue_date, 'YYYY-MM-DD') AS issue_date FROM app.billing_batch
+       WHERE company_id = ${companyId} AND id = ${c.batchId}::uuid`.execute(trx),
+  ).then((r) => r.rows[0]);
+  if (!batch)
+    throw new BatchError('INVALID_BATCH', `batch ${c.batchId} is not in company ${companyId}`);
+  if (batch.status !== 'approved' && batch.status !== 'posted') {
+    throw new BatchError('BATCH_STATE', `batch ${c.batchId} is ${batch.status}; approve it first`);
+  }
+  const todo = await withTenant(db, tenantId, (trx) =>
+    trx
+      .selectFrom('app.billing_batch_item')
+      .select(['item_no', 'party_id', 'line_ids'])
+      .where('batch_id', '=', c.batchId)
+      .where('status', '=', 'preview')
+      .orderBy('item_no')
+      .execute(),
+  );
+  let posted = 0;
+  let failed = 0;
+  for (const item of todo.slice(0, c.limit ?? todo.length)) {
+    try {
+      await withTenant(db, tenantId, async (trx) => {
+        const lock = await sql<{ status: string }>`
+          SELECT status FROM app.billing_batch_item
+           WHERE batch_id = ${c.batchId}::uuid AND item_no = ${item.item_no} FOR UPDATE`.execute(
+          trx,
+        );
+        if (lock.rows[0]?.status !== 'preview') return;
+        const lines = await trx
+          .selectFrom('app.billing_line')
+          .select([
+            'id',
+            'product_id',
+            'product_profile_id',
+            'description',
+            'quantity',
+            'unit_price',
+            'tax_code',
+          ])
+          .where(
+            'id',
+            'in',
+            item.line_ids.length > 0 ? item.line_ids : ['00000000-0000-0000-0000-000000000000'],
+          )
+          .where('status', '=', 'pending')
+          .orderBy('bill_date')
+          .orderBy('id')
+          .execute();
+        if (lines.length !== item.line_ids.length) {
+          throw new BatchError('BATCH_STATE', 'a billing line of this item is no longer pending');
+        }
+        const draft = await createDraftInvoice(
+          trx,
+          {
+            companyId,
+            partyId: item.party_id,
+            issueDate: batch.issue_date,
+            sourceKey: `batch:${c.batchId}:${String(item.item_no)}`,
+            lines: lines.map((l) => ({
+              ...(l.product_id ? { productId: l.product_id } : {}),
+              productProfileId: l.product_profile_id,
+              description: l.description,
+              quantity: l.quantity,
+              unitPrice: l.unit_price,
+              ...(l.tax_code ? { taxCode: l.tax_code } : {}),
+            })),
+          },
+          deps,
+        );
+        const invoice =
+          draft.status === 'posted'
+            ? draft
+            : await approveInvoice(trx, { companyId, invoiceId: draft.invoiceId }, deps);
+        await trx
+          .updateTable('app.billing_line')
+          .set({ status: 'invoiced', invoice_id: invoice.invoiceId })
+          .where('id', 'in', item.line_ids)
+          .execute();
+        await trx
+          .updateTable('app.billing_batch_item')
+          .set({
+            status: 'posted',
+            invoice_id: invoice.invoiceId,
+            attempts: sql<number>`attempts + 1`,
+          })
+          .where('batch_id', '=', c.batchId)
+          .where('item_no', '=', item.item_no)
+          .execute();
+      });
+      posted += 1;
+    } catch (e) {
+      await withTenant(db, tenantId, (trx) =>
+        trx
+          .updateTable('app.billing_batch_item')
+          .set({
+            status: 'failed',
+            failure_code: errorCode(e),
+            failure_message: ((e as Error).message ?? String(e)).slice(0, 2000),
+            attempts: sql<number>`attempts + 1`,
+          })
+          .where('batch_id', '=', c.batchId)
+          .where('item_no', '=', item.item_no)
+          .execute(),
+      );
+      failed += 1;
+    }
+  }
+  return withTenant(db, tenantId, async (trx) => {
+    const left = await sql<{ n: number }>`
+      SELECT count(*)::int AS n FROM app.billing_batch_item
+       WHERE batch_id = ${c.batchId}::uuid AND status = 'preview'`.execute(trx);
+    const remaining = left.rows[0]?.n ?? 0;
+    if (remaining === 0) {
+      await trx
+        .updateTable('app.billing_batch')
+        .set({ status: 'posted' })
+        .where('id', '=', c.batchId)
+        .where('status', '=', 'approved')
+        .execute();
+    }
+    return { posted, failed, remaining, status: remaining === 0 ? 'posted' : 'approved' };
+  });
+}
+
+export interface BatchSummaryRow {
+  readonly itemNo: number;
+  readonly partyId: string;
+  readonly partyName: string;
+  readonly status: 'preview' | 'posted' | 'failed';
+  readonly invoiceNo: string | null;
+  readonly entryNo: string | null;
+  readonly gross: string | null;
+  readonly failureCode: string | null;
+  readonly failureMessage: string | null;
+}
+
+/** Batch summary journal report (UC-02 step 6): one row per item, posted totals. */
+export async function batchSummary(
+  trx: Trx,
+  companyId: string,
+  batchId: string,
+): Promise<{ rows: BatchSummaryRow[]; totals: { posted: number; failed: number; gross: string } }> {
+  const rows = (
+    await sql<{
+      item_no: number;
+      party_id: string;
+      party_name: string;
+      status: 'preview' | 'posted' | 'failed';
+      invoice_no: string | null;
+      entry_no: string | null;
+      gross: string | null;
+      failure_code: string | null;
+      failure_message: string | null;
+    }>`
+      SELECT i.item_no, i.party_id::text, p.legal_name AS party_name, i.status, s.invoice_no,
+             e.entry_no, s.gross_total::text AS gross, i.failure_code, i.failure_message
+        FROM app.billing_batch_item i
+        JOIN app.party p ON p.tenant_id = i.tenant_id AND p.id = i.party_id
+        LEFT JOIN app.sales_invoice s ON s.tenant_id = i.tenant_id AND s.id = i.invoice_id
+        LEFT JOIN app.journal_entry e ON e.tenant_id = s.tenant_id AND e.id = s.entry_id
+       WHERE i.company_id = ${companyId.toLowerCase()} AND i.batch_id = ${batchId}::uuid
+       ORDER BY i.item_no`.execute(trx)
+  ).rows;
+  const out = rows.map((r) => ({
+    itemNo: r.item_no,
+    partyId: r.party_id,
+    partyName: r.party_name,
+    status: r.status,
+    invoiceNo: r.invoice_no,
+    entryNo: r.entry_no,
+    gross: r.gross,
+    failureCode: r.failure_code,
+    failureMessage: r.failure_message,
+  }));
+  return {
+    rows: out,
+    totals: {
+      posted: out.filter((r) => r.status === 'posted').length,
+      failed: out.filter((r) => r.status === 'failed').length,
+      gross: numeric(
+        out.reduce(
+          (s, r) => (r.status === 'posted' && r.gross ? s.plus(r.gross) : s),
+          new Decimal(0),
+        ),
+      ),
     },
   };
 }
