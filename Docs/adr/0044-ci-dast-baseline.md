@@ -1,7 +1,7 @@
 ---
 adr: 0044
 title: "Run a passive ZAP baseline scan of the compose stack in CI and fail on High alerts"
-status: Proposed
+status: Accepted
 date: 2026-11-01
 author: claude
 category: security
@@ -13,8 +13,9 @@ superseded_by: none
 # ADR-0044: Run a passive ZAP baseline scan of the compose stack in CI and fail on High alerts
 
 ## Status
-Proposed — awaiting the product owner's acceptance (security category; ADR-0043 excluded DAST and
-CI security gates are human-owned per AGENTS.md §5). No workflow is changed until accepted.
+Accepted — 2026-11-01 by the product owner ("3 things accepted", DL-0263). Security category;
+proposed 2026-11-01 (awaiting acceptance because ADR-0043 excluded DAST and CI security gates are
+human-owned per AGENTS.md §5). T-0096 may now implement the workflow.
 
 ## Context and problem statement
 Design §6.9 requires DAST; backlog T-0096 AC-1: "CI DAST job produces a report and fails on any High

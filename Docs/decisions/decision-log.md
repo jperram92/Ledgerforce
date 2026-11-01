@@ -2011,3 +2011,7 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Documents are raw commands because document builders arrive with their module tasks; they will reuse this interpreter.
 - CI: the `db` job runs it with the fixed seed; a new `invariants` job runs it with a fresh seed per run (derived from the run id, printed before the run). ci.yml is not a security gate.
 
+### DL-0263 — Owner accepts ADR-0044 (DAST) and delegates accounting ADRs and golden postings
+- Date: 2026-11-01 · By: claude (recording the product owner) · Task: — · Category: governance
+- The owner answered "3 things accepted. Fully build out app." to the three open questions in HANDOVER: (1) ADR-0044 (passive ZAP baseline in CI, fail on High) → Accepted; T-0096 unblocked. (2) Cross-reviews by Codex: accepted as the process; this cloud session has no Codex CLI or OpenAI credentials, so the reviews remain pending (gate 8) until the conductor runs Codex. (3) Standing delegation accepted: the building agent may accept accounting ADRs and approve/supersede golden postings, each backed by a research record and logged here with the reason; security ADRs, releases, phase gates and out-of-scope choices stay with the owner (the delegation offered covered accounting and golden postings only). Recorded here; the matching text in AGENTS.md §6 / config.yaml `human_gates` must be added by the owner, because an agent may not modify its own instruction files (the attempt was refused as self-modification).
+
