@@ -207,7 +207,7 @@ export function toCommand(t: GoldenJournal, ctx: CommandContext): PostingCommand
 /**
  * Golden bindings → AU services SMB template (packages/modules/gl templates). `role` resolves
  * through the company's system-role binding; `code` names a template account; null means the
- * template has no account for it yet (owned by T-0116: AASB/GST template additions).
+ * template has no account for it yet.
  */
 export const AU_SERVICES_BINDINGS: Readonly<
   Record<string, { readonly role: string } | { readonly code: string } | null>
@@ -233,16 +233,15 @@ export const AU_SERVICES_BINDINGS: Readonly<
   'product:SUBSCRIPTION.revenue': { code: '4120' },
   'asset: Computer equipment': { code: '1500' },
   'expense: Insurance': { code: '6800' },
-  // Proposed roles (T-0115) that already have a template account; role binding in T-0116.
+  // Accounts bound through template settings (suggestedSettings), not system roles yet (T-0117).
   'system:PREPAYMENTS': { code: '1300' },
   'system:ACCUM_DEPRECIATION': { code: '1510' },
   'system:DEPRECIATION_EXPENSE': { code: '6600' },
-  // No template account yet (T-0116).
-  'system:AR_ECL_ALLOWANCE': null,
-  'system:ACCRUED_EXPENSES': null,
-  'system:SGC_PAYABLE': null,
-  'system:PRIOR_PERIOD_ADJUSTMENTS': null,
-  'setting:payroll.sgc_expense': null,
-  'expense: Office expenses': null,
-  'expense: Electricity': null,
+  'system:AR_ECL_ALLOWANCE': { code: '1220' },
+  'system:ACCRUED_EXPENSES': { code: '2360' },
+  'system:SGC_PAYABLE': { code: '2370' },
+  'system:PRIOR_PERIOD_ADJUSTMENTS': { code: '3400' },
+  'setting:payroll.sgc_expense': { code: '6420' },
+  'expense: Office expenses': { code: '6230' },
+  'expense: Electricity': { code: '6240' },
 };

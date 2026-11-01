@@ -84,6 +84,17 @@ export const SOURCE_TYPES: Readonly<
       st('payroll.net_pay_batch', 'ap'), // Phase 1; conservative (RQ-0026)
       st('manual_journal', 'journal'),
       st('ledger.reversal', 'reversal'), // a void changes the locked side: override under any lock
+      // AASB/GST golden postings GP-020…GP-036 (T-0116, DL-0258)
+      st('ar.recovery', 'ar'), // cash received on a written-off debt (GP-026)
+      st('ar.ecl_adjustment', 'journal'), // period-end allowance movement, no AR lines (GP-025)
+      st('payments.stripe.tax_invoice', 'payout'), // monthly fee-GST true-up (GP-028)
+      st('ledger.accrual', 'journal'), // accrued expense and its auto-reversal (GP-031)
+      st('ledger.prepayment_release', 'journal'), // GP-032b
+      st('ledger.recurring.depreciation', 'journal'), // GP-030
+      st('ledger.prior_period_adjustment', 'journal'), // AASB 108, no control lines
+      st('revrec.release', 'journal'), // deferred revenue / contract liability release (GP-017, GP-021c)
+      st('payroll.super_payment', 'ap'), // Payday Super (GP-033), as net pay batches
+      st('payroll.sgc_assessment', 'ap'), // GP-034
     ].map(([k, v]) => [k, Object.freeze(v)]),
   ),
 );

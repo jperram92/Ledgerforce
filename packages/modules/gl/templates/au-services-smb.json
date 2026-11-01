@@ -53,6 +53,15 @@
       "control": false
     },
     {
+      "code": "1220",
+      "name": "Allowance for expected credit losses",
+      "type": "asset",
+      "subtype": "receivable_allowance",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false
+    },
+    {
       "code": "1300",
       "name": "Prepayments",
       "type": "asset",
@@ -151,6 +160,24 @@
       "systemRole": "PAYROLL_CLEARING"
     },
     {
+      "code": "2360",
+      "name": "Accrued expenses",
+      "type": "liability",
+      "subtype": "current_liability",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "2370",
+      "name": "Super guarantee charge payable",
+      "type": "liability",
+      "subtype": "current_liability",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false
+    },
+    {
       "code": "2400",
       "name": "Customer prepayments",
       "type": "liability",
@@ -226,6 +253,15 @@
       "postable": false,
       "control": false,
       "systemRole": "CURRENT_YEAR_EARNINGS"
+    },
+    {
+      "code": "3400",
+      "name": "Prior-period adjustments",
+      "type": "equity",
+      "subtype": "equity",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false
     },
     {
       "code": "4110",
@@ -328,6 +364,24 @@
       "defaultTaxCode": "GST"
     },
     {
+      "code": "6230",
+      "name": "Office expenses",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "6240",
+      "name": "Electricity",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false
+    },
+    {
       "code": "6310",
       "name": "Hosting and cloud services",
       "type": "expense",
@@ -356,6 +410,15 @@
       "postable": true,
       "control": false,
       "defaultTaxCode": "N-T"
+    },
+    {
+      "code": "6420",
+      "name": "Super guarantee charge expense",
+      "type": "expense",
+      "subtype": "employment_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false
     },
     {
       "code": "6500",
@@ -430,6 +493,14 @@
   "suggestedSettings": {
     "stripe_clearing_account": "1210",
     "merchant_fees_account": "6120",
-    "bad_debts_account": "6500"
+    "bad_debts_account": "6500",
+    "ecl_allowance_account": "1220",
+    "prepayments_account": "1300",
+    "accumulated_depreciation_account": "1510",
+    "depreciation_expense_account": "6600",
+    "accrued_expenses_account": "2360",
+    "sgc_payable_account": "2370",
+    "sgc_expense_account": "6420",
+    "prior_period_adjustments_account": "3400"
   }
 }

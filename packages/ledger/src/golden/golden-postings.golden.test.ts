@@ -31,22 +31,12 @@ const SUPERSEDED: Record<string, string> = {
   'GP-012': 'GP-020',
   'GP-013': 'GP-022',
   'GP-018': 'GP-023',
+  'GP-035': 'GP-036',
 };
-const ALL = Array.from({ length: 35 }, (_, i) => `GP-${String(i + 1).padStart(3, '0')}`);
+const ALL = Array.from({ length: 36 }, (_, i) => `GP-${String(i + 1).padStart(3, '0')}`);
 
-/** Source types named by Approved entries that the engine does not accept yet (T-0116). */
-const PENDING_SOURCE_TYPES = [
-  'ar.ecl_adjustment',
-  'ar.recovery',
-  'ledger.accrual',
-  'ledger.prepayment_release',
-  'ledger.prior_period_adjustment',
-  'ledger.recurring.depreciation',
-  'payments.stripe.tax_invoice',
-  'payroll.sgc_assessment',
-  'payroll.super_payment',
-  'revrec.release',
-];
+/** Source types named by Approved entries that the engine does not accept yet (emptied in T-0116). */
+const PENDING_SOURCE_TYPES: string[] = [];
 
 /** Deterministic stand-in UUIDs: the pure check validates shape, not existence. */
 const fakeId = (key: string) => {
@@ -56,7 +46,7 @@ const fakeId = (key: string) => {
 };
 
 describe('SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands', () => {
-  it('parses GP-001…GP-035 with their statuses; superseded entries point forward', () => {
+  it('parses GP-001…GP-036 with their statuses; superseded entries point forward', () => {
     expect(entries.map((e) => e.id)).toEqual(ALL);
     for (const e of entries) {
       if (e.id in SUPERSEDED) {

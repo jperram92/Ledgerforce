@@ -98,7 +98,8 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 | GP-032 | Prepaid expense with monthly release | MVP | — | Approved |
 | GP-033 | Super payment under Payday Super | Phase 1 | UC-07 | Approved |
 | GP-034 | Super guarantee charge assessment | Phase 1 | UC-07 | Approved |
-| GP-035 | Prior-period adjustment (AASB 108) | Phase 1 | — | Approved |
+| GP-035 | Prior-period adjustment (AASB 108) | Phase 1 | — | Superseded by GP-036 |
+| GP-036 | Prior-period error: late bill through AP (supersedes GP-035) | Phase 1 | — | Approved |
 
 ---
 
@@ -749,7 +750,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-035 — Prior-period adjustment (AASB 108)
 
-- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: Phase 1 (with an accounting ADR) · Source type: `ledger.prior_period_adjustment` · Q11
+- **Status: Superseded by GP-036** (DL-0258, 2026-11-01) · Phase: Phase 1 (with an accounting ADR) · Source type: `ledger.prior_period_adjustment` · Q11
 - **Scenario:** 2027-09-10, after FY2027 (to 30 June 2027) is hard-locked and reported, an unrecorded June 2027 office
   bill of $550.00 ($500.00 + GST 50.00) is found; material. Posted in the current open period, tagged
   `corrects_period = FY2027`, `original_account = 6100`, with reason and approver.
@@ -763,6 +764,28 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 - **Check:** 500.00 + 50.00 = 550.00 ✓ · Current-year profit unchanged; the restated report mode shows 500.00 as FY2027 office expense; "as originally reported" stays available.
 - **Tax/BAS:** input tax credit claimed in the current BAS (within the 4-year limit **(unverified)**). Immaterial errors are ordinary current-period corrections.
+
+## GP-036 — Prior-period error: late-found supplier bill posted through AP (AASB 108)
+
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096; supersedes GP-035, DL-0258)** · Phase: Phase 1 (with an accounting ADR) · Source type: `ap.bill` (tagged `prior_period_adjustment`, `corrects_period`, `original_account`) · **Supersedes GP-035** · Q11
+- **Why superseded:** GP-035 credited the AP control account from a general-ledger source type, which the engine
+  refuses — control accounts accept postings only from their subledger (design §3.2, AGENTS.md §4). A late-found bill
+  is a real supplier debt, so it is posted as an AP bill (creating the AP open item) and tagged as a prior-period
+  adjustment; the P&L side still goes to equity.
+- **Scenario:** as GP-035 — 2027-09-10, after FY2027 is hard-locked and reported, an unrecorded June 2027 office bill
+  of $550.00 ($500.00 + GST 50.00) is found; material. Posted in the current open period, tagged
+  `corrects_period = FY2027`, `original_account = 6100` (office expenses), with reason and approver.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:PRIOR_PERIOD_ADJUSTMENTS | 3150 | 500.00 | | GST (tax 50.00) | Supplier |
+| 2 | tax:GST.paid | 2210 | 50.00 | | GST | — |
+| 3 | system:AP_CONTROL | 2100 | | 550.00 | — | Supplier |
+| | **Total** | | **550.00** | **550.00** | | |
+
+- **Check:** 500.00 + 50.00 = 550.00 ✓ · Subledger: AP open item 550.00 for the supplier.
+- **Tax/BAS:** input tax credit in the current BAS (G11 +550.00, 1B +50.00). Restated report mode shows 500.00 as FY2027 office expense; current-year profit unchanged.
+- `ledger.prior_period_adjustment` (journal class) remains the source type for corrections with no control-account line.
 
 ### Proposed reference-chart additions
 
@@ -841,7 +864,7 @@ above has been changed.
 | Q8 | Total invoice rule default, residual on the largest revenue line; per-line 2 dp opt-in | GP-023 |
 | Q9 | Yes — customer refunds use the supplier bank-detail verification and cooling-off | GP-006 |
 | Q10 | Liability (contract liability), with non-cancellable / non-refundable flags | GP-014, GP-015 |
-| Q11 | Void only when unallocated; otherwise credit note; material errors in reported periods via prior-period adjustment | GP-019, GP-035 |
+| Q11 | Void only when unallocated; otherwise credit note; material errors in reported periods via prior-period adjustment | GP-019, GP-036 |
 | Q12 | Expected-credit-loss allowance on by default; direct write-off only as a documented materiality election | GP-024, GP-025 |
 | Q13 | Advance invoices before performance only for non-cancellable contracts; ledger gross, report-layer netting | GP-014, GP-016, GP-021 |
 | Q14 | Depreciation, accruals and prepayments in the MVP | GP-030, GP-031, GP-032 |
@@ -856,3 +879,4 @@ above has been changed.
 | 2026-11-01 | claude (T-0115) | Follow-up note linking RQ-0096 decision confirmations; no entry changed. |
 | 2026-11-01 | claude (T-0115) | Owner approved the RQ-0096 change list; added Draft entries GP-020…GP-035 and chart additions implementing it. Superseded entries left unchanged for the owner to mark. |
 | 2026-11-01 | claude (T-0115) | Owner delegated approval (DL-0256): entries Approved, GP-004/007/012/013/018 superseded, Q1–Q15 resolved. |
+| 2026-11-01 | claude (T-0116) | GP-036 supersedes GP-035 (control-account rule); DL-0258. |

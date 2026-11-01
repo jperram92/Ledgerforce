@@ -24,25 +24,11 @@ const FILE = resolve(import.meta.dirname, '../../../../Docs/accounting/postings.
 const tables = approvedTables(parsePostings(readFileSync(FILE, 'utf8')));
 
 /**
- * Golden tables the engine cannot replay yet, with the reason. Owned by T-0116 (template roles
- * and accounts for the AASB/GST entries, new source types). Shrinks to empty; never grows silently.
+ * Golden tables the engine cannot replay yet, with the reason and owning task. Shrinks to empty;
+ * never grows silently. T-0116 emptied everything except the reversal (T-0032).
  */
 const PENDING: Record<string, string> = {
-  'GP-008': 'binding expense: Office expenses (no template account)',
-  'GP-017': 'source type revrec.release',
-  'GP-019': 'reversal API (ledger.reversal is not a raw command)',
-  'GP-021c': 'source type revrec.release',
-  'GP-024': 'binding system:AR_ECL_ALLOWANCE (role not in template)',
-  'GP-025': 'source type ar.ecl_adjustment',
-  'GP-026': 'source type ar.recovery',
-  'GP-028': 'source type payments.stripe.tax_invoice',
-  'GP-030': 'source type ledger.recurring.depreciation',
-  'GP-031a': 'source type ledger.accrual',
-  'GP-031b': 'source type ledger.accrual',
-  'GP-032b': 'source type ledger.prepayment_release',
-  'GP-033': 'source type payroll.super_payment',
-  'GP-034': 'source type payroll.sgc_assessment',
-  'GP-035': 'source type ledger.prior_period_adjustment',
+  'GP-019': 'reversal API (T-0032: reversals are posted from the original entry, not as raw lines)',
 };
 
 /**
@@ -74,6 +60,13 @@ const MEANS: Record<string, string> = {
   'product:SUBSCRIPTION.revenue': 'Subscriptions',
   'asset: Computer equipment': 'Office equipment',
   'expense: Insurance': 'Insurance',
+  'system:AR_ECL_ALLOWANCE': 'Allowance for expected credit losses',
+  'system:ACCRUED_EXPENSES': 'Accrued expenses',
+  'system:SGC_PAYABLE': 'Super guarantee charge payable',
+  'system:PRIOR_PERIOD_ADJUSTMENTS': 'Prior-period adjustments',
+  'setting:payroll.sgc_expense': 'Super guarantee charge expense',
+  'expense: Office expenses': 'Office expenses',
+  'expense: Electricity': 'Electricity',
 };
 const nameOfCode = new Map(auServicesSmb.accounts.map((a) => [a.code, a.name]));
 

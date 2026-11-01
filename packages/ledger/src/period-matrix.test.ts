@@ -73,6 +73,17 @@ const EXPECTED_CLASS: Record<string, string> = {
   'payroll.net_pay_batch': 'ap',
   manual_journal: 'journal',
   'ledger.reversal': 'reversal',
+  // AASB/GST golden postings GP-020…GP-036 (T-0116, DL-0258).
+  'ar.recovery': 'ar',
+  'ar.ecl_adjustment': 'journal',
+  'payments.stripe.tax_invoice': 'payout',
+  'ledger.accrual': 'journal',
+  'ledger.prepayment_release': 'journal',
+  'ledger.recurring.depreciation': 'journal',
+  'ledger.prior_period_adjustment': 'journal',
+  'revrec.release': 'journal',
+  'payroll.super_payment': 'ap',
+  'payroll.sgc_assessment': 'ap',
 };
 
 const SETTINGS: readonly PayoutUnderArLock[] = ['override', 'allow'];
