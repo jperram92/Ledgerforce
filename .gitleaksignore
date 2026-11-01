@@ -1,0 +1,22 @@
+# Gitleaks: reviewed false positives in PAST commits only (T-0095, DL-0244, owner OK 2026-10-31).
+# Each entry is <commit>:<path>:<rule>:<line>. They are test placeholders (a Salesforce
+# consumer-key stand-in, a deliberately wrong AppRole secret-id), a sample one-time password in
+# Docs/ops/install.md, an Apex TimeZoneSidKey literal, and quotes of those in a T-0095 note.
+# The working tree was fixed in 2391410; history cannot be rewritten (AGENTS.md §0.6).
+# Only commit-scoped entries are allowed (infra/test/security-workflow.contract.test.ts);
+# working-tree scans never read this file and inline gitleaks:allow is never honoured.
+1434ee7b4683aaeff721561205c3be15eb375933:packages/connectors/salesforce/src/connection-store.db.test.ts:generic-api-key:29
+1434ee7b4683aaeff721561205c3be15eb375933:packages/connectors/salesforce/src/jwt-bearer.contract.test.ts:generic-api-key:24
+1434ee7b4683aaeff721561205c3be15eb375933:packages/connectors/salesforce/src/jwt.test.ts:generic-api-key:14
+1434ee7b4683aaeff721561205c3be15eb375933:salesforce/force-app/main/default/classes/LFReadOnlyMirrorTest.cls:generic-api-key:26
+5d256127eafaf75b5ff2691e6edc61775a1e5b73:apps/worker/src/salesforce-writeback.outage.db.test.ts:generic-api-key:47
+6f73089f45f440a7287032b904851d55ecf033c0:Docs/ops/install.md:generic-api-key:74
+9f0d9bf7f05289083d648565ed53edabd4929f1b:packages/shared/src/crypto/transit-kms.test.ts:generic-api-key:499
+d49ad4fd4e85b47522da30d2c8135f5d98855c2f:.agent/evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md:generic-api-key:18
+d49ad4fd4e85b47522da30d2c8135f5d98855c2f:.agent/evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md:generic-api-key:23
+d49ad4fd4e85b47522da30d2c8135f5d98855c2f:.agent/evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md:generic-api-key:24
+d8bb7af2b918814ad484deeaf4a48a0cc330a524:packages/connectors/salesforce/src/connection-store.db.test.ts:generic-api-key:29
+d8bb7af2b918814ad484deeaf4a48a0cc330a524:packages/connectors/salesforce/src/jwt-bearer.contract.test.ts:generic-api-key:24
+d8bb7af2b918814ad484deeaf4a48a0cc330a524:packages/connectors/salesforce/src/jwt.test.ts:generic-api-key:14
+d8bb7af2b918814ad484deeaf4a48a0cc330a524:salesforce/force-app/main/default/classes/LFReadOnlyMirrorTest.cls:generic-api-key:26
+e0742f8702f95958f4c7b9326f5a44a6c04e65ef:apps/worker/src/sync-issues.db.test.ts:generic-api-key:64

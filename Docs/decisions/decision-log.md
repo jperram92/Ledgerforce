@@ -1889,3 +1889,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Environment: Docker Hub returned 429 and `pkg-containers.githubusercontent.com` / `grype.anchore.io` are denied by this cloud session's network policy. Images were pulled by digest from `mirror.gcr.io` (content-addressed, so the pinned digests are verified); Grype's DB download could not be done locally, so the vulnerability gate is proven only in GitHub Actions. Runner not changed to route around the policy.
 - Alternatives: adding `.gitleaksignore` now (rejected: ADR forbids self-granted exceptions); editing test placeholders (deferred: does not fix history, and is part of the owner's choice); proxy plumbing in scan.mjs (rejected: CI has direct egress; would be environment-specific code).
 - ADR: ADR-0043 (Accepted, DL-0241) · Status: accepted (implementation); exception: open, human gate
+
+### DL-0244 — Fix working-tree false positives; commit-scoped .gitleaksignore for history only
+- Date: 2026-11-01 · By: claude, owner instruction · Task: T-0095 · Category: security
+- Owner instruction (2026-10-31): "you fix it ... keep building until the build is fully done", then "Sounds great. So keep building" in reply to the proposal to add a history-only ignore file. Recorded as the owner's acceptance of the narrow exception ADR-0043 rule 5 requires.
+- Working tree: key-like placeholders renamed (2391410); tree scan clean with no suppression. scan.mjs passes `--ignore-gitleaks-allow` always and reads `.gitleaksignore` only in history mode.
+- History: `.gitleaksignore` lists exactly 15 `<commit>:<path>:generic-api-key:<line>` fingerprints (12 original + 3 quotes in this task's own note at d49ad4f). Contract test forbids bare path entries, other rules and duplicates. Real-scanner tests prove a new secret still fails and tree scans honour no suppression.
+- Alternatives: history rewrite (forbidden, AGENTS.md §0.6); scanning only PR commit ranges (rejected: flagged commits are not on main, and it would hide real old leaks).
+- ADR: ADR-0043 · Status: accepted
