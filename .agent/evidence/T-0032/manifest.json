@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0032",
+  "entries": [
+    {
+      "scenario": "SS-UC10-09",
+      "file": ".agent/evidence/T-0032/20261101-093644-tests-db.json",
+      "test": "4 test(s): packages/ledger/src/reversal.db.test.ts › SS-UC10-09: Void posts a reversal, never an edit › SS-UC10-09 voiding GP-001 posts GP-019, marks the original reversed and restores every balance | packages/ledger/src/reversal.db.test.ts › SS-UC10-09: Void posts a reversal, never an edit › SS-UC10-09 a repeat with the same key returns the first reversal and writes nothing | packages/ledger/src/reversal.db.test.ts › SS-UC10-09: Void posts a reversal, never an edit › SS-UC10-09 refuses to reverse an entry twice, or to reverse a reversal | packages/ledger/src/reversal.db.test.ts › SS-UC10-09: Void posts a reversal, never an edit › Q11: an invoice with an allocation is not voided (credit note instead); nothing is written",
+      "commit": "a7a92765cacc",
+      "provider": "claude",
+      "timestamp": "2026-11-01T09:36:44.393Z",
+      "result": "passed"
+    }
+  ]
+}
