@@ -1926,3 +1926,7 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 ### DL-0249 — Cross-review T-0113 PASS; task done
 - Date: 2026-11-01 · By: claude (reviewer; builder codex) · Task: T-0113 · Category: process
 - Re-ran the real-Docker regression on Linux (3/3) and against pre-fix smoke.sh (RED on password redaction; the stopped-setup race reproduces on Windows/CI, not with Compose v5.6.1). verify.sh on a tree containing the change: 13/0/3. All checklist items pass; report .agent/evidence/T-0113/review-claude-20261101-040347.md. Committed on the T-0095 branch because T-0113 has no branch of its own (its commits live on the PR #1 line).
+
+### DL-0250 — Cross-review T-0114 PASS; task done
+- Date: 2026-11-01 · By: claude (reviewer; builder codex) · Task: T-0114 · Category: process
+- Verified the codex-built recorder fix without claiming the task (verify.sh --task T-0114: 13/0/3; evidence tests 30/30 on Linux) and reviewed it: PASS. Report .agent/evidence/T-0114/review-claude-*.md. Verification by the reviewer does not make claude a builder: no code was changed.
