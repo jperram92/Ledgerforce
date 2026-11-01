@@ -4,10 +4,10 @@
   "branch": "feat/T-0040-sales-invoice",
   "step": null,
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-01T19:45:38.449Z",
+  "lease_expires_at": "2026-11-01T19:54:44.062Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T19:00:38.457Z",
+  "updated_at": "2026-11-01T19:09:44.064Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

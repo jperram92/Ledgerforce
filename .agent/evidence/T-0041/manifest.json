@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0041",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-104",
+      "file": ".agent/evidence/T-0041/20261101-190909-tests-db.json",
+      "test": "2 test(s): packages/modules/documents/src/invoice-pdf.db.test.ts › T-0041: invoice PDF › SS-PLAT-104 the GP-001 invoice PDF contains number, ABN, GST 125.00 and total 1,375.00 | packages/modules/documents/src/invoice-pdf.db.test.ts › T-0041: invoice PDF › SS-PLAT-104 the renderer blocks network requests and scripts",
+      "commit": "01cee717d247",
+      "provider": "claude",
+      "timestamp": "2026-11-01T19:09:09.789Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-104",
+      "file": ".agent/evidence/T-0041/20261101-190914-tests-unit.json",
+      "test": "2 test(s): packages/modules/documents/src/invoice-html.test.ts › Invoice HTML (T-0041) › SS-PLAT-104 shows a tax invoice with supplier ABN, number, dates, GST and total | packages/modules/documents/src/invoice-html.test.ts › Invoice HTML (T-0041) › SS-PLAT-104 escapes every value and contains no script",
+      "commit": "01cee717d247",
+      "provider": "claude",
+      "timestamp": "2026-11-01T19:09:14.878Z",
+      "result": "passed"
+    }
+  ]
+}

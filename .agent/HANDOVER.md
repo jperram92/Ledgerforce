@@ -234,3 +234,4 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01T12:33:10.793Z claude: release T-0039 → review (verify 14/0/2; awaiting codex cross-review)
 - 2026-11-01T12:43:26.424Z claude: T-0040 → verifying
 - 2026-11-01T12:51:26.821Z claude: release T-0040 → review (verify 14/0/2; awaiting codex cross-review)
+- 2026-11-01T19:09:44.064Z claude: T-0041 → verifying

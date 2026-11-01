@@ -30,7 +30,18 @@ export class PdfRenderer {
       const page = await context.newPage();
       page.setDefaultTimeout(timeout);
       await page.setContent(html, { waitUntil: 'load', timeout });
-      const pdf = await page.pdf({ format: 'A4', printBackground: true, timeout });
+      // page.pdf() takes no timeout of its own: bound it here (ADR-0045 rule 4).
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const pdf = await Promise.race([
+        page.pdf({ format: 'A4', printBackground: true }),
+        new Promise<never>((_, reject) => {
+          timer = setTimeout(() => {
+            reject(new Error(`PDF render exceeded ${String(timeout)} ms`));
+          }, timeout);
+        }),
+      ]).finally(() => {
+        clearTimeout(timer);
+      });
       return new Uint8Array(pdf);
     } finally {
       await context.close();

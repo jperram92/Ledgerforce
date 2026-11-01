@@ -2058,3 +2058,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - SS-UC01-11's card text names GP-018a/b; GP-018 is superseded by GP-023 (DL-0256), so the test asserts GP-023a/b.
 - Cross-tenant: the line guard ignores headers this transaction cannot see, leaving refusal to RLS and the foreign key (the generated cross-tenant inserts expect the RLS error).
 
+### DL-0269 — Billing formats as data; invoice PDF via playwright-core (ADR-0045); pdfjs-dist for tests
+- Date: 2026-11-01 · By: claude · Task: T-0041 · Category: implementation + dependency (ADR-0045 Proposed)
+- Billing formats are template records (migration 0036 `app.billing_format`, AU catalogue of the eight design §4.3 formats in @ledgerforce/documents, validated and seeded per company); invoices may reference their format.
+- PDF: one pure HTML template (`invoice-v1`) for preview, email and PDF; `PdfRenderer` prints it with headless Chromium through playwright-core 1.63.0 (the version already used for tests) — new runtime dependency recorded in ADR-0045 (architecture, Proposed: accepted on green CI + cross-review). JS disabled, all requests aborted, setContent only, timeout per render.
+- Dev tooling: pdfjs-dist 6.3.289 (released 2026-08-29; latest 6.4.299 is under the two-week age floor) extracts the PDF text in the contract test, so the assertion is on real text, not on HTML.
+- CI: the db job installs Chromium (`playwright install --with-deps chromium`), because the PDF contract test runs with the database. Shipping Chromium in the worker image and rendering on `ar.invoice.posted` is new card T-0119 (image vulnerability gate must stay green).
+- The card's AC-1 had no scenario id; registered as SS-PLAT-104.
+
