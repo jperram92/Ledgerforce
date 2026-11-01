@@ -123,11 +123,7 @@ describe('SS-PLAT-100: Tax codes per company, effective-dated, enforced by the e
       );
     await set(f.acct['2310'] ?? '');
     const foreign = await f.inTenant((trx) =>
-      trx
-        .selectFrom('app.account')
-        .select('id')
-        .where('company_id', '=', other)
-        .executeTakeFirst(),
+      trx.selectFrom('app.account').select('id').where('company_id', '=', other).executeTakeFirst(),
     );
     const theirs = foreign?.id ?? randomUUID();
     expect((await errorOf(set(theirs)))?.message).toMatch(/foreign key/);
