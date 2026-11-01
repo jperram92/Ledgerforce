@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0044",
+  "entries": [
+    {
+      "scenario": "SS-UC02-02",
+      "file": ".agent/evidence/T-0044/20261101-202244-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/batch.post.db.test.ts › SS-UC02-02 / SS-UC02-05: Approved batch posts all invoices in one job; a crashed run resumes › SS-UC02-05 a run killed after 20 invoices, then re-run, leaves 40 invoices and no duplicates | packages/modules/ar/src/batch.post.db.test.ts › SS-UC02-02 / SS-UC02-05: Approved batch posts all invoices in one job; a crashed run resumes › SS-UC02-02 every journal follows the posting rule and the batch summary lists 40 entries",
+      "commit": "b80d68f93a45",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:22:44.792Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-05",
+      "file": ".agent/evidence/T-0044/20261101-202244-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/batch.post.db.test.ts › SS-UC02-02 / SS-UC02-05: Approved batch posts all invoices in one job; a crashed run resumes › SS-UC02-05 a run killed after 20 invoices, then re-run, leaves 40 invoices and no duplicates | packages/modules/ar/src/batch.post.db.test.ts › SS-UC02-02 / SS-UC02-05: Approved batch posts all invoices in one job; a crashed run resumes › SS-UC02-02 every journal follows the posting rule and the batch summary lists 40 entries",
+      "commit": "b80d68f93a45",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:22:44.792Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-03",
+      "file": ".agent/evidence/T-0044/20261101-202244-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/batch.post.db.test.ts › SS-UC02-03 / SS-UC02-06: one failure does not roll back the others; numbers stay gapless › SS-UC02-03 with one party made inactive after the preview, 39 post and 1 is in the exception list with its reason | packages/modules/ar/src/batch.post.db.test.ts › SS-UC02-03 / SS-UC02-06: one failure does not roll back the others; numbers stay gapless › SS-UC02-06 the 39 posted invoices have consecutive numbers continuing the series; the failure consumed none | packages/modules/ar/src/batch.post.db.test.ts › SS-UC02-03 / SS-UC02-06: one failure does not roll back the others; numbers stay gapless › approval needs a previewed batch; a posted batch cannot be approved again",
+      "commit": "b80d68f93a45",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:22:44.792Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-06",
+      "file": ".agent/evidence/T-0044/20261101-202244-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/batch.post.db.test.ts › SS-UC02-03 / SS-UC02-06: one failure does not roll back the others; numbers stay gapless › SS-UC02-03 with one party made inactive after the preview, 39 post and 1 is in the exception list with its reason | packages/modules/ar/src/batch.post.db.test.ts › SS-UC02-03 / SS-UC02-06: one failure does not roll back the others; numbers stay gapless › SS-UC02-06 the 39 posted invoices have consecutive numbers continuing the series; the failure consumed none | packages/modules/ar/src/batch.post.db.test.ts › SS-UC02-03 / SS-UC02-06: one failure does not roll back the others; numbers stay gapless › approval needs a previewed batch; a posted batch cannot be approved again",
+      "commit": "b80d68f93a45",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:22:44.792Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-04",
+      "file": ".agent/evidence/T-0044/20261101-202252-tests-db.json",
+      "test": "1 test(s): packages/modules/email/src/batch-email.db.test.ts › SS-UC02-04: PDFs emailed to Billing To and CC › SS-UC02-04 a batch of 40 with one inactive party sends 39 emails, each To its Billing To, Cc its CC, PDF attached",
+      "commit": "b80d68f93a45",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:22:52.183Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-01",
+      "file": ".agent/evidence/T-0044/20261101-202301-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-07 an Auditor (no ar.batch.run) is refused 403 naming the permission | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › requires an idempotency key | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-01 the AR Clerk previews November: one row per account, decimal-string totals; a replay returns the same batch | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › refuses an invalid period with 422 and a body naming the problem | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-02 approval needs ar.batch.approve: the AR Clerk is refused, the Approver approves once",
+      "commit": "b80d68f93a45",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:23:01.714Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-07",
+      "file": ".agent/evidence/T-0044/20261101-202301-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-07 an Auditor (no ar.batch.run) is refused 403 naming the permission | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › requires an idempotency key | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-01 the AR Clerk previews November: one row per account, decimal-string totals; a replay returns the same batch | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › refuses an invalid period with 422 and a body naming the problem | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-02 approval needs ar.batch.approve: the AR Clerk is refused, the Approver approves once",
+      "commit": "b80d68f93a45",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:23:01.714Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-02",
+      "file": ".agent/evidence/T-0044/20261101-202301-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-02 approval needs ar.batch.approve: the AR Clerk is refused, the Approver approves once",
+      "commit": "b80d68f93a45",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:23:01.714Z",
+      "result": "passed"
+    }
+  ]
+}
