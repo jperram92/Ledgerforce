@@ -148,6 +148,18 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0051: bills inbox and attachments (CHECK-constrained hashes and types).
+  'app.bill_inbox_item': {
+    message_id: () => `<${randomBytes(6).toString('hex')}@test>`,
+    raw_sha256: () => randomBytes(32).toString('hex'),
+    status: () => 'new',
+  },
+  'app.document_attachment': {
+    owner_type: () => 'bill_inbox_item',
+    content_type: () => 'application/pdf',
+    size_bytes: () => '1',
+    sha256: () => randomBytes(32).toString('hex'),
+  },
   // T-0050: supplier bills (draft so lines may be inserted; totals CHECKs).
   'app.supplier_bill': {
     status: () => 'draft',

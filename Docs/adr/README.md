@@ -94,5 +94,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0044](0044-ci-dast-baseline.md) | Run a passive ZAP baseline scan of the compose stack in CI and fail on High alerts | security | yes | Accepted |
 | [0045](0045-pdf-rendering-playwright-core.md) | Render document PDFs from HTML templates with playwright-core driving headless Chromium | architecture | no | Proposed |
 | [0046](0046-email-smtp-nodemailer.md) | Send document email over SMTP with nodemailer from outbox handlers | integration | no | Proposed |
+| [0047](0047-mime-parsing-postal-mime.md) | Parse inbound bill email with postal-mime | integration | no | Proposed |
 
-Next free number: **0047** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).
+Next free number: **0048** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

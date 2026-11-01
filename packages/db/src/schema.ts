@@ -669,6 +669,35 @@ export interface ArSettingsTable {
   bad_debt_account_id: Generated<string | null>;
 }
 
+/** Migration 0045 (T-0051): inbound bill email — the draft bill awaiting coding. */
+export interface BillInboxItemTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  message_id: string;
+  raw_sha256: string;
+  from_address: string | null;
+  subject: string | null;
+  party_id: string | null;
+  status: Generated<'new' | 'no_attachment' | 'coded' | 'rejected'>;
+  bill_id: string | null;
+  received_at: Timestamp;
+}
+
+export interface DocumentAttachmentTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  owner_type: 'bill_inbox_item' | 'supplier_bill';
+  owner_id: string;
+  file_name: string;
+  content_type: 'application/pdf';
+  size_bytes: number;
+  sha256: string;
+  content: Buffer;
+  created_at: Timestamp;
+}
+
 /** Migration 0044 (T-0050): supplier bill; frozen once posted. */
 export interface SupplierBillTable {
   id: Generated<string>;
@@ -987,6 +1016,8 @@ export interface Database {
   'app.bad_debt_write_off': BadDebtWriteOffTable;
   'app.supplier_bill': SupplierBillTable;
   'app.supplier_bill_line': SupplierBillLineTable;
+  'app.bill_inbox_item': BillInboxItemTable;
+  'app.document_attachment': DocumentAttachmentTable;
   'app.customer_prepayment': CustomerPrepaymentTable;
   'app.prepayment_application': PrepaymentApplicationTable;
   'app.sales_invoice_deposit': SalesInvoiceDepositTable;
