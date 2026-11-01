@@ -669,6 +669,44 @@ export interface ArSettingsTable {
   bad_debt_account_id: Generated<string | null>;
 }
 
+/** Migration 0044 (T-0050): supplier bill; frozen once posted. */
+export interface SupplierBillTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  status: Generated<'draft' | 'posted' | 'void'>;
+  bill_no: string | null;
+  supplier_ref: string;
+  bill_date: ColumnType<Date, string, string>;
+  due_date: ColumnType<Date, string, string>;
+  currency: string;
+  net_total: string;
+  tax_total: string;
+  gross_total: string;
+  created_by: string | null;
+  approved_by: string | null;
+  approved_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+  entry_id: string | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
+export interface SupplierBillLineTable {
+  tenant_id: TenantId;
+  company_id: string;
+  bill_id: string;
+  line_no: number;
+  account_id: string;
+  description: string;
+  amount: string;
+  tax_code: string;
+  tax_code_id: string | null;
+  net: string | null;
+  tax: string | null;
+  gross: string | null;
+}
+
 /** Migration 0043 (T-0048): written write-off record (GP-024). */
 export interface BadDebtWriteOffTable {
   id: Generated<string>;
@@ -947,6 +985,8 @@ export interface Database {
   'app.credit_note': CreditNoteTable;
   'app.customer_receipt': CustomerReceiptTable;
   'app.bad_debt_write_off': BadDebtWriteOffTable;
+  'app.supplier_bill': SupplierBillTable;
+  'app.supplier_bill_line': SupplierBillLineTable;
   'app.customer_prepayment': CustomerPrepaymentTable;
   'app.prepayment_application': PrepaymentApplicationTable;
   'app.sales_invoice_deposit': SalesInvoiceDepositTable;
