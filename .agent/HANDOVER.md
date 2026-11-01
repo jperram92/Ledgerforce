@@ -1,14 +1,14 @@
-# Handover — T-0034 GST calculator in review; next T-0118 / T-0033; 2026-11-01
+# Handover — T-0118 tax codes in the DB in review; next T-0033; 2026-11-01
 ## Codex continuation prompt
-> Resume from the repository. Branch line: feat/T-0095-security-gates → feat/T-0096-dast-smoke → feat/T-0115-aasb-alignment → feat/T-0031-golden-runner (each branched from the previous; head of T-0031 after 11bbc4a). (1) Cross-review the claude-built cards in review, starting with T-0031 (golden runner: packages/ledger/src/golden/), T-0115 (AASB research and design §3.10/§3.10.1), T-0007 (golden postings drafting; owner approved by instruction, DL-0256) and T-0095. (2) T-0116 is done and in review (feat/T-0116-golden-bindings: migration 0031, template accounts, ten source types, GP-036 supersedes GP-035). T-0032 (reverse(), feat/T-0032-reversal) done and in review: the golden runner's PENDING list is empty. T-0034 (@ledgerforce/tax: computeTax + AU_TAX_CODES, feat/T-0034-tax-gst) done and in review. Next build cards: `node scripts/agent/conductor.ts next` (T-0118 tax codes in the DB, T-0033 invariant suite). T-0117 (system-role promotion) needs a data-model ADR.
+> Resume from the repository. Branch line: feat/T-0095-security-gates → feat/T-0096-dast-smoke → feat/T-0115-aasb-alignment → feat/T-0031-golden-runner → feat/T-0116-golden-bindings → feat/T-0032-reversal → feat/T-0034-tax-gst → feat/T-0118-tax-codes-db (each branched from the previous). (1) Cross-review the claude-built cards in review (`node scripts/agent/conductor.ts status`), starting with T-0031, T-0115, T-0007, T-0095, T-0116, T-0032, T-0034 and T-0118 (migration 0032 app.tax_code + company.tax_rounding + journal_line FK; engine INVALID_TAX_CODE; packages/modules/tax/src/tax-codes.ts; SS-PLAT-100). (2) Next build card: `node scripts/agent/conductor.ts next` (T-0033 invariant suite). T-0117 (system-role promotion) needs a data-model ADR.
 
 From: claude (run 2026-10-31-claude-r01, continued 2026-11-01).
-Done this session: T-0095 security gates (review); codex tasks T-0112/T-0113/T-0114 cross-reviewed PASS (done); T-0096 DAST researched, ADR-0044 Proposed (blocked); T-0115 AASB research rounds 1–2, design §3.10/§3.10.1, decision packs (review); golden postings: owner approved the change list and then all entries by instruction (DL-0255, DL-0256) — GP-020…035 Approved, GP-004/007/012/013/018 superseded; T-0007 → review; T-0031 golden runner built (SS-PLAT-12 green, verify 14/0/2) → review; T-0116 created.
+Done this session: T-0095 security gates (review); codex tasks T-0112/T-0113/T-0114 cross-reviewed PASS (done); T-0096 DAST researched, ADR-0044 Proposed (blocked); T-0115 AASB research, design §3.10/§3.10.1 (review); golden postings Approved by owner instruction (DL-0255, DL-0256); T-0007, T-0031, T-0116, T-0032, T-0034 → review; T-0118 tax codes in the database (verify 14/0/2) → review.
 In progress: nothing.
-Next action: T-0118 (tax codes in the database) or T-0033 (invariant suite), then the accounting backlog unblocked by T-0031 (posting-profile, AR invoice, tax codes …) via `node scripts/agent/conductor.ts next`.
-Decisions taken: DL-0243…DL-0257.
+Next action: `node scripts/agent/conductor.ts next` → T-0033 (invariant suite), then the accounting backlog.
+Decisions taken: DL-0243…DL-0261.
 Open questions for human: (1) Accept ADR-0044 (DAST) to unblock T-0096. (2) Run Codex to clear cross-reviews. (3) If the owner wants agents to approve future golden postings/accounting ADRs without asking, record that standing delegation in AGENTS.md §6 (an agent may not edit its own instruction file; the approval of the current entries is recorded in DL-0256).
-Do not: edit Approved golden postings (supersede instead); weaken the golden runner's PENDING pin (it must only shrink); change CI security gates without an accepted ADR.
+Do not: edit Approved golden postings (supersede instead); weaken the golden runner's PENDING pin (it must only shrink); change CI security gates without an accepted ADR; edit merged migrations (0032 is new on this branch).
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -221,3 +221,5 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01T10:10:35.368Z claude: release T-0034 → review (verify 14/0/2; SS-UC01-11 green (GP-023a/b); DB persistence split to T-0118; awaiting codex review)
 - 2026-11-01 claude: T-0034 → review (verify 14/0/2; SS-UC01-11 green; T-0118 split; DL-0260).
 - 2026-11-01T10:22:46.689Z claude: T-0118 → in_progress
+- 2026-11-01T10:37:53.507Z claude: T-0118 → verifying
+- 2026-11-01T10:43:09.286Z claude: release T-0118 → review (verify 14 PASS/0 FAIL/2 PENDING (coverage baseline, cross-review); awaiting codex cross-review)

@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0118",
+  "current_task": null,
   "branch": "feat/T-0118-tax-codes-db",
   "step": null,
-  "claimed_by": "claude",
-  "lease_expires_at": "2026-11-01T11:07:46.684Z",
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T10:22:46.689Z",
+  "updated_at": "2026-11-01T10:43:09.285Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
