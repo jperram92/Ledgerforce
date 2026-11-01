@@ -264,7 +264,21 @@ describe('SS-PLAT-65 a valid command posts as one numbered, chained entry [T-002
   });
 
   it('SS-PLAT-65 carries transaction currency, amount, rate, tax code and party as given [T-0025]', async () => {
-    const taxCode = randomUUID();
+    // A real company tax code (T-0118: the engine and a foreign key now check it).
+    const { id: taxCode } = await f.inTenant((trx) =>
+      trx
+        .insertInto('app.tax_code')
+        .values({
+          company_id: f.companyId,
+          code: `T${randomUUID().slice(0, 8).toUpperCase()}`,
+          name: 'Test GST-free',
+          kind: 'gst_free',
+          rate: '0',
+          effective_from: '2000-07-01',
+        })
+        .returning('id')
+        .executeTakeFirstOrThrow(),
+    );
     const r = await run(
       jcmd([
         {

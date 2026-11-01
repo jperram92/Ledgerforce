@@ -46,7 +46,9 @@ export type PostingErrorCode =
   /** reverse(): the entry is not posted, already reversed, or itself a reversal (T-0032). */
   | 'NOT_REVERSIBLE'
   /** reverse(): the document has allocations — issue a credit note instead (postings.md Q11). */
-  | 'ALLOCATED';
+  | 'ALLOCATED'
+  /** A line's tax code is not the company's, or not active and in force on the entry date (T-0118). */
+  | 'INVALID_TAX_CODE';
 
 /** A posting command refused by the engine. Nothing was written. `line` is 1-based. */
 export class PostingError extends DomainError {

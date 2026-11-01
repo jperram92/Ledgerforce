@@ -220,3 +220,4 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01T10:05:06.268Z claude: T-0034 → verifying
 - 2026-11-01T10:10:35.368Z claude: release T-0034 → review (verify 14/0/2; SS-UC01-11 green (GP-023a/b); DB persistence split to T-0118; awaiting codex review)
 - 2026-11-01 claude: T-0034 → review (verify 14/0/2; SS-UC01-11 green; T-0118 split; DL-0260).
+- 2026-11-01T10:22:46.689Z claude: T-0118 → in_progress

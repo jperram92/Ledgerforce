@@ -26,6 +26,32 @@ export interface CompanyTable {
   base_currency: string;
   status: Generated<'active' | 'archived'>;
   created_at: Timestamp;
+  /** Migration 0032 (T-0118, postings.md Q8): GST rounding rule. */
+  tax_rounding: Generated<'total_invoice' | 'per_line_2dp'>;
+}
+
+/** Migration 0032 (T-0118): tax code per company, effective-dated; a rate change is a new row. */
+export interface TaxCodeTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  code: string;
+  name: string;
+  kind:
+    'taxable' | 'gst_free' | 'input_taxed' | 'bas_excluded' | 'import' | 'capital' | 'adjustment';
+  /** NUMERIC(18,8) text, a fraction ("0.10000000"). */
+  rate: string;
+  /** Inclusive range; written as YYYY-MM-DD, read as Date (pg date). */
+  effective_from: ColumnType<Date, string, never>;
+  effective_to: ColumnType<Date | null, string | null | undefined, string | null>;
+  sales_labels: Generated<string[]>;
+  purchase_labels: Generated<string[]>;
+  /** NULL = the company's GST_COLLECTED / GST_PAID system role. */
+  collected_account_id: string | null;
+  paid_account_id: string | null;
+  verify: Generated<boolean>;
+  status: Generated<'active' | 'inactive'>;
+  created_at: Timestamp;
 }
 
 export interface AppUserTable {
@@ -542,6 +568,7 @@ export interface AuditLogTable {
 export interface Database {
   'app.tenant': TenantTable;
   'app.company': CompanyTable;
+  'app.tax_code': TaxCodeTable;
   'app.app_user': AppUserTable;
   'app.session': SessionTable;
   'app.auth_request': AuthRequestTable;

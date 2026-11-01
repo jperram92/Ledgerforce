@@ -148,6 +148,15 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0118: a fresh code per row, so generated rows never overlap another range of the same code.
+  'app.tax_code': {
+    code: () => `T${randomBytes(4).toString('hex').toUpperCase()}`,
+    kind: () => 'taxable',
+    rate: () => '0.1',
+    status: () => 'active',
+    effective_from: () => '2000-07-01',
+    effective_to: () => '2099-12-31',
+  },
   'app.sync_issue': {
     handler: () => 'test.handler',
     connector: () => 'test',

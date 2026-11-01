@@ -195,8 +195,23 @@ describe('SS-PLAT-89: Manual journal goes draft → submit → approve → post 
       });
     }
     // A tax code on an ordinary line counts as tax too (it feeds the BAS).
+    // A real company tax code (T-0118: the engine and a foreign key now check it).
+    const { id: taxCodeId } = await f.inTenant((trx) =>
+      trx
+        .insertInto('app.tax_code')
+        .values({
+          company_id: f.companyId,
+          code: `T${randomUUID().slice(0, 8).toUpperCase()}`,
+          name: 'Test GST-free',
+          kind: 'gst_free',
+          rate: '0',
+          effective_from: '2000-07-01',
+        })
+        .returning('id')
+        .executeTakeFirstOrThrow(),
+    );
     const taxed = await create([
-      { account: acct('6200'), debit: '10.0000', taxCodeId: randomUUID() },
+      { account: acct('6200'), debit: '10.0000', taxCodeId },
       { account: acct('1010'), credit: '10.0000' },
     ]);
     expect(await submit(taxed.id)).toMatchObject({ approvalRequired: true });

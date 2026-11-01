@@ -30,6 +30,7 @@ import { sql, type Transaction } from 'kysely';
 import { Money } from '@ledgerforce/shared/money';
 import { dimensionSetId, missingRequiredDimensions } from './dimension-set.ts';
 import { nextNumber } from './numbering.ts';
+import { sourceClassOf } from './period-matrix.ts';
 import { recordPeriodOverride, resolvePostingDate, toPeriodError } from './period.ts';
 import {
   PostingError,
@@ -265,6 +266,30 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     ).map((p) => [p.id, p.status]),
   );
 
+  // Tax codes (T-0118): the company's own code, active and in force on the document date. A
+  // reversal mirrors a posted line, so it needs only the company's code: its rate may since
+  // have been closed, and the reversal still carries the code the original was taxed at.
+  const taxCodeIds = uniq(checked.lines.flatMap((l) => (l.taxCodeId ? [lc(l.taxCodeId)] : [])));
+  const isReversal = sourceClassOf(c.sourceType) === 'reversal';
+  const taxCodes = new Map(
+    (taxCodeIds.length === 0
+      ? []
+      : (
+          await sql<{ id: string; code: string; in_force: boolean }>`
+            SELECT id::text, code,
+                   (status = 'active' AND effective_from <= ${c.entryDate}::date
+                    AND (effective_to IS NULL OR effective_to >= ${c.entryDate}::date)) AS in_force
+              FROM app.tax_code
+             WHERE company_id = ${companyId} AND id = ANY(${sql.val(taxCodeIds)}::uuid[])`.execute(
+            trx,
+          )
+        ).rows
+    ).map((t): [string, { code: string; inForce: boolean }] => [
+      t.id,
+      { code: t.code, inForce: t.in_force },
+    ]),
+  );
+
   const valueIds = uniq(checked.lines.flatMap((l) => l.dimensions.map(lc)));
   const values = new Map(
     (valueIds.length === 0
@@ -337,6 +362,16 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     const partyId = l.partyId === undefined ? null : lc(l.partyId);
     if (partyId !== null && parties.get(partyId) !== 'active') {
       fail('INVALID_PARTY', `party ${partyId} is not an active party of this company`, n);
+    }
+
+    if (l.taxCodeId !== undefined) {
+      const t = taxCodes.get(lc(l.taxCodeId));
+      if (!t) {
+        fail('INVALID_TAX_CODE', `tax code ${l.taxCodeId} is not a tax code of this company`, n);
+      }
+      if (!isReversal && !t.inForce) {
+        fail('INVALID_TAX_CODE', `tax code ${t.code} is not in force on ${c.entryDate}`, n);
+      }
     }
 
     const dims = l.dimensions.map(lc);

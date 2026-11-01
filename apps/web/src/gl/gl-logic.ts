@@ -60,6 +60,8 @@ const REFUSALS: Record<string, Words> = {
     'This entry cannot be voided: it is already voided, is itself a void, or is not posted.',
   ALLOCATED: () =>
     'This document has payments or credits applied to it, so it cannot be voided. Issue a credit note instead.',
+  INVALID_TAX_CODE: () =>
+    'A line uses a tax code that does not belong to this company or is not in force on the entry date. Choose a current tax code.',
 };
 
 export const POSTING_REFUSAL_CODES: readonly string[] = Object.freeze(Object.keys(REFUSALS));
