@@ -2092,3 +2092,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Approval posts GP-005 (Dr revenue / Dr GST collected / Cr AR, party on revenue and AR) and allocates the credit to the invoice's open item while any is left; a paid invoice leaves the credit open as customer credit (refund T-0055). Creditable = invoice gross − posted credit notes (CREDIT_EXCEEDS_INVOICE), checked at draft and again at approval.
 - API: `PUT /ar/credit-notes/:id` with a client-chosen id — the SoD step `credit_note.create` must name its subject before the handler runs, so the id is chosen by the caller (idempotent); `POST /ar/credit-notes/:id/approve` runs SOD_CREDIT_NOTE_SELF_APPROVAL with the stored gross. The T-0015 stand-in controller in sod.db.test.ts moved to `/test/ar/credit-notes` (unchanged otherwise) so it does not shadow the real routes.
 
+### DL-0274 — Receipts post at once; allocations are ledger allocations; payment status is derived
+- Date: 2026-11-01 · By: claude · Task: T-0046 · Category: implementation (AR, data model additive, public API)
+- `recordReceipt` posts GP-002 immediately (Dr bank, or Undeposited funds for unbanked cheques/cash — GP-002 variant / Cr AR control with the party) and records `app.customer_receipt` (migration 0041, immutable; RCT- numbers from `ar_receipt_document`; idempotency key replays). Allocations to the customer's invoices use the ledger's `allocate()`; the receipt's unallocated amount is its open item (customer credit) and can be allocated later.
+- Invoice payment status (unpaid / partially_paid / paid) is derived from the invoice's open item, never stored, so posted invoices stay frozen (T-0040 guard) and status can never drift from the subledger.
+- Refusals: OVER_ALLOCATED (more than the receipt's unallocated or the invoice's open amount), INVALID_RECEIPT (another customer's or an unposted invoice) — the whole receipt rolls back.
+- API under `/ar` (already proxied): POST /ar/receipts (ar.receipt.record, idempotency key), POST /ar/receipts/:id/allocations, GET /ar/invoices/:id/payment-status (ar.read). Deposits of undeposited funds to the bank are a bank-module flow (T-0060/T-0061).
+

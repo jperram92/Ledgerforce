@@ -52,8 +52,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC03-04 | Salesforce shows Paid with payment date | UC-03 | MVP | contract | no | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts | T-0067, T-0074 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | 5d25612 |
 | SS-UC03-05 | Duplicate webhook is idempotent | UC-03 | MVP | db-integration | no | — | T-0074 | not-started | — | — |
 | SS-UC03-06 | Invalid or replayed webhook rejected | UC-03 | MVP | unit | no | — | T-0074 | not-started | — | — |
-| SS-UC03-07 | Bank-transfer receipt posts GP-002 | UC-03 | MVP | golden | no | — | T-0046 | not-started | — | — |
-| SS-UC03-08 | Partial payment leaves the correct open amount | UC-03 | MVP | db-integration | no | — | T-0046 | not-started | — | — |
+| SS-UC03-07 | Bank-transfer receipt posts GP-002 | UC-03 | MVP | golden | no | packages/modules/ar/src/receipts.db.test.ts (GP-002 line for line); apps/api/src/ar/receipts.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 30b996c |
+| SS-UC03-08 | Partial payment leaves the correct open amount | UC-03 | MVP | db-integration | no | packages/modules/ar/src/receipts.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 30b996c |
 | SS-UC03-09 | Late payout in an AR-locked period follows the period matrix | UC-03 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0075, T-0023 | green (period/matrix layer; payout cell is tenant setting `payout_under_ar_lock` awaiting product owner, RQ-0026; payout posting in T-0075) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC03-10 | Receipt allocation screen | UC-03 | MVP | e2e-playwright | yes | — | T-0085 | not-started | — | — |
 | SS-UC04-01 | Reminder 1 at 7 days overdue | UC-04 | MVP | db-integration | no | — | T-0068 | not-started | — | — |
