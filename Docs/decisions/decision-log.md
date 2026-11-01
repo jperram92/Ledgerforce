@@ -2106,3 +2106,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - BAS query change: a base line on a liability account (customer prepayments, deferred revenue) is a supply like revenue, so prepayment GST lands at G1/1A on receipt and the application reverses it — the project's GST is reported once (asserted 300.00 then 700.00). GST collected/paid lines remain tax lines; W labels are unaffected.
 - Registered SS-PLAT-105 (the card had no scenario id).
 
+### DL-0276 — Write-off via the ECL allowance; GST adjustment on the GST line; accounts from AR settings
+- Date: 2026-11-01 · By: claude · Task: T-0048 · Category: implementation (AR; data model additive)
+- The card names GP-007; it is superseded by GP-024 (DL-0256), which this implements, including the "allowance short" variant: the net of the open amount is charged to the ECL allowance up to its credit balance and the rest to the bad-debt (impairment) expense. GP-007's direct shape is what results when the allowance is empty.
+- The GST in the open amount (open × invoice GST ÷ gross, cents) is debited to GST collected with GST-ADJ, so the BAS query (DL-0264) reports a decreasing adjustment at 1B on accruals and nothing on cash (asserted). A written reason is mandatory (`app.bad_debt_write_off`, migration 0043, immutable).
+- The allowance and expense accounts are AR settings (template suggestedSettings 1220/6500) until system-role promotion (T-0117). Period-end allowance movements (GP-025, source ar_ecl_adjustment) post as journals; recoveries (GP-026) are a later flow.
+

@@ -221,6 +221,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-103 | Posting profiles: the AU template's 3 party profiles (control account + default tax code) and 5 product profiles (revenue/expense/COGS accounts) are valid and seeded onto the company chart; Salesforce Product2.Family / Account.Type resolve to profiles; parties and products carry profiles of the right kind; misdirected profiles (customer on AP control, revenue on an expense account, another company's account) are refused | — | MVP | unit + db-integration | no | packages/modules/gl/src/profiles.template.test.ts; packages/modules/products/src/products.db.test.ts | T-0038 | green | [.agent/evidence/T-0038/manifest.json](../../.agent/evidence/T-0038/manifest.json) | 4236e8c |
 | SS-PLAT-104 | Invoice PDF: a posted GP-001 invoice renders (HTML template → headless Chromium) to a PDF whose text contains "Tax invoice", the INV number, the supplier ABN 51 824 753 556, GST $125.00 and Total $1,375.00; template values are escaped, scripts do not run and network requests are blocked | UC-01 | MVP | contract + unit | no | packages/modules/documents/src/invoice-pdf.db.test.ts; packages/modules/documents/src/invoice-html.test.ts | T-0041 | green | [.agent/evidence/T-0041/manifest.json](../../.agent/evidence/T-0041/manifest.json) | 01cee71 |
 | SS-PLAT-105 | Prepayments and deposits: a progressive-supply prepayment posts GP-020 (GST at receipt); its application to the final invoice posts GP-022a/b and leaves 7,700.00 open; a deposit invoice posts GP-014 and the final invoice net of it GP-015; the BAS reports the project's GST once (300.00 then 700.00); a security deposit is untaxed | UC-01 | MVP | golden + db-integration | no | packages/modules/ar/src/prepayments.db.test.ts | T-0047 | green | [.agent/evidence/T-0047/manifest.json](../../.agent/evidence/T-0047/manifest.json) | 5d65967 |
+| SS-PLAT-106 | Bad-debt write-off: writing off a 1,375.00 invoice covered by the ECL allowance posts exactly GP-024 and closes it; the BAS shows 1B +125.00 on accruals and nothing on cash; a short allowance sends the rest to bad-debt expense; a written reason is required | UC-04 | MVP | golden + db-integration | no | packages/modules/ar/src/write-off.db.test.ts | T-0048 | green | [.agent/evidence/T-0048/manifest.json](../../.agent/evidence/T-0048/manifest.json) | 2a58b8f |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -632,6 +633,10 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-105 — Prepayments and deposit invoices
 - Phase: MVP · Layer: **golden + db-integration** · Task(s): T-0047 (GP-014, GP-015, GP-020, GP-022, Q7, Q10, DL-0275)
 - **Given** a prepayment for a progressive supply and a 30 % deposit invoice · **When** the final invoices are posted with the prepayment applied / deposit netted · **Then** every journal equals its golden posting, the final invoices are 7,700.00 open, and the BAS shows each project's GST once
+
+### SS-PLAT-106 — Bad-debt write-off through the allowance
+- Phase: MVP · Layer: **golden + db-integration** · Task(s): T-0048 (GP-024, GP-025, Q3, DL-0276)
+- **Given** an unpaid 1,375.00 invoice and a funded ECL allowance · **When** it is written off with a reason · **Then** the journal equals GP-024, the invoice closes, BAS accruals show 1B +125.00 (cash: none), and a short allowance sends the remainder to the bad-debt expense
 
 ## T-0112 PR integration regression evidence (2026-10-28)
 
