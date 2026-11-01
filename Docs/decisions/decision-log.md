@@ -2040,3 +2040,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Salesforce hooks are data (`app.salesforce_profile_mapping`, exactly one target per kind). The cross-tenant harness's PREREQUISITES hooks may now fill a value (a mapping row gets a same-company product profile).
 - The party × product override matrix and the gap check are T-0039.
 
+### DL-0267 — Posting-profile matrix: overrides only, purpose-based accounts, exemption-wins tax precedence
+- Date: 2026-11-01 · By: claude · Task: T-0039 · Category: implementation (design §4.4)
+- `app.posting_profile_override` (migration 0034) holds party × product rows only where they differ; NULL means the product default. `resolvePosting` in @ledgerforce/products: sale → override revenue ?? product revenue; purchase → override expense ?? product expense ?? override COGS ?? product COGS (a resale item is bought into cost of sales); control account from the party profile; every chosen account must be active, postable, non-control and of the right type, else `PROFILE_GAP` (reasons profile, kind, account, control, tax_code).
+- Tax code precedence: override; else agreed default; else an exemption (GST-free, input-taxed, BAS-excluded) beats a taxable code — so an overseas customer's GST-free export beats a GST service, and a GST-free product beats a domestic customer's GST; two taxable codes → the product's (capital vs non-capital is a product fact); two different exemptions → gap until an override decides. The code must be active and in force on the document date (effective-dated tax_code). This mirrors how Business Central combines business and product posting groups, kept to the AU cases.
+- `profileGaps` checks every active combination that could occur (customer profiles for sales, supplier profiles for purchases); the AU template has none. It is the wizard's gap check now; running it nightly needs a scheduler, which waits on ADR-0029 (Proposed: scheduling/supervision runs as lf_migrator) — the job body is this function.
+- SS-UC01-06 is green at the profile layer; the draft invoice carrying the PROFILE_GAP warning on Closed Won is T-0069's (it calls resolvePosting).
+

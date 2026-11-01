@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0039",
+  "entries": [
+    {
+      "scenario": "SS-UC01-06",
+      "file": ".agent/evidence/T-0039/20261101-122459-tests-db.json",
+      "test": "3 test(s): packages/modules/products/src/matrix.db.test.ts › SS-UC01-06: Posting-profile gap flagged, not posted › SS-UC01-06 a fresh AU template has no gaps | packages/modules/products/src/matrix.db.test.ts › SS-UC01-06: Posting-profile gap flagged, not posted › SS-UC01-06 a combination with no usable revenue account resolves to PROFILE_GAP and is listed by the gap check | packages/modules/products/src/matrix.db.test.ts › SS-UC01-06: Posting-profile gap flagged, not posted › SS-UC01-06 a tax code not in force is a gap",
+      "commit": "e15981570855",
+      "provider": "claude",
+      "timestamp": "2026-11-01T12:24:59.317Z",
+      "result": "passed"
+    }
+  ]
+}

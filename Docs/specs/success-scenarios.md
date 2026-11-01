@@ -32,7 +32,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC01-03 | Auto-approve under threshold posts GP-001 and emails | UC-01 | MVP | golden | no | — | T-0069, T-0040, T-0042 | not-started | — | — |
 | SS-UC01-04 | Above threshold stays Draft | UC-01 | MVP | unit | no | — | T-0069 | not-started | — | — |
 | SS-UC01-05 | No Billing To contact blocks approval | UC-01 | MVP | db-integration | no | — | T-0040 | not-started | — | — |
-| SS-UC01-06 | Posting-profile gap flagged, not posted | UC-01 | MVP | unit | no | — | T-0039, T-0069 | not-started | — | — |
+| SS-UC01-06 | Posting-profile gap flagged, not posted | UC-01 | MVP | unit | no | packages/modules/products/src/matrix.db.test.ts (profile layer: resolvePosting → PROFILE_GAP, profileGaps lists the combination); draft flag on Closed Won in T-0069 | T-0039, T-0069 | green (profile layer; draft PROFILE_GAP warning in T-0069) | [.agent/evidence/T-0039/manifest.json](../../.agent/evidence/T-0039/manifest.json) | e159815 |
 | SS-UC01-07 | Duplicate CDC event is idempotent | UC-01 | MVP | db-integration | no | — | T-0065, T-0069 | not-started | — | — |
 | SS-UC01-08 | Closed Won dated in a hard-locked period follows lock policy | UC-01 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0069, T-0023 | green (period/policy layer; Closed Won draft invoice and Sync issue in T-0069) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC01-09 | Salesforce outage does not block accounting | UC-01 | MVP | db-integration | no | apps/worker/src/salesforce-writeback.outage.db.test.ts | T-0067 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | af03e20 |
