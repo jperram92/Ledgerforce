@@ -144,7 +144,7 @@ describe('T-0041: billing formats', () => {
 });
 
 describe('T-0041: invoice PDF', () => {
-  it('the GP-001 invoice PDF contains number, ABN, GST 125.00 and total 1,375.00', async () => {
+  it('SS-PLAT-104 the GP-001 invoice PDF contains number, ABN, GST 125.00 and total 1,375.00', async () => {
     const doc = await f.inTenant((trx) => loadInvoiceDocument(trx, f.companyId, invoiceId));
     expect(doc.invoiceNo).toBe(invoiceNo);
     const pdf = await renderer.render(renderInvoiceHtml(doc));
@@ -157,7 +157,7 @@ describe('T-0041: invoice PDF', () => {
     expect(text).toMatch(/Total\s*\$1,375\.00/);
   }, 60_000);
 
-  it('the renderer blocks network requests and scripts', async () => {
+  it('SS-PLAT-104 the renderer blocks network requests and scripts', async () => {
     const html =
       '<html><body><p id="x">static</p><img src="http://198.51.100.1/x.png">' +
       '<script>document.getElementById("x").textContent = "scripted"</script></body></html>';

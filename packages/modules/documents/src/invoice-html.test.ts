@@ -41,7 +41,7 @@ const doc: InvoiceDocument = {
 };
 
 describe('Invoice HTML (T-0041)', () => {
-  it('shows a tax invoice with supplier ABN, number, dates, GST and total', () => {
+  it('SS-PLAT-104 shows a tax invoice with supplier ABN, number, dates, GST and total', () => {
     const html = renderInvoiceHtml(doc);
     expect(html).toContain('Tax invoice');
     expect(html).toContain('ABN 51 824 753 556');
@@ -53,7 +53,7 @@ describe('Invoice HTML (T-0041)', () => {
     expect(html).toContain('$1,000.00');
   });
 
-  it('escapes every value and contains no script', () => {
+  it('SS-PLAT-104 escapes every value and contains no script', () => {
     const html = renderInvoiceHtml(doc);
     expect(html).toContain('Acme &lt;Pty&gt; Ltd');
     expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
