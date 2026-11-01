@@ -81,6 +81,10 @@ export interface DraftInvoiceInput {
   readonly reference?: string;
   /** Idempotency of the source (e.g. a Salesforce Opportunity), unique per company. */
   readonly sourceKey?: string;
+  /** 'deposit': a deposit tax invoice crediting CUSTOMER_PREPAYMENTS (GP-014, Q10). */
+  readonly kind?: 'standard' | 'deposit';
+  /** Posted deposit invoices of the same customer this final invoice nets off (GP-015). */
+  readonly depositInvoiceIds?: readonly string[];
   readonly createdBy?: string;
   readonly lines: readonly DraftLineInput[];
 }
@@ -258,8 +262,9 @@ async function loadInvoice(trx: Trx, companyId: string, invoiceId: string, lock:
     tax_total: string | null;
     gross_total: string | null;
     warnings: InvoiceWarning[];
+    kind: 'standard' | 'deposit';
   }>`
-    SELECT id::text, party_id::text, status, invoice_no, to_char(issue_date, 'YYYY-MM-DD') AS issue_date,
+    SELECT id::text, party_id::text, status, invoice_no, kind, to_char(issue_date, 'YYYY-MM-DD') AS issue_date,
            to_char(due_date, 'YYYY-MM-DD') AS due_date, pricing, entry_id::text, created_by::text,
            net_total::text, tax_total::text, gross_total::text, warnings
       FROM app.sales_invoice WHERE company_id = ${companyId} AND id = ${invoiceId}::uuid
@@ -404,6 +409,7 @@ export async function createDraftInvoice(
       currency: company.base_currency,
       reference: input.reference ?? null,
       source_key: input.sourceKey ?? null,
+      kind: input.kind ?? 'standard',
       created_by: input.createdBy ?? null,
       warnings: JSON.stringify(warnings),
     })
@@ -426,6 +432,43 @@ export async function createDraftInvoice(
       })),
     )
     .execute();
+
+  for (const depositId of input.depositInvoiceIds ?? []) {
+    const dep = await trx
+      .selectFrom('app.sales_invoice')
+      .select(['party_id', 'status', 'kind', 'net_total', 'tax_total'])
+      .where('company_id', '=', companyId)
+      .where('id', '=', depositId)
+      .executeTakeFirst();
+    if (
+      !dep ||
+      dep.status !== 'posted' ||
+      dep.kind !== 'deposit' ||
+      dep.party_id !== input.partyId
+    ) {
+      throw new InvoiceError(
+        'INVALID_INVOICE',
+        `deposit ${depositId} is not a posted deposit invoice of this customer`,
+      );
+    }
+    const depLine = await trx
+      .selectFrom('app.sales_invoice_line')
+      .select('tax_code_id')
+      .where('invoice_id', '=', depositId)
+      .orderBy('line_no')
+      .executeTakeFirst();
+    await trx
+      .insertInto('app.sales_invoice_deposit')
+      .values({
+        company_id: companyId,
+        invoice_id: header.id,
+        deposit_invoice_id: depositId,
+        net: dep.net_total ?? '0',
+        tax: dep.tax_total ?? '0',
+        tax_code_id: depLine?.tax_code_id ?? null,
+      })
+      .execute();
+  }
 
   const draft = view(
     { id: header.id, status: 'draft', invoice_no: null, entry_id: null },
@@ -478,14 +521,44 @@ export async function approveInvoice(
       'the customer has no active Billing To contact with an email address',
     );
   }
-  const { priced, warnings } = await priceInvoiceLines(trx, companyId, inv, lines);
-  if (!priced) {
+  const resolved = await priceInvoiceLines(trx, companyId, inv, lines);
+  if (!resolved.priced) {
     throw new InvoiceError(
       'PROFILE_GAP',
-      warnings.map((w) => `line ${String(w.line)}: ${w.message}`).join('; '),
+      resolved.warnings.map((w) => `line ${String(w.line)}: ${w.message}`).join('; '),
     );
   }
-  await creditHold(trx, companyId, inv.party_id, priced.gross);
+  let priced: Priced = resolved.priced;
+  // Deposit invoices credit customer prepayments instead of revenue (GP-014, Q10).
+  if (inv.kind === 'deposit') {
+    const prepayments = await trx
+      .selectFrom('app.account_system_role')
+      .select('account_id')
+      .where('company_id', '=', companyId)
+      .where('role', '=', 'CUSTOMER_PREPAYMENTS')
+      .executeTakeFirstOrThrow();
+    priced = {
+      ...priced,
+      lines: priced.lines.map((l) => ({ ...l, accountId: prepayments.account_id })),
+    };
+  }
+  // Deposits this final invoice nets off (GP-015): Dr customer prepayments, less GST.
+  const deposits = await trx
+    .selectFrom('app.sales_invoice_deposit')
+    .select(['net', 'tax', 'tax_code_id'])
+    .where('invoice_id', '=', inv.id)
+    .execute();
+  const depNet = deposits.reduce((s, d) => s.plus(d.net), new Decimal(0));
+  const depTax = deposits.reduce((s, d) => s.plus(d.tax), new Decimal(0));
+  const totals = {
+    net: numeric(new Decimal(priced.net).minus(depNet)),
+    tax: numeric(new Decimal(priced.tax).minus(depTax)),
+    gross: numeric(new Decimal(priced.gross).minus(depNet).minus(depTax)),
+  };
+  if (!new Decimal(totals.gross).gt(0) || new Decimal(totals.tax).isNegative()) {
+    throw new InvoiceError('INVALID_INVOICE', 'deposits applied exceed the invoice');
+  }
+  await creditHold(trx, companyId, inv.party_id, totals.gross);
 
   const invoiceNo = await nextNumber(trx, companyId, INVOICE_NUMBER_SERIES);
   const revenue = new Map<
@@ -507,10 +580,16 @@ export async function approveInvoice(
   const journal: PostingLineInput[] = [
     {
       account: { id: priced.controlAccountId },
-      debit: priced.gross,
+      debit: totals.gross,
       partyId: inv.party_id,
       dueDate: inv.due_date,
     },
+    ...deposits.map((d) => ({
+      account: { role: 'CUSTOMER_PREPAYMENTS' },
+      debit: numeric(d.net),
+      ...(d.tax_code_id ? { taxCodeId: d.tax_code_id, taxAmount: numeric(d.tax) } : {}),
+      partyId: inv.party_id,
+    })),
     ...[...revenue.values()]
       .filter((r) => !r.net.isZero())
       .map((r) => ({
@@ -520,9 +599,9 @@ export async function approveInvoice(
         taxAmount: numeric(r.tax),
         partyId: inv.party_id,
       })),
-    ...(new Decimal(priced.tax).isZero()
+    ...(new Decimal(totals.tax).isZero()
       ? []
-      : [{ account: { role: 'GST_COLLECTED' }, credit: priced.tax }]),
+      : [{ account: { role: 'GST_COLLECTED' }, credit: totals.tax }]),
   ];
   const posted = await post(
     trx,
@@ -561,9 +640,9 @@ export async function approveInvoice(
       status: 'posted',
       invoice_no: invoiceNo,
       entry_id: posted.entryId,
-      net_total: priced.net,
-      tax_total: priced.tax,
-      gross_total: priced.gross,
+      net_total: totals.net,
+      tax_total: totals.tax,
+      gross_total: totals.gross,
       warnings: '[]',
       approved_by: c.approvedBy ?? null,
       approved_at: sql<Date>`clock_timestamp()`,
@@ -581,13 +660,13 @@ export async function approveInvoice(
       invoiceNo,
       entryId: posted.entryId,
       partyId: inv.party_id,
-      gross: priced.gross,
+      gross: totals.gross,
       recipients,
     },
   });
   return view(
     { id: inv.id, status: 'posted', invoice_no: invoiceNo, entry_id: posted.entryId },
-    { net: priced.net, tax: priced.tax, gross: priced.gross },
+    totals,
     [],
   );
 }

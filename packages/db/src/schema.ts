@@ -444,6 +444,50 @@ export interface SalesInvoiceTable {
   updated_at: Timestamp;
   /** Migration 0036 (T-0041). */
   billing_format_id: Generated<string | null>;
+  /** Migration 0042 (T-0047): deposit invoices credit CUSTOMER_PREPAYMENTS. */
+  kind: Generated<'standard' | 'deposit'>;
+}
+
+/** Migration 0042 (T-0047): prepayment received before an invoice (GP-020). */
+export interface CustomerPrepaymentTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  receipt_date: ColumnType<Date, string, never>;
+  supply_type: 'progressive_periodic' | 'unknown_total' | 'gst_free' | 'security_deposit';
+  gross: string;
+  net: string;
+  tax: string;
+  tax_code_id: string | null;
+  account_id: string;
+  idempotency_key: string;
+  entry_id: string;
+  created_by: string | null;
+  created_at: Timestamp;
+}
+
+export interface PrepaymentApplicationTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  prepayment_id: string;
+  invoice_id: string;
+  application_date: ColumnType<Date, string, never>;
+  net: string;
+  tax: string;
+  entry_id: string;
+  created_at: Timestamp;
+}
+
+export interface SalesInvoiceDepositTable {
+  tenant_id: TenantId;
+  company_id: string;
+  invoice_id: string;
+  deposit_invoice_id: string;
+  net: string;
+  tax: string;
+  tax_code_id: string | null;
 }
 
 /** Migration 0038 (T-0043): billable line, pending until a batch invoices it. */
@@ -881,6 +925,9 @@ export interface Database {
   'app.ar_settings': ArSettingsTable;
   'app.credit_note': CreditNoteTable;
   'app.customer_receipt': CustomerReceiptTable;
+  'app.customer_prepayment': CustomerPrepaymentTable;
+  'app.prepayment_application': PrepaymentApplicationTable;
+  'app.sales_invoice_deposit': SalesInvoiceDepositTable;
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;

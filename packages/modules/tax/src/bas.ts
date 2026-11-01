@@ -161,7 +161,9 @@ export async function basLabels(
     }
     if (r.is_tax_account) continue;
 
-    const sale = r.account_type === 'revenue';
+    // Revenue and contract liabilities (customer prepayments, deferred revenue, GP-020/022) are
+    // supplies made; every other account is an acquisition (DL-0275).
+    const sale = r.account_type === 'revenue' || r.account_type === 'liability';
     const net = sale ? credit.minus(debit) : debit.minus(credit);
     const tax = signed(r.tax_amount, net);
     for (const label of sale ? r.sales_labels : r.purchase_labels) {

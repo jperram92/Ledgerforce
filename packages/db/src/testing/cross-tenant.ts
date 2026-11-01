@@ -148,6 +148,15 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0047: prepayments and deposits (supply type CHECK; gross = net + tax; amounts > 0).
+  'app.customer_prepayment': {
+    supply_type: () => 'progressive_periodic',
+    gross: () => '1',
+    net: () => '1',
+    tax: () => '0',
+  },
+  'app.prepayment_application': { net: () => '1', tax: () => '0' },
+  'app.sales_invoice_deposit': { net: () => '1', tax: () => '0' },
   // T-0046: customer receipts (method CHECK, amount > 0).
   'app.customer_receipt': { method: () => 'eft', amount: () => '1' },
   // T-0045: credit notes (reason CHECK; gross > 0; draft so lines may be inserted).
