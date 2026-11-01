@@ -1,14 +1,14 @@
-# Handover — T-0095 working tree fixed; history ignore file awaits permission, 2026-10-31
+# Handover — T-0095 in review (awaiting Codex cross-review), 2026-11-01
 ## Codex continuation prompt
-> Resume T-0095 on feat/T-0095-security-gates at 2391410 (`git log -4 --format=full`). Owner said "you fix it ... keep building until the build is fully done". Done: security.yml (now also on push), placeholders that looked like keys renamed, scan.mjs ignores inline gitleaks:allow and reads .gitleaksignore only for history. Remaining: (1) create `.gitleaksignore` with the 15 commit-scoped fingerprints from `node scripts/security/scan.mjs history . <out>` (all generic-api-key placeholders; Claude's attempt was refused by its auto-mode safety classifier as "security weaken" — needs the owner's explicit OK); (2) read GitHub Actions `security` run 41251688021 (expect only `secrets` red); (3) write SS-PLAT-18 evidence + manifest from that run; (4) verify.sh; (5) cross-review.
+> Cross-review T-0095 on feat/T-0095-security-gates (head after 8f74387; `git log 29e3def..HEAD --format=full`). Run the `cross-review` skill against `.claude/agents/reviewer.md` and write `.agent/evidence/T-0095/review-codex-<date>.md`. Focus: `.github/workflows/security.yml` (read-only permissions, SHA-pinned actions, no softening), `scripts/security/scan.mjs` (fail-closed, container user/scratch /tmp, redaction), `.gitleaksignore` (19 commit-scoped entries only — verify each with `git show <commit>:<path>` is a placeholder), `infra/docker/Dockerfile` runtime changes (Alpine node without npm/corepack/yarn; web without curl, apk upgrade), and evidence `.agent/evidence/T-0095/20261101-034942-SS-PLAT-18-ci-security-run.md` vs GitHub run 41270568508. Re-run: `pnpm exec vitest run infra/test/security-workflow.contract.test.ts` and, with Docker, `node --test tests/security/scanners.contract.test.mjs`. Note: compose install-smoke (SS-PLAT-23) runs only on pull requests and has not run against the Alpine runtime images — run it or open a PR before merge.
 
-From: claude (run 2026-10-31-claude-r01, continued). Reason: waiting for owner permission for the ignore file.
-Done: see prompt. Real scanners locally 7/8 (vulnerability test needs grype.anchore.io, blocked here). Workflow contract 3/4: the .gitleaksignore test is RED until the file exists.
-In progress: first GitHub run of security.yml on 2391410.
-Next action: on owner OK, create .gitleaksignore (header comment + 15 fingerprints), rerun contract (expect 4/4) and history scan (expect PASS), push.
-Decisions taken: DL-0243; DL-0244 to be written with the ignore file.
-Open questions for human: may the agent add a .gitleaksignore listing only the 15 historical, commit-scoped false-positive fingerprints?
-Do not: add bare path entries or gitleaks:allow, weaken tests, edit ci.yml/verify.sh, rewrite history, claim green.
+From: claude (run 2026-10-31-claude-r01, continued 2026-11-01). Reason: task built and verified; review must be by the other provider.
+Done: security.yml with SAST, secrets (history + tree), dependencies, image SBOM + Grype for api/worker/setup/web, scanner contract job. GitHub run 41270568508 on 071317b: 8/8 green; scanner contracts 9/9. verify.sh on 8f74387: 13 PASS / 0 FAIL / 3 PENDING. Decisions DL-0243..0248.
+In progress: nothing; status review.
+Next action: Codex cross-review (above). Then merge with green CI. Next build work is gated: 53 cards await Codex cross-review and T-0007 golden postings await the product owner (blocks T-0031 and 14 dependants).
+Decisions taken: DL-0243 (workflow), DL-0244 (history-only ignore, owner instruction), DL-0245 (container user), DL-0246 (scratch /tmp), DL-0247 (full-history parity), DL-0248 (runtime images).
+Open questions for human: (1) Approve the golden postings in T-0007 to unblock the accounting backlog. (2) Run Codex (`node scripts/agent/conductor.ts run` on a machine with the codex CLI) to clear the 53 pending cross-reviews.
+Do not: add bare-path or inline gitleaks suppressions, lower the Grype threshold or use ignore-unfixed, edit ci.yml/verify.sh, rewrite history, merge without cross-review.
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -193,3 +193,5 @@ Do not: add bare path entries or gitleaks:allow, weaken tests, edit ci.yml/verif
 - 2026-10-31T23:11:26.758Z claude: release T-0095 → todo
 - 2026-10-31 claude: placeholders fixed (2391410), security.yml runs on push; .gitleaksignore pending owner OK.
 - 2026-11-01T03:53:44.822Z claude: T-0095 → verifying
+- 2026-11-01T04:02:01.598Z claude: release T-0095 → review (verify 13 PASS/0 FAIL/3 PENDING on 8f74387; security workflow run 41270568508 8/8 green; awaiting codex cross-review (security-relevant: ADR-0043, .gitleaksignore DL-0244/0247, runtime images DL-0248))
+- 2026-11-01 claude: T-0095 → review (security run 41270568508 8/8 green; verify 13/0/3).
