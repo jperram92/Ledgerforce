@@ -40,6 +40,7 @@
     "@types/pg": "8.23.1",
     "oidc-provider": "9.12.2",
     "unplugin-swc": "2.0.0",
-    "vitest": "4.1.12"
+    "vitest": "4.1.12",
+    "@ledgerforce/ledger": "workspace:*"
   }
 }

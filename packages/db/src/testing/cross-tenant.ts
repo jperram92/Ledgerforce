@@ -148,6 +148,20 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0045: credit notes (reason CHECK; gross > 0; draft so lines may be inserted).
+  'app.credit_note': {
+    status: () => 'draft',
+    reason_code: () => 'goodwill',
+    net_total: () => '1',
+    tax_total: () => '0',
+    gross_total: () => '1',
+  },
+  'app.credit_note_line': {
+    invoice_line_no: () => '1',
+    net: () => '1',
+    tax: () => '0',
+    gross: () => '1',
+  },
   // T-0043: billable lines and batches (CHECK-constrained codes).
   'app.billing_line': { quantity: () => '1', tax_code: () => 'GST', status: () => 'pending' },
   'app.billing_batch': { billing_format: () => 'BATCH', status: () => 'preview' },

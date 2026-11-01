@@ -85,7 +85,7 @@ class TestPaymentBatchController {
   }
 }
 
-@Controller('ar/credit-notes')
+@Controller('test/ar/credit-notes')
 class TestCreditNoteController {
   @Post()
   @HttpCode(201)
@@ -331,8 +331,11 @@ describe('SS-UC06-02: Creator cannot release own batch', () => {
 
 describe('SS-UC11-06: Clerk cannot approve own credit note above threshold', () => {
   it('a credit note above the threshold created by the AR Clerk: the same Clerk approving it is denied', async () => {
-    await call('POST', '/ar/credit-notes', 'arClerk', { id: 'CN-000017', amount: '1650.0000' });
-    const res = await call('POST', '/ar/credit-notes/CN-000017/approve', 'arClerk');
+    await call('POST', '/test/ar/credit-notes', 'arClerk', {
+      id: 'CN-000017',
+      amount: '1650.0000',
+    });
+    const res = await call('POST', '/test/ar/credit-notes/CN-000017/approve', 'arClerk');
     expect(res.status).toBe(403);
     expect(await res.json()).toMatchObject({
       error: 'sod_violation',
@@ -342,9 +345,13 @@ describe('SS-UC11-06: Clerk cannot approve own credit note above threshold', () 
   });
 
   it('at or below the threshold the Clerk may approve their own; above it another approver may', async () => {
-    await call('POST', '/ar/credit-notes', 'arClerk', { id: 'CN-000018', amount: '220.0000' });
-    expect((await call('POST', '/ar/credit-notes/CN-000018/approve', 'arClerk')).status).toBe(200);
-    expect((await call('POST', '/ar/credit-notes/CN-000017/approve', 'approver')).status).toBe(200);
+    await call('POST', '/test/ar/credit-notes', 'arClerk', { id: 'CN-000018', amount: '220.0000' });
+    expect((await call('POST', '/test/ar/credit-notes/CN-000018/approve', 'arClerk')).status).toBe(
+      200,
+    );
+    expect((await call('POST', '/test/ar/credit-notes/CN-000017/approve', 'approver')).status).toBe(
+      200,
+    );
   });
 });
 

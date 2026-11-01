@@ -543,7 +543,14 @@ export async function approveInvoice(
   for (const l of priced.lines) {
     await trx
       .updateTable('app.sales_invoice_line')
-      .set({ net: l.net, tax: l.tax, gross: l.gross, tax_code: l.taxCode })
+      .set({
+        net: l.net,
+        tax: l.tax,
+        gross: l.gross,
+        tax_code: l.taxCode,
+        account_id: l.accountId,
+        tax_code_id: l.taxCodeId,
+      })
       .where('invoice_id', '=', inv.id)
       .where('line_no', '=', l.lineNo)
       .execute();

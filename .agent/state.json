@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0043-batch-preview",
+  "current_task": "T-0045",
+  "branch": "feat/T-0044-batch-post",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "claude",
+  "lease_expires_at": "2026-11-01T21:16:39.624Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T20:30:36.920Z",
+  "updated_at": "2026-11-01T20:31:39.633Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -75,7 +75,8 @@
     "T-0041": 1,
     "T-0042": 1,
     "T-0043": 1,
-    "T-0044": 1
+    "T-0044": 1,
+    "T-0045": 1
   },
   "failures": {},
   "providers": {},

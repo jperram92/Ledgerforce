@@ -1,3 +1,4 @@
+import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArBatchesController } from './ar/batches.controller.ts';
 import 'reflect-metadata';
 import { type DynamicModule, Module, type INestApplication, type Type } from '@nestjs/common';
@@ -98,6 +99,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   AuditLogController,
   SyncIssuesController,
   ArBatchesController,
+  ArCreditNotesController,
   AuthController,
   LoginController,
 ];
@@ -133,6 +135,7 @@ class AppModule {
         AuditLogController,
         SyncIssuesController,
         ArBatchesController,
+        ArCreditNotesController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,

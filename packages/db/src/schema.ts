@@ -554,6 +554,46 @@ export interface SalesInvoiceLineTable {
   net: string | null;
   tax: string | null;
   gross: string | null;
+  /** Migration 0040 (T-0045): what the line posted to, set at approval. */
+  account_id: Generated<string | null>;
+  tax_code_id: Generated<string | null>;
+}
+
+/** Migration 0040 (T-0045): customer credit note against an invoice; frozen once posted. */
+export interface CreditNoteTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  invoice_id: string;
+  status: Generated<'draft' | 'posted' | 'void'>;
+  credit_note_no: string | null;
+  issue_date: ColumnType<Date, string, string>;
+  reason_code: 'price_concession' | 'return' | 'scope_reduction' | 'billing_error' | 'goodwill';
+  memo: string | null;
+  net_total: string;
+  tax_total: string;
+  gross_total: string;
+  created_by: string | null;
+  approved_by: string | null;
+  approved_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+  entry_id: string | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
+export interface CreditNoteLineTable {
+  tenant_id: TenantId;
+  company_id: string;
+  credit_note_id: string;
+  line_no: number;
+  invoice_line_no: number;
+  description: string;
+  account_id: string;
+  tax_code_id: string | null;
+  net: string;
+  tax: string;
+  gross: string;
 }
 
 export interface ArSettingsTable {
@@ -821,6 +861,8 @@ export interface Database {
   'app.sales_invoice': SalesInvoiceTable;
   'app.sales_invoice_line': SalesInvoiceLineTable;
   'app.ar_settings': ArSettingsTable;
+  'app.credit_note': CreditNoteTable;
+  'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;
   'app.billing_line': BillingLineTable;
