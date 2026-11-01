@@ -7,8 +7,9 @@ Done: T-0095 built, CI-proven (security run 41270568508 8/8), verified 13/0/3 �
 In progress: nothing.
 Next action: owner decisions below; codex cross-reviews.
 Decisions taken: DL-0243..0252.
+Golden postings Approved by the owner's instruction (DL-0256); T-0007 done; next build task T-0031 (golden runner).
 Also: T-0115 (AASB alignment) done on feat/T-0115-aasb-alignment — report, RQ-0095, design §3.10; in review.
-Open questions for human: (0) Owner approved the AASB/GST change list (DL-0255); sign off worked entries GP-020…GP-035 in Docs/accounting/postings.md (change each Status to Approved) and mark GP-004, GP-007, GP-012, GP-013, GP-018 superseded; also decide the unchanged GP-001…GP-019 entries. (1) Accept ADR-0044 (passive ZAP DAST job in security.yml, read-only, fails on High) to unblock T-0096. (2) Approve the golden postings in T-0007 to unblock the accounting backlog (T-0031 and dependants). (3) Run Codex (`node scripts/agent/conductor.ts run` where the codex CLI is installed) to clear the 53 claude-built cards awaiting cross-review.
+Open questions for human: (1) Accept ADR-0044 (passive ZAP DAST job in security.yml, read-only, fails on High) to unblock T-0096. (2) Approve the golden postings in T-0007 to unblock the accounting backlog (T-0031 and dependants). (3) Run Codex (`node scripts/agent/conductor.ts run` where the codex CLI is installed) to clear the 53 claude-built cards awaiting cross-review.
 Do not: change CI security gates without an accepted ADR; add suppressions; rewrite history; merge without cross-review.
 
 ## Log
@@ -205,3 +206,4 @@ Do not: change CI security gates without an accepted ADR; add suppressions; rewr
 - 2026-11-01T04:27:37.263Z claude: T-0115 → researching
 - 2026-11-01T04:35:49.708Z claude: T-0115 → verifying
 - 2026-11-01T04:35:50.114Z claude: release T-0115 → review (docs-only: AASB research (RQ-0095, report), design §3.10/§12, postings research note; awaiting codex review and owner decisions)
+- 2026-11-01T05:14:37.014Z human: release T-0007 → review (owner approved golden postings by instruction (DL-0256); codex cross-review of drafting pending)

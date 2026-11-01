@@ -205,7 +205,7 @@ Nothing in this section changes a golden posting: golden postings remain human-o
 
 #### 3.10.1 Decisions confirmed against legislation and other systems (Nov 1, 2026)
 
-A second research round checked each decision against the GST Act and ATO rulings, the AASB standards, the Corporations Act, the Payday Super law and how Xero, MYOB, QuickBooks AU and Employment Hero work: [AASB decisions confirmed by law](../research/reports/AASB%20decisions%20confirmed%20by%20law.md) (RQ-0096; same sourcing caveat as above). The **recommended decision** for each item is below; each becomes binding only when the owner approves the matching golden postings or accounting ADR.
+A second research round checked each decision against the GST Act and ATO rulings, the AASB standards, the Corporations Act, the Payday Super law and how Xero, MYOB, QuickBooks AU and Employment Hero work: [AASB decisions confirmed by law](../research/reports/AASB%20decisions%20confirmed%20by%20law.md) (RQ-0096; same sourcing caveat as above). The decision for each item is below. **Decided 2026-11-01:** the owner approved them by instruction (DL-0256); golden postings GP-020…GP-035 are Approved and GP-004/007/012/013/018 superseded.
 
 | Decision | Recommended (research-confirmed) | Changed from §3.10? | Confidence |
 | --- | --- | --- | --- |
@@ -908,5 +908,6 @@ As of the date at the top; pages opened or retrieved during research.
 | Date | By | Change |
 | --- | --- | --- |
 | 2026-10-24 | James Perram | Initial design. |
+| 2026-11-01 | claude (T-0115, owner approval DL-0256) | §3.10.1 decisions binding; golden postings approved. |
 | 2026-11-01 | claude (T-0115, owner request) | §3.10.1 added: each AASB/GST decision confirmed against legislation and Xero/MYOB/QuickBooks/Employment Hero practice (RQ-0096); still recommendations until the owner approves golden postings/ADRs. |
 | 2026-11-01 | claude (T-0115, owner request) | AASB alignment: new §3.10; notes in §1 scope, §3.2 roles/attributes, §3.4 rounding, §3.5 period-end and AASB 108, §3.6 GST, §3.7 AASB 121, §3.8 review of standard postings; §8.1 modules; §11.1 risk; §11.2 decisions; §11.4 sources. Accounting treatments are proposals pending the owner's decisions; no golden posting changed. |

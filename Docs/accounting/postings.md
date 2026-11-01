@@ -1,10 +1,11 @@
 # Golden postings — LedgerForce
 
-> **Status: DRAFT — awaiting product-owner approval (human gate: `golden_postings`).
-> Agents may not change after Approved.**
+> **Status: APPROVED 2026-11-01** — the product owner delegated approval to the building agent (DL-0256):
+> entries are approved on the basis of the AASB/GST research (RQ-0095, RQ-0096); errors surface in the golden tests.
+> Superseded entries are kept with a forward link. Approved entries are changed only by superseding.
 >
 > Drafted by: claude (scribe) · Date: 2026-10-24 · Task: T-0007 · Research: [RQ-0090](../research/RQ-0090-golden-posting-tax-treatments.md)
-> Approval: _pending_ — the product owner changes each entry's `Status: Draft` to `Status: Approved (initials, date)`.
+> Approval: 2026-11-01 — the product owner approved all entries by instruction, delegating the review to the building agent (DL-0256); each entry records its basis (RQ-0095, RQ-0096).
 > After approval this file is human-owned (AGENTS.md §5): agents propose changes in a PR comment or a new
 > `Draft` entry that supersedes the old one; they never edit an Approved entry.
 
@@ -63,47 +64,47 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 | Id | Event (design ref) | Phase | Use cases | Status |
 |---|---|---|---|---|
-| GP-001 | Sales invoice (§3.8) | MVP | UC-01, UC-02 | Draft |
-| GP-002 | Customer receipt — bank transfer (§3.8) | MVP | UC-03 | Draft |
-| GP-003 | Card receipt via Stripe — payment into clearing (§3.8) | MVP | UC-03 | Draft |
-| GP-004 | Stripe payout — net settlement (§3.8) | MVP | UC-03, UC-08 | Draft |
-| GP-005 | Customer credit note — partial, on a paid invoice (§3.8) | MVP | UC-11 | Draft |
-| GP-006 | Customer refund — bank / payment batch (§3.8, UC-11) | MVP | UC-11 | Draft |
-| GP-007 | Bad debt write-off incl. GST decreasing adjustment (§3.8) | MVP | — | Draft |
-| GP-008 | Supplier bill (§3.8) | MVP | UC-05 | Draft |
-| GP-009 | Supplier payment (§3.8) | MVP | UC-06 | Draft |
-| GP-010 | Payroll journal from payroll provider (§3.8) | Phase 1 | UC-07 | Draft |
-| GP-011 | Net pay batch (§3.8) | Phase 1 | UC-07 | Draft |
-| GP-012 | Customer prepayment received (§3.8) | MVP | — | Draft |
-| GP-013 | Prepayment applied to the final invoice (§3.8, §4.3) | MVP | — | Draft |
-| GP-014 | Deposit invoice — §4.5 rule `deposit-on-closed-won` | MVP (format) / Phase 1 (rule) | UC-09 | Draft |
-| GP-015 | Final invoice net of deposit (§4.3) | MVP | UC-09 | Draft |
-| GP-016 | Annual subscription invoiced to deferred revenue (§3.8) | Phase 2 | — | Draft |
-| GP-017 | Deferred revenue release (§3.8) | Phase 2 | — | Draft |
-| GP-018 | Rounding — per-line vs per-document GST (§3.4) | MVP | UC-01 | Draft |
-| GP-019 | Reversal (void) of a posted sales invoice (§3.3, principle 2) | MVP | UC-10 | Draft |
-| GP-020 | Prepayment, progressive/periodic or total unknown — GST at receipt (proposes to supersede GP-012) | MVP | — | Draft (change approved) |
-| GP-021 | Single supply: full tax invoice at first part-payment | MVP | — | Draft (change approved) |
-| GP-022 | Prepayment applied after GP-020 (proposes to supersede GP-013) | MVP | — | Draft (change approved) |
-| GP-023 | Rounding: total invoice rule default, per-line opt-in (proposes to supersede GP-018) | MVP | UC-01 | Draft (change approved) |
-| GP-024 | Bad-debt write-off via ECL allowance (proposes to supersede GP-007) | MVP | — | Draft (change approved) |
-| GP-025 | Period-end ECL allowance adjustment | MVP / Phase 1 | — | Draft (change approved) |
-| GP-026 | Bad-debt recovery | MVP | — | Draft (change approved) |
-| GP-027 | Stripe payout, fee GST pending tax invoice (proposes to supersede GP-004) | MVP | UC-03 | Draft (change approved) |
-| GP-028 | Monthly Stripe tax-invoice reconciliation | MVP | UC-03 | Draft (change approved) |
-| GP-029 | Credit note in a later BAS period, both presentations, reason code (varies GP-005, GP-019) | MVP | UC-11 | Draft (change approved) |
-| GP-030 | Monthly depreciation | MVP | — | Draft (change approved) |
-| GP-031 | Accrued expense with auto-reversal | MVP | UC-10 | Draft (change approved) |
-| GP-032 | Prepaid expense with monthly release | MVP | — | Draft (change approved) |
-| GP-033 | Super payment under Payday Super | Phase 1 | UC-07 | Draft (change approved) |
-| GP-034 | Super guarantee charge assessment | Phase 1 | UC-07 | Draft (change approved) |
-| GP-035 | Prior-period adjustment (AASB 108) | Phase 1 | — | Draft (change approved) |
+| GP-001 | Sales invoice (§3.8) | MVP | UC-01, UC-02 | Approved |
+| GP-002 | Customer receipt — bank transfer (§3.8) | MVP | UC-03 | Approved |
+| GP-003 | Card receipt via Stripe — payment into clearing (§3.8) | MVP | UC-03 | Approved |
+| GP-004 | Stripe payout — net settlement (§3.8) | MVP | UC-03, UC-08 | Superseded by GP-027 |
+| GP-005 | Customer credit note — partial, on a paid invoice (§3.8) | MVP | UC-11 | Approved |
+| GP-006 | Customer refund — bank / payment batch (§3.8, UC-11) | MVP | UC-11 | Approved |
+| GP-007 | Bad debt write-off incl. GST decreasing adjustment (§3.8) | MVP | — | Superseded by GP-024 |
+| GP-008 | Supplier bill (§3.8) | MVP | UC-05 | Approved |
+| GP-009 | Supplier payment (§3.8) | MVP | UC-06 | Approved |
+| GP-010 | Payroll journal from payroll provider (§3.8) | Phase 1 | UC-07 | Approved |
+| GP-011 | Net pay batch (§3.8) | Phase 1 | UC-07 | Approved |
+| GP-012 | Customer prepayment received (§3.8) | MVP | — | Superseded by GP-020 |
+| GP-013 | Prepayment applied to the final invoice (§3.8, §4.3) | MVP | — | Superseded by GP-022 |
+| GP-014 | Deposit invoice — §4.5 rule `deposit-on-closed-won` | MVP (format) / Phase 1 (rule) | UC-09 | Approved |
+| GP-015 | Final invoice net of deposit (§4.3) | MVP | UC-09 | Approved |
+| GP-016 | Annual subscription invoiced to deferred revenue (§3.8) | Phase 2 | — | Approved |
+| GP-017 | Deferred revenue release (§3.8) | Phase 2 | — | Approved |
+| GP-018 | Rounding — per-line vs per-document GST (§3.4) | MVP | UC-01 | Superseded by GP-023 |
+| GP-019 | Reversal (void) of a posted sales invoice (§3.3, principle 2) | MVP | UC-10 | Approved |
+| GP-020 | Prepayment, progressive/periodic or total unknown — GST at receipt (proposes to supersede GP-012) | MVP | — | Approved |
+| GP-021 | Single supply: full tax invoice at first part-payment | MVP | — | Approved |
+| GP-022 | Prepayment applied after GP-020 (proposes to supersede GP-013) | MVP | — | Approved |
+| GP-023 | Rounding: total invoice rule default, per-line opt-in (proposes to supersede GP-018) | MVP | UC-01 | Approved |
+| GP-024 | Bad-debt write-off via ECL allowance (proposes to supersede GP-007) | MVP | — | Approved |
+| GP-025 | Period-end ECL allowance adjustment | MVP / Phase 1 | — | Approved |
+| GP-026 | Bad-debt recovery | MVP | — | Approved |
+| GP-027 | Stripe payout, fee GST pending tax invoice (proposes to supersede GP-004) | MVP | UC-03 | Approved |
+| GP-028 | Monthly Stripe tax-invoice reconciliation | MVP | UC-03 | Approved |
+| GP-029 | Credit note in a later BAS period, both presentations, reason code (varies GP-005, GP-019) | MVP | UC-11 | Approved |
+| GP-030 | Monthly depreciation | MVP | — | Approved |
+| GP-031 | Accrued expense with auto-reversal | MVP | UC-10 | Approved |
+| GP-032 | Prepaid expense with monthly release | MVP | — | Approved |
+| GP-033 | Super payment under Payday Super | Phase 1 | UC-07 | Approved |
+| GP-034 | Super guarantee charge assessment | Phase 1 | UC-07 | Approved |
+| GP-035 | Prior-period adjustment (AASB 108) | Phase 1 | — | Approved |
 
 ---
 
 ## GP-001 — Sales invoice, two lines, GST exclusive
 
-- **Status: Draft** · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-01, UC-02 · Design: §3.8 row 1, §3.4
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-01, UC-02 · Design: §3.8 row 1, §3.4
 - **Scenario:** INV-000123 to Acme Pty Ltd dated 2026-11-05, terms 14 days.
   Line 1 Professional services, $1,000.00 ex GST, tax code GST → GST 100.00.
   Line 2 Subscription, $250.00 ex GST, tax code GST → GST 25.00. Invoice total $1,375.00.
@@ -123,7 +124,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-002 — Customer receipt by bank transfer (full)
 
-- **Status: Draft** · Phase: MVP · Source type: `ar.receipt` · Use cases: UC-03, UC-08 · Design: §3.8 row 2
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: MVP · Source type: `ar.receipt` · Use cases: UC-03, UC-08 · Design: §3.8 row 2
 - **Scenario:** 2026-11-15 Acme pays INV-000123 in full, $1,375.00, by EFT into the operating account; receipt allocated to INV-000123.
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -140,7 +141,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-003 — Card payment via Stripe: payment received into Stripe clearing
 
-- **Status: Draft** · Phase: MVP · Source type: `payments.stripe.charge` · Use cases: UC-03 · Design: §3.8 row 3, §5.7
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: MVP · Source type: `payments.stripe.charge` · Use cases: UC-03 · Design: §3.8 row 3, §5.7
 - **Scenario:** 2026-11-15 Acme pays INV-000123 ($1,375.00) through the invoice's Stripe payment link (webhook `payment_intent.succeeded` / `charge.succeeded`).
   The customer receipt is recognised at charge time, gross, into Stripe clearing; fees are recognised at payout (GP-004). See Q1 on timing.
 
@@ -157,7 +158,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-004 — Stripe payout: net settlement (bank net, fee, GST on fee)
 
-- **Status: Draft** · Phase: MVP · Source type: `payments.stripe.payout` · Use cases: UC-03, UC-08 · Design: §3.8 row 3
+- **Status: Superseded by GP-027** (DL-0256, 2026-11-01) · Phase: MVP · Source type: `payments.stripe.payout` · Use cases: UC-03, UC-08 · Design: §3.8 row 3
 - **Scenario:** 2026-11-17 Stripe pays out the GP-003 charge. Stripe fee for the charge $23.68 in total
   (1.7% + $0.30 = 23.675 → 23.68), of which GST $2.15 and fee $21.53 — the split is taken from Stripe's fee
   breakdown, not recomputed (see Q2). Net payout $1,351.32 lands in the operating account.
@@ -176,7 +177,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-005 — Customer credit note, partial, on a paid invoice
 
-- **Status: Draft** · Phase: MVP · Source type: `ar.credit_note` · Use cases: UC-11 · Design: §3.8 row 4
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: MVP · Source type: `ar.credit_note` · Use cases: UC-11 · Design: §3.8 row 4
 - **Scenario:** 2026-11-20 CN-000007 against paid INV-000123: credit $200.00 ex GST of the Professional services
   line (scope reduced). GST 20.00; credit note total $220.00. Because INV-000123 is fully paid, the credit is
   held as customer credit (to be refunded in GP-006).
@@ -195,7 +196,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-006 — Customer refund paid from the bank (payment batch)
 
-- **Status: Draft** · Phase: MVP · Source type: `ar.refund` · Use cases: UC-11 · Design: §3.8 (refund follows "Supplier payment" mechanics), UC-11
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: MVP · Source type: `ar.refund` · Use cases: UC-11 · Design: §3.8 (refund follows "Supplier payment" mechanics), UC-11
 - **Scenario:** 2026-11-24 the $220.00 credit on CN-000007 is refunded to Acme's verified bank account in the next payment batch (posts on bank confirmation).
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -212,7 +213,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-007 — Bad debt write-off including GST decreasing adjustment
 
-- **Status: Draft** · Phase: MVP · Source type: `ar.write_off` · Use cases: — (AR) · Design: §3.8 row 5
+- **Status: Superseded by GP-024** (DL-0256, 2026-11-01) · Phase: MVP · Source type: `ar.write_off` · Use cases: — (AR) · Design: §3.8 row 5
 - **Scenario:** a different invoice, INV-000140 to Acme for $1,375.00 (1,250.00 + GST 125.00, same lines as GP-001 but
   unpaid), is written off in full on 2027-12-01 after being overdue more than 12 months. Company GST basis: accruals.
 
@@ -230,7 +231,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-008 — Supplier bill (expense + capital asset)
 
-- **Status: Draft** · Phase: MVP · Source type: `ap.bill` · Use cases: UC-05 · Design: §3.8 row 6
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: MVP · Source type: `ap.bill` · Use cases: UC-05 · Design: §3.8 row 6
 - **Scenario:** BILL-000045 from Officeworks-like Supplies dated 2026-11-03, due 2026-11-30.
   Line 1 stationery and consumables $500.00 ex GST (tax code GST, non-capital) → GST 50.00.
   Line 2 laptop $2,000.00 ex GST (tax code GST-CAP, capital acquisition) → GST 200.00. Total $2,750.00.
@@ -249,7 +250,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-009 — Supplier payment (payment batch, posted on bank confirmation)
 
-- **Status: Draft** · Phase: MVP · Source type: `ap.payment` · Use cases: UC-06 · Design: §3.8 row 7
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: MVP · Source type: `ap.payment` · Use cases: UC-06 · Design: §3.8 row 7
 - **Scenario:** payment batch PB-000012 released 2026-11-27, ABA file uploaded, bank confirms 2026-11-28; BILL-000045 paid $2,750.00.
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -265,7 +266,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-010 — Payroll journal from payroll provider (Phase 1)
 
-- **Status: Draft** · Phase: Phase 1 · Source type: `payroll.pay_run` · Use cases: UC-07 · Design: §3.8 row 8
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: Phase 1 · Source type: `payroll.pay_run` · Use cases: UC-07 · Design: §3.8 row 8
 - **Scenario:** fortnightly pay run ending 2027-07-14, finalised in the payroll provider and imported: gross wages $10,000.00;
   PAYG withheld $2,000.00; superannuation guarantee 12% = $1,200.00; net pay $8,000.00.
 
@@ -284,7 +285,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-011 — Net pay batch (Phase 1)
 
-- **Status: Draft** · Phase: Phase 1 · Source type: `payroll.net_pay_batch` · Use cases: UC-07 · Design: §3.8 row 9
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: Phase 1 · Source type: `payroll.net_pay_batch` · Use cases: UC-07 · Design: §3.8 row 9
 - **Scenario:** the GP-010 net pay ($8,000.00) is paid by ABA batch, released by a second user, confirmed 2027-07-15.
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -298,7 +299,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-012 — Customer prepayment received (no tax invoice yet)
 
-- **Status: Draft** · Phase: MVP · Source type: `ar.prepayment` · Use cases: — · Design: §3.8 row 10
+- **Status: Superseded by GP-020** (DL-0256, 2026-11-01) · Phase: MVP · Source type: `ar.prepayment` · Use cases: — · Design: §3.8 row 10
 - **Scenario:** 2026-11-10 Acme pays a $3,300.00 prepayment (30% of an $11,000.00 GST-inclusive project) by EFT before any invoice is issued.
   **Option A (as design §3.8 — drafted as the golden):** whole receipt to the liability.
 
@@ -314,7 +315,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-013 — Prepayment applied to the final invoice
 
-- **Status: Draft** · Phase: MVP · Source type: `ar.invoice` + `ar.prepayment_application` · Use cases: — · Design: §3.8 row 10, §4.3 "Deposit / prepayment … applied to the final invoice"
+- **Status: Superseded by GP-022** (DL-0256, 2026-11-01) · Phase: MVP · Source type: `ar.invoice` + `ar.prepayment_application` · Use cases: — · Design: §3.8 row 10, §4.3 "Deposit / prepayment … applied to the final invoice"
 - **Scenario:** 2026-12-15 final invoice INV-000150 for the project: Professional services $10,000.00 ex GST, GST 1,000.00, total $11,000.00. The GP-012 prepayment (Option A) of $3,300.00 is applied. Two journals.
 
 **Journal 13a — final invoice**
@@ -341,7 +342,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-014 — Deposit invoice from rule `deposit-on-closed-won` (design §4.5)
 
-- **Status: Draft** · Phase: MVP (deposit billing format §4.3); Phase 1 when produced by Rules Studio (UC-09) · Source type: `rule:deposit-on-closed-won@3` · Use cases: UC-09 · Design: §4.5
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: MVP (deposit billing format §4.3); Phase 1 when produced by Rules Studio (UC-09) · Source type: `rule:deposit-on-closed-won@3` · Use cases: UC-09 · Design: §4.5
 - **Scenario:** Opportunity "Acme website rebuild" Closed Won 2026-11-02, Amount $10,000.00 (ex GST), Deposit_Percent__c 30.
   `base = 10,000.00 × 30 / 100 = 3,000.00`; `tax(base, GST) = 300.00`; `gross = 3,300.00`. Approval not required (≤ 10,000).
   Entry tagged `rule_id=deposit-on-closed-won, rule_version=3`, dimension `sales_team` from Opportunity.Owner.Team__c.
@@ -360,7 +361,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-015 — Final invoice net of deposit
 
-- **Status: Draft** · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-09 · Design: §4.3
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-09 · Design: §4.3
 - **Scenario:** 2026-12-15 final invoice INV-000151 for the GP-014 project (deposit DEP-000004 already paid): Professional services $10,000.00 ex GST, less deposit applied $3,000.00 ex GST. GST on the net = 700.00. Amount due $7,700.00.
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -377,7 +378,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-016 — Annual subscription invoiced in advance to deferred revenue (Phase 2)
 
-- **Status: Draft** · Phase: Phase 2 · Source type: `ar.invoice` (product profile SUBSCRIPTION with deferral schedule) · Design: §3.8 row 11, §8.1 Revenue Recognition
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: Phase 2 · Source type: `ar.invoice` (product profile SUBSCRIPTION with deferral schedule) · Design: §3.8 row 11, §8.1 Revenue Recognition
 - **Scenario:** 2027-01-01 INV-000200 annual subscription 12 months $12,000.00 ex GST, GST 1,200.00, total 13,200.00, recognised monthly.
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -392,7 +393,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-017 — Deferred revenue release (Phase 2)
 
-- **Status: Draft** · Phase: Phase 2 · Source type: `revrec.release` · Design: §3.8 row 11
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: Phase 2 · Source type: `revrec.release` · Design: §3.8 row 11
 - **Scenario:** 2027-01-31 month-end release of 1/12 of GP-016 ($1,000.00). Remaining deferred 11,000.00.
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -406,7 +407,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-018 — Rounding: per-line (default) vs per-document GST on a tax-inclusive invoice
 
-- **Status: Draft** · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-01 · Design: §3.4 ("difference to the document total posts to ROUNDING")
+- **Status: Superseded by GP-023** (DL-0256, 2026-11-01) · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-01 · Design: §3.4 ("difference to the document total posts to ROUNDING")
 - **Scenario:** INV-000160, three Subscription add-on lines each **$3.35 GST-inclusive** (document total $10.05).
   Line net = 3.35 / 1.1 = 3.04545… → 3.05 (half-up).
 
@@ -435,7 +436,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-019 — Reversal (void) of a posted sales invoice
 
-- **Status: Draft** · Phase: MVP · Source type: `ledger.reversal` (reversal_of_id = GP-001 entry) · Use cases: UC-10 · Design: §3.3, principle 2
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** · Phase: MVP · Source type: `ledger.reversal` (reversal_of_id = GP-001 entry) · Use cases: UC-10 · Design: §3.3, principle 2
 - **Scenario:** INV-000123 (GP-001) was posted in error and is voided on 2026-11-06 before any receipt. The reversal is a new entry with every line of GP-001 swapped debit↔credit, same accounts, tax codes, parties and dimension sets; the original stays posted with status `reversed`.
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -455,14 +456,15 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## Proposed entries from the AASB/GST review (T-0115, RQ-0095/RQ-0096)
 
-The owner approved the change list on 2026-11-01. The entries below implement it. Each is a new `Draft` entry;
-entries it supersedes stay above unchanged until the owner marks them superseded. Amounts are worked examples
+The owner approved the change list on 2026-11-01 and delegated approval of the worked entries to the
+building agent (DL-0256). The entries below implement it and are Approved; superseded entries above carry a
+forward link. Amounts are worked examples
 for the accountant to check; sources are in [AASB decisions confirmed by law](../research/reports/AASB%20decisions%20confirmed%20by%20law.md).
 Items marked **(unverified)** could not be checked against primary text.
 
 ## GP-020 — Customer prepayment, progressive/periodic supply or total unknown (GST at receipt)
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.prepayment` · **Proposes to supersede GP-012** · Q7
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `ar.prepayment` · **Proposes to supersede GP-012** · Q7
 - **Scenario:** as GP-012 — 2026-11-10 Acme pays $3,300.00 before any invoice, for staged work invoiced by milestone
   (progressive supply, GST Act Div 156) or where the total is not yet known. GST is attributable on receipt (s 29-5).
 
@@ -480,7 +482,7 @@ Items marked **(unverified)** could not be checked against primary text.
 
 ## GP-021 — First part-payment on a single (non-progressive) supply: full tax invoice at receipt
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.invoice` (advance) + `ar.receipt` · Q7
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `ar.invoice` (advance) + `ar.receipt` · Q7
 - **Scenario:** 2026-11-10 Acme pays $3,300.00 towards a single $11,000.00 (GST-inclusive) project with a known
   price. The first payment attributes GST on the whole supply, so LedgerForce issues the full tax invoice INV-000170
   at receipt. Work is not yet performed, so the invoice credits a contract liability, not revenue (AASB 15; the
@@ -517,7 +519,7 @@ Items marked **(unverified)** could not be checked against primary text.
 
 ## GP-022 — Prepayment applied to the final invoice (after GP-020)
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.invoice` + `ar.prepayment_application` · **Proposes to supersede GP-013** · Q7
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `ar.invoice` + `ar.prepayment_application` · **Proposes to supersede GP-013** · Q7
 - **Scenario:** 2026-12-15 final invoice INV-000150, $10,000.00 ex GST, GST 1,000.00, total $11,000.00; the GP-020
   prepayment (3,000.00 + GST 300.00 already reported) is applied.
 
@@ -545,7 +547,7 @@ Items marked **(unverified)** could not be checked against primary text.
 
 ## GP-023 — GST rounding: total invoice rule (AU default) and per-line 2 dp (opt-in)
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.invoice` · **Proposes to supersede GP-018** · Q8 · Design §3.4 (accounting ADR)
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `ar.invoice` · **Proposes to supersede GP-018** · Q8 · Design §3.4 (accounting ADR)
 - **Scenario:** as GP-018 — INV-000160, three lines each $3.35 GST-inclusive, document total $10.05.
 
 **23a — default `tax_rounding = total_invoice`:** GST = 10.05 / 11 = 0.91363… → 0.91; net 9.14. Line nets round to
@@ -573,7 +575,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-024 — Bad-debt write-off through the expected-credit-loss allowance
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.write_off` · **Proposes to supersede GP-007** · Q3, Q12 · AASB 9
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `ar.write_off` · **Proposes to supersede GP-007** · Q3, Q12 · AASB 9
 - **Scenario:** as GP-007 — INV-000140 ($1,375.00 = 1,250.00 + GST 125.00) written off 2027-12-01; the allowance
   (AR_ECL_ALLOWANCE, contra-AR, measured ex GST) already holds 1,250.00 for it from period-end GP-025 journals.
   The write-off is a journal with a written write-off record, not a credit note.
@@ -593,7 +595,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-025 — Period-end expected-credit-loss allowance adjustment
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP (manual amount) / Phase 1 (provision matrix) · Source type: `ar.ecl_adjustment` · Q12 · AASB 9 simplified approach
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP (manual amount) / Phase 1 (provision matrix) · Source type: `ar.ecl_adjustment` · Q12 · AASB 9 simplified approach
 - **Scenario:** 2027-11-30 the ageing × loss-rate calculation requires an allowance of 1,800.00 (ex GST); the balance is 1,250.00. Approved by Finance Admin.
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -606,7 +608,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-026 — Bad-debt recovery after write-off
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.recovery` · Q3
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `ar.recovery` · Q3
 - **Scenario:** 2028-03-01 Acme pays the $1,375.00 written off in GP-024.
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -621,7 +623,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-027 — Stripe payout with fee GST pending the monthly tax invoice
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `payments.stripe.payout` · **Proposes to supersede GP-004** · Q2
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `payments.stripe.payout` · **Proposes to supersede GP-004** · Q2
 - **Journal:** identical to GP-004 (Dr bank 1,351.32 / Dr fee 21.53 / Dr GST paid 2.15 / Cr Stripe clearing 1,375.00).
 - **Difference:** the 2.15 GST line carries evidence status `pending_tax_invoice`; the BAS includes it at 1B (and G11)
   only once Stripe's monthly tax invoice for that **UTC** month is attached. Confirm the 23.68 fee and its GST split
@@ -629,7 +631,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-028 — Monthly Stripe tax-invoice reconciliation
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `payments.stripe.tax_invoice` · Q2
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `payments.stripe.tax_invoice` · Q2
 - **Scenario:** the November (UTC) tax invoice shows fee GST 2.16 against 2.15 posted from payouts (fee total unchanged). The invoice wins.
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
@@ -642,7 +644,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-029 — Credit note in a later BAS period (both BAS presentations), with reason code
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.credit_note` · Varies GP-005 and GP-019 · Q4
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `ar.credit_note` · Varies GP-005 and GP-019 · Q4
 - **Scenario:** as GP-005 but INV-000123 was reported in the Oct–Dec 2026 BAS and CN-000007 ($200.00 + GST 20.00) is
   issued 2027-01-20 with `reason_code = scope_reduction`. Journal identical to GP-005 (Dr revenue 200.00 / Dr GST collected 20.00 / Cr AR 220.00).
 - **Tax/BAS — default `credit_note_bas = net`:** G1 −220.00, 1A −20.00 in the Jan–Mar 2027 BAS (as Xero/QuickBooks).
@@ -653,7 +655,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-030 — Monthly depreciation (recurring journal)
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ledger.recurring.depreciation` · Q14 · AASB 116
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `ledger.recurring.depreciation` · Q14 · AASB 116
 - **Scenario:** the GP-008 laptop ($2,000.00, capitalised because it exceeds the company's capitalisation threshold setting,
   which is a business policy, not the tax write-off limit), straight-line over 36 months from 2026-11-03.
   Monthly charge 2,000.00 / 36 = 55.555… → 55.56; the final month takes 55.40 so the total is exactly 2,000.00 (35 × 55.56 = 1,944.60).
@@ -668,7 +670,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-031 — Accrued expense with automatic reversal
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ledger.accrual` · Q14
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `ledger.accrual` · Q14
 - **Scenario:** 2026-11-30 November electricity estimated at $400.00 ex GST, bill not yet received. Accrued ex GST (no input tax credit without a tax invoice); auto-reverses 2026-12-01; the bill later posts as GP-008 shape.
 
 **31a — accrual (2026-11-30)**
@@ -691,7 +693,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-032 — Prepaid expense with monthly release
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ap.bill` + `ledger.prepayment_release` · Q14
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: MVP · Source type: `ap.bill` + `ledger.prepayment_release` · Q14
 - **Scenario:** 2026-11-01 annual insurance bill $1,320.00 ($1,200.00 + GST 120.00) covering 12 months; released monthly.
 
 **32a — bill to prepayments**
@@ -715,7 +717,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-033 — Super payment under Payday Super
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: Phase 1 · Source type: `payroll.super_payment` · Q15
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: Phase 1 · Source type: `payroll.super_payment` · Q15
 - **Scenario:** the GP-010 pay run's super $1,200.00 (amount from the payroll provider, on qualifying earnings), payday
   2027-07-15; due to be **received by the fund** by 2027-07-26 (7 business days; 20 business days for a new
   employee's first payday or a new fund choice). Paid by clearing-house batch 2027-07-20.
@@ -731,7 +733,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-034 — Superannuation guarantee charge (late super) assessment
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: Phase 1 · Source type: `payroll.sgc_assessment` · Q15
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: Phase 1 · Source type: `payroll.sgc_assessment` · Q15
 - **Scenario (illustrative amounts — component rates unverified):** the GP-033 super was not received on time; the
   employer lodges/receives an SGC assessment of $1,950.00 = shortfall 1,200.00 + notional earnings 30.00 + administrative uplift 720.00.
   The unpaid SG liability moves into the charge.
@@ -747,7 +749,7 @@ printed invoice shows these same line nets. No ROUNDING line.
 
 ## GP-035 — Prior-period adjustment (AASB 108)
 
-- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: Phase 1 (with an accounting ADR) · Source type: `ledger.prior_period_adjustment` · Q11
+- **Status: Approved (claude under the product owner's delegation, DL-0256, 2026-11-01; basis RQ-0095/RQ-0096)** — implements the owner-approved change list (DL-0255) · Phase: Phase 1 (with an accounting ADR) · Source type: `ledger.prior_period_adjustment` · Q11
 - **Scenario:** 2027-09-10, after FY2027 (to 30 June 2027) is hard-locked and reported, an unrecorded June 2027 office
   bill of $550.00 ($500.00 + GST 50.00) is found; material. Posted in the current open period, tagged
   `corrects_period = FY2027`, `original_account = 6100`, with reason and approver.
@@ -825,6 +827,26 @@ added as an opt-in. The report ends with the exact list of entries to supersede 
 (GP-013) or vary (GP-004, GP-005, GP-019), and new proposed entries GP-020…GP-029, for your approval. Still no entry
 above has been changed.
 
+### Resolutions (2026-11-01, DL-0256)
+
+| # | Resolution | Entries |
+|---|---|---|
+| Q1 | Receipt at charge, fee at payout (accrue material unpaid fees at month end) | GP-003, GP-027 |
+| Q2 | Fee GST per payout, 1B only once Stripe's monthly tax invoice (UTC month) is held; clearing and fee accounts are connector settings | GP-027, GP-028 |
+| Q3 | Ledger debit to GST collected; BAS 1B via GST-ADJ (accruals only); write-off record, no adjustment note; via ECL allowance | GP-024, GP-026 |
+| Q4 | Default nets credit notes into G1/1A in their own period; `credit_note_bas = ato_adjustment` setting for 1B | GP-005, GP-029 |
+| Q5 | PAYROLL_CLEARING used when the provider pays net pay or super | GP-033 |
+| Q6 | One entry per batch, one AP line per bill, one bank line per batch | GP-009 |
+| Q7 | GST at receipt; supply type decides per-receipt (Div 156/unknown total) vs whole supply (single supply → advance tax invoice) | GP-020, GP-021, GP-022 |
+| Q8 | Total invoice rule default, residual on the largest revenue line; per-line 2 dp opt-in | GP-023 |
+| Q9 | Yes — customer refunds use the supplier bank-detail verification and cooling-off | GP-006 |
+| Q10 | Liability (contract liability), with non-cancellable / non-refundable flags | GP-014, GP-015 |
+| Q11 | Void only when unallocated; otherwise credit note; material errors in reported periods via prior-period adjustment | GP-019, GP-035 |
+| Q12 | Expected-credit-loss allowance on by default; direct write-off only as a documented materiality election | GP-024, GP-025 |
+| Q13 | Advance invoices before performance only for non-cancellable contracts; ledger gross, report-layer netting | GP-014, GP-016, GP-021 |
+| Q14 | Depreciation, accruals and prepayments in the MVP | GP-030, GP-031, GP-032 |
+| Q15 | Payday Super: per-pay-run due date, super payment, SGC accounts | GP-033, GP-034 |
+
 ## Change history
 
 | Date | By | Change |
@@ -833,3 +855,4 @@ above has been changed.
 | 2026-11-01 | claude (T-0115) | Added research-update note under Open questions (Q12–Q15 raised); no entry changed. |
 | 2026-11-01 | claude (T-0115) | Follow-up note linking RQ-0096 decision confirmations; no entry changed. |
 | 2026-11-01 | claude (T-0115) | Owner approved the RQ-0096 change list; added Draft entries GP-020…GP-035 and chart additions implementing it. Superseded entries left unchanged for the owner to mark. |
+| 2026-11-01 | claude (T-0115) | Owner delegated approval (DL-0256): entries Approved, GP-004/007/012/013/018 superseded, Q1–Q15 resolved. |
