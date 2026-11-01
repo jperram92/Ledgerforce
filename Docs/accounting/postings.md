@@ -82,6 +82,22 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 | GP-017 | Deferred revenue release (§3.8) | Phase 2 | — | Draft |
 | GP-018 | Rounding — per-line vs per-document GST (§3.4) | MVP | UC-01 | Draft |
 | GP-019 | Reversal (void) of a posted sales invoice (§3.3, principle 2) | MVP | UC-10 | Draft |
+| GP-020 | Prepayment, progressive/periodic or total unknown — GST at receipt (proposes to supersede GP-012) | MVP | — | Draft (change approved) |
+| GP-021 | Single supply: full tax invoice at first part-payment | MVP | — | Draft (change approved) |
+| GP-022 | Prepayment applied after GP-020 (proposes to supersede GP-013) | MVP | — | Draft (change approved) |
+| GP-023 | Rounding: total invoice rule default, per-line opt-in (proposes to supersede GP-018) | MVP | UC-01 | Draft (change approved) |
+| GP-024 | Bad-debt write-off via ECL allowance (proposes to supersede GP-007) | MVP | — | Draft (change approved) |
+| GP-025 | Period-end ECL allowance adjustment | MVP / Phase 1 | — | Draft (change approved) |
+| GP-026 | Bad-debt recovery | MVP | — | Draft (change approved) |
+| GP-027 | Stripe payout, fee GST pending tax invoice (proposes to supersede GP-004) | MVP | UC-03 | Draft (change approved) |
+| GP-028 | Monthly Stripe tax-invoice reconciliation | MVP | UC-03 | Draft (change approved) |
+| GP-029 | Credit note in a later BAS period, both presentations, reason code (varies GP-005, GP-019) | MVP | UC-11 | Draft (change approved) |
+| GP-030 | Monthly depreciation | MVP | — | Draft (change approved) |
+| GP-031 | Accrued expense with auto-reversal | MVP | UC-10 | Draft (change approved) |
+| GP-032 | Prepaid expense with monthly release | MVP | — | Draft (change approved) |
+| GP-033 | Super payment under Payday Super | Phase 1 | UC-07 | Draft (change approved) |
+| GP-034 | Super guarantee charge assessment | Phase 1 | UC-07 | Draft (change approved) |
+| GP-035 | Prior-period adjustment (AASB 108) | Phase 1 | — | Draft (change approved) |
 
 ---
 
@@ -437,6 +453,336 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ---
 
+## Proposed entries from the AASB/GST review (T-0115, RQ-0095/RQ-0096)
+
+The owner approved the change list on 2026-11-01. The entries below implement it. Each is a new `Draft` entry;
+entries it supersedes stay above unchanged until the owner marks them superseded. Amounts are worked examples
+for the accountant to check; sources are in [AASB decisions confirmed by law](../research/reports/AASB%20decisions%20confirmed%20by%20law.md).
+Items marked **(unverified)** could not be checked against primary text.
+
+## GP-020 — Customer prepayment, progressive/periodic supply or total unknown (GST at receipt)
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.prepayment` · **Proposes to supersede GP-012** · Q7
+- **Scenario:** as GP-012 — 2026-11-10 Acme pays $3,300.00 before any invoice, for staged work invoiced by milestone
+  (progressive supply, GST Act Div 156) or where the total is not yet known. GST is attributable on receipt (s 29-5).
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | bank:OPERATING | 1100 | 3,300.00 | | — | — |
+| 2 | system:CUSTOMER_PREPAYMENTS | 2400 | | 3,000.00 | GST (tax 300.00) | Acme |
+| 3 | tax:GST.collected | 2200 | | 300.00 | GST | — |
+| | **Total** | | **3,300.00** | **3,300.00** | | |
+
+- **Check:** 3,300.00 = 3,000.00 + 300.00 ✓
+- **Tax/BAS (accruals):** G1 +3,300.00; 1A +300.00 at 2026-11-10. Cash basis: same period (payment received).
+- **Untaxed variant (GP-012 shape) only for:** GST-free or input-taxed supplies, receipts flagged as a genuine Div 99 security deposit (GST when forfeited or applied), and unidentified receipts.
+- **Fields:** receipt carries `supply_type` (progressive_periodic | single | unknown_total | gst_free | security_deposit); the engine records GST attributed to date per supply so the final invoice never repeats it.
+
+## GP-021 — First part-payment on a single (non-progressive) supply: full tax invoice at receipt
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.invoice` (advance) + `ar.receipt` · Q7
+- **Scenario:** 2026-11-10 Acme pays $3,300.00 towards a single $11,000.00 (GST-inclusive) project with a known
+  price. The first payment attributes GST on the whole supply, so LedgerForce issues the full tax invoice INV-000170
+  at receipt. Work is not yet performed, so the invoice credits a contract liability, not revenue (AASB 15; the
+  contract must be non-cancellable — otherwise use a payment request and GP-020's untaxed path is not available, see Q13).
+
+**21a — advance tax invoice**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_CONTROL | 1200 | 11,000.00 | | — | Acme |
+| 2 | system:CUSTOMER_PREPAYMENTS | 2400 | | 10,000.00 | GST (tax 1,000.00) | Acme |
+| 3 | tax:GST.collected | 2200 | | 1,000.00 | GST | — |
+| | **Total** | | **11,000.00** | **11,000.00** | | |
+
+**21b — receipt applied**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | bank:OPERATING | 1100 | 3,300.00 | | — | — |
+| 2 | system:AR_CONTROL | 1200 | | 3,300.00 | — | Acme |
+| | **Total** | | **3,300.00** | **3,300.00** | | |
+
+**21c — on completion (2026-12-15), revenue recognised**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:CUSTOMER_PREPAYMENTS | 2400 | 10,000.00 | | — | Acme |
+| 2 | product:PROFESSIONAL_SERVICES.revenue | 4000 | | 10,000.00 | — | Acme |
+| | **Total** | | **10,000.00** | **10,000.00** | | |
+
+- **Check:** 21a 11,000.00 = 10,000.00 + 1,000.00 ✓ · 21b 3,300.00 = 3,300.00 ✓ · 21c 10,000.00 = 10,000.00 ✓ · INV-000170 open 7,700.00.
+- **Tax/BAS (accruals):** G1 +11,000.00, 1A +1,000.00 at 2026-11-10. No GST at completion.
+- Note: the review's sketch used the GP-001 (revenue) shape; this draft uses the GP-014 (liability) shape because revenue is not earned at receipt.
+
+## GP-022 — Prepayment applied to the final invoice (after GP-020)
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.invoice` + `ar.prepayment_application` · **Proposes to supersede GP-013** · Q7
+- **Scenario:** 2026-12-15 final invoice INV-000150, $10,000.00 ex GST, GST 1,000.00, total $11,000.00; the GP-020
+  prepayment (3,000.00 + GST 300.00 already reported) is applied.
+
+**22a — final invoice**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_CONTROL | 1200 | 11,000.00 | | — | Acme |
+| 2 | product:PROFESSIONAL_SERVICES.revenue | 4000 | | 10,000.00 | GST (tax 1,000.00) | Acme |
+| 3 | tax:GST.collected | 2200 | | 1,000.00 | GST | — |
+| | **Total** | | **11,000.00** | **11,000.00** | | |
+
+**22b — application of prepayment (removes GST already attributed)**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:CUSTOMER_PREPAYMENTS | 2400 | 3,000.00 | | GST (tax −300.00) | Acme |
+| 2 | tax:GST.collected | 2200 | 300.00 | | GST | — |
+| 3 | system:AR_CONTROL | 1200 | | 3,300.00 | — | Acme |
+| | **Total** | | **3,300.00** | **3,300.00** | | |
+
+- **Check:** 22a 11,000.00 = 10,000.00 + 1,000.00 ✓ · 22b 3,000.00 + 300.00 = 3,300.00 ✓ · GST on the project 300.00 + 1,000.00 − 300.00 = 1,000.00 ✓
+- **Subledger:** INV-000150 open 7,700.00; prepayment unapplied 0.00.
+- **Tax/BAS (accruals):** final period G1 +7,700.00, 1A +700.00 (net of the 300.00 reported at GP-020).
+
+## GP-023 — GST rounding: total invoice rule (AU default) and per-line 2 dp (opt-in)
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.invoice` · **Proposes to supersede GP-018** · Q8 · Design §3.4 (accounting ADR)
+- **Scenario:** as GP-018 — INV-000160, three lines each $3.35 GST-inclusive, document total $10.05.
+
+**23a — default `tax_rounding = total_invoice`:** GST = 10.05 / 11 = 0.91363… → 0.91; net 9.14. Line nets round to
+3.05 each (9.15); the −0.01 residual goes to the largest line (ties: the last line), giving 3.05 / 3.05 / 3.04. The
+printed invoice shows these same line nets. No ROUNDING line.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_CONTROL | 1200 | 10.05 | | — | Acme |
+| 2 | product:SUBSCRIPTION.revenue | 4100 | | 9.14 | GST-INC (tax 0.91 doc-level) | Acme |
+| 3 | tax:GST.collected | 2200 | | 0.91 | GST-INC | — |
+| | **Total** | | **10.05** | **10.05** | | |
+
+**23b — opt-in `tax_rounding = per_line_2dp` (taxable supply rule, matches Xero/QuickBooks):** line GST 0.30 each.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_CONTROL | 1200 | 10.05 | | — | Acme |
+| 2 | product:SUBSCRIPTION.revenue | 4100 | | 9.15 | GST-INC (tax 0.90) | Acme |
+| 3 | tax:GST.collected | 2200 | | 0.90 | GST-INC | — |
+| | **Total** | | **10.05** | **10.05** | | |
+
+- **Check:** 23a 10.05 = 9.14 + 0.91 ✓ · 23b 10.05 = 9.15 + 0.90 ✓
+- **Tax/BAS:** 23a G1 +10.05, 1A +0.91 · 23b G1 +10.05, 1A +0.90. Expect 1-cent differences against invoices issued by per-line systems.
+
+## GP-024 — Bad-debt write-off through the expected-credit-loss allowance
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.write_off` · **Proposes to supersede GP-007** · Q3, Q12 · AASB 9
+- **Scenario:** as GP-007 — INV-000140 ($1,375.00 = 1,250.00 + GST 125.00) written off 2027-12-01; the allowance
+  (AR_ECL_ALLOWANCE, contra-AR, measured ex GST) already holds 1,250.00 for it from period-end GP-025 journals.
+  The write-off is a journal with a written write-off record, not a credit note.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_ECL_ALLOWANCE | 1210 | 1,250.00 | | — | Acme |
+| 2 | tax:GST.collected | 2200 | 125.00 | | GST-ADJ | — |
+| 3 | system:AR_CONTROL | 1200 | | 1,375.00 | — | Acme |
+| | **Total** | | **1,375.00** | **1,375.00** | | |
+
+- **Check:** 1,250.00 + 125.00 = 1,375.00 ✓
+- **Variant — allowance short:** if the allowance holds only 1,000.00: Dr AR_ECL_ALLOWANCE 1,000.00 / Dr 6300 Impairment of receivables 250.00 / Dr GST collected 125.00 / Cr AR 1,375.00 ✓.
+- **Tax/BAS:** accruals 1B +125.00 (decreasing adjustment, on write-off or when 12 months overdue); cash basis no BAS effect (GST never reported). No adjustment note; the write-off record is required.
+- **Direct write-off (GP-007 shape)** remains available only as a tenant's documented materiality election.
+- **New roles/accounts:** `system:AR_ECL_ALLOWANCE` (1210, contra-asset); 6300 renamed "Impairment of receivables".
+
+## GP-025 — Period-end expected-credit-loss allowance adjustment
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP (manual amount) / Phase 1 (provision matrix) · Source type: `ar.ecl_adjustment` · Q12 · AASB 9 simplified approach
+- **Scenario:** 2027-11-30 the ageing × loss-rate calculation requires an allowance of 1,800.00 (ex GST); the balance is 1,250.00. Approved by Finance Admin.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | setting:ar.bad_debt_account (Impairment of receivables) | 6300 | 550.00 | | — | — |
+| 2 | system:AR_ECL_ALLOWANCE | 1210 | | 550.00 | — | — |
+| | **Total** | | **550.00** | **550.00** | | |
+
+- **Check:** 550.00 = 550.00 ✓ · A decrease posts the reverse. No GST, no subledger effect.
+
+## GP-026 — Bad-debt recovery after write-off
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.recovery` · Q3
+- **Scenario:** 2028-03-01 Acme pays the $1,375.00 written off in GP-024.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | bank:OPERATING | 1100 | 1,375.00 | | — | — |
+| 2 | setting:ar.bad_debt_account (Impairment of receivables) | 6300 | | 1,250.00 | GST-ADJ (tax 125.00) | Acme |
+| 3 | tax:GST.collected | 2200 | | 125.00 | GST-ADJ | — |
+| | **Total** | | **1,375.00** | **1,375.00** | | |
+
+- **Check:** 1,375.00 = 1,250.00 + 125.00 ✓
+- **Tax/BAS:** accruals — increasing adjustment 1A +125.00. Cash basis — GST attributable on receipt: 1A +125.00, G1 +1,375.00 **(unverified)**.
+
+## GP-027 — Stripe payout with fee GST pending the monthly tax invoice
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `payments.stripe.payout` · **Proposes to supersede GP-004** · Q2
+- **Journal:** identical to GP-004 (Dr bank 1,351.32 / Dr fee 21.53 / Dr GST paid 2.15 / Cr Stripe clearing 1,375.00).
+- **Difference:** the 2.15 GST line carries evidence status `pending_tax_invoice`; the BAS includes it at 1B (and G11)
+  only once Stripe's monthly tax invoice for that **UTC** month is attached. Confirm the 23.68 fee and its GST split
+  against a real AU payout before approval (Stripe states GST is charged on top of its fees).
+
+## GP-028 — Monthly Stripe tax-invoice reconciliation
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `payments.stripe.tax_invoice` · Q2
+- **Scenario:** the November (UTC) tax invoice shows fee GST 2.16 against 2.15 posted from payouts (fee total unchanged). The invoice wins.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | tax:GST.paid | 2210 | 0.01 | | GST | — |
+| 2 | setting:stripe.fee_account | 6200 | | 0.01 | GST | Stripe |
+| | **Total** | | **0.01** | **0.01** | | |
+
+- **Check:** 0.01 = 0.01 ✓ · Marks every payout GST line in the month `tax_invoice_held`; 1B for the month = 2.16.
+
+## GP-029 — Credit note in a later BAS period (both BAS presentations), with reason code
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ar.credit_note` · Varies GP-005 and GP-019 · Q4
+- **Scenario:** as GP-005 but INV-000123 was reported in the Oct–Dec 2026 BAS and CN-000007 ($200.00 + GST 20.00) is
+  issued 2027-01-20 with `reason_code = scope_reduction`. Journal identical to GP-005 (Dr revenue 200.00 / Dr GST collected 20.00 / Cr AR 220.00).
+- **Tax/BAS — default `credit_note_bas = net`:** G1 −220.00, 1A −20.00 in the Jan–Mar 2027 BAS (as Xero/QuickBooks).
+- **Tax/BAS — setting `credit_note_bas = ato_adjustment`:** 1B +20.00 (worksheet G18) in Jan–Mar 2027; G1 unchanged.
+- **Same BAS period** as the invoice: G1/1A net under both settings.
+- **Reason codes:** price_concession, return, scope_reduction, billing_error, goodwill → reduce revenue. `credit_loss` is not allowed on a credit note; it routes to GP-024. A GP-019 void in a later period follows the same BAS setting.
+- **Document:** the credit note is titled an adjustment note and references INV-000123.
+
+## GP-030 — Monthly depreciation (recurring journal)
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ledger.recurring.depreciation` · Q14 · AASB 116
+- **Scenario:** the GP-008 laptop ($2,000.00, capitalised because it exceeds the company's capitalisation threshold setting,
+  which is a business policy, not the tax write-off limit), straight-line over 36 months from 2026-11-03.
+  Monthly charge 2,000.00 / 36 = 55.555… → 55.56; the final month takes 55.40 so the total is exactly 2,000.00 (35 × 55.56 = 1,944.60).
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:DEPRECIATION_EXPENSE | 6500 | 55.56 | | — | — |
+| 2 | system:ACCUM_DEPRECIATION | 1519 | | 55.56 | — | — |
+| | **Total** | | **55.56** | **55.56** | | |
+
+- **Check:** 55.56 = 55.56 ✓ · No GST. Tax depreciation (instant asset write-off, small business pool) stays off the ledger.
+
+## GP-031 — Accrued expense with automatic reversal
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ledger.accrual` · Q14
+- **Scenario:** 2026-11-30 November electricity estimated at $400.00 ex GST, bill not yet received. Accrued ex GST (no input tax credit without a tax invoice); auto-reverses 2026-12-01; the bill later posts as GP-008 shape.
+
+**31a — accrual (2026-11-30)**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | expense: Electricity | 6150 | 400.00 | | — | — |
+| 2 | system:ACCRUED_EXPENSES | 2150 | | 400.00 | — | — |
+| | **Total** | | **400.00** | **400.00** | | |
+
+**31b — automatic reversal (2026-12-01)**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:ACCRUED_EXPENSES | 2150 | 400.00 | | — | — |
+| 2 | expense: Electricity | 6150 | | 400.00 | — | — |
+| | **Total** | | **400.00** | **400.00** | | |
+
+- **Check:** 31a 400.00 = 400.00 ✓ · 31b 400.00 = 400.00 ✓ · Recurring journals may also auto-reverse; editing an accrual reposts it and regenerates its reversal.
+
+## GP-032 — Prepaid expense with monthly release
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: MVP · Source type: `ap.bill` + `ledger.prepayment_release` · Q14
+- **Scenario:** 2026-11-01 annual insurance bill $1,320.00 ($1,200.00 + GST 120.00) covering 12 months; released monthly.
+
+**32a — bill to prepayments**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:PREPAYMENTS | 1400 | 1,200.00 | | GST (tax 120.00) | Supplier |
+| 2 | tax:GST.paid | 2210 | 120.00 | | GST | — |
+| 3 | system:AP_CONTROL | 2100 | | 1,320.00 | — | Supplier |
+| | **Total** | | **1,320.00** | **1,320.00** | | |
+
+**32b — monthly release (2026-11-30)**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | expense: Insurance | 6160 | 100.00 | | — | — |
+| 2 | system:PREPAYMENTS | 1400 | | 100.00 | — | — |
+| | **Total** | | **100.00** | **100.00** | | |
+
+- **Check:** 32a 1,200.00 + 120.00 = 1,320.00 ✓ · 32b 100.00 = 100.00 ✓ · Tax/BAS: G11 +1,320.00, 1B +120.00 at the bill (accruals).
+
+## GP-033 — Super payment under Payday Super
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: Phase 1 · Source type: `payroll.super_payment` · Q15
+- **Scenario:** the GP-010 pay run's super $1,200.00 (amount from the payroll provider, on qualifying earnings), payday
+  2027-07-15; due to be **received by the fund** by 2027-07-26 (7 business days; 20 business days for a new
+  employee's first payday or a new fund choice). Paid by clearing-house batch 2027-07-20.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:SUPER_PAYABLE | 2320 | 1,200.00 | | — | — |
+| 2 | bank:OPERATING | 1100 | | 1,200.00 | — | — |
+| | **Total** | | **1,200.00** | **1,200.00** | | |
+
+- **Check:** 1,200.00 = 1,200.00 ✓ · Variant: Cr `system:PAYROLL_CLEARING` when the provider pays super (Q5).
+- **Controls:** SUPER_PAYABLE lines carry the per-pay-run due date; alert ahead of it allowing clearing-house transit time. Business-day counting and public holidays **(unverified)**.
+
+## GP-034 — Superannuation guarantee charge (late super) assessment
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: Phase 1 · Source type: `payroll.sgc_assessment` · Q15
+- **Scenario (illustrative amounts — component rates unverified):** the GP-033 super was not received on time; the
+  employer lodges/receives an SGC assessment of $1,950.00 = shortfall 1,200.00 + notional earnings 30.00 + administrative uplift 720.00.
+  The unpaid SG liability moves into the charge.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:SUPER_PAYABLE | 2320 | 1,200.00 | | — | — |
+| 2 | setting:payroll.sgc_expense | 6420 | 750.00 | | — | — |
+| 3 | system:SGC_PAYABLE | 2330 | | 1,950.00 | — | ATO |
+| | **Total** | | **1,950.00** | **1,950.00** | | |
+
+- **Check:** 1,200.00 + 750.00 = 1,950.00 ✓ · Later general interest charge on an unpaid assessment posts to a separate non-deductible account. Confirm component rates and deductibility before approval.
+
+## GP-035 — Prior-period adjustment (AASB 108)
+
+- **Status: Draft (proposed by claude, T-0115)** — change approved by the product owner 2026-11-01 (DL-0255, change list in RQ-0096); this worked entry awaits the owner's sign-off · Phase: Phase 1 (with an accounting ADR) · Source type: `ledger.prior_period_adjustment` · Q11
+- **Scenario:** 2027-09-10, after FY2027 (to 30 June 2027) is hard-locked and reported, an unrecorded June 2027 office
+  bill of $550.00 ($500.00 + GST 50.00) is found; material. Posted in the current open period, tagged
+  `corrects_period = FY2027`, `original_account = 6100`, with reason and approver.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:PRIOR_PERIOD_ADJUSTMENTS | 3150 | 500.00 | | GST (tax 50.00) | Supplier |
+| 2 | tax:GST.paid | 2210 | 50.00 | | GST | — |
+| 3 | system:AP_CONTROL | 2100 | | 550.00 | — | Supplier |
+| | **Total** | | **550.00** | **550.00** | | |
+
+- **Check:** 500.00 + 50.00 = 550.00 ✓ · Current-year profit unchanged; the restated report mode shows 500.00 as FY2027 office expense; "as originally reported" stays available.
+- **Tax/BAS:** input tax credit claimed in the current BAS (within the 4-year limit **(unverified)**). Immaterial errors are ordinary current-period corrections.
+
+### Proposed reference-chart additions
+
+| Code | Account | Binding |
+|---|---|---|
+| 1210 | Allowance for expected credit losses (contra-AR) | `system:AR_ECL_ALLOWANCE` |
+| 1400 | Prepayments | `system:PREPAYMENTS` |
+| 1519 | Accumulated depreciation — computer equipment | `system:ACCUM_DEPRECIATION` |
+| 2150 | Accrued expenses | `system:ACCRUED_EXPENSES` |
+| 2330 | Super guarantee charge payable | `system:SGC_PAYABLE` |
+| 3150 | Prior-period adjustments (equity) | `system:PRIOR_PERIOD_ADJUSTMENTS` |
+| 6150 / 6160 | Electricity / Insurance | chosen on line |
+| 6300 | Impairment of receivables (renamed from Bad debts) | `setting:ar.bad_debt_account` |
+| 6420 | Super guarantee charge expense | `setting:payroll.sgc_expense` |
+| 6500 | Depreciation | `system:DEPRECIATION_EXPENSE` |
+
+Flag-only changes (no new journal): GP-014 and GP-016 gain `contract_non_cancellable` / `deposit_non_refundable` and a
+due date (report-layer netting when cancellable, after MVP); GP-008 records the capitalisation-threshold test; GP-010
+notes that SG comes from the provider. Leave-provision and lease entries follow once their Phase 1–2 scope is decided.
+
+---
+
 ## Open questions for accountant
 
 These are deliberately **not** decided by agents. Each blocks approval of the listed entries; answer inline or
@@ -486,3 +832,4 @@ above has been changed.
 | 2026-10-24 | claude (T-0007) | Initial DRAFT, GP-001 … GP-019, Q1–Q11. |
 | 2026-11-01 | claude (T-0115) | Added research-update note under Open questions (Q12–Q15 raised); no entry changed. |
 | 2026-11-01 | claude (T-0115) | Follow-up note linking RQ-0096 decision confirmations; no entry changed. |
+| 2026-11-01 | claude (T-0115) | Owner approved the RQ-0096 change list; added Draft entries GP-020…GP-035 and chart additions implementing it. Superseded entries left unchanged for the owner to mark. |

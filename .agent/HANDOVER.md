@@ -8,7 +8,7 @@ In progress: nothing.
 Next action: owner decisions below; codex cross-reviews.
 Decisions taken: DL-0243..0252.
 Also: T-0115 (AASB alignment) done on feat/T-0115-aasb-alignment — report, RQ-0095, design §3.10; in review.
-Open questions for human: (0) Decide the AASB proposals in design §11.2 / postings.md Q7, Q8, Q12–Q15 before approving golden postings. (1) Accept ADR-0044 (passive ZAP DAST job in security.yml, read-only, fails on High) to unblock T-0096. (2) Approve the golden postings in T-0007 to unblock the accounting backlog (T-0031 and dependants). (3) Run Codex (`node scripts/agent/conductor.ts run` where the codex CLI is installed) to clear the 53 claude-built cards awaiting cross-review.
+Open questions for human: (0) Owner approved the AASB/GST change list (DL-0255); sign off worked entries GP-020…GP-035 in Docs/accounting/postings.md (change each Status to Approved) and mark GP-004, GP-007, GP-012, GP-013, GP-018 superseded; also decide the unchanged GP-001…GP-019 entries. (1) Accept ADR-0044 (passive ZAP DAST job in security.yml, read-only, fails on High) to unblock T-0096. (2) Approve the golden postings in T-0007 to unblock the accounting backlog (T-0031 and dependants). (3) Run Codex (`node scripts/agent/conductor.ts run` where the codex CLI is installed) to clear the 53 claude-built cards awaiting cross-review.
 Do not: change CI security gates without an accepted ADR; add suppressions; rewrite history; merge without cross-review.
 
 ## Log
