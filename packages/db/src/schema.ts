@@ -724,6 +724,46 @@ export interface SupplierBillTable {
   submitted_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
 }
 
+/** Migration 0047 (T-0054): supplier payment batches. */
+export interface PaymentBatchTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: string;
+  batch_no: string;
+  payment_date: ColumnType<Date, string, string>;
+  due_by: ColumnType<Date, string, string>;
+  account_id: string;
+  currency: string;
+  total: string;
+  payment_count: number;
+  status: Generated<'draft' | 'partially_released' | 'released' | 'cancelled'>;
+  created_by: string | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
+export interface PaymentBatchItemTable {
+  tenant_id: TenantId;
+  company_id: string;
+  batch_id: string;
+  line_no: number;
+  bill_id: string;
+  party_id: string;
+  amount: string;
+  bank_account_id: string | null;
+  excluded_reason: 'BANK_DETAILS_COOLING_OFF' | 'NO_VERIFIED_BANK_DETAILS' | null;
+  payable_from: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+}
+
+export interface PaymentBatchReleaseTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  batch_id: string;
+  released_by: string | null;
+  released_at: Timestamp;
+}
+
 export interface SupplierBillLineTable {
   tenant_id: TenantId;
   company_id: string;
@@ -1018,6 +1058,9 @@ export interface Database {
   'app.customer_receipt': CustomerReceiptTable;
   'app.bad_debt_write_off': BadDebtWriteOffTable;
   'app.supplier_bill': SupplierBillTable;
+  'app.payment_batch': PaymentBatchTable;
+  'app.payment_batch_item': PaymentBatchItemTable;
+  'app.payment_batch_release': PaymentBatchReleaseTable;
   'app.supplier_bill_line': SupplierBillLineTable;
   'app.bill_inbox_item': BillInboxItemTable;
   'app.document_attachment': DocumentAttachmentTable;
