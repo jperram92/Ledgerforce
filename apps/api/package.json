@@ -11,6 +11,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@ledgerforce/ap": "workspace:*",
     "@ledgerforce/ar": "workspace:*",
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/gl": "workspace:*",

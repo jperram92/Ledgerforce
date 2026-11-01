@@ -10,7 +10,7 @@ import { approvedTables, parsePostings } from '@ledgerforce/ledger/golden';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
 import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { approveBill, createBill, suggestCoding, type BillError } from './bills.ts';
+import { approveBill, createBill, submitBill, suggestCoding, type BillError } from './bills.ts';
 
 const FILE = resolve(import.meta.dirname, '../../../../Docs/accounting/postings.md');
 const gp008 = approvedTables(parsePostings(readFileSync(FILE, 'utf8'))).find(
@@ -83,6 +83,7 @@ describe('SS-UC05-04: Approved bill posts GP-008', () => {
         tax: '250.0000',
         gross: '2750.0000',
       });
+      await submitBill(trx, { companyId: f.companyId, billId: d.billId });
       return approveBill(trx, { companyId: f.companyId, billId: d.billId });
     });
     expect(b.billNo).toMatch(/^BILL-\d{6}$/);
@@ -141,6 +142,7 @@ describe('SS-UC05-04: Approved bill posts GP-008', () => {
             },
           ],
         });
+        await submitBill(trx, { companyId: f.companyId, billId: d.billId });
         return approveBill(trx, { companyId: f.companyId, billId: d.billId });
       });
     }
@@ -166,6 +168,7 @@ describe('SS-UC05-07: Bill in AP-locked period rejected', () => {
     const err = await f
       .inTenant(async (trx) => {
         const d = await createBill(trx, gp008Bill('SUP-INV-OCT', '2026-10-20'));
+        await submitBill(trx, { companyId: f.companyId, billId: d.billId });
         return approveBill(trx, { companyId: f.companyId, billId: d.billId });
       })
       .then(

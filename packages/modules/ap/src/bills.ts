@@ -24,7 +24,7 @@ type Trx = Transaction<Database>;
 export const BILL_NUMBER_SERIES = 'ap_bill_document';
 const DEFAULT_TERMS_DAYS = 30;
 
-export type BillErrorCode = 'INVALID_BILL' | 'DUPLICATE_BILL' | 'NOT_DRAFT';
+export type BillErrorCode = 'INVALID_BILL' | 'DUPLICATE_BILL' | 'NOT_DRAFT' | 'NOT_SUBMITTED';
 
 export class BillError extends Error {
   readonly code: BillErrorCode;
@@ -105,6 +105,8 @@ export interface BillLineInput {
 
 export interface BillInput {
   readonly companyId: string;
+  /** Client-chosen id (the API's PUT /ap/bills/:id); a repeat returns the existing bill. */
+  readonly id?: string;
   readonly partyId: string;
   readonly supplierRef: string;
   readonly billDate: string;
@@ -172,6 +174,10 @@ async function priceLines(
 
 export async function createBill(trx: Trx, c: BillInput): Promise<BillView> {
   const companyId = c.companyId.toLowerCase();
+  if (c.id) {
+    const existing = await getBill(trx, companyId, c.id).catch(() => null);
+    if (existing) return existing;
+  }
   if (!DATE_RE.test(c.billDate) || (c.dueDate !== undefined && !DATE_RE.test(c.dueDate))) {
     throw new BillError('INVALID_BILL', 'bill and due dates are YYYY-MM-DD');
   }
@@ -229,6 +235,7 @@ export async function createBill(trx: Trx, c: BillInput): Promise<BillView> {
   const header = await trx
     .insertInto('app.supplier_bill')
     .values({
+      ...(c.id ? { id: c.id.toLowerCase() } : {}),
       company_id: companyId,
       party_id: c.partyId,
       supplier_ref: c.supplierRef.trim(),
@@ -284,8 +291,9 @@ export async function approveBill(
       due_date: string;
       supplier_ref: string;
       created_by: string | null;
+      submitted_at: Date | null;
     }>`
-      SELECT id::text, status, party_id::text, to_char(bill_date, 'YYYY-MM-DD') AS bill_date,
+      SELECT id::text, status, party_id::text, submitted_at, to_char(bill_date, 'YYYY-MM-DD') AS bill_date,
              to_char(due_date, 'YYYY-MM-DD') AS due_date, supplier_ref, created_by::text
         FROM app.supplier_bill WHERE company_id = ${companyId} AND id = ${c.billId}::uuid FOR UPDATE`.execute(
       trx,
@@ -293,6 +301,9 @@ export async function approveBill(
   ).rows[0];
   if (!h) throw new BillError('INVALID_BILL', `bill ${c.billId} is not in company ${companyId}`);
   if (h.status !== 'draft') throw new BillError('NOT_DRAFT', `bill ${c.billId} is ${h.status}`);
+  if (!h.submitted_at) {
+    throw new BillError('NOT_SUBMITTED', `bill ${c.billId} has not been submitted for approval`);
+  }
   const rows = await trx
     .selectFrom('app.supplier_bill_line')
     .select(['line_no', 'account_id', 'description', 'amount', 'tax_code'])
@@ -395,4 +406,91 @@ export async function approveBill(
     tax: taxed.tax,
     gross: taxed.gross,
   };
+}
+
+export interface BillSummary extends BillView {
+  readonly partyId: string;
+  readonly supplierRef: string;
+  readonly billDate: string;
+  readonly submittedAt: Date | null;
+  readonly createdBy: string | null;
+}
+
+/** One bill of the company. */
+export async function getBill(trx: Trx, companyId: string, billId: string): Promise<BillSummary> {
+  const r = (
+    await sql<{
+      id: string;
+      status: 'draft' | 'posted' | 'void';
+      bill_no: string | null;
+      entry_id: string | null;
+      net_total: string;
+      tax_total: string;
+      gross_total: string;
+      party_id: string;
+      supplier_ref: string;
+      bill_date: string;
+      submitted_at: Date | null;
+      created_by: string | null;
+    }>`
+      SELECT id::text, status, bill_no, entry_id::text, net_total::text, tax_total::text, gross_total::text,
+             party_id::text, supplier_ref, to_char(bill_date, 'YYYY-MM-DD') AS bill_date, submitted_at, created_by::text
+        FROM app.supplier_bill WHERE company_id = ${companyId.toLowerCase()} AND id = ${billId}::uuid`.execute(
+      trx,
+    )
+  ).rows[0];
+  if (!r) throw new BillError('INVALID_BILL', `bill ${billId} is not in company ${companyId}`);
+  return {
+    billId: r.id,
+    status: r.status,
+    billNo: r.bill_no,
+    entryId: r.entry_id,
+    net: r.net_total,
+    tax: r.tax_total,
+    gross: r.gross_total,
+    partyId: r.party_id,
+    supplierRef: r.supplier_ref,
+    billDate: r.bill_date,
+    submittedAt: r.submitted_at,
+    createdBy: r.created_by,
+  };
+}
+
+/** Submit a coded draft for approval (UC-05: AP Clerk → Approver queue). Nothing posts. */
+export async function submitBill(
+  trx: Trx,
+  c: { companyId: string; billId: string; submittedBy?: string },
+): Promise<BillSummary> {
+  const companyId = c.companyId.toLowerCase();
+  const r = await trx
+    .updateTable('app.supplier_bill')
+    .set({
+      submitted_by: c.submittedBy ?? null,
+      submitted_at: sql<Date>`clock_timestamp()`,
+      updated_at: sql<Date>`clock_timestamp()`,
+    })
+    .where('company_id', '=', companyId)
+    .where('id', '=', c.billId)
+    .where('status', '=', 'draft')
+    .where('submitted_at', 'is', null)
+    .executeTakeFirst();
+  if (r.numUpdatedRows !== 1n) {
+    throw new BillError('NOT_DRAFT', `bill ${c.billId} is not an unsubmitted draft`);
+  }
+  return getBill(trx, companyId, c.billId);
+}
+
+/** The Approver's queue: submitted drafts, oldest first. */
+export async function billsAwaitingApproval(trx: Trx, companyId: string): Promise<BillSummary[]> {
+  const ids = await trx
+    .selectFrom('app.supplier_bill')
+    .select('id')
+    .where('company_id', '=', companyId.toLowerCase())
+    .where('status', '=', 'draft')
+    .where('submitted_at', 'is not', null)
+    .orderBy('submitted_at')
+    .execute();
+  const out: BillSummary[] = [];
+  for (const r of ids) out.push(await getBill(trx, companyId, r.id));
+  return out;
 }
