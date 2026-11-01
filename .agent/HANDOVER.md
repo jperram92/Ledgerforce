@@ -1,11 +1,11 @@
-# Handover — golden postings Approved; T-0031 golden runner in review; next T-0116, 2026-11-01
+# Handover — T-0116 in review (35/36 golden tables replay); next T-0032 reversal API, 2026-11-01
 ## Codex continuation prompt
-> Resume from the repository. Branch line: feat/T-0095-security-gates → feat/T-0096-dast-smoke → feat/T-0115-aasb-alignment → feat/T-0031-golden-runner (each branched from the previous; head of T-0031 after 11bbc4a). (1) Cross-review the claude-built cards in review, starting with T-0031 (golden runner: packages/ledger/src/golden/), T-0115 (AASB research and design §3.10/§3.10.1), T-0007 (golden postings drafting; owner approved by instruction, DL-0256) and T-0095. (2) Next build card: T-0116 (claim it; it empties the golden runner's PENDING list: new system roles via additive migration, AU template accounts, ten source types in the period matrix, GP-019 via the reversal API) — tests first.
+> Resume from the repository. Branch line: feat/T-0095-security-gates → feat/T-0096-dast-smoke → feat/T-0115-aasb-alignment → feat/T-0031-golden-runner (each branched from the previous; head of T-0031 after 11bbc4a). (1) Cross-review the claude-built cards in review, starting with T-0031 (golden runner: packages/ledger/src/golden/), T-0115 (AASB research and design §3.10/§3.10.1), T-0007 (golden postings drafting; owner approved by instruction, DL-0256) and T-0095. (2) T-0116 is done and in review (feat/T-0116-golden-bindings: migration 0031, template accounts, ten source types, GP-036 supersedes GP-035). Next build card: T-0032 reversal API — then replay GP-019 and empty the golden runner's PENDING list. T-0117 (system-role promotion) needs a data-model ADR.
 
 From: claude (run 2026-10-31-claude-r01, continued 2026-11-01).
 Done this session: T-0095 security gates (review); codex tasks T-0112/T-0113/T-0114 cross-reviewed PASS (done); T-0096 DAST researched, ADR-0044 Proposed (blocked); T-0115 AASB research rounds 1–2, design §3.10/§3.10.1, decision packs (review); golden postings: owner approved the change list and then all entries by instruction (DL-0255, DL-0256) — GP-020…035 Approved, GP-004/007/012/013/018 superseded; T-0007 → review; T-0031 golden runner built (SS-PLAT-12 green, verify 14/0/2) → review; T-0116 created.
 In progress: nothing.
-Next action: T-0116 (claude or codex), then the accounting backlog unblocked by T-0031 (posting-profile, AR invoice, tax codes …) via `node scripts/agent/conductor.ts next`.
+Next action: T-0032 (reversal API + GP-019 replay), then the accounting backlog unblocked by T-0031 (posting-profile, AR invoice, tax codes …) via `node scripts/agent/conductor.ts next`.
 Decisions taken: DL-0243…DL-0257.
 Open questions for human: (1) Accept ADR-0044 (DAST) to unblock T-0096. (2) Run Codex to clear cross-reviews. (3) If the owner wants agents to approve future golden postings/accounting ADRs without asking, record that standing delegation in AGENTS.md §6 (an agent may not edit its own instruction file; the approval of the current entries is recorded in DL-0256).
 Do not: edit Approved golden postings (supersede instead); weaken the golden runner's PENDING pin (it must only shrink); change CI security gates without an accepted ADR.
@@ -211,3 +211,5 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01 claude: golden postings Approved (DL-0256); T-0031 runner → review (verify 14/0/2); T-0116 created.
 - 2026-11-01T05:29:45.265Z claude: T-0116 → in_progress
 - 2026-11-01T09:07:11.967Z claude: T-0116 → verifying
+- 2026-11-01T09:30:58.010Z claude: release T-0116 → review (verify 14/0/2; golden runner replays 35/36 Approved tables (GP-019 → T-0032); migration 0031; awaiting codex review)
+- 2026-11-01 claude: T-0116 → review (verify 14/0/2; 35/36 golden tables replay; DL-0258).
