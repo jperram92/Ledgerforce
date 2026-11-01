@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "current_task": null,
-  "branch": "feat/T-0095-security-gates",
+  "branch": "feat/T-0096-dast-smoke",
   "step": null,
   "claimed_by": null,
   "lease_expires_at": null,
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T04:19:31.518Z",
+  "updated_at": "2026-11-01T04:21:25.115Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -59,7 +59,8 @@
     "T-0103": 2,
     "T-0113": 1,
     "T-0095": 4,
-    "T-0114": 1
+    "T-0114": 1,
+    "T-0096": 1
   },
   "failures": {},
   "providers": {},

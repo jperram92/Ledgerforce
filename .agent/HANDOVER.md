@@ -1,15 +1,14 @@
-# Handover — T-0095 in review (awaiting Codex cross-review), 2026-11-01
+# Handover — T-0095 in review; T-0096 blocked on ADR-0044; 2026-11-01
 ## Codex continuation prompt
-> Cross-review T-0095 on feat/T-0095-security-gates (head after 8f74387; `git log 29e3def..HEAD --format=full`). Run the `cross-review` skill against `.claude/agents/reviewer.md` and write `.agent/evidence/T-0095/review-codex-<date>.md`. Focus: `.github/workflows/security.yml` (read-only permissions, SHA-pinned actions, no softening), `scripts/security/scan.mjs` (fail-closed, container user/scratch /tmp, redaction), `.gitleaksignore` (19 commit-scoped entries only — verify each with `git show <commit>:<path>` is a placeholder), `infra/docker/Dockerfile` runtime changes (Alpine node without npm/corepack/yarn; web without curl, apk upgrade), and evidence `.agent/evidence/T-0095/20261101-034942-SS-PLAT-18-ci-security-run.md` vs GitHub run 41270568508. Re-run: `pnpm exec vitest run infra/test/security-workflow.contract.test.ts` and, with Docker, `node --test tests/security/scanners.contract.test.mjs`. Note: compose install-smoke (SS-PLAT-23) runs only on pull requests and has not run against the Alpine runtime images — run it or open a PR before merge.
+> Resume from the repository. (1) Cross-review T-0095 on feat/T-0095-security-gates (head 2164cfd..ef54e60; see .agent/evidence/T-0095/ and DL-0243..0248) with the `cross-review` skill. (2) Cross-review the other claude-built cards in status review. T-0096 (DAST) is on feat/T-0096-dast-smoke and blocked until the owner accepts ADR-0044; do not change workflows before that.
 
-From: claude (run 2026-10-31-claude-r01, continued 2026-11-01). Reason: task built and verified; review must be by the other provider.
-Done: security.yml with SAST, secrets (history + tree), dependencies, image SBOM + Grype for api/worker/setup/web, scanner contract job. GitHub run 41270568508 on 071317b: 8/8 green; scanner contracts 9/9. verify.sh on 8f74387: 13 PASS / 0 FAIL / 3 PENDING. Decisions DL-0243..0248.
-In progress: nothing; status review.
-Next action: Codex cross-review (above). Then merge with green CI. Next build work is gated: 53 cards await Codex cross-review and T-0007 golden postings await the product owner (blocks T-0031 and 14 dependants).
-Decisions taken: DL-0243 (workflow), DL-0244 (history-only ignore, owner instruction), DL-0245 (container user), DL-0246 (scratch /tmp), DL-0247 (full-history parity), DL-0248 (runtime images).
-Also done this session: Claude cross-reviewed and closed codex tasks T-0113, T-0114, T-0112 (DL-0249..0251).
-Open questions for human: (1) Approve the golden postings in T-0007 to unblock the accounting backlog. (2) Run Codex (`node scripts/agent/conductor.ts run` on a machine with the codex CLI) to clear the 53 pending cross-reviews.
-Do not: add bare-path or inline gitleaks suppressions, lower the Grype threshold or use ignore-unfixed, edit ci.yml/verify.sh, rewrite history, merge without cross-review.
+From: claude (run 2026-10-31-claude-r01, continued 2026-11-01).
+Done: T-0095 built, CI-proven (security run 41270568508 8/8), verified 13/0/3 → review. Cross-reviewed codex tasks T-0113, T-0114, T-0112: PASS, done. T-0096: RQ-0094 resolved, ADR-0044 Proposed, task blocked (human gate).
+In progress: nothing.
+Next action: owner decisions below; codex cross-reviews.
+Decisions taken: DL-0243..0252.
+Open questions for human: (1) Accept ADR-0044 (passive ZAP DAST job in security.yml, read-only, fails on High) to unblock T-0096. (2) Approve the golden postings in T-0007 to unblock the accounting backlog (T-0031 and dependants). (3) Run Codex (`node scripts/agent/conductor.ts run` where the codex CLI is installed) to clear the 53 claude-built cards awaiting cross-review.
+Do not: change CI security gates without an accepted ADR; add suppressions; rewrite history; merge without cross-review.
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -199,3 +198,6 @@ Do not: add bare-path or inline gitleaks suppressions, lower the Grype threshold
 - 2026-11-01T04:03:48.203Z codex: release T-0113 → done (cross-review PASS by claude (.agent/evidence/T-0113/review-claude-20261101-040347.md))
 - 2026-11-01T04:11:51.663Z codex: release T-0114 → done (verify 13/0/3; cross-review PASS by claude (.agent/evidence/T-0114/review-claude-20261101-041151.md))
 - 2026-11-01T04:19:31.519Z codex: release T-0112 → done (cross-review PASS by claude (.agent/evidence/T-0112/review-claude-20261101-041931.md); Windows-only failures tracked in T-0103)
+- 2026-11-01T04:19:56.516Z claude: T-0096 → researching
+- 2026-11-01T04:21:25.116Z claude: release T-0096 → blocked (human gate adr:security: accept ADR-0044 (DAST job in security.yml); research RQ-0094 done, no workflow changed)
+- 2026-11-01 claude: T-0096 researched (RQ-0094), ADR-0044 proposed, blocked on owner.

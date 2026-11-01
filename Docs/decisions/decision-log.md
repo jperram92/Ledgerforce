@@ -1934,3 +1934,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 ### DL-0251 — Cross-review T-0112 PASS; task done; Windows failures stay in T-0103
 - Date: 2026-11-01 · By: claude (reviewer; builder codex) · Task: T-0112 · Category: process
 - verify.sh --task T-0112 on Linux: every substantive gate PASS; only gate 12 bookkeeping failed (in_progress, steps unticked), PASS after the review. Outbox wiring, fail-closed posting and owner-authorized LF_EVIDENCE_DIR placement checked. The Windows atomic-write and missed-heartbeat failures are not T-0112 criteria and remain tracked in blocked T-0103. Report .agent/evidence/T-0112/review-claude-*.md.
+
+### DL-0252 — T-0096 DAST: research done, ADR-0044 proposed, human gate
+- Date: 2026-11-01 · By: claude · Task: T-0096 · Category: security
+- RQ-0094 (ZAP source code + action README): baseline scan is passive; exit codes 0/1/2/3; all alerts WARN by default; the official action writes GitHub issues with a write token by default.
+- Proposed ADR-0044: `dast` job in security.yml running a digest-pinned zap-baseline.py with `-I -J`, a repository parser failing on High alerts and fail-closed on errors, no issue writing, real-scanner contract tests. ADR-0043 excluded DAST and CI security gates are human-owned, so T-0096 is blocked until the owner accepts ADR-0044. No workflow changed.
+- ADR: ADR-0044 · Status: proposed
