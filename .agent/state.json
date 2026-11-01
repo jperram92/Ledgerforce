@@ -4,10 +4,10 @@
   "branch": "feat/T-0032-reversal",
   "step": null,
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-01T10:17:28.420Z",
+  "lease_expires_at": "2026-11-01T10:21:58.584Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T09:32:28.423Z",
+  "updated_at": "2026-11-01T09:36:58.586Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

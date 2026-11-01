@@ -56,6 +56,10 @@ const REFUSALS: Record<string, Words> = {
     'The date is in a locked period, and an override is not allowed here. Choose a date in an open period.',
   ALREADY_POSTED: () =>
     'This journal is already posted. Posting it again would change nothing; corrections are made with a reversing journal.',
+  NOT_REVERSIBLE: () =>
+    'This entry cannot be voided: it is already voided, is itself a void, or is not posted.',
+  ALLOCATED: () =>
+    'This document has payments or credits applied to it, so it cannot be voided. Issue a credit note instead.',
 };
 
 export const POSTING_REFUSAL_CODES: readonly string[] = Object.freeze(Object.keys(REFUSALS));
