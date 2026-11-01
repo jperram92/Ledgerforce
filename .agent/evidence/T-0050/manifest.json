@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0050",
+  "entries": [
+    {
+      "scenario": "SS-UC05-04",
+      "file": ".agent/evidence/T-0050/20261101-214936-tests-db.json",
+      "test": "3 test(s): packages/modules/ap/src/bills.db.test.ts › SS-UC05-04: Approved bill posts GP-008 › SS-UC05-04 approving BILL as in GP-008 posts exactly GP-008 and leaves an AP open item of 2,750.00 | packages/modules/ap/src/bills.db.test.ts › SS-UC05-04: Approved bill posts GP-008 › the same supplier invoice number cannot be entered twice (duplicate bill) | packages/modules/ap/src/bills.db.test.ts › SS-UC05-04: Approved bill posts GP-008 › SS-UC05-02 the suggestion for this supplier comes from its posted bills",
+      "commit": "a0fc22b6ba79",
+      "provider": "claude",
+      "timestamp": "2026-11-01T21:49:36.258Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-02",
+      "file": ".agent/evidence/T-0050/20261101-214936-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/bills.db.test.ts › SS-UC05-04: Approved bill posts GP-008 › SS-UC05-02 the suggestion for this supplier comes from its posted bills",
+      "commit": "a0fc22b6ba79",
+      "provider": "claude",
+      "timestamp": "2026-11-01T21:49:36.258Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-07",
+      "file": ".agent/evidence/T-0050/20261101-214936-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/bills.db.test.ts › SS-UC05-07: Bill in AP-locked period rejected › SS-UC05-07 a bill dated 2026-10-20 in an AP-locked October is rejected with PERIOD_LOCKED and nothing posts",
+      "commit": "a0fc22b6ba79",
+      "provider": "claude",
+      "timestamp": "2026-11-01T21:49:36.258Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-02",
+      "file": ".agent/evidence/T-0050/20261101-214940-tests-unit.json",
+      "test": "2 test(s): packages/modules/ap/src/suggest.test.ts › SS-UC05-02: Suggested coding from past bills › SS-UC05-02 a supplier whose last 3 bills used Office expenses / GST is suggested Office expenses with GST | packages/modules/ap/src/suggest.test.ts › SS-UC05-02: Suggested coding from past bills › only the last 3 bills count; ties go to the most recent; no history → no suggestion",
+      "commit": "a0fc22b6ba79",
+      "provider": "claude",
+      "timestamp": "2026-11-01T21:49:40.025Z",
+      "result": "passed"
+    }
+  ]
+}
