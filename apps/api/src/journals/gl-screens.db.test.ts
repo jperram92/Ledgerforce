@@ -162,7 +162,7 @@ describe('SS-PLAT-96: GL screen read routes (chart, journal list, journal previe
     expect(body.companies).toEqual([
       { id: co('accountant').id, name: 'Harbour & Co Pty Ltd', base_currency: 'AUD' },
     ]);
-    expect(body.accounts).toHaveLength(43);
+    expect(body.accounts).toHaveLength(auServicesSmb.accounts.length); // 50 since T-0116 (DL-0258)
     expect(body.accounts.map((a) => a.code)).toEqual([...body.accounts.map((a) => a.code)].sort());
     expect(body.accounts.find((a) => a.code === '1200')).toEqual({
       id: co('accountant').acct['1200'],
