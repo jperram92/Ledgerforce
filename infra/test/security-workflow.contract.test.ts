@@ -117,7 +117,7 @@ describe('approved security workflow contract [T-0095]', () => {
     }
   });
 
-  it('runs the ADR-0044 DAST baseline against the started stack, contract-tested [T-0096]', () => {
+  it('SS-PLAT-101 runs the ADR-0044 DAST baseline against the started stack, contract-tested [T-0096]', () => {
     const file = resolve(root, '.github/workflows/security.yml');
     const text = existsSync(file) ? readFileSync(file, 'utf8') : '';
     const workflow = document('.github/workflows/security.yml');
