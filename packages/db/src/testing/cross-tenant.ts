@@ -148,6 +148,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0046: customer receipts (method CHECK, amount > 0).
+  'app.customer_receipt': { method: () => 'eft', amount: () => '1' },
   // T-0045: credit notes (reason CHECK; gross > 0; draft so lines may be inserted).
   'app.credit_note': {
     status: () => 'draft',

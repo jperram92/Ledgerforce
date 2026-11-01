@@ -31,6 +31,11 @@ export async function seedBillingCompany(f: LedgerFixture): Promise<SeededProfil
       .values({ company_id: f.companyId, code: 'ar_credit_note_document', prefix: 'CN-' })
       .onConflict((oc) => oc.doNothing())
       .execute();
+    await trx
+      .insertInto('app.number_series')
+      .values({ company_id: f.companyId, code: 'ar_receipt_document', prefix: 'RCT-' })
+      .onConflict((oc) => oc.doNothing())
+      .execute();
     await seedTaxCodes(trx, f.companyId);
     return seedPostingProfiles(trx, f.companyId, auServicesSmb, new Map(Object.entries(f.acct)));
   });

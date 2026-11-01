@@ -559,6 +559,24 @@ export interface SalesInvoiceLineTable {
   tax_code_id: Generated<string | null>;
 }
 
+/** Migration 0041 (T-0046): customer receipt, posted at once; immutable. */
+export interface CustomerReceiptTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  receipt_no: string;
+  receipt_date: ColumnType<Date, string, never>;
+  amount: string;
+  method: 'eft' | 'cheque' | 'cash' | 'card';
+  account_id: string;
+  reference: string | null;
+  idempotency_key: string;
+  entry_id: string;
+  created_by: string | null;
+  created_at: Timestamp;
+}
+
 /** Migration 0040 (T-0045): customer credit note against an invoice; frozen once posted. */
 export interface CreditNoteTable {
   id: Generated<string>;
@@ -862,6 +880,7 @@ export interface Database {
   'app.sales_invoice_line': SalesInvoiceLineTable;
   'app.ar_settings': ArSettingsTable;
   'app.credit_note': CreditNoteTable;
+  'app.customer_receipt': CustomerReceiptTable;
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;

@@ -1,3 +1,4 @@
+import { ArReceiptsController } from './ar/receipts.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArBatchesController } from './ar/batches.controller.ts';
 import 'reflect-metadata';
@@ -100,6 +101,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   SyncIssuesController,
   ArBatchesController,
   ArCreditNotesController,
+  ArReceiptsController,
   AuthController,
   LoginController,
 ];
@@ -136,6 +138,7 @@ class AppModule {
         SyncIssuesController,
         ArBatchesController,
         ArCreditNotesController,
+        ArReceiptsController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,
