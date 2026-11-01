@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0041",
+  "current_task": null,
   "branch": "feat/T-0040-sales-invoice",
   "step": null,
-  "claimed_by": "claude",
-  "lease_expires_at": "2026-11-01T19:54:44.062Z",
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T19:09:44.064Z",
+  "updated_at": "2026-11-01T19:26:07.443Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
