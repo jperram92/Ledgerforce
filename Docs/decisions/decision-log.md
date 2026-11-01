@@ -1994,3 +1994,12 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - `AU_TAX_CODES` (data) with effective dating and BAS labels; labels not confirmed by RQ-0095/0096 (G2/G3/G4/G13/G14, imports) carry `verify: true` for the BAS task.
 - Tests: SS-UC01-11 golden against GP-023a/b; fast-check INV-gst-sum, INV-gst-scale, INV-gst-total-invoice. Mutation (residual applied in the wrong mode) fails both golden variants.
 - Card exceeded its size target: database tax_code table, company tax_rounding setting and journal-line wiring split to T-0118. `@ledgerforce/ledger` exports its golden parser as `./golden` for module golden tests.
+
+### DL-0261 — Tax codes are per-company effective-dated rows; the engine checks them on the document date
+- Date: 2026-11-01 · By: claude · Task: T-0118 · Category: implementation (tax, data model additive)
+- `app.tax_code` (migration 0032) holds each company's codes; a rate change is a new row whose range follows the closed old one, never an edit of the rate (lf_app may update only name, effective_to, status and the two accounts), so posted lines keep the rate they were taxed at. Overlapping ranges of one code are refused by a trigger serialised on an advisory lock (no btree_gist extension needed, works on PostgreSQL 16 and 17). The trigger runs before ON CONFLICT, so `seedTaxCodes` skips existing (code, effective_from) pairs itself.
+- Collected/paid accounts are optional per code; NULL means the company's GST_COLLECTED / GST_PAID system role (how Xero/MYOB default every GST code to one GST account).
+- `app.company.tax_rounding` (total_invoice default, per_line_2dp) is the Q8 setting the calculator reads.
+- `journal_line.tax_code_id` gets a foreign key to the company's code (additive, same tenant and company). The engine refuses with INVALID_TAX_CODE before writing — in preview too — when a line's code is not the company's or not active and in force on the requested entry date (the document/tax-point date, not a period-redirected date). A reversal only needs the company's code: it mirrors the original, whose code may since have ended (mutation-tested).
+- The evidence recorder's scenario pattern now accepts three-digit ids (the platform series reached SS-PLAT-100).
+

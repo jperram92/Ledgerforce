@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0118",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-100",
+      "file": ".agent/evidence/T-0118/20261101-103148-tests-db.json",
+      "test": "7 test(s): packages/modules/tax/src/tax-codes.db.test.ts › SS-PLAT-100: Tax codes per company, effective-dated, enforced by the engine (T-0118) › SS-PLAT-100 seeds every AU code once per company; a second seed adds nothing | packages/modules/tax/src/tax-codes.db.test.ts › SS-PLAT-100: Tax codes per company, effective-dated, enforced by the engine (T-0118) › SS-PLAT-100 looks a code up by date, consistent with the catalogue | packages/modules/tax/src/tax-codes.db.test.ts › SS-PLAT-100: Tax codes per company, effective-dated, enforced by the engine (T-0118) › SS-PLAT-100 refuses an overlapping effective range for the same code; a closed range can be followed | packages/modules/tax/src/tax-codes.db.test.ts › SS-PLAT-100: Tax codes per company, effective-dated, enforced by the engine (T-0118) › SS-PLAT-100 a tax code may name its own collected account, only from its own company | packages/modules/tax/src/tax-codes.db.test.ts › SS-PLAT-100: Tax codes per company, effective-dated, enforced by the engine (T-0118) › SS-PLAT-100 company tax_rounding defaults to total_invoice and accepts only the two rules | packages/modules/tax/src/tax-codes.db.test.ts › SS-PLAT-100: Tax codes per company, effective-dated, enforced by the engine (T-0118) › SS-PLAT-100 the engine refuses a tax code of another company, or one not in force on the entry date | packages/modules/tax/src/tax-codes.db.test.ts › SS-PLAT-100: Tax codes per company, effective-dated, enforced by the engine (T-0118) › SS-PLAT-100 a reversal keeps the tax code its original was taxed at, even after that code ended",
+      "commit": "335a9a6c235c",
+      "provider": "claude",
+      "timestamp": "2026-11-01T10:31:48.919Z",
+      "result": "passed"
+    }
+  ]
+}
