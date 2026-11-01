@@ -4,10 +4,10 @@
   "branch": "feat/T-0095-security-gates",
   "step": null,
   "claimed_by": "claude",
-  "lease_expires_at": "2026-10-31T23:56:26.961Z",
+  "lease_expires_at": "2026-11-01T04:38:44.812Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-10-31T23:11:26.970Z",
+  "updated_at": "2026-11-01T03:53:44.821Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

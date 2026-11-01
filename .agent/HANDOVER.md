@@ -192,3 +192,4 @@ Do not: add bare path entries or gitleaks:allow, weaken tests, edit ci.yml/verif
 - 2026-10-31T23:09:58.592Z claude: release T-0095 → blocked (human gate: owner to decide Gitleaks exception (evidence/T-0095/gitleaks-exception-proposal-claude-20261031.md) and to open a PR so security.yml runs in Actions (vulnerability gate unproven locally: grype.anchore.io denied). verify 11 PASS/2 FAIL/3 PENDING.)
 - 2026-10-31T23:11:26.758Z claude: release T-0095 → todo
 - 2026-10-31 claude: placeholders fixed (2391410), security.yml runs on push; .gitleaksignore pending owner OK.
+- 2026-11-01T03:53:44.822Z claude: T-0095 → verifying

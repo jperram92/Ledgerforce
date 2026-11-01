@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0095",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-18",
+      "file": ".agent/evidence/T-0095/20261101-034942-SS-PLAT-18-ci-security-run.md",
+      "test": "9 test(s): tests/security/scanners.contract.test.mjs › SS-PLAT-18 (GitHub Actions security run 41270568508, 8/8 jobs success)",
+      "commit": "071317b",
+      "provider": "claude",
+      "timestamp": "2026-11-01T03:49:42.693Z",
+      "result": "passed"
+    }
+  ]
+}
