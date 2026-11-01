@@ -6,7 +6,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./testing": "./src/testing/journal-fixture.ts"
+    "./testing": "./src/testing/journal-fixture.ts",
+    "./golden": "./src/golden/postings.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

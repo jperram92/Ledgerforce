@@ -1987,3 +1987,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Control accounts accept `ledger_reversal` (it mirrors a subledger document); raw commands still cannot carry it (`checkCommand` refuses unless called by reverse()). SS-PLAT-64 unit test updated to pin this.
 - Concurrency: lf_app has no UPDATE on journal tables, so `SELECT … FOR UPDATE` is refused; reversal serialises on a transaction advisory lock per entry.
 - Golden runner: GP-019 replays by posting GP-001 and reversing it — all 36 Approved tables now replay; PENDING is empty. Mutation (unswapped lines) fails 4 tests.
+
+### DL-0260 — GST calculator and AU tax-code catalogue as a module; persistence split to T-0118
+- Date: 2026-11-01 · By: claude · Task: T-0034 · Category: implementation (tax)
+- New workspace package `@ledgerforce/tax` (no new third-party dependency: decimal.js is already the project's money library). `computeTax()` implements the Q8 decision (GP-023): `total_invoice` (AU default) rounds the document's unrounded GST once half-up and puts the cent residual on the largest taxable line (ties: last), so line amounts always add up and ROUNDING stays zero; `per_line_2dp` rounds each line. Inclusive pricing keeps gross, exclusive keeps net. Results are cent amounts in the ledger's NUMERIC(19,4) text via Money (the no-float lint rule forbids toFixed even on Decimal); exact intermediate GST stays in Decimal because Money refuses > 4 decimals.
+- `AU_TAX_CODES` (data) with effective dating and BAS labels; labels not confirmed by RQ-0095/0096 (G2/G3/G4/G13/G14, imports) carry `verify: true` for the BAS task.
+- Tests: SS-UC01-11 golden against GP-023a/b; fast-check INV-gst-sum, INV-gst-scale, INV-gst-total-invoice. Mutation (residual applied in the wrong mode) fails both golden variants.
+- Card exceeded its size target: database tax_code table, company tax_rounding setting and journal-line wiring split to T-0118. `@ledgerforce/ledger` exports its golden parser as `./golden` for module golden tests.

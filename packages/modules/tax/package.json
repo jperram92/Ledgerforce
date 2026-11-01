@@ -1,0 +1,23 @@
+{
+  "name": "@ledgerforce/tax",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Tax engine: AU tax-code catalogue and GST calculator with ATO rounding rules (design §3.4, §3.6)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/shared": "workspace:*",
+    "decimal.js": "10.6.0"
+  },
+  "devDependencies": {
+    "@ledgerforce/ledger": "workspace:*",
+    "@types/node": "22.20.5",
+    "fast-check": "4.10.2",
+    "vitest": "4.1.12"
+  }
+}

@@ -217,6 +217,7 @@ graph LR
 | [T-0115](T-0115.md) | AASB alignment: research Australian Accounting Standards and update the solution design | MVP | todo | — |
 | [T-0116](T-0116.md) | Template roles, accounts and source types for the AASB/GST golden postings | MVP | todo | T-0031 |
 | [T-0117](T-0117.md) | Promote period-end accounts to system roles (additive role binding) | Phase 1 | todo | T-0116 |
+| [T-0118](T-0118.md) | Tax codes in the database: effective-dated tax_code table, company rounding setting, line wiring | MVP | todo | T-0034 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:
