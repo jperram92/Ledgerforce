@@ -418,6 +418,22 @@ export interface ProductTable {
   created_at: Timestamp;
 }
 
+/** Migration 0034 (T-0039): party × product profile overrides; NULL = product default. */
+export interface PostingProfileOverrideTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_profile_id: ColumnType<string, string, never>;
+  product_profile_id: ColumnType<string, string, never>;
+  revenue_account_id: string | null;
+  expense_account_id: string | null;
+  cogs_account_id: string | null;
+  discount_account_id: string | null;
+  tax_code: string | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
 /** Migration 0033 (T-0038): Product2.Family / Account.Type → profile. */
 export interface SalesforceProfileMappingTable {
   id: Generated<string>;
@@ -655,6 +671,7 @@ export interface Database {
   'app.product_posting_profile': ProductPostingProfileTable;
   'app.product': ProductTable;
   'app.salesforce_profile_mapping': SalesforceProfileMappingTable;
+  'app.posting_profile_override': PostingProfileOverrideTable;
   'app.party_role': PartyRoleTable;
   'app.party_address': PartyAddressTable;
   'app.party_contact': PartyContactTable;

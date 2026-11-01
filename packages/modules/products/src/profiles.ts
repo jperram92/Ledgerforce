@@ -57,7 +57,7 @@ export interface ProductInput {
   salesforceProduct2Id?: string;
 }
 
-interface AccountFacts {
+export interface AccountFacts {
   type: string;
   postable: boolean;
   is_control: boolean;
@@ -82,7 +82,7 @@ async function accountFacts(
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-async function requireAccount(
+export async function requireAccount(
   trx: Trx,
   companyId: string,
   profile: string,

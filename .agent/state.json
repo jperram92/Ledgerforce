@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0035-bas-query",
+  "current_task": "T-0039",
+  "branch": "feat/T-0038-posting-profiles",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "claude",
+  "lease_expires_at": "2026-11-01T13:02:26.348Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T12:16:44.237Z",
+  "updated_at": "2026-11-01T12:17:26.355Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -69,7 +69,8 @@
     "T-0118": 1,
     "T-0033": 1,
     "T-0035": 1,
-    "T-0038": 1
+    "T-0038": 1,
+    "T-0039": 1
   },
   "failures": {},
   "providers": {},
