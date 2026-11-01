@@ -2047,3 +2047,14 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - `profileGaps` checks every active combination that could occur (customer profiles for sales, supplier profiles for purchases); the AU template has none. It is the wizard's gap check now; running it nightly needs a scheduler, which waits on ADR-0029 (Proposed: scheduling/supervision runs as lf_migrator) — the job body is this function.
 - SS-UC01-06 is green at the profile layer; the draft invoice carrying the PROFILE_GAP warning on Closed Won is T-0069's (it calls resolvePosting).
 
+### DL-0268 — Sales invoices: approve posts in one transaction; warnings on drafts; outbox port; GP-023 replaces GP-018 in SS-UC01-11
+- Date: 2026-11-01 · By: claude · Task: T-0040 · Category: implementation (AR, data model additive)
+- New package @ledgerforce/ar and migration 0035 (sales_invoice, sales_invoice_line, ar_settings). Approval and posting are one transaction (status draft → posted; no separate "approved, not posted" state yet — added when asynchronous batch posting needs it, T-0044). The database freezes a posted invoice and its lines (triggers); only posted → void is allowed later.
+- Journal shape is the golden one: Dr AR control gross (party, due date) / Cr revenue grouped by (account, tax code) in line order with tax code, tax and party / Cr GST collected — GP-001 and GP-023a/b reproduced line for line by the lifecycle test (three invoice lines on one account become one revenue line, as GP-023 shows).
+- Accounts and tax codes come from the posting-profile matrix (T-0039); a line that does not resolve is a PROFILE_GAP warning on the draft and blocks approval (SS-UC01-06 draft half for T-0069). Auto-approve applies only to a clean draft within the gross threshold; a refusal leaves it a draft.
+- Approval refusals: NO_BILLING_TO (no active Billing To contact with an email), PROFILE_GAP, CREDIT_HOLD (hook: open AR + invoice > credit limit), NOT_DRAFT. Segregation of duties is applied by the API before approve, as for manual journals.
+- Events go through a `DocumentOutbox` port so the module does not depend on pg-boss; production wires @ledgerforce/outbox `enqueue` (same transaction). `ar.invoice.posted` carries the Billing To recipients; sending the email is T-0042.
+- Invoice numbers come from a separate gapless series `ar_invoice_document` (prefix INV-), distinct from the journal entry series. Default terms 14 days when no due date is given (payment terms per party are later work).
+- SS-UC01-11's card text names GP-018a/b; GP-018 is superseded by GP-023 (DL-0256), so the test asserts GP-023a/b.
+- Cross-tenant: the line guard ignores headers this transaction cannot see, leaving refusal to RLS and the foreign key (the generated cross-tenant inserts expect the RLS error).
+
