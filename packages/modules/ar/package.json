@@ -1,0 +1,27 @@
+{
+  "name": "@ledgerforce/ar",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Accounts receivable: sales invoices (draft → approve → post), design §3.8 row 1, UC-01",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/products": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "@ledgerforce/tax": "workspace:*",
+    "decimal.js": "10.6.0",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@ledgerforce/gl": "workspace:*",
+    "@types/node": "22.20.5",
+    "vitest": "4.1.12"
+  }
+}

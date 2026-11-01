@@ -418,6 +418,57 @@ export interface ProductTable {
   created_at: Timestamp;
 }
 
+/** Migration 0035 (T-0040): sales invoice; frozen once posted. */
+export interface SalesInvoiceTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  status: Generated<'draft' | 'posted' | 'void'>;
+  invoice_no: string | null;
+  issue_date: ColumnType<Date, string, string>;
+  due_date: ColumnType<Date, string, string>;
+  pricing: Generated<'exclusive' | 'inclusive'>;
+  currency: string;
+  reference: string | null;
+  source_key: string | null;
+  net_total: string | null;
+  tax_total: string | null;
+  gross_total: string | null;
+  warnings: ColumnType<unknown, string | undefined, string>;
+  created_by: string | null;
+  approved_by: string | null;
+  approved_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+  entry_id: string | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
+export interface SalesInvoiceLineTable {
+  tenant_id: TenantId;
+  company_id: string;
+  invoice_id: string;
+  line_no: number;
+  product_id: string | null;
+  product_profile_id: string;
+  description: string;
+  quantity: string;
+  unit_price: string;
+  amount: string;
+  tax_code: string | null;
+  net: string | null;
+  tax: string | null;
+  gross: string | null;
+}
+
+export interface ArSettingsTable {
+  tenant_id: TenantId;
+  company_id: string;
+  auto_approve: Generated<boolean>;
+  auto_approve_threshold: string | null;
+  updated_at: Timestamp;
+}
+
 /** Migration 0034 (T-0039): party × product profile overrides; NULL = product default. */
 export interface PostingProfileOverrideTable {
   id: Generated<string>;
@@ -672,6 +723,9 @@ export interface Database {
   'app.product': ProductTable;
   'app.salesforce_profile_mapping': SalesforceProfileMappingTable;
   'app.posting_profile_override': PostingProfileOverrideTable;
+  'app.sales_invoice': SalesInvoiceTable;
+  'app.sales_invoice_line': SalesInvoiceLineTable;
+  'app.ar_settings': ArSettingsTable;
   'app.party_role': PartyRoleTable;
   'app.party_address': PartyAddressTable;
   'app.party_contact': PartyContactTable;
