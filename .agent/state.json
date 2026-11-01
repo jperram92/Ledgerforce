@@ -4,10 +4,10 @@
   "branch": "feat/T-0050-bills",
   "step": null,
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-01T22:41:56.630Z",
+  "lease_expires_at": "2026-11-01T22:47:34.266Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T21:56:56.635Z",
+  "updated_at": "2026-11-01T22:02:34.267Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

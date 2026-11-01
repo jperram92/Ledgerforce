@@ -62,7 +62,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC04-04 | Paid invoice gets no reminder | UC-04 | MVP | unit | no | — | T-0068 | not-started | — | — |
 | SS-UC04-05 | Salesforce Task logged for the Account owner | UC-04 | Phase 1 | contract | no | — | T-0100 | not-started | — | — |
 | SS-UC04-06 | Credit hold at 30 days blocks auto-approve | UC-04 | Phase 1 | db-integration | no | — | T-0100 | not-started | — | — |
-| SS-UC05-01 | Emailed PDF becomes a draft bill | UC-05 | MVP | db-integration | no | — | T-0051 | not-started | — | — |
+| SS-UC05-01 | Emailed PDF becomes a draft bill | UC-05 | MVP | db-integration | no | packages/modules/ap/src/inbox.db.test.ts (raw MIME → draft with PDF; transports T-0121) | T-0051 | green (ingest layer; IMAP/webhook T-0121) | [.agent/evidence/T-0051/manifest.json](../../.agent/evidence/T-0051/manifest.json) | d1c23cb |
 | SS-UC05-02 | Suggested coding from past bills | UC-05 | MVP | unit | no | packages/modules/ap/src/suggest.test.ts; packages/modules/ap/src/bills.db.test.ts | T-0050 | green | [.agent/evidence/T-0050/manifest.json](../../.agent/evidence/T-0050/manifest.json) | a0fc22b |
 | SS-UC05-03 | Coded bill routes to Approver; nothing posts before approval | UC-05 | MVP | db-integration | no | — | T-0052 | not-started | — | — |
 | SS-UC05-04 | Approved bill posts GP-008 | UC-05 | MVP | golden | no | packages/modules/ap/src/bills.db.test.ts (GP-008 line for line) | T-0050, T-0052 | green (approval workflow/SoD T-0052) | [.agent/evidence/T-0050/manifest.json](../../.agent/evidence/T-0050/manifest.json) | a0fc22b |

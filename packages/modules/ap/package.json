@@ -17,7 +17,7 @@
     "@ledgerforce/tax": "workspace:*",
     "decimal.js": "10.6.0",
     "kysely": "0.29.7",
-    "postal-mime": "4.0.6"
+    "postal-mime": "4.0.8"
   },
   "devDependencies": {
     "@ledgerforce/ar": "workspace:*",

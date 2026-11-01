@@ -2124,3 +2124,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - The supplier's invoice number is unique per supplier (DUPLICATE_BILL), the first defence against paying a bill twice.
 - `suggestCoding` takes the most used (account, tax code) of the supplier's last three posted bills; a tie goes to the coding seen first from the newest bill (SS-UC05-02). Approval routing and SoD (bill_self_approval) are T-0052; the bills inbox T-0051.
 
+### DL-0279 — Bills inbox: transport-agnostic MIME ingest; the inbox item is the draft bill; PDFs in the database
+- Date: 2026-11-01 · By: claude · Task: T-0051 · Category: implementation + dependency (ADR-0047 Proposed)
+- RQ-0098: IMAP polling for self-host, provider inbound webhooks for SaaS, no SMTP receiver; both feed one function, `ingestBillEmail(raw RFC 5322)`, idempotent on Message-ID (fallback raw SHA-256). Parser postal-mime 4.0.8 (MIT-0, no dependencies): 4.0.6 was first pinned, then the verify dependency gate reported GHSA-f2hq-32vh-53cc (High, quadratic CPU decoding many RFC 2047 words, fixed in 4.0.8, released 2026-10-17 — inside the age policy).
+- The UC-05 "draft bill" is the inbox item (`app.bill_inbox_item`, migration 0045): a supplier bill needs a supplier reference and coded lines (totals > 0), which an email does not carry; coding (`codeInboxItem`) creates the draft `supplier_bill` (T-0050) and copies the PDF to it. Sender address suggests the supplier only when it matches exactly one active supplier contact.
+- Attachments: `app.document_attachment`, PDF only, ≤ 10 MB, SHA-256, append-only (bytea in PostgreSQL for the MVP; object storage is a later decision). Transports (IMAP poller, webhook endpoint, mailbox credential storage — a security ADR) are card T-0121.
+

@@ -27,7 +27,7 @@ transport-agnostic ingest of raw RFC 5322 messages, which needs a MIME parser.
    poor use of effort and a security risk.
 
 ## Decision outcome
-Option 1, `postal-mime@4.0.6`. Rules: the parser only reads bytes already received (no network);
+Option 1, `postal-mime@4.0.8` (4.0.6 was first chosen; GHSA-f2hq-32vh-53cc — quadratic CPU on many RFC 2047 encoded words — affects < 4.0.8, found by the dependency gate). Rules: the parser only reads bytes already received (no network);
 attachments are size-limited (10 MB) and only PDFs are stored; the sender address is used to
 suggest a supplier, never to post anything.
 
