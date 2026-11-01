@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0033",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-11",
+      "file": ".agent/evidence/T-0033/20261101-110726-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/ledger.invariants.db.test.ts › SS-PLAT-11: Invariants hold over 10,000 random documents › SS-PLAT-11 INV-balance INV-tb-zero INV-ar-control INV-ap-control INV-reversal over 10,000 seeded documents",
+      "commit": "1b025bad9efd",
+      "provider": "claude",
+      "timestamp": "2026-11-01T11:07:26.843Z",
+      "result": "passed"
+    }
+  ]
+}

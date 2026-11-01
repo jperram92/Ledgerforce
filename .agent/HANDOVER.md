@@ -1,13 +1,13 @@
-# Handover — T-0118 tax codes in the DB in review; next T-0033; 2026-11-01
+# Handover — T-0033 invariant suite in review; next T-0096 (ADR-0044 accepted); 2026-11-01
 ## Codex continuation prompt
-> Resume from the repository. Branch line: feat/T-0095-security-gates → feat/T-0096-dast-smoke → feat/T-0115-aasb-alignment → feat/T-0031-golden-runner → feat/T-0116-golden-bindings → feat/T-0032-reversal → feat/T-0034-tax-gst → feat/T-0118-tax-codes-db (each branched from the previous). (1) Cross-review the claude-built cards in review (`node scripts/agent/conductor.ts status`), starting with T-0031, T-0115, T-0007, T-0095, T-0116, T-0032, T-0034 and T-0118 (migration 0032 app.tax_code + company.tax_rounding + journal_line FK; engine INVALID_TAX_CODE; packages/modules/tax/src/tax-codes.ts; SS-PLAT-100). (2) Next build card: `node scripts/agent/conductor.ts next` (T-0033 invariant suite). T-0117 (system-role promotion) needs a data-model ADR.
+> Resume from the repository. Branch line: feat/T-0095-security-gates → feat/T-0096-dast-smoke → feat/T-0115-aasb-alignment → feat/T-0031-golden-runner → feat/T-0116-golden-bindings → feat/T-0032-reversal → feat/T-0034-tax-gst → feat/T-0118-tax-codes-db → feat/T-0033-invariant-suite (each branched from the previous). (1) Cross-review the claude-built cards in review (`node scripts/agent/conductor.ts status`), starting with T-0031, T-0115, T-0007, T-0095, T-0116, T-0032, T-0034 T-0118 and T-0033 (SS-PLAT-11: packages/ledger/src/ledger.invariants.db.test.ts, 10,000 documents, CI `invariants` job with fresh seed; T-0118: migration 0032 app.tax_code + company.tax_rounding + journal_line FK; engine INVALID_TAX_CODE; packages/modules/tax/src/tax-codes.ts; SS-PLAT-100). (2) Owner accepted ADR-0044 and delegated accounting ADRs/golden postings (DL-0263; AGENTS.md §6 text to be added by the owner). Next build card: T-0096 (DAST, unblocked), then `node scripts/agent/conductor.ts next`. T-0117 (system-role promotion) needs a data-model ADR.
 
 From: claude (run 2026-10-31-claude-r01, continued 2026-11-01).
-Done this session: T-0095 security gates (review); codex tasks T-0112/T-0113/T-0114 cross-reviewed PASS (done); T-0096 DAST researched, ADR-0044 Proposed (blocked); T-0115 AASB research, design §3.10/§3.10.1 (review); golden postings Approved by owner instruction (DL-0255, DL-0256); T-0007, T-0031, T-0116, T-0032, T-0034 → review; T-0118 tax codes in the database (verify 14/0/2) → review.
+Done this session: T-0095 security gates (review); codex tasks T-0112/T-0113/T-0114 cross-reviewed PASS (done); T-0096 DAST researched, ADR-0044 Proposed (blocked); T-0115 AASB research, design §3.10/§3.10.1 (review); golden postings Approved by owner instruction (DL-0255, DL-0256); T-0007, T-0031, T-0116, T-0032, T-0034 → review; T-0118 tax codes in the database and T-0033 invariant suite (verify 14/0/2 each) → review.
 In progress: nothing.
-Next action: `node scripts/agent/conductor.ts next` → T-0033 (invariant suite), then the accounting backlog.
-Decisions taken: DL-0243…DL-0261.
-Open questions for human: (1) Accept ADR-0044 (DAST) to unblock T-0096. (2) Run Codex to clear cross-reviews. (3) If the owner wants agents to approve future golden postings/accounting ADRs without asking, record that standing delegation in AGENTS.md §6 (an agent may not edit its own instruction file; the approval of the current entries is recorded in DL-0256).
+Next action: T-0096 DAST job (ZAP 2.17.0 pinned ghcr.io/zaproxy/zaproxy:2.17.0@sha256:030d3df57735dacbb83464854758e674dd9ad01d79d12a129a8e58b1fd384238; the image cannot be pulled in this sandbox — validate through CI), then `node scripts/agent/conductor.ts next`.
+Decisions taken: DL-0243…DL-0263.
+Open questions for human: (1) Run Codex to clear cross-reviews (no Codex CLI/credentials in the cloud session). (2) Add the accepted standing delegation (DL-0263) to AGENTS.md §6 and config.yaml human_gates — agents may not edit their own instruction files.
 Do not: edit Approved golden postings (supersede instead); weaken the golden runner's PENDING pin (it must only shrink); change CI security gates without an accepted ADR; edit merged migrations (0032 is new on this branch).
 
 ## Log
@@ -223,3 +223,5 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01T10:22:46.689Z claude: T-0118 → in_progress
 - 2026-11-01T10:37:53.507Z claude: T-0118 → verifying
 - 2026-11-01T10:43:09.286Z claude: release T-0118 → review (verify 14 PASS/0 FAIL/2 PENDING (coverage baseline, cross-review); awaiting codex cross-review)
+- 2026-11-01T11:10:36.066Z claude: T-0033 → verifying
+- 2026-11-01T11:18:39.042Z claude: release T-0033 → review (verify 14 PASS/0 FAIL/2 PENDING; awaiting codex cross-review)
