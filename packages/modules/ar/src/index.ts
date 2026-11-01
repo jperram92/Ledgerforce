@@ -4,3 +4,4 @@ export * from './credit-notes.ts';
 export * from './receipts.ts';
 export * from './prepayments.ts';
 export * from './write-off.ts';
+export * from './aged.ts';

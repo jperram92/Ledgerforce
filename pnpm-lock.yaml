@@ -345,6 +345,9 @@ importers:
         specifier: 0.29.7
         version: 0.29.7
     devDependencies:
+      '@ledgerforce/connector-salesforce':
+        specifier: workspace:*
+        version: link:../../connectors/salesforce
       '@ledgerforce/gl':
         specifier: workspace:*
         version: link:../gl
