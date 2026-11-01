@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0042",
+  "entries": [
+    {
+      "scenario": "SS-UC01-03",
+      "file": ".agent/evidence/T-0042/20261101-194041-tests-db.json",
+      "test": "1 test(s): packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-03 / SS-UC02-04: invoice emailed with its PDF to Billing To and CC › SS-UC01-03 SS-UC02-04 the posted invoice event sends one email To the Billing To contact, Cc the Billing CC, with the PDF attached; redelivery sends nothing",
+      "commit": "f34671370097",
+      "provider": "claude",
+      "timestamp": "2026-11-01T19:40:41.860Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-04",
+      "file": ".agent/evidence/T-0042/20261101-194041-tests-db.json",
+      "test": "1 test(s): packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-03 / SS-UC02-04: invoice emailed with its PDF to Billing To and CC › SS-UC01-03 SS-UC02-04 the posted invoice event sends one email To the Billing To contact, Cc the Billing CC, with the PDF attached; redelivery sends nothing",
+      "commit": "f34671370097",
+      "provider": "claude",
+      "timestamp": "2026-11-01T19:40:41.860Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-08",
+      "file": ".agent/evidence/T-0042/20261101-194041-tests-db.json",
+      "test": "2 test(s): packages/modules/email/src/invoice-email.db.test.ts › SS-UC06-08: Remittance advices emailed › SS-UC06-08 the supplier Remittance contact receives one advice listing the bills paid | packages/modules/email/src/invoice-email.db.test.ts › SS-UC06-08: Remittance advices emailed › a party without the contact role gets no email: NO_RECIPIENT",
+      "commit": "f34671370097",
+      "provider": "claude",
+      "timestamp": "2026-11-01T19:40:41.860Z",
+      "result": "passed"
+    }
+  ]
+}

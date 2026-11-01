@@ -2066,3 +2066,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - CI: the db job installs Chromium (`playwright install --with-deps chromium`), because the PDF contract test runs with the database. Shipping Chromium in the worker image and rendering on `ar.invoice.posted` is new card T-0119 (image vulnerability gate must stay green).
 - The card's AC-1 had no scenario id; registered as SS-PLAT-104.
 
+### DL-0270 — Document email: nodemailer from outbox handlers (ADR-0046), dedupe per document, SMTP sink in tests
+- Date: 2026-11-01 · By: claude · Task: T-0042 · Category: implementation + dependency (ADR-0046 Proposed)
+- @ledgerforce/email sends from outbox handlers only: `invoiceEmailHandler` (`email.invoice_posted`, topic `ar.invoice.posted`) renders the T-0041 tax invoice and PDF and sends To = Billing To, Cc = Billing CC (resolved at send time from contact roles; statements fall back to Billing To; remittances go to the Remittance role). `sendRemittanceAdvice` lists the bills paid and the total, for T-0057 to call on batch confirmation.
+- `app.email_delivery` (migration 0037, append-only) records each sent email under a per-document dedupe key, so redelivery or a second event does not resend once committed; SMTP cannot join the transaction, so a crash between send and commit can resend (at-least-once, ADR-0046 rule 3).
+- nodemailer 10.1.2 (released 2026-10-16; newer 10.1.6–10.3.1 are inside the two-week age floor) and @types/nodemailer 8.0.2 (dev). SMTP from LF_SMTP_URL/LF_SMTP_FROM; TLS required except a loopback `smtp://` relay.
+- Tests talk real SMTP to an in-process sink (`@ledgerforce/email/testing`), not a mocked transport. SS-UC02-04 (39-invoice batch) and SS-UC06-08 (batch confirmation) are green at the email layer; their triggers are T-0044 and T-0057. The worker does not register the handler yet: it needs Chromium in the worker image and SMTP settings in compose (T-0119).
+
