@@ -385,6 +385,20 @@ describe('SS-PLAT-11: Invariants hold over 10,000 random documents', () => {
         [...want].filter(([k]) => k.startsWith('AP_')).reduce((s, [, v]) => s + v, 0n),
       );
 
+      // Per document, not only per party: every document's open amount equals the model, and a
+      // reversal (absent from the model) and its voided original are fully closed — otherwise a
+      // voided invoice would still show in aged AR while the party total happens to net to zero.
+      const perEntry = await sql<{ entry_id: string; open: string }>`
+        SELECT entry_id::text, sum(base_open_amount)::text AS open
+          FROM app.subledger_entry WHERE company_id = ${f.companyId}
+         GROUP BY entry_id`.execute(trx);
+      const openOf = new Map(docs.map((d) => [d.entryId, d.open]));
+      for (const r of perEntry.rows) {
+        expect(units(r.open), `open amount of entry ${r.entry_id}`).toBe(
+          openOf.get(r.entry_id) ?? 0n,
+        );
+      }
+
       // INV-reversal: each voided document and its reversal net to zero on every account.
       const pairs = await sql<{ id: string; account_id: string; net: string }>`
         SELECT o.id::text, l.account_id::text, sum(l.debit - l.credit)::text AS net
