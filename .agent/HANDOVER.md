@@ -7,7 +7,8 @@ Done: T-0095 built, CI-proven (security run 41270568508 8/8), verified 13/0/3 �
 In progress: nothing.
 Next action: owner decisions below; codex cross-reviews.
 Decisions taken: DL-0243..0252.
-Open questions for human: (1) Accept ADR-0044 (passive ZAP DAST job in security.yml, read-only, fails on High) to unblock T-0096. (2) Approve the golden postings in T-0007 to unblock the accounting backlog (T-0031 and dependants). (3) Run Codex (`node scripts/agent/conductor.ts run` where the codex CLI is installed) to clear the 53 claude-built cards awaiting cross-review.
+Also: T-0115 (AASB alignment) done on feat/T-0115-aasb-alignment — report, RQ-0095, design §3.10; in review.
+Open questions for human: (0) Decide the AASB proposals in design §11.2 / postings.md Q7, Q8, Q12–Q15 before approving golden postings. (1) Accept ADR-0044 (passive ZAP DAST job in security.yml, read-only, fails on High) to unblock T-0096. (2) Approve the golden postings in T-0007 to unblock the accounting backlog (T-0031 and dependants). (3) Run Codex (`node scripts/agent/conductor.ts run` where the codex CLI is installed) to clear the 53 claude-built cards awaiting cross-review.
 Do not: change CI security gates without an accepted ADR; add suppressions; rewrite history; merge without cross-review.
 
 ## Log
@@ -202,3 +203,5 @@ Do not: change CI security gates without an accepted ADR; add suppressions; rewr
 - 2026-11-01T04:21:25.116Z claude: release T-0096 → blocked (human gate adr:security: accept ADR-0044 (DAST job in security.yml); research RQ-0094 done, no workflow changed)
 - 2026-11-01 claude: T-0096 researched (RQ-0094), ADR-0044 proposed, blocked on owner.
 - 2026-11-01T04:27:37.263Z claude: T-0115 → researching
+- 2026-11-01T04:35:49.708Z claude: T-0115 → verifying
+- 2026-11-01T04:35:50.114Z claude: release T-0115 → review (docs-only: AASB research (RQ-0095, report), design §3.10/§12, postings research note; awaiting codex review and owner decisions)

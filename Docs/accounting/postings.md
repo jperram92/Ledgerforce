@@ -456,8 +456,22 @@ in a PR comment and the scribe will update the drafts (as new Draft entries if a
 | Q10 | Deposit invoice account: the §4.5 rule credits CUSTOMER_PREPAYMENTS (liability) on a tax invoice — confirm vs crediting revenue on the deposit invoice. | GP-014, GP-015 | Liability, cleared by the final invoice. |
 | Q11 | Reversal of an invoice in a later period: should the void be blocked once a receipt/credit is allocated (require credit note instead)? | GP-019 | Void allowed only when open = original (no allocations); otherwise credit note. |
 
+### Research update 2026-11-01 (T-0115) — for the accountant, not decisions
+
+An AASB/ATO review of every draft entry and question is in
+[AASB alignment of LedgerForce postings](../research/reports/AASB%20alignment%20of%20LedgerForce%20postings.md)
+(RQ-0095; primary sites were unreachable, so items marked unverified there need checking). Its suggestions, for
+your decision only: Q7 — reject Option A (GST is attributable on receipt, GST Act s 29-5); Q8 — make per-document
+rounding the AU default with the residual on the largest revenue line; Q4 — net into G1/1A only in the same BAS
+period, otherwise 1B; Q3, Q6, Q10, Q11 — draft answers supported; Q1, Q2, Q5 — supported with refinements. New
+questions raised: Q12 AASB 9 expected-credit-loss allowance (affects GP-007); Q13 deposit/subscription invoices
+before performance only for non-cancellable contracts (GP-014, GP-016); Q14 depreciation, accruals and prepayment
+postings needed in the MVP (GP-008); Q15 super payment posting under Payday Super from 1 July 2026 (GP-010/011).
+No entry above has been changed.
+
 ## Change history
 
 | Date | By | Change |
 |---|---|---|
 | 2026-10-24 | claude (T-0007) | Initial DRAFT, GP-001 … GP-019, Q1–Q11. |
+| 2026-11-01 | claude (T-0115) | Added research-update note under Open questions (Q12–Q15 raised); no entry changed. |

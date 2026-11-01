@@ -1,6 +1,6 @@
 # LedgerForce — Open-Source SMB ERP for Salesforce: Solution Design
 
-Oct 24, 2026 · @James Perram
+Oct 24, 2026 · @James Perram · **Revised Nov 1, 2026** (T-0115: Australian Accounting Standards alignment — new §3.10, marked notes in §1, §3.2, §3.4–§3.8, §8.1, §11; history in §12)
 
 ## 1. Executive summary
 
@@ -36,7 +36,7 @@ LedgerForce (working name) is an open-source, double-entry accounting system for
 | --- | --- |
 | GL, AR, AP, bank, tax (GST/VAT), batch billing, dunning, supplier and staff payment batches, Salesforce sync, reporting | Manufacturing, warehouse management, full inventory costing |
 | Payroll journals and net-pay batches from a payroll provider | Native payroll calculation and STP lodgement (Phase 3 at the earliest) |
-| Single entity, then multi-entity with intercompany (Phase 2) | Enterprise consolidation with minority interests, IFRS 16 lease accounting |
+| Single entity, then multi-entity with intercompany (Phase 2) | Enterprise consolidation with minority interests; full AASB 16 lease accounting beyond the short-term/low-value exemptions (AASB 16 has no small-business exemption, so a manual right-of-use/lease-liability path is proposed for Phase 2 — §3.10) |
 | Self-hosted and hosted SaaS deployment | Other CRMs (Phase 3 extension point only) |
 
 ## 2. What Xero, NetSuite and Business Central teach us
@@ -84,6 +84,7 @@ Every business document (invoice, bill, receipt, payment, payroll import, manual
 
 - Fields: code, name, type (Asset, Liability, Equity, Revenue, Expense), subtype (e.g. Current asset, Bank, Fixed asset, Direct cost), normal balance, currency (blank = any), postable flag, control-account flag, status, default tax code, required dimensions.
 - **System roles** are bound to accounts at setup and cannot be deleted while bound: AR\_CONTROL, AP\_CONTROL, GST\_COLLECTED, GST\_PAID, RETAINED\_EARNINGS, CURRENT\_YEAR\_EARNINGS, ROUNDING, FX\_REALISED, FX\_UNREALISED, SUSPENSE, UNDEPOSITED\_FUNDS, PAYROLL\_CLEARING, WAGES\_PAYABLE, PAYG\_WITHHOLDING, SUPER\_PAYABLE, DEFERRED\_REVENUE, CUSTOMER\_PREPAYMENTS.
+- **AASB note (T-0115, proposed — owner decision):** add system roles AR\_ECL\_ALLOWANCE (contra-AR, AASB 9), ACCUM\_DEPRECIATION and DEPRECIATION\_EXPENSE (AASB 116), ACCRUED\_EXPENSES and PREPAYMENTS (accrual basis), PRIOR\_PERIOD\_ADJUSTMENTS (equity, AASB 108). Add account attributes for reporting: current/non-current, cash-flow category, AASB 18 P&L category (operating, investing, financing, income tax, discontinued) and expense nature, defaulted by the chart template. See §3.10.
 - **Control accounts** (AR, AP, payroll clearing) accept postings only from their subledger, never from manual journals, so subledger and GL can't drift.
 - Templates: AU services SMB, AU SaaS, AU trade; NZ, UK and US in Phase 1. Each template ships accounts, system-role bindings, tax codes and posting profiles together.
 
@@ -109,6 +110,7 @@ Every business document (invoice, bill, receipt, payment, payroll import, manual
 
 - Store amounts as NUMERIC(19,4) and rates as NUMERIC(18,8); in code use a decimal library. Floating point is banned by lint rule.
 - Tax rounding per line or per document is a company setting (AU default: per line, half-up to cents); the difference to the document total posts to ROUNDING.
+- **AASB/ATO note (T-0115, proposed — owner decision Q8, accounting ADR):** the ATO allows the *total invoice rule* (round the invoice's GST once) or the *taxable supply rule* (sum unrounded line GST, round once). With 4-decimal storage, rounding each line to cents matches neither. Proposed AU default: per document (total invoice rule), with any cent residual taken to the largest revenue line rather than ROUNDING. The default above stands until the owner decides.
 - Document numbers (INV-000123) come from a per-company, per-series counter table updated under row lock, because database sequences leave gaps and tax invoices need clean series.
 
 ### 3.5 Periods and close
@@ -123,15 +125,18 @@ Every business document (invoice, bill, receipt, payment, payroll import, manual
 
 Retained earnings are computed at report time (cumulative prior-year P&L), as Xero does, so no closing entry is required; an optional year-end closing entry is available for those who want it.
 
+**Period-end journals (T-0115, proposed — §3.10).** AASB recognition and measurement require entries when no document is posted: accrued expenses and prepayments (auto-reversing on day 1), depreciation (recurring), the expected-credit-loss allowance movement (AASB 9), leave provisions (AASB 119, Phase 1) and FX revaluation (§3.7). The engine needs one generic capability — approved, recurring or auto-reversing period-end journals bound to system roles — that all of these ride on. **Prior-period errors (AASB 108)** are corrected without breaking principle 2: an approved `prior_period_adjustment` entry is posted in the current open period, tagged with the period it corrects, to equity (PRIOR\_PERIOD\_ADJUSTMENTS) for P&L effects; reports offer a *restated* mode that re-attributes it to the corrected period and an *as originally reported* mode. Hard-locked periods are never edited.
+
 ### 3.6 Tax engine
 
 - Tax codes are effective-dated with rate, inclusive/exclusive handling, and the accounts they post to. AU defaults: GST (10%), GST-free, input taxed, BAS excluded, GST on imports, capital acquisitions.
 - Each tax code maps to report boxes (BAS G1, 1A, 1B, etc.) so the BAS report is a query, not a spreadsheet.
 - Cash vs accrual GST basis is a company setting; the engine records both and the report picks one.
+- **GST accounting notes (T-0115):** AASB Interpretation 1031 — revenue, expenses and assets are recognised net of GST unless it is not recoverable (needs a non-recoverable GST code that posts the GST into the expense or asset); receivables and payables are gross; the balance sheet shows one net GST line (GST collected and GST paid netted by the report layer). The BAS label comes from the tax code **and** the attribution date, not the GL account. Proposed (owner decisions Q2, Q4, Q7): adjustment notes in the same BAS period net into G1/1A, later periods go to 1B; Stripe fee GST is claimed at 1B only once Stripe's monthly tax invoice is held; GST on a part-payment received before an invoice is attributable on receipt (GST Act s 29-5), so untaxed prepayments are allowed only for GST-free supplies or genuine security deposits (Div 99).
 
 ### 3.7 Multi-currency
 
-Base currency per company; documents in any currency with a rate captured at document date. Realised FX gain/loss posts at allocation; unrealised revaluation is a period-end batch job (Phase 1) that posts and auto-reverses on day 1 of the next period.
+Base currency per company; documents in any currency with a rate captured at document date. Realised FX gain/loss posts at allocation; unrealised revaluation is a period-end batch job (Phase 1) that posts and auto-reverses on day 1 of the next period. **AASB 121 note (T-0115):** revaluation covers every foreign-currency *monetary* balance — AR/AP open items, foreign-currency bank and card accounts, loans, intercompany balances and foreign-currency accruals — at the closing rate; non-monetary items (prepayments, PP&E, inventory, deferred revenue) stay at the transaction-date rate.
 
 ### 3.8 Standard postings (default posting rules)
 
@@ -149,6 +154,13 @@ Base currency per company; documents in any currency with a rate captured at doc
 | Customer prepayment | Bank | Customer prepayments (liability) |
 | Deferred revenue release (Phase 2) | Deferred revenue | Revenue |
 
+**AASB/GST review of this table (T-0115, report: [AASB alignment of LedgerForce postings](../research/reports/Docs/research/reports/AASB%20alignment%20of%20LedgerForce%20postings.md)).** All rows balance and follow Interpretation 1031. Two rows are not compliant as written and are **proposed** for change, pending the owner's golden-posting decisions:
+
+- *Customer prepayment* (no invoice yet): GST is attributable on receipt, so the proposal is Dr Bank (gross) / Cr Customer prepayments (net of GST) / Cr GST collected — or require a deposit tax invoice (§4.5). The liability is a contract liability under AASB 15.
+- *Bad debt write-off*: AASB 9 requires a lifetime expected-credit-loss allowance on trade receivables, so the write-off debits AR\_ECL\_ALLOWANCE; the allowance is topped up at period end (Dr impairment expense / Cr AR\_ECL\_ALLOWANCE); the GST decreasing adjustment (1B, accruals only) is a separate tax event triggered by write-off or 12 months overdue.
+
+Proposed additional standard postings (owner to approve as golden postings): depreciation (Dr depreciation expense / Cr accumulated depreciation); asset disposal (gain/loss, GST on sale); accrued expense and its day-1 reversal; prepaid expense and its release; ECL allowance movement; bad-debt recovery; super payment under Payday Super (Dr Super payable / Cr Bank, due within 7 business days of payday from 1 July 2026); leave provision movement (Phase 1); prior-period adjustment (AASB 108). Deposit and annual-subscription invoices may debit AR before performance only when the contract is non-cancellable or the deposit non-refundable (AASB 15 para 108); otherwise the report layer nets receivable and contract liability.
+
 ### 3.9 Posting engine pipeline
 
 1. **Command** arrives (UI, API, Salesforce event, import) with an idempotency key.
@@ -159,6 +171,37 @@ Base currency per company; documents in any currency with a rate captured at doc
 6. **Publish** the outbox event (e.g. invoice.posted) to the sync worker, which updates Salesforce, sends email, etc.
 
 A **preview** mode runs steps 1–4 and returns the journal without writing it, which powers the UI's "show me the journal" button and the rule tester.
+
+### 3.10 Australian Accounting Standards (AASB) alignment
+
+Added Nov 1, 2026 (T-0115). Full analysis, verdict per golden posting and per open question, and 25 prioritised changes: [AASB alignment of LedgerForce postings](../research/reports/Docs/research/reports/AASB%20alignment%20of%20LedgerForce%20postings.md); research record RQ-0095. **Sourcing caveat:** aasb.gov.au, ato.gov.au, legislation.gov.au and asic.gov.au could not be fetched from the research environment, so findings rest on search-result text and secondary sources; items marked unverified there must be checked against the primary text before golden postings are Approved.
+
+**Who must report.** Most target customers (1–50 staff) are small proprietary companies, sole traders, partnerships or trusts with no duty to prepare general purpose statements. A minority must: large proprietary companies (2 of 3: consolidated revenue ≥ $50m, gross assets ≥ $25m, ≥ 100 employees), small companies directed by shareholders or ASIC, some foreign-controlled companies, and medium/large charities. They prepare Tier 2 statements under AASB 1060, which **reduces disclosures only — recognition and measurement are full AASB**. So the ledger must support full compliance even when a tenant opts down to tax-driven accounts.
+
+**Presentation timeline.** AASB 18 replaces AASB 101 for for-profit entities for periods beginning on or after 1 January 2027 (first year for a 30 June balancer begins 1 July 2027). Tier 2 alignment is only proposed (ED 341, 1 July 2030). Reports are therefore data-driven templates over account attributes (§3.2) that can render AASB 101 and AASB 18 layouts, plus a cash-flow statement (gross cash flows; GST on investing/financing flows classified as operating, Int 1031) and a statement of changes in equity with a restatement row.
+
+**Where the design already complies:** immutable double-entry ledger and reversal-based correction (compatible with AASB 108 via §3.5); revenue and expenses net of GST with gross receivables and payables (Int 1031); invoice, receipt, Stripe charge/payout, refund, supplier bill and payment, payroll journal and net-pay structures; deferred revenue for non-cancellable subscriptions; deposit invoices crediting a liability rather than revenue (AASB 15).
+
+**Gaps and proposed changes (owner decisions marked PO):**
+
+| Area | Standard / law | Change | Phase | PO? |
+| --- | --- | --- | --- | --- |
+| GST on prepayments | GST Act s 29-5, Div 99 | Prepayment receipts attribute GST on receipt, or require a deposit tax invoice; security-deposit flag | MVP | Yes (Q7) |
+| GST rounding | ATO tax invoice rules | AU default per document; residual to largest revenue line | MVP | Yes (Q8, ADR) |
+| Credit losses | AASB 9 | ECL allowance role; write-off via allowance; period-end allowance journal (manual in MVP, provision matrix in Phase 1) | MVP / Phase 1 | Yes |
+| Credit notes | AASB 15 vs AASB 9; ATO adjustments | Reason codes (price/return/scope vs credit loss); same-period vs later-period BAS rule | MVP | Yes (Q4) |
+| Presentation | Int 1031; AASB 15 | Net GST line; AR credit balances shown as liabilities; Stripe clearing as a receivable; customer prepayments and deferred revenue reported as contract liabilities | MVP | Review |
+| Capital assets | AASB 116 | Depreciation roles, capitalisation threshold and recurring depreciation in MVP (an MVP bill can capitalise an asset); fixed-asset register "lite" with disposals in Phase 1 | MVP / Phase 1 | Yes |
+| Accruals and prepayments | Accrual basis (AASB 101/18) | Auto-reversing journals; accrued-expense and prepayment roles and schedules | MVP | Yes |
+| Payroll | Payday Super (from 1 July 2026); AASB 119 | Super payment posting and due date (payday + 7 business days); SG amount taken from the provider; leave provisions and accrued wages | Phase 1 | Yes |
+| Prior-period errors | AASB 108 | `prior_period_adjustment` source type, equity role, restated report mode | Phase 1 | Yes (ADR) |
+| Report classification | AASB 18, AASB 107 | Account attributes and data-driven templates; cash flow and changes-in-equity statements | Phase 1–2 | Review |
+| FX | AASB 121 | Revaluation of all foreign-currency monetary balances | Phase 1 | No |
+| Revenue timing | AASB 15 | Cancellable-contract netting; contract asset (unbilled revenue) for progress billing; day-based pro-rating; financing warning when payment and performance are > 12 months apart | Phase 1–2 | Yes |
+| Leases | AASB 16 | Default short-term/low-value exemptions; manual right-of-use asset and lease liability path | Phase 2 | Yes (scope) |
+| Tax-only depreciation | ITAA (instant asset write-off, small business pool) | Off-ledger tax depreciation shadow book; never posted to the GL | Later | No |
+
+Nothing in this section changes a golden posting: golden postings remain human-owned (AGENTS.md §6) and the proposals above are recorded as open questions in `Docs/accounting/postings.md`.
 
 ## 4. Mapping, posting rules and the module model
 
@@ -507,7 +550,9 @@ Fifteen modules cover the scope; the twelve use cases below are the acceptance b
 | Bank | Statement import, matching rules, reconciliation, transfers | MVP |
 | Salesforce Connector | CDC/Platform Event subscription, write-back, reconciliation, LWC package | MVP |
 | Payments | Stripe payment links, payout reconciliation | MVP |
-| Payroll Bridge | Pay-run journal import, net-pay batches, super and PAYG liability tracking | Phase 1 |
+| Payroll Bridge | Pay-run journal import, net-pay batches, super and PAYG liability tracking; Payday Super due dates and super payment batches; leave provisions (AASB 119) | Phase 1 |
+| Period-end (proposed, §3.10) | Auto-reversing accruals, prepayment schedules, ECL allowance journal, depreciation run | MVP (manual/recurring), Phase 1 (schedules, provision matrix) |
+| Fixed Assets lite (proposed, §3.10) | Asset register, straight-line/diminishing-value depreciation, disposals | Phase 1 (depreciation roles and recurring journal in MVP) |
 | Rules Studio | Custom journal rules, tester, versioning | Phase 1 |
 | Billing Plans | Subscriptions, milestones, usage | Phase 1–2 |
 | Revenue Recognition | Deferred revenue schedules, releases | Phase 2 |
@@ -774,6 +819,7 @@ The three risks most likely to sink the project are subtle accounting errors in 
 | CDC allocation or entity cap exceeded on Enterprise orgs | Missed or delayed syncs | Polling fallback per object, nightly reconciliation, usage monitoring via /limits |
 | Payroll scope creep | ATO registration and OSF burden delays everything | Payroll bridge only (ADR-0010); revisit in Phase 3 |
 | Tax rule errors (GST edge cases, rounding) | BAS errors for customers | Tax engine test pack reviewed by you; effective-dated codes; BAS reconciliation report |
+| Statements that tie to the bank but misstate under AASB (missing period-end journals) | Pilot month-end balance sheet wrong for Tier 2 reporters | §3.10 period-end capability in MVP; owner-approved golden postings for ECL, depreciation, accruals; verify AASB/ATO text once primary sites are reachable |
 | Name conflicts with Salesforce trademarks | Forced rename after launch | Trademark check before public release (see open decisions) |
 | Credentials leaked by an agent | Breach | Agents never receive production secrets; dev uses Salesforce scratch orgs and Stripe test mode |
 | Open-source licence choice deters adopters or invites free-riding | Weak community or no revenue | Decide in ADR-0009 before first public commit |
@@ -788,6 +834,7 @@ The three risks most likely to sink the project are subtle accounting errors in 
 - [ ] **Invoice trigger default.** Opportunity Closed Won or Order activation.
 - [ ] **SoD thresholds** in Section 6.5 (defaults are placeholders).
 - [ ] **Agent budget** per provider per day, and whether parallel builds are allowed.
+- [ ] **AASB alignment decisions (T-0115, §3.10):** GST on prepayments (Q7); AU rounding default (Q8); ECL allowance policy for trade receivables; deposit/subscription cancellability rule; MVP depreciation and accruals capability; Payday Super handling in the payroll bridge; whether leases (AASB 16 manual path) enter scope; which presentation (AASB 101 or AASB 18) the default report templates follow for Tier 2 tenants before 2030.
 
 ### 11.3 Checklist for the reviewing LLM
 
@@ -831,3 +878,11 @@ As of the date at the top; pages opened or retrieved during research.
 - [Banqup: Australia e-invoicing requirements (PINT A-NZ)](https://resources.banqup.com/resources/compliance-pulse/australia)
 - [Atlan: What is AGENTS.md](https://docs.atlan.com/agents/concepts/agents-md)
 - [RuntimeWire: Claude Code adds AGENTS.md fallback](https://runtimewire.com/article/claude-code-adds-agents-md-support)
+- AASB alignment (Nov 2026, T-0115): sources are listed per finding in the [AASB alignment report](../research/reports/Docs/research/reports/AASB%20alignment%20of%20LedgerForce%20postings.md) and its research notes; primary AASB/ATO/legislation sites could not be fetched, so those findings rest on search-result text and secondary sources (Big-4, IASB staff papers, Treasury, ACNC).
+
+## 12. Revision history
+
+| Date | By | Change |
+| --- | --- | --- |
+| 2026-10-24 | James Perram | Initial design. |
+| 2026-11-01 | claude (T-0115, owner request) | AASB alignment: new §3.10; notes in §1 scope, §3.2 roles/attributes, §3.4 rounding, §3.5 period-end and AASB 108, §3.6 GST, §3.7 AASB 121, §3.8 review of standard postings; §8.1 modules; §11.1 risk; §11.2 decisions; §11.4 sources. Accounting treatments are proposals pending the owner's decisions; no golden posting changed. |

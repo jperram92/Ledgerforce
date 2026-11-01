@@ -1940,3 +1940,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - RQ-0094 (ZAP source code + action README): baseline scan is passive; exit codes 0/1/2/3; all alerts WARN by default; the official action writes GitHub issues with a write token by default.
 - Proposed ADR-0044: `dast` job in security.yml running a digest-pinned zap-baseline.py with `-I -J`, a repository parser failing on High alerts and fail-closed on errors, no issue writing, real-scanner contract tests. ADR-0043 excluded DAST and CI security gates are human-owned, so T-0096 is blocked until the owner accepts ADR-0044. No workflow changed.
 - ADR: ADR-0044 · Status: proposed
+
+### DL-0253 — AASB alignment research; solution design revised with proposals only
+- Date: 2026-11-01 · By: claude (owner request) · Task: T-0115 · Category: accounting (research), process
+- Owner asked for a walkthrough of the draft golden postings, deep research against Australian Accounting Standards and a solution-design update. Research: four streams, synthesis report Docs/research/reports/AASB alignment of LedgerForce postings.md, record RQ-0095. Primary AASB/ATO/legislation sites were unreachable; findings rest on search-result text and secondary sources, unverified items marked.
+- Design revised: new §3.10 and marked notes (§1, §3.2, §3.4–§3.8, §8.1, §11.1, §11.2, §11.4) plus §12 revision history. Accounting treatments are written as proposals pending owner decisions; the existing defaults (e.g. §3.4 per-line rounding) stand until decided. Golden postings unchanged; a research note and new questions Q12–Q15 added under "Open questions for accountant" (allowed by Docs/accounting/AGENTS.md).
+- Alternatives: rewriting §3.8/§3.4 defaults directly (rejected: accounting treatments and golden postings are human gates, AGENTS.md §6).
