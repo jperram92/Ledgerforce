@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { AU_TAX_CODES, taxCodeOn, type TaxCodeDefinition } from './au-tax-codes.ts';
 
 describe('AU tax-code catalogue (T-0034, design §3.6)', () => {
-  it('has the design §3.6 codes plus the adjustment code, each once', () => {
+  it('has the design §3.6 codes, the adjustment code and the GP-010 withholding codes, each once', () => {
     expect(AU_TAX_CODES.map((t) => t.code).sort()).toEqual(
       [
         'BAS-EXCLUDED',
+        'BAS-W1',
+        'BAS-W2',
         'GST',
         'GST-ADJ',
         'GST-CAP',

@@ -3,9 +3,8 @@
  * company by T-0118 (tax_code table with effective dating); the calculator takes `rate`.
  *
  * BAS labels: G1/1A (sales), G10/G11/1B (purchases) and the adjustment label are confirmed by
- * RQ-0095/RQ-0096. Labels marked `verify: true` (G2/G3 exports and other GST-free sales,
- * G13/G14 input-taxed and GST-free purchases, GST on imports) come from prior knowledge and are
- * re-checked against the ATO BAS instructions in the BAS report task before they drive a BAS.
+ * RQ-0095/RQ-0096; G2/G3/G4 sales and the worksheet-only G13/G14 purchases by RQ-0097 (T-0035).
+ * GST on imports keeps `verify: true` until import rules are researched.
  */
 export type TaxCodeKind =
   'taxable' | 'gst_free' | 'input_taxed' | 'bas_excluded' | 'import' | 'capital' | 'adjustment';
@@ -61,7 +60,7 @@ export const AU_TAX_CODES: readonly TaxCodeDefinition[] = Object.freeze([
     effectiveTo: null,
     sales: ['G1', 'G3'],
     purchases: ['G11', 'G14'],
-    verify: true,
+    verify: false,
   },
   {
     code: 'GST-FREE-EXPORT',
@@ -72,7 +71,7 @@ export const AU_TAX_CODES: readonly TaxCodeDefinition[] = Object.freeze([
     effectiveTo: null,
     sales: ['G1', 'G2'],
     purchases: [],
-    verify: true,
+    verify: false,
   },
   {
     code: 'INPUT-TAXED',
@@ -83,7 +82,7 @@ export const AU_TAX_CODES: readonly TaxCodeDefinition[] = Object.freeze([
     effectiveTo: null,
     sales: ['G1', 'G4'],
     purchases: ['G11', 'G13'],
-    verify: true,
+    verify: false,
   },
   {
     code: 'BAS-EXCLUDED',
@@ -116,6 +115,30 @@ export const AU_TAX_CODES: readonly TaxCodeDefinition[] = Object.freeze([
     effectiveTo: null,
     sales: ['1A'],
     purchases: ['1B'],
+    verify: false,
+  },
+  // PAYG withholding labels on pay-run journals (GP-010): no GST; W1 gross wages on the wages
+  // expense line, W2 tax withheld on the PAYG withholding line (RQ-0097 finding 3).
+  {
+    code: 'BAS-W1',
+    name: 'PAYG W1 — gross salary and wages',
+    kind: 'bas_excluded',
+    rate: '0',
+    effectiveFrom: GST_START,
+    effectiveTo: null,
+    sales: [],
+    purchases: ['W1'],
+    verify: false,
+  },
+  {
+    code: 'BAS-W2',
+    name: 'PAYG W2 — amounts withheld',
+    kind: 'bas_excluded',
+    rate: '0',
+    effectiveFrom: GST_START,
+    effectiveTo: null,
+    sales: [],
+    purchases: ['W2'],
     verify: false,
   },
 ]);
