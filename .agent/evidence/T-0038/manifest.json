@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0038",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-103",
+      "file": ".agent/evidence/T-0038/20261101-120813-tests-unit.json",
+      "test": "6 test(s): packages/modules/gl/src/profiles.template.test.ts › SS-PLAT-103: Template posting profiles › SS-PLAT-103 has 3 party and 5 product profiles, all valid | packages/modules/gl/src/profiles.template.test.ts › SS-PLAT-103: Template posting profiles › SS-PLAT-103 customer profiles use AR control, supplier profiles AP control | packages/modules/gl/src/profiles.template.test.ts › SS-PLAT-103: Template posting profiles › SS-PLAT-103 overseas customers default to GST-free export; domestic parties to GST | packages/modules/gl/src/profiles.template.test.ts › SS-PLAT-103: Template posting profiles › SS-PLAT-103 every product profile names a revenue account; hardware has a COGS account | packages/modules/gl/src/profiles.template.test.ts › SS-PLAT-103: Template posting profiles › SS-PLAT-103 Salesforce mapping hooks name existing profiles | packages/modules/gl/src/profiles.template.test.ts › SS-PLAT-103: Template posting profiles › SS-PLAT-103 validateTemplate refuses misdirected profiles and dangling mappings",
+      "commit": "4236e8cf80d0",
+      "provider": "claude",
+      "timestamp": "2026-11-01T12:08:13.535Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-103",
+      "file": ".agent/evidence/T-0038/20261101-120814-tests-db.json",
+      "test": "7 test(s): packages/modules/products/src/products.db.test.ts › SS-PLAT-103: Posting profiles and products › SS-PLAT-103 seeds 3 party and 5 product profiles onto the chart | packages/modules/products/src/products.db.test.ts › SS-PLAT-103: Posting profiles and products › SS-PLAT-103 template revenue accounts agree with the golden product bindings | packages/modules/products/src/products.db.test.ts › SS-PLAT-103: Posting profiles and products › SS-PLAT-103 default tax codes are catalogue codes | packages/modules/products/src/products.db.test.ts › SS-PLAT-103: Posting profiles and products › SS-PLAT-103 Salesforce Product2.Family and Account.Type resolve to profiles | packages/modules/products/src/products.db.test.ts › SS-PLAT-103: Posting profiles and products › SS-PLAT-103 a party carries a customer and a supplier profile, each of its own kind | packages/modules/products/src/products.db.test.ts › SS-PLAT-103: Posting profiles and products › SS-PLAT-103 refuses a customer profile on the AP control account and a revenue profile on an expense account | packages/modules/products/src/products.db.test.ts › SS-PLAT-103: Posting profiles and products › SS-PLAT-103 products carry a product profile; SKUs and Salesforce ids are unique per company",
+      "commit": "4236e8cf80d0",
+      "provider": "claude",
+      "timestamp": "2026-11-01T12:08:14.814Z",
+      "result": "passed"
+    }
+  ]
+}
