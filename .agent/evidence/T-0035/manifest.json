@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0035",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-102",
+      "file": ".agent/evidence/T-0035/20261101-112753-tests-db.json",
+      "test": "5 test(s): packages/modules/tax/src/bas.db.test.ts › SS-PLAT-102: BAS labels for a period on the accruals and the cash basis › SS-PLAT-102 accruals Oct–Dec: invoices G1/1A (GP-001 ×3), bill G10/G11/1B (GP-008) | packages/modules/tax/src/bas.db.test.ts › SS-PLAT-102: BAS labels for a period on the accruals and the cash basis › SS-PLAT-102 accruals Jan–Mar: credit note nets G1/1A (GP-029), write-off 1B (GP-024), recovery 1A (GP-026), W1/W2 (GP-010) | packages/modules/tax/src/bas.db.test.ts › SS-PLAT-102: BAS labels for a period on the accruals and the cash basis › SS-PLAT-102 cash Oct–Dec: only the part of inv1 paid (550 of 1,375) is attributed | packages/modules/tax/src/bas.db.test.ts › SS-PLAT-102: BAS labels for a period on the accruals and the cash basis › SS-PLAT-102 cash Jan–Mar: rest of inv1, the paid bill and the recovery; no credit-note or write-off effect for unpaid invoices | packages/modules/tax/src/bas.db.test.ts › SS-PLAT-102: BAS labels for a period on the accruals and the cash basis › SS-PLAT-102 refuses an unknown basis or an inverted period",
+      "commit": "56f91dd5ef16",
+      "provider": "claude",
+      "timestamp": "2026-11-01T11:27:53.651Z",
+      "result": "passed"
+    }
+  ]
+}
