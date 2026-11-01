@@ -261,7 +261,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 - **Given** a branch that deletes a tracked file or adds a DROP in a migration · **When** verify.sh runs · **Then** verify fails naming the file/statement
 
 ### SS-PLAT-11 — Invariants hold over 10,000 random documents
-- Phase: MVP · Layer: **property** · Screenshot evidence: no · Task(s): T-0033
+- Phase: MVP · Layer: **property** (db: real engine and PostgreSQL) · Screenshot evidence: no · Task(s): T-0033 (DL-0262) · Seed printed; reproduce with `LF_FC_SEED=<seed>`; CI runs a fixed and a fresh seed
 - **Given** 10,000 generated documents (seeded) · **When** they are posted and some reversed · **Then** every entry balances, TB nets to 0, AR sub = AR control, AP sub = AP control, reversal restores prior balances
 
 ### SS-PLAT-12 — Every Approved golden posting is reproduced exactly

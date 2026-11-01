@@ -63,6 +63,38 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:db
 
+  invariants:
+    # SS-PLAT-11 (T-0033): the db job runs the invariant suite with its fixed seed; this job runs
+    # it again with a fresh seed per CI run, printed first, so every run explores new documents
+    # and any failure reproduces locally with LF_FC_SEED=<seed>.
+    name: accounting invariants (10,000 documents, fresh seed)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci_only_password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      LF_TEST_DATABASE_URL: postgres://postgres:ci_only_password@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: SS-PLAT-11 with a fresh seed
+        run: |
+          export LF_FC_SEED=$(( (GITHUB_RUN_ID * 31 + GITHUB_RUN_ATTEMPT) % 2147483647 ))
+          echo "LF_FC_SEED=${LF_FC_SEED}  (reproduce: LF_FC_SEED=${LF_FC_SEED} pnpm exec vitest run --project db packages/ledger/src/ledger.invariants.db.test.ts)"
+          pnpm exec vitest run --project db --reporter=verbose packages/ledger/src/ledger.invariants.db.test.ts
+
   e2e:
     name: e2e (Playwright) + evidence
     runs-on: ubuntu-latest
