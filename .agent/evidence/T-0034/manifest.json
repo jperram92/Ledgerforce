@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0034",
+  "entries": [
+    {
+      "scenario": "SS-UC01-11",
+      "file": ".agent/evidence/T-0034/20261101-100453-tests-unit.json",
+      "test": "3 test(s): packages/modules/tax/src/gst.golden.test.ts › SS-UC01-11: Tax-inclusive rounding follows company setting › GP-023 has exactly the two Approved variants a (total_invoice) and b (per_line_2dp) | packages/modules/tax/src/gst.golden.test.ts › SS-UC01-11: Tax-inclusive rounding follows company setting › SS-UC01-11 total_invoice produces GP-023a line for line | packages/modules/tax/src/gst.golden.test.ts › SS-UC01-11: Tax-inclusive rounding follows company setting › SS-UC01-11 per_line_2dp produces GP-023b line for line",
+      "commit": "3efa23ffe712",
+      "provider": "claude",
+      "timestamp": "2026-11-01T10:04:53.983Z",
+      "result": "passed"
+    }
+  ]
+}

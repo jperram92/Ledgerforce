@@ -37,7 +37,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC01-08 | Closed Won dated in a hard-locked period follows lock policy | UC-01 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0069, T-0023 | green (period/policy layer; Closed Won draft invoice and Sync issue in T-0069) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC01-09 | Salesforce outage does not block accounting | UC-01 | MVP | db-integration | no | apps/worker/src/salesforce-writeback.outage.db.test.ts | T-0067 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | af03e20 |
 | SS-UC01-10 | Invoice detail shows mapped lines and journal preview | UC-01 | MVP | e2e-playwright | yes | — | T-0083 | not-started | — | — |
-| SS-UC01-11 | Tax-inclusive rounding follows company setting | UC-01 | MVP | golden | no | — | T-0034, T-0040 | not-started | — | — |
+| SS-UC01-11 | Tax-inclusive rounding follows company setting | UC-01 | MVP | golden | no | packages/modules/tax/src/gst.golden.test.ts (calculator, GP-023a/b); invoice posting in T-0040 | T-0034, T-0040 | green | [.agent/evidence/T-0034/manifest.json](../../.agent/evidence/T-0034/manifest.json) | 3efa23f |
 | SS-UC02-01 | Preview lists all invoices, posts nothing | UC-02 | MVP | db-integration | no | — | T-0043 | not-started | — | — |
 | SS-UC02-02 | Approved batch posts all invoices in one job | UC-02 | MVP | db-integration | no | — | T-0044 | not-started | — | — |
 | SS-UC02-03 | One failure does not roll back the others | UC-02 | MVP | db-integration | no | — | T-0044 | not-started | — | — |
