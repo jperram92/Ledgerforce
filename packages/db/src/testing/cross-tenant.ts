@@ -148,6 +148,10 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0043: billable lines and batches (CHECK-constrained codes).
+  'app.billing_line': { quantity: () => '1', tax_code: () => 'GST', status: () => 'pending' },
+  'app.billing_batch': { billing_format: () => 'BATCH', status: () => 'preview' },
+  'app.billing_batch_item': { status: () => 'preview' },
   // T-0042: sent document emails (purpose CHECK; at least one To address).
   'app.email_delivery': {
     purpose: () => 'invoice',

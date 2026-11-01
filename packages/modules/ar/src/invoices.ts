@@ -114,14 +114,14 @@ function addDays(date: string, days: number): string {
   return new Date(t).toISOString().slice(0, 10);
 }
 
-interface LineRow {
+export interface LineRow {
   line_no: number;
   product_profile_id: string;
   amount: string;
   tax_code: string | null;
 }
 
-interface Priced {
+export interface Priced {
   readonly lines: readonly {
     lineNo: number;
     accountId: string;
@@ -138,7 +138,7 @@ interface Priced {
 }
 
 /** Resolve and price an invoice's lines. Returns warnings instead when a line does not resolve. */
-async function price(
+export async function priceInvoiceLines(
   trx: Trx,
   companyId: string,
   inv: { party_id: string; issue_date: string; pricing: 'exclusive' | 'inclusive' },
@@ -387,7 +387,7 @@ export async function createDraftInvoice(
   }
 
   const pricing = input.pricing ?? 'exclusive';
-  const { priced, warnings } = await price(
+  const { priced, warnings } = await priceInvoiceLines(
     trx,
     companyId,
     { party_id: input.partyId, issue_date: input.issueDate, pricing },
@@ -478,7 +478,7 @@ export async function approveInvoice(
       'the customer has no active Billing To contact with an email address',
     );
   }
-  const { priced, warnings } = await price(trx, companyId, inv, lines);
+  const { priced, warnings } = await priceInvoiceLines(trx, companyId, inv, lines);
   if (!priced) {
     throw new InvoiceError(
       'PROFILE_GAP',
@@ -586,7 +586,7 @@ export async function approveInvoice(
 }
 
 /** Credit-hold hook (design §4.2): open AR plus this invoice must not exceed the credit limit. */
-async function creditHold(
+export async function creditHold(
   trx: Trx,
   companyId: string,
   partyId: string,

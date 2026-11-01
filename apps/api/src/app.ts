@@ -1,3 +1,4 @@
+import { ArBatchesController } from './ar/batches.controller.ts';
 import 'reflect-metadata';
 import { type DynamicModule, Module, type INestApplication, type Type } from '@nestjs/common';
 import { APP_INTERCEPTOR, NestFactory } from '@nestjs/core';
@@ -96,6 +97,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   UserApiTokensController,
   AuditLogController,
   SyncIssuesController,
+  ArBatchesController,
   AuthController,
   LoginController,
 ];
@@ -130,6 +132,7 @@ class AppModule {
         UserApiTokensController,
         AuditLogController,
         SyncIssuesController,
+        ArBatchesController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,

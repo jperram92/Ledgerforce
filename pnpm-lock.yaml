@@ -68,6 +68,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@ledgerforce/ar':
+        specifier: workspace:*
+        version: link:../../packages/modules/ar
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -117,6 +120,12 @@ importers:
         specifier: 7.8.2
         version: 7.8.2
     devDependencies:
+      '@ledgerforce/products':
+        specifier: workspace:*
+        version: link:../../packages/modules/products
+      '@ledgerforce/tax':
+        specifier: workspace:*
+        version: link:../../packages/modules/tax
       '@nestjs/testing':
         specifier: 12.1.2
         version: 12.1.2(@nestjs/common@12.1.2(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.1.2)(@nestjs/platform-express@12.1.2)

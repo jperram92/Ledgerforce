@@ -446,6 +446,59 @@ export interface SalesInvoiceTable {
   billing_format_id: Generated<string | null>;
 }
 
+/** Migration 0038 (T-0043): billable line, pending until a batch invoices it. */
+export interface BillingLineTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  product_id: string | null;
+  product_profile_id: string;
+  description: string;
+  quantity: string;
+  unit_price: string;
+  tax_code: string | null;
+  bill_date: ColumnType<Date, string, string>;
+  source_ref: string | null;
+  status: Generated<'pending' | 'invoiced' | 'cancelled'>;
+  invoice_id: string | null;
+  created_at: Timestamp;
+}
+
+export interface BillingBatchTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  period_from: ColumnType<Date, string, never>;
+  period_to: ColumnType<Date, string, never>;
+  issue_date: ColumnType<Date, string, never>;
+  billing_format: Generated<string>;
+  status: Generated<'preview' | 'approved' | 'posted' | 'cancelled'>;
+  idempotency_key: string;
+  invoice_count: number;
+  ready_count: number;
+  net_total: string;
+  tax_total: string;
+  gross_total: string;
+  created_by: string | null;
+  created_at: Timestamp;
+}
+
+export interface BillingBatchItemTable {
+  tenant_id: TenantId;
+  company_id: string;
+  batch_id: string;
+  item_no: number;
+  party_id: string;
+  line_ids: string[];
+  net: string | null;
+  tax: string | null;
+  gross: string | null;
+  warnings: ColumnType<unknown, string | undefined, string>;
+  status: Generated<'preview' | 'posted' | 'failed'>;
+  invoice_id: string | null;
+}
+
 /** Migration 0037 (T-0042, ADR-0046): sent document emails, deduped per document. */
 export interface EmailDeliveryTable {
   id: Generated<string>;
@@ -763,6 +816,9 @@ export interface Database {
   'app.ar_settings': ArSettingsTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;
+  'app.billing_line': BillingLineTable;
+  'app.billing_batch': BillingBatchTable;
+  'app.billing_batch_item': BillingBatchItemTable;
   'app.party_role': PartyRoleTable;
   'app.party_address': PartyAddressTable;
   'app.party_contact': PartyContactTable;

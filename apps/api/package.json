@@ -2,7 +2,7 @@
   "name": "@ledgerforce/api",
   "version": "0.0.0",
   "private": true,
-  "description": "NestJS HTTP API (design §7.1). The only compiled package: SWC emits decorator metadata (DL-0061).",
+  "description": "NestJS HTTP API (design \u00a77.1). The only compiled package: SWC emits decorator metadata (DL-0061).",
   "type": "module",
   "main": "dist/main.js",
   "scripts": {
@@ -11,6 +11,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@ledgerforce/ar": "workspace:*",
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
     "@ledgerforce/journals": "workspace:*",
@@ -29,6 +30,8 @@
     "rxjs": "7.8.2"
   },
   "devDependencies": {
+    "@ledgerforce/products": "workspace:*",
+    "@ledgerforce/tax": "workspace:*",
     "@nestjs/testing": "12.1.2",
     "@swc/cli": "0.8.1",
     "@swc/core": "1.16.13",

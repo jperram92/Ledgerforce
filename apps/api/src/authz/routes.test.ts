@@ -47,6 +47,18 @@ describe('SS-PLAT-49: Every endpoint checks a permission', () => {
     },
   );
 
+  it('SS-UC02-07 the batch preview route needs ar.batch.run; reading a batch needs ar.read', () => {
+    const byName = new Map(routes().map((r) => [r.name, r.access]));
+    expect(byName.get('ArBatchesController.preview')).toEqual({
+      kind: 'permission',
+      permission: 'ar.batch.run',
+    });
+    expect(byName.get('ArBatchesController.get')).toEqual({
+      kind: 'permission',
+      permission: 'ar.read',
+    });
+  });
+
   it('bank details and role administration need specific permissions', () => {
     const byName = new Map(routes().map((r) => [r.name, r.access]));
     expect(byName.get('PartyBankAccountsController.list')).toEqual({
