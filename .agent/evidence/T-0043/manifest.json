@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0043",
+  "entries": [
+    {
+      "scenario": "SS-UC02-01",
+      "file": ".agent/evidence/T-0043/20261101-200437-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/batch.preview.db.test.ts › SS-UC02-01: Preview lists all invoices, posts nothing › SS-UC02-01 a November preview of 40 billable accounts returns 40 rows with totals and warnings and writes no journal | packages/modules/ar/src/batch.preview.db.test.ts › SS-UC02-01: Preview lists all invoices, posts nothing › SS-UC02-01 the same request again returns the same preview (idempotent); lines stay pending | packages/modules/ar/src/batch.preview.db.test.ts › SS-UC02-01: Preview lists all invoices, posts nothing › refuses an inverted period and a period with nothing to bill",
+      "commit": "14be3990d058",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:04:37.835Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-01",
+      "file": ".agent/evidence/T-0043/20261101-200441-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-07 an Auditor (no ar.batch.run) is refused 403 naming the permission | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › requires an idempotency key | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-01 the AR Clerk previews November: one row per account, decimal-string totals; a replay returns the same batch | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › refuses an invalid period with 422 and a body naming the problem",
+      "commit": "14be3990d058",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:04:41.970Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-07",
+      "file": ".agent/evidence/T-0043/20261101-200441-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-07 an Auditor (no ar.batch.run) is refused 403 naming the permission | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › requires an idempotency key | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-01 the AR Clerk previews November: one row per account, decimal-string totals; a replay returns the same batch | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › refuses an invalid period with 422 and a body naming the problem",
+      "commit": "14be3990d058",
+      "provider": "claude",
+      "timestamp": "2026-11-01T20:04:41.970Z",
+      "result": "passed"
+    }
+  ]
+}
