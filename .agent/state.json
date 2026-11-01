@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "current_task": null,
-  "branch": "feat/T-0051-bills-inbox",
+  "branch": "feat/T-0054-payment-batches",
   "step": null,
   "claimed_by": null,
   "lease_expires_at": null,
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T22:38:09.495Z",
+  "updated_at": "2026-11-01T23:05:59.963Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -83,7 +83,8 @@
     "T-0049": 1,
     "T-0050": 1,
     "T-0051": 1,
-    "T-0052": 1
+    "T-0052": 1,
+    "T-0054": 1
   },
   "failures": {},
   "providers": {},

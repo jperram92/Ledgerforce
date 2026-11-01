@@ -531,7 +531,9 @@ describe('SS-UC06-03: Release requires step-up MFA', () => {
     expect(await res.json()).toEqual({ error: 'step_up_required', max_age: 300 });
     const s = await stepUpAtIdp(session, 'apr', { amr: ['pwd', 'otp'] });
     expect((await finishStepUp(s, session)).status).toBe(303);
-    expect((await call('POST', '/test/ap/payment-batches/nov-2026/release', session)).status).toBe(200);
+    expect((await call('POST', '/test/ap/payment-batches/nov-2026/release', session)).status).toBe(
+      200,
+    );
   });
 
   it('the step-up lasts its maximum age: 301 seconds later the release is refused again', async () => {
@@ -540,7 +542,9 @@ describe('SS-UC06-03: Release requires step-up MFA', () => {
     const s = await stepUpAtIdp(session, 'apr');
     expect((await finishStepUp(s, session)).status).toBe(303);
     now += 300_000;
-    expect((await call('POST', '/test/ap/payment-batches/dec-2026/release', session)).status).toBe(200);
+    expect((await call('POST', '/test/ap/payment-batches/dec-2026/release', session)).status).toBe(
+      200,
+    );
     now += 1000;
     const res = await call('POST', '/test/ap/payment-batches/dec-2026/release', session);
     expect(res.status).toBe(401);

@@ -155,7 +155,10 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     payment_count: () => '1',
     status: () => 'draft',
   },
-  'app.payment_batch_item': { amount: () => '1', excluded_reason: () => 'NO_VERIFIED_BANK_DETAILS' },
+  'app.payment_batch_item': {
+    amount: () => '1',
+    excluded_reason: () => 'NO_VERIFIED_BANK_DETAILS',
+  },
   // T-0051: bills inbox and attachments (CHECK-constrained hashes and types).
   'app.bill_inbox_item': {
     message_id: () => `<${randomBytes(6).toString('hex')}@test>`,
