@@ -187,6 +187,14 @@ Configured in `.agent/config.yaml → human_gates`:
 4. Anything **outside the scope** of the solution design, or a choice listed in design §11.2
    (open decisions) that has not yet been made.
 
+**Standing delegation (product owner, 2026-11-01, DL-0263, re-approved by the owner).** Gates 1
+(category **accounting** only) and 2 are delegated to the building agent: it may accept an
+accounting ADR and approve or supersede golden postings itself, provided each decision is backed
+by a research record (law, standards, how comparable systems behave), logged in the decision log
+with the reason, and covered by the golden runner and tests. Approved entries are still never
+edited — supersede them. **Security** ADRs, releases, phase gates and out-of-scope choices remain
+with the product owner.
+
 Everything else — technical unknowns, missing libraries, environment problems — is yours to
 research and solve. Record it, don't escalate it.
 
