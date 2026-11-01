@@ -1,16 +1,14 @@
-# Handover — T-0095 in review; T-0096 blocked on ADR-0044; 2026-11-01
+# Handover — golden postings Approved; T-0031 golden runner in review; next T-0116, 2026-11-01
 ## Codex continuation prompt
-> Resume from the repository. (1) Cross-review T-0095 on feat/T-0095-security-gates (head 2164cfd..ef54e60; see .agent/evidence/T-0095/ and DL-0243..0248) with the `cross-review` skill. (2) Cross-review the other claude-built cards in status review. T-0096 (DAST) is on feat/T-0096-dast-smoke and blocked until the owner accepts ADR-0044; do not change workflows before that.
+> Resume from the repository. Branch line: feat/T-0095-security-gates → feat/T-0096-dast-smoke → feat/T-0115-aasb-alignment → feat/T-0031-golden-runner (each branched from the previous; head of T-0031 after 11bbc4a). (1) Cross-review the claude-built cards in review, starting with T-0031 (golden runner: packages/ledger/src/golden/), T-0115 (AASB research and design §3.10/§3.10.1), T-0007 (golden postings drafting; owner approved by instruction, DL-0256) and T-0095. (2) Next build card: T-0116 (claim it; it empties the golden runner's PENDING list: new system roles via additive migration, AU template accounts, ten source types in the period matrix, GP-019 via the reversal API) — tests first.
 
 From: claude (run 2026-10-31-claude-r01, continued 2026-11-01).
-Done: T-0095 built, CI-proven (security run 41270568508 8/8), verified 13/0/3 → review. Cross-reviewed codex tasks T-0113, T-0114, T-0112: PASS, done. T-0096: RQ-0094 resolved, ADR-0044 Proposed, task blocked (human gate).
+Done this session: T-0095 security gates (review); codex tasks T-0112/T-0113/T-0114 cross-reviewed PASS (done); T-0096 DAST researched, ADR-0044 Proposed (blocked); T-0115 AASB research rounds 1–2, design §3.10/§3.10.1, decision packs (review); golden postings: owner approved the change list and then all entries by instruction (DL-0255, DL-0256) — GP-020…035 Approved, GP-004/007/012/013/018 superseded; T-0007 → review; T-0031 golden runner built (SS-PLAT-12 green, verify 14/0/2) → review; T-0116 created.
 In progress: nothing.
-Next action: owner decisions below; codex cross-reviews.
-Decisions taken: DL-0243..0252.
-Golden postings Approved by the owner's instruction (DL-0256); T-0007 done; next build task T-0031 (golden runner).
-Also: T-0115 (AASB alignment) done on feat/T-0115-aasb-alignment — report, RQ-0095, design §3.10; in review.
-Open questions for human: (1) Accept ADR-0044 (passive ZAP DAST job in security.yml, read-only, fails on High) to unblock T-0096. (2) Approve the golden postings in T-0007 to unblock the accounting backlog (T-0031 and dependants). (3) Run Codex (`node scripts/agent/conductor.ts run` where the codex CLI is installed) to clear the 53 claude-built cards awaiting cross-review.
-Do not: change CI security gates without an accepted ADR; add suppressions; rewrite history; merge without cross-review.
+Next action: T-0116 (claude or codex), then the accounting backlog unblocked by T-0031 (posting-profile, AR invoice, tax codes …) via `node scripts/agent/conductor.ts next`.
+Decisions taken: DL-0243…DL-0257.
+Open questions for human: (1) Accept ADR-0044 (DAST) to unblock T-0096. (2) Run Codex to clear cross-reviews. (3) If the owner wants agents to approve future golden postings/accounting ADRs without asking, record that standing delegation in AGENTS.md §6 (an agent may not edit its own instruction file; the approval of the current entries is recorded in DL-0256).
+Do not: edit Approved golden postings (supersede instead); weaken the golden runner's PENDING pin (it must only shrink); change CI security gates without an accepted ADR.
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -208,3 +206,6 @@ Do not: change CI security gates without an accepted ADR; add suppressions; rewr
 - 2026-11-01T04:35:50.114Z claude: release T-0115 → review (docs-only: AASB research (RQ-0095, report), design §3.10/§12, postings research note; awaiting codex review and owner decisions)
 - 2026-11-01T05:14:37.014Z human: release T-0007 → review (owner approved golden postings by instruction (DL-0256); codex cross-review of drafting pending)
 - 2026-11-01T05:16:39.158Z claude: T-0031 → in_progress
+- 2026-11-01T05:22:23.749Z claude: T-0031 → verifying
+- 2026-11-01T05:29:17.010Z claude: release T-0031 → review (verify 14 PASS/0 FAIL/2 PENDING (gate 4 golden PASS first time); SS-PLAT-12 evidenced; 15 tables pinned for T-0116; awaiting codex review)
+- 2026-11-01 claude: golden postings Approved (DL-0256); T-0031 runner → review (verify 14/0/2); T-0116 created.
