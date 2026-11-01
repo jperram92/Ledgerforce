@@ -469,9 +469,20 @@ before performance only for non-cancellable contracts (GP-014, GP-016); Q14 depr
 postings needed in the MVP (GP-008); Q15 super payment posting under Payday Super from 1 July 2026 (GP-010/011).
 No entry above has been changed.
 
+**Follow-up 2026-11-01 (RQ-0096):** each suggestion was checked against legislation, ATO rulings and how
+Xero/MYOB/QuickBooks work — see
+[AASB decisions confirmed by law](../research/reports/AASB%20decisions%20confirmed%20by%20law.md). Changes to the
+suggestions above: Q7 — GST at receipt, but a single non-progressive supply attributes GST on the whole supply at the
+first payment (supply type becomes a required input); Q4 — default reversed to netting the note into G1/1A in its own
+period (as Xero/QuickBooks do), with the strict 1B form as a setting; Q8 — per-document default kept, per-line 2 dp
+added as an opt-in. The report ends with the exact list of entries to supersede (GP-007, GP-012, GP-018), re-draft
+(GP-013) or vary (GP-004, GP-005, GP-019), and new proposed entries GP-020…GP-029, for your approval. Still no entry
+above has been changed.
+
 ## Change history
 
 | Date | By | Change |
 |---|---|---|
 | 2026-10-24 | claude (T-0007) | Initial DRAFT, GP-001 … GP-019, Q1–Q11. |
 | 2026-11-01 | claude (T-0115) | Added research-update note under Open questions (Q12–Q15 raised); no entry changed. |
+| 2026-11-01 | claude (T-0115) | Follow-up note linking RQ-0096 decision confirmations; no entry changed. |

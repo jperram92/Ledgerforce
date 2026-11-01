@@ -203,6 +203,29 @@ Added Nov 1, 2026 (T-0115). Full analysis, verdict per golden posting and per op
 
 Nothing in this section changes a golden posting: golden postings remain human-owned (AGENTS.md §6) and the proposals above are recorded as open questions in `Docs/accounting/postings.md`.
 
+#### 3.10.1 Decisions confirmed against legislation and other systems (Nov 1, 2026)
+
+A second research round checked each decision against the GST Act and ATO rulings, the AASB standards, the Corporations Act, the Payday Super law and how Xero, MYOB, QuickBooks AU and Employment Hero work: [AASB decisions confirmed by law](../research/reports/AASB%20decisions%20confirmed%20by%20law.md) (RQ-0096; same sourcing caveat as above). The **recommended decision** for each item is below; each becomes binding only when the owner approves the matching golden postings or accounting ADR.
+
+| Decision | Recommended (research-confirmed) | Changed from §3.10? | Confidence |
+| --- | --- | --- | --- |
+| GST on prepayments (Q7) | GST always at receipt for taxable supplies. Supply type is required: progressive/periodic (Div 156) or total unknown → 1/11 of the receipt; single supply with known total → GST on the whole supply at first receipt (issue a full tax invoice then). Untaxed only for GST-free/input-taxed, flagged Div 99 security deposits, unidentified money | Sharpened | Medium-high |
+| GST rounding (Q8) | Default total invoice rule; cent residual on the largest revenue line (ROUNDING stays zero on sales); opt-in "per line, 2 dp" (taxable supply rule) for Xero/QuickBooks users | Option added | High (law) |
+| Credit notes on BAS (Q4) | Default: note reduces G1/1A in its own period (as Xero/QuickBooks do); setting for the strict ATO form (earlier-period notes at 1B); always issue a proper adjustment note | Default reversed | Medium |
+| Stripe fee GST (Q2) | Post fee and GST per payout; 1B claim held "pending tax invoice" until Stripe's monthly tax invoice (UTC month) is held; invoice wins on cent differences | Confirmed | High |
+| Bad-debt GST (Q3) | 1/11 decreasing adjustment at 1B on write-off or 12 months overdue, accruals basis only; recovery at 1A; a written write-off record (no adjustment note) | Confirmed | Medium-high |
+| Expected credit losses | Allowance method on by default (AR_ECL_ALLOWANCE; write-off via allowance as a journal, not a credit note); direct write-off only as a documented materiality election | Refined | High |
+| Deposits / annual invoices before performance | Ledger stays gross (Dr AR / Cr contract liability / Cr GST; never revenue); cancellable/refundable flags and due date; report-layer netting for cancellable, not-yet-due unpaid invoices (after MVP); "payment request" (not a tax invoice) option | Refined | Medium |
+| Credit-note reasons | Mandatory reason code; "credit loss" is not a credit-note reason — routed to write-off | Confirmed | High |
+| Presentation | Contract liabilities grouped; per-customer AR credit balances shown as liabilities (no cross-customer netting); Stripe clearing as receivable by default, tenant option to show as cash equivalent | Softened (Stripe) | Medium |
+| Depreciation | MVP: depreciation roles, capitalisation threshold (business policy, not the tax write-off limit), recurring journal; Phase 1 register with disposals; tax depreciation off-ledger, thresholds as dated settings | Confirmed | High |
+| Accruals / prepayments | Auto-reversing journals including recurring journals; regenerate the reversal when an accrual is reposted | Confirmed | High |
+| Payday Super | Law: Act No. 57 of 2025 (assent 6 Nov 2025), paydays from 1 July 2026; super received by the fund within 7 business days (20 business days for a new employee/new fund choice, count from payday); SG 12% on qualifying earnings from the provider; per-pay-run super payment; SGC accounts (deductible vs non-deductible interest); ATO clearing house closed | Confirmed, details added | High |
+| Leave and leases | LSL current/non-current split by vesting (right to defer), not expected timing; payroll import needs years of service/vested flag. AASB 16 short-term/low-value exemptions by default; Tier 2 gets disclosure relief only | Refined | Medium-high |
+| Reporting framework | Tier 2 tenants render AASB 101 layout until the AASB sets Tier 2 alignment (ED 341: 1 July 2030, not final); Tier 1 for-profit AASB 18 from 1 Jan 2027; switch dates as dated configuration. Int 1031 gross cash flows kept. AASB 108 via current-period equity adjustment plus restated view. Company thresholds and retention (7 years s286; 5 years tax) as dated configuration; proposed $100m/$50m thresholds not yet law | Confirmed | Medium-high |
+
+Golden-posting changes to put to the owner (detail in the report): supersede GP-012, GP-018, GP-007; re-draft GP-013; later-period BAS variants for GP-005 and GP-019; "pending tax invoice" status on GP-004's GST line; new proposed GP-020…GP-029 (single-supply invoice route, ECL allowance adjustment, bad-debt recovery, Stripe monthly reconciliation, depreciation, accrual, prepayment, super payment, SGC, prior-period adjustment).
+
 ## 4. Mapping, posting rules and the module model
 
 Setup is a guided 10-step wizard that ends with every Salesforce record type mapped to a party, product, posting profile and billing format, so the first invoice posts correctly without anyone touching a debit or credit.
@@ -885,4 +908,5 @@ As of the date at the top; pages opened or retrieved during research.
 | Date | By | Change |
 | --- | --- | --- |
 | 2026-10-24 | James Perram | Initial design. |
+| 2026-11-01 | claude (T-0115, owner request) | §3.10.1 added: each AASB/GST decision confirmed against legislation and Xero/MYOB/QuickBooks/Employment Hero practice (RQ-0096); still recommendations until the owner approves golden postings/ADRs. |
 | 2026-11-01 | claude (T-0115, owner request) | AASB alignment: new §3.10; notes in §1 scope, §3.2 roles/attributes, §3.4 rounding, §3.5 period-end and AASB 108, §3.6 GST, §3.7 AASB 121, §3.8 review of standard postings; §8.1 modules; §11.1 risk; §11.2 decisions; §11.4 sources. Accounting treatments are proposals pending the owner's decisions; no golden posting changed. |
