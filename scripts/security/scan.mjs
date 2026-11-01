@@ -32,6 +32,14 @@ function docker(tool, args, { network = false, source = true, extras = [] } = {}
       '--rm',
       '--cap-drop=ALL',
       '--security-opt=no-new-privileges',
+      // Run as the calling user: with every capability dropped, container root cannot write into
+      // an output directory owned by another user (the GitHub runner is uid 1001). HOME=/tmp gives
+      // the tools a writable home for their caches.
+      ...(typeof process.getuid === 'function'
+        ? ['--user', `${process.getuid()}:${process.getgid()}`]
+        : []),
+      '--env',
+      'HOME=/tmp',
       ...(network ? [] : ['--network=none']),
       ...(source ? mounts : []),
       ...extras,
@@ -42,11 +50,18 @@ function docker(tool, args, { network = false, source = true, extras = [] } = {}
   );
   if (result.error || result.signal)
     throw new Error(`scanner ${tool} failed to execute: ${result.error?.message || result.signal}`);
+  lastStderr = result.stderr || '';
   return result;
 }
+let lastStderr = '';
 function json(name) {
   const file = join(out, name);
-  if (!existsSync(file)) throw new Error(`scanner did not produce ${name}`);
+  if (!existsSync(file)) {
+    // A missing report is a tool failure: show the tool's own diagnostics (tail only). Secret
+    // scans run with --redact=100, so their diagnostics never carry a finding's value.
+    const tail = lastStderr.trim().split('\n').slice(-20).join('\n');
+    throw new Error(`scanner did not produce ${name}${tail ? `\n${tail}` : ''}`);
+  }
   return JSON.parse(readFileSync(file, 'utf8'));
 }
 

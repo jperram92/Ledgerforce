@@ -1897,3 +1897,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - History: `.gitleaksignore` lists exactly 15 `<commit>:<path>:generic-api-key:<line>` fingerprints (12 original + 3 quotes in this task's own note at d49ad4f). Contract test forbids bare path entries, other rules and duplicates. Real-scanner tests prove a new secret still fails and tree scans honour no suppression.
 - Alternatives: history rewrite (forbidden, AGENTS.md §0.6); scanning only PR commit ranges (rejected: flagged commits are not on main, and it would hide real old leaks).
 - ADR: ADR-0043 · Status: accepted
+
+### DL-0245 — Scanner containers run as the calling user
+- Date: 2026-11-01 · By: claude · Task: T-0095 · Category: security (implementation)
+- First GitHub runs of security.yml: every scanner wrote no report ("scanner did not produce …"), 1 pass / 7 fail in scanner-contracts. Cause: containers ran as root with `--cap-drop=ALL`, so without CAP_DAC_OVERRIDE they could not write into the runner-owned (uid 1001) output directory. Local runs were as root and hid it. Reproduced locally as a uid-1001 user: 1 pass / 7 fail, identical to CI.
+- Decision: `docker run --user <uid>:<gid> --env HOME=/tmp` (stricter than root; no capability added back). Missing reports now print the scanner's last 20 stderr lines (secret scans are fully redacted).
+- Result: non-root 7/8, root 7/8 (8th = Grype DB download, network-denied in this sandbox only); repo SAST/history/tree scans PASS as non-root.
+- Alternatives: chmod 777 the output directory (rejected: wider permissions); add CAP_DAC_OVERRIDE (rejected: more privilege).
