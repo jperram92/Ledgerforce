@@ -132,7 +132,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-09 | Failover resume works | — | Sprint 0 | unit | no | — | T-0003 | not-started | — | — |
 | SS-PLAT-10 | No-delete guard | — | Sprint 0 | unit | no | — | T-0003 | not-started | — | — |
 | SS-PLAT-11 | Invariants hold over 10,000 random documents | — | MVP | property | no | — | T-0033 | not-started | — | — |
-| SS-PLAT-12 | Every Approved golden posting is reproduced exactly | — | MVP | golden | no | — | T-0031 | not-started | — | — |
+| SS-PLAT-12 | Every Approved golden posting is reproduced exactly | — | MVP | golden | no | packages/ledger/src/golden/golden-postings.golden.test.ts; packages/ledger/src/golden/golden-engine.db.test.ts | T-0031 | green | [.agent/evidence/T-0031/manifest.json](../../.agent/evidence/T-0031/manifest.json) | 6285915 |
 | SS-PLAT-13 | Float arithmetic on money is a lint error | — | MVP | unit | no | packages/testing/eslint-rules/no-float-money.config.test.ts; packages/shared/src/money/*.test.ts | T-0017 | green | [.agent/evidence/T-0017/manifest.json](../../.agent/evidence/T-0017/manifest.json) | 5385095 |
 | SS-PLAT-14 | Same idempotency key posts once | — | MVP | db-integration | no | packages/ledger/src/engine.idempotency.db.test.ts; packages/ledger/src/posting-invariants.prop.db.test.ts | T-0025 | green | [.agent/evidence/T-0025/manifest.json](../../.agent/evidence/T-0025/manifest.json) | afb5dad |
 | SS-PLAT-15 | Preview writes nothing | — | MVP | db-integration + property | no | packages/ledger/src/engine.preview.db.test.ts; packages/ledger/src/engine.preview.prop.db.test.ts; packages/outbox/src/preview.db.test.ts | T-0026 | green | [.agent/evidence/T-0026/manifest.json](../../.agent/evidence/T-0026/manifest.json) | fa6e6a5 |

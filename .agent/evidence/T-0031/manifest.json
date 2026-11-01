@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0031",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-12",
+      "file": ".agent/evidence/T-0031/20261101-052130-tests-unit.json",
+      "test": "5 test(s): packages/ledger/src/golden/golden-postings.golden.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands › parses GP-001…GP-035 with their statuses; superseded entries point forward | packages/ledger/src/golden/golden-postings.golden.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands › runs on Approved entries only and refuses a file that still has Draft entries | packages/ledger/src/golden/golden-postings.golden.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands › every Approved journal table balances and equals its Total row | packages/ledger/src/golden/golden-postings.golden.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands › GP-027 reuses the journal of GP-004 (identical lines, new evidence status) | packages/ledger/src/golden/golden-postings.golden.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands › every table becomes a raw command the engine check accepts (known source types)",
+      "commit": "6285915cb8b0",
+      "provider": "claude",
+      "timestamp": "2026-11-01T05:21:30.137Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-12",
+      "file": ".agent/evidence/T-0031/20261101-052131-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/golden/golden-engine.db.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay › the tables that cannot be replayed yet are exactly the pinned PENDING list | packages/ledger/src/golden/golden-engine.db.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay › preview() reproduces every other Approved table line for line",
+      "commit": "6285915cb8b0",
+      "provider": "claude",
+      "timestamp": "2026-11-01T05:21:31.622Z",
+      "result": "passed"
+    }
+  ]
+}

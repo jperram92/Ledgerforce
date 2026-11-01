@@ -215,6 +215,7 @@ graph LR
 | [T-0113](T-0113.md) | Install smoke: wait for completed setup reliably | MVP | todo | T-0094 |
 | [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | todo | T-0010 |
 | [T-0115](T-0115.md) | AASB alignment: research Australian Accounting Standards and update the solution design | MVP | todo | — |
+| [T-0116](T-0116.md) | Template roles, accounts and source types for the AASB/GST golden postings | MVP | todo | T-0031 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:
