@@ -1,0 +1,31 @@
+{
+  "name": "@ledgerforce/email",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Document email over SMTP from outbox handlers: invoices, statements, reminders, remittances (design §5.7, ADR-0046)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/smtp-sink.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/documents": "workspace:*",
+    "@ledgerforce/outbox": "workspace:*",
+    "kysely": "0.29.7",
+    "nodemailer": "10.1.2"
+  },
+  "devDependencies": {
+    "@ledgerforce/ar": "workspace:*",
+    "@ledgerforce/gl": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/products": "workspace:*",
+    "@ledgerforce/tax": "workspace:*",
+    "@types/node": "22.20.5",
+    "@types/nodemailer": "8.0.2",
+    "vitest": "4.1.12"
+  }
+}

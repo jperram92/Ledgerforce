@@ -148,6 +148,11 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0042: sent document emails (purpose CHECK; at least one To address).
+  'app.email_delivery': {
+    purpose: () => 'invoice',
+    to_addrs: () => '{to@example.test}',
+  },
   // T-0041: billing format template records (CHECK-constrained codes; posted needs a series).
   'app.billing_format': {
     code: () => `F_${randomBytes(4).toString('hex').toUpperCase()}`,

@@ -446,6 +446,20 @@ export interface SalesInvoiceTable {
   billing_format_id: Generated<string | null>;
 }
 
+/** Migration 0037 (T-0042, ADR-0046): sent document emails, deduped per document. */
+export interface EmailDeliveryTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  purpose: 'invoice' | 'statement' | 'reminder' | 'remittance';
+  dedupe_key: string;
+  to_addrs: string[];
+  cc_addrs: Generated<string[]>;
+  subject: string;
+  message_id: string | null;
+  sent_at: Timestamp;
+}
+
 /** Migration 0036 (T-0041, design §4.3): billing format template record. */
 export interface BillingFormatTable {
   id: Generated<string>;
@@ -748,6 +762,7 @@ export interface Database {
   'app.sales_invoice_line': SalesInvoiceLineTable;
   'app.ar_settings': ArSettingsTable;
   'app.billing_format': BillingFormatTable;
+  'app.email_delivery': EmailDeliveryTable;
   'app.party_role': PartyRoleTable;
   'app.party_address': PartyAddressTable;
   'app.party_contact': PartyContactTable;
