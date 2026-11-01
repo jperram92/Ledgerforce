@@ -442,6 +442,27 @@ export interface SalesInvoiceTable {
   entry_id: string | null;
   created_at: Timestamp;
   updated_at: Timestamp;
+  /** Migration 0036 (T-0041). */
+  billing_format_id: Generated<string | null>;
+}
+
+/** Migration 0036 (T-0041, design §4.3): billing format template record. */
+export interface BillingFormatTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  code: string;
+  name: string;
+  posted: Generated<boolean>;
+  line_source: string;
+  grouping: 'per_account' | 'per_opportunity';
+  tax_treatment: 'exclusive' | 'inclusive';
+  number_series: string | null;
+  pdf_layout: string;
+  email_template: string;
+  payment_link: Generated<'none' | 'stripe'>;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
 }
 
 export interface SalesInvoiceLineTable {
@@ -726,6 +747,7 @@ export interface Database {
   'app.sales_invoice': SalesInvoiceTable;
   'app.sales_invoice_line': SalesInvoiceLineTable;
   'app.ar_settings': ArSettingsTable;
+  'app.billing_format': BillingFormatTable;
   'app.party_role': PartyRoleTable;
   'app.party_address': PartyAddressTable;
   'app.party_contact': PartyContactTable;

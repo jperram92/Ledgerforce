@@ -61,6 +61,8 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # Invoice PDFs render with headless Chromium (ADR-0045, T-0041).
+      - run: pnpm exec playwright install --with-deps chromium
       - run: pnpm test:db
 
   invariants:

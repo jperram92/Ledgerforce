@@ -148,6 +148,21 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0041: billing format template records (CHECK-constrained codes; posted needs a series).
+  'app.billing_format': {
+    code: () => `F_${randomBytes(4).toString('hex').toUpperCase()}`,
+    line_source: () => 'manual',
+    grouping: () => 'per_account',
+    tax_treatment: () => 'exclusive',
+    number_series: () => 'ar_invoice_document',
+    pdf_layout: () => 'invoice-v1',
+    email_template: () => 'invoice',
+    payment_link: () => 'none',
+    status: () => 'active',
+  },
+  // T-0040: invoice header and line CHECKs.
+  'app.sales_invoice': { status: () => 'draft', pricing: () => 'exclusive', currency: () => 'AUD' },
+  'app.sales_invoice_line': { quantity: () => '1', tax_code: () => 'GST' },
   // T-0038: posting profiles, products and Salesforce mapping hooks (CHECK-constrained codes).
   'app.party_posting_profile': {
     code: () => `P_${randomBytes(4).toString('hex').toUpperCase()}`,
