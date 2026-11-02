@@ -8,6 +8,12 @@
  * POST /ap/payment-batches/:id/aba returns the ABA (Cemtex) file of a released batch as an
  * attachment (T-0056, DL-0282): it unseals account numbers, so it is a POST — audited like a
  * mutation — and needs ap.payment_batch.release; it changes nothing and can be repeated.
+ * POST /ap/payment-batches/:id/confirm records the bank's confirmation of a released batch
+ * (T-0057, DL-0285): GP-009 posts (one entry per batch) with its `ledger.entry.posted` outbox
+ * event in the same transaction — the event sends the remittance advices — so the route answers
+ * 503 queue_not_configured without the posting queue. It needs ap.payment_batch.release (only
+ * releasers record that the money left the bank); design §6.5 has no SoD rule for it. A repeat
+ * returns the first confirmation (replayed).
  */
 import {
   BadRequestException,
@@ -27,20 +33,23 @@ import {
 } from '@nestjs/common';
 import {
   AbaExportError,
+  confirmPaymentBatch,
   createPaymentBatch,
   exportPaymentBatchAba,
   getPaymentBatch,
   PaymentBatchError,
   releasePaymentBatch,
   type PaymentBatchView,
+  type PaymentConfirmationView,
 } from '@ledgerforce/ap';
+import type { PostingOutbox } from '@ledgerforce/ledger';
 import type { Kms } from '@ledgerforce/shared/crypto';
 import type { Request, Response } from 'express';
 import { principalOf, tokenPrincipalOf } from '../auth/session-tenant-resolver.ts';
 import { RequirePermission, RequireStepUp } from '../authz/permission.decorator.ts';
 import { InvalidSodSubject, SoD, type SubjectFrom } from '../sod/sod.decorator.ts';
 import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
-import { KMS } from '../tokens.ts';
+import { KMS, POSTING_OUTBOX } from '../tokens.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const bad = (message: string): never => {
@@ -101,6 +110,33 @@ const viewOf = (b: PaymentBatchView) => ({
     reason: x.reason,
     payable_from: x.payableFrom?.toISOString() ?? null,
   })),
+  confirmation: b.confirmation
+    ? {
+        entry_id: b.confirmation.entryId,
+        confirmed_on: b.confirmation.confirmedOn,
+        bank_reference: b.confirmation.bankReference,
+        confirmed_by: b.confirmation.confirmedBy,
+        confirmed_at: b.confirmation.confirmedAt.toISOString(),
+      }
+    : null,
+});
+
+const confirmationOf = (c: PaymentConfirmationView) => ({
+  batch_id: c.batchId,
+  batch_no: c.batchNo,
+  entry_id: c.entryId,
+  confirmed_on: c.confirmedOn,
+  bank_reference: c.bankReference,
+  confirmed_by: c.confirmedBy,
+  total: c.total,
+  replayed: c.replayed,
+  payments: c.payments.map((x) => ({
+    bill_id: x.billId,
+    bill_no: x.billNo,
+    party_id: x.partyId,
+    amount: x.amount,
+  })),
+  remittance_missing: c.remittanceMissing,
 });
 
 @Controller('ap/payment-batches')
@@ -109,6 +145,7 @@ export class ApPaymentBatchesController {
     private readonly tx: TenantTx,
     private readonly audit: AuditTrail,
     @Inject(KMS) private readonly kms: Kms | null,
+    @Inject(POSTING_OUTBOX) private readonly outbox: PostingOutbox | null,
   ) {}
 
   @Put(':id')
@@ -201,5 +238,48 @@ export class ApPaymentBatchesController {
     res.setHeader('Content-Disposition', `attachment; filename="${file.fileName}"`);
     res.setHeader('Cache-Control', 'no-store');
     return file.content;
+  }
+
+  @Post(':id/confirm')
+  @HttpCode(200)
+  @RequirePermission('ap.payment_batch.release')
+  async confirm(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Query('company_id') companyId: string | undefined,
+    @Body() body: unknown,
+  ) {
+    const b = obj(body);
+    const confirmedOn = str(b['confirmed_on'], 'confirmed_on');
+    const ref = b['bank_reference'];
+    if (ref !== undefined && ref !== null && typeof ref !== 'string') {
+      bad('bank_reference must be a string');
+    }
+    if (!this.outbox) throw new ServiceUnavailableException({ error: 'queue_not_configured' });
+    const by = actorOf(req);
+    const c = await confirmPaymentBatch(
+      this.tx.get(),
+      {
+        companyId: uuid(companyId, 'company_id'),
+        batchId: uuid(id, 'id'),
+        confirmedOn,
+        ...(typeof ref === 'string' ? { bankReference: ref } : {}),
+        ...(by ? { confirmedBy: by } : {}),
+      },
+      { outbox: this.outbox },
+    ).catch(refusal);
+    if (!c.replayed) {
+      this.audit.describe({
+        entityType: 'payment_batch',
+        entityId: c.batchId,
+        after: {
+          entry_id: c.entryId,
+          confirmed_on: c.confirmedOn,
+          bank_reference: c.bankReference,
+          total: c.total,
+        },
+      });
+    }
+    return confirmationOf(c);
   }
 }

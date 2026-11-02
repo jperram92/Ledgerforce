@@ -42,6 +42,8 @@ export interface PaymentConfirmationView {
   readonly confirmedOn: string;
   readonly bankReference: string | null;
   readonly confirmedBy: string | null;
+  /** The batch total paid (NUMERIC text). */
+  readonly total: string;
   readonly replayed: boolean;
   /** The payments posted, in batch line order. */
   readonly payments: readonly { billId: string; billNo: string; partyId: string; amount: string }[];
@@ -120,6 +122,7 @@ async function viewOf(
     confirmedOn: c.confirmedOn,
     bankReference: c.bankReference,
     confirmedBy: c.confirmedBy,
+    total: batch.total,
     replayed,
     payments: payments.map((p) => ({
       billId: p.billId,
