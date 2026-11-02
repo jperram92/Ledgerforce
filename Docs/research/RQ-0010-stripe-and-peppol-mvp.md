@@ -78,6 +78,10 @@ account during the Stripe task.
 
 ## Follow-ups
 
+- 2026-11-02 (T-0073): the payment-collection object is revised by
+  [RQ-0100](RQ-0100-stripe-invoice-payment-link.md) — a **Payment Link** per invoice and amount due,
+  because a Checkout Session expires within 24 h (ADR-0048). The payout findings here stand.
+
 - Stripe task: capture a real test-mode AU payout's balance transactions as a contract fixture.
 - Phase 2 gate: re-research PINT A-NZ version and access-point accreditation.
 

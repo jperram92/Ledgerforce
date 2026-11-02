@@ -564,6 +564,23 @@ export interface EmailDeliveryTable {
   sent_at: Timestamp;
 }
 
+/** Migration 0048 (T-0073, RQ-0100): Stripe Payment Link per invoice and amount due. */
+export interface StripePaymentLinkTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  invoice_id: string;
+  amount_due: Numeric;
+  currency: string;
+  stripe_id: string;
+  url: string;
+  livemode: boolean;
+  idempotency_key: string;
+  status: Generated<'active' | 'deactivated'>;
+  created_at: Generated<Date>;
+  deactivated_at: Date | null;
+}
+
 /** Migration 0036 (T-0041, design §4.3): billing format template record. */
 export interface BillingFormatTable {
   id: Generated<string>;
@@ -1070,6 +1087,7 @@ export interface Database {
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;
+  'app.stripe_payment_link': StripePaymentLinkTable;
   'app.billing_line': BillingLineTable;
   'app.billing_batch': BillingBatchTable;
   'app.billing_batch_item': BillingBatchItemTable;

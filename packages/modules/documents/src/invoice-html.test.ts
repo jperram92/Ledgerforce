@@ -95,3 +95,19 @@ describe('Billing formats (design §4.3)', () => {
     );
   });
 });
+
+describe('Invoice HTML payment link (T-0073)', () => {
+  it('SS-UC03-01 shows the Stripe payment link with the amount due, escaped, and nothing without one', () => {
+    const html = renderInvoiceHtml({
+      ...doc,
+      paymentLink: { url: 'https://buy.stripe.com/test_a"b<c', amountDue: '375.0000' },
+    });
+    expect(html).toContain('Pay online');
+    expect(html).toContain('href="https://buy.stripe.com/test_a&quot;b&lt;c"');
+    expect(html).toContain('Amount due $375.00');
+    expect(renderInvoiceHtml(doc)).not.toContain('Pay online');
+    expect(() =>
+      renderInvoiceHtml({ ...doc, paymentLink: { url: 'javascript:alert(1)', amountDue: '1' } }),
+    ).toThrow(/https/);
+  });
+});

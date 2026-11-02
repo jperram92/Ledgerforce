@@ -1,0 +1,34 @@
+{
+  "name": "@ledgerforce/connector-stripe",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Stripe connector: fetch-based API client (test mode unless configured live) and one Payment Link per invoice and amount due for invoice PDFs and emails (design §5.7, RQ-0100, ADR-0048)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/documents": "workspace:*",
+    "decimal.js": "10.6.0",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@ledgerforce/ar": "workspace:*",
+    "@ledgerforce/email": "workspace:*",
+    "@ledgerforce/gl": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/products": "workspace:*",
+    "@ledgerforce/tax": "workspace:*",
+    "@ledgerforce/testing": "workspace:*",
+    "@types/node": "22.20.5",
+    "pdfjs-dist": "6.3.289",
+    "playwright-core": "1.63.0",
+    "postal-mime": "4.0.8",
+    "vitest": "4.1.12"
+  }
+}

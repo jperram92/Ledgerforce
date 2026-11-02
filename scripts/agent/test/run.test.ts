@@ -215,7 +215,10 @@ test('run routes a card in review to the provider that did NOT build it', () => 
   const log = fakeLog();
   const r = runCli(root, ['run', '--once', '--dry-run'], FAST);
   assert.match(r.stdout, /cross-review/i);
-  assert.doesNotMatch(r.stdout.split('--- prompt ---')[0], /\$ bash .*claude|\[1\] claude/);
+  // No attempt line names the builder. (Both providers run the same fake script here, so the
+  // command line cannot tell them apart; matching "claude" in it only hit checkout paths such as
+  // .claude/worktrees/ — DL-0283.)
+  assert.doesNotMatch(r.stdout.split('--- prompt ---')[0], /^\[\d+\] claude\b/m);
   const r2 = runCli(root, ['run', '--once'], { ...FAST, FAKE_LOG: log });
   assert.equal(r2.code, 0, r2.stdout + r2.stderr);
   assert.deepEqual(calls(log).map((l) => l.split(' ')[1]), ['codex']);

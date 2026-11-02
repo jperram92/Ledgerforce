@@ -271,6 +271,58 @@ importers:
         specifier: 4.1.12
         version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.5(@types/node@22.20.5)(yaml@2.9.1))
 
+  packages/connectors/stripe:
+    dependencies:
+      '@ledgerforce/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@ledgerforce/documents':
+        specifier: workspace:*
+        version: link:../../modules/documents
+      decimal.js:
+        specifier: 10.6.0
+        version: 10.6.0
+      kysely:
+        specifier: 0.29.7
+        version: 0.29.7
+    devDependencies:
+      '@ledgerforce/ar':
+        specifier: workspace:*
+        version: link:../../modules/ar
+      '@ledgerforce/email':
+        specifier: workspace:*
+        version: link:../../modules/email
+      '@ledgerforce/gl':
+        specifier: workspace:*
+        version: link:../../modules/gl
+      '@ledgerforce/ledger':
+        specifier: workspace:*
+        version: link:../../ledger
+      '@ledgerforce/products':
+        specifier: workspace:*
+        version: link:../../modules/products
+      '@ledgerforce/tax':
+        specifier: workspace:*
+        version: link:../../modules/tax
+      '@ledgerforce/testing':
+        specifier: workspace:*
+        version: link:../../testing
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
+      pdfjs-dist:
+        specifier: 6.3.289
+        version: 6.3.289
+      playwright-core:
+        specifier: 1.63.0
+        version: 1.63.0
+      postal-mime:
+        specifier: 4.0.8
+        version: 4.0.8
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.5(@types/node@22.20.5)(yaml@2.9.1))
+
   packages/db:
     dependencies:
       '@ledgerforce/shared':

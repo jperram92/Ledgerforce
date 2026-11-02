@@ -1,0 +1,183 @@
+{
+  "source": "Built from the Payment Link object and create/update parameters in the official stripe@23.1.0 type definitions (OpenAPI v2596) and docs.stripe.com extracts, RQ-0100 S3-S7. Not recorded from a live account: no Stripe key or network was available. Replace with a redacted test-mode recording (fixtures/recorded/) when one is (RQ-0100 follow-up).",
+  "apiVersion": "2026-10-28.endive",
+  "accessed": "2026-11-02",
+  "placeholders": "{{name}} is replaced by the test before matching (ids generated at run time).",
+  "interactions": [
+    {
+      "name": "create-link-amount-due-1375.00",
+      "request": {
+        "method": "POST",
+        "path": "/v1/payment_links",
+        "idempotencyKey": "lf-plink-v1-{{invoiceId}}-137500",
+        "form": {
+          "line_items[0][price_data][currency]": "aud",
+          "line_items[0][price_data][product_data][name]": "Invoice {{invoiceNo}}",
+          "line_items[0][price_data][unit_amount]": "137500",
+          "line_items[0][quantity]": "1",
+          "restrictions[completed_sessions][limit]": "1",
+          "inactive_message": "This payment link is no longer valid. Please use the link on the latest invoice or contact the sender.",
+          "metadata[lf_tenant_id]": "{{tenantId}}",
+          "metadata[lf_company_id]": "{{companyId}}",
+          "metadata[lf_invoice_id]": "{{invoiceId}}",
+          "metadata[lf_invoice_no]": "{{invoiceNo}}",
+          "payment_intent_data[metadata][lf_tenant_id]": "{{tenantId}}",
+          "payment_intent_data[metadata][lf_company_id]": "{{companyId}}",
+          "payment_intent_data[metadata][lf_invoice_id]": "{{invoiceId}}",
+          "payment_intent_data[metadata][lf_invoice_no]": "{{invoiceNo}}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "plink_1SQbTestFullAmount0001",
+          "object": "payment_link",
+          "active": true,
+          "currency": "aud",
+          "inactive_message": "This payment link is no longer valid. Please use the link on the latest invoice or contact the sender.",
+          "livemode": false,
+          "metadata": {
+            "lf_tenant_id": "{{tenantId}}",
+            "lf_company_id": "{{companyId}}",
+            "lf_invoice_id": "{{invoiceId}}",
+            "lf_invoice_no": "{{invoiceNo}}"
+          },
+          "payment_intent_data": {
+            "metadata": {
+              "lf_tenant_id": "{{tenantId}}",
+              "lf_company_id": "{{companyId}}",
+              "lf_invoice_id": "{{invoiceId}}",
+              "lf_invoice_no": "{{invoiceNo}}"
+            }
+          },
+          "restrictions": { "completed_sessions": { "count": 0, "limit": 1 } },
+          "url": "https://buy.stripe.com/test_8x2bJ1aB3cD4eF5gH6"
+        }
+      }
+    },
+    {
+      "name": "deactivate-link-after-amount-due-changed",
+      "request": {
+        "method": "POST",
+        "path": "/v1/payment_links/plink_1SQbTestFullAmount0001",
+        "idempotencyKey": "lf-plink-off-v1-plink_1SQbTestFullAmount0001",
+        "form": { "active": "false" }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "plink_1SQbTestFullAmount0001",
+          "object": "payment_link",
+          "active": false,
+          "currency": "aud",
+          "livemode": false,
+          "url": "https://buy.stripe.com/test_8x2bJ1aB3cD4eF5gH6"
+        }
+      }
+    },
+    {
+      "name": "create-link-amount-due-375.00-after-part-payment",
+      "request": {
+        "method": "POST",
+        "path": "/v1/payment_links",
+        "idempotencyKey": "lf-plink-v1-{{invoiceId}}-37500",
+        "form": {
+          "line_items[0][price_data][currency]": "aud",
+          "line_items[0][price_data][product_data][name]": "Invoice {{invoiceNo}}",
+          "line_items[0][price_data][unit_amount]": "37500",
+          "line_items[0][quantity]": "1",
+          "restrictions[completed_sessions][limit]": "1",
+          "inactive_message": "This payment link is no longer valid. Please use the link on the latest invoice or contact the sender.",
+          "metadata[lf_tenant_id]": "{{tenantId}}",
+          "metadata[lf_company_id]": "{{companyId}}",
+          "metadata[lf_invoice_id]": "{{invoiceId}}",
+          "metadata[lf_invoice_no]": "{{invoiceNo}}",
+          "payment_intent_data[metadata][lf_tenant_id]": "{{tenantId}}",
+          "payment_intent_data[metadata][lf_company_id]": "{{companyId}}",
+          "payment_intent_data[metadata][lf_invoice_id]": "{{invoiceId}}",
+          "payment_intent_data[metadata][lf_invoice_no]": "{{invoiceNo}}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "plink_1SQbTestPartAmount0002",
+          "object": "payment_link",
+          "active": true,
+          "currency": "aud",
+          "livemode": false,
+          "metadata": { "lf_invoice_id": "{{invoiceId}}" },
+          "restrictions": { "completed_sessions": { "count": 0, "limit": 1 } },
+          "url": "https://buy.stripe.com/test_3cI5kZ7mN8oP9qR0sT"
+        }
+      }
+    },
+    {
+      "name": "invalid-amount-error",
+      "request": {
+        "method": "POST",
+        "path": "/v1/payment_links",
+        "idempotencyKey": "lf-contract-invalid-amount",
+        "form": {
+          "line_items[0][price_data][currency]": "aud",
+          "line_items[0][price_data][product_data][name]": "Invoice INV-ERR",
+          "line_items[0][price_data][unit_amount]": "0",
+          "line_items[0][quantity]": "1"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "type": "invalid_request_error",
+            "code": "amount_too_small",
+            "param": "line_items[0][price_data][unit_amount]",
+            "message": "Amount must be at least $0.50 aud"
+          }
+        }
+      }
+    },
+    {
+      "name": "livemode-mismatch",
+      "request": {
+        "method": "POST",
+        "path": "/v1/payment_links",
+        "idempotencyKey": "lf-contract-livemode",
+        "form": {
+          "line_items[0][price_data][currency]": "aud",
+          "line_items[0][price_data][product_data][name]": "Invoice INV-LIVE",
+          "line_items[0][price_data][unit_amount]": "100",
+          "line_items[0][quantity]": "1"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "plink_1SQbLiveModeObject0003",
+          "object": "payment_link",
+          "active": true,
+          "livemode": true,
+          "url": "https://buy.stripe.com/5kA1bC2dE3fG4hI5jK"
+        }
+      }
+    },
+    {
+      "name": "server-error",
+      "request": {
+        "method": "POST",
+        "path": "/v1/payment_links",
+        "idempotencyKey": "lf-contract-server-error",
+        "form": {
+          "line_items[0][price_data][currency]": "aud",
+          "line_items[0][price_data][product_data][name]": "Invoice INV-500",
+          "line_items[0][price_data][unit_amount]": "100",
+          "line_items[0][quantity]": "1"
+        }
+      },
+      "response": {
+        "status": 500,
+        "body": { "error": { "type": "api_error", "message": "An unknown error occurred" } }
+      }
+    }
+  ]
+}
