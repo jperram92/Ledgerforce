@@ -31,7 +31,8 @@ export type QuerySession = Omit<RestSession, 'http'> & { http: HttpGet };
 /** A record as the query resource returns it (`attributes` removed). */
 export type SfRecord = Record<string, unknown>;
 
-async function get(session: QuerySession, path: string): Promise<unknown> {
+/** One authenticated, throttled GET of a REST resource; classified errors, parsed JSON. */
+export async function restGet(session: QuerySession, path: string): Promise<unknown> {
   session.gate?.assertWithinBudget(session.instanceUrl, session.budgetShare);
   let res: Awaited<ReturnType<HttpGet>>;
   let text: string;
@@ -56,16 +57,18 @@ async function get(session: QuerySession, path: string): Promise<unknown> {
   }
 }
 
-const base = (s: QuerySession) => `/services/data/v${s.apiVersion ?? SALESFORCE_REST_API_VERSION}`;
+/** `/services/data/vXX.X` of the session. */
+export const dataPath = (s: QuerySession) =>
+  `/services/data/v${s.apiVersion ?? SALESFORCE_REST_API_VERSION}`;
 
 /** Pages of a queryAll, in the query's order. */
 export async function* queryAllPages(
   session: QuerySession,
   soql: string,
 ): AsyncGenerator<SfRecord[]> {
-  let path: string | null = `${base(session)}/queryAll/?q=${encodeURIComponent(soql)}`;
+  let path: string | null = `${dataPath(session)}/queryAll/?q=${encodeURIComponent(soql)}`;
   while (path !== null) {
-    const body = (await get(session, path)) as {
+    const body = (await restGet(session, path)) as {
       done?: unknown;
       nextRecordsUrl?: unknown;
       records?: unknown;
@@ -92,7 +95,7 @@ export async function* queryAllPages(
 
 /** Field names of an object the session can query (sObject Describe; one API call). */
 export async function describeFields(session: QuerySession, entity: string): Promise<Set<string>> {
-  const body = (await get(session, `${base(session)}/sobjects/${entity}/describe`)) as {
+  const body = (await restGet(session, `${dataPath(session)}/sobjects/${entity}/describe`)) as {
     fields?: unknown;
   } | null;
   if (!body || !Array.isArray(body.fields)) {

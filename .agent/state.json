@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0069-closed-won-invoice",
+  "current_task": "T-0070",
+  "branch": "feat/T-0070-sf-nightly-reconciliation",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "claude",
+  "lease_expires_at": "2026-11-02T17:32:31.619Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-02T16:28:45.214Z",
+  "updated_at": "2026-11-02T16:47:31.623Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -87,7 +87,8 @@
     "T-0054": 1,
     "T-0065": 1,
     "T-0066": 1,
-    "T-0069": 1
+    "T-0069": 1,
+    "T-0070": 1
   },
   "failures": {},
   "providers": {},

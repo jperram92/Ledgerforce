@@ -13,6 +13,13 @@
  *    even for queryAll (S3). A page is a snapshot taken when the query ran.
  *  - `GET …/sobjects/<Object>/describe` lists the object's fields.
  *  - `401` for an unknown bearer token; `Sforce-Limit-Info: api-usage=u/m` on every answer.
+ *  - `GET …/sobjects/<Object>/deleted/?start=…&end=…` (sObject Get Deleted, T-0070, RQ-0110;
+ *    fixtures/documented/rest-getdeleted-responses.json): seconds ignored, start ≤ 15 days before
+ *    the server clock (`serverTime`) or `INVALID_REPLICATION_DATE`; `deletedRecords` from the
+ *    object's delete log, `earliestDateAvailable` = the last physical deletion (entries deleted
+ *    before it are gone), `latestDateCovered` = min(end, server clock).
+ *  - `remove` soft-deletes into the Recycle Bin (and the delete log); `purge` deletes physically
+ *    (emptied bin, or a hard delete of a live record): the row disappears from queryAll.
  *
  * SystemModstamp is kept to whole seconds, as Salesforce returns it (RQ-0103 finding 6).
  */
@@ -26,6 +33,17 @@ interface Documented {
   maxBatchSize: number;
   errors: Record<string, { status: number; body: unknown }>;
 }
+interface DocumentedDeleted {
+  maxDaysBack: number;
+  errors: Record<string, { status: number; body: unknown }>;
+}
+export const DOCUMENTED_GET_DELETED = JSON.parse(
+  readFileSync(
+    new URL('../../fixtures/documented/rest-getdeleted-responses.json', import.meta.url),
+    'utf8',
+  ),
+) as DocumentedDeleted;
+
 export const DOCUMENTED_QUERY = JSON.parse(
   readFileSync(
     new URL('../../fixtures/documented/rest-query-responses.json', import.meta.url),
@@ -45,6 +63,10 @@ export interface FakeSalesforceQuery {
   upsert(object: string, id: string, values: FakeRow, at: Date): void;
   /** Soft-delete a record as of `at` (Recycle Bin). */
   remove(object: string, id: string, at: Date): void;
+  /** Physically delete a record as of `at` (bin emptied, or hard delete of a live record). */
+  purge(object: string, id: string, at: Date): void;
+  /** The org's clock for Get Deleted (defaults to the real clock). */
+  serverTime: () => Date;
   row(object: string, id: string): FakeRow | undefined;
   outage: { status: number; body?: unknown } | null;
   apiUsage: { used: number; max: number };
@@ -63,7 +85,15 @@ export async function startFakeSalesforceQuery(opts: {
 }): Promise<FakeSalesforceQuery> {
   const pageSize = Math.min(opts.pageSize ?? DOCUMENTED_QUERY.maxBatchSize, 2000);
   const v = `/services/data/v${DOCUMENTED_QUERY.apiVersion}`;
-  const objects = new Map<string, { fields: Set<string>; rows: Map<string, FakeRow> }>();
+  const objects = new Map<
+    string,
+    {
+      fields: Set<string>;
+      rows: Map<string, FakeRow>;
+      deleteLog: { id: string; at: number }[];
+      earliest: number | null;
+    }
+  >();
   const locators = new Map<string, { rows: FakeRow[]; rowCount: number }>();
   let serial = 0;
   const table = (object: string) => {
@@ -79,6 +109,8 @@ export async function startFakeSalesforceQuery(opts: {
       objects.set(object, {
         fields: new Set(['Id', 'SystemModstamp', 'IsDeleted', ...fields]),
         rows: new Map(),
+        deleteLog: [],
+        earliest: null,
       });
     },
     upsert(object, id, values, at) {
@@ -98,7 +130,19 @@ export async function startFakeSalesforceQuery(opts: {
       const r = t.rows.get(id);
       if (!r) throw new Error(`fake query: ${object} ${id} does not exist`);
       t.rows.set(id, { ...r, IsDeleted: true, SystemModstamp: stamp(at) });
+      t.deleteLog.push({ id, at: Date.parse(stamp(at).replace('+0000', 'Z')) });
     },
+    purge(object, id, at) {
+      const t = table(object);
+      const r = t.rows.get(id);
+      if (!r) throw new Error(`fake query: ${object} ${id} does not exist`);
+      const when = Date.parse(stamp(at).replace('+0000', 'Z'));
+      t.rows.delete(id);
+      if (r.IsDeleted !== true) t.deleteLog.push({ id, at: when });
+      t.earliest = when;
+      t.deleteLog = t.deleteLog.filter((e) => e.at >= when);
+    },
+    serverTime: () => new Date(),
     row: (object, id) => objects.get(object)?.rows.get(id),
     outage: null,
     apiUsage: { used: 0, max: 100_000 },
@@ -136,6 +180,34 @@ export async function startFakeSalesforceQuery(opts: {
       return {
         status: 200,
         body: { name: describe[1], fields: [...t.fields].map((name) => ({ name })) },
+      };
+    }
+    const deleted = new RegExp(`^${v}/sobjects/([A-Za-z0-9_]+)/deleted/?$`).exec(url.pathname);
+    if (deleted?.[1]) {
+      const t = objects.get(deleted[1]);
+      if (!t) return { status: 404, body: [{ errorCode: 'NOT_FOUND', message: 'not found' }] };
+      const minute = (s: string | null) => {
+        const ms = Date.parse(s ?? '');
+        return Number.isNaN(ms) ? NaN : Math.floor(ms / 60_000) * 60_000;
+      };
+      const start = minute(url.searchParams.get('start'));
+      const end = minute(url.searchParams.get('end'));
+      const now = state.serverTime().getTime();
+      const oldest = now - DOCUMENTED_GET_DELETED.maxDaysBack * 86_400_000;
+      const bad = DOCUMENTED_GET_DELETED.errors['invalidReplicationDate'];
+      if (!bad) throw new Error('fake query: no documented invalidReplicationDate');
+      if (Number.isNaN(start) || Number.isNaN(end) || start >= end || start < oldest) return bad;
+      const covered = Math.min(end, Math.floor(now / 60_000) * 60_000);
+      const iso = (ms: number) => stamp(new Date(ms));
+      return {
+        status: 200,
+        body: {
+          deletedRecords: t.deleteLog
+            .filter((e) => e.at >= start && e.at <= covered)
+            .map((e) => ({ id: e.id, deletedDate: iso(e.at) })),
+          earliestDateAvailable: iso(t.earliest ?? oldest),
+          latestDateCovered: iso(covered),
+        },
       };
     }
     const more = new RegExp(`^${v}/query/([A-Za-z0-9-]+)$`).exec(url.pathname);
