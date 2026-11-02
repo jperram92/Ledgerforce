@@ -78,7 +78,11 @@ describe('Billing readiness (RQ-0106 finding 4, card open question §11.2)', () 
     expect(billingReadiness(opp(), [], settings)).toEqual({ ready: false, reason: 'NO_LINES' });
     // An archived (deleted) line no longer counts.
     expect(
-      billingReadiness(opp({ amount: '1000' }), [lines[0] as SourceLine, { ...(lines[1] as SourceLine), archived: true }], settings),
+      billingReadiness(
+        opp({ amount: '1000' }),
+        [lines[0] as SourceLine, { ...(lines[1] as SourceLine), archived: true }],
+        settings,
+      ),
     ).toEqual({ ready: true });
   });
 
@@ -91,9 +95,10 @@ describe('Billing readiness (RQ-0106 finding 4, card open question §11.2)', () 
       ready: false,
       reason: 'ARCHIVED',
     });
-    expect(
-      billingReadiness(opp(), lines, { ...settings, invoiceTrigger: 'order' }),
-    ).toEqual({ ready: false, reason: 'NOT_TRIGGER_OBJECT' });
+    expect(billingReadiness(opp(), lines, { ...settings, invoiceTrigger: 'order' })).toEqual({
+      ready: false,
+      reason: 'NOT_TRIGGER_OBJECT',
+    });
     const order = opp({ entityName: 'Order', stageName: null, statusCode: 'Draft' });
     expect(billingReadiness(order, lines, { ...settings, invoiceTrigger: 'order' })).toEqual({
       ready: false,
@@ -121,7 +126,9 @@ describe('Billing readiness (RQ-0106 finding 4, card open question §11.2)', () 
 
 describe('Line mapping (RQ-0106 finding 5)', () => {
   it('quantity × unit price that equals TotalPrice keeps quantity and unit price', () => {
-    expect(invoiceLineFor(line({ quantity: '3', unitPrice: '83.335', totalPrice: '250.01' }))).toEqual({
+    expect(
+      invoiceLineFor(line({ quantity: '3', unitPrice: '83.335', totalPrice: '250.01' })),
+    ).toEqual({
       quantity: '3',
       unitPrice: '83.335',
       description: 'Professional services',

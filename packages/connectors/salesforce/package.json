@@ -21,6 +21,7 @@
     "@ledgerforce/products": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
     "avsc": "5.7.9",
+    "decimal.js": "10.6.0",
     "kysely": "0.29.7"
   },
   "devDependencies": {

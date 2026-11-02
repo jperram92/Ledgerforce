@@ -20,6 +20,8 @@ import {
   setPartyProfiles,
 } from '@ledgerforce/products';
 import { sql, type Transaction } from 'kysely';
+import { mirrorBillingChange } from '../billing/mirror.ts';
+import type { BillingDeps, BillingOutcome } from '../billing/source.ts';
 import type { CdcHandler } from '../pubsub/subscriber.ts';
 import type { DecodedEvent } from '../pubsub/avro.ts';
 import {
@@ -50,7 +52,13 @@ interface Mapped {
   targetId: string | null;
   applied: string[];
   issue?: { code: string; message: string };
+  /** Billing sources (Opportunity / Order and lines, T-0069): what evaluating the source did. */
+  billing?: BillingOutcome;
 }
+
+/** app.salesforce_inbound_change.target_type (0050 CHECK): billing mirrors are recorded as NULL. */
+const dbTarget = (t: InboundTarget | null | undefined): string | null =>
+  t === 'party' || t === 'contact' || t === 'product' ? t : null;
 
 export interface InboundResult extends Omit<Mapped, 'outcome'> {
   outcome: InboundOutcome | 'duplicate';
@@ -93,6 +101,11 @@ async function staleBy(trx: Trx, companyId: string, c: InboundChange): Promise<S
 export interface InboundContext {
   companyId: string;
   reportIssue: InboundIssueSink;
+  /**
+   * Invoice drafting for billing sources (T-0069): AR's document outbox and the posting engine's
+   * options. Without it Opportunity / Order changes are mirrored only.
+   */
+  billing?: BillingDeps;
 }
 
 const keyOf = (c: InboundChange) => sql`
@@ -145,7 +158,7 @@ export async function applyInboundChange(
     const target = inboundMapFor(c.entityName)?.target ?? null;
     await sql`
       UPDATE app.salesforce_inbound_change
-         SET outcome = 'ignored', target_type = ${target}, issue_code = ${skipped},
+         SET outcome = 'ignored', target_type = ${dbTarget(target)}, issue_code = ${skipped},
              issue_message = ${
                skipped === 'SUPERSEDED'
                  ? 'a newer polled or reconciled state of the record is already applied'
@@ -163,7 +176,7 @@ export async function applyInboundChange(
     };
   }
   const plan = planChange(c);
-  const m = await mapInSavepoint(trx, ctx.companyId, c, plan);
+  const m = await mapInSavepoint(trx, ctx.companyId, c, plan, ctx.billing);
   let issueEventId: string | null = null;
   if (m.issue || plan.conflicts.length > 0) {
     issueEventId = await ctx.reportIssue(trx, {
@@ -190,7 +203,7 @@ async function settle(
 ): Promise<void> {
   await sql`
     UPDATE app.salesforce_inbound_change
-       SET outcome = ${m.outcome}, target_type = ${m.targetType}, target_id = ${m.targetId},
+       SET outcome = ${m.outcome}, target_type = ${dbTarget(m.targetType)}, target_id = ${m.targetId},
            applied_fields = ${m.applied}::text[],
            conflict_fields = coalesce(${conflicts}::text[], conflict_fields),
            issue_code = ${m.issue?.code ?? null}, issue_message = ${m.issue?.message.slice(0, 1000) ?? null}
@@ -211,11 +224,12 @@ async function mapInSavepoint(
   companyId: string,
   c: InboundChange,
   plan: PlannedChange,
+  billing: BillingDeps | undefined,
 ): Promise<Mapped> {
   await sql`SAVEPOINT lf_inbound_change`.execute(trx);
   let m: Mapped;
   try {
-    m = await mapChange(trx, companyId, c, plan);
+    m = await mapChange(trx, companyId, c, plan, billing);
   } catch (e) {
     if (!isDataProblem(e)) throw e;
     const target = inboundMapFor(c.entityName)?.target ?? null;
@@ -248,15 +262,22 @@ function lacking(c: InboundChange, plan: PlannedChange, creating: boolean): stri
   return required.map((r) => r.to).filter((t) => (plan.values.get(t) ?? null) === null);
 }
 
-function mapChange(
+async function mapChange(
   trx: Trx,
   companyId: string,
   c: InboundChange,
   plan: PlannedChange,
+  billing: BillingDeps | undefined,
 ): Promise<Mapped> {
   const target = inboundMapFor(c.entityName)?.target;
   if (!plan.mapped || !target) {
-    return Promise.resolve({ outcome: 'ignored', targetType: null, targetId: null, applied: [] });
+    return { outcome: 'ignored', targetType: null, targetId: null, applied: [] };
+  }
+  if (target === 'billing_source' || target === 'billing_line') {
+    const gaps = c.changeType === 'DELETE' ? [] : plan.missing;
+    if (gaps.length > 0) return missingIssue(target, c, gaps, c.changeType !== 'UPDATE');
+    const r = await mirrorBillingChange(trx, companyId, c, plan, billing);
+    return { ...r, targetType: target };
   }
   if (target === 'party') return mapParty(trx, companyId, c, plan);
   if (target === 'contact') return mapContact(trx, companyId, c, plan);
@@ -604,6 +625,7 @@ export async function retryInboundChange(
   companyId: string,
   rowId: string,
   c: InboundChange,
+  billing?: BillingDeps,
 ): Promise<Mapped> {
   const { rows } = await sql<{ outcome: string }>`
     SELECT outcome FROM app.salesforce_inbound_change
@@ -623,7 +645,7 @@ export async function retryInboundChange(
       applied: [],
     };
   }
-  const m = await mapInSavepoint(trx, companyId, c, planChange(c));
+  const m = await mapInSavepoint(trx, companyId, c, planChange(c), billing);
   if (m.outcome !== 'issue') await settle(trx, rowId, m, null, undefined);
   return m;
 }
@@ -712,7 +734,7 @@ export function inboundCdcHandlers(ctx: InboundContext & { source: string }): {
 }
 
 /** Outbox handler (`HandlerRegistry.register`) that turns inbound issues into Sync issues. */
-export function salesforceInboundIssueHandler(): {
+export function salesforceInboundIssueHandler(opts: { billing?: BillingDeps } = {}): {
   name: string;
   topics: readonly string[];
   handle(
@@ -726,7 +748,13 @@ export function salesforceInboundIssueHandler(): {
     async handle(trx, event) {
       const p = parseInboundIssuePayload(event.payload);
       if (p.kind === 'conflict') throw new InboundIssueError('conflict', p.code, p.message);
-      const m = await retryInboundChange(trx, event.companyId ?? '', event.aggregateId, p.change);
+      const m = await retryInboundChange(
+        trx,
+        event.companyId ?? '',
+        event.aggregateId,
+        p.change,
+        opts.billing,
+      );
       if (m.issue) throw new InboundIssueError('unmappable', m.issue.code, m.issue.message);
     },
   };

@@ -510,7 +510,10 @@ export async function createDraftInvoice(
     .executeTakeFirst();
   const decision = autoApproveDecision(
     settings
-      ? { autoApprove: settings.auto_approve, autoApproveThreshold: settings.auto_approve_threshold }
+      ? {
+          autoApprove: settings.auto_approve,
+          autoApproveThreshold: settings.auto_approve_threshold,
+        }
       : undefined,
     { gross: priced.gross, warnings: warnings.length },
   );

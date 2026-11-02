@@ -165,6 +165,25 @@ beforeAll(async () => {
   ]);
   fake.define('Contact', ['AccountId', 'FirstName', 'LastName', 'Email', 'Phone']);
   fake.define('Product2', ['Name', 'ProductCode', 'Description', 'Family', 'IsActive']);
+  // UC-01 billing sources are mapped too (T-0069); this org has them, with no changes here.
+  fake.define('Opportunity', ['Name', 'AccountId', 'StageName', 'IsWon', 'CloseDate', 'Amount']);
+  fake.define('Order', ['AccountId', 'Status', 'StatusCode', 'EffectiveDate', 'TotalAmount']);
+  fake.define('OpportunityLineItem', [
+    'OpportunityId',
+    'Product2Id',
+    'Quantity',
+    'UnitPrice',
+    'TotalPrice',
+    'Description',
+  ]);
+  fake.define('OrderItem', [
+    'OrderId',
+    'Product2Id',
+    'Quantity',
+    'UnitPrice',
+    'TotalPrice',
+    'Description',
+  ]);
   session = { http: fake.http, instanceUrl: INSTANCE, accessToken: TOKEN };
 }, 120_000);
 
@@ -195,6 +214,10 @@ describe('SS-PLAT-26: Missed Salesforce events recovered by nightly reconciliati
       ['Account', 0],
       ['Contact', 0],
       ['Product2', 0],
+      ['Opportunity', 0],
+      ['Order', 0],
+      ['OpportunityLineItem', 0],
+      ['OrderItem', 0],
     ]);
     expect(await party(acc(1))).toMatchObject([{ legal_name: 'Harbour Freight Pty Ltd' }]);
     const before = await appliedCount();

@@ -14,7 +14,7 @@
 import type { DecodedEvent } from '../pubsub/avro.ts';
 import { FIELD_MAP } from '../writeback/mapping.ts';
 
-export type InboundTarget = 'party' | 'contact' | 'product';
+export type InboundTarget = 'party' | 'contact' | 'product' | 'billing_source' | 'billing_line';
 export type InboundChangeType = 'CREATE' | 'UPDATE' | 'DELETE' | 'UNDELETE';
 
 export interface InboundFieldRule {
@@ -75,6 +75,59 @@ export const INBOUND_FIELD_MAP: readonly InboundObjectMap[] = Object.freeze([
       { to: 'description', from: ['Description'] },
       { to: 'family', from: ['Family'], required: true },
       { to: 'active', from: ['IsActive'] },
+    ],
+  },
+  // UC-01 billing source (T-0069, RQ-0106): mirrored, then drafted into an invoice when won /
+  // activated and complete. Account and dates are not required here: a change without them is
+  // mirrored and the readiness check reports what is missing.
+  {
+    entity: 'Opportunity',
+    target: 'billing_source',
+    fields: [
+      { to: 'name', from: ['Name'] },
+      { to: 'account', from: ['AccountId'] },
+      { to: 'stage', from: ['StageName'] },
+      { to: 'is_won', from: ['IsWon'] },
+      { to: 'date', from: ['CloseDate'] },
+      { to: 'amount', from: ['Amount'] },
+      { to: 'currency', from: ['CurrencyIsoCode'] },
+    ],
+  },
+  {
+    entity: 'Order',
+    target: 'billing_source',
+    fields: [
+      { to: 'name', from: ['Name', 'OrderNumber'] },
+      { to: 'account', from: ['AccountId'] },
+      { to: 'status', from: ['Status'] },
+      { to: 'status_code', from: ['StatusCode'] },
+      { to: 'date', from: ['EffectiveDate'] },
+      { to: 'amount', from: ['TotalAmount'] },
+      { to: 'currency', from: ['CurrencyIsoCode'] },
+    ],
+  },
+  {
+    entity: 'OpportunityLineItem',
+    target: 'billing_line',
+    fields: [
+      { to: 'parent', from: ['OpportunityId'], required: true },
+      { to: 'product', from: ['Product2Id'] },
+      { to: 'quantity', from: ['Quantity'] },
+      { to: 'unit_price', from: ['UnitPrice'] },
+      { to: 'total_price', from: ['TotalPrice'] },
+      { to: 'description', from: ['Description'] },
+    ],
+  },
+  {
+    entity: 'OrderItem',
+    target: 'billing_line',
+    fields: [
+      { to: 'parent', from: ['OrderId'], required: true },
+      { to: 'product', from: ['Product2Id'] },
+      { to: 'quantity', from: ['Quantity'] },
+      { to: 'unit_price', from: ['UnitPrice'] },
+      { to: 'total_price', from: ['TotalPrice'] },
+      { to: 'description', from: ['Description'] },
     ],
   },
 ]);

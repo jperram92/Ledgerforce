@@ -34,8 +34,10 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   applyInboundChange,
   inboundCdcHandlers,
+  inboundChanges,
   inboundIssueMessage,
   listInboundChanges,
+  retryInboundChange,
   type InboundIssue,
 } from '../inbound/index.ts';
 import { polledChange } from '../polling/delta.ts';
@@ -207,7 +209,12 @@ async function customer(n: number, name: string): Promise<string> {
       .executeTakeFirstOrThrow();
     await trx
       .insertInto('app.party_contact_role')
-      .values({ company_id: f.companyId, party_id: c.party_id, contact_id: c.id, role: 'billing_to' })
+      .values({
+        company_id: f.companyId,
+        party_id: c.party_id,
+        contact_id: c.id,
+        role: 'billing_to',
+      })
       .execute();
     return c.party_id;
   });
@@ -394,7 +401,46 @@ describe('SS-UC01-01: Closed Won creates a draft invoice from the template', () 
       }),
     );
     expect(await invoicesFor(`salesforce:Order:${ord(1)}`)).toEqual([]);
-    await deliver(update('Order', ord(1), { Status: 'Activated', StatusCode: 'Activated' }));
+    // The AU catalogue has no order_items format: activation is a Sync issue until the tenant
+    // clones one (billing formats are data, design §4.3).
+    issues.length = 0;
+    const activated = update('Order', ord(1), { Status: 'Activated', StatusCode: 'Activated' });
+    await deliver(activated);
+    expect(issues.map((i) => i.code)).toEqual(['NO_BILLING_FORMAT']);
+    expect(await invoicesFor(`salesforce:Order:${ord(1)}`)).toEqual([]);
+    await f.inTenant((trx) =>
+      trx
+        .insertInto('app.billing_format')
+        .values({
+          company_id: f.companyId,
+          code: 'ORDER',
+          name: 'Order invoice',
+          posted: true,
+          line_source: 'order_items',
+          grouping: 'per_opportunity',
+          tax_treatment: 'exclusive',
+          number_series: 'ar_invoice_document',
+          pdf_layout: 'invoice-v1',
+          email_template: 'invoice',
+          payment_link: 'none',
+        })
+        .execute(),
+    );
+    // Sync issues "Retry" re-runs the mapping of the same processed change (no new key).
+    const row = must(
+      (await f.inTenant((trx) => listInboundChanges(trx, f.companyId, { recordId: ord(1) }))).find(
+        (r) => r.outcome === 'issue',
+      ),
+    );
+    await f.inTenant((trx) =>
+      retryInboundChange(
+        trx,
+        f.companyId,
+        row.id,
+        must(inboundChanges(SOURCE, activated, [ord(1)])[0]),
+        { outbox },
+      ),
+    );
     const inv = await invoicesFor(`salesforce:Order:${ord(1)}`);
     expect(inv).toHaveLength(1);
     expect(must(inv[0]).issue_date).toBe('2026-11-06');

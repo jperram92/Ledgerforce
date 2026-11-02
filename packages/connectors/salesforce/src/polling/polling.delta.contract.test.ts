@@ -69,7 +69,10 @@ describe('delta SOQL (RQ-0103 findings 1, 2, 4)', () => {
     expect(pollFields('Contact')).toEqual(
       expect.arrayContaining(['AccountId', 'FirstName', 'LastName', 'Email', 'Phone']),
     );
-    expect(pollFields('Opportunity')).toEqual([]);
+    expect(pollFields('Opportunity')).toEqual(
+      expect.arrayContaining(['AccountId', 'StageName', 'IsWon', 'CloseDate', 'Amount']),
+    );
+    expect(pollFields('Lead')).toEqual([]);
   });
 });
 
