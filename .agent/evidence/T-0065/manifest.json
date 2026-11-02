@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0065",
+  "entries": [
+    {
+      "scenario": "SS-UC01-07",
+      "file": ".agent/evidence/T-0065/20261102-014424-tests-db.json",
+      "test": "3 test(s): packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-07: Duplicate CDC event is idempotent › SS-UC01-07: Duplicate CDC event is idempotent — a redelivered Account change is processed once and logged as duplicate | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-07: Duplicate CDC event is idempotent › SS-UC01-07: the same change from another channel is caught by the mapping and logged as duplicate | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-07: Duplicate CDC event is idempotent › SS-UC01-07: two changes of one record in one transaction (same commit, next sequence) both apply",
+      "commit": "500770cc7a86-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T01:44:24.230Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-07",
+      "file": ".agent/evidence/T-0065/20261102-014432-tests-db.json",
+      "test": "2 test(s): apps/worker/src/salesforce-inbound.issues.db.test.ts › SS-UC01-07: inbound mapping issues in the Sync issues inbox › SS-UC01-07: an unmappable change lands in the inbox at once and one-click retry maps it | apps/worker/src/salesforce-inbound.issues.db.test.ts › SS-UC01-07: inbound mapping issues in the Sync issues inbox › SS-UC01-07: an inbound edit of a LedgerForce-owned field stays an issue (the write-back restores it)",
+      "commit": "500770cc7a86-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T01:44:32.560Z",
+      "result": "passed"
+    }
+  ]
+}
