@@ -121,8 +121,15 @@ export interface RemittanceAdvice {
   /** The payment's reference (batch line or payment number); one advice per reference. */
   readonly paymentReference: string;
   readonly paymentDate: string;
-  /** Bills paid: number and amount as decimal strings. */
-  readonly bills: readonly { readonly billNo: string; readonly amount: string }[];
+  /**
+   * Bills paid: number and amount as decimal strings, and the supplier's own invoice number
+   * (`reference`), which is what the supplier matches the payment against (T-0057).
+   */
+  readonly bills: readonly {
+    readonly billNo: string;
+    readonly amount: string;
+    readonly reference?: string;
+  }[];
 }
 
 /** "2750.00" → 275000n cents (amounts are cents; extra decimals are not expected here). */
@@ -149,7 +156,11 @@ export async function sendRemittanceAdvice(
     .executeTakeFirstOrThrow();
   const payer = company.legal_name ?? company.name;
   const total = a.bills.reduce((s, b) => s + cents(b.amount), 0n);
-  const lines = a.bills.map((b) => `  ${b.billNo.padEnd(20)} ${formatMoney(b.amount)}`);
+  const lines = a.bills.map(
+    (b) =>
+      `  ${b.billNo.padEnd(20)} ${(b.reference ? `your ref ${b.reference}` : '').padEnd(32)} ` +
+      formatMoney(b.amount),
+  );
   return sendOnce(trx, deps.sender, {
     companyId: a.companyId,
     purpose: 'remittance',
@@ -161,7 +172,7 @@ export async function sendRemittanceAdvice(
       text:
         `${payer} paid ${formatMoney(fromCents(total))} on ${formatDate(a.paymentDate)} ` +
         `(reference ${a.paymentReference}) for:\n${lines.join('\n')}\n` +
-        `  ${'Total'.padEnd(20)} ${formatMoney(fromCents(total))}\n`,
+        `  ${'Total'.padEnd(20)} ${''.padEnd(32)} ${formatMoney(fromCents(total))}\n`,
     },
   });
 }

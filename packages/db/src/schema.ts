@@ -764,6 +764,17 @@ export interface PaymentBatchReleaseTable {
   released_at: Timestamp;
 }
 
+export interface PaymentBatchConfirmationTable {
+  tenant_id: TenantId;
+  company_id: string;
+  batch_id: string;
+  entry_id: string;
+  confirmed_on: ColumnType<Date, string, string>;
+  bank_reference: string | null;
+  confirmed_by: string | null;
+  confirmed_at: Timestamp;
+}
+
 export interface SupplierBillLineTable {
   tenant_id: TenantId;
   company_id: string;
@@ -1061,6 +1072,7 @@ export interface Database {
   'app.payment_batch': PaymentBatchTable;
   'app.payment_batch_item': PaymentBatchItemTable;
   'app.payment_batch_release': PaymentBatchReleaseTable;
+  'app.payment_batch_confirmation': PaymentBatchConfirmationTable;
   'app.supplier_bill_line': SupplierBillLineTable;
   'app.bill_inbox_item': BillInboxItemTable;
   'app.document_attachment': DocumentAttachmentTable;

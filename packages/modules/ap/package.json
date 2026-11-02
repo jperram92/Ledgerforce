@@ -2,7 +2,7 @@
   "name": "@ledgerforce/ap",
   "version": "0.0.0",
   "private": true,
-  "description": "Accounts payable: supplier bills, suggested coding, approval, posting and payment batches (design §3.8 row 6, UC-05, UC-06)",
+  "description": "Accounts payable: supplier bills, suggested coding, approval, posting and payment batches (design \u00a73.8 row 6, UC-05, UC-06)",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
@@ -15,7 +15,9 @@
     "@ledgerforce/bank": "workspace:*",
     "@ledgerforce/connector-aba": "workspace:*",
     "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/email": "workspace:*",
     "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/outbox": "workspace:*",
     "@ledgerforce/parties": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
     "@ledgerforce/tax": "workspace:*",
@@ -27,6 +29,7 @@
     "@ledgerforce/ar": "workspace:*",
     "@types/node": "22.20.5",
     "@types/nodemailer": "8.0.2",
+    "fast-check": "4.10.2",
     "nodemailer": "10.1.2",
     "vitest": "4.1.12"
   }

@@ -1,7 +1,7 @@
 /**
  * Supplier payment batches: build and release (T-0054, UC-06 steps 1–2, design §6.5 rule 1,
- * DL-0281). Nothing is posted here: the payments post (GP-009) on bank confirmation (T-0057); the
- * ABA file is T-0056.
+ * DL-0281). Nothing is posted here: the payments post (GP-009) on bank confirmation
+ * (payment-confirmation.ts, T-0057, DL-0285); the ABA file is T-0056.
  *
  * createPaymentBatch takes every posted bill of the company due on or before `dueBy` with an open
  * AP amount that no live batch already pays, and makes one payment per bill at its open amount
@@ -24,7 +24,8 @@ type Trx = Transaction<Database>;
 
 export const PAYMENT_BATCH_NUMBER_SERIES = 'ap_payment_batch_document';
 
-export type PaymentBatchErrorCode = 'INVALID_BATCH' | 'NOTHING_DUE' | 'NOT_RELEASABLE';
+export type PaymentBatchErrorCode =
+  'INVALID_BATCH' | 'NOTHING_DUE' | 'NOT_RELEASABLE' | 'NOT_CONFIRMABLE' | 'NOT_CONFIRMED';
 
 export class PaymentBatchError extends Error {
   readonly code: PaymentBatchErrorCode;
@@ -61,6 +62,14 @@ export interface PaymentBatchView {
     payableFrom: Date | null;
   }[];
   readonly createdBy: string | null;
+  /** The bank's confirmation and its GP-009 entry (T-0057); null until confirmed. */
+  readonly confirmation: {
+    readonly entryId: string;
+    readonly confirmedOn: string;
+    readonly bankReference: string | null;
+    readonly confirmedBy: string | null;
+    readonly confirmedAt: Date;
+  } | null;
   readonly replayed: boolean;
 }
 
@@ -117,6 +126,17 @@ export async function getPaymentBatch(
     .orderBy('released_at')
     .orderBy('id')
     .execute();
+  const confirmation = await trx
+    .selectFrom('app.payment_batch_confirmation')
+    .select([
+      'entry_id',
+      'bank_reference',
+      'confirmed_by',
+      'confirmed_at',
+      sql<string>`to_char(confirmed_on, 'YYYY-MM-DD')`.as('confirmed_on'),
+    ])
+    .where('batch_id', '=', b.id)
+    .executeTakeFirst();
   const threshold = await twoReleaserThreshold(trx);
   return {
     batchId: b.id,
@@ -154,6 +174,15 @@ export async function getPaymentBatch(
         : [],
     ),
     createdBy: b.created_by,
+    confirmation: confirmation
+      ? {
+          entryId: confirmation.entry_id,
+          confirmedOn: confirmation.confirmed_on,
+          bankReference: confirmation.bank_reference,
+          confirmedBy: confirmation.confirmed_by,
+          confirmedAt: confirmation.confirmed_at,
+        }
+      : null,
     replayed,
   };
 }

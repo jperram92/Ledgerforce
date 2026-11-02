@@ -159,6 +159,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     amount: () => '1',
     excluded_reason: () => 'NO_VERIFIED_BANK_DETAILS',
   },
+  // T-0057: bank confirmation of a batch (bank reference length CHECK).
+  'app.payment_batch_confirmation': { bank_reference: () => 'BANK-REF-1' },
   // T-0051: bills inbox and attachments (CHECK-constrained hashes and types).
   'app.bill_inbox_item': {
     message_id: () => `<${randomBytes(6).toString('hex')}@test>`,

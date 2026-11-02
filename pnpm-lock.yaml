@@ -351,9 +351,15 @@ importers:
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../db
+      '@ledgerforce/email':
+        specifier: workspace:*
+        version: link:../email
       '@ledgerforce/ledger':
         specifier: workspace:*
         version: link:../../ledger
+      '@ledgerforce/outbox':
+        specifier: workspace:*
+        version: link:../../outbox
       '@ledgerforce/parties':
         specifier: workspace:*
         version: link:../parties
@@ -382,6 +388,9 @@ importers:
       '@types/nodemailer':
         specifier: 8.0.2
         version: 8.0.2
+      fast-check:
+        specifier: 4.10.2
+        version: 4.10.2
       nodemailer:
         specifier: 10.1.2
         version: 10.1.2

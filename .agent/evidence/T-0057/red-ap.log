@@ -1,0 +1,187 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a7133e2b5650398e0
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33803
+ ❯ |db| packages/modules/ap/src/remittance.db.test.ts (2 tests | 2 failed) 1537ms
+     × SS-UC06-08 each supplier Remittance contact receives one advice listing the bills paid 122ms
+     × other posted entries (a bill) send no remittance; an unconfirmed batch cannot be remitted 204ms
+ ❯ |db| packages/modules/ap/src/payment-confirmation.db.test.ts (5 tests | 5 failed) 1571ms
+     × SS-UC06-07 a released batch posts nothing; the bank confirmation posts exactly GP-009 and pays the bill 254ms
+     × SS-UC06-07 one entry per batch: one AP_CONTROL line per bill with its supplier, one bank line for the total 240ms
+     × two confirmations at the same time post one journal 116ms
+     × only a released batch can be confirmed, never before its payment date; nothing is written on refusal 47ms
+     × the database refuses a confirmation of an unreleased batch and cancelling a confirmed one 70ms
+ ❯ |db| packages/modules/ap/src/payment-confirmation.prop.db.test.ts (1 test | 1 failed) 1608ms
+     × SS-UC06-07 any confirmed batch balances, pays every bill and keeps AP subledger = AP control 350ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ap/src/payment-confirmation.db.test.ts > SS-UC06-07: Batch posts GP-009 on confirmation only > SS-UC06-07 a released batch posts nothing; the bank confirmation posts exactly GP-009 and pays the bill
+AssertionError: expected { …(13) } to match object { status: 'released', …(2) }
+(11 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "confirmation": null,
+    "status": "released",
+    "total": "2750.0000",
+  }
+
+ ❯ packages/modules/ap/src/payment-confirmation.db.test.ts:145:22
+    143|     // After release: released, and no payment journal exists.
+    144|     const released = await f.inTenant((trx) => getPaymentBatch(trx, f.…
+    145|     expect(released).toMatchObject({ status: 'released', total: '2750.…
+       |                      ^
+    146|     expect(await paymentEntries()).toEqual([]);
+    147|     const [billItem] = await f.inTenant((trx) => subledgerEntriesOf(tr…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  |db| packages/modules/ap/src/payment-confirmation.db.test.ts > SS-UC06-07: Batch posts GP-009 on confirmation only > SS-UC06-07 one entry per batch: one AP_CONTROL line per bill with its supplier, one bank line for the total
+PaymentBatchError: not implemented
+ ❯ confirmPaymentBatch packages/modules/ap/src/payment-confirmation.ts:32:25
+     30|   _opts: PostOptions = {},
+     31| ): Promise<PaymentConfirmationView> {
+     32|   return Promise.reject(new PaymentBatchError('INVALID_BATCH', 'not im…
+       |                         ^
+     33| }
+     34|
+ ❯ packages/modules/ap/src/payment-confirmation.db.test.ts:100:5
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/payment-confirmation.db.test.ts:219:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  |db| packages/modules/ap/src/payment-confirmation.db.test.ts > SS-UC06-07: Batch posts GP-009 on confirmation only > two confirmations at the same time post one journal
+PaymentBatchError: not implemented
+ ❯ confirmPaymentBatch packages/modules/ap/src/payment-confirmation.ts:32:25
+     30|   _opts: PostOptions = {},
+     31| ): Promise<PaymentConfirmationView> {
+     32|   return Promise.reject(new PaymentBatchError('INVALID_BATCH', 'not im…
+       |                         ^
+     33| }
+     34|
+ ❯ packages/modules/ap/src/payment-confirmation.db.test.ts:100:5
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/payment-confirmation.db.test.ts:248:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  |db| packages/modules/ap/src/payment-confirmation.db.test.ts > SS-UC06-07: Batch posts GP-009 on confirmation only > only a released batch can be confirmed, never before its payment date; nothing is written on refusal
+AssertionError: expected 'INVALID_BATCH' to be 'NOT_CONFIRMABLE' // Object.is equality
+
+Expected: "NOT_CONFIRMABLE"
+Received: "INVALID_BATCH"
+
+ ❯ packages/modules/ap/src/payment-confirmation.db.test.ts:273:62
+    271|     );
+    272|     const before = (await paymentEntries()).length;
+    273|     expect((await refusal(confirm(id, '2026-12-18')))?.code).toBe('NOT…
+       |                                                              ^
+    274|     await f.inTenant((trx) =>
+    275|       releasePaymentBatch(trx, { companyId: f.companyId, batchId: id, …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  |db| packages/modules/ap/src/payment-confirmation.db.test.ts > SS-UC06-07: Batch posts GP-009 on confirmation only > the database refuses a confirmation of an unreleased batch and cancelling a confirmed one
+PaymentBatchError: not implemented
+ ❯ confirmPaymentBatch packages/modules/ap/src/payment-confirmation.ts:32:25
+     30|   _opts: PostOptions = {},
+     31| ): Promise<PaymentConfirmationView> {
+     32|   return Promise.reject(new PaymentBatchError('INVALID_BATCH', 'not im…
+       |                         ^
+     33| }
+     34|
+ ❯ packages/modules/ap/src/payment-confirmation.db.test.ts:100:5
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/payment-confirmation.db.test.ts:302:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  |db| packages/modules/ap/src/payment-confirmation.prop.db.test.ts > GP-009 invariants > SS-UC06-07 any confirmed batch balances, pays every bill and keeps AP subledger = AP control
+Error: Property failed after 1 tests
+{ seed: 993838322, path: "0:0:0", endOnFailure: true }
+Counterexample: [[{"supplier":0,"cents":1n}]]
+Shrunk 2 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ asyncThrowIfFailed node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2481:8
+
+Caused by: PaymentBatchError: not implemented
+ ❯ confirmPaymentBatch packages/modules/ap/src/payment-confirmation.ts:32:25
+ ❯ packages/modules/ap/src/payment-confirmation.prop.db.test.ts:89:13
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/payment-confirmation.prop.db.test.ts:88:21
+ ❯ AsyncProperty.run node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:1217:19
+ ❯ asyncPropertyExecution node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2564:14
+ ❯ asyncRunIt node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2557:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'INVALID_BATCH' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  |db| packages/modules/ap/src/remittance.db.test.ts > SS-UC06-08: Remittance advices emailed > SS-UC06-08 each supplier Remittance contact receives one advice listing the bills paid
+error: contact role ap_contact needs the party to have an active customer role
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ InsertQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/insert-query-builder.js:1101:24
+ ❯ setContactRole packages/modules/parties/src/parties.ts:162:3
+    160|     .where('id', '=', contactId)
+    161|     .executeTakeFirstOrThrow();
+    162|   await trx
+       |   ^
+    163|     .insertInto('app.party_contact_role')
+    164|     .values({
+ ❯ packages/modules/ap/src/remittance.db.test.ts:52:5
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ InsertQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/insert-query-builder.js:1101:24
+ ❯ setContactRole packages/modules/parties/src/parties.ts:162:3
+ ❯ packages/modules/ap/src/remittance.db.test.ts:52:5
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  |db| packages/modules/ap/src/remittance.db.test.ts > SS-UC06-08: Remittance advices emailed > other posted entries (a bill) send no remittance; an unconfirmed batch cannot be remitted
+AssertionError: expected undefined to be 'NOT_CONFIRMED' // Object.is equality
+
+- Expected:
+"NOT_CONFIRMED"
+
++ Received:
+undefined
+
+ ❯ packages/modules/ap/src/remittance.db.test.ts:200:23
+    198|         (e: unknown) => e as { code?: string },
+    199|       );
+    200|     expect(err?.code).toBe('NOT_CONFIRMED');
+       |                       ^
+    201|     expect(sink.messages).toHaveLength(before);
+    202|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  8 failed (8)
+   Start at  02:06:27
+   Duration  5.32s (transform 3.52s, setup 0ms, import 6.42s, tests 4.72s, environment 0ms)
+
