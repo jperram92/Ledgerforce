@@ -342,6 +342,9 @@ importers:
 
   packages/modules/ap:
     dependencies:
+      '@ledgerforce/ar':
+        specifier: workspace:*
+        version: link:../ar
       '@ledgerforce/bank':
         specifier: workspace:*
         version: link:../bank
@@ -379,9 +382,12 @@ importers:
         specifier: 4.0.8
         version: 4.0.8
     devDependencies:
-      '@ledgerforce/ar':
+      '@ledgerforce/connector-salesforce':
         specifier: workspace:*
-        version: link:../ar
+        version: link:../../connectors/salesforce
+      '@ledgerforce/products':
+        specifier: workspace:*
+        version: link:../products
       '@types/node':
         specifier: 22.20.5
         version: 22.20.5

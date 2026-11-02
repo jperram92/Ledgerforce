@@ -176,7 +176,7 @@ describe('SS-UC06-07: Batch posts GP-009 on confirmation only', () => {
       'system:AP_CONTROL': '2000',
       'bank:OPERATING': '1010',
     };
-    const rows = await linesOf(c.entryId);
+    const rows = await linesOf(c.entryId ?? '');
     expect(rows).toHaveLength(gp009?.lines.length ?? -1);
     gp009?.lines.forEach((g, i) => {
       const at = `GP-009 line ${String(i + 1)} (${g.binding})`;
@@ -189,7 +189,7 @@ describe('SS-UC06-07: Batch posts GP-009 on confirmation only', () => {
     // Subledger: payment −2,750.00 allocated to the bill → 0.00 (Paid).
     const [paid] = await f.inTenant((trx) => subledgerEntriesOf(trx, bill.entryId ?? ''));
     expect(paid?.openAmount).toBe('0.0000');
-    const [payment] = await f.inTenant((trx) => subledgerEntriesOf(trx, c.entryId));
+    const [payment] = await f.inTenant((trx) => subledgerEntriesOf(trx, c.entryId ?? ''));
     expect(payment).toMatchObject({ originalAmount: '2750.0000', openAmount: '0.0000' });
 
     // The batch shows its confirmation; status is still released (the confirmation is a fact).
@@ -218,7 +218,7 @@ describe('SS-UC06-07: Batch posts GP-009 on confirmation only', () => {
     const before = (await paymentEntries()).length;
     const c = await confirm(batchId, '2026-12-04');
     expect(await paymentEntries()).toHaveLength(before + 1);
-    const rows = await linesOf(c.entryId);
+    const rows = await linesOf(c.entryId ?? '');
     expect(rows).toEqual([
       { code: '2000', debit: '120.1000', credit: '0.0000', party_id: a },
       { code: '2000', debit: '80.0500', credit: '0.0000', party_id: a },

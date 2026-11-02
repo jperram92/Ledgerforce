@@ -159,6 +159,18 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     amount: () => '1',
     excluded_reason: () => 'NO_VERIFIED_BANK_DETAILS',
   },
+  // T-0055: customer refunds (method/status CHECKs; requested, so the nullable entry_id/paid_on stay empty) and
+  // their batch lines (an exclusion needs no bank account).
+  'app.customer_refund': {
+    currency: () => 'AUD',
+    amount: () => '1',
+    method: () => 'bank_batch',
+    status: () => 'requested',
+  },
+  'app.payment_batch_refund': {
+    amount: () => '1',
+    excluded_reason: () => 'NO_VERIFIED_BANK_DETAILS',
+  },
   // T-0057: bank confirmation of a batch (bank reference length CHECK).
   'app.payment_batch_confirmation': { bank_reference: () => 'BANK-REF-1' },
   // T-0051: bills inbox and attachments (CHECK-constrained hashes and types).

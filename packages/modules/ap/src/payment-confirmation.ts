@@ -12,8 +12,15 @@
  * The confirmation is recorded in app.payment_batch_confirmation (migration 0048); a repeat
  * returns the first confirmation. The payments' remittance advices go out from the
  * `ledger.entry.posted` event of this entry (remittance.ts). Money is decimal strings; no floats.
+ *
+ * Customer refunds in the batch (T-0055, GP-006, DL-0288) each post their own entry, as GP-006
+ * shows (source ar_refund, Dr AR control (customer) / Cr the batch's bank account), through
+ * @ledgerforce/ar payCustomerRefund, which also clears the customer's credit. The GP-009 entry then
+ * credits the bank with the bills' total only, and a batch that pays only refunds has no GP-009
+ * entry (its confirmation's entry is null, migration 0049).
  */
 import type { Database } from '@ledgerforce/db';
+import { payCustomerRefund, RefundError } from '@ledgerforce/ar';
 import { resolveRecipients } from '@ledgerforce/email';
 import { allocate, post, subledgerEntriesOf, type PostOptions } from '@ledgerforce/ledger';
 import { Money } from '@ledgerforce/shared/money';
@@ -38,7 +45,8 @@ export interface ConfirmPaymentBatchInput {
 export interface PaymentConfirmationView {
   readonly batchId: string;
   readonly batchNo: string;
-  readonly entryId: string;
+  /** The GP-009 entry; null when the batch pays only customer refunds. */
+  readonly entryId: string | null;
   readonly confirmedOn: string;
   readonly bankReference: string | null;
   readonly confirmedBy: string | null;
@@ -47,6 +55,14 @@ export interface PaymentConfirmationView {
   readonly replayed: boolean;
   /** The payments posted, in batch line order. */
   readonly payments: readonly { billId: string; billNo: string; partyId: string; amount: string }[];
+  /** The customer refunds paid, each with its own GP-006 entry (T-0055). */
+  readonly refunds: readonly {
+    refundId: string;
+    refundNo: string;
+    partyId: string;
+    amount: string;
+    entryId: string | null;
+  }[];
   /** Suppliers paid who have no Remittance contact (no advice can be emailed to them). */
   readonly remittanceMissing: readonly string[];
 }
@@ -60,6 +76,7 @@ const isDate = (d: string) =>
 /** The batch's payments with their bills' numbers and journal entries, in line order. */
 async function paymentsOf(trx: Trx, batch: PaymentBatchView) {
   const ids = batch.payments.map((p) => p.billId);
+  if (ids.length === 0) return []; // a batch of customer refunds only (T-0055)
   const bills = new Map(
     (
       await trx
@@ -109,6 +126,21 @@ async function viewOf(
   const c = batch.confirmation;
   if (!c) throw new PaymentBatchError('NOT_CONFIRMABLE', `batch ${batch.batchNo} is unconfirmed`);
   const payments = await paymentsOf(trx, batch);
+  const refundEntries = new Map(
+    batch.refunds.length === 0
+      ? []
+      : (
+          await trx
+            .selectFrom('app.customer_refund')
+            .select(['id', 'entry_id'])
+            .where(
+              'id',
+              'in',
+              batch.refunds.map((r) => r.refundId),
+            )
+            .execute()
+        ).map((r) => [r.id, r.entry_id]),
+  );
   const parties = [...new Set(payments.map((p) => p.partyId))];
   const remittanceMissing: string[] = [];
   for (const party of parties) {
@@ -129,6 +161,13 @@ async function viewOf(
       billNo: p.billNo,
       partyId: p.partyId,
       amount: p.amount,
+    })),
+    refunds: batch.refunds.map((r) => ({
+      refundId: r.refundId,
+      refundNo: r.refundNo,
+      partyId: r.partyId,
+      amount: r.amount,
+      entryId: refundEntries.get(r.refundId) ?? null,
     })),
     remittanceMissing,
   };
@@ -189,29 +228,33 @@ export async function confirmPaymentBatch(
     billItems.push(item);
   }
 
-  const posted = await post(
-    trx,
-    {
-      companyId,
-      idempotencyKey: `ap-payment-batch:${batchId}`,
-      entryDate: c.confirmedOn,
-      sourceType: PAYMENT_SOURCE_TYPE,
-      sourceId: batchId,
-      memo: `Payment batch ${batch.batchNo}${bankReference ? ` ${bankReference}` : ''}`,
-      ...(c.confirmedBy ? { createdBy: c.confirmedBy } : {}),
-      lines: [
-        ...payments.map((p) => ({
-          account: { role: 'AP_CONTROL' as const },
-          debit: p.amount,
-          partyId: p.partyId,
-          memo: p.billNo,
-        })),
-        { account: { id: batch.accountId }, credit: batch.total },
-      ],
-    },
-    opts,
-  );
-  const paymentItems = await subledgerEntriesOf(trx, posted.entryId);
+  const billsTotal = payments.reduce((s, p) => s.plus(p.amount), new Decimal(0));
+  const posted =
+    payments.length === 0
+      ? null
+      : await post(
+          trx,
+          {
+            companyId,
+            idempotencyKey: `ap-payment-batch:${batchId}`,
+            entryDate: c.confirmedOn,
+            sourceType: PAYMENT_SOURCE_TYPE,
+            sourceId: batchId,
+            memo: `Payment batch ${batch.batchNo}${bankReference ? ` ${bankReference}` : ''}`,
+            ...(c.confirmedBy ? { createdBy: c.confirmedBy } : {}),
+            lines: [
+              ...payments.map((p) => ({
+                account: { role: 'AP_CONTROL' as const },
+                debit: p.amount,
+                partyId: p.partyId,
+                memo: p.billNo,
+              })),
+              { account: { id: batch.accountId }, credit: numeric(billsTotal) },
+            ],
+          },
+          opts,
+        );
+  const paymentItems = posted ? await subledgerEntriesOf(trx, posted.entryId) : [];
   for (const [i, p] of payments.entries()) {
     const from = paymentItems.find((x) => x.lineNo === i + 1);
     const to = billItems[i];
@@ -226,12 +269,32 @@ export async function confirmPaymentBatch(
       ...(c.confirmedBy ? { createdBy: c.confirmedBy } : {}),
     });
   }
+  // Each refund: its own GP-006 entry, from the batch's bank account, clearing the credit.
+  for (const r of batch.refunds) {
+    await payCustomerRefund(
+      trx,
+      {
+        companyId,
+        refundId: r.refundId,
+        paidOn: c.confirmedOn,
+        bankAccountId: batch.accountId,
+        reference: batch.batchNo,
+        ...(c.confirmedBy ? { createdBy: c.confirmedBy } : {}),
+      },
+      opts,
+    ).catch((e: unknown) => {
+      if (e instanceof RefundError) {
+        throw new PaymentBatchError('NOT_CONFIRMABLE', `refund ${r.refundNo}: ${e.message}`);
+      }
+      throw e;
+    });
+  }
   await trx
     .insertInto('app.payment_batch_confirmation')
     .values({
       company_id: companyId,
       batch_id: batchId,
-      entry_id: posted.entryId,
+      entry_id: posted?.entryId ?? null,
       confirmed_on: c.confirmedOn,
       bank_reference: bankReference ?? null,
       confirmed_by: c.confirmedBy ?? null,

@@ -8,6 +8,7 @@
 import { randomBytes } from 'node:crypto';
 import { seedBillingCompany } from '@ledgerforce/ar/testing';
 import type { LedgerFixture } from '@ledgerforce/ledger/testing';
+import { setPartyProfiles, type SeededProfiles } from '@ledgerforce/products';
 import { addBankAccount } from '@ledgerforce/parties';
 import { LocalKeyringKms } from '@ledgerforce/shared/crypto';
 import { approveBill, createBill, submitBill } from '../bills.ts';
@@ -20,14 +21,26 @@ export const payablesKms = LocalKeyringKms.fromJson(
 );
 
 export interface PayablesFixture {
-  /** A supplier; `verifiedHoursAgo` null = no bank details. */
-  addSupplier(name: string, verifiedHoursAgo: number | null): Promise<string>;
+  /** The posting profiles the company was seeded with (to raise customer invoices). */
+  readonly profiles: SeededProfiles;
+  /**
+   * A party with bank details verified `verifiedHoursAgo` hours ago (null = no bank details).
+   * `customer`: a customer that is also a supplier (payee) — only suppliers and employees hold
+   * bank details (migration 0012, design §4.2), and customer refunds use the same verification
+   * and cooling-off (postings Q9, DL-0288; customer-only holders are ADR-0050, Proposed).
+   * `customer-only`: a customer without the payee role, so it cannot hold bank details.
+   */
+  addSupplier(
+    name: string,
+    verifiedHoursAgo: number | null,
+    role?: 'supplier' | 'customer' | 'customer-only',
+  ): Promise<string>;
   /** A posted GST-free bill of `amount` (decimal string) to office expenses. */
   postBill(supplier: string, ref: string, amount: string, dueDate: string): Promise<string>;
 }
 
 export async function seedPayablesCompany(f: LedgerFixture): Promise<PayablesFixture> {
-  await seedBillingCompany(f);
+  const profiles = await seedBillingCompany(f);
   await f.inTenant(async (trx) => {
     for (const [code, prefix] of [
       ['ap_bill_document', 'BILL-'],
@@ -42,7 +55,8 @@ export async function seedPayablesCompany(f: LedgerFixture): Promise<PayablesFix
   const verifier = await f.addUser('owner');
   let n = 0;
   return {
-    async addSupplier(name, verifiedHoursAgo) {
+    profiles,
+    async addSupplier(name, verifiedHoursAgo, role = 'supplier') {
       n += 1;
       const party = await f.inTenant(async (trx) => {
         const p = await trx
@@ -50,10 +64,43 @@ export async function seedPayablesCompany(f: LedgerFixture): Promise<PayablesFix
           .values({ company_id: f.companyId, legal_name: name, status: 'active' })
           .returning('id')
           .executeTakeFirstOrThrow();
-        await trx
-          .insertInto('app.party_role')
-          .values({ company_id: f.companyId, party_id: p.id, role: 'supplier' })
-          .execute();
+        const roles =
+          role === 'supplier'
+            ? (['supplier'] as const)
+            : role === 'customer'
+              ? (['customer', 'supplier'] as const)
+              : (['customer'] as const);
+        for (const r of roles) {
+          await trx
+            .insertInto('app.party_role')
+            .values({ company_id: f.companyId, party_id: p.id, role: r })
+            .execute();
+        }
+        if (role !== 'supplier') {
+          // A customer to invoice: its posting profile and a Billing To contact (as AR's fixture).
+          await setPartyProfiles(trx, f.companyId, p.id, {
+            customerProfileId: profiles.partyProfiles.get('DOMESTIC_CUSTOMER') ?? '',
+          });
+          const c = await trx
+            .insertInto('app.party_contact')
+            .values({
+              company_id: f.companyId,
+              party_id: p.id,
+              name: `Accounts ${String(n)}`,
+              email: `accounts${String(n)}@customer.example`,
+            })
+            .returning('id')
+            .executeTakeFirstOrThrow();
+          await trx
+            .insertInto('app.party_contact_role')
+            .values({
+              company_id: f.companyId,
+              party_id: p.id,
+              contact_id: c.id,
+              role: 'billing_to',
+            })
+            .execute();
+        }
         return p.id;
       });
       if (verifiedHoursAgo === null) return party;

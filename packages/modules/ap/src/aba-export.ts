@@ -10,6 +10,8 @@
  * own bill reference as the lodgement reference so the supplier can match the payment. Free text
  * (account titles, references) is transliterated to the BECS set; identifiers are validated by the
  * writer, never altered. Transaction code 50; no self-balancing record (RQ-0006 defaults).
+ * Customer refunds in the batch (T-0055, DL-0288) follow the bills, to the customer's recorded
+ * bank account, with the refund number as the lodgement reference.
  */
 import { revealCompanyBankAccountNumber } from '@ledgerforce/bank';
 import { AbaFormatError, toBecs, writeAba } from '@ledgerforce/connector-aba';
@@ -88,8 +90,22 @@ export async function exportPaymentBatchAba(
     .orderBy('i.line_no')
     .execute();
 
+  const refunds = await trx
+    .selectFrom('app.payment_batch_refund as i')
+    .innerJoin('app.customer_refund as r', (j) =>
+      j.onRef('r.tenant_id', '=', 'i.tenant_id').onRef('r.id', '=', 'i.refund_id'),
+    )
+    .innerJoin('app.party_bank_account as a', (j) =>
+      j.onRef('a.tenant_id', '=', 'i.tenant_id').onRef('a.id', '=', 'i.bank_account_id'),
+    )
+    .select(['i.amount', 'i.bank_account_id', 'r.refund_no', 'a.bsb', 'a.account_name'])
+    .where('i.batch_id', '=', batch.batchId)
+    .where('i.excluded_reason', 'is', null)
+    .orderBy('i.line_no')
+    .execute();
+
   const lines = [];
-  for (const i of items) {
+  for (const i of [...items, ...refunds.map((r) => ({ ...r, supplier_ref: r.refund_no }))]) {
     lines.push({
       bsb: i.bsb,
       accountNumber: await revealAccountNumber(trx, kms, i.bank_account_id ?? ''),
