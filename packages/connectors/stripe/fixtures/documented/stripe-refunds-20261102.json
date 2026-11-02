@@ -1,0 +1,47 @@
+{
+  "source": "Built from RefundCreateParams and the Refund object in the official stripe@23.1.0 type definitions (OpenAPI v2596), RQ-0104 S6; request encoding as RQ-0100 S6. Not recorded from a live account: no Stripe key or network was available. Replace with a redacted test-mode recording (fixtures/recorded/) when one is (RQ-0104 follow-up).",
+  "apiVersion": "2026-10-28.endive",
+  "accessed": "2026-11-02",
+  "placeholders": "{{name}} is replaced by the test before matching (ids generated at run time).",
+  "interactions": [
+    {
+      "name": "refund-credit-note-220.00",
+      "request": {
+        "method": "POST",
+        "path": "/v1/refunds",
+        "idempotencyKey": "lf-refund-v1-{{creditNoteId}}-22000",
+        "form": {
+          "payment_intent": "{{paymentIntentId}}",
+          "amount": "22000",
+          "reason": "requested_by_customer",
+          "metadata[lf_tenant_id]": "{{tenantId}}",
+          "metadata[lf_company_id]": "{{companyId}}",
+          "metadata[lf_credit_note_id]": "{{creditNoteId}}",
+          "metadata[lf_credit_note_no]": "{{creditNoteNo}}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "re_1SQbTestRefund000220",
+          "object": "refund",
+          "amount": 22000,
+          "balance_transaction": "txn_1SQbTestRefund000220",
+          "charge": "ch_1SQbTestCharge0001375",
+          "created": 1795478400,
+          "currency": "aud",
+          "metadata": {
+            "lf_tenant_id": "{{tenantId}}",
+            "lf_company_id": "{{companyId}}",
+            "lf_credit_note_id": "{{creditNoteId}}",
+            "lf_credit_note_no": "{{creditNoteNo}}"
+          },
+          "payment_intent": "{{paymentIntentId}}",
+          "reason": "requested_by_customer",
+          "receipt_number": null,
+          "status": "succeeded"
+        }
+      }
+    }
+  ]
+}

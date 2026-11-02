@@ -230,6 +230,22 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     idempotency_key: () => `lf-plink-v1-${randomBytes(6).toString('hex')}`,
     status: () => 'active',
   },
+  // T-0074: Stripe events acted on and refunds (CHECK-constrained Stripe ids, cents, status).
+  'app.stripe_webhook_event': {
+    event_id: () => `evt_${randomBytes(6).toString('hex')}`,
+    event_type: () => 'payment_intent.succeeded',
+    payment_intent_id: () => `pi_${randomBytes(6).toString('hex')}`,
+    amount: () => '1.00',
+    currency: () => 'AUD',
+  },
+  'app.stripe_refund': {
+    payment_intent_id: () => `pi_${randomBytes(6).toString('hex')}`,
+    amount: () => '1.00',
+    currency: () => 'AUD',
+    stripe_refund_id: () => `re_${randomBytes(6).toString('hex')}`,
+    stripe_status: () => 'succeeded',
+    idempotency_key: () => `lf-refund-v1-${randomBytes(6).toString('hex')}`,
+  },
   // T-0041: billing format template records (CHECK-constrained codes; posted needs a series).
   'app.billing_format': {
     code: () => `F_${randomBytes(4).toString('hex').toUpperCase()}`,

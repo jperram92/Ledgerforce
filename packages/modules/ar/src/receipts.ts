@@ -48,6 +48,11 @@ export interface ReceiptInput {
   readonly reference?: string;
   readonly idempotencyKey: string;
   readonly createdBy?: string;
+  /**
+   * The journal's source type: `ar_receipt` (default), or `payments_stripe_charge` for a card
+   * payment received through Stripe into the clearing account (GP-003, T-0074).
+   */
+  readonly sourceType?: 'ar_receipt' | 'payments_stripe_charge';
   readonly allocations: readonly { readonly invoiceId: string; readonly amount: string }[];
 }
 
@@ -191,7 +196,7 @@ export async function recordReceipt(
       companyId,
       idempotencyKey: `ar-receipt:${c.idempotencyKey}`,
       entryDate: c.receiptDate,
-      sourceType: 'ar_receipt',
+      sourceType: c.sourceType ?? 'ar_receipt',
       memo: `Receipt ${receiptNo}${c.reference ? ` ${c.reference}` : ''}`,
       ...(c.createdBy ? { createdBy: c.createdBy } : {}),
       lines: [

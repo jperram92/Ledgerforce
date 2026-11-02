@@ -273,12 +273,18 @@ importers:
 
   packages/connectors/stripe:
     dependencies:
+      '@ledgerforce/ar':
+        specifier: workspace:*
+        version: link:../../modules/ar
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../db
       '@ledgerforce/documents':
         specifier: workspace:*
         version: link:../../modules/documents
+      '@ledgerforce/ledger':
+        specifier: workspace:*
+        version: link:../../ledger
       decimal.js:
         specifier: 10.6.0
         version: 10.6.0
@@ -286,18 +292,15 @@ importers:
         specifier: 0.29.7
         version: 0.29.7
     devDependencies:
-      '@ledgerforce/ar':
+      '@ledgerforce/connector-salesforce':
         specifier: workspace:*
-        version: link:../../modules/ar
+        version: link:../salesforce
       '@ledgerforce/email':
         specifier: workspace:*
         version: link:../../modules/email
       '@ledgerforce/gl':
         specifier: workspace:*
         version: link:../../modules/gl
-      '@ledgerforce/ledger':
-        specifier: workspace:*
-        version: link:../../ledger
       '@ledgerforce/products':
         specifier: workspace:*
         version: link:../../modules/products

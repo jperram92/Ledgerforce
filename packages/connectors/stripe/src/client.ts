@@ -78,6 +78,24 @@ export interface CreatePaymentLink {
   readonly metadata?: Readonly<Record<string, string>>;
 }
 
+export interface CreateRefund {
+  readonly paymentIntentId: string;
+  /** Integer cents as a decimal string (never a float). */
+  readonly amountCents: string;
+  readonly reason?: 'requested_by_customer' | 'duplicate' | 'fraudulent';
+  readonly metadata?: Readonly<Record<string, string>>;
+}
+
+export interface Refund {
+  readonly id: string;
+  /** Integer cents as a decimal string. */
+  readonly amountCents: string;
+  /** ISO 4217, upper-case. */
+  readonly currency: string;
+  /** pending | requires_action | succeeded | failed | canceled. */
+  readonly status: string;
+}
+
 export interface PaymentLink {
   readonly id: string;
   readonly url: string;
@@ -160,11 +178,55 @@ export class StripeClient {
     return this.#paymentLink(`/v1/payment_links/${id}`, { active: false }, `lf-plink-off-v1-${id}`);
   }
 
-  async #paymentLink(
+  /**
+   * Refund (part of) a PaymentIntent (RQ-0104 S6): `POST /v1/refunds` with `payment_intent`,
+   * integer-cent `amount`, `reason`, `metadata` and an Idempotency-Key.
+   */
+  async createRefund(p: CreateRefund, idempotencyKey: string): Promise<Refund> {
+    if (!/^pi_[A-Za-z0-9]+$/.test(p.paymentIntentId)) {
+      throw new StripeConfigError('not a PaymentIntent id');
+    }
+    if (!/^[1-9]\d*$/.test(p.amountCents)) {
+      throw new StripeConfigError('amountCents must be a positive integer string');
+    }
+    const { status, body } = await this.#post(
+      '/v1/refunds',
+      {
+        payment_intent: p.paymentIntentId,
+        amount: p.amountCents,
+        reason: p.reason ?? 'requested_by_customer',
+        ...(p.metadata ? { metadata: p.metadata } : {}),
+      },
+      idempotencyKey,
+    );
+    const id = body['id'];
+    const amount = body['amount'];
+    const currency = body['currency'];
+    const st = body['status'];
+    if (
+      typeof id !== 'string' ||
+      !/^re_[A-Za-z0-9]+$/.test(id) ||
+      body['object'] !== 'refund' ||
+      typeof amount !== 'number' ||
+      !Number.isSafeInteger(amount) ||
+      typeof currency !== 'string' ||
+      typeof st !== 'string' ||
+      body['payment_intent'] !== p.paymentIntentId
+    ) {
+      throw new StripeApiError(
+        status,
+        'malformed_response',
+        'not a Refund object for this payment',
+      );
+    }
+    return { id, amountCents: String(amount), currency: currency.toUpperCase(), status: st };
+  }
+
+  async #post(
     path: string,
     params: FormObject,
     idempotencyKey: string,
-  ): Promise<PaymentLink> {
+  ): Promise<{ status: number; body: Record<string, unknown> }> {
     if (idempotencyKey.length < 1 || idempotencyKey.length > 255) {
       throw new StripeConfigError('an idempotency key is 1–255 characters');
     }
@@ -198,10 +260,19 @@ export class StripeClient {
       const msg = typeof err['message'] === 'string' ? err['message'].slice(0, 300) : 'no message';
       throw new StripeApiError(res.status, code, msg);
     }
-    const id = body?.['id'];
-    const url = body?.['url'];
-    const active = body?.['active'];
-    const livemode = body?.['livemode'];
+    return { status: res.status, body: body ?? {} };
+  }
+
+  async #paymentLink(
+    path: string,
+    params: FormObject,
+    idempotencyKey: string,
+  ): Promise<PaymentLink> {
+    const { status, body } = await this.#post(path, params, idempotencyKey);
+    const id = body['id'];
+    const url = body['url'];
+    const active = body['active'];
+    const livemode = body['livemode'];
     if (
       typeof id !== 'string' ||
       typeof url !== 'string' ||
@@ -209,11 +280,11 @@ export class StripeClient {
       typeof active !== 'boolean' ||
       typeof livemode !== 'boolean'
     ) {
-      throw new StripeApiError(res.status, 'malformed_response', 'not a Payment Link object');
+      throw new StripeApiError(status, 'malformed_response', 'not a Payment Link object');
     }
     if (livemode !== (this.mode === 'live')) {
       throw new StripeApiError(
-        res.status,
+        status,
         'livemode_mismatch',
         `a ${livemode ? 'live' : 'test'}-mode object was returned to a ${this.mode}-mode client`,
       );

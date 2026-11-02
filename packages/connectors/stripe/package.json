@@ -2,7 +2,7 @@
   "name": "@ledgerforce/connector-stripe",
   "version": "0.0.0",
   "private": true,
-  "description": "Stripe connector: fetch-based API client (test mode unless configured live) and one Payment Link per invoice and amount due for invoice PDFs and emails (design §5.7, RQ-0100, ADR-0048)",
+  "description": "Stripe connector: fetch-based API client (test mode unless configured live) and one Payment Link per invoice and amount due for invoice PDFs and emails and signed, replay-protected webhooks posting card receipts into Stripe clearing, plus refunds (design \u00a75.7, \u00a76.9, RQ-0100, RQ-0104, ADR-0048, ADR-0049)",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
@@ -12,16 +12,17 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@ledgerforce/ar": "workspace:*",
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/documents": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
     "decimal.js": "10.6.0",
     "kysely": "0.29.7"
   },
   "devDependencies": {
-    "@ledgerforce/ar": "workspace:*",
+    "@ledgerforce/connector-salesforce": "workspace:*",
     "@ledgerforce/email": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
-    "@ledgerforce/ledger": "workspace:*",
     "@ledgerforce/products": "workspace:*",
     "@ledgerforce/tax": "workspace:*",
     "@ledgerforce/testing": "workspace:*",
