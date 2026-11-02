@@ -53,7 +53,9 @@ Option 1, with these rules:
 1. Secrets: `LF_STRIPE_WEBHOOK_SECRET` (`whsec_…`; comma-separated list during rotation) or
    `LF_STRIPE_WEBHOOK_SECRET_FILE`. Absent → the route answers 503 and verifies nothing. Never
    logged, never stored in the database or repository; tests generate their own.
-2. The raw request body (≤ 512 KiB) is verified before it is parsed: HMAC-SHA256 over
+2. The raw request body (`application/json`, within the API's existing JSON body limit — Express's
+   100 KiB default; Nest keeps the raw bytes with `rawBody: true`) is verified before it is
+   trusted: HMAC-SHA256 over
    `` `${t}.${body}` ``, hex, any `v1` of any configured secret, constant-time compare;
    `|now − t| ≤ 300 s`. Any failure → 400 `{error}` and nothing is read or written.
 3. Only after verification are `metadata.lf_tenant_id`, `lf_company_id`, `lf_invoice_id` read.

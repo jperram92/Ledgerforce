@@ -47,6 +47,8 @@ export interface StripeWebhookConfig {
   readonly posting?: PostOptions;
   /** Unix seconds; defaults to the system clock. */
   readonly now?: () => number;
+  /** Request context for the audit row (design §6.8). */
+  readonly request?: { readonly ip: string | null; readonly requestId: string | null };
 }
 
 export type IgnoredReason =
@@ -153,7 +155,7 @@ export async function processPaymentSucceeded(
   trx: Trx,
   event: StripeEvent,
   pi: PaymentIntentFacts,
-  cfg: Pick<StripeWebhookConfig, 'mode' | 'outbox' | 'posting'>,
+  cfg: Pick<StripeWebhookConfig, 'mode' | 'outbox' | 'posting' | 'request'>,
 ): Promise<WebhookOutcome> {
   const ignored = (reason: IgnoredReason): WebhookOutcome => ({
     kind: 'ignored',
@@ -175,7 +177,13 @@ export async function processPaymentSucceeded(
 
   const inv = await trx
     .selectFrom('app.sales_invoice')
-    .select(['party_id', 'status', 'entry_id', 'currency'])
+    .select([
+      'party_id',
+      'status',
+      'entry_id',
+      'currency',
+      sql<string>`to_char(issue_date, 'YYYY-MM-DD')`.as('issue_date'),
+    ])
     .where('company_id', '=', pi.companyId)
     .where('id', '=', pi.invoiceId)
     .executeTakeFirst();
@@ -214,8 +222,11 @@ export async function processPaymentSucceeded(
     open = Decimal.max(0, new Decimal(o ?? '0'));
   }
   const toInvoice = Decimal.min(amount, open);
-  // Stripe's clock (UTC) dates the payment, as GP-028 dates Stripe's fees by UTC month.
-  const receiptDate = new Date(event.created * 1000).toISOString().slice(0, 10);
+  // Stripe's clock (UTC) dates the payment, as GP-028 dates Stripe's fees by UTC month. A UTC date
+  // can fall a day before a locally dated invoice (it was paid through the invoice's own link, so
+  // never really earlier): then the receipt takes the invoice date, so it can be allocated.
+  const paidOn = new Date(event.created * 1000).toISOString().slice(0, 10);
+  const receiptDate = paidOn < inv.issue_date ? inv.issue_date : paidOn;
   const receipt = await recordReceipt(
     trx,
     {
@@ -247,6 +258,28 @@ export async function processPaymentSucceeded(
       amount: amount.toFixed(4),
       currency: pi.currency,
       receipt_id: receipt.receiptId,
+    })
+    .execute();
+  await trx
+    .insertInto('audit.audit_log')
+    .values({
+      actor_type: 'integration',
+      actor_user_id: null,
+      action: 'stripe.payment_received',
+      entity_type: 'customer_receipt',
+      entity_id: receipt.receiptId,
+      before: null,
+      after: JSON.stringify({
+        stripeEventId: event.id,
+        paymentIntentId: pi.id,
+        invoiceId: pi.invoiceId,
+        amount: amount.toFixed(2),
+        currency: pi.currency,
+        receiptNo: receipt.receiptNo,
+      }),
+      ip: cfg.request?.ip ?? null,
+      user_agent: null,
+      request_id: cfg.request?.requestId ?? null,
     })
     .execute();
   const writeBack = await receiptWriteBack(trx, {

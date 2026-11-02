@@ -3,6 +3,11 @@ import { ApPaymentBatchesController } from './ap/payment-batches.controller.ts';
 import { ArReceiptsController } from './ar/receipts.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArBatchesController } from './ar/batches.controller.ts';
+import {
+  StripeWebhookController,
+  type StripeWebhookOptions,
+} from './payments/stripe-webhook.controller.ts';
+import type { DocumentOutbox } from '@ledgerforce/ar';
 import 'reflect-metadata';
 import { type DynamicModule, Module, type INestApplication, type Type } from '@nestjs/common';
 import { APP_INTERCEPTOR, NestFactory } from '@nestjs/core';
@@ -42,7 +47,7 @@ import { SyncIssuesController } from './sync/sync-issues.controller.ts';
 import { CLOCK, DB, KMS, MFA_POLICY, SYNC_REQUEUE } from './tokens.ts';
 import type { DeliveryRequeue } from '@ledgerforce/outbox';
 import type { PostingOutbox } from '@ledgerforce/ledger';
-import { POSTING_OUTBOX } from './tokens.ts';
+import { DOCUMENT_OUTBOX, POSTING_OUTBOX, STRIPE_WEBHOOK } from './tokens.ts';
 
 export interface ApiOptions {
   /** Connection string for lf_app (never a superuser or the migrator). */
@@ -67,6 +72,13 @@ export interface ApiOptions {
   syncRequeue?: DeliveryRequeue;
   /** Atomic ledger event/job producer. Posting fails closed when it is absent. */
   postingOutbox?: PostingOutbox;
+  /**
+   * Stripe webhook signing (ADR-0049): endpoint secrets from configuration and the Stripe mode.
+   * Without it (or without `documentOutbox` and `postingOutbox`) POST /webhooks/stripe answers 503.
+   */
+  stripeWebhook?: StripeWebhookOptions;
+  /** Document events (write-back snapshots), written in the request's transaction. */
+  documentOutbox?: DocumentOutbox;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
   tenantResolver?: TenantResolver;
   /** Test hook: extra controllers (stand-ins for routes of later tasks, e.g. SS-UC02-07). */
@@ -106,6 +118,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ArReceiptsController,
   ApBillsController,
   ApPaymentBatchesController,
+  StripeWebhookController,
   AuthController,
   LoginController,
 ];
@@ -123,6 +136,8 @@ class AppModule {
     kms: Kms | null,
     syncRequeue: DeliveryRequeue | null,
     postingOutbox: PostingOutbox | null,
+    stripeWebhook: StripeWebhookOptions | null,
+    documentOutbox: DocumentOutbox | null,
   ): DynamicModule {
     return {
       module: AppModule,
@@ -145,6 +160,7 @@ class AppModule {
         ArReceiptsController,
         ApBillsController,
         ApPaymentBatchesController,
+        StripeWebhookController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,
@@ -159,6 +175,8 @@ class AppModule {
         { provide: KMS, useValue: kms },
         { provide: SYNC_REQUEUE, useValue: syncRequeue },
         { provide: POSTING_OUTBOX, useValue: postingOutbox },
+        { provide: STRIPE_WEBHOOK, useValue: stripeWebhook },
+        { provide: DOCUMENT_OUTBOX, useValue: documentOutbox },
         TenantTx,
         AuditTrail,
         Authz,
@@ -216,9 +234,13 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
       opts.kms ?? null,
       opts.syncRequeue ?? null,
       opts.postingOutbox ?? null,
+      opts.stripeWebhook ?? null,
+      opts.documentOutbox ?? null,
     ),
     {
       logger: ['error', 'warn'],
+      // Webhook signatures are over the exact bytes received (RQ-0104); JSON parsing is unchanged.
+      rawBody: true,
     },
   );
   app.use(requestIdMiddleware);

@@ -77,15 +77,15 @@ let cfg: StripeWebhookConfig;
 const money = (s: string) =>
   s === '0' ? '0.0000' : `${s.replace(/,/g, '')}${s.includes('.') ? '00' : '.0000'}`;
 
-async function postStripeInvoice(opportunity: string | null) {
+async function postStripeInvoice(opportunity: string | null, issueDate = '2026-11-05') {
   return f.inTenant(async (trx) => {
     const d = await createDraftInvoice(
       trx,
       {
         companyId: f.companyId,
         partyId: acme,
-        issueDate: '2026-11-05',
-        dueDate: '2026-11-19',
+        issueDate,
+        dueDate: '2026-11-30',
         ...(opportunity ? { salesforceOpportunityId: opportunity } : {}),
         lines: [
           {
@@ -557,5 +557,45 @@ describe('SS-UC11-04 refund through Stripe', () => {
     expect(await refund('11.01')).toBe('EXCEEDS_CREDIT');
     expect(await refund('11.00')).toBe('NO_STRIPE_PAYMENT');
     expect(refundStub.received).toHaveLength(1);
+  });
+});
+
+describe('SS-UC03-02 payment date', () => {
+  it('SS-UC03-02 a UTC payment date a day before the locally dated invoice takes the invoice date, so it still allocates', async () => {
+    const late = await postStripeInvoice(null, '2026-11-16');
+    await f.inTenant((trx) =>
+      trx
+        .insertInto('app.stripe_payment_link')
+        .values({
+          company_id: f.companyId,
+          invoice_id: late.id,
+          amount_due: '1375.0000',
+          currency: 'AUD',
+          stripe_id: 'plink_1T0074LateDate',
+          url: 'https://buy.stripe.com/test_t0074late',
+          livemode: false,
+          idempotency_key: `lf-plink-v1-${late.id}-137500`,
+          deactivated_at: null,
+        })
+        .execute(),
+    );
+    const out = await deliver(
+      paymentIntentEvent({
+        eventId: 'evt_1T0074LateDate',
+        pi: `pi_${randomBytes(8).toString('hex')}`,
+        cents: 137500,
+        invoiceId: late.id,
+      }),
+    );
+    if (out.kind !== 'receipt') throw new Error(`expected a receipt, got ${out.kind}`);
+    expect(out.unallocated).toBe('0.0000');
+    const date = await f.inTenant(
+      async (trx) =>
+        (
+          await sql<{ d: string }>`SELECT to_char(receipt_date, 'YYYY-MM-DD') AS d
+            FROM app.customer_receipt WHERE id = ${out.receiptId}::uuid`.execute(trx)
+        ).rows[0]?.d,
+    );
+    expect(date).toBe('2026-11-16');
   });
 });

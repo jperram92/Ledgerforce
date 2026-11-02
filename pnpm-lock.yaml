@@ -74,6 +74,9 @@ importers:
       '@ledgerforce/ar':
         specifier: workspace:*
         version: link:../../packages/modules/ar
+      '@ledgerforce/connector-stripe':
+        specifier: workspace:*
+        version: link:../../packages/connectors/stripe
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../packages/db
