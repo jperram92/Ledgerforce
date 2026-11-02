@@ -161,6 +161,14 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   },
   // T-0057: bank confirmation of a batch (bank reference length CHECK).
   'app.payment_batch_confirmation': { bank_reference: () => 'BANK-REF-1' },
+  // T-0060: bank matching (migration 0050) — a rule's JSON definition; a manual match (no rule);
+  // a rule suggestion (its rule and account are set by the PREREQUISITES hook below).
+  'app.bank_match_rule': {
+    definition: () =>
+      '{"match": "all", "conditions": [{"field": "text", "op": "contains", "value": "x"}]}',
+  },
+  'app.bank_match': { source_kind: () => 'journal_entry', method: () => 'manual' },
+  'app.bank_match_suggestion': { kind: () => 'rule' },
   // T-0051: bills inbox and attachments (CHECK-constrained hashes and types).
   'app.bill_inbox_item': {
     message_id: () => `<${randomBytes(6).toString('hex')}@test>`,
@@ -453,6 +461,81 @@ export const PREREQUISITES: Readonly<
         [row.get('tenant_id'), row.get('entry_id'), row.get('batch_id')],
       ),
     );
+  },
+  // A match needs a line of its bank account and a posted entry that moves the bank's GL account
+  // by the line amount (migration 0050 insert guard): seed a statement and a 1.0000 line on the
+  // generated bank account, then, as a seed step with triggers off, post the generated entry with
+  // one 1.0000 debit on the bank's GL account. source_kind journal_entry names the entry itself.
+  'app.bank_match': async (admin, row) => {
+    const tenant = row.get('tenant_id') ?? '';
+    const company = row.get('company_id') ?? '';
+    const bank = await admin.query<{ gl: string; currency: string }>(
+      `SELECT gl_account_id::text AS gl, currency FROM app.bank_account WHERE tenant_id = $1 AND id = $2`,
+      [tenant, row.get('bank_account_id')],
+    );
+    const { gl = '', currency = 'AUD' } = bank.rows[0] ?? {};
+    const fixed = new Map([
+      ['company_id', company],
+      ['bank_account_id', row.get('bank_account_id') ?? ''],
+    ]);
+    const statement = await seedRow(
+      admin,
+      { schema: 'app', table: 'bank_statement', qualified: 'app.bank_statement' },
+      tenant,
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([...fixed, ['currency', currency]]),
+    );
+    const line = await seedRow(
+      admin,
+      { schema: 'app', table: 'bank_statement_line', qualified: 'app.bank_statement_line' },
+      tenant,
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([...fixed, ['statement_id', String(statement['id'])], ['amount', '1.0000']]),
+    );
+    row.set('statement_line_id', String(line['id']));
+    row.set('source_id', row.get('journal_entry_id') ?? '');
+    const set = await seedRow(
+      admin,
+      { schema: 'app', table: 'dimension_set', qualified: 'app.dimension_set' },
+      tenant,
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([
+        ['company_id', company],
+        ['hash', randomBytes(32).toString('hex')],
+      ]),
+    );
+    await asReplica(admin, async (q) => {
+      await q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `UPDATE app.journal_entry SET status = 'posted', posted_at = coalesce(posted_at, now())
+          WHERE tenant_id = $1 AND id = $2`,
+        [tenant, row.get('journal_entry_id')],
+      );
+      await q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `INSERT INTO app.journal_line (tenant_id, company_id, entry_id, line_no, account_id, debit,
+                                       credit, txn_currency, txn_amount, fx_rate, dimension_set_id)
+         VALUES ($1, $2, $3, 9001, $4, 1, 0, 'AUD', 1, 1, $5)`,
+        [tenant, company, row.get('journal_entry_id'), gl, set['id']],
+      );
+    });
+  },
+  // A rule suggestion names its rule and suggested account (CHECK, migration 0050): seed a rule of
+  // the same company and take the rule's account.
+  'app.bank_match_suggestion': async (admin, row) => {
+    const rule = await seedRow(
+      admin,
+      { schema: 'app', table: 'bank_match_rule', qualified: 'app.bank_match_rule' },
+      row.get('tenant_id') ?? '',
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([['company_id', row.get('company_id') ?? '']]),
+    );
+    row.set('rule_id', String(rule['id']));
+    row.set('account_id', String(rule['account_id']));
   },
   // A company bank account needs its GL account to be an asset of subtype bank (migration 0013).
   'app.bank_account': async (admin, row) => {
