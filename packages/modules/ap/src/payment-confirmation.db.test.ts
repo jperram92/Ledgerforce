@@ -333,7 +333,7 @@ describe('SS-UC06-07: Batch posts GP-009 on confirmation only', () => {
           .values({
             company_id: f.companyId,
             batch_id: draft,
-            entry_id: c.entryId,
+            entry_id: c.entryId ?? '',
             confirmed_on: '2026-12-31',
           })
           .execute(),

@@ -768,8 +768,8 @@ export interface PaymentBatchConfirmationTable {
   tenant_id: TenantId;
   company_id: string;
   batch_id: string;
-  /** Nullable from migration 0049: a batch that pays only customer refunds has no GP-009 entry. */
-  entry_id: string | null;
+  /** GP-009 entry; for a batch of customer refunds only, its first refund's GP-006 entry (0049). */
+  entry_id: string;
   confirmed_on: ColumnType<Date, string, string>;
   bank_reference: string | null;
   confirmed_by: string | null;

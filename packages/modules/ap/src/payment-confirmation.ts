@@ -17,7 +17,8 @@
  * shows (source ar_refund, Dr AR control (customer) / Cr the batch's bank account), through
  * @ledgerforce/ar payCustomerRefund, which also clears the customer's credit. The GP-009 entry then
  * credits the bank with the bills' total only, and a batch that pays only refunds has no GP-009
- * entry (its confirmation's entry is null, migration 0049).
+ * entry: its confirmation row names its first refund's GP-006 entry (migration 0049) and the view
+ * reports entryId null.
  */
 import type { Database } from '@ledgerforce/db';
 import { payCustomerRefund, RefundError } from '@ledgerforce/ar';
@@ -270,8 +271,9 @@ export async function confirmPaymentBatch(
     });
   }
   // Each refund: its own GP-006 entry, from the batch's bank account, clearing the credit.
+  let firstRefundEntry: string | null = null;
   for (const r of batch.refunds) {
-    await payCustomerRefund(
+    const paid = await payCustomerRefund(
       trx,
       {
         companyId,
@@ -288,13 +290,17 @@ export async function confirmPaymentBatch(
       }
       throw e;
     });
+    firstRefundEntry ??= paid.entryId;
   }
+  const entryId = posted?.entryId ?? firstRefundEntry;
+  if (!entryId)
+    throw new PaymentBatchError('NOT_CONFIRMABLE', `batch ${batch.batchNo} pays nothing`);
   await trx
     .insertInto('app.payment_batch_confirmation')
     .values({
       company_id: companyId,
       batch_id: batchId,
-      entry_id: posted?.entryId ?? null,
+      entry_id: entryId,
       confirmed_on: c.confirmedOn,
       bank_reference: bankReference ?? null,
       confirmed_by: c.confirmedBy ?? null,

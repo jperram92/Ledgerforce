@@ -16,11 +16,12 @@
 --   suppliers (Q9). A separate table rather than a nullable bill_id on payment_batch_item: the item
 --   rows keep their bill FK and NOT NULL, and each row has exactly one kind of document.
 --   Append-only (SELECT, INSERT).
--- * app.payment_batch_confirmation.entry_id becomes nullable: a batch that pays only refunds has
---   no GP-009 entry (each refund posts its own GP-006 entry). The guard is replaced (CREATE OR
---   REPLACE): entry_id may be NULL only when the batch pays no bill; otherwise it must still be the
---   batch's own posted ap_payment entry. ALTER COLUMN ... DROP NOT NULL is additive (it widens what
---   is accepted) and is allowed by the runner's policy.
+-- * app.payment_batch_confirmation: a batch that pays only refunds has no GP-009 entry (each
+--   refund posts its own GP-006 entry). entry_id stays NOT NULL (the verify gate refuses DROP NOT
+--   NULL): such a batch's confirmation names the GP-006 entry of its first refund. The guard is
+--   replaced (CREATE OR REPLACE): when the batch pays refunds and no bill, the entry must be a
+--   posted ar_refund entry of a refund this batch pays; otherwise it must still be the batch's own
+--   posted ap_payment entry (as 0048).
 -- * Tenant-owned: RLS ENABLE + FORCE, tenant_isolation, explicit lf_app grants; nothing deleted.
 
 CREATE TABLE app.customer_refund (
@@ -122,17 +123,14 @@ $$;
 CREATE TRIGGER customer_refund_guard BEFORE UPDATE ON app.customer_refund
   FOR EACH ROW EXECUTE FUNCTION app.customer_refund_guard();
 
--- A refund-only batch has no GP-009 entry.
-ALTER TABLE app.payment_batch_confirmation ALTER COLUMN entry_id DROP NOT NULL;
-
--- As 0048, except: with no bill paid in the batch the entry is NULL (and must be).
+-- As 0048, except: with no bill paid in the batch the entry is the GP-006 entry of one of its refunds.
 CREATE OR REPLACE FUNCTION app.payment_batch_confirmation_guard() RETURNS trigger
   LANGUAGE plpgsql
 AS $$
 DECLARE
   st    text;
   bno   text;
-  bills boolean;
+  refunds_only boolean;
 BEGIN
   IF NEW.tenant_id IS DISTINCT FROM nullif(current_setting('app.tenant_id', true), '')::uuid THEN
     RETURN NEW; -- another tenant's row (or no tenant): RLS decides (as migration 0028)
@@ -144,12 +142,21 @@ BEGIN
     RAISE EXCEPTION 'payment batch % is %; only a released batch can be confirmed', bno, coalesce(st, 'missing')
       USING ERRCODE = 'check_violation';
   END IF;
-  bills := EXISTS (
-    SELECT 1 FROM app.payment_batch_item i
-     WHERE i.tenant_id = NEW.tenant_id AND i.batch_id = NEW.batch_id AND i.excluded_reason IS NULL);
-  IF NEW.entry_id IS NULL THEN
-    IF bills THEN
-      RAISE EXCEPTION 'payment batch % pays bills and needs its ap_payment entry', bno
+  -- Refunds only: the batch pays at least one refund and no bill.
+  refunds_only := NOT EXISTS (
+      SELECT 1 FROM app.payment_batch_item i
+       WHERE i.tenant_id = NEW.tenant_id AND i.batch_id = NEW.batch_id AND i.excluded_reason IS NULL)
+    AND EXISTS (
+      SELECT 1 FROM app.payment_batch_refund r
+       WHERE r.tenant_id = NEW.tenant_id AND r.batch_id = NEW.batch_id AND r.excluded_reason IS NULL);
+  IF refunds_only THEN
+    IF NOT EXISTS (
+      SELECT 1 FROM app.payment_batch_refund r
+        JOIN app.journal_entry e ON e.tenant_id = r.tenant_id AND e.company_id = r.company_id
+       WHERE r.tenant_id = NEW.tenant_id AND r.batch_id = NEW.batch_id AND r.excluded_reason IS NULL
+         AND e.id = NEW.entry_id AND e.status = 'posted' AND e.source_type = 'ar_refund'
+         AND e.source_id = r.refund_id::text) THEN
+      RAISE EXCEPTION 'payment batch % pays only refunds and is confirmed by one of their posted ar_refund entries', bno
         USING ERRCODE = 'check_violation';
     END IF;
     RETURN NEW;

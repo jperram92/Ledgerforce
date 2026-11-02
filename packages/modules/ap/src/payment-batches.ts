@@ -87,7 +87,7 @@ export interface PaymentBatchView {
   readonly createdBy: string | null;
   /** The bank's confirmation and its GP-009 entry (T-0057); null until confirmed. */
   readonly confirmation: {
-    /** Null when the batch pays only customer refunds (no GP-009 entry, migration 0049). */
+    /** The GP-009 entry; null when the batch pays only customer refunds (no GP-009 entry). */
     readonly entryId: string | null;
     readonly confirmedOn: string;
     readonly bankReference: string | null;
@@ -244,7 +244,8 @@ export async function getPaymentBatch(
     createdBy: b.created_by,
     confirmation: confirmation
       ? {
-          entryId: confirmation.entry_id,
+          // A refunds-only batch's row names a GP-006 entry (migration 0049); it has no GP-009.
+          entryId: items.some((i) => i.excluded_reason === null) ? confirmation.entry_id : null,
           confirmedOn: confirmation.confirmed_on,
           bankReference: confirmation.bank_reference,
           confirmedBy: confirmation.confirmed_by,
