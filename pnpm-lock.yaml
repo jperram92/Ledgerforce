@@ -123,6 +123,9 @@ importers:
         specifier: 7.8.2
         version: 7.8.2
     devDependencies:
+      '@ledgerforce/bank':
+        specifier: workspace:*
+        version: link:../../packages/modules/bank
       '@ledgerforce/products':
         specifier: workspace:*
         version: link:../../packages/modules/products

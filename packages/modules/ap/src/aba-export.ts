@@ -34,7 +34,7 @@ export class AbaExportError extends Error {
 export interface AbaExport {
   readonly batchId: string;
   readonly batchNo: string;
-  /** e.g. "PB-000001-20261106.aba". */
+  /** e.g. "PB-000001-20261106.aba" (only letters, digits, ".", "_" and "-"; safe in a header). */
   readonly fileName: string;
   /** The file text (ASCII, CRLF record separators). */
   readonly content: string;
@@ -120,7 +120,7 @@ export async function exportPaymentBatchAba(
   return {
     batchId: batch.batchId,
     batchNo: batch.batchNo,
-    fileName: `${batch.batchNo}-${batch.paymentDate.replace(/-/g, '')}.aba`,
+    fileName: `${batch.batchNo.replace(/[^A-Za-z0-9._-]/g, '_')}-${batch.paymentDate.replace(/-/g, '')}.aba`,
     content,
     paymentCount: lines.length,
     total: batch.total,

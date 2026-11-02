@@ -31,6 +31,7 @@
     "rxjs": "7.8.2"
   },
   "devDependencies": {
+    "@ledgerforce/bank": "workspace:*",
     "@ledgerforce/products": "workspace:*",
     "@ledgerforce/tax": "workspace:*",
     "@nestjs/testing": "12.1.2",
