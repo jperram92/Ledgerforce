@@ -173,6 +173,19 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   },
   // T-0057: bank confirmation of a batch (bank reference length CHECK).
   'app.payment_batch_confirmation': { bank_reference: () => 'BANK-REF-1' },
+  // T-0080: opening balance at conversion (balance date = conversion date − 1) and its documents
+  // (kind, non-zero amount, GST of the same sign, due date not before the document date).
+  'app.opening_balance': {
+    conversion_date: () => '2026-11-01',
+    balance_date: () => '2026-10-31',
+  },
+  'app.opening_balance_item': {
+    kind: () => 'ar',
+    amount: () => '1',
+    gst_amount: () => '0',
+    document_date: () => '2026-10-01',
+    due_date: () => '2026-10-31',
+  },
   // T-0051: bills inbox and attachments (CHECK-constrained hashes and types).
   'app.bill_inbox_item': {
     message_id: () => `<${randomBytes(6).toString('hex')}@test>`,
@@ -463,6 +476,20 @@ export const PREREQUISITES: Readonly<
                 source_id = $3
           WHERE tenant_id = $1 AND id = $2`,
         [row.get('tenant_id'), row.get('entry_id'), row.get('batch_id')],
+      ),
+    );
+  },
+  // An opening balance must point at its company's own posted ledger_opening_balance entry dated
+  // the balance date (migration 0051 insert guard): make the generated entry that, as a seed step
+  // with triggers off.
+  'app.opening_balance': async (admin, row) => {
+    await asReplica(admin, (q) =>
+      q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `UPDATE app.journal_entry SET status = 'posted', posted_at = coalesce(posted_at, now()),
+                source_type = 'ledger_opening_balance', entry_date = $3
+          WHERE tenant_id = $1 AND id = $2`,
+        [row.get('tenant_id'), row.get('entry_id'), row.get('balance_date')],
       ),
     );
   },

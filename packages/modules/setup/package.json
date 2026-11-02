@@ -1,0 +1,27 @@
+{
+  "name": "@ledgerforce/setup",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Setup wizard backend: opening balances at conversion (design §4.1 step 9, GP-037)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/bank": "workspace:*",
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "decimal.js": "10.6.0",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@ledgerforce/ar": "workspace:*",
+    "@ledgerforce/gl": "workspace:*",
+    "@types/node": "22.20.5",
+    "vitest": "4.1.12"
+  }
+}

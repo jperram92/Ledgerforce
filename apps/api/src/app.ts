@@ -1,6 +1,7 @@
 import { ApBillsController } from './ap/bills.controller.ts';
 import { ApPaymentBatchesController } from './ap/payment-batches.controller.ts';
 import { ArReceiptsController } from './ar/receipts.controller.ts';
+import { OpeningBalancesController } from './setup/opening-balances.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArBatchesController } from './ar/batches.controller.ts';
 import 'reflect-metadata';
@@ -106,6 +107,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ArReceiptsController,
   ApBillsController,
   ApPaymentBatchesController,
+  OpeningBalancesController,
   AuthController,
   LoginController,
 ];
@@ -145,6 +147,7 @@ class AppModule {
         ArReceiptsController,
         ApBillsController,
         ApPaymentBatchesController,
+        OpeningBalancesController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,

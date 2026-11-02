@@ -776,6 +776,35 @@ export interface PaymentBatchConfirmationTable {
   confirmed_at: Timestamp;
 }
 
+/** Migration 0051 (T-0080): opening balance at conversion (GP-037). Insert-only. */
+export interface OpeningBalanceTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  conversion_date: ColumnType<Date, string, never>;
+  balance_date: ColumnType<Date, string, never>;
+  entry_id: string;
+  idempotency_key: string;
+  created_by: string | null;
+  created_at: Timestamp;
+}
+
+/** Migration 0051 (T-0080): an open AR/AP document behind one opening control line. Insert-only. */
+export interface OpeningBalanceItemTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  opening_balance_id: string;
+  kind: 'ar' | 'ap';
+  line_no: number;
+  party_id: string;
+  document_no: string;
+  document_date: ColumnType<Date, string, never>;
+  due_date: ColumnType<Date, string, never>;
+  amount: string;
+  gst_amount: Generated<string>;
+}
+
 /** Migration 0049 (T-0055): customer refunds (GP-006). */
 export interface CustomerRefundTable {
   id: string;
@@ -1109,6 +1138,8 @@ export interface Database {
   'app.payment_batch_release': PaymentBatchReleaseTable;
   'app.payment_batch_confirmation': PaymentBatchConfirmationTable;
   'app.customer_refund': CustomerRefundTable;
+  'app.opening_balance': OpeningBalanceTable;
+  'app.opening_balance_item': OpeningBalanceItemTable;
   'app.payment_batch_refund': PaymentBatchRefundTable;
   'app.supplier_bill_line': SupplierBillLineTable;
   'app.bill_inbox_item': BillInboxItemTable;

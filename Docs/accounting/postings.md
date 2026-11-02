@@ -100,6 +100,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 | GP-034 | Super guarantee charge assessment | Phase 1 | UC-07 | Approved |
 | GP-035 | Prior-period adjustment (AASB 108) | Phase 1 | — | Superseded by GP-036 |
 | GP-036 | Prior-period error: late bill through AP (supersedes GP-035) | Phase 1 | — | Approved |
+| GP-037 | Opening balances at conversion: trial balance plus open AR/AP items (§4.1 step 9) | MVP | — | Approved |
 
 ---
 
@@ -787,6 +788,48 @@ printed invoice shows these same line nets. No ROUNDING line.
 - **Tax/BAS:** input tax credit in the current BAS (G11 +550.00, 1B +50.00). Restated report mode shows 500.00 as FY2027 office expense; current-year profit unchanged.
 - `ledger.prior_period_adjustment` (journal class) remains the source type for corrections with no control-account line.
 
+## GP-037 — Opening balances at conversion: trial balance plus open AR/AP items
+
+- **Status: Approved (claude under the product owner's standing delegation, DL-0263, 2026-11-02; basis RQ-0109; decision DL-0292)** · Phase: MVP · Source type: `ledger.opening_balance` · Use cases: — · Design: §4.1 step 9, §3.2 (control accounts), §3.3
+- **Scenario:** Demo Co goes live in LedgerForce on **2026-11-01** (the conversion date). Its old system's trial
+  balance at the close of **2026-10-31** (the balance date, the entry date) is keyed or imported, with the open items
+  behind its AR and AP balances: Acme owes INV-0991 (2026-09-15, due 2026-10-15, $1,375.00 incl. GST 125.00) and
+  INV-1004 (2026-10-15, due 2026-11-14, $550.00 incl. GST 50.00); the business owes Supplier bill B-77 (2026-10-08,
+  due 2026-11-07, $660.00 incl. GST 60.00). Year-to-date profit and loss (July–October) comes across on its own
+  accounts because the balance date is inside the current financial year.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | bank:OPERATING | 1100 | 12,400.00 | | — | — |
+| 2 | system:AR_CONTROL (INV-0991, due 2026-10-15) | 1200 | 1,375.00 | | — | Acme |
+| 3 | system:AR_CONTROL (INV-1004, due 2026-11-14) | 1200 | 550.00 | | — | Acme |
+| 4 | asset: Computer equipment | 1510 | 3,000.00 | | — | — |
+| 5 | tax:GST.paid | 2210 | 120.00 | | — | — |
+| 6 | expense: Office expenses | 6100 | 2,515.00 | | — | — |
+| 7 | system:AP_CONTROL (B-77, due 2026-11-07) | 2100 | | 660.00 | — | Supplier |
+| 8 | tax:GST.collected | 2200 | | 300.00 | — | — |
+| 9 | system:RETAINED_EARNINGS | 3200 | | 10,000.00 | — | — |
+| 10 | product:PROFESSIONAL_SERVICES.revenue | 4000 | | 9,000.00 | — | — |
+| | **Total** | | **19,960.00** | **19,960.00** | | |
+
+- **Check:** 12,400.00 + 1,375.00 + 550.00 + 3,000.00 + 120.00 + 2,515.00 = 19,960.00 = 660.00 + 300.00 + 10,000.00 + 9,000.00 ✓
+- **Rules:** one AR_CONTROL / AP_CONTROL line **per open document** (party + due date), never one line per control
+  account; the trial balance's AR (1,925.00) and AP (660.00) amounts must equal the sum of their items, otherwise the
+  whole import is refused with the difference. An unbalanced trial balance is refused — there is **no plug** to a
+  historical-adjustment or opening-balance-equity account (RQ-0109 finding 3). A customer credit balance (unapplied
+  payment, open credit note) is a credit AR line; a supplier debit balance a debit AP line. Current year earnings is
+  never posted (closing computes it); other control accounts (payroll clearing) must be zero at conversion.
+- **Date and period:** the entry date is the conversion date − 1 day; its fiscal period must exist and be **open**.
+  One live opening entry per company, and no other posted entry on or before the balance date. Correction: reverse
+  the whole entry (refused once an item is allocated — Q11 rule) and post a new one.
+- **Subledger:** three open items — Acme +1,375.00 (due 2026-10-15, 1–30 days overdue at 2026-11-01), Acme +550.00
+  (due 2026-11-14, current), Supplier −660.00 (due 2026-11-07). Each keeps its original number, date and GST content
+  as data; later receipts and payments allocate to them like any open item.
+- **Tax/BAS:** none on either basis — the lines carry no tax codes; the GST account balances (300.00 collected,
+  120.00 paid) are the old system's, to be settled by the old BAS. **Cash basis:** the GST inside the open items
+  (125.00 + 50.00 on sales, 60.00 on the bill) becomes attributable when they are paid after conversion (GST Act
+  s 29-5); reporting it from the recorded GST content is follow-up work (T-0125), not part of this journal.
+
 ### Proposed reference-chart additions
 
 | Code | Account | Binding |
@@ -880,3 +923,4 @@ above has been changed.
 | 2026-11-01 | claude (T-0115) | Owner approved the RQ-0096 change list; added Draft entries GP-020…GP-035 and chart additions implementing it. Superseded entries left unchanged for the owner to mark. |
 | 2026-11-01 | claude (T-0115) | Owner delegated approval (DL-0256): entries Approved, GP-004/007/012/013/018 superseded, Q1–Q15 resolved. |
 | 2026-11-01 | claude (T-0116) | GP-036 supersedes GP-035 (control-account rule); DL-0258. |
+| 2026-11-02 | claude (T-0080) | GP-037 opening balances at conversion added and approved under the standing delegation (DL-0263); basis RQ-0109; DL-0292. No existing entry changed. |

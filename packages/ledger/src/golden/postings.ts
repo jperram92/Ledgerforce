@@ -247,6 +247,7 @@ export const AU_SERVICES_BINDINGS: Readonly<
   'system:ACCRUED_EXPENSES': { code: '2360' },
   'system:SGC_PAYABLE': { code: '2370' },
   'system:PRIOR_PERIOD_ADJUSTMENTS': { code: '3400' },
+  'system:RETAINED_EARNINGS': { role: 'RETAINED_EARNINGS' },
   'setting:payroll.sgc_expense': { code: '6420' },
   'expense: Office expenses': { code: '6230' },
   'expense: Electricity': { code: '6240' },
