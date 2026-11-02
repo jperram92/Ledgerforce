@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0056",
+  "entries": [
+    {
+      "scenario": "SS-UC06-06",
+      "file": ".agent/evidence/T-0056/20261102-013017-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/aba-export.db.test.ts › SS-UC06-06: ABA file is byte-exact › SS-UC06-06 a released batch produces the expected ABA file byte for byte; a draft batch is refused | packages/modules/ap/src/aba-export.db.test.ts › SS-UC06-06: ABA file is byte-exact › SS-UC06-06 a batch of another company is not found",
+      "commit": "20968a83b52b-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T01:30:17.610Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-06",
+      "file": ".agent/evidence/T-0056/20261102-013023-tests-unit.json",
+      "test": "2 test(s): packages/connectors/aba/src/aba.contract.test.ts › SS-UC06-06: ABA file is byte-exact › SS-UC06-06 a three-payment supplier batch matches the expected file byte for byte (header, details, trailer totals, CRLF) | packages/connectors/aba/src/aba.contract.test.ts › SS-UC06-06: ABA file is byte-exact › SS-UC06-06 the self-balancing variant adds one code-13 debit to the funding account and nets to zero",
+      "commit": "20968a83b52b-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T01:30:23.954Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-06",
+      "file": ".agent/evidence/T-0056/20261102-013025-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-batch-aba.db.test.ts › SS-UC06-06: ABA file is byte-exact › SS-UC06-06 a releaser downloads the ABA file of a released batch (audited); a draft batch and an AP Clerk are refused",
+      "commit": "20968a83b52b-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T01:30:25.577Z",
+      "result": "passed"
+    }
+  ]
+}

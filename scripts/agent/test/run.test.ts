@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, readdirSync, readFileSync, writeFileSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { makeRepo, runCli, git, cardField, readState, readText, configWith, fake, AGENT_DIR } from './helpers.ts';
+import { makeRepo, runCli, git, cardField, readState, readText, configWith, fake, AGENT_DIR, BIN } from './helpers.ts';
 import { loadConfig } from '../lib/config.ts';
 import { quotaMatch, classifyOutput } from '../lib/run.ts';
 
@@ -215,7 +215,10 @@ test('run routes a card in review to the provider that did NOT build it', () => 
   const log = fakeLog();
   const r = runCli(root, ['run', '--once', '--dry-run'], FAST);
   assert.match(r.stdout, /cross-review/i);
-  assert.doesNotMatch(r.stdout.split('--- prompt ---')[0], /\$ bash .*claude|\[1\] claude/);
+  // Both fakes live under the checkout, whose path may contain "claude" (e.g. .claude/worktrees/…):
+  // mask that directory so only a provider name in the planned command can match.
+  const plan = (r.stdout.split('--- prompt ---')[0] ?? '').replaceAll(BIN, '<fixtures-bin>');
+  assert.doesNotMatch(plan, /\$ bash .*claude|\[1\] claude/);
   const r2 = runCli(root, ['run', '--once'], { ...FAST, FAKE_LOG: log });
   assert.equal(r2.code, 0, r2.stdout + r2.stderr);
   assert.deepEqual(calls(log).map((l) => l.split(' ')[1]), ['codex']);

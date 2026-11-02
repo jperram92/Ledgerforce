@@ -1,0 +1,54 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aa3c800f0b0ab6286
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:46303
+ ❯ |db| packages/modules/ap/src/aba-export.db.test.ts (2 tests | 2 failed) 771ms
+     × SS-UC06-06 a released batch produces the expected ABA file byte for byte; a draft batch is refused 142ms
+     × SS-UC06-06 a batch of another company is not found 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ap/src/aba-export.db.test.ts > SS-UC06-06: ABA file is byte-exact > SS-UC06-06 a released batch produces the expected ABA file byte for byte; a draft batch is refused
+AssertionError: expected undefined to be 'NOT_RELEASED' // Object.is equality
+
+- Expected:
+"NOT_RELEASED"
+
++ Received:
+undefined
+
+ ❯ packages/modules/ap/src/aba-export.db.test.ts:67:50
+     65|
+     66|     // A draft batch is never exported.
+     67|     expect((await refusal(exportAba(id)))?.code).toBe('NOT_RELEASED');
+       |                                                  ^
+     68|     // Released, but GL 1010 has no company bank account with ABA deta…
+     69|     await f.inTenant((trx) =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |db| packages/modules/ap/src/aba-export.db.test.ts > SS-UC06-06: ABA file is byte-exact > SS-UC06-06 a batch of another company is not found
+AssertionError: expected undefined to be 'INVALID_BATCH' // Object.is equality
+
+- Expected:
+"INVALID_BATCH"
+
++ Received:
+undefined
+
+ ❯ packages/modules/ap/src/aba-export.db.test.ts:101:53
+     99|   it('SS-UC06-06 a batch of another company is not found', async () =>…
+    100|     const other = randomUUID();
+    101|     expect((await refusal(exportAba(other)))?.code).toBe('INVALID_BATC…
+       |                                                     ^
+    102|   });
+    103| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  01:21:29
+   Duration  4.07s (transform 700ms, setup 0ms, import 1.01s, tests 771ms, environment 0ms)
+
