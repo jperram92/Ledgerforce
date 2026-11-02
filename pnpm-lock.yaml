@@ -339,6 +339,12 @@ importers:
 
   packages/modules/ap:
     dependencies:
+      '@ledgerforce/bank':
+        specifier: workspace:*
+        version: link:../bank
+      '@ledgerforce/connector-aba':
+        specifier: workspace:*
+        version: link:../../connectors/aba
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../db

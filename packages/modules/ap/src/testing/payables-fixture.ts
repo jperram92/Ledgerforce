@@ -14,7 +14,8 @@ import { approveBill, createBill, submitBill } from '../bills.ts';
 
 export const PAYMENT_BATCH_SERIES_PREFIX = 'PB-';
 
-const kms = LocalKeyringKms.fromJson(
+/** The test key service that sealed the fixture's bank details (ABA export unseals with it). */
+export const payablesKms = LocalKeyringKms.fromJson(
   JSON.stringify({ active: 'k1', keys: { k1: randomBytes(32).toString('base64') } }),
 );
 
@@ -57,7 +58,7 @@ export async function seedPayablesCompany(f: LedgerFixture): Promise<PayablesFix
       });
       if (verifiedHoursAgo === null) return party;
       const account = await f.inTenant((trx) =>
-        addBankAccount(trx, kms, f.companyId, party, {
+        addBankAccount(trx, payablesKms, f.companyId, party, {
           bsb: '062-000',
           accountNumber: String(100000 + n),
           accountName: name.slice(0, 32),

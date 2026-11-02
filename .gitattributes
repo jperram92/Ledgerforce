@@ -2,3 +2,5 @@
 * text=auto eol=lf
 # Bash scripts must remain executable by Git Bash and Linux after Windows checkout.
 *.sh text eol=lf
+# Bank payment files (ABA/Cemtex) are byte-exact fixtures with CRLF record separators (T-0056).
+*.aba -text
