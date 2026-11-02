@@ -26,6 +26,7 @@ import {
   inboundChanges,
   inboundMapFor,
   planChange,
+  SNAPSHOT_SEQUENCE_BASE,
   type InboundChange,
   type InboundTarget,
   type InboundValue,
@@ -55,6 +56,38 @@ export interface InboundResult extends Omit<Mapped, 'outcome'> {
   outcome: InboundOutcome | 'duplicate';
   rowId: string | null;
   conflicts: string[];
+  /** Why an `ignored` change was not mapped: a newer state is already applied (RQ-0103). */
+  skipped?: SkipCode;
+}
+
+export type SkipCode = 'ALREADY_CURRENT' | 'SUPERSEDED';
+
+/**
+ * Snapshots (polling, reconcile) and CDC changes converge by Salesforce timestamp (RQ-0103
+ * finding 7). SystemModstamp has whole-second precision and a CDC commit timestamp is never before
+ * the SystemModstamp of the same transaction, so only a strictly later second proves staleness:
+ *  - a snapshot is ALREADY_CURRENT when a CDC change applied at or after the next second, or a
+ *    snapshot with a later stamp, was applied;
+ *  - a CDC change is SUPERSEDED when a snapshot stamped at or after its next second was applied.
+ * Anything closer re-applies the same or newer state, which is harmless. Issues never count.
+ */
+async function staleBy(trx: Trx, companyId: string, c: InboundChange): Promise<SkipCode | null> {
+  const at = new Date(Number(c.commitTimestamp));
+  const { rows } = await sql<{ n: number }>`
+    SELECT 1 AS n FROM app.salesforce_inbound_change
+     WHERE company_id = ${companyId} AND entity_name = ${c.entityName} AND record_id = ${c.recordId}
+       AND outcome IN ('applied', 'archived')
+       AND ${
+         c.snapshot
+           ? sql`((sequence_number < ${SNAPSHOT_SEQUENCE_BASE}
+                    AND commit_timestamp >= ${at}::timestamptz + interval '1 second')
+                  OR (sequence_number >= ${SNAPSHOT_SEQUENCE_BASE} AND commit_timestamp > ${at}))`
+           : sql`(sequence_number >= ${SNAPSHOT_SEQUENCE_BASE}
+                  AND commit_timestamp >= ${at}::timestamptz + interval '1 second')`
+       }
+     LIMIT 1`.execute(trx);
+  if (rows.length === 0) return null;
+  return c.snapshot ? 'ALREADY_CURRENT' : 'SUPERSEDED';
 }
 
 export interface InboundContext {
@@ -105,6 +138,28 @@ export async function applyInboundChange(
       targetId: null,
       applied: [],
       conflicts: [],
+    };
+  }
+  const skipped = await staleBy(trx, ctx.companyId, c);
+  if (skipped) {
+    const target = inboundMapFor(c.entityName)?.target ?? null;
+    await sql`
+      UPDATE app.salesforce_inbound_change
+         SET outcome = 'ignored', target_type = ${target}, issue_code = ${skipped},
+             issue_message = ${
+               skipped === 'SUPERSEDED'
+                 ? 'a newer polled or reconciled state of the record is already applied'
+                 : 'a newer change of the record is already applied'
+             }
+       WHERE id = ${rowId}`.execute(trx);
+    return {
+      outcome: 'ignored',
+      rowId,
+      targetType: target,
+      targetId: null,
+      applied: [],
+      conflicts: [],
+      skipped,
     };
   }
   const plan = planChange(c);

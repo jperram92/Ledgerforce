@@ -110,6 +110,7 @@ export function parseInboundIssuePayload(payload: Record<string, unknown>): Inbo
       changedFields: (c['changedFields'] as string[] | undefined) ?? [],
       nulledFields: (c['nulledFields'] as string[] | undefined) ?? [],
       fields: (c['fields'] as Record<string, unknown> | undefined) ?? {},
+      ...(c['snapshot'] === true ? { snapshot: true } : {}),
     },
   };
 }

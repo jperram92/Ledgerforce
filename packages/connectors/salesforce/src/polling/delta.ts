@@ -16,13 +16,14 @@
 import { createHash } from 'node:crypto';
 import {
   inboundMapFor,
+  SNAPSHOT_SEQUENCE_BASE,
   type InboundChange,
   type InboundChangeType,
 } from '../inbound/inbound-map.ts';
 import type { SfRecord } from './query-client.ts';
 
 /** Lowest sequence number of a polled change (CDC transactions stay far below: ≤ 10,000 rows). */
-export const POLL_SEQUENCE_BASE = 2 ** 24;
+export const POLL_SEQUENCE_BASE = SNAPSHOT_SEQUENCE_BASE;
 const SEQUENCE_SPAN = 2 ** 31 - 1 - POLL_SEQUENCE_BASE;
 
 const NAME_RE = /^[A-Za-z][A-Za-z0-9_]{0,79}$/;

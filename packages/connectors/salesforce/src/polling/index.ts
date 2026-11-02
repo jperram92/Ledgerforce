@@ -14,3 +14,15 @@ export {
   type QuerySession,
   type SfRecord,
 } from './query-client.ts';
+export {
+  configureSyncObject,
+  getSyncObject,
+  pollObject,
+  reconcileInbound,
+  runPollingCycle,
+  type PollContext,
+  type PollOptions,
+  type PollReport,
+  type SyncMode,
+  type SyncObject,
+} from './poller.ts';

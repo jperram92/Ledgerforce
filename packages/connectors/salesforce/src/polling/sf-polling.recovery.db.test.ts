@@ -128,8 +128,11 @@ const party = (id: string) =>
       .where('salesforce_account_id', '=', id)
       .execute(),
   );
-const changesFor = (recordId: string) =>
-  q((trx) => listInboundChanges(trx, f.companyId, { recordId }));
+/** Processed changes of a record in processing order (CDC and snapshot keys are not comparable). */
+const changesFor = async (recordId: string) =>
+  (await q((trx) => listInboundChanges(trx, f.companyId, { recordId }))).sort(
+    (a, b) => a.processedAt.getTime() - b.processedAt.getTime(),
+  );
 const syncObject = async (entity: string) =>
   must(await q((trx) => getSyncObject(trx, f.companyId, entity)));
 const appliedCount = async () =>
@@ -243,10 +246,17 @@ describe('SS-PLAT-26: Missed Salesforce events recovered by nightly reconciliati
         email: 'mia@bayside.example',
       },
     ]);
-    // Each change replayed once: one applied row per change.
+    // Each change replayed once: one applied row per change — CDC's create, day 0's same-second
+    // snapshot of that state, and the one offline rename.
     expect(
-      (await changesFor(acc(1))).filter((r) => r.outcome === 'applied').map((r) => r.source),
-    ).toEqual(['/data/AccountChangeEvent', 'reconcile']);
+      (await changesFor(acc(1)))
+        .filter((r) => r.outcome === 'applied')
+        .map((r) => [r.source, r.commitNumber]),
+    ).toEqual([
+      ['/data/AccountChangeEvent', expect.any(BigInt)],
+      ['reconcile', BigInt(T0 + 1000)],
+      ['reconcile', BigInt(T0 + DAY)],
+    ]);
     expect(await appliedCount()).toBe(before + 5); // the 5 changes made while offline
     expect(issues).toEqual([]);
 
@@ -254,7 +264,7 @@ describe('SS-PLAT-26: Missed Salesforce events recovered by nightly reconciliati
     const again = await reconcileInbound({ ...base(), now: () => at(4 * DAY + 60_000) });
     expect(again.reduce((n, r) => n + r.applied + r.archived, 0)).toBe(0);
     expect(await appliedCount()).toBe(before + 5);
-    expect(must((await changesFor(acc(2)))[0]).duplicateCount).toBeGreaterThanOrEqual(1);
+    expect(must((await changesFor(acc(3))).at(-1)).duplicateCount).toBeGreaterThanOrEqual(1);
     // The watermark is the highest SystemModstamp read (Salesforce's clock), not the run time.
     expect((await syncObject('Account')).watermark).toEqual(at(2 * DAY));
 

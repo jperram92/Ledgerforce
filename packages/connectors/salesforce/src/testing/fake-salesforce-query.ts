@@ -64,7 +64,7 @@ export async function startFakeSalesforceQuery(opts: {
   const pageSize = Math.min(opts.pageSize ?? DOCUMENTED_QUERY.maxBatchSize, 2000);
   const v = `/services/data/v${DOCUMENTED_QUERY.apiVersion}`;
   const objects = new Map<string, { fields: Set<string>; rows: Map<string, FakeRow> }>();
-  const locators = new Map<string, { rows: FakeRow[]; total: number }>();
+  const locators = new Map<string, { rows: FakeRow[]; rowCount: number }>();
   let serial = 0;
   const table = (object: string) => {
     const t = objects.get(object);
@@ -113,16 +113,16 @@ export async function startFakeSalesforceQuery(opts: {
     return { status: doc.status, body };
   };
 
-  const page = (object: string, rows: FakeRow[], total: number) => {
+  const page = (object: string, rows: FakeRow[], rowCount: number) => {
     const records = rows.slice(0, pageSize).map((r) => ({
       attributes: { type: object, url: `${v}/sobjects/${object}/${String(r.Id)}` },
       ...r,
     }));
     const rest = rows.slice(pageSize);
-    if (rest.length === 0) return { totalSize: total, done: true, records };
-    const locator = `01gTEST${String(++serial).padStart(11, '0')}-${String(total - rest.length)}`;
-    locators.set(locator, { rows: rest.map((r) => ({ ...r, __object: object })), total });
-    return { totalSize: total, done: false, nextRecordsUrl: `${v}/query/${locator}`, records };
+    if (rest.length === 0) return { totalSize: rowCount, done: true, records };
+    const locator = `01gTEST${String(++serial).padStart(11, '0')}-${String(rowCount - rest.length)}`;
+    locators.set(locator, { rows: rest.map((r) => ({ ...r, __object: object })), rowCount });
+    return { totalSize: rowCount, done: false, nextRecordsUrl: `${v}/query/${locator}`, records };
   };
 
   const evaluate = (path: string, auth: string): { status: number; body: unknown } => {
@@ -149,7 +149,7 @@ export async function startFakeSalesforceQuery(opts: {
         body: page(
           object,
           l.rows.map(({ __object: _o, ...r }) => r),
-          l.total,
+          l.rowCount,
         ),
       };
     }
