@@ -1,0 +1,3 @@
+      Tests  2282 passed (2282)
+ FAIL  |openbao| packages/shared/src/crypto/transit-kms.openbao.itest.ts [ packages/shared/src/crypto/transit-kms.openbao.itest.ts ]
+ Test Files  1 failed | 179 passed (180)
