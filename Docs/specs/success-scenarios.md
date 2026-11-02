@@ -87,9 +87,9 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC07-05 | Payroll Officer cannot release own net-pay batch | UC-07 | Phase 1 | db-integration | no | — | T-0100 | not-started | — | — |
 | SS-UC08-01 | CSV, OFX and CAMT.053 normalise identically | UC-08 | MVP | contract | no | packages/modules/bank/src/statement-import.test.ts | T-0058 (T-0059 re-scoped, DL-0114) | green | [.agent/evidence/T-0058/manifest.json](../../.agent/evidence/T-0058/manifest.json) | 540e85e |
 | SS-UC08-02 | Duplicate statement import detected | UC-08 | MVP | db-integration | no | packages/modules/bank/src/statements.db.test.ts | T-0058 | green | [.agent/evidence/T-0058/manifest.json](../../.agent/evidence/T-0058/manifest.json) | 540e85e |
-| SS-UC08-03 | Exact match auto-matches | UC-08 | MVP | db-integration | no | — | T-0060 | not-started | — | — |
-| SS-UC08-04 | Rule match is suggested, not applied | UC-08 | MVP | unit | no | — | T-0060 | not-started | — | — |
-| SS-UC08-05 | Unmatched line created as a transaction | UC-08 | MVP | db-integration | no | — | T-0060 | not-started | — | — |
+| SS-UC08-03 | Exact match auto-matches | UC-08 | MVP | db-integration | no | packages/modules/bank/src/matching.db.test.ts; packages/modules/ap/src/bank-match.db.test.ts (supplier batch); packages/modules/bank/src/matcher.test.ts (pure) | T-0060 | green | [.agent/evidence/T-0060/manifest.json](../../.agent/evidence/T-0060/manifest.json) | b0cd2ea |
+| SS-UC08-04 | Rule match is suggested, not applied | UC-08 | MVP | unit | no | packages/modules/bank/src/matcher.test.ts; packages/modules/bank/src/matching.db.test.ts (stored suggestion) | T-0060 | green | [.agent/evidence/T-0060/manifest.json](../../.agent/evidence/T-0060/manifest.json) | b0cd2ea |
+| SS-UC08-05 | Unmatched line created as a transaction | UC-08 | MVP | db-integration | no | packages/modules/bank/src/matching.db.test.ts | T-0060 | green | [.agent/evidence/T-0060/manifest.json](../../.agent/evidence/T-0060/manifest.json) | b0cd2ea |
 | SS-UC08-06 | Statement balance equals book balance | UC-08 | MVP | db-integration | no | — | T-0061 | not-started | — | — |
 | SS-UC08-07 | Reconciled lines locked after hard lock | UC-08 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0061, T-0023 | green (database layer; unmatch action in T-0061) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC08-08 | Reconciliation screens | UC-08 | MVP | e2e-playwright | yes | — | T-0088 | not-started | — | — |
