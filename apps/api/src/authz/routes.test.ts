@@ -59,6 +59,19 @@ describe('SS-PLAT-49: Every endpoint checks a permission', () => {
     });
   });
 
+  it('SS-PLAT-108/109 report routes: GL detail needs reports.run, aged AP ap.read, aged AR ar.read [T-0077]', () => {
+    const byName = new Map(routes().map((r) => [r.name, r.access]));
+    expect(
+      ['glDetail', 'agedPayables', 'agedReceivables'].map((k) =>
+        byName.get(`ReportsController.${k}`),
+      ),
+    ).toEqual([
+      { kind: 'permission', permission: 'reports.run' },
+      { kind: 'permission', permission: 'ap.read' },
+      { kind: 'permission', permission: 'ar.read' },
+    ]);
+  });
+
   it('bank details and role administration need specific permissions', () => {
     const byName = new Map(routes().map((r) => [r.name, r.access]));
     expect(byName.get('PartyBankAccountsController.list')).toEqual({
