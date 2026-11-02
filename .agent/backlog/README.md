@@ -13,9 +13,9 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 
 | Status | Cards |
 |---|---:|
-| todo | 93 |
+| todo | 92 |
 | review | 13 |
-| blocked | 1 |
+| blocked | 2 |
 | **total** | **107** |
 
 | Phase | Cards |
@@ -221,7 +221,7 @@ graph LR
 | [T-0119](T-0119.md) | Chromium in the worker image and PDF rendering as a worker job | MVP | todo | T-0041 |
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
 | [T-0121](T-0121.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
-| [T-0122](T-0122.md) | Customer refund via Stripe refund API | MVP | todo | T-0055, T-0073, T-0074 | UC-11 | 1 |
+| [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:
