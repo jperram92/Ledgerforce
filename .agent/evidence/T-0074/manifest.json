@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0074",
+  "entries": [
+    {
+      "scenario": "SS-UC03-02",
+      "file": ".agent/evidence/T-0074/20261102-064939-tests-db.json",
+      "test": "2 test(s): packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts › SS-UC03-02 Stripe payment webhook posts GP-003 › SS-UC03-02: Stripe payment posts GP-003 and marks invoice Paid | packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts › SS-UC03-02 payment date › SS-UC03-02 a UTC payment date a day before the locally dated invoice takes the invoice date, so it still allocates",
+      "commit": "2847774e1f69-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:49:39.790Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-04",
+      "file": ".agent/evidence/T-0074/20261102-064939-tests-db.json",
+      "test": "1 test(s): packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts › SS-UC03-04 write-back of the Stripe payment › SS-UC03-04: Salesforce shows Paid with payment date",
+      "commit": "2847774e1f69-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:49:39.790Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-05",
+      "file": ".agent/evidence/T-0074/20261102-064939-tests-db.json",
+      "test": "3 test(s): packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts › SS-UC03-05 duplicate delivery › SS-UC03-05: Duplicate webhook is idempotent | packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts › SS-UC03-05 duplicate delivery › SS-UC03-05 a refused delivery stores nothing, so the genuine one still posts later | packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts › SS-UC03-05 duplicate delivery › SS-UC03-05 signed events that are not ours to post are acknowledged and post nothing",
+      "commit": "2847774e1f69-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:49:39.790Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-04",
+      "file": ".agent/evidence/T-0074/20261102-064939-tests-db.json",
+      "test": "2 test(s): packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts › SS-UC11-04 refund through Stripe › SS-UC11-04: Refund via Stripe calls the refund API | packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts › SS-UC11-04 refund through Stripe › SS-UC11-04 a refund beyond the credit or without a Stripe payment is refused before Stripe is called",
+      "commit": "2847774e1f69-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:49:39.790Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-06",
+      "file": ".agent/evidence/T-0074/20261102-064948-tests-unit.json",
+      "test": "7 test(s): packages/connectors/stripe/src/webhook-signature.test.ts › SS-UC03-06 Stripe webhook signature › SS-UC03-06: Invalid or replayed webhook rejected — a bad signature and a timestamp outside tolerance are both refused | packages/connectors/stripe/src/webhook-signature.test.ts › SS-UC03-06 Stripe webhook signature › SS-UC03-06 a correctly signed body within the window is accepted, on the edge of the window too | packages/connectors/stripe/src/webhook-signature.test.ts › SS-UC03-06 Stripe webhook signature › SS-UC03-06 a timestamp too far in the future is refused (clock skew either way) | packages/connectors/stripe/src/webhook-signature.test.ts › SS-UC03-06 Stripe webhook signature › SS-UC03-06 a tampered body or a signature over another timestamp is refused | packages/connectors/stripe/src/webhook-signature.test.ts › SS-UC03-06 Stripe webhook signature › SS-UC03-06 any of several v1 signatures may match (secret roll), and any configured secret may sign | packages/connectors/stripe/src/webhook-signature.test.ts › SS-UC03-06 Stripe webhook signature › SS-UC03-06 missing, malformed or v0-only headers and an empty secret list are refused | packages/connectors/stripe/src/webhook-signature.test.ts › SS-UC03-06 Stripe webhook signature › SS-UC03-06 only a JSON event object parses",
+      "commit": "2847774e1f69-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:49:48.989Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-06",
+      "file": ".agent/evidence/T-0074/20261102-064950-tests-api-db.json",
+      "test": "3 test(s): apps/api/src/payments/stripe-webhook.db.test.ts › SS-UC03-06 POST /webhooks/stripe refuses what Stripe did not sign just now › SS-UC03-06: Invalid or replayed webhook rejected — bad signature and stale timestamp both answer 400 and nothing is posted | apps/api/src/payments/stripe-webhook.db.test.ts › SS-UC03-06 POST /webhooks/stripe refuses what Stripe did not sign just now › SS-UC03-06 a missing header, a body altered after signing and a non-JSON body answer 400 | apps/api/src/payments/stripe-webhook.db.test.ts › SS-UC03-06 POST /webhooks/stripe refuses what Stripe did not sign just now › SS-UC03-06 without a configured signing secret the route answers 503 and verifies nothing",
+      "commit": "2847774e1f69-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:49:50.376Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-05",
+      "file": ".agent/evidence/T-0074/20261102-064950-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/payments/stripe-webhook.db.test.ts › SS-UC03-05 a genuine delivery posts once › SS-UC03-05 the signed payment posts one receipt; Stripe retrying the same event gets 200 duplicate",
+      "commit": "2847774e1f69-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:49:50.376Z",
+      "result": "passed"
+    }
+  ]
+}
