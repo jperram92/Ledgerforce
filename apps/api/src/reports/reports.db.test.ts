@@ -59,10 +59,10 @@ afterAll(async () => {
 });
 
 describe('SS-PLAT-108/109 report routes [T-0077]', () => {
-  it('SS-PLAT-108 GET /reports/gl-detail returns the AP control detail with decimal-string money', async () => {
+  it('SS-PLAT-108 GET /gl/detail returns the AP control detail with decimal-string money', async () => {
     const ap = f.acct['2000'] ?? '';
     const res = await get(
-      `/reports/gl-detail?company_id=${f.companyId}&from=2026-11-01&to=2026-11-30&account_id=${ap}&party_id=${supplier}`,
+      `/gl/detail?company_id=${f.companyId}&from=2026-11-01&to=2026-11-30&account_id=${ap}&party_id=${supplier}`,
       'accountant',
     );
     expect(res.status).toBe(200);
@@ -92,9 +92,9 @@ describe('SS-PLAT-108/109 report routes [T-0077]', () => {
     ]);
   });
 
-  it('SS-PLAT-109 GET /reports/aged-payables ages the bill and totals the AP control balance', async () => {
+  it('SS-PLAT-109 GET /ap/aged-payables ages the bill and totals the AP control balance', async () => {
     const res = await get(
-      `/reports/aged-payables?company_id=${f.companyId}&as_of=2026-12-31`,
+      `/ap/aged-payables?company_id=${f.companyId}&as_of=2026-12-31`,
       'apClerk',
     );
     expect(res.status).toBe(200);
@@ -108,9 +108,9 @@ describe('SS-PLAT-108/109 report routes [T-0077]', () => {
     expect(body.totals.total).toBe('1100.0000');
   });
 
-  it('GET /reports/aged-receivables answers an AR reader', async () => {
+  it('GET /ar/aged-receivables answers an AR reader', async () => {
     const res = await get(
-      `/reports/aged-receivables?company_id=${f.companyId}&as_of=2026-12-31`,
+      `/ar/aged-receivables?company_id=${f.companyId}&as_of=2026-12-31`,
       'accountant',
     );
     expect(res.status).toBe(200);
@@ -118,27 +118,23 @@ describe('SS-PLAT-108/109 report routes [T-0077]', () => {
   });
 
   it('refuses an AP clerk GL detail and aged AR (403) and bad queries (400)', async () => {
-    const gl = `/reports/gl-detail?company_id=${f.companyId}&to=2026-11-30`;
+    const gl = `/gl/detail?company_id=${f.companyId}&to=2026-11-30`;
     expect((await get(gl, 'apClerk')).status).toBe(403);
     expect(
-      (await get(`/reports/aged-receivables?company_id=${f.companyId}&as_of=2026-12-31`, 'apClerk'))
+      (await get(`/ar/aged-receivables?company_id=${f.companyId}&as_of=2026-12-31`, 'apClerk'))
         .status,
     ).toBe(403);
     expect((await get(gl, 'accountant')).status).toBe(200);
     for (const q of [
-      `/reports/gl-detail?company_id=nope&to=2026-11-30`,
-      `/reports/gl-detail?company_id=${f.companyId}&from=2026-12-01&to=2026-11-30`,
-      `/reports/gl-detail?company_id=${f.companyId}&to=2026-11-30&account_id=x`,
-      `/reports/aged-payables?company_id=${f.companyId}&as_of=31-12-2026`,
+      `/gl/detail?company_id=nope&to=2026-11-30`,
+      `/gl/detail?company_id=${f.companyId}&from=2026-12-01&to=2026-11-30`,
+      `/gl/detail?company_id=${f.companyId}&to=2026-11-30&account_id=x`,
+      `/ap/aged-payables?company_id=${f.companyId}&as_of=31-12-2026`,
     ])
       expect([q, (await get(q, 'accountant')).status]).toEqual([q, 400]);
     expect(
-      (
-        await get(
-          `/reports/gl-detail?company_id=${f.companyId}&period_id=${randomUUID()}`,
-          'accountant',
-        )
-      ).status,
+      (await get(`/gl/detail?company_id=${f.companyId}&period_id=${randomUUID()}`, 'accountant'))
+        .status,
     ).toBe(422);
   });
 });

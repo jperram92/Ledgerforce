@@ -2,11 +2,12 @@
  * Ledger reports over HTTP (T-0077, design §8.1, DL-0290). Read-only and thin: validates the query
  * and calls the module report functions inside the caller's tenant transaction (RLS).
  *
- *  - GET /reports/gl-detail?company_id&(period_id | [from]&to)&account_id*&dimension_value_id*&party_id
+ *  - GET /gl/detail?company_id&(period_id | [from]&to)&account_id*&dimension_value_id*&party_id
  *    → reports.run. account_id and dimension_value_id repeat or take comma-separated lists.
- *  - GET /reports/aged-payables?company_id&as_of → ap.read
- *  - GET /reports/aged-receivables?company_id&as_of → ar.read
+ *  - GET /ap/aged-payables?company_id&as_of → ap.read
+ *  - GET /ar/aged-receivables?company_id&as_of → ar.read
  *
+ * The routes sit under the API's own prefixes (gl, ap, ar): the web app owns /reports/* (DL-0290).
  * Money in responses is a decimal string ("110.0000"), never a JSON number or object.
  */
 import {
@@ -93,11 +94,11 @@ function glDetailView(r: GlDetailReport) {
   };
 }
 
-@Controller('reports')
+@Controller()
 export class ReportsController {
   constructor(private readonly tx: TenantTx) {}
 
-  @Get('gl-detail')
+  @Get('gl/detail')
   @RequirePermission('reports.run')
   async glDetail(
     @Query('company_id') companyId: unknown,
@@ -124,7 +125,7 @@ export class ReportsController {
     return glDetailView(r);
   }
 
-  @Get('aged-payables')
+  @Get('ap/aged-payables')
   @RequirePermission('ap.read')
   agedPayables(@Query('company_id') companyId: unknown, @Query('as_of') asOf: unknown) {
     return agedPayables(this.tx.get(), {
@@ -133,7 +134,7 @@ export class ReportsController {
     });
   }
 
-  @Get('aged-receivables')
+  @Get('ar/aged-receivables')
   @RequirePermission('ar.read')
   agedReceivables(@Query('company_id') companyId: unknown, @Query('as_of') asOf: unknown) {
     return agedReceivables(this.tx.get(), {
