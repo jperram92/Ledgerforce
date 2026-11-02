@@ -436,6 +436,24 @@ export const PREREQUISITES: Readonly<
       ),
     );
   },
+  // A confirmation needs a released batch and the batch's own posted ap_payment entry
+  // (migration 0048 insert guard): release the generated batch (draft → released is allowed)
+  // and, as a seed step with triggers off, make the generated entry that batch's payment entry.
+  'app.payment_batch_confirmation': async (admin, row) => {
+    await admin.query(
+      `UPDATE app.payment_batch SET status = 'released' WHERE tenant_id = $1 AND id = $2`,
+      [row.get('tenant_id'), row.get('batch_id')],
+    );
+    await asReplica(admin, (q) =>
+      q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `UPDATE app.journal_entry SET status = 'posted', posted_at = coalesce(posted_at, now()), source_type = 'ap_payment',
+                source_id = $3
+          WHERE tenant_id = $1 AND id = $2`,
+        [row.get('tenant_id'), row.get('entry_id'), row.get('batch_id')],
+      ),
+    );
+  },
   // A company bank account needs its GL account to be an asset of subtype bank (migration 0013).
   'app.bank_account': async (admin, row) => {
     await admin.query(`UPDATE app.account SET subtype = 'bank' WHERE tenant_id = $1 AND id = $2`, [

@@ -44,6 +44,9 @@ DECLARE
   st  text;
   bno text;
 BEGIN
+  IF NEW.tenant_id IS DISTINCT FROM nullif(current_setting('app.tenant_id', true), '')::uuid THEN
+    RETURN NEW; -- another tenant's row (or no tenant): RLS decides (as migration 0028)
+  END IF;
   SELECT status, batch_no INTO st, bno FROM app.payment_batch
    WHERE tenant_id = NEW.tenant_id AND company_id = NEW.company_id AND id = NEW.batch_id
      FOR SHARE;
