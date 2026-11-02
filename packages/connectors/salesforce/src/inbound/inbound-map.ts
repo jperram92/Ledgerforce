@@ -126,6 +126,11 @@ export interface InboundChange {
   changedFields: string[];
   nulledFields: string[];
   fields: Record<string, unknown>;
+  /**
+   * The record's full current state as of `commitTimestamp` (a polled or reconciled row, T-0066),
+   * not a CDC diff. Snapshots and CDC changes converge by timestamp (apply.ts, RQ-0103).
+   */
+  snapshot?: boolean;
 }
 
 const CHANGE_TYPES: ReadonlySet<string> = new Set(['CREATE', 'UPDATE', 'DELETE', 'UNDELETE']);

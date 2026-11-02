@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0065-sf-inbound-mapping",
+  "current_task": "T-0066",
+  "branch": "feat/T-0066-sf-polling-fallback",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "claude",
+  "lease_expires_at": "2026-11-02T07:04:07.747Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-02T02:09:45.384Z",
+  "updated_at": "2026-11-02T06:19:07.749Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -85,7 +85,8 @@
     "T-0051": 1,
     "T-0052": 1,
     "T-0054": 1,
-    "T-0065": 1
+    "T-0065": 1,
+    "T-0066": 1
   },
   "failures": {},
   "providers": {},
