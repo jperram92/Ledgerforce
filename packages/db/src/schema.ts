@@ -446,6 +446,8 @@ export interface SalesInvoiceTable {
   billing_format_id: Generated<string | null>;
   /** Migration 0042 (T-0047): deposit invoices credit CUSTOMER_PREPAYMENTS. */
   kind: Generated<'standard' | 'deposit'>;
+  /** Migration 0052 (T-0069): document note, e.g. the lock-date policy moved the date. */
+  note: Generated<string | null>;
 }
 
 /** Migration 0042 (T-0047): prepayment received before an invoice (GP-020). */

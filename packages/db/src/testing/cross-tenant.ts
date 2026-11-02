@@ -315,6 +315,23 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     last_poll_records: () => '0',
     last_poll_error: () => 'test error',
   },
+  // Salesforce billing source (migration 0052, T-0069): trigger setting, mirrored headers/lines.
+  'app.salesforce_billing_settings': {
+    invoice_trigger: () => 'opportunity',
+    won_stages: () => '{Closed Won}',
+  },
+  'app.salesforce_billing_source': {
+    entity_name: () => 'Opportunity',
+    record_id: () => `006${randomBytes(8).toString('hex').slice(0, 15)}`,
+    account_record_id: () => `001${randomBytes(8).toString('hex').slice(0, 15)}`,
+    currency: () => 'AUD',
+  },
+  'app.salesforce_billing_source_line': {
+    entity_name: () => 'OpportunityLineItem',
+    record_id: () => `00k${randomBytes(8).toString('hex').slice(0, 15)}`,
+    parent_record_id: () => `006${randomBytes(8).toString('hex').slice(0, 15)}`,
+    product2_record_id: () => `01t${randomBytes(8).toString('hex').slice(0, 15)}`,
+  },
   // Open items and allocations (migration 0028). Seeded rows (superuser, no tenant set) are
   // stored as generated: an AR item of +1, an allocation of 1 with no FX difference. A row
   // inserted by lf_app is filled and checked by triggers (prerequisites below).

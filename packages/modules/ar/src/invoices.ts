@@ -86,6 +86,10 @@ export interface DraftInvoiceInput {
   /** Posted deposit invoices of the same customer this final invoice nets off (GP-015). */
   readonly depositInvoiceIds?: readonly string[];
   readonly createdBy?: string;
+  /** The billing format (template) the invoice is issued under (design §4.3). */
+  readonly billingFormatId?: string;
+  /** A note shown on the document, e.g. the lock-date policy moved the date (design §2). */
+  readonly note?: string;
   readonly lines: readonly DraftLineInput[];
 }
 
@@ -306,6 +310,27 @@ function view(
   };
 }
 
+export type AutoApproveDecision =
+  | { approve: true }
+  | { approve: false; reason: 'OFF' | 'NO_THRESHOLD' | 'WARNINGS' | 'ABOVE_THRESHOLD' };
+
+/**
+ * Whether a new draft is approved at once (UC-01 main flow 6, A6): auto-approve on, a threshold
+ * set, nothing blocking (warnings), and the gross within the threshold (≤, exact decimals). The
+ * remaining approval checks (Billing To, credit hold) run in `approveInvoice`.
+ */
+export function autoApproveDecision(
+  settings: { autoApprove: boolean; autoApproveThreshold: string | null } | undefined,
+  draft: { gross: string | null; warnings: number },
+): AutoApproveDecision {
+  if (settings?.autoApprove !== true) return { approve: false, reason: 'OFF' };
+  if (settings.autoApproveThreshold === null) return { approve: false, reason: 'NO_THRESHOLD' };
+  if (draft.warnings > 0 || draft.gross === null) return { approve: false, reason: 'WARNINGS' };
+  return new Decimal(draft.gross).lte(settings.autoApproveThreshold)
+    ? { approve: true }
+    : { approve: false, reason: 'ABOVE_THRESHOLD' };
+}
+
 /** Create a draft invoice; approve it at once when auto-approve allows (UC-01). */
 export async function createDraftInvoice(
   trx: Trx,
@@ -411,6 +436,8 @@ export async function createDraftInvoice(
       source_key: input.sourceKey ?? null,
       kind: input.kind ?? 'standard',
       created_by: input.createdBy ?? null,
+      billing_format_id: input.billingFormatId ?? null,
+      note: input.note ?? null,
       warnings: JSON.stringify(warnings),
     })
     .returning('id')
@@ -481,11 +508,13 @@ export async function createDraftInvoice(
     .select(['auto_approve', 'auto_approve_threshold'])
     .where('company_id', '=', companyId)
     .executeTakeFirst();
-  const within =
-    settings?.auto_approve === true &&
-    settings.auto_approve_threshold !== null &&
-    new Decimal(priced.gross).lte(settings.auto_approve_threshold);
-  if (!within) return draft;
+  const decision = autoApproveDecision(
+    settings
+      ? { autoApprove: settings.auto_approve, autoApproveThreshold: settings.auto_approve_threshold }
+      : undefined,
+    { gross: priced.gross, warnings: warnings.length },
+  );
+  if (!decision.approve) return draft;
   try {
     return await approveInvoice(trx, { companyId, invoiceId: header.id }, deps);
   } catch (e) {

@@ -14,7 +14,9 @@
   "dependencies": {
     "@grpc/grpc-js": "1.14.6",
     "@grpc/proto-loader": "0.8.1",
+    "@ledgerforce/ar": "workspace:*",
     "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
     "@ledgerforce/parties": "workspace:*",
     "@ledgerforce/products": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
@@ -22,8 +24,9 @@
     "kysely": "0.29.7"
   },
   "devDependencies": {
+    "@ledgerforce/documents": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
-    "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/tax": "workspace:*",
     "@types/node": "22.20.5",
     "vitest": "4.1.12"
   }
