@@ -1,0 +1,58 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ab616a86226bcf702
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44487
+ ❯ |db| packages/ledger/src/period-control.db.test.ts (10 tests | 2 failed) 1540ms
+     × property: app.period_decision(status, app.source_type_class(st), setting) equals the TypeScript matrix 35ms
+     × the trigger enforces every status × source type cell, with and without an override 179ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/ledger/src/period-control.db.test.ts > SS-PLAT-06: Period status matrix is enforced as data (database) > property: app.period_decision(status, app.source_type_class(st), setting) equals the TypeScript matrix
+Error: Property failed after 4 tests
+{ seed: -1415543681, path: "3:0:1", endOnFailure: true }
+Counterexample: ["open","ledger_opening_balance","override"]
+Shrunk 2 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ asyncThrowIfFailed node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2481:8
+
+Caused by: AssertionError: expected undefined to be 'journal' // Object.is equality
+
+- Expected:
+"journal"
+
++ Received:
+undefined
+
+ ❯ packages/ledger/src/period-control.db.test.ts:81:47
+ ❯ AsyncProperty.run node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:1217:19
+ ❯ asyncPropertyExecution node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2564:14
+ ❯ asyncRunIt node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2557:15
+ ❯ packages/ledger/src/period-control.db.test.ts:70:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |db| packages/ledger/src/period-control.db.test.ts > SS-PLAT-06: Period status matrix is enforced as data (database) > the trigger enforces every status × source type cell, with and without an override
+AssertionError: open × ledger_opening_balance: expected 'refused' to be 'posted' // Object.is equality
+
+Expected: "posted"
+Received: "refused"
+
+ ❯ packages/ledger/src/period-control.db.test.ts:152:71
+    150|       for (const st of Object.keys(SOURCE_TYPES)) {
+    151|         const d = periodDecision(status, st, DEFAULT_PERIOD_SETTINGS);
+    152|         expect(await attempt(status, st, false), `${status} × ${st}`).…
+       |                                                                       ^
+    153|           d === 'allow' ? 'posted' : 'refused',
+    154|         );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 8 passed (10)
+   Start at  16:39:14
+   Duration  3.77s (transform 435ms, setup 0ms, import 707ms, tests 1.54s, environment 0ms)
+

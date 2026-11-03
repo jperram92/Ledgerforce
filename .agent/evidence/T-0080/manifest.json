@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0080",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-115",
+      "file": ".agent/evidence/T-0080/20261102-170217-tests-db.json",
+      "test": "5 test(s): packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening balances at conversion (GP-037) › SS-PLAT-115 preview shows the GP-037 journal dated the balance date and writes nothing | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening balances at conversion (GP-037) › SS-PLAT-115 posting writes exactly GP-037: one AR/AP line per open document with its party and due date | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening balances at conversion (GP-037) › SS-PLAT-115 a repeat with the same key returns the first result and writes nothing | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening balances at conversion (GP-037) › SS-PLAT-115 aged AR at the conversion date ages the opening items by due date and equals the AR control balance | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening balances at conversion (GP-037) › SS-PLAT-115 a receipt after conversion allocates to an opening item, which then cannot be reversed",
+      "commit": "a9019440c99f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T17:02:17.330Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-116",
+      "file": ".agent/evidence/T-0080/20261102-170217-tests-db.json",
+      "test": "9 test(s): packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening-balance refusals write nothing (SS-PLAT-116) › a second live opening balance for the same company | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening-balance refusals write nothing (SS-PLAT-116) › an unbalanced trial balance (no plug account) | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening-balance refusals write nothing (SS-PLAT-116) › open items that do not add up to the AR or AP amount in the trial balance | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening-balance refusals write nothing (SS-PLAT-116) › an unknown or repeated account code, and current year earnings | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening-balance refusals write nothing (SS-PLAT-116) › an unknown or ambiguous party, or one without the customer / supplier role | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening-balance refusals write nothing (SS-PLAT-116) › an item dated after the balance date | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening-balance refusals write nothing (SS-PLAT-116) › a balance date with no fiscal period or in a period that is not open | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening-balance refusals write nothing (SS-PLAT-116) › posted entries on or before the balance date; after reversing its opening entry a company can post a new one | packages/modules/setup/src/opening-balances.db.test.ts › T-0080: opening-balance refusals write nothing (SS-PLAT-116) › the database refuses an opening-balance record that points at any other entry",
+      "commit": "a9019440c99f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T17:02:17.330Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-12",
+      "file": ".agent/evidence/T-0080/20261102-170222-tests-unit.json",
+      "test": "5 test(s): packages/ledger/src/golden/golden-postings.golden.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands › parses GP-001…GP-037 with their statuses; superseded entries point forward | packages/ledger/src/golden/golden-postings.golden.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands › runs on Approved entries only and refuses a file that still has Draft entries | packages/ledger/src/golden/golden-postings.golden.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands › every Approved journal table balances and equals its Total row | packages/ledger/src/golden/golden-postings.golden.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands › GP-027 reuses the journal of GP-004 (identical lines, new evidence status) | packages/ledger/src/golden/golden-postings.golden.test.ts › SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands › every table becomes a raw command the engine check accepts (known source types)",
+      "commit": "a9019440c99f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T17:02:22.295Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-116",
+      "file": ".agent/evidence/T-0080/20261102-170222-tests-unit.json",
+      "test": "4 test(s): packages/modules/setup/src/opening-csv.test.ts › SS-PLAT-116: opening-balance CSV files › reads a trial balance by account code, any column order, extra columns ignored, zero rows dropped | packages/modules/setup/src/opening-csv.test.ts › SS-PLAT-116: opening-balance CSV files › refuses a trial-balance row with both sides, a negative or malformed amount, or a missing column | packages/modules/setup/src/opening-csv.test.ts › SS-PLAT-116: opening-balance CSV files › reads open items with signed amounts and optional GST; quoted party names keep their commas | packages/modules/setup/src/opening-csv.test.ts › SS-PLAT-116: opening-balance CSV files › refuses a zero amount, GST larger than or opposite to the amount, bad dates, due before issue, duplicates",
+      "commit": "a9019440c99f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T17:02:22.295Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-117",
+      "file": ".agent/evidence/T-0080/20261102-170228-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/setup/opening-balances.db.test.ts › SS-PLAT-117: opening balances over HTTP › preview returns the GP-037 journal dated the balance date and writes nothing | apps/api/src/setup/opening-balances.db.test.ts › SS-PLAT-117: opening balances over HTTP › refusals are 422 with the code (and the CSV row), writing nothing | apps/api/src/setup/opening-balances.db.test.ts › SS-PLAT-117: opening balances over HTTP › an Accountant without settings.chart.manage is refused | apps/api/src/setup/opening-balances.db.test.ts › SS-PLAT-117: opening balances over HTTP › posts once: 201 with the opening balance, 200 on replay, readable by GET | apps/api/src/setup/opening-balances.db.test.ts › SS-PLAT-117: opening balances over HTTP › another tenant sees no opening balance and cannot post to this company",
+      "commit": "a9019440c99f-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T17:02:28.338Z",
+      "result": "passed"
+    }
+  ]
+}

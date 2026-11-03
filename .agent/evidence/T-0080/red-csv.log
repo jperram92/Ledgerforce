@@ -1,0 +1,25 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ab616a86226bcf702
+
+ ❯ |unit| packages/modules/setup/src/opening-csv.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/setup/src/opening-csv.test.ts [ packages/modules/setup/src/opening-csv.test.ts ]
+Error: Cannot find module './errors.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-ab616a86226bcf702/packages/modules/setup/src/opening-csv.test.ts
+ ❯ packages/modules/setup/src/opening-csv.test.ts:7:1
+      5|  */
+      6| import { describe, expect, it } from 'vitest';
+      7| import { OpeningBalanceError } from './errors.ts';
+       | ^
+      8| import { parseOpenItemsCsv, parseTrialBalanceCsv } from './opening-csv…
+      9|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  16:43:03
+   Duration  379ms (transform 61ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

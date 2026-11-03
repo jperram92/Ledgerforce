@@ -1,0 +1,35 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ab616a86226bcf702
+
+ ❯ |unit| packages/ledger/src/golden/golden-postings.golden.test.ts (5 tests | 1 failed) 36ms
+     × every table becomes a raw command the engine check accepts (known source types) 17ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/ledger/src/golden/golden-postings.golden.test.ts > SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands > every table becomes a raw command the engine check accepts (known source types)
+AssertionError: expected [ 'ledger.opening_balance' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "ledger.opening_balance",
++ ]
+
+ ❯ packages/ledger/src/golden/golden-postings.golden.test.ts:121:33
+    119|       ).toBe(true);
+    120|     }
+    121|     expect([...pending].sort()).toEqual(PENDING_SOURCE_TYPES);
+       |                                 ^
+    122|     expect([...reversals]).toEqual(['GP-019']);
+    123|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  16:38:52
+   Duration  562ms (transform 278ms, setup 0ms, import 336ms, tests 36ms, environment 0ms)
+

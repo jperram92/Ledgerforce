@@ -172,7 +172,7 @@ graph LR
 | [T-0077](T-0077.md) | GL detail and aged AR/AP reports | MVP | todo | T-0076, T-0028, T-0049 | — | 0 |
 | [T-0078](T-0078.md) | Month-end close checklist (UC-10) | MVP | todo | T-0023, T-0061, T-0076 | UC-10 | 5 |
 | [T-0079](T-0079.md) | Hard-lock reopen with two approvers and audit reason | MVP | todo | T-0078, T-0015, T-0013 | UC-10 | 1 |
-| [T-0080](T-0080.md) | Setup wizard backend (10 steps) and opening balances | MVP | todo | T-0018, T-0034, T-0058, T-0063, T-0039, T-0046, T-0050 | — | 0 |
+| [T-0080](T-0080.md) | Setup wizard backend (10 steps) and opening balances | MVP | todo | T-0018, T-0034, T-0058, T-0063, T-0039, T-0046, T-0050 | — | 3 |
 | [T-0123](T-0123.md) | Setup wizard state machine and step validators (steps 1–10) | MVP | todo | T-0080, T-0018, T-0034, T-0058, T-0063, T-0039 | — | 0 |
 | [T-0124](T-0124.md) | Receipts, refunds and payment batches settle opening AR/AP items | MVP | todo | T-0080, T-0046, T-0054, T-0057 | UC-03, UC-06 | 0 |
 | [T-0125](T-0125.md) | Cash-basis BAS: GST on opening AR/AP items when they are paid | MVP | todo | T-0080, T-0035, T-0124 | — | 0 |
