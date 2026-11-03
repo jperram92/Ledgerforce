@@ -39,7 +39,12 @@ import {
 type Trx = Transaction<Database>;
 
 export type BankMatchErrorCode =
-  'NOT_FOUND' | 'ALREADY_MATCHED' | 'INVALID_TRANSACTION' | 'SUGGESTION_CLOSED';
+  | 'NOT_FOUND'
+  | 'ALREADY_MATCHED'
+  | 'INVALID_TRANSACTION'
+  | 'SUGGESTION_CLOSED'
+  | 'NOT_MATCHED'
+  | 'RECONCILED';
 
 export class BankMatchError extends DomainError {
   declare readonly code: BankMatchErrorCode;

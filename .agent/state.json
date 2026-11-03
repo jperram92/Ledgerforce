@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0060-bank-matching",
+  "current_task": "T-0061",
+  "branch": "feat/T-0061-bank-reconciliation",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "claude",
+  "lease_expires_at": "2026-11-02T17:47:08.939Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-02T16:59:22.549Z",
+  "updated_at": "2026-11-02T17:02:08.942Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -87,7 +87,8 @@
     "T-0054": 1,
     "T-0056": 1,
     "T-0057": 1,
-    "T-0060": 1
+    "T-0060": 1,
+    "T-0061": 1
   },
   "failures": {},
   "providers": {},
