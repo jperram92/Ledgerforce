@@ -2185,3 +2185,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Scope: SS-PLAT-26 needs no scratch org (all three steps are proven against the documented-shape fakes and real PostgreSQL); no scenario moves to T-0110. No new scenario ids.
 - Follow-ups: wire `runNightlyReconciliation` into apps/worker with connection-backed Query/Rest sessions (with T-0066's polling wiring); drift of LedgerForce-owned fields edited by users in Salesforce (design §5.5 conflict log — needs a read of the mirror fields; RQ-0110 finding 7); scratch-org recording of a Get Deleted answer (T-0110); an `open → resolved` path for Sync issues settled by reconciliation (product decision on the issue model).
 - ADR: none (within ADR-0006, ADR-0008, ADR-0032, ADR-0036; no new dependency) · Status: accepted
+
+### DL-0302 — Continue Salesforce verification while bank completion gates wait
+- Date: 2026-11-06 · By: codex · Task: T-0070 · Category: process/tooling
+- Decision: follow the owner's saved unfinished-task plan by continuing T-0070 verification on its existing branch, leaving T-0061 blocked at 71da22e. Use a separate native Linux checkout and task-specific logs with the already-tested pinned runtime, Corepack fallback and native tmpfs scratch.
+- Why: T-0061 functional checks are complete; repeating them cannot recover missing RED history or supply independent review. T-0070 has recorded RED/GREEN evidence and resolved RQ-0110, but its full verifier never completed. Runtime findings are preserved on the T-0061 branch at 71da22e in RQ-0111 and DL-0295 through DL-0301.
+- Alternatives: repeatedly reclaim/retest the blocked bank task or weaken its completion gates (rejected). No new production dependency, test change or approval waiver. The documented 0048/0049 placeholders remain local-only until integration supplies real migrations.
+- ADR: none · Status: accepted
