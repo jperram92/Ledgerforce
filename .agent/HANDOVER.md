@@ -1,13 +1,14 @@
-# Handover - T-0070 browser verification
+# Handover - T-0070 verified; continue T-0080
 
 ## Codex continuation prompt
-> Resume T-0070 on feat/T-0070-sf-nightly-reconciliation at 950c378 plus subsequent evidence commits. Next command: inspect active full-verifier session 67017 (or latest results/verify-serial-*.log under /var/tmp/ledgerforce-t0070-validation-20261106). Do not start a duplicate verifier. Read the active run log. Never stage local migration placeholders.
+> Resume from the repository. T-0070 on feat/T-0070-sf-nightly-reconciliation has completed verification after b1d8ea5; inspect the following closure commit. Next owner-plan task is T-0080 on feat/T-0080-setup-wizard. First check git status and archive packages/db/migrations/0049_local_gap_placeholder.sql into an unused .tmp path before switching (the T-0080 branch has the real 0049 migration). Read its card and run resume before claiming.
 
-From: codex, active run 2026-11-05-codex-r01.
-Done: original full verifier returned 13 PASS / 1 FAIL / 2 PENDING; 1,351 DB tests, 694 RLS tests and 82 agent tests pass. Production code unchanged from Claude implementation.
-In progress: full browser gate timed out on three of 99 tests under two-CPU affinity. Unrestricted run improved to 98/99; journal multi-state test still timed out. Single-worker full browser rerun passed 99/99 with the same deadlines and assertions. Full verifier rerun is now ongoing through the committed verify-runtime.sh scheduling adapter. Original logs/traces preserved.
-Next action: collect full verifier result; diagnose remaining failures if any; refresh SS-PLAT-26 evidence and save exact validation results. Full verifier is not green; coverage baseline and independent review remain pending.
-Do not: label aggregate verifier green from a targeted rerun; weaken checks; commit 0048/0049 placeholders; push main. T-0061 remains blocked at 71da22e.
+From: codex, run 2026-11-05-codex-r01, closed Nov 7 local.
+Done: T-0070 full verifier 14 PASS / 0 FAIL / 2 PENDING, 99 browser tests pass with one worker; fresh SS-PLAT-26 3/3. All reports and original failure traces preserved. No production code changed.
+Pending: T-0070 coverage baseline absent on main and independent review; current claimed_by is codex after verification takeover, original implementation Claude. No self-review or done claim. T-0061 remains blocked at 71da22e.
+Next action: continue T-0080 verification per its card, using pinned native runtime and its local-only 0050 fixture; keep one browser worker without weakening test expectations.
+Decisions: DL-0302, DL-0303. Open questions for human: only existing owner-plan gates below.
+Do not: commit migration placeholders; delete original failure evidence; push main; claim worker wiring, Windows fixes, review or integration readiness from these checks.
 
 ## Owner's parallel-round plan (preserved from 0a178ed)
 # Handover — parallel build round to Codex; 2026-11-03
@@ -331,3 +332,5 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-06T03:38:00.561Z codex: T-0070 → verifying
 - 2026-11-06T03:49:02.205Z codex: T-0070 → verifying
 - 2026-11-06T04:02:39.027Z codex: T-0070 → verifying
+- 2026-11-06T22:52:43.331Z codex: T-0070 → verifying
+- 2026-11-06T22:52:46.489Z codex: release T-0070 → review (verify 14 PASS / 0 FAIL / 2 PENDING; fresh SS-PLAT-26 3/3; awaiting independent review and coverage baseline)

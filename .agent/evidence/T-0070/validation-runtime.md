@@ -29,3 +29,7 @@ Playwright 1.63.0 installed `lib/common/index.js` computes percentage workers fr
 - Browser follow-up: unrestricted four-worker run passed 98/99; SS-PLAT-94 still reached the 30-second deadline. Result in 20261106-e2e-unbound.log; its trace retained in 20261106-e2e-unbound/. Full suite now running with `pnpm -s run test:e2e --workers=1`, unchanged assertions/timeouts/retries. Native output results/e2e-serial-20261106.log, session 99381.
 
 - Serial browser result: all 99 tests PASS (8.4 minutes), including SS-PLAT-94 in 22.2 seconds and SS-PLAT-99 in 19.8 seconds. No test/deadline/retry changes. Full verifier now running via `.agent/evidence/T-0070/verify-runtime.sh`, session 67017: exported pnpm adapter adds only `--workers=1` to the exact `pnpm -s run test:e2e` invocation and forwards all other commands unchanged. This is an explicit runtime scheduling choice, not a production patch.
+
+## Final result
+
+Full rerun `verify-serial-20261106-033708.log`: 14 PASS / 0 FAIL / 2 PENDING, VERIFY: OK. Unit 1,010/1,010; DB 1,351/1,351; agent 82/82; browser 99/99 (7.3 minutes). Coverage is 60 percent with no main baseline; independent review remains pending. The native source is 950c378, unchanged product code from 564c5d1. Fresh SS-PLAT-26 report 20261106-225013-tests-db.json passes 3/3. Earlier failures and their traces remain evidence of why concurrency was bounded.

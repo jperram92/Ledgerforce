@@ -2201,3 +2201,5 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - ADR: none · Status: accepted
 
 - DL-0303 validation follow-up: serial browser suite 99/99 PASS. Use the committed verify-runtime.sh adapter for a full verifier rerun, explicitly adding one browser worker and forwarding every other command unchanged. Existing verifier failures remain preserved, and no aggregate green claim is made until completion.
+
+- DL-0303 final validation (2026-11-07 local): complete verifier 14 PASS / 0 FAIL / 2 PENDING, including 99/99 browser tests with one worker. Fresh nightly reconciliation evidence 3/3 passes. Retain the original failed report and traces; release to review with coverage baseline and independent review explicitly pending.

@@ -10,6 +10,15 @@
       "provider": "claude",
       "timestamp": "2026-11-02T16:52:57.063Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-26",
+      "file": ".agent/evidence/T-0070/20261106-225013-tests-db.json",
+      "test": "3 test(s): packages/connectors/salesforce/src/reconcile/sf-nightly-recon.db.test.ts › SS-PLAT-26: Missed Salesforce events recovered by nightly reconciliation › SS-PLAT-26: Missed Salesforce events recovered by nightly reconciliation — after a 3-day outage one nightly run replays changes once, archives purged records and re-pushes stale write-backs | packages/connectors/salesforce/src/reconcile/sf-nightly-recon.db.test.ts › SS-PLAT-26: Missed Salesforce events recovered by nightly reconciliation › SS-PLAT-26: a Salesforce outage during the run is recorded, nothing is marked, and the run is retried within the hour | packages/connectors/salesforce/src/reconcile/sf-nightly-recon.db.test.ts › SS-PLAT-26: Missed Salesforce events recovered by nightly reconciliation › the run log is append-only, the purge check never moves backward, and another tenant sees nothing",
+      "commit": "950c37836347-dirty",
+      "provider": "codex",
+      "timestamp": "2026-11-06T22:50:13.731Z",
+      "result": "passed"
     }
   ]
 }
