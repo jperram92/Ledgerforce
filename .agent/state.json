@@ -4,10 +4,10 @@
   "branch": "feat/T-0080-setup-wizard",
   "step": null,
   "claimed_by": "codex",
-  "lease_expires_at": "2026-11-06T23:42:24.273Z",
+  "lease_expires_at": "2026-11-06T23:56:28.269Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-06T22:57:24.282Z",
+  "updated_at": "2026-11-06T23:11:28.289Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

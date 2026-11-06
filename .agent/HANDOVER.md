@@ -1,7 +1,7 @@
 # Handover - T-0080 opening-balance verification
 
 ## Codex continuation prompt
-> Resume T-0080 on feat/T-0080-setup-wizard from 81137b4 plus the verification-preparation commit. Read .agent/runs/2026-11-06-codex-r01.md. Next: inspect the task-specific native verifier under /var/tmp/ledgerforce-t0080-validation-20261107 before starting another run. Never stage the local 0050 migration placeholder.
+> Resume T-0080 on feat/T-0080-setup-wizard at c859544 (verification preparation; product code from 81137b4). Read .agent/runs/2026-11-06-codex-r01.md. Next command: `wsl.exe --exec bash -c "tail -n 60 /var/tmp/ledgerforce-t0080-validation-20261107/results/verify-serial-20261106-230201.log"`. Active verifier session 56047; log-capture session 51064. Check these before starting another run. Never stage the local 0050 migration placeholder.
 
 From: codex, Nov 7 local.
 Done: T-0070 verified 14 PASS / 0 FAIL / 2 PENDING, fresh scenario 3/3, released to review and pushed at 3ba5481. T-0061 remains blocked at 71da22e.
@@ -335,3 +335,4 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-06T04:02:39.027Z codex: T-0070 → verifying
 - 2026-11-06T22:52:43.331Z codex: T-0070 → verifying
 - 2026-11-06T22:52:46.489Z codex: release T-0070 → review (verify 14 PASS / 0 FAIL / 2 PENDING; fresh SS-PLAT-26 3/3; awaiting independent review and coverage baseline)
+- 2026-11-06T23:11:28.291Z codex: T-0080 → verifying
