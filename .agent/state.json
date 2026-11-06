@@ -3,11 +3,11 @@
   "current_task": "T-0080",
   "branch": "feat/T-0080-setup-wizard",
   "step": null,
-  "claimed_by": "claude",
-  "lease_expires_at": "2026-11-02T17:53:11.242Z",
+  "claimed_by": "codex",
+  "lease_expires_at": "2026-11-06T23:42:24.273Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-02T17:08:11.244Z",
+  "updated_at": "2026-11-06T22:57:24.282Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -88,7 +88,7 @@
     "T-0056": 1,
     "T-0057": 1,
     "T-0055": 1,
-    "T-0080": 1
+    "T-0080": 2
   },
   "failures": {},
   "providers": {},
