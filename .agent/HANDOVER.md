@@ -1,15 +1,13 @@
-# Handover - T-0070 verification continuation
-## Codex continuation prompt
-> Resume T-0070 on feat/T-0070-sf-nightly-reconciliation from 564c5d1 plus the following verification-preparation commit. Read .agent/runs/2026-11-05-codex-r01.md. Next command: Get-Content .tmp/t0070-linux-verify.log -Tail 70. Inspect any running verifier before launching another. Native checkout: /var/tmp/ledgerforce-t0070-validation-20261106/repo. Never stage migration placeholders 0048 or 0049.
+# Handover - T-0070 browser verification
 
-From: codex, run 2026-11-05-codex-r01 (Nov 6 local).
-Task: T-0070; claimed for verification, no production code changes.
-Done: read original Claude RED log, passing unit/database evidence and resolved RQ-0110; dependencies T-0066/T-0067 are in review. Latest source commit 564c5d1 explicitly records that full verification was not completed.
-In progress: isolated full verification using pinned Node/pnpm, PostgreSQL 16, Chromium, one Vitest worker and native tmpfs scratch (validated on T-0061). Original implementation builder was claude; continuation lease is codex.
-Next action: collect complete verifier, diagnose failures before changes; preserve test-first, evidence and independent-review gates.
-T-0061: remains blocked on its branch at 71da22e; 13 functional gates passed but original module RED provenance, main coverage baseline and independent review are missing. Do not reset its status or repeat unchanged tests. Continue other owner-requested work while that handoff waits.
-Decisions: DL-0302. Runtime research/evidence is retained on T-0061 at 71da22e (RQ-0111; DL-0295 through DL-0301).
-Do not: commit local migration placeholders, claim unrun checks, weaken tests/gates, push main or discard the owner plan below.
+## Codex continuation prompt
+> Resume T-0070 on feat/T-0070-sf-nightly-reconciliation at 950c378 plus subsequent evidence commits. Next command: wsl.exe --exec bash -c "tail -n 30 /var/tmp/ledgerforce-t0070-validation-20261106/results/e2e-serial-20261106.log". Check session 99381 before launching another browser run. Read the active run log. Never stage local migration placeholders.
+
+From: codex, active run 2026-11-05-codex-r01.
+Done: original full verifier returned 13 PASS / 1 FAIL / 2 PENDING; 1,351 DB tests, 694 RLS tests and 82 agent tests pass. Production code unchanged from Claude implementation.
+In progress: full browser gate timed out on three of 99 tests under two-CPU affinity. Unrestricted run improved to 98/99; journal multi-state test still timed out. Single-worker full browser rerun ongoing, same deadlines and assertions. Original logs/traces preserved.
+Next action: collect serial browser result; diagnose remaining failures if any; refresh SS-PLAT-26 evidence and save exact validation results. Full verifier is not green; coverage baseline and independent review remain pending.
+Do not: label aggregate verifier green from a targeted rerun; weaken checks; commit 0048/0049 placeholders; push main. T-0061 remains blocked at 71da22e.
 
 ## Owner's parallel-round plan (preserved from 0a178ed)
 # Handover — parallel build round to Codex; 2026-11-03
@@ -327,3 +325,5 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-05T01:30:41.237Z codex: T-0061 → in_progress
 - 2026-11-05T02:08:03.987Z codex: T-0061 → in_progress
 - 2026-11-05T06:39:52.586Z codex: T-0061 → in_progress
+- 2026-11-05T22:33:43.219Z codex: T-0070 → verifying
+- 2026-11-06T03:14:33.532Z codex: T-0070 → in_progress

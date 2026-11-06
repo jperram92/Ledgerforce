@@ -2192,3 +2192,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: T-0061 functional checks are complete; repeating them cannot recover missing RED history or supply independent review. T-0070 has recorded RED/GREEN evidence and resolved RQ-0110, but its full verifier never completed. Runtime findings are preserved on the T-0061 branch at 71da22e in RQ-0111 and DL-0295 through DL-0301.
 - Alternatives: repeatedly reclaim/retest the blocked bank task or weaken its completion gates (rejected). No new production dependency, test change or approval waiver. The documented 0048/0049 placeholders remain local-only until integration supplies real migrations.
 - ADR: none · Status: accepted
+
+### DL-0303 — Diagnose browser contention without changing test expectations
+- Date: 2026-11-06 · By: codex · Task: T-0070 · Category: validation runtime
+- Decision: preserve the failed full verification and traces; rerun the complete browser suite first without taskset and then with one browser worker. No retries, deadline extensions, assertion changes or skipped tests.
+- Evidence: initial 96/99, unrestricted 98/99. Playwright 1.63.0 installed lib/common/index.js resolveWorkers uses os.cpus().length for percentage workers, which does not reflect the two-CPU taskset bound. Remaining SS-PLAT-94 failure is a 30-second timeout during accessibility work. Serial result pending.
+- Why: isolate resource contention from product defects before changing production code. Other gates already passed and their original logs remain available; no new aggregate pass is claimed.
+- ADR: none · Status: accepted
