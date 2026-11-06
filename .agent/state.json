@@ -4,10 +4,10 @@
   "branch": "feat/T-0070-sf-nightly-reconciliation",
   "step": null,
   "claimed_by": "codex",
-  "lease_expires_at": "2026-11-06T04:23:00.551Z",
+  "lease_expires_at": "2026-11-06T04:34:02.168Z",
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-06T03:38:00.559Z",
+  "updated_at": "2026-11-06T03:49:02.175Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
