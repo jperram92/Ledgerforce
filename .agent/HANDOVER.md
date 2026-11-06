@@ -1,12 +1,12 @@
 # Handover - T-0070 browser verification
 
 ## Codex continuation prompt
-> Resume T-0070 on feat/T-0070-sf-nightly-reconciliation at 950c378 plus subsequent evidence commits. Next command: wsl.exe --exec bash -c "tail -n 30 /var/tmp/ledgerforce-t0070-validation-20261106/results/e2e-serial-20261106.log". Check session 99381 before launching another browser run. Read the active run log. Never stage local migration placeholders.
+> Resume T-0070 on feat/T-0070-sf-nightly-reconciliation at 950c378 plus subsequent evidence commits. Next command: inspect active full-verifier session 67017 (or latest results/verify-serial-*.log under /var/tmp/ledgerforce-t0070-validation-20261106). Do not start a duplicate verifier. Read the active run log. Never stage local migration placeholders.
 
 From: codex, active run 2026-11-05-codex-r01.
 Done: original full verifier returned 13 PASS / 1 FAIL / 2 PENDING; 1,351 DB tests, 694 RLS tests and 82 agent tests pass. Production code unchanged from Claude implementation.
-In progress: full browser gate timed out on three of 99 tests under two-CPU affinity. Unrestricted run improved to 98/99; journal multi-state test still timed out. Single-worker full browser rerun ongoing, same deadlines and assertions. Original logs/traces preserved.
-Next action: collect serial browser result; diagnose remaining failures if any; refresh SS-PLAT-26 evidence and save exact validation results. Full verifier is not green; coverage baseline and independent review remain pending.
+In progress: full browser gate timed out on three of 99 tests under two-CPU affinity. Unrestricted run improved to 98/99; journal multi-state test still timed out. Single-worker full browser rerun passed 99/99 with the same deadlines and assertions. Full verifier rerun is now ongoing through the committed verify-runtime.sh scheduling adapter. Original logs/traces preserved.
+Next action: collect full verifier result; diagnose remaining failures if any; refresh SS-PLAT-26 evidence and save exact validation results. Full verifier is not green; coverage baseline and independent review remain pending.
 Do not: label aggregate verifier green from a targeted rerun; weaken checks; commit 0048/0049 placeholders; push main. T-0061 remains blocked at 71da22e.
 
 ## Owner's parallel-round plan (preserved from 0a178ed)
@@ -327,3 +327,5 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-05T06:39:52.586Z codex: T-0061 → in_progress
 - 2026-11-05T22:33:43.219Z codex: T-0070 → verifying
 - 2026-11-06T03:14:33.532Z codex: T-0070 → in_progress
+- 2026-11-06T03:33:40.798Z codex: T-0070 → in_progress
+- 2026-11-06T03:38:00.561Z codex: T-0070 → verifying

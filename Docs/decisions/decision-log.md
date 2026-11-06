@@ -2199,3 +2199,5 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Evidence: initial 96/99, unrestricted 98/99. Playwright 1.63.0 installed lib/common/index.js resolveWorkers uses os.cpus().length for percentage workers, which does not reflect the two-CPU taskset bound. Remaining SS-PLAT-94 failure is a 30-second timeout during accessibility work. Serial result pending.
 - Why: isolate resource contention from product defects before changing production code. Other gates already passed and their original logs remain available; no new aggregate pass is claimed.
 - ADR: none · Status: accepted
+
+- DL-0303 validation follow-up: serial browser suite 99/99 PASS. Use the committed verify-runtime.sh adapter for a full verifier rerun, explicitly adding one browser worker and forwarding every other command unchanged. Existing verifier failures remain preserved, and no aggregate green claim is made until completion.
