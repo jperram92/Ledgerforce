@@ -26,3 +26,5 @@ d8bb7af2b918814ad484deeaf4a48a0cc330a524:packages/connectors/salesforce/src/jwt-
 d8bb7af2b918814ad484deeaf4a48a0cc330a524:packages/connectors/salesforce/src/jwt.test.ts:generic-api-key:14
 d8bb7af2b918814ad484deeaf4a48a0cc330a524:salesforce/force-app/main/default/classes/LFReadOnlyMirrorTest.cls:generic-api-key:26
 e0742f8702f95958f4c7b9326f5a44a6c04e65ef:apps/worker/src/sync-issues.db.test.ts:generic-api-key:64
+2847774e1f6934dbaed059d4313354a899a58ba1:apps/api/src/payments/stripe-webhook.db.test.ts:generic-api-key:149
+db482717d614d5db1536a9c55a34a527f35d37fb:packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts:generic-api-key:529
