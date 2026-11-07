@@ -1,14 +1,74 @@
-# Handover — T-0054 payment batches in review; 2026-11-01
-## Codex continuation prompt
-> Resume from the repository. Branch line: feat/T-0095-security-gates → feat/T-0096-dast-smoke → feat/T-0115-aasb-alignment → feat/T-0031-golden-runner → feat/T-0116-golden-bindings → feat/T-0032-reversal → feat/T-0034-tax-gst → feat/T-0118-tax-codes-db → feat/T-0033-invariant-suite → feat/T-0096-dast-smoke → feat/T-0035-bas-query → feat/T-0038-posting-profiles → feat/T-0039-profile-matrix → feat/T-0040-sales-invoice → feat/T-0041-invoice-pdf → feat/T-0042-email → feat/T-0043-batch-preview → feat/T-0044-batch-post → feat/T-0045-credit-notes → feat/T-0046-receipts → feat/T-0047-prepayments → feat/T-0048-write-off → feat/T-0049-aged-ar → feat/T-0050-bills → feat/T-0051-bills-inbox → feat/T-0052-bill-approval → feat/T-0054-payment-batches (each branched from the previous; T-0096 was fast-forwarded onto T-0033). (1) Cross-review the claude-built cards in review (`node scripts/agent/conductor.ts status`), starting with T-0031, T-0115, T-0007, T-0095, T-0116, T-0032, T-0034 T-0118 and T-0033 (SS-PLAT-11: packages/ledger/src/ledger.invariants.db.test.ts, 10,000 documents, CI `invariants` job with fresh seed; T-0118: migration 0032 app.tax_code + company.tax_rounding + journal_line FK; engine INVALID_TAX_CODE; packages/modules/tax/src/tax-codes.ts; SS-PLAT-100). (2) Owner accepted ADR-0044 and delegated accounting ADRs/golden postings (DL-0263; AGENTS.md §6 text to be added by the owner). Next build card: T-0096 (DAST, unblocked), then `node scripts/agent/conductor.ts next`. T-0117 (system-role promotion) needs a data-model ADR.
+# Handover - T-0057 cross-review FAIL
 
-From: claude (run 2026-10-31-claude-r01, continued 2026-11-01).
-Done this session: T-0095 security gates (review); codex tasks T-0112/T-0113/T-0114 cross-reviewed PASS (done); T-0096 DAST researched, ADR-0044 Proposed (blocked); T-0115 AASB research, design §3.10/§3.10.1 (review); golden postings Approved by owner instruction (DL-0255, DL-0256); T-0007, T-0031, T-0116, T-0032, T-0034 → review; T-0118 tax codes in the database and T-0033 invariant suite (verify 14/0/2 each) → review.
-In progress: nothing.
-Next action: node scripts/agent/conductor.ts next, then claim it (T-0054 awaits codex cross-review).
-Decisions taken: DL-0243…DL-0263.
-Open questions for human: (1) Run Codex to clear cross-reviews (no Codex CLI/credentials in the cloud session).
-Do not: edit Approved golden postings (supersede instead); weaken the golden runner's PENDING pin (it must only shrink); change CI security gates without an accepted ADR; edit merged migrations (0032 is new on this branch).
+## Codex continuation prompt
+> Resume from the repository on feat/T-0057-payment-confirmation. Reviewed product head d6775e9; see the following docs(review) commit and .agent/evidence/T-0057/review-codex-20261107-065235.md. Next command: node scripts/agent/conductor.ts status. T-0057 needs builder repairs: add failing module/API invalid-calendar-date tests, fix the HTTP 500, establish comparable main coverage, then rerun verification and independent review. Builder attribution remains claude; Codex has only reviewed, not claimed or changed production code. Follow role eligibility when taking over implementation. Preserve the owner integration plan and merge gates below.
+
+From: codex, run 2026-11-07-codex-r01.
+Reason: reviewer work complete; repairs belong to the builder per .claude/agents/reviewer.md.
+Validation: original d6775e9 snapshot full verifier 14 PASS / 0 FAIL / 2 PENDING (coverage baseline, review). Unit 988, DB 1278 (RLS 638), agent 82, browser 99 all pass. Separate real-HTTP invalid-date probe fails 500 vs 422. Review outcome remains FAIL; no all-green completion claimed.
+Done: reproduced confirmed_on 2026-13-01 => HTTP 500, expected INVALID_BATCH / 422, using real PostgreSQL and HTTP. Reviewed exact-head green CI security/static/DB/E2E/invariant jobs. No PR exists. Product unchanged. Full fresh verification results are recorded in the review and run log.
+In progress: T-0057 in_progress, claimed_by claude, no lease; two A2 review actions remain (date error, missing coverage comparison). Historical acceptance reports do not prove these new checks.
+Next action: builder records regression RED in packages/modules/ap/src/payment-confirmation.db.test.ts and apps/api/src/ap/payment-confirmation.db.test.ts before fixing isDate. Diagnostic helper/output are in .agent/evidence/T-0057/review-invalid-date-*.
+Decisions taken: DL-0305. SMTP retry duplicates before transaction commit are explicitly covered by ADR-0046's at-least-once limitation; no new defect reported for that policy.
+Open questions for human: none new; existing owner-plan gates below remain.
+Do not: mark T-0057 done or merge this branch; treat verifier exit 0 with PENDING as all-green; modify product in reviewer role; erase RED evidence; weaken tests; self-review; alter Approved goldens; read/edit .env files.
+
+Prior continuation: T-0070 pushed 3ba5481 and T-0080 pushed 9c11388, both review; T-0061 blocked at 71da22e. T-0080 original API RED provenance remains explicitly unproved. No integration merges performed.
+
+## Owner's parallel-round plan (preserved from 0a178ed)
+# Handover — parallel build round to Codex; 2026-11-03
+## Codex continuation prompt
+> Resume from the repository, not the chat. Read AGENTS.md, run the resume skill, then this file. Claude built the cards below in parallel worktrees, one branch per task, stacked on four lines that all start from `feat/T-0054-payment-batches` (381cf74). Nothing is merged to main. (1) Finish the three WIP cards (T-0061, T-0070, T-0080) from the exact next steps in their cards' "Notes for the next agent". (2) Build the integration branch `integration/2026-11-mvp-ap-bank-stripe-sf` in the merge order below, renumbering migrations as listed (the runner rejects gaps; these files are unmerged, so renaming is allowed per DL-0162/DL-0182 — record a DL entry), then run `pnpm install`, full `pnpm exec vitest run` (only the openbao itest may fail without an OpenBao server), the RLS suite (0 skipped) and `bash scripts/agent/verify.sh`. (3) Cross-review every claude-built card in `review` with the cross-review skill (`node scripts/agent/conductor.ts status`). (4) Then `node scripts/agent/conductor.ts next`.
+
+From: claude (runs 2026-11-02 r02–r14, orchestrated; sub-agents in .claude/worktrees).
+
+### Branches (all pushed to origin)
+| Card | Branch | Head | Status | Based on |
+|---|---|---|---|---|
+| T-0052 bill approval | feat/T-0052-bill-approval | 2b4e1b3 | review | T-0051 line |
+| T-0054 payment batches | feat/T-0054-payment-batches | 381cf74 | review | T-0052 |
+| T-0056 ABA export | feat/T-0056-aba-export | 2b249d6 | review | T-0054 |
+| T-0057 payment confirmation GP-009 + remittances | feat/T-0057-payment-confirmation | d6775e9 | review | T-0056 |
+| T-0055 customer refunds GP-006 (batch) | feat/T-0055-customer-refunds | 378efc6 | review | T-0057 |
+| T-0077 GL detail + aged AP reports | feat/T-0077-gl-detail-aged-reports | aa39606 | review | T-0057 |
+| T-0080 setup wizard / opening balances GP-037 | feat/T-0080-setup-wizard | 81137b4 | **in_progress (verify not run)** | T-0055 |
+| T-0060 bank matching | feat/T-0060-bank-matching | bc6621b | review | T-0057 |
+| T-0061 bank reconciliation | feat/T-0061-bank-reconciliation | 8bfb1e7 | **in_progress (module + db test green; API route, RLS, verify left)** | T-0060 |
+| T-0073 Stripe payment links | feat/T-0073-stripe-payment-links | d00f8f9 | review | T-0054 |
+| T-0074 Stripe webhooks + Stripe refund (SS-UC11-04) | feat/T-0074-stripe-webhooks | eca1292 | review | T-0073 |
+| T-0065 SF inbound mapping | feat/T-0065-sf-inbound-mapping | 0cb12e4 | review | T-0054 |
+| T-0066 SF polling fallback | feat/T-0066-sf-polling-fallback | cdedaf4 | review | T-0065 |
+| T-0069 Closed Won → draft invoice | feat/T-0069-closed-won-invoice | 93d4d54 | review | T-0066 |
+| T-0070 SF nightly reconciliation | feat/T-0070-sf-nightly-reconciliation | 564c5d1 | **in_progress (verify not run)** | T-0069 |
+
+### Integration merge order and migration renumbering
+Merge in this order; rename only the files marked →.
+1. T-0057 line: 0046 bill submission, 0047 payment batch, 0048 ap_payment_confirmation (keep).
+2. T-0055: 0049 ar_customer_refund (keep). T-0077 (no migration).
+3. T-0060: 0050 bank_matching (keep). T-0061: 0051 bank_reconciliation (keep).
+4. T-0080: 0051_setup_opening_balance → **0052**.
+5. T-0073: 0048_payments_stripe_payment_link → **0053**. T-0074: 0049_payments_stripe_webhook → **0054**.
+6. T-0065: 0050_salesforce_inbound_change → **0055**; T-0066: 0051_salesforce_sync_object → **0056**; T-0069: 0052_salesforce_billing_source → **0057**; T-0070: 0053_salesforce_reconciliation → **0058**.
+Shared files will conflict textually (append-only lists): Docs/decisions/decision-log.md (DL-0280…DL-0294, keep all, in number order), Docs/specs/success-scenarios.md, packages/db/src/schema.ts, packages/db/src/testing/cross-tenant.ts (keep every override), apps/api/src/app.ts (keep every controller), infra/docker/nginx/default.conf.template (union of prefixes: ar, ap, gl, setup, webhooks), package.json files and pnpm-lock.yaml (regenerate with `pnpm install`), scripts/agent/test/run.test.ts (identical T-0056 fix on several branches). Check id collisions: SS-PLAT-108/109 (T-0077), SS-PLAT-115–117 (T-0080), GP-037 (T-0080), cards T-0122 (superseded by T-0074) and T-0123–T-0126 (T-0080 splits).
+
+### Decisions waiting for the product owner
+- ADR-0049 (security, Proposed): Stripe webhook tenant routing (one endpoint per deployment; tenant from Payment Link metadata verified against the stored link).
+- ADR-0050 (security, Proposed): let customers hold verified bank details so customer-only parties can be refunded by bank.
+- Design §11.2: invoice trigger default (Opportunity Closed Won vs Order activated; built as a per-company setting defaulting to opportunity), SoD thresholds (placeholders, ADR-0026 Proposed).
+- ADR-0048 (integration, Proposed): Stripe Payment Link per invoice — accept on green CI + cross-review.
+
+### Follow-ups found this round (no cards yet unless noted)
+- apps/worker registers no outbox handlers: register remittanceAdviceHandler (T-0057), salesforceInboundIssueHandler with billing deps (T-0065/T-0069), invoice email with the Stripe link provider (T-0073); start the CDC subscriber, runPollingCycle and nightly reconciliation (T-0066/T-0070) — fits T-0120.
+- UC-06 A3: bank rejects one payment line (cancel payment, re-open bill) — new card.
+- Rate limiting for public routes (design §6.9; /webhooks/stripe is public) — T-0097.
+- Opportunity amount-paid write-back after a Stripe refund (T-0074) and after batch refunds (wire opportunityWriteBack to the outbox, T-0110).
+- Real recordings to replace documented fixtures: Stripe test mode, Salesforce scratch org (CDC, queryAll pages).
+- Grouped bank matches and foreign-currency statement lines (T-0060).
+
+Next action: Codex — finish T-0061/T-0070/T-0080 per their card notes, then build the integration branch above.
+Open questions for human: the decisions listed above; run Codex for cross-reviews.
+Do not: edit Approved golden postings; commit the local `00NN_local_gap_placeholder.sql` files; weaken any test or gate; push to main.
+
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -262,3 +322,23 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01T22:52:24.672Z claude: T-0054 → in_progress
 - 2026-11-01T22:52:40.088Z claude: T-0054 → verifying
 - 2026-11-01T23:05:59.964Z claude: release T-0054 → review (verify 14/0/2; awaiting codex cross-review)
+- 2026-11-03T21:41:32.393Z codex: T-0061 → in_progress
+- 2026-11-03T22:19:49.087Z codex: T-0061 → in_progress
+- 2026-11-04T11:20:29.443Z codex: release T-0061 → todo (Resuming owner-requested validation after installing missing Chromium and starting WSL)
+- 2026-11-04T11:20:30.401Z codex: T-0061 → in_progress
+- 2026-11-04T21:41:20.110Z codex: T-0061 → in_progress
+- 2026-11-04T22:08:24.714Z codex: T-0061 → verifying
+- 2026-11-05T01:30:41.237Z codex: T-0061 → in_progress
+- 2026-11-05T02:08:03.987Z codex: T-0061 → in_progress
+- 2026-11-05T06:39:52.586Z codex: T-0061 → in_progress
+- 2026-11-05T22:33:43.219Z codex: T-0070 → verifying
+- 2026-11-06T03:14:33.532Z codex: T-0070 → in_progress
+- 2026-11-06T03:33:40.798Z codex: T-0070 → in_progress
+- 2026-11-06T03:38:00.561Z codex: T-0070 → verifying
+- 2026-11-06T03:49:02.205Z codex: T-0070 → verifying
+- 2026-11-06T04:02:39.027Z codex: T-0070 → verifying
+- 2026-11-06T22:52:43.331Z codex: T-0070 → verifying
+- 2026-11-06T22:52:46.489Z codex: release T-0070 → review (verify 14 PASS / 0 FAIL / 2 PENDING; fresh SS-PLAT-26 3/3; awaiting independent review and coverage baseline)
+- 2026-11-06T23:11:28.291Z codex: T-0080 → verifying
+- 2026-11-06T23:20:08.444Z codex: T-0080 → verifying
+- 2026-11-07T05:48:40.310Z codex: release T-0080 → review (verify 14 PASS / 0 FAIL / 2 PENDING; fresh scenarios pass; independent review and API provenance finding pending)
