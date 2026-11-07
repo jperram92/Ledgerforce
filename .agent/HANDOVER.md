@@ -1,15 +1,15 @@
-# Handover - T-0080 opening-balance verification
+# Handover - T-0070 and T-0080 verified; independent review pending
 
 ## Codex continuation prompt
-> Resume T-0080 on feat/T-0080-setup-wizard at c859544 (verification preparation; product code from 81137b4). Read .agent/runs/2026-11-06-codex-r01.md. Next command: `wsl.exe --exec bash -c "tail -n 60 /var/tmp/ledgerforce-t0080-validation-20261107/results/verify-serial-20261106-230201.log"`. Active verifier session 56047; log-capture session 51064. Check these before starting another run. Never stage the local 0050 migration placeholder.
+> Resume from the repository on feat/T-0080-setup-wizard. Tested source c859544 (product code 81137b4), evidence checkpoints through 83f295d plus the following closure commit. Next command: `node scripts/agent/conductor.ts status`. Check review eligibility before claiming or reviewing: T-0070 and T-0080 currently have claimed_by codex after verification takeover, so Codex must not issue their cross-review under the current skill. Review must address T-0080 API test-first provenance. Preserve all owner-plan gates before integration.
 
-From: codex, Nov 7 local.
-Done: T-0070 verified 14 PASS / 0 FAIL / 2 PENDING, fresh scenario 3/3, released to review and pushed at 3ba5481. T-0061 remains blocked at 71da22e.
-In progress: T-0080 verification-only takeover. Read original run r12, card, resolved RQ-0109, GP-037 evidence and original RED logs. Dependencies are review, accepted by configured policy. Product code remains Claude implementation.
-Known provenance gap: original run r12 explicitly says API tests were written after the controller; no API RED evidence exists. Do not fabricate historical RED or infer full TDD compliance from module RED logs.
-Next action: full native verification with the T-0070 validated runtime and one browser worker; refresh scenario evidence for SS-PLAT-115/116/117. Coverage baseline and independent review are not waived.
+From: codex, run 2026-11-06-codex-r01, closed Nov 7 local.
+Done: T-0080 full verifier 14 PASS / 0 FAIL / 2 PENDING; 995 unit, 1338 DB, 82 agent and 99 browser tests pass. Fresh scenario reports: unit 9, module DB 14, API 5 pass. Product code and Approved GP-037 unchanged.
+T-0070: review and pushed at 3ba5481; verifier 14/0/2 and fresh scenario 3/3. T-0061: remains blocked at 71da22e.
+Pending: main coverage baseline (T-0080 measured 72.09 percent), independent review, and T-0080 API RED provenance gap explicitly recorded by original run r12. Current functional success does not establish historical test-first compliance. No task is marked done from pending gates.
+Next action: eligible independent review; retain findings and repair observed defects test-first. Integration is not performed and must retain green-CI/cross-review and existing security/phase gates.
 Decisions: DL-0304. Open questions for human: existing owner-plan gates below only.
-Do not: edit Approved goldens; commit placeholders; weaken tests; claim the full wizard is delivered (this task covers opening-balance backend only).
+Do not: commit local migration placeholders; alter Approved goldens; weaken tests; rewrite history; self-review; infer full wizard delivery or Windows fixes from this validation.
 
 ## Owner's parallel-round plan (preserved from 0a178ed)
 # Handover — parallel build round to Codex; 2026-11-03
@@ -337,3 +337,4 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-06T22:52:46.489Z codex: release T-0070 → review (verify 14 PASS / 0 FAIL / 2 PENDING; fresh SS-PLAT-26 3/3; awaiting independent review and coverage baseline)
 - 2026-11-06T23:11:28.291Z codex: T-0080 → verifying
 - 2026-11-06T23:20:08.444Z codex: T-0080 → verifying
+- 2026-11-07T05:48:40.310Z codex: release T-0080 → review (verify 14 PASS / 0 FAIL / 2 PENDING; fresh scenarios pass; independent review and API provenance finding pending)

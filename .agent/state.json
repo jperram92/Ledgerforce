@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0080",
+  "current_task": null,
   "branch": "feat/T-0080-setup-wizard",
   "step": null,
-  "claimed_by": "codex",
-  "lease_expires_at": "2026-11-07T00:05:08.418Z",
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": null,
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-06T23:20:08.441Z",
+  "updated_at": "2026-11-07T05:48:40.308Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

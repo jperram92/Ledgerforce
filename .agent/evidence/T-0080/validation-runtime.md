@@ -17,3 +17,12 @@ Full log: `results/verify-serial-20261106-230201.log` in the native runtime. Sta
 The original run `.agent/runs/2026-11-02-claude-r12.md` explicitly records that API tests were written after the controller. Passing current tests does not establish historical API test-first provenance. Preserve that finding for independent review; do not fabricate an earlier RED run. Module, CSV, golden and period-mirror RED logs remain preserved.
 
 Missing main coverage baseline and independent review remain pending unless actually resolved. T-0080 delivers the opening-balance backend; the broader setup wizard and other deferred behaviors remain in T-0123 through T-0126. Approved GP-037 is unchanged by this continuation.
+
+## Final result
+
+`verify-serial-20261106-230201.log`: exit 0, 14 PASS / 0 FAIL / 2 PENDING. Unit 995/995; DB 1,338/1,338; agent 82/82; browser 99/99 (3.7 minutes). Coverage measured 72.09 percent but has no main baseline. Independent review remains pending. Fresh evidence runs pass 9 unit, 14 module DB and 5 API tests.
+
+New reports:
+- `.agent/evidence/T-0080/20261106-232714-tests-unit.json`
+- `.agent/evidence/T-0080/20261106-232717-tests-db.json`
+- `.agent/evidence/T-0080/20261106-232722-tests-api-db.json`
