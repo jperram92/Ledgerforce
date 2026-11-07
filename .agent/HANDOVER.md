@@ -1,19 +1,17 @@
-# Handover - T-0057 cross-review FAIL
+# Handover - T-0057 builder repair
 
 ## Codex continuation prompt
-> Resume from the repository on feat/T-0057-payment-confirmation. Reviewed product head d6775e9; see the following docs(review) commit and .agent/evidence/T-0057/review-codex-20261107-065235.md. Next command: node scripts/agent/conductor.ts status. T-0057 needs builder repairs: add failing module/API invalid-calendar-date tests, fix the HTTP 500, establish comparable main coverage, then rerun verification and independent review. Builder attribution remains claude; Codex has only reviewed, not claimed or changed production code. Follow role eligibility when taking over implementation. Preserve the owner integration plan and merge gates below.
+> Resume T-0057 on feat/T-0057-payment-confirmation from the repository. Start with node scripts/agent/conductor.ts status and .agent/runs/2026-11-07-codex-r02.md. User explicitly authorized builder takeover and multiple sub-agents after review 5746638. Canonical RED reproduced 8 failures; minimal invalid-date guard now passes all 19 targeted tests. Check the newest builder verification/evidence before rerunning. Coverage main baseline remains unavailable: main d20af5c contains only Docs/Test.MD. Do not self-approve this Codex implementation; require another provider's review and preserve initial-integration gates.
 
-From: codex, run 2026-11-07-codex-r01.
-Reason: reviewer work complete; repairs belong to the builder per .claude/agents/reviewer.md.
-Validation: original d6775e9 snapshot full verifier 14 PASS / 0 FAIL / 2 PENDING (coverage baseline, review). Unit 988, DB 1278 (RLS 638), agent 82, browser 99 all pass. Separate real-HTTP invalid-date probe fails 500 vs 422. Review outcome remains FAIL; no all-green completion claimed.
-Done: reproduced confirmed_on 2026-13-01 => HTTP 500, expected INVALID_BATCH / 422, using real PostgreSQL and HTTP. Reviewed exact-head green CI security/static/DB/E2E/invariant jobs. No PR exists. Product unchanged. Full fresh verification results are recorded in the review and run log.
-In progress: T-0057 in_progress, claimed_by claude, no lease; two A2 review actions remain (date error, missing coverage comparison). Historical acceptance reports do not prove these new checks.
-Next action: builder records regression RED in packages/modules/ap/src/payment-confirmation.db.test.ts and apps/api/src/ap/payment-confirmation.db.test.ts before fixing isDate. Diagnostic helper/output are in .agent/evidence/T-0057/review-invalid-date-*.
-Decisions taken: DL-0305. SMTP retry duplicates before transaction commit are explicitly covered by ADR-0046's at-least-once limitation; no new defect reported for that policy.
-Open questions for human: none new; existing owner-plan gates below remain.
-Do not: mark T-0057 done or merge this branch; treat verifier exit 0 with PENDING as all-green; modify product in reviewer role; erase RED evidence; weaken tests; self-review; alter Approved goldens; read/edit .env files.
+From: codex, run 2026-11-07-codex-r02.
+Done: added module/API regression cases for invalid months/days and rollover, with no posting/outbox effects on refusal; valid leap day stays accepted. Checked parsed date before ISO serialization, matching the posting engine pattern. RED 8 failed/11 passed; GREEN 19/19. Prior FAIL review retained as history.
+In progress: quick/full verification and fresh scenario evidence. Card claimed by codex as builder; root coordinates three user-requested sub-agents. They do not count as cross-provider review.
+Next action: finish builder verification, persist exact outcomes and scenario manifest, then hand to claude for independent review. Inspect /var/tmp/ledgerforce-t0057-review-20261107/results first; no changed assertions, deadlines or retries.
+Decisions: DL-0306. Authenticated remote main d20af5c has no executable source/test harness; historical 72.22% feature baseline is not main. Keep coverage comparison pending; document initial-integration baseline decision instead of inventing a value.
+Open questions for human: no new accounting/security choice; existing owner-plan gates below remain. Initial product integration must resolve how to establish the first genuine main baseline without misrepresenting or waiving the gate.
+Do not: treat prior review as approval of the fix; declare done/merge with pending gates; weaken tests; relabel feature coverage as main; edit Approved goldens or .env files.
 
-Prior continuation: T-0070 pushed 3ba5481 and T-0080 pushed 9c11388, both review; T-0061 blocked at 71da22e. T-0080 original API RED provenance remains explicitly unproved. No integration merges performed.
+Prior continuation: T-0070 pushed 3ba5481 and T-0080 pushed 9c11388, both review; T-0061 blocked at 71da22e. No integration merges performed.
 
 ## Owner's parallel-round plan (preserved from 0a178ed)
 # Handover — parallel build round to Codex; 2026-11-03
@@ -342,3 +340,4 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-06T23:11:28.291Z codex: T-0080 → verifying
 - 2026-11-06T23:20:08.444Z codex: T-0080 → verifying
 - 2026-11-07T05:48:40.310Z codex: release T-0080 → review (verify 14 PASS / 0 FAIL / 2 PENDING; fresh scenarios pass; independent review and API provenance finding pending)
+- 2026-11-07T22:43:42.883Z codex: T-0057 → verifying

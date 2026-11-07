@@ -194,4 +194,46 @@ describe('SS-UC06-07: Batch posts GP-009 on confirmation only', () => {
       },
     ]);
   });
+
+  it.each(['2026-13-01', '2026-00-01', '2026-12-32', '2026-12-00', '2027-02-29', '2027-04-31'])(
+    'SS-UC06-07 returns INVALID_BATCH for calendar date %s with no posting effects [T-0057]',
+    async (date) => {
+      const supplier = await p.addSupplier(`API calendar validation ${date}`, 72);
+      const billId = await p.postBill(supplier, `API-DATE-${date}`, '45.00', '2026-12-28');
+      const batchId = randomUUID();
+      await build(batchId, '2026-12-28');
+      expect(
+        (await call('POST', `/ap/payment-batches/${batchId}/release?${q()}`, 'releaser')).status,
+      ).toBe(200);
+      const paymentState = async () => {
+        const entries = await f.admin.query<{ id: string }>(
+          `SELECT id::text FROM app.journal_entry
+          WHERE tenant_id = $1 AND source_type = 'ap_payment' ORDER BY id`,
+          [f.tenantId],
+        );
+        const events = await f.admin.query<{ id: string }>(
+          `SELECT id::text FROM app.outbox_event
+          WHERE tenant_id = $1 AND payload->>'sourceType' = 'ap_payment' ORDER BY id`,
+          [f.tenantId],
+        );
+        return { entries: entries.rows, events: events.rows };
+      };
+      const before = await paymentState();
+
+      const res = await confirm(batchId, 'treasurer', { confirmed_on: date });
+
+      expect(res.status).toBe(422);
+      expect(await res.json()).toMatchObject({ error: 'INVALID_BATCH' });
+      expect(await paymentState()).toEqual(before);
+      const batch = await call('GET', `/ap/payment-batches/${batchId}?${q()}`, 'treasurer');
+      expect(await batch.json()).toMatchObject({ status: 'released', confirmation: null });
+      const bill = await f.admin.query<{ open_amount: string }>(
+        `SELECT s.open_amount::text FROM app.subledger_entry s
+         JOIN app.supplier_bill b ON b.entry_id = s.entry_id
+        WHERE b.tenant_id = $1 AND b.id = $2`,
+        [f.tenantId, billId],
+      );
+      expect(bill.rows).toEqual([{ open_amount: '-45.0000' }]);
+    },
+  );
 });
