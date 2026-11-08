@@ -232,17 +232,19 @@ describe('SS-PLAT-12 parser: the real Docs/accounting/postings.md', () => {
   const md = readFileSync(POSTINGS, 'utf8');
   const postings = parseGoldenPostings(md);
 
-  it('reads every entry of the index, GP-001 … GP-019, with at least one journal each', () => {
+  it('reads every entry of the index, GP-001 … GP-020, with at least one journal each', () => {
     const ids = postings.map((p) => p.id);
     expect(ids).toEqual(
-      Array.from({ length: 19 }, (_, i) => `GP-${String(i + 1).padStart(3, '0')}`),
+      Array.from({ length: 20 }, (_, i) => `GP-${String(i + 1).padStart(3, '0')}`),
     );
     for (const p of postings) {
       expect(p.journals.length, p.id).toBeGreaterThan(0);
       expect(p.sourceTypes.length, p.id).toBeGreaterThan(0);
     }
-    expect(postings.find((p) => p.id === 'GP-013')?.journals).toHaveLength(2);
+    // GP-013 is one journal since RQ-0095 Q7; its superseded 13a/13b are prose in a blockquote.
+    expect(postings.find((p) => p.id === 'GP-013')?.journals).toHaveLength(1);
     expect(postings.find((p) => p.id === 'GP-018')?.journals).toHaveLength(2);
+    expect(postings.find((p) => p.id === 'GP-020')?.journals).toHaveLength(2);
   });
 
   it('agrees with the index table on every status (Draft or Approved, never anything else)', () => {
