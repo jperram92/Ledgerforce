@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0114",
+  "current_task": "T-0031",
   "branch": "feat/T-0114-windows-evidence-recorder",
-  "step": null,
+  "step": "step 2/5 — parser, mapping, comparison, runner modes green",
   "claimed_by": "codex",
-  "lease_expires_at": "2026-10-29T08:49:07.158Z",
-  "last_green_commit": null,
+  "lease_expires_at": "2026-11-08T04:10:39.970Z",
+  "last_green_commit": "490d66268e52d67200622a94433244a00f1b67d4",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-10-29T08:04:07.165Z",
+  "updated_at": "2026-11-08T03:25:39.992Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
