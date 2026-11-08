@@ -1,0 +1,15 @@
+      7| import { auTaxCodes } from '@ledgerforce/tax';
+      8| import { describe, expect, it } from 'vitest';
+      9| import { POSTING_SLOTS, SLOT_ACCOUNT_TYPES, slotAllows } from './posti…
+       | ^
+     10| import {
+     11|   auServicesSmbProfiles,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  03:53:43
+   Duration  497ms (transform 174ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

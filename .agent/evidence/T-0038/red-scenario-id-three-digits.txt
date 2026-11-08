@@ -1,0 +1,6 @@
+     × finds three-digit ids once the register passes 99 (SS-PLAT-100, DL-0248) 6ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected [ 'SS-PLAT-99' ] to deeply equal [ 'SS-PLAT-100', 'SS-PLAT-99' ]
+- Expected
++ Received
+      Tests  1 failed | 6 passed (7)

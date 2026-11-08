@@ -1,0 +1,23 @@
+{
+  "name": "@ledgerforce/products",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Products, party posting profiles and product posting profiles with Salesforce mapping hooks (design §4.4)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/gl": "workspace:*",
+    "@ledgerforce/tax": "workspace:*",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "vitest": "4.1.12"
+  }
+}
