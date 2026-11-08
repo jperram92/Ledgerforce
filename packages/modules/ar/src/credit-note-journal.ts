@@ -83,7 +83,8 @@ export interface CreditNoteJournal {
   residue: string;
 }
 
-const CENTS = /^\d+(\.\d{1,2})?$/;
+/** At most cents; NUMERIC(19,4) text from the database ("200.0000") is accepted as 200.00. */
+const CENTS = /^\d+(\.\d{1,2}0{0,2})?$/;
 
 export function buildCreditNoteJournal(input: CreditNoteJournalInput): CreditNoteJournal {
   if (input.lines.length === 0) refuse('INVALID_CREDIT_NOTE', 'a credit note needs a line');

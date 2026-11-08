@@ -193,6 +193,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     replay_id: () => '\\x01',
   },
   'app.salesforce_resync_request': { reason: () => 'replay_id_invalid' },
+  // Credit notes (migration 0040): the price mode has no default (it is the invoice's).
+  'app.credit_note': { amounts_are: () => 'exclusive' },
   // Salesforce inbound mapping (migration 0034): an entity it maps, an 18-character record id,
   // a cdc: key; a rejected record needs no LedgerForce row; an issue code and field name.
   'app.salesforce_record_sync': {
@@ -356,7 +358,139 @@ export const PREREQUISITES: Readonly<
       row.get('gl_account_id'),
     ]);
   },
+  // Credit notes (migration 0040): a credit note is raised on a posted invoice of its party,
+  // currency and price mode, not dated after it — post the generated invoice (seed step).
+  'app.credit_note': async (admin, row) => {
+    await postSeededInvoice(
+      admin,
+      row.get('tenant_id'),
+      row.get('company_id'),
+      row.get('invoice_id'),
+      {
+        partyId: row.get('party_id'),
+        currency: row.get('currency'),
+      },
+    );
+  },
+  // A line posting is recorded while its approved invoice posts, for a line of that invoice, and
+  // matches a posted ar_invoice journal line on its account and tax code (migration 0040); the
+  // line belongs to the invoice by its composite foreign key.
+  'app.sales_invoice_line_posting': async (admin, row) => {
+    const tenant = row.get('tenant_id');
+    const invoice = row.get('invoice_id');
+    await admin.query(
+      `UPDATE app.sales_invoice SET status = 'approved', approval_kind = 'auto', approved_at = now(),
+              net_total = 0, tax_total = 0, total = 1
+        WHERE tenant_id = $1 AND id = $2 AND status = 'draft'`,
+      [tenant, invoice],
+    );
+    await seedInvoiceEntry(admin, tenant, row.get('company_id'), invoice, {
+      accountId: row.get('account_id'),
+      taxCodeId: row.get('tax_code_id'),
+    });
+  },
+  // A credit-note line names a posted line of its credit note's invoice and takes that line's
+  // account and tax code (ADR-0044 W6): point the generated credit note at the line's invoice.
+  'app.credit_note_line': async (admin, row) => {
+    const tenant = row.get('tenant_id');
+    const lp = await admin.query<{ invoice_id: string; account_id: string; tax_code_id: string }>(
+      `SELECT invoice_id::text, account_id::text, tax_code_id::text FROM app.sales_invoice_line_posting
+        WHERE tenant_id = $1 AND invoice_line_id = $2`,
+      [tenant, row.get('invoice_line_id')],
+    );
+    const p = lp.rows[0];
+    if (!p) return;
+    await admin.query(
+      `UPDATE app.credit_note SET invoice_id = $3 WHERE tenant_id = $1 AND id = $2`,
+      [tenant, row.get('credit_note_id'), p.invoice_id],
+    );
+    const values = row as Map<string, string>;
+    values.set('account_id', p.account_id);
+    values.set('tax_code_id', p.tax_code_id);
+  },
 };
+
+/** A posted ar_invoice journal entry (one line) for a generated invoice; seed step, triggers off. */
+async function seedInvoiceEntry(
+  admin: Queryable,
+  tenant: string | undefined,
+  company: string | undefined,
+  invoiceId: string | undefined,
+  line: { accountId?: string | undefined; taxCodeId?: string | undefined } = {},
+): Promise<string> {
+  const existing = await admin.query<{ id: string }>(
+    `SELECT id::text FROM app.dimension_set WHERE tenant_id = $1 AND company_id = $2 LIMIT 1`,
+    [tenant, company],
+  );
+  const set =
+    existing.rows[0] ??
+    (await seedRow(
+      admin,
+      { schema: 'app', table: 'dimension_set', qualified: 'app.dimension_set' },
+      tenant ?? '',
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([['company_id', company ?? '']]),
+    ));
+  const anyAccount = await admin.query<{ id: string }>(
+    `SELECT id::text FROM app.account WHERE tenant_id = $1 AND company_id = $2 LIMIT 1`,
+    [tenant, company],
+  );
+  const account =
+    line.accountId ??
+    anyAccount.rows[0]?.id ??
+    String(
+      (
+        await seedRow(
+          admin,
+          { schema: 'app', table: 'account', qualified: 'app.account' },
+          tenant ?? '',
+          DEFAULT_ROW_OVERRIDES,
+          1,
+          new Map([['company_id', company ?? '']]),
+        )
+      ).id,
+    );
+  const entryId = randomUUID();
+  await asReplica(admin, async (q) => {
+    await q.query(
+      // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+      `INSERT INTO app.journal_entry (id, tenant_id, company_id, entry_date, source_type, source_id,
+                                      status, idempotency_key, posted_at)
+       VALUES ($1, $2, $3, '2000-01-01', 'ar_invoice', $4, 'posted', $5, now())`,
+      [entryId, tenant, company, invoiceId, `seed:${entryId}`],
+    );
+    await q.query(
+      // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+      `INSERT INTO app.journal_line (tenant_id, company_id, entry_id, line_no, account_id, debit,
+                                     credit, txn_currency, txn_amount, fx_rate, dimension_set_id,
+                                     tax_code_id)
+       VALUES ($1, $2, $3, 1, $4, 1, 0, 'AAA', 1, 1, $5, $6)`,
+      [tenant, company, entryId, account, set.id, line.taxCodeId ?? null],
+    );
+  });
+  return entryId;
+}
+
+/** Mark a generated sales invoice posted (with a seeded entry) for a credit note's party. */
+async function postSeededInvoice(
+  admin: Queryable,
+  tenant: string | undefined,
+  company: string | undefined,
+  invoiceId: string | undefined,
+  facts: { partyId: string | undefined; currency: string | undefined },
+): Promise<void> {
+  const entryId = await seedInvoiceEntry(admin, tenant, company, invoiceId);
+  await admin.query(
+    `UPDATE app.sales_invoice
+        SET party_id = $3, currency = $4, amounts_are = 'exclusive', invoice_date = '2000-01-01',
+            due_date = '2000-01-01', status = 'posted', approval_kind = 'auto', approved_at = now(),
+            net_total = 0, tax_total = 0, total = 1, journal_entry_id = $5, posted_at = now(),
+            invoice_no = $6
+      WHERE tenant_id = $1 AND id = $2`,
+    [tenant, invoiceId, facts.partyId, facts.currency, entryId, `INV-${entryId.slice(0, 8)}`],
+  );
+}
 
 /** Run `fn` in one transaction with triggers off (superuser seed step only; lf_app cannot). */
 async function asReplica(admin: Queryable, fn: (q: Queryable) => Promise<unknown>): Promise<void> {

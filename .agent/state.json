@@ -2,12 +2,12 @@
   "schema_version": 1,
   "current_task": "T-0045",
   "branch": "feat/T-0045-credit-notes",
-  "step": "1/6 — RQ-0114; credit-note builder, creditable check, BAS period green (unit 11, prop 2)",
+  "step": "2/6 — migration 0040, credit-notes.ts, GP-005 golden PASS, lifecycle green; pnpm test:db 83/1253",
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-08T19:18:53.445Z",
+  "lease_expires_at": "2026-11-09T00:05:01.097Z",
   "last_green_commit": "445848ec56cfdf7943d11ad1f2df13cd8e60e094",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T18:33:53.446Z",
+  "updated_at": "2026-11-08T23:20:01.100Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -69,6 +69,7 @@
   "pending_checkpoints": [
     "1/8 — invoice journal builder green (unit+prop)",
     "4/8 — migration 0037, approve rules, post via engine; golden green",
-    "1/6 — RQ-0114; credit-note builder, creditable check, BAS period green (unit 11, prop 2)"
+    "1/6 — RQ-0114; credit-note builder, creditable check, BAS period green (unit 11, prop 2)",
+    "2/6 — migration 0040, credit-notes.ts, GP-005 golden PASS, lifecycle green; pnpm test:db 83/1253"
   ]
 }

@@ -135,6 +135,8 @@ graph LR
 | [T-0123](T-0123.md) | Tax determination (ADR-0044) part 2: resolver precedence, confirmations (TAX_CONFIRMATION_REQUIRED), resolution trace, adjustments inherit the original line, NO_TAX_RULE supersedes TAX_CODE_CONFLICT (est. 400 lines) | MVP | todo | T-0122 | UC-01, UC-05 | 3 |
 | [T-0124](T-0124.md) | Golden Drafts GP-007-A, GP-012-B, GP-015-B + review MINOR corrections (golden_postings gate, delegated DL-0253/DL-0282; never edits Approved) (est. 300 lines) | MVP | todo | T-0121 | UC-09 | 0 |
 | [T-0126](T-0126.md) | Tax report: posted EXP lines without export evidence, flagged past the s 38-185 60-day period (ADR-0044 R4; follow-up to T-0035) (est. 200 lines) | MVP | todo | T-0035, T-0123 | UC-05 | 1 |
+| [T-0135](T-0135.md) | Credit-note API routes: RBAC, @SoD credit_note.create/approve with the small-team exception path (follow-up to T-0045) (est. 250 lines) | MVP | todo | T-0045, T-0015 | UC-11 | 1 |
+| [T-0136](T-0136.md) | BAS: later-period credit notes at 1B with option sales_adjustment_presentation (RQ-0095 Q4; follow-up to T-0035/T-0045) (est. 200 lines) | MVP | todo | T-0035, T-0045 | UC-11 | 1 |
 | [T-0040](T-0040.md) | Sales invoice lifecycle: draft → approve → post | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0015, T-0026, T-0031 | UC-01 | 3 |
 | [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | todo | T-0040 | — | 0 |
 | [T-0042](T-0042.md) | Email delivery (SMTP) via outbox for invoices, statements, reminders, remittances | MVP | todo | T-0041, T-0030, T-0031 | UC-01, UC-02, UC-06 | 3 |
