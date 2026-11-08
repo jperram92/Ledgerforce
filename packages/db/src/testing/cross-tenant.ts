@@ -77,6 +77,15 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     kind: () => 'gst_free',
     rate: () => '0',
   },
+  // Posting profiles (migration 0032): UPPER_SNAKE codes; a customer profile posts to AR_CONTROL;
+  // an override's generated parent account is an active, postable, non-control asset (above).
+  'app.party_posting_profile': {
+    code: () => `P${randomBytes(4).toString('hex').toUpperCase()}`,
+    party_kind: () => 'customer',
+    control_role: () => 'AR_CONTROL',
+  },
+  'app.product_posting_profile': { code: () => `R${randomBytes(4).toString('hex').toUpperCase()}` },
+  'app.posting_profile_override': { slot: () => 'asset' },
   'app.dimension': { code: () => `dim_${randomBytes(4).toString('hex')}` },
   'app.dimension_value': { code: () => `v${randomBytes(4).toString('hex')}` },
   // Trigger-computed; the generator only needs to satisfy NOT NULL (the value is replaced).

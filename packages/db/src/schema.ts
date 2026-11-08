@@ -365,6 +365,95 @@ export interface PartyTable {
   salesforce_account_id: string | null;
   status: Generated<'active' | 'archived'>;
   created_at: Timestamp;
+  /** Posting profiles per role (migration 0032, DL-0247): customer kind / supplier kind only. */
+  customer_posting_profile_id: ColumnType<string | null, string | null | undefined, string | null>;
+  supplier_posting_profile_id: ColumnType<string | null, string | null | undefined, string | null>;
+}
+
+export type PostingSlotName = 'revenue' | 'discount' | 'expense' | 'cogs' | 'asset';
+type OptionalId = ColumnType<string | null, string | null | undefined, string | null>;
+
+/** Party posting profile (migration 0032, design §4.4): who — control account and default tax code. */
+export interface PartyPostingProfileTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  code: string;
+  name: string;
+  party_kind: 'customer' | 'supplier';
+  control_role: 'AR_CONTROL' | 'AP_CONTROL';
+  /** Tax code key; resolved by date through app.tax_code. */
+  default_tax_code: string | null;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
+/** Product posting profile (migration 0032, design §4.4): what — one optional account per slot. */
+export interface ProductPostingProfileTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  code: string;
+  name: string;
+  revenue_account_id: OptionalId;
+  discount_account_id: OptionalId;
+  expense_account_id: OptionalId;
+  cogs_account_id: OptionalId;
+  asset_account_id: OptionalId;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
+/** Matrix override: party profile × product profile × slot → account (migration 0032). */
+export interface PostingProfileOverrideTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_posting_profile_id: string;
+  product_posting_profile_id: string;
+  slot: PostingSlotName;
+  account_id: string;
+  created_at: Timestamp;
+}
+
+/** Product (migration 0032). Salesforce owns Product2 (design D1); LF keeps the mapping. */
+export interface ProductTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  code: string | null;
+  name: string;
+  description: string | null;
+  product_posting_profile_id: string | null;
+  default_tax_code: string | null;
+  /** 18-character form only. */
+  salesforce_product_id: string | null;
+  /** Raw Product2.Family value as last imported (data only; T-0065). */
+  salesforce_family: string | null;
+  status: Generated<'active' | 'archived'>;
+  created_at: Timestamp;
+}
+
+/** Salesforce Account picklist value → party posting profile (migration 0032). */
+export interface PartyProfileMappingTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  sf_field: Generated<string>;
+  sf_value: string;
+  party_posting_profile_id: string;
+  created_at: Timestamp;
+}
+
+/** Salesforce Product2 picklist value → product posting profile (migration 0032). */
+export interface ProductProfileMappingTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  sf_field: Generated<string>;
+  sf_value: string;
+  product_posting_profile_id: string;
+  created_at: Timestamp;
 }
 
 export type PartyRole = 'customer' | 'supplier' | 'employee';
@@ -588,6 +677,12 @@ export interface Database {
   'app.allocation': AllocationTable;
   'app.number_series': NumberSeriesTable;
   'app.party': PartyTable;
+  'app.party_posting_profile': PartyPostingProfileTable;
+  'app.product_posting_profile': ProductPostingProfileTable;
+  'app.posting_profile_override': PostingProfileOverrideTable;
+  'app.product': ProductTable;
+  'app.party_profile_mapping': PartyProfileMappingTable;
+  'app.product_profile_mapping': ProductProfileMappingTable;
   'app.party_role': PartyRoleTable;
   'app.party_address': PartyAddressTable;
   'app.party_contact': PartyContactTable;

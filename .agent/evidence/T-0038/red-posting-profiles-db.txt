@@ -1,0 +1,15 @@
+     14| import { sql, type Kysely } from 'kysely';
+     15| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     16| import { POSTING_SLOTS, slotAllows } from './posting-slots.ts';
+       | ^
+     17| import {
+     18|   createProduct,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  03:53:47
+   Duration  1.48s (transform 222ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

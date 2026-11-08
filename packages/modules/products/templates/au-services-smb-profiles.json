@@ -1,0 +1,70 @@
+{
+  "$comment": "AU services SMB posting profiles (T-0038, design §4.4, RQ-0095, DL-0247). Data, not code (design principle 3). Account codes refer to the au-services-smb chart (T-0018), tax codes to au-gst (T-0034). Slots with no natural account in this chart stay empty: the wizard's gap step and the T-0039 gap check list them. Salesforce values are org-editable picklist API values matched exactly. Pending accountant review together with the chart.",
+  "id": "au-services-smb-profiles",
+  "chartTemplate": "au-services-smb",
+  "taxTemplate": "au-gst",
+  "version": 1,
+  "partyProfiles": [
+    {
+      "code": "DOMESTIC_CUSTOMER",
+      "name": "Domestic customer",
+      "partyKind": "customer",
+      "controlRole": "AR_CONTROL",
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "OVERSEAS_CUSTOMER",
+      "name": "Overseas customer",
+      "partyKind": "customer",
+      "controlRole": "AR_CONTROL",
+      "defaultTaxCode": "FRE"
+    },
+    {
+      "code": "DOMESTIC_SUPPLIER",
+      "name": "Domestic supplier",
+      "partyKind": "supplier",
+      "controlRole": "AP_CONTROL",
+      "defaultTaxCode": "GST"
+    }
+  ],
+  "productProfiles": [
+    {
+      "code": "SUBSCRIPTION",
+      "name": "Subscription",
+      "accounts": { "revenue": "4120", "expense": "6310" }
+    },
+    {
+      "code": "PROFESSIONAL_SERVICES",
+      "name": "Professional services",
+      "accounts": { "revenue": "4110", "expense": "5000" }
+    },
+    {
+      "code": "HARDWARE",
+      "name": "Hardware",
+      "accounts": { "revenue": "4190", "asset": "1500" }
+    },
+    {
+      "code": "REIMBURSABLE_EXPENSE",
+      "name": "Reimbursable expense",
+      "accounts": { "revenue": "4190" }
+    },
+    {
+      "code": "FREIGHT",
+      "name": "Freight",
+      "accounts": { "revenue": "4190" }
+    }
+  ],
+  "salesforce": {
+    "account": [
+      { "field": "Type", "value": "Customer - Direct", "profile": "DOMESTIC_CUSTOMER" },
+      { "field": "Type", "value": "Customer - Channel", "profile": "DOMESTIC_CUSTOMER" }
+    ],
+    "product": [
+      { "field": "Family", "value": "Subscription", "profile": "SUBSCRIPTION" },
+      { "field": "Family", "value": "Professional Services", "profile": "PROFESSIONAL_SERVICES" },
+      { "field": "Family", "value": "Hardware", "profile": "HARDWARE" },
+      { "field": "Family", "value": "Reimbursable Expense", "profile": "REIMBURSABLE_EXPENSE" },
+      { "field": "Family", "value": "Freight", "profile": "FREIGHT" }
+    ]
+  }
+}
