@@ -216,6 +216,13 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   // inserted by lf_app is filled and checked by triggers (prerequisites below).
   'app.subledger_entry': { control_role: () => 'AR_CONTROL' },
   'app.allocation': { fx_difference: () => '0' },
+  // Customer receipts (migration 0039): a non-card method; undeposited funds needs no bank
+  // account. Seeded rows (superuser, no tenant set) skip the guard that checks the entry.
+  'app.ar_receipt': {
+    id: () => randomUUID(),
+    method: () => 'eft',
+    deposit_to: () => 'undeposited_funds',
+  },
   // Manual journals (migration 0029): a draft holds a JSON array of at least two lines.
   'app.manual_journal': { status: () => 'draft', lines: () => '[{}, {}]' },
   // Salesforce JWT bearer connection (migration 0017): a complete sealed key and certificate facts.
@@ -346,6 +353,33 @@ export const PREREQUISITES: Readonly<
            FROM app.subledger_entry f
           WHERE t.tenant_id = $1 AND t.id = $2 AND f.tenant_id = $1 AND f.id = $3`,
         [row.get('tenant_id'), row.get('to_entry_id'), row.get('from_entry_id')],
+      ),
+    );
+  },
+  // A receipt names the engine's posted ar_receipt entry of it whose credits equal its amount
+  // (migration 0039 guard): make the generated entry that posting, with one credit line of 1.
+  'app.ar_receipt': async (admin, row) => {
+    const tenant = row.get('tenant_id') ?? '';
+    const entry = row.get('journal_entry_id') ?? '';
+    await seedRow(
+      admin,
+      { schema: 'app', table: 'journal_line', qualified: 'app.journal_line' },
+      tenant,
+      { ...DEFAULT_ROW_OVERRIDES, 'app.journal_line': { debit: () => '0', credit: () => '1' } },
+      1,
+      new Map([
+        ['company_id', row.get('company_id') ?? ''],
+        ['entry_id', entry],
+        ['line_no', '1'],
+      ]),
+    );
+    await asReplica(admin, (q) =>
+      q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `UPDATE app.journal_entry SET source_type = 'ar_receipt', source_id = $3, status = 'posted',
+                                   posted_at = now()
+          WHERE tenant_id = $1 AND id = $2`,
+        [tenant, entry, row.get('id')],
       ),
     );
   },
