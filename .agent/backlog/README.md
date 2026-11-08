@@ -121,7 +121,7 @@ graph LR
 | [T-0028](T-0028.md) | Subledger entries and allocations | MVP | review | T-0025 | — | 0 |
 | [T-0029](T-0029.md) | Manual journals with approval rule; control accounts reject manual journals | MVP | review | T-0025, T-0015 | — | 1 |
 | [T-0030](T-0030.md) | Transactional outbox and pg-boss worker | MVP | review | T-0025 | — | 1 |
-| [T-0031](T-0031.md) | Golden-posting test runner | MVP | todo | T-0025, T-0007 | — | 1 |
+| [T-0031](T-0031.md) | Golden-posting test runner | MVP | verifying | T-0025, T-0007 | — | 1 |
 | [T-0032](T-0032.md) | Reversal (void) of posted entries | MVP | todo | T-0025, T-0027, T-0028, T-0031 | UC-10 | 1 |
 | [T-0033](T-0033.md) | Accounting invariant property suite (10,000 random documents) | MVP | todo | T-0027, T-0028, T-0032, T-0029 | — | 1 |
 | [T-0034](T-0034.md) | Tax codes (effective-dated) and GST engine with rounding | MVP | verifying | T-0018, T-0017, T-0031 | UC-01 | 1 |

@@ -217,3 +217,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T03:30:26.413Z codex: checkpoint: 4/6 — properties + Draft SS-UC01-11 golden green
 - 2026-11-08T03:37:57.044Z codex: T-0034 → verifying
 - 2026-11-08T03:44:51.308Z codex: checkpoint: 6/6 — verifying; golden SS-UC01-11 waits golden_postings gate (DL-0242)
+- 2026-11-08T03:25:39.972Z codex: checkpoint: step 2/5 — parser, mapping, comparison, runner modes green
+- 2026-11-08T03:28:33.960Z codex: checkpoint: step 3-4/5 — engine golden world + golden tests green (drafts PENDING)
+- 2026-11-08T03:31:24.162Z codex: checkpoint: step 5/5 — golden-status + verify gate 4 honest
+- 2026-11-08T03:39:16.803Z codex: release T-0031 → verifying (waiting golden_postings gate (DL-0242))

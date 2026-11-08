@@ -1,10 +1,10 @@
 // Tests for the shell entry points: resume.sh, verify.sh, checkpoint.sh, handover.sh.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, writeFileSync, unlinkSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, writeFileSync, unlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { makeRepo, runBash, runCli, git, readText, cardField } from './helpers.ts';
+import { AGENT_DIR, makeRepo, runBash, runCli, git, readText, cardField } from './helpers.ts';
 
 test('resume.sh prints every section of the context pack', () => {
   const root = makeRepo();
@@ -259,4 +259,38 @@ test('verify.sh (full): no false positives — protective TRUNCATE triggers, str
   assert.match(r2.stdout, /GATE 6 migrations-forward: FAIL/);
   assert.match(r2.stdout, /0004_bad\.sql:1/);
   assert.match(r2.stdout, /0004_bad\.sql:2/);
+});
+
+test('verify.sh --quick: green golden tests keep gate 4 PENDING while any golden posting is Draft (T-0031)', () => {
+  const root = makeRepo();
+  writeFileSync(join(root, 'package.json'), JSON.stringify({ name: 'golden-fixture', private: true, scripts: { test: 'node -e ""' } }));
+  mkdirSync(join(root, 'node_modules'));
+  const golden = join(root, 'packages/ledger/src/golden');
+  mkdirSync(golden, { recursive: true });
+  writeFileSync(join(golden, 'a.golden.test.ts'), '// golden tests run by the package test script\n');
+  for (const f of ['golden-status.ts', 'parse.ts']) {
+    copyFileSync(join(AGENT_DIR, '../../packages/ledger/src/golden', f), join(golden, f));
+  }
+  const gp = (status: string) => [
+    '## GP-001 — Receipt', '',
+    `- **Status: ${status}** · Phase: MVP · Source type: \`ar.receipt\``, '',
+    '| # | Account | Ref | Debit | Credit | Tax code | Party |',
+    '|---|---|---|---:|---:|---|---|',
+    '| 1 | bank:OPERATING | 1100 | 1.00 | | — | — |',
+    '| 2 | system:AR_CONTROL | 1200 | | 1.00 | — | Acme |',
+    '| | **Total** | | **1.00** | **1.00** | | |', '',
+  ].join('\n');
+  mkdirSync(join(root, 'Docs/accounting'), { recursive: true });
+  writeFileSync(join(root, 'Docs/accounting/postings.md'), gp('Draft'));
+  const draft = runBash(root, 'verify.sh', ['--quick']);
+  assert.match(draft.stdout, /GATE 2a unit-tests: PASS/, draft.stdout);
+  assert.match(draft.stdout, /GATE 4 golden-postings: NOT YET AVAILABLE \(.*0 Approved, 1 Draft \(GP-001\)/, draft.stdout);
+
+  writeFileSync(join(root, 'Docs/accounting/postings.md'), gp('Approved (JP, 2026-11-10)'));
+  const approved = runBash(root, 'verify.sh', ['--quick']);
+  assert.match(approved.stdout, /GATE 4 golden-postings: PASS \(.*1 Approved, 0 Draft/, approved.stdout);
+
+  unlinkSync(join(golden, 'golden-status.ts'));
+  const noTool = runBash(root, 'verify.sh', ['--quick']);
+  assert.match(noTool.stdout, /GATE 4 golden-postings: NOT YET AVAILABLE \(.*no golden-status tool/, noTool.stdout);
 });
