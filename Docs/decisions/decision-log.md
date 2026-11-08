@@ -1917,3 +1917,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: decision ids must be unique; append-only order preserved.
 - Alternatives: none.
 - ADR: none · Status: accepted
+
+### DL-0248 — AI "registered accountant" persona replaces paid external accounting review
+- Date: 2026-11-08 · By: human (direction), claude · Task: T-0007 · Category: process
+- Decision: The product owner wrote: "You need to create a 'registered accountant' persona based off the aasb guidelines. I won't be paying for external support." Added sub-agent `.claude/agents/accountant-reviewer.md`: an AI persona applying AASB standards (Conceptual Framework, AASB 101/1060/108/15/9/107/116/16/119/137/121), the GST Act/GSTRs, BAS labels, PAYG/STP/SG, under APES 110 and TPB-code conduct. It reviews golden postings, accounting RQs/ADRs and tax mapping, classifying findings BLOCKER/MAJOR/MINOR/CONFIRMED. Its review replaces the "registered tax agent/accountant review before production" requirement previously stated for the delegated golden approval.
+- Why: Owner instruction; gives every accounting treatment an independent, standards-grounded second review inside the agent process.
+- Caveat (kept visible): the persona is not a TPB-registered practitioner, carries no professional indemnity, and every report starts with that statement. Users of LedgerForce remain responsible for their own tax positions.
+- Alternatives: paid external review (rejected by owner); no second review (rejected: single-reviewer risk on accounting).
+- ADR: none · Status: accepted

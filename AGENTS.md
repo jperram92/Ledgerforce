@@ -218,6 +218,7 @@ them via `.agents/skills` or by path). Each is plain markdown any model can foll
 
 Sub-agent roles live in `.claude/agents/*.md` (architect, researcher, ledger-engineer,
 test-author, db-engineer, salesforce-engineer, ui-engineer, qa-evidence, security-reviewer,
+accountant-reviewer (AI persona for accounting/tax review — DL-0248),
 reviewer, scribe). Codex: when a task says "act as <role>", read that file and follow it.
 
 The loops that drive the whole process (session, TDD, research, failover, review, evidence,
