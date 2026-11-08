@@ -1,0 +1,15 @@
+      4|  */
+      5| import { describe, expect, it } from 'vitest';
+      6| import {
+       | ^
+      7|   CreditNoteError,
+      8|   basPeriodOf,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  18:31:54
+   Duration  226ms (transform 52ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
