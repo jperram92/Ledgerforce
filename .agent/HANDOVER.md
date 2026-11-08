@@ -227,3 +227,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T08:11:39.485Z claude: T-0065 → in_progress
 - 2026-11-08T08:12:00.985Z claude: checkpoint: 2/7 — CDC patches, versions and pure mappers
 - 2026-11-08T08:18:41.391Z claude: checkpoint: 4/7 — migration 0034, apply, handler; db 20/20
+- 2026-11-08T08:20:30.220Z claude: T-0065 → verifying
