@@ -1,0 +1,15 @@
+      6| import { checkCommand } from '@ledgerforce/ledger';
+      7| import { describe, expect, it } from 'vitest';
+      8| import {
+       | ^
+      9|   InvoiceJournalError,
+     10|   buildInvoiceJournal,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  no tests
+   Start at  08:29:12
+   Duration  702ms (transform 419ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
