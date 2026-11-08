@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a91ce477e1527a0a9
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41357
+ ❯ |db| packages/modules/products/src/gap-check.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/products/src/gap-check.db.test.ts [ packages/modules/products/src/gap-check.db.test.ts ]
+Error: Cannot find module './profile-resolution.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a91ce477e1527a0a9/packages/modules/products/src/gap-check.db.test.ts
+ ❯ packages/modules/products/src/gap-check.db.test.ts:17:1
+     15| import { PostingProfileResolutionError } from './matrix.ts';
+     16| import { createProduct, loadPostingProfileTemplate } from './posting-p…
+     17| import { postingProfileGapCheck, resolvePartyProductPosting } from './…
+       | ^
+     18| import { auServicesSmbProfiles } from './profiles.template.ts';
+     19|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  08:11:09
+   Duration  1.73s (transform 300ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

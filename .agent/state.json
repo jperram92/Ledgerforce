@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
   "current_task": null,
-  "branch": "feat/T-0114-windows-evidence-recorder",
+  "branch": "feat/T-0039-profile-resolution",
   "step": null,
   "claimed_by": null,
   "lease_expires_at": null,
-  "last_green_commit": "c9dddb6f47e5ebdc18b0df8fb96e4672c1728312",
+  "last_green_commit": "e8c35fd92f09476f6caa048fbd69add1f053f075",
   "run_id": "2026-10-29-codex-r01",
   "updated_at": "2026-11-08T08:18:12.709Z",
   "phase": "sprint-0",
@@ -59,7 +59,8 @@
     "T-0103": 2,
     "T-0113": 1,
     "T-0095": 1,
-    "T-0114": 1
+    "T-0114": 1,
+    "T-0039": 1
   },
   "failures": {},
   "providers": {},

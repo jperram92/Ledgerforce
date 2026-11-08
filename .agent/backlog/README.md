@@ -129,7 +129,7 @@ graph LR
 | [T-0036](T-0036.md) | Parties, roles, contacts and billing contact roles | MVP | review | T-0010 | — | 0 |
 | [T-0037](T-0037.md) | Party bank details with envelope encryption and masking | MVP | review | T-0036 | — | 1 |
 | [T-0038](T-0038.md) | Products, party posting profiles and product posting profiles | MVP | review | T-0036, T-0018, T-0034 | — | 1 |
-| [T-0039](T-0039.md) | Posting-profile matrix resolution and gap check | MVP | todo | T-0038 | UC-01 | 1 |
+| [T-0039](T-0039.md) | Posting-profile matrix resolution and gap check | MVP | review | T-0038 | UC-01 | 1 |
 | [T-0040](T-0040.md) | Sales invoice lifecycle: draft → approve → post | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0015, T-0026, T-0031 | UC-01 | 3 |
 | [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | todo | T-0040 | — | 0 |
 | [T-0042](T-0042.md) | Email delivery (SMTP) via outbox for invoices, statements, reminders, remittances | MVP | todo | T-0041, T-0030, T-0031 | UC-01, UC-02, UC-06 | 3 |
@@ -214,3 +214,4 @@ graph LR
 | [T-0112](T-0112.md) | Repair PR review build and outbox integration failures | MVP | in_progress | none (owner-requested repair) |
 | [T-0113](T-0113.md) | Install smoke: wait for completed setup reliably | MVP | todo | T-0094 |
 | [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | todo | T-0010 |
+| [T-0115](T-0115.md) | Nightly posting-profile gap check job | MVP | todo | T-0039 | UC-01 | 0 |
