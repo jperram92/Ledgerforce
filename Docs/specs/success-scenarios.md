@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 189 scenarios (25 need screenshots).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 193 scenarios (25 need screenshots); SS-PLAT-100..103 added 2026-11-08 (T-0038).
 
 ## How to update (who, when)
 
@@ -215,6 +215,10 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-97 | Sync issues inbox list: filter by status (default "Needs a person"; in the address), 20 per page with keyset "Next page" / "First page", each issue with record, event, what went wrong in plain words, tries, last failure and a status word; loading, empty, error (Try again) and forbidden states; axe clean at 1440 and 390 | — | MVP | e2e-playwright | yes | tests/e2e/web/sync-issues.spec.ts; apps/web/src/sync/sync.test.tsx; apps/web/src/sync/sync-logic.test.ts | T-0092 | green | [.agent/evidence/T-0092/manifest.json](../../.agent/evidence/T-0092/manifest.json) | e9b312c |
 | SS-PLAT-98 | Sync issue detail: the error in plain words with a next step (known Salesforce codes named), the raw code, HTTP status and message, whether retrying helps, the payload reference (topic, record type and id, event, handler) with the payload on demand, attempts with first and last failure, and who last changed the status; unknown id shows not found | — | MVP | e2e-playwright | yes | tests/e2e/web/sync-issues.spec.ts; apps/web/src/sync/sync.test.tsx; apps/web/src/sync/sync-logic.test.ts | T-0092 | green | [.agent/evidence/T-0092/manifest.json](../../.agent/evidence/T-0092/manifest.json) | e9b312c |
 | SS-PLAT-99 | Retry and ignore from the detail page: each asks for confirmation first; Retry offered for open and ignored issues, Ignore (optional note ≤ 500) for open only, otherwise a sentence says why; callers without `sync.issues.manage` see both disabled with an explanation naming who can; results and API refusals (409, 503, 403) shown in plain words; a step-up challenge goes to /auth/step-up | — | MVP | e2e-playwright | yes | tests/e2e/web/sync-issues.spec.ts; apps/web/src/sync/sync.test.tsx | T-0092 | green | [.agent/evidence/T-0092/manifest.json](../../.agent/evidence/T-0092/manifest.json) | e9b312c |
+| SS-PLAT-100 | AU services SMB posting-profile template pre-maps 3 party profiles (DOMESTIC_CUSTOMER, OVERSEAS_CUSTOMER, DOMESTIC_SUPPLIER) and 5 product profiles (SUBSCRIPTION, PROFESSIONAL_SERVICES, HARDWARE, REIMBURSABLE_EXPENSE, FREIGHT) onto the AU chart and tax codes; the validator refuses unknown accounts, wrong slot types, control accounts, unknown tax codes and duplicates; loading it writes every profile, slot account and Salesforce mapping | — | MVP | unit + db-integration | no | — | T-0038 | not-started | — | — |
+| SS-PLAT-101 | The database enforces posting-profile rules: slot account type per slot (one SQL function mirrored in TS), slot accounts active, postable and not control, a referenced account cannot be archived or retyped out of its slot, party kind ↔ control role, default tax code must exist for the company, a party links only to a profile of the matching kind, overrides only for slots; every new table tenant-isolated | — | MVP | db-integration | no | — | T-0038 | not-started | — | — |
+| SS-PLAT-102 | A product's default tax code resolves by date through the effective-dated app.tax_code (T-0034); a code with no version in the company is refused | — | MVP | db-integration | no | — | T-0038 | not-started | — | — |
+| SS-PLAT-103 | Salesforce Account.Type / Product2.Family (or a custom field) values map to exactly one party or product profile per company (data only; the connector is T-0065) | — | MVP | db-integration | no | — | T-0038, T-0065 | not-started | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -603,6 +607,23 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-99 — Retry and ignore with confirmation, permission- and status-aware
 - Phase: MVP · Layer: **e2e-playwright** + component · Screenshot evidence: yes · Task(s): T-0092 (RQ-0047)
 - **Given** an open, an ignored, a retried and a resolved issue · **When** an Owner, Finance Admin or Accountant chooses Retry or Ignore, and an Auditor views the same issue · **Then** nothing is sent until the confirmation is accepted (Cancel sends nothing); Retry is offered for open and ignored issues and posts `POST /sync-issues/:id/retry`; Ignore is offered for open issues and posts the optional note (≤ 500 characters); the new status is shown; for retried and resolved issues a sentence says why there is nothing to do; the Auditor sees both actions disabled, each described by text naming who can act; a 409 (changed elsewhere), 503 (queue not configured) or 403 is shown in plain words; a `401 step_up_required` goes to `/auth/step-up`; keyboard-only path works with a visible focus ring; axe clean at 1440 and 390
+
+
+### SS-PLAT-100 — The AU services template pre-maps party and product posting profiles
+- Phase: MVP · Layer: **unit** + **db-integration** · Screenshot evidence: no · Task(s): T-0038 (RQ-0095)
+- **Given** the AU services SMB chart (T-0018) and AU tax codes (T-0034) · **When** the posting-profile template is validated and loaded into a company · **Then** it holds exactly DOMESTIC_CUSTOMER (AR_CONTROL, GST), OVERSEAS_CUSTOMER (AR_CONTROL, FRE) and DOMESTIC_SUPPLIER (AP_CONTROL, GST), and SUBSCRIPTION, PROFESSIONAL_SERVICES, HARDWARE, REIMBURSABLE_EXPENSE and FREIGHT with every named slot account present in the chart and of an allowed type; the validator reports an unknown account, a wrong slot type, a control account, an unknown tax code, a duplicate profile and a duplicate Salesforce value; the loaded profiles resolve `product:PROFESSIONAL_SERVICES.revenue` to 4110 and `product:HARDWARE.asset` to 1500
+
+### SS-PLAT-101 — Posting-profile rules held by the database
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0038 (RQ-0095)
+- **Given** a company with the AU chart and tax codes · **When** profiles, products, overrides and party links are written as `lf_app` · **Then** a revenue slot on an expense account, any slot on a control, archived or non-postable account, a customer profile with AP_CONTROL, an unknown default tax code, a customer-profile link from the supplier column and an override for an unknown slot are refused (23514); archiving or retyping an account used by a profile slot or override is refused; DELETE is not granted; another tenant sees none of the rows and cannot write them (cross-tenant suite)
+
+### SS-PLAT-102 — Product default tax code resolves through app.tax_code
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0038 (RQ-0095)
+- **Given** a product with default tax code GST and a second GST version from a later date · **When** its tax code is resolved for a date in each version and for a product with no tax code · **Then** the version valid on that date is returned (with the GST_COLLECTED / GST_PAID accounts), and null when the product has none; a product naming a code with no version in its company is refused
+
+### SS-PLAT-103 — Salesforce picklist values map to posting profiles
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0038, T-0065 (RQ-0095)
+- **Given** mappings for Account.Type and Product2.Family and a custom field · **When** a value is looked up · **Then** the profile is found by (object, field, value); the same value cannot map twice; an Account mapping must name a party profile and a Product2 mapping a product profile; an unmapped value returns null (the connector, T-0065, reports it)
 
 ## T-0112 PR integration regression evidence (2026-10-28)
 
