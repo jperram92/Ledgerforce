@@ -183,6 +183,24 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     replay_id: () => '\\x01',
   },
   'app.salesforce_resync_request': { reason: () => 'replay_id_invalid' },
+  // Salesforce inbound mapping (migration 0034): an entity it maps, an 18-character record id,
+  // a cdc: key; a rejected record needs no LedgerForce row; an issue code and field name.
+  'app.salesforce_record_sync': {
+    entity: () => 'Account',
+    record_id: () => `001${randomBytes(6).toString('hex').slice(0, 12)}AAA`,
+    state: () => 'rejected',
+    last_key: () => `cdc:Account:${randomUUID()}`,
+    fields: () => '{}',
+  },
+  'app.salesforce_inbound_issue': {
+    entity: () => 'Account',
+    record_id: () => '001000000000001AAA',
+    code: () => 'unmapped_value',
+    field: () => 'Type',
+    status: () => 'open',
+    last_key: () => `cdc:Account:${randomUUID()}`,
+    payload: () => '{}',
+  },
   // Open items and allocations (migration 0028). Seeded rows (superuser, no tenant set) are
   // stored as generated: an AR item of +1, an allocation of 1 with no FX difference. A row
   // inserted by lf_app is filled and checked by triggers (prerequisites below).

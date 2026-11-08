@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0065",
+  "entries": [
+    {
+      "scenario": "SS-UC01-12",
+      "file": ".agent/evidence/T-0065/20261108-082017-tests-unit.json",
+      "test": "10 test(s): packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12: CDC events become per-record field patches [T-0065] › a CREATE carries every non-null field, compound components as Parent.Child | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12: CDC events become per-record field patches [T-0065] › an UPDATE carries only the header-named fields; a body null that is not named is \"unchanged\" | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12: CDC events become per-record field patches [T-0065] › DELETE and UNDELETE are their own operations; only the records still to apply are returned | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12: CDC events become per-record field patches [T-0065] › a polled record (SystemModstamp delta, T-0066) is a full snapshot keyed on SystemModstamp | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12: CDC events become per-record field patches [T-0065] › mergeState applies a patch over the last known state; a nulled compound clears its components | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] › Account → party values, addresses and the profile picklist value | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] › Account validation failures block the record; an address problem does not | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] › Contact → name from compound Name, email, phone and billing roles from the multi-select | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] › Contact without Account, name or with a bad email is refused | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] › Product2 → product; IsActive false archives; Family is the default profile field",
+      "commit": "8ff8848cb0e7",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:20:17.368Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0065/20261108-082017-tests-unit.json",
+      "test": "2 test(s): packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-13: record versions order CDC commits and polled snapshots [T-0065] › orders CDC changes by (commit number, sequence number) | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-13: record versions order CDC commits and polled snapshots [T-0065] › orders a polled snapshot against anything by time",
+      "commit": "8ff8848cb0e7",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:20:17.368Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-14",
+      "file": ".agent/evidence/T-0065/20261108-082017-tests-unit.json",
+      "test": "5 test(s): packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] › Account → party values, addresses and the profile picklist value | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] › Account validation failures block the record; an address problem does not | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] › Contact → name from compound Name, email, phone and billing roles from the multi-select | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] › Contact without Account, name or with a bad email is refused | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts › SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] › Product2 → product; IsActive false archives; Family is the default profile field",
+      "commit": "8ff8848cb0e7",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:20:17.368Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-07",
+      "file": ".agent/evidence/T-0065/20261108-082019-tests-db.json",
+      "test": "3 test(s): packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-07: Duplicate CDC event is idempotent [T-0065] › a redelivered Account CREATE through the subscriber gives one party; the replay applies nothing | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-07: Duplicate CDC event is idempotent [T-0065] › the same change applied twice (any path) is a no-op the second time and is logged as duplicate | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-07: Duplicate CDC event is idempotent [T-0065] › a polled snapshot keyed on SystemModstamp is idempotent too",
+      "commit": "8ff8848cb0e7",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:20:19.773Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0065/20261108-082019-tests-db.json",
+      "test": "5 test(s): packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-13: out-of-order, delete and undelete events [T-0065] › an older UPDATE arriving after a newer one is ignored as stale | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-13: out-of-order, delete and undelete events [T-0065] › a polled snapshot older than the last CDC commit is stale; a newer one applies | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-13: out-of-order, delete and undelete events [T-0065] › DELETE archives, a stale CREATE does not resurrect, UNDELETE re-activates; nothing is deleted | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-13: out-of-order, delete and undelete events [T-0065] › a DELETE seen before its (older) CREATE leaves no party | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts › SS-UC01-13: out-of-order, delete and undelete events [T-0065] › Contact and Product2 deletes archive the contact and the product",
+      "commit": "8ff8848cb0e7",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:20:19.773Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-12",
+      "file": ".agent/evidence/T-0065/20261108-082019-tests-db.json",
+      "test": "6 test(s): packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] › Account → customer party with the Type-mapped profile, ABN, currency and addresses | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] › a partial UPDATE changes only what Salesforce changed; LedgerForce-owned fields are kept | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] › a party created in LedgerForce with the Account Id is linked, not duplicated | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] › a Type mapped to a supplier profile adds the supplier role and moves the profile | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] › Contact → party contact with billing roles; a removed role is deactivated, never deleted | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] › Product2 → product with the Family-mapped profile, code, tax code; IsActive false archives",
+      "commit": "8ff8848cb0e7",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:20:19.773Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-14",
+      "file": ".agent/evidence/T-0065/20261108-082019-tests-db.json",
+      "test": "6 test(s): packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] › an unmapped Account.Type imports the party without a profile and raises one issue until mapped | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] › an invalid ABN rejects the record with a blocking issue; the fixing UPDATE applies it | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] › a Contact of an Account that is not synced is a blocking missing_parent issue | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] › an unknown Family imports the product without a profile; an unknown tax code rejects it | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] › a rejected record does not abort the transaction: the next change in it still applies | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts › SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] › issues are append-only rows: lf_app cannot delete them",
+      "commit": "8ff8848cb0e7",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:20:19.773Z",
+      "result": "passed"
+    }
+  ]
+}

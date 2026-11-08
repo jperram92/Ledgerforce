@@ -1,0 +1,385 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a83e0c46b5ef1494b
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:34873
+ ❯ |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts (12 tests | 12 failed) 795ms
+     × Account → customer party with the Type-mapped profile, ABN, currency and addresses 19ms
+     × a partial UPDATE changes only what Salesforce changed; LedgerForce-owned fields are kept 9ms
+     × a party created in LedgerForce with the Account Id is linked, not duplicated 7ms
+     × a Type mapped to a supplier profile adds the supplier role and moves the profile 4ms
+     × Contact → party contact with billing roles; a removed role is deactivated, never deleted 7ms
+     × Product2 → product with the Family-mapped profile, code, tax code; IsActive false archives 5ms
+     × an unmapped Account.Type imports the party without a profile and raises one issue until mapped 3ms
+     × an invalid ABN rejects the record with a blocking issue; the fixing UPDATE applies it 3ms
+     × a Contact of an Account that is not synced is a blocking missing_parent issue 3ms
+     × an unknown Family imports the product without a profile; an unknown tax code rejects it 5ms
+     × a rejected record does not abort the transaction: the next change in it still applies 4ms
+     × issues are append-only rows: lf_app cannot delete them 44ms
+ ❯ |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts (8 tests | 8 failed) 612ms
+     × a redelivered Account CREATE through the subscriber gives one party; the replay applies nothing 9ms
+     × the same change applied twice (any path) is a no-op the second time and is logged as duplicate 5ms
+     × a polled snapshot keyed on SystemModstamp is idempotent too 2ms
+     × an older UPDATE arriving after a newer one is ignored as stale 2ms
+     × a polled snapshot older than the last CDC commit is stale; a newer one applies 2ms
+     × DELETE archives, a stale CREATE does not resurrect, UNDELETE re-activates; nothing is deleted 2ms
+     × a DELETE seen before its (older) CREATE leaves no party 2ms
+     × Contact and Product2 deletes archive the contact and the product 3ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 20 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts > SS-UC01-07: Duplicate CDC event is idempotent [T-0065] > a redelivered Account CREATE through the subscriber gives one party; the replay applies nothing
+Error: not implemented
+ ❯ salesforceInboundHandler packages/connectors/salesforce/src/inbound/apply.ts:46:9
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+     46|   throw new Error('not implemented');
+       |         ^
+     47| }
+     48| export function getRecordSync(
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts:94:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts > SS-UC01-07: Duplicate CDC event is idempotent [T-0065] > the same change applied twice (any path) is a no-op the second time and is logged as duplicate
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts:151:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts > SS-UC01-07: Duplicate CDC event is idempotent [T-0065] > a polled snapshot keyed on SystemModstamp is idempotent too
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts:166:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts > SS-UC01-13: out-of-order, delete and undelete events [T-0065] > an older UPDATE arriving after a newer one is ignored as stale
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts:176:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts > SS-UC01-13: out-of-order, delete and undelete events [T-0065] > a polled snapshot older than the last CDC commit is stale; a newer one applies
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts:189:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts > SS-UC01-13: out-of-order, delete and undelete events [T-0065] > DELETE archives, a stale CREATE does not resurrect, UNDELETE re-activates; nothing is deleted
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts:204:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts > SS-UC01-13: out-of-order, delete and undelete events [T-0065] > a DELETE seen before its (older) CREATE leaves no party
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts:233:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts > SS-UC01-13: out-of-order, delete and undelete events [T-0065] > Contact and Product2 deletes archive the contact and the product
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts:243:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] > Account → customer party with the Type-mapped profile, ABN, currency and addresses
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:109:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] > a partial UPDATE changes only what Salesforce changed; LedgerForce-owned fields are kept
+error: invalid input syntax for type uuid: ""
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ UpdateQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/update-query-builder.js:455:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ UpdateQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/update-query-builder.js:455:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:162:5
+    160|     const ACC = sfId('001', 1);
+    161|     const before = await party(ACC);
+    162|     await w.inTenant((trx) =>
+       |     ^
+    163|       trx
+    164|         .updateTable('app.party')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] > a party created in LedgerForce with the Account Id is linked, not duplicated
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:198:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] > a Type mapped to a supplier profile adds the supplier role and moves the profile
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:205:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] > Contact → party contact with billing roles; a removed role is deactivated, never deleted
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:222:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-12: Salesforce Account, Contact and Product2 map onto parties and products [T-0065] > Product2 → product with the Family-mapped profile, code, tax code; IsActive false archives
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:286:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] > an unmapped Account.Type imports the party without a profile and raises one issue until mapped
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:348:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] > an invalid ABN rejects the record with a blocking issue; the fixing UPDATE applies it
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:386:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] > a Contact of an Account that is not synced is a blocking missing_parent issue
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:414:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] > an unknown Family imports the product without a profile; an unknown tax code rejects it
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/testing/inbound-world.ts:57:37
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:431:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] > a rejected record does not abort the transaction: the next change in it still applies
+Error: not implemented
+ ❯ applyInboundChange packages/connectors/salesforce/src/inbound/apply.ts:43:9
+     41|   _change: InboundChange,
+     42| ): Promise<ApplyResult> {
+     43|   throw new Error('not implemented');
+       |         ^
+     44| }
+     45| export function salesforceInboundHandler(_companyId: string): CdcHandl…
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:464:14
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:463:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/20]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts > SS-UC01-14: unmapped values and validation failures raise sync issues [T-0065] > issues are append-only rows: lf_app cannot delete them
+AssertionError: expected [Function] to throw error matching /permission denied|never/ but got 'relation "app.salesforce_inbound_issu…'
+
+- Expected:
+/permission denied|never/
+
++ Received:
+"relation \"app.salesforce_inbound_issue\" does not exist"
+
+ ❯ packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts:499:6
+    497|     await expect(
+    498|       w.inTenant((trx) => sql`DELETE FROM app.salesforce_inbound_issue…
+    499|     ).rejects.toThrow(/permission denied|never/);
+       |      ^
+    500|   });
+    501| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/20]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  20 failed (20)
+   Start at  08:14:28
+   Duration  3.11s (transform 911ms, setup 0ms, import 2.02s, tests 1.41s, environment 0ms)
+

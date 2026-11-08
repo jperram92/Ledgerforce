@@ -128,3 +128,36 @@ export {
   type WriteBackHandlerDeps,
   type WriteBackReport,
 } from './writeback/writeback.ts';
+export {
+  changeFromSnapshot,
+  changesFromCdcEvent,
+  compareVersion,
+  INBOUND_ENTITIES,
+  mergeState,
+  type InboundChange,
+  type InboundEntity,
+  type RecordVersion,
+  type SfState,
+} from './inbound/changes.ts';
+export {
+  BILLING_ROLE_VALUES,
+  mapAccount,
+  mapContact,
+  mapProduct,
+  type AccountValues,
+  type AddressValues,
+  type ContactValues,
+  type IssueCode,
+  type Problem,
+  type ProductValues,
+} from './inbound/mapping.ts';
+export {
+  applyInboundChange,
+  getRecordSync,
+  listInboundIssues,
+  salesforceInboundHandler,
+  type ApplyOutcome,
+  type ApplyResult,
+  type InboundIssue,
+  type RecordSync,
+} from './inbound/apply.ts';

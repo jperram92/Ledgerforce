@@ -251,3 +251,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T08:13:47.257Z claude: checkpoint: 4/7 — resolver and gap check green (unit 14, db 7)
 - 2026-11-08T08:14:23.390Z claude: T-0039 → verifying
 - 2026-11-08T08:21:03.200Z claude: release T-0039 → review (verify 12 PASS/3 FAIL/1 PENDING: 2a fails only on scripts/agent/test/run.test.ts worktree-path artefact (.claude/ in path), 3/4 cascade from 2a, 4 also PENDING on Draft GPs (T-0039 posts nothing), 8 cross-review pending; awaiting codex cross-review)
+- 2026-11-08T08:11:39.485Z claude: T-0065 → in_progress
+- 2026-11-08T08:12:00.985Z claude: checkpoint: 2/7 — CDC patches, versions and pure mappers
+- 2026-11-08T08:18:41.391Z claude: checkpoint: 4/7 — migration 0034, apply, handler; db 20/20
+- 2026-11-08T08:20:30.220Z claude: T-0065 → verifying
+- 2026-11-08T13:02:46.587Z claude: release T-0065 → review (verify 12 PASS/3 FAIL/1 PENDING at c701dd3: only known worktree artefact (run.test.ts) + dependent gates 3/4; awaiting codex cross-review; lead to leave the 0033 placeholder out at merge (DL-0268))

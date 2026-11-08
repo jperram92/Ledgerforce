@@ -1,0 +1,451 @@
+{
+  "source": "Documented, NOT recorded: written from RQ-0098 (S1 compound fields, S2 bitmaps, S3 change types) and RQ-0036 (S7 header) for T-0065. Field sets are a subset of the standard AccountChangeEvent, ContactChangeEvent and Product2ChangeEvent schemas plus the LedgerForce custom fields the mapper reads (LF_ABN__c, LF_Billing_Role__c, LF_Tax_Code__c). Payloads are built by src/testing/master-data-events.ts with avsc from these schemas. No Salesforce org was contacted; replace with redacted recordings in fixtures/recorded/ from a scratch org (RQ-0098 follow-up). No real id, user or token appears here.",
+  "schemas": {
+    "Account": {
+      "topic": "/data/AccountChangeEvent",
+      "schemaId": "TESTaccountChangeEventSchema02",
+      "schema": {
+        "type": "record",
+        "name": "AccountChangeEvent",
+        "namespace": "com.sforce.eventbus",
+        "fields": [
+          {
+            "name": "ChangeEventHeader",
+            "type": {
+              "type": "record",
+              "name": "ChangeEventHeader",
+              "fields": [
+                {
+                  "name": "entityName",
+                  "type": "string"
+                },
+                {
+                  "name": "recordIds",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                },
+                {
+                  "name": "changeType",
+                  "type": {
+                    "type": "enum",
+                    "name": "ChangeType",
+                    "symbols": [
+                      "CREATE",
+                      "UPDATE",
+                      "DELETE",
+                      "UNDELETE",
+                      "GAP_CREATE",
+                      "GAP_UPDATE",
+                      "GAP_DELETE",
+                      "GAP_UNDELETE",
+                      "GAP_OVERFLOW",
+                      "SNAPSHOT"
+                    ]
+                  }
+                },
+                {
+                  "name": "changeOrigin",
+                  "type": "string"
+                },
+                {
+                  "name": "transactionKey",
+                  "type": "string"
+                },
+                {
+                  "name": "sequenceNumber",
+                  "type": "int"
+                },
+                {
+                  "name": "commitTimestamp",
+                  "type": "long"
+                },
+                {
+                  "name": "commitNumber",
+                  "type": "long"
+                },
+                {
+                  "name": "commitUser",
+                  "type": "string"
+                },
+                {
+                  "name": "nulledFields",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                },
+                {
+                  "name": "diffFields",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                },
+                {
+                  "name": "changedFields",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "Name",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "Type",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "BillingAddress",
+            "type": [
+              "null",
+              {
+                "type": "record",
+                "name": "Address",
+                "fields": [
+                  {
+                    "name": "Street",
+                    "type": ["null", "string"],
+                    "default": null
+                  },
+                  {
+                    "name": "City",
+                    "type": ["null", "string"],
+                    "default": null
+                  },
+                  {
+                    "name": "State",
+                    "type": ["null", "string"],
+                    "default": null
+                  },
+                  {
+                    "name": "PostalCode",
+                    "type": ["null", "string"],
+                    "default": null
+                  },
+                  {
+                    "name": "Country",
+                    "type": ["null", "string"],
+                    "default": null
+                  },
+                  {
+                    "name": "CountryCode",
+                    "type": ["null", "string"],
+                    "default": null
+                  }
+                ]
+              }
+            ],
+            "default": null
+          },
+          {
+            "name": "ShippingAddress",
+            "type": ["null", "Address"],
+            "default": null
+          },
+          {
+            "name": "CurrencyIsoCode",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "LF_ABN__c",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "LastModifiedDate",
+            "type": ["null", "long"],
+            "default": null
+          }
+        ]
+      }
+    },
+    "Contact": {
+      "topic": "/data/ContactChangeEvent",
+      "schemaId": "TESTcontactChangeEventSchema01",
+      "schema": {
+        "type": "record",
+        "name": "ContactChangeEvent",
+        "namespace": "com.sforce.eventbus",
+        "fields": [
+          {
+            "name": "ChangeEventHeader",
+            "type": {
+              "type": "record",
+              "name": "ChangeEventHeader",
+              "fields": [
+                {
+                  "name": "entityName",
+                  "type": "string"
+                },
+                {
+                  "name": "recordIds",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                },
+                {
+                  "name": "changeType",
+                  "type": {
+                    "type": "enum",
+                    "name": "ChangeType",
+                    "symbols": [
+                      "CREATE",
+                      "UPDATE",
+                      "DELETE",
+                      "UNDELETE",
+                      "GAP_CREATE",
+                      "GAP_UPDATE",
+                      "GAP_DELETE",
+                      "GAP_UNDELETE",
+                      "GAP_OVERFLOW",
+                      "SNAPSHOT"
+                    ]
+                  }
+                },
+                {
+                  "name": "changeOrigin",
+                  "type": "string"
+                },
+                {
+                  "name": "transactionKey",
+                  "type": "string"
+                },
+                {
+                  "name": "sequenceNumber",
+                  "type": "int"
+                },
+                {
+                  "name": "commitTimestamp",
+                  "type": "long"
+                },
+                {
+                  "name": "commitNumber",
+                  "type": "long"
+                },
+                {
+                  "name": "commitUser",
+                  "type": "string"
+                },
+                {
+                  "name": "nulledFields",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                },
+                {
+                  "name": "diffFields",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                },
+                {
+                  "name": "changedFields",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "AccountId",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "Name",
+            "type": [
+              "null",
+              {
+                "type": "record",
+                "name": "Name",
+                "fields": [
+                  {
+                    "name": "Salutation",
+                    "type": ["null", "string"],
+                    "default": null
+                  },
+                  {
+                    "name": "FirstName",
+                    "type": ["null", "string"],
+                    "default": null
+                  },
+                  {
+                    "name": "LastName",
+                    "type": ["null", "string"],
+                    "default": null
+                  }
+                ]
+              }
+            ],
+            "default": null
+          },
+          {
+            "name": "Email",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "Phone",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "LF_Billing_Role__c",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "LastModifiedDate",
+            "type": ["null", "long"],
+            "default": null
+          }
+        ]
+      }
+    },
+    "Product2": {
+      "topic": "/data/Product2ChangeEvent",
+      "schemaId": "TESTproduct2ChangeEventSchema01",
+      "schema": {
+        "type": "record",
+        "name": "Product2ChangeEvent",
+        "namespace": "com.sforce.eventbus",
+        "fields": [
+          {
+            "name": "ChangeEventHeader",
+            "type": {
+              "type": "record",
+              "name": "ChangeEventHeader",
+              "fields": [
+                {
+                  "name": "entityName",
+                  "type": "string"
+                },
+                {
+                  "name": "recordIds",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                },
+                {
+                  "name": "changeType",
+                  "type": {
+                    "type": "enum",
+                    "name": "ChangeType",
+                    "symbols": [
+                      "CREATE",
+                      "UPDATE",
+                      "DELETE",
+                      "UNDELETE",
+                      "GAP_CREATE",
+                      "GAP_UPDATE",
+                      "GAP_DELETE",
+                      "GAP_UNDELETE",
+                      "GAP_OVERFLOW",
+                      "SNAPSHOT"
+                    ]
+                  }
+                },
+                {
+                  "name": "changeOrigin",
+                  "type": "string"
+                },
+                {
+                  "name": "transactionKey",
+                  "type": "string"
+                },
+                {
+                  "name": "sequenceNumber",
+                  "type": "int"
+                },
+                {
+                  "name": "commitTimestamp",
+                  "type": "long"
+                },
+                {
+                  "name": "commitNumber",
+                  "type": "long"
+                },
+                {
+                  "name": "commitUser",
+                  "type": "string"
+                },
+                {
+                  "name": "nulledFields",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                },
+                {
+                  "name": "diffFields",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                },
+                {
+                  "name": "changedFields",
+                  "type": {
+                    "type": "array",
+                    "items": "string"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": "Name",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "ProductCode",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "Description",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "Family",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "IsActive",
+            "type": ["null", "boolean"],
+            "default": null
+          },
+          {
+            "name": "LF_Tax_Code__c",
+            "type": ["null", "string"],
+            "default": null
+          },
+          {
+            "name": "LastModifiedDate",
+            "type": ["null", "long"],
+            "default": null
+          }
+        ]
+      }
+    }
+  }
+}
