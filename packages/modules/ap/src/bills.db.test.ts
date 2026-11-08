@@ -89,7 +89,7 @@ describe('bill entry', () => {
     ]);
   });
 
-  it('UC-05 A3: the same supplier invoice number (any formatting) is a warning on entry, not a refusal', async () => {
+  it('SS-UC05-09: Duplicate supplier invoice — the same supplier invoice number (any formatting) is a warning on entry, not a refusal', async () => {
     const r = await create(gp008({ supplierRef: 'inv 0045' }));
     expect(r.billNo).toBe('BILL-000046');
     expect(r.duplicates).toEqual([
@@ -126,7 +126,7 @@ describe('bill entry', () => {
 });
 
 describe('preview and post', () => {
-  it('preview builds the GP-008-shaped journal and writes nothing', async () => {
+  it('SS-UC05-10: Bill preview — builds the GP-008-shaped journal and writes nothing', async () => {
     const before = await fp();
     const p = await w.inTenant((trx) => previewBill(trx, firstBill.id));
     expect(await fp()).toEqual(before);
@@ -177,7 +177,7 @@ describe('preview and post', () => {
     expect(await fp()).toEqual(before);
   });
 
-  it('UC-05 A3: a duplicate supplier invoice cannot post twice; nothing is written', async () => {
+  it('SS-UC05-09: Duplicate supplier invoice — a duplicate supplier invoice cannot post twice; nothing is written', async () => {
     const dup = (
       await w.inTenant((trx) =>
         findDuplicateBills(trx, {
