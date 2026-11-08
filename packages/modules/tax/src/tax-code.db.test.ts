@@ -47,7 +47,9 @@ beforeAll(async () => {
       ])
       .returning('id')
       .execute();
-    return [rows[0]!.id, rows[1]!.id];
+    const [a, b] = rows.map((r) => r.id);
+    if (!a || !b) throw new Error('companies not created');
+    return [a, b];
   });
   await inTenant((trx) => loadChartTemplate(trx, companyId, auServicesSmb));
   await inTenant((trx) => loadTaxCodes(trx, companyId, auTaxCodes));
