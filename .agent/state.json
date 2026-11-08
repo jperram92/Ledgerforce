@@ -5,9 +5,9 @@
   "step": "4/7 — migration 0034, apply, handler; db 20/20",
   "claimed_by": "claude",
   "lease_expires_at": "2026-11-08T09:03:41.389Z",
-  "last_green_commit": "f91ccca89cf42dff3c3b9e6ed975a2969890da28",
+  "last_green_commit": "10d8617645509380be0e2198b5d89c508cb91d60",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T08:18:41.391Z",
+  "updated_at": "2026-11-08T08:18:41.537Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 193 scenarios (25 need screenshots); SS-PLAT-100..103 added 2026-11-08 (T-0038).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 193 scenarios (25 need screenshots); SS-PLAT-100..103 added 2026-11-08 (T-0038); SS-UC01-12..14 added 2026-11-08 (T-0065).
 
 ## How to update (who, when)
 
@@ -33,11 +33,14 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC01-04 | Above threshold stays Draft | UC-01 | MVP | unit | no | — | T-0069 | not-started | — | — |
 | SS-UC01-05 | No Billing To contact blocks approval | UC-01 | MVP | db-integration | no | — | T-0040 | not-started | — | — |
 | SS-UC01-06 | Posting-profile gap flagged, not posted | UC-01 | MVP | unit | no | — | T-0039, T-0069 | not-started | — | — |
-| SS-UC01-07 | Duplicate CDC event is idempotent | UC-01 | MVP | db-integration | no | — | T-0065, T-0069 | not-started | — | — |
+| SS-UC01-07 | Duplicate CDC event is idempotent | UC-01 | MVP | db-integration | no | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts (master-data layer; the draft-invoice half is T-0069) | T-0065, T-0069 | green (master-data layer; draft invoice in T-0069) | [.agent/evidence/T-0065/manifest.json](../../.agent/evidence/T-0065/manifest.json) | COMMIT |
 | SS-UC01-08 | Closed Won dated in a hard-locked period follows lock policy | UC-01 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0069, T-0023 | green (period/policy layer; Closed Won draft invoice and Sync issue in T-0069) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC01-09 | Salesforce outage does not block accounting | UC-01 | MVP | db-integration | no | apps/worker/src/salesforce-writeback.outage.db.test.ts | T-0067 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | af03e20 |
 | SS-UC01-10 | Invoice detail shows mapped lines and journal preview | UC-01 | MVP | e2e-playwright | yes | — | T-0083 | not-started | — | — |
 | SS-UC01-11 | Tax-inclusive rounding follows company setting | UC-01 | MVP | golden | no | packages/modules/tax/src/golden/gp-018.golden.test.ts (against **Draft** GP-018a/b — waits golden_postings gate, DL-0242; engine-level, posting via ledger is T-0040) | T-0034, T-0040 | green | [.agent/evidence/T-0034/manifest.json](../../.agent/evidence/T-0034/manifest.json) | 0d3ce8f |
+| SS-UC01-12 | Salesforce Account, Contact and Product2 map onto parties and products (Salesforce-owned fields only) | UC-01 | MVP | unit contract + db-integration | no | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts; packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts | T-0065 | green | [.agent/evidence/T-0065/manifest.json](../../.agent/evidence/T-0065/manifest.json) | COMMIT |
+| SS-UC01-13 | Out-of-order, delete and undelete events (stale ignored, delete archives, undelete re-activates) | UC-01 | MVP | unit contract + db-integration | no | packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts; packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts | T-0065 | green | [.agent/evidence/T-0065/manifest.json](../../.agent/evidence/T-0065/manifest.json) | COMMIT |
+| SS-UC01-14 | Unmapped values and validation failures raise inbound sync issues, never silently dropped | UC-01 | MVP | db-integration | no | packages/connectors/salesforce/src/inbound/sf-inbound.mapping.db.test.ts | T-0065 | green (inbox UI follow-up) | [.agent/evidence/T-0065/manifest.json](../../.agent/evidence/T-0065/manifest.json) | COMMIT |
 | SS-UC02-01 | Preview lists all invoices, posts nothing | UC-02 | MVP | db-integration | no | — | T-0043 | not-started | — | — |
 | SS-UC02-02 | Approved batch posts all invoices in one job | UC-02 | MVP | db-integration | no | — | T-0044 | not-started | — | — |
 | SS-UC02-03 | One failure does not roll back the others | UC-02 | MVP | db-integration | no | — | T-0044 | not-started | — | — |
