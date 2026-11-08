@@ -221,3 +221,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T03:28:33.960Z codex: checkpoint: step 3-4/5 — engine golden world + golden tests green (drafts PENDING)
 - 2026-11-08T03:31:24.162Z codex: checkpoint: step 5/5 — golden-status + verify gate 4 honest
 - 2026-11-08T03:39:16.803Z codex: release T-0031 → verifying (waiting golden_postings gate (DL-0242))
+- 2026-11-08T04:01:54.813Z codex: checkpoint: 3/6 — tables, template seed, tests green; evidence
+- 2026-11-08T04:07:46.604Z codex: T-0038 → verifying
+- 2026-11-08T04:12:46.017Z codex: release T-0038 → review (verify 12 PASS/3 FAIL/1 PENDING: only failure is the known worktree-path artefact scripts/agent/test/run.test.ts (path contains .claude/), cascading to gates 3/4; cross-review PENDING; no golden needed (T-0038 posts nothing))

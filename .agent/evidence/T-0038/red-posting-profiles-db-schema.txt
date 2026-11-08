@@ -1,0 +1,3 @@
+ FAIL  |db| packages/modules/products/src/posting-profiles.db.test.ts [ packages/modules/products/src/posting-profiles.db.test.ts ]
+error: relation "app.party_posting_profile" does not exist
+      Tests  14 skipped (14)

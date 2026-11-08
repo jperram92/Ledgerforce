@@ -1924,4 +1924,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Owner instruction; gives every accounting treatment an independent, standards-grounded second review inside the agent process.
 - Caveat (kept visible): the persona is not a TPB-registered practitioner, carries no professional indemnity, and every report starts with that statement. Users of LedgerForce remain responsible for their own tax positions.
 - Alternatives: paid external review (rejected by owner); no second review (rejected: single-reviewer risk on accounting).
+
+### DL-0249 — Claim T-0038 by hand under DL-0242; scenarios SS-PLAT-100..103
+- Date: 2026-11-08 · By: claude · Task: T-0038 · Category: process
+- Decision: `conductor.ts claim T-0038` refused ("depends_on T-0034 which is not done or review"; T-0034 is at verifying behind the golden gate). Per DL-0242 the card fields were set by hand (status in_progress, claimed_by claude, lease, attempts 1, research RQ-0096); state.json is not edited by hand. Branch `feat/T-0038-posting-profiles` starts at 9065929 (T-0034 merged). The card had no scenarios, so SS-PLAT-100 (template), SS-PLAT-101 (database rules + isolation), SS-PLAT-102 (product tax code through app.tax_code) and SS-PLAT-103 (Salesforce mapping) were added to the register before building. T-0038 posts nothing, so no golden posting is needed; nothing from T-0031 is used.
+- Why: DL-0242 authorises building T-0038 ahead of the golden gate; the register needs an SS id per acceptance criterion.
+- Alternatives: wait for T-0034 review (rejected by DL-0242).
+- ADR: none · Status: accepted
+
+### DL-0250 — Posting-profile data model: customer/supplier party profiles, five optional product slots, mapping table
+- Date: 2026-11-08 · By: claude · Task: T-0038 · Category: data
+- Decision: (1) `app.party_posting_profile` is customer- or supplier-specific (`party_kind`) with `control_role` AR_CONTROL / AP_CONTROL (FK to the company's system-role binding, so the account follows a re-bind) and optional `default_tax_code`. Because one party can be both customer and supplier (design §4.2), `app.party` gets two additive columns `customer_posting_profile_id` and `supplier_posting_profile_id` instead of design §4.2's single "party posting profile" field (as BC separates customer and vendor posting groups). (2) `app.product_posting_profile` has five optional slots `revenue`, `discount`, `expense`, `cogs`, `asset`; the slot → account type rule lives in IMMUTABLE `app.posting_slot_allows(slot, type)` mirrored in TS. Slot accounts must be active, postable and not control. An empty slot is a gap for T-0039. (3) `app.posting_profile_override` (party profile × product profile × slot → account) stores §4.4's matrix overrides; resolution and the gap check stay in T-0039. (4) `app.product` with optional code, profile, `default_tax_code` (a code resolved by date via `findTaxCode`; existence enforced by trigger because tax_code is versioned), Salesforce Product2 Id (18-char, unique per company) and the raw `salesforce_family`. (5) `app.posting_profile_mapping (sf_object, sf_field, sf_value) → profile` stores Account.Type / Product2.Family / custom-field mappings as data. (6) Code in a new workspace package `packages/modules/products` (`@ledgerforce/products`); template `templates/au-services-smb-profiles.json` maps onto the existing AU chart only (no chart change, so the 43-account T-0018/T-0082 expectations stand): HARDWARE.asset 1500; revenue of HARDWARE, REIMBURSABLE_EXPENSE and FREIGHT 4190 Recoverable costs income; purchase-side slots with no natural account stay empty for the wizard's gap step. Migration 0032.
+- Why: RQ-0096; golden keys `product:<PROFILE>.<slot>`, `DOMESTIC_CUSTOMER`, `DOMESTIC_SUPPLIER` (Draft postings.md); design principle 3 (configuration over code).
+- Alternatives: one party profile with both AR and AP (rejected: the golden file names customer and supplier profiles separately); account codes in profiles instead of ids (rejected: foreign keys keep integrity); adding hardware/COGS/freight accounts to the chart template (rejected for now: changes T-0018/T-0082 expectations; accountant to review the template).
+- ADR: none (new tables inside the §4.4 model; ledger model unchanged) · Status: accepted — template mappings pending accountant review with the chart
+
+### DL-0251 — Evidence recorder accepts scenario ids with three or more digits
+- Date: 2026-11-08 · By: claude · Task: T-0038 · Category: tooling
+- Decision: `scenarioIdsIn` (packages/testing/src/evidence/test-report.ts) matches `\d{2,}` instead of `\d{2}` as the last id part, so SS-PLAT-100 and later are recorded. Test-first: a new case in test-report.test.ts failed (`[ 'SS-PLAT-99' ]` instead of `[ 'SS-PLAT-100', 'SS-PLAT-99' ]`, `.agent/evidence/T-0038/red-scenario-id-three-digits.txt`), then passed; existing cases unchanged. The recorder's launcher (record-tests.ts, T-0114, codex) is not touched.
+- Why: `pnpm evidence:tests --require SS-PLAT-100` refused T-0038's evidence ("not found in any test title"); the register's PLAT ids passed 99 with T-0038.
+- Alternatives: renumber the scenarios to fit two digits (rejected: register ids are never renumbered and the next free id is 100).
+- ADR: none · Status: accepted
+
+### DL-0252 — Merge renumbering for T-0038
+- Date: 2026-11-08 · By: claude (lead) · Task: T-0038 · Category: process
+- Decision: T-0038 was built in parallel and reused ids already taken on the lead branch. On merge: its DL-0246/0247/0248 became DL-0249/0250/0251 and its RQ-0095 became RQ-0096 (file renamed in the merge, before it ever existed on the lead branch), with references updated in its card, run log, code comments, template and register rows SS-PLAT-100..103. Captured evidence text files keep their original wording (evidence is never rewritten); read old ids there via this mapping.
+- Why: ids must be unique.
+- Alternatives: none.
 - ADR: none · Status: accepted
