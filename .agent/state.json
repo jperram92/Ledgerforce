@@ -2,12 +2,12 @@
   "schema_version": 1,
   "current_task": "T-0033",
   "branch": "feat/T-0033-invariant-suite",
-  "step": "3/7 — invariant suite green at 1,000 documents; red proven by mutants",
+  "step": "4/7 — 10,000-document run evidenced twice; CI job; register",
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-08T19:16:20.197Z",
+  "lease_expires_at": "2026-11-08T23:56:52.276Z",
   "last_green_commit": "e8c35fd92f09476f6caa048fbd69add1f053f075",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T18:31:20.198Z",
+  "updated_at": "2026-11-08T23:11:52.277Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -66,6 +66,7 @@
   "failures": {},
   "providers": {},
   "pending_checkpoints": [
-    "3/7 — invariant suite green at 1,000 documents; red proven by mutants"
+    "3/7 — invariant suite green at 1,000 documents; red proven by mutants",
+    "4/7 — 10,000-document run evidenced twice; CI job; register"
   ]
 }
