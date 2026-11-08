@@ -276,3 +276,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T18:03:43.015Z claude: T-0050 → verifying
 - 2026-11-08T18:13:56.998Z claude: release T-0050 → review (All ACs green (SS-UC05-02/04/07/09/10; GP-008 PASS via bill producer). verify 12/3/1: failures only run.test.ts worktree artefact (2a, mirrored by 3) and golden diff guard (4); awaiting codex cross-review)
 - 2026-11-08T23:02:41.838Z claude: checkpoint (commit deferred to conductor): 2-4/8 — chart v2, profiles v2, EXS in au-gst v2; AC-1..AC-5 green
+- 2026-11-08T23:24:03.866Z claude: release T-0121 → review (AC-1..AC-5 green; persona PASS; verify only known/flaky failures; awaiting codex cross-review)
