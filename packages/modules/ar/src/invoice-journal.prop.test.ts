@@ -78,9 +78,13 @@ describe('sales invoice journal invariants (fast-check, default runs)', () => {
         const revenue = j.lines.filter((l) => 'id' in l.account && ACCOUNTS.includes(l.account.id));
         expect(sum(revenue.map((l) => l.credit)).toNumericString()).toBe(j.netTotal);
         expect(sum(revenue.map((l) => l.taxAmount)).toNumericString()).toBe(j.taxTotal);
-        const tax = j.lines.filter((l) => 'id' in l.account && l.account.id === GST.collectedAccountId);
+        const tax = j.lines.filter(
+          (l) => 'id' in l.account && l.account.id === GST.collectedAccountId,
+        );
         expect(sum(tax.map((l) => l.credit)).toNumericString()).toBe(j.taxTotal);
-        const rounding = j.lines.filter((l) => 'role' in l.account && l.account.role === 'ROUNDING');
+        const rounding = j.lines.filter(
+          (l) => 'role' in l.account && l.account.role === 'ROUNDING',
+        );
         const residue = Money.of(j.residue, 'AUD');
         if (residue.isZero()) expect(rounding).toHaveLength(0);
         else

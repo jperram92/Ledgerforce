@@ -323,6 +323,9 @@ importers:
       '@ledgerforce/outbox':
         specifier: workspace:*
         version: link:../../outbox
+      '@ledgerforce/parties':
+        specifier: workspace:*
+        version: link:../parties
       '@ledgerforce/products':
         specifier: workspace:*
         version: link:../products

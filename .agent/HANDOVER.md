@@ -252,3 +252,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T08:14:23.390Z claude: T-0039 → verifying
 - 2026-11-08T08:21:03.200Z claude: release T-0039 → review (verify 12 PASS/3 FAIL/1 PENDING: 2a fails only on scripts/agent/test/run.test.ts worktree-path artefact (.claude/ in path), 3/4 cascade from 2a, 4 also PENDING on Draft GPs (T-0039 posts nothing), 8 cross-review pending; awaiting codex cross-review)
 - 2026-11-08T13:03:27.713Z claude: checkpoint (commit deferred to conductor): 1/8 — invoice journal builder green (unit+prop)
+- 2026-11-08T13:12:49.572Z claude: checkpoint (commit deferred to conductor): 4/8 — migration 0037, approve rules, post via engine; golden green

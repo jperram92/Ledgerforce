@@ -2,12 +2,12 @@
   "schema_version": 1,
   "current_task": "T-0040",
   "branch": "feat/T-0040-invoice-lifecycle",
-  "step": "1/8 — invoice journal builder green (unit+prop)",
+  "step": "4/8 — migration 0037, approve rules, post via engine; golden green",
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-08T13:48:27.710Z",
+  "lease_expires_at": "2026-11-08T13:57:49.569Z",
   "last_green_commit": "e8c35fd92f09476f6caa048fbd69add1f053f075",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T13:03:27.712Z",
+  "updated_at": "2026-11-08T13:12:49.572Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -66,6 +66,7 @@
   "failures": {},
   "providers": {},
   "pending_checkpoints": [
-    "1/8 — invoice journal builder green (unit+prop)"
+    "1/8 — invoice journal builder green (unit+prop)",
+    "4/8 — migration 0037, approve rules, post via engine; golden green"
   ]
 }

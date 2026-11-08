@@ -14,6 +14,7 @@
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/ledger": "workspace:*",
     "@ledgerforce/outbox": "workspace:*",
+    "@ledgerforce/parties": "workspace:*",
     "@ledgerforce/products": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
     "@ledgerforce/tax": "workspace:*",

@@ -86,7 +86,9 @@ describe('buildInvoiceJournal (RQ-0104 finding 1)', () => {
 
   it('GP-018a per_line inclusive: three lines of one product become one revenue line, no rounding line', () => {
     const j = buildInvoiceJournal(inclusive3('per_line'));
-    expect(j.lines.map((l) => [l.account, l.debit ?? null, l.credit ?? null, l.taxAmount ?? null])).toEqual([
+    expect(
+      j.lines.map((l) => [l.account, l.debit ?? null, l.credit ?? null, l.taxAmount ?? null]),
+    ).toEqual([
       [{ role: 'AR_CONTROL' }, '10.0500', null, null],
       [{ id: SUB }, null, '9.1500', '0.9000'],
       [{ id: GST.collectedAccountId }, null, '0.9000', null],
@@ -95,7 +97,9 @@ describe('buildInvoiceJournal (RQ-0104 finding 1)', () => {
 
   it('GP-018b per_document inclusive: the 0.01 residue is a ROUNDING debit right after AR', () => {
     const j = buildInvoiceJournal(inclusive3('per_document'));
-    expect(j.lines.map((l) => [l.account, l.debit ?? null, l.credit ?? null, l.taxAmount ?? null])).toEqual([
+    expect(
+      j.lines.map((l) => [l.account, l.debit ?? null, l.credit ?? null, l.taxAmount ?? null]),
+    ).toEqual([
       [{ role: 'AR_CONTROL' }, '10.0500', null, null],
       [{ role: 'ROUNDING' }, '0.0100', null, null],
       [{ id: SUB }, null, '9.1500', '0.9100'],
@@ -120,10 +124,18 @@ describe('buildInvoiceJournal (RQ-0104 finding 1)', () => {
   });
 
   it('a GST-free line posts no tax line and carries tax 0 on its revenue line', () => {
-    const j = buildInvoiceJournal(base({ lines: [{ amount: '80.00', accountId: PS, taxCode: FRE }] }));
+    const j = buildInvoiceJournal(
+      base({ lines: [{ amount: '80.00', accountId: PS, taxCode: FRE }] }),
+    );
     expect(j.lines).toEqual([
       { account: { role: 'AR_CONTROL' }, debit: '80.0000', partyId: ACME, dueDate: '2026-11-19' },
-      { account: { id: PS }, credit: '80.0000', taxCodeId: FRE.id, taxAmount: '0.0000', partyId: ACME },
+      {
+        account: { id: PS },
+        credit: '80.0000',
+        taxCodeId: FRE.id,
+        taxAmount: '0.0000',
+        partyId: ACME,
+      },
     ]);
   });
 
@@ -150,7 +162,9 @@ describe('buildInvoiceJournal (RQ-0104 finding 1)', () => {
     expect(
       code(
         base({
-          lines: [{ amount: '10.00', accountId: PS, taxCode: { ...GST, collectedAccountId: null } }],
+          lines: [
+            { amount: '10.00', accountId: PS, taxCode: { ...GST, collectedAccountId: null } },
+          ],
         }),
       ),
     ).toBe('TAX_ACCOUNT_MISSING');
