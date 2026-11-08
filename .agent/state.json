@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0034",
+  "current_task": "T-0038",
   "branch": "feat/T-0114-windows-evidence-recorder",
-  "step": "6/6 — verifying; golden SS-UC01-11 waits golden_postings gate (DL-0242)",
+  "step": "3/6 — tables, template seed, tests green; evidence",
   "claimed_by": "codex",
-  "lease_expires_at": "2026-11-08T04:29:51.306Z",
-  "last_green_commit": "c2f194865f69d932975a4a8ad43fc4e71b613eab",
+  "lease_expires_at": "2026-11-08T04:52:46.602Z",
+  "last_green_commit": "79633350e0d9395f7f17f3c692a38895d27bba47",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T03:44:51.346Z",
+  "updated_at": "2026-11-08T04:07:46.604Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
