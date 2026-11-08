@@ -262,3 +262,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T13:09:00.973Z claude: checkpoint: 5/8 — reverse() + GP-019 golden + INV-reversal green
 - 2026-11-08T13:17:19.758Z claude: T-0032 → verifying
 - 2026-11-08T18:06:06.570Z claude: release T-0032 → review (verify green except known run.test.ts worktree artefact (2a/3) and golden diff guard (4); awaiting codex cross-review)
+- 2026-11-08T18:31:20.198Z claude: checkpoint (commit deferred to conductor): 3/7 — invariant suite green at 1,000 documents; red proven by mutants
