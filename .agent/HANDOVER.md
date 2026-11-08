@@ -251,3 +251,5 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T08:13:47.257Z claude: checkpoint: 4/7 — resolver and gap check green (unit 14, db 7)
 - 2026-11-08T08:14:23.390Z claude: T-0039 → verifying
 - 2026-11-08T08:21:03.200Z claude: release T-0039 → review (verify 12 PASS/3 FAIL/1 PENDING: 2a fails only on scripts/agent/test/run.test.ts worktree-path artefact (.claude/ in path), 3/4 cascade from 2a, 4 also PENDING on Draft GPs (T-0039 posts nothing), 8 cross-review pending; awaiting codex cross-review)
+- 2026-11-08T13:10:47.108Z claude: checkpoint: 5/8 — GP-008 PASS via bill producer; AP invariants
+- 2026-11-08T18:03:43.015Z claude: T-0050 → verifying

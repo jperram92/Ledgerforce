@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0050",
+  "entries": [
+    {
+      "scenario": "SS-UC05-02",
+      "file": ".agent/evidence/T-0050/20261108-131140-tests-unit.json",
+      "test": "1 test(s): packages/modules/ap/src/coding.suggest.test.ts › suggestCoding › SS-UC05-02: Suggested coding from past bills — last 3 bills Office expenses / GST → Office expenses with GST",
+      "commit": "d371f7d3387d-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:11:40.890Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0050/20261108-131142-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/bills.db.test.ts › bill entry › SS-UC05-09: Duplicate supplier invoice — the same supplier invoice number (any formatting) is a warning on entry, not a refusal | packages/modules/ap/src/bills.db.test.ts › preview and post › SS-UC05-09: Duplicate supplier invoice — a duplicate supplier invoice cannot post twice; nothing is written",
+      "commit": "d371f7d3387d-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:11:42.656Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-10",
+      "file": ".agent/evidence/T-0050/20261108-131142-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/bills.db.test.ts › preview and post › SS-UC05-10: Bill preview — builds the GP-008-shaped journal and writes nothing",
+      "commit": "d371f7d3387d-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:11:42.656Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-02",
+      "file": ".agent/evidence/T-0050/20261108-131142-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/bills.db.test.ts › suggested coding (UC-05 step 2) › SS-UC05-02 (db): suggests the account and tax code the supplier's posted bills used",
+      "commit": "d371f7d3387d-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:11:42.656Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-07",
+      "file": ".agent/evidence/T-0050/20261108-131142-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/bills.db.test.ts › SS-UC05-07: Bill in AP-locked period rejected › a bill dated 2026-10-20 posted without override in an AP-locked October is rejected with PERIOD_LOCKED; nothing is written | packages/modules/ap/src/bills.db.test.ts › SS-UC05-07: Bill in AP-locked period rejected › UC-05 A2: with a recorded override by a holder of period.lock.override the same bill posts",
+      "commit": "d371f7d3387d-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:11:42.656Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-04",
+      "file": ".agent/evidence/T-0050/20261108-131142-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/golden/gp-008.golden.db.test.ts › GP-008 through the bill producer (approved-only) › SS-UC05-04: Approved bill posts GP-008 — journal equals GP-008 line for line, AP open item 2,750.00",
+      "commit": "d371f7d3387d-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:11:42.656Z",
+      "result": "passed"
+    }
+  ]
+}
