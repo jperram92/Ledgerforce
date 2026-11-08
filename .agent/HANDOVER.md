@@ -17,6 +17,9 @@ Verify (--task T-0031 / T-0034): 12/3/1 and 11/4/1 — failures are only the wor
 (`run.test.ts`, gates 2a/3), the golden diff guard (gate 4) and, for T-0034, its honestly unticked verify step (12).
 Open questions for human: (1) accept the golden diff-guard FAIL at merge for the owner-delegated approval
 (DL-0253); (2) accountant-reviewer persona review (DL-0248) of the Approved postings before production.
+- Resolved by DL-0282: accept ADR-0044 (GST tax determination, accounting, Proposed)? Claude may accept it after a persona re-review with no BLOCKER.
+- Resolved by DL-0282: approve the new superseding golden Drafts of T-0124 (GP-007-A, GP-012-B, GP-015-B, MINOR errata) under the existing delegation? Claude may approve each after a persona re-review with no BLOCKER.
+Review triage (DL-0283): ADR-0044 Proposed; cards T-0121 (templates v2), T-0122/T-0123 (tax determination), T-0124 (golden Drafts), T-0125 (balance-sheet credit balances).
 Do not: edit Approved goldens; weaken the golden guard or tests; push to main; touch codex tasks T-0095/T-0103/T-0112/T-0114.
 
 # Build-loop handover — 2026-10-29
