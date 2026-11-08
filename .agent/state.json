@@ -4,10 +4,10 @@
   "branch": "feat/T-0039-profile-resolution",
   "step": "4/7 — resolver and gap check green (unit 14, db 7)",
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-08T08:58:47.255Z",
-  "last_green_commit": "c9dddb6f47e5ebdc18b0df8fb96e4672c1728312",
+  "lease_expires_at": "2026-11-08T08:59:23.386Z",
+  "last_green_commit": "e8c35fd92f09476f6caa048fbd69add1f053f075",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T08:13:47.256Z",
+  "updated_at": "2026-11-08T08:14:23.390Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

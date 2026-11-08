@@ -225,3 +225,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T04:07:46.604Z codex: T-0038 → verifying
 - 2026-11-08T04:12:46.017Z codex: release T-0038 → review (verify 12 PASS/3 FAIL/1 PENDING: only failure is the known worktree-path artefact scripts/agent/test/run.test.ts (path contains .claude/), cascading to gates 3/4; cross-review PENDING; no golden needed (T-0038 posts nothing))
 - 2026-11-08T08:13:47.257Z claude: checkpoint: 4/7 — resolver and gap check green (unit 14, db 7)
+- 2026-11-08T08:14:23.390Z claude: T-0039 → verifying

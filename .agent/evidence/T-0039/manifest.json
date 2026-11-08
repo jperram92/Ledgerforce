@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0039",
+  "entries": [
+    {
+      "scenario": "SS-UC01-06",
+      "file": ".agent/evidence/T-0039/20261108-081404-tests-unit.json",
+      "test": "1 test(s): packages/modules/products/src/matrix.resolve.test.ts › SS-UC01-06: Posting-profile gap flagged, not posted › refuses with PROFILE_GAP naming the slot, and the gap check lists the combination",
+      "commit": "e8c35fd92f09-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:14:04.424Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-104",
+      "file": ".agent/evidence/T-0039/20261108-081404-tests-unit.json",
+      "test": "10 test(s): packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-104: the resolver returns account and tax code, refusals name what is missing › uses the product profile slot when there is no override | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-104: the resolver returns account and tax code, refusals name what is missing › a party × product override wins over the product slot | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-104: the resolver returns account and tax code, refusals name what is missing › an override fills an empty product slot for that party profile only | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-104: the resolver returns account and tax code, refusals name what is missing › purchases resolve through the supplier profile and AP_CONTROL | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-104: the resolver returns account and tax code, refusals name what is missing › refuses a party without a profile, a product without a profile, and archived profiles | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-104: the resolver returns account and tax code, refusals name what is missing › refuses a profile of the wrong kind for the direction and a slot of the other direction | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-104: the resolver returns account and tax code, refusals name what is missing › refuses an unknown profile id (another company or tenant) as missing | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-104: the resolver returns account and tax code, refusals name what is missing › tax code: explicit line code, else the one default set or both equal | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-104: the resolver returns account and tax code, refusals name what is missing › tax code: differing defaults are refused by name, never ranked (RQ-0097); none is refused | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-104: the resolver returns account and tax code, refusals name what is missing › resolvePostingProfile combines account and tax code",
+      "commit": "e8c35fd92f09-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:14:04.424Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-105",
+      "file": ".agent/evidence/T-0039/20261108-081404-tests-unit.json",
+      "test": "3 test(s): packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-105: the gap check lists every combination that cannot resolve › lists the AU-template gaps of active profiles only, sorted, per direction | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-105: the gap check lists every combination that cannot resolve › narrows to the given slots | packages/modules/products/src/matrix.resolve.test.ts › SS-PLAT-105: the gap check lists every combination that cannot resolve › a combination is listed exactly when the resolver refuses it with PROFILE_GAP (property)",
+      "commit": "e8c35fd92f09-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:14:04.424Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-06",
+      "file": ".agent/evidence/T-0039/20261108-081405-tests-db.json",
+      "test": "1 test(s): packages/modules/products/src/gap-check.db.test.ts › SS-UC01-06: Posting-profile gap flagged, not posted › OVERSEAS_CUSTOMER × DEMO_KIT has no revenue account: refused by name, nothing posted, listed by the gap check",
+      "commit": "e8c35fd92f09-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:14:05.725Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-104",
+      "file": ".agent/evidence/T-0039/20261108-081405-tests-db.json",
+      "test": "4 test(s): packages/modules/products/src/gap-check.db.test.ts › SS-PLAT-104: resolution from the stored matrix › product slot, override and supplier side resolve to the stored accounts | packages/modules/products/src/gap-check.db.test.ts › SS-PLAT-104: resolution from the stored matrix › missing links and differing tax defaults are refused by name | packages/modules/products/src/gap-check.db.test.ts › SS-PLAT-104: resolution from the stored matrix › an archived product profile is refused | packages/modules/products/src/gap-check.db.test.ts › SS-PLAT-104: resolution from the stored matrix › another tenant's party or product is not found",
+      "commit": "e8c35fd92f09-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:14:05.725Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-105",
+      "file": ".agent/evidence/T-0039/20261108-081405-tests-db.json",
+      "test": "2 test(s): packages/modules/products/src/gap-check.db.test.ts › SS-PLAT-105: gap check over the stored matrix › lists revenue/expense gaps of active profiles only; adding an override removes one; writes nothing | packages/modules/products/src/gap-check.db.test.ts › SS-PLAT-105: gap check over the stored matrix › all direction slots by default; another tenant's gap check sees only its own profiles",
+      "commit": "e8c35fd92f09-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T08:14:05.725Z",
+      "result": "passed"
+    }
+  ]
+}
