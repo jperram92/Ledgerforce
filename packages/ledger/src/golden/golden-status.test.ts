@@ -62,17 +62,17 @@ describe('SS-PLAT-12 golden status (verify.sh gate 4)', () => {
 
   it('accepts the owner-delegated approval note as an Approved status', () => {
     const s = goldenStatus(
-      section('GP-001', 'Approved (owner-delegated to claude per DL-0249, 2026-11-08)'),
+      section('GP-001', 'Approved (owner-delegated to claude per DL-0253, 2026-11-08)'),
     );
     expect(s.result).toBe('PASS');
     expect(
       parseGoldenPostings(
-        section('GP-001', 'Approved (owner-delegated to claude per DL-0249, 2026-11-08)'),
+        section('GP-001', 'Approved (owner-delegated to claude per DL-0253, 2026-11-08)'),
       )[0]?.approval,
-    ).toBe('owner-delegated to claude per DL-0249, 2026-11-08');
+    ).toBe('owner-delegated to claude per DL-0253, 2026-11-08');
   });
 
-  it('stays PENDING while an in-phase Approved entry waits for a required task (DL-0252)', () => {
+  it('stays PENDING while an in-phase Approved entry waits for a required task (DL-0256)', () => {
     const md =
       section('GP-001', 'Approved (JP, 2026-11-10)') +
       section('GP-019', 'Approved (JP, 2026-11-10)');
@@ -88,7 +88,7 @@ describe('SS-PLAT-12 golden status (verify.sh gate 4)', () => {
     expect(s.line).toMatch(/2 Approved, 0 Draft; 1 PENDING by gate \(GP-019: requires T-0032/);
   });
 
-  it('lists out-of-phase Approved entries without holding the enforced phase (DL-0252)', () => {
+  it('lists out-of-phase Approved entries without holding the enforced phase (DL-0256)', () => {
     const md =
       section('GP-001', 'Approved (JP, 2026-11-10)').replace('Phase: MVP', 'Phase: MVP') +
       section('GP-010', 'Approved (JP, 2026-11-10)').replace('Phase: MVP', 'Phase: Phase 1');
@@ -122,7 +122,7 @@ describe('SS-PLAT-12 golden status (verify.sh gate 4)', () => {
     expect(missing.out).toMatch(/^PENDING: no Docs\/accounting\/postings\.md/);
   });
 
-  it('the CLI gates on the backlog: GP-019 PENDING until T-0032 is done (DL-0252)', () => {
+  it('the CLI gates on the backlog: GP-019 PENDING until T-0032 is done (DL-0256)', () => {
     const root = repoWith(section('GP-019', 'Approved (JP, 2026-11-10)'));
     const pending = cli(root);
     expect(pending.code, pending.err).toBe(10);
@@ -133,7 +133,7 @@ describe('SS-PLAT-12 golden status (verify.sh gate 4)', () => {
     expect(pass.code, pass.err).toBe(0);
   });
 
-  it('reports the real repository as PENDING while any of its GPs is Draft or gated in phase (DL-0242, DL-0252)', () => {
+  it('reports the real repository as PENDING while any of its GPs is Draft or gated in phase (DL-0242, DL-0256)', () => {
     const md = readFileSync(join(REPO, 'Docs/accounting/postings.md'), 'utf8');
     const postings = parseGoldenPostings(md);
     const drafts = postings.filter((p) => p.status === 'Draft');

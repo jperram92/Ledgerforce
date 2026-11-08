@@ -1,5 +1,5 @@
 /**
- * Golden gating (T-0007/T-0031, SS-PLAT-12, DL-0252): an Approved golden whose producer cannot
+ * Golden gating (T-0007/T-0031, SS-PLAT-12, DL-0256): an Approved golden whose producer cannot
  * exist yet is reported PENDING with an explicit reason — never PASS, never FAIL.
  *  - out of phase: only entries of the enforced phase (MVP) are run; Phase 1/2 are PENDING.
  *  - requires: an explicit per-GP task marker keeps the entry PENDING until that task is done.

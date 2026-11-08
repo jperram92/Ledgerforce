@@ -2,7 +2,7 @@
  * Golden approval status (T-0031) for verify.sh gate 4: PASS only when the file has at least one
  * entry, every entry is Approved and no in-phase entry is held by a `requires` gate; PENDING
  * while any entry is Draft (or there are none) or an in-phase Approved entry still waits for the
- * task that builds its producer (gating.ts, DL-0252); FAIL when the file cannot be read exactly.
+ * task that builds its producer (gating.ts, DL-0256); FAIL when the file cannot be read exactly.
  * Out-of-phase Approved entries are listed but do not hold the enforced phase. Green golden tests
  * alone never make gate 4 PASS.
  *

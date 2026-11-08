@@ -38,7 +38,7 @@ describe(`SS-PLAT-12 golden postings — file layer (${mode})`, () => {
         expect(p.run, p.gp.id).toBe(false);
         expect(p.pendingReason, p.gp.id).toMatch(/^Draft, not run/);
       } else if (gated !== null) {
-        // DL-0252: out of phase or waiting for a named task — PENDING with that reason.
+        // DL-0256: out of phase or waiting for a named task — PENDING with that reason.
         expect(p.run, p.gp.id).toBe(false);
         expect(p.pendingReason, p.gp.id).toBe(gated.reason);
       } else {
@@ -48,7 +48,7 @@ describe(`SS-PLAT-12 golden postings — file layer (${mode})`, () => {
     }
   });
 
-  it('SS-PLAT-12: only out-of-phase entries and entries with a named required task are gated (DL-0252)', () => {
+  it('SS-PLAT-12: only out-of-phase entries and entries with a named required task are gated (DL-0256)', () => {
     const gated = postings
       .map((gp) => ({ id: gp.id, g: gate(gp) }))
       .filter((x) => x.g !== null)

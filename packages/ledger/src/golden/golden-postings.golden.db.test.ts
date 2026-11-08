@@ -25,7 +25,7 @@ const POSTINGS = fileURLToPath(new URL('../../../../Docs/accounting/postings.md'
 const REPO = fileURLToPath(new URL('../../../../', import.meta.url));
 const postings = parseGoldenPostings(readFileSync(POSTINGS, 'utf8'));
 const mode = goldenModeFrom(process.env);
-// DL-0252: out-of-phase entries and entries waiting for a named task are PENDING with a reason.
+// DL-0256: out-of-phase entries and entries waiting for a named task are PENDING with a reason.
 const plan = planGoldenRun(postings, mode, repoGoldenGate(REPO));
 
 let g: GoldenFixture;

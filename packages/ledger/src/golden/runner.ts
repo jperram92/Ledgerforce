@@ -58,7 +58,7 @@ export interface PlannedGolden {
 }
 
 /**
- * Plans the run. `gate` (gating.ts, DL-0252) keeps an entry whose producer cannot exist yet —
+ * Plans the run. `gate` (gating.ts, DL-0256) keeps an entry whose producer cannot exist yet —
  * out of phase, or waiting for a named task — PENDING with its reason, in both modes.
  */
 export function planGoldenRun(

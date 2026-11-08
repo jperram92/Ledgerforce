@@ -106,7 +106,7 @@ describe('SS-PLAT-12 runner plan and outcomes', () => {
     expect(plan[1]?.pendingReason).toMatch(/Draft.*not run.*approved-only/);
   });
 
-  it('plans a gated Approved entry as PENDING with the gate reason, in both modes (DL-0252)', async () => {
+  it('plans a gated Approved entry as PENDING with the gate reason, in both modes (DL-0256)', async () => {
     const gate = (g: GoldenPosting) =>
       g.id === 'GP-019' ? { kind: 'requires' as const, reason: 'requires T-0032 (x)' } : null;
     for (const mode of ['approved-only', 'include-drafts'] as const) {

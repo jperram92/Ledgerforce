@@ -1,5 +1,5 @@
 /**
- * Golden gating (T-0007/T-0031, SS-PLAT-12, DL-0252): which golden postings the runner may
+ * Golden gating (T-0007/T-0031, SS-PLAT-12, DL-0256): which golden postings the runner may
  * enforce now. An entry that cannot be produced yet for a legitimate, recorded reason is
  * PENDING with that reason — never PASS (it proves nothing) and never FAIL (it is not a defect).
  *
