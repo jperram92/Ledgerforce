@@ -2026,3 +2026,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: one global migration sequence (DL-0037), ids unique across parallel builders.
 - Alternatives: numbering the migration 0033 (rejected: lead assignment); committing placeholders (rejected: they must not reach the lead branch).
 - ADR: none · Status: accepted
+
+### DL-0288 — Follow-up cards from T-0040: T-0116 (invoice API) and T-0117 (invoice SoD rule, blocked on human)
+- Date: 2026-11-08 · By: claude · Task: T-0040 · Category: scope
+- Decision: T-0040 delivers the module, tables, golden-proved posting, preview and immutability. Two pieces are split off rather than squeezed in: T-0116 — HTTP routes, approval permission, Finance-Admin-only auto-approve setting (public API → ADR; needed by T-0083); T-0117 — whether sales-invoice approval gets an SoD rule (security ADR, human gate; DL-0286), created `blocked`.
+- Why: card size (~400 lines, already reached by the module and tests); AGENTS.md §6 human gates.
+- Alternatives: build the API in T-0040 (rejected: size, ADR needed); silently skip SoD (rejected: the gap is now visible as a card).
+- ADR: none · Status: accepted

@@ -215,3 +215,5 @@ graph LR
 | [T-0113](T-0113.md) | Install smoke: wait for completed setup reliably | MVP | todo | T-0094 |
 | [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | todo | T-0010 |
 | [T-0115](T-0115.md) | Nightly posting-profile gap check job | MVP | todo | T-0039 | UC-01 | 0 |
+| [T-0116](T-0116.md) | Sales invoice API routes and Finance-Admin-only auto-approve setting | MVP | todo | T-0040 | UC-01 | 0 |
+| [T-0117](T-0117.md) | SoD rule for sales-invoice approval (creator ≠ approver) — proposal + security ADR | MVP | blocked | T-0040, T-0015 | UC-01 | 0 |
