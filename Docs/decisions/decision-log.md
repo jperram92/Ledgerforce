@@ -2013,3 +2013,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: FAIL on GP-012 (rejected: the treatment is defensible for milestone services under Div 156 and the risk is disclosed); PASS without majors (rejected: template defaults would misstate BAS labels and PP&E).
 - Caveat: primary hosts (ato.gov.au, legislation.gov.au, austlii, stripe.com, aasb.gov.au) were unreachable (proxy 403 / ENOTFOUND); sources were corroborated by fresh search extracts only, and the report lists what remains unverified. The persona is not a TPB-registered practitioner.
 - ADR: none (the tax-determination matrix needs a new accounting ADR) · Status: proposed (awaiting human) — majors to be turned into superseding Draft entries / template versions under the `golden_postings` gate
+
+### DL-0282 — Golden/accounting delegation extended to review follow-ups
+- Date: 2026-11-08 · By: human (decision), claude (record) · Task: T-0007 · Category: accounting
+- Decision: Asked whether the DL-0253 delegation covers the accountant-reviewer's MAJOR follow-ups (new superseding golden Drafts and the GST tax-determination accounting ADR), the product owner chose "Yes, approve as you go": Claude may approve new superseding golden entries and accept accounting-category ADRs under the same delegation, each only after the accountant-reviewer persona (DL-0248) has re-reviewed it with no BLOCKER. Approved entries are still never edited — corrections supersede.
+- Why: keep the build moving without per-item accounting sign-off (owner instruction).
+- Alternatives: template fixes only; ask each time (both offered, not chosen).
+- ADR: none · Status: accepted
