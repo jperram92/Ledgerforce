@@ -41,6 +41,14 @@ describe('scenarioIdsIn', () => {
     ]);
     expect(scenarioIdsIn('no scenario here, SSN-12')).toEqual([]);
   });
+
+  it('finds three-digit ids once the register passes 99 (SS-PLAT-100, DL-0248)', () => {
+    expect(scenarioIdsIn('SS-PLAT-100: template and SS-PLAT-99')).toEqual([
+      'SS-PLAT-100',
+      'SS-PLAT-99',
+    ]);
+    expect(scenarioIdsIn('SS-PLAT-1: too short')).toEqual([]);
+  });
 });
 
 describe('scenarioResults', () => {

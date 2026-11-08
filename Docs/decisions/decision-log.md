@@ -1915,3 +1915,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0095; golden keys `product:<PROFILE>.<slot>`, `DOMESTIC_CUSTOMER`, `DOMESTIC_SUPPLIER` (Draft postings.md); design principle 3 (configuration over code).
 - Alternatives: one party profile with both AR and AP (rejected: the golden file names customer and supplier profiles separately); account codes in profiles instead of ids (rejected: foreign keys keep integrity); adding hardware/COGS/freight accounts to the chart template (rejected for now: changes T-0018/T-0082 expectations; accountant to review the template).
 - ADR: none (new tables inside the §4.4 model; ledger model unchanged) · Status: accepted — template mappings pending accountant review with the chart
+
+### DL-0248 — Evidence recorder accepts scenario ids with three or more digits
+- Date: 2026-11-08 · By: claude · Task: T-0038 · Category: tooling
+- Decision: `scenarioIdsIn` (packages/testing/src/evidence/test-report.ts) matches `\d{2,}` instead of `\d{2}` as the last id part, so SS-PLAT-100 and later are recorded. Test-first: a new case in test-report.test.ts failed (`[ 'SS-PLAT-99' ]` instead of `[ 'SS-PLAT-100', 'SS-PLAT-99' ]`, `.agent/evidence/T-0038/red-scenario-id-three-digits.txt`), then passed; existing cases unchanged. The recorder's launcher (record-tests.ts, T-0114, codex) is not touched.
+- Why: `pnpm evidence:tests --require SS-PLAT-100` refused T-0038's evidence ("not found in any test title"); the register's PLAT ids passed 99 with T-0038.
+- Alternatives: renumber the scenarios to fit two digits (rejected: register ids are never renumbered and the next free id is 100).
+- ADR: none · Status: accepted

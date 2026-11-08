@@ -21,7 +21,8 @@ export interface ScenarioResult {
   tests: string[];
 }
 
-const SCENARIO_RE = /\bSS-(?:[A-Z0-9]+-)*\d{2}\b/g;
+// Two or more digits: the register numbers past 99 (SS-PLAT-100, DL-0248).
+const SCENARIO_RE = /\bSS-(?:[A-Z0-9]+-)*\d{2,}\b/g;
 
 export function scenarioIdsIn(text: string): string[] {
   return [...new Set(text.match(SCENARIO_RE) ?? [])];
