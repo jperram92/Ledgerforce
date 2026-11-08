@@ -1,0 +1,20 @@
+LedgerForce verify — 2026-11-08T18:03:57Z — task T-0050
+GATE 1 typecheck: PASS (pnpm typecheck)
+GATE 1 lint: PASS (pnpm lint)
+GATE 1 format: PASS (pnpm format:check)
+GATE 2a unit-tests: FAIL (pnpm test + node --test scripts/agent/test)
+GATE 2b db-tests: PASS (pnpm test:db)
+GATE 2c coverage: PASS (lines 82.46% vs main 72.22%)
+GATE 3 accounting-invariants: FAIL (2 property test file(s); gate 2a failed)
+GATE 4 golden-postings: FAIL (Docs/accounting/postings.md:73: adds an Approved status — only the product owner approves golden postings)
+GATE 5 cross-tenant-rls: PASS (1 cross-tenant RLS test file(s) ran in gate 2b)
+GATE 6 migrations-forward: PASS (applied in 2b; 8 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+GATE 7 security: PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep — runs in CI))
+GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (claude) in .agent/evidence/T-0050/review-*.md)
+GATE 9 e2e-evidence: PASS (pnpm test:e2e; 5 scenario(s) with passed evidence)
+GATE 10 no-shortcuts: PASS (181 test file(s) scanned; diff vs e39a76c clean)
+GATE 11 no-delete: PASS (vs merge-base e39a76c, staged + working tree)
+GATE 12 memory: PASS (T-0050: required steps ticked for status verifying, 1 linked RQ(s) resolved, HANDOVER present)
+PASS: 12   FAIL: 3   PENDING: 1
+VERIFY: FAIL
+Notes (claude r10): 2a fails only on scripts/agent/test/run.test.ts (worktree .claude/ path artefact; node --test 82/83); pnpm test alone: 85 files / 1045 passed, exit 0. Gate 3 mirrors 2a. Gate 4 = golden diff guard by design until the owner merges (DL-0253). Gate 8 pending codex cross-review. Run with untracked no-op placeholders for migrations 0033-0037 (DL-0293), hence '8 new/changed .sql file(s)' in gate 6.

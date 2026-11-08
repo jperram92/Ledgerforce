@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0050",
+  "current_task": null,
   "branch": "feat/T-0050-supplier-bills",
-  "step": "5/8 — GP-008 PASS via bill producer; AP invariants",
-  "claimed_by": "claude",
-  "lease_expires_at": "2026-11-08T18:48:43.010Z",
+  "step": null,
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": "445848ec56cfdf7943d11ad1f2df13cd8e60e094",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T18:03:43.012Z",
+  "updated_at": "2026-11-08T18:13:56.992Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
