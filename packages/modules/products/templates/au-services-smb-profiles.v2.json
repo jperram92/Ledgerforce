@@ -1,0 +1,77 @@
+{
+  "$comment": "AU services SMB posting profiles, version 2 (T-0121, design §4.4). Supersedes version 1 (au-services-smb-profiles.json) for new companies; companies set up with v1 keep their rows (DL-0340). Built on au-services-smb chart version 2 and au-gst version 2. Changes from v1 per the accountant-reviewer persona review (DL-0280 MAJORs 4-5, triage DL-0283): HARDWARE (resale) no longer capitalises into 1500 — its asset slot is empty, so the wizard gap step asks whether hardware is inventory or expensed on purchase — and its revenue is 4140 Hardware sales; new EQUIPMENT profile for own-use equipment (asset 1500, purchase tax code CAP); OVERSEAS_CUSTOMER has no default tax code, so a product without its own code is refused NO_TAX_CODE and a person codes the line (interim until ADR-0044, T-0122/T-0123). purchaseTaxCode is template data the wizard offers as the default tax code of products it creates under the profile; it is not stored on the profile (ADR-0044's product tax class is the stored form). Data, not code (design principle 3).",
+  "id": "au-services-smb-profiles",
+  "chartTemplate": "au-services-smb",
+  "chartTemplateVersion": 2,
+  "taxTemplate": "au-gst",
+  "taxTemplateVersion": 2,
+  "version": 2,
+  "partyProfiles": [
+    {
+      "code": "DOMESTIC_CUSTOMER",
+      "name": "Domestic customer",
+      "partyKind": "customer",
+      "controlRole": "AR_CONTROL",
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "OVERSEAS_CUSTOMER",
+      "name": "Overseas customer",
+      "partyKind": "customer",
+      "controlRole": "AR_CONTROL"
+    },
+    {
+      "code": "DOMESTIC_SUPPLIER",
+      "name": "Domestic supplier",
+      "partyKind": "supplier",
+      "controlRole": "AP_CONTROL",
+      "defaultTaxCode": "GST"
+    }
+  ],
+  "productProfiles": [
+    {
+      "code": "SUBSCRIPTION",
+      "name": "Subscription",
+      "accounts": { "revenue": "4120", "expense": "6310" }
+    },
+    {
+      "code": "PROFESSIONAL_SERVICES",
+      "name": "Professional services",
+      "accounts": { "revenue": "4110", "expense": "5000" }
+    },
+    {
+      "code": "HARDWARE",
+      "name": "Hardware",
+      "accounts": { "revenue": "4140" }
+    },
+    {
+      "code": "REIMBURSABLE_EXPENSE",
+      "name": "Reimbursable expense",
+      "accounts": { "revenue": "4190" }
+    },
+    {
+      "code": "FREIGHT",
+      "name": "Freight",
+      "accounts": { "revenue": "4190" }
+    },
+    {
+      "code": "EQUIPMENT",
+      "name": "Equipment (own use)",
+      "accounts": { "asset": "1500" },
+      "purchaseTaxCode": "CAP"
+    }
+  ],
+  "salesforce": {
+    "account": [
+      { "field": "Type", "value": "Customer - Direct", "profile": "DOMESTIC_CUSTOMER" },
+      { "field": "Type", "value": "Customer - Channel", "profile": "DOMESTIC_CUSTOMER" }
+    ],
+    "product": [
+      { "field": "Family", "value": "Subscription", "profile": "SUBSCRIPTION" },
+      { "field": "Family", "value": "Professional Services", "profile": "PROFESSIONAL_SERVICES" },
+      { "field": "Family", "value": "Hardware", "profile": "HARDWARE" },
+      { "field": "Family", "value": "Reimbursable Expense", "profile": "REIMBURSABLE_EXPENSE" },
+      { "field": "Family", "value": "Freight", "profile": "FREIGHT" }
+    ]
+  }
+}

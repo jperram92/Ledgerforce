@@ -7,6 +7,7 @@
  */
 import type { ChartTemplate } from '@ledgerforce/gl';
 import type { TaxCodeTemplate } from '@ledgerforce/tax';
+import auServicesSmbProfilesV2Json from '../templates/au-services-smb-profiles.v2.json' with { type: 'json' };
 import auServicesSmbProfilesJson from '../templates/au-services-smb-profiles.json' with { type: 'json' };
 import {
   CONTROL_ROLE_FOR_KIND,
@@ -31,6 +32,11 @@ export interface TemplateProductProfile {
   name: string;
   /** slot → chart account code; a missing slot is a gap for the wizard (T-0039). */
   accounts: Partial<Record<PostingSlot, string>>;
+  /**
+   * Tax code the wizard offers as the default of products it creates under this profile when
+   * they are bought (v2 EQUIPMENT → CAP). Template data only: not stored on the profile (DL-0340).
+   */
+  purchaseTaxCode?: string | undefined;
 }
 
 export interface TemplateSalesforceMapping {
@@ -45,7 +51,11 @@ export interface TemplateSalesforceMapping {
 export interface PostingProfileTemplate {
   id: string;
   chartTemplate: string;
+  /** The chart version the codes refer to; absent in v1 (any version accepted). */
+  chartTemplateVersion?: number | undefined;
   taxTemplate: string;
+  /** The tax-code template version the codes refer to; absent in v1 (any version accepted). */
+  taxTemplateVersion?: number | undefined;
   version: number;
   partyProfiles: TemplatePartyProfile[];
   productProfiles: TemplateProductProfile[];
@@ -64,6 +74,27 @@ export function validateProfileTemplate(
   const errors: string[] = [];
   const accounts = new Map(chart.accounts.map((a) => [a.code, a]));
   const taxes = new Set(taxCodes.codes.map((c) => c.code));
+
+  // Versions are compared only against the named templates themselves; a company's stored chart
+  // and codes (loadPostingProfileTemplate) are checked code by code below instead.
+  if (
+    t.chartTemplateVersion !== undefined &&
+    chart.id === t.chartTemplate &&
+    t.chartTemplateVersion !== chart.version
+  ) {
+    errors.push(
+      `built on chart ${t.chartTemplate} version ${String(t.chartTemplateVersion)}, not version ${String(chart.version)}`,
+    );
+  }
+  if (
+    t.taxTemplateVersion !== undefined &&
+    taxCodes.id === t.taxTemplate &&
+    t.taxTemplateVersion !== taxCodes.version
+  ) {
+    errors.push(
+      `built on tax codes ${t.taxTemplate} version ${String(t.taxTemplateVersion)}, not version ${String(taxCodes.version)}`,
+    );
+  }
 
   const codes = (kind: string, list: { code: string }[]) => {
     const seen = new Set<string>();
@@ -93,6 +124,9 @@ export function validateProfileTemplate(
 
   for (const p of t.productProfiles) {
     if (!p.name.trim()) errors.push(`${p.code}: name is empty`);
+    if (p.purchaseTaxCode !== undefined && !taxes.has(p.purchaseTaxCode)) {
+      errors.push(`${p.code}: unknown purchase tax code ${p.purchaseTaxCode}`);
+    }
     for (const [slot, code] of Object.entries(p.accounts)) {
       if (!isPostingSlot(slot)) {
         errors.push(`${p.code}: unknown slot ${slot}`);
@@ -136,3 +170,5 @@ export function validateProfileTemplate(
 }
 
 export const auServicesSmbProfiles = auServicesSmbProfilesJson as PostingProfileTemplate;
+/** Profiles v2 (T-0121, DL-0340): on chart v2 and au-gst v2; supersedes v1 for new companies. */
+export const auServicesSmbProfilesV2 = auServicesSmbProfilesV2Json as PostingProfileTemplate;

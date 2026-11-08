@@ -16,6 +16,7 @@
  */
 import type { BasLabel, Database, TaxCodeKind, TaxCodeSubkind, TaxRounding } from '@ledgerforce/db';
 import { sql, type Transaction } from 'kysely';
+import auTaxCodesV1Json from '../templates/au-tax-codes.v1.json' with { type: 'json' };
 import auTaxCodesJson from '../templates/au-tax-codes.json' with { type: 'json' };
 
 /** The kind code sees: the stored kind, refined by the subkind where one is set. */
@@ -71,6 +72,8 @@ export interface TaxCodeTemplate {
 }
 
 export const auTaxCodes: TaxCodeTemplate = auTaxCodesJson as TaxCodeTemplate;
+/** au-gst v1 (T-0034), superseded by v2 (T-0035, T-0121); kept for companies set up with it (DL-0340). */
+export const auTaxCodesV1: TaxCodeTemplate = auTaxCodesV1Json as TaxCodeTemplate;
 
 export class TaxCodeNotFoundError extends Error {
   constructor(code: string, on: string) {

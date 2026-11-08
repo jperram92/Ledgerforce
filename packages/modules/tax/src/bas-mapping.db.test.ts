@@ -172,6 +172,9 @@ describe('SS-PLAT-110 BAS label map (design §3.6, RQ-0102 finding 1)', () => {
         'CAP purchases G10 gross debit both',
         'EXP sales G1 gross credit both',
         'EXP sales G2 gross credit both',
+        // T-0121 (SS-PLAT-130): export of services, s 38-190 → G1 + G3.
+        'EXS sales G1 gross credit both',
+        'EXS sales G3 gross credit both',
         'FRE purchases G11 gross debit both',
         'FRE sales G1 gross credit both',
         'FRE sales G3 gross credit both',
@@ -187,6 +190,28 @@ describe('SS-PLAT-110 BAS label map (design §3.6, RQ-0102 finding 1)', () => {
     );
     // BAS excluded reports nothing.
     expect(rows.filter((r) => r.taxCode === 'N-T')).toEqual([]);
+  });
+
+  it('SS-PLAT-130 (AC-4): EXP → G1+G2; EXS and FRE → G1+G3; INP purchases → G11, sales → G1; no code ever maps to G13', async () => {
+    const rows = await inTenant((trx) => basLabelMap(trx, { companyId, on: '2026-11-05' }));
+    const labels = (code: string, flow: string) =>
+      rows
+        .filter((r) => r.taxCode === code && r.flow === flow)
+        .map((r) => r.label)
+        .sort();
+    expect(labels('EXP', 'sales')).toEqual(['G1', 'G2']);
+    expect(labels('EXS', 'sales')).toEqual(['G1', 'G3']);
+    expect(labels('FRE', 'sales')).toEqual(['G1', 'G3']);
+    // DL-0280 MINOR: input-taxed purchases (bank fees) are G11, not G13 (purchases for making
+    // input-taxed sales). G14 (calculation worksheet) is not a stored label yet (T-0145).
+    expect(labels('INP', 'purchases')).toEqual(['G11']);
+    expect(labels('INP', 'sales')).toEqual(['G1']);
+    expect(rows.filter((r) => String(r.label) === 'G13')).toEqual([]);
+    // W1/W2 are amounts of the pay-run journal on its entry date (= pay date), same on both bases.
+    expect(rows.filter((r) => r.taxCode.startsWith('BAS-W')).map((r) => r.basis)).toEqual([
+      'both',
+      'both',
+    ]);
   });
 
   const mapRow = (v: Record<string, unknown>) =>

@@ -3,12 +3,13 @@
  * product profiles onto the AU chart (T-0018) and AU tax codes (T-0034) (T-0038, design §4.4,
  * RQ-0096, DL-0250). Templates are data (design principle 3); the validator keeps them honest.
  */
-import { auServicesSmb } from '@ledgerforce/gl';
-import { auTaxCodes } from '@ledgerforce/tax';
+import { auServicesSmb, auServicesSmbV2 } from '@ledgerforce/gl';
+import { auTaxCodes, auTaxCodesV1 } from '@ledgerforce/tax';
 import { describe, expect, it } from 'vitest';
 import { POSTING_SLOTS, SLOT_ACCOUNT_TYPES, slotAllows } from './posting-slots.ts';
 import {
   auServicesSmbProfiles,
+  auServicesSmbProfilesV2,
   validateProfileTemplate,
   type PostingProfileTemplate,
 } from './profiles.template.ts';
@@ -123,5 +124,118 @@ describe('SS-PLAT-100: AU services SMB posting-profile template', () => {
     expect(errors).toMatch(/Product2\.Family = Hardware is mapped twice/);
     expect(errors).toMatch(/Account\.Type = Other names unknown party profile RELATED_PARTY/);
     expect(errors).toMatch(/profile code bad code must be UPPER_SNAKE/);
+  });
+});
+
+/**
+ * SS-PLAT-130 (AC-2) — profiles v2 (T-0121, DL-0280 MAJORs 4–5, DL-0283): resale hardware is not
+ * capitalised into PP&E and earns hardware sales; own-use equipment is its own profile on 1500
+ * with CAP; an overseas customer has no party-only GST-free default (interim until ADR-0044).
+ */
+describe('SS-PLAT-130: AU services SMB posting-profile template v2', () => {
+  const v2 = auServicesSmbProfilesV2;
+  const product = (code: string) =>
+    must(
+      v2.productProfiles.find((p) => p.code === code),
+      code,
+    );
+  const party = (code: string) =>
+    must(
+      v2.partyProfiles.find((p) => p.code === code),
+      code,
+    );
+
+  it('is version 2, built on chart v2 and au-gst v2, and has no errors against them', () => {
+    expect([v2.id, v2.version, v2.chartTemplateVersion, v2.taxTemplateVersion]).toEqual([
+      'au-services-smb-profiles',
+      2,
+      2,
+      2,
+    ]);
+    expect(validateProfileTemplate(v2, auServicesSmbV2, auTaxCodes)).toEqual([]);
+  });
+
+  it('is refused against the wrong chart or tax-code version', () => {
+    expect(validateProfileTemplate(v2, auServicesSmb, auTaxCodes).join('\n')).toMatch(
+      /built on chart au-services-smb version 2, not version 1/,
+    );
+    expect(validateProfileTemplate(v2, auServicesSmbV2, auTaxCodesV1).join('\n')).toMatch(
+      /built on tax codes au-gst version 2, not version 1/,
+    );
+  });
+
+  it('HARDWARE: asset slot empty (inventory or expensed is a wizard question), revenue 4140, cogs a gap', () => {
+    expect(product('HARDWARE').accounts).toEqual({ revenue: '4140' });
+  });
+
+  it('EQUIPMENT (own-use): asset 1500, purchase tax CAP', () => {
+    expect(product('EQUIPMENT')).toEqual({
+      code: 'EQUIPMENT',
+      name: 'Equipment (own use)',
+      accounts: { asset: '1500' },
+      purchaseTaxCode: 'CAP',
+    });
+  });
+
+  it('OVERSEAS_CUSTOMER has no default tax code; the other party profiles keep GST', () => {
+    expect(party('OVERSEAS_CUSTOMER').defaultTaxCode).toBeUndefined();
+    expect('defaultTaxCode' in party('OVERSEAS_CUSTOMER')).toBe(false);
+    expect(party('DOMESTIC_CUSTOMER').defaultTaxCode).toBe('GST');
+    expect(party('DOMESTIC_SUPPLIER').defaultTaxCode).toBe('GST');
+  });
+
+  it('every account code is in chart v2 and every tax code in au-gst v2', () => {
+    const accounts = new Set(auServicesSmbV2.accounts.map((a) => a.code));
+    const taxes = new Set(auTaxCodes.codes.map((c) => c.code));
+    for (const p of v2.productProfiles) {
+      for (const code of Object.values(p.accounts)) expect(accounts.has(code), p.code).toBe(true);
+      if (p.purchaseTaxCode !== undefined) expect(taxes.has(p.purchaseTaxCode), p.code).toBe(true);
+    }
+    for (const p of v2.partyProfiles) {
+      if (p.defaultTaxCode !== undefined) expect(taxes.has(p.defaultTaxCode), p.code).toBe(true);
+    }
+  });
+
+  it('keeps the other profiles and the Salesforce mappings of v1', () => {
+    expect(v2.productProfiles.map((p) => p.code)).toEqual([
+      'SUBSCRIPTION',
+      'PROFESSIONAL_SERVICES',
+      'HARDWARE',
+      'REIMBURSABLE_EXPENSE',
+      'FREIGHT',
+      'EQUIPMENT',
+    ]);
+    for (const code of [
+      'SUBSCRIPTION',
+      'PROFESSIONAL_SERVICES',
+      'REIMBURSABLE_EXPENSE',
+      'FREIGHT',
+    ]) {
+      expect(product(code), code).toEqual(
+        auServicesSmbProfiles.productProfiles.find((p) => p.code === code),
+      );
+    }
+    expect(v2.salesforce).toEqual(auServicesSmbProfiles.salesforce);
+  });
+
+  it('flags a purchase tax code that au-gst does not have', () => {
+    const t = clone(v2);
+    must(
+      t.productProfiles.find((p) => p.code === 'EQUIPMENT'),
+      'EQUIPMENT',
+    ).purchaseTaxCode = 'VAT';
+    expect(validateProfileTemplate(t, auServicesSmbV2, auTaxCodes).join('\n')).toMatch(
+      /EQUIPMENT: unknown purchase tax code VAT/,
+    );
+  });
+
+  it('v1 is unchanged: HARDWARE on 1500 and 4190, OVERSEAS_CUSTOMER defaults to FRE', () => {
+    expect(auServicesSmbProfiles.version).toBe(1);
+    const hw = auServicesSmbProfiles.productProfiles.find((p) => p.code === 'HARDWARE');
+    expect(hw?.accounts).toEqual({ revenue: '4190', asset: '1500' });
+    expect(
+      auServicesSmbProfiles.partyProfiles.find((p) => p.code === 'OVERSEAS_CUSTOMER')
+        ?.defaultTaxCode,
+    ).toBe('FRE');
   });
 });

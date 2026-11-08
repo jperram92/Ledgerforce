@@ -4,6 +4,7 @@
  * the database repeats the role rules (migration 0005), so a bad template fails twice.
  */
 import type { AccountType } from '@ledgerforce/db';
+import auServicesSmbV2Json from '../templates/au-services-smb.v2.json' with { type: 'json' };
 import auServicesSmbJson from '../templates/au-services-smb.json' with { type: 'json' };
 import {
   ACCOUNT_TYPES,
@@ -88,3 +89,5 @@ export function validateTemplate(t: ChartTemplate): string[] {
 }
 
 export const auServicesSmb = auServicesSmbJson as ChartTemplate;
+/** Chart v2 (T-0121, DL-0340): supersedes v1 for new companies; v1 stays for companies set up with it. */
+export const auServicesSmbV2 = auServicesSmbV2Json as ChartTemplate;

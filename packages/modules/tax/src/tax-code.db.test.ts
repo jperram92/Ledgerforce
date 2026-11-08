@@ -11,6 +11,7 @@ import { sql, type Kysely } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   auTaxCodes,
+  auTaxCodesV1,
   findTaxCode,
   getTaxRounding,
   loadTaxCodes,
@@ -102,12 +103,58 @@ describe('AU tax codes (design §3.6)', () => {
       ['BAS-W2', 'bas_excluded', '0.00000000', null, null, null],
       ['CAP', 'capital', '0.10000000', null, 'GST_PAID', null],
       ['EXP', 'gst_free', '0.00000000', null, null, null],
+      // T-0121 (DL-0280 MAJOR 6, ADR-0044 R7): EXS is GST-free export of services (s 38-190).
+      ['EXS', 'gst_free', '0.00000000', null, null, null],
       ['FRE', 'gst_free', '0.00000000', null, null, null],
       ['GST', 'taxable', '0.10000000', 'GST_COLLECTED', 'GST_PAID', null],
       ['IMP', 'imports', '0.10000000', null, 'GST_PAID', null],
       ['INP', 'input_taxed', '0.00000000', null, null, null],
       ['N-T', 'bas_excluded', '0.00000000', null, null, null],
     ]);
+  });
+
+  it('SS-PLAT-130 (AC-3): au-gst v2 has EXP, EXS, BAS-W1, BAS-W2, effective-dated from 2000-07-01, loaded for a new company', async () => {
+    expect([auTaxCodes.id, auTaxCodes.version]).toEqual(['au-gst', 2]);
+    const rows = await inTenant((trx) =>
+      trx
+        .selectFrom('app.tax_code')
+        .select(['code', 'name', sql<string>`valid_from::text`.as('valid_from'), 'valid_to'])
+        .where('company_id', '=', companyId)
+        .where('code', 'in', ['EXP', 'EXS', 'BAS-W1', 'BAS-W2'])
+        .orderBy('code')
+        .execute(),
+    );
+    expect(rows.map((r) => [r.code, r.name, r.valid_from, r.valid_to])).toEqual([
+      ['BAS-W1', 'PAYG: total salary and wages (W1)', '2000-07-01', null],
+      ['BAS-W2', 'PAYG: amounts withheld (W2)', '2000-07-01', null],
+      ['EXP', 'GST-free exports', '2000-07-01', null],
+      ['EXS', 'GST-free export of services', '2000-07-01', null],
+    ]);
+    const exs = await inTenant((trx) =>
+      findTaxCode(trx, { companyId, code: 'EXS', on: '2026-11-05' }),
+    );
+    expect([exs.kind, exs.rate, exs.collectedAccountId, exs.paidAccountId]).toEqual([
+      'gst_free',
+      '0.00000000',
+      null,
+      null,
+    ]);
+  });
+
+  it('SS-PLAT-130: au-gst v1 (T-0034) is kept unchanged and marked superseded', () => {
+    expect([auTaxCodesV1.id, auTaxCodesV1.version]).toEqual(['au-gst', 1]);
+    expect(auTaxCodesV1.codes.map((c) => c.code)).toEqual([
+      'GST',
+      'FRE',
+      'INP',
+      'N-T',
+      'IMP',
+      'CAP',
+    ]);
+    expect(auTaxCodesV1.basLabels).toBeUndefined();
+    expect((auTaxCodesV1 as unknown as { $comment: string }).$comment).toMatch(
+      /^Superseded by au-gst version 2/,
+    );
   });
 
   it('resolves GST on a date to its rate and the accounts bound to GST_COLLECTED / GST_PAID', async () => {
