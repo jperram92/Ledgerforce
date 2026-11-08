@@ -1,0 +1,24 @@
+{
+  "name": "@ledgerforce/bank",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Bank: company bank accounts and statement import — CSV, OFX, CAMT.053 (design §4.1 step 4, §5.7)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@ledgerforce/gl": "workspace:*",
+    "@types/node": "22.20.5",
+    "fast-check": "4.10.2",
+    "vitest": "4.1.12"
+  }
+}

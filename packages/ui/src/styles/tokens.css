@@ -1,0 +1,76 @@
+/* Copied unchanged from Docs/ui/system/tokens.css (the canonical design system, DL-0070) into the
+   @ledgerforce/ui package so apps import it from the package. Change both together. */
+/* Direction C "Timeline" tokens. Colour has one job: where something sits in time.
+   Settled (past) = solid ink; expected (future) = the same ink, dashed or outlined; today = one
+   teal rule and the decisions that sit on it. Direction of money is shown by position (above
+   the axis = in, below = out), so no hue pair is needed for it (RQ-0089).
+   Type: Overpass, a libre face drawn from the US Highway Gothic road-sign letters: made to be
+   read at a glance, with working tabular figures (experiment E1, RQ-0085). */
+@font-face {
+  font-family: 'Overpass';
+  font-weight: 400;
+  font-display: block;
+  src: url(fonts/overpass-latin-400-normal.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Overpass';
+  font-weight: 600;
+  font-display: block;
+  src: url(fonts/overpass-latin-600-normal.woff2) format('woff2');
+}
+@font-face {
+  font-family: 'Overpass';
+  font-weight: 800;
+  font-display: block;
+  src: url(fonts/overpass-latin-800-normal.woff2) format('woff2');
+}
+
+:root {
+  --font: 'Overpass', 'Segoe UI', sans-serif;
+  --paper: #ffffff;
+  --lane: #f3f5f6;
+  --ink: #1b272d;
+  --ink-2: #4c5a61;
+  --line: #d4dbdf;
+  --line-2: #8f9ca3;
+  --now: #006d77; /* today, and decisions that are due now */
+  --now-soft: #e0f0f1;
+  --late: #1b272d; /* overdue: ink plus hatching plus the word, never a red alone */
+  --focus: #006d77;
+  --r: 2px;
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s5: 24px;
+  --s6: 40px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --paper: #121619;
+    --lane: #1a2024;
+    --ink: #e4eaec;
+    --ink-2: #a3b0b6;
+    --line: #2e383d;
+    --line-2: #67757c;
+    --now: #5cc8d1;
+    --now-soft: #12373b;
+    --late: #e4eaec;
+    --focus: #5cc8d1;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --paper: #121619;
+  --lane: #1a2024;
+  --ink: #e4eaec;
+  --ink-2: #a3b0b6;
+  --line: #2e383d;
+  --line-2: #67757c;
+  --now: #5cc8d1;
+  --now-soft: #12373b;
+  --late: #e4eaec;
+  --focus: #5cc8d1;
+  color-scheme: dark;
+}

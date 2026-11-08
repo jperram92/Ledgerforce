@@ -1,0 +1,12 @@
+M1 pageSize 5 -> 6: KILLED Tests:       2 failed, 6 passed, 8 total
+M2 sort ascending: KILLED Tests:       2 failed, 6 passed, 8 total
+M3 sort by due date: KILLED Tests:       1 failed, 7 passed, 8 total
+M4 wrong related list id: KILLED Tests:       6 failed, 2 passed, 8 total
+M5 amount due not requested: KILLED Tests:       1 failed, 7 passed, 8 total
+M6 raw money instead of displayValue: KILLED Tests:       2 failed, 6 passed, 8 total
+M7 loading ends after one wire: KILLED ?
+M8 empty never shown: KILLED Tests:       1 failed, 7 passed, 8 total
+M9 invoice error ignored: KILLED Tests:       1 failed, 7 passed, 8 total
+M10 date not in UTC: KILLED Tests:       1 failed, 7 passed, 8 total
+M11 missing value shows 0: KILLED Tests:       1 failed, 7 passed, 8 total
+M12 money fallback not currency: KILLED Tests:       1 failed, 7 passed, 8 total

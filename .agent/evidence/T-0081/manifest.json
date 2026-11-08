@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0081",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261025-040135-SS-PLAT-52-sign-in-1440-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: a visitor without a session signs in through the tenant login URL [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:35.404Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261025-040135-SS-PLAT-52-sign-in-invalid-name-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: a visitor without a session signs in through the tenant login URL [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:35.971Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261025-040137-SS-PLAT-52-sign-in-390-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-in page @ 390 light [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:37.472Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261025-040138-SS-PLAT-52-sign-in-390-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-in page @ 390 dark [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:38.864Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261025-040140-SS-PLAT-52-user-menu-open-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-out from the user menu by keyboard ends the session [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:40.289Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261025-040140-SS-PLAT-52-signed-out-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-out from the user menu by keyboard ends the session [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:40.396Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261025-040141-SS-PLAT-52-session-check-error-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: a failing session check shows an error with Retry, not a loop [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:41.861Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040143-SS-PLAT-53-shell-home-1440-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 1440 light [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:43.364Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040144-SS-PLAT-53-shell-home-1440-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 1440 dark [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:44.754Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040146-SS-PLAT-53-shell-home-390-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 390 light [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:46.239Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040147-SS-PLAT-53-shell-home-390-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 390 dark [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:47.725Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040150-SS-PLAT-53-section-sales-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:50.069Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040150-SS-PLAT-53-section-purchases-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:50.726Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040151-SS-PLAT-53-section-bank-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:51.360Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040151-SS-PLAT-53-section-reports-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:51.969Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040152-SS-PLAT-53-section-settings-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:52.574Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040153-SS-PLAT-53-keyboard-focus-nav-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: keyboard path: skip link, navigation and focus on the new heading [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:53.509Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040154-SS-PLAT-53-not-found-390.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: an unknown path shows not-found inside the shell [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:54.853Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261025-040156-SS-PLAT-53-user-menu-390-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: user menu at 390 dark stays inside the screen [T-0081]",
+      "commit": "ae91f6119909",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:01:56.448Z",
+      "result": "passed"
+    }
+  ]
+}

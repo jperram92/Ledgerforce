@@ -1,0 +1,137 @@
+/* Sync issues inbox (T-0092) in the Timeline direction (DL-0070): builds on admin.css (tables,
+   states, confirm, words). Ink and lines, teal only for focus and "your turn", radius 2px, no
+   shadows, no all-caps. Requires tokens.css, timeline.css, shell.css and admin.css first. */
+
+.sync-filter {
+  margin: var(--s3) var(--s5) 0;
+  max-width: 76rem;
+}
+.sync-filter ul {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--s2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s4);
+  border-bottom: 1px solid var(--line);
+}
+.sync-filter a {
+  display: inline-block;
+  padding: var(--s1) 0;
+  font-weight: 600;
+  color: var(--ink-2);
+  border-bottom: 3px solid transparent;
+}
+.sync-filter a[aria-current='page'] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+.sync-topic {
+  display: block;
+}
+.admin-table .num {
+  font-variant-numeric: tabular-nums;
+}
+.word[data-status='retried'] {
+  border-style: dotted;
+}
+.word[data-status='ignored'] {
+  color: var(--ink-2);
+}
+
+.sync-error {
+  padding: var(--s2) var(--s3);
+  border-left: 4px solid var(--ink);
+  border-top: 1px dashed var(--ink-2);
+  border-bottom: 1px dashed var(--ink-2);
+  max-width: 70ch;
+}
+.sync-error p + p {
+  margin-top: var(--s1);
+}
+.sync-error-heading {
+  font-weight: 800;
+}
+
+.sync-facts {
+  display: grid;
+  grid-template-columns: minmax(8rem, max-content) minmax(0, 1fr);
+  gap: var(--s1) var(--s3);
+  margin: var(--s3) 0 0;
+  max-width: 70rem;
+}
+.sync-facts dt {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.sync-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.sync-payload {
+  margin-top: var(--s3);
+}
+.sync-payload summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.sync-payload pre {
+  margin: var(--s2) 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    400 13px/1.4 ui-monospace,
+    'SFMono-Regular',
+    Menlo,
+    Consolas,
+    monospace;
+  background: var(--lane);
+  padding: var(--s2);
+  border-radius: var(--r);
+}
+
+.sync-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2) var(--s3);
+  align-items: center;
+  margin-top: var(--s3);
+}
+.sync-actions .admin-note {
+  flex-basis: 100%;
+  margin: 0;
+}
+.sync-note {
+  flex-basis: 100%;
+  display: grid;
+  gap: var(--s1);
+  max-width: 34rem;
+}
+.sync-note label {
+  font-weight: 600;
+}
+.sync-note textarea {
+  font: 400 16px/1.4 var(--font);
+  padding: 8px 10px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink-2);
+  border-radius: var(--r);
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .sync-filter {
+    margin-left: var(--s4);
+    margin-right: var(--s4);
+  }
+  .sync-facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .sync-facts dd {
+    margin-bottom: var(--s2);
+  }
+}

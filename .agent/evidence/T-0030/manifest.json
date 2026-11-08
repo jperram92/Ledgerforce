@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0030",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-24",
+      "file": ".agent/evidence/T-0030/20261025-184626-tests-unit.json",
+      "test": "10 test(s): packages/outbox/src/deliver.test.ts › SS-PLAT-24 handler registry › SS-PLAT-24 returns the handlers of a topic in registration order | packages/outbox/src/deliver.test.ts › SS-PLAT-24 handler registry › SS-PLAT-24 refuses a duplicate handler name (the inbox key) | packages/outbox/src/deliver.test.ts › SS-PLAT-24 handler registry › SS-PLAT-24 refuses names and topics the database would refuse | packages/outbox/src/deliver.test.ts › SS-PLAT-24 delivery job contract › SS-PLAT-24 accepts exactly { tenantId, eventId } as UUIDs | packages/outbox/src/deliver.test.ts › SS-PLAT-24 delivery job contract › SS-PLAT-24 refuses null | packages/outbox/src/deliver.test.ts › SS-PLAT-24 delivery job contract › SS-PLAT-24 refuses missing event | packages/outbox/src/deliver.test.ts › SS-PLAT-24 delivery job contract › SS-PLAT-24 refuses bad tenant | packages/outbox/src/deliver.test.ts › SS-PLAT-24 delivery job contract › SS-PLAT-24 refuses bad event | packages/outbox/src/deliver.test.ts › SS-PLAT-24 delivery job contract › SS-PLAT-24 refuses extra field | packages/outbox/src/deliver.test.ts › SS-PLAT-24 retry policy › SS-PLAT-24 backs off exponentially from 1 minute to at most 6 hours, then dead-letters",
+      "commit": "ceaac002c1e9",
+      "provider": "claude",
+      "timestamp": "2026-10-25T18:46:26.545Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-24",
+      "file": ".agent/evidence/T-0030/20261025-184628-tests-db.json",
+      "test": "4 test(s): apps/worker/src/outbox.delivery.db.test.ts › SS-PLAT-24 outbox delivery › SS-PLAT-24: Outbox delivers at least once, handlers idempotent | apps/worker/src/outbox.delivery.db.test.ts › SS-PLAT-24 outbox delivery › SS-PLAT-24 a handler that fails leaves no effect and no inbox row; the retry applies it once | apps/worker/src/outbox.delivery.db.test.ts › SS-PLAT-24 outbox delivery › SS-PLAT-24 a job for another tenant cannot read the event (RLS) | apps/worker/src/outbox.delivery.db.test.ts › SS-PLAT-24 outbox delivery › SS-PLAT-24 no pg-boss instance reported an error",
+      "commit": "ceaac002c1e9",
+      "provider": "claude",
+      "timestamp": "2026-10-25T18:46:28.859Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-69",
+      "file": ".agent/evidence/T-0030/20261025-184628-tests-db.json",
+      "test": "5 test(s): apps/worker/src/queue-admin.db.test.ts › SS-PLAT-69 queue install › SS-PLAT-69 refuses to install as lf_app | apps/worker/src/queue-admin.db.test.ts › SS-PLAT-69 queue install › SS-PLAT-69 installs pg-boss and the outbox queues as lf_migrator, idempotently | packages/outbox/src/outbox.db.test.ts › SS-PLAT-69 outbox and queue privileges › SS-PLAT-69 outbox events are append-only, also for their owner | packages/outbox/src/outbox.db.test.ts › SS-PLAT-69 outbox and queue privileges › SS-PLAT-69 schema pgboss is owned by lf_migrator; lf_app has DML only, no DDL | packages/outbox/src/outbox.db.test.ts › SS-PLAT-69 outbox and queue privileges › SS-PLAT-69 no pg-boss instance reported an error",
+      "commit": "ceaac002c1e9",
+      "provider": "claude",
+      "timestamp": "2026-10-25T18:46:28.859Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-68",
+      "file": ".agent/evidence/T-0030/20261025-184628-tests-db.json",
+      "test": "4 test(s): packages/outbox/src/outbox.db.test.ts › SS-PLAT-68 outbox event and job commit atomically with the posting › SS-PLAT-68 a committed post writes one event and one job keyed by the event id | packages/outbox/src/outbox.db.test.ts › SS-PLAT-68 outbox event and job commit atomically with the posting › SS-PLAT-68 a post rolled back by its caller leaves no event and no job | packages/outbox/src/outbox.db.test.ts › SS-PLAT-68 outbox event and job commit atomically with the posting › SS-PLAT-68 a replayed post (same idempotency key) adds no second event or job | packages/outbox/src/outbox.db.test.ts › SS-PLAT-68 outbox event and job commit atomically with the posting › SS-PLAT-68 a job that cannot be inserted undoes the entry and the event",
+      "commit": "ceaac002c1e9",
+      "provider": "claude",
+      "timestamp": "2026-10-25T18:46:28.859Z",
+      "result": "passed"
+    }
+  ]
+}

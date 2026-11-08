@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .approvals li { display: grid; grid-template-columns: 32px 1fr auto auto; gap: 12px; align-items: center; padding: 12px var(--lf-card-pad); border-bottom: 1px solid var(--lf-border); }
+  .approvals li:last-child { border-bottom: 0; }
+  .approvals ul { list-style: none; margin: 0; padding: 0; }
+  .ico { width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; background: var(--lf-surface-2); color: var(--lf-text-muted); border: 1px solid var(--lf-border); }
+  .approvals .t { font-weight: 500; }
+  .approvals .s { font-size: 12.5px; color: var(--lf-text-subtle); }
+  .bars { display: flex; flex-direction: column; gap: 10px; }
+  .bar { display: grid; grid-template-columns: 92px 1fr 96px; gap: 10px; align-items: center; font-size: 13px; }
+  .bar .track { height: 10px; border-radius: 0 4px 4px 0; background: transparent; }
+  .bar .fill { height: 10px; border-radius: 0 4px 4px 0; background: var(--lf-accent); }
+  .bar .lbl { color: var(--lf-text-muted); }
+  .bar.overdue .fill { background: var(--lf-danger-solid); }
+  .close-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+  .close-steps li { display: flex; gap: 10px; align-items: center; }
+  .close-steps .ok { color: var(--lf-success-fg); } .close-steps .todo { color: var(--lf-text-subtle); }
+  .sync-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 4px; }
+  .sync-grid div { background: var(--lf-surface-2); border: 1px solid var(--lf-border); border-radius: var(--lf-radius-md); padding: 10px; }
+  .sync-grid b { display: block; font-size: 18px; font-variant-numeric: var(--lf-numeric); }
+  .sync-grid span { font-size: 12px; color: var(--lf-text-muted); }
+  .lower { grid-template-columns: 1.35fr 1fr; align-items: start; }
+</style>
+</head>
+<body data-active="home" data-user="Sam Nguyen" data-initials="SN" data-role="Owner" data-period="Oct 2026" data-period-state="Open" data-sync="warn" data-sync-text="3 issues">
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <nav class="sidenav" id="lf-nav" aria-label="Primary"></nav>
+  <div class="main-col">
+    <header class="topbar" id="lf-top"></header>
+    <main id="main" class="content">
+      <div class="page-head">
+        <div>
+          <h1>Good morning, Sam</h1>
+          <p class="sub">Saturday 24 October 2026 · Figures as at last bank statement (23 Oct)</p>
+        </div>
+        <div class="actions">
+          <a class="btn" href="#"><i data-i="plus"></i>New bill</a>
+          <a class="btn primary" href="#"><i data-i="plus"></i>New invoice <span class="kbd">N</span></a>
+        </div>
+      </div>
+
+      <section aria-label="Key figures" class="grid kpis" style="margin-bottom:16px">
+        <a class="card card-b kpi" href="06-bank-reconciliation.html" style="color:inherit;text-decoration:none">
+          <div class="label"><i data-i="bank"></i>Cash in bank</div>
+          <div class="fig">$184,320<span class="cents">.55</span></div>
+          <div class="foot"><span data-chip="ok">Reconciled to 22 Oct</span> 2 accounts</div>
+        </a>
+        <a class="card card-b kpi" href="02-invoice-list.html" style="color:inherit;text-decoration:none">
+          <div class="label"><i data-i="receipt"></i>Customers owe you</div>
+          <div class="fig">$96,412<span class="cents">.80</span></div>
+          <div class="foot">31 invoices · <span data-chip="overdue">$18,240.00 overdue</span></div>
+        </a>
+        <a class="card card-b kpi" href="05-payment-batch-release.html" style="color:inherit;text-decoration:none">
+          <div class="label"><i data-i="bag"></i>You owe suppliers</div>
+          <div class="fig">$41,870<span class="cents">.25</span></div>
+          <div class="foot">$22,415.00 due in the next 7 days</div>
+        </a>
+        <a class="card card-b kpi" href="#" style="color:inherit;text-decoration:none">
+          <div class="label"><i data-i="file"></i>GST to pay · Jul–Sep BAS</div>
+          <div class="fig">$12,604<span class="cents">.10</span></div>
+          <div class="foot"><span data-chip="warn">Due Tue 28 Oct</span> Accrual basis</div>
+        </a>
+      </section>
+
+      <div class="grid lower">
+        <div class="stack">
+          <section class="card approvals" aria-labelledby="appr-h">
+            <div class="card-h"><h2 id="appr-h">Needs your approval <span class="subtle" style="font-weight:400">· 4</span></h2><a class="small" href="#">View all</a></div>
+            <ul>
+              <li>
+                <span class="ico"><i data-i="send"></i></span>
+                <div><div class="t">Supplier payment batch PB-0087 · 11 bills</div><div class="s">Created by Lena Ortiz (AP Clerk) · you release it — creator can't</div></div>
+                <span class="num strong">$22,415.00</span>
+                <a class="btn sm primary" href="05-payment-batch-release.html">Review</a>
+              </li>
+              <li>
+                <span class="ico"><i data-i="receipt"></i></span>
+                <div><div class="t">Bill · Tasman Cloud Hosting · TCH-88213</div><div class="s">Entered by Lena Ortiz · over $1,000 approval threshold</div></div>
+                <span class="num strong">$3,190.00</span>
+                <a class="btn sm" href="12-mobile-approvals.html">Review</a>
+              </li>
+              <li>
+                <span class="ico"><i data-i="book"></i></span>
+                <div><div class="t">Manual journal MJ-0412 · Oct accrued wages</div><div class="s">Prepared by Priya Shah (Accountant) · over $5,000</div></div>
+                <span class="num strong">$14,880.00</span>
+                <a class="btn sm" href="#">Review</a>
+              </li>
+              <li>
+                <span class="ico"><i data-i="undo"></i></span>
+                <div><div class="t">Credit note CN-000118 · Wattle &amp; Stone Architects</div><div class="s">Requested by Jordan Lee (AR Clerk) · partial refund</div></div>
+                <span class="num strong">$660.00</span>
+                <a class="btn sm" href="#">Review</a>
+              </li>
+            </ul>
+          </section>
+
+          <section class="card" aria-labelledby="age-h">
+            <div class="card-h"><h2 id="age-h">Who owes you, by age</h2><span class="meta">Receivables · $96,412.80</span></div>
+            <div class="card-b bars" role="list">
+              <div class="bar" role="listitem" title="Not yet due: $62,930.30 (19 invoices)"><span class="lbl">Not yet due</span><span class="track"><span class="fill" style="display:block;width:100%"></span></span><span class="num">$62,930.30</span></div>
+              <div class="bar" role="listitem" title="1–30 days: $15,242.50 (7 invoices)"><span class="lbl">1–30 days</span><span class="track"><span class="fill" style="display:block;width:24.2%"></span></span><span class="num">$15,242.50</span></div>
+              <div class="bar overdue" role="listitem" title="31–60 days overdue: $11,385.00 (3 invoices)"><span class="lbl">31–60 days</span><span class="track"><span class="fill" style="display:block;width:18.1%"></span></span><span class="num">$11,385.00</span></div>
+              <div class="bar overdue" role="listitem" title="61+ days overdue: $6,855.00 (2 invoices)"><span class="lbl">61+ days</span><span class="track"><span class="fill" style="display:block;width:10.9%"></span></span><span class="num">$6,855.00</span></div>
+            </div>
+            <p class="card-f" style="margin:0">Red bars are more than 30 days overdue and trigger reminders. <a href="#">Aged receivables report</a></p>
+          </section>
+        </div>
+
+        <div class="stack">
+          <section class="card" aria-labelledby="close-h">
+            <div class="card-h"><h2 id="close-h">September close</h2><span data-chip="awaiting">In progress · 6 of 7</span></div>
+            <div class="card-b">
+              <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="7" aria-valuenow="6" aria-label="Close steps done: 6 of 7" style="margin-bottom:14px"><span style="width:86%"></span></div>
+              <ul class="close-steps">
+                <li><i data-i="check-circle" class="ok"></i>AR and AP locked · Priya Shah, 3–6 Oct</li>
+                <li><i data-i="check-circle" class="ok"></i>Bank recs, accruals and TB review done</li>
+                <li><i data-i="check-circle" class="ok"></i>Soft closed · Priya Shah, 9 Oct</li>
+                <li><i data-i="dashed" class="todo"></i>Hard lock after BAS lodged (due 28 Oct)</li>
+              </ul>
+            </div>
+            <div class="card-f"><span>Only Finance Admins can post to September</span><a href="07-period-close-checklist.html">Open checklist</a></div>
+          </section>
+
+          <section class="card" aria-labelledby="sync-h">
+            <div class="card-h"><h2 id="sync-h">Salesforce sync</h2><span class="sf err"><i data-i="cloud" class="cloud"></i>3 need attention</span></div>
+            <div class="card-b">
+              <p class="small muted">Accounting is never blocked by Salesforce. Write-backs queue and retry automatically.</p>
+              <div class="sync-grid">
+                <div><b>1,284</b><span>Synced today</span></div>
+                <div><b>2</b><span>Retrying</span></div>
+                <div><b style="color:var(--lf-danger-fg)">3</b><span>Need a person</span></div>
+              </div>
+              <p class="xs subtle" style="margin-top:10px">API use 6% of daily allowance (cap 25%) · last event 2 min ago</p>
+            </div>
+            <div class="card-f"><span>Oldest issue 3 h ago</span><a href="09-sync-issues-inbox.html">Open sync inbox</a></div>
+          </section>
+
+          <section class="card" aria-labelledby="ctrl-h">
+            <div class="card-h"><h2 id="ctrl-h">Controls</h2><span data-chip="warn">Small-team mode</span></div>
+            <div class="card-b small">
+              <p class="muted">Two exceptions this week where one person did both steps. Your outside accountant (Mei Tan, Approver) reviews them; you acknowledge the weekly report.</p>
+            </div>
+            <div class="card-f"><span>Week ending 25 Oct</span><a href="#">Review 2 exceptions</a></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

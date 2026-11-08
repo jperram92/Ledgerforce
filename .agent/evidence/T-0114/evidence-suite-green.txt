@@ -1,0 +1,9 @@
+﻿
+ RUN  v4.1.12 C:/Users/james/Ledgerforce
+
+
+ Test Files  4 passed (4)
+      Tests  30 passed (30)
+   Start at  19:01:33
+   Duration  8.20s (transform 338ms, setup 0ms, import 743ms, tests 8.50s, environment 1ms)
+

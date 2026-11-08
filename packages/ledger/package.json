@@ -1,0 +1,25 @@
+{
+  "name": "@ledgerforce/ledger",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Posting engine and the only writer of ledger tables (design §3.3, §3.9)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/journal-fixture.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@ledgerforce/gl": "workspace:*",
+    "@types/node": "22.20.5",
+    "fast-check": "4.10.2",
+    "vitest": "4.1.12"
+  }
+}

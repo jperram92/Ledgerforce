@@ -1,0 +1,22 @@
+# SS-PLAT-23 install smoke: bash infra/compose/smoke.sh (local dockerd), one-time password redacted
+--- setup output (one-time password redacted)
+migrations: applied 27, already applied 0
+queue: pg-boss and the outbox queues are installed
+========================================================================
+LedgerForce owner setup
+Owner setup link: http://ledgerforce.localhost:18080/t/harbour-co/auth/login
+Sign in as: owner@example.test
+One-time password: [redacted]
+At first sign-in you set up an authenticator app (MFA) and choose your own password;
+the one-time password stops working then. Keep this output private until you have signed in.
+========================================================================
+--- SS-PLAT-23 install smoke spec
+Running 7 tests using 1 worker
+  ✓  1 [chromium] › tests/install/install.smoke.spec.ts:87:3 › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: setup ran the migrations and queue install as lf_migrator and printed a one-time owner setup link (1.1s)
+  ✓  2 [chromium] › tests/install/install.smoke.spec.ts:110:3 › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: api and worker connect as lf_app, which is not superuser and has no BYPASSRLS (674ms)
+  ✓  3 [chromium] › tests/install/install.smoke.spec.ts:130:3 › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the sign-in page renders (519ms)
+  ✓  4 [chromium] › tests/install/install.smoke.spec.ts:137:3 › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the setup link opens the organisation sign-in page (1.8s)
+  ✓  5 [chromium] › tests/install/install.smoke.spec.ts:151:3 › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the Owner signs in once with the one-time password, enrols MFA and lands in LedgerForce (4.5s)
+  ✓  6 [chromium] › tests/install/install.smoke.spec.ts:190:3 › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: the one-time password no longer works (1.2s)
+  ✓  7 [chromium] › tests/install/install.smoke.spec.ts:204:3 › SS-PLAT-23 self-hosted compose install › SS-PLAT-23: Keycloak admin and the master realm are not public; the tenant realm issuer is the public URL (422ms)
+  7 passed (11.6s)

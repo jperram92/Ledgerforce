@@ -1,0 +1,213 @@
+# Build-loop handover — 2026-10-29
+
+## Primary Codex continuation prompt
+> Current build loop: T-0114 on feat/T-0114-windows-evidence-recorder fixes Windows pnpm spawn in the evidence recorder. Corrected real tests RED 4/4 against old code, GREEN 4/4 on Node 22.22.0; whole evidence suite 30/30, typecheck/lint pass. Full verify and review pending. Owner ACCEPTED ADR-0043 and authorized scoped security additions (DL-0241); T-0095 is unblocked, no repeat approval needed. After checkpointing/verifying T-0114, resume T-0095 on its task branch and implement accepted scanners test-first. T-0113 is in review with all checks passing at 405f794; PR #1 remains unmerged without independent Claude review. Read git log -1 body and current state rather than the superseded prompt below.
+
+### Superseded prompt (retained)
+> Resume from repository state and `git log -1 --format=full`. T-0113 is in review: all checks pass at 405f794, full verifier 13 PASS/0 FAIL/3 PENDING, handover commit 78f6e77. PR #1 remains unmerged without independent Claude review. T-0095 research is on feat/T-0095-security-gates: RQ-0092 resolved, ADR-0043 Proposed, task blocked pending explicit human acceptance and scoped security-workflow authorization. Do not edit protected workflows before that answer. Continue the Windows evidence-recorder follow-up (packages/testing/src/evidence/record-tests.ts) test-first on its own task branch; current launcher uses spawnSync('pnpm') and fails on Windows. T-0103 remains blocked on unchanged atomic throughput; do not weaken assertions.
+
+## Open questions for human
+- **Resolved 2026-10-29:** owner accepted ADR-0043 and authorized its scoped addition (DL-0241). The historical pending question below is superseded. Implement T-0095 within that scope after T-0114; no repeat approval needed.
+- [adr:security] T-0095: accept ADR-0043 and authorize the exact new security workflow/configuration/runner/test scope? Recommendation: local fail-closed scanners with read-only CI permissions; preserve current checks. See Docs/adr/0043-ci-security-scanners.md and RQ-0092. Async question pending; no acceptance inferred.
+- Independent Claude review is required for Codex repairs before merging PR #1. Pending request: .agent/evidence/PR-1/review-request-claude-20261029.md. Existing accounting/security/golden gates remain unchanged.
+
+## Prior install handover (retained)
+# Handover — install-smoke repair, 2026-10-29
+
+## Current Codex continuation prompt
+> Resume on feat/T-0113-install-setup-wait. Read AGENTS.md, T-0113, run 2026-10-29-codex-r01.md and `git log -1 --format=full`. Base repair is c312393; diagnosis/task split is f861278; the commit containing this prompt fixes the setup wait race. Next: inspect PR #1 checks after pushing, and `.tmp/t0103-pinned-unrestricted.txt` for the still-running Windows conductor rerun. T-0113 real-Docker regression tests passed 3/3 after RED 1/3; full install smoke and full verification still required. T-0103 is blocked on atomic-reader throughput; no test expectations may be relaxed. Independent Claude review request remains pending, not an approval. Do not merge before green CI and cross-review.
+
+Done: e32bad1 pushed to PR #1; full install CI 40810531406 PASS (7/7), static/unit, DB/RLS and browser CI PASS. T-0113's stopped-container wait and redaction fixes also pass 3/3 real-Docker regressions. Imported signed-in screenshot retains CI merge-checkout f232188 metadata. Evidence and memory gates PASS; T-0113 verifying. No CI gates edited.
+In progress: full definition-of-done jobs 40810531408/40810526850 and independent review. Unrestricted pinned Windows conductor finished 81/82 (atomic-reader throughput 27 writes; all run/failover tests PASS). Retry experiments were reverted. T-0103 remains blocked; sandbox-only PowerShell denials do not reproduce unrestricted.
+Latest verifier result: e32bad1 gave 11 PASS / 2 FAIL / 3 PENDING. Only failures were missing T-0113 manifest and in_progress status. The evidence checkpoint corrects both; local evidence and memory gates pass. Rerun CI on this checkpoint before declaring review-ready. Coverage baseline, draft golden tests and independent review remain pending; no merge approval exists.
+Decisions: DL-0239, RQ-0091. No new human decision needed. Existing design/golden approvals remain outstanding as previously recorded.
+
+## Superseded T-0103 continuation (retained)
+# Handover - 2026-10-29 02:42 UTC
+## Codex continuation prompt
+> Resume T-0103 on feat/T-0103-windows-heartbeat. Read AGENTS.md, this handover, run 2026-10-28-codex-r03.md and `git log -1 --format=full` (the WIP commit containing this prompt follows feabf92). Run `bash scripts/agent/resume.sh`, reclaim T-0103, then `node --test scripts/agent/test/atomic-write.test.ts`. Diagnose the unchanged throughput assertion using pinned Node 22.22.0; host shells currently differ (24.19.0 / 24.7.0). Keep >100 reads/writes and all deadlines intact. Windows heartbeat implementation passes, but whole conductor is 81/82. After fixing verification, address install-smoke's already-stopped setup wait race in a separate task with real Docker RED/GREEN tests. Read .agent/evidence/PR-1/review-request-claude-20261029.md for the requested independent review. Push final fixes to the PR branch and merge only after green CI and valid cross-provider review. Never infer approval from the pending request.
+
+From: codex (run 2026-10-28-codex-r03)    Reason: Requested independent review packet prepared; validation failures remain
+Task: T-0103 Conductor: Windows provider process-tree termination on missed heartbeat
+Branch: feat/T-0103-windows-heartbeat   Last green commit: none
+Done: Windows Job Object containment and concurrent output relay pass unchanged heartbeat (~13 seconds); configured browser evidence destination passes both explicit-root and task-isolation tests. Earlier repairs pushed to PR head feabf92; static/unit and DB CI passed there.
+In progress: scripts/agent/test/atomic-write.test.ts throughput remains below >100 writes; full conductor 81/82. Full verification incomplete. Install smoke CI fails because compose wait misses stopped setup, though setup exited 0. Do not commit raw smoke failure logs: they expose disposable generated setup credentials.
+Next action: reclaim T-0103 and diagnose unchanged atomic-write throughput before completing verification. Lease released to todo for continuation, not marked done. New review request is pending, not a report or approval. Claude CLI is unavailable here; use the request in a Claude session once ready.
+Decisions taken: DL-0238; RQ-0014 Windows containment follow-up. Rejected and reverted a test-module-registration wrapper after it did not fix throughput.
+Open questions for human: no new design decision. Existing accounting/security/golden gates remain recorded in the prior handover at feabf92. No main merge; independent Claude review still required.
+Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
+
+## Log
+- 2026-10-24 04:00 control files committed (d64eb32)
+- 2026-10-24 ~07:2x 4 sub-agents stopped by usage limit; checkpointed 2089650; resumed 07:45 after reset — failover-by-repo-state worked as designed
+- 2026-10-24T08:18:05.120Z human: release T-0001 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.272Z human: release T-0002 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.436Z human: release T-0003 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.560Z human: release T-0004 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.687Z human: release T-0005 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.819Z human: release T-0006 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:05.954Z human: release T-0008 → review (full verify.sh green 2026-10-24 (11 PASS, 0 FAIL); awaiting codex cross-review (DL-0053))
+- 2026-10-24T08:18:06.103Z unknown: T-0009 → in_progress
+- 2026-10-24T08:18:48.097Z human: release T-0009 → blocked (human gate: product owner to choose UI direction from the UI/UX research agent's three options (DL-0052); evidence harness part is complete)
+- 2026-10-24T10:30:33.965Z codex: T-0010 → in_progress
+- 2026-10-24T10:34:09.059Z codex: handover: Recovery checkpoint; verification continues
+- 2026-10-24T10:47:41.970Z codex: T-0010 → in_progress
+- 2026-10-24T10:52:32.170Z codex: handover: Blocked: Windows heartbeat regression remains red; recovery and evidence preserved
+- 2026-10-24T10:52:33.083Z codex: release T-0010 → blocked (Windows missed-heartbeat regression still times out after 25 seconds; original provider PID disappears while descendant pipes remain open. Keep test unchanged and fix process ownership before full verification and Claude review.)
+- 2026-10-24T12:57:04.526Z codex: release T-0010 → todo (unblocked: Windows heartbeat step moved to T-0103)
+- 2026-10-24T12:57:04.841Z claude: T-0010 → verifying
+- 2026-10-24T12:58:31.823Z claude: release T-0010 → review (verify 12 PASS/0 FAIL on merged tree; awaiting codex review of Claude-authored parts)
+- 2026-10-24 12:5x claude: merged Codex recovery (6c7af74); T-0010 → review after verify 12 PASS/0 FAIL; T-0103 split out
+- 2026-10-24T13:05:42.221Z claude: T-0104 → verifying
+- 2026-10-24T13:09:05.899Z claude: release T-0104 → review (verify 12 PASS/0 FAIL; awaiting codex cross-review)
+- 2026-10-24 13:2x claude: T-0104 → review (verify 12 PASS/0 FAIL)
+- 2026-10-24T13:16:46.015Z claude: T-0105 → verifying
+- 2026-10-24T13:38:15.135Z claude: release T-0105 → review (verify exit 0, 12 PASS/0 FAIL; awaiting codex cross-review; ADR-0016 awaiting human)
+- 2026-10-24 13:4x claude: T-0105 → review (verify exit 0); conductor race fixed (DL-0069)
+- 2026-10-24T14:02:08.218Z human: release T-0009 → todo (unblocked: product owner chose direction C (DL-0070))
+- 2026-10-24T14:02:08.588Z claude: T-0009 → verifying
+- 2026-10-24T14:03:46.723Z claude: release T-0009 → review (verify exit 0; Timeline adopted; awaiting codex cross-review)
+- 2026-10-24T14:06:31.727Z claude: T-0014 → verifying
+- 2026-10-24T14:08:14.888Z claude: release T-0014 → review (verify exit 0; awaiting codex cross-review)
+- 2026-10-24 14:1x claude: product owner chose UI direction C (DL-0070); T-0009 and T-0014 → review (verify exit 0)
+- 2026-10-24T14:09:19.988Z claude: T-0017 → verifying
+- 2026-10-24T14:10:52.794Z claude: release T-0017 → review (verify exit 0; awaiting codex cross-review)
+- 2026-10-24 14:2x claude: T-0017 → review (verify exit 0)
+- 2026-10-24T14:19:44.096Z claude: T-0018 → verifying
+- 2026-10-24T14:21:15.031Z claude: release T-0018 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 14:2x claude: T-0018 built (migration 0005, @ledgerforce/gl), evidenced SS-PLAT-31/32, verify 12 PASS/0 FAIL → review
+- 2026-10-24T14:28:42.944Z claude: T-0019 → verifying
+- 2026-10-24T14:30:13.199Z claude: release T-0019 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 14:3x claude: T-0019 built (migration 0006, @ledgerforce/ledger), evidenced SS-PLAT-33/34, verify 12 PASS/0 FAIL → review
+- 2026-10-24T14:36:57.562Z claude: T-0020 → verifying
+- 2026-10-24T14:38:23.880Z claude: release T-0020 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 14:4x claude: T-0020 built (migration 0007), evidenced SS-PLAT-01, verify 12 PASS/0 FAIL → review
+- 2026-10-24T17:44:30.092Z claude: T-0021 → verifying
+- 2026-10-24T17:46:34.418Z claude: release T-0021 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 17:4x claude: T-0021 built (migration 0008), evidenced SS-PLAT-02, verify 12 PASS/0 FAIL → review (resumed after a usage-limit stop; no work lost)
+- 2026-10-24T18:17:38.353Z claude: T-0022 → verifying
+- 2026-10-24T18:19:37.397Z claude: release T-0022 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 18:2x claude: T-0022 built (RQ-0016, ADR-0017, migration 0009), evidenced SS-PLAT-03, verify 12 PASS/0 FAIL → review
+- 2026-10-24T19:31:01.463Z claude: T-0024 → verifying
+- 2026-10-24T19:32:50.220Z claude: release T-0024 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 19:3x claude: register rows evidenced→green until cross-review (DL-0077); T-0024 built (migration 0010), SS-PLAT-05 + SS-UC02-06 (numbering layer) green with evidence, verify 12 PASS/0 FAIL → review
+- 2026-10-24T19:45:42.609Z claude: T-0036 → verifying
+- 2026-10-24T19:47:53.403Z claude: release T-0036 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 19:5x claude: T-0036 built (RQ-0017, migration 0011), SS-PLAT-35/36/37 green with evidence, verify 12 PASS/0 FAIL → review; T-0107 added; run log updated
+- 2026-10-24T20:07:34.153Z claude: T-0037 → verifying
+- 2026-10-24T20:09:30.915Z claude: release T-0037 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review (security-relevant: ADR-0018))
+- 2026-10-24 20:1x claude: T-0037 built (RQ-0018, ADR-0018, migration 0012, shared/crypto, API masked read), SS-PLAT-22/38 green with evidence, verify 12 PASS/0 FAIL → review; T-0108 added
+- 2026-10-24 22:4x claude (lead): all four parallel agents stopped on the usage limit (HTTP 429, reset 22:40 UTC) and were resumed from their worktrees. Saved progress: T-0058 research + red tests (30095b0); T-0106 research + red tests (60ee4fe); T-0062 metadata green (447b6c3); T-0011 migration 0014 + login green (c259211). No work lost.
+- 2026-10-24T22:46:35.744Z claude: T-0062 → verifying
+- 2026-10-24T22:48:33.837Z claude: release T-0062 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; offline only — org deploy needs Dev Hub; awaiting codex cross-review)
+- 2026-10-24 22:5x claude (lead): merged T-0062 (sub-agent); gates on merged tree green (270 unit / 300 db); verify 12 PASS/0 FAIL → review. T-0011 finished (waits for T-0058's migration 0013 before merge). T-0058, T-0106 still running.
+- 2026-10-24T22:55:05.585Z claude: T-0058 → verifying
+- 2026-10-24T22:56:30.398Z claude: release T-0058 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; awaiting codex cross-review)
+- 2026-10-24 23:0x claude (lead): merged T-0058 (conflicts in decision log + register, append-only, both kept in order); gates on merged tree green (304 unit / 337 db); verify 12 PASS/0 FAIL → review.
+- 2026-10-24T22:58:12.013Z claude: T-0011 → verifying
+- 2026-10-24T22:59:40.245Z claude: release T-0011 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0016 still Proposed; awaiting codex cross-review)
+- 2026-10-24 23:1x claude (lead): merged T-0011 (conflicts in decision log, register, schema header resolved; migrations 0013+0014 together); gates green (304 unit / 358 db, audit clean); verify 12 PASS/0 FAIL → review.
+- 2026-10-24T23:02:14.866Z claude: T-0106 → verifying
+- 2026-10-24T23:04:04.383Z claude: release T-0106 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; awaiting codex cross-review)
+- 2026-10-24 23:2x claude (lead): merged T-0106 (decision log + lockfile regenerated by pnpm); gates green (370 unit / 358 db / 38 e2e, audit clean); verify 12 PASS/0 FAIL → review. Found and recorded DL-0098 (gate-run screenshots committed under T-0009); T-0109 added. All four parallel tasks merged.
+- 2026-10-24T23:05:56.678Z claude: T-0107 → verifying
+- 2026-10-24T23:07:47.662Z claude: release T-0107 → review (verify 12 PASS/0 FAIL/4 PENDING; awaiting codex cross-review)
+- 2026-10-24 23:1x claude (lead): T-0107 built (migration 0015), SS-PLAT-47 green with evidence, verify 12 PASS/0 FAIL → review. Parallel round 1 complete.
+- 2026-10-25 03:4x claude (lead): round-2 agents stopped on the usage limit (HTTP 429, reset 03:40 UTC); resumed from their worktrees. Saved: T-0012 ADR-0023 + red tests + migration 0016 green (7389163); T-0063 RQ-0024 + JWT signer/exchange (604a4b4); T-0081 RQ-0025 (e5f09d1). No work lost.
+- 2026-10-25T03:51:21.647Z claude: T-0012 → verifying
+- 2026-10-25T03:54:28.494Z claude: release T-0012 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0023 Proposed (security); awaiting codex cross-review)
+- 2026-10-25 04:0x claude (lead): merged T-0012 (clean); interceptor reviewed (public/undeclared/permission order fails closed); gates green (447 unit / 393 db, audit clean); verify 12 PASS/0 FAIL → review.
+- 2026-10-25T03:56:39.509Z claude: T-0063 → verifying
+- 2026-10-25T03:59:18.724Z claude: release T-0063 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; offline only (real token endpoint needs a scratch org); awaiting codex cross-review)
+- 2026-10-25 04:1x claude (lead): merged T-0063 (registers resolved by id, totals recomputed: 144); gates green (473 unit / 413 db, audit clean); verify 12 PASS/0 FAIL → review. DL-0113 (per-agent scratchpad folders). Waiting for T-0081.
+- 2026-10-25T04:07:01.032Z claude: T-0081 → verifying
+- 2026-10-25T04:09:26.560Z claude: release T-0081 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; awaiting codex cross-review)
+- 2026-10-25 04:3x claude (lead): merged T-0081 (registers by id, lockfile regenerated by pnpm, totals 147); gates green (506 unit / 413 db / 51 e2e, audit clean); verify 12 PASS/0 FAIL → review. Round 2 complete. T-0059 re-scoped (DL-0114).
+- 2026-10-25T04:14:31.207Z claude: T-0109 → verifying
+- 2026-10-25T04:16:50.703Z claude: release T-0109 → review (verify 12 PASS/0 FAIL/4 PENDING; verify run left no other task's evidence; awaiting codex cross-review)
+- 2026-10-25 04:1x claude (lead): T-0109 built — verify gate 9 no longer writes other tasks' evidence (proven by a real verify run); SS-PLAT-55 green; → review. DL-0098 cleanup rule retired.
+- 2026-10-25 08:4x claude (lead): round-3 agents stopped on the usage limit (HTTP 429, reset 08:40 UTC); resumed from their worktrees. Saved: T-0023 RQ-0026 + red tests (9958715); T-0013 RQ-0027 + ADR-0025 + red tests + migration 0019 (9ec2ac4); T-0059 green (2e8fca8). No work lost.
+- 2026-10-25T09:02:58.126Z claude: T-0023 → verifying
+- 2026-10-25T09:05:33.649Z claude: release T-0023 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0024 Proposed (accounting); awaiting codex cross-review)
+- 2026-10-25 09:1x claude (lead): merged T-0023 (clean); gates green (519 unit / 484 db / 82 agent-script); verify 12 PASS/0 FAIL → review.
+- 2026-10-25T09:08:08.732Z claude: T-0013 → verifying
+- 2026-10-25T09:10:37.030Z claude: release T-0013 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; ADR-0025 Proposed (security); awaiting codex cross-review)
+- 2026-10-25 09:2x claude (lead): merged T-0013 (ADR index + registers resolved; totals 152); gates green (530 unit / 517 db); verify 12 PASS/0 FAIL → review.
+- 2026-10-25T09:12:06.868Z claude: T-0059 → verifying
+- 2026-10-25T09:14:31.636Z claude: release T-0059 → review (verify 12 PASS/0 FAIL/4 PENDING on merged tree; awaiting codex cross-review)
+- 2026-10-25 09:3x claude (lead): merged T-0059 (DL resolved by id; totals 152); migrations 0018–0020 in sequence; gates green (545 unit / 526 db); verify 12 PASS/0 FAIL → review. Round 3 complete.
+- 2026-10-25T13:42:19.197Z claude: T-0025 → verifying
+- 2026-10-25T13:46:22.202Z claude: release T-0025 → review (verify 13 PASS/0 FAIL/3 PENDING on merged tree (gate 3 invariants now PASS); awaiting codex cross-review)
+- 2026-10-25 13:4x claude (lead): merged T-0025 (clean; no migration); gates green (561 unit / 550 db); verify 13 PASS/0 FAIL/3 PENDING (gate 3 invariants now PASS) → review. Usage-limit stop/worker restart mid-merge: staged merge was intact; committed.
+- 2026-10-25T13:49:21.522Z claude: T-0015 → verifying
+- 2026-10-25T13:53:05.528Z claude: release T-0015 → review
+- 2026-10-25 claude (lead): merged T-0015 (conflicts in decision log/register resolved by id; totals 156/16); gates green (603 unit / 612 db); verify 13 PASS/0 FAIL/3 PENDING → review. Round 4 complete.
+- 2026-10-25 claude (lead): round 5 claimed (T-0016, T-0027, T-0030, T-0053; DL-0140).
+- 2026-10-25 18:4x claude (lead): all four round-5 agents stopped by the usage limit (~14:4x); WIP was committed on their branches (T-0016 2, T-0027 2, T-0030 2, T-0053 3 commits); resumed after the reset.
+- 2026-10-25T18:48:09.195Z claude: T-0016 → verifying
+- 2026-10-25T19:06:02.529Z claude: T-0027 → verifying
+- 2026-10-25T19:09:04.302Z claude: T-0030 → verifying
+- 2026-10-25T19:11:59.436Z claude: T-0053 → verifying
+- 2026-10-25T19:15:00.427Z claude: release T-0016 → review
+- 2026-10-25T19:15:00.594Z claude: release T-0027 → review
+- 2026-10-25T19:15:00.778Z claude: release T-0030 → review
+- 2026-10-25T19:15:00.994Z claude: release T-0053 → review
+- 2026-10-25 claude (lead): round 5 merged (T-0016, T-0027, T-0030 + ADR-0029, T-0053); final tree gates green (628 unit / 739 db / 82 agent); verify 13/0/3 each → review. First T-0016 verify had one intermittent gate-2a failure (likely the Salesforce test-key DER flake fixed in T-0030); six reruns and all later verifies green.
+- 2026-10-25 claude (lead): round 6 claimed (T-0026, T-0064, T-0076, T-0093; DL-0162).
+- 2026-10-25 23:4x claude (lead): all four round-6 agents stopped by the usage limit (~20:0x); their WIP commits are on the feat/T-0026, T-0064, T-0076, T-0093 branches; resumed after the reset.
+- 2026-10-25T23:48:29.073Z claude: T-0026 → verifying
+- 2026-10-25T23:52:22.104Z claude: release T-0026 → review
+- 2026-10-26T00:04:36.583Z claude: T-0064 → verifying
+- 2026-10-26T00:04:36.696Z claude: T-0076 → verifying
+- 2026-10-26T00:04:36.840Z claude: T-0093 → verifying
+- 2026-10-26T00:14:04.017Z claude: release T-0064 → review
+- 2026-10-26T00:14:04.146Z claude: release T-0076 → review
+- 2026-10-26T00:14:04.276Z claude: release T-0093 → review
+- 2026-10-26 claude (lead): round 6 merged (T-0026, T-0064 [0027→0026], T-0076, T-0093 [0029→0027]); final tree gates green (697 unit / 815 db / 82 agent); verify 13/0/3 each → review. run.test.ts:104 failed once at the T-0076 merge, 5 reruns green (DL-0183, unexplained).
+- 2026-10-26 claude (lead): round 7 claimed (T-0028, T-0067, T-0094, T-0108; DL-0184).
+- 2026-10-26 04:4x claude (lead): all four round-7 agents stopped by the usage limit (~01:0x); T-0028 and T-0094 had uncommitted work only (still in their worktrees), T-0067 and T-0108 one commit each; resumed after the reset.
+- 2026-10-26T04:56:53.864Z claude: T-0067 → verifying
+- 2026-10-26T05:04:46.411Z claude: T-0067 → in_progress
+- 2026-10-26 05:0x claude (lead): verify T-0067 FAILED (8 PASS/5 FAIL): (a) the outage db test timed out at 60 s under load, and the next test then failed on leaked state; (b) SS-UC01-02/UC11-05/UC12-05 can't be built yet (gate 9 manifest, gate 12 step 7). T-0067 is back to in_progress; the agent is fixing the test (deterministic, no timeout or assertion changes) and splitting those SS into T-0110 (DL-0205).
+- 2026-10-26T05:30:10.156Z claude: T-0028 → verifying
+- 2026-10-26T05:30:10.311Z claude: T-0067 → verifying
+- 2026-10-26T05:30:10.460Z claude: T-0108 → verifying
+- 2026-10-26T05:30:10.647Z claude: T-0094 → verifying
+- 2026-10-26T09:42:20.989Z claude: release T-0028 → review
+- 2026-10-26T09:42:21.199Z claude: release T-0067 → review
+- 2026-10-26T09:42:21.351Z claude: release T-0108 → review
+- 2026-10-26T09:48:35.140Z claude: release T-0094 → review
+- 2026-10-26 claude (lead): round 7 merged (T-0067 [verify failed → outage test made deterministic, SS split to T-0110], T-0108, T-0028, SS-UC10-08 wiring, T-0094); final tree gates green (816 unit / 859 db / 82 agent); verify 13/0/3 each (T-0094 after ticking its evidence step, evidence checked) → review.
+- 2026-10-26 claude (lead): round 8 claimed (T-0029, T-0071, T-0072; DL-0207). After it, the backlog is gated on T-0007 golden postings (human).
+- 2026-10-26T10:14:18.725Z claude: T-0072 → verifying
+- 2026-10-26T10:24:08.696Z claude: release T-0072 → review
+- 2026-10-26T10:28:04.344Z claude: T-0029 → verifying
+- 2026-10-26T10:31:59.138Z claude: release T-0029 → review
+- 2026-10-26T10:35:26.537Z claude: T-0071 → verifying
+- 2026-10-26T10:39:35.286Z claude: release T-0071 → review
+- 2026-10-26 claude (lead): round 8 merged (T-0072, T-0029, T-0071); final tree gates green (845 unit + LWC Jest / 916 db / 82 agent); verify 13/0/3 each (T-0072 after ticking its n/a evidence step) → review. No further claimable tasks: the backlog waits on T-0007 golden postings (human) and the Codex cross-reviews.
+- 2026-10-26 claude (lead): correction — T-0082 and T-0092 became claimable once T-0029/T-0071 merged; round 9 claimed (DL-0224).
+- 2026-10-26 14:4x claude (lead): both round-9 agents stopped by the usage limit (~11:3x); T-0082 has 1 commit, T-0092 uncommitted work only (kept in its worktree); resumed after the reset.
+- 2026-10-26T15:08:42.545Z claude: T-0082 → verifying
+- 2026-10-26T15:08:42.691Z claude: T-0092 → verifying
+- 2026-10-26T15:18:10.447Z claude: release T-0082 → review
+- 2026-10-26T15:18:10.589Z claude: release T-0092 → review
+- 2026-10-26 claude (lead): round 9 merged (T-0092, T-0082; web router/sections/main conflicts resolved by keeping both sides); gates green (905 unit + LWC / 921 db / 82 agent); verify 13/0/3 each, including gate-9 e2e on the merged router → review.
+- 2026-10-28T10:42:13.278Z codex: T-0112 → in_progress
+- 2026-10-28T11:54:14.368Z codex: T-0112 → in_progress
+- 2026-10-28T21:57:40.724Z codex: T-0112 → in_progress
+- 2026-10-28T22:11:36.817Z codex: T-0103 → researching
+- 2026-10-28T22:18:24.677Z codex: T-0103 → in_progress
+- 2026-10-29T02:42:54.132Z codex: handover: Preparing requested independent review packet; validation failures remain
+- 2026-10-29T02:44:47.523Z codex: release T-0103 → todo (WIP preserved for continuation: atomic throughput and full verification remain; independent review request prepared)
+- 2026-10-29T02:58:02.525Z codex: T-0103 → in_progress
+- 2026-10-29T03:04:15.041Z codex: release T-0103 → blocked (Pinned Windows atomic-reader test remains below unchanged >100 write threshold; immediate-retry experiments unreliable and reverted. Heartbeat fix preserved; full verification not green.)
+- 2026-10-29T03:04:33.810Z codex: T-0113 → in_progress
+- 2026-10-29T03:13:23.110Z codex: T-0113 → verifying
+- 2026-10-29T07:41:19.208Z codex: release T-0113 → review (All CI checks pass at 405f794; full verifier 13 PASS/0 FAIL/3 PENDING. Await independent Claude review, no merge.)
+- 2026-10-29T07:41:35.528Z codex: T-0095 → researching
+- 2026-10-29T07:45:59.170Z codex: release T-0095 → blocked (human gate adr:security: accept ADR-0043 and explicitly authorize scoped new security workflow; no protected workflow changed)
+- 2026-10-29T07:49:08.338Z codex: T-0114 → in_progress
+- 2026-10-29T07:58:34.868Z codex: T-0114 → in_progress
+- 2026-10-29T08:00:53.105Z codex: release T-0095 → todo (Owner accepted ADR-0043 and explicitly authorized scoped addition (DL-0241); continue after active T-0114.)
+- 2026-10-29T08:04:07.167Z codex: T-0114 → verifying

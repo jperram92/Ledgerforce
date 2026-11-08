@@ -1,0 +1,25 @@
+{
+  "name": "@ledgerforce/outbox",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Transactional outbox (ADR-0008): outbox rows and pg-boss jobs written in the caller's transaction; idempotent delivery through a per-handler inbox",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/harness.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
+    "@opentelemetry/api": "1.9.1",
+    "kysely": "0.29.7",
+    "pg-boss": "12.37.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "vitest": "4.1.12"
+  }
+}

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Invoices — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  td .inv { font-weight: 500; color: var(--lf-text); }
+  td .cust { font-weight: 500; }
+  .sfcell a { display: inline-flex; align-items: center; gap: 4px; }
+  .sfcell .ext { width: 12px; height: 12px; opacity: .9; }
+  .hints { display: flex; gap: 14px; align-items: center; color: var(--lf-text-subtle); font-size: 12px; }
+  .void-row td { color: var(--lf-text-muted); }
+  .void-row .inv { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--lf-text-muted); }
+  .summary { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 0; border-bottom: 1px solid var(--lf-border); }
+  .summary > div { padding: 14px var(--lf-card-pad); border-right: 1px solid var(--lf-border); }
+  .summary > div:last-child { border-right: 0; }
+  .summary .l { font-size: 12.5px; color: var(--lf-text-muted); }
+  .summary .v { font-size: 20px; font-weight: 600; font-variant-numeric: var(--lf-numeric); margin-top: 2px; }
+</style>
+</head>
+<body data-active="invoices" data-user="Jordan Lee" data-initials="JL" data-role="AR Clerk" data-period="Oct 2026" data-period-state="Open" data-sync="warn" data-sync-text="3 issues">
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <nav class="sidenav" id="lf-nav" aria-label="Primary"></nav>
+  <div class="main-col">
+    <header class="topbar" id="lf-top"></header>
+    <main id="main" class="content">
+      <div class="page-head">
+        <div>
+          <div class="crumbs"><a href="#">Sales</a><i data-i="chevron-right" class="i-sm"></i>Invoices</div>
+          <h1>Invoices</h1>
+        </div>
+        <div class="actions">
+          <a class="btn" href="04-batch-billing-run.html"><i data-i="play"></i>Run batch billing</a>
+          <a class="btn primary" href="03-invoice-detail.html"><i data-i="plus"></i>New invoice <span class="kbd">N</span></a>
+        </div>
+      </div>
+
+      <section class="card" aria-label="Invoice list">
+        <div class="summary" aria-label="Totals for current filter">
+          <div><div class="l">Outstanding</div><div class="v">$96,412.80</div></div>
+          <div><div class="l">Overdue · 9 invoices</div><div class="v" style="color:var(--lf-danger-fg)">$18,240.00</div></div>
+          <div><div class="l">Drafts awaiting send</div><div class="v">$16,830.00</div></div>
+          <div><div class="l">Paid in October</div><div class="v">$71,064.25</div></div>
+        </div>
+        <div class="filters">
+          <div class="seg" role="group" aria-label="Status">
+            <button type="button" aria-pressed="true">All <span class="n">214</span></button>
+            <button type="button" aria-pressed="false">Draft <span class="n">6</span></button>
+            <button type="button" aria-pressed="false">Awaiting approval <span class="n">2</span></button>
+            <button type="button" aria-pressed="false">Unpaid <span class="n">31</span></button>
+            <button type="button" aria-pressed="false">Overdue <span class="n">9</span></button>
+            <button type="button" aria-pressed="false">Paid <span class="n">172</span></button>
+            <button type="button" aria-pressed="false">Void <span class="n">3</span></button>
+          </div>
+          <button class="filter-btn set" type="button"><i data-i="calendar" class="i-sm"></i>Issued: Aug–Oct 2026 <i data-i="x" class="i-sm"></i></button>
+          <button class="filter-btn" type="button"><i data-i="plus" class="i-sm"></i>Customer</button>
+          <button class="filter-btn" type="button"><i data-i="filter" class="i-sm"></i>More</button>
+          <div class="grow" style="flex:1"></div>
+          <div class="seg" role="group" aria-label="Row density" data-density-toggle>
+            <button type="button" aria-pressed="true" data-value="comfortable">Comfortable</button>
+            <button type="button" aria-pressed="false" data-value="compact">Compact</button>
+          </div>
+        </div>
+        <div class="bulkbar" role="region" aria-label="Bulk actions">
+          <input type="checkbox" checked aria-label="Deselect all">
+          <b>3 selected</b><span class="muted">· $15,455.00 due</span>
+          <span style="flex:1"></span>
+          <button class="btn sm primary" type="button"><i data-i="mail"></i>Send reminder</button>
+          <button class="btn sm" type="button"><i data-i="file"></i>Send statement</button>
+          <button class="btn sm" type="button"><i data-i="download"></i>Download PDFs</button>
+          <button class="btn sm" type="button"><i data-i="download"></i>Export CSV</button>
+          <button class="btn sm ghost" type="button">Clear</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <caption class="sr-only">Unpaid and recent invoices, issued August to October 2026</caption>
+            <thead>
+              <tr>
+                <th class="chk" scope="col"><span class="sr-only">Select</span></th>
+                <th scope="col">Number</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Issued</th>
+                <th scope="col">Due</th>
+                <th scope="col">Status</th>
+                <th scope="col">Salesforce</th>
+                <th scope="col" class="num">Total (inc GST)</th>
+                <th scope="col" class="num">Amount due</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><input type="checkbox" aria-label="Select INV-001058"></td><td><a class="inv" href="03-invoice-detail.html">INV-001058</a></td><td><span class="cust">Kestrel Logistics Pty Ltd</span><span class="sec">Opportunity · Phase 2 rollout</span></td><td>24 Oct 2026</td><td>23 Nov 2026</td><td><span data-chip="draft"></span></td><td class="sfcell"><a class="sf ok" href="#" aria-label="Open Opportunity in Salesforce (synced)"><i data-i="cloud" class="cloud"></i>Synced<i data-i="ext" class="ext"></i></a></td><td class="num">12,650.00</td><td class="num">12,650.00</td></tr>
+              <tr><td><input type="checkbox" aria-label="Select INV-001057"></td><td><a class="inv" href="03-invoice-detail.html">INV-001057</a></td><td><span class="cust">Bondi Coastal Physio</span><span class="sec">Opportunity · Annual support renewal</span></td><td>23 Oct 2026</td><td>22 Nov 2026</td><td><span data-chip="awaiting"></span></td><td class="sfcell"><a class="sf pending" href="#" aria-label="Open Opportunity in Salesforce (update queued)"><i data-i="refresh" class="cloud"></i>Queued<i data-i="ext" class="ext"></i></a></td><td class="num">4,180.00</td><td class="num">4,180.00</td></tr>
+              <tr><td><input type="checkbox" aria-label="Select INV-001056"></td><td><a class="inv" href="03-invoice-detail.html">INV-001056</a></td><td><span class="cust">Wattle &amp; Stone Architects</span><span class="sec">Batch BR-0031 · October retainers</span></td><td>1 Oct 2026</td><td>31 Oct 2026</td><td><span data-chip="posted">Posted · sent</span></td><td class="sfcell"><a class="sf ok" href="#" aria-label="Open invoice in Salesforce (synced)"><i data-i="cloud" class="cloud"></i>Synced<i data-i="ext" class="ext"></i></a></td><td class="num">2,722.50</td><td class="num">2,722.50</td></tr>
+              <tr><td><input type="checkbox" aria-label="Select INV-001055"></td><td><a class="inv" href="03-invoice-detail.html">INV-001055</a></td><td><span class="cust">Murray River Organics</span><span class="sec">Batch BR-0031 · October retainers</span></td><td>1 Oct 2026</td><td>31 Oct 2026</td><td><span data-chip="partpaid"></span></td><td class="sfcell"><a class="sf ok" href="#" aria-label="Open invoice in Salesforce (synced)"><i data-i="cloud" class="cloud"></i>Synced<i data-i="ext" class="ext"></i></a></td><td class="num">5,500.00</td><td class="num">2,750.00</td></tr>
+              <tr class="selected"><td><input type="checkbox" checked aria-label="Select INV-001053"></td><td><a class="inv" href="03-invoice-detail.html">INV-001053</a></td><td><span class="cust">Southern Cross Solar</span><span class="sec">Opportunity · CPQ implementation</span></td><td>28 Sep 2026</td><td>12 Oct 2026</td><td><span data-chip="overdue">Overdue · 12 days</span></td><td class="sfcell"><a class="sf ok" href="#" aria-label="Open invoice in Salesforce (synced)"><i data-i="cloud" class="cloud"></i>Synced<i data-i="ext" class="ext"></i></a></td><td class="num">8,965.00</td><td class="num">8,965.00</td></tr>
+              <tr class="selected"><td><input type="checkbox" checked aria-label="Select INV-001052"></td><td><a class="inv" href="03-invoice-detail.html">INV-001052</a></td><td><span class="cust">Lighthouse Learning</span><span class="sec">Opportunity · LMS integration</span></td><td>15 Sep 2026</td><td>15 Oct 2026</td><td><span data-chip="overdue">Overdue · 9 days</span></td><td class="sfcell"><a class="sf err" href="09-sync-issues-inbox.html" aria-label="Salesforce update failed — open sync issue"><i data-i="alert" class="cloud"></i>Failed — fix</a></td><td class="num">3,520.00</td><td class="num">3,520.00</td></tr>
+              <tr class="selected"><td><input type="checkbox" checked aria-label="Select INV-001051"></td><td><a class="inv" href="03-invoice-detail.html">INV-001051</a></td><td><span class="cust">Coral Bay Tourism</span><span class="sec">Batch BR-0030 · September retainers</span></td><td>1 Sep 2026</td><td>1 Oct 2026</td><td><span data-chip="overdue">Overdue · 23 days</span></td><td class="sfcell"><a class="sf ok" href="#" aria-label="Open invoice in Salesforce (synced)"><i data-i="cloud" class="cloud"></i>Synced<i data-i="ext" class="ext"></i></a></td><td class="num">2,970.00</td><td class="num">2,970.00</td></tr>
+              <tr><td><input type="checkbox" aria-label="Select INV-001048"></td><td><a class="inv" href="03-invoice-detail.html">INV-001048</a></td><td><span class="cust">Kestrel Logistics Pty Ltd</span><span class="sec">Opportunity · Phase 1 discovery</span></td><td>25 Aug 2026</td><td>24 Sep 2026</td><td><span data-chip="overdue">Overdue · 30 days</span></td><td class="sfcell"><a class="sf ok" href="#" aria-label="Open invoice in Salesforce (synced)"><i data-i="cloud" class="cloud"></i>Synced<i data-i="ext" class="ext"></i></a></td><td class="num">6,050.00</td><td class="num">6,050.00</td></tr>
+              <tr><td><input type="checkbox" aria-label="Select INV-001054"></td><td><a class="inv" href="03-invoice-detail.html">INV-001054</a></td><td><span class="cust">Pinnacle Dental Group</span><span class="sec">Batch BR-0031 · October retainers</span></td><td>1 Oct 2026</td><td>31 Oct 2026</td><td><span data-chip="paid">Paid · 14 Oct</span></td><td class="sfcell"><a class="sf ok" href="#" aria-label="Open invoice in Salesforce (synced)"><i data-i="cloud" class="cloud"></i>Synced<i data-i="ext" class="ext"></i></a></td><td class="num">1,375.00</td><td class="num">0.00</td></tr>
+              <tr class="void-row"><td><input type="checkbox" aria-label="Select INV-001050"></td><td><a class="inv" href="03-invoice-detail.html">INV-001050</a></td><td><span class="cust">Redgum Ventures</span><span class="sec">Reversed by journal JNL-004102 · 2 Sep</span></td><td>29 Aug 2026</td><td>28 Sep 2026</td><td><span data-chip="void"></span></td><td class="sfcell"><a class="sf ok" href="#" aria-label="Open invoice in Salesforce (synced)"><i data-i="cloud" class="cloud"></i>Synced<i data-i="ext" class="ext"></i></a></td><td class="num">6,600.00</td><td class="num">0.00</td></tr>
+              <tr><td><input type="checkbox" aria-label="Select INV-001047"></td><td><a class="inv" href="03-invoice-detail.html">INV-001047</a></td><td><span class="cust">Bondi Coastal Physio</span><span class="sec">Manual invoice</span></td><td>20 Aug 2026</td><td>19 Sep 2026</td><td><span data-chip="paid">Paid · 18 Sep</span></td><td class="sfcell"><span class="sf none"><i data-i="link" class="cloud"></i>Not linked</span></td><td class="num">880.00</td><td class="num">0.00</td></tr>
+            </tbody>
+            <tfoot>
+              <tr><td></td><td colspan="6">11 of 214 invoices shown · totals exclude void</td><td class="num">48,812.50</td><td class="num">43,807.50</td></tr>
+            </tfoot>
+          </table>
+        </div>
+        <div class="card-f">
+          <div class="hints" aria-label="Keyboard shortcuts"><span><span class="kbd">J</span> <span class="kbd">K</span> move</span><span><span class="kbd">X</span> select</span><span><span class="kbd">Enter</span> open</span><span><span class="kbd">/</span> filter</span><span><span class="kbd">?</span> all shortcuts</span></div>
+          <span class="small">Posted invoices can't be deleted — open one and choose <b>Void</b> or <b>Credit note</b>.</span>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0019",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-33",
+      "file": ".agent/evidence/T-0019/20261024-142832-tests-db.json",
+      "test": "9 test(s): packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-33: Dimension sets are deduplicated by a hash of their sorted pairs › the same pairs in any order give the same set id (property) | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-33: Dimension sets are deduplicated by a hash of their sorted pairs › different pairs give different sets, and each combination is stored once | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-33: Dimension sets are deduplicated by a hash of their sorted pairs › the empty set is a real, single set (no NULL dimension keys) | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-33: Dimension sets are deduplicated by a hash of their sorted pairs › the two primary dimensions are copied into indexed columns | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-33: Dimension sets are deduplicated by a hash of their sorted pairs › a set holds at most one value per dimension | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-33: Dimension sets are deduplicated by a hash of their sorted pairs › a value from another tenant, an unknown value or a repeated value is refused | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-33: Dimension sets are deduplicated by a hash of their sorted pairs › a caller cannot store a forged hash or canonical form: the trigger recomputes them | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-33: Dimension sets are deduplicated by a hash of their sorted pairs › sets are immutable and never deleted (lf_app has no UPDATE or DELETE) | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-33: Dimension sets are deduplicated by a hash of their sorted pairs › an archived value cannot be used in a new set",
+      "commit": "361b38f4bd91",
+      "provider": "claude",
+      "timestamp": "2026-10-24T14:28:32.386Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-34",
+      "file": ".agent/evidence/T-0019/20261024-142832-tests-db.json",
+      "test": "5 test(s): packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-34: Required dimensions per account are enforced; dimension identity is stable › reports the required dimensions a set is missing, by code | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-34: Required dimensions per account are enforced; dimension identity is stable › an account cannot require a dimension the company does not have | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-34: Required dimensions per account are enforced; dimension identity is stable › dimension codes and primary slots cannot change once created | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-34: Required dimensions per account are enforced; dimension identity is stable › a primary slot is taken by at most one dimension, and only slots 1 and 2 exist | packages/ledger/src/dimension-set.db.test.ts › SS-PLAT-34: Required dimensions per account are enforced; dimension identity is stable › a dimension required by an active account cannot be archived",
+      "commit": "361b38f4bd91",
+      "provider": "claude",
+      "timestamp": "2026-10-24T14:28:32.386Z",
+      "result": "passed"
+    }
+  ]
+}

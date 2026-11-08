@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0022",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-03",
+      "file": ".agent/evidence/T-0022/20261024-181728-tests-db.json",
+      "test": "10 test(s): packages/ledger/src/hash-chain.db.test.ts › SS-PLAT-03: Hash chain detects tampering › 100 posted entries form one chain (seq 1..100, each linked to the previous hash) that verifies | packages/ledger/src/hash-chain.db.test.ts › SS-PLAT-03: Hash chain detects tampering › a superuser altering one amount (kept balanced) is reported at that entry | packages/ledger/src/hash-chain.db.test.ts › SS-PLAT-03: Hash chain detects tampering › a superuser altering a header field (memo) is reported at that entry | packages/ledger/src/hash-chain.db.test.ts › SS-PLAT-03: Hash chain detects tampering › a superuser who re-hashes the altered entry breaks the next link instead | packages/ledger/src/hash-chain.db.test.ts › SS-PLAT-03: Hash chain detects tampering › a superuser deleting an entry leaves a sequence gap; deleting the last one mismatches the head | packages/ledger/src/hash-chain.db.test.ts › SS-PLAT-03: Hash chain detects tampering › concurrent posting in one company still yields a single linear chain | packages/ledger/src/hash-chain.db.test.ts › SS-PLAT-03: Hash chain detects tampering › a reversal (the one permitted change, status → reversed) keeps the chain valid | packages/ledger/src/hash-chain.db.test.ts › SS-PLAT-03: Hash chain detects tampering › the application cannot choose a hash, and lines cannot be added to a chained entry | packages/ledger/src/hash-chain.db.test.ts › SS-PLAT-03: Hash chain detects tampering › draft entries are not chained | packages/ledger/src/hash-chain.db.test.ts › SS-PLAT-03: Hash chain detects tampering › property: the TypeScript canonical form equals the SQL one for any content",
+      "commit": "31124c24de51",
+      "provider": "claude",
+      "timestamp": "2026-10-24T18:17:28.993Z",
+      "result": "passed"
+    }
+  ]
+}

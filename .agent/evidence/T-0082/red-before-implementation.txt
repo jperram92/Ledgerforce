@@ -1,0 +1,107 @@
+# T-0082 RED before implementation
+
+## apps/api/src/journals/gl-screens.db.test.ts (SS-PLAT-96): all 5 failed with 404, routes missing (tail of output)
+
+    "created_by": "01900000-0000-7000-8000-0000000082a1",
+-   "people": {
+-     "01900000-0000-7000-8000-0000000082a1": "Priya Shah",
+-   },
+  }
+
+ ❯ apps/api/src/journals/gl-screens.db.test.ts:251:30
+    249|     await call('POST', `/manual-journals/${id}/submit`, 'accountant', …
+    250|     const res = await call('GET', `/manual-journals/${id}`, 'approver'…
+    251|     expect(await res.json()).toMatchObject({
+       |                              ^
+    252|       created_by: PEOPLE.accountant.id,
+    253|       people: { [PEOPLE.accountant.id]: 'Priya Shah' },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |api-db| apps/api/src/journals/gl-screens.db.test.ts > SS-PLAT-96: GL screen read routes (chart, journal list, journal preview) > SS-PLAT-96 GET /manual-journals/:id/preview shows the journal the engine would post and writes nothing
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/journals/gl-screens.db.test.ts:264:24
+    262|     );
+    263|     const res = await call('GET', `/manual-journals/${id}/preview`, 'a…
+    264|     expect(res.status).toBe(200);
+       |                        ^
+    265|     expect(await res.json()).toEqual({
+    266|       entry_date: '2026-10-24',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |api-db| apps/api/src/journals/gl-screens.db.test.ts > SS-PLAT-96: GL screen read routes (chart, journal list, journal preview) > SS-PLAT-96 a control-account line is refused by the preview with CONTROL_ACCOUNT and its line; a posted journal answers ALREADY_POSTED
+AssertionError: expected 404 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 404
+
+ ❯ apps/api/src/journals/gl-screens.db.test.ts:314:24
+    312|     });
+    313|     const res = await call('GET', `/manual-journals/${id}/preview`, 'a…
+    314|     expect(res.status).toBe(422);
+       |                        ^
+    315|     expect(await res.json()).toMatchObject({
+    316|       error: 'posting_refused',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  10:44:24
+   Duration  3.68s (transform 1.24s, setup 0ms, import 1.84s, tests 787ms, environment 0ms)
+
+
+
+## apps/web/src/gl/gl-logic.test.ts: failed to import ./gl-logic.ts (module missing)
+
+ ❯ TransformPluginContext.error node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:8800:14
+ ❯ resolveId node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:26594:18
+ ❯ node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:26693:23
+ ❯ TransformPluginContext.transform node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:26666:4
+ ❯ EnvironmentPluginContainer.transform node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:8582:14
+ ❯ loadAndTransform node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:20155:26
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  14:43:49
+   Duration  30.10s (transform 38ms, setup 1.94s, import 0ms, tests 0ms, environment 27.48s)
+
+
+
+## apps/web/src/gl/gl.test.tsx (SS-PLAT-93..95): 10/10 failed, no routes or links yet
+
+     × is listed on Reports and shows accounts by type with roles and controls in words 1049ms
+     × a clerk without gl.account.read sees the forbidden state and no request is made 1009ms
+     × shows the empty state when the company has no chart yet 1007ms
+     × lists journals with status words and right-set amounts; preparers get New 1007ms
+     × an Auditor reads the list but cannot start a journal 1008ms
+     × creates a draft with an Idempotency-Key and decimal-string amounts, then opens it 1007ms
+     × shows the problems with the form before sending anything 1007ms
+     × an Approver approves a journal that needs approval, naming the preparer 1005ms
+     × shows the engine preview, balanced, before submitting; Submit sends the draft 1009ms
+     × marks the refused CONTROL_ACCOUNT line, explains it and withholds Submit 1006ms
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |web| apps/web/src/gl/gl.test.tsx > SS-PLAT-93: chart of accounts > is listed on Reports and shows accounts by type with roles and controls in words
+ FAIL  |web| apps/web/src/gl/gl.test.tsx > SS-PLAT-93: chart of accounts > a clerk without gl.account.read sees the forbidden state and no request is made
+ FAIL  |web| apps/web/src/gl/gl.test.tsx > SS-PLAT-93: chart of accounts > shows the empty state when the company has no chart yet
+ FAIL  |web| apps/web/src/gl/gl.test.tsx > SS-PLAT-94: manual journals > lists journals with status words and right-set amounts; preparers get New
+ FAIL  |web| apps/web/src/gl/gl.test.tsx > SS-PLAT-94: manual journals > an Auditor reads the list but cannot start a journal
+ FAIL  |web| apps/web/src/gl/gl.test.tsx > SS-PLAT-94: manual journals > creates a draft with an Idempotency-Key and decimal-string amounts, then opens it
+ FAIL  |web| apps/web/src/gl/gl.test.tsx > SS-PLAT-94: manual journals > shows the problems with the form before sending anything
+ FAIL  |web| apps/web/src/gl/gl.test.tsx > SS-PLAT-94: manual journals > an Approver approves a journal that needs approval, naming the preparer
+ FAIL  |web| apps/web/src/gl/gl.test.tsx > SS-PLAT-95: show me the journal > shows the engine preview, balanced, before submitting; Submit sends the draft

@@ -1,0 +1,7 @@
+# Files the Salesforce CLI must not deploy (RQ-0022).
+package.xml
+test/
+**/jsconfig.json
+**/.eslintrc.json
+**/__tests__/**
+node_modules/

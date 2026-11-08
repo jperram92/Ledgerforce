@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0104",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-28",
+      "file": ".agent/evidence/T-0104/20261024-130542-tests-api-db.json",
+      "test": "6 test(s): apps/api/src/tenancy/tenant-transaction.db.test.ts › SS-PLAT-28: Every API request runs in its own tenant transaction › a request resolved to tenant A sees only A’s company | apps/api/src/tenancy/tenant-transaction.db.test.ts › SS-PLAT-28: Every API request runs in its own tenant transaction › tenant B, on the same pooled connection straight after, sees only B’s company | apps/api/src/tenancy/tenant-transaction.db.test.ts › SS-PLAT-28: Every API request runs in its own tenant transaction › a request with no resolvable tenant gets 401 and runs no SQL | apps/api/src/tenancy/tenant-transaction.db.test.ts › SS-PLAT-28: Every API request runs in its own tenant transaction › leaves no tenant context on the pooled connection after the request | apps/api/src/tenancy/tenant-transaction.db.test.ts › SS-PLAT-28: Every API request runs in its own tenant transaction › the production default resolver refuses every request until OIDC exists (T-0011) | apps/api/src/tenancy/tenant-transaction.db.test.ts › SS-PLAT-28: Every API request runs in its own tenant transaction › never takes the tenant from a header or query string",
+      "commit": "3ca2bd9cb84b-dirty",
+      "provider": "claude",
+      "timestamp": "2026-10-24T13:05:42.742Z",
+      "result": "passed"
+    }
+  ]
+}

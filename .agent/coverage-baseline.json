@@ -1,0 +1,18 @@
+{
+  "note": "unit-test coverage baseline; verify gate 2c fails if coverage drops below main",
+  "recorded": "2026-10-24",
+  "total": {
+    "lines": {
+      "pct": 72.22
+    },
+    "branches": {
+      "pct": 69.37
+    },
+    "functions": {
+      "pct": 78.94
+    },
+    "statements": {
+      "pct": 70.78
+    }
+  }
+}

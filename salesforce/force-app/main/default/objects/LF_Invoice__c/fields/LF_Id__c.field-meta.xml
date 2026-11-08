@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LF_Id__c</fullName>
+    <caseSensitive>false</caseSensitive>
+    <description>LedgerForce invoice id (UUID). External ID used to upsert this mirror. Written by LedgerForce write-back; read-only in Salesforce (design §5.4).</description>
+    <externalId>true</externalId>
+    <label>LedgerForce Id</label>
+    <length>36</length>
+    <required>false</required>
+    <type>Text</type>
+    <unique>true</unique>
+</CustomField>

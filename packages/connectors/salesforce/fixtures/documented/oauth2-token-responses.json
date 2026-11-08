@@ -1,0 +1,54 @@
+{
+  "source": "Documented, NOT recorded: written from RQ-0024 Findings 3 and 4 and their sources (no Salesforce org was contacted). Replace with redacted recordings in fixtures/recorded/ from a scratch org (RQ-0024 follow-up). No real token, id or key appears here.",
+  "responses": {
+    "success": {
+      "status": 200,
+      "body": {
+        "access_token": "00DTEST000000000!REDACTED",
+        "instance_url": "https://harbour-dev-ed.develop.my.salesforce.com",
+        "id": "https://test.salesforce.com/id/00DTEST000000000AAA/005TEST000000000AAA",
+        "token_type": "Bearer",
+        "scope": "api",
+        "issued_at": "1761300000000"
+      }
+    },
+    "not_preauthorized": {
+      "status": 400,
+      "body": {
+        "error": "invalid_grant",
+        "error_description": "user hasn't approved this consumer"
+      }
+    },
+    "invalid_audience": {
+      "status": 400,
+      "body": { "error": "invalid_grant", "error_description": "audience is invalid" }
+    },
+    "invalid_assertion": {
+      "status": 400,
+      "body": { "error": "invalid_grant", "error_description": "invalid assertion" }
+    },
+    "invalid_user": {
+      "status": 400,
+      "body": { "error": "invalid_grant", "error_description": "inactive user" }
+    },
+    "ip_restricted": {
+      "status": 400,
+      "body": {
+        "error": "invalid_grant",
+        "error_description": "ip restricted or invalid login hours"
+      }
+    },
+    "invalid_grant": {
+      "status": 400,
+      "body": { "error": "invalid_grant", "error_description": "authentication failure" }
+    },
+    "invalid_client": {
+      "status": 400,
+      "body": { "error": "invalid_client_id", "error_description": "client identifier invalid" }
+    },
+    "unsupported_grant_type": {
+      "status": 400,
+      "body": { "error": "unsupported_grant_type", "error_description": "grant type not supported" }
+    }
+  }
+}

@@ -1,0 +1,50 @@
+      6| import { describe, expect, it } from 'vitest';
+      7| import { OUTBOX_QUEUE_OPTIONS } from './queue.ts';
+      8| import { retryBounds, retrySchedule } from './backoff.ts';
+       | ^
+      9|
+     10| const MIN = 60;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  09:57:46
+   Duration  268ms (transform 43ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| apps/worker/src/sync-issues.db.test.ts [ apps/worker/src/sync-issues.db.test.ts ]
+Error: Cannot find module './sync-issue-worker.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-adae3d63f917efced/apps/worker/src/sync-issues.db.test.ts
+ ❯ apps/worker/src/sync-issues.db.test.ts:59:1
+     57| import { afterAll, afterEach, beforeAll, beforeEach, describe, expect,…
+     58| import { startOutboxWorker } from './outbox-worker.ts';
+     59| import { startSyncIssueWorker } from './sync-issue-worker.ts';
+       | ^
+     60|
+     61| const T = '01900000-0000-7000-8000-000000007101';
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  09:59:46
+   Duration  2.55s (transform 747ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
+    286|   it('SS-PLAT-91 the Auditor may read but not act; a clerk may not rea…
+    287|     const s = await seedIssue(A);
+    288|     expect((await call('/sync-issues', AUDITOR)).status).toBe(200);
+       |                                                          ^
+    289|     const denied = await call(`/sync-issues/${s.issueId}/retry`, AUDIT…
+    290|     expect(denied.status).toBe(403);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
+   Start at  10:09:09
+   Duration  4.74s (transform 1.43s, setup 0ms, import 2.42s, tests 966ms, environment 0ms)
+

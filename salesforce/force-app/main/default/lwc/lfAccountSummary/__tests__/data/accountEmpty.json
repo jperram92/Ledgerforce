@@ -1,0 +1,10 @@
+{
+  "apiName": "Account",
+  "id": "001000000000002AAA",
+  "fields": {
+    "LF_Balance_Due__c": { "displayValue": null, "value": null },
+    "LF_Overdue_Amount__c": { "displayValue": null, "value": null },
+    "LF_Last_Payment_Date__c": { "displayValue": null, "value": null },
+    "LF_Credit_Status__c": { "displayValue": null, "value": null }
+  }
+}

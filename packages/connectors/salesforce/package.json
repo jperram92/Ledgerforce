@@ -1,0 +1,26 @@
+{
+  "name": "@ledgerforce/connector-salesforce",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Salesforce connector: External Client App JWT bearer auth and encrypted token store (design §5.2, ADR-0007); Pub/Sub API CDC subscriber with a replay-id store (design §5.3, ADR-0032); sObject Collections write-back from the outbox (design §5.4, ADR-0036)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./testing": "./src/testing/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "1.14.6",
+    "@grpc/proto-loader": "0.8.1",
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "avsc": "5.7.9",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "vitest": "4.1.12"
+  }
+}

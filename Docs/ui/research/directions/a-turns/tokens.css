@@ -1,0 +1,41 @@
+/* Direction A "Turns" tokens. Colour has one job: whose turn it is.
+   Orange = you (or a person must act); blue = someone else or the system has it; ink = settled.
+   Blue/orange is the colour-vision-safe pair (INS-11, RQ-0089). Dark is designed, not inverted:
+   ground #121212 (fewest reading errors in the 2025 Hrcak study, RQ-0089). */
+@font-face { font-family: "Atkinson Hyperlegible Next"; font-weight: 400; font-display: block; src: url(fonts/atkinson-hyperlegible-next-latin-400-normal.woff2) format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible Next"; font-weight: 600; font-display: block; src: url(fonts/atkinson-hyperlegible-next-latin-600-normal.woff2) format("woff2"); }
+@font-face { font-family: "Atkinson Hyperlegible Next"; font-weight: 700; font-display: block; src: url(fonts/atkinson-hyperlegible-next-latin-700-normal.woff2) format("woff2"); }
+
+:root {
+  --font: "Atkinson Hyperlegible Next", "Segoe UI", sans-serif;
+  --ground: #e6eae8;      /* rail and page */
+  --pane: #ffffff;        /* list and detail */
+  --pane-2: #f3f5f4;      /* zebra, table heads */
+  --ink: #1a2320;
+  --ink-2: #4a5551;
+  --line: #d3d9d6;
+  --line-2: #a9b3af;
+  --you: #9c4a00;  --you-fill: #ffe8d1;  --you-mark: #e07800;
+  --oth: #0c5391;  --oth-fill: #dfecf8;  --oth-mark: #2f7cc4;
+  --done: #3f4a46;
+  --focus: #0c5391;
+  --sel: #fff5ea;         /* selected row = your-turn tint */
+  --r: 3px;               /* controls only; panes are square to the window */
+  --row: 40px;            /* owner default (comfortable) */
+  --row-c: 32px;          /* operator tables (compact) */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px;
+  --t-xs: 12.5px; --t-s: 13.5px; --t-m: 14.5px; --t-l: 17px; --t-xl: 22px; --t-xxl: 28px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #121212; --pane: #1a1c1b; --pane-2: #222524; --ink: #e8ecea; --ink-2: #aab4b0;
+  --line: #333837; --line-2: #59625f;
+  --you: #ffb46b; --you-fill: #3a2410; --you-mark: #ff9a2e;
+  --oth: #94c6f5; --oth-fill: #12283c; --oth-mark: #5aa2e6;
+  --done: #c9d1ce; --focus: #94c6f5; --sel: #2a2016; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --ground: #121212; --pane: #1a1c1b; --pane-2: #222524; --ink: #e8ecea; --ink-2: #aab4b0;
+  --line: #333837; --line-2: #59625f;
+  --you: #ffb46b; --you-fill: #3a2410; --you-mark: #ff9a2e;
+  --oth: #94c6f5; --oth-fill: #12283c; --oth-mark: #5aa2e6;
+  --done: #c9d1ce; --focus: #94c6f5; --sel: #2a2016; color-scheme: dark; }

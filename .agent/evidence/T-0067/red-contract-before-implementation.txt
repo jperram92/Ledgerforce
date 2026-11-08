@@ -1,0 +1,194 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aab12063cc32ee6c5
+
+ ❯ |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts (12 tests | 12 failed) 31ms
+     × SS-UC03-04: Salesforce shows Paid with payment date 5ms
+     × SS-UC03-04 a replay sends the same values and creates nothing new (upsert is idempotent) 1ms
+     × SS-UC04-02: Credit status "Overdue" written back 1ms
+     × SS-PLAT-83 the field map is data, names only package fields, and only LedgerForce-owned ones 5ms
+     × SS-PLAT-83 450 invoices and 260 account/opportunity updates go out in requests of at most 200 1ms
+     × SS-PLAT-83 the same record twice in one event is sent once, last value wins 1ms
+     × SS-PLAT-83 the payload contract is strict: unknown statuses, fields and float money are refused 1ms
+     × SS-PLAT-84 503 is a retryable outage and carries Retry-After; nothing is written 1ms
+     × SS-PLAT-84 429, 403 REQUEST_LIMIT_EXCEEDED, 400 and 401 are classified 1ms
+     × SS-PLAT-84 a per-record failure in a 200 answer fails the delivery with the record errors 1ms
+     × SS-PLAT-84 Retry-After and Sforce-Limit-Info are parsed 1ms
+     × SS-PLAT-84 the worker stops sending at 25 % of the daily allocation and resumes when the reading is stale 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-UC03-04 write-back of a paid invoice > SS-UC03-04: Salesforce shows Paid with payment date
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/mapping.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export const CREDIT_STATUS_LABELS = {};
+ ❯ parseWriteBackPayload packages/connectors/salesforce/src/writeback/mapping.ts:12:64
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:110:60
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-UC03-04 write-back of a paid invoice > SS-UC03-04 a replay sends the same values and creates nothing new (upsert is idempotent)
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/mapping.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export const CREDIT_STATUS_LABELS = {};
+ ❯ parseWriteBackPayload packages/connectors/salesforce/src/writeback/mapping.ts:12:64
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:193:34
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-UC04-02 credit status write-back > SS-UC04-02: Credit status "Overdue" written back
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/mapping.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export const CREDIT_STATUS_LABELS = {};
+ ❯ parseWriteBackPayload packages/connectors/salesforce/src/writeback/mapping.ts:12:64
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:216:45
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-PLAT-83 field map, ownership and batches of at most 200 > SS-PLAT-83 the field map is data, names only package fields, and only LedgerForce-owned ones
+AssertionError: expected [] to deeply equal [ 'LF_Balance_Due__c', …(3) ]
+
+- Expected
++ Received
+
+- [
+-   "LF_Balance_Due__c",
+-   "LF_Credit_Status__c",
+-   "LF_Last_Payment_Date__c",
+-   "LF_Overdue_Amount__c",
+- ]
++ []
+
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:256:37
+    254|     const owned = (o: string) =>
+    255|       FIELD_MAP.filter((s) => s.sobject === o).flatMap((s) => s.fields…
+    256|     expect(owned('Account').sort()).toEqual(
+       |                                     ^
+    257|       [
+    258|         'LF_Balance_Due__c',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-PLAT-83 field map, ownership and batches of at most 200 > SS-PLAT-83 450 invoices and 260 account/opportunity updates go out in requests of at most 200
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/mapping.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export const CREDIT_STATUS_LABELS = {};
+ ❯ parseWriteBackPayload packages/connectors/salesforce/src/writeback/mapping.ts:12:64
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:306:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-PLAT-83 field map, ownership and batches of at most 200 > SS-PLAT-83 the same record twice in one event is sent once, last value wins
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/mapping.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export const CREDIT_STATUS_LABELS = {};
+ ❯ parseWriteBackPayload packages/connectors/salesforce/src/writeback/mapping.ts:12:64
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:327:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-PLAT-83 field map, ownership and batches of at most 200 > SS-PLAT-83 the payload contract is strict: unknown statuses, fields and float money are refused
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/mapping.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export const CREDIT_STATUS_LABELS = {};
+ ❯ parseWriteBackPayload packages/connectors/salesforce/src/writeback/mapping.ts:12:64
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:349:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-PLAT-84 outage, limits and per-record failures > SS-PLAT-84 503 is a retryable outage and carries Retry-After; nothing is written
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/mapping.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export const CREDIT_STATUS_LABELS = {};
+ ❯ parseWriteBackPayload packages/connectors/salesforce/src/writeback/mapping.ts:12:64
+ ❯ one packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:379:7
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:386:44
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-PLAT-84 outage, limits and per-record failures > SS-PLAT-84 429, 403 REQUEST_LIMIT_EXCEEDED, 400 and 401 are classified
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/mapping.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export const CREDIT_STATUS_LABELS = {};
+ ❯ parseWriteBackPayload packages/connectors/salesforce/src/writeback/mapping.ts:12:64
+ ❯ one packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:379:7
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:402:41
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-PLAT-84 outage, limits and per-record failures > SS-PLAT-84 a per-record failure in a 200 answer fails the delivery with the record errors
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/mapping.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export const CREDIT_STATUS_LABELS = {};
+ ❯ parseWriteBackPayload packages/connectors/salesforce/src/writeback/mapping.ts:12:64
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:420:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-PLAT-84 outage, limits and per-record failures > SS-PLAT-84 Retry-After and Sforce-Limit-Info are parsed
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/collections.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export type HttpRequest = (
+ ❯ parseRetryAfter packages/connectors/salesforce/src/writeback/collections.ts:23:74
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:448:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts > SS-PLAT-84 outage, limits and per-record failures > SS-PLAT-84 the worker stops sending at 25 % of the daily allocation and resumes when the reading is stale
+Error: not implemented (T-0067 red)
+ ❯ todo packages/connectors/salesforce/src/writeback/collections.ts:2:9
+      1| const todo = (): never => {
+      2|   throw new Error('not implemented (T-0067 red)');
+       |         ^
+      3| };
+      4| export type HttpRequest = (
+ ❯ new ApiUsageGate packages/connectors/salesforce/src/writeback/collections.ts:19:5
+ ❯ packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts:463:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  12 failed (12)
+   Start at  00:24:18
+   Duration  761ms (transform 333ms, setup 0ms, import 451ms, tests 31ms, environment 0ms)
+

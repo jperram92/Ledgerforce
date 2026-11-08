@@ -1,0 +1,258 @@
+/*
+ * LedgerForce design tokens — v0.1 (Sprint 0)
+ * Source of truth for colour, type, space, radius, elevation and density.
+ * Consumed by: mockups (Docs/ui/mockups), later apps/web (Tailwind theme + shadcn/ui CSS variables).
+ * Contrast of every text/background pair is verified by Docs/ui/tools/contrast.mjs (WCAG 2.2 AA).
+ * Rules: never use a raw hex in a component; add a token here and re-run the contrast check.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Light theme (default)                                               */
+/* ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+
+  /* Neutrals */
+  --lf-bg: #f5f6f8;              /* app canvas behind cards */
+  --lf-surface: #ffffff;         /* cards, tables, panels */
+  --lf-surface-2: #f9fafb;       /* table header, sunken wells */
+  --lf-surface-hover: #f1f3f6;   /* row hover */
+  --lf-surface-selected: #eef0fe;/* selected row */
+  --lf-border: #e3e6eb;          /* dividers (decorative, no contrast requirement) */
+  --lf-border-strong: #858e9e;   /* input + checkbox borders (>= 3:1, WCAG 1.4.11) */
+  --lf-text: #101828;            /* primary text */
+  --lf-text-muted: #475467;      /* secondary text, labels */
+  --lf-text-subtle: #5d6779;     /* meta text, captions (still >= 4.5:1 on bg) */
+  --lf-text-inverse: #ffffff;
+
+  /* Brand accent: one colour, used for primary actions, links, focus, "Posted" */
+  --lf-accent: #4f46e5;
+  --lf-accent-hover: #4338ca;
+  --lf-accent-fg: #ffffff;       /* text on accent */
+  --lf-accent-soft: #eef0fe;     /* accent tint background */
+  --lf-accent-text: #4338ca;     /* accent-coloured text on surface/soft */
+  --lf-focus: #4f46e5;           /* focus ring (>= 3:1 on surface and bg) */
+
+  /* Semantic */
+  --lf-success-fg: #067647;  --lf-success-bg: #ecfdf3;  --lf-success-border: #75e0a7;  --lf-success-solid: #067647;
+  --lf-warning-fg: #a43e05;  --lf-warning-bg: #fffaeb;  --lf-warning-border: #fec84b;  --lf-warning-solid: #dc6803;
+  --lf-danger-fg:  #b42318;  --lf-danger-bg:  #fef3f2;  --lf-danger-border:  #fda29b;  --lf-danger-solid:  #c4271c;
+  --lf-info-fg:    #175cd3;  --lf-info-bg:    #eff8ff;  --lf-info-border:    #84caff;  --lf-info-solid:    #1570ef;
+
+  /* Document status palette — ALWAYS rendered as chip text + colour (+ icon), never colour alone */
+  --lf-status-draft-fg: #475467;     --lf-status-draft-bg: #f2f4f7;
+  --lf-status-awaiting-fg: #a43e05;  --lf-status-awaiting-bg: #fffaeb;
+  --lf-status-approved-fg: #175cd3;  --lf-status-approved-bg: #eff8ff;
+  --lf-status-posted-fg: #4338ca;    --lf-status-posted-bg: #eef0fe;
+  --lf-status-partpaid-fg: #0e6a83;  --lf-status-partpaid-bg: #ecfdff;
+  --lf-status-paid-fg: #067647;      --lf-status-paid-bg: #ecfdf3;
+  --lf-status-overdue-fg: #b42318;   --lf-status-overdue-bg: #fef3f2;
+  --lf-status-void-fg: #344054;      --lf-status-void-bg: #ffffff;  --lf-status-void-border: #858e9e;
+  --lf-status-reversed-fg: #6431b8;  --lf-status-reversed-bg: #f4f3ff;
+  --lf-status-locked-fg: #ffffff;    --lf-status-locked-bg: #344054;
+
+  /* Sync (Salesforce) indicator */
+  --lf-sync-ok: var(--lf-success-fg);
+  --lf-sync-pending: var(--lf-info-fg);
+  --lf-sync-error: var(--lf-danger-fg);
+
+  /* Shell */
+  --lf-nav-bg: #ffffff;
+  --lf-nav-fg: #344054;
+  --lf-nav-active-bg: #eef0fe;
+  --lf-nav-active-fg: #3730a3;
+
+  /* Elevation */
+  --lf-shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --lf-shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --lf-shadow-md: 0 4px 8px -2px rgba(16, 24, 40, 0.08), 0 2px 4px -2px rgba(16, 24, 40, 0.04);
+  --lf-shadow-lg: 0 12px 24px -4px rgba(16, 24, 40, 0.10), 0 4px 8px -4px rgba(16, 24, 40, 0.04);
+  --lf-shadow-overlay: 0 24px 48px -12px rgba(16, 24, 40, 0.22);
+  --lf-scrim: rgba(16, 24, 40, 0.45);
+
+  /* Typography */
+  --lf-font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --lf-font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, "DejaVu Sans Mono", monospace;
+  --lf-text-xs: 0.75rem;    /* 12px meta, chip */
+  --lf-text-sm: 0.8125rem;  /* 13px table compact, helper */
+  --lf-text-base: 0.875rem; /* 14px body / table default */
+  --lf-text-md: 1rem;       /* 16px inputs on mobile, lead */
+  --lf-text-lg: 1.125rem;   /* 18px card title */
+  --lf-text-xl: 1.25rem;    /* 20px section */
+  --lf-text-2xl: 1.5rem;    /* 24px page title (h1) */
+  --lf-text-3xl: 1.875rem;  /* 30px KPI figure */
+  --lf-leading-tight: 1.25;
+  --lf-leading: 1.5;
+  --lf-weight-regular: 400;
+  --lf-weight-medium: 500;
+  --lf-weight-semibold: 600;
+  --lf-numeric: tabular-nums lining-nums; /* font-variant-numeric for every money/qty cell */
+
+  /* Spacing (4px base) */
+  --lf-space-0: 0;
+  --lf-space-0-5: 2px;
+  --lf-space-1: 4px;
+  --lf-space-2: 8px;
+  --lf-space-3: 12px;
+  --lf-space-4: 16px;
+  --lf-space-5: 20px;
+  --lf-space-6: 24px;
+  --lf-space-8: 32px;
+  --lf-space-10: 40px;
+  --lf-space-12: 48px;
+  --lf-space-16: 64px;
+
+  /* Radii */
+  --lf-radius-sm: 4px;
+  --lf-radius-md: 6px;
+  --lf-radius-lg: 8px;
+  --lf-radius-xl: 12px;
+  --lf-radius-full: 999px;
+
+  /* Layout */
+  --lf-nav-w: 232px;
+  --lf-topbar-h: 56px;
+  --lf-content-max: 1360px;
+
+  /* Density — Comfortable (default) */
+  --lf-row-h: 44px;
+  --lf-cell-px: 12px;
+  --lf-cell-py: 10px;
+  --lf-control-h: 36px;
+  --lf-table-font: var(--lf-text-base);
+  --lf-card-pad: 20px;
+
+  /* Motion */
+  --lf-ease: cubic-bezier(0.2, 0, 0, 1);
+  --lf-duration: 120ms;
+}
+
+/* Density — Compact (bookkeeper/accountant toggle; only vertical rhythm + type size change) */
+[data-density="compact"] {
+  --lf-row-h: 32px;
+  --lf-cell-px: 8px;
+  --lf-cell-py: 6px;
+  --lf-control-h: 28px;
+  --lf-table-font: var(--lf-text-sm);
+  --lf-card-pad: 14px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Dark theme: follows OS unless user forced light; or forced dark      */
+/* ------------------------------------------------------------------ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --lf-bg: #0c111d;
+    --lf-surface: #151a24;
+    --lf-surface-2: #1b212d;
+    --lf-surface-hover: #222937;
+    --lf-surface-selected: #23284a;
+    --lf-border: #2a3140;
+    --lf-border-strong: #6f7a8e;
+    --lf-text: #f2f4f7;
+    --lf-text-muted: #c6cbd4;
+    --lf-text-subtle: #9aa3b2;
+    --lf-text-inverse: #0c111d;
+    --lf-accent: #8b93f8;
+    --lf-accent-hover: #a4abfa;
+    --lf-accent-fg: #0c111d;
+    --lf-accent-soft: #23284a;
+    --lf-accent-text: #a4abfa;
+    --lf-focus: #a4abfa;
+    --lf-success-fg: #6ce9a6;  --lf-success-bg: #0b2a1c;  --lf-success-border: #1f7a4d;  --lf-success-solid: #47cd89;
+    --lf-warning-fg: #fdb022;  --lf-warning-bg: #2e1f05;  --lf-warning-border: #93580b;  --lf-warning-solid: #f79009;
+    --lf-danger-fg:  #fda29b;  --lf-danger-bg:  #33130f;  --lf-danger-border:  #a3251a;  --lf-danger-solid:  #f97066;
+    --lf-info-fg:    #84caff;  --lf-info-bg:    #0b2342;  --lf-info-border:    #1d5fb8;  --lf-info-solid:    #53b1fd;
+    --lf-status-draft-fg: #cecfd2;     --lf-status-draft-bg: #262c38;
+    --lf-status-awaiting-fg: #fdb022;  --lf-status-awaiting-bg: #2e1f05;
+    --lf-status-approved-fg: #84caff;  --lf-status-approved-bg: #0b2342;
+    --lf-status-posted-fg: #b4b9fb;    --lf-status-posted-bg: #23284a;
+    --lf-status-partpaid-fg: #67e3f9;  --lf-status-partpaid-bg: #082a33;
+    --lf-status-paid-fg: #6ce9a6;      --lf-status-paid-bg: #0b2a1c;
+    --lf-status-overdue-fg: #fda29b;   --lf-status-overdue-bg: #33130f;
+    --lf-status-void-fg: #cecfd2;      --lf-status-void-bg: #151a24;  --lf-status-void-border: #6f7a8e;
+    --lf-status-reversed-fg: #c8b6fd;  --lf-status-reversed-bg: #2a1d4d;
+    --lf-status-locked-fg: #0c111d;    --lf-status-locked-bg: #cecfd2;
+    --lf-nav-bg: #11161f;
+    --lf-nav-fg: #c6cbd4;
+    --lf-nav-active-bg: #23284a;
+    --lf-nav-active-fg: #c7cbfc;
+    --lf-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --lf-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+    --lf-shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.5);
+    --lf-shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.6);
+    --lf-shadow-overlay: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+    --lf-scrim: rgba(0, 0, 0, 0.6);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --lf-bg: #0c111d;
+  --lf-surface: #151a24;
+  --lf-surface-2: #1b212d;
+  --lf-surface-hover: #222937;
+  --lf-surface-selected: #23284a;
+  --lf-border: #2a3140;
+  --lf-border-strong: #6f7a8e;
+  --lf-text: #f2f4f7;
+  --lf-text-muted: #c6cbd4;
+  --lf-text-subtle: #9aa3b2;
+  --lf-text-inverse: #0c111d;
+  --lf-accent: #8b93f8;
+  --lf-accent-hover: #a4abfa;
+  --lf-accent-fg: #0c111d;
+  --lf-accent-soft: #23284a;
+  --lf-accent-text: #a4abfa;
+  --lf-focus: #a4abfa;
+  --lf-success-fg: #6ce9a6;  --lf-success-bg: #0b2a1c;  --lf-success-border: #1f7a4d;  --lf-success-solid: #47cd89;
+  --lf-warning-fg: #fdb022;  --lf-warning-bg: #2e1f05;  --lf-warning-border: #93580b;  --lf-warning-solid: #f79009;
+  --lf-danger-fg:  #fda29b;  --lf-danger-bg:  #33130f;  --lf-danger-border:  #a3251a;  --lf-danger-solid:  #f97066;
+  --lf-info-fg:    #84caff;  --lf-info-bg:    #0b2342;  --lf-info-border:    #1d5fb8;  --lf-info-solid:    #53b1fd;
+  --lf-status-draft-fg: #cecfd2;     --lf-status-draft-bg: #262c38;
+  --lf-status-awaiting-fg: #fdb022;  --lf-status-awaiting-bg: #2e1f05;
+  --lf-status-approved-fg: #84caff;  --lf-status-approved-bg: #0b2342;
+  --lf-status-posted-fg: #b4b9fb;    --lf-status-posted-bg: #23284a;
+  --lf-status-partpaid-fg: #67e3f9;  --lf-status-partpaid-bg: #082a33;
+  --lf-status-paid-fg: #6ce9a6;      --lf-status-paid-bg: #0b2a1c;
+  --lf-status-overdue-fg: #fda29b;   --lf-status-overdue-bg: #33130f;
+  --lf-status-void-fg: #cecfd2;      --lf-status-void-bg: #151a24;  --lf-status-void-border: #6f7a8e;
+  --lf-status-reversed-fg: #c8b6fd;  --lf-status-reversed-bg: #2a1d4d;
+  --lf-status-locked-fg: #0c111d;    --lf-status-locked-bg: #cecfd2;
+  --lf-nav-bg: #11161f;
+  --lf-nav-fg: #c6cbd4;
+  --lf-nav-active-bg: #23284a;
+  --lf-nav-active-fg: #c7cbfc;
+  --lf-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --lf-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --lf-shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.5);
+  --lf-shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.6);
+  --lf-shadow-overlay: 0 24px 48px -12px rgba(0, 0, 0, 0.7);
+  --lf-scrim: rgba(0, 0, 0, 0.6);
+}
+
+/* ------------------------------------------------------------------ */
+/* shadcn/ui bridge: apps/web maps these names onto LF tokens so shadcn */
+/* components pick them up without per-component overrides.            */
+/* ------------------------------------------------------------------ */
+:root {
+  --background: var(--lf-bg);
+  --foreground: var(--lf-text);
+  --card: var(--lf-surface);
+  --card-foreground: var(--lf-text);
+  --popover: var(--lf-surface);
+  --popover-foreground: var(--lf-text);
+  --primary: var(--lf-accent);
+  --primary-foreground: var(--lf-accent-fg);
+  --secondary: var(--lf-surface-2);
+  --secondary-foreground: var(--lf-text);
+  --muted: var(--lf-surface-2);
+  --muted-foreground: var(--lf-text-muted);
+  --accent: var(--lf-surface-hover);
+  --accent-foreground: var(--lf-text);
+  --destructive: var(--lf-danger-solid);
+  --border: var(--lf-border);
+  --input: var(--lf-border-strong);
+  --ring: var(--lf-focus);
+  --radius: var(--lf-radius-md);
+}

@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0026",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-15",
+      "file": ".agent/evidence/T-0026/20261025-193546-tests-db.json",
+      "test": "8 test(s): packages/ledger/src/engine.preview.db.test.ts › SS-PLAT-15 preview writes nothing [T-0026] › SS-PLAT-15 preview of any document changes no row or sequence anywhere; post then stores exactly the previewed journal [T-0026] | packages/ledger/src/engine.preview.db.test.ts › SS-PLAT-15 preview writes nothing [T-0026] › SS-PLAT-15 preview of a date the lock-date policy moves changes nothing and shows the moved date and note [T-0026] | packages/ledger/src/engine.preview.db.test.ts › SS-PLAT-15 preview writes nothing [T-0026] › SS-PLAT-15 preview runs in a READ ONLY transaction: it issues no write statement at all [T-0026] | packages/ledger/src/engine.preview.db.test.ts › SS-PLAT-15 preview writes nothing [T-0026] › SS-PLAT-72 a refused preview refuses with the same typed error as post, and neither changes anything [T-0026] | packages/ledger/src/engine.preview.db.test.ts › SS-PLAT-15 preview writes nothing [T-0026] › SS-PLAT-72 preview of a key that has posted: same document → ALREADY_POSTED with the entry, other document → IDEMPOTENCY_CONFLICT; nothing changes [T-0026] | packages/ledger/src/engine.preview.prop.db.test.ts › SS-PLAT-15 preview equals post over random commands [T-0026] › SS-PLAT-15 INV-preview for any valid command, preview changes nothing and equals the journal post stores [T-0026] | packages/ledger/src/engine.preview.prop.db.test.ts › SS-PLAT-15 preview equals post over random commands [T-0026] › SS-PLAT-72 INV-preview-outcome for any command, preview and post refuse with the same code or both give the same journal [T-0026] | packages/outbox/src/preview.db.test.ts › SS-PLAT-15 preview writes no outbox event or job [T-0026] › SS-PLAT-15 preview leaves every table (incl. outbox_event and pgboss.job) and sequence unchanged; post then writes the previewed journal, one event and one job [T-0026]",
+      "commit": "fa6e6a580662",
+      "provider": "claude",
+      "timestamp": "2026-10-25T19:35:46.386Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-72",
+      "file": ".agent/evidence/T-0026/20261025-193546-tests-db.json",
+      "test": "3 test(s): packages/ledger/src/engine.preview.db.test.ts › SS-PLAT-15 preview writes nothing [T-0026] › SS-PLAT-72 a refused preview refuses with the same typed error as post, and neither changes anything [T-0026] | packages/ledger/src/engine.preview.db.test.ts › SS-PLAT-15 preview writes nothing [T-0026] › SS-PLAT-72 preview of a key that has posted: same document → ALREADY_POSTED with the entry, other document → IDEMPOTENCY_CONFLICT; nothing changes [T-0026] | packages/ledger/src/engine.preview.prop.db.test.ts › SS-PLAT-15 preview equals post over random commands [T-0026] › SS-PLAT-72 INV-preview-outcome for any command, preview and post refuse with the same code or both give the same journal [T-0026]",
+      "commit": "fa6e6a580662",
+      "provider": "claude",
+      "timestamp": "2026-10-25T19:35:46.386Z",
+      "result": "passed"
+    }
+  ]
+}

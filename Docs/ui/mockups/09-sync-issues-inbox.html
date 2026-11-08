@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salesforce sync issues — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  .inbox { display: grid; grid-template-columns: 420px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .issues { list-style: none; margin: 0; padding: 0; }
+  .issues li a { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; padding: 12px var(--lf-card-pad); border-bottom: 1px solid var(--lf-border); color: var(--lf-text); }
+  .issues li a:hover { background: var(--lf-surface-hover); text-decoration: none; }
+  .issues li a[aria-current="true"] { background: var(--lf-surface-selected); box-shadow: inset 3px 0 0 var(--lf-accent); }
+  .issues .t { font-weight: 500; font-size: 13.5px; }
+  .issues .m { font-size: 12px; color: var(--lf-text-subtle); grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .issues .when { font-size: 12px; color: var(--lf-text-subtle); }
+  .grp { padding: 8px var(--lf-card-pad); font-size: 11.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--lf-text-subtle); background: var(--lf-surface-2); border-bottom: 1px solid var(--lf-border); }
+  .dir { display: inline-flex; gap: 4px; align-items: center; font-weight: 500; color: var(--lf-text-muted); }
+  .errbox { border: 1px solid var(--lf-danger-border); background: var(--lf-danger-bg); border-radius: var(--lf-radius-md); padding: 12px 14px; }
+  .errbox code { font-family: var(--lf-font-mono); font-size: 12.5px; color: var(--lf-danger-fg); font-weight: 600; }
+  .errbox p { color: var(--lf-text); font-size: 13px; margin-top: 4px; }
+  .card-f .actions { flex-wrap: nowrap; }
+  .attempts { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+  .attempts span { font-size: 11.5px; padding: 2px 6px; border-radius: 4px; background: var(--lf-surface-2); border: 1px solid var(--lf-border); color: var(--lf-text-muted); font-variant-numeric: var(--lf-numeric); }
+</style>
+</head>
+<body data-active="sync" data-user="Priya Shah" data-initials="PS" data-role="Accountant" data-period="Oct 2026" data-period-state="Open" data-sync="warn" data-sync-text="3 issues">
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <nav class="sidenav" id="lf-nav" aria-label="Primary"></nav>
+  <div class="main-col">
+    <header class="topbar" id="lf-top"></header>
+    <main id="main" class="content">
+      <div class="page-head">
+        <div>
+          <div class="crumbs">Salesforce sync</div>
+          <h1>Sync issues</h1>
+          <p class="sub">harbourco.my.salesforce.com · integration user lf-integration@harbourco.example · last event 2 min ago</p>
+        </div>
+        <div class="actions"><span class="pill"><span class="dot ok" aria-hidden="true"></span>Listening (CDC)</span><span class="pill">API use <b>6%</b> of daily cap</span><button class="btn" type="button"><i data-i="refresh"></i>Run reconciliation now</button></div>
+      </div>
+
+      <div class="banner info" style="margin-bottom:16px"><i data-i="info" class="i-lg"></i><div><b>Your books are not affected.</b> <span class="body-text">Documents keep posting while Salesforce is behind. These items failed 6+ automatic retries (1 minute to 6 hours apart) and need a person.</span></div></div>
+
+      <div class="inbox">
+        <section class="card" aria-labelledby="list-h">
+          <div class="card-h"><h2 id="list-h">Inbox</h2><div class="seg" role="group" aria-label="Filter"><button type="button" aria-pressed="true">Open 5</button><button type="button" aria-pressed="false">Resolved today 14</button></div></div>
+          <div class="grp">Needs a person · 3</div>
+          <ul class="issues">
+            <li><a href="#" aria-current="true"><span class="t">INV-001052 status not written to Salesforce</span><span class="when">3 h</span><span class="m"><span class="dir">LF <i data-i="arrow" class="i-sm"></i> SF</span>· Opportunity locked · 7 attempts</span></a></li>
+            <li><a href="#"><span class="t">Account “Redgum Ventures” matches 2 parties</span><span class="when">5 h</span><span class="m"><span class="dir">SF <i data-i="arrow" class="i-sm"></i> LF</span>· Same ABN 63 114 220 815 · choose merge</span></a></li>
+            <li><a href="#"><span class="t">Product “Freight surcharge” has no posting profile</span><span class="when">1 d</span><span class="m"><span class="dir">SF <i data-i="arrow" class="i-sm"></i> LF</span>· Family “Freight” unmapped · 9 Opportunities</span></a></li>
+          </ul>
+          <div class="grp">Retrying automatically · 2</div>
+          <ul class="issues">
+            <li><a href="#"><span class="t">Kestrel Logistics balance update</span><span class="when">next 10:32</span><span class="m"><span class="dir">LF <i data-i="arrow" class="i-sm"></i> SF</span>· Throttled to stay under 25% API cap · attempt 2</span></a></li>
+            <li><a href="#"><span class="t">Bondi Coastal Physio Opportunity status</span><span class="when">next 10:20</span><span class="m"><span class="dir">LF <i data-i="arrow" class="i-sm"></i> SF</span>· UNABLE_TO_LOCK_ROW · attempt 3</span></a></li>
+          </ul>
+        </section>
+
+        <section class="card" aria-labelledby="det-h">
+          <div class="card-h">
+            <div><h2 id="det-h">INV-001052 status not written to Salesforce</h2><p class="small muted" style="margin-top:2px">Lighthouse Learning · Opportunity “LMS integration” · first failed 24 Oct, 7:12 am</p></div>
+            <span class="chip st-err"><i data-i="x-circle"></i>Needs a person</span>
+          </div>
+          <div class="card-b stack">
+            <div class="errbox" role="alert">
+              <code>ENTITY_IS_LOCKED</code>
+              <p>Salesforce says the Opportunity is locked for editing — it is in an approval process (“Discount approval”). LedgerForce can't update <span class="mono">LF_Invoice_Status__c</span> until it's unlocked.</p>
+            </div>
+            <div class="explain"><i data-i="zap"></i><span><b>Suggested fix:</b> ask the Opportunity owner (Alex Chen) to finish the approval, or give the integration user “Edit locked records” in its permission set. Then retry — the update is safe to repeat.</span></div>
+
+            <dl class="kv">
+              <dt>Direction</dt><dd>LedgerForce → Salesforce (outbox event <span class="mono">invoice.overdue</span>)</dd>
+              <dt>Target</dt><dd><a href="#">Opportunity 0065g00000Xc9TQ <i data-i="ext" class="i-sm"></i></a></dd>
+              <dt>Idempotency key</dt><dd class="mono">inv-001052:invoice.overdue:v3</dd>
+              <dt>Attempts</dt><dd><div class="attempts"><span>07:12</span><span>07:13</span><span>07:15</span><span>07:19</span><span>07:27</span><span>07:43</span><span>08:15</span><span>… next would be 14:15</span></div></dd>
+            </dl>
+
+            <div>
+              <div class="row between" style="margin-bottom:6px"><span class="lbl">Payload sent</span><button class="btn sm ghost" type="button"><i data-i="copy"></i>Copy</button></div>
+<pre class="code" aria-label="JSON payload">{
+  <span class="k">"allOrNone"</span>: false,
+  <span class="k">"records"</span>: [{
+    <span class="k">"attributes"</span>: { <span class="k">"type"</span>: <span class="s">"Opportunity"</span> },
+    <span class="k">"Id"</span>: <span class="s">"0065g00000Xc9TQ"</span>,
+    <span class="k">"LF_Invoice_Status__c"</span>: <span class="s">"Overdue"</span>,
+    <span class="k">"LF_Amount_Invoiced__c"</span>: <span class="n">3520.00</span>,
+    <span class="k">"LF_Amount_Paid__c"</span>: <span class="n">0.00</span>
+  }]
+}</pre>
+            </div>
+          </div>
+          <div class="card-f">
+            <span class="xs">History stays in the audit log.</span>
+            <div class="actions">
+              <button class="btn" type="button">Mark resolved…</button>
+              <a class="btn" href="#"><i data-i="ext"></i>Open in Salesforce</a>
+              <button class="btn primary" type="button"><i data-i="refresh"></i>Retry now</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

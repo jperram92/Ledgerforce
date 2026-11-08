@@ -1,0 +1,51 @@
+# LedgerForce agent conductor configuration (design §10.4). Human-owned.
+# Model choice is left to each CLI's default so this file never pins a model id.
+providers:
+  - id: claude
+    cli: "claude -p"                       # Claude Code headless (print) mode
+    args: ["--output-format", "stream-json", "--verbose", "--permission-mode", "acceptEdits", "--max-turns", "200"]  # RQ-0002: -p starts in Manual mode, so always pass --permission-mode
+    role: [build, review]
+    instructions: CLAUDE.md                # imports AGENTS.md
+  - id: codex
+    cli: "codex exec"                      # OpenAI Codex non-interactive mode
+    args: ["--cd", "{repo}", "-s", "workspace-write", "-c", "sandbox_workspace_write.network_access=true", "--json", "-o", "{last_message_file}"]  # RQ-0001: --full-auto removed; .git is read-only, so the conductor commits for codex
+    role: [build, review]
+    instructions: AGENTS.md
+failover_order: [claude, codex]            # Claude primary; Codex takes over on credit/quota/rate-limit failure
+review: cross_provider                     # code by one provider is reviewed by the other
+lease_minutes: 45
+heartbeat_minutes: 10                      # agent renews lease at every checkpoint, at least this often
+max_attempts_per_task: 3
+dependency_satisfied_by: [done, review]   # DL-0053: provisional while no codex in this environment — review = verify-green, awaiting cross-review; a FAIL reopens dependants. Set back to [done] once codex runs.                   # across providers, then status: blocked
+parallel_tasks: 5                          # design §11.2: human decided 2026-10-24 to allow parallel builds (DL-0081)
+budgets:
+  claude: { daily_usd: 40 }
+  codex: { daily_usd: 40 }
+failure_patterns:                          # case-insensitive regexes over stdout AND stderr that trigger provider failover (RQ-0001, RQ-0002)
+  quota:
+    - "429"
+    - "rate.?limit"
+    - "insufficient_quota"
+    - "credit balance"
+    - "usage limit"
+    - "quota exceeded"
+    - "overloaded"
+    - "hit your .* limit"                  # e.g. "You've hit your session limit · resets 7:30am (UTC)" (seen 2026-10-24)
+    - "session limit"
+    - "weekly limit"
+    - "spend limit"
+    - "credit balance is too low"
+    - "at capacity"
+    - "high demand"
+    - "exceeded retry limit"
+    - "temporarily limiting requests"
+    - "529"
+human_gates: [adr:accounting, adr:security, release, golden_postings, phase_gate, out_of_scope]
+paths:
+  state: .agent/state.json
+  handover: .agent/HANDOVER.md
+  backlog: .agent/backlog
+  runs: .agent/runs
+  evidence: .agent/evidence
+  decision_log: Docs/decisions/decision-log.md
+  research: Docs/research

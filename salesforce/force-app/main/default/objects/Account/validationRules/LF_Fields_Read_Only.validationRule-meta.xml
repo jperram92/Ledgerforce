@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>LF_Fields_Read_Only</fullName>
+    <active>true</active>
+    <description>LedgerForce-owned fields change only through the LedgerForce integration user (custom permission LF_Integration_Write). Design §5.4, DL-0097.</description>
+    <errorConditionFormula>AND(
+  NOT($Permission.LF_Integration_Write),
+  OR(
+    ISCHANGED(LF_Balance_Due__c),
+    ISCHANGED(LF_Overdue_Amount__c),
+    ISCHANGED(LF_Credit_Status__c),
+    ISCHANGED(LF_Last_Payment_Date__c),
+    AND(ISNEW(), NOT(ISBLANK(LF_Balance_Due__c))),
+    AND(ISNEW(), NOT(ISBLANK(LF_Overdue_Amount__c))),
+    AND(ISNEW(), NOT(ISBLANK(LF_Credit_Status__c))),
+    AND(ISNEW(), NOT(ISBLANK(LF_Last_Payment_Date__c)))
+  )
+)</errorConditionFormula>
+    <errorMessage>This value is maintained by LedgerForce and is read-only in Salesforce. Make the change in LedgerForce.</errorMessage>
+</ValidationRule>

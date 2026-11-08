@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0109",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-55",
+      "file": ".agent/evidence/T-0109/20261025-041429-tests-unit.json",
+      "test": "4 test(s): packages/testing/src/evidence/destination.test.ts › SS-PLAT-55: A verify run writes evidence only for the task being verified › without LF_EVIDENCE_ONLY_TASK, evidence goes where it always did | packages/testing/src/evidence/destination.test.ts › SS-PLAT-55: A verify run writes evidence only for the task being verified › the verified task's own specs still write into the repository | packages/testing/src/evidence/destination.test.ts › SS-PLAT-55: A verify run writes evidence only for the task being verified › another task's specs are redirected to a temp dir, per task | packages/testing/src/evidence/destination.test.ts › SS-PLAT-55: A verify run writes evidence only for the task being verified › an explicit LF_EVIDENCE_DIR is respected for the verified task, and overridden for others",
+      "commit": "2b04331ff4af",
+      "provider": "claude",
+      "timestamp": "2026-10-25T04:14:29.874Z",
+      "result": "passed"
+    }
+  ]
+}

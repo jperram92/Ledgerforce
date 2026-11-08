@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.02" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <BkToCstmrStmt>
+    <GrpHdr><MsgId>HARBOUR-20270103</MsgId><CreDtTm>2027-01-03T06:00:00+11:00</CreDtTm></GrpHdr>
+    <Stmt>
+      <Id>OPERATING-20270102</Id>
+      <CreDtTm>2027-01-03T06:00:00+11:00</CreDtTm>
+      <FrToDt><FrDtTm>2027-01-02T00:00:00+11:00</FrDtTm><ToDtTm>2027-01-02T23:59:59+11:00</ToDtTm></FrToDt>
+      <Acct>
+        <Id><Othr><Id>062000-12345678</Id></Othr></Id>
+        <Ccy>AUD</Ccy>
+      </Acct>
+      <Bal><Tp><CdOrPrtry><Cd>OPBD</Cd></CdOrPrtry></Tp><Amt Ccy="AUD">14419.53</Amt><CdtDbtInd>CRDT</CdtDbtInd><Dt><Dt>2027-01-02</Dt></Dt></Bal>
+      <Bal><Tp><CdOrPrtry><Cd>CLBD</Cd></CdOrPrtry></Tp><Amt Ccy="AUD">14719.53</Amt><CdtDbtInd>CRDT</CdtDbtInd><Dt><Dt>2027-01-02</Dt></Dt></Bal>
+      <Ntry>
+        <Amt Ccy="AUD">300.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt><Dt>2027-01-02</Dt></BookgDt>
+        <ValDt><Dt>2027-01-02</Dt></ValDt>
+        <AcctSvcrRef>202701020001</AcctSvcrRef>
+        <NtryDtls>
+          <Btch><NbOfTxs>2</NbOfTxs><TtlAmt Ccy="AUD">300.00</TtlAmt><CdtDbtInd>CRDT</CdtDbtInd></Btch>
+          <TxDtls>
+            <Refs><EndToEndId>INV-000140</EndToEndId></Refs>
+            <AmtDtls><TxAmt><Amt Ccy="AUD">120.00</Amt></TxAmt></AmtDtls>
+            <RmtInf><Ustrd>BPAY Acme Pty Ltd INV-000140</Ustrd></RmtInf>
+          </TxDtls>
+          <TxDtls>
+            <Refs><EndToEndId>INV-000141</EndToEndId></Refs>
+            <AmtDtls><TxAmt><Amt Ccy="AUD">180.00</Amt></TxAmt></AmtDtls>
+            <RmtInf><Ustrd>BPAY Blue Cup Cafe INV-000141</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+    </Stmt>
+    <Stmt>
+      <Id>SAVINGS-20270102</Id>
+      <CreDtTm>2027-01-03T06:00:00+11:00</CreDtTm>
+      <FrToDt><FrDtTm>2027-01-02T00:00:00+11:00</FrDtTm><ToDtTm>2027-01-02T23:59:59+11:00</ToDtTm></FrToDt>
+      <Acct>
+        <Id><Othr><Id>062000-87654321</Id></Othr></Id>
+        <Ccy>AUD</Ccy>
+      </Acct>
+      <Bal><Tp><CdOrPrtry><Cd>OPBD</Cd></CdOrPrtry></Tp><Amt Ccy="AUD">20000.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Dt><Dt>2027-01-02</Dt></Dt></Bal>
+      <Bal><Tp><CdOrPrtry><Cd>CLBD</Cd></CdOrPrtry></Tp><Amt Ccy="AUD">19041.10</Amt><CdtDbtInd>CRDT</CdtDbtInd><Dt><Dt>2027-01-02</Dt></Dt></Bal>
+      <Ntry>
+        <Amt Ccy="AUD">1000.00</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt><Dt>2027-01-02</Dt></BookgDt>
+        <ValDt><Dt>2027-01-02</Dt></ValDt>
+        <AcctSvcrRef>202701020101</AcctSvcrRef>
+        <NtryDtls><TxDtls><RmtInf><Ustrd>Transfer to Operating</Ustrd></RmtInf></TxDtls></NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="AUD">41.10</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts>BOOK</Sts>
+        <BookgDt><Dt>2027-01-02</Dt></BookgDt>
+        <ValDt><Dt>2027-01-02</Dt></ValDt>
+        <AcctSvcrRef>202701020102</AcctSvcrRef>
+        <NtryDtls><TxDtls><RmtInf><Ustrd>Interest</Ustrd></RmtInf></TxDtls></NtryDtls>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

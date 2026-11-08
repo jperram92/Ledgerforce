@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Close September 2026 — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; align-items: start; }
+  .periods { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .per { display: flex; flex-direction: column; gap: 4px; padding: 10px 14px; min-width: 150px; border: 1px solid var(--lf-border); border-radius: var(--lf-radius-lg); background: var(--lf-surface); color: var(--lf-text); }
+  .per[aria-current="true"] { border-color: var(--lf-accent); box-shadow: 0 0 0 1px var(--lf-accent); }
+  .per b { font-size: 14px; }
+  .checklist { list-style: none; margin: 0; padding: 0; }
+  .checklist > li { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 14px; padding: 16px var(--lf-card-pad); border-bottom: 1px solid var(--lf-border); position: relative; }
+  .checklist > li:last-child { border-bottom: 0; }
+  .num-badge { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 600; font-size: 13px; border: 1px solid var(--lf-border-strong); color: var(--lf-text-muted); background: var(--lf-surface); }
+  .done .num-badge { background: var(--lf-success-bg); color: var(--lf-success-fg); border-color: var(--lf-success-border); }
+  .next .num-badge { background: var(--lf-accent); color: var(--lf-accent-fg); border-color: var(--lf-accent); }
+  .next { background: var(--lf-accent-soft); }
+  .checklist h3 { font-size: 14.5px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .checklist .what { color: var(--lf-text-muted); font-size: 13px; margin-top: 2px; }
+  .who { display: flex; gap: 8px; align-items: center; margin-top: 8px; font-size: 12.5px; color: var(--lf-text-muted); flex-wrap: wrap; }
+  .who b { color: var(--lf-text); font-weight: 500; }
+  .per .chip { align-self: flex-start; }
+  .lockgrid .chip { justify-self: end; }
+  .lockgrid { display: grid; grid-template-columns: 1fr auto; gap: 10px 12px; align-items: center; font-size: 13.5px; }
+</style>
+</head>
+<body data-active="close" data-user="Priya Shah" data-initials="PS" data-role="Accountant · Finance Admin" data-period="Oct 2026" data-period-state="Open" data-sync="ok" data-sync-text="Synced 2 min ago">
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <nav class="sidenav" id="lf-nav" aria-label="Primary"></nav>
+  <div class="main-col">
+    <header class="topbar" id="lf-top"></header>
+    <main id="main" class="content">
+      <div class="page-head">
+        <div>
+          <div class="crumbs">Close</div>
+          <h1>Close September 2026</h1>
+          <p class="sub">Staged close: lock sales, then purchases, then everything — each step recorded with who and when.</p>
+        </div>
+        <div class="actions"><button class="btn" type="button"><i data-i="file"></i>Close pack (PDF)</button></div>
+      </div>
+
+      <nav class="periods" aria-label="Periods">
+        <a class="per" href="#"><span class="xs subtle">July 2026</span><span data-chip="locked">Hard locked</span></a>
+        <a class="per" href="#"><span class="xs subtle">August 2026</span><span data-chip="locked">Hard locked</span></a>
+        <a class="per" href="#" aria-current="true"><span class="xs subtle">September 2026</span><span data-chip="awaiting">Soft closed · 6 of 7</span></a>
+        <a class="per" href="#"><span class="xs subtle">October 2026</span><span data-chip="ok">Open</span></a>
+      </nav>
+
+      <div class="layout">
+        <section class="card" aria-labelledby="cl-h">
+          <div class="card-h"><h2 id="cl-h">Checklist</h2><div class="row"><div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="7" aria-valuenow="6" aria-label="Close steps done" style="width:160px"><span style="width:86%"></span></div><span class="small muted">6 of 7</span></div></div>
+          <ol class="checklist">
+            <li class="done"><span class="num-badge"><i data-i="check"></i></span><div><h3>Lock sales (AR) <span data-chip="locked">AR locked</span></h3><p class="what">No invoices, credit notes or receipts dated in September, except by Finance Admins (override is logged).</p><div class="who"><span class="avatar sm" aria-hidden="true">PS</span><b>Priya Shah</b> · Fri 3 Oct 2026, 9:14 am</div></div><button class="btn sm ghost" type="button">Details</button></li>
+            <li class="done"><span class="num-badge"><i data-i="check"></i></span><div><h3>Lock purchases (AP) <span data-chip="locked">AP locked</span></h3><p class="what">Bills and supplier payments dated September are closed. 1 late bill was redirected to 1 Oct with a note.</p><div class="who"><span class="avatar sm" aria-hidden="true">PS</span><b>Priya Shah</b> · Mon 6 Oct 2026, 4:02 pm</div></div><button class="btn sm ghost" type="button">Details</button></li>
+            <li class="done"><span class="num-badge"><i data-i="check"></i></span><div><h3>Bank reconciliations complete</h3><p class="what">Operating ···418 and Business Saver ···902: statement balance = book balance at 30 Sep.</p><div class="who"><i data-i="zap" class="i-sm"></i><b>Checked automatically</b> · Tue 7 Oct 2026, 6:00 am · <a href="#">2 reports</a></div></div><button class="btn sm ghost" type="button">Details</button></li>
+            <li class="done"><span class="num-badge"><i data-i="check"></i></span><div><h3>Accruals and adjustments posted</h3><p class="what">MJ-0398 accrued wages $13,920.00 · MJ-0399 prepaid insurance $1,180.00 — both approved.</p><div class="who"><span class="avatar sm" aria-hidden="true">PS</span><b>Priya Shah</b> prepared · <span class="avatar sm b" aria-hidden="true">MT</span><b>Mei Tan</b> approved · Wed 8 Oct 2026</div></div><button class="btn sm ghost" type="button">Details</button></li>
+            <li class="done"><span class="num-badge"><i data-i="check"></i></span><div><h3>Review trial balance</h3><p class="what">“TB ties to bank, AR ageing and Salesforce Account balances.” — reviewer note</p><div class="who"><span class="avatar sm b" aria-hidden="true">MT</span><b>Mei Tan</b> (Approver) · Wed 8 Oct 2026, 3:30 pm · <a href="#">TB snapshot</a></div></div><button class="btn sm ghost" type="button">Details</button></li>
+            <li class="done"><span class="num-badge"><i data-i="check"></i></span><div><h3>Soft close <span data-chip="awaiting">Soft closed</span></h3><p class="what">Only Finance Admins can post to September. Every override needs a reason and appears in the close pack.</p><div class="who"><span class="avatar sm" aria-hidden="true">PS</span><b>Priya Shah</b> · Thu 9 Oct 2026, 10:05 am</div></div><button class="btn sm ghost" type="button">Details</button></li>
+            <li class="next" aria-current="step"><span class="num-badge">7</span><div><h3>Hard lock after BAS lodged</h3><p class="what">Nobody can post to September after this, including Finance Admins. Enter the ATO lodgement receipt for the Jul–Sep BAS (due Tue 28 Oct).</p>
+              <div class="row" style="margin-top:10px;gap:10px;flex-wrap:wrap"><div class="field" style="width:240px"><label for="bas">BAS lodgement reference</label><input id="bas" class="input" placeholder="e.g. 7340 2216 9981"></div></div>
+            </div><div style="align-self:end"><button class="btn primary" type="button"><i data-i="lock"></i>Hard lock September…</button></div></li>
+          </ol>
+        </section>
+
+        <div class="stack">
+          <section class="card" aria-labelledby="now-h">
+            <div class="card-h"><h2 id="now-h">September right now</h2></div>
+            <div class="card-b lockgrid">
+              <span>Sales invoices &amp; receipts</span><span data-chip="locked">Locked</span>
+              <span>Bills &amp; supplier payments</span><span data-chip="locked">Locked</span>
+              <span>Bank transactions</span><span data-chip="awaiting">Finance Admins only</span>
+              <span>Manual journals</span><span data-chip="awaiting">Finance Admins only</span>
+            </div>
+            <div class="card-f"><span>Late postings: <b>post to first open date with a note</b> (tenant setting)</span></div>
+          </section>
+
+          <section class="card" aria-labelledby="att-h">
+            <div class="card-h"><h2 id="att-h">Blocked or redirected</h2><span class="meta">since AR lock</span></div>
+            <div class="card-b">
+              <ol class="timeline">
+                <li><span class="avatar sm c" aria-hidden="true">LO</span><div><b>Bill SP-7701 dated 29 Sep</b> moved to 1 Oct with note “September AP locked 6 Oct”<div class="when">Lena Ortiz · 12 Oct, 11:20 am</div></div></li>
+                <li><span class="avatar sm b" aria-hidden="true">Sf</span><div><b>Salesforce edit to Opportunity</b> (closed Sep) did not re-invoice; logged for review<div class="when">Integration · 14 Oct, 2:41 pm</div></div></li>
+                <li><span class="avatar sm" aria-hidden="true">PS</span><div><b>Override:</b> MJ-0405 GST rounding $0.04 posted to 30 Sep, reason recorded<div class="when">Priya Shah · 15 Oct, 9:02 am</div></div></li>
+              </ol>
+            </div>
+          </section>
+
+          <div class="explain"><i data-i="users"></i><span><b>Reopening a hard-locked month</b> needs two approvers and a written reason, and shows on every report for that month.</span></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

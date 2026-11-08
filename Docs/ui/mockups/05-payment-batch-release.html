@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Release payment batch PB-0087 — LedgerForce</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 16px; align-items: start; }
+  .chain { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .chain li { display: grid; grid-template-columns: 30px 1fr auto; gap: 10px; align-items: center; padding: 10px 12px; border: 1px solid var(--lf-border); border-radius: var(--lf-radius-lg); background: var(--lf-surface-2); }
+  .chain li.me { border-color: var(--lf-accent); background: var(--lf-accent-soft); }
+  .chain .role { font-size: 12px; color: var(--lf-text-subtle); }
+  .chain .name { font-weight: 600; font-size: 13.5px; }
+  .mfa { border: 1px solid var(--lf-border); border-radius: var(--lf-radius-lg); padding: 16px; }
+  .mfa h3 { display: flex; gap: 8px; align-items: center; font-size: 14px; margin-bottom: 4px; }
+  .bank { font-family: var(--lf-font-mono); font-size: 12.5px; color: var(--lf-text-muted); }
+  .card-h + .table-wrap td:not(:first-child) { white-space: nowrap; }
+  .excl td { background: var(--lf-warning-bg); }
+  .excl td, .excl td .sec { color: var(--lf-text); }
+  .aba { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 13px; }
+  .aba dt { color: var(--lf-text-muted); } .aba dd { margin: 0; text-align: right; font-variant-numeric: var(--lf-numeric); }
+</style>
+</head>
+<body data-active="paybatch" data-user="Sam Nguyen" data-initials="SN" data-role="Owner" data-period="Oct 2026" data-period-state="Open" data-sync="ok" data-sync-text="Synced 1 min ago">
+<a class="skip" href="#main">Skip to content</a>
+<div class="app">
+  <nav class="sidenav" id="lf-nav" aria-label="Primary"></nav>
+  <div class="main-col">
+    <header class="topbar" id="lf-top"></header>
+    <main id="main" class="content">
+      <div class="page-head">
+        <div>
+          <div class="crumbs"><a href="#">Purchases</a><i data-i="chevron-right" class="i-sm"></i><a href="#">Payment batches</a><i data-i="chevron-right" class="i-sm"></i>PB-0087</div>
+          <div class="row"><h1>Supplier payments PB-0087</h1><span data-chip="awaiting">Awaiting 2nd release</span></div>
+          <p class="sub">11 bills · pay on Mon 27 Oct 2026 from Operating account · created by Lena Ortiz 23 Oct, 2:05 pm</p>
+        </div>
+        <div class="actions"><button class="btn" type="button"><i data-i="file"></i>Remittance preview</button><button class="btn danger" type="button">Reject batch…</button></div>
+      </div>
+
+      <div class="layout">
+        <div class="stack">
+          <div class="banner warn" role="status">
+            <i data-i="shield" class="i-lg"></i>
+            <div><b>1 bill held back: Blue Gum IT Services ($4,180.00).</b>
+              <p class="body-text" style="margin-top:2px">Their bank details were changed today at 7:55 am by Lena Ortiz. Changed accounts can't be paid for 24 hours and until someone other than the requester verifies them by phone. It can join the next batch after <b>Sat 25 Oct, 7:55 am</b>.</p></div>
+            <div class="act"><a class="btn sm" href="#">Open verification</a></div>
+          </div>
+
+          <section class="card" aria-labelledby="bills-h">
+            <div class="card-h"><h2 id="bills-h">Bills in this batch</h2><span class="meta">Bank accounts masked — last 3 digits shown</span></div>
+            <div class="table-wrap">
+              <table class="data">
+                <caption class="sr-only">Bills to be paid</caption>
+                <thead><tr><th scope="col">Supplier</th><th scope="col">Bill</th><th scope="col">Due</th><th scope="col">Pay to</th><th scope="col" class="num">Amount</th></tr></thead>
+                <tbody>
+                  <tr class="excl"><td><b>Blue Gum IT Services</b><span class="sec">Excluded — bank change cooling-off (ends 25 Oct, 7:55 am)</span></td><td>BG-2291</td><td>28 Oct</td><td><span class="chip st-warn"><i data-i="alert"></i>Changed today · unverified</span></td><td class="num"><s>4,180.00</s></td></tr>
+                  <tr><td>Pacific Software Licensing</td><td>PSL-10442</td><td>27 Oct</td><td><span class="bank">BSB ···-·21 · ···907</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">5,940.00</td></tr>
+                  <tr><td>Harris Legal</td><td>HL-3381</td><td>30 Oct</td><td><span class="bank">BSB ···-·04 · ···615</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">4,400.00</td></tr>
+                  <tr><td>Coastal Recruitment</td><td>CR-0912</td><td>27 Oct</td><td><span class="bank">BSB ···-·88 · ···230</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">3,300.00</td></tr>
+                  <tr><td>Tasman Cloud Hosting</td><td>TCH-88102</td><td>29 Oct</td><td><span class="bank">BSB ···-·10 · ···448</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">2,860.00</td></tr>
+                  <tr><td>Greenline Electrical</td><td>GE-551</td><td>31 Oct</td><td><span class="bank">BSB ···-·33 · ···019</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">1,650.00</td></tr>
+                  <tr><td>Spark Print Co</td><td>SP-7720</td><td>28 Oct</td><td><span class="bank">BSB ···-·62 · ···774</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">1,254.00</td></tr>
+                  <tr><td>Bright Spark Marketing</td><td>BSM-204</td><td>30 Oct</td><td><span class="bank">BSB ···-·15 · ···352</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">1,100.00</td></tr>
+                  <tr><td>Metro Cleaning Services</td><td>MCS-1187</td><td>27 Oct</td><td><span class="bank">BSB ···-·47 · ···860</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">682.00</td></tr>
+                  <tr><td>Sydney Data Centre Services</td><td>SDC-4410</td><td>31 Oct</td><td><span class="bank">BSB ···-·29 · ···501</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">519.00</td></tr>
+                  <tr><td>Allied Couriers</td><td>AC-99012</td><td>29 Oct</td><td><span class="bank">BSB ···-·71 · ···143</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">391.60</td></tr>
+                  <tr><td>Northside Office Supplies</td><td>NOS-3302</td><td>31 Oct</td><td><span class="bank">BSB ···-·56 · ···288</span> <span class="chip st-ok"><i data-i="check"></i>Verified</span></td><td class="num">318.40</td></tr>
+                </tbody>
+                <tfoot><tr><td colspan="4">11 bills to pay · 1 excluded</td><td class="num">22,415.00</td></tr></tfoot>
+              </table>
+            </div>
+          </section>
+        </div>
+
+        <div class="stack">
+          <section class="card" aria-labelledby="rel-h">
+            <div class="card-h"><h2 id="rel-h">Release</h2><span class="meta">Over $10,000 → 2 releasers</span></div>
+            <div class="card-b stack" style="gap:14px">
+              <ol class="chain" aria-label="People involved">
+                <li><span class="avatar sm c" aria-hidden="true">LO</span><div><div class="role">Created · AP Clerk</div><div class="name">Lena Ortiz</div></div><span class="xs subtle">23 Oct, 2:05 pm</span></li>
+                <li><span class="avatar sm b" aria-hidden="true">MT</span><div><div class="role">1st release · Approver (outside accountant)</div><div class="name">Mei Tan</div></div><span class="chip st-ok"><i data-i="check"></i>Released</span></li>
+                <li class="me"><span class="avatar sm" aria-hidden="true">SN</span><div><div class="role">2nd release · Owner · you</div><div class="name">Sam Nguyen</div></div><span class="chip st-info"><i data-i="clock"></i>Your turn</span></li>
+              </ol>
+              <div class="explain"><i data-i="users"></i><span>The creator can never release their own batch. <b>Lena can't release PB-0087</b>, and neither person can release twice.</span></div>
+
+              <div class="mfa" role="group" aria-labelledby="mfa-h">
+                <h3 id="mfa-h"><i data-i="shield"></i>Confirm it's you</h3>
+                <p class="small muted" style="margin-bottom:12px">Releasing money needs a fresh sign-in check. Enter the 6-digit code from your authenticator app, or use your passkey.</p>
+                <div class="otp" aria-label="Authentication code, 3 of 6 digits entered"><span>4</span><span>8</span><span>1</span><span class="cur"></span><span></span><span></span></div>
+                <div class="row" style="margin-top:12px"><button class="btn" type="button"><i data-i="user"></i>Use passkey instead</button></div>
+              </div>
+              <button class="btn primary lg" type="button" aria-disabled="true"><i data-i="send"></i>Release $22,415.00 to bank</button>
+            </div>
+          </section>
+
+          <section class="card" aria-labelledby="aba-h">
+            <div class="card-h"><h2 id="aba-h">Bank file (ABA)</h2><span data-chip="draft">Ready after release</span></div>
+            <div class="card-b">
+              <dl class="aba">
+                <dt>Pay from</dt><dd>Operating ···418</dd>
+                <dt>APCA user ID</dt><dd>301500</dd>
+                <dt>Processing date</dt><dd>27 Oct 2026</dd>
+                <dt>Records</dt><dd>11 credits + 1 balancing debit</dd>
+                <dt>File total</dt><dd><b>22,415.00</b></dd>
+              </dl>
+            </div>
+            <div class="card-f"><button class="btn sm" type="button" aria-disabled="true"><i data-i="download"></i>Download PB-0087.aba</button><span class="xs">Posts when you confirm the bank accepted it</span></div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

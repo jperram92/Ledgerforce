@@ -1,0 +1,21 @@
+{
+  "name": "@ledgerforce/gl",
+  "version": "0.0.0",
+  "private": true,
+  "description": "General ledger module: chart of accounts, system roles, country templates (design §3.2)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "vitest": "4.1.12"
+  }
+}

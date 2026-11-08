@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document xmlns="urn:iso:std:iso:20022:tech:xsd:camt.053.001.08" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <BkToCstmrStmt>
+    <GrpHdr><MsgId>HARBOUR-20261201</MsgId><CreDtTm>2026-12-01T08:30:00+11:00</CreDtTm></GrpHdr>
+    <Stmt>
+      <Id>STMT-2026-11</Id>
+      <CreDtTm>2026-12-01T08:30:00+11:00</CreDtTm>
+      <FrToDt><FrDtTm>2026-11-01T00:00:00+11:00</FrDtTm><ToDtTm>2026-11-30T23:59:59+11:00</ToDtTm></FrToDt>
+      <Acct>
+        <Id><Othr><Id>062000-12345678</Id></Othr></Id>
+        <Ccy>AUD</Ccy>
+      </Acct>
+      <Bal><Tp><CdOrPrtry><Cd>OPBD</Cd></CdOrPrtry></Tp><Amt Ccy="AUD">5000.00</Amt><CdtDbtInd>CRDT</CdtDbtInd><Dt><Dt>2026-11-01</Dt></Dt></Bal>
+      <Bal><Tp><CdOrPrtry><Cd>CLBD</Cd></CdOrPrtry></Tp><Amt Ccy="AUD">13394.43</Amt><CdtDbtInd>CRDT</CdtDbtInd><Dt><Dt>2026-11-30</Dt></Dt></Bal>
+      <Ntry>
+        <Amt Ccy="AUD">1375.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><DtTm>2026-11-02T00:30:00+11:00</DtTm></BookgDt>
+        <ValDt><Dt>2026-11-02</Dt></ValDt>
+        <AcctSvcrRef>202611020001</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>INV-000123</EndToEndId></Refs>
+            <RmtInf><Ustrd>Direct credit Acme Pty Ltd</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="AUD">10.00</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-11-02</Dt></BookgDt>
+        <ValDt><Dt>2026-11-02</Dt></ValDt>
+        <AcctSvcrRef>202611020002</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>NOTPROVIDED</EndToEndId></Refs>
+            <RmtInf><Ustrd>Account fee</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="AUD">4.50</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-11-03</Dt></BookgDt>
+        <ValDt><Dt>2026-11-03</Dt></ValDt>
+        <AcctSvcrRef>202611030003</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>NOTPROVIDED</EndToEndId></Refs>
+            <RmtInf><Ustrd>Card purchase Blue Cup Cafe</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="AUD">4.50</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-11-03</Dt></BookgDt>
+        <ValDt><Dt>2026-11-03</Dt></ValDt>
+        <AcctSvcrRef>202611030004</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>NOTPROVIDED</EndToEndId></Refs>
+            <RmtInf><Ustrd>Card purchase Blue Cup Cafe</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="AUD">2200.00</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-11-05</Dt></BookgDt>
+        <ValDt><Dt>2026-11-05</Dt></ValDt>
+        <AcctSvcrRef>202611050005</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>RENT-NOV</EndToEndId></Refs>
+            <RmtInf><Ustrd>BPAY Office Rent Pty</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <!-- Pending: must not be imported. -->
+      <Ntry>
+        <Amt Ccy="AUD">99.00</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts><Cd>PDNG</Cd></Sts>
+        <BookgDt><Dt>2026-11-06</Dt></BookgDt>
+        <ValDt><Dt>2026-11-06</Dt></ValDt>
+        <AcctSvcrRef>PENDING-1</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>NOTPROVIDED</EndToEndId></Refs>
+            <RmtInf><Ustrd>Pending card authorisation</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="AUD">550.55</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-11-10</Dt></BookgDt>
+        <ValDt><Dt>2026-11-10</Dt></ValDt>
+        <AcctSvcrRef>202611100006</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>po_1Q2w3E</EndToEndId></Refs>
+            <RmtInf><Ustrd>Stripe payout</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="AUD">1234.56</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-11-15</Dt></BookgDt>
+        <ValDt><Dt>2026-11-15</Dt></ValDt>
+        <AcctSvcrRef>202611150007</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>PAYG-1125</EndToEndId></Refs>
+            <RmtInf><Ustrd>Transfer to ATO</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="AUD">12.34</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-11-20</Dt></BookgDt>
+        <ValDt><Dt>2026-11-20</Dt></ValDt>
+        <AcctSvcrRef>202611200008</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>NOTPROVIDED</EndToEndId></Refs>
+            <RmtInf><Ustrd>Interest</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="AUD">89.90</Amt>
+        <CdtDbtInd>DBIT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-11-28</Dt></BookgDt>
+        <ValDt><Dt>2026-11-28</Dt></ValDt>
+        <AcctSvcrRef>202611280009</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>TLS-889</EndToEndId></Refs>
+            <RmtInf><Ustrd>Telstra direct debit November, mobile</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+      <Ntry>
+        <Amt Ccy="AUD">10000.00</Amt>
+        <CdtDbtInd>CRDT</CdtDbtInd>
+        <Sts><Cd>BOOK</Cd></Sts>
+        <BookgDt><Dt>2026-11-30</Dt></BookgDt>
+        <ValDt><Dt>2026-11-30</Dt></ValDt>
+        <AcctSvcrRef>202611300010</AcctSvcrRef>
+        <BkTxCd><Prtry><Cd>NTRF</Cd></Prtry></BkTxCd>
+        <NtryDtls>
+          <TxDtls>
+            <Refs><EndToEndId>CAP-01</EndToEndId></Refs>
+            <RmtInf><Ustrd>Deposit Harbour &amp; Co Pty Ltd</Ustrd></RmtInf>
+          </TxDtls>
+        </NtryDtls>
+      </Ntry>
+    </Stmt>
+  </BkToCstmrStmt>
+</Document>

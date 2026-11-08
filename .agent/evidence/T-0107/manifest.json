@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0107",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-47",
+      "file": ".agent/evidence/T-0107/20261024-230554-tests-db.json",
+      "test": "2 test(s): packages/db/src/company-abn.db.test.ts › SS-PLAT-47: A company ABN must pass the ABR checksum › accepts a valid ABN and no ABN | packages/db/src/company-abn.db.test.ts › SS-PLAT-47: A company ABN must pass the ABR checksum › refuses an 11-digit ABN that fails the checksum, on insert and on update",
+      "commit": "3ec79cd00d51",
+      "provider": "claude",
+      "timestamp": "2026-10-24T23:05:54.098Z",
+      "result": "passed"
+    }
+  ]
+}

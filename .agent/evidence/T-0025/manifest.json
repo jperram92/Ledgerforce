@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0025",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-64",
+      "file": ".agent/evidence/T-0025/20261025-093755-tests-unit.json",
+      "test": "7 test(s): packages/ledger/src/posting-command.test.ts › SS-PLAT-64 command shape is refused before SQL with a typed error [T-0025] › SS-PLAT-64 needs at least two lines [T-0025] | packages/ledger/src/posting-command.test.ts › SS-PLAT-64 command shape is refused before SQL with a typed error [T-0025] › SS-PLAT-64 every line has exactly one side greater than zero [T-0025] | packages/ledger/src/posting-command.test.ts › SS-PLAT-64 command shape is refused before SQL with a typed error [T-0025] › SS-PLAT-64 an unbalanced command is refused in memory, naming both totals [T-0025] | packages/ledger/src/posting-command.test.ts › SS-PLAT-64 command shape is refused before SQL with a typed error [T-0025] › SS-PLAT-64 source types outside the period matrix are refused; reversals are not built yet [T-0025] | packages/ledger/src/posting-command.test.ts › SS-PLAT-64 command shape is refused before SQL with a typed error [T-0025] › SS-PLAT-64 malformed header fields are refused [T-0025] | packages/ledger/src/posting-command.test.ts › SS-PLAT-64 command shape is refused before SQL with a typed error [T-0025] › SS-PLAT-64 malformed line fields are refused with the line number [T-0025] | packages/ledger/src/posting-command.test.ts › Control accounts accept only their subledger (design §3.2) [T-0025] › SS-PLAT-64 AR, AP and payroll clearing each accept only their own source types [T-0025]",
+      "commit": "afb5dadd4d7e",
+      "provider": "claude",
+      "timestamp": "2026-10-25T09:37:55.581Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-65",
+      "file": ".agent/evidence/T-0025/20261025-093755-tests-unit.json",
+      "test": "1 test(s): packages/ledger/src/posting-command.test.ts › Entry numbering series (DL-0135) [T-0025] › SS-PLAT-65 each source type numbers from its own je_ series [T-0025]",
+      "commit": "afb5dadd4d7e",
+      "provider": "claude",
+      "timestamp": "2026-10-25T09:37:55.581Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-14",
+      "file": ".agent/evidence/T-0025/20261025-093804-tests-db.json",
+      "test": "7 test(s): packages/ledger/src/engine.idempotency.db.test.ts › SS-PLAT-14 same idempotency key posts once [T-0025] › SS-PLAT-14 Same idempotency key posts once: the second call returns the first result [T-0025] | packages/ledger/src/engine.idempotency.db.test.ts › SS-PLAT-14 same idempotency key posts once [T-0025] › SS-PLAT-14 a replay returns the first result even if the command would now be refused [T-0025] | packages/ledger/src/engine.idempotency.db.test.ts › SS-PLAT-14 same idempotency key posts once [T-0025] › SS-PLAT-14 concurrent posts with one key on separate connections create one entry [T-0025] | packages/ledger/src/engine.idempotency.db.test.ts › SS-PLAT-14 same idempotency key posts once [T-0025] › SS-PLAT-14 a concurrent repeat waits for the first post and replays it, even if it would now be refused [T-0025] | packages/ledger/src/engine.idempotency.db.test.ts › SS-PLAT-14 same idempotency key posts once [T-0025] › SS-PLAT-14 a key committed concurrently outside the engine lock is replayed, not an error [T-0025] | packages/ledger/src/engine.idempotency.db.test.ts › SS-PLAT-14 same idempotency key posts once [T-0025] › SS-PLAT-14 a key reused for another document is refused and writes nothing [T-0025] | packages/ledger/src/engine.idempotency.db.test.ts › SS-PLAT-14 same idempotency key posts once [T-0025] › SS-PLAT-14 the key is scoped per company [T-0025]",
+      "commit": "afb5dadd4d7e",
+      "provider": "claude",
+      "timestamp": "2026-10-25T09:38:04.858Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-65",
+      "file": ".agent/evidence/T-0025/20261025-093804-tests-db.json",
+      "test": "7 test(s): packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-65 a valid command posts as one numbered, chained entry [T-0025] › SS-PLAT-65 writes the entry and its lines exactly as built, by account id and system role [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-65 a valid command posts as one numbered, chained entry [T-0025] › SS-PLAT-65 consecutive posts take consecutive numbers from the source type series [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-65 a valid command posts as one numbered, chained entry [T-0025] › SS-PLAT-65 carries transaction currency, amount, rate, tax code and party as given [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-65 a valid command posts as one numbered, chained entry [T-0025] › SS-PLAT-65 a base-currency line must keep rate 1 and txn amount = base; a foreign one needs both [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-65 a valid command posts as one numbered, chained entry [T-0025] › SS-PLAT-65 preview returns the journal post will write, and writes nothing (read-only transaction) [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-65 a valid command posts as one numbered, chained entry [T-0025] › SS-PLAT-65 the outbox hook runs inside the posting transaction and sees the entry [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-65 a valid command posts as one numbered, chained entry [T-0025] › SS-PLAT-65 a failure inside the write leaves nothing, even if the caller commits [T-0025]",
+      "commit": "afb5dadd4d7e",
+      "provider": "claude",
+      "timestamp": "2026-10-25T09:38:04.858Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-64",
+      "file": ".agent/evidence/T-0025/20261025-093804-tests-db.json",
+      "test": "8 test(s): packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-64 refusals are typed and write nothing [T-0025] › SS-PLAT-64 unknown company, account, unbound role [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-64 refusals are typed and write nothing [T-0025] › SS-PLAT-64 archived, non-postable and currency-restricted accounts [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-64 refusals are typed and write nothing [T-0025] › SS-PLAT-64 control accounts accept only their own subledger [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-64 refusals are typed and write nothing [T-0025] › SS-PLAT-64 parties must be active parties of the company [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-64 refusals are typed and write nothing [T-0025] › SS-PLAT-64 dimensions must be valid, and required dimensions present [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-64 refusals are typed and write nothing [T-0025] › SS-PLAT-64 a source type without an active entry number series is refused [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-64 refusals are typed and write nothing [T-0025] › SS-PLAT-64 the period must allow the source type (no period, AR lock) [T-0025] | packages/ledger/src/engine.pipeline.db.test.ts › SS-PLAT-64 refusals are typed and write nothing [T-0025] › SS-PLAT-64 the tenant lock-date policy moves a locked date to the first open date, with a note [T-0025]",
+      "commit": "afb5dadd4d7e",
+      "provider": "claude",
+      "timestamp": "2026-10-25T09:38:04.858Z",
+      "result": "passed"
+    }
+  ]
+}

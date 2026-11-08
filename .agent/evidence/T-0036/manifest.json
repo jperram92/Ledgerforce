@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0036",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-35",
+      "file": ".agent/evidence/T-0036/20261024-194536-tests-unit.json",
+      "test": "7 test(s): packages/modules/parties/src/identifiers.test.ts › SS-PLAT-35: Party identifiers are validated and normalised › accepts the ATO example ABN and rejects a one-digit change (RQ-0017 S1) | packages/modules/parties/src/identifiers.test.ts › SS-PLAT-35: Party identifiers are validated and normalised › normalises spaces in an ABN, and refuses anything that is not a valid ABN | packages/modules/parties/src/identifiers.test.ts › SS-PLAT-35: Party identifiers are validated and normalised › property: changing any single digit of a valid ABN makes it invalid | packages/modules/parties/src/identifiers.test.ts › SS-PLAT-35: Party identifiers are validated and normalised › derives the Peppol participant ID from the ABN (scheme 0151) | packages/modules/parties/src/identifiers.test.ts › SS-PLAT-35: Party identifiers are validated and normalised › converts a 15-character Salesforce Id to its 18-character form (RQ-0017 S5 vector) | packages/modules/parties/src/identifiers.test.ts › SS-PLAT-35: Party identifiers are validated and normalised › refuses an 18-character Id whose suffix does not match, and malformed Ids | packages/modules/parties/src/identifiers.test.ts › SS-PLAT-35: Party identifiers are validated and normalised › property: 15-character Ids differing only in case get different 18-character forms",
+      "commit": "481ae750979a",
+      "provider": "claude",
+      "timestamp": "2026-10-24T19:45:36.380Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-36",
+      "file": ".agent/evidence/T-0036/20261024-194538-tests-db.json",
+      "test": "8 test(s): packages/modules/parties/src/parties.db.test.ts › SS-PLAT-36: One party with roles, addresses, contacts and contact roles › one party can be both customer and supplier, with billing and shipping addresses | packages/modules/parties/src/parties.db.test.ts › SS-PLAT-36: One party with roles, addresses, contacts and contact roles › the database refuses an ABN that fails the checksum, even when written directly | packages/modules/parties/src/parties.db.test.ts › SS-PLAT-36: One party with roles, addresses, contacts and contact roles › property: the SQL ABN check agrees with the TypeScript one, on random and on valid ABNs | packages/modules/parties/src/parties.db.test.ts › SS-PLAT-36: One party with roles, addresses, contacts and contact roles › Peppol delivery needs an ABN | packages/modules/parties/src/parties.db.test.ts › SS-PLAT-36: One party with roles, addresses, contacts and contact roles › the Salesforce Account Id is stored 18-char and is unique per company (15-char input finds the same party) | packages/modules/parties/src/parties.db.test.ts › SS-PLAT-36: One party with roles, addresses, contacts and contact roles › contact roles follow party roles: remittance needs a supplier, billing roles need a customer | packages/modules/parties/src/parties.db.test.ts › SS-PLAT-36: One party with roles, addresses, contacts and contact roles › a contact role must name a contact of the same party (no borrowing another party's contact) | packages/modules/parties/src/parties.db.test.ts › SS-PLAT-36: One party with roles, addresses, contacts and contact roles › nothing is deleted: lf_app has no DELETE on any party table",
+      "commit": "481ae750979a",
+      "provider": "claude",
+      "timestamp": "2026-10-24T19:45:38.742Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-37",
+      "file": ".agent/evidence/T-0036/20261024-194538-tests-db.json",
+      "test": "4 test(s): packages/modules/parties/src/parties.db.test.ts › SS-PLAT-37: An invoice cannot be approved for a customer with no Billing To contact › a customer without a Billing To contact is blocked; adding one clears the blocker | packages/modules/parties/src/parties.db.test.ts › SS-PLAT-37: An invoice cannot be approved for a customer with no Billing To contact › an inactive role or an archived contact does not count | packages/modules/parties/src/parties.db.test.ts › SS-PLAT-37: An invoice cannot be approved for a customer with no Billing To contact › a party that is not a customer, or is archived, is blocked for its own reason | packages/modules/parties/src/parties.db.test.ts › SS-PLAT-37: An invoice cannot be approved for a customer with no Billing To contact › recipients: Billing To in To, Billing CC in CC, sorted, only active contacts with email",
+      "commit": "481ae750979a",
+      "provider": "claude",
+      "timestamp": "2026-10-24T19:45:38.742Z",
+      "result": "passed"
+    }
+  ]
+}

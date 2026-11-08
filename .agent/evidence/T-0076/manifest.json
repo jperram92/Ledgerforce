@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0076",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-76",
+      "file": ".agent/evidence/T-0076/20261025-234910-tests-db.json",
+      "test": "11 test(s): packages/ledger/src/account-movements.db.test.ts › SS-PLAT-76 accountMovements reads posted movements for any date range [T-0076] › SS-PLAT-76 a whole period comes from account_balance, without drafts or other companies [T-0076] | packages/ledger/src/account-movements.db.test.ts › SS-PLAT-76 accountMovements reads posted movements for any date range [T-0076] › SS-PLAT-76 a cut period is read from its posted lines by date [T-0076] | packages/ledger/src/account-movements.db.test.ts › SS-PLAT-76 accountMovements reads posted movements for any date range [T-0076] › SS-PLAT-76 no start date means from the first period [T-0076] | packages/ledger/src/account-movements.db.test.ts › SS-PLAT-76 accountMovements reads posted movements for any date range [T-0076] › SS-PLAT-76 a dimension filter keeps sets holding every requested value [T-0076] | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts › SS-PLAT-76 trial balance, profit and loss, balance sheet [T-0076] › SS-PLAT-76 trial balance for one period or a cut range still nets to zero [T-0076] | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts › SS-PLAT-76 trial balance, profit and loss, balance sheet [T-0076] › SS-PLAT-76 profit and loss for a range, by type and subtype [T-0076] | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts › SS-PLAT-76 trial balance, profit and loss, balance sheet [T-0076] › SS-PLAT-76 balance sheet: prior years in retained earnings, this year on the current-year line [T-0076] | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts › SS-PLAT-76 trial balance, profit and loss, balance sheet [T-0076] › SS-PLAT-76 balance sheet mid-month and at the prior year end [T-0076] | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts › SS-PLAT-76 trial balance, profit and loss, balance sheet [T-0076] › SS-PLAT-76 a year-end closing entry leaves equity unchanged [T-0076] | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts › SS-PLAT-76 trial balance, profit and loss, balance sheet [T-0076] › SS-PLAT-76 a dimension filter narrows the TB and the P&L [T-0076] | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts › SS-PLAT-76 trial balance, profit and loss, balance sheet [T-0076] › SS-PLAT-76 bad input is refused with a report error [T-0076]",
+      "commit": "fdc062fd94b7",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:49:10.818Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-77",
+      "file": ".agent/evidence/T-0076/20261025-234910-tests-db.json",
+      "test": "1 test(s): packages/modules/reporting/src/reports.prop.db.test.ts › SS-PLAT-77 reports hold for random posted ledgers [T-0076] › SS-PLAT-77 TB nets to zero and matches the model, BS balances, P&L matches [T-0076]",
+      "commit": "fdc062fd94b7",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:49:10.818Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-08",
+      "file": ".agent/evidence/T-0076/20261025-234910-tests-db.json",
+      "test": "2 test(s): packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts › SS-UC10-08 TB review step shows TB nets to zero [T-0076] › SS-UC10-08: TB review step shows TB nets to zero [T-0076] | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts › SS-UC10-08 TB review step shows TB nets to zero [T-0076] › SS-UC10-08 an unknown period is refused [T-0076]",
+      "commit": "fdc062fd94b7",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:49:10.818Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-76",
+      "file": ".agent/evidence/T-0076/20261025-234920-tests-unit.json",
+      "test": "7 test(s): packages/modules/reporting/src/statements.test.ts › SS-PLAT-76 trial balance shaping [T-0076] › SS-PLAT-76 puts each net balance on its side and totals both columns [T-0076] | packages/modules/reporting/src/statements.test.ts › SS-PLAT-76 trial balance shaping [T-0076] › SS-PLAT-76 a balanced ledger nets to zero; an empty one too [T-0076] | packages/modules/reporting/src/statements.test.ts › SS-PLAT-76 profit and loss shaping [T-0076] › SS-PLAT-76 revenue then expenses, grouped by subtype in chart-code order [T-0076] | packages/modules/reporting/src/statements.test.ts › SS-PLAT-76 profit and loss shaping [T-0076] › SS-PLAT-76 a loss is negative; contra amounts keep their sign [T-0076] | packages/modules/reporting/src/statements.test.ts › SS-PLAT-76 balance sheet shaping [T-0076] › SS-PLAT-76 retained earnings take prior-year profit; current-year earnings the year to date [T-0076] | packages/modules/reporting/src/statements.test.ts › SS-PLAT-76 balance sheet shaping [T-0076] › SS-PLAT-76 a year-end closing entry moves profit into posted retained earnings, same totals [T-0076] | packages/modules/reporting/src/statements.test.ts › SS-PLAT-76 balance sheet shaping [T-0076] › SS-PLAT-76 earnings lines are shown at zero; an unbalanced input says so [T-0076]",
+      "commit": "fdc062fd94b7",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:49:20.635Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-77",
+      "file": ".agent/evidence/T-0076/20261025-234920-tests-unit.json",
+      "test": "1 test(s): packages/modules/reporting/src/statements.test.ts › SS-PLAT-77 statements hold for random balanced ledgers [T-0076] › SS-PLAT-77 TB nets to zero, BS balances, CYE = profit of the year, RE = posted + prior profit [T-0076]",
+      "commit": "fdc062fd94b7",
+      "provider": "claude",
+      "timestamp": "2026-10-25T23:49:20.635Z",
+      "result": "passed"
+    }
+  ]
+}

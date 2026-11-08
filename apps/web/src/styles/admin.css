@@ -1,0 +1,328 @@
+/* Admin screens (T-0093) in the Timeline direction (DL-0070): ink and lines, teal only for focus
+   and "your turn", radius 2px, no shadows, no all-caps (G3, G10). Tables become labelled stacks
+   on phones so nothing scrolls sideways. Requires tokens.css, timeline.css and shell.css first. */
+
+.admin-block,
+.admin-state,
+.admin-note,
+.admin-back,
+.admin-filters,
+.subpages {
+  margin: var(--s3) var(--s5) var(--s4);
+  max-width: 76rem;
+}
+.admin-state h2,
+.admin-block h2 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: var(--s2);
+}
+.admin-state p {
+  margin: var(--s2) 0 var(--s3);
+}
+.admin-note {
+  color: var(--ink-2);
+}
+.admin-block .admin-note {
+  margin: var(--s2) 0;
+}
+.admin-block > p {
+  max-width: 70ch;
+}
+
+/* Section page: the pages inside a section */
+.subpages ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s3);
+  max-width: 70ch;
+}
+.subpages li {
+  padding: var(--s3) var(--s4);
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+}
+.subpages a {
+  font-weight: 800;
+}
+.subpages p {
+  margin-top: var(--s1);
+  color: var(--ink-2);
+}
+
+/* Tables */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.admin-table th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink-2);
+  border-bottom: 2px solid var(--ink);
+  padding: var(--s2) var(--s3) var(--s2) 0;
+}
+.admin-table td {
+  border-bottom: 1px solid var(--line);
+  padding: var(--s2) var(--s3) var(--s2) 0;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.admin-table a {
+  font-weight: 600;
+}
+.code {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+.word {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid var(--ink-2);
+  border-radius: var(--r);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.word[data-status='disabled'],
+.word[data-status='open'] {
+  border-style: dashed;
+}
+.word[data-status='invited'] {
+  border-style: dotted;
+}
+.admin-table details summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.admin-table details dl {
+  margin: var(--s2) 0 0;
+}
+.admin-table details dt {
+  color: var(--ink-2);
+  font-size: 13px;
+  margin-top: var(--s2);
+}
+.admin-table details dd {
+  margin: 0;
+}
+.admin-table pre {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font:
+    400 13px/1.4 ui-monospace,
+    'SFMono-Regular',
+    Menlo,
+    Consolas,
+    monospace;
+  background: var(--lane);
+  padding: var(--s2);
+  border-radius: var(--r);
+}
+
+/* Forms */
+.admin-form {
+  display: grid;
+  gap: var(--s2);
+  max-width: 34rem;
+  margin-top: var(--s3);
+}
+.admin-form label,
+.admin-filters label,
+.admin-form legend {
+  font-weight: 600;
+}
+.admin-form input,
+.admin-form select,
+.admin-form textarea,
+.admin-filters input,
+.admin-filters select {
+  font: 400 16px/1.4 var(--font);
+  padding: 8px 10px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink-2);
+  border-radius: var(--r);
+  width: 100%;
+}
+.admin-form fieldset {
+  border: 1px solid var(--line-2);
+  border-radius: var(--r);
+  padding: var(--s2) var(--s3) var(--s3);
+  margin: var(--s2) 0 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  gap: var(--s1) var(--s3);
+}
+.admin-form .check {
+  font-weight: 400;
+  display: flex;
+  gap: var(--s2);
+  align-items: center;
+}
+.admin-form .check input {
+  width: auto;
+}
+.admin-form .primary,
+.admin-form .secondary,
+.admin-form .danger {
+  justify-self: start;
+  margin-top: var(--s2);
+}
+.admin-form.inline {
+  max-width: 34rem;
+}
+.confirm {
+  margin-top: var(--s2);
+  padding: var(--s3);
+  border: 2px solid var(--ink);
+  border-radius: var(--r);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  align-items: center;
+}
+.confirm p {
+  flex-basis: 100%;
+  font-weight: 600;
+}
+
+.admin-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: var(--s3);
+  align-items: end;
+  padding: var(--s3) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.admin-filters .field {
+  display: grid;
+  gap: var(--s1);
+}
+.admin-filters .actions {
+  display: flex;
+  gap: var(--s3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Buttons beside the shell's .primary */
+.secondary,
+.danger {
+  font: 600 15px/1 var(--font);
+  padding: 10px 14px;
+  color: var(--ink);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: var(--r);
+  cursor: pointer;
+}
+.secondary:hover {
+  background: var(--lane);
+}
+.danger {
+  color: var(--paper);
+  background: var(--ink);
+}
+.secondary:disabled,
+.danger:disabled,
+.primary:disabled {
+  cursor: default;
+  border-style: dashed;
+}
+
+/* Roles */
+.admin-roles {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 var(--s2);
+  display: grid;
+  gap: var(--s2);
+  max-width: 34rem;
+}
+.admin-roles li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s2) 0;
+  border-bottom: 1px solid var(--line);
+  font-weight: 600;
+}
+
+/* Outcomes */
+.done {
+  margin-top: var(--s3);
+  font-weight: 600;
+  padding: var(--s2) var(--s3);
+  border-left: 4px solid var(--ink);
+  background: var(--lane);
+}
+.refusal {
+  margin-top: var(--s3);
+  font-weight: 600;
+  padding: var(--s2) var(--s3);
+  border-left: 4px solid var(--ink);
+  border-top: 1px dashed var(--ink-2);
+  border-bottom: 1px dashed var(--ink-2);
+}
+.turn {
+  font-weight: 800;
+  padding: var(--s2) var(--s3);
+  border-left: 4px solid var(--now);
+  background: var(--now-soft);
+}
+.turn[data-turn='owner'] {
+  border-left-style: dashed;
+}
+
+.admin-pager {
+  display: flex;
+  gap: var(--s4);
+  align-items: center;
+  margin-top: var(--s3);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 900px) {
+  .admin-block,
+  .admin-state,
+  .admin-note,
+  .admin-back,
+  .admin-filters,
+  .subpages {
+    margin-left: var(--s4);
+    margin-right: var(--s4);
+  }
+  /* Rows become stacks, each value with its column name. */
+  .admin-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .admin-table tr {
+    display: block;
+    padding: var(--s2) 0;
+    border-bottom: 2px solid var(--line-2);
+  }
+  .admin-table td {
+    display: block;
+    position: relative;
+    border-bottom: 0;
+    padding: var(--s1) 0 var(--s1) 8.5rem;
+  }
+  .admin-table td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 8rem;
+    color: var(--ink-2);
+    font: 600 14px/1.45 var(--font);
+  }
+}

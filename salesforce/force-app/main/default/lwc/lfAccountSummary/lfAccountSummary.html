@@ -1,0 +1,101 @@
+<template>
+  <lightning-card title="LedgerForce billing" icon-name="standard:account">
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <div class="slds-is-relative slds-var-p-vertical_large">
+          <lightning-spinner
+            alternative-text="Loading LedgerForce data"
+            size="small"
+          ></lightning-spinner>
+        </div>
+      </template>
+      <template lwc:elseif={errorMessage}>
+        <p data-id="error" role="alert" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+      <template lwc:else>
+        <dl
+          data-id="summary"
+          class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium"
+        >
+          <template for:each={summary} for:item="item">
+            <div key={item.key} class="slds-col slds-size_1-of-2 slds-var-m-bottom_x-small">
+              <dt class="slds-text-title">{item.label}</dt>
+              <dd data-id={item.key} class="slds-text-heading_small">
+                <template lwc:if={item.text}>{item.text}</template>
+                <template lwc:elseif={item.isMoney}>
+                  <lightning-formatted-number
+                    value={item.value}
+                    format-style="currency"
+                  ></lightning-formatted-number>
+                </template>
+                <template lwc:elseif={item.isDate}>
+                  <lightning-formatted-date-time
+                    value={item.value}
+                    time-zone="UTC"
+                    year="numeric"
+                    month="short"
+                    day="numeric"
+                  ></lightning-formatted-date-time>
+                </template>
+                <template lwc:else>—</template>
+              </dd>
+            </div>
+          </template>
+        </dl>
+        <template lwc:if={hasInvoices}>
+          <table data-id="invoices" class="slds-table slds-table_bordered slds-table_cell-buffer">
+            <caption class="slds-assistive-text">
+              Five most recent LedgerForce invoices
+            </caption>
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th scope="col">Invoice</th>
+                <th scope="col">Issued</th>
+                <th scope="col">Due</th>
+                <th scope="col">Status</th>
+                <th scope="col" class="slds-text-align_right">Total</th>
+                <th scope="col" class="slds-text-align_right">Amount due</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={invoices} for:item="invoice">
+                <tr key={invoice.id}>
+                  <th scope="row" data-id="name">{invoice.name}</th>
+                  <template for:each={invoice.cells} for:item="cell">
+                    <td key={cell.key} data-id={cell.key} class={cell.className}>
+                      <template lwc:if={cell.text}>{cell.text}</template>
+                      <template lwc:elseif={cell.isMoney}>
+                        <lightning-formatted-number
+                          value={cell.value}
+                          format-style="currency"
+                        ></lightning-formatted-number>
+                      </template>
+                      <template lwc:elseif={cell.isDate}>
+                        <lightning-formatted-date-time
+                          value={cell.value}
+                          time-zone="UTC"
+                          year="numeric"
+                          month="short"
+                          day="numeric"
+                        ></lightning-formatted-date-time>
+                      </template>
+                      <template lwc:else>—</template>
+                    </td>
+                  </template>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </template>
+        <template lwc:else>
+          <div
+            data-id="empty"
+            class="slds-text-align_center slds-text-color_weak slds-var-p-vertical_medium"
+          >
+            <p>No LedgerForce invoices for this account yet.</p>
+          </div>
+        </template>
+      </template>
+    </div>
+  </lightning-card>
+</template>

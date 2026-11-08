@@ -1,0 +1,122 @@
+# LedgerForce CI: the gates from design §10.8 / Docs/process/definition-of-done.md.
+# Database tests use a postgres:17 service container through LF_TEST_DATABASE_URL (the "external"
+# mode of startTestDatabase, packages/db/README.md). Locally the same tests start their own
+# cluster (DL-0007).
+name: ci
+
+on:
+  push:
+    branches-ignore: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: 'true'
+  LF_PROVIDER: ci
+
+jobs:
+  static:
+    name: typecheck · lint · format · unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint # includes lf/no-float-money and lf/no-direct-ledger-write
+      - run: pnpm format:check
+      - run: pnpm test
+
+  db:
+    name: db integration + cross-tenant RLS
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci_only_password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      LF_TEST_DATABASE_URL: postgres://postgres:ci_only_password@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:db
+
+  e2e:
+    name: e2e (Playwright) + evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Installs the Chromium build that matches the pinned @playwright/test version.
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+        env:
+          LF_EVIDENCE_DIR: ${{ runner.temp }}/evidence # CI evidence is uploaded, not committed
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-and-evidence
+          path: |
+            playwright-report/
+            test-results/
+            ${{ runner.temp }}/evidence/
+          if-no-files-found: ignore
+
+  verify:
+    name: definition of done (scripts/agent/verify.sh)
+    needs: [static, db, e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci_only_password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      LF_TEST_DATABASE_URL: postgres://postgres:ci_only_password@localhost:5432/postgres
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # verify.sh compares against the base branch
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: bash scripts/agent/verify.sh
+        env:
+          LF_EVIDENCE_DIR: ${{ runner.temp }}/evidence

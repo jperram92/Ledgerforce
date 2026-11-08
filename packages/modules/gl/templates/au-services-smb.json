@@ -1,0 +1,435 @@
+{
+  "$comment": "AU services SMB starter chart (T-0018, design §3.2). Data, not code (design principle 3). Pending accountant review — see HANDOVER. Tax codes are keys for the tax module (not yet built).",
+  "id": "au-services-smb",
+  "name": "Australia — services small business",
+  "country": "AU",
+  "version": 1,
+  "accounts": [
+    {
+      "code": "1010",
+      "name": "Operating account",
+      "type": "asset",
+      "subtype": "bank",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "1020",
+      "name": "Business saver",
+      "type": "asset",
+      "subtype": "bank",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "1100",
+      "name": "Undeposited funds",
+      "type": "asset",
+      "subtype": "current_asset",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "systemRole": "UNDEPOSITED_FUNDS"
+    },
+    {
+      "code": "1200",
+      "name": "Trade debtors",
+      "type": "asset",
+      "subtype": "receivable",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": true,
+      "systemRole": "AR_CONTROL"
+    },
+    {
+      "code": "1210",
+      "name": "Stripe clearing",
+      "type": "asset",
+      "subtype": "current_asset",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "1300",
+      "name": "Prepayments",
+      "type": "asset",
+      "subtype": "current_asset",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "1500",
+      "name": "Office equipment",
+      "type": "asset",
+      "subtype": "fixed_asset",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "1510",
+      "name": "Accumulated depreciation - office equipment",
+      "type": "asset",
+      "subtype": "fixed_asset",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "1820",
+      "name": "GST paid",
+      "type": "asset",
+      "subtype": "current_asset",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "systemRole": "GST_PAID"
+    },
+    {
+      "code": "2000",
+      "name": "Trade creditors",
+      "type": "liability",
+      "subtype": "payable",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": true,
+      "systemRole": "AP_CONTROL"
+    },
+    {
+      "code": "2310",
+      "name": "GST collected",
+      "type": "liability",
+      "subtype": "current_liability",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "systemRole": "GST_COLLECTED"
+    },
+    {
+      "code": "2320",
+      "name": "PAYG withholding payable",
+      "type": "liability",
+      "subtype": "current_liability",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "systemRole": "PAYG_WITHHOLDING"
+    },
+    {
+      "code": "2330",
+      "name": "Superannuation payable",
+      "type": "liability",
+      "subtype": "current_liability",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "systemRole": "SUPER_PAYABLE"
+    },
+    {
+      "code": "2340",
+      "name": "Wages payable",
+      "type": "liability",
+      "subtype": "current_liability",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "systemRole": "WAGES_PAYABLE"
+    },
+    {
+      "code": "2350",
+      "name": "Payroll clearing",
+      "type": "liability",
+      "subtype": "current_liability",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": true,
+      "systemRole": "PAYROLL_CLEARING"
+    },
+    {
+      "code": "2400",
+      "name": "Customer prepayments",
+      "type": "liability",
+      "subtype": "current_liability",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "systemRole": "CUSTOMER_PREPAYMENTS"
+    },
+    {
+      "code": "2410",
+      "name": "Deferred revenue",
+      "type": "liability",
+      "subtype": "current_liability",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "systemRole": "DEFERRED_REVENUE"
+    },
+    {
+      "code": "2500",
+      "name": "Business credit card",
+      "type": "liability",
+      "subtype": "credit_card",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "2900",
+      "name": "Suspense",
+      "type": "liability",
+      "subtype": "current_liability",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "systemRole": "SUSPENSE"
+    },
+    {
+      "code": "3000",
+      "name": "Owner's capital",
+      "type": "equity",
+      "subtype": "equity",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "3100",
+      "name": "Owner drawings",
+      "type": "equity",
+      "subtype": "equity",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "3200",
+      "name": "Retained earnings",
+      "type": "equity",
+      "subtype": "retained_earnings",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "systemRole": "RETAINED_EARNINGS"
+    },
+    {
+      "code": "3300",
+      "name": "Current year earnings",
+      "type": "equity",
+      "subtype": "current_year_earnings",
+      "normalBalance": "credit",
+      "postable": false,
+      "control": false,
+      "systemRole": "CURRENT_YEAR_EARNINGS"
+    },
+    {
+      "code": "4110",
+      "name": "Professional services",
+      "type": "revenue",
+      "subtype": "operating_revenue",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "4120",
+      "name": "Subscriptions",
+      "type": "revenue",
+      "subtype": "operating_revenue",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "4130",
+      "name": "Training",
+      "type": "revenue",
+      "subtype": "operating_revenue",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "4190",
+      "name": "Recoverable costs income",
+      "type": "revenue",
+      "subtype": "operating_revenue",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "4900",
+      "name": "Interest income",
+      "type": "revenue",
+      "subtype": "other_revenue",
+      "normalBalance": "credit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "INP"
+    },
+    {
+      "code": "5000",
+      "name": "Subcontractors",
+      "type": "expense",
+      "subtype": "direct_cost",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "6110",
+      "name": "Bank fees",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "INP"
+    },
+    {
+      "code": "6120",
+      "name": "Merchant fees",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "6200",
+      "name": "Rent",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "6220",
+      "name": "Telephone and internet",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "6310",
+      "name": "Hosting and cloud services",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "6400",
+      "name": "Wages and salaries",
+      "type": "expense",
+      "subtype": "employment_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "N-T"
+    },
+    {
+      "code": "6410",
+      "name": "Superannuation expense",
+      "type": "expense",
+      "subtype": "employment_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "N-T"
+    },
+    {
+      "code": "6500",
+      "name": "Bad debts",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false
+    },
+    {
+      "code": "6600",
+      "name": "Depreciation",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "N-T"
+    },
+    {
+      "code": "6700",
+      "name": "Accounting fees",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "6800",
+      "name": "Insurance",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "defaultTaxCode": "GST"
+    },
+    {
+      "code": "6900",
+      "name": "Rounding",
+      "type": "expense",
+      "subtype": "operating_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "systemRole": "ROUNDING"
+    },
+    {
+      "code": "6910",
+      "name": "Realised FX gains and losses",
+      "type": "expense",
+      "subtype": "other_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "systemRole": "FX_REALISED"
+    },
+    {
+      "code": "6920",
+      "name": "Unrealised FX gains and losses",
+      "type": "expense",
+      "subtype": "other_expense",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "systemRole": "FX_UNREALISED"
+    }
+  ],
+  "suggestedSettings": {
+    "stripe_clearing_account": "1210",
+    "merchant_fees_account": "6120",
+    "bad_debts_account": "6500"
+  }
+}

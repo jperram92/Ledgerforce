@@ -1,0 +1,25 @@
+{
+  "name": "@ledgerforce/reporting",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Reporting: trial balance, profit and loss, balance sheet (design §8.1, §3.5)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@ledgerforce/gl": "workspace:*",
+    "@types/node": "22.20.5",
+    "fast-check": "4.10.2",
+    "vitest": "4.1.12"
+  }
+}

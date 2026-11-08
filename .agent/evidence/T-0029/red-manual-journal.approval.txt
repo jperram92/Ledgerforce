@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a8c111121651182b1
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33349
+ ❯ |db| packages/modules/journals/src/manual-journal.approval.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/journals/src/manual-journal.approval.db.test.ts [ packages/modules/journals/src/manual-journal.approval.db.test.ts ]
+Error: Cannot find module './manual-journals.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a8c111121651182b1/packages/modules/journals/src/manual-journal.approval.db.test.ts
+ ❯ packages/modules/journals/src/manual-journal.approval.db.test.ts:20:1
+     18| import { sql } from 'kysely';
+     19| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     20| import {
+       | ^
+     21|   ManualJournalError,
+     22|   approveManualJournal,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  09:57:36
+   Duration  2.01s (transform 591ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

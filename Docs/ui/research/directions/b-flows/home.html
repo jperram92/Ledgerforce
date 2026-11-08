@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>October so far – Harbour &amp; Co – LedgerForce</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="flows.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="d-out" viewBox="0 0 26 26"><rect x="1" y="5" width="13" height="16" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 13h15M19 8l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="d-in" viewBox="0 0 26 26"><rect x="12" y="5" width="13" height="16" fill="none" stroke="currentColor" stroke-width="2"/><path d="M1 13h15M11 8l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="d-owe" viewBox="0 0 26 26"><rect x="1" y="5" width="13" height="16" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 13h15M19 8l5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 2"/></symbol>
+</svg>
+
+<header class="places">
+  <div class="org">Harbour &amp; Co</div>
+  <nav aria-label="Places your money sits"><ul>
+    <li><a href="#" aria-current="page">Overview</a></li>
+    <li><a href="#">Customers</a></li>
+    <li><a href="#">Suppliers</a></li>
+    <li><a href="#">Bank</a></li>
+    <li><a href="#">Tax</a></li>
+    <li><a href="#">Staff</a></li>
+    <li><a href="#">The books</a></li>
+  </ul></nav>
+  <div class="me">Sam Nguyen <span>Owner</span></div>
+</header>
+
+<main id="main">
+  <div class="lead">
+    <p class="when">October 2026, from the bank statement of Thu 23 Oct</p>
+    <h1>$112,640.35 came in this month and $87,224.00 went out</h1>
+    <p class="say">So the bank went up by $25,416.35, from $158,904.20 on 1 October to <b>$184,320.55</b> today. The biggest single thing out was staff wages.</p>
+  </div>
+
+  <div class="band">
+    <div data-flow="f-month"></div>
+    <div class="key"><span><i class="ki"></i>Money in</span><span><i class="ko"></i>Money out</span><span>Band thickness is the amount. Select any band to see the payments in it.</span></div>
+  </div>
+  <script type="application/json" id="f-month">{
+    "summary": "October to 23 Oct. In: customers by bank transfer 86,415.35 and by card through Stripe 26,225.00. Bank 184,320.55. Out: staff wages 38,214.60, suppliers 31,906.40, rent 8,250.00, super 6,380.00, bank and card fees 2,473.00.",
+    "height": 300,
+    "cols": [
+      [ {"label": "Customers, bank transfer", "value": 86415.35, "sub": "38 payments", "dir": "in"},
+        {"label": "Customers, card via Stripe", "value": 26225.00, "sub": "14 payouts, after fees", "dir": "in"} ],
+      [ {"label": "Your bank, 2 accounts", "value": 184320.55, "hIn": 112640.35, "hOut": 112640.35, "sub": "Was 158,904.20 on 1 Oct", "dir": "bank"} ],
+      [ {"label": "Staff wages", "value": 38214.60, "sub": "pay run 16 Oct", "dir": "out"},
+        {"label": "Suppliers", "value": 31906.40, "sub": "2 payment runs", "dir": "out"},
+        {"label": "Rent", "value": 8250.00, "sub": "Harbourside Property Trust", "dir": "out"},
+        {"label": "Superannuation", "value": 6380.00, "sub": "September quarter", "dir": "out"},
+        {"label": "Bank and card fees", "value": 2473.00, "dir": "out"} ]
+    ]}</script>
+
+  <div class="cols">
+    <section aria-labelledby="h-still">
+      <h2 id="h-still">Still to move</h2>
+      <p>Money that is owed but hasn't moved yet. If everyone paid you and you paid everyone today, you would have $226,259.00.</p>
+      <div class="pos">
+        <div class="bar" aria-hidden="true"><span class="b-bank" style="width:65.66%"></span><span class="b-in" style="width:34.34%"></span></div>
+        <div class="bar lower" aria-hidden="true" style="margin-top:4px"><span class="b-gap" style="width:80.60%"></span><span class="b-out" style="width:19.40%"></span></div>
+        <dl>
+          <div><dt>In the bank</dt><dd>184,320.55<small>reconciled to 22 Oct</small></dd></div>
+          <div><dt>Customers owe you</dt><dd class="in">96,412.80<small>33,482.50 overdue, 8 customers</small></dd></div>
+          <div><dt>You owe suppliers</dt><dd class="out">41,870.25<small>22,415.00 goes on Tue 28 Oct</small></dd></div>
+          <div><dt>GST for the ATO</dt><dd class="out">12,604.10<small>BAS due Tue 28 Oct</small></dd></div>
+        </dl>
+        <p class="note">The tax reserve account holds 12,440.35, which is 163.75 less than the BAS. Move 163.75 before Tuesday.</p>
+      </div>
+    </section>
+
+    <section aria-labelledby="h-asks">
+      <h2 id="h-asks">Waiting for you</h2>
+      <p>Four decisions. Nothing moves until you make them.</p>
+      <ul class="asks">
+        <li><svg class="dir out" aria-hidden="true"><use href="#d-out"/></svg>
+          <div><p class="s">Pay <b>$22,415.00</b> out to 11 suppliers on Tuesday.</p><p class="who">Lena made the run and Mei released it first. Runs over $10,000 need a second person: you.</p></div>
+          <a class="btn go" href="#">Review and release</a></li>
+        <li><svg class="dir out" aria-hidden="true"><use href="#d-owe"/></svg>
+          <div><p class="s">Record <b>$14,880.00</b> of October wages as owed, before they are paid.</p><p class="who">Priya's journal MJ-0412. Over $5,000, so you or Mei approve.</p></div>
+          <a class="btn" href="#">Review</a></li>
+        <li><svg class="dir out" aria-hidden="true"><use href="#d-owe"/></svg>
+          <div><p class="s">Accept a <b>$3,190.00</b> bill from Tasman Cloud Hosting.</p><p class="who">Entered by Lena. Bills over $1,000 need someone else.</p></div>
+          <a class="btn" href="#">Review</a></li>
+        <li><svg class="dir out" aria-hidden="true"><use href="#d-out"/></svg>
+          <div><p class="s">Give <b>$660.00</b> back to Wattle &amp; Stone Architects.</p><p class="who">Jordan's credit note for a cancelled training day.</p></div>
+          <a class="btn" href="#">Review</a></li>
+      </ul>
+    </section>
+  </div>
+
+  <div class="band shade">
+    <section aria-labelledby="h-books" style="max-width:980px">
+      <h2 id="h-books">Are the books in order?</h2>
+      <p>Three things your accountant keeps an eye on, in plain words.</p>
+      <ul class="facts-say">
+        <li><span class="state out">Almost</span>September is closed except the final lock. Priya locks it once the BAS is lodged on Tuesday. <a href="#">6 of 7 steps done</a></li>
+        <li><span class="state out">3 need a person</span>Salesforce has the latest status for 1,284 records today. Three updates failed and wait for Priya; two more are retrying on their own. <a href="#">See what failed</a></li>
+        <li><span class="state in">Watched</span>Twice this week one person did both steps of a check, because the team is small. Mei reviews those, then you acknowledge them. <a href="#">2 exceptions</a></li>
+      </ul>
+    </section>
+  </div>
+</main>
+<script src="flow.js"></script>
+</body>
+</html>

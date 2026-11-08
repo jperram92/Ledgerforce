@@ -1,0 +1,54 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a8c111121651182b1
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:38717
+ ❯ |db| packages/ledger/src/control-accounts.db.test.ts (5 tests | 2 failed) 1643ms
+     × approvedBy is written to journal_entry.approved_by, shown by preview and covered by the hash chain 9ms
+     × an approvedBy that is not a user of the tenant is refused with UNKNOWN_USER before any write 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/ledger/src/control-accounts.db.test.ts > Posting engine records the approver of a journal (RQ-0043 finding 6) [T-0029] > approvedBy is written to journal_entry.approved_by, shown by preview and covered by the hash chain
+AssertionError: expected undefined to be '01a177a2-c2db-79fb-9ed3-393725e489d8' // Object.is equality
+
+- Expected:
+"01a177a2-c2db-79fb-9ed3-393725e489d8"
+
++ Received:
+undefined
+
+ ❯ packages/ledger/src/control-accounts.db.test.ts:167:30
+    165|     );
+    166|     const built = await f.inTenant((trx) => preview(trx, c));
+    167|     expect(built.approvedBy).toBe(users.approver);
+       |                              ^
+    168|     const r = await f.inTenant((trx) => post(trx, c));
+    169|     const row = await f.inTenant((trx) =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |db| packages/ledger/src/control-accounts.db.test.ts > Posting engine records the approver of a journal (RQ-0043 finding 6) [T-0029] > an approvedBy that is not a user of the tenant is refused with UNKNOWN_USER before any write
+AssertionError: expected undefined to be 'UNKNOWN_USER' // Object.is equality
+
+- Expected:
+"UNKNOWN_USER"
+
++ Received:
+undefined
+
+ ❯ packages/ledger/src/control-accounts.db.test.ts:191:42
+    189|     for (const run of [preview, post] as const) {
+    190|       const err = await f.inTenant((trx) => run(trx, c)).catch((e: unk…
+    191|       expect((err as PostingError).code).toBe('UNKNOWN_USER');
+       |                                          ^
+    192|     }
+    193|     expect(await ledgerRows()).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 3 passed (5)
+   Start at  09:55:15
+   Duration  3.44s (transform 488ms, setup 0ms, import 689ms, tests 1.64s, environment 0ms)
+

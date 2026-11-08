@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LedgerForce UI mockups — gallery</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="shell.css">
+<script src="shell.js" defer></script>
+<style>
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 32px 24px 64px; }
+  @media (max-width: 600px) { .wrap { padding: 20px 16px 48px; } footer code { word-break: break-all; } }
+  .hero { display: flex; gap: 16px; align-items: center; margin-bottom: 8px; }
+  .hero .brand-mark { width: 40px; height: 40px; font-size: 18px; border-radius: 10px; }
+  .lead { color: var(--lf-text-muted); max-width: 760px; font-size: 15px; margin-bottom: 28px; }
+  h2.sect { font-size: 18px; margin: 28px 0 12px; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(270px, 100%), 1fr)); gap: 16px; }
+  .shot { display: flex; flex-direction: column; background: var(--lf-surface); border: 1px solid var(--lf-border); border-radius: var(--lf-radius-lg); overflow: hidden; color: var(--lf-text); box-shadow: var(--lf-shadow-xs); }
+  .shot:hover { text-decoration: none; box-shadow: var(--lf-shadow-md); }
+  .shot .img { aspect-ratio: 16 / 10; background: var(--lf-surface-2); border-bottom: 1px solid var(--lf-border); overflow: hidden; }
+  .shot img { width: 100%; display: block; }
+  .shot .img.tall img { width: 46%; margin: 0 auto; }
+  .shot .cap { padding: 12px 14px; }
+  .shot .cap b { display: block; font-size: 14px; }
+  .shot .cap span { font-size: 12.5px; color: var(--lf-text-muted); }
+  .shot .uc { display: inline-block; margin-top: 6px; }
+  .principles { list-style: none; counter-reset: p; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 10px; }
+  .principles li { counter-increment: p; display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 12px 14px; background: var(--lf-surface); border: 1px solid var(--lf-border); border-radius: var(--lf-radius-lg); font-size: 13.5px; }
+  .principles li::before { content: counter(p); width: 26px; height: 26px; border-radius: 50%; background: var(--lf-accent-soft); color: var(--lf-accent-text); display: grid; place-items: center; font-weight: 600; font-size: 12.5px; }
+  .principles b { display: block; }
+  .principles span { color: var(--lf-text-muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  footer { margin-top: 36px; color: var(--lf-text-subtle); font-size: 12.5px; }
+</style>
+</head>
+<body>
+<main class="wrap" id="main">
+  <div class="hero"><span class="brand-mark" aria-hidden="true">Lf</span><h1>What LedgerForce will look like</h1></div>
+  <p class="lead">Twelve high-fidelity mockups with realistic Australian data for Harbour &amp; Co Pty Ltd (a 14-person Salesforce consultancy). They follow the 12 UI principles below and use only the design tokens in <a href="../tokens.css">tokens.css</a>. Static HTML — open any screen, try the moon button for dark mode.</p>
+
+  <h2 class="sect">Screens</h2>
+  <div class="gallery">
+    <a class="shot" href="01-home-dashboard.html"><div class="img"><img src="../screenshots/01-home-dashboard.png" alt="Home dashboard screenshot"></div><div class="cap"><b>01 · Home</b><span>Cash, who owes you, what you owe, GST due, approvals, close and sync health.</span><br><span class="tag uc">Owner</span></div></a>
+    <a class="shot" href="02-invoice-list.html"><div class="img"><img src="../screenshots/02-invoice-list.png" alt="Invoice list screenshot"></div><div class="cap"><b>02 · Invoices</b><span>Status chips, Salesforce link on every row, bulk reminders, density toggle.</span><br><span class="tag uc">UC-01 · UC-04</span></div></a>
+    <a class="shot" href="03-invoice-detail.html"><div class="img"><img src="../screenshots/03-invoice-detail.png" alt="Invoice detail screenshot"></div><div class="cap"><b>03 · Invoice detail</b><span>Lines and GST, journal panel open, sync status, audit trail, Void creates reversal.</span><br><span class="tag uc">UC-01 · UC-11</span></div></a>
+    <a class="shot" href="04-batch-billing-run.html"><div class="img"><img src="../screenshots/04-batch-billing-run.png" alt="Batch billing preview screenshot"></div><div class="cap"><b>04 · Batch billing preview</b><span>Exceptions and warnings, totals, batch journal, approve and post 38.</span><br><span class="tag uc">UC-02</span></div></a>
+    <a class="shot" href="05-payment-batch-release.html"><div class="img"><img src="../screenshots/05-payment-batch-release.png" alt="Payment batch release screenshot"></div><div class="cap"><b>05 · Release supplier payments</b><span>Maker-checker chain, step-up MFA, cooling-off exclusion, ABA file.</span><br><span class="tag uc">UC-06</span></div></a>
+    <a class="shot" href="06-bank-reconciliation.html"><div class="img"><img src="../screenshots/06-bank-reconciliation.png" alt="Bank reconciliation screenshot"></div><div class="cap"><b>06 · Bank reconciliation</b><span>Statement vs book balance, exact and rule matches, create transactions.</span><br><span class="tag uc">UC-08</span></div></a>
+    <a class="shot" href="07-period-close-checklist.html"><div class="img"><img src="../screenshots/07-period-close-checklist.png" alt="Period close checklist screenshot"></div><div class="cap"><b>07 · Month-end close</b><span>AR lock → AP lock → soft close → hard lock, who and when for each step.</span><br><span class="tag uc">UC-10</span></div></a>
+    <a class="shot" href="08-setup-wizard.html"><div class="img"><img src="../screenshots/08-setup-wizard.png" alt="Setup wizard screenshot"></div><div class="cap"><b>08 · Setup wizard, step 7</b><span>Customer type × product type matrix with gap flags and journal preview.</span><br><span class="tag uc">§4.1 · §4.4</span></div></a>
+    <a class="shot" href="09-sync-issues-inbox.html"><div class="img"><img src="../screenshots/09-sync-issues-inbox.png" alt="Sync issues inbox screenshot"></div><div class="cap"><b>09 · Sync issues inbox</b><span>Salesforce error in plain words, payload, attempts, one-click retry.</span><br><span class="tag uc">§5.6</span></div></a>
+    <a class="shot" href="10-salesforce-account-lwc.html"><div class="img"><img src="../screenshots/10-salesforce-account-lwc.png" alt="Salesforce account component screenshot"></div><div class="cap"><b>10 · Inside Salesforce</b><span>Lightning card on the Account: balance, overdue, last payment, 5 invoices.</span><br><span class="tag uc">UC-12</span></div></a>
+    <a class="shot" href="11-journal-rule-studio.html"><div class="img"><img src="../screenshots/11-journal-rule-studio.png" alt="Rule studio screenshot"></div><div class="cap"><b>11 · Rule studio</b><span>YAML rule, three balancing test cases, author can't activate.</span><br><span class="tag uc">UC-09 · Phase 1</span></div></a>
+    <a class="shot" href="12-mobile-approvals.html"><div class="img tall"><img src="../screenshots/12-mobile-approvals.png" alt="Mobile approval screenshot"></div><div class="cap"><b>12 · Approve on your phone</b><span>Bill, coding, journal, why you, one-thumb approve.</span><br><span class="tag uc">UC-05 · 390 px</span></div></a>
+  </div>
+
+  <h2 class="sect">The 12 principles</h2>
+  <ol class="principles">
+    <li><div><b>Every number is traceable</b><span>One click from any figure to the documents and journal behind it.</span></div></li>
+    <li><div><b>Status is a word plus a colour</b><span>Never colour alone. Every chip has text and an icon.</span></div></li>
+    <li><div><b>Money is set for reading</b><span>Right-aligned, tabular figures, 2 decimals, negatives in (parentheses) announced as “minus”.</span></div></li>
+    <li><div><b>Show the journal before you post</b><span>Preview mode is one click on every postable document, open by default in reviews.</span></div></li>
+    <li><div><b>Nothing posted is deleted</b><span>Void says “creates reversal journal”; delete is shown as unavailable, with the reason.</span></div></li>
+    <li><div><b>Controls explain themselves</b><span>SoD, thresholds and lock dates appear as sentences before you act, not errors after.</span></div></li>
+    <li><div><b>Two-person actions show both people</b><span>Maker, checker and you — by name, role and time.</span></div></li>
+    <li><div><b>Weakened controls are visible</b><span>Small-team mode and overrides are labelled, reported and acknowledged.</span></div></li>
+    <li><div><b>Sync is never hidden</b><span>Salesforce status on every synced record and in the top bar; books never wait for it.</span></div></li>
+    <li><div><b>Keyboard-first entry</b><span>Every list and form works without a mouse; shortcuts are shown where they apply.</span></div></li>
+    <li><div><b>Calm density</b><span>Comfortable by default for owners, Compact for bookkeepers — same columns.</span></div></li>
+    <li><div><b>Plain words first</b><span>“Customers owe you” on top, “Accounts receivable” underneath. One primary action per view.</span></div></li>
+  </ol>
+
+  <h2 class="sect">Status vocabulary</h2>
+  <div class="chips"><span data-chip="draft"></span><span data-chip="awaiting"></span><span data-chip="approved"></span><span data-chip="posted"></span><span data-chip="partpaid"></span><span data-chip="paid"></span><span data-chip="overdue"></span><span data-chip="void"></span><span data-chip="reversed"></span><span data-chip="locked"></span></div>
+
+  <footer>Mockups v0.1 · Sprint 0 · source in Docs/ui/mockups · regenerate screenshots with <code>node Docs/ui/tools/screenshot-mockups.mjs</code></footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,88 @@
+ ›   Warning: @salesforce/cli update available from 2.155.0 to 2.155.7.
+@salesforce/cli/2.155.0 linux-x64 node-v22.22.0
+convert exit=0
+{
+  "status": 0,
+  "result": {
+    "location": "<scratchpad>/convert/mdapi"
+  },
+  "warnings": []
+}
+
+mdapi/classes/LFReadOnlyMirrorTest.cls
+mdapi/classes/LFReadOnlyMirrorTest.cls-meta.xml
+mdapi/customPermissions/LF_Integration_Write.customPermission
+mdapi/objects/Account.object
+mdapi/objects/LF_Billing_Request__e.object
+mdapi/objects/LF_Invoice__c.object
+mdapi/objects/LF_Payment__c.object
+mdapi/objects/Opportunity.object
+mdapi/package.xml
+mdapi/permissionsets/LF_Billing_Requester.permissionset
+mdapi/permissionsets/LF_Integration_User.permissionset
+mdapi/permissionsets/LF_Read_Only.permissionset
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>LFReadOnlyMirrorTest</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>Account.LF_Balance_Due__c</members>
+        <members>Account.LF_Credit_Status__c</members>
+        <members>Account.LF_Last_Payment_Date__c</members>
+        <members>Account.LF_Overdue_Amount__c</members>
+        <members>LF_Billing_Request__e.LF_Record_Id__c</members>
+        <members>LF_Billing_Request__e.LF_Request_Id__c</members>
+        <members>LF_Billing_Request__e.LF_Request_Type__c</members>
+        <members>LF_Billing_Request__e.LF_Requested_By__c</members>
+        <members>LF_Invoice__c.LF_Account__c</members>
+        <members>LF_Invoice__c.LF_Amount_Credited__c</members>
+        <members>LF_Invoice__c.LF_Amount_Due__c</members>
+        <members>LF_Invoice__c.LF_Days_Overdue__c</members>
+        <members>LF_Invoice__c.LF_Due_Date__c</members>
+        <members>LF_Invoice__c.LF_Id__c</members>
+        <members>LF_Invoice__c.LF_Issue_Date__c</members>
+        <members>LF_Invoice__c.LF_Last_Payment_Date__c</members>
+        <members>LF_Invoice__c.LF_Opportunity__c</members>
+        <members>LF_Invoice__c.LF_PDF_Link__c</members>
+        <members>LF_Invoice__c.LF_Payment_Link__c</members>
+        <members>LF_Invoice__c.LF_Status__c</members>
+        <members>LF_Invoice__c.LF_Total__c</members>
+        <members>LF_Payment__c.LF_Account__c</members>
+        <members>LF_Payment__c.LF_Amount__c</members>
+        <members>LF_Payment__c.LF_Id__c</members>
+        <members>LF_Payment__c.LF_Invoice__c</members>
+        <members>LF_Payment__c.LF_Method__c</members>
+        <members>LF_Payment__c.LF_Payment_Date__c</members>
+        <members>LF_Payment__c.LF_Reference__c</members>
+        <members>Opportunity.LF_Amount_Invoiced__c</members>
+        <members>Opportunity.LF_Amount_Paid__c</members>
+        <members>Opportunity.LF_Invoice_Status__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>LF_Billing_Request__e</members>
+        <members>LF_Invoice__c</members>
+        <members>LF_Payment__c</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>LF_Integration_Write</members>
+        <name>CustomPermission</name>
+    </types>
+    <types>
+        <members>LF_Billing_Requester</members>
+        <members>LF_Integration_User</members>
+        <members>LF_Read_Only</members>
+        <name>PermissionSet</name>
+    </types>
+    <types>
+        <members>Account.LF_Fields_Read_Only</members>
+        <members>LF_Invoice__c.LF_Mirror_Read_Only</members>
+        <members>LF_Payment__c.LF_Mirror_Read_Only</members>
+        <members>Opportunity.LF_Fields_Read_Only</members>
+        <name>ValidationRule</name>
+    </types>
+    <version>67.0</version>
+</Package>

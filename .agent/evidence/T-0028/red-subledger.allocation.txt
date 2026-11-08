@@ -1,0 +1,6 @@
+ FAIL  |db| packages/ledger/src/subledger.allocation.db.test.ts [ packages/ledger/src/subledger.allocation.db.test.ts ]
+Error: Cannot find module './subledger.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a8a8c6194403ecbe0/packages/ledger/src/subledger.allocation.db.test.ts
+     23| import { PostingError, type PostingCommand, type PostingLineInput } fr…
+     26|   AllocationError,
+ Test Files  1 failed (1)
+      Tests  no tests

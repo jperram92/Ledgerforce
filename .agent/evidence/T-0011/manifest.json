@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0011",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-41",
+      "file": ".agent/evidence/T-0011/20261024-202558-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/auth/oidc.db.test.ts › SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) › login redirects to the IdP with code + PKCE S256 + state + nonce, kept server-side and bound to the browser | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) › the callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) › nonce: an ID token whose nonce differs from the stored one is refused (400), no session | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) › PKCE: a code redeemed with the wrong verifier is refused (400), no session | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) › app.tenant_id_for_slug returns only an id, and lf_app still cannot read other tenants",
+      "commit": "c2592118661a",
+      "provider": "claude",
+      "timestamp": "2026-10-24T20:25:58.093Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-42",
+      "file": ".agent/evidence/T-0011/20261024-202558-tests-api-db.json",
+      "test": "6 test(s): apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › an authenticated but unknown subject gets 403 and no session (no just-in-time accounts) | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › another tenant's user, a user at another issuer, or a disabled user gets 403 | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › a replayed callback (state already used) gets 400 and creates no second session | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › a state older than 10 minutes gets 400 and no session | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › a callback without the browser binding, with another login’s cookie, or with a forged tenant gets 400 | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-42: Login refuses unknown users, replayed or expired state and unknown tenants › an unknown, suspended, slug-less or malformed tenant slug gets the same 404, with nothing leaked",
+      "commit": "c2592118661a",
+      "provider": "claude",
+      "timestamp": "2026-10-24T20:25:58.093Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-20",
+      "file": ".agent/evidence/T-0011/20261024-202558-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/auth/oidc.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — login › a session created by OIDC login stores amr/acr and follows the 30-min idle / 12-h absolute policy | apps/api/src/auth/oidc.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles — login › a password-only login is captured as such, so T-0013 can demand MFA",
+      "commit": "c2592118661a",
+      "provider": "claude",
+      "timestamp": "2026-10-24T20:25:58.093Z",
+      "result": "passed"
+    }
+  ]
+}

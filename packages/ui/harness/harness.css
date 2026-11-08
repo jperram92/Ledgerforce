@@ -1,0 +1,74 @@
+/* Page frame for the component fixture only (header, headings, columns). Not part of the package. */
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--s5);
+  padding: 0 var(--s5);
+  height: 52px;
+  border-bottom: 2px solid var(--ink);
+}
+.top .org {
+  font-weight: 800;
+  white-space: nowrap;
+}
+.top .me {
+  margin-left: auto;
+  white-space: nowrap;
+  font-size: 14px;
+}
+.top .me span {
+  color: var(--ink-2);
+}
+.head {
+  padding: var(--s5) var(--s5) var(--s3);
+}
+.head h1 {
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  max-width: 26ch;
+}
+.head p {
+  margin-top: var(--s2);
+  color: var(--ink-2);
+  max-width: 70ch;
+}
+.block {
+  padding: var(--s4) var(--s5);
+}
+.block h2 {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: var(--s2);
+}
+.cols {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  gap: var(--s5);
+  border-top: 1px solid var(--line);
+}
+.sentence {
+  margin-top: var(--s4);
+  max-width: 70ch;
+}
+@media (max-width: 900px) {
+  .top {
+    padding: 0 var(--s4);
+  }
+  .top .me span {
+    display: none;
+  }
+  .head {
+    padding: var(--s4);
+  }
+  .head h1 {
+    font-size: 26px;
+  }
+  .block {
+    padding: var(--s4);
+  }
+  .cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

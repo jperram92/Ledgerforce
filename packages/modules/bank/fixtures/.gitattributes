@@ -1,0 +1,3 @@
+# Bank files are kept byte-for-byte as banks send them (CRLF, BOM, CHARSET 1252): the
+# file hash is part of duplicate detection (RQ-0019).
+* -text
