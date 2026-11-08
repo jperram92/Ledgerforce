@@ -23,7 +23,10 @@
  * subledger_entry, built in step 4 (BuiltEntry.subledgerItems, so preview shows them) and
  * written in step 6 after the lines; the database fills it from its line (migration 0028).
  * Approvals are the documents' business (manual journals, T-0029); the engine records the
- * approver it is given (approved_by). Not here yet: event posting rules (golden postings Draft).
+ * approver it is given (approved_by). Reversals (T-0032): postReversal()/previewReversalPlan() run
+ * the same steps on a plan reversal.ts builds from the stored original, and the write also marks
+ * the original reversed (migration 0008) and closes its open items. Not here yet: event posting
+ * rules.
  */
 import type { Database } from '@ledgerforce/db';
 import { sql, type Transaction } from 'kysely';

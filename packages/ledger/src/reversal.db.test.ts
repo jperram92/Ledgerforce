@@ -319,6 +319,44 @@ describe('reversal (void) of posted entries [T-0032]', () => {
     );
   });
 
+  it('the same-period rule binds only what reaches the BAS or the subledger: an untaxed manual journal reverses into a later open period [T-0032]', async () => {
+    const lines = [
+      { account: { id: f.acct['6200'] ?? '' }, debit: '40.00' },
+      { account: { id: f.acct['1100'] ?? '' }, credit: '40.00' },
+    ];
+    const accrual = (
+      await f.inTenant((trx) =>
+        post(trx, {
+          companyId: f.companyId,
+          idempotencyKey: randomUUID(),
+          entryDate: '2026-09-30',
+          sourceType: 'manual_journal',
+          lines,
+        }),
+      )
+    ).entryId;
+    const r = await f.inTenant((trx) =>
+      reverse(trx, voidOf(accrual, { entryDate: '2026-10-01', memo: 'accrual reversal' })),
+    );
+    expect(r.entryDate).toBe('2026-10-01');
+    expect((await entryRow(accrual)).status).toBe('reversed');
+    expect((await entryRow(r.entryId)).memo).toMatch(/^Reversal of .+: accrual reversal$/);
+
+    // The same journal with a tax code is held to the same BAS period.
+    const taxed = (
+      await f.inTenant((trx) =>
+        post(trx, {
+          companyId: f.companyId,
+          idempotencyKey: randomUUID(),
+          entryDate: '2026-09-30',
+          sourceType: 'manual_journal',
+          lines: [{ ...lines[0], taxCodeId: GST, taxAmount: '4.00' }, lines[1]] as typeof lines,
+        }),
+      )
+    ).entryId;
+    await refused(voidOf(taxed, { entryDate: '2026-10-01' }), 'VOID_OTHER_PERIOD', /credit note/);
+  });
+
   it('respects period locks: a soft-closed period needs an override; hard-locked denies [T-0032]', async () => {
     const company = f.companyId;
     // A month of its own so other tests are unaffected: March 2027.
