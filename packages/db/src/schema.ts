@@ -26,6 +26,38 @@ export interface CompanyTable {
   base_currency: string;
   status: Generated<'active' | 'archived'>;
   created_at: Timestamp;
+  /** GST rounding method (migration 0031, design §3.4, RQ-0094). AU default per_line. */
+  tax_rounding: Generated<TaxRounding>;
+}
+
+export type TaxRounding = 'per_line' | 'per_document';
+export type TaxCodeKind =
+  | 'taxable'
+  | 'gst_free'
+  | 'input_taxed'
+  | 'bas_excluded'
+  | 'imports'
+  | 'capital';
+
+/**
+ * Effective-dated tax code version (migration 0031, design §3.6). A rate change is a new row;
+ * lf_app may only close valid_to or rename (trigger). SELECT/INSERT/UPDATE, no DELETE.
+ * Dates are YYYY-MM-DD; select them as ::text (node-postgres parses date to a JS Date).
+ */
+export interface TaxCodeTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  code: string;
+  name: string;
+  kind: TaxCodeKind;
+  /** NUMERIC(18,8) as text. */
+  rate: string;
+  collected_role: 'GST_COLLECTED' | null;
+  paid_role: 'GST_PAID' | null;
+  valid_from: ColumnType<string, string, string>;
+  valid_to: ColumnType<string | null, string | null | undefined, string | null>;
+  created_at: Timestamp;
 }
 
 export interface AppUserTable {
@@ -549,6 +581,7 @@ export interface Database {
   'app.api_token': ApiTokenTable;
   'app.account': AccountTable;
   'app.account_system_role': AccountSystemRoleTable;
+  'app.tax_code': TaxCodeTable;
   'app.dimension': DimensionTable;
   'app.dimension_value': DimensionValueTable;
   'app.dimension_set': DimensionSetTable;

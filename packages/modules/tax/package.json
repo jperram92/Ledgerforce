@@ -1,0 +1,25 @@
+{
+  "name": "@ledgerforce/tax",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Tax module: effective-dated tax codes and the GST engine with per-line/per-document rounding (design §3.4, §3.6)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "decimal.js": "10.6.0",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@ledgerforce/gl": "workspace:*",
+    "@types/node": "22.20.5",
+    "fast-check": "4.10.2",
+    "vitest": "4.1.12"
+  }
+}

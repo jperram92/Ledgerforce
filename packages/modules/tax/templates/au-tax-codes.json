@@ -1,0 +1,54 @@
+{
+  "$comment": "AU default tax codes (T-0034, design §3.6). Data, not code (design principle 3). Rates per GST Act s 9-70 (10%) from the start of GST on 2000-07-01; see RQ-0094. A rate change is a new effective-dated row, never an edit. Pending accountant review together with GP-018 (Draft). BAS box mapping is T-0035.",
+  "id": "au-gst",
+  "country": "AU",
+  "version": 1,
+  "codes": [
+    {
+      "code": "GST",
+      "name": "GST 10%",
+      "kind": "taxable",
+      "rate": "0.10",
+      "collectedRole": "GST_COLLECTED",
+      "paidRole": "GST_PAID",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "FRE",
+      "name": "GST-free",
+      "kind": "gst_free",
+      "rate": "0",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "INP",
+      "name": "Input taxed",
+      "kind": "input_taxed",
+      "rate": "0",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "N-T",
+      "name": "BAS excluded (not reportable)",
+      "kind": "bas_excluded",
+      "rate": "0",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "IMP",
+      "name": "GST on imports",
+      "kind": "imports",
+      "rate": "0.10",
+      "paidRole": "GST_PAID",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "CAP",
+      "name": "GST on capital acquisitions",
+      "kind": "capital",
+      "rate": "0.10",
+      "paidRole": "GST_PAID",
+      "validFrom": "2000-07-01"
+    }
+  ]
+}
