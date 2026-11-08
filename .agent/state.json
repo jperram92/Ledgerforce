@@ -5,7 +5,7 @@
   "step": null,
   "claimed_by": null,
   "lease_expires_at": null,
-  "last_green_commit": "e8c35fd92f09476f6caa048fbd69add1f053f075",
+  "last_green_commit": "445848ec56cfdf7943d11ad1f2df13cd8e60e094",
   "run_id": "2026-10-29-codex-r01",
   "updated_at": "2026-11-08T18:06:06.569Z",
   "phase": "sprint-0",

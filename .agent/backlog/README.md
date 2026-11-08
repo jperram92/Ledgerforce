@@ -145,7 +145,7 @@ graph LR
 | [T-0047](T-0047.md) | Customer prepayments, deposit invoices and application to final invoice; gst_supply_pattern, single-supply path (GP-012-B/GP-015-B), BAS-prep display — gated on its accounting decision | MVP | todo | T-0046, T-0035, T-0124 | — | 2 |
 | [T-0048](T-0048.md) | Bad debt write-off with GST decreasing adjustment; write-off against the ECL allowance (GP-007-A) | MVP | todo | T-0046, T-0035, T-0121, T-0124 | — | 1 |
 | [T-0049](T-0049.md) | Customer statements and aged receivables | MVP | todo | T-0046 | UC-12 | 1 |
-| [T-0050](T-0050.md) | Supplier bills entry and suggested coding | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0031 | UC-05 | 3 |
+| [T-0050](T-0050.md) | Supplier bills entry and suggested coding | MVP | review | T-0039, T-0025, T-0034, T-0028, T-0031 | UC-05 | 3 |
 | [T-0051](T-0051.md) | Bills inbox: inbound email PDF → draft bill | MVP | todo | T-0050 | UC-05 | 1 |
 | [T-0052](T-0052.md) | Bill approval workflow with SoD | MVP | todo | T-0050, T-0015, T-0031 | UC-05 | 4 |
 | [T-0053](T-0053.md) | Supplier/employee bank-detail change verification with cooling-off | MVP | review | T-0037, T-0015, T-0013 | UC-06 | 2 |

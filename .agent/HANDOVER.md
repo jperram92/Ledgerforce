@@ -272,3 +272,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T13:13:46.661Z claude: T-0040 → in_progress
 - 2026-11-08T18:05:06.134Z claude: T-0040 → verifying
 - 2026-11-08T18:05:20.971Z claude: release T-0040 → review (golden GP-001 and GP-018a/b produced by the invoice code PASS; db 17/17; verify 11/4/1 — FAILs only the known run.test.ts worktree artefact (2a/3), golden diff guard (4) and memory status at run time (12); cross-review by codex pending)
+- 2026-11-08T13:10:47.108Z claude: checkpoint: 5/8 — GP-008 PASS via bill producer; AP invariants
+- 2026-11-08T18:03:43.015Z claude: T-0050 → verifying
+- 2026-11-08T18:13:56.998Z claude: release T-0050 → review (All ACs green (SS-UC05-02/04/07/09/10; GP-008 PASS via bill producer). verify 12/3/1: failures only run.test.ts worktree artefact (2a, mirrored by 3) and golden diff guard (4); awaiting codex cross-review)

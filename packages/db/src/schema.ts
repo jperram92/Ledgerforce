@@ -464,6 +464,48 @@ export interface ProductTable {
   created_at: Timestamp;
 }
 
+/** Supplier bill (migration 0038, UC-05, T-0050). Posted = immutable (guard trigger). */
+export type BillStatus = 'draft' | 'awaiting_approval' | 'approved' | 'posted' | 'void';
+export interface BillTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  bill_no: string;
+  supplier_id: string;
+  supplier_ref: string;
+  /** Generated: upper case, ASCII letters and digits of supplier_ref (RQ-0106 F1). */
+  supplier_ref_key: ColumnType<string, never, never>;
+  bill_date: ColumnType<Date, Date | string, Date | string>;
+  due_date: ColumnType<Date, Date | string, Date | string>;
+  currency: string;
+  amounts_are: Generated<'exclusive' | 'inclusive'>;
+  status: Generated<BillStatus>;
+  memo: string | null;
+  entered_by: string | null;
+  approved_by: string | null;
+  journal_entry_id: string | null;
+  posted_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+  created_at: Timestamp;
+}
+
+/** Supplier bill line (migration 0038). Changes only while the bill is draft. */
+export interface BillLineTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  bill_id: string;
+  line_no: number;
+  description: string;
+  /** NUMERIC(19,4) text, > 0. */
+  amount: string;
+  account_id: string | null;
+  product_id: string | null;
+  posting_slot: Generated<'expense' | 'asset'>;
+  tax_code: string | null;
+  coding_source: 'manual' | 'supplier_history' | 'product_profile' | null;
+  created_at: Timestamp;
+}
+
 /** Salesforce Account picklist value → party posting profile (migration 0032). */
 export interface PartyProfileMappingTable {
   id: Generated<string>;
@@ -727,6 +769,8 @@ export interface Database {
   'app.product_posting_profile': ProductPostingProfileTable;
   'app.posting_profile_override': PostingProfileOverrideTable;
   'app.product': ProductTable;
+  'app.bill': BillTable;
+  'app.bill_line': BillLineTable;
   'app.party_profile_mapping': PartyProfileMappingTable;
   'app.product_profile_mapping': ProductProfileMappingTable;
   'app.party_role': PartyRoleTable;

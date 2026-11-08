@@ -2195,4 +2195,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: T-0040's DL-0285..0288 collided with lead entries and became DL-0294..0297, with references updated in its card, T-0116, T-0117, run log r09, backlog index and HANDOVER lines. Its untracked local migration placeholders 0033–0036 never reached a branch; 0037 now follows the lead's contiguous 0033–0036. Evidence text keeps original ids. Register row SS-UC01-11 takes T-0040's version (adds the invoice-produced GP-018 test).
 - Why: unique ids; contiguous migrations.
 - Alternatives: none.
+
+### DL-0290 — Supplier bill model (migration 0038) and duplicate supplier invoices
+- Date: 2026-11-08 · By: claude · Task: T-0050 · Category: architecture
+- Decision: New module package `@ledgerforce/ap` owns `app.bill` / `app.bill_line` (migration 0038; tenant_id, RLS ENABLE+FORCE, lf_app SELECT/INSERT/UPDATE, no DELETE). Bill numbers come from the gapless series `bill` (BILL-000045). The supplier invoice identity is (company, supplier, normalised supplier_ref) with `supplier_ref_key` = upper-case ASCII letters and digits (generated column). Entry returns matching bills as a warning; posting refuses a second posted bill (`DUPLICATE_SUPPLIER_REF`), backed by a partial unique index over posted bills. Guard triggers: bills are created draft; header and lines change only in draft; `posted` needs the posted `ap_bill` journal entry whose source_id is the bill; posted bills are immutable except posted → void (future reversal). Bill line amounts are > 0 (a supplier credit is its own document) and in the base currency only until FX bills exist.
+- Why: UC-05 A3 ("warning, cannot post twice"), design §3.3 (posted = immutable), §3.4 (gapless numbering); RQ-0106 F1, F3.
+- Alternatives: unique index on all bills (rejected: blocks keying a corrected copy, contradicts "warning"); exact-text comparison (rejected: "INV-0045" vs "inv 0045" slips through); negative bill lines (rejected: tax amounts must stay non-negative; credits are separate documents).
+- ADR: none · Status: accepted
+
+### DL-0291 — Deterministic suggested coding for bill lines
+- Date: 2026-11-08 · By: claude · Task: T-0050 · Category: accounting
+- Decision: `suggestCoding` (pure) looks first at lines of the supplier's **posted** bills — the most recent 5 bills by bill date desc, bill number desc; a line with a product only at that product's lines — and suggests the most frequent (account, tax code) pair, ties to the most recently used pair, then account id and tax code ascending. Without history it suggests the product posting profile (T-0039 resolver, purchase direction, slot expense|asset); a TAX_CODE_CONFLICT/NO_TAX_CODE still suggests the account with no tax code (DL-0260). A suggestion is only offered; `bill_line.coding_source` records whether the clerk accepted one. postBill freezes the resolved account and tax code onto product-coded lines while the bill is still draft, so history reads what actually posted.
+- Why: UC-05 step 2, SS-UC05-02; RQ-0106 F2; determinism is proven by a fast-check order-independence property.
+- Alternatives: last-used only (rejected: one odd bill flips the suggestion); include draft bills (rejected: unapproved coding); window of 3 (rejected: too small for suppliers with mixed lines — 5 still satisfies "last 3 bills").
+- ADR: none · Status: accepted
+
+### DL-0292 — Bills post from draft or approved until T-0052; GP-008 line order; golden producer
+- Date: 2026-11-08 · By: claude · Task: T-0050 · Category: accounting
+- Decision: (1) T-0050 keeps the full status field (`draft`, `awaiting_approval`, `approved`, `posted`, `void`) and `approved_by`, but implements no approval or SoD: `postBill` posts a `draft` or `approved` bill and records `approvedBy` on the bill and the journal entry when given. T-0052 adds submit/approve with design §6.5 rule 3 and must then narrow posting to `approved` only. (2) Journal lines in GP-008's order: document lines (grouped by account and tax code), one GST-paid line per tax code with the code and no tax amount (RQ-0095 F1), ROUNDING residue if any, then AP control (gross, supplier, due date → AP open item). Amounts come from the T-0034 tax engine; idempotency key `ap.bill:<bill id>`; source type `ap_bill`, source_id the bill id. (3) The GP-008 golden test passes the bill producer (createBill + postBill) to the T-0031 `runGolden`; `@ledgerforce/ledger` exports `./golden` and `./testing/golden-world` for that. The engine-layer runner in packages/ledger keeps its raw replay (ledger cannot depend on ap).
+- Why: UC-05 / card scope ("approval workflow is T-0052"); GP-008 Approved (DL-0253); RQ-0106 F3–F4.
+- Alternatives: require `approved` now with a stub approve (rejected: would invent SoD semantics T-0052 owns); post at approval only via an event (rejected: no approval exists yet).
+- ADR: none · Status: accepted (T-0052 must tighten posting to `approved`)
+
+### DL-0293 — Local untracked placeholders for reserved migrations 0033–0037
+- Date: 2026-11-08 · By: claude · Task: T-0050 · Category: process
+- Decision: The lead assigned migration number 0038 to T-0050 while 0033–0037 are reserved by parallel branches; the runner refuses gaps, so local test runs use untracked no-op files `00NN_local_placeholder_t0050.sql` (`SELECT 1;`) created and parked by a scratch script. They are never committed (commits stage explicit paths; placeholders are moved out before `conductor.ts checkpoint`, which stages everything). Unlike DL-0268 none reached the branch. On merge, the real 0033–0037 take those numbers; 0038 depends only on 0002–0032.
+- Why: keep the assigned number without committing stand-ins (directive 6 would then forbid removing them).
+- Alternatives: renumber to 0033 (rejected: collides with the reservation); commit placeholders (rejected: DL-0268's problem).
 - ADR: none · Status: accepted
