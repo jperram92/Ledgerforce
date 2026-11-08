@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0035",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-114",
+      "file": ".agent/evidence/T-0035/20261108-131745-tests-unit.json",
+      "test": "3 test(s): packages/modules/tax/src/bas-compute.prop.test.ts › SS-PLAT-114 BAS invariants › INV-bas-settled: settled cash equals accruals (exact in one part, within k half-cents in k) | packages/modules/tax/src/bas-compute.prop.test.ts › SS-PLAT-114 BAS invariants › INV-bas-mirror: a document and its mirror net to zero on every label | packages/modules/tax/src/bas-compute.prop.test.ts › SS-PLAT-114 BAS invariants › INV-bas-simpler: the Simpler BAS equals the full BAS on G1, 1A and 1B",
+      "commit": "fcfdcafc85e3",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:17:45.916Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-114",
+      "file": ".agent/evidence/T-0035/20261108-131752-tests-db.json",
+      "test": "5 test(s): packages/ledger/src/tax-lines.db.test.ts › SS-PLAT-114 taxedLines — posted lines with a tax code › returns the company’s posted taxed lines in the date range, nothing else | packages/ledger/src/tax-lines.db.test.ts › SS-PLAT-114 taxedLines — posted lines with a tax code › by entry id returns the entry’s taxed lines whatever their date | packages/ledger/src/tax-lines.db.test.ts › SS-PLAT-114 allocationReleases — base released per side, by allocation date › reports each side of every allocation and allocation reversal dated in the range | packages/ledger/src/tax-lines.db.test.ts › SS-PLAT-114 allocationReleases — base released per side, by allocation date › both reads write nothing | packages/modules/tax/src/bas-report.db.test.ts › sales: GP-001 invoice, GP-002 receipt, GP-005 credit note, GP-006 refund › SS-PLAT-114 the report writes nothing",
+      "commit": "fcfdcafc85e3",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:17:52.910Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-110",
+      "file": ".agent/evidence/T-0035/20261108-131752-tests-db.json",
+      "test": "11 test(s): packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 new AU tax codes (RQ-0095 Q3, RQ-0102 finding 6) › ADJ-BD is a 10 % bad-debt decreasing adjustment posting to GST collected (DL-0257) | packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 new AU tax codes (RQ-0095 Q3, RQ-0102 finding 6) › EXP is GST-free exports; BAS-W1 / BAS-W2 are PAYG reporting codes without tax | packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 new AU tax codes (RQ-0095 Q3, RQ-0102 finding 6) › a subkind must agree with the stored kind, rate and roles (refused 23514) | packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 new AU tax codes (RQ-0095 Q3, RQ-0102 finding 6) › the subkind is history: it cannot change after insert | packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 company GST basis setting (design §3.6) › defaults to accruals, accepts cash, refuses anything else | packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 BAS label map (design §3.6, RQ-0102 finding 1) › the AU template maps every code to its BAS labels | packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 BAS label map (design §3.6, RQ-0102 finding 1) › refuses unknown labels, amounts, flows, bases and a side that contradicts the flow | packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 BAS label map (design §3.6, RQ-0102 finding 1) › refuses a tax code the company does not have (23503) | packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 BAS label map (design §3.6, RQ-0102 finding 1) › refuses a version overlapping the same code, flow and label on an intersecting basis | packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 BAS label map (design §3.6, RQ-0102 finding 1) › a mapping change is a new version: close the old one, add the next, resolve by date | packages/modules/tax/src/bas-mapping.db.test.ts › SS-PLAT-110 BAS label map (design §3.6, RQ-0102 finding 1) › only valid_to may change; lf_app cannot delete",
+      "commit": "fcfdcafc85e3",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:17:52.910Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-111",
+      "file": ".agent/evidence/T-0035/20261108-131752-tests-db.json",
+      "test": "6 test(s): packages/modules/tax/src/bas-report.db.test.ts › sales: GP-001 invoice, GP-002 receipt, GP-005 credit note, GP-006 refund › SS-PLAT-111 GP-001 on accruals: G1 1,375.00, 1A 125.00 in the invoice period | packages/modules/tax/src/bas-report.db.test.ts › sales: GP-001 invoice, GP-002 receipt, GP-005 credit note, GP-006 refund › SS-PLAT-111 GP-005 in the same BAS period nets into G1/1A (1,155.00 / 105.00) | packages/modules/tax/src/bas-report.db.test.ts › bad debt: GP-007 write-off of an unpaid GP-001-shaped invoice › SS-PLAT-111 accruals: 1B 125.00 in the write-off period, after G1/1A at invoice | packages/modules/tax/src/bas-report.db.test.ts › purchases, prepayment, payroll, partial payment and Simpler BAS › SS-PLAT-111 GP-008 accruals: G10 2,200.00, G11 550.00, 1B 250.00 | packages/modules/tax/src/bas-report.db.test.ts › purchases, prepayment, payroll, partial payment and Simpler BAS › SS-PLAT-111/112 GP-012 prepayment: G1 3,300.00, 1A 300.00 at receipt on both bases | packages/modules/tax/src/bas-report.db.test.ts › purchases, prepayment, payroll, partial payment and Simpler BAS › SS-PLAT-111 GP-010 payroll: W1 10,000.00, W2 2,000.00 on both bases",
+      "commit": "fcfdcafc85e3",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:17:52.910Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-112",
+      "file": ".agent/evidence/T-0035/20261108-131752-tests-db.json",
+      "test": "5 test(s): packages/modules/tax/src/bas-report.db.test.ts › sales: GP-001 invoice, GP-002 receipt, GP-005 credit note, GP-006 refund › SS-PLAT-112 cash basis: nothing until paid, then G1/1A in the receipt period | packages/modules/tax/src/bas-report.db.test.ts › sales: GP-001 invoice, GP-002 receipt, GP-005 credit note, GP-006 refund › SS-PLAT-112 cash basis: the credit note counts when its refund is paid (GP-006) | packages/modules/tax/src/bas-report.db.test.ts › bad debt: GP-007 write-off of an unpaid GP-001-shaped invoice › SS-PLAT-112 cash: nothing — the write-off is not consideration and ADJ-BD maps to none | packages/modules/tax/src/bas-report.db.test.ts › purchases, prepayment, payroll, partial payment and Simpler BAS › SS-PLAT-112 GP-008 cash: nothing until the bill is paid, then all of it | packages/modules/tax/src/bas-report.db.test.ts › purchases, prepayment, payroll, partial payment and Simpler BAS › SS-PLAT-112 a half payment reports half the invoice on the cash basis",
+      "commit": "fcfdcafc85e3",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:17:52.910Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-113",
+      "file": ".agent/evidence/T-0035/20261108-131752-tests-db.json",
+      "test": "1 test(s): packages/modules/tax/src/bas-report.db.test.ts › purchases, prepayment, payroll, partial payment and Simpler BAS › SS-PLAT-113 Simpler BAS shows only G1, 1A and 1B with the full-format amounts",
+      "commit": "fcfdcafc85e3",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:17:52.910Z",
+      "result": "passed"
+    }
+  ]
+}
