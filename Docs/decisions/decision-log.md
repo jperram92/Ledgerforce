@@ -2013,3 +2013,24 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: design §3.6 "each tax code maps to report boxes … the BAS report is a query"; one GST code serves both flows, and every Approved golden puts sales on revenue/liability and purchases on expense/asset accounts (RQ-0102 finding 2).
 - Alternatives: flow by source type (rejected: manual journals, Stripe charges carry purchase GST on an AR entry); separate sales/purchase codes (rejected: the Approved goldens use one `GST`); flow from the GST account of the tax line (rejected: zero-rated codes have no tax line).
 - ADR: none · Status: accepted (pending accountant-reviewer persona review of non-golden rows)
+
+### DL-0278 — Cash-basis GST attributed by settlement allocations; source types classified as data in code
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: accounting
+- Decision: On the cash basis a *document* entry (`ar_invoice`, `ar_credit_note`, `ar_write_off`, `ap_bill`) reports its BAS amounts × (Σ base released from its open items by allocations dated in the period whose counter entry is a *settlement* — `ar_receipt`, `ar_refund`, `payments_stripe_charge`, `ap_payment`, `ar_prepayment_application` — ÷ Σ |base original| of its items), rounded half-up to cents per document and label. Every other taxed line (*immediate*: `ar_prepayment` (GP-012 Option B), manual journals, payroll, Stripe payout, and the fee GST on a Stripe charge) counts at its entry date. A reversal takes the class of the entry it reverses. The classification is `CASH_ATTRIBUTION` in `packages/modules/tax/src/bas-compute.ts`; a unit test requires it to cover the ledger's closed `SOURCE_TYPES` list exactly, and an unknown type fails the report. Allocation reversals reduce the share. Accruals: every taxed line counts at its entry date.
+- Why: GST Act s 29-5(2) — attributable to the extent consideration is received (RQ-0102 finding 3); GP-002 "proportional to the amount received"; GP-007 cash "no BAS adjustment" follows because a write-off is not consideration; GP-005/GP-006 a refunded credit note reports in the refund period.
+- Alternatives: count every allocation (rejected: credit notes and write-offs would report as cash received); attribute by bank lines in the counter entry (rejected: Stripe clearing is not a bank account); keep the classification in a table (rejected for now: source types are a closed code list mirrored in SQL, DL-0256-style test keeps it in step).
+- ADR: none · Status: accepted (accountant-reviewer persona to check, DL-0248)
+
+### DL-0279 — Ledger read API for the tax report; @ledgerforce/tax depends on @ledgerforce/ledger
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: architecture
+- Decision: `packages/ledger/src/tax-lines.ts` adds two read-only functions, `taxedLines` (posted/reversed taxed lines by date range or entry ids, with account type, bound system roles and the reversal's class source type) and `allocationReleases` (each allocation side dated in a range with the base released, the counter entry and the entry's Σ |base original|). The tax module calls them; it holds no SQL on ledger tables. `@ledgerforce/tax` gains the workspace runtime dependency `@ledgerforce/ledger` (as `@ledgerforce/reporting` has, lockfile importer entry only). `@ledgerforce/ledger/testing/golden` (test-only) re-exports the golden world, `goldenCommand` and `parseGoldenPostings` so the BAS db test posts the Approved goldens exactly as the runner does. The journal fixture's `Line` gains optional `taxCodeId`/`taxAmount`.
+- Why: packages/ledger/AGENTS.md — any SQL touching ledger tables outside the ledger package is a defect; the reporting module reads through ledger APIs the same way (accountMovements).
+- Alternatives: SQL in the tax module (rejected: rule above); BAS in packages/modules/reporting (rejected: the mapping is tax-owned data).
+- ADR: none (workspace package, no third-party dependency) · Status: accepted
+
+### DL-0280 — T-0035 success scenarios SS-PLAT-110…114
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: process
+- Decision: T-0035's scenarios are SS-PLAT-110 (codes + map in the database), 111 (accruals from the Approved goldens), 112 (cash by settlement allocation), 113 (Simpler BAS), 114 (read-only; settled cash = accruals). Ids 104–109 are left free because parallel branches (T-0040, T-0050) already use SS-PLAT-104/105 and may take the next ones before merge.
+- Why: avoid id collisions between parallel branches; the register forbids renumbering.
+- Alternatives: next free id 104 (rejected: already used on other branches).
+- ADR: none · Status: accepted

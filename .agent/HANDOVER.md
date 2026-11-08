@@ -249,3 +249,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T08:18:12.433Z claude: release T-0031 → review (verify 12 PASS/3 FAIL/1 PENDING: 2a/3 only the known worktree-path artefact run.test.ts; 4 = golden diff guard on owner-delegated Approved statuses (DL-0253, owner accepts at merge); SS-PLAT-12 14 PASS 6 PENDING-with-reason (DL-0256); cross-review PENDING)
 - 2026-11-08T08:18:12.710Z claude: release T-0034 → review (verify 11 PASS/4 FAIL/1 PENDING: 2a/3 only the known worktree-path artefact run.test.ts; 4 = golden diff guard on owner-delegated Approved statuses (DL-0253); 12 = step 7 honestly unticked; GP-018 Approved and reproduced; cross-review PENDING)
 - 2026-11-08T13:06:39.314Z claude: T-0035 → in_progress
+- 2026-11-08T13:07:38.604Z claude: checkpoint: 2/8 — BAS label map, ADJ-BD, migration 0036 green
