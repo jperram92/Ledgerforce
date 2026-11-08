@@ -131,7 +131,7 @@ graph LR
 | [T-0038](T-0038.md) | Products, party posting profiles and product posting profiles | MVP | review | T-0036, T-0018, T-0034 | — | 1 |
 | [T-0039](T-0039.md) | Posting-profile matrix resolution and gap check | MVP | review | T-0038 | UC-01 | 1 |
 | [T-0121](T-0121.md) | AU templates v2: CAP on fixed assets, ECL allowance 1290, HARDWARE/EQUIPMENT profiles, no OVERSEAS FRE default, EXP/EXS, INP→G11, BAS-W1/W2 (est. 380 lines) | MVP | todo | T-0034, T-0035, T-0038 | UC-01, UC-05 | 1 |
-| [T-0122](T-0122.md) | Tax determination (ADR-0044, Accepted DL-0286) part 1: tax_class columns, app.tax_determination with R3 guard, specificity and author ≠ activator, AU seed, tax-class gap check (est. 400 lines) | MVP | todo | T-0039, T-0121 | UC-01, UC-05 | 1 |
+| [T-0122](T-0122.md) | Tax determination (ADR-0044, Accepted DL-0295) part 1: tax_class columns, app.tax_determination with R3 guard, specificity and author ≠ activator, AU seed, tax-class gap check (est. 400 lines) | MVP | todo | T-0039, T-0121 | UC-01, UC-05 | 1 |
 | [T-0123](T-0123.md) | Tax determination (ADR-0044) part 2: resolver precedence, confirmations (TAX_CONFIRMATION_REQUIRED), resolution trace, adjustments inherit the original line, NO_TAX_RULE supersedes TAX_CODE_CONFLICT (est. 400 lines) | MVP | todo | T-0122 | UC-01, UC-05 | 3 |
 | [T-0124](T-0124.md) | Golden Drafts GP-007-A, GP-012-B, GP-015-B + review MINOR corrections (golden_postings gate, delegated DL-0253/DL-0282; never edits Approved) (est. 300 lines) | MVP | todo | T-0121 | UC-09 | 0 |
 | [T-0126](T-0126.md) | Tax report: posted EXP lines without export evidence, flagged past the s 38-185 60-day period (ADR-0044 R4; follow-up to T-0035) (est. 200 lines) | MVP | todo | T-0035, T-0123 | UC-05 | 1 |
@@ -221,3 +221,5 @@ graph LR
 | [T-0113](T-0113.md) | Install smoke: wait for completed setup reliably | MVP | todo | T-0094 |
 | [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | todo | T-0010 |
 | [T-0115](T-0115.md) | Nightly posting-profile gap check job | MVP | todo | T-0039 | UC-01 | 0 |
+| [T-0116](T-0116.md) | Sales invoice API routes and Finance-Admin-only auto-approve setting | MVP | todo | T-0040 | UC-01 | 0 |
+| [T-0117](T-0117.md) | SoD rule for sales-invoice approval (creator ≠ approver) — proposal + security ADR | MVP | blocked | T-0040, T-0015 | UC-01 | 0 |

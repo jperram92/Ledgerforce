@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0040",
+  "entries": [
+    {
+      "scenario": "SS-UC01-03",
+      "file": ".agent/evidence/T-0040/20261108-131420-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/invoice.golden.db.test.ts › T-0040 golden postings produced by the sales-invoice code › SS-UC01-03: Auto-approve under threshold posts GP-001 and emails",
+      "commit": "89fa8bbc9341-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:14:20.373Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-11",
+      "file": ".agent/evidence/T-0040/20261108-131420-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/invoice.golden.db.test.ts › T-0040 golden postings produced by the sales-invoice code › SS-UC01-11: Tax-inclusive rounding follows company setting",
+      "commit": "89fa8bbc9341-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:14:20.373Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-05",
+      "file": ".agent/evidence/T-0040/20261108-131420-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-UC01-05: No Billing To contact blocks approval › SS-UC01-05: approval of a draft for an Account without a Billing To contact is rejected with NO_BILLING_TO and nothing posts | packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-UC01-05: No Billing To contact blocks approval › SS-UC01-05: the database refuses the approval too (last line of defence) | packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-UC01-05: No Billing To contact blocks approval › SS-UC01-05: auto-approval leaves the draft with reason NO_BILLING_TO (UC-01 A1)",
+      "commit": "89fa8bbc9341-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:14:20.373Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-120",
+      "file": ".agent/evidence/T-0040/20261108-131420-tests-db.json",
+      "test": "8 test(s): packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-120: Sales invoice goes draft → approved → posted through the engine › SS-PLAT-120 numbers at post, posts through the engine with the approver, opens the AR item and replays | packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-120: Sales invoice goes draft → approved → posted through the engine › SS-PLAT-120 invoice numbers are consecutive and taken only at post | packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-120: Sales invoice goes draft → approved → posted through the engine › SS-PLAT-120 a posted invoice and its lines never change; drafts edit only while draft | packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-120: Sales invoice goes draft → approved → posted through the engine › SS-PLAT-120 the database refuses a posted invoice that does not name the engine entry for it | packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-120: Sales invoice goes draft → approved → posted through the engine › SS-PLAT-120 create is idempotent per key | packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-120: Sales invoice goes draft → approved → posted through the engine › SS-PLAT-120 auto-approve: off or above the threshold or on credit hold stays draft; under it posts | packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-120: Sales invoice goes draft → approved → posted through the engine › SS-PLAT-120 auto-approve settings are a per-company history; the latest row wins; default off | packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-120: Sales invoice goes draft → approved → posted through the engine › SS-PLAT-120 refuses an invoice in another currency than the base (FX is out of scope)",
+      "commit": "89fa8bbc9341-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:14:20.373Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-121",
+      "file": ".agent/evidence/T-0040/20261108-131420-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-121: Invoice journal preview writes nothing › SS-PLAT-121 the preview of a draft equals the journal post writes; no entry or number is taken",
+      "commit": "89fa8bbc9341-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:14:20.373Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-122",
+      "file": ".agent/evidence/T-0040/20261108-131420-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-122: Approval refuses an unresolvable posting profile › SS-PLAT-122 TAX_CODE_CONFLICT asks for an explicit tax code on the line; nothing posts | packages/modules/ar/src/invoice.lifecycle.db.test.ts › SS-PLAT-122: Approval refuses an unresolvable posting profile › SS-PLAT-122 a customer without a party posting profile is refused NO_PARTY_PROFILE",
+      "commit": "89fa8bbc9341-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T13:14:20.373Z",
+      "result": "passed"
+    }
+  ]
+}

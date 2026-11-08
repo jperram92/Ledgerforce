@@ -1,0 +1,2 @@
+command: grep -rnE "(INSERT INTO|UPDATE|insertInto\(|updateTable\()\s*'?app\.(journal_entry|journal_line|account_balance|subledger_entry|allocation|dimension_set)" packages/modules/ar packages/db/migrations/0037_ar_sales_invoice.sql
+result: no matches (2026-11-08) — packages/modules/ar writes no ledger table; it calls post()/preview() of packages/ledger.

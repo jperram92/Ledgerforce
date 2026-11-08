@@ -2161,4 +2161,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: T-0035's DL-0280 collided with the lead branch's DL-0280 (persona review) and became DL-0288; its DL-0275..0279 are unique and kept. T-0035's untracked local placeholders 0033–0035 never reached any branch; the lead's documented no-ops 0033 (DL-0284) and 0035 (DL-0287) plus T-0065's 0034 precede T-0035's 0036. Evidence text keeps original ids.
 - Why: unique ids; contiguous migrations.
 - Alternatives: none.
+
+### DL-0294 — Sales invoice lifecycle: journal from the document, approval rules, numbering at post, email as an outbox notice
+- Date: 2026-11-08 · By: claude · Task: T-0040 · Category: accounting
+- Decision: (1) Invoice lines become the journal through one builder used by preview, approve and post: party × product → revenue account and tax code (T-0039 resolver, explicit line code wins), tax-code version on the invoice date, GST via `calculateTax` with the company `tax_rounding`, shape via the tax module's `draftTaxedDocumentLines` — AR control first (party, due date), ROUNDING residue second, revenue grouped by (account, tax code) in first-appearance order with Σ line tax, one collected-GST line per code; all amounts non-negative, the side gives the direction. (2) Workflow draft → approved → posted; approval refuses NO_BILLING_TO / NOT_A_CUSTOMER / PARTY_ARCHIVED (design §4.2, also enforced by the migration 0037 guard), any posting-profile refusal (TAX_CODE_CONFLICT says "set an explicit tax code on the invoice line", DL-0260) and every engine check through `preview()`; the approver is recorded on the invoice and on the journal entry. (3) The invoice number comes from series `ar_invoice` (`INV-`) inside one savepoint with `post()`, so a refusal returns the number. (4) Auto-approve (on, total ≤ threshold, no credit hold) approves with kind `auto` and posts; otherwise the draft stays with the reason (UC-01 A1/A2/A6); the credit-hold check is a hook (Phase 1). (5) "Emails" = one `ar.invoice.posted` outbox notice to the Billing To/CC contacts written in the posting transaction (`invoiceOutboxNotifier`); the SMTP send and PDF are T-0042/T-0041. (6) Only base-currency, positive-amount invoices for now (FX, discounts and credit notes are later cards).
+- Why: RQ-0104; GP-001 and GP-018a/b (Approved, DL-0253) are reproduced by this code through the engine (`invoice.golden.db.test.ts`), lifting the raw-replay limitation of DL-0246 for these entries.
+- Alternatives: a second builder in the ar module (rejected: duplicates T-0034's tested shape); numbering at approval (rejected: design §3.4 — numbers are for posted documents; gaps on rejected approvals); sending SMTP inline (rejected: not transactional, T-0042's scope).
+- ADR: none · Status: accepted
+
+### DL-0295 — No SoD rule exists for sales-invoice approval; proposed separately (T-0117)
+- Date: 2026-11-08 · By: claude · Task: T-0040 · Category: security
+- Decision: Design §6.5 lists six SoD rules and none covers sales invoices; the SoD subject list is closed in code (`SOD_SUBJECT_STEPS`) and in the database (`app.sod_step_known`). T-0040 does not invent one: approval is guarded by the design's explicit invoice rules (DL-0294 (2)) and records the approver; "may the creator approve their own invoice" goes to follow-up card T-0117 (proposed `invoice.create/approve` rule + security ADR — human gate). Open question recorded for the owner.
+- Why: RQ-0104 Q3; adding an SoD rule changes the security model (AGENTS.md §6, design §10.6).
+- Alternatives: add `SOD_INVOICE_SELF_APPROVAL` now (rejected: security gate, and §6.4 lets the AR Clerk create and send invoices).
+- ADR: none (T-0117 will propose one) · Status: proposed (awaiting human)
+
+### DL-0296 — T-0040 layout: new @ledgerforce/ar package, migration 0037 with local placeholders, SS-PLAT-120..122
+- Date: 2026-11-08 · By: claude · Task: T-0040 · Category: process
+- Decision: (1) New workspace package `packages/modules/ar` (`@ledgerforce/ar`; workspace deps only, `fast-check` 4.10.2 dev — same pinned version as the other packages, no new lockfile package). (2) `@ledgerforce/ledger` exports `./golden` (runner API) and `./testing/golden-world` so a module's golden test plugs its own producer into `runGolden`; the ledger's raw-replay engine test is unchanged. (3) The migration is `0037_ar_sales_invoice.sql` as assigned by the lead (0033–0036 belong to parallel tasks); the runner refuses gaps, so this worktree ran its tests with four **untracked** no-op placeholders `0033..0036_local_placeholder_t0040.sql` that are never committed (DL-0268 pattern; commits add paths explicitly, never `-A`). (4) New scenarios SS-PLAT-120 (lifecycle, numbering, immutability), SS-PLAT-121 (preview writes nothing), SS-PLAT-122 (profile refusals at approval) — 106..119 skipped because parallel branches are using that range (T-0035 uses 110..114); the lead may renumber on merge. (5) Test files `invoice.lifecycle.db.test.ts` / `invoice.golden.db.test.ts` instead of the card's `invoice.lifecycle.spec.ts`, as DL-0245 (6).
+- Why: one global migration sequence (DL-0037), ids unique across parallel builders.
+- Alternatives: numbering the migration 0033 (rejected: lead assignment); committing placeholders (rejected: they must not reach the lead branch).
+- ADR: none · Status: accepted
+
+### DL-0297 — Follow-up cards from T-0040: T-0116 (invoice API) and T-0117 (invoice SoD rule, blocked on human)
+- Date: 2026-11-08 · By: claude · Task: T-0040 · Category: scope
+- Decision: T-0040 delivers the module, tables, golden-proved posting, preview and immutability. Two pieces are split off rather than squeezed in: T-0116 — HTTP routes, approval permission, Finance-Admin-only auto-approve setting (public API → ADR; needed by T-0083); T-0117 — whether sales-invoice approval gets an SoD rule (security ADR, human gate; DL-0295), created `blocked`.
+- Why: card size (~400 lines, already reached by the module and tests); AGENTS.md §6 human gates.
+- Alternatives: build the API in T-0040 (rejected: size, ADR needed); silently skip SoD (rejected: the gap is now visible as a card).
+- ADR: none · Status: accepted
+
+### DL-0298 — Merge renumbering for T-0040
+- Date: 2026-11-08 · By: claude (lead) · Task: T-0040 · Category: process
+- Decision: T-0040's DL-0285..0288 collided with lead entries and became DL-0294..0297, with references updated in its card, T-0116, T-0117, run log r09, backlog index and HANDOVER lines. Its untracked local migration placeholders 0033–0036 never reached a branch; 0037 now follows the lead's contiguous 0033–0036. Evidence text keeps original ids. Register row SS-UC01-11 takes T-0040's version (adds the invoice-produced GP-018 test).
+- Why: unique ids; contiguous migrations.
+- Alternatives: none.
 - ADR: none · Status: accepted

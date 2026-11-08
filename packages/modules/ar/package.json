@@ -1,0 +1,30 @@
+{
+  "name": "@ledgerforce/ar",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Accounts receivable: sales invoice lifecycle draft → approve → post through the posting engine (design §3.8, §4.2, §4.3, UC-01)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/outbox": "workspace:*",
+    "@ledgerforce/parties": "workspace:*",
+    "@ledgerforce/products": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "@ledgerforce/tax": "workspace:*",
+    "kysely": "0.29.7",
+    "pg-boss": "12.37.1"
+  },
+  "devDependencies": {
+    "@ledgerforce/gl": "workspace:*",
+    "@types/node": "22.20.5",
+    "fast-check": "4.10.2",
+    "vitest": "4.1.12"
+  }
+}

@@ -267,3 +267,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T13:15:20.497Z claude: checkpoint: 4/8 — BAS report accruals + cash green (47/47)
 - 2026-11-08T18:05:52.914Z claude: T-0035 → verifying
 - 2026-11-08T18:15:00.291Z claude: release T-0035 → review (verify.sh --task T-0035 12 PASS / 3 FAIL / 1 PENDING: only the known run.test.ts worktree-path artefact (2a, and 3 by dependency) and the gate 4 golden diff guard fail; cross-review by codex pending)
+- 2026-11-08T13:03:27.713Z claude: checkpoint (commit deferred to conductor): 1/8 — invoice journal builder green (unit+prop)
+- 2026-11-08T13:12:49.572Z claude: checkpoint (commit deferred to conductor): 4/8 — migration 0037, approve rules, post via engine; golden green
+- 2026-11-08T13:13:46.661Z claude: T-0040 → in_progress
+- 2026-11-08T18:05:06.134Z claude: T-0040 → verifying
+- 2026-11-08T18:05:20.971Z claude: release T-0040 → review (golden GP-001 and GP-018a/b produced by the invoice code PASS; db 17/17; verify 11/4/1 — FAILs only the known run.test.ts worktree artefact (2a/3), golden diff guard (4) and memory status at run time (12); cross-review by codex pending)

@@ -685,8 +685,23 @@ export interface AuditLogTable {
   api_token_id: string | null;
 }
 
+/** Sales invoice line (migration 0037, T-0040); changes only while its invoice is a draft. */
+export interface SalesInvoiceLineTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  invoice_id: string;
+  line_no: number;
+  product_id: string;
+  description: string | null;
+  amount: Numeric;
+  /** Explicit tax code key; wins over posting-profile defaults (DL-0260). */
+  tax_code: string | null;
+}
+
 export interface Database {
   'app.tenant': TenantTable;
+  'app.sales_invoice_line': SalesInvoiceLineTable;
   'app.company': CompanyTable;
   'app.app_user': AppUserTable;
   'app.session': SessionTable;

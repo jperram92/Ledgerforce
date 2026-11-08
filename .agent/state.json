@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "current_task": null,
-  "branch": "feat/T-0039-profile-resolution",
+  "branch": "feat/T-0040-invoice-lifecycle",
   "step": null,
   "claimed_by": null,
   "lease_expires_at": null,
@@ -60,9 +60,13 @@
     "T-0113": 1,
     "T-0095": 1,
     "T-0114": 1,
-    "T-0039": 1
+    "T-0039": 1,
+    "T-0040": 1
   },
   "failures": {},
   "providers": {},
-  "pending_checkpoints": []
+  "pending_checkpoints": [
+    "1/8 — invoice journal builder green (unit+prop)",
+    "4/8 — migration 0037, approve rules, post via engine; golden green"
+  ]
 }
