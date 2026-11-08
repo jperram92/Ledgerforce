@@ -17,13 +17,16 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { createGoldenWorld, type GoldenFixture } from '../testing/golden-world.ts';
+import { repoGoldenGate } from './gating.ts';
 import { parseGoldenPostings } from './parse.ts';
 import { goldenModeFrom, planGoldenRun, runGolden, summarizeGolden } from './runner.ts';
 
 const POSTINGS = fileURLToPath(new URL('../../../../Docs/accounting/postings.md', import.meta.url));
+const REPO = fileURLToPath(new URL('../../../../', import.meta.url));
 const postings = parseGoldenPostings(readFileSync(POSTINGS, 'utf8'));
 const mode = goldenModeFrom(process.env);
-const plan = planGoldenRun(postings, mode);
+// DL-0252: out-of-phase entries and entries waiting for a named task are PENDING with a reason.
+const plan = planGoldenRun(postings, mode, repoGoldenGate(REPO));
 
 let g: GoldenFixture;
 
@@ -39,7 +42,7 @@ describe(`SS-PLAT-12 golden postings — engine layer (${mode})`, () => {
   for (const p of plan) {
     const title = p.run
       ? `${p.gp.id} [${p.label}] engine output equals the golden line for line — ${p.gp.title}`
-      : `${p.gp.id} [DRAFT] PENDING — not run in approved-only mode — ${p.gp.title}`;
+      : `${p.gp.id} [${p.label}] PENDING — ${p.pendingReason ?? ''} — ${p.gp.title}`;
     it(title, async () => {
       const produce = vi.fn(g.produce);
       const outcome = await runGolden(p, produce);
@@ -60,12 +63,15 @@ describe(`SS-PLAT-12 golden postings — engine layer (${mode})`, () => {
     }
     const summary = summarizeGolden(outcomes);
     console.info(`[golden ${mode}] ${summary.text}`);
-    const approved = postings.filter((x) => x.status === 'Approved').map((x) => x.id);
-    const drafts = postings.filter((x) => x.status === 'Draft').map((x) => x.id);
+    const enforced = plan.filter((x) => x.label === 'APPROVED' && x.run).map((x) => x.gp.id);
+    const pending = plan.filter((x) => !x.run).map((x) => x.gp.id);
     const reports = outcomes.filter((o) => o.status === 'FAIL').map((o) => o.report);
     expect(summary.failed, reports.join('\n\n')).toEqual([]);
-    expect(summary.passed).toEqual(approved);
-    // A Draft entry is never counted as reproduced here.
-    expect(summary.pending).toEqual(mode === 'approved-only' ? drafts : []);
+    // Every Approved entry that is in phase and not waiting for a named task is reproduced.
+    expect(summary.passed).toEqual(enforced);
+    // A Draft or gated entry is never counted as reproduced here; each is PENDING with a reason.
+    expect(summary.pending).toEqual(pending);
+    for (const p of plan.filter((x) => !x.run)) expect(p.pendingReason, p.gp.id).toBeTruthy();
+    for (const o of outcomes.filter((x) => x.status === 'PENDING')) console.info(o.report);
   });
 });

@@ -106,6 +106,31 @@ describe('SS-PLAT-12 runner plan and outcomes', () => {
     expect(plan[1]?.pendingReason).toMatch(/Draft.*not run.*approved-only/);
   });
 
+  it('plans a gated Approved entry as PENDING with the gate reason, in both modes (DL-0252)', async () => {
+    const gate = (g: GoldenPosting) =>
+      g.id === 'GP-019' ? { kind: 'requires' as const, reason: 'requires T-0032 (x)' } : null;
+    for (const mode of ['approved-only', 'include-drafts'] as const) {
+      const plan = planGoldenRun(
+        [gp('GP-001', 'Approved'), gp('GP-019', 'Approved'), gp('GP-002', 'Draft')],
+        mode,
+        gate,
+      );
+      expect(plan.map((p) => [p.gp.id, p.run, p.label])).toEqual([
+        ['GP-001', true, 'APPROVED'],
+        ['GP-019', false, 'APPROVED'],
+        ['GP-002', mode === 'include-drafts', 'DRAFT'],
+      ]);
+      expect(plan[1]?.pendingReason).toBe('requires T-0032 (x)');
+      const produce = vi.fn();
+      const held = plan[1];
+      if (!held) throw new Error('nothing planned');
+      const outcome = await runGolden(held, produce);
+      expect(produce).not.toHaveBeenCalled();
+      expect(outcome.status).toBe('PENDING');
+      expect(outcome.report).toMatch(/GP-019 \[APPROVED\] PENDING — requires T-0032/);
+    }
+  });
+
   it('plans Draft entries to run, labelled DRAFT, in include-drafts mode', () => {
     const plan = planGoldenRun([gp('GP-002', 'Draft')], 'include-drafts');
     expect(plan.map((p) => [p.run, p.label])).toEqual([[true, 'DRAFT']]);
