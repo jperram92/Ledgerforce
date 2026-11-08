@@ -28,6 +28,7 @@ import type { GoldenProducer } from '../golden/runner.ts';
 import { SOURCE_TYPES } from '../period-matrix.ts';
 import { generateFiscalYear } from '../period.ts';
 import { post } from '../posting-engine.ts';
+import { reverse } from '../reversal.ts';
 import { createLedgerFixture, storedJournal, type LedgerFixture } from './journal-fixture.ts';
 
 const settings = auServicesSmb.suggestedSettings;
@@ -106,7 +107,18 @@ export interface GoldenFixture {
   close(): Promise<void>;
 }
 
-export async function createGoldenWorld(tenantId: string): Promise<GoldenFixture> {
+export interface GoldenWorldOptions {
+  /**
+   * Every golden, so that a reversal golden (GP-019, `reversalOf`) can post the entry it
+   * reverses first (T-0032).
+   */
+  postings?: readonly GoldenPosting[];
+}
+
+export async function createGoldenWorld(
+  tenantId: string,
+  opts: GoldenWorldOptions = {},
+): Promise<GoldenFixture> {
   const f = await createLedgerFixture(tenantId);
   const companyId = f.companyId;
 
@@ -188,16 +200,49 @@ export async function createGoldenWorld(tenantId: string): Promise<GoldenFixture
       ? null
       : (Object.keys(GOLDEN_TAX_CODE_IDS).find((k) => GOLDEN_TAX_CODE_IDS[k] === id) ?? id);
 
-  const produce: GoldenProducer = async (gp: GoldenPosting, index: number) => {
-    const expected = expectedLines(gp, index, world);
+  /** Posts journal `index` of `gp` and returns the entry id. */
+  const postGolden = async (gp: GoldenPosting, index: number): Promise<string> => {
     const command = goldenCommand(gp, index, world, {
       idempotencyKey: `golden:${gp.id}:${String(index)}:${randomUUID()}`,
       defaultDate: GOLDEN_DEFAULT_DATE,
     });
-    const journal = await f.inTenant(async (trx) => {
-      const r = await post(trx, command);
-      return storedJournal(trx, r.entryId);
-    });
+    return (await f.inTenant((trx) => post(trx, command))).entryId;
+  };
+
+  /**
+   * A reversal golden (T-0032): post the original golden's journal through the engine, then
+   * void it with reverse() on the reversal golden's date. The journal compared is the reversal.
+   */
+  const postReversalGolden = async (gp: GoldenPosting, originalId: string): Promise<string> => {
+    const original = opts.postings?.find((p) => p.id === originalId);
+    if (!original) {
+      throw new GoldenMappingError(
+        `${gp.id}: reverses ${originalId}, which is not among the postings given to the world`,
+      );
+    }
+    if (original.journals.length !== 1) {
+      throw new GoldenMappingError(`${gp.id}: ${originalId} must have exactly one journal`);
+    }
+    const entryId = await postGolden(original, 0);
+    const r = await f.inTenant((trx) =>
+      reverse(trx, {
+        companyId,
+        idempotencyKey: `golden:${gp.id}:${randomUUID()}`,
+        entryId,
+        entryDate: gp.entryDate ?? GOLDEN_DEFAULT_DATE,
+        memo: `golden ${gp.id} — ${gp.title}`,
+      }),
+    );
+    return r.entryId;
+  };
+
+  const produce: GoldenProducer = async (gp: GoldenPosting, index: number) => {
+    const expected = expectedLines(gp, index, world);
+    const entryId =
+      gp.reversalOf === undefined
+        ? await postGolden(gp, index)
+        : await postReversalGolden(gp, gp.reversalOf);
+    const journal = await f.inTenant((trx) => storedJournal(trx, entryId));
     const actual: LineView[] = journal.lines.map((l) => ({
       lineNo: l.lineNo,
       accountId: l.accountId,

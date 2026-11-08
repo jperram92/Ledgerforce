@@ -72,6 +72,11 @@ export interface GoldenPosting {
   /** The first YYYY-MM-DD in the scenario text, or null. */
   readonly entryDate: string | null;
   readonly journals: readonly GoldenJournal[];
+  /**
+   * A reversal golden (GP-019): the GP whose entry it reverses, read from the Source type
+   * ("`ledger.reversal` (reversal_of_id = GP-001 entry)"). Absent for every other entry (T-0032).
+   */
+  readonly reversalOf?: string;
 }
 
 const AMOUNT_RE = /^-?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?$/;
@@ -165,6 +170,7 @@ function parseSection(id: string, title: string, body: readonly string[]): Golde
   const stSeg = /Source type:\s*([^·]+)/.exec(statusLine)?.[1] ?? '';
   const sourceTypes = [...stSeg.matchAll(/`([^`]+)`/g)].map((m) => m[1] ?? '');
   if (sourceTypes.length === 0) return err('no Source type in the status line');
+  const reversalOf = /reversal_of_id\s*=\s*(GP-\d{3})\b/.exec(stSeg)?.[1];
 
   const rest = body.slice(statusIdx + 1);
   const entryDate = DATE_RE.exec(rest.join('\n'))?.[1] ?? null;
@@ -239,7 +245,17 @@ function parseSection(id: string, title: string, body: readonly string[]): Golde
     // A single table's label (if any) is prose, not a journal name.
     journals[0] = { ...journals[0], label: null };
   }
-  return { id, title, status, approval, phase, sourceTypes, entryDate, journals };
+  return {
+    id,
+    title,
+    status,
+    approval,
+    phase,
+    sourceTypes,
+    entryDate,
+    journals,
+    ...(reversalOf === undefined ? {} : { reversalOf }),
+  };
 }
 
 /** Every `## GP-NNN — …` section of the file, in file order. */

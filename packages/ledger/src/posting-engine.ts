@@ -29,11 +29,13 @@ import type { Database } from '@ledgerforce/db';
 import { sql, type Transaction } from 'kysely';
 import { Money } from '@ledgerforce/shared/money';
 import { dimensionSetId, missingRequiredDimensions } from './dimension-set.ts';
+import { markReversed } from './journal.ts';
 import { nextNumber } from './numbering.ts';
 import { recordPeriodOverride, resolvePostingDate, toPeriodError } from './period.ts';
 import {
   PostingError,
   checkCommand,
+  checkReversalCommand,
   controlAccountAccepts,
   entrySeriesFor,
   lineTotals,
@@ -170,8 +172,16 @@ interface DimensionValueRow {
   dimension_status: string;
 }
 
-/** Steps 3–4: validate against the database, resolve accounts, build the lines. Reads only. */
-async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<BuiltEntry> {
+/**
+ * Steps 3–4: validate against the database, resolve accounts, build the lines. Reads only.
+ * `controlSourceType` is the source type whose subledger must own any control account touched:
+ * the command's own, or for a reversal the original entry's (T-0032).
+ */
+async function validateAndBuild(
+  trx: Trx,
+  checked: CheckedCommand,
+  controlSourceType: string = checked.command.sourceType,
+): Promise<BuiltEntry> {
   const c = checked.command;
   const companyId = lc(c.companyId);
   const company = await trx
@@ -297,11 +307,11 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
       fail('INVALID_COMMAND', `dueDate is only for a line on an AR or AP control account`, n);
     }
     if (a.is_control) {
-      if (!own.some((role) => controlAccountAccepts(role, c.sourceType))) {
+      if (!own.some((role) => controlAccountAccepts(role, controlSourceType))) {
         fail(
           'CONTROL_ACCOUNT',
           `account ${a.code} is a control account (${own.join(', ') || 'unbound'}); ` +
-            `${c.sourceType} is not its subledger`,
+            `${controlSourceType} is not its subledger`,
           n,
         );
       }
@@ -489,8 +499,10 @@ async function findByKey(
   return r.rows[0];
 }
 
+type CommandHead = Pick<PostingCommand, 'sourceType' | 'sourceId' | 'idempotencyKey'>;
+
 /** The first result again, if the key was used for this same document. */
-function replay(e: StoredEntry, c: PostingCommand): PostResult {
+function replay(e: StoredEntry, c: CommandHead): PostResult {
   if (e.source_type !== c.sourceType || e.source_id !== (c.sourceId ?? null)) {
     fail(
       'IDEMPOTENCY_CONFLICT',
@@ -520,6 +532,7 @@ async function write(
   built: BuiltEntry,
   command: PostingCommand,
   outbox: PostingOutbox,
+  reversal?: ReversalPlan,
 ): Promise<PostResult> {
   await sql`SAVEPOINT lf_posting`.execute(trx);
   try {
@@ -544,6 +557,7 @@ async function write(
         source_type: built.sourceType,
         source_id: built.sourceId,
         status: 'posted',
+        reversal_of_id: reversal?.reversalOfId ?? null,
         idempotency_key: built.idempotencyKey,
         memo: built.memo,
         created_by: built.createdBy,
@@ -603,6 +617,12 @@ async function write(
           })),
         )
         .execute();
+    }
+    if (reversal !== undefined) {
+      // posted → reversed, the one permitted change (ADR-0004 rule 1). The database refuses it
+      // unless this entry's lines mirror the original's exactly (migration 0008).
+      await markReversed(trx, reversal.reversalOfId, entry.id);
+      await reversal.afterWrite?.(trx, { entryId: entry.id, entryDate: built.entryDate });
     }
     await outbox.enqueue(trx, {
       companyId: built.companyId,
@@ -674,11 +694,87 @@ export async function post(
 ): Promise<PostResult> {
   const checked = checkCommand(command);
   const companyId = lc(command.companyId);
-  await sql`SELECT pg_advisory_xact_lock(hashtextextended(
-      'lf.posting_idem:' || current_setting('app.tenant_id', true) || ':' || ${companyId}::text
-        || ':' || ${command.idempotencyKey}::text, 0))`.execute(trx);
+  await lockKey(trx, companyId, command.idempotencyKey);
   const existing = await findByKey(trx, companyId, command.idempotencyKey);
   if (existing) return replay(existing, command);
   const built = checkBuilt(await validateAndBuild(trx, checked));
   return write(trx, built, command, opts.outbox ?? NO_OUTBOX);
+}
+
+async function lockKey(trx: Trx, companyId: string, key: string): Promise<void> {
+  await sql`SELECT pg_advisory_xact_lock(hashtextextended(
+      'lf.posting_idem:' || current_setting('app.tenant_id', true) || ':' || ${companyId}::text
+        || ':' || ${key}::text, 0))`.execute(trx);
+}
+
+/**
+ * A reversal planned from a stored entry (T-0032). Built only by reversal.ts, which reads the
+ * original and mirrors it; the engine still validates, checks and writes it like any entry, and
+ * the database refuses the posted → reversed mark unless the lines mirror the original.
+ */
+export interface ReversalPlan {
+  /** Source type ledger_reversal; every line of the original with debit and credit swapped. */
+  readonly command: PostingCommand;
+  readonly reversalOfId: string;
+  /** The original's source type: its subledger owns any control account the reversal touches. */
+  readonly originalSourceType: string;
+  /** Extra checks on the built entry, before any write (RQ-0095 Q11 period rule). */
+  checkBuilt?(built: BuiltEntry): void;
+  /** Inside the write savepoint, after the lines, open items and the posted → reversed mark. */
+  afterWrite?(trx: Trx, written: { entryId: string; entryDate: string }): Promise<void>;
+}
+
+/** What a reversal's idempotency is keyed on, known before the original is read. */
+export interface ReversalHead {
+  readonly companyId: string;
+  readonly idempotencyKey: string;
+  readonly sourceType: string;
+  /** The original entry id. */
+  readonly sourceId: string;
+}
+
+async function buildReversal(trx: Trx, plan: ReversalPlan): Promise<BuiltEntry> {
+  const checked = checkReversalCommand(plan.command);
+  const built = checkBuilt(await validateAndBuild(trx, checked, plan.originalSourceType));
+  plan.checkBuilt?.(built);
+  return built;
+}
+
+/**
+ * Post a reversal (reversal.ts → reverse()). The key is locked and replayed first, so a repeat
+ * returns the first reversal without reading the original again; otherwise `plan` reads and
+ * checks the original and the reversal is written in one savepoint with the original's mark.
+ */
+export async function postReversal(
+  trx: Trx,
+  head: ReversalHead,
+  plan: () => Promise<ReversalPlan>,
+  opts: PostOptions = {},
+): Promise<PostResult> {
+  const companyId = lc(head.companyId);
+  await lockKey(trx, companyId, head.idempotencyKey);
+  const existing = await findByKey(trx, companyId, head.idempotencyKey);
+  if (existing) return replay(existing, head);
+  const p = await plan();
+  const built = await buildReversal(trx, p);
+  return write(trx, built, p.command, opts.outbox ?? NO_OUTBOX, p);
+}
+
+/** preview() for a reversal: the journal postReversal() would write. Reads only, takes no lock. */
+export async function previewReversalPlan(
+  trx: Trx,
+  head: ReversalHead,
+  plan: () => Promise<ReversalPlan>,
+): Promise<BuiltEntry> {
+  const existing = await findByKey(trx, lc(head.companyId), head.idempotencyKey);
+  if (existing) {
+    const first = replay(existing, head);
+    throw new PostingError(
+      'ALREADY_POSTED',
+      `idempotency key ${JSON.stringify(head.idempotencyKey)} already posted this reversal ` +
+        `as entry ${first.entryNo}; posting it again returns that entry and writes nothing`,
+      { entryId: first.entryId, entryNo: first.entryNo },
+    );
+  }
+  return buildReversal(trx, await plan());
 }

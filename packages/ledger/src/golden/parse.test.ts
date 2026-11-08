@@ -259,4 +259,14 @@ describe('SS-PLAT-12 parser: the real Docs/accounting/postings.md', () => {
       ).toBe(true);
     }
   });
+
+  it('reads the original a reversal golden reverses from its Source type (GP-019 → GP-001) [T-0032]', () => {
+    const gp019 = postings.find((p) => p.id === 'GP-019');
+    expect(gp019?.sourceTypes).toEqual(['ledger.reversal']);
+    expect(gp019?.reversalOf).toBe('GP-001');
+    expect(gp019?.entryDate).toBe('2026-11-06');
+    for (const p of postings.filter((x) => x.id !== 'GP-019')) {
+      expect(p.reversalOf, p.id).toBeUndefined();
+    }
+  });
 });

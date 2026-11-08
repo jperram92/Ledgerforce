@@ -56,6 +56,19 @@ const REFUSALS: Record<string, Words> = {
     'The date is in a locked period, and an override is not allowed here. Choose a date in an open period.',
   ALREADY_POSTED: () =>
     'This journal is already posted. Posting it again would change nothing; corrections are made with a reversing journal.',
+  // Reversal (void) refusals (T-0032, RQ-0095 Q11).
+  UNKNOWN_ENTRY: () => 'That journal could not be found in this company, so it cannot be reversed.',
+  NOT_POSTED: () => 'Only a posted journal can be reversed. This one has not been posted.',
+  ALREADY_REVERSED: () =>
+    'This journal has already been reversed. A journal can be reversed only once.',
+  REVERSAL_OF_REVERSAL: () =>
+    'This journal is itself a reversal. To restore the original, post the document again instead.',
+  REVERSAL_BEFORE_ORIGINAL: () =>
+    'A reversal cannot be dated before the journal it reverses. Choose the same date or a later one.',
+  VOID_HAS_ALLOCATIONS: () =>
+    'This invoice or bill already has payments or credits applied, so it cannot be voided. Issue a credit note instead.',
+  VOID_OTHER_PERIOD: () =>
+    'A void must fall in the same GST reporting period as the original. Issue a credit note instead.',
 };
 
 export const POSTING_REFUSAL_CODES: readonly string[] = Object.freeze(Object.keys(REFUSALS));
