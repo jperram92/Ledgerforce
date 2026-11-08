@@ -32,12 +32,7 @@ export interface CompanyTable {
 
 export type TaxRounding = 'per_line' | 'per_document';
 export type TaxCodeKind =
-  | 'taxable'
-  | 'gst_free'
-  | 'input_taxed'
-  | 'bas_excluded'
-  | 'imports'
-  | 'capital';
+  'taxable' | 'gst_free' | 'input_taxed' | 'bas_excluded' | 'imports' | 'capital';
 
 /**
  * Effective-dated tax code version (migration 0031, design §3.6). A rate change is a new row;
