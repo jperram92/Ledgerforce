@@ -63,6 +63,40 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm test:db
 
+  # SS-PLAT-11 at full size: 10,000 random documents through the posting engine (T-0033, DL-0300).
+  # `pnpm test:db` runs the same suite with 1,000; the seed is logged and kept in the report.
+  invariants:
+    name: accounting invariants (10,000 documents)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci_only_password
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      LF_TEST_DATABASE_URL: postgres://postgres:ci_only_password@localhost:5432/postgres
+      LF_INVARIANT_REPORT: ${{ runner.temp }}/invariants/report.json
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:invariants
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: invariants-report
+          path: ${{ runner.temp }}/invariants/
+          if-no-files-found: ignore
+
   e2e:
     name: e2e (Playwright) + evidence
     runs-on: ubuntu-latest
