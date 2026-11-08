@@ -141,10 +141,27 @@ gate_script 2b db-tests "test:db" 0
 # 3 accounting invariants (fast-check *.prop.test.ts run inside 2a; trigger-level inside 2b)
 mirror 3 accounting-invariants 2a '\.prop\.test\.[cm]?[jt]sx?$' "property test file(s)"
 
-# 4 golden postings: *.golden.test.ts inside 2a + Docs/accounting diff guard (not in --quick)
+# 4 golden postings: *.golden.test.ts inside 2a, *.golden.db.test.ts inside 2b (not in --quick),
+#   approval status of Docs/accounting/postings.md, and the Docs/accounting diff guard (not in --quick).
+#   Green golden tests PASS the gate only when every golden posting is Approved (T-0031): while any
+#   entry is Draft the runner reports it PENDING, so the gate is PENDING too.
 {
   mirror_eval 2a '\.golden\.test\.[cm]?[jt]sx?$' "golden test file(s)"
   tests_r="$M_R"; last="$M_D"
+  if [ "$QUICK" = 0 ] && [ "$(count_files '\.golden\.db\.test\.[cm]?[jt]sx?$')" != 0 ]; then
+    mirror_eval 2b '\.golden\.db\.test\.[cm]?[jt]sx?$' "golden DB test file(s)"
+    last="$last; $M_D"
+    if [ "$M_R" = FAIL ]; then tests_r=FAIL; elif [ "$M_R" = PENDING ] && [ "$tests_r" = PASS ]; then tests_r=PENDING; fi
+  fi
+  GS="packages/ledger/src/golden/golden-status.ts"
+  if [ -f "$GS" ]; then
+    node "$GS" "$ROOT" >"$TMP/4s.log" 2>&1; c=$?
+    gs_line="$(head -1 "$TMP/4s.log" | sed -E 's/^(PASS|FAIL|PENDING): //')"
+    case "$c" in 0) gs_r=PASS ;; 10) gs_r=PENDING ;; *) gs_r=FAIL ;; esac
+  else gs_r=PENDING; gs_line="no golden-status tool ($GS)"; fi
+  last="$last; $gs_line"
+  if [ "$gs_r" = FAIL ]; then tests_r=FAIL
+  elif [ "$gs_r" = PENDING ] && [ "$tests_r" = PASS ]; then tests_r=PENDING; fi
   if [ "$QUICK" = 1 ]; then guard_r=SKIP; guard="diff guard skipped by --quick"
   else
     node "$CONDUCTOR" gate golden >"$TMP/4.log" 2>&1; c=$?
