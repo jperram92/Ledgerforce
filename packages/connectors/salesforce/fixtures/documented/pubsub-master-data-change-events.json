@@ -95,18 +95,12 @@
           },
           {
             "name": "Name",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "Type",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
@@ -119,50 +113,32 @@
                 "fields": [
                   {
                     "name": "Street",
-                    "type": [
-                      "null",
-                      "string"
-                    ],
+                    "type": ["null", "string"],
                     "default": null
                   },
                   {
                     "name": "City",
-                    "type": [
-                      "null",
-                      "string"
-                    ],
+                    "type": ["null", "string"],
                     "default": null
                   },
                   {
                     "name": "State",
-                    "type": [
-                      "null",
-                      "string"
-                    ],
+                    "type": ["null", "string"],
                     "default": null
                   },
                   {
                     "name": "PostalCode",
-                    "type": [
-                      "null",
-                      "string"
-                    ],
+                    "type": ["null", "string"],
                     "default": null
                   },
                   {
                     "name": "Country",
-                    "type": [
-                      "null",
-                      "string"
-                    ],
+                    "type": ["null", "string"],
                     "default": null
                   },
                   {
                     "name": "CountryCode",
-                    "type": [
-                      "null",
-                      "string"
-                    ],
+                    "type": ["null", "string"],
                     "default": null
                   }
                 ]
@@ -172,34 +148,22 @@
           },
           {
             "name": "ShippingAddress",
-            "type": [
-              "null",
-              "Address"
-            ],
+            "type": ["null", "Address"],
             "default": null
           },
           {
             "name": "CurrencyIsoCode",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "LF_ABN__c",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "LastModifiedDate",
-            "type": [
-              "null",
-              "long"
-            ],
+            "type": ["null", "long"],
             "default": null
           }
         ]
@@ -299,10 +263,7 @@
           },
           {
             "name": "AccountId",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
@@ -315,26 +276,17 @@
                 "fields": [
                   {
                     "name": "Salutation",
-                    "type": [
-                      "null",
-                      "string"
-                    ],
+                    "type": ["null", "string"],
                     "default": null
                   },
                   {
                     "name": "FirstName",
-                    "type": [
-                      "null",
-                      "string"
-                    ],
+                    "type": ["null", "string"],
                     "default": null
                   },
                   {
                     "name": "LastName",
-                    "type": [
-                      "null",
-                      "string"
-                    ],
+                    "type": ["null", "string"],
                     "default": null
                   }
                 ]
@@ -344,34 +296,22 @@
           },
           {
             "name": "Email",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "Phone",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "LF_Billing_Role__c",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "LastModifiedDate",
-            "type": [
-              "null",
-              "long"
-            ],
+            "type": ["null", "long"],
             "default": null
           }
         ]
@@ -471,58 +411,37 @@
           },
           {
             "name": "Name",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "ProductCode",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "Description",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "Family",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "IsActive",
-            "type": [
-              "null",
-              "boolean"
-            ],
+            "type": ["null", "boolean"],
             "default": null
           },
           {
             "name": "LF_Tax_Code__c",
-            "type": [
-              "null",
-              "string"
-            ],
+            "type": ["null", "string"],
             "default": null
           },
           {
             "name": "LastModifiedDate",
-            "type": [
-              "null",
-              "long"
-            ],
+            "type": ["null", "long"],
             "default": null
           }
         ]
