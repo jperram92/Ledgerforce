@@ -219,3 +219,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T03:44:51.308Z codex: checkpoint: 6/6 — verifying; golden SS-UC01-11 waits golden_postings gate (DL-0242)
 - 2026-11-08T04:01:54.813Z codex: checkpoint: 3/6 — tables, template seed, tests green; evidence
 - 2026-11-08T04:07:46.604Z codex: T-0038 → verifying
+- 2026-11-08T04:12:46.017Z codex: release T-0038 → review (verify 12 PASS/3 FAIL/1 PENDING: only failure is the known worktree-path artefact scripts/agent/test/run.test.ts (path contains .claude/), cascading to gates 3/4; cross-review PENDING; no golden needed (T-0038 posts nothing))

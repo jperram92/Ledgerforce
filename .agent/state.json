@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0038",
+  "current_task": null,
   "branch": "feat/T-0114-windows-evidence-recorder",
-  "step": "3/6 — tables, template seed, tests green; evidence",
-  "claimed_by": "codex",
-  "lease_expires_at": "2026-11-08T04:52:46.602Z",
+  "step": null,
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": "79633350e0d9395f7f17f3c692a38895d27bba47",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T04:07:46.604Z",
+  "updated_at": "2026-11-08T04:12:46.016Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
