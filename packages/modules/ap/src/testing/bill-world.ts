@@ -26,11 +26,18 @@ export interface BillWorld {
   /** Tax code key → id of its (only) version. */
   taxCodeIds: Map<string, string>;
   products: { laptop: string; paper: string };
-  users: { apClerk: string; approver: string; financeAdmin: string };
+  /**
+   * Users holding one role template each. In a `solo` world (small-team mode tests) there is one
+   * active user, the Owner, and every entry here is that user.
+   */
+  users: { owner: string; apClerk: string; approver: string; financeAdmin: string };
   close(): Promise<void>;
 }
 
-export async function createBillWorld(tenantId: string): Promise<BillWorld> {
+export async function createBillWorld(
+  tenantId: string,
+  opts: { team?: 'team' | 'solo' } = {},
+): Promise<BillWorld> {
   const g = await createGoldenWorld(tenantId);
   const f = g.fixture;
   const companyId = g.world.companyId;
@@ -130,11 +137,16 @@ export async function createBillWorld(tenantId: string): Promise<BillWorld> {
     };
   });
 
-  const users = {
-    apClerk: await f.addUser('ap_clerk'),
-    approver: await f.addUser('approver'),
-    financeAdmin: await f.addUser('finance_admin'),
-  };
+  const owner = await f.addUser('owner');
+  const users =
+    opts.team === 'solo'
+      ? { owner, apClerk: owner, approver: owner, financeAdmin: owner }
+      : {
+          owner,
+          apClerk: await f.addUser('ap_clerk'),
+          approver: await f.addUser('approver'),
+          financeAdmin: await f.addUser('finance_admin'),
+        };
 
   return {
     g,

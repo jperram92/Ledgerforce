@@ -275,3 +275,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T13:10:47.108Z claude: checkpoint: 5/8 — GP-008 PASS via bill producer; AP invariants
 - 2026-11-08T18:03:43.015Z claude: T-0050 → verifying
 - 2026-11-08T18:13:56.998Z claude: release T-0050 → review (All ACs green (SS-UC05-02/04/07/09/10; GP-008 PASS via bill producer). verify 12/3/1: failures only run.test.ts worktree artefact (2a, mirrored by 3) and golden diff guard (4); awaiting codex cross-review)
+- 2026-11-08T23:03:21.513Z claude: checkpoint (commit deferred to conductor): step 4/7 — submit/approve/reject with SoD, migration 0041, T-0050 tests approve first (green)

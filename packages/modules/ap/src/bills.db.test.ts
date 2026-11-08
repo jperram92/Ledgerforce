@@ -5,11 +5,15 @@
  * suggestion), preview (writes nothing), posting through the posting engine (one ap_bill entry,
  * AP open item), duplicate refusal on post, immutability of posted bills, and AP lock
  * (SS-UC05-07). The GP-008 journal itself is asserted line for line in golden/gp-008.
+ *
+ * T-0052 (DL-0330): only an approved bill posts, so every bill is submitted and approved by the
+ * Approver (approveBill with post: false) before postBill; the assertions are unchanged.
  */
 import { databaseFingerprint, storedJournal } from '@ledgerforce/ledger/testing';
 import { findPeriod, setPeriodStatus, subledgerEntriesOf } from '@ledgerforce/ledger';
 import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { approveBill, submitBill } from './bill-approval.ts';
 import {
   createBill,
   findDuplicateBills,
@@ -64,6 +68,14 @@ const refusal = async (p: Promise<unknown>) => {
   }
   throw new Error('expected a refusal');
 };
+
+/** UC-05 step 3: the AP Clerk submits, the Approver approves (without posting). */
+const approve = (id: string) =>
+  w.inTenant(async (trx) => {
+    await submitBill(trx, { billId: id, submittedBy: w.users.apClerk });
+    const r = await approveBill(trx, { billId: id, approvedBy: w.users.approver, post: false });
+    if (r.outcome !== 'approved') throw new Error(`approval denied: ${r.rule}`);
+  });
 
 let firstBill: { id: string; billNo: string };
 
@@ -145,8 +157,9 @@ describe('preview and post', () => {
   });
 
   it('posts through the posting engine: one ap_bill entry, AP open item 2,750.00 due 2026-11-30', async () => {
+    await approve(firstBill.id);
     const r = await w.inTenant((trx) =>
-      postBill(trx, firstBill.id, { createdBy: w.users.apClerk, approvedBy: w.users.approver }),
+      postBill(trx, firstBill.id, { createdBy: w.users.apClerk }),
     );
     expect(r.replayed).toBe(false);
     const row = await billRow(firstBill.id);
@@ -189,7 +202,25 @@ describe('preview and post', () => {
     ).find((d) => d.status === 'draft');
     expect(dup?.billNo).toBe('BILL-000046');
     const before = await fp();
-    expect(await refusal(w.inTenant((trx) => postBill(trx, dup?.id ?? '')))).toMatchObject({
+    // T-0052: a duplicate of a posted bill cannot even be submitted for approval.
+    expect(
+      await refusal(
+        w.inTenant((trx) =>
+          submitBill(trx, { billId: dup?.id ?? '', submittedBy: w.users.apClerk }),
+        ),
+      ),
+    ).toMatchObject({ code: 'DUPLICATE_SUPPLIER_REF' });
+    expect(await fp()).toEqual(before);
+  });
+
+  it('SS-UC05-09: Duplicate supplier invoice — two copies approved before either posted: the second cannot post; nothing is written', async () => {
+    const a = await create(gp008({ supplierRef: 'DUP-2' }));
+    const b = await create(gp008({ supplierRef: 'dup 2' }));
+    await approve(a.id);
+    await approve(b.id);
+    await w.inTenant((trx) => postBill(trx, a.id));
+    const before = await fp();
+    expect(await refusal(w.inTenant((trx) => postBill(trx, b.id)))).toMatchObject({
       code: 'DUPLICATE_SUPPLIER_REF',
     });
     expect(await fp()).toEqual(before);
@@ -222,6 +253,7 @@ describe('posted bills are immutable (database guard)', () => {
 
   it('refuses marking a bill posted without its ap_bill journal entry', async () => {
     const b = await create(gp008({ supplierRef: 'GUARD-1' }));
+    await approve(b.id);
     const other = await w.inTenant((trx) =>
       trx
         .selectFrom('app.journal_entry')
@@ -324,6 +356,7 @@ describe('suggested coding (UC-05 step 2)', () => {
           ],
         }),
       );
+      await approve(b.id);
       await w.inTenant((trx) => postBill(trx, b.id));
     }
     const s = await w.inTenant((trx) =>
@@ -398,12 +431,14 @@ describe('SS-UC05-07: Bill in AP-locked period rejected', () => {
     const b = await create(
       gp008({ supplierRef: 'OCT-LATE', billDate: '2026-10-20', dueDate: '2026-11-19' }),
     );
+    await approve(b.id);
     const before = await fp();
     expect(await refusal(w.inTenant((trx) => postBill(trx, b.id)))).toMatchObject({
       code: 'PERIOD_LOCKED',
     });
     expect(await fp()).toEqual(before);
-    expect((await billRow(b.id)).status).toBe('draft');
+    // Still approved, not posted (T-0052: it was approved before the post was tried).
+    expect((await billRow(b.id)).status).toBe('approved');
   });
 
   it('UC-05 A2: with a recorded override by a holder of period.lock.override the same bill posts', async () => {

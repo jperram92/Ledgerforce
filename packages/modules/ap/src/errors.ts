@@ -1,4 +1,4 @@
-/** Refusals of the supplier-bill module (T-0050). Nothing was written when one is thrown. */
+/** Refusals of the supplier-bill module (T-0050, T-0052). Nothing was written when one is thrown. */
 import { DomainError } from '@ledgerforce/shared';
 
 export type BillErrorCode =
@@ -11,7 +11,13 @@ export type BillErrorCode =
   | 'BILL_LINE_UNCODED'
   | 'TAX_CODE_REQUIRED'
   | 'TAX_ACCOUNT_MISSING'
-  | 'NO_BILL_SERIES';
+  | 'NO_BILL_SERIES'
+  /** T-0052: the workflow action needs another status (e.g. approve needs awaiting_approval). */
+  | 'BILL_WRONG_STATUS'
+  /** T-0052: only a draft bill is edited; send an approved bill back to draft first. */
+  | 'BILL_NOT_EDITABLE'
+  /** T-0052: reject and send-back need a reason (1–2000 characters). */
+  | 'REASON_REQUIRED';
 
 export class BillError extends DomainError {
   declare readonly code: BillErrorCode;
