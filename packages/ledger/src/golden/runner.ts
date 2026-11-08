@@ -13,6 +13,7 @@
  * the posting engine; an event's own golden test can pass its posting rule instead).
  */
 import { diffJournal, formatJournalDiff, type LineView } from './compare.ts';
+import type { GoldenGate } from './gating.ts';
 import type { GoldenPosting } from './parse.ts';
 
 export type { LineView } from './compare.ts';
@@ -56,21 +57,30 @@ export interface PlannedGolden {
   pendingReason?: string;
 }
 
+/**
+ * Plans the run. `gate` (gating.ts, DL-0256) keeps an entry whose producer cannot exist yet —
+ * out of phase, or waiting for a named task — PENDING with its reason, in both modes.
+ */
 export function planGoldenRun(
   postings: readonly GoldenPosting[],
   mode: GoldenMode,
+  gate: GoldenGate = () => null,
 ): PlannedGolden[] {
-  return postings.map((gp) => {
-    if (gp.status === 'Approved') return { gp, run: true, label: 'APPROVED' };
-    if (mode === 'include-drafts') return { gp, run: true, label: 'DRAFT' };
-    return {
-      gp,
-      run: false,
-      label: 'DRAFT',
-      pendingReason:
-        'Draft, not run in approved-only mode: awaiting product-owner approval (human gate golden_postings); ' +
-        `${DRAFT_ENV}=1 runs it locally as developer feedback`,
-    };
+  return postings.map((gp): PlannedGolden => {
+    const label = gp.status === 'Approved' ? 'APPROVED' : 'DRAFT';
+    if (gp.status === 'Draft' && mode === 'approved-only') {
+      return {
+        gp,
+        run: false,
+        label,
+        pendingReason:
+          'Draft, not run in approved-only mode: awaiting product-owner approval (human gate golden_postings); ' +
+          `${DRAFT_ENV}=1 runs it locally as developer feedback`,
+      };
+    }
+    const g = gate(gp);
+    if (g !== null) return { gp, run: false, label, pendingReason: g.reason };
+    return { gp, run: true, label };
   });
 }
 

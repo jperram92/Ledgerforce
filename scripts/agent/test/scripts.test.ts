@@ -268,7 +268,8 @@ test('verify.sh --quick: green golden tests keep gate 4 PENDING while any golden
   const golden = join(root, 'packages/ledger/src/golden');
   mkdirSync(golden, { recursive: true });
   writeFileSync(join(golden, 'a.golden.test.ts'), '// golden tests run by the package test script\n');
-  for (const f of ['golden-status.ts', 'parse.ts']) {
+  // golden-status.ts and the plain-node modules it imports (gating.ts since DL-0256)
+  for (const f of ['golden-status.ts', 'parse.ts', 'gating.ts']) {
     copyFileSync(join(AGENT_DIR, '../../packages/ledger/src/golden', f), join(golden, f));
   }
   const gp = (status: string) => [

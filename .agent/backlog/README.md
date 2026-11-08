@@ -31,7 +31,7 @@ Success scenarios: 121 (94 use-case, 27 platform).
 ## Critical path to the MVP gate
 
 Longest dependency chain by estimated changed lines (~7400 lines, 24 cards). Any slip here slips the MVP gate.
-Note that **T-0007 (golden postings) is blocked on human approval** and gates the golden-posting runner.
+Note that **T-0007 (golden postings)** was blocked on human approval; since 2026-11-08 GP-001…GP-020 are Approved under owner delegation (DL-0253) and T-0007 is in review.
 
 ```mermaid
 graph LR
@@ -94,7 +94,7 @@ graph LR
 | [T-0004](T-0004.md) | Seed ADRs 0001–0010 and decision log | Sprint 0 | review | — | — | 0 |
 | [T-0005](T-0005.md) | Sprint-0 research pack (stack, Salesforce, ABA, RLS, Playwright, UI) | Sprint 0 | review | — | — | 0 |
 | [T-0006](T-0006.md) | Backlog, use-case specs and success-scenario register | Sprint 0 | review | — | — | 0 |
-| [T-0007](T-0007.md) | Golden postings DRAFT (human gate: golden_postings) | Sprint 0 | blocked | — | — | 0 |
+| [T-0007](T-0007.md) | Golden postings DRAFT (human gate: golden_postings) | Sprint 0 | review | — | — | 0 |
 | [T-0008](T-0008.md) | DB test harness, platform baseline migration and RLS suite skeleton | Sprint 0 | review | T-0001 | — | 2 |
 | [T-0009](T-0009.md) | Playwright evidence harness and UI principles | Sprint 0 | review | T-0001 | — | 1 |
 | [T-0103](T-0103.md) | Conductor: Windows provider process-tree termination on missed heartbeat | Sprint 0 | todo | T-0003 | — | 1 |
@@ -121,10 +121,10 @@ graph LR
 | [T-0028](T-0028.md) | Subledger entries and allocations | MVP | review | T-0025 | — | 0 |
 | [T-0029](T-0029.md) | Manual journals with approval rule; control accounts reject manual journals | MVP | review | T-0025, T-0015 | — | 1 |
 | [T-0030](T-0030.md) | Transactional outbox and pg-boss worker | MVP | review | T-0025 | — | 1 |
-| [T-0031](T-0031.md) | Golden-posting test runner | MVP | verifying | T-0025, T-0007 | — | 1 |
+| [T-0031](T-0031.md) | Golden-posting test runner | MVP | review | T-0025, T-0007 | — | 1 |
 | [T-0032](T-0032.md) | Reversal (void) of posted entries | MVP | todo | T-0025, T-0027, T-0028, T-0031 | UC-10 | 1 |
 | [T-0033](T-0033.md) | Accounting invariant property suite (10,000 random documents) | MVP | todo | T-0027, T-0028, T-0032, T-0029 | — | 1 |
-| [T-0034](T-0034.md) | Tax codes (effective-dated) and GST engine with rounding | MVP | verifying | T-0018, T-0017, T-0031 | UC-01 | 1 |
+| [T-0034](T-0034.md) | Tax codes (effective-dated) and GST engine with rounding | MVP | review | T-0018, T-0017, T-0031 | UC-01 | 1 |
 | [T-0035](T-0035.md) | BAS box mapping and tax report query (both GST bases) | MVP | todo | T-0034, T-0027 | — | 0 |
 | [T-0036](T-0036.md) | Parties, roles, contacts and billing contact roles | MVP | review | T-0010 | — | 0 |
 | [T-0037](T-0037.md) | Party bank details with envelope encryption and masking | MVP | review | T-0036 | — | 1 |

@@ -10,6 +10,10 @@
  * │ Approved file directly, supersedes this transcription; do not edit the values here     │
  * │ to match code — if code and Draft differ, the Draft (or an approved change) wins.       │
  * └─────────────────────────────────────────────────────────────────────────────────────────┘
+ * Update 2026-11-08 (DL-0253, DL-0255): GP-018 is now **Approved** (owner-delegated to claude) with
+ * the values transcribed here unchanged and Q8 answered (residue → ROUNDING); its tax code label is
+ * now `GST` with inclusive price mode. The box above is historical; the T-0031 runner reproduces
+ * the Approved GP-018 through the posting engine.
  *
  * Scenario (postings.md GP-018): INV-000160, three Subscription add-on lines each $3.35
  * GST-inclusive (document total $10.05). postings.md labels the tax code "GST-INC": in this

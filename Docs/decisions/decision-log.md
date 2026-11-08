@@ -1893,7 +1893,7 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: Build `tax_rounding` = `per_line` (default) | `per_document` on `app.company`. per_line: GST per line half-up to cents, inclusive net = gross − GST, no residue. per_document: GST rounded once per tax code on the document; inclusive line nets rounded per line; residue `Σnet + ΣGST − total` returned for posting to `system:ROUNDING` exactly as Draft GP-018b and design §3.4 say. The engine never absorbs the residue into a revenue line. postings.md Q8 (residue destination; whether per-document should be offered) is left open for the accountant.
 - Why: RQ-0094 — the ATO accepts both the taxable-supply (per line) and total-invoice (per document) rules, half cent up; the residue destination is an accounting treatment (human gate).
 - Alternatives: implement only per_line (rejected: design §3.4 requires the setting); absorb residue in largest revenue line (rejected: would decide Q8).
-- ADR: none · Status: proposed (awaiting human) — accounting treatment rides on GP-018 approval
+- ADR: none · Status: proposed (awaiting human) — accounting treatment rides on GP-018 approval · Accepted by DL-0255
 
 ### DL-0245 — Tax module shape: @ledgerforce/tax, pricing mode on the document, Draft journal builder
 - Date: 2026-11-08 · By: claude · Task: T-0034 · Category: architecture
@@ -1951,4 +1951,44 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: T-0038 was built in parallel and reused ids already taken on the lead branch. On merge: its DL-0246/0247/0248 became DL-0249/0250/0251 and its RQ-0095 became RQ-0096 (file renamed in the merge, before it ever existed on the lead branch), with references updated in its card, run log, code comments, template and register rows SS-PLAT-100..103. Captured evidence text files keep their original wording (evidence is never rewritten); read old ids there via this mapping.
 - Why: ids must be unique.
 - Alternatives: none.
+- ADR: none · Status: accepted
+
+### DL-0253 — Golden postings GP-001…GP-020 approved by claude under product-owner delegation
+- Date: 2026-11-08 · By: human (delegation), claude (approval) · Task: T-0007 · Category: accounting
+- Decision: The product owner delegated the `golden_postings` human gate for T-0007 to claude. The owner's words in the 2026-11-08 session (relayed to this branch by the lead claude session): "If everything is blocked by golden posting then go and find the answer and unblock it all on codex behalf" and then "go ahead, keep building in parallel". Under that delegation claude applied RQ-0095 (answers to Q1–Q11 and runner fixes F1–F5) to `Docs/accounting/postings.md`, validated the file with the golden runner (DL-0256) and then set every entry GP-001…GP-020 to `Status: Approved (owner-delegated to claude per DL-0253, 2026-11-08)` and the file header to Approved. From that commit the file is human-owned (AGENTS.md §5): any change is a new superseding Draft entry.
+- What was approved: GP-001 sales invoice; GP-002 bank receipt; GP-003 Stripe charge with fee + fee GST at charge; GP-004 Stripe payout net only; GP-005 credit note; GP-006 customer refund; GP-007 bad debt with `ADJ-BD`; GP-008 supplier bill with one tax line per code (GST + CAP); GP-009 supplier payment batch; GP-010/011 payroll (Phase 1); GP-012 prepayment Option B; GP-013 final invoice net of prepayment (single journal); GP-014 deposit invoice (`ar.invoice`); GP-015 final invoice net of deposit; GP-016/017 deferred revenue (Phase 2); GP-018 rounding per line / per document to ROUNDING; GP-019 void (same BAS period, no allocations); GP-020 provider-debit pay run via PAYROLL_CLEARING (Phase 1).
+- Validation before approval: `pnpm exec vitest run --project unit packages/ledger/src/golden` 70/70 (every journal balances to its Total row); `LF_GOLDEN_DRAFTS=1` engine layer 21/21 — 14 MVP entries reproduced line for line through the posting engine, GP-019 PENDING (requires T-0032), GP-010/011/020 PENDING out of phase (Phase 1), GP-016/017 PENDING out of phase (Phase 2).
+- Confidence caveats (RQ-0095): overall **medium** — ATO, GST Act, Stripe, AASB and NAB sources were read through search-engine extracts because the proxy blocked direct fetches. Per question: Q1 medium; Q2 medium-high; Q3 high (BAS) / medium (ledger account); Q4 medium; Q5 medium; Q6 high/medium; Q7 high that Option A is non-compliant / medium for the whole-supply attribution caveat; Q8 high/medium; Q9 medium; Q10 high; Q11 medium. Q1/Q2 rest on a Stripe test-mode spike (T-0074/T-0075) confirming AU `fee_details` carries the fee GST.
+- Pre-production requirement: independent review by the accountant-reviewer AI persona (DL-0248) is required before production use; the persona is not a TPB-registered practitioner (see RQ-0095 confidence levels). The follow-ups in RQ-0095 (re-reading the primary sources directly, GSTR 2000/35 and 2000/19) remain open.
+- Guardrail note: the conductor's `golden` diff guard (verify gate 4) reports FAIL on this branch because an agent added `Status: Approved` lines. The guard is a CI gate and was not changed; the owner (or whoever merges with the owner's authority) accepts that finding at merge.
+- Why: owner delegation; T-0007 blocked every posting task (T-0040 onwards); RQ-0095 supplies sourced answers.
+- Alternatives: keep Draft until an external accountant reviews (rejected by owner, DL-0248); approve without applying RQ-0095 (rejected: five entries could not be posted and Option A was non-compliant).
+- ADR: none · Status: accepted (owner-delegated)
+
+### DL-0254 — Design §6.5 rule 2 extended to customer-refund bank details (RQ-0095 Q9)
+- Date: 2026-11-08 · By: claude (owner-delegated, DL-0253) · Task: T-0007 · Category: security
+- Decision: Refunds of customer credit balances may be paid in ABA payment batches. A customer's refund bank details go through the same workflow as supplier and employee bank details (design §6.5 rule 2: requester ≠ verifier, 24-hour cooling-off, notice to the previous contact); batch creator ≠ releaser applies unchanged; the refund at release is ≤ the customer's open credit; where the original receipt came through Stripe the default is a Stripe refund to the original card and overriding it needs a reason. Applies to GP-006; implementation in T-0055 / T-0015.
+- Why: ABA credits are not name-checked by the bank, so changed bank details are a classic fraud vector — the reason rule 2 exists (RQ-0095 Q9).
+- Alternatives: forbid customer refunds in batches (rejected: manual payments are weaker); allow without verification (rejected: fraud risk).
+- ADR: none (security reviewer to note it at the next §6.5 review) · Status: accepted (owner-delegated)
+
+### DL-0255 — DL-0244 (GST rounding residue to ROUNDING) accepted by the golden approval
+- Date: 2026-11-08 · By: claude (owner-delegated, DL-0253) · Task: T-0007, T-0034 · Category: accounting
+- Decision: DL-0244 was `proposed (awaiting human)` pending GP-018 and Q8. RQ-0095 Q8 answered it (keep ROUNDING per design §3.4; `per_document` only as an advanced company setting) and GP-018 is Approved under DL-0253 with code `GST` + inclusive price mode. DL-0244 is therefore accepted as built; it gets only a trailing "Accepted by DL-0255" note.
+- Why: the accounting treatment DL-0244 waited for is now decided.
+- Alternatives: none.
+- ADR: none · Status: accepted
+
+### DL-0256 — Golden runner: phase gate and per-GP `requires` marker report PENDING with a reason
+- Date: 2026-11-08 · By: claude · Task: T-0007, T-0031 · Category: process
+- Decision: `packages/ledger/src/golden/gating.ts` decides which goldens are enforced. (1) Only entries of the enforced phase (`ENFORCED_PHASE = 'MVP'`, read from the leading phase of the status line; an unreadable phase throws) are run; Phase 1/2 entries are PENDING "out of phase". (2) `GOLDEN_REQUIRES` names, per GP, the task that builds its producer (today GP-019 → T-0032, the reversal path); the entry stays PENDING until that card's frontmatter says `status: done`. Gated entries are never run, never PASS, never FAIL, in both modes. (3) `golden-status.ts` (gate 4) is PASS only when every GP is Approved and no in-phase entry is held by a `requires` gate; out-of-phase entries are listed but do not hold the MVP gate. Moving `ENFORCED_PHASE` is part of the human phase gate.
+- Why: approved entries whose producers cannot exist yet must be visible and honest — not silently passed and not red in CI.
+- Alternatives: leave them failing (rejected: red CI for legitimate future work); mark them in postings.md (rejected: the file is human-owned after approval); skip them (`.skip` banned).
+- ADR: none · Status: accepted
+
+### DL-0257 — Tax code `ADJ-BD` joins the AU template with the BAS mapping, not in T-0007
+- Date: 2026-11-08 · By: claude · Task: T-0007, T-0035, T-0048 · Category: architecture
+- Decision: GP-007 uses tax code `ADJ-BD` (bad-debt decreasing adjustment, RQ-0095 Q3). It is not added to `packages/modules/tax/templates/au-tax-codes.json` now: the template's kinds are constrained by migration 0031 (`kind IN ('taxable', …, 'capital')`, rate/role checks), so a new `adjustment_decreasing` kind needs a forward-only migration plus its BAS box mapping, which is T-0035's scope (and the posting rule is T-0048). The golden runner maps `ADJ-BD` (and `CAP`) to fixed tax-code ids in the golden world, as for every golden code today (DL-0246).
+- Why: nothing in T-0007 or the tax module needs the code yet; adding a kind without its BAS mapping would be half a feature.
+- Alternatives: add the kind and migration now (rejected: scope of T-0035, needs the mapping test first).
 - ADR: none · Status: accepted

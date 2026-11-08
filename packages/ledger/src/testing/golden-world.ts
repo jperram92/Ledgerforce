@@ -53,6 +53,8 @@ export const GOLDEN_BINDING_CODES: Readonly<Record<string, string>> = Object.fre
 const TAX_ROLES: Readonly<Record<string, string>> = Object.freeze({
   'tax:GST.collected': 'GST_COLLECTED',
   'tax:GST.paid': 'GST_PAID',
+  // The AU template's CAP code posts its GST to the GST_PAID role (RQ-0095 F1, GP-008 line 4).
+  'tax:CAP.paid': 'GST_PAID',
 });
 
 /** Accounts chosen on a document line in the goldens that the template does not have. */
@@ -74,6 +76,9 @@ export const GOLDEN_TAX_CODE_IDS: Readonly<Record<string, string>> = Object.free
   'GST-INC': '01900000-0000-7000-8000-0000000a0004',
   'BAS-W1': '01900000-0000-7000-8000-0000000a0005',
   'BAS-W2': '01900000-0000-7000-8000-0000000a0006',
+  // RQ-0095: template code names (GP-008 F1, GP-007 Q3). The older draft names above stay mapped.
+  CAP: '01900000-0000-7000-8000-0000000a0007',
+  'ADJ-BD': '01900000-0000-7000-8000-0000000a0008',
 });
 
 const bindingText = (b: Binding): string => {

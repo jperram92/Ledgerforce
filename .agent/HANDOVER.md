@@ -1,3 +1,24 @@
+# Handover — T-0007 golden approval, 2026-11-08 (claude, run 2026-11-08-claude-r06)
+
+## Codex continuation prompt
+> Resume from the repository. Branch `feat/T-0007-golden-approval` (not pushed). T-0007, T-0031 and T-0034 are in
+> **review**, built by claude: cross-review them (skill `cross-review`, checklist `.claude/agents/reviewer.md`).
+> Read `git log -5 --format=full`, DL-0253…DL-0257, RQ-0095, `Docs/accounting/postings.md`. GP-001…GP-020 are
+> Approved under product-owner delegation (DL-0253) — do not edit them; corrections are new superseding Draft
+> entries. Check: `pnpm exec vitest run --project db packages/ledger/src/golden` (approved-only: 14 passed,
+> 6 PENDING with reasons), `node packages/ledger/src/golden/golden-status.ts .` (PENDING: GP-019 requires T-0032),
+> `node scripts/agent/conductor.ts gate golden` (FAIL by design: agent-added Approved statuses — owner accepts at
+> merge; never weaken the guard). Next build task after review: T-0032 (reversal path, opens GP-019).
+
+Done: RQ-0095 applied to postings.md (Q1–Q11, F1–F5, new GP-020); runner phase gate + `requires` marker
+(DL-0256); every GP Approved (owner-delegated, DL-0253; DL-0254 Q9; DL-0255 accepts DL-0244; DL-0257 ADJ-BD
+deferral); merged lead branch at 5ffc236; T-0007/T-0031/T-0034 released to review.
+Verify (--task T-0031 / T-0034): 12/3/1 and 11/4/1 — failures are only the worktree-path artefact
+(`run.test.ts`, gates 2a/3), the golden diff guard (gate 4) and, for T-0034, its honestly unticked verify step (12).
+Open questions for human: (1) accept the golden diff-guard FAIL at merge for the owner-delegated approval
+(DL-0253); (2) accountant-reviewer persona review (DL-0248) of the Approved postings before production.
+Do not: edit Approved goldens; weaken the golden guard or tests; push to main; touch codex tasks T-0095/T-0103/T-0112/T-0114.
+
 # Build-loop handover — 2026-10-29
 
 ## Primary Codex continuation prompt
@@ -221,6 +242,9 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T03:28:33.960Z codex: checkpoint: step 3-4/5 — engine golden world + golden tests green (drafts PENDING)
 - 2026-11-08T03:31:24.162Z codex: checkpoint: step 5/5 — golden-status + verify gate 4 honest
 - 2026-11-08T03:39:16.803Z codex: release T-0031 → verifying (waiting golden_postings gate (DL-0242))
+- 2026-11-08T04:15:32.286Z human: release T-0007 → review (owner-delegated approval (DL-0253))
 - 2026-11-08T04:01:54.813Z codex: checkpoint: 3/6 — tables, template seed, tests green; evidence
 - 2026-11-08T04:07:46.604Z codex: T-0038 → verifying
 - 2026-11-08T04:12:46.017Z codex: release T-0038 → review (verify 12 PASS/3 FAIL/1 PENDING: only failure is the known worktree-path artefact scripts/agent/test/run.test.ts (path contains .claude/), cascading to gates 3/4; cross-review PENDING; no golden needed (T-0038 posts nothing))
+- 2026-11-08T08:18:12.433Z claude: release T-0031 → review (verify 12 PASS/3 FAIL/1 PENDING: 2a/3 only the known worktree-path artefact run.test.ts; 4 = golden diff guard on owner-delegated Approved statuses (DL-0253, owner accepts at merge); SS-PLAT-12 14 PASS 6 PENDING-with-reason (DL-0256); cross-review PENDING)
+- 2026-11-08T08:18:12.710Z claude: release T-0034 → review (verify 11 PASS/4 FAIL/1 PENDING: 2a/3 only the known worktree-path artefact run.test.ts; 4 = golden diff guard on owner-delegated Approved statuses (DL-0253); 12 = step 7 honestly unticked; GP-018 Approved and reproduced; cross-review PENDING)
