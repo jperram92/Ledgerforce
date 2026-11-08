@@ -107,7 +107,7 @@ describe('SS-PLAT-12 runner plan and outcomes', () => {
   });
 
   it('plans a gated Approved entry as PENDING with the gate reason, in both modes (DL-0256)', async () => {
-    const gate = (g: GoldenPosting) =>
+    const gate = (g: { id: string }) =>
       g.id === 'GP-019' ? { kind: 'requires' as const, reason: 'requires T-0032 (x)' } : null;
     for (const mode of ['approved-only', 'include-drafts'] as const) {
       const plan = planGoldenRun(

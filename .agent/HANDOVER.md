@@ -221,3 +221,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T03:28:33.960Z codex: checkpoint: step 3-4/5 — engine golden world + golden tests green (drafts PENDING)
 - 2026-11-08T03:31:24.162Z codex: checkpoint: step 5/5 — golden-status + verify gate 4 honest
 - 2026-11-08T03:39:16.803Z codex: release T-0031 → verifying (waiting golden_postings gate (DL-0242))
+- 2026-11-08T04:15:32.286Z human: release T-0007 → review (owner-delegated approval (DL-0253))
