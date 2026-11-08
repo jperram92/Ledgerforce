@@ -251,3 +251,5 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T13:06:39.314Z claude: T-0035 → in_progress
 - 2026-11-08T13:07:38.604Z claude: checkpoint: 2/8 — BAS label map, ADJ-BD, migration 0036 green
 - 2026-11-08T13:15:20.497Z claude: checkpoint: 4/8 — BAS report accruals + cash green (47/47)
+- 2026-11-08T18:05:52.914Z claude: T-0035 → verifying
+- 2026-11-08T18:15:00.291Z claude: release T-0035 → review (verify.sh --task T-0035 12 PASS / 3 FAIL / 1 PENDING: only the known run.test.ts worktree-path artefact (2a, and 3 by dependency) and the gate 4 golden diff guard fail; cross-review by codex pending)

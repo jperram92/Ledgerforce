@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0035",
+  "current_task": null,
   "branch": "feat/T-0035-bas-mapping",
-  "step": "4/8 — BAS report accruals + cash green (47/47)",
-  "claimed_by": "claude",
-  "lease_expires_at": "2026-11-08T14:00:20.485Z",
+  "step": null,
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": "da52d93763188bb8ebf970388fde95d68cfe3860",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T13:15:20.538Z",
+  "updated_at": "2026-11-08T18:15:00.290Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
