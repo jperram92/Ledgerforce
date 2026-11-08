@@ -21,6 +21,7 @@
  * decimal.js only; results are 2-decimal strings (cents).
  */
 import type { AccountType, BasLabel, GstBasis } from '@ledgerforce/db';
+import { Money } from '@ledgerforce/shared';
 import { Decimal } from 'decimal.js';
 import type { BasLabelMapRow } from './bas-report.ts';
 
@@ -147,6 +148,9 @@ export function lineContributions(
 }
 
 const cents = (d: Dec): Dec => d.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+/** A cent-rounded amount as "1375.00" via Money's exact NUMERIC(19,4) text; never "-0.00". */
+const centsText = (d: Dec): string =>
+  d.isZero() ? '0.00' : Money.of(d.toString(), 'AUD').toNumericString().slice(0, -2);
 
 /** Label amounts as cent strings, in BAS order, for the format's labels. */
 export function computeBas(input: BasInput): Partial<Record<BasLabel, string>> {
@@ -175,9 +179,7 @@ export function computeBas(input: BasInput): Partial<Record<BasLabel, string>> {
   const labels = input.format === 'simpler' ? SIMPLER_BAS_LABELS : BAS_LABELS;
   const out: Partial<Record<BasLabel, string>> = {};
   for (const l of labels) {
-    const v = cents(totals.get(l) ?? new D(0));
-    // eslint-disable-next-line lf/no-float-money -- decimal.js Decimal#toFixed is exact (as Money's decToString)
-    out[l] = v.isZero() ? '0.00' : v.toFixed(2);
+    out[l] = centsText(cents(totals.get(l) ?? new D(0)));
   }
   return out;
 }
