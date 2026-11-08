@@ -1992,3 +1992,24 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: nothing in T-0007 or the tax module needs the code yet; adding a kind without its BAS mapping would be half a feature.
 - Alternatives: add the kind and migration now (rejected: scope of T-0035, needs the mapping test first).
 - ADR: none · Status: accepted
+
+### DL-0275 — T-0035 migration number 0036; local untracked placeholders for 0033–0035
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: process
+- Decision: The lead assigned migration number 0036 to T-0035 (0033–0035 belong to parallel branches). The runner refuses numbering gaps, so the T-0035 worktree runs its tests with three **untracked** no-op files `0033/0034/0035_t0035_local_placeholder.sql` (`SELECT 1;`). They are never committed: every commit is made by hand with explicit paths, and before `conductor.ts checkpoint` (whose `commitAll` stages untracked files, DL-0268) they are moved out of the tree and back afterwards. At merge the real 0033–0035 take their places.
+- Why: the runner's sequence check is a safety gate and is not weakened; DL-0268 showed how a committed placeholder leaks into a branch.
+- Alternatives: renumber to 0033 (rejected: reserved by the lead); a custom migrations dir for tests (rejected: every db test uses the default dir); commit placeholders (rejected: DL-0268).
+- ADR: none · Status: accepted
+
+### DL-0276 — New tax-code kinds as `subkind` refining a compatible stored kind (ADJ-BD, BAS-W1/W2)
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: architecture
+- Decision: Migration 0036 adds `app.tax_code.subkind` (`adjustment_decreasing` | `payg_withholding`) with CHECK `tax_code_subkind_kind`: `adjustment_decreasing` is stored with kind `taxable`, collected role only (ADJ-BD, 10 %, GST_COLLECTED — RQ-0095 Q3, DL-0257); `payg_withholding` with kind `bas_excluded` (BAS-W1/BAS-W2, rate 0, no roles). Code sees the effective kind `coalesce(subkind, kind)` (`findTaxCode`, template `kind`). subkind is fixed after insert by a second guard trigger. The AU template (version 2) adds ADJ-BD, EXP (GST-free exports, for G2), BAS-W1, BAS-W2. tax-code.db.test.ts's template list is extended accordingly (behaviour change, nothing removed).
+- Why: 0031's `kind` CHECK cannot be widened forward-only — the runner refuses `DROP CONSTRAINT` (RQ-0102 finding 6); the stored kinds chosen keep every 0031 rate/role invariant true.
+- Alternatives: a new `kind_v2` column replacing `kind` (rejected: duplicate source of truth, backfill, deprecation ADR); store ADJ-BD as plain `taxable` (rejected: the BAS map and T-0048 must know it is an adjustment); widen by DROP/ADD (refused by policy).
+- ADR: none · Status: accepted
+
+### DL-0277 — BAS label map as an effective-dated table; sale vs purchase by account type
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: accounting
+- Decision: `app.bas_label_map` (migration 0036) maps (tax code, flow, label) → amount (gross/net/tax), positive side and basis (both/accruals/cash), effective-dated with no overlaps on an intersecting basis, only `valid_to` mutable, no DELETE, RLS ENABLE+FORCE. A line's flow is **sales** when its account type is revenue or liability and **purchases** when asset, expense or equity; one-flow codes (ADJ-BD, BAS-W1, BAS-W2) use flow `any` with an explicit side. AU rows per RQ-0102 finding 1 (GST G1/1A, G11/1B; FRE G1+G3, G11; EXP G1+G2; INP G1, G11; IMP G11/1B; CAP G10/1B; ADJ-BD 1B accruals only; W1 net debit; W2 net credit; N-T none). Company setting `gst_basis` (accruals default). Implements the Tax/BAS lines of the Approved goldens; the non-golden rows (G2/G3, IMP, INP) need the accountant-reviewer persona's check (DL-0248).
+- Why: design §3.6 "each tax code maps to report boxes … the BAS report is a query"; one GST code serves both flows, and every Approved golden puts sales on revenue/liability and purchases on expense/asset accounts (RQ-0102 finding 2).
+- Alternatives: flow by source type (rejected: manual journals, Stripe charges carry purchase GST on an AR entry); separate sales/purchase codes (rejected: the Approved goldens use one `GST`); flow from the GST account of the tax line (rejected: zero-rated codes have no tax line).
+- ADR: none · Status: accepted (pending accountant-reviewer persona review of non-golden rows)

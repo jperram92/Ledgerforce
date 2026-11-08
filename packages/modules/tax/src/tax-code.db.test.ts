@@ -83,7 +83,7 @@ describe('company tax_rounding setting (design §3.4)', () => {
 });
 
 describe('AU tax codes (design §3.6)', () => {
-  it('loads the six AU codes with their kinds, rates and roles', async () => {
+  it('loads the AU template codes with their stored kinds, rates and roles', async () => {
     const rows = await inTenant((trx) =>
       trx
         .selectFrom('app.tax_code')
@@ -95,7 +95,13 @@ describe('AU tax codes (design §3.6)', () => {
     expect(
       rows.map((r) => [r.code, r.kind, r.rate, r.collected_role, r.paid_role, r.valid_to]),
     ).toEqual([
+      // T-0035 (RQ-0102, DL-0257): ADJ-BD and BAS-W1/W2 refine a stored kind via subkind
+      // (bas-mapping.db.test.ts checks the effective kinds); EXP is GST-free exports.
+      ['ADJ-BD', 'taxable', '0.10000000', 'GST_COLLECTED', null, null],
+      ['BAS-W1', 'bas_excluded', '0.00000000', null, null, null],
+      ['BAS-W2', 'bas_excluded', '0.00000000', null, null, null],
       ['CAP', 'capital', '0.10000000', null, 'GST_PAID', null],
+      ['EXP', 'gst_free', '0.00000000', null, null, null],
       ['FRE', 'gst_free', '0.00000000', null, null, null],
       ['GST', 'taxable', '0.10000000', 'GST_COLLECTED', 'GST_PAID', null],
       ['IMP', 'imports', '0.10000000', null, 'GST_PAID', null],

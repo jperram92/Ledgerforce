@@ -219,6 +219,11 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-101 | The database enforces posting-profile rules: slot account type per slot (one SQL function mirrored in TS), slot accounts active, postable and not control, a referenced account cannot be archived or retyped out of its slot, party kind ↔ control role, default tax code must exist for the company, a party links only to a profile of the matching kind, overrides only for slots; every new table tenant-isolated | — | MVP | db-integration | no | packages/modules/products/src/posting-profiles.db.test.ts; packages/db/src/rls.db.test.ts | T-0038 | green | [.agent/evidence/T-0038/manifest.json](../../.agent/evidence/T-0038/manifest.json) | f92c98d |
 | SS-PLAT-102 | A product's default tax code resolves by date through the effective-dated app.tax_code (T-0034); a code with no version in the company is refused | — | MVP | db-integration | no | packages/modules/products/src/posting-profiles.db.test.ts | T-0038 | green | [.agent/evidence/T-0038/manifest.json](../../.agent/evidence/T-0038/manifest.json) | f92c98d |
 | SS-PLAT-103 | Salesforce Account.Type / Product2.Family (or a custom field) values map to exactly one party or product profile per company (data only; the connector is T-0065) | — | MVP | db-integration | no | packages/modules/products/src/posting-profiles.db.test.ts | T-0038, T-0065 | green | [.agent/evidence/T-0038/manifest.json](../../.agent/evidence/T-0038/manifest.json) | f92c98d |
+| SS-PLAT-110 | Tax codes ADJ-BD / EXP / BAS-W1 / BAS-W2 and the effective-dated tax code → BAS label map are held by the database (kinds, labels, overlaps, history, GST basis setting, no DELETE) | — | MVP | db-integration | no | packages/modules/tax/src/bas-mapping.db.test.ts (+ packages/db/src/rls.db.test.ts for app.bas_label_map) | T-0035 | green | — | — |
+| SS-PLAT-111 | Accruals BAS from the Approved goldens' Tax/BAS lines (GP-001, GP-005 same period, GP-007, GP-008, GP-010, GP-012) | — | MVP | db-integration | no | packages/modules/tax/src/bas-report.db.test.ts | T-0035 | not-started | — | — |
+| SS-PLAT-112 | Cash BAS attributes a document's GST by settlement allocation (GP-002 full/partial, GP-005 + GP-006, GP-007 none, GP-012 at receipt) | — | MVP | db-integration | no | packages/modules/tax/src/bas-report.db.test.ts | T-0035 | not-started | — | — |
+| SS-PLAT-113 | Simpler BAS shows only G1, 1A and 1B | — | MVP | db-integration | no | packages/modules/tax/src/bas-report.db.test.ts | T-0035 | not-started | — | — |
+| SS-PLAT-114 | The BAS report writes nothing; once every document is settled cash and accruals totals agree | — | MVP | db-integration + property | no | packages/modules/tax/src/bas-report.db.test.ts, packages/modules/tax/src/bas-compute.prop.test.ts | T-0035 | not-started | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -624,6 +629,26 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-103 — Salesforce picklist values map to posting profiles
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0038, T-0065 (RQ-0096)
 - **Given** mappings for Account.Type and Product2.Family and a custom field · **When** a value is looked up · **Then** the profile is found by (object, field, value); the same value cannot map twice; an Account mapping must name a party profile and a Product2 mapping a product profile; an unmapped value returns null (the connector, T-0065, reports it)
+
+### SS-PLAT-110 — Tax codes and the BAS label map are held by the database
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0035 (RQ-0102, DL-0257, DL-0276, DL-0277)
+- **Given** a company with the AU chart and the AU tax-code template v2 · **When** codes and BAS map rows are read and written as `lf_app` · **Then** ADJ-BD resolves as `adjustment_decreasing` 10 % on GST collected, BAS-W1/W2 as `payg_withholding`, EXP as GST-free; a subkind that contradicts kind/rate/roles is refused and never changes; every code maps to its labels (N-T to none); unknown labels/amounts/flows/bases, a side contradicting the flow, an unknown tax code and an overlapping version are refused; only `valid_to` changes; `gst_basis` defaults to accruals and accepts cash; DELETE is not granted; another tenant sees nothing (cross-tenant suite)
+
+### SS-PLAT-111 — Accruals BAS reproduces the Approved goldens' Tax/BAS lines
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0035
+- **Given** the golden journals posted through the engine with real tax codes · **When** the BAS is queried on the accruals basis for the period · **Then** GP-001 gives G1 1,375.00 / 1A 125.00; GP-001 + GP-005 in the same period G1 1,155.00 / 1A 105.00; GP-007 1B 125.00 in the write-off period; GP-008 G10 2,200.00 / G11 550.00 / 1B 250.00; GP-012 G1 3,300.00 / 1A 300.00; GP-010 W1 10,000.00 / W2 2,000.00
+
+### SS-PLAT-112 — Cash BAS attributes by settlement allocation
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0035
+- **Given** the same journals plus receipts, refunds and allocations · **When** the BAS is queried on the cash basis · **Then** an unpaid invoice reports nothing; GP-002 reports G1 1,375.00 / 1A 125.00 in the receipt period (a half payment half of it); a credit note refunded (GP-005 + GP-006) reports G1 −220.00 / 1A −20.00 in the refund period; a written-off invoice (GP-007) reports nothing; GP-012 reports G1 3,300.00 / 1A 300.00 at receipt
+
+### SS-PLAT-113 — Simpler BAS shows only G1, 1A and 1B
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0035
+- **Given** a period with sales, capital and non-capital purchases · **When** the BAS is queried in the simpler format · **Then** only G1, 1A and 1B are returned, with the same amounts as the full format
+
+### SS-PLAT-114 — The BAS report is read-only; settled cash equals accruals
+- Phase: MVP · Layer: **db-integration + property** · Screenshot evidence: no · Task(s): T-0035
+- **Given** any set of documents (fast-check) · **When** each is fully settled and both bases are computed over all dates · **Then** every label agrees; and running the query leaves the database fingerprint unchanged
 
 ## T-0112 PR integration regression evidence (2026-10-28)
 

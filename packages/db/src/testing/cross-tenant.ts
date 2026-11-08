@@ -77,6 +77,16 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     kind: () => 'gst_free',
     rate: () => '0',
   },
+  // BAS label map (migration 0036): constrained flow/label/amount/side/basis. The guard that
+  // requires an existing tax code skips rows seeded without a session tenant (superuser seeding).
+  'app.bas_label_map': {
+    tax_code: () => `T${randomBytes(4).toString('hex').toUpperCase()}`,
+    flow: () => 'any',
+    label: () => 'G1',
+    amount: () => 'gross',
+    positive_side: () => 'credit',
+    basis: () => 'both',
+  },
   // Posting profiles (migration 0032): UPPER_SNAKE codes; a customer profile posts to AR_CONTROL;
   // an override's generated parent account is an active, postable, non-control asset (above).
   'app.party_posting_profile': {
@@ -220,6 +230,15 @@ export const PREREQUISITES: Readonly<
       `INSERT INTO app.party_role (tenant_id, company_id, party_id, role) VALUES ($1, $2, $3, 'supplier')
        ON CONFLICT DO NOTHING`,
       [row.get('tenant_id'), row.get('company_id'), row.get('party_id')],
+    );
+  },
+  // A BAS map row names a tax code the company has (migration 0036 guard): seed a zero-rated one.
+  'app.bas_label_map': async (admin, row) => {
+    await admin.query(
+      `INSERT INTO app.tax_code (tenant_id, company_id, code, name, kind, rate, valid_from)
+       VALUES ($1, $2, $3, 'cross-tenant fixture', 'gst_free', 0, '2000-07-01')
+       ON CONFLICT DO NOTHING`,
+      [row.get('tenant_id'), row.get('company_id'), row.get('tax_code')],
     );
   },
   // Period overrides and settings need a user holding the period permission (migration 0018),
