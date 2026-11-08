@@ -215,3 +215,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T03:24:53.542Z codex: checkpoint: 2/6 — tax_code + effective dating (migration 0031) green
 - 2026-11-08T03:27:31.339Z codex: checkpoint: 3/6 — GST calculator per line/per document + inclusive green
 - 2026-11-08T03:30:26.413Z codex: checkpoint: 4/6 — properties + Draft SS-UC01-11 golden green
+- 2026-11-08T03:37:57.044Z codex: T-0034 → verifying

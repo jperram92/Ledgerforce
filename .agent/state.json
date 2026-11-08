@@ -4,10 +4,10 @@
   "branch": "feat/T-0114-windows-evidence-recorder",
   "step": "4/6 — properties + Draft SS-UC01-11 golden green",
   "claimed_by": "codex",
-  "lease_expires_at": "2026-11-08T04:15:26.411Z",
+  "lease_expires_at": "2026-11-08T04:22:57.041Z",
   "last_green_commit": "3f1cbdf5cb12109633b48bd59e0eecb472f8920d",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T03:30:26.429Z",
+  "updated_at": "2026-11-08T03:37:57.043Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
