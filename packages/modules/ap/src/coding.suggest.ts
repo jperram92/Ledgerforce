@@ -63,7 +63,8 @@ export function suggestCoding(input: SuggestCodingInput): CodingSuggestion | nul
   const relevant = input.history.filter((l) => product === null || l.productId === product);
   if (relevant.length > 0) {
     const bills = new Map<string, CodingHistoryLine>();
-    for (const l of [...relevant].sort(billRecency)) if (!bills.has(l.billId)) bills.set(l.billId, l);
+    for (const l of [...relevant].sort(billRecency))
+      if (!bills.has(l.billId)) bills.set(l.billId, l);
     const window = new Set([...bills.keys()].slice(0, HISTORY_WINDOW));
     const lines = relevant.filter((l) => window.has(l.billId)).sort(lineRecency);
     const pairs = new Map<string, { line: CodingHistoryLine; count: number; rank: number }>();
