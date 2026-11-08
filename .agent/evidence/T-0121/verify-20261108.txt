@@ -1,0 +1,172 @@
+LedgerForce verify — 2026-11-08T23:06:26Z — task T-0121
+GATE 1 typecheck: PASS (pnpm typecheck)
+GATE 1 lint: PASS (pnpm lint)
+GATE 1 format: PASS (pnpm format:check)
+GATE 2a unit-tests: FAIL (pnpm test + node --test scripts/agent/test)
+----- output (last 40 lines) -----
+  ...
+# Subtest: inline flow maps and lists, nested and empty
+ok 79 - inline flow maps and lists, nested and empty
+  ---
+  duration_ms: 0.456981
+  type: 'test'
+  ...
+# Subtest: literal block scalar
+ok 80 - literal block scalar
+  ---
+  duration_ms: 0.267725
+  type: 'test'
+  ...
+# Subtest: errors carry a line number
+ok 81 - errors carry a line number
+  ---
+  duration_ms: 0.595176
+  type: 'test'
+  ...
+# Subtest: parses the real .agent/config.yaml
+ok 82 - parses the real .agent/config.yaml
+  ---
+  duration_ms: 42.031386
+  type: 'test'
+  ...
+# Subtest: formatScalar round-trips through parseYaml
+ok 83 - formatScalar round-trips through parseYaml
+  ---
+  duration_ms: 1.265079
+  type: 'test'
+  ...
+1..83
+# tests 83
+# suites 0
+# pass 82
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 76942.336119
+----------------------------------
+GATE 2b db-tests: PASS (pnpm test:db)
+GATE 2c coverage: FAIL (coverage run failed)
+----- output (last 40 lines) -----
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a304f81a864b4f036
+      Coverage enabled with v8
+
+ ❯ |unit| packages/testing/eslint-rules/no-float-money.config.test.ts (3 tests | 1 failed) 6274ms
+     × reports lf/no-float-money in a money package (packages/ledger) under the real config 5707ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/testing/eslint-rules/no-float-money.config.test.ts > SS-PLAT-13: Float arithmetic on money is a lint error > reports lf/no-float-money in a money package (packages/ledger) under the real config
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ packages/testing/eslint-rules/no-float-money.config.test.ts:26:3
+     24|
+     25| describe('SS-PLAT-13: Float arithmetic on money is a lint error', () =…
+     26|   it('reports lf/no-float-money in a money package (packages/ledger) u…
+       |   ^
+     27|     const ids = await ruleIds(FLOAT_ON_MONEY, 'packages/ledger/src/__f…
+     28|     expect(ids.filter((id) => id === 'lf/no-float-money').length).toBe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 64 passed (65)
+      Tests  1 failed | 831 passed (832)
+   Start at  23:15:48
+   Duration  71.54s (transform 6.31s, setup 0ms, import 48.33s, tests 71.74s, environment 8ms)
+
+----------------------------------
+GATE 3 accounting-invariants: FAIL (4 property test file(s); gate 2a failed)
+GATE 4 golden-postings: FAIL (Docs/accounting/postings.md:73: adds an Approved status — only the product owner approves golden postings)
+  Docs/accounting/postings.md:74: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:75: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:76: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:77: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:78: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:79: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:80: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:81: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:82: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:83: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:84: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:85: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:86: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:87: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:88: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:89: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:90: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:91: adds an Approved status — only the product owner approves golden postings
+  Docs/accounting/postings.md:92: adds an Approved status — only the product owner approves golden postings
+GATE 5 cross-tenant-rls: PASS (1 cross-tenant RLS test file(s) ran in gate 2b)
+GATE 6 migrations-forward: PASS (applied in 2b; 8 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+GATE 7 security: PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep — runs in CI))
+GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (claude) in .agent/evidence/T-0121/review-*.md)
+----- output (last 40 lines) -----
+  ✓  96 [chromium] › tests/e2e/web/sync-issues.spec.ts:663:5 › SS-PLAT-99 retry and ignore › SS-PLAT-99: an Auditor sees the actions disabled with the reason @ 1440 [T-0092] (4.6s)
+  ✓  98 [chromium] › tests/e2e/web/sync-issues.spec.ts:663:5 › SS-PLAT-99 retry and ignore › SS-PLAT-99: an Auditor sees the actions disabled with the reason @ 390 [T-0092] (3.1s)
+  ✓  97 [chromium] › tests/e2e/web/sync-issues.spec.ts:563:3 › SS-PLAT-98 one sync issue › SS-PLAT-98: a refused record names the Salesforce code; an unknown id is not found [T-0092] (7.1s)
+  ✓  99 [chromium] › tests/e2e/web/sync-issues.spec.ts:685:3 › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092] (12.3s)
+
+
+  1) [chromium] › tests/e2e/ui-mockups.spec.ts:54:7 › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 390px 
+
+    Error: page.screenshot: Protocol error (Page.captureScreenshot): Unable to capture screenshot
+    Call log:
+      - taking page screenshot
+      - waiting for fonts to load...
+      - fonts loaded
+
+
+       at ../../packages/testing/src/evidence/fixture.ts:54
+
+      52 |         date,
+      53 |       });
+    > 54 |       await page.screenshot({ path, fullPage: true });
+         |                  ^
+      55 |       await testInfo.attach(`${scenarioId}-${slug}`, { path, contentType: 'image/png' });
+      56 |       pending.push({
+      57 |         scenario: scenarioId,
+        at evidence (/home/user/Ledgerforce/.claude/worktrees/agent-a304f81a864b4f036/packages/testing/src/evidence/fixture.ts:54:18)
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a304f81a864b4f036/tests/e2e/ui-mockups.spec.ts:68:15
+
+    Error Context: test-results/ui-mockups-SS-PLAT-UI-01-s-a93d3-ckups-08-setup-wizard-390px-chromium/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-mockups-SS-PLAT-UI-01-s-a93d3-ckups-08-setup-wizard-390px-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/ui-mockups-SS-PLAT-UI-01-s-a93d3-ckups-08-setup-wizard-390px-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests/e2e/ui-mockups.spec.ts:54:7 › SS-PLAT-UI-01 static UI mockups › 08-setup-wizard @ 390px 
+  98 passed (3.8m)
+----------------------------------
+GATE 9 e2e-evidence: FAIL (pnpm test:e2e failed; 1 scenario(s) with passed evidence)
+GATE 10 no-shortcuts: PASS (197 test file(s) scanned; diff vs e39a76c clean)
+GATE 11 no-delete: PASS (vs merge-base e39a76c, staged + working tree)
+GATE 12 memory: PASS (T-0121: required steps ticked for status verifying, 0 linked RQ(s) resolved, HANDOVER present)
+
+=== SUMMARY ===
+ #   | gate                  | result
+ 1   | typecheck             | PASS (pnpm typecheck)
+ 1   | lint                  | PASS (pnpm lint)
+ 1   | format                | PASS (pnpm format:check)
+ 2a  | unit-tests            | FAIL (pnpm test + node --test scripts/agent/test)
+ 2b  | db-tests              | PASS (pnpm test:db)
+ 2c  | coverage              | FAIL (coverage run failed)
+ 3   | accounting-invariants | FAIL (4 property test file(s); gate 2a failed)
+ 4   | golden-postings       | FAIL (Docs/accounting/postings.md:73: adds an Approved status — only the product owner approves golden postings)
+ 5   | cross-tenant-rls      | PASS (1 cross-tenant RLS test file(s) ran in gate 2b)
+ 6   | migrations-forward    | PASS (applied in 2b; 8 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+ 7   | security              | PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep — runs in CI))
+ 8   | cross-review          | PENDING (no review report by a provider other than the builder (claude) in .agent/evidence/T-0121/review-*.md)
+ 9   | e2e-evidence          | FAIL (pnpm test:e2e failed; 1 scenario(s) with passed evidence)
+ 10  | no-shortcuts          | PASS (197 test file(s) scanned; diff vs e39a76c clean)
+ 11  | no-delete             | PASS (vs merge-base e39a76c, staged + working tree)
+ 12  | memory                | PASS (T-0121: required steps ticked for status verifying, 0 linked RQ(s) resolved, HANDOVER present)
+PASS: 10   FAIL: 5   PENDING: 1
+!!! 1 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+VERIFY: FAIL

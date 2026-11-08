@@ -1,5 +1,5 @@
 {
-  "$comment": "AU services SMB posting profiles (T-0038, design §4.4, RQ-0096, DL-0250). Data, not code (design principle 3). Account codes refer to the au-services-smb chart (T-0018), tax codes to au-gst (T-0034). Slots with no natural account in this chart stay empty: the wizard's gap step and the T-0039 gap check list them. Salesforce values are org-editable picklist API values matched exactly. Pending accountant review together with the chart.",
+  "$comment": "Superseded by au-services-smb-profiles version 2 (au-services-smb-profiles.v2.json, T-0121, DL-0340) for new companies; kept unchanged for companies set up with it (ADR-0014, no delete). AU services SMB posting profiles (T-0038, design §4.4, RQ-0096, DL-0250). Data, not code (design principle 3). Account codes refer to the au-services-smb chart (T-0018), tax codes to au-gst (T-0034). Slots with no natural account in this chart stay empty: the wizard's gap step and the T-0039 gap check list them. Salesforce values are org-editable picklist API values matched exactly. Pending accountant review together with the chart.",
   "id": "au-services-smb-profiles",
   "chartTemplate": "au-services-smb",
   "taxTemplate": "au-gst",

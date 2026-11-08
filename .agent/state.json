@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "current_task": null,
-  "branch": "feat/T-0040-invoice-lifecycle",
+  "branch": "feat/T-0121-au-templates-v2",
   "step": null,
   "claimed_by": null,
   "lease_expires_at": null,
   "last_green_commit": "445848ec56cfdf7943d11ad1f2df13cd8e60e094",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T18:06:06.569Z",
+  "updated_at": "2026-11-08T23:24:03.866Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -61,12 +61,14 @@
     "T-0095": 1,
     "T-0114": 1,
     "T-0039": 1,
-    "T-0040": 1
+    "T-0040": 1,
+    "T-0121": 1
   },
   "failures": {},
   "providers": {},
   "pending_checkpoints": [
     "1/8 — invoice journal builder green (unit+prop)",
-    "4/8 — migration 0037, approve rules, post via engine; golden green"
+    "4/8 — migration 0037, approve rules, post via engine; golden green",
+    "2-4/8 — chart v2, profiles v2, EXS in au-gst v2; AC-1..AC-5 green"
   ]
 }

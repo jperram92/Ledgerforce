@@ -111,6 +111,20 @@ describe('line contributions (DL-0277)', () => {
     expect(contrib(line({ credit: '300', taxCode: 'N-T' }))).toEqual({});
   });
 
+  it('SS-PLAT-130: an EXS sale adds to G1 and G3; an INP purchase to G11 only (never G13)', () => {
+    expect(contrib(line({ credit: '300', taxCode: 'EXS' }))).toEqual({ G1: '300', G3: '300' });
+    expect(contrib(line({ accountType: 'expense', debit: '12', taxCode: 'INP' }))).toEqual({
+      G11: '12',
+    });
+  });
+
+  it('SS-PLAT-130: W1/W2 count at the pay-run entry date on both bases (pay date, not accrual)', () => {
+    expect(cashAttribution('payroll_pay_run')).toBe('immediate');
+    const w1 = line({ accountType: 'expense', debit: '10000', taxCode: 'BAS-W1' });
+    expect(contrib(w1, 'cash')).toEqual(contrib(w1, 'accruals'));
+    expect(contrib(w1, 'cash')).toEqual({ W1: '10000' });
+  });
+
   it('ADJ-BD is 1B on accruals only (any account); W1/W2 are the plain amounts', () => {
     const adj = line({
       accountType: 'expense',

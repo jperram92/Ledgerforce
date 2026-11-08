@@ -1,5 +1,5 @@
 {
-  "$comment": "AU default tax codes (T-0034, design §3.6). Data, not code (design principle 3). Rates per GST Act s 9-70 (10%) from the start of GST on 2000-07-01; see RQ-0094. A rate change is a new effective-dated row, never an edit. Pending accountant review together with GP-018 (Draft). BAS label mapping (basLabels) and codes ADJ-BD, EXP, BAS-W1, BAS-W2 added by T-0035 (RQ-0102, DL-0257): a mapping change is a new effective-dated row, never an edit.",
+  "$comment": "AU default tax codes (T-0034, design §3.6). Data, not code (design principle 3). Rates per GST Act s 9-70 (10%) from the start of GST on 2000-07-01; see RQ-0094. A rate change is a new effective-dated row, never an edit. Pending accountant review together with GP-018 (Draft). BAS label mapping (basLabels) and codes ADJ-BD, EXP, BAS-W1, BAS-W2 added by T-0035 (RQ-0102, DL-0257): a mapping change is a new effective-dated row, never an edit. T-0121 (DL-0280 MAJOR 6, ADR-0044 R7, DL-0340) completes version 2 with EXS (GST-free export of services, s 38-190, G1 + G3); version 1 is kept as au-tax-codes.v1.json, marked superseded.",
   "id": "au-gst",
   "country": "AU",
   "version": 2,
@@ -53,6 +53,13 @@
     {
       "code": "EXP",
       "name": "GST-free exports",
+      "kind": "gst_free",
+      "rate": "0",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "EXS",
+      "name": "GST-free export of services",
       "kind": "gst_free",
       "rate": "0",
       "validFrom": "2000-07-01"
@@ -158,6 +165,24 @@
       "code": "EXP",
       "flow": "sales",
       "label": "G2",
+      "amount": "gross",
+      "positiveSide": "credit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "EXS",
+      "flow": "sales",
+      "label": "G1",
+      "amount": "gross",
+      "positiveSide": "credit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "EXS",
+      "flow": "sales",
+      "label": "G3",
       "amount": "gross",
       "positiveSide": "credit",
       "basis": "both",

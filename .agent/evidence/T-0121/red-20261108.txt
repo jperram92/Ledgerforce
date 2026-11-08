@@ -1,0 +1,605 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a304f81a864b4f036
+
+ ❯ |unit| packages/modules/products/src/matrix.resolve.test.ts (17 tests | 3 failed) 57ms
+     × OVERSEAS_CUSTOMER × a product without a tax code → NO_TAX_CODE (v1 gave FRE) 7ms
+     × a product with its own code still resolves; a domestic customer still defaults to GST 1ms
+     × HARDWARE sales post to 4140; HARDWARE purchases have an asset gap; EQUIPMENT buys onto 1500 3ms
+ ❯ |unit| packages/modules/gl/src/templates.test.ts (11 tests | 5 failed) 36ms
+     × is version 2 of the same template and has no errors 12ms
+     × every debit-normal fixed asset defaults to CAP; credit-normal accumulated depreciation has no code 3ms
+     × has 1290 Allowance for expected credit losses: contra receivable, credit normal, postable, not control 1ms
+     × has 4140 Hardware sales (GST); 4190 stays Recoverable costs income 1ms
+     × changes nothing else: v2 = v1 + 1290 + 4140, with fixed-asset tax codes CAP 2ms
+ ❯ |unit| packages/modules/tax/src/bas-compute.test.ts (15 tests | 1 failed) 21ms
+     × SS-PLAT-130: an EXS sale adds to G1 and G3; an INP purchase to G11 only (never G13) 7ms
+ ❯ |unit| packages/modules/products/src/profiles.template.test.ts (17 tests | 7 failed) 29ms
+     × is version 2, built on chart v2 and au-gst v2, and has no errors against them 11ms
+     × is refused against the wrong chart or tax-code version 1ms
+     × HARDWARE: asset slot empty (inventory or expensed is a wizard question), revenue 4140, cogs a gap 2ms
+     × EQUIPMENT (own-use): asset 1500, purchase tax CAP 1ms
+     × OVERSEAS_CUSTOMER has no default tax code; the other party profiles keep GST 1ms
+     × keeps the other profiles and the Salesforce mappings of v1 1ms
+     × flags a purchase tax code that au-gst does not have 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 16 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/gl/src/templates.test.ts > SS-PLAT-130: AU services SMB chart template v2 > is version 2 of the same template and has no errors
+AssertionError: expected [ 'au-services-smb', 1 ] to deeply equal [ 'au-services-smb', 2 ]
+
+- Expected
++ Received
+
+  [
+    "au-services-smb",
+-   2,
++   1,
+  ]
+
+ ❯ packages/modules/gl/src/templates.test.ts:110:59
+    108|
+    109|   it('is version 2 of the same template and has no errors', () => {
+    110|     expect([auServicesSmbV2.id, auServicesSmbV2.version]).toEqual(['au…
+       |                                                           ^
+    111|     expect(validateTemplate(auServicesSmbV2)).toEqual([]);
+    112|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/16]⎯
+
+ FAIL  |unit| packages/modules/gl/src/templates.test.ts > SS-PLAT-130: AU services SMB chart template v2 > every debit-normal fixed asset defaults to CAP; credit-normal accumulated depreciation has no code
+AssertionError: 1500: expected 'GST' to be 'CAP' // Object.is equality
+
+Expected: "CAP"
+Received: "GST"
+
+ ❯ packages/modules/gl/src/templates.test.ts:118:73
+    116|     expect(fixed.length).toBeGreaterThan(0);
+    117|     for (const a of fixed) {
+    118|       if (a.normalBalance === 'debit') expect(a.defaultTaxCode, a.code…
+       |                                                                         ^
+    119|       else expect(a.defaultTaxCode, a.code).toBeUndefined();
+    120|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/16]⎯
+
+ FAIL  |unit| packages/modules/gl/src/templates.test.ts > SS-PLAT-130: AU services SMB chart template v2 > has 1290 Allowance for expected credit losses: contra receivable, credit normal, postable, not control
+Error: test fixture: 1290 not found in the template
+ ❯ must packages/modules/gl/src/templates.test.ts:18:30
+     16|
+     17| function must<T>(v: T | undefined, what: string): T {
+     18|   if (v === undefined) throw new Error(`test fixture: ${what} not foun…
+       |                              ^
+     19|   return v;
+     20| }
+ ❯ packages/modules/gl/src/templates.test.ts:126:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/16]⎯
+
+ FAIL  |unit| packages/modules/gl/src/templates.test.ts > SS-PLAT-130: AU services SMB chart template v2 > has 4140 Hardware sales (GST); 4190 stays Recoverable costs income
+Error: test fixture: 4140 not found in the template
+ ❯ must packages/modules/gl/src/templates.test.ts:18:30
+     16|
+     17| function must<T>(v: T | undefined, what: string): T {
+     18|   if (v === undefined) throw new Error(`test fixture: ${what} not foun…
+       |                              ^
+     19|   return v;
+     20| }
+ ❯ packages/modules/gl/src/templates.test.ts:142:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/16]⎯
+
+ FAIL  |unit| packages/modules/gl/src/templates.test.ts > SS-PLAT-130: AU services SMB chart template v2 > changes nothing else: v2 = v1 + 1290 + 4140, with fixed-asset tax codes CAP
+AssertionError: expected [] to deeply equal [ '1290', '4140' ]
+
+- Expected
++ Received
+
+- [
+-   "1290",
+-   "4140",
+- ]
++ []
+
+ ❯ packages/modules/gl/src/templates.test.ts:158:61
+    156|     const v1 = byCode(auServicesSmb);
+    157|     const v2 = byCode(auServicesSmbV2);
+    158|     expect([...v2.keys()].filter((c) => !v1.has(c)).sort()).toEqual(['…
+       |                                                             ^
+    159|     for (const [code, a] of v1) {
+    160|       const b = must(v2.get(code), code);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/16]⎯
+
+ FAIL  |unit| packages/modules/products/src/matrix.resolve.test.ts > SS-PLAT-130: profiles v2 — overseas customer has no party-only GST-free default > OVERSEAS_CUSTOMER × a product without a tax code → NO_TAX_CODE (v1 gave FRE)
+Error: expected a PostingProfileResolutionError, nothing was thrown
+ ❯ refusal packages/modules/products/src/matrix.resolve.test.ts:90:9
+     88|     throw e;
+     89|   }
+     90|   throw new Error('expected a PostingProfileResolutionError, nothing w…
+       |         ^
+     91| };
+     92|
+ ❯ packages/modules/products/src/matrix.resolve.test.ts:516:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/16]⎯
+
+ FAIL  |unit| packages/modules/products/src/matrix.resolve.test.ts > SS-PLAT-130: profiles v2 — overseas customer has no party-only GST-free default > a product with its own code still resolves; a domestic customer still defaults to GST
+PostingProfileResolutionError: TAX_CODE_CONFLICT: party posting profile OVERSEAS_CUSTOMER defaults to FRE but product Implementation defaults to GST; choose the tax code on the line
+ ❯ resolveTaxCode packages/modules/products/src/matrix.ts:226:11
+    224|         : `party posting profile ${q.partyProfile}`;
+    225|     const what = q.product === undefined ? 'the product' : `product ${…
+    226|     throw new PostingProfileResolutionError(
+       |           ^
+    227|       'TAX_CODE_CONFLICT',
+    228|       `${who} defaults to ${party} but ${what} defaults to ${product};…
+ ❯ resolvePostingProfile packages/modules/products/src/matrix.ts:257:15
+ ❯ sale packages/modules/products/src/matrix.resolve.test.ts:505:5
+ ❯ packages/modules/products/src/matrix.resolve.test.ts:521:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/16]⎯
+
+ FAIL  |unit| packages/modules/products/src/matrix.resolve.test.ts > SS-PLAT-130: profiles v2 — overseas customer has no party-only GST-free default > HARDWARE sales post to 4140; HARDWARE purchases have an asset gap; EQUIPMENT buys onto 1500
+AssertionError: expected '4190' to be '4140' // Object.is equality
+
+Expected: "4140"
+Received: "4190"
+
+ ❯ packages/modules/products/src/matrix.resolve.test.ts:541:7
+    539|         productProfileId: 'pr-HARDWARE',
+    540|       }).account.code,
+    541|     ).toBe('4140');
+       |       ^
+    542|     const gaps = findProfileGaps(m)
+    543|       .filter((g) => g.productProfile.code === 'HARDWARE')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/16]⎯
+
+ FAIL  |unit| packages/modules/products/src/profiles.template.test.ts > SS-PLAT-130: AU services SMB posting-profile template v2 > is version 2, built on chart v2 and au-gst v2, and has no errors against them
+AssertionError: expected [ 'au-services-smb-profiles', 1, …(2) ] to deeply equal [ 'au-services-smb-profiles', 2, 2, 2 ]
+
+- Expected
++ Received
+
+  [
+    "au-services-smb-profiles",
+-   2,
+-   2,
+-   2,
++   1,
++   undefined,
++   undefined,
+  ]
+
+ ❯ packages/modules/products/src/profiles.template.test.ts:149:81
+    147|
+    148|   it('is version 2, built on chart v2 and au-gst v2, and has no errors…
+    149|     expect([v2.id, v2.version, v2.chartTemplateVersion, v2.taxTemplate…
+       |                                                                                 ^
+    150|       'au-services-smb-profiles',
+    151|       2,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/16]⎯
+
+ FAIL  |unit| packages/modules/products/src/profiles.template.test.ts > SS-PLAT-130: AU services SMB posting-profile template v2 > is refused against the wrong chart or tax-code version
+AssertionError: expected '' to match /built on chart au-services-smb versio…/
+
+- Expected:
+/built on chart au-services-smb version 2, not version 1/
+
++ Received:
+""
+
+ ❯ packages/modules/products/src/profiles.template.test.ts:159:79
+    157|
+    158|   it('is refused against the wrong chart or tax-code version', () => {
+    159|     expect(validateProfileTemplate(v2, auServicesSmb, auTaxCodes).join…
+       |                                                                               ^
+    160|       /built on chart au-services-smb version 2, not version 1/,
+    161|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/16]⎯
+
+ FAIL  |unit| packages/modules/products/src/profiles.template.test.ts > SS-PLAT-130: AU services SMB posting-profile template v2 > HARDWARE: asset slot empty (inventory or expensed is a wizard question), revenue 4140, cogs a gap
+AssertionError: expected { revenue: '4190', asset: '1500' } to deeply equal { revenue: '4140' }
+
+- Expected
++ Received
+
+  {
+-   "revenue": "4140",
++   "asset": "1500",
++   "revenue": "4190",
+  }
+
+ ❯ packages/modules/products/src/profiles.template.test.ts:168:42
+    166|
+    167|   it('HARDWARE: asset slot empty (inventory or expensed is a wizard qu…
+    168|     expect(product('HARDWARE').accounts).toEqual({ revenue: '4140' });
+       |                                          ^
+    169|   });
+    170|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/16]⎯
+
+ FAIL  |unit| packages/modules/products/src/profiles.template.test.ts > SS-PLAT-130: AU services SMB posting-profile template v2 > EQUIPMENT (own-use): asset 1500, purchase tax CAP
+Error: test fixture: EQUIPMENT not found in the template
+ ❯ must packages/modules/products/src/profiles.template.test.ts:21:30
+     19|
+     20| function must<T>(v: T | undefined, what: string): T {
+     21|   if (v === undefined) throw new Error(`test fixture: ${what} not foun…
+       |                              ^
+     22|   return v;
+     23| }
+ ❯ product packages/modules/products/src/profiles.template.test.ts:138:5
+ ❯ packages/modules/products/src/profiles.template.test.ts:172:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/16]⎯
+
+ FAIL  |unit| packages/modules/products/src/profiles.template.test.ts > SS-PLAT-130: AU services SMB posting-profile template v2 > OVERSEAS_CUSTOMER has no default tax code; the other party profiles keep GST
+AssertionError: expected 'FRE' to be undefined
+
+- Expected:
+undefined
+
++ Received:
+"FRE"
+
+ ❯ packages/modules/products/src/profiles.template.test.ts:181:55
+    179|
+    180|   it('OVERSEAS_CUSTOMER has no default tax code; the other party profi…
+    181|     expect(party('OVERSEAS_CUSTOMER').defaultTaxCode).toBeUndefined();
+       |                                                       ^
+    182|     expect('defaultTaxCode' in party('OVERSEAS_CUSTOMER')).toBe(false);
+    183|     expect(party('DOMESTIC_CUSTOMER').defaultTaxCode).toBe('GST');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/16]⎯
+
+ FAIL  |unit| packages/modules/products/src/profiles.template.test.ts > SS-PLAT-130: AU services SMB posting-profile template v2 > keeps the other profiles and the Salesforce mappings of v1
+AssertionError: expected [ 'SUBSCRIPTION', …(4) ] to deeply equal [ 'SUBSCRIPTION', …(5) ]
+
+- Expected
++ Received
+
+@@ -2,7 +2,6 @@
+    "SUBSCRIPTION",
+    "PROFESSIONAL_SERVICES",
+    "HARDWARE",
+    "REIMBURSABLE_EXPENSE",
+    "FREIGHT",
+-   "EQUIPMENT",
+  ]
+
+ ❯ packages/modules/products/src/profiles.template.test.ts:200:51
+    198|
+    199|   it('keeps the other profiles and the Salesforce mappings of v1', () …
+    200|     expect(v2.productProfiles.map((p) => p.code)).toEqual([
+       |                                                   ^
+    201|       'SUBSCRIPTION',
+    202|       'PROFESSIONAL_SERVICES',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/16]⎯
+
+ FAIL  |unit| packages/modules/products/src/profiles.template.test.ts > SS-PLAT-130: AU services SMB posting-profile template v2 > flags a purchase tax code that au-gst does not have
+Error: test fixture: EQUIPMENT not found in the template
+ ❯ must packages/modules/products/src/profiles.template.test.ts:21:30
+     19|
+     20| function must<T>(v: T | undefined, what: string): T {
+     21|   if (v === undefined) throw new Error(`test fixture: ${what} not foun…
+       |                              ^
+     22|   return v;
+     23| }
+ ❯ packages/modules/products/src/profiles.template.test.ts:218:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/16]⎯
+
+ FAIL  |unit| packages/modules/tax/src/bas-compute.test.ts > line contributions (DL-0277) > SS-PLAT-130: an EXS sale adds to G1 and G3; an INP purchase to G11 only (never G13)
+AssertionError: expected {} to deeply equal { G1: '300', G3: '300' }
+
+- Expected
++ Received
+
+- {
+-   "G1": "300",
+-   "G3": "300",
+- }
++ {}
+
+ ❯ packages/modules/tax/src/bas-compute.test.ts:115:62
+    113|
+    114|   it('SS-PLAT-130: an EXS sale adds to G1 and G3; an INP purchase to G…
+    115|     expect(contrib(line({ credit: '300', taxCode: 'EXS' }))).toEqual({…
+       |                                                              ^
+    116|     expect(contrib(line({ accountType: 'expense', debit: '12', taxCode…
+    117|       G11: '12',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/16]⎯
+
+
+ Test Files  4 failed (4)
+      Tests  16 failed | 44 passed (60)
+   Start at  18:32:46
+   Duration  800ms (transform 718ms, setup 0ms, import 1.28s, tests 143ms, environment 1ms)
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a304f81a864b4f036
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:36431
+ ❯ |db| packages/modules/tax/src/tax-code.db.test.ts (19 tests | 3 failed) 744ms
+     × loads the AU template codes with their stored kinds, rates and roles 9ms
+     × SS-PLAT-130 (AC-3): au-gst v2 has EXP, EXS, BAS-W1, BAS-W2, effective-dated from 2000-07-01, loaded for a new company 4ms
+     × SS-PLAT-130: au-gst v1 (T-0034) is kept unchanged and marked superseded 1ms
+ ❯ |db| packages/modules/tax/src/bas-mapping.db.test.ts (12 tests | 2 failed) 669ms
+     × the AU template maps every code to its BAS labels 9ms
+     × SS-PLAT-130 (AC-4): EXP → G1+G2; EXS and FRE → G1+G3; INP purchases → G11, sales → G1; no code ever maps to G13 3ms
+ ❯ |db| packages/modules/products/src/templates-v2.db.test.ts (5 tests | 4 failed) 635ms
+     × chart v2: 1500 defaults to CAP, 1290 is a credit-normal allowance, 4140 hardware sales 17ms
+     × profiles v2: OVERSEAS_CUSTOMER stored without a default; EQUIPMENT on 1500; HARDWARE without asset 6ms
+     × an overseas sale of a product without a tax code is refused NO_TAX_CODE, not FRE 8ms
+     × hardware is sold on 4140 with GST; the gap check asks about its asset and cogs slots 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/products/src/templates-v2.db.test.ts > SS-PLAT-130: AU templates v2 load for a new company > chart v2: 1500 defaults to CAP, 1290 is a credit-normal allowance, 4140 hardware sales
+AssertionError: expected [ [ '1500', …(5) ], [ '1510', …(5) ] ] to deeply equal [ [ '1290', …(5) ], …(3) ]
+
+- Expected
++ Received
+
+  [
+    [
+-     "1290",
+-     "Allowance for expected credit losses",
+-     "asset",
+-     "credit",
+-     false,
+-     null,
+-   ],
+-   [
+      "1500",
+      "Office equipment",
+      "asset",
+      "debit",
+      false,
+-     "CAP",
++     "GST",
+    ],
+    [
+      "1510",
+      "Accumulated depreciation - office equipment",
+      "asset",
+      "credit",
+      false,
+      null,
+-   ],
+-   [
+-     "4140",
+-     "Hardware sales",
+-     "revenue",
+-     "credit",
+-     false,
+-     "GST",
+    ],
+  ]
+
+ ❯ packages/modules/products/src/templates-v2.db.test.ts:95:7
+     93|     expect(
+     94|       rows.map((r) => [r.code, r.name, r.type, r.normal_balance, r.is_…
+     95|     ).toEqual([
+       |       ^
+     96|       ['1290', 'Allowance for expected credit losses', 'asset', 'credi…
+     97|       ['1500', 'Office equipment', 'asset', 'debit', false, 'CAP'],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  |db| packages/modules/products/src/templates-v2.db.test.ts > SS-PLAT-130: AU templates v2 load for a new company > profiles v2: OVERSEAS_CUSTOMER stored without a default; EQUIPMENT on 1500; HARDWARE without asset
+AssertionError: expected 'FRE' to be null
+
+- Expected:
+null
+
++ Received:
+"FRE"
+
+ ❯ packages/modules/products/src/templates-v2.db.test.ts:116:38
+    114|     const m = await inTenant((trx) => loadPostingMatrix(trx, companyId…
+    115|     const overseas = m.partyProfiles.find((p) => p.code === 'OVERSEAS_…
+    116|     expect(overseas?.defaultTaxCode).toBeNull();
+       |                                      ^
+    117|     const slots = (code: string) =>
+    118|       Object.fromEntries(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  |db| packages/modules/products/src/templates-v2.db.test.ts > SS-PLAT-130: AU templates v2 load for a new company > an overseas sale of a product without a tax code is refused NO_TAX_CODE, not FRE
+AssertionError: expected undefined to be an instance of PostingProfileResolutionError
+ ❯ packages/modules/products/src/templates-v2.db.test.ts:142:17
+    140|       err = e;
+    141|     }
+    142|     expect(err).toBeInstanceOf(PostingProfileResolutionError);
+       |                 ^
+    143|     expect((err as PostingProfileResolutionError).code).toBe('NO_TAX_C…
+    144|     // A person codes the line: the line's code always wins.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  |db| packages/modules/products/src/templates-v2.db.test.ts > SS-PLAT-130: AU templates v2 load for a new company > hardware is sold on 4140 with GST; the gap check asks about its asset and cogs slots
+AssertionError: expected [ '4190', 'GST' ] to deeply equal [ '4140', 'GST' ]
+
+- Expected
++ Received
+
+  [
+-   "4140",
++   "4190",
+    "GST",
+  ]
+
+ ❯ packages/modules/products/src/templates-v2.db.test.ts:172:41
+    170|       }),
+    171|     );
+    172|     expect([r.account.code, r.taxCode]).toEqual(['4140', 'GST']);
+       |                                         ^
+    173|     const gaps = await inTenant((trx) => postingProfileGapCheck(trx, {…
+    174|     const hw = gaps
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  |db| packages/modules/tax/src/bas-mapping.db.test.ts > SS-PLAT-110 BAS label map (design §3.6, RQ-0102 finding 1) > the AU template maps every code to its BAS labels
+AssertionError: expected [ …(18) ] to deeply equal [ …(20) ]
+
+- Expected
++ Received
+
+@@ -4,12 +4,10 @@
+    "BAS-W2 any W2 net credit both",
+    "CAP purchases 1B tax debit both",
+    "CAP purchases G10 gross debit both",
+    "EXP sales G1 gross credit both",
+    "EXP sales G2 gross credit both",
+-   "EXS sales G1 gross credit both",
+-   "EXS sales G3 gross credit both",
+    "FRE purchases G11 gross debit both",
+    "FRE sales G1 gross credit both",
+    "FRE sales G3 gross credit both",
+    "GST purchases 1B tax debit both",
+    "GST purchases G11 gross debit both",
+
+ ❯ packages/modules/tax/src/bas-mapping.db.test.ts:166:18
+    164|       .map((r) => `${r.taxCode} ${r.flow} ${r.label} ${r.amount} ${r.p…
+    165|       .sort();
+    166|     expect(text).toEqual(
+       |                  ^
+    167|       [
+    168|         'ADJ-BD any 1B tax debit accruals',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  |db| packages/modules/tax/src/bas-mapping.db.test.ts > SS-PLAT-110 BAS label map (design §3.6, RQ-0102 finding 1) > SS-PLAT-130 (AC-4): EXP → G1+G2; EXS and FRE → G1+G3; INP purchases → G11, sales → G1; no code ever maps to G13
+AssertionError: expected [] to deeply equal [ 'G1', 'G3' ]
+
+- Expected
++ Received
+
+- [
+-   "G1",
+-   "G3",
+- ]
++ []
+
+ ❯ packages/modules/tax/src/bas-mapping.db.test.ts:203:36
+    201|         .sort();
+    202|     expect(labels('EXP', 'sales')).toEqual(['G1', 'G2']);
+    203|     expect(labels('EXS', 'sales')).toEqual(['G1', 'G3']);
+       |                                    ^
+    204|     expect(labels('FRE', 'sales')).toEqual(['G1', 'G3']);
+    205|     // DL-0280 MINOR: input-taxed purchases (bank fees) are G11, not G…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  |db| packages/modules/tax/src/tax-code.db.test.ts > AU tax codes (design §3.6) > loads the AU template codes with their stored kinds, rates and roles
+AssertionError: expected [ [ 'ADJ-BD', 'taxable', …(4) ], …(9) ] to deeply equal [ Array(11) ]
+
+- Expected
++ Received
+
+@@ -38,18 +38,10 @@
+      null,
+      null,
+      null,
+    ],
+    [
+-     "EXS",
+-     "gst_free",
+-     "0.00000000",
+-     null,
+-     null,
+-     null,
+-   ],
+-   [
+      "FRE",
+      "gst_free",
+      "0.00000000",
+      null,
+      null,
+
+ ❯ packages/modules/tax/src/tax-code.db.test.ts:98:7
+     96|     expect(
+     97|       rows.map((r) => [r.code, r.kind, r.rate, r.collected_role, r.pai…
+     98|     ).toEqual([
+       |       ^
+     99|       // T-0035 (RQ-0102, DL-0257): ADJ-BD and BAS-W1/W2 refine a stor…
+    100|       // (bas-mapping.db.test.ts checks the effective kinds); EXP is G…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  |db| packages/modules/tax/src/tax-code.db.test.ts > AU tax codes (design §3.6) > SS-PLAT-130 (AC-3): au-gst v2 has EXP, EXS, BAS-W1, BAS-W2, effective-dated from 2000-07-01, loaded for a new company
+AssertionError: expected [ [ 'BAS-W1', …(3) ], …(2) ] to deeply equal [ [ 'BAS-W1', …(3) ], …(3) ]
+
+- Expected
++ Received
+
+  [
+    [
+      "BAS-W1",
+      "PAYG: total salary and wages (W1)",
+-     "2000-07-01",
++     "Sat Jul 01",
+      null,
+    ],
+    [
+      "BAS-W2",
+      "PAYG: amounts withheld (W2)",
+-     "2000-07-01",
++     "Sat Jul 01",
+      null,
+    ],
+    [
+      "EXP",
+      "GST-free exports",
+-     "2000-07-01",
+-     null,
+-   ],
+-   [
+-     "EXS",
+-     "GST-free export of services",
+-     "2000-07-01",
++     "Sat Jul 01",
+      null,
+    ],
+  ]
+
+ ❯ packages/modules/tax/src/tax-code.db.test.ts:129:7
+    127|     expect(
+    128|       rows.map((r) => [r.code, r.name, String(r.valid_from).slice(0, 1…
+    129|     ).toEqual([
+       |       ^
+    130|       ['BAS-W1', 'PAYG: total salary and wages (W1)', '2000-07-01', nu…
+    131|       ['BAS-W2', 'PAYG: amounts withheld (W2)', '2000-07-01', null],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  |db| packages/modules/tax/src/tax-code.db.test.ts > AU tax codes (design §3.6) > SS-PLAT-130: au-gst v1 (T-0034) is kept unchanged and marked superseded
+AssertionError: expected 'AU default tax codes (T-0034, design …' to match /^Superseded by au-gst version 2/
+
+- Expected:
+/^Superseded by au-gst version 2/
+
++ Received:
+"AU default tax codes (T-0034, design §3.6). Data, not code (design principle 3). Rates per GST Act s 9-70 (10%) from the start of GST on 2000-07-01; see RQ-0094. A rate change is a new effective-dated row, never an edit. Pending accountant review together with GP-018 (Draft). BAS box mapping is T-0035."
+
+ ❯ packages/modules/tax/src/tax-code.db.test.ts:150:72
+    148|     expect(auTaxCodesV1.codes.map((c) => c.code)).toEqual(['GST', 'FRE…
+    149|     expect(auTaxCodesV1.basLabels).toBeUndefined();
+    150|     expect((auTaxCodesV1 as unknown as { $comment: string }).$comment)…
+       |                                                                        ^
+    151|       /^Superseded by au-gst version 2/,
+    152|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  9 failed | 27 passed (36)
+   Start at  18:32:47
+   Duration  2.46s (transform 737ms, setup 0ms, import 1.61s, tests 2.05s, environment 0ms)
+

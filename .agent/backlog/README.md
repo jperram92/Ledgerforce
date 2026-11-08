@@ -14,14 +14,14 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | Status | Cards |
 |---|---:|
 | todo | 98 |
-| review | 13 |
+| review | 14 |
 | blocked | 1 |
-| **total** | **112** |
+| **total** | **113** |
 
 | Phase | Cards |
 |---|---:|
 | Sprint 0 | 9 |
-| MVP | 96 |
+| MVP | 97 |
 | Phase 1 | 1 |
 | Phase 2 | 1 |
 | Phase 3 | 1 |
@@ -130,11 +130,12 @@ graph LR
 | [T-0037](T-0037.md) | Party bank details with envelope encryption and masking | MVP | review | T-0036 | — | 1 |
 | [T-0038](T-0038.md) | Products, party posting profiles and product posting profiles | MVP | review | T-0036, T-0018, T-0034 | — | 1 |
 | [T-0039](T-0039.md) | Posting-profile matrix resolution and gap check | MVP | review | T-0038 | UC-01 | 1 |
-| [T-0121](T-0121.md) | AU templates v2: CAP on fixed assets, ECL allowance 1290, HARDWARE/EQUIPMENT profiles, no OVERSEAS FRE default, EXP/EXS, INP→G11, BAS-W1/W2 (est. 380 lines) | MVP | todo | T-0034, T-0035, T-0038 | UC-01, UC-05 | 1 |
+| [T-0121](T-0121.md) | AU templates v2: CAP on fixed assets, ECL allowance 1290, HARDWARE/EQUIPMENT profiles, no OVERSEAS FRE default, EXP/EXS, INP→G11, BAS-W1/W2 (est. 380 lines) | MVP | review | T-0034, T-0035, T-0038 | UC-01, UC-05 | 1 |
 | [T-0122](T-0122.md) | Tax determination (ADR-0044, Accepted DL-0295) part 1: tax_class columns, app.tax_determination with R3 guard, specificity and author ≠ activator, AU seed, tax-class gap check (est. 400 lines) | MVP | todo | T-0039, T-0121 | UC-01, UC-05 | 1 |
 | [T-0123](T-0123.md) | Tax determination (ADR-0044) part 2: resolver precedence, confirmations (TAX_CONFIRMATION_REQUIRED), resolution trace, adjustments inherit the original line, NO_TAX_RULE supersedes TAX_CODE_CONFLICT (est. 400 lines) | MVP | todo | T-0122 | UC-01, UC-05 | 3 |
 | [T-0124](T-0124.md) | Golden Drafts GP-007-A, GP-012-B, GP-015-B + review MINOR corrections (golden_postings gate, delegated DL-0253/DL-0282; never edits Approved) (est. 300 lines) | MVP | todo | T-0121 | UC-09 | 0 |
 | [T-0126](T-0126.md) | Tax report: posted EXP lines without export evidence, flagged past the s 38-185 60-day period (ADR-0044 R4; follow-up to T-0035) (est. 200 lines) | MVP | todo | T-0035, T-0123 | UC-05 | 1 |
+| [T-0145](T-0145.md) | BAS calculation-worksheet labels: INP sales G4, purchases without GST G14 (follow-up to T-0121 AC-4, DL-0341) (est. 250 lines) | MVP | todo | T-0035, T-0121 | UC-05 | 1 |
 | [T-0040](T-0040.md) | Sales invoice lifecycle: draft → approve → post | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0015, T-0026, T-0031 | UC-01 | 3 |
 | [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | todo | T-0040 | — | 0 |
 | [T-0042](T-0042.md) | Email delivery (SMTP) via outbox for invoices, statements, reminders, remittances | MVP | todo | T-0041, T-0030, T-0031 | UC-01, UC-02, UC-06 | 3 |

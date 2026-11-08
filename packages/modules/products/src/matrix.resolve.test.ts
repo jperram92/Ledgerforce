@@ -18,6 +18,11 @@ import {
   type PostingMatrix,
 } from './matrix.ts';
 import { POSTING_SLOTS, type PostingSlot } from './posting-slots.ts';
+import {
+  auServicesSmbProfiles,
+  auServicesSmbProfilesV2,
+  type PostingProfileTemplate,
+} from './profiles.template.ts';
 
 const acct = (code: string) => ({ id: `acct-${code}`, code });
 
@@ -468,5 +473,84 @@ describe('SS-PLAT-105: the gap check lists every combination that cannot resolve
         expect([...listed]).toEqual([]);
       }),
     );
+  });
+});
+
+/**
+ * SS-PLAT-130 (AC-5) — with profiles v2 (T-0121), an overseas customer no longer makes a sale
+ * silently GST-free: a product without its own tax code is refused with NO_TAX_CODE, so a person
+ * codes the line (DL-0280 MAJOR 5; interim until ADR-0044, T-0122/T-0123).
+ */
+describe('SS-PLAT-130: profiles v2 — overseas customer has no party-only GST-free default', () => {
+  /** The template's profiles as a matrix; slot account ids are the chart codes. */
+  const fromTemplate = (t: PostingProfileTemplate): PostingMatrix => ({
+    partyProfiles: t.partyProfiles.map((p) => ({
+      id: `pp-${p.code}`,
+      code: p.code,
+      partyKind: p.partyKind,
+      status: 'active',
+      defaultTaxCode: p.defaultTaxCode ?? null,
+    })),
+    productProfiles: t.productProfiles.map((p) => ({
+      id: `pr-${p.code}`,
+      code: p.code,
+      status: 'active',
+      slots: Object.fromEntries(
+        Object.entries(p.accounts).map(([slot, code]) => [slot, acct(String(code))]),
+      ),
+    })),
+    overrides: [],
+  });
+  const sale = (t: PostingProfileTemplate, party: string, productTaxCode: string | null) =>
+    resolvePostingProfile(fromTemplate(t), {
+      direction: 'sale',
+      slot: 'revenue',
+      partyProfileId: `pp-${party}`,
+      productProfileId: 'pr-PROFESSIONAL_SERVICES',
+      productTaxCode,
+      productLabel: 'Implementation',
+    });
+
+  it('OVERSEAS_CUSTOMER × a product without a tax code → NO_TAX_CODE (v1 gave FRE)', () => {
+    expect(sale(auServicesSmbProfiles, 'OVERSEAS_CUSTOMER', null).taxCode).toBe('FRE');
+    const r = refusal(() => sale(auServicesSmbProfilesV2, 'OVERSEAS_CUSTOMER', null));
+    expect(r.code).toBe('NO_TAX_CODE');
+  });
+
+  it('a product with its own code still resolves; a domestic customer still defaults to GST', () => {
+    expect(sale(auServicesSmbProfilesV2, 'OVERSEAS_CUSTOMER', 'GST')).toMatchObject({
+      taxCode: 'GST',
+      taxCodeSource: 'product',
+      account: { code: '4110' },
+    });
+    expect(sale(auServicesSmbProfilesV2, 'DOMESTIC_CUSTOMER', null)).toMatchObject({
+      taxCode: 'GST',
+      taxCodeSource: 'party_profile',
+    });
+  });
+
+  it('HARDWARE sales post to 4140; HARDWARE purchases have an asset gap; EQUIPMENT buys onto 1500', () => {
+    const m = fromTemplate(auServicesSmbProfilesV2);
+    expect(
+      resolvePostingAccount(m, {
+        direction: 'sale',
+        slot: 'revenue',
+        partyProfileId: 'pp-DOMESTIC_CUSTOMER',
+        productProfileId: 'pr-HARDWARE',
+      }).account.code,
+    ).toBe('4140');
+    const gaps = findProfileGaps(m)
+      .filter((g) => g.productProfile.code === 'HARDWARE')
+      .map((g) => `${g.direction} ${g.partyProfile.code} ${g.slot}`);
+    expect(gaps).toContain('purchase DOMESTIC_SUPPLIER asset');
+    expect(gaps).toContain('sale DOMESTIC_CUSTOMER cogs');
+    expect(
+      resolvePostingAccount(m, {
+        direction: 'purchase',
+        slot: 'asset',
+        partyProfileId: 'pp-DOMESTIC_SUPPLIER',
+        productProfileId: 'pr-EQUIPMENT',
+      }).account.code,
+    ).toBe('1500');
   });
 });
