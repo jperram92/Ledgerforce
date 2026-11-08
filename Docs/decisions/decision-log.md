@@ -1880,3 +1880,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Every remaining MVP card depends transitively on T-0007, so nothing else was claimable; the owner asked to keep building in parallel without approving accounting expectations.
 - Alternatives: approve the drafts with default answers to Q1–Q11 (rejected by owner for now); stop and wait (rejected: idle).
 - ADR: none · Status: accepted
+
+### DL-0243 — Claim T-0034 by hand under DL-0242; branch from the DL-0242 commit
+- Date: 2026-11-08 · By: claude · Task: T-0034 · Category: process
+- Decision: `conductor.ts claim T-0034` refused ("depends_on T-0031 which is not done or review"). Per DL-0242 the card fields were set by hand (status in_progress, claimed_by claude, lease, attempts 1, research RQ-0094); state.json is not edited by hand. Branch `feat/T-0034-tax-gst-engine` starts at 3d4bd99 (the DL-0242 commit, a fast-forward of the worktree HEAD e39a76c) so the authorising entry is on the branch. No code from T-0031 is used: the SS-UC01-11 golden test is a self-contained test against the Draft GP-018a/b values, labelled Draft, to be superseded by the T-0031 runner.
+- Why: DL-0242 authorises building T-0034 ahead of the golden gate while T-0031 is built in parallel.
+- Alternatives: wait for T-0031 (rejected by DL-0242); change the conductor dependency rule (rejected: out of scope, process gate).
+- ADR: none · Status: accepted
+
+### DL-0244 — GST rounding: both methods as company setting, residue to ROUNDING, Q8 stays open
+- Date: 2026-11-08 · By: claude · Task: T-0034 · Category: accounting
+- Decision: Build `tax_rounding` = `per_line` (default) | `per_document` on `app.company`. per_line: GST per line half-up to cents, inclusive net = gross − GST, no residue. per_document: GST rounded once per tax code on the document; inclusive line nets rounded per line; residue `Σnet + ΣGST − total` returned for posting to `system:ROUNDING` exactly as Draft GP-018b and design §3.4 say. The engine never absorbs the residue into a revenue line. postings.md Q8 (residue destination; whether per-document should be offered) is left open for the accountant.
+- Why: RQ-0094 — the ATO accepts both the taxable-supply (per line) and total-invoice (per document) rules, half cent up; the residue destination is an accounting treatment (human gate).
+- Alternatives: implement only per_line (rejected: design §3.4 requires the setting); absorb residue in largest revenue line (rejected: would decide Q8).
+- ADR: none · Status: proposed (awaiting human) — accounting treatment rides on GP-018 approval
