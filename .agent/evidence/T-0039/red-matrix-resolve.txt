@@ -1,0 +1,25 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a91ce477e1527a0a9
+
+ ❯ |unit| packages/modules/products/src/matrix.resolve.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/products/src/matrix.resolve.test.ts [ packages/modules/products/src/matrix.resolve.test.ts ]
+Error: Cannot find module './matrix.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a91ce477e1527a0a9/packages/modules/products/src/matrix.resolve.test.ts
+ ❯ packages/modules/products/src/matrix.resolve.test.ts:10:1
+      8| import fc from 'fast-check';
+      9| import { describe, expect, it } from 'vitest';
+     10| import {
+       | ^
+     11|   DIRECTION_SLOTS,
+     12|   findProfileGaps,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  08:05:14
+   Duration  301ms (transform 63ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

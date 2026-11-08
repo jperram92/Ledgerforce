@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 193 scenarios (25 need screenshots); SS-PLAT-100..103 added 2026-11-08 (T-0038).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 193 scenarios (25 need screenshots); SS-PLAT-100..103 added 2026-11-08 (T-0038); SS-PLAT-104..105 added 2026-11-08 (T-0039).
 
 ## How to update (who, when)
 
@@ -219,6 +219,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-101 | The database enforces posting-profile rules: slot account type per slot (one SQL function mirrored in TS), slot accounts active, postable and not control, a referenced account cannot be archived or retyped out of its slot, party kind ↔ control role, default tax code must exist for the company, a party links only to a profile of the matching kind, overrides only for slots; every new table tenant-isolated | — | MVP | db-integration | no | packages/modules/products/src/posting-profiles.db.test.ts; packages/db/src/rls.db.test.ts | T-0038 | green | [.agent/evidence/T-0038/manifest.json](../../.agent/evidence/T-0038/manifest.json) | f92c98d |
 | SS-PLAT-102 | A product's default tax code resolves by date through the effective-dated app.tax_code (T-0034); a code with no version in the company is refused | — | MVP | db-integration | no | packages/modules/products/src/posting-profiles.db.test.ts | T-0038 | green | [.agent/evidence/T-0038/manifest.json](../../.agent/evidence/T-0038/manifest.json) | f92c98d |
 | SS-PLAT-103 | Salesforce Account.Type / Product2.Family (or a custom field) values map to exactly one party or product profile per company (data only; the connector is T-0065) | — | MVP | db-integration | no | packages/modules/products/src/posting-profiles.db.test.ts | T-0038, T-0065 | green | [.agent/evidence/T-0038/manifest.json](../../.agent/evidence/T-0038/manifest.json) | f92c98d |
+| SS-PLAT-104 | Posting-profile resolver: for a company, party, product, direction (sale/purchase) and slot it returns the account (party × product override, else the product profile slot) and the tax code (explicit line code, else the single or equal party/product default); refusals name what is missing: PROFILE_GAP (party profile, product profile, slot), NO_PARTY_PROFILE, NO_PRODUCT_PROFILE, PROFILE_ARCHIVED, SLOT_NOT_FOR_DIRECTION, TAX_CODE_CONFLICT (both defaults set and different), NO_TAX_CODE | — | MVP | unit + db-integration | no | — | T-0039 | not-started | — | — |
+| SS-PLAT-105 | Posting-profile gap check: lists every active party profile × active product profile × direction slot (sale: revenue, discount, cogs; purchase: expense, asset) that cannot resolve, sorted, with a sentence each, optionally narrowed to given slots; a combination is listed exactly when the resolver refuses it with PROFILE_GAP; reads only, tenant-isolated | — | MVP | unit + db-integration | no | — | T-0039 | not-started | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -624,6 +626,14 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-103 — Salesforce picklist values map to posting profiles
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0038, T-0065 (RQ-0096)
 - **Given** mappings for Account.Type and Product2.Family and a custom field · **When** a value is looked up · **Then** the profile is found by (object, field, value); the same value cannot map twice; an Account mapping must name a party profile and a Product2 mapping a product profile; an unmapped value returns null (the connector, T-0065, reports it)
+
+### SS-PLAT-104 — Posting-profile matrix resolves account and tax code, refusals name the gap
+- Phase: MVP · Layer: **unit** + **db-integration** · Screenshot evidence: no · Task(s): T-0039 (RQ-0097)
+- **Given** the AU template profiles, an override OVERSEAS_CUSTOMER × PROFESSIONAL_SERVICES revenue → another revenue account, and parties/products linked to profiles · **When** the resolver is asked for (party, product, direction, slot) · **Then** the override wins over the product slot, the product slot is used otherwise, an empty slot without override is refused with PROFILE_GAP naming the party profile, product profile, slot and direction; a party without a profile for the direction, a product without a profile, an archived profile and a slot of the other direction are refused by name; the tax code is the explicit line code if given, else the one default set (or both equal), else TAX_CODE_CONFLICT naming both codes or NO_TAX_CODE — no precedence between differing defaults is assumed (human question, RQ-0097)
+
+### SS-PLAT-105 — Posting-profile gap check lists every combination that cannot resolve
+- Phase: MVP · Layer: **unit** (fast-check) + **db-integration** · Screenshot evidence: no · Task(s): T-0039 (RQ-0097)
+- **Given** a company's active party and product profiles and overrides · **When** the gap check runs (wizard, later nightly and period close) · **Then** it lists each party profile × product profile × slot of the profile's direction with no account, sorted, each with a plain sentence; with a slot filter only those slots; for any matrix a combination is listed if and only if the resolver refuses it with PROFILE_GAP (property); filling a slot or adding an override removes it from the list; it writes nothing and other tenants' profiles never appear
 
 ## T-0112 PR integration regression evidence (2026-10-28)
 
