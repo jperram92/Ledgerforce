@@ -106,7 +106,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC10-06 | Reopen needs two approvers and a reason | UC-10 | MVP | db-integration | no | — | T-0079 | not-started | — | — |
 | SS-UC10-07 | Close cannot pass with unreconciled bank | UC-10 | MVP | db-integration | no | — | T-0078 | not-started | — | — |
 | SS-UC10-08 | TB review step shows TB nets to zero | UC-10 | MVP | db-integration | no | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts | T-0078, T-0076, T-0028 | green (TB and subledger = control layers, DL-0206; close checklist wiring T-0078) | [.agent/evidence/T-0076/manifest.json](../../.agent/evidence/T-0076/manifest.json) | fdc062f |
-| SS-UC10-09 | Void posts a reversal, never an edit | UC-10 | MVP | golden | no | — | T-0032 | not-started | — | — |
+| SS-UC10-09 | Void posts a reversal, never an edit | UC-10 | MVP | golden | no | packages/ledger/src/golden/gp-019.golden.db.test.ts, packages/ledger/src/reversal.db.test.ts, packages/ledger/src/reversal.prop.db.test.ts | T-0032 | green (2026-11-08: GP-019 Approved reproduced line for line by its own golden test; void rules RQ-0095 Q11 / DL-0270; INV-reversal property; the suite-wide runner keeps GP-019 PENDING via GOLDEN_REQUIRES until T-0032 is done, DL-0256/DL-0272) | [.agent/evidence/T-0032/manifest.json](../../.agent/evidence/T-0032/manifest.json) | — |
 | SS-UC10-10 | Close checklist screen | UC-10 | MVP | e2e-playwright | yes | — | T-0090 | not-started | — | — |
 | SS-UC11-01 | Partial credit note posts GP-005 | UC-11 | MVP | golden | no | — | T-0045 | not-started | — | — |
 | SS-UC11-02 | Credit on a paid invoice is held as customer credit | UC-11 | MVP | db-integration | no | — | T-0045 | not-started | — | — |

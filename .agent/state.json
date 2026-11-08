@@ -4,10 +4,10 @@
   "branch": "feat/T-0032-reversal",
   "step": "5/8 — reverse() + GP-019 golden + INV-reversal green",
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-08T13:54:00.972Z",
+  "lease_expires_at": "2026-11-08T14:02:19.728Z",
   "last_green_commit": "aeed07668580ec619fb335837996774ca509bdd4",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T13:09:01.090Z",
+  "updated_at": "2026-11-08T13:17:19.755Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
