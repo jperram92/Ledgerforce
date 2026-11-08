@@ -1,5 +1,51 @@
 {
   "schemaVersion": 1,
   "taskId": "T-0038",
-  "entries": []
+  "entries": [
+    {
+      "scenario": "SS-PLAT-100",
+      "file": ".agent/evidence/T-0038/20261108-040059-tests-unit.json",
+      "test": "6 test(s): packages/modules/products/src/profiles.template.test.ts › SS-PLAT-100: AU services SMB posting-profile template › the shipped template has no errors against the AU chart and tax codes | packages/modules/products/src/profiles.template.test.ts › SS-PLAT-100: AU services SMB posting-profile template › pre-maps 3 party profiles: domestic and overseas customers, domestic suppliers | packages/modules/products/src/profiles.template.test.ts › SS-PLAT-100: AU services SMB posting-profile template › pre-maps 5 product profiles with the golden-file keys and the AU chart accounts | packages/modules/products/src/profiles.template.test.ts › SS-PLAT-100: AU services SMB posting-profile template › maps Salesforce Account.Type customer values and Product2.Family values to profiles | packages/modules/products/src/profiles.template.test.ts › SS-PLAT-100: AU services SMB posting-profile template › flags an unknown account, a wrong slot type and a control account | packages/modules/products/src/profiles.template.test.ts › SS-PLAT-100: AU services SMB posting-profile template › flags an unknown tax code, a kind/role mismatch, duplicates and dangling Salesforce mappings",
+      "commit": "f92c98d542ab",
+      "provider": "claude",
+      "timestamp": "2026-11-08T04:00:59.808Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-100",
+      "file": ".agent/evidence/T-0038/20261108-040101-tests-db.json",
+      "test": "3 test(s): packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-100: the AU services posting-profile template loads into a company › writes 3 party profiles with their control role and default tax code | packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-100: the AU services posting-profile template loads into a company › writes 5 product profiles whose slots name the template accounts | packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-100: the AU services posting-profile template loads into a company › refuses to load an invalid template before writing anything",
+      "commit": "f92c98d542ab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T04:01:01.078Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-101",
+      "file": ".agent/evidence/T-0038/20261108-040101-tests-db.json",
+      "test": "7 test(s): packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-101: the database holds the posting-profile rules › app.posting_slot_allows agrees with the TypeScript mirror for every slot × type | packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-101: the database holds the posting-profile rules › refuses a slot account of the wrong type, a control account and an archived or non-postable one | packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-101: the database holds the posting-profile rules › refuses archiving or retyping an account a profile slot or an override uses | packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-101: the database holds the posting-profile rules › refuses an override for an unknown slot, on a wrong type, and a second override for the same cell | packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-101: the database holds the posting-profile rules › a party profile kind decides its control role and its tax code must exist | packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-101: the database holds the posting-profile rules › a party links its customer and supplier profiles only to profiles of that kind | packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-101: the database holds the posting-profile rules › lf_app cannot delete profiles, products, overrides or mappings",
+      "commit": "f92c98d542ab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T04:01:01.078Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-102",
+      "file": ".agent/evidence/T-0038/20261108-040101-tests-db.json",
+      "test": "2 test(s): packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-102: a product default tax code resolves through app.tax_code › returns the version valid on the date, and null for a product without a tax code | packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-102: a product default tax code resolves through app.tax_code › refuses a product naming a tax code with no version in its company, and a duplicate Salesforce Id",
+      "commit": "f92c98d542ab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T04:01:01.078Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-103",
+      "file": ".agent/evidence/T-0038/20261108-040101-tests-db.json",
+      "test": "2 test(s): packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-103: Salesforce picklist values map to posting profiles › finds the template mappings for Account.Type and Product2.Family | packages/modules/products/src/posting-profiles.db.test.ts › SS-PLAT-103: Salesforce picklist values map to posting profiles › accepts a custom field, refuses a value mapped twice and a bad field name",
+      "commit": "f92c98d542ab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T04:01:01.078Z",
+      "result": "passed"
+    }
+  ]
 }
