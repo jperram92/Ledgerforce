@@ -1,0 +1,183 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a83e0c46b5ef1494b
+
+ ❯ |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts (12 tests | 12 failed) 49ms
+     × a CREATE carries every non-null field, compound components as Parent.Child 30ms
+     × an UPDATE carries only the header-named fields; a body null that is not named is "unchanged" 2ms
+     × DELETE and UNDELETE are their own operations; only the records still to apply are returned 1ms
+     × a polled record (SystemModstamp delta, T-0066) is a full snapshot keyed on SystemModstamp 0ms
+     × mergeState applies a patch over the last known state; a nulled compound clears its components 0ms
+     × orders CDC changes by (commit number, sequence number) 0ms
+     × orders a polled snapshot against anything by time 0ms
+     × Account → party values, addresses and the profile picklist value 0ms
+     × Account validation failures block the record; an address problem does not 1ms
+     × Contact → name from compound Name, email, phone and billing roles from the multi-select 0ms
+     × Contact without Account, name or with a bad email is refused 0ms
+     × Product2 → product; IsActive false archives; Family is the default profile field 0ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-12: CDC events become per-record field patches [T-0065] > a CREATE carries every non-null field, compound components as Parent.Child
+Error: not implemented
+ ❯ changesFromCdcEvent packages/connectors/salesforce/src/inbound/changes.ts:18:9
+     16| }
+     17| export function changesFromCdcEvent(_e: DecodedEvent, _ids: readonly s…
+     18|   throw new Error('not implemented');
+       |         ^
+     19| }
+     20| export function changeFromSnapshot(
+ ❯ changes packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:41:10
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:46:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-12: CDC events become per-record field patches [T-0065] > an UPDATE carries only the header-named fields; a body null that is not named is "unchanged"
+Error: not implemented
+ ❯ changesFromCdcEvent packages/connectors/salesforce/src/inbound/changes.ts:18:9
+     16| }
+     17| export function changesFromCdcEvent(_e: DecodedEvent, _ids: readonly s…
+     18|   throw new Error('not implemented');
+       |         ^
+     19| }
+     20| export function changeFromSnapshot(
+ ❯ changes packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:41:10
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:80:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-12: CDC events become per-record field patches [T-0065] > DELETE and UNDELETE are their own operations; only the records still to apply are returned
+Error: not implemented
+ ❯ changesFromCdcEvent packages/connectors/salesforce/src/inbound/changes.ts:18:9
+     16| }
+     17| export function changesFromCdcEvent(_e: DecodedEvent, _ids: readonly s…
+     18|   throw new Error('not implemented');
+       |         ^
+     19| }
+     20| export function changeFromSnapshot(
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:103:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-12: CDC events become per-record field patches [T-0065] > a polled record (SystemModstamp delta, T-0066) is a full snapshot keyed on SystemModstamp
+Error: not implemented
+ ❯ changeFromSnapshot packages/connectors/salesforce/src/inbound/changes.ts:26:9
+     24|   _at: Date,
+     25| ): InboundChange {
+     26|   throw new Error('not implemented');
+       |         ^
+     27| }
+     28| export function compareVersion(_a: RecordVersion, _b: RecordVersion): …
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:117:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-12: CDC events become per-record field patches [T-0065] > mergeState applies a patch over the last known state; a nulled compound clears its components
+Error: not implemented
+ ❯ mergeState packages/connectors/salesforce/src/inbound/changes.ts:32:9
+     30| }
+     31| export function mergeState(_s: SfState, _p: SfState): SfState {
+     32|   throw new Error('not implemented');
+       |         ^
+     33| }
+     34|
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:130:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-13: record versions order CDC commits and polled snapshots [T-0065] > orders CDC changes by (commit number, sequence number)
+Error: not implemented
+ ❯ compareVersion packages/connectors/salesforce/src/inbound/changes.ts:29:9
+     27| }
+     28| export function compareVersion(_a: RecordVersion, _b: RecordVersion): …
+     29|   throw new Error('not implemented');
+       |         ^
+     30| }
+     31| export function mergeState(_s: SfState, _p: SfState): SfState {
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:148:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-13: record versions order CDC commits and polled snapshots [T-0065] > orders a polled snapshot against anything by time
+Error: not implemented
+ ❯ compareVersion packages/connectors/salesforce/src/inbound/changes.ts:29:9
+     27| }
+     28| export function compareVersion(_a: RecordVersion, _b: RecordVersion): …
+     29|   throw new Error('not implemented');
+       |         ^
+     30| }
+     31| export function mergeState(_s: SfState, _p: SfState): SfState {
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:155:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] > Account → party values, addresses and the profile picklist value
+Error: not implemented
+ ❯ mapAccount packages/connectors/salesforce/src/inbound/mapping.ts:3:9
+      1| import type { SfState } from './changes.ts';
+      2| export function mapAccount(_s: SfState, _f: string): any {
+      3|   throw new Error('not implemented');
+       |         ^
+      4| }
+      5| export function mapContact(_s: SfState): any {
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:164:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] > Account validation failures block the record; an address problem does not
+Error: not implemented
+ ❯ mapAccount packages/connectors/salesforce/src/inbound/mapping.ts:3:9
+      1| import type { SfState } from './changes.ts';
+      2| export function mapAccount(_s: SfState, _f: string): any {
+      3|   throw new Error('not implemented');
+       |         ^
+      4| }
+      5| export function mapContact(_s: SfState): any {
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:199:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] > Contact → name from compound Name, email, phone and billing roles from the multi-select
+Error: not implemented
+ ❯ mapContact packages/connectors/salesforce/src/inbound/mapping.ts:6:9
+      4| }
+      5| export function mapContact(_s: SfState): any {
+      6|   throw new Error('not implemented');
+       |         ^
+      7| }
+      8| export function mapProduct(_s: SfState, _f: string): any {
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:219:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] > Contact without Account, name or with a bad email is refused
+Error: not implemented
+ ❯ mapContact packages/connectors/salesforce/src/inbound/mapping.ts:6:9
+      4| }
+      5| export function mapContact(_s: SfState): any {
+      6|   throw new Error('not implemented');
+       |         ^
+      7| }
+      8| export function mapProduct(_s: SfState, _f: string): any {
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:247:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts > SS-UC01-12 / SS-UC01-14: mapping Salesforce-owned fields, problems never dropped [T-0065] > Product2 → product; IsActive false archives; Family is the default profile field
+Error: not implemented
+ ❯ mapProduct packages/connectors/salesforce/src/inbound/mapping.ts:9:9
+      7| }
+      8| export function mapProduct(_s: SfState, _f: string): any {
+      9|   throw new Error('not implemented');
+       |         ^
+     10| }
+     11|
+ ❯ packages/connectors/salesforce/src/inbound/inbound.mapping.contract.test.ts:257:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  12 failed (12)
+   Start at  08:09:39
+   Duration  819ms (transform 181ms, setup 0ms, import 492ms, tests 49ms, environment 0ms)
+
