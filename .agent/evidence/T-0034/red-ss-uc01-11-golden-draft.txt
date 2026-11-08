@@ -1,0 +1,106 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a1c47984eae27d655
+
+ ❯ |unit| packages/modules/tax/src/golden/gp-018.golden.test.ts (2 tests | 2 failed) 6ms
+     × per_line produces the Draft GP-018a journal (no ROUNDING line), balanced at 10.05 4ms
+     × per_document produces the Draft GP-018b journal (0.01 debit to ROUNDING), balanced at 10.06 1ms
+ ❯ |unit| packages/modules/tax/src/tax-journal.test.ts (4 tests | 4 failed) 11ms
+     × purchase per_document inclusive: Cr AP total, Dr expense nets and GST paid, residue credited to ROUNDING 6ms
+     × sale with GST and GST-free lines: revenue grouped by account and code, no tax line for a zero tax 1ms
+     × a credit (negative) line flips to the other side 0ms
+     × refuses a line-account list that does not match the lines 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/tax/src/tax-journal.test.ts > draftTaxedDocumentLines > purchase per_document inclusive: Cr AP total, Dr expense nets and GST paid, residue credited to ROUNDING
+Error: not implemented
+ ❯ draftTaxedDocumentLines packages/modules/tax/src/tax-journal.ts:15:9
+     13|   _opts: { side: 'sale' | 'purchase'; lineAccounts: readonly string[] …
+     14| ): DraftJournalLine[] {
+     15|   throw new Error('not implemented');
+       |         ^
+     16| }
+     17|
+ ❯ packages/modules/tax/src/tax-journal.test.ts:23:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  |unit| packages/modules/tax/src/tax-journal.test.ts > draftTaxedDocumentLines > sale with GST and GST-free lines: revenue grouped by account and code, no tax line for a zero tax
+Error: not implemented
+ ❯ draftTaxedDocumentLines packages/modules/tax/src/tax-journal.ts:15:9
+     13|   _opts: { side: 'sale' | 'purchase'; lineAccounts: readonly string[] …
+     14| ): DraftJournalLine[] {
+     15|   throw new Error('not implemented');
+       |         ^
+     16| }
+     17|
+ ❯ packages/modules/tax/src/tax-journal.test.ts:47:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |unit| packages/modules/tax/src/tax-journal.test.ts > draftTaxedDocumentLines > a credit (negative) line flips to the other side
+Error: not implemented
+ ❯ draftTaxedDocumentLines packages/modules/tax/src/tax-journal.ts:15:9
+     13|   _opts: { side: 'sale' | 'purchase'; lineAccounts: readonly string[] …
+     14| ): DraftJournalLine[] {
+     15|   throw new Error('not implemented');
+       |         ^
+     16| }
+     17|
+ ❯ packages/modules/tax/src/tax-journal.test.ts:70:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  |unit| packages/modules/tax/src/tax-journal.test.ts > draftTaxedDocumentLines > refuses a line-account list that does not match the lines
+AssertionError: expected [Function] to throw error matching /1 line/ but got 'not implemented'
+
+- Expected:
+/1 line/
+
++ Received:
+"not implemented"
+
+ ❯ packages/modules/tax/src/tax-journal.test.ts:90:85
+     88|       lines: [{ amount: '1.00', taxCode: 'GST', rate: '0.10' }],
+     89|     });
+     90|     expect(() => draftTaxedDocumentLines(calc, { side: 'sale', lineAcc…
+       |                                                                                     ^
+     91|       /1 line/,
+     92|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |unit| packages/modules/tax/src/golden/gp-018.golden.test.ts > SS-UC01-11: Tax-inclusive rounding follows company setting [DRAFT GP-018 — not Approved] > per_line produces the Draft GP-018a journal (no ROUNDING line), balanced at 10.05
+Error: not implemented
+ ❯ draftTaxedDocumentLines packages/modules/tax/src/tax-journal.ts:15:9
+     13|   _opts: { side: 'sale' | 'purchase'; lineAccounts: readonly string[] …
+     14| ): DraftJournalLine[] {
+     15|   throw new Error('not implemented');
+       |         ^
+     16| }
+     17|
+ ❯ journalFor packages/modules/tax/src/golden/gp-018.golden.test.ts:67:10
+ ❯ packages/modules/tax/src/golden/gp-018.golden.test.ts:81:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |unit| packages/modules/tax/src/golden/gp-018.golden.test.ts > SS-UC01-11: Tax-inclusive rounding follows company setting [DRAFT GP-018 — not Approved] > per_document produces the Draft GP-018b journal (0.01 debit to ROUNDING), balanced at 10.06
+Error: not implemented
+ ❯ draftTaxedDocumentLines packages/modules/tax/src/tax-journal.ts:15:9
+     13|   _opts: { side: 'sale' | 'purchase'; lineAccounts: readonly string[] …
+     14| ): DraftJournalLine[] {
+     15|   throw new Error('not implemented');
+       |         ^
+     16| }
+     17|
+ ❯ journalFor packages/modules/tax/src/golden/gp-018.golden.test.ts:67:10
+ ❯ packages/modules/tax/src/golden/gp-018.golden.test.ts:88:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  6 failed (6)
+   Start at  03:29:15
+   Duration  269ms (transform 175ms, setup 0ms, import 237ms, tests 17ms, environment 0ms)
+
