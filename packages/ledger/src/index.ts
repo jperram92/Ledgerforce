@@ -9,3 +9,4 @@ export * from './posting-command.ts';
 export * from './posting-engine.ts';
 export * from './subledger.ts';
 export * from './reversal.ts';
+export * from './tax-lines.ts';

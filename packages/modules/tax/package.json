@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
     "decimal.js": "10.6.0",
     "kysely": "0.29.7"

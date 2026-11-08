@@ -470,6 +470,9 @@ importers:
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../db
+      '@ledgerforce/ledger':
+        specifier: workspace:*
+        version: link:../../ledger
       '@ledgerforce/shared':
         specifier: workspace:*
         version: link:../../shared

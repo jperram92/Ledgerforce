@@ -28,11 +28,20 @@ export interface CompanyTable {
   created_at: Timestamp;
   /** GST rounding method (migration 0031, design §3.4, RQ-0094). AU default per_line. */
   tax_rounding: Generated<TaxRounding>;
+  /** GST accounting basis (migration 0036, design §3.6, RQ-0102). Default accruals. */
+  gst_basis: Generated<GstBasis>;
 }
 
 export type TaxRounding = 'per_line' | 'per_document';
 export type TaxCodeKind =
   'taxable' | 'gst_free' | 'input_taxed' | 'bas_excluded' | 'imports' | 'capital';
+/**
+ * Refines the stored kind (migration 0036, RQ-0102 finding 6): adjustment_decreasing is stored as
+ * kind taxable, payg_withholding as kind bas_excluded. Effective kind = coalesce(subkind, kind).
+ */
+export type TaxCodeSubkind = 'adjustment_decreasing' | 'payg_withholding';
+export type GstBasis = 'accruals' | 'cash';
+export type BasLabel = 'G1' | 'G2' | 'G3' | 'G10' | 'G11' | '1A' | '1B' | 'W1' | 'W2';
 
 /**
  * Effective-dated tax code version (migration 0031, design §3.6). A rate change is a new row;
@@ -50,6 +59,27 @@ export interface TaxCodeTable {
   rate: string;
   collected_role: 'GST_COLLECTED' | null;
   paid_role: 'GST_PAID' | null;
+  valid_from: ColumnType<string, string, string>;
+  valid_to: ColumnType<string | null, string | null | undefined, string | null>;
+  created_at: Timestamp;
+  /** Migration 0036; fixed after insert (trigger). */
+  subkind: ColumnType<TaxCodeSubkind | null, TaxCodeSubkind | null | undefined, never>;
+}
+
+/**
+ * Tax code -> BAS label, effective-dated per company (migration 0036, design §3.6, RQ-0102).
+ * Only valid_to may change (trigger); SELECT/INSERT/UPDATE for lf_app, no DELETE.
+ */
+export interface BasLabelMapTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  tax_code: string;
+  flow: 'sales' | 'purchases' | 'any';
+  label: BasLabel;
+  amount: 'gross' | 'net' | 'tax';
+  positive_side: 'debit' | 'credit';
+  basis: 'both' | 'accruals' | 'cash';
   valid_from: ColumnType<string, string, string>;
   valid_to: ColumnType<string | null, string | null | undefined, string | null>;
   created_at: Timestamp;
@@ -666,6 +696,7 @@ export interface Database {
   'app.account': AccountTable;
   'app.account_system_role': AccountSystemRoleTable;
   'app.tax_code': TaxCodeTable;
+  'app.bas_label_map': BasLabelMapTable;
   'app.dimension': DimensionTable;
   'app.dimension_value': DimensionValueTable;
   'app.dimension_set': DimensionSetTable;

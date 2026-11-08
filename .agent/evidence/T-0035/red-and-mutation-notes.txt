@@ -1,0 +1,18 @@
+T-0035 — RED and mutation records (2026-11-08, claude)
+
+1. packages/modules/tax/src/bas-mapping.db.test.ts before migration 0036:
+   suite failed in beforeAll (loadTaxCodes): error: column "subkind" of relation "tax_code" does not exist
+   — 11 tests not run. GREEN after 0036 (+ cross-tenant override/prerequisite): bas-mapping + tax-code db
+   28/28; packages/db 545/545 (commit 24a75ad).
+
+2. packages/ledger/src/tax-lines.db.test.ts with a stub tax-lines.ts: 4/4 failed "taxedLines: not
+   implemented" / "allocationReleases: not implemented" (fixture postings and allocations succeeded).
+
+3. packages/modules/tax/src/bas-report.db.test.ts with a stub basReport: 14/15 failed "basReport: not
+   implemented"; the postings.md text check passed (GP-001/002/005/006/007/008/010/012 golden journals
+   posted through the engine). GREEN 47/47 across tax db + tax-lines db (commit da52d93).
+
+4. Unit/property tests were written after bas-compute.ts; RED proven by mutation: document share rounded
+   ROUND_DOWN instead of half-up, and ar_write_off classified 'settlement' → 3/16 failed (classification
+   test, half-up share rounding test, INV-bas-settled property); file restored byte-identical (git diff
+   empty). GREEN 42/42 tax unit (commit fcfdcaf).

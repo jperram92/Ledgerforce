@@ -21,6 +21,9 @@ export interface Line {
   code: string;
   debit?: string;
   credit?: string;
+  /** journal_line.tax_code_id / tax_amount (no foreign key; T-0035 read-API tests). */
+  taxCodeId?: string;
+  taxAmount?: string;
 }
 
 export interface EntryOptions {
@@ -162,6 +165,8 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
             txn_currency: 'AUD',
             txn_amount: l.debit ?? l.credit ?? '0',
             fx_rate: '1',
+            tax_code_id: l.taxCodeId ?? null,
+            tax_amount: l.taxAmount ?? null,
             dimension_set_id: chart.emptySet,
             memo: opts.lineMemo ?? null,
           })),

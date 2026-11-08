@@ -2113,3 +2113,52 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: contiguous migration numbering; parallel branches already hold later numbers.
 - Alternatives: renumber later branches (rejected: churn on live branches).
 - ADR: none · Status: accepted
+
+### DL-0275 — T-0035 migration number 0036; local untracked placeholders for 0033–0035
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: process
+- Decision: The lead assigned migration number 0036 to T-0035 (0033–0035 belong to parallel branches). The runner refuses numbering gaps, so the T-0035 worktree runs its tests with three **untracked** no-op files `0033/0034/0035_t0035_local_placeholder.sql` (`SELECT 1;`). They are never committed: every commit is made by hand with explicit paths, and before `conductor.ts checkpoint` (whose `commitAll` stages untracked files, DL-0268) they are moved out of the tree and back afterwards. At merge the real 0033–0035 take their places.
+- Why: the runner's sequence check is a safety gate and is not weakened; DL-0268 showed how a committed placeholder leaks into a branch.
+- Alternatives: renumber to 0033 (rejected: reserved by the lead); a custom migrations dir for tests (rejected: every db test uses the default dir); commit placeholders (rejected: DL-0268).
+- ADR: none · Status: accepted
+
+### DL-0276 — New tax-code kinds as `subkind` refining a compatible stored kind (ADJ-BD, BAS-W1/W2)
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: architecture
+- Decision: Migration 0036 adds `app.tax_code.subkind` (`adjustment_decreasing` | `payg_withholding`) with CHECK `tax_code_subkind_kind`: `adjustment_decreasing` is stored with kind `taxable`, collected role only (ADJ-BD, 10 %, GST_COLLECTED — RQ-0095 Q3, DL-0257); `payg_withholding` with kind `bas_excluded` (BAS-W1/BAS-W2, rate 0, no roles). Code sees the effective kind `coalesce(subkind, kind)` (`findTaxCode`, template `kind`). subkind is fixed after insert by a second guard trigger. The AU template (version 2) adds ADJ-BD, EXP (GST-free exports, for G2), BAS-W1, BAS-W2. tax-code.db.test.ts's template list is extended accordingly (behaviour change, nothing removed).
+- Why: 0031's `kind` CHECK cannot be widened forward-only — the runner refuses `DROP CONSTRAINT` (RQ-0102 finding 6); the stored kinds chosen keep every 0031 rate/role invariant true.
+- Alternatives: a new `kind_v2` column replacing `kind` (rejected: duplicate source of truth, backfill, deprecation ADR); store ADJ-BD as plain `taxable` (rejected: the BAS map and T-0048 must know it is an adjustment); widen by DROP/ADD (refused by policy).
+- ADR: none · Status: accepted
+
+### DL-0277 — BAS label map as an effective-dated table; sale vs purchase by account type
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: accounting
+- Decision: `app.bas_label_map` (migration 0036) maps (tax code, flow, label) → amount (gross/net/tax), positive side and basis (both/accruals/cash), effective-dated with no overlaps on an intersecting basis, only `valid_to` mutable, no DELETE, RLS ENABLE+FORCE. A line's flow is **sales** when its account type is revenue or liability and **purchases** when asset, expense or equity; one-flow codes (ADJ-BD, BAS-W1, BAS-W2) use flow `any` with an explicit side. AU rows per RQ-0102 finding 1 (GST G1/1A, G11/1B; FRE G1+G3, G11; EXP G1+G2; INP G1, G11; IMP G11/1B; CAP G10/1B; ADJ-BD 1B accruals only; W1 net debit; W2 net credit; N-T none). Company setting `gst_basis` (accruals default). Implements the Tax/BAS lines of the Approved goldens; the non-golden rows (G2/G3, IMP, INP) need the accountant-reviewer persona's check (DL-0248).
+- Why: design §3.6 "each tax code maps to report boxes … the BAS report is a query"; one GST code serves both flows, and every Approved golden puts sales on revenue/liability and purchases on expense/asset accounts (RQ-0102 finding 2).
+- Alternatives: flow by source type (rejected: manual journals, Stripe charges carry purchase GST on an AR entry); separate sales/purchase codes (rejected: the Approved goldens use one `GST`); flow from the GST account of the tax line (rejected: zero-rated codes have no tax line).
+- ADR: none · Status: accepted (pending accountant-reviewer persona review of non-golden rows)
+
+### DL-0278 — Cash-basis GST attributed by settlement allocations; source types classified as data in code
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: accounting
+- Decision: On the cash basis a *document* entry (`ar_invoice`, `ar_credit_note`, `ar_write_off`, `ap_bill`) reports its BAS amounts × (Σ base released from its open items by allocations dated in the period whose counter entry is a *settlement* — `ar_receipt`, `ar_refund`, `payments_stripe_charge`, `ap_payment`, `ar_prepayment_application` — ÷ Σ |base original| of its items), rounded half-up to cents per document and label. Every other taxed line (*immediate*: `ar_prepayment` (GP-012 Option B), manual journals, payroll, Stripe payout, and the fee GST on a Stripe charge) counts at its entry date. A reversal takes the class of the entry it reverses. The classification is `CASH_ATTRIBUTION` in `packages/modules/tax/src/bas-compute.ts`; a unit test requires it to cover the ledger's closed `SOURCE_TYPES` list exactly, and an unknown type fails the report. Allocation reversals reduce the share. Accruals: every taxed line counts at its entry date.
+- Why: GST Act s 29-5(2) — attributable to the extent consideration is received (RQ-0102 finding 3); GP-002 "proportional to the amount received"; GP-007 cash "no BAS adjustment" follows because a write-off is not consideration; GP-005/GP-006 a refunded credit note reports in the refund period.
+- Alternatives: count every allocation (rejected: credit notes and write-offs would report as cash received); attribute by bank lines in the counter entry (rejected: Stripe clearing is not a bank account); keep the classification in a table (rejected for now: source types are a closed code list mirrored in SQL, DL-0256-style test keeps it in step).
+- ADR: none · Status: accepted (accountant-reviewer persona to check, DL-0248)
+
+### DL-0279 — Ledger read API for the tax report; @ledgerforce/tax depends on @ledgerforce/ledger
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: architecture
+- Decision: `packages/ledger/src/tax-lines.ts` adds two read-only functions, `taxedLines` (posted/reversed taxed lines by date range or entry ids, with account type, bound system roles and the reversal's class source type) and `allocationReleases` (each allocation side dated in a range with the base released, the counter entry and the entry's Σ |base original|). The tax module calls them; it holds no SQL on ledger tables. `@ledgerforce/tax` gains the workspace runtime dependency `@ledgerforce/ledger` (as `@ledgerforce/reporting` has, lockfile importer entry only). `@ledgerforce/ledger/testing/golden` (test-only) re-exports the golden world, `goldenCommand` and `parseGoldenPostings` so the BAS db test posts the Approved goldens exactly as the runner does. The journal fixture's `Line` gains optional `taxCodeId`/`taxAmount`.
+- Why: packages/ledger/AGENTS.md — any SQL touching ledger tables outside the ledger package is a defect; the reporting module reads through ledger APIs the same way (accountMovements).
+- Alternatives: SQL in the tax module (rejected: rule above); BAS in packages/modules/reporting (rejected: the mapping is tax-owned data).
+- ADR: none (workspace package, no third-party dependency) · Status: accepted
+
+### DL-0288 — T-0035 success scenarios SS-PLAT-110…114 (renumbered from DL-0280 at merge, DL-0289)
+- Date: 2026-11-08 · By: claude · Task: T-0035 · Category: process
+- Decision: T-0035's scenarios are SS-PLAT-110 (codes + map in the database), 111 (accruals from the Approved goldens), 112 (cash by settlement allocation), 113 (Simpler BAS), 114 (read-only; settled cash = accruals). Ids 104–109 are left free because parallel branches (T-0040, T-0050) already use SS-PLAT-104/105 and may take the next ones before merge.
+- Why: avoid id collisions between parallel branches; the register forbids renumbering.
+- Alternatives: next free id 104 (rejected: already used on other branches).
+- ADR: none · Status: accepted
+
+### DL-0289 — Merge renumbering for T-0035
+- Date: 2026-11-08 · By: claude (lead) · Task: T-0035 · Category: process
+- Decision: T-0035's DL-0280 collided with the lead branch's DL-0280 (persona review) and became DL-0288; its DL-0275..0279 are unique and kept. T-0035's untracked local placeholders 0033–0035 never reached any branch; the lead's documented no-ops 0033 (DL-0284) and 0035 (DL-0287) plus T-0065's 0034 precede T-0035's 0036. Evidence text keeps original ids.
+- Why: unique ids; contiguous migrations.
+- Alternatives: none.
+- ADR: none · Status: accepted

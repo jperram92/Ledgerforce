@@ -7,15 +7,53 @@
  * Account bindings are by system role (T-0018): a code names GST_COLLECTED / GST_PAID, and the
  * account is resolved through app.account_system_role at the time of use, so re-binding a role
  * moves every code with it.
+ *
+ * Kinds (T-0035, migration 0036, RQ-0102 finding 6): migration 0031's `kind` CHECK cannot be
+ * widened forward-only, so the two newer kinds are stored as a `subkind` refining a compatible
+ * stored kind — adjustment_decreasing (ADJ-BD, DL-0257) as taxable, payg_withholding (BAS-W1/W2)
+ * as bas_excluded. Everything above the database sees the effective kind coalesce(subkind, kind).
+ * The template also carries the BAS label map (design §3.6), loaded with the codes.
  */
-import type { Database, TaxCodeKind, TaxRounding } from '@ledgerforce/db';
+import type { BasLabel, Database, TaxCodeKind, TaxCodeSubkind, TaxRounding } from '@ledgerforce/db';
 import { sql, type Transaction } from 'kysely';
 import auTaxCodesJson from '../templates/au-tax-codes.json' with { type: 'json' };
+
+/** The kind code sees: the stored kind, refined by the subkind where one is set. */
+export type TaxKind = TaxCodeKind | TaxCodeSubkind;
+
+/** Stored (kind, subkind) of each effective kind. */
+const STORED_KIND: Readonly<
+  Record<TaxKind, { kind: TaxCodeKind; subkind: TaxCodeSubkind | null }>
+> = Object.freeze({
+  taxable: { kind: 'taxable', subkind: null },
+  gst_free: { kind: 'gst_free', subkind: null },
+  input_taxed: { kind: 'input_taxed', subkind: null },
+  bas_excluded: { kind: 'bas_excluded', subkind: null },
+  imports: { kind: 'imports', subkind: null },
+  capital: { kind: 'capital', subkind: null },
+  adjustment_decreasing: { kind: 'taxable', subkind: 'adjustment_decreasing' },
+  payg_withholding: { kind: 'bas_excluded', subkind: 'payg_withholding' },
+});
+
+export type BasFlow = 'sales' | 'purchases' | 'any';
+export type BasAmount = 'gross' | 'net' | 'tax';
+export type BasBasisScope = 'both' | 'accruals' | 'cash';
+
+/** One row of the template's BAS label map (see the template's $basLabelsComment). */
+export interface TemplateBasLabel {
+  code: string;
+  flow: BasFlow;
+  label: BasLabel;
+  amount: BasAmount;
+  positiveSide: 'debit' | 'credit';
+  basis: BasBasisScope;
+  validFrom: string;
+}
 
 export interface TemplateTaxCode {
   code: string;
   name: string;
-  kind: TaxCodeKind;
+  kind: TaxKind;
   /** Decimal string, e.g. "0.10" — never a JS number. */
   rate: string;
   collectedRole?: 'GST_COLLECTED' | undefined;
@@ -28,6 +66,8 @@ export interface TaxCodeTemplate {
   country: string;
   version: number;
   codes: TemplateTaxCode[];
+  /** Absent in a template without a BAS mapping. */
+  basLabels?: TemplateBasLabel[];
 }
 
 export const auTaxCodes: TaxCodeTemplate = auTaxCodesJson as TaxCodeTemplate;
@@ -44,7 +84,7 @@ export interface TaxCodeVersion {
   id: string;
   code: string;
   name: string;
-  kind: TaxCodeKind;
+  kind: TaxKind;
   /** NUMERIC(18,8) text, e.g. "0.10000000". */
   rate: string;
   collectedAccountId: string | null;
@@ -65,7 +105,8 @@ export async function loadTaxCodes(
         company_id: companyId,
         code: c.code,
         name: c.name,
-        kind: c.kind,
+        kind: STORED_KIND[c.kind].kind,
+        subkind: STORED_KIND[c.kind].subkind,
         rate: c.rate,
         collected_role: c.collectedRole ?? null,
         paid_role: c.paidRole ?? null,
@@ -73,6 +114,24 @@ export async function loadTaxCodes(
       })),
     )
     .execute();
+  const labels = template.basLabels ?? [];
+  if (labels.length > 0) {
+    await trx
+      .insertInto('app.bas_label_map')
+      .values(
+        labels.map((l) => ({
+          company_id: companyId,
+          tax_code: l.code,
+          flow: l.flow,
+          label: l.label,
+          amount: l.amount,
+          positive_side: l.positiveSide,
+          basis: l.basis,
+          valid_from: l.validFrom,
+        })),
+      )
+      .execute();
+  }
 }
 
 /** The version of `code` valid on `on` (YYYY-MM-DD; valid_to is the last valid day). */
@@ -98,7 +157,7 @@ export async function findTaxCode(
       't.id',
       't.code',
       't.name',
-      't.kind',
+      sql<TaxKind>`coalesce(t.subkind, t.kind)`.as('kind'),
       't.rate',
       sql<string>`t.valid_from::text`.as('valid_from'),
       sql<string | null>`t.valid_to::text`.as('valid_to'),

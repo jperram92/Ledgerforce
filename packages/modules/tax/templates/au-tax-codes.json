@@ -1,8 +1,8 @@
 {
-  "$comment": "AU default tax codes (T-0034, design §3.6). Data, not code (design principle 3). Rates per GST Act s 9-70 (10%) from the start of GST on 2000-07-01; see RQ-0094. A rate change is a new effective-dated row, never an edit. Pending accountant review together with GP-018 (Draft). BAS box mapping is T-0035.",
+  "$comment": "AU default tax codes (T-0034, design §3.6). Data, not code (design principle 3). Rates per GST Act s 9-70 (10%) from the start of GST on 2000-07-01; see RQ-0094. A rate change is a new effective-dated row, never an edit. Pending accountant review together with GP-018 (Draft). BAS label mapping (basLabels) and codes ADJ-BD, EXP, BAS-W1, BAS-W2 added by T-0035 (RQ-0102, DL-0257): a mapping change is a new effective-dated row, never an edit.",
   "id": "au-gst",
   "country": "AU",
-  "version": 1,
+  "version": 2,
   "codes": [
     {
       "code": "GST",
@@ -48,6 +48,200 @@
       "kind": "capital",
       "rate": "0.10",
       "paidRole": "GST_PAID",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "EXP",
+      "name": "GST-free exports",
+      "kind": "gst_free",
+      "rate": "0",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "ADJ-BD",
+      "name": "Bad debt written off (GST decreasing adjustment)",
+      "kind": "adjustment_decreasing",
+      "rate": "0.10",
+      "collectedRole": "GST_COLLECTED",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "BAS-W1",
+      "name": "PAYG: total salary and wages (W1)",
+      "kind": "payg_withholding",
+      "rate": "0",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "BAS-W2",
+      "name": "PAYG: amounts withheld (W2)",
+      "kind": "payg_withholding",
+      "rate": "0",
+      "validFrom": "2000-07-01"
+    }
+  ],
+  "$basLabelsComment": "BAS labels per code (RQ-0102 finding 1). flow: sales = line on a revenue or liability account, purchases = asset, expense or equity, any = either; amount: gross = net + GST, net = the line amount, tax = the line's GST; positiveSide: the side that adds to the label; basis: both | accruals | cash. N-T (BAS excluded) has no rows.",
+  "basLabels": [
+    {
+      "code": "GST",
+      "flow": "sales",
+      "label": "G1",
+      "amount": "gross",
+      "positiveSide": "credit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "GST",
+      "flow": "sales",
+      "label": "1A",
+      "amount": "tax",
+      "positiveSide": "credit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "GST",
+      "flow": "purchases",
+      "label": "G11",
+      "amount": "gross",
+      "positiveSide": "debit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "GST",
+      "flow": "purchases",
+      "label": "1B",
+      "amount": "tax",
+      "positiveSide": "debit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "FRE",
+      "flow": "sales",
+      "label": "G1",
+      "amount": "gross",
+      "positiveSide": "credit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "FRE",
+      "flow": "sales",
+      "label": "G3",
+      "amount": "gross",
+      "positiveSide": "credit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "FRE",
+      "flow": "purchases",
+      "label": "G11",
+      "amount": "gross",
+      "positiveSide": "debit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "EXP",
+      "flow": "sales",
+      "label": "G1",
+      "amount": "gross",
+      "positiveSide": "credit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "EXP",
+      "flow": "sales",
+      "label": "G2",
+      "amount": "gross",
+      "positiveSide": "credit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "INP",
+      "flow": "sales",
+      "label": "G1",
+      "amount": "gross",
+      "positiveSide": "credit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "INP",
+      "flow": "purchases",
+      "label": "G11",
+      "amount": "gross",
+      "positiveSide": "debit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "IMP",
+      "flow": "purchases",
+      "label": "G11",
+      "amount": "gross",
+      "positiveSide": "debit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "IMP",
+      "flow": "purchases",
+      "label": "1B",
+      "amount": "tax",
+      "positiveSide": "debit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "CAP",
+      "flow": "purchases",
+      "label": "G10",
+      "amount": "gross",
+      "positiveSide": "debit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "CAP",
+      "flow": "purchases",
+      "label": "1B",
+      "amount": "tax",
+      "positiveSide": "debit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "ADJ-BD",
+      "flow": "any",
+      "label": "1B",
+      "amount": "tax",
+      "positiveSide": "debit",
+      "basis": "accruals",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "BAS-W1",
+      "flow": "any",
+      "label": "W1",
+      "amount": "net",
+      "positiveSide": "debit",
+      "basis": "both",
+      "validFrom": "2000-07-01"
+    },
+    {
+      "code": "BAS-W2",
+      "flow": "any",
+      "label": "W2",
+      "amount": "net",
+      "positiveSide": "credit",
+      "basis": "both",
       "validFrom": "2000-07-01"
     }
   ]
