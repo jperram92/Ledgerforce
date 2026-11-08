@@ -1,0 +1,27 @@
+{
+  "name": "@ledgerforce/ap",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Accounts payable: supplier bills, duplicate detection, suggested coding and posting through the posting engine (design §3.8 row 6, UC-05)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/products": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "@ledgerforce/tax": "workspace:*",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@ledgerforce/gl": "workspace:*",
+    "@types/node": "22.20.5",
+    "fast-check": "4.10.2",
+    "vitest": "4.1.12"
+  }
+}
