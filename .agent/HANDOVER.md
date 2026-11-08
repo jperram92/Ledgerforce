@@ -259,3 +259,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T08:18:41.391Z claude: checkpoint: 4/7 — migration 0034, apply, handler; db 20/20
 - 2026-11-08T08:20:30.220Z claude: T-0065 → verifying
 - 2026-11-08T13:02:46.587Z claude: release T-0065 → review (verify 12 PASS/3 FAIL/1 PENDING at c701dd3: only known worktree artefact (run.test.ts) + dependent gates 3/4; awaiting codex cross-review; lead to leave the 0033 placeholder out at merge (DL-0268))
+- 2026-11-08T13:09:00.973Z claude: checkpoint: 5/8 — reverse() + GP-019 golden + INV-reversal green
+- 2026-11-08T13:17:19.758Z claude: T-0032 → verifying
+- 2026-11-08T18:06:06.570Z claude: release T-0032 → review (verify green except known run.test.ts worktree artefact (2a/3) and golden diff guard (4); awaiting codex cross-review)

@@ -8,3 +8,4 @@ export * from './period.ts';
 export * from './posting-command.ts';
 export * from './posting-engine.ts';
 export * from './subledger.ts';
+export * from './reversal.ts';

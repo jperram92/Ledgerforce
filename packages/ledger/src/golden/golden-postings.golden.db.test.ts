@@ -31,7 +31,8 @@ const plan = planGoldenRun(postings, mode, repoGoldenGate(REPO));
 let g: GoldenFixture;
 
 beforeAll(async () => {
-  g = await createGoldenWorld('01900000-0000-7000-8000-000000003101');
+  // postings: a reversal golden (GP-019) posts the entry it reverses first (T-0032).
+  g = await createGoldenWorld('01900000-0000-7000-8000-000000003101', { postings });
 });
 
 afterAll(async () => {

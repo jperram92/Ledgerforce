@@ -42,7 +42,21 @@ export type PostingErrorCode =
   | 'UNKNOWN_USER'
   | 'OVERRIDE_NOT_PERMITTED'
   /** preview() only: the key already posted this document; post() would replay it (T-0026). */
-  | 'ALREADY_POSTED';
+  | 'ALREADY_POSTED'
+  /** Reversal (T-0032): no posted entry with this id in this company. */
+  | 'UNKNOWN_ENTRY'
+  /** Reversal: the entry is not posted (draft). */
+  | 'NOT_POSTED'
+  /** Reversal: the entry is already reversed (status reversed). */
+  | 'ALREADY_REVERSED'
+  /** Reversal: the entry is itself a reversal; re-post the document instead. */
+  | 'REVERSAL_OF_REVERSAL'
+  /** Reversal: dated before the entry it reverses. */
+  | 'REVERSAL_BEFORE_ORIGINAL'
+  /** Void (RQ-0095 Q11): an open item of the entry has allocations; use a credit note. */
+  | 'VOID_HAS_ALLOCATIONS'
+  /** Void (RQ-0095 Q11): the reversal would fall outside the entry's period; use a credit note. */
+  | 'VOID_OTHER_PERIOD';
 
 /** A posting command refused by the engine. Nothing was written. `line` is 1-based. */
 export class PostingError extends DomainError {
@@ -309,6 +323,26 @@ export function lineTotals(lines: readonly { debit: string; credit: string }[]):
 
 /** Pure checks of a command (no I/O). Throws PostingError. */
 export function checkCommand(command: PostingCommand): CheckedCommand {
+  checkHeader(command);
+  const cls = sourceClassOf(command.sourceType);
+  if (cls === undefined) {
+    fail(
+      'UNKNOWN_SOURCE_TYPE',
+      `source type ${JSON.stringify(command.sourceType)} is not in the period matrix`,
+    );
+  }
+  if (cls === 'reversal') {
+    fail(
+      'SOURCE_TYPE_NOT_SUPPORTED',
+      `${command.sourceType} is not posted through raw commands: a reversal is produced from ` +
+        'the original entry by reverse() (T-0032, GP-019)',
+    );
+  }
+  return checkCommandBody(command);
+}
+
+/** Key, date and uuid checks shared by raw and reversal commands. */
+function checkHeader(command: PostingCommand): void {
   const key: unknown = command.idempotencyKey;
   if (typeof key !== 'string' || key.length < 1 || key.length > 200) {
     fail('INVALID_COMMAND', 'idempotencyKey must be 1..200 characters');
@@ -322,19 +356,24 @@ export function checkCommand(command: PostingCommand): CheckedCommand {
   checkUuid(command.companyId ?? null, 'companyId');
   checkUuid(command.createdBy, 'createdBy');
   checkUuid(command.approvedBy, 'approvedBy');
-  const cls = sourceClassOf(command.sourceType);
-  if (cls === undefined) {
+}
+
+/**
+ * Pure checks of the mirrored command reverse() builds from a stored entry (T-0032). Only the
+ * reversal path calls this; raw commands go through checkCommand(), which refuses the class.
+ */
+export function checkReversalCommand(command: PostingCommand): CheckedCommand {
+  checkHeader(command);
+  if (sourceClassOf(command.sourceType) !== 'reversal') {
     fail(
-      'UNKNOWN_SOURCE_TYPE',
-      `source type ${JSON.stringify(command.sourceType)} is not in the period matrix`,
+      'INVALID_COMMAND',
+      `a reversal is posted as a reversal source type, not ${command.sourceType}`,
     );
   }
-  if (cls === 'reversal') {
-    fail(
-      'SOURCE_TYPE_NOT_SUPPORTED',
-      `${command.sourceType} is not posted through raw commands (reversals wait for GP-019)`,
-    );
-  }
+  return checkCommandBody(command);
+}
+
+function checkCommandBody(command: PostingCommand): CheckedCommand {
   if (command.periodOverride !== undefined) {
     if (command.createdBy === undefined) {
       fail('INVALID_COMMAND', 'periodOverride needs createdBy (the user granting the override)');

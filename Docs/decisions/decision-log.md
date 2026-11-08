@@ -2085,3 +2085,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: accept without wording changes (rejected: the persona made W1–W9 a condition); add the EXP list as an AC on T-0035 (rejected: card under active build on another branch); fold the single-supply path into a separate new card now (rejected: the review asks for it on T-0047; the card notes say to split it if it exceeds the size target, with the refusal holding meanwhile).
 - Caveat: primary hosts are still blocked; the s 38-185/38-190 condition texts rest on search extracts (DL-0285 re-check list). If the primary text differs, correct the cells with new effective-dated rows.
 - ADR: ADR-0044 · Status: accepted
+
+### DL-0270 — Void rules (RQ-0095 Q11) as built: "same BAS period" = same fiscal month, only for BAS/subledger entries
+- Date: 2026-11-08 · By: claude · Task: T-0032 · Category: accounting
+- Decision: `reverse()` (packages/ledger/src/reversal.ts) refuses `VOID_HAS_ALLOCATIONS` when any open item of the original is not fully open (open = original, transaction and base). It refuses `VOID_OTHER_PERIOD` when the reversal's resolved period differs from the original's period. Both messages say "Issue a credit note instead". The same-period rule applies when the original carries a tax code or an open item (it reaches the BAS or the subledger). An untaxed manual journal without open items may be reversed into any later period the matrix allows, for example an accrual reversal on the 1st of the next month. No company BAS frequency exists yet (design §4.1 step 3). Fiscal periods are calendar months, and a month never spans two BAS periods, so "same fiscal month" is the conservative reading of "same BAS period". The rule may widen to the BAS period once the setting exists. Period locks are unchanged: the reversal class needs an override under any lock and is denied when hard-locked (period-matrix.ts).
+- Why: GP-019 (Approved) and RQ-0095 Q11 require the rule. A void after the GST is reported would mis-state the BAS. A credit note is always a valid alternative, so being conservative costs nothing.
+- Alternatives: apply the period rule to every entry (rejected: it blocks routine accrual reversals that never touch the BAS); assume quarterly BAS (rejected: it is wrong for monthly filers); add a BAS-frequency setting now (rejected: that is wizard scope, design §4.1).
+- ADR: none (application of an Approved golden; the accountant-reviewer persona, DL-0248, should confirm before production) · Status: accepted
+
+### DL-0271 — Reversal path: engine hooks, no migration, raw `ledger_reversal` commands stay refused
+- Date: 2026-11-08 · By: claude · Task: T-0032 · Category: architecture
+- Decision: A reversal is planned only from the stored original (reversal.ts reads its lines, dimension-set values, tax, party and FX). It is then validated, checked and written by the posting engine: `postReversal` / `previewReversalPlan` and `checkReversalCommand`. Control accounts are checked against the original's source type. In the same savepoint the engine writes `reversal_of_id`, calls `app.journal_mark_reversed` (migration 0008, which refuses unless the lines mirror exactly) and then allocates each mirrored open item against the original's item through `allocate()`. Locks: the idempotency key first (a replay never re-reads the original), then an advisory lock on the original, then the `lf.open_item:` keys `allocate()` uses, so a concurrent allocation cannot slip between the check and the void. `post()` keeps refusing raw `ledger_reversal` commands. No migration is needed (0035 is unused). The database already has `reversal_of_id`, the mirror check, the single posted → reversed transition and the hash chain, which does not hash status. A unique index on `reversal_of_id` was rejected because existing immutability tests insert a second mirrored reversal on purpose to prove the mark refuses it.
+- Why: one write path (design §3.9); the database stays the last line of defence.
+- Alternatives: accept caller-built mirrored commands (rejected: callers could hand-craft lines); add migration 0035 with a unique partial index (rejected: see above, and the mark function already makes a second reversal fail).
+- ADR: none · Status: accepted
+
+### DL-0272 — GP-019 has its own golden test; the suite-wide gate is untouched
+- Date: 2026-11-08 · By: claude · Task: T-0032 · Category: process
+- Decision: `packages/ledger/src/golden/gp-019.golden.db.test.ts` runs `runGolden` for GP-019 with the real producer: the golden world posts GP-001 and voids it with `reverse()` on 2026-11-06. This is the event's own golden test ("one per GP-NNN", packages/ledger/AGENTS.md), and it is what proves GP-019 before T-0032 is `done`. The golden parser reads `reversalOf` from GP-019's Source type ("reversal_of_id = GP-001 entry"). `createGoldenWorld(tenant, { postings })` lets the suite-wide runner produce GP-019 the same way. `GOLDEN_REQUIRES` (DL-0256) is unchanged, so the runner reports GP-019 PENDING until the card is `done` and then enforces it.
+- Why: the brief requires evidence that GP-019 passes, without weakening the gate.
+- Alternatives: remove the GOLDEN_REQUIRES entry now (rejected: DL-0256 opens it only at `done`); force the card status locally (rejected: that falsifies state).
+- ADR: none · Status: accepted
+
+### DL-0287 — Migration 0035 is a documented reserved no-op
+- Date: 2026-11-08 · By: claude (lead) · Task: T-0032 · Category: process
+- Decision: T-0032 did not use its reserved migration 0035; the slot is filled with `0035_reserved_noop.sql` (`SELECT 1;`), as DL-0284 did for 0033. T-0035 keeps 0036, T-0040 0037, T-0050 0038. Lead-assigned DL ids from here: T-0040's DL-0285..0288 will be renumbered at merge.
+- Why: contiguous migration numbering; parallel branches already hold later numbers.
+- Alternatives: renumber later branches (rejected: churn on live branches).
+- ADR: none · Status: accepted

@@ -1,0 +1,15 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a2bec5cad8504aae9
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:35101
+stdout | packages/ledger/src/golden/gp-019.golden.db.test.ts > GP-019 reversal (void) of a posted sales invoice [T-0032] > SS-UC10-09: Void posts a reversal, never an edit — GP-019 [APPROVED] reproduced line for line
+GP-019 [APPROVED] PASS — Reversal (void) of a posted sales invoice
+  GP-019 — reproduced line for line (4 lines)
+
+ ✓ |db| packages/ledger/src/golden/gp-019.golden.db.test.ts > GP-019 reversal (void) of a posted sales invoice [T-0032] > SS-UC10-09: Void posts a reversal, never an edit — GP-019 [APPROVED] reproduced line for line 96ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  13:03:03
+   Duration  2.92s (transform 354ms, setup 0ms, import 607ms, tests 1.13s, environment 0ms)
+

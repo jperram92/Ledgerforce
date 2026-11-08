@@ -1,0 +1,84 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a2bec5cad8504aae9
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41651
+ ❯ |db| packages/ledger/src/reversal.prop.db.test.ts (0 test)
+ ❯ |db| packages/ledger/src/reversal.db.test.ts (0 test)
+ ❯ |unit| packages/ledger/src/golden/parse.test.ts (12 tests | 1 failed) 35ms
+     × reads the original a reversal golden reverses from its Source type (GP-019 → GP-001) [T-0032] 12ms
+ ❯ |db| packages/ledger/src/golden/gp-019.golden.db.test.ts (1 test | 1 failed) 519ms
+     × SS-UC10-09: Void posts a reversal, never an edit — GP-019 [APPROVED] reproduced line for line 6ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/ledger/src/reversal.db.test.ts [ packages/ledger/src/reversal.db.test.ts ]
+Error: Cannot find module './reversal.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a2bec5cad8504aae9/packages/ledger/src/reversal.db.test.ts
+ ❯ packages/ledger/src/reversal.db.test.ts:21:1
+     19| import { PostingError, type PostingCommand } from './posting-command.t…
+     20| import { post, type PostingOutbox } from './posting-engine.ts';
+     21| import { previewReversal, reverse, type ReversalCommand } from './reve…
+       | ^
+     22| import { allocate, subledgerEntriesOf } from './subledger.ts';
+     23| import {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |db| packages/ledger/src/reversal.prop.db.test.ts [ packages/ledger/src/reversal.prop.db.test.ts ]
+Error: Cannot find module './reversal.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a2bec5cad8504aae9/packages/ledger/src/reversal.prop.db.test.ts
+ ❯ packages/ledger/src/reversal.prop.db.test.ts:18:1
+     16| import type { PostingLineInput } from './posting-command.ts';
+     17| import { post } from './posting-engine.ts';
+     18| import { reverse } from './reversal.ts';
+       | ^
+     19| import { createLedgerFixture, type LedgerFixture } from './testing/jou…
+     20|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/ledger/src/golden/parse.test.ts > SS-PLAT-12 parser: the real Docs/accounting/postings.md > reads the original a reversal golden reverses from its Source type (GP-019 → GP-001) [T-0032]
+AssertionError: expected undefined to be 'GP-001' // Object.is equality
+
+- Expected:
+"GP-001"
+
++ Received:
+undefined
+
+ ❯ packages/ledger/src/golden/parse.test.ts:266:31
+    264|     const gp019 = postings.find((p) => p.id === 'GP-019');
+    265|     expect(gp019?.sourceTypes).toEqual(['ledger.reversal']);
+    266|     expect(gp019?.reversalOf).toBe('GP-001');
+       |                               ^
+    267|     expect(gp019?.entryDate).toBe('2026-11-06');
+    268|     for (const p of postings.filter((x) => x.id !== 'GP-019')) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |db| packages/ledger/src/golden/gp-019.golden.db.test.ts > GP-019 reversal (void) of a posted sales invoice [T-0032] > SS-UC10-09: Void posts a reversal, never an edit — GP-019 [APPROVED] reproduced line for line
+AssertionError: expected undefined to be 'GP-001' // Object.is equality
+
+- Expected:
+"GP-001"
+
++ Received:
+undefined
+
+ ❯ packages/ledger/src/golden/gp-019.golden.db.test.ts:36:27
+     34|     if (!gp) throw new Error('GP-019 is missing from postings.md');
+     35|     expect(gp.status).toBe('Approved');
+     36|     expect(gp.reversalOf).toBe('GP-001');
+       |                           ^
+     37|     const outcome = await runGolden({ gp, run: true, label: 'APPROVED'…
+     38|     console.info(outcome.report);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  4 failed (4)
+      Tests  2 failed | 11 passed (13)
+   Start at  08:27:22
+   Duration  2.04s (transform 521ms, setup 0ms, import 578ms, tests 554ms, environment 0ms)
+
