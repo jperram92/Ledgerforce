@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0034",
+  "entries": [
+    {
+      "scenario": "SS-UC01-11",
+      "file": ".agent/evidence/T-0034/20261108-033726-tests-unit.json",
+      "test": "2 test(s): packages/modules/tax/src/golden/gp-018.golden.test.ts › SS-UC01-11: Tax-inclusive rounding follows company setting [DRAFT GP-018 — not Approved] › per_line produces the Draft GP-018a journal (no ROUNDING line), balanced at 10.05 | packages/modules/tax/src/golden/gp-018.golden.test.ts › SS-UC01-11: Tax-inclusive rounding follows company setting [DRAFT GP-018 — not Approved] › per_document produces the Draft GP-018b journal (0.01 debit to ROUNDING), balanced at 10.06",
+      "commit": "0d3ce8f08c62",
+      "provider": "claude",
+      "timestamp": "2026-11-08T03:37:26.081Z",
+      "result": "passed"
+    }
+  ]
+}

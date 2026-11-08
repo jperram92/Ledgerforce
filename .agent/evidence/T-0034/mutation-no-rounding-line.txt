@@ -1,0 +1,127 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a1c47984eae27d655
+
+ ❯ |unit| packages/modules/tax/src/tax-journal.test.ts (4 tests | 1 failed) 23ms
+     × purchase per_document inclusive: Cr AP total, Dr expense nets and GST paid, residue credited to ROUNDING 17ms
+ ❯ |unit| packages/modules/tax/src/golden/gp-018.golden.test.ts (2 tests | 1 failed) 15ms
+     × per_document produces the Draft GP-018b journal (0.01 debit to ROUNDING), balanced at 10.06 10ms
+ ❯ |unit| packages/modules/tax/src/gst-rounding.prop.test.ts (8 tests | 1 failed) 486ms
+     × INV-balance: the drafted journal balances and every line has exactly one positive side 60ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst-rounding.prop.test.ts > GST engine invariants > INV-balance: the drafted journal balances and every line has exactly one positive side
+Error: Property failed after 33 tests
+{ seed: 1339479316, path: "32:4:5:6:3:4:7:3:6:5:5:5:7", endOnFailure: true }
+Counterexample: [{"lines":[{"amount":"-0.0600","taxCode":"GST","rate":"0.10"},{"amount":"-17998.1500","taxCode":"GST","rate":"0.10"},{"amount":"0.0000","taxCode":"R1","rate":"0.0001"}],"amountsAre":"inclusive","rounding":"per_document"},"sale"]
+Shrunk 12 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ throwIfFailed node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2476:8
+ ❯ reportRunDetails node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2492:14
+ ❯ Module.assert node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2662:7
+ ❯ packages/modules/tax/src/gst-rounding.prop.test.ts:192:8
+    190|
+    191|   it('INV-balance: the drafted journal balances and every line has exa…
+    192|     fc.assert(
+       |        ^
+    193|       fc.property(docArb(), fc.constantFrom('sale' as const, 'purchase…
+    194|         const r = run(d);
+
+Caused by: AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/modules/tax/src/gst-rounding.prop.test.ts:201:27
+ ❯ Property.predicate node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:1355:99
+ ❯ Property.run node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:1324:24
+ ❯ propertyExecution node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2549:23
+ ❯ run node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2639:91
+ ❯ runIt node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2542:15
+ ❯ check node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2655:14
+ ❯ Module.assert node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2660:14
+ ❯ packages/modules/tax/src/gst-rounding.prop.test.ts:192:8
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  |unit| packages/modules/tax/src/tax-journal.test.ts > draftTaxedDocumentLines > purchase per_document inclusive: Cr AP total, Dr expense nets and GST paid, residue credited to ROUNDING
+AssertionError: expected [ { …(5) }, …(2) ] to deeply equal [ { …(5) }, { …(5) }, { …(5) }, …(1) ]
+
+- Expected
++ Received
+
+@@ -5,17 +5,10 @@
+      "debit": "0.0000",
+      "taxAmount": null,
+      "taxCode": null,
+    },
+    {
+-     "account": "system:ROUNDING",
+-     "credit": "0.0100",
+-     "debit": "0.0000",
+-     "taxAmount": null,
+-     "taxCode": null,
+-   },
+-   {
+      "account": "expense:6100",
+      "credit": "0.0000",
+      "debit": "9.1500",
+      "taxAmount": "0.9100",
+      "taxCode": "GST",
+
+ ❯ packages/modules/tax/src/tax-journal.test.ts:27:7
+     25|         lineAccounts: ['expense:6100', 'expense:6100', 'expense:6100'],
+     26|       }),
+     27|     ).toEqual([
+       |       ^
+     28|       {
+     29|         account: 'system:AP_CONTROL',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |unit| packages/modules/tax/src/golden/gp-018.golden.test.ts > SS-UC01-11: Tax-inclusive rounding follows company setting [DRAFT GP-018 — not Approved] > per_document produces the Draft GP-018b journal (0.01 debit to ROUNDING), balanced at 10.06
+AssertionError: expected [ { …(5) }, { …(5) }, { …(5) } ] to deeply equal [ { …(5) }, { …(5) }, { …(5) }, …(1) ]
+
+- Expected
++ Received
+
+@@ -5,17 +5,10 @@
+      "debit": "10.0500",
+      "taxAmount": null,
+      "taxCode": null,
+    },
+    {
+-     "account": "system:ROUNDING",
+-     "credit": "0.0000",
+-     "debit": "0.0100",
+-     "taxAmount": null,
+-     "taxCode": null,
+-   },
+-   {
+      "account": "product:SUBSCRIPTION.revenue",
+      "credit": "9.1500",
+      "debit": "0.0000",
+      "taxAmount": "0.9100",
+      "taxCode": "GST",
+
+ ❯ packages/modules/tax/src/golden/gp-018.golden.test.ts:89:15
+     87|   it('per_document produces the Draft GP-018b journal (0.01 debit to R…
+     88|     const j = journalFor('per_document');
+     89|     expect(j).toEqual(GP_018B_DRAFT);
+       |               ^
+     90|     const t = totals(j);
+     91|     expect([t.dr.toNumericString(), t.cr.toNumericString()]).toEqual([…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  3 failed | 1 passed (4)
+      Tests  3 failed | 23 passed (26)
+   Start at  03:29:59
+   Duration  799ms (transform 285ms, setup 0ms, import 478ms, tests 544ms, environment 0ms)
+

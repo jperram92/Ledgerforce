@@ -1,0 +1,212 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a1c47984eae27d655
+
+ ❯ |unit| packages/modules/tax/src/gst.engine.test.ts (12 tests | 12 failed) 24ms
+     × tax-exclusive: GST per line, total = net + GST (GP-001 amounts) 7ms
+     × tax-inclusive: GST = gross/11 rounded, net = gross − GST, no residue (GP-018a) 1ms
+     × half a cent rounds up: 0.05 ex GST → 0.01 per line 1ms
+     × a negative (credit) line rounds half away from zero 1ms
+     × GST-free lines carry zero tax and are totalled per code 1ms
+     × tax-inclusive: GST once on the document, nets per line, residue to ROUNDING (GP-018b) 0ms
+     × tax-exclusive: GST once on Σnet, total = net + GST, no residue 1ms
+     × lines of mixed sign within a code get no line-level tax (document tax only) 0ms
+     × refuses amounts finer than the currency minor unit 4ms
+     × refuses rates outside 0 ≤ rate < 1 or with more than 8 decimals 1ms
+     × refuses one tax code with two rates in a document 3ms
+     × an empty document totals zero 1ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > per_line (AU default) > tax-exclusive: GST per line, total = net + GST (GP-001 amounts)
+Error: not implemented
+ ❯ calculateTax packages/modules/tax/src/gst.engine.ts:39:9
+     37| }
+     38| export function calculateTax(_input: TaxCalculationInput): TaxCalculat…
+     39|   throw new Error('not implemented');
+       |         ^
+     40| }
+     41|
+ ❯ calc packages/modules/tax/src/gst.engine.test.ts:14:13
+ ❯ packages/modules/tax/src/gst.engine.test.ts:31:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > per_line (AU default) > tax-inclusive: GST = gross/11 rounded, net = gross − GST, no residue (GP-018a)
+Error: not implemented
+ ❯ calculateTax packages/modules/tax/src/gst.engine.ts:39:9
+     37| }
+     38| export function calculateTax(_input: TaxCalculationInput): TaxCalculat…
+     39|   throw new Error('not implemented');
+       |         ^
+     40| }
+     41|
+ ❯ calc packages/modules/tax/src/gst.engine.test.ts:14:13
+ ❯ packages/modules/tax/src/gst.engine.test.ts:52:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > per_line (AU default) > half a cent rounds up: 0.05 ex GST → 0.01 per line
+Error: not implemented
+ ❯ calculateTax packages/modules/tax/src/gst.engine.ts:39:9
+     37| }
+     38| export function calculateTax(_input: TaxCalculationInput): TaxCalculat…
+     39|   throw new Error('not implemented');
+       |         ^
+     40| }
+     41|
+ ❯ calc packages/modules/tax/src/gst.engine.test.ts:14:13
+ ❯ packages/modules/tax/src/gst.engine.test.ts:74:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > per_line (AU default) > a negative (credit) line rounds half away from zero
+Error: not implemented
+ ❯ calculateTax packages/modules/tax/src/gst.engine.ts:39:9
+     37| }
+     38| export function calculateTax(_input: TaxCalculationInput): TaxCalculat…
+     39|   throw new Error('not implemented');
+       |         ^
+     40| }
+     41|
+ ❯ calc packages/modules/tax/src/gst.engine.test.ts:14:13
+ ❯ packages/modules/tax/src/gst.engine.test.ts:87:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > per_line (AU default) > GST-free lines carry zero tax and are totalled per code
+Error: not implemented
+ ❯ calculateTax packages/modules/tax/src/gst.engine.ts:39:9
+     37| }
+     38| export function calculateTax(_input: TaxCalculationInput): TaxCalculat…
+     39|   throw new Error('not implemented');
+       |         ^
+     40| }
+     41|
+ ❯ calc packages/modules/tax/src/gst.engine.test.ts:14:13
+ ❯ packages/modules/tax/src/gst.engine.test.ts:96:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > per_document > tax-inclusive: GST once on the document, nets per line, residue to ROUNDING (GP-018b)
+Error: not implemented
+ ❯ calculateTax packages/modules/tax/src/gst.engine.ts:39:9
+     37| }
+     38| export function calculateTax(_input: TaxCalculationInput): TaxCalculat…
+     39|   throw new Error('not implemented');
+       |         ^
+     40| }
+     41|
+ ❯ calc packages/modules/tax/src/gst.engine.test.ts:14:13
+ ❯ packages/modules/tax/src/gst.engine.test.ts:114:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > per_document > tax-exclusive: GST once on Σnet, total = net + GST, no residue
+Error: not implemented
+ ❯ calculateTax packages/modules/tax/src/gst.engine.ts:39:9
+     37| }
+     38| export function calculateTax(_input: TaxCalculationInput): TaxCalculat…
+     39|   throw new Error('not implemented');
+       |         ^
+     40| }
+     41|
+ ❯ calc packages/modules/tax/src/gst.engine.test.ts:14:13
+ ❯ packages/modules/tax/src/gst.engine.test.ts:139:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > per_document > lines of mixed sign within a code get no line-level tax (document tax only)
+Error: not implemented
+ ❯ calculateTax packages/modules/tax/src/gst.engine.ts:39:9
+     37| }
+     38| export function calculateTax(_input: TaxCalculationInput): TaxCalculat…
+     39|   throw new Error('not implemented');
+       |         ^
+     40| }
+     41|
+ ❯ calc packages/modules/tax/src/gst.engine.test.ts:14:13
+ ❯ packages/modules/tax/src/gst.engine.test.ts:154:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > input validation > refuses amounts finer than the currency minor unit
+AssertionError: expected error to be instance of TaxCalculationError
+
+- Expected:
+[Function TaxCalculationError]
+
++ Received:
+Error {
+  "message": "not implemented",
+}
+
+ ❯ packages/modules/tax/src/gst.engine.test.ts:177:46
+    175|
+    176|   it('refuses amounts finer than the currency minor unit', () => {
+    177|     expect(one({ amount: '1.005', ...GST })).toThrow(TaxCalculationErr…
+       |                                              ^
+    178|   });
+    179|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > input validation > refuses rates outside 0 ≤ rate < 1 or with more than 8 decimals
+AssertionError: expected error to be instance of TaxCalculationError
+
+- Expected:
+[Function TaxCalculationError]
+
++ Received:
+Error {
+  "message": "not implemented",
+}
+
+ ❯ packages/modules/tax/src/gst.engine.test.ts:181:62
+    179|
+    180|   it('refuses rates outside 0 ≤ rate < 1 or with more than 8 decimals'…
+    181|     expect(one({ amount: '1.00', taxCode: 'X', rate: '1' })).toThrow(T…
+       |                                                              ^
+    182|     expect(one({ amount: '1.00', taxCode: 'X', rate: '-0.1' })).toThro…
+    183|     expect(one({ amount: '1.00', taxCode: 'X', rate: '0.123456789' }))…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > input validation > refuses one tax code with two rates in a document
+AssertionError: expected [Function] to throw error matching /GST has two rates/ but got 'not implemented'
+
+- Expected:
+/GST has two rates/
+
++ Received:
+"not implemented"
+
+ ❯ packages/modules/tax/src/gst.engine.test.ts:200:7
+    198|         ],
+    199|       }),
+    200|     ).toThrow(/GST has two rates/);
+       |       ^
+    201|   });
+    202|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst.engine.test.ts > input validation > an empty document totals zero
+Error: not implemented
+ ❯ calculateTax packages/modules/tax/src/gst.engine.ts:39:9
+     37| }
+     38| export function calculateTax(_input: TaxCalculationInput): TaxCalculat…
+     39|   throw new Error('not implemented');
+       |         ^
+     40| }
+     41|
+ ❯ calc packages/modules/tax/src/gst.engine.test.ts:14:13
+ ❯ packages/modules/tax/src/gst.engine.test.ts:204:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  12 failed (12)
+   Start at  03:25:57
+   Duration  337ms (transform 45ms, setup 0ms, import 67ms, tests 24ms, environment 0ms)
+

@@ -71,6 +71,12 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   },
   // Its generated parent account is an active, postable, non-control asset (overrides above).
   'app.account_system_role': { role: () => 'UNDEPOSITED_FUNDS' },
+  // Tax codes (migration 0031): an upper-case code; a zero-rated kind needs no GST role binding.
+  'app.tax_code': {
+    code: () => `T${randomBytes(4).toString('hex').toUpperCase()}`,
+    kind: () => 'gst_free',
+    rate: () => '0',
+  },
   'app.dimension': { code: () => `dim_${randomBytes(4).toString('hex')}` },
   'app.dimension_value': { code: () => `v${randomBytes(4).toString('hex')}` },
   // Trigger-computed; the generator only needs to satisfy NOT NULL (the value is replaced).

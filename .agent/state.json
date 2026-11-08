@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0114",
+  "current_task": "T-0034",
   "branch": "feat/T-0114-windows-evidence-recorder",
-  "step": null,
+  "step": "6/6 — verifying; golden SS-UC01-11 waits golden_postings gate (DL-0242)",
   "claimed_by": "codex",
-  "lease_expires_at": "2026-10-29T08:49:07.158Z",
-  "last_green_commit": null,
+  "lease_expires_at": "2026-11-08T04:29:51.306Z",
+  "last_green_commit": "c2f194865f69d932975a4a8ad43fc4e71b613eab",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-10-29T08:04:07.165Z",
+  "updated_at": "2026-11-08T03:44:51.346Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

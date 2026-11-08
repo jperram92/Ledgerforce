@@ -211,3 +211,9 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-10-29T07:58:34.868Z codex: T-0114 → in_progress
 - 2026-10-29T08:00:53.105Z codex: release T-0095 → todo (Owner accepted ADR-0043 and explicitly authorized scoped addition (DL-0241); continue after active T-0114.)
 - 2026-10-29T08:04:07.167Z codex: T-0114 → verifying
+- 2026-11-08T03:21:09.088Z codex: checkpoint: 1/6 — RQ-0094 answered-pending-human
+- 2026-11-08T03:24:53.542Z codex: checkpoint: 2/6 — tax_code + effective dating (migration 0031) green
+- 2026-11-08T03:27:31.339Z codex: checkpoint: 3/6 — GST calculator per line/per document + inclusive green
+- 2026-11-08T03:30:26.413Z codex: checkpoint: 4/6 — properties + Draft SS-UC01-11 golden green
+- 2026-11-08T03:37:57.044Z codex: T-0034 → verifying
+- 2026-11-08T03:44:51.308Z codex: checkpoint: 6/6 — verifying; golden SS-UC01-11 waits golden_postings gate (DL-0242)

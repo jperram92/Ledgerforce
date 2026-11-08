@@ -1,0 +1,93 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a1c47984eae27d655
+
+ ❯ |unit| packages/modules/tax/src/gst-rounding.prop.test.ts (7 tests | 2 failed) 282ms
+     × per_line: net + tax = gross on every line, tax is the half-up rounding of the exact tax, no residue 15ms
+     × per_document: code tax is the half-up rounding of the exact tax on the code total; exclusive has no residue; line taxes (when given) sum to the code tax 71ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst-rounding.prop.test.ts > GST engine invariants > per_line: net + tax = gross on every line, tax is the half-up rounding of the exact tax, no residue
+Error: Property failed after 7 tests
+{ seed: 903415461, path: "6:10:12", endOnFailure: true }
+Counterexample: [{"lines":[{"amount":"-42461.8500","taxCode":"GST","rate":"0.10"}],"amountsAre":"exclusive","rounding":"per_line"}]
+Shrunk 2 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ throwIfFailed node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2476:8
+ ❯ reportRunDetails node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2492:14
+ ❯ Module.assert node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2662:7
+ ❯ packages/modules/tax/src/gst-rounding.prop.test.ts:98:8
+     96|
+     97|   it('per_line: net + tax = gross on every line, tax is the half-up ro…
+     98|     fc.assert(
+       |        ^
+     99|       fc.property(docArb(), (d) => {
+    100|         const r = run({ ...d, rounding: 'per_line' });
+
+Caused by: AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/modules/tax/src/gst-rounding.prop.test.ts:114:50
+ ❯ packages/modules/tax/src/gst-rounding.prop.test.ts:102:17
+ ❯ Property.predicate node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:1355:99
+ ❯ Property.run node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:1324:24
+ ❯ propertyExecution node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2549:23
+ ❯ run node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2639:91
+ ❯ runIt node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2542:15
+ ❯ check node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2655:14
+ ❯ Module.assert node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2660:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |unit| packages/modules/tax/src/gst-rounding.prop.test.ts > GST engine invariants > per_document: code tax is the half-up rounding of the exact tax on the code total; exclusive has no residue; line taxes (when given) sum to the code tax
+Error: Property failed after 6 tests
+{ seed: -373569331, path: "5:2:6:21:8:17:19:32:19:28:24:24:24", endOnFailure: true }
+Counterexample: [{"lines":[{"amount":"0.0200","taxCode":"GST","rate":"0.10"},{"amount":"-99981.5400","taxCode":"GST","rate":"0.10"},{"amount":"-99981.5300","taxCode":"GST","rate":"0.10"},{"amount":"0.0000","taxCode":"R1","rate":"0.0001"}],"amountsAre":"exclusive","rounding":"per_line"}]
+Shrunk 12 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ throwIfFailed node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2476:8
+ ❯ reportRunDetails node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2492:14
+ ❯ Module.assert node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2662:7
+ ❯ packages/modules/tax/src/gst-rounding.prop.test.ts:121:8
+    119|
+    120|   it('per_document: code tax is the half-up rounding of the exact tax …
+    121|     fc.assert(
+       |        ^
+    122|       fc.property(docArb(), (d) => {
+    123|         const r = run({ ...d, rounding: 'per_document' });
+
+Caused by: AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/modules/tax/src/gst-rounding.prop.test.ts:132:52
+ ❯ Property.predicate node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:1355:99
+ ❯ Property.run node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:1324:24
+ ❯ propertyExecution node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2549:23
+ ❯ run node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2639:91
+ ❯ runIt node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2542:15
+ ❯ check node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2655:14
+ ❯ Module.assert node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2660:14
+ ❯ packages/modules/tax/src/gst-rounding.prop.test.ts:121:8
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 5 passed (7)
+   Start at  03:28:27
+   Duration  522ms (transform 78ms, setup 0ms, import 119ms, tests 282ms, environment 0ms)
+
