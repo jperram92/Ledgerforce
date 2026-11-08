@@ -13,15 +13,15 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 
 | Status | Cards |
 |---|---:|
-| todo | 97 |
+| todo | 98 |
 | review | 13 |
 | blocked | 1 |
-| **total** | **111** |
+| **total** | **112** |
 
 | Phase | Cards |
 |---|---:|
 | Sprint 0 | 9 |
-| MVP | 95 |
+| MVP | 96 |
 | Phase 1 | 1 |
 | Phase 2 | 1 |
 | Phase 3 | 1 |
@@ -131,9 +131,10 @@ graph LR
 | [T-0038](T-0038.md) | Products, party posting profiles and product posting profiles | MVP | review | T-0036, T-0018, T-0034 | — | 1 |
 | [T-0039](T-0039.md) | Posting-profile matrix resolution and gap check | MVP | review | T-0038 | UC-01 | 1 |
 | [T-0121](T-0121.md) | AU templates v2: CAP on fixed assets, ECL allowance 1290, HARDWARE/EQUIPMENT profiles, no OVERSEAS FRE default, EXP/EXS, INP→G11, BAS-W1/W2 (est. 380 lines) | MVP | todo | T-0034, T-0035, T-0038 | UC-01, UC-05 | 1 |
-| [T-0122](T-0122.md) | Tax determination (ADR-0044, Proposed — accept under DL-0282) part 1: tax_class columns, app.tax_determination, AU seed (est. 350 lines) | MVP | todo | T-0039, T-0121 | UC-01, UC-05 | 1 |
-| [T-0123](T-0123.md) | Tax determination (ADR-0044) part 2: resolver precedence, confirmations, NO_TAX_RULE supersedes TAX_CODE_CONFLICT (est. 380 lines) | MVP | todo | T-0122 | UC-01, UC-05 | 2 |
+| [T-0122](T-0122.md) | Tax determination (ADR-0044, Accepted DL-0286) part 1: tax_class columns, app.tax_determination with R3 guard, specificity and author ≠ activator, AU seed, tax-class gap check (est. 400 lines) | MVP | todo | T-0039, T-0121 | UC-01, UC-05 | 1 |
+| [T-0123](T-0123.md) | Tax determination (ADR-0044) part 2: resolver precedence, confirmations (TAX_CONFIRMATION_REQUIRED), resolution trace, adjustments inherit the original line, NO_TAX_RULE supersedes TAX_CODE_CONFLICT (est. 400 lines) | MVP | todo | T-0122 | UC-01, UC-05 | 3 |
 | [T-0124](T-0124.md) | Golden Drafts GP-007-A, GP-012-B, GP-015-B + review MINOR corrections (golden_postings gate, delegated DL-0253/DL-0282; never edits Approved) (est. 300 lines) | MVP | todo | T-0121 | UC-09 | 0 |
+| [T-0126](T-0126.md) | Tax report: posted EXP lines without export evidence, flagged past the s 38-185 60-day period (ADR-0044 R4; follow-up to T-0035) (est. 200 lines) | MVP | todo | T-0035, T-0123 | UC-05 | 1 |
 | [T-0040](T-0040.md) | Sales invoice lifecycle: draft → approve → post | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0015, T-0026, T-0031 | UC-01 | 3 |
 | [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | todo | T-0040 | — | 0 |
 | [T-0042](T-0042.md) | Email delivery (SMTP) via outbox for invoices, statements, reminders, remittances | MVP | todo | T-0041, T-0030, T-0031 | UC-01, UC-02, UC-06 | 3 |
@@ -141,8 +142,8 @@ graph LR
 | [T-0044](T-0044.md) | Batch billing run: approve, post as one job with per-invoice isolation | MVP | todo | T-0043, T-0042, T-0024 | UC-02 | 5 |
 | [T-0045](T-0045.md) | Customer credit notes | MVP | todo | T-0040, T-0031 | UC-11 | 4 |
 | [T-0046](T-0046.md) | Customer receipts and allocations | MVP | todo | T-0040, T-0031 | UC-03 | 2 |
-| [T-0047](T-0047.md) | Customer prepayments, deposit invoices and application to final invoice | MVP | todo | T-0046 | — | 0 |
-| [T-0048](T-0048.md) | Bad debt write-off with GST decreasing adjustment | MVP | todo | T-0046, T-0035 | — | 0 |
+| [T-0047](T-0047.md) | Customer prepayments, deposit invoices and application to final invoice; gst_supply_pattern, single-supply path (GP-012-B/GP-015-B), BAS-prep display — gated on its accounting decision | MVP | todo | T-0046, T-0035, T-0124 | — | 2 |
+| [T-0048](T-0048.md) | Bad debt write-off with GST decreasing adjustment; write-off against the ECL allowance (GP-007-A) | MVP | todo | T-0046, T-0035, T-0121, T-0124 | — | 1 |
 | [T-0049](T-0049.md) | Customer statements and aged receivables | MVP | todo | T-0046 | UC-12 | 1 |
 | [T-0050](T-0050.md) | Supplier bills entry and suggested coding | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0031 | UC-05 | 3 |
 | [T-0051](T-0051.md) | Bills inbox: inbound email PDF → draft bill | MVP | todo | T-0050 | UC-05 | 1 |

@@ -91,6 +91,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0042](0042-gl-read-routes-chart-journal-list-preview.md) | GL read routes for the web screens: chart of accounts, manual-journal list and the engine preview of a stored journal | architecture | no | Proposed |
 
 | [0043](0043-ci-security-scanners.md) | Fail-closed CI scans with local rules and verified tooling | security | yes | Accepted |
-| [0044](0044-gst-tax-determination-matrix.md) | GST tax determination: party and product tax classes, effective-dated `app.tax_determination` matrix (code/confirm/manual), product-inherent classes first, no party-only GST-free default | accounting | yes | Proposed (may be accepted by claude under DL-0282 after persona re-review) |
+| [0044](0044-gst-tax-determination-matrix.md) | GST tax determination: party and product tax classes, effective-dated `app.tax_determination` matrix (code/confirm/manual), product-inherent classes first, no party-only GST-free default | accounting | yes | Accepted (claude under DL-0282 after persona re-review DL-0285; DL-0286) |
 
 Next free number: **0045** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

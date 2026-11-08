@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 206 scenarios (25 need screenshots, recounted 2026-11-08 by the lead); SS-PLAT-100..103 added 2026-11-08 (T-0038); SS-PLAT-104..105 added 2026-11-08 (T-0039); SS-UC01-12..14 added 2026-11-08 (T-0065); SS-PLAT-130..134 added 2026-11-08 (T-0121..T-0125, ids 106..129 left for running builders).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 206 scenarios (25 need screenshots, recounted 2026-11-08 by the lead); SS-PLAT-100..103 added 2026-11-08 (T-0038); SS-PLAT-104..105 added 2026-11-08 (T-0039); SS-UC01-12..14 added 2026-11-08 (T-0065); SS-PLAT-130..134 added 2026-11-08 (T-0121..T-0125, ids 106..129 left for running builders); SS-PLAT-135..139 added 2026-11-08 (T-0123, T-0126, T-0047, T-0048; ADR-0044 re-review DL-0285/DL-0286).
 
 ## How to update (who, when)
 
@@ -229,6 +229,11 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-132 | Tax determination precedence: explicit line code, product-inherent class, matrix cell, else NO_TAX_RULE named refusal | — | MVP | unit | no | — | T-0123 | not-started | — | — |
 | SS-PLAT-133 | No resolution returns FRE/EXP/EXS from a party default alone (fast-check invariant) | — | MVP | unit (property) | no | — | T-0123 | not-started | — | — |
 | SS-PLAT-134 | Balance sheet presents net customer credit balances as a liability and supplier debit balances as an asset | — | MVP | db-integration | no | — | T-0125 | not-started | — | — |
+| SS-PLAT-135 | Every resolved document line stores its tax resolution trace (step, determination row, classes, tax date); credit notes, adjustment notes and reversals take the original line's code, confirmation and trace and never re-resolve | — | MVP | db-integration | no | — | T-0123 | not-started | — | — |
+| SS-PLAT-136 | Tax report lists posted EXP lines without an export evidence reference and flags those past the s 38-185 60-day period | — | MVP | unit + db-integration | no | — | T-0126 | not-started | — | — |
+| SS-PLAT-137 | Deposit invoices and prepayment receipts carry a gst_supply_pattern shown on the BAS-prep report; a single_supply deposit is refused until the single-supply path exists, never posted as Div 156 | — | MVP | db-integration | no | — | T-0047 | not-started | — | — |
+| SS-PLAT-138 | Single-supply deposits attribute the whole GST at first payment (GP-012-B) and the final invoice clears GST_ATTRIBUTED_UNBILLED (GP-015-B), green in the golden runner | — | MVP | golden | no | — | T-0047 | not-started | — | — |
+| SS-PLAT-139 | Bad-debt write-off against the ECL allowance (GP-007-A) is green in the golden runner; any excess goes to the bad-debt account | — | MVP | golden | no | — | T-0048 | not-started | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
