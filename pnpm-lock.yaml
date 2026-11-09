@@ -345,9 +345,15 @@ importers:
         specifier: 0.29.7
         version: 0.29.7
     devDependencies:
+      '@ledgerforce/bank':
+        specifier: workspace:*
+        version: link:../bank
       '@ledgerforce/gl':
         specifier: workspace:*
         version: link:../gl
+      '@ledgerforce/parties':
+        specifier: workspace:*
+        version: link:../parties
       '@types/node':
         specifier: 22.20.5
         version: 22.20.5

@@ -2346,3 +2346,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: design §6.5 rule 3 is about who put the content there; RQ-0116 F4. The fast-check property found a NULL `entered_by` case in the first version of the deferred trigger, fixed with IS NOT DISTINCT FROM.
 - Alternatives: only `entered_by` (rejected: an approver could edit then approve their own figures); DELETE lines on edit (rejected: directive 6, no DELETE grant).
 - ADR: none · Status: accepted
+
+### DL-0350 — T-0054 research gate: no RQ needed; built to the Proposed security ADRs
+- Date: 2026-11-09 · By: claude · Task: T-0054 · Category: security
+- Decision: The card's only open question (§11.2 SoD thresholds) is already answered by DL-0131: `batch_two_releasers` is a tenant setting with the design's placeholder default 10,000.0000, "above" is strictly greater. The card needs no new security decision: maker-checker and two releasers are SOD_BATCH_SELF_RELEASE / SOD_BATCH_SAME_RELEASER (ADR-0026, T-0015), step-up on `ap.payment_batch.release` is ADR-0025 (T-0013), release roles Owner + Approver are ADR-0023, cooling-off is ADR-0030 (T-0053). ADR-0016/0018/0023/0025 are all still **Proposed** (security, human gate); T-0054 is built to them like T-0013/T-0015/T-0053 were, and the gate stays with the human.
+- Why: AGENTS.md §2 research gate; §6 human gates (no new security ADR is introduced, so none is opened).
+- Alternatives: an RQ restating DL-0131 (rejected: no unknown); stopping until the ADRs are accepted (rejected: the established practice is to build to Proposed ADRs and leave acceptance to the owner).
+- ADR: ADR-0023, ADR-0025, ADR-0026 (Proposed) · Status: accepted (thresholds remain §11.2 placeholders)
+
+### DL-0351 — "Approved due bills" are posted bills with an open AP item; one payment per bill for its open amount
+- Date: 2026-11-09 · By: claude · Task: T-0054 · Category: architecture
+- Decision: `listPayableBills` proposes bills with status `posted` and an approver (an approved bill posts on approval, T-0052), whose AP open item (`app.subledger_entry`, AP_CONTROL) is still open, due on or before the given date (or exactly the `billIds` chosen), in the paying bank account's currency, and without a scheduled payment in another batch. Each becomes one payment for its full open amount (−open_amount) to the supplier's active verified account (GP-009: one AP line per bill). The total is summed with `Money` (decimal.js).
+- Why: UC-06 SS-UC06-01 "totalling the bills' open amounts"; only a posted bill has an AP liability to pay; GP-009 Q6.
+- Alternatives: include `approved` unposted bills (rejected: no open item, nothing to allocate at confirmation); partial payments per bill (rejected: not in UC-06 MVP); one payment per supplier (rejected: GP-009 per-bill lines).
+- ADR: none · Status: accepted
+
+### DL-0352 — Payment batch data model (migration 0042): status only through a SECURITY DEFINER release function
+- Date: 2026-11-09 · By: claude · Task: T-0054 · Category: security
+- Decision: Tables `app.payment_batch`, `payment_batch_payment`, `payment_batch_exclusion`, `payment_batch_release`, all tenant-owned (RLS ENABLE + FORCE, cross-tenant covered). lf_app gets SELECT + INSERT on the batch, payments and exclusions and SELECT only on releases; no UPDATE grant at all, so the status moves only through `app.payment_batch_release(batch, actor, session)`. Total, count and required releasers are frozen at creation; payments and exclusions are added only while the batch is `created` with no release (advisory lock shared with the release function); a bill has at most one `scheduled` payment (partial unique index). Statuses `confirmed` and `cancelled` (and payment statuses `paid`, `rejected`, `cancelled`) are reserved in the CHECKs for T-0056/T-0057/T-0150 because the runner forbids dropping a constraint later; no transition into them exists yet.
+- Why: design §6.5 rule 1 must hold even if the module is bypassed (defence in depth, as bank-detail changes in 0025); directive 6 (nothing deleted).
+- Alternatives: lf_app UPDATE with a guard trigger (rejected: a direct UPDATE could skip step-up); a status history table (rejected: releases already are the history).
+- ADR: none (within ADR-0025/0026) · Status: accepted
+
+### DL-0353 — Release order: permission → step-up → SoD, all repeated in the database; payees re-checked at release
+- Date: 2026-11-09 · By: claude · Task: T-0054 · Category: security
+- Decision: `releasePaymentBatch` checks `ap.payment_batch.release`, then a fresh MFA step-up of the acting session (`app.payment_batch_step_up_fresh`, the ADR-0025 300 s rule of 0025) and answers `step_up_required` without writing, then evaluates the SoD engine; a denial writes a `sod_violation` audit row and returns `denied` (commit to keep it), small-team mode allows it only with a recorded exception. The database function repeats permission (role mirror), step-up, both SoD rules (with the small-team exception), the frozen total and count, and that every payee's scheduled account is still its active, verified and payable account (else PAYEE_INELIGIBLE). Required releasers = max(frozen, value under current settings), so lowering the threshold after creation never removes a releaser. Nothing posts at release (GP-009).
+- Why: API interceptor order (ADR-0025/0026); design §6.5 rule 2 (details changed after the batch was built must not be paid); fail closed.
+- Alternatives: step-up only in the API (rejected: no route yet, and the module is callable directly); re-check payees only at file generation (rejected: release is the authorisation point).
+- ADR: none (ADR-0025, ADR-0026) · Status: accepted
+
+### DL-0354 — T-0054 test file and dev-only workspace devDependencies
+- Date: 2026-11-09 · By: claude · Task: T-0054 · Category: tooling
+- Decision: The card's `payment-batch.release.spec.ts` is `packages/modules/ap/src/payment-batch.release.db.test.ts`, because the `db` Vitest project only collects `*.db.test.ts`. `@ledgerforce/ap` gains dev-only workspace devDependencies `@ledgerforce/bank` (company bank account for the batch) and `@ledgerforce/parties` (the real bank-detail request/verify flow in tests); the module itself calls `app.party_payment_eligibility` in SQL and adds no runtime dependency. API routes and cancellation are follow-up T-0150.
+- Why: AGENTS.md §4 (dev tooling → decision log); tests use the real workflows, not seeded rows.
+- Alternatives: a runtime dependency on parties (rejected: one SQL function call suffices); seeding verified bank details with SQL (rejected: would bypass the 0025 workflow under test).
+- ADR: none · Status: accepted

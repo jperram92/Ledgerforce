@@ -136,6 +136,7 @@ graph LR
 | [T-0124](T-0124.md) | Golden Drafts GP-007-A, GP-012-B, GP-015-B + review MINOR corrections (golden_postings gate, delegated DL-0253/DL-0282; never edits Approved) (est. 300 lines) | MVP | todo | T-0121 | UC-09 | 0 |
 | [T-0126](T-0126.md) | Tax report: posted EXP lines without export evidence, flagged past the s 38-185 60-day period (ADR-0044 R4; follow-up to T-0035) (est. 200 lines) | MVP | todo | T-0035, T-0123 | UC-05 | 1 |
 | [T-0145](T-0145.md) | BAS calculation-worksheet labels: INP sales G4, purchases without GST G14 (follow-up to T-0121 AC-4, DL-0341) (est. 250 lines) | MVP | todo | T-0035, T-0121 | UC-05 | 1 |
+| [T-0150](T-0150.md) | Payment batch API routes (create, release with step-up and SoD) and batch cancellation (follow-up to T-0054) (est. 300 lines) | MVP | todo | T-0054 | UC-06 | 0 |
 | [T-0135](T-0135.md) | Credit-note API routes: RBAC, @SoD credit_note.create/approve with the small-team exception path (follow-up to T-0045) (est. 250 lines) | MVP | todo | T-0045, T-0015 | UC-11 | 1 |
 | [T-0136](T-0136.md) | BAS: later-period credit notes at 1B with option sales_adjustment_presentation (RQ-0095 Q4; follow-up to T-0035/T-0045) (est. 200 lines) | MVP | todo | T-0035, T-0045 | UC-11 | 1 |
 | [T-0140](T-0140.md) | Bill API routes (submit/approve/reject/send back) and one shared SoD store for API and modules (follow-up to T-0052) (est. 300 lines) | MVP | todo | T-0052 | UC-05 | 0 |
