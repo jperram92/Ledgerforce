@@ -1,0 +1,5 @@
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |unit| packages/modules/ar/src/bad-debt-journal.test.ts [ packages/modules/ar/src/bad-debt-journal.test.ts ]
+Error: Cannot find module './bad-debt-journal.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-ab2a87bf189e9c0fa/packages/modules/ar/src/bad-debt-journal.test.ts
+      7|   BadDebtError,
+ Test Files  1 failed (1)

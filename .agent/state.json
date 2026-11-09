@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0054-payment-batches",
+  "current_task": "T-0048",
+  "branch": "feat/T-0048-bad-debt",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "claude",
+  "lease_expires_at": "2026-11-09T10:20:43.896Z",
   "last_green_commit": "638267bf0db6e1390a94770e66f764610a853a69",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-09T09:16:35.201Z",
+  "updated_at": "2026-11-09T09:35:43.907Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -63,7 +63,8 @@
     "T-0039": 1,
     "T-0040": 1,
     "T-0121": 1,
-    "T-0054": 1
+    "T-0054": 1,
+    "T-0048": 1
   },
   "failures": {},
   "providers": {},
