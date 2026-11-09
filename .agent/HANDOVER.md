@@ -292,3 +292,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-09T04:03:00.375Z claude: release T-0052 → review (All criteria green; verify 12/3/1 with only the known failures (run.test.ts artefact 2a/3, golden diff guard 4); gate 8 needs codex cross-review)
 - 2026-11-09T04:38:48.097Z claude: checkpoint: 2/7 — Drafts proposed; runner draft mode GP-007-A PASS
 - 2026-11-09T09:04:22.769Z claude: release T-0124 → verifying (awaiting persona re-review + delegated approval (DL-0282))
+- 2026-11-09T09:29:10.710Z claude: release T-0124 → review (RC-1..RC-5 applied; new entries approved and ADR-0045 accepted under DL-0282 after persona re-review DL-0386 (DL-0387); verify 12/3/1 with only known failures (run.test.ts 2a/3, golden diff guard 4); gate 8 needs codex cross-review)
