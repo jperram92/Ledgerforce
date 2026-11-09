@@ -293,3 +293,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-09T04:39:06.688Z claude: T-0054 → in_progress
 - 2026-11-09T04:39:06.908Z claude: checkpoint (commit deferred to conductor): 5/8 — payment batches: build, exclusions, maker-checker, step-up release green (16/16)
 - 2026-11-09T09:04:46.526Z claude: T-0054 → verifying
+- 2026-11-09T09:16:35.202Z claude: release T-0054 → review (verify 12 PASS / 3 known FAIL (run.test.ts worktree path, gate 3 mirror, golden diff guard) / 1 PENDING cross-review; awaiting codex cross-review)
