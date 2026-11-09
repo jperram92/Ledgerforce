@@ -2223,3 +2223,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: keep the assigned number without committing stand-ins (directive 6 would then forbid removing them).
 - Alternatives: renumber to 0033 (rejected: collides with the reservation); commit placeholders (rejected: DL-0268's problem).
 - ADR: none · Status: accepted
+
+### DL-0330 — Bills post only when approved; approval workflow and migration 0041
+- Date: 2026-11-08 · By: claude · Task: T-0052 · Category: security
+- Decision: `postBill` posts **approved** bills only (tightens DL-0292 as it required); `previewBill` still previews draft, awaiting and approved bills. Workflow `draft → awaiting_approval → approved → posted`, with `awaiting_approval → draft` (reject, reason) and `approved → draft` (send back, reason; clears the approval, so an edited bill is resubmitted and approved again). Migration 0041 enforces the transitions in the database (draft → posted / approved refused; drafts carry no approval facts; submission and approval frozen; the posted entry carries the bill's approver), repeats design §6.5 rule 3 at commit in a deferred constraint trigger (as 0029 for journals), and adds the append-only `app.bill_approval_event` trail (tenant_id, RLS ENABLE+FORCE, lf_app SELECT/INSERT). Approval posts in the same transaction by default (UC-05 step 4); `post: false` leaves it approved (UC-05 A2: posting with an override later). The approval columns come from `ALTER TABLE ... ADD COLUMN` and a second trigger; 0038's `bill_guard` is untouched (additive).
+- Why: T-0052 card, DL-0292, UC-05, RQ-0116 F3/F7.
+- Alternatives: replace `app.bill_guard` with CREATE OR REPLACE (rejected: an additive second trigger keeps 0038 unchanged); approve-only with posting always a separate call (rejected: UC-05 step 4 "on approval the bill posts").
+- ADR: none (ADR-0026 SoD model unchanged) · Status: accepted
+
+### DL-0331 — The bill self-approval amount is the gross total frozen at submit
+- Date: 2026-11-08 · By: claude · Task: T-0052 · Category: security
+- Decision: The amount compared with `bill_self_approval_threshold` is the bill's gross total in base currency (the AP control credit) from the posting engine's preview at submit, stored as `app.bill.approval_amount`. A bill dated in an AP-locked period may still be submitted: its total is then the Σcredit of the same built command (coding, tax codes and duplicates still checked), and the lock is decided at post. Submit also freezes the resolved coding on the lines (lines change only while draft), so the approver approves exactly what posts.
+- Why: SS-UC05-05 "a $2,750 bill" is GP-008's gross (net 2,500.00); RQ-0116 F1, F3.
+- Alternatives: net amount (rejected: contradicts SS-UC05-05); recompute at approval (rejected: lines cannot change after submit, so a frozen value is equal and auditable); refuse submit in a locked period (rejected: blocks UC-05 A2).
+- ADR: none · Status: accepted (threshold values remain §11.2 placeholders, DL-0131)
+
+### DL-0332 — Bill SoD runs in the AP module; refusals are returned and audited, not thrown
+- Date: 2026-11-08 · By: claude · Task: T-0052 · Category: architecture
+- Decision: `approveBill` evaluates SOD_BILL_SELF_APPROVAL with the T-0015 `evaluateSod`, reading history (`app.sod_action`), settings (latest `app.sod_settings`) and other eligible approvers (`ap.bill.approve`) under RLS, under the API's per-subject advisory lock key (`lf.sod:<tenant>:bill:<id>`). A refusal writes `audit.audit_log` (`sod_violation`, the API interceptor's shape) and an `approval_denied` event and returns `{outcome:'denied', rule}`; the caller commits. The settings/eligibility readers duplicate `apps/api/src/sod/sod.service.ts` for now (a module cannot import from apps/api); follow-up T-0140 builds one shared store and adds the bill API routes.
+- Why: no bills API exists yet and the scenarios are db-integration at module level; a thrown refusal would roll back its own audit row. RQ-0116 F6.
+- Alternatives: enforce only in the API with `@SoD` (rejected: no route yet, and the module would post unchecked); move the readers now (rejected: touches the API's SoD path outside this card's scope; T-0140).
+- ADR: none (ADR-0026) · Status: accepted
+
+### DL-0333 — Whoever enters or edits a bill is its enterer; draft edits never delete lines
+- Date: 2026-11-08 · By: claude · Task: T-0052 · Category: security
+- Decision: `createBill` (with `enteredBy`) and `updateDraftBill` record SoD step `bill.enter` for the actor, so an editor cannot self-approve above the threshold; `entered_by` on the bill also counts (the database check uses both, NULL-safe). `updateDraftBill` replaces existing lines by number and appends new ones; fewer lines than stored are refused because lines are never deleted (directive 6). Line removal is researched in T-0140.
+- Why: design §6.5 rule 3 is about who put the content there; RQ-0116 F4. The fast-check property found a NULL `entered_by` case in the first version of the deferred trigger, fixed with IS NOT DISTINCT FROM.
+- Alternatives: only `entered_by` (rejected: an approver could edit then approve their own figures); DELETE lines on edit (rejected: directive 6, no DELETE grant).
+- ADR: none · Status: accepted
