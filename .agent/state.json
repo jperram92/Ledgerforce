@@ -4,10 +4,10 @@
   "branch": "feat/T-0054-payment-batches",
   "step": "5/8 — payment batches: build, exclusions, maker-checker, step-up release green (16/16)",
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-09T05:24:06.904Z",
+  "lease_expires_at": "2026-11-09T09:49:46.524Z",
   "last_green_commit": "445848ec56cfdf7943d11ad1f2df13cd8e60e094",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-09T04:39:06.906Z",
+  "updated_at": "2026-11-09T09:04:46.526Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
