@@ -165,6 +165,16 @@ describe('SS-PLAT-12 parser: GP sections', () => {
     expect(gp?.approval).toBe('JP, 2026-11-10');
   });
 
+  it('reads the delegated approval status of a re-reviewed entry with its full note [T-0124]', () => {
+    const note =
+      'owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09';
+    const [gp] = parseGoldenPostings(
+      entry(GP_A.replace('**Status: Draft**', `**Status: Approved (${note})**`)),
+    );
+    expect(gp?.status).toBe('Approved');
+    expect(gp?.approval).toBe(note);
+  });
+
   it('treats a proposal status "Draft (proposed by claude, T-0099)" as Draft', () => {
     const md = entry(
       GP_A.replace('**Status: Draft**', '**Status: Draft (proposed by claude, T-0099)**'),
@@ -321,8 +331,31 @@ describe('SS-PLAT-12 parser: the real Docs/accounting/postings.md', () => {
       expect(by(id)?.status, id).toBe('Approved');
     }
     const a = by('GP-007-A');
-    expect(a?.sourceTypes).toEqual(['manual_journal', 'ar.write_off', 'ar.write_off']);
-    expect(a?.journals.map((j) => j.date)).toEqual(['2027-06-30', '2027-12-01', '2027-12-01']);
+    // RC-1 (persona re-review DL-0386): gross allowance A1 1,375.00 and the A4 remeasurement.
+    expect(a?.sourceTypes).toEqual([
+      'manual_journal',
+      'ar.write_off',
+      'ar.write_off',
+      'manual_journal',
+    ]);
+    expect(a?.journals.map((j) => j.date)).toEqual([
+      '2027-06-30',
+      '2027-12-01',
+      '2027-12-01',
+      '2027-12-31',
+    ]);
+    expect(a?.journals.map((j) => j.total.debit)).toEqual([
+      '1375.00',
+      '1375.00',
+      '1375.00',
+      '125.00',
+    ]);
+    // RC-2: GP-012-B line 2 carries the attribution code GST-UB.
+    expect(by('GP-012-B')?.journals[0]?.lines[1]?.tax).toEqual({
+      codes: ['GST-UB'],
+      amount: '700.00',
+      note: null,
+    });
     expect(by('GP-012-B')?.sourceTypes).toEqual(['ar.prepayment']);
     expect(by('GP-012-B')?.entryDate).toBe('2026-11-10');
     expect(by('GP-015-B')?.sourceTypes).toEqual(['ar.invoice']);

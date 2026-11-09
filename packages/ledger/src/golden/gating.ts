@@ -43,15 +43,15 @@ export const GOLDEN_REQUIRES: Readonly<Record<string, GoldenRequirement>> = Obje
     why: 'reversal path: the engine refuses raw ledger_reversal commands; a reversal must be produced from the original entry',
   },
   // T-0124 (DL-0381): the single-supply variants need the system role GST_ATTRIBUTED_UNBILLED and
-  // the gst_supply_pattern classification (ADR-0045, Proposed) plus the BAS-query rule for the
-  // attribution line (T-0035); T-0047 builds them and depends on T-0035.
+  // the gst_supply_pattern classification and the attribution tax code GST-UB with its BAS rows
+  // (ADR-0045 R6, persona re-review DL-0386); T-0047 builds them and depends on T-0035.
   'GP-012-B': {
     task: 'T-0047',
-    why: 'single-supply path: system role GST_ATTRIBUTED_UNBILLED, gst_supply_pattern and the BAS attribution rule (ADR-0045, T-0035) do not exist yet',
+    why: 'single-supply path: system role GST_ATTRIBUTED_UNBILLED, tax code GST-UB with its accruals-only BAS rows, and gst_supply_pattern (ADR-0045, T-0035) do not exist yet',
   },
   'GP-015-B': {
     task: 'T-0047',
-    why: 'single-supply path: system role GST_ATTRIBUTED_UNBILLED, gst_supply_pattern and the BAS attribution rule (ADR-0045, T-0035) do not exist yet',
+    why: 'single-supply path: system role GST_ATTRIBUTED_UNBILLED, tax code GST-UB with its accruals-only BAS rows, and gst_supply_pattern (ADR-0045, T-0035) do not exist yet',
   },
 });
 

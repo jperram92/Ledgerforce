@@ -616,25 +616,26 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-007-A — Bad debt write-off against an ECL allowance (AASB 9 variant of GP-007)
 
-- **Status: Draft (proposed by claude, T-0124)** · Phase: MVP · Source type: `manual_journal` + `ar.write_off` + `ar.write_off` · Use cases: — (AR) · Design: §3.8 row 5 · Review: DL-0280 MAJOR 2, DL-0283, DL-0286 (M6)
-- **Supersedes GP-007 (part):** adds the allowance path beside GP-007; it does not replace it. GP-007 stays valid for
+- **Status: Draft (proposed by claude, T-0124)** · Phase: MVP · Source type: `manual_journal` + `ar.write_off` + `ar.write_off` + `manual_journal` · Use cases: — (AR) · Design: §3.8 row 5 · Review: DL-0280 MAJOR 2, DL-0283, DL-0286 (M6)
+- **Variant of GP-007 (complements; GP-007 unchanged):** adds the allowance path beside GP-007. GP-007 stays valid for
   **direct write-off** (no allowance held — many non-reporting SMBs). This entry covers an entity that applies the
   AASB 9 simplified expected-credit-loss approach to trade receivables (AASB 9 ¶5.5.15) and writes off against the
   allowance (¶5.4.4). Only the product owner (or claude under DL-0282, after persona re-review) changes this status.
 - **Scenario:** INV-000140 to Acme dated 2026-11-05, terms 14 days (due 2026-11-19), $1,375.00 (1,250.00 + GST 125.00,
   same lines as GP-001), never paid. Company GST basis: accruals. At the year end 2027-06-30 the company provides an
-  ECL allowance of 1,250.00 for it — the expected loss net of the GST that the bad-debt adjustment will recover
-  (A1). On 2027-12-01 the debt is written off: it is then overdue more than 12 months (due 2026-11-19, so 12 months
+  ECL allowance of 1,375.00 for it — the lifetime expected credit loss on the GST-inclusive gross carrying amount
+  (AASB 9 ¶5.5.15; receivables include GST, AASB Int 1031). The Div 21 GST relief is not a cash flow of the
+  receivable and is recognised only when the decreasing adjustment arises (A2). On 2027-12-01 the debt is written off: it is then overdue more than 12 months (due 2026-11-19, so 12 months
   were reached on 2027-11-19 — s 21-5(1)(b) is checkable) and the write-off uses the allowance (A2). A3 shows the
-  excess rule on the same invoice when the allowance held is only 1,000.00.
+  excess rule on the same invoice when the allowance available is only 1,000.00.
 
 **A1 — ECL allowance recognised at the year end 2027-06-30 (adjusting manual journal)**
 
 | # | Account | Ref | Debit | Credit | Tax code | Party |
 |---|---|---|---:|---:|---|---|
-| 1 | setting:ar.bad_debt_account | 6500 | 1,250.00 | | — | — |
-| 2 | setting:ar.ecl_allowance_account | 1290 | | 1,250.00 | — | — |
-| | **Total** | | **1,250.00** | **1,250.00** | | |
+| 1 | setting:ar.bad_debt_account | 6500 | 1,375.00 | | — | — |
+| 2 | setting:ar.ecl_allowance_account | 1290 | | 1,375.00 | — | — |
+| | **Total** | | **1,375.00** | **1,375.00** | | |
 
 **A2 — write-off against the allowance on 2027-12-01**
 
@@ -655,14 +656,29 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 | 4 | system:AR_CONTROL | 1200 | | 1,375.00 | — | Acme |
 | | **Total** | | **1,375.00** | **1,375.00** | | |
 
-- **Check:** A1 1,250.00 = 1,250.00 ✓ · A2 1,250.00 + 125.00 = 1,375.00 = 1,375.00 ✓ · A3 1,000.00 + 250.00 + 125.00 =
-  1,375.00 = 1,375.00 ✓ · after A1 + A2 the allowance for INV-000140 is 0.00 and the P&L shows the 1,250.00 loss
-  once (in the period of A1), exactly as GP-007 shows it at write-off · ADJ-BD tax amounts: 1,250.00 × 10% = 125.00;
+**A4 — remeasurement after the write-off (adjusting manual journal, 2027-12-31): release of the GST portion left in the allowance**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | setting:ar.ecl_allowance_account | 1290 | 125.00 | | — | — |
+| 2 | setting:ar.bad_debt_account | 6500 | | 125.00 | — | — |
+| | **Total** | | **125.00** | **125.00** | | |
+
+In practice A4 is part of the next period-end remeasurement of the whole allowance.
+
+- **Check:** A1 1,375.00 = 1,375.00 ✓ · A2 1,250.00 + 125.00 = 1,375.00 = 1,375.00 ✓ · A3 1,000.00 + 250.00 + 125.00 =
+  1,375.00 = 1,375.00 ✓ · A4 125.00 = 125.00 ✓ · after A1 + A2 + A4 the allowance for INV-000140 is 0.00; the P&L
+  shows 1,375.00 in FY2027 (A1) and −125.00 in FY2028 (A4), a life-of-debt loss of 1,250.00 = GP-007 · ADJ-BD tax amounts: 1,250.00 × 10% = 125.00;
   A3 1,000.00 × 10% = 100.00 and 250.00 × 10% = 25.00, Σ 125.00 = the GST line (1/11 of 1,375.00).
-- **Allowance rule:** the write-off debits the allowance up to the amount held for the debt (net of GST); **any excess
-  debits `setting:ar.bad_debt_account`** on its own line with the same ADJ-BD tax split (A3). An allowance larger
+- **Allowance rule:** The write-off charges to the allowance the written-off amount **excluding GST** (the GST portion
+  is relieved through ADJ-BD), up to the amount the user assigns from the allowance. The default is the lesser of that
+  ex-GST amount and the allowance account's credit balance, and it never takes the allowance to a debit balance. Any
+  excess debits `setting:ar.bad_debt_account` on its own line with the same ADJ-BD tax split (A3). Any allowance left
+  (A2: 125.00) is released at the next remeasurement (A4). An allowance larger
   than the loss is released by a separate adjusting journal (Dr allowance / Cr `setting:ar.bad_debt_account`), not
   by the write-off.
+- **Policy note:** A tenant may adopt, as a documented accounting policy, measurement net of the recoverable GST
+  (A1 = 1,250.00, no A4); A1 is a manual estimate, so the engine is unaffected.
 - **Accounts:** the allowance is `setting:ar.ecl_allowance_account` — chart v2 **1290 Allowance for expected credit
   losses** (asset, receivable, credit normal, contra-receivable, **not** a control account; T-0121, DL-0340/DL-0342).
   The impairment expense is the existing bad-debt setting (chart 6500 Bad debts). Ref codes in this entry are the
@@ -670,11 +686,16 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 - **Source types:** A1 is a period-end **adjusting manual journal** (`manual_journal`, period class `journal`): it
   touches neither AR_CONTROL nor any subledger, the allowance is not a control account and the estimate is an
   accountant's judgement. T-0048 may add an automated ECL run with its own source type (`ar.ecl_provision`, DL-0286);
-  that would be a further superseding Draft of A1's source type with the same lines. A2/A3 are `ar.write_off`, as GP-007.
+  that would be a further superseding Draft of A1's source type with the same lines, and must store the run inputs
+  (ageing buckets, loss rates, forward-looking adjustment). Until then the provision-matrix working is attached to the
+  manual journal, and A1 is posted as a remeasurement to the target balance at each reporting date (persona re-review
+  Q13, DL-0386). A2/A3 are `ar.write_off`, as GP-007; A4 is a `manual_journal` remeasurement.
 - **Subledger:** A2/A3 write-off document −1,375.00 allocated to INV-000140 → open 0.00, status Written off. A1 has no
   subledger effect (the allowance is portfolio-level; aged AR still shows INV-000140 gross until written off).
-- **Tax/BAS (accruals):** A1 none (no GST event — an allowance is not a write-off for s 21-5). A2/A3 decreasing
-  adjustment **1B +125.00** in the period of the write-off (2027-12), as GP-007. **Cash basis:** same ledger lines, no
+- **Tax/BAS (accruals):** A1 and A4 none (no GST event — an allowance is not a write-off for s 21-5). A2/A3 decreasing
+  adjustment **1B +125.00** in the period of the write-off (2027-12), as GP-007. Monthly reporters: see s 21-5 (the
+  debt reached 12 months overdue on 2027-11-19); the engine attributes 1B at the write-off date, which is later and
+  so conservative. **Cash basis:** same ledger lines, no
   BAS effect (the GST was never attributed). A later recovery is an increasing adjustment at 1A (as GP-007).
 - **Presentation:** 1290 is shown as a deduction from trade receivables (net carrying amount).
 - **Runner:** runs now on the chart-v2 golden world (T-0124). Producing it from a document needs T-0048 (write-off
@@ -682,9 +703,10 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-012-B — Uninvoiced part payment for a single (non-Div 156) supply, accruals basis (variant beside GP-012)
 
-- **Status: Draft (proposed by claude, T-0124)** · Phase: MVP · Source type: `ar.prepayment` · Use cases: UC-09 · Design: §3.8 row 10 · Review: DL-0280 MAJOR 1, DL-0283, DL-0286 (M6) · Decision: ADR-0045 (Proposed)
-- **Supersedes GP-012 (part):** a variant for receipts classified `gst_supply_pattern = single_supply`. GP-012, GP-013,
-  GP-014 and GP-015 stay valid, unchanged, for `progressive_div156` (the default for milestone or periodic services)
+- **Status: Draft (proposed by claude, T-0124)** · Phase: MVP · Source type: `ar.prepayment` · Use cases: UC-09 · Design: §3.8 row 10 · Review: DL-0280 MAJOR 1, DL-0283, DL-0286 (M6) · Decision: ADR-0045
+- **Variant of GP-012; supersedes only GP-012's *Residual risk* note:** for receipts classified
+  `gst_supply_pattern = single_supply`. GP-012, GP-013,
+  GP-014 and GP-015 stay valid, unchanged, for `progressive_div156` (milestone or periodic services)
   and the Div 99 security-deposit variant. The **cash basis always uses GP-012** (s 29-5(2): GST to the extent of the
   consideration received).
 - **Scenario:** 2026-11-10 Acme pays $3,300.00 by EFT before any invoice: 30% of an $11,000.00 GST-inclusive project
@@ -698,17 +720,19 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 | # | Account | Ref | Debit | Credit | Tax code | Party |
 |---|---|---|---:|---:|---|---|
 | 1 | bank:OPERATING | 1010 | 3,300.00 | | — | — |
-| 2 | system:GST_ATTRIBUTED_UNBILLED | new (ADR-0045) | 700.00 | | GST (tax 700.00 attribution only) | Acme |
+| 2 | system:GST_ATTRIBUTED_UNBILLED | new (ADR-0045) | 700.00 | | GST-UB (tax 700.00) | Acme |
 | 3 | system:CUSTOMER_PREPAYMENTS | 2400 | | 3,000.00 | GST (tax 300.00) | Acme |
 | 4 | tax:GST.collected | 2310 | | 1,000.00 | GST | — |
 | | **Total** | | **4,000.00** | **4,000.00** | | |
 
 - **Check:** 3,300.00 + 700.00 = 4,000.00 = 3,000.00 + 1,000.00 ✓ · GST: 300.00 (on the 3,300.00 received, 1/11) +
   700.00 (on the 7,700.00 not yet billed or received, 1/11) = 1,000.00 = 10% of 10,000.00 ✓.
-- **Line 2 (attribution only):** its GST tax amount is an **attribution**, not a sale reduction: by the F4 convention a
-  GST-coded debit line normally reduces 1A, so the BAS query needs the ADR-0045 rule (a GST line on the
-  GST_ATTRIBUTED_UNBILLED role counts as an attribution at G1/1A with the sign of a sale) — T-0035/T-0047. Until that
-  rule and the role exist the runner reports this entry PENDING (`requires` T-0047).
+- **Line 2 (attribution code GST-UB):** the 700.00 is the GST on the 7,000.00 not yet billed or received, attributed
+  now under s 29-5(1). It carries the attribution code **`GST-UB`** (ADR-0045 R6): accruals-only BAS rows, 1A amount
+  `tax`, G1 amount `tax_grossed` (700.00 × 11 = 7,700.00), positive on the debit side; the engine allows `GST-UB` only
+  on the GST_ATTRIBUTED_UNBILLED role. BAS 2026-11: G1 3,300.00 (line 3) + 7,700.00 (line 2) = 11,000.00; 1A 300.00 +
+  700.00 = 1,000.00. Until the role, the code and its rows exist the runner reports this entry PENDING (`requires`
+  T-0047).
 - **Subledger:** unapplied prepayment −3,000.00 net (−3,300.00 gross received) on Acme (customer credit, not an
   AR_CONTROL line), as GP-012; the receipt carries `gst_supply_pattern = single_supply`.
 - **Tax/BAS (accruals) 2026-11:** G1 +11,000.00 (the whole supply's GST-inclusive value is attributed), 1A +1,000.00.
@@ -719,8 +743,8 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-015-B — Final invoice after GP-012-B (single supply, accruals basis)
 
-- **Status: Draft (proposed by claude, T-0124)** · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-09 · Design: §4.3 · Review: DL-0280 MAJOR 1, DL-0283, DL-0286 (M6) · Decision: ADR-0045 (Proposed)
-- **Supersedes GP-015 (part):** the final-invoice variant for `single_supply`; GP-013/GP-015 stay valid for
+- **Status: Draft (proposed by claude, T-0124)** · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-09 · Design: §4.3 · Review: DL-0280 MAJOR 1, DL-0283, DL-0286 (M6) · Decision: ADR-0045
+- **Variant of GP-015 (GP-013/GP-015 unchanged):** the final-invoice variant for `single_supply`; GP-013/GP-015 stay valid for
   `progressive_div156`. Cash basis: GP-013 unchanged.
 - **Scenario:** 2026-12-15 final invoice INV-000152 for the GP-012-B project: Professional services $10,000.00 ex GST,
   less the GP-012-B prepayment applied ($3,000.00 ex GST). All the GST (1,000.00) was attributed in November, so this
@@ -745,9 +769,10 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 - **Tax/BAS (accruals) 2026-12:** G1 0.00, 1A 0.00. Project totals: G1 11,000.00 and 1A 1,000.00, all in 2026-11 ✓.
 - **Deposit invoice classified `single_supply`:** the same pattern applies when the GP-014 deposit invoice is issued for
   a single supply: the invoice issue (2026-11-02) attributes the whole GST — Dr AR_CONTROL 3,300.00, Dr
-  GST_ATTRIBUTED_UNBILLED 700.00 / Cr CUSTOMER_PREPAYMENTS 3,000.00 (GST, tax 300.00), Cr GST collected 1,000.00
+  GST_ATTRIBUTED_UNBILLED 700.00 (GST-UB, tax 700.00) / Cr CUSTOMER_PREPAYMENTS 3,000.00 (GST, tax 300.00), Cr GST collected 1,000.00
   (Σ 4,000.00; G1 +11,000.00, 1A +1,000.00) — and the final invoice is this entry.
-- **Runner:** PENDING (`requires` T-0047) until the role, the classification and the BAS rule exist (ADR-0045).
+- **Runner:** PENDING (`requires` T-0047) until the role, the classification and the tax code GST-UB with its BAS rows
+  exist (ADR-0045). Price variation and cancellation follow ADR-0045 R9 (golden Drafts written by T-0047).
 
 ## Draft errata and notes (T-0124)
 
@@ -770,7 +795,8 @@ of any Approved entry; each says what it supersedes or complements. Each stays `
 - Payday is the date the wages are **paid**, not the pay-period end (2027-07-14, a Wednesday).
   - **GP-010/GP-011** (`ledgerforce_batch`): payday **2027-07-15** (Thu, the GP-011 batch confirmation) → SG due within
     7 business days = **2027-07-26** (Mon: 16, 19, 20, 21, 22, 23, 26 July).
-  - **GP-020** (`provider_debit`): payday **2027-07-14** (the provider debit) → SG due **2027-07-23** (Fri: 15, 16, 19,
+  - **GP-020** (`provider_debit`): payday is the date the provider pays the employees, assumed here to be the
+    debit date **2027-07-14** → SG due **2027-07-23** (Fri: 15, 16, 19,
     20, 21, 22, 23 July).
 - **W1/W2** are reported in the BAS period in which the wages are **paid** (payday), not the period the pay run ends.
   No journal line changes. (Business days exclude weekends; no national public holiday falls in this window.)
@@ -809,9 +835,9 @@ New doubts go below as Q12 onwards.
 | Q9 | Customer refunds: should refunds of credit balances be allowed in AP payment batches (ABA) with the customer's bank details verified by the same workflow as suppliers (§6.5 rule 2)? | GP-006 | Yes — same verification and cooling-off. | **Answered (RQ-0095 Q9, medium):** yes, with supplier-grade bank-detail verification (§6.5 rule 2 extended to customer refunds, DL-0254); refund ≤ open credit; Stripe refund to the original card preferred. GP-006 notes. |
 | Q10 | Deposit invoice account: the §4.5 rule credits CUSTOMER_PREPAYMENTS (liability) on a tax invoice — confirm vs crediting revenue on the deposit invoice. | GP-014, GP-015 | Liability, cleared by the final invoice. | **Answered (RQ-0095 Q10, high):** liability (contract liability, AASB 15 ¶106) confirmed. GP-014 note; GP-014 source type `ar.invoice` (F2). |
 | Q11 | Reversal of an invoice in a later period: should the void be blocked once a receipt/credit is allocated (require credit note instead)? | GP-019 | Void allowed only when open = original (no allocations); otherwise credit note. | **Answered (RQ-0095 Q11, medium):** void only with no allocations **and** in the same BAS period (period not hard-locked); otherwise a credit note. GP-019 note. |
-| Q12 | GP-012-B line 2: is a GST-coded **debit** on GST_ATTRIBUTED_UNBILLED the right carrier for the attribution, with a BAS-query rule that counts it as a sale (ADR-0045 option A), or should the attribution use its own tax code? | GP-012-B, GP-015-B | Role-based BAS rule (ADR-0045 option A). | Open (T-0124) — for the persona re-review / ADR-0045. |
-| Q13 | GP-007-A A1: post the year-end ECL allowance as a `manual_journal` now, or wait for a dedicated `ar.ecl_provision` source type (DL-0286, T-0048)? | GP-007-A | `manual_journal` (adjusting journal; no control account touched). | Open (T-0124) — for the persona re-review. |
-| Q14 | GP-007-A: should the allowance be measured net of the recoverable GST (1,250.00, as drafted) or on the GST-inclusive receivable (1,375.00)? | GP-007-A | Net of GST (review proposal; the GST is recovered by the 1B adjustment). | Open (T-0124) — for the persona re-review. |
+| Q12 | GP-012-B line 2: is a GST-coded **debit** on GST_ATTRIBUTED_UNBILLED the right carrier for the attribution, with a BAS-query rule that counts it as a sale (ADR-0045 option A), or should the attribution use its own tax code? | GP-012-B, GP-015-B | Role-based BAS rule (ADR-0045 option A). | **Answered:** Option B (`GST-UB`), persona re-review 2026-11-09 (`accounting-rereview-20261109.md`, DL-0386). |
+| Q13 | GP-007-A A1: post the year-end ECL allowance as a `manual_journal` now, or wait for a dedicated `ar.ecl_provision` source type (DL-0286, T-0048)? | GP-007-A | `manual_journal` (adjusting journal; no control account touched). | **Answered:** `manual_journal` confirmed; `ar.ecl_provision` with stored matrix inputs when T-0048 automates the matrix (persona re-review 2026-11-09, DL-0386). |
+| Q14 | GP-007-A: should the allowance be measured net of the recoverable GST (1,250.00, as drafted) or on the GST-inclusive receivable (1,375.00)? | GP-007-A | Net of GST (review proposal; the GST is recovered by the 1B adjustment). | **Answered:** Gross (1,375.00), persona re-review 2026-11-09, `accounting-rereview-20261109.md` (DL-0386). |
 
 ## Change history
 
