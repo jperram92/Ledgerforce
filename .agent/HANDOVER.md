@@ -292,3 +292,5 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-09T04:03:00.375Z claude: release T-0052 → review (All criteria green; verify 12/3/1 with only the known failures (run.test.ts artefact 2a/3, golden diff guard 4); gate 8 needs codex cross-review)
 - 2026-11-09T04:37:32.044Z claude: T-0049 → in_progress
 - 2026-11-09T09:04:12.861Z claude: checkpoint (commit deferred to conductor): 4/7 — ageing, statements, as-at reads green
+- 2026-11-09T09:05:03.993Z claude: T-0049 → verifying
+- 2026-11-09T09:17:18.135Z claude: release T-0049 → review (built by claude; verify 11/4/1 with only known failures (run.test.ts, golden diff guard) and a load-only coverage timeout in an untouched test; awaiting codex cross-review)
