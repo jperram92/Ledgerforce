@@ -13,7 +13,7 @@
  * golden tax code gets a fixed id here.
  */
 import { randomUUID } from 'node:crypto';
-import { auServicesSmb } from '@ledgerforce/gl';
+import { auServicesSmb, auServicesSmbV2 } from '@ledgerforce/gl';
 import { sql } from 'kysely';
 import {
   GoldenMappingError,
@@ -32,6 +32,7 @@ import { reverse } from '../reversal.ts';
 import { createLedgerFixture, storedJournal, type LedgerFixture } from './journal-fixture.ts';
 
 const settings = auServicesSmb.suggestedSettings;
+const settingsV2 = auServicesSmbV2.suggestedSettings;
 
 /** Entry date for a golden whose scenario states none (GP-018); inside the fixture's FY2027. */
 export const GOLDEN_DEFAULT_DATE = '2026-11-05';
@@ -48,6 +49,15 @@ export const GOLDEN_BINDING_CODES: Readonly<Record<string, string>> = Object.fre
   'product:SUBSCRIPTION.revenue': '4120',
   'expense: Office expenses': '6150',
   'asset: Computer equipment': '1520',
+});
+
+/**
+ * Bindings that exist only on chart v2 (T-0121, DL-0340): the ECL allowance setting (GP-007-A,
+ * T-0124). A v1 world leaves them unresolved, so a golden that needs them fails loudly there.
+ */
+export const GOLDEN_BINDING_CODES_V2: Readonly<Record<string, string>> = Object.freeze({
+  ...GOLDEN_BINDING_CODES,
+  'setting:ar.ecl_allowance_account': settingsV2.ecl_allowance_account ?? '',
 });
 
 /** tax:<code>.<slot> bindings the file equates with a system role (reference chart). */
@@ -113,13 +123,21 @@ export interface GoldenWorldOptions {
    * reverses first (T-0032).
    */
   postings?: readonly GoldenPosting[];
+  /**
+   * Chart template of the test company: 'v1' (default; T-0018, what module golden tests use) or
+   * 'v2' (T-0121: v1 plus 1290 ECL allowance and 4140, 1500 defaults to CAP). Every v1 binding
+   * keeps its account code on v2; v2 adds the bindings in GOLDEN_BINDING_CODES_V2 (T-0124).
+   */
+  chart?: 'v1' | 'v2';
 }
 
 export async function createGoldenWorld(
   tenantId: string,
   opts: GoldenWorldOptions = {},
 ): Promise<GoldenFixture> {
-  const f = await createLedgerFixture(tenantId);
+  const v2 = opts.chart === 'v2';
+  const f = await createLedgerFixture(tenantId, v2 ? { template: auServicesSmbV2 } : {});
+  const bindingCodes = v2 ? GOLDEN_BINDING_CODES_V2 : GOLDEN_BINDING_CODES;
   const companyId = f.companyId;
 
   const { roles, names, added, parties } = await f.inTenant(async (trx) => {
@@ -179,7 +197,7 @@ export async function createGoldenWorld(
         if (id === undefined) throw new GoldenMappingError(`role ${role} is not bound`);
         return { ref: { role }, accountId: id, label: `${text} → ${named(id)}` };
       }
-      const code = GOLDEN_BINDING_CODES[text];
+      const code = bindingCodes[text];
       const id = code === undefined ? undefined : byCode(code);
       if (id === undefined) {
         throw new GoldenMappingError(`binding ${text} has no account in the golden world`);

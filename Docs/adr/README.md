@@ -92,5 +92,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 
 | [0043](0043-ci-security-scanners.md) | Fail-closed CI scans with local rules and verified tooling | security | yes | Accepted |
 | [0044](0044-gst-tax-determination-matrix.md) | GST tax determination: party and product tax classes, effective-dated `app.tax_determination` matrix (code/confirm/manual), product-inherent classes first, no party-only GST-free default | accounting | yes | Accepted (claude under DL-0282 after persona re-review DL-0285; DL-0286) |
+| [0045](0045-gst-supply-pattern-and-attributed-unbilled-gst.md) | GST attribution for deposits and part payments: `gst_supply_pattern` on the deposit document and a `GST_ATTRIBUTED_UNBILLED` asset role for single (non-Div 156) supplies | accounting | yes | Proposed (T-0124; acceptable by claude under DL-0282 after persona re-review) |
 
-Next free number: **0045** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).
+Next free number: **0046** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

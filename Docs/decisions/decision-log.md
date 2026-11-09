@@ -2346,3 +2346,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: design §6.5 rule 3 is about who put the content there; RQ-0116 F4. The fast-check property found a NULL `entered_by` case in the first version of the deferred trigger, fixed with IS NOT DISTINCT FROM.
 - Alternatives: only `entered_by` (rejected: an approver could edit then approve their own figures); DELETE lines on edit (rejected: directive 6, no DELETE grant).
 - ADR: none · Status: accepted
+
+### DL-0380 — T-0124: superseding golden Drafts GP-007-A, GP-012-B, GP-015-B and errata E-001…E-004 proposed; Approved text untouched
+- Date: 2026-11-09 · By: claude · Task: T-0124 · Category: accounting
+- Decision: `Docs/accounting/postings.md` gains, as **Draft (proposed by claude, T-0124)** only: GP-007-A (write-off against an AASB 9 ECL allowance: A1 allowance 2027-06-30, A2 write-off 2027-12-01, A3 excess-over-allowance variant; INV-000140 dated 2026-11-05, due 2026-11-19), GP-012-B (uninvoiced part payment, single supply, accruals: whole GST 1,000.00 at first payment via GST_ATTRIBUTED_UNBILLED 700.00), GP-015-B (final invoice after GP-012-B: G1/1A 0 in 2026-12; note for a single-supply GP-014 deposit invoice), header E-001 (reference chart v2 codes with an old-ref column), errata E-002 (GP-020 PAYROLL_CLEARING 2350), E-003 (paydays: GP-010/011 2027-07-15 → SG due 2027-07-26; GP-020 2027-07-14 → 2027-07-23; W1/W2 in the period wages are paid), E-004 (GP-018b ex-GST price 9.14; optional revenue-adjustment presentation, card T-0165); index rows (variants and E-rows, all Draft), open questions Q12–Q14, one change-history row. Conventions: a variant beside an Approved entry is `GP-NNN-X` with "Supersedes GP-NNN (part)" in its own text; non-journal corrections are `E-NNN`; **no note is added to any Approved entry and the illustrative reference table is left as is** (the local rule says only the product owner marks an old item superseded; the forward pointer is in the new sections). `git diff` of postings.md is additions only (220 lines, 0 removed). Figures re-derived independently from the review tables: every journal balances and the ADJ-BD / GST tax amounts are 10% of the line base, half-up.
+- Why: T-0124 card items 1–8; persona review `.agent/evidence/T-0007/accounting-review-20261108.md` (DL-0280), triage DL-0283, card changes DL-0286; AGENTS.md §5 (never edit Approved goldens); skill `golden-posting` B.2.
+- Alternatives: fix the illustrative codes in place (rejected: the skill does not permit editing the human-owned file's approved header; a new section is reversible); add trailing "superseded" notes on GP-007/012/015/020 (rejected: local rule — owner only); one combined errata GP entry with a dummy journal (rejected: a golden must be a real journal).
+- ADR: ADR-0045 (GP-012-B/GP-015-B) · Status: proposed (awaiting accountant-reviewer persona re-review, then claude may approve under DL-0282)
+
+### DL-0381 — T-0124 runner gating: GP-012-B/GP-015-B `requires` T-0047; GP-007-A is enforced (deviation from AC-1 wording)
+- Date: 2026-11-09 · By: claude · Task: T-0124 · Category: process
+- Decision: `GOLDEN_REQUIRES` (gating.ts, DL-0256) gains GP-012-B and GP-015-B → task **T-0047** with the reason "system role GST_ATTRIBUTED_UNBILLED, gst_supply_pattern and the BAS attribution rule (ADR-0045, T-0035) do not exist yet". One task per marker is kept: T-0047 already depends on T-0035. GP-007-A gets **no** marker: it runs now on the chart-v2 golden world and passes in draft mode. The card's AC-1 listed T-0121/T-0048 for GP-007-A; the lead's T-0124 instruction says GP-007-A must be runnable now, T-0121's chart v2 is merged into the base (card still `review`), and GP-007 itself is not gated on T-0048 because the runner posts raw journals. A marker on T-0121 would hold GP-007-A PENDING on a card status, not on a missing capability.
+- Why: honesty of the gate — PENDING only for a capability that is really missing (GST_ATTRIBUTED_UNBILLED role does not exist; posting GP-012-B would fail on role resolution).
+- Alternatives: array of required tasks (rejected: not needed, would change the marker format other entries use); gate GP-007-A on T-0048 (rejected: nothing in T-0048 is needed to reproduce the lines).
+- ADR: none · Status: accepted
+
+### DL-0382 — Golden parser/world: variant ids, per-journal label dates, chart-v2 world option
+- Date: 2026-11-09 · By: claude · Task: T-0124 · Category: architecture
+- Decision: (1) parse.ts reads headings `## GP-NNN — …` and `## GP-NNN-X — …` (one capital letter); other shapes are not GP headings. (2) When an entry has several journals, the first YYYY-MM-DD in a journal's bold label dates that journal (`GoldenJournal.date`); otherwise the scenario date applies; a single table's label is prose and never dates it. command.ts posts on `journal.date ?? entryDate ?? default`. Existing entries are unaffected (no existing multi-journal label has a date). (3) `createLedgerFixture(tenantId, { template })` (default v1) and `createGoldenWorld(tenantId, { chart: 'v2' })`; the v2 world adds the binding `setting:ar.ecl_allowance_account` → template v2 suggested setting (1290). The GP-001…GP-020 engine suite now runs on v2; a db test proves every v1 golden binding resolves to the same code on v2, and module golden tests (AR, AP, tax) keep the default v1 world. Tests written first and seen RED: parser (4 failing), command date (1), v2 world (2).
+- Why: GP-007-A needs dated journals (allowance at year end, write-off 17 months after the invoice) and the 1290 account; keeping v1 the default leaves every existing test untouched.
+- Alternatives: rely on the first scenario date for all journals (rejected: would post the A1 allowance on the write-off date — the lines match but the record would be untrue); switch every fixture to v2 (rejected: touches unrelated module tests, 1500 default tax differs).
+- ADR: none · Status: accepted
+
+### DL-0383 — GP-007-A: allowance by adjusting manual journal, measured net of GST, explicit excess rule
+- Date: 2026-11-09 · By: claude · Task: T-0124 · Category: accounting
+- Decision: In Draft GP-007-A, A1 (ECL allowance) has source type `manual_journal` (period class `journal`): it touches no control account or subledger and is an accountant's year-end estimate. DL-0286 planned an `ar.ecl_provision` source in T-0048 for an automated run; if built, it is a further superseding Draft of A1's source type with the same lines (postings.md Q13). The allowance is measured net of the GST later recovered by the 1B adjustment (1,250.00, as the review proposed; Q14). A3 makes the review's excess rule concrete (allowance 1,000.00: Dr 1290 1,000.00 tax 100.00, Dr bad debts 250.00 tax 25.00, Dr GST 125.00 / Cr AR 1,375.00). An allowance larger than the loss is released by a separate adjusting journal.
+- Why: runnable now without a new source type or migration; mirrors common SMB practice; the persona re-review decides Q13/Q14.
+- Alternatives: new `ar.ecl_provision` source now (rejected: period matrix + SQL mirror migration belongs to T-0048); allowance gross of GST (left as Q14).
+- ADR: none (variant within GP-007's approved treatment; persona re-review required) · Status: proposed (awaiting persona re-review)
+
+### DL-0384 — ADR-0045 proposed: `gst_supply_pattern` classification and `GST_ATTRIBUTED_UNBILLED` role
+- Date: 2026-11-09 · By: claude · Task: T-0124 (for T-0047) · Category: accounting
+- Decision: Draft **ADR-0045** (accounting, Proposed): R1 `gst_supply_pattern` ∈ {progressive_div156 (default), single_supply, security_deposit_div99} stored on deposit invoices and prepayment receipts, user-confirmed; R2 new non-control asset role GST_ATTRIBUTED_UNBILLED; R3 single supply on accruals attributes the whole GST at first payment/invoice (GP-012-B) and the final invoice clears the role (GP-015-B); R4 cash basis unchanged; R5 Div 99 unchanged; R6 role-based BAS rule; R7 BAS-prep display; R8 refusal until built. Option B (dedicated attribution tax code) kept as fallback (postings.md Q12). ADR index next free number → 0046.
+- Why: DL-0283/DL-0286 require a separate accounting decision before T-0047 can be claimed; DL-0280 MAJOR 1.
+- Alternatives: see ADR-0045 options B–D.
+- ADR: ADR-0045 · Status: proposed (awaiting persona re-review; claude may accept under DL-0282)
+
+### DL-0385 — Follow-up card T-0165 for the GP-018b revenue presentation (E-004)
+- Date: 2026-11-09 · By: claude · Task: T-0124 · Category: scope
+- Decision: New card **T-0165** (Phase 1, depends on T-0076, T-0124): optional P&L presentation of ROUNDING from sales documents as a revenue adjustment, setting off by default, no posting change.
+- Why: E-004 records the option; implementing it is report work outside T-0124.
+- Alternatives: add an AC to T-0076 (rejected: T-0076 is in review on its own branch).
+- ADR: none · Status: accepted

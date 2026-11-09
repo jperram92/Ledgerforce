@@ -28,6 +28,7 @@ const gp = (id: string, status: 'Draft' | 'Approved'): GoldenPosting => ({
   journals: [
     {
       label: null,
+      date: null,
       lines: [
         {
           no: 1,

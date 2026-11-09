@@ -6,9 +6,13 @@
  * its golden fails with a line-level diff.
  */
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createGoldenWorld, type GoldenFixture } from '../testing/golden-world.ts';
-import { expectedLines } from './command.ts';
-import { parseGoldenPostings, type GoldenPosting } from './parse.ts';
+import {
+  createGoldenWorld,
+  GOLDEN_BINDING_CODES,
+  type GoldenFixture,
+} from '../testing/golden-world.ts';
+import { expectedLines, GoldenMappingError } from './command.ts';
+import { parseBinding, parseGoldenPostings, type GoldenPosting } from './parse.ts';
 import { planGoldenRun, runGolden, type GoldenProducer } from './runner.ts';
 
 const approved = (id: string, sourceType: string, rows: string): GoldenPosting => {
@@ -102,5 +106,70 @@ describe('SS-PLAT-12 runner, Approved entries through the posting engine', () =>
     expect(outcome.report).toContain(
       'expected (golden): # | account | debit | credit | tax | party',
     );
+  });
+});
+
+describe('golden world on chart v2 (T-0121 1290, T-0124 GP-007-A)', () => {
+  let v2: GoldenFixture;
+
+  beforeAll(async () => {
+    v2 = await createGoldenWorld('01900000-0000-7000-8000-000000003103', { chart: 'v2' });
+  });
+
+  afterAll(async () => {
+    await v2.close();
+  });
+
+  it('resolves setting:ar.ecl_allowance_account to chart v2 1290; the default v1 world refuses it', () => {
+    const b = { kind: 'setting', key: 'ar.ecl_allowance_account' } as const;
+    expect(v2.world.account(b).label).toBe(
+      'setting:ar.ecl_allowance_account → 1290 Allowance for expected credit losses',
+    );
+    expect(() => g.world.account(b)).toThrow(GoldenMappingError);
+  });
+
+  it('keeps every v1 binding on the same account code in the v2 world', () => {
+    for (const text of Object.keys(GOLDEN_BINDING_CODES)) {
+      const b = parseBinding(text);
+      const code = (w: GoldenFixture) => /→ (\S+) /.exec(w.world.account(b).label)?.[1];
+      expect(code(v2), text).toBe(code(g));
+    }
+  });
+
+  it('posts a dated two-journal entry (allowance, then write-off against it) line for line', async () => {
+    const gp = parseGoldenPostings(`## GP-906 — Synthetic allowance write-off
+
+- **Status: Approved (TEST, 2026-11-09)** · Phase: MVP · Source type: \`manual_journal\` + \`ar.write_off\` · Design: test
+- **Scenario:** synthetic invoice dated 2026-11-05.
+
+**A1 — allowance 2027-06-30**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | setting:ar.bad_debt_account | 6500 | 10.00 | | — | — |
+| 2 | setting:ar.ecl_allowance_account | 1290 | | 10.00 | — | — |
+| | **Total** | | **10.00** | **10.00** | | |
+
+**A2 — write-off 2027-12-01**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | setting:ar.ecl_allowance_account | 1290 | 10.00 | | ADJ-BD (tax 1.00) | Acme |
+| 2 | tax:GST.collected | 2310 | 1.00 | | ADJ-BD | — |
+| 3 | system:AR_CONTROL | 1200 | | 11.00 | — | Acme |
+| | **Total** | | **11.00** | **11.00** | | |
+`)[0];
+    if (!gp) throw new Error('no GP');
+    const outcome = await runApproved(gp, v2.produce);
+    expect(outcome.status, outcome.report).toBe('PASS');
+    const dates = await v2.fixture.admin.query(
+      `SELECT entry_date::text AS d, source_type AS s FROM app.journal_entry
+        WHERE tenant_id = $1 AND source_id = 'GP-906' ORDER BY entry_date`,
+      [v2.fixture.tenantId],
+    );
+    expect(dates.rows).toEqual([
+      { d: '2027-06-30', s: 'manual_journal' },
+      { d: '2027-12-01', s: 'ar_write_off' },
+    ]);
   });
 });

@@ -1,0 +1,9 @@
+stdout | packages/ledger/src/golden/golden-postings.golden.db.test.ts > SS-PLAT-12 golden postings — engine layer (include-drafts) > SS-PLAT-12: Every Approved golden posting is reproduced exactly
+[golden include-drafts] golden postings: 14 passed, 0 failed, 8 PENDING (GP-010, GP-011, GP-016, GP-017, GP-019, GP-020, GP-012-B, GP-015-B)
+GP-012-B [DRAFT] PENDING — requires T-0047 (single-supply path: system role GST_ATTRIBUTED_UNBILLED, gst_supply_pattern and the BAS attribution rule (ADR-0045, T-0035) do not exist yet), which is not done (status todo)
+GP-015-B [DRAFT] PENDING — requires T-0047 (single-supply path: system role GST_ATTRIBUTED_UNBILLED, gst_supply_pattern and the BAS attribution rule (ADR-0045, T-0035) do not exist yet), which is not done (status todo)
+ ✓ |db| packages/ledger/src/golden/golden-postings.golden.db.test.ts > SS-PLAT-12 golden postings — engine layer (include-drafts) > GP-007-A [DRAFT] engine output equals the golden line for line — Bad debt write-off against an ECL allowance (AASB 9 varia
+ ✓ |db| packages/ledger/src/golden/golden-postings.golden.db.test.ts > SS-PLAT-12 golden postings — engine layer (include-drafts) > GP-012-B [DRAFT] PENDING — requires T-0047 (single-supply path: system role GST_ATTRIBUTED_UNBILLED, gst_supply_pattern an
+ ✓ |db| packages/ledger/src/golden/golden-postings.golden.db.test.ts > SS-PLAT-12 golden postings — engine layer (include-drafts) > GP-015-B [DRAFT] PENDING — requires T-0047 (single-supply path: system role GST_ATTRIBUTED_UNBILLED, gst_supply_pattern an
+ ✓ |db| packages/ledger/src/golden/golden-postings.golden.db.test.ts > SS-PLAT-12 golden postings — engine layer (include-drafts) > SS-PLAT-12: Every Approved golden posting is reproduced exactly 244ms
+      Tests  24 passed (24)

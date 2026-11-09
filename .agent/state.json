@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0121-au-templates-v2",
+  "current_task": "T-0124",
+  "branch": "feat/T-0124-golden-drafts",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "claude",
+  "lease_expires_at": "2026-11-09T05:13:29.897Z",
   "last_green_commit": "445848ec56cfdf7943d11ad1f2df13cd8e60e094",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T23:24:03.866Z",
+  "updated_at": "2026-11-09T04:28:29.902Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -62,7 +62,8 @@
     "T-0114": 1,
     "T-0039": 1,
     "T-0040": 1,
-    "T-0121": 1
+    "T-0121": 1,
+    "T-0124": 1
   },
   "failures": {},
   "providers": {},
