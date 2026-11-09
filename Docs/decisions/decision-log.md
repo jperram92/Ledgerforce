@@ -2388,3 +2388,19 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: E-004 records the option; implementing it is report work outside T-0124.
 - Alternatives: add an AC to T-0076 (rejected: T-0076 is in review on its own branch).
 - ADR: none · Status: accepted
+
+### DL-0386 — Accountant-reviewer persona re-review of T-0124 Drafts (GP-007-A, GP-012-B, GP-015-B, E-001…E-004) and ADR-0045: PASS WITH MAJORS, no BLOCKER
+- Date: 2026-11-09 · By: claude (accountant-reviewer AI persona, DL-0248) · Task: T-0124 (also T-0047, T-0048) · Category: accounting
+- Decision: The re-review is recorded in `.agent/evidence/T-0124/accounting-rereview-20261109.md`. Overall **PASS WITH MAJORS**: 0 BLOCKER, 5 MAJOR, 7 MINOR, 16 CONFIRMED. Every journal balances and matches an independent derivation. E-001 matches chart template v2 row for row. The E-003 dates are right (SG due 2027-07-26 and 2027-07-23).
+  - **MAJORs:**
+    - (M1) GP-007-A measures the ECL net of GST. AASB 9 measures it on the GST-inclusive receivable (1,375.00); the Div 21 relief is recognised only at write-off. This withdraws the persona's own 2026-11-08 proposal.
+    - (M2) The ADR-0045 Option A carrier fails unsafe. The shipped BAS map reads a GST debit on an asset as a purchase (G11 +1,400.00, 1B +700.00).
+    - (M3) R6 gives G1 +1,400.00 for line 2 instead of 7,700.00, because the 7,000.00 base is not carried.
+    - (M4) The R1 default `progressive_div156` is silent; there must be no DB default and the choice must be explicit and recorded.
+    - (M5) No lifecycle rule exists for cancellation, price variation, unascertainable consideration or stranded role balances (new R9).
+  - **Answers:** Q12 = Option B, a dedicated accruals-only code `GST-UB` with an engine guard to the role. Q13 = `manual_journal` now; `ar.ecl_provision` with stored matrix inputs when T-0048 automates the matrix. Q14 = gross, with the write-off charging the ex-GST amount to the allowance and an A4 release of the 125.00 left.
+  - **Approval conditions:** the required wording and line changes are RC-1 to RC-5 in the report. E-001 to E-004 may be approved now. GP-007-A may be approved after RC-1. GP-012-B, GP-015-B and ADR-0045 may be approved or accepted after RC-2 to RC-5.
+- Why: DL-0282 lets claude approve the T-0124 Drafts and accept ADR-0045 only after a persona re-review with no BLOCKER. No BLOCKER was found, for three reasons: GP-012-B and GP-015-B are PENDING behind T-0047, R8 refuses `single_supply` until built, and the ADR's own G1 11,000.00 test would catch M2 and M3. The MAJORs would be locked into T-0047/T-0048 tests if left, so they are fixed in wording first, as in DL-0285.
+- Alternatives: FAIL on M2/M3 (rejected: nothing is built and both fail closed); keep the net-of-GST ECL as the golden (rejected: it is not the AASB 9 measure, but it is allowed as a documented tenant policy); keep Option A with a role exception (rejected: two special cases in a code-driven BAS map, and a mis-binding leads to under-reporting).
+- Caveat: primary hosts (ato.gov.au, legislation.gov.au, aasb.gov.au) still return proxy 403. The s 29-5(1) whole-GST rule is corroborated by ATO page extracts only. The AASB 9 paragraphs, the s 21-5 attribution period and the particular-attribution rule for unascertainable consideration are unverified. The persona is not a TPB-registered practitioner.
+- ADR: ADR-0045 · Status: accepted (review outcome); claude may accept ADR-0045 and approve GP-012-B/GP-015-B under DL-0282 once RC-2…RC-5 are applied, and approve GP-007-A once RC-1 is applied
