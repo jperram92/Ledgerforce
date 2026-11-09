@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0057",
+  "current_task": null,
   "branch": "feat/T-0057-payment-confirmation",
   "step": null,
-  "claimed_by": "codex",
-  "lease_expires_at": "2026-11-09T22:05:47.813Z",
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": "da5d6ecdcdfcf30b762f5b6e42fb68af125d1ca4",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-09T21:20:47.880Z",
+  "updated_at": "2026-11-09T23:59:08.788Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
