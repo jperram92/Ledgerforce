@@ -1,0 +1,3481 @@
+From 94975b3dba9d5f80bcd063e53bad7924a1ce9482 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 9 Nov 2026 09:17:39 +0000
+Subject: [PATCH 1/3] =?UTF-8?q?wip(T-0069):=20step=205/10=20=E2=80=94=20Cl?=
+ =?UTF-8?q?osed=20Won=20draft,=20idempotency,=20lock=20policy,=20auto-appr?=
+ =?UTF-8?q?ove=20green?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+What changed:
+- RQ-0124 (answered): trigger rule, line source, Avro encodings, idempotency, document facts.
+- Migration 0044: app.salesforce_billing_record / _trigger / _issue / _settings (tenant_id,
+  RLS ENABLE+FORCE, lf_app grants without DELETE, guards, never-deleted triggers).
+- packages/connectors/salesforce/src/billing: source.ts (pure: billing CDC changes, sfMoney /
+  sfDate without float arithmetic, won/activated rule, draft plan with roll-up completeness),
+  apply.ts (versioned record state, per-source evaluation, createSalesInvoice with key
+  sf:<Entity>:<Id>, posting-profile warnings, lock-date policy, auto-approve in a savepoint,
+  one write-back event with the final status, billing issues, CDC handler, settings).
+- inbound/changes.ts: cdcChangesOf generalises the T-0065 change builder (behaviour unchanged).
+- Documented Avro fixture for Opportunity/OpportunityLineItem/Order/OrderItem; test helpers;
+  cross-tenant row overrides for the four new tables; connector depends on ar/ledger/outbox/
+  products workspace packages (DL-0375).
+- DL-0370..DL-0375.
+
+Why: T-0069 / UC-01 — Closed Won (or Order activated, behind a setting) creates exactly one
+draft invoice, auto-approves under the threshold via T-0040, never posts on a profile gap or
+tax-code conflict, follows the lock-date policy and writes the status back (T-0067 contract).
+
+Validation:
+- RED 1: contract + db tests failed on the missing modules.
+- RED 2 (right reason): 13/13 db tests failed with relation "app.salesforce_billing_record"
+  does not exist (migration held back).
+- GREEN: vitest db billing 13/13 passed; unit connector 80/80; packages/db rls.db.test.ts
+  598/598; full unit project 864/864; connector typecheck and lint clean; format:check clean.
+- verify --quick: only the known run.test.ts failure (2a) and its knock-on gates 3/4; not
+  yet run in full.
+- One test expectation corrected from '1250.00' to '1250.0000' (preview returns NUMERIC(19,4)
+  text; same value, same strictness).
+
+Next action: golden test SS-UC01-03 (GP-001 from the Closed Won flow), outbox-to-fake-REST
+write-back proof for SS-UC01-02, follow-up cards T-0160.., register/evidence, full verify.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_014KLkD1D96Sp3PfYtBZqsoM
+---
+ .agent/HANDOVER.md                            |   1 +
+ .agent/backlog/T-0069.md                      |  22 +-
+ .agent/state.json                             |  18 +-
+ Docs/decisions/decision-log.md                |  42 +
+ .../RQ-0124-closed-won-invoice-trigger.md     | 100 +++
+ .../pubsub-billing-source-change-events.json  | 567 ++++++++++++++
+ packages/connectors/salesforce/package.json   |   7 +-
+ .../salesforce/src/billing/apply.ts           | 741 ++++++++++++++++++
+ .../src/billing/closed-won.db.test.ts         | 614 +++++++++++++++
+ .../src/billing/source.contract.test.ts       | 217 +++++
+ .../salesforce/src/billing/source.ts          | 299 +++++++
+ .../salesforce/src/inbound/changes.ts         |  19 +-
+ .../salesforce/src/testing/billing-events.ts  | 102 +++
+ .../salesforce/src/testing/billing-world.ts   | 156 ++++
+ .../src/testing/master-data-events.ts         |   2 +-
+ .../0044_salesforce_billing_trigger.sql       | 245 ++++++
+ packages/db/src/testing/cross-tenant.ts       |  31 +
+ pnpm-lock.yaml                                |  15 +-
+ 18 files changed, 3172 insertions(+), 26 deletions(-)
+ create mode 100644 Docs/research/RQ-0124-closed-won-invoice-trigger.md
+ create mode 100644 packages/connectors/salesforce/fixtures/documented/pubsub-billing-source-change-events.json
+ create mode 100644 packages/connectors/salesforce/src/billing/apply.ts
+ create mode 100644 packages/connectors/salesforce/src/billing/closed-won.db.test.ts
+ create mode 100644 packages/connectors/salesforce/src/billing/source.contract.test.ts
+ create mode 100644 packages/connectors/salesforce/src/billing/source.ts
+ create mode 100644 packages/connectors/salesforce/src/testing/billing-events.ts
+ create mode 100644 packages/connectors/salesforce/src/testing/billing-world.ts
+ create mode 100644 packages/db/migrations/0044_salesforce_billing_trigger.sql
+
+diff --git a/.agent/HANDOVER.md b/.agent/HANDOVER.md
+index 41856c2..b07d63a 100644
+--- a/.agent/HANDOVER.md
++++ b/.agent/HANDOVER.md
+@@ -290,3 +290,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
+ - 2026-11-08T23:03:21.513Z claude: checkpoint (commit deferred to conductor): step 4/7 — submit/approve/reject with SoD, migration 0041, T-0050 tests approve first (green)
+ - 2026-11-08T23:20:40.187Z claude: T-0052 → verifying
+ - 2026-11-09T04:03:00.375Z claude: release T-0052 → review (All criteria green; verify 12/3/1 with only the known failures (run.test.ts artefact 2a/3, golden diff guard 4); gate 8 needs codex cross-review)
++- 2026-11-09T09:17:26.648Z claude: checkpoint (commit deferred to conductor): 5/10 — Closed Won draft, idempotency, lock policy, auto-approve green
+diff --git a/.agent/backlog/T-0069.md b/.agent/backlog/T-0069.md
+index 61f699f..ee5df45 100644
+--- a/.agent/backlog/T-0069.md
++++ b/.agent/backlog/T-0069.md
+@@ -4,13 +4,13 @@ title: "Closed Won / Order activated → draft invoice (UC-01) with auto-approve
+ phase: MVP
+ use_cases: [UC-01]
+ depends_on: [T-0065, T-0040, T-0067, T-0031]
+-status: todo
+-claimed_by: null
+-lease_expires_at: null
+-attempts: 0
++status: in_progress
++claimed_by: claude
++lease_expires_at: 2026-11-09T10:02:26.638Z
++attempts: 1
+ last_checkpoint: null
+ adr_required: false
+-research: []
++research: [RQ-0124]
+ success_scenarios: [SS-UC01-01, SS-UC01-02, SS-UC01-03, SS-UC01-04, SS-UC01-06, SS-UC01-07, SS-UC01-08]
+ evidence: []
+ estimate_lines: 350
+@@ -27,7 +27,7 @@ Opportunity Closed Won (or Order activated — §11.2 default open) creates a dr
+ - Depends on: T-0065 (Inbound mapping: Account/Contact/Product → Party/Product with idempotency); T-0040 (Sales invoice lifecycle: draft → approve → post); T-0067 (Write-back to Salesforce via sObject Collections from the outbox); T-0031 (Golden-posting test runner)
+ 
+ ## Open questions (→ research before start)
+-- [ ] §11.2 invoice trigger default — implement both behind a setting, default Opportunity until decided.
++- [x] §11.2 invoice trigger default — implement both behind a setting, default Opportunity until decided.
+ 
+ ## Acceptance criteria (each maps to a test + SS id)
+ - [ ] **SS-UC01-01** (db-integration) — Closed Won creates a draft invoice from the template. *Given* an Opportunity with 2 line items (Professional services $1,000, Subscription $250) on an Account with a Billing To contact; *when* the Opportunity moves to Closed Won; *then* exactly one Draft invoice exists with 2 lines mapped to the PROFESSIONAL_SERVICES and SUBSCRIPTION profiles and tax code GST.
+@@ -50,11 +50,11 @@ Opportunity Closed Won (or Order activated — §11.2 default open) creates a dr
+ - db-integration: closed-won.spec.ts.
+ 
+ ## Steps
+-- [ ] 1. Resolve open questions → `Docs/research/RQ-NNNN-*.md` (status answered) and link in `research:`
+-- [ ] 2. Write failing tests for every AC above (red, for the right reason) — `tdd-cycle`
+-- [ ] 3. trigger handler
+-- [ ] 4. template line mapping
+-- [ ] 5. auto-approve
++- [x] 1. Resolve open questions → `Docs/research/RQ-NNNN-*.md` (status answered) and link in `research:`
++- [x] 2. Write failing tests for every AC above (red, for the right reason) — `tdd-cycle`
++- [x] 3. trigger handler
++- [x] 4. template line mapping
++- [x] 5. auto-approve
+ - [ ] 6. tests
+ - [ ] 7. `bash scripts/agent/verify.sh` green (definition of done) [phase: verify]
+ - [ ] 8. Playwright evidence into `.agent/evidence/T-0069/` (`evidence` skill) and link in `evidence:`
+diff --git a/.agent/state.json b/.agent/state.json
+index 7417cb3..9a9d1ef 100644
+--- a/.agent/state.json
++++ b/.agent/state.json
+@@ -1,13 +1,13 @@
+ {
+   "schema_version": 1,
+-  "current_task": null,
+-  "branch": "feat/T-0121-au-templates-v2",
+-  "step": null,
+-  "claimed_by": null,
+-  "lease_expires_at": null,
++  "current_task": "T-0069",
++  "branch": "feat/T-0069-closed-won-invoice",
++  "step": "5/10 — Closed Won draft, idempotency, lock policy, auto-approve green",
++  "claimed_by": "claude",
++  "lease_expires_at": "2026-11-09T10:02:26.638Z",
+   "last_green_commit": "445848ec56cfdf7943d11ad1f2df13cd8e60e094",
+   "run_id": "2026-10-29-codex-r01",
+-  "updated_at": "2026-11-08T23:24:03.866Z",
++  "updated_at": "2026-11-09T09:17:26.640Z",
+   "phase": "sprint-0",
+   "attempts": {
+     "T-0010": 3,
+@@ -62,13 +62,15 @@
+     "T-0114": 1,
+     "T-0039": 1,
+     "T-0040": 1,
+-    "T-0121": 1
++    "T-0121": 1,
++    "T-0069": 1
+   },
+   "failures": {},
+   "providers": {},
+   "pending_checkpoints": [
+     "1/8 — invoice journal builder green (unit+prop)",
+     "4/8 — migration 0037, approve rules, post via engine; golden green",
+-    "2-4/8 — chart v2, profiles v2, EXS in au-gst v2; AC-1..AC-5 green"
++    "2-4/8 — chart v2, profiles v2, EXS in au-gst v2; AC-1..AC-5 green",
++    "5/10 — Closed Won draft, idempotency, lock policy, auto-approve green"
+   ]
+ }
+diff --git a/Docs/decisions/decision-log.md b/Docs/decisions/decision-log.md
+index 0827c7f..d60e866 100644
+--- a/Docs/decisions/decision-log.md
++++ b/Docs/decisions/decision-log.md
+@@ -2346,3 +2346,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
+ - Why: design §6.5 rule 3 is about who put the content there; RQ-0116 F4. The fast-check property found a NULL `entered_by` case in the first version of the deferred trigger, fixed with IS NOT DISTINCT FROM.
+ - Alternatives: only `entered_by` (rejected: an approver could edit then approve their own figures); DELETE lines on edit (rejected: directive 6, no DELETE grant).
+ - ADR: none · Status: accepted
++
++### DL-0370 — Invoice trigger: both Opportunity Closed Won and Order activation, behind a setting, default Opportunity
++- Date: 2026-11-09 · By: claude · Task: T-0069 · Category: scope
++- Decision: `app.salesforce_billing_settings.trigger_source` (`opportunity` | `order`, history, latest row wins) selects the billing source per company; default `opportunity`. Events of the other source are remembered but draft nothing (`not_this_trigger`). This is a placeholder for design §11.2 "Invoice trigger default", not a decision of it.
++- Why: T-0069 card open question ("implement both behind a setting, default Opportunity until decided"); RQ-0124 F1.
++- Alternatives: Opportunity only (rejected: the card asks for both); both at once (rejected: an Opportunity and its Order would bill twice).
++- ADR: none · Status: accepted (product owner still to decide §11.2)
++
++### DL-0371 — Won = IsWon or a configured won stage name; activated = StatusCode Activated; lines from remembered line-item events with a roll-up completeness check
++- Date: 2026-11-09 · By: claude · Task: T-0069 · Category: architecture
++- Decision: Billing-source records (Opportunity, OpportunityLineItem, Order, OrderItem) are remembered per record with their CDC version in `app.salesforce_billing_record` (migration 0044; 0034's entity CHECK cannot be widened). A source fires when its merged state has `IsWon = true` or `StageName` in `won_stages` (default `Closed Won`), or `StatusCode = 'Activated'`. Lines are the live line records naming the source; their `TotalPrice` sum must equal the header's `Amount` / `TotalAmount`, else a waiting `LINES_INCOMPLETE` issue (no draft) that the next line or header change re-evaluates. No REST query is made.
++- Why: RQ-0124 F2–F3 — `IsWon` in `changedFields` is not documented; cross-channel events are unordered; no extra API calls and no live org in CI.
++- Alternatives: SOQL query of the lines at trigger time (rejected: API budget, new client code, nothing to record it against); trust whatever lines exist (rejected: under-bills when the line event is late).
++- ADR: none · Status: accepted
++
++### DL-0372 — Salesforce currency doubles become decimal text by shortest round-trip, never rounded
++- Date: 2026-11-09 · By: claude · Task: T-0069 · Category: architecture
++- Decision: Avro `double` amounts are converted with ECMAScript Number→String (shortest round-trip) at change time and parsed only as text (`sfMoney`, Money/decimal.js); a non-zero digit beyond the cent refuses the source (`INVALID_SOURCE`). Avro `date` ints are days since 1970-01-01 UTC. The fixture schemas are documented, not recorded (T-0160).
++- Why: AGENTS.md §4 bans float money; RQ-0124 F4.
++- Alternatives: `toFixed(2)` (rejected: rounds and is banned); keep JSON numbers in jsonb (rejected: a float would reach later code).
++- ADR: none · Status: accepted
++
++### DL-0373 — One write-back event per draft transaction, carrying the final status
++- Date: 2026-11-09 · By: claude · Task: T-0069 · Category: architecture
++- Decision: The Closed Won transaction writes exactly one outbox event: `invoice.drafted` (status Draft) when the invoice stays draft, or `invoice.posted` (status Posted, number, total, amount due, Opportunity amount invoiced) when auto-approve posted it. Payload is the T-0067 contract v1 `writeBack` snapshot plus `source`. An Order-triggered invoice writes only the `LF_Invoice__c` mirror (no Opportunity update).
++- Why: Two events from one transaction could be delivered out of order and leave "Draft" on a posted invoice; values are current state, so one event is enough. RQ-0124 F6.
++- Alternatives: drafted and posted both (rejected: ordering risk); the posted write-back from the AR module for every post (out of scope here; follow-up T-0163).
++- ADR: none (ADR-0036 contract unchanged) · Status: accepted
++
++### DL-0374 — Posting-profile refusals at draft time are warnings that stop auto-approve; lock policy decides the invoice date
++- Date: 2026-11-09 · By: claude · Task: T-0069 · Category: accounting
++- Decision: Each draft line is resolved once through `resolvePartyProductPosting` (sale, revenue). Any refusal (PROFILE_GAP, TAX_CODE_CONFLICT, NO_TAX_CODE, …) is stored as a warning on `app.salesforce_billing_trigger.warnings` and auto-approve is not tried (reason = the first warning code). The invoice date is the close/effective date passed through `resolvePostingDate('ar_invoice')`: `reject` → `PERIOD_LOCKED` billing issue and no draft; `post_to_first_open_date_with_note` → the first open date with the policy note as memo. Auto-approve runs in a savepoint; an engine refusal leaves the draft with the error code as reason. Due date = invoice date + `payment_terms_days` (default 14, GP-001's terms). No accounting treatment changes: posting is T-0040's `autoApproveSalesInvoice` → posting engine (GP-001, Approved).
++- Why: UC-01 A2, A4, A6; SS-UC01-06, SS-UC01-08; RQ-0124 F6.
++- Alternatives: let autoApprove fail with the reason only (rejected: with auto-approve off no warning would be recorded); invoice date = event date (rejected: UC-01 uses the close date).
++- ADR: none · Status: accepted
++
++### DL-0375 — Billing trigger lives in the Salesforce connector; it depends on the AR, ledger, products and outbox workspace packages
++- Date: 2026-11-09 · By: claude · Task: T-0069 · Category: architecture
++- Decision: `packages/connectors/salesforce/src/billing/` holds the pure source logic and the applier/handler; `@ledgerforce/connector-salesforce` gains workspace dependencies `@ledgerforce/ar`, `@ledgerforce/ledger`, `@ledgerforce/outbox` and `@ledgerforce/products` (products moved from dev to runtime). No third-party dependency is added. `cdcChangesOf` generalises the T-0065 change builder for any entity set; `changesFromCdcEvent` keeps its behaviour.
++- Why: The CDC handler is the connector's; it produces commands (createSalesInvoice / autoApprove) and never writes ledger tables. No cycle: none of those packages depends on the connector.
++- Alternatives: put the handler in apps/worker (rejected: splits the inbound handlers); copy the change builder (rejected: duplicated version rules).
++- ADR: none (workspace packages only) · Status: accepted
+diff --git a/Docs/research/RQ-0124-closed-won-invoice-trigger.md b/Docs/research/RQ-0124-closed-won-invoice-trigger.md
+new file mode 100644
+index 0000000..19bcd72
+--- /dev/null
++++ b/Docs/research/RQ-0124-closed-won-invoice-trigger.md
+@@ -0,0 +1,100 @@
++---
++id: RQ-0124
++title: How does a Closed Won Opportunity (or an activated Order) become exactly one draft sales invoice, and what do the change events carry?
++status: answered
++opened: 2026-11-09
++resolved: 2026-11-09
++opened_by: claude
++linked_tasks: [T-0069, T-0065, T-0040, T-0067, T-0023]
++linked_adrs: [ADR-0006, ADR-0032, ADR-0036]
++superseded_by:
++---
++
++# RQ-0124 — Closed Won / Order activated → draft invoice
++
++## Question
++
++- **Q1.** §11.2 leaves the invoice trigger open (Opportunity Closed Won or Order activation). What
++  do we build until the owner decides?
++- **Q2.** How do we know an Opportunity is won, and an Order activated, from CDC change events?
++- **Q3.** Where do the invoice lines come from — the Opportunity event carries no line items?
++- **Q4.** How do the Avro payloads encode Date and Currency fields, and how do we turn a currency
++  value into money without floating-point arithmetic?
++- **Q5.** What makes it idempotent per Opportunity/Order id, given the same event can arrive twice
++  and later edits of a won Opportunity produce further events?
++- **Q6.** Invoice date, due date, lock-date policy, warnings (PROFILE_GAP, TAX_CODE_CONFLICT) and
++  the status write-back: what does each come from?
++
++## Why it matters
++
++A second draft per Opportunity is a double invoice (and, under auto-approve, a double posting).
++A missed line under-bills. A float-parsed amount violates AGENTS.md §4.
++
++## Sources consulted
++
++| # | Source | Accessed | Kind | What it says |
++|---|---|---|---|---|
++| S1 | Design §4.3 (Standard invoice: "Opportunity Closed Won, Order activated, manual — lines from OpportunityLineItem / OrderItem"), §5.3 (CDC on Opportunity, OpportunityLineItem, Order, OrderItem), §5.5 field table (Opportunity + line items / Order + OrderItem are SF-owned billing sources), §11.2 "Invoice trigger default" (open) | 2026-11-09 | primary (spec) | Both triggers are in scope; default undecided; line items are their own CDC entities. |
++| S2 | RQ-0004 (Pub/Sub CDC), findings on entity selection | 2026-11-09 | prior research | Default CDC selection = Account, Contact, Opportunity, OpportunityLineItem, Product2; Order/OrderItem swap in when the tenant picks Order-based invoicing. |
++| S3 | RQ-0098 F1–F3 (master-data mapping) and `inbound/changes.ts` | 2026-11-09 | prior research / code | UPDATE bodies carry only header-named fields; commit numbers order changes of a record system-wide; across channels there is no ordering guarantee. |
++| S4 | Salesforce, *Opportunity* field reference (developer.salesforce.com/docs/atlas.en-us.sfFieldRef.meta/sfFieldRef/salesforce_field_reference_Opportunity.htm) and *OpportunityChangeEvent* reference (…/salesforce_field_reference_OpportunityChangeEvent.htm), via web search 2026-11-09 | 2026-11-09 | vendor docs (search summary; the docs host is not reachable from this sandbox) | `IsWon` ("Won") and `IsClosed` ("Closed") are boolean fields derived from the stage; the sample create event shows `StageName`, `IsClosed`, `IsWon`. Whether `IsWon` is listed in `changedFields` on a stage change is **not** stated. |
++| S5 | Salesforce, *ChangeEventHeader Fields* (…/change_data_capture/cdc_event_fields_header.htm) | 2026-11-09 | vendor docs (search summary) | `changedFields` lists the fields changed by an UPDATE (plus LastModifiedDate), empty for other change types; must be decoded (bitmap) in Pub/Sub API. |
++| S6 | Salesforce, *Order* and *OrderStatus* object reference (…/object_reference/sforce_api_objects_order.htm, …_orderstatus.htm), *OrderItem* reference | 2026-11-09 | vendor docs (search summary) | An Order's `StatusCode` is `Draft` or `Activated`; every `Status` picklist value belongs to one of the two; activation is an update of `Status`. OrderItem `TotalPrice` defaults to UnitPrice × Quantity. |
++| S7 | Salesforce, *Event Deserialization Considerations* (developer.salesforce.com/docs/platform/pub-sub-api/guide/event-deserialization-considerations.html) and *REST sobject eventSchema* example, via web search | 2026-11-09 | vendor docs (search summary) | After Avro decoding, Date and Date/Time values arrive as epoch numbers; numeric fields are typed `double` in the event schema (`"Data:Double:…"`). Avro's `date` convention is an int of days since 1970-01-01. |
++| S8 | `packages/modules/ar/src/sales-invoices.ts` (T-0040), `packages/ledger/src/period.ts` `resolvePostingDate` (T-0023), `packages/modules/products/src/profile-resolution.ts` (T-0039), `writeback/mapping.ts` (T-0067) | 2026-11-09 | code | createSalesInvoice is idempotent per (company, key); autoApproveSalesInvoice returns the draft reason; resolvePostingDate implements `reject` / `post_to_first_open_date_with_note`; the resolver throws PROFILE_GAP / TAX_CODE_CONFLICT; the write-back contract already has `invoice.drafted` and the Opportunity `invoiceStatus` / `amountInvoiced` fields. |
++
++## Findings
++
++1. **Q1 — trigger setting.** Build both behind a per-company setting `trigger_source`
++   (`opportunity` | `order`), default `opportunity`, as the card says. The setting is data with
++   history (who, why), like `ar_invoice_settings`. Recorded as a §11.2 placeholder, not a decision
++   of the open item (DL-0370).
++2. **Q2 — won / activated.** Because S4 does not guarantee that `IsWon` appears in an UPDATE's
++   changed fields, the remembered full record state (patches merged as in T-0065) is evaluated:
++   an Opportunity is won when `IsWon` is `true` **or** `StageName` is one of the company's won
++   stage names (setting, default `["Closed Won"]` — the standard won stage). An Order is activated
++   when `StatusCode` is `Activated` (S6). The trigger fires when the merged state says won or
++   activated, whichever event made it so.
++3. **Q3 — lines.** Lines come from the remembered OpportunityLineItem / OrderItem records whose
++   `OpportunityId` / `OrderId` is the source (S1, S2), stored like the T-0065 record state. Across
++   channels events are unordered (S3), so completeness is checked: the sum of the live lines'
++   `TotalPrice` must equal the header's `Amount` (Opportunity) / `TotalAmount` (Order), which
++   Salesforce rolls up from those lines. A won source with no lines or a mismatch raises a
++   **waiting** billing issue (`NO_LINES` / `LINES_INCOMPLETE`) and creates nothing; the next line
++   or header change re-evaluates it. No REST query is made (no extra API calls, no live org).
++4. **Q4 — encodings.** Date fields: int days since epoch → `YYYY-MM-DD` (UTC); a `YYYY-MM-DD`
++   string (polled snapshot) is accepted as is. Currency/number fields: an Avro `double` is turned
++   into its shortest round-trip decimal text (ECMAScript Number→String, which is exact for any
++   value with ≤ 15 significant digits) and parsed with decimal.js; a value with a non-zero digit
++   beyond the cent is refused (`INVALID_AMOUNT`), never rounded. No float arithmetic happens.
++   Documented fixture schemas follow S7; a recorded scratch-org schema replaces them later
++   (follow-up T-0160).
++5. **Q5 — idempotency.** Two layers: (a) each billing record keeps its last version
++   (commit number + sequence / SystemModstamp); a change with the same version is a duplicate,
++   counted with its key, and does nothing (design §5.6 rule 1); (b) one trigger row per
++   (company, source entity, source record Id), unique in the database, links the single invoice,
++   and the invoice's idempotency key is `sf:<Entity>:<Id18>` — a later event of a drafted source
++   only bumps a counter. Edits after drafting do not amend the draft (follow-up T-0161).
++6. **Q6 — document facts.** Invoice date = Opportunity `CloseDate` / Order `EffectiveDate`, passed
++   through `resolvePostingDate(sourceType 'ar_invoice')`: `reject` → billing issue
++   `PERIOD_LOCKED`, no draft; `post_to_first_open_date_with_note` → the first open date and the
++   policy's note as the invoice memo (SS-UC01-08). Due date = invoice date + the setting's payment
++   terms (default 14 days, as GP-001's "terms 14 days"; per-party terms are not modelled yet,
++   T-0162). Line amount = `TotalPrice` (tax-exclusive, the Salesforce price convention), product by
++   `Product2Id` → `product.salesforce_product_id`, party by `AccountId` →
++   `party.salesforce_account_id`; tax code left to the posting profile (DL-0260). Each line is
++   resolved once at draft time; any resolver refusal (PROFILE_GAP, TAX_CODE_CONFLICT, …) becomes a
++   warning stored with the trigger, and auto-approve is not attempted. Otherwise
++   `autoApproveSalesInvoice` decides. Write-back: `invoice.drafted` (status Draft) on creation and
++   `invoice.posted` (status Posted, number, total, amount invoiced) after an auto-post, through the
++   transactional outbox in the same transaction (T-0067 contract v1).
++
++## Conclusion
++
++Implement a billing-source applier beside the T-0065 master-data applier: remember
++Opportunity/OpportunityLineItem/Order/OrderItem state per record (versioned, duplicates counted),
++evaluate the source after every change, and create at most one draft per source through T-0040,
++with lock policy, warnings, auto-approve and the outbox write-back as in F6. Migration 0044 adds
++the four tenant tables (record state, trigger, issue, settings). Unverified vendor details (IsWon
++in changedFields, double/int encodings) are handled defensively and listed for a scratch-org
++recording (T-0160).
+diff --git a/packages/connectors/salesforce/fixtures/documented/pubsub-billing-source-change-events.json b/packages/connectors/salesforce/fixtures/documented/pubsub-billing-source-change-events.json
+new file mode 100644
+index 0000000..d61b7e5
+--- /dev/null
++++ b/packages/connectors/salesforce/fixtures/documented/pubsub-billing-source-change-events.json
+@@ -0,0 +1,567 @@
++{
++  "source": "Documented, NOT recorded: written from RQ-0124 (S4 Opportunity/OpportunityChangeEvent fields, S5 header, S6 Order StatusCode and OrderItem TotalPrice, S7 Date as Avro int days since epoch and numbers as double) and RQ-0098 / RQ-0036 for the header, for T-0069. Field sets are a subset of the standard OpportunityChangeEvent, OpportunityLineItemChangeEvent, OrderChangeEvent and OrderItemChangeEvent schemas (the fields the billing trigger reads). Payloads are built by src/testing/billing-events.ts with avsc from these schemas. No Salesforce org was contacted; replace with redacted recordings in fixtures/recorded/ from a scratch org (follow-up T-0160). No real id, user or token appears here.",
++  "schemas": {
++    "Opportunity": {
++      "topic": "/data/OpportunityChangeEvent",
++      "schemaId": "TESTopportunityChangeEventSchema1",
++      "schema": {
++        "type": "record",
++        "name": "OpportunityChangeEvent",
++        "namespace": "com.sforce.eventbus",
++        "fields": [
++          {
++            "name": "ChangeEventHeader",
++            "type": {
++              "type": "record",
++              "name": "ChangeEventHeader",
++              "fields": [
++                {
++                  "name": "entityName",
++                  "type": "string"
++                },
++                {
++                  "name": "recordIds",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "changeType",
++                  "type": {
++                    "type": "enum",
++                    "name": "ChangeType",
++                    "symbols": [
++                      "CREATE",
++                      "UPDATE",
++                      "DELETE",
++                      "UNDELETE",
++                      "GAP_CREATE",
++                      "GAP_UPDATE",
++                      "GAP_DELETE",
++                      "GAP_UNDELETE",
++                      "GAP_OVERFLOW",
++                      "SNAPSHOT"
++                    ]
++                  }
++                },
++                {
++                  "name": "changeOrigin",
++                  "type": "string"
++                },
++                {
++                  "name": "transactionKey",
++                  "type": "string"
++                },
++                {
++                  "name": "sequenceNumber",
++                  "type": "int"
++                },
++                {
++                  "name": "commitTimestamp",
++                  "type": "long"
++                },
++                {
++                  "name": "commitNumber",
++                  "type": "long"
++                },
++                {
++                  "name": "commitUser",
++                  "type": "string"
++                },
++                {
++                  "name": "nulledFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "diffFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "changedFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                }
++              ]
++            }
++          },
++          {
++            "name": "Name",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "AccountId",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "StageName",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "IsClosed",
++            "type": ["null", "boolean"],
++            "default": null
++          },
++          {
++            "name": "IsWon",
++            "type": ["null", "boolean"],
++            "default": null
++          },
++          {
++            "name": "CloseDate",
++            "type": [
++              "null",
++              {
++                "type": "int",
++                "logicalType": "date"
++              }
++            ],
++            "default": null
++          },
++          {
++            "name": "Amount",
++            "type": ["null", "double"],
++            "default": null
++          },
++          {
++            "name": "CurrencyIsoCode",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "LastModifiedDate",
++            "type": ["null", "long"],
++            "default": null
++          }
++        ]
++      }
++    },
++    "OpportunityLineItem": {
++      "topic": "/data/OpportunityLineItemChangeEvent",
++      "schemaId": "TESTopportunityLineItemChangeEvt1",
++      "schema": {
++        "type": "record",
++        "name": "OpportunityLineItemChangeEvent",
++        "namespace": "com.sforce.eventbus",
++        "fields": [
++          {
++            "name": "ChangeEventHeader",
++            "type": {
++              "type": "record",
++              "name": "ChangeEventHeader",
++              "fields": [
++                {
++                  "name": "entityName",
++                  "type": "string"
++                },
++                {
++                  "name": "recordIds",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "changeType",
++                  "type": {
++                    "type": "enum",
++                    "name": "ChangeType",
++                    "symbols": [
++                      "CREATE",
++                      "UPDATE",
++                      "DELETE",
++                      "UNDELETE",
++                      "GAP_CREATE",
++                      "GAP_UPDATE",
++                      "GAP_DELETE",
++                      "GAP_UNDELETE",
++                      "GAP_OVERFLOW",
++                      "SNAPSHOT"
++                    ]
++                  }
++                },
++                {
++                  "name": "changeOrigin",
++                  "type": "string"
++                },
++                {
++                  "name": "transactionKey",
++                  "type": "string"
++                },
++                {
++                  "name": "sequenceNumber",
++                  "type": "int"
++                },
++                {
++                  "name": "commitTimestamp",
++                  "type": "long"
++                },
++                {
++                  "name": "commitNumber",
++                  "type": "long"
++                },
++                {
++                  "name": "commitUser",
++                  "type": "string"
++                },
++                {
++                  "name": "nulledFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "diffFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "changedFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                }
++              ]
++            }
++          },
++          {
++            "name": "OpportunityId",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "Product2Id",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "Description",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "Quantity",
++            "type": ["null", "double"],
++            "default": null
++          },
++          {
++            "name": "UnitPrice",
++            "type": ["null", "double"],
++            "default": null
++          },
++          {
++            "name": "TotalPrice",
++            "type": ["null", "double"],
++            "default": null
++          },
++          {
++            "name": "SortOrder",
++            "type": ["null", "int"],
++            "default": null
++          },
++          {
++            "name": "LastModifiedDate",
++            "type": ["null", "long"],
++            "default": null
++          }
++        ]
++      }
++    },
++    "Order": {
++      "topic": "/data/OrderChangeEvent",
++      "schemaId": "TESTorderChangeEventSchema0001",
++      "schema": {
++        "type": "record",
++        "name": "OrderChangeEvent",
++        "namespace": "com.sforce.eventbus",
++        "fields": [
++          {
++            "name": "ChangeEventHeader",
++            "type": {
++              "type": "record",
++              "name": "ChangeEventHeader",
++              "fields": [
++                {
++                  "name": "entityName",
++                  "type": "string"
++                },
++                {
++                  "name": "recordIds",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "changeType",
++                  "type": {
++                    "type": "enum",
++                    "name": "ChangeType",
++                    "symbols": [
++                      "CREATE",
++                      "UPDATE",
++                      "DELETE",
++                      "UNDELETE",
++                      "GAP_CREATE",
++                      "GAP_UPDATE",
++                      "GAP_DELETE",
++                      "GAP_UNDELETE",
++                      "GAP_OVERFLOW",
++                      "SNAPSHOT"
++                    ]
++                  }
++                },
++                {
++                  "name": "changeOrigin",
++                  "type": "string"
++                },
++                {
++                  "name": "transactionKey",
++                  "type": "string"
++                },
++                {
++                  "name": "sequenceNumber",
++                  "type": "int"
++                },
++                {
++                  "name": "commitTimestamp",
++                  "type": "long"
++                },
++                {
++                  "name": "commitNumber",
++                  "type": "long"
++                },
++                {
++                  "name": "commitUser",
++                  "type": "string"
++                },
++                {
++                  "name": "nulledFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "diffFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "changedFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                }
++              ]
++            }
++          },
++          {
++            "name": "AccountId",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "OpportunityId",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "OrderNumber",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "Status",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "StatusCode",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "EffectiveDate",
++            "type": [
++              "null",
++              {
++                "type": "int",
++                "logicalType": "date"
++              }
++            ],
++            "default": null
++          },
++          {
++            "name": "TotalAmount",
++            "type": ["null", "double"],
++            "default": null
++          },
++          {
++            "name": "CurrencyIsoCode",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "LastModifiedDate",
++            "type": ["null", "long"],
++            "default": null
++          }
++        ]
++      }
++    },
++    "OrderItem": {
++      "topic": "/data/OrderItemChangeEvent",
++      "schemaId": "TESTorderItemChangeEventSchema1",
++      "schema": {
++        "type": "record",
++        "name": "OrderItemChangeEvent",
++        "namespace": "com.sforce.eventbus",
++        "fields": [
++          {
++            "name": "ChangeEventHeader",
++            "type": {
++              "type": "record",
++              "name": "ChangeEventHeader",
++              "fields": [
++                {
++                  "name": "entityName",
++                  "type": "string"
++                },
++                {
++                  "name": "recordIds",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "changeType",
++                  "type": {
++                    "type": "enum",
++                    "name": "ChangeType",
++                    "symbols": [
++                      "CREATE",
++                      "UPDATE",
++                      "DELETE",
++                      "UNDELETE",
++                      "GAP_CREATE",
++                      "GAP_UPDATE",
++                      "GAP_DELETE",
++                      "GAP_UNDELETE",
++                      "GAP_OVERFLOW",
++                      "SNAPSHOT"
++                    ]
++                  }
++                },
++                {
++                  "name": "changeOrigin",
++                  "type": "string"
++                },
++                {
++                  "name": "transactionKey",
++                  "type": "string"
++                },
++                {
++                  "name": "sequenceNumber",
++                  "type": "int"
++                },
++                {
++                  "name": "commitTimestamp",
++                  "type": "long"
++                },
++                {
++                  "name": "commitNumber",
++                  "type": "long"
++                },
++                {
++                  "name": "commitUser",
++                  "type": "string"
++                },
++                {
++                  "name": "nulledFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "diffFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                },
++                {
++                  "name": "changedFields",
++                  "type": {
++                    "type": "array",
++                    "items": "string"
++                  }
++                }
++              ]
++            }
++          },
++          {
++            "name": "OrderId",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "Product2Id",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "Description",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "Quantity",
++            "type": ["null", "double"],
++            "default": null
++          },
++          {
++            "name": "UnitPrice",
++            "type": ["null", "double"],
++            "default": null
++          },
++          {
++            "name": "TotalPrice",
++            "type": ["null", "double"],
++            "default": null
++          },
++          {
++            "name": "OrderItemNumber",
++            "type": ["null", "string"],
++            "default": null
++          },
++          {
++            "name": "LastModifiedDate",
++            "type": ["null", "long"],
++            "default": null
++          }
++        ]
++      }
++    }
++  }
++}
+diff --git a/packages/connectors/salesforce/package.json b/packages/connectors/salesforce/package.json
+index 59a6740..7ce6384 100644
+--- a/packages/connectors/salesforce/package.json
++++ b/packages/connectors/salesforce/package.json
+@@ -2,7 +2,7 @@
+   "name": "@ledgerforce/connector-salesforce",
+   "version": "0.0.0",
+   "private": true,
+-  "description": "Salesforce connector: External Client App JWT bearer auth and encrypted token store (design §5.2, ADR-0007); Pub/Sub API CDC subscriber with a replay-id store (design §5.3, ADR-0032); sObject Collections write-back from the outbox (design §5.4, ADR-0036); inbound Account/Contact/Product2 mapping to parties and products (design §5.5, T-0065)",
++  "description": "Salesforce connector: External Client App JWT bearer auth and encrypted token store (design \u00a75.2, ADR-0007); Pub/Sub API CDC subscriber with a replay-id store (design \u00a75.3, ADR-0032); sObject Collections write-back from the outbox (design \u00a75.4, ADR-0036); inbound Account/Contact/Product2 mapping to parties and products (design \u00a75.5, T-0065); Closed Won Opportunity / activated Order to one draft sales invoice with auto-approve and status write-back (UC-01, T-0069)",
+   "type": "module",
+   "exports": {
+     ".": "./src/index.ts",
+@@ -14,15 +14,18 @@
+   "dependencies": {
+     "@grpc/grpc-js": "1.14.6",
+     "@grpc/proto-loader": "0.8.1",
++    "@ledgerforce/ar": "workspace:*",
+     "@ledgerforce/db": "workspace:*",
++    "@ledgerforce/ledger": "workspace:*",
++    "@ledgerforce/outbox": "workspace:*",
+     "@ledgerforce/parties": "workspace:*",
++    "@ledgerforce/products": "workspace:*",
+     "@ledgerforce/shared": "workspace:*",
+     "avsc": "5.7.9",
+     "kysely": "0.29.7"
+   },
+   "devDependencies": {
+     "@ledgerforce/gl": "workspace:*",
+-    "@ledgerforce/products": "workspace:*",
+     "@ledgerforce/tax": "workspace:*",
+     "@types/node": "22.20.5",
+     "vitest": "4.1.12"
+diff --git a/packages/connectors/salesforce/src/billing/apply.ts b/packages/connectors/salesforce/src/billing/apply.ts
+new file mode 100644
+index 0000000..ae77e6f
+--- /dev/null
++++ b/packages/connectors/salesforce/src/billing/apply.ts
+@@ -0,0 +1,741 @@
++/**
++ * Closed Won Opportunity / activated Order → one draft sales invoice (T-0069, UC-01 main flow 1–6,
++ * A2–A4, A6; design §4.3, §5.4–§5.6; RQ-0124; migration 0044).
++ *
++ * Per billing change, inside the caller's tenant transaction (the CDC subscriber's batch):
++ *  1. Lock the record's state row; the same version is a duplicate, an older one stale — both are
++ *     counted with the key and nothing else happens (design §5.6 rule 1).
++ *  2. Merge the patch onto the remembered state and store it with the new version.
++ *  3. Evaluate the record's source (the header itself, or the line's Opportunity / Order):
++ *     - already drafted → count the event on the trigger row; never a second invoice;
++ *     - not the configured trigger (design §11.2 setting) or not won / activated → nothing;
++ *     - plan the draft (lines complete, account, products, currency); a gap is a billing issue
++ *       (Sync issues) and the source waits for its next change;
++ *     - the invoice date passes the tenant lock-date policy (T-0023): reject → PERIOD_LOCKED
++ *       issue, no draft; first open date → that date with the policy note as the memo;
++ *     - createSalesInvoice (T-0040) with the key sf:<Entity>:<Id>; each line is resolved through
++ *       the posting-profile matrix (T-0039): any refusal (PROFILE_GAP, TAX_CODE_CONFLICT, …) is a
++ *       warning on the trigger and auto-approve is not tried; otherwise autoApproveSalesInvoice
++ *       decides (threshold, Billing To, credit hold) and posts through the posting engine;
++ *     - one write-back event with the final status (invoice.drafted or invoice.posted, T-0067
++ *       contract v1) in the same transaction; the trigger row; open issues resolved.
++ *
++ * This module never writes ledger tables: posting is autoApproveSalesInvoice → packages/ledger.
++ */
++import {
++  autoApproveSalesInvoice,
++  createSalesInvoice,
++  getSalesInvoice,
++  loadInvoiceSettings,
++  SalesInvoiceError,
++  type AutoApproveResult,
++  type CreditHoldCheck,
++  type InvoiceNotifier,
++} from '@ledgerforce/ar';
++import type { Database } from '@ledgerforce/db';
++import {
++  PeriodLockedError,
++  PostingError,
++  resolvePostingDate,
++  type PostingOutbox,
++} from '@ledgerforce/ledger';
++import { enqueue, type OutboxMessage } from '@ledgerforce/outbox';
++import { toSalesforceId18 } from '@ledgerforce/parties';
++import { PostingProfileResolutionError, resolvePartyProductPosting } from '@ledgerforce/products';
++import { sql, type Transaction } from 'kysely';
++import {
++  compareVersion,
++  mergeState,
++  type RecordVersion,
++  type SfState,
++} from '../inbound/changes.ts';
++import type { CdcHandler } from '../pubsub/subscriber.ts';
++import {
++  billingChangesFromCdcEvent,
++  DEFAULT_BILLING_SETTINGS,
++  isLineEntity,
++  isTriggered,
++  LINE_OF,
++  planDraft,
++  sourceOf,
++  TRIGGER_ENTITY,
++  type BillingChange,
++  type BillingEntity,
++  type BillingSettings,
++  type BlockingCode,
++  type SourceEntity,
++} from './source.ts';
++
++type Trx = Transaction<Database>;
++
++/** Write-back topics (writeback/mapping.ts WRITEBACK_TOPICS). */
++export const INVOICE_DRAFTED_TOPIC = 'invoice.drafted';
++export const INVOICE_STATUS_POSTED_TOPIC = 'invoice.posted';
++export const SALES_INVOICE_AGGREGATE = 'sales_invoice';
++
++/** Where the write-back event goes: production is the transactional outbox (billingOutbox). */
++export interface BillingOutbox {
++  enqueue(trx: Trx, msg: OutboxMessage): Promise<unknown>;
++}
++
++/** The transactional outbox (ADR-0008): the event commits or rolls back with the draft. */
++export const billingOutbox = (boss: Parameters<typeof enqueue>[1]): BillingOutbox => ({
++  enqueue: (trx, msg) => enqueue(trx, boss, msg),
++});
++
++export interface BillingDeps {
++  outbox: BillingOutbox;
++  /** The posting engine's outbox hook for auto-posted invoices (ledgerOutbox in production). */
++  postingOutbox?: PostingOutbox;
++  /** Invoice email notice on auto-post (invoiceOutboxNotifier in production, T-0042). */
++  notifier?: InvoiceNotifier;
++  creditHold?: CreditHoldCheck;
++}
++
++export interface DraftWarning {
++  code: string;
++  /** Invoice line number, when the warning is about a line. */
++  lineNo: number | null;
++  message: string;
++  /** True for posting-profile refusals: the draft waits for a person (UC-01 A2). */
++  blocksAutoApprove: boolean;
++}
++
++export type SourceResult =
++  | { status: 'not_triggered' }
++  | { status: 'not_this_trigger'; triggerSource: BillingSettings['triggerSource'] }
++  | { status: 'waiting'; code: BlockingCode }
++  | { status: 'already_drafted'; invoiceId: string }
++  | {
++      status: 'drafted';
++      invoiceId: string;
++      warnings: DraftWarning[];
++      auto: AutoApproveResult | { outcome: 'draft'; reason: string };
++    };
++
++export interface BillingApplyResult {
++  outcome: 'applied' | 'duplicate' | 'stale' | 'rejected';
++  /** What happened to the record's source; null when the change was not applied. */
++  source: SourceResult | null;
++}
++
++export interface BillingRecord {
++  entity: BillingEntity;
++  recordId: string;
++  parentId: string | null;
++  state: 'live' | 'deleted';
++  fields: SfState;
++  version: RecordVersion;
++  lastKey: string;
++  duplicates: number;
++  stale: number;
++  lastSkippedKey: string | null;
++}
++
++export interface BillingTrigger {
++  id: string;
++  sourceEntity: SourceEntity;
++  recordId: string;
++  accountId: string;
++  invoiceId: string;
++  triggerKey: string;
++  sourceDate: string;
++  note: string | null;
++  warnings: DraftWarning[];
++  autoApprove: 'posted' | 'draft';
++  autoReason: string | null;
++  laterEvents: number;
++  lastEventKey: string | null;
++}
++
++export interface BillingIssue {
++  id: string;
++  sourceEntity: SourceEntity;
++  recordId: string;
++  code: BlockingCode;
++  message: string;
++  status: 'open' | 'resolved' | 'ignored';
++  occurrences: number;
++  lastKey: string;
++  payload: SfState;
++}
++
++// --- settings -----------------------------------------------------------------------------------
++
++/** The company's current trigger setting (latest row), else the defaults (RQ-0124 F1, F6). */
++export async function loadBillingSettings(trx: Trx, companyId: string): Promise<BillingSettings> {
++  const r = await sql<{
++    trigger_source: BillingSettings['triggerSource'];
++    won_stages: string[];
++    payment_terms_days: number;
++  }>`
++    SELECT trigger_source, won_stages, payment_terms_days FROM app.salesforce_billing_settings
++     WHERE company_id = ${companyId} ORDER BY set_at DESC, id DESC LIMIT 1`.execute(trx);
++  const row = r.rows[0];
++  return row
++    ? {
++        triggerSource: row.trigger_source,
++        wonStages: row.won_stages,
++        paymentTermsDays: row.payment_terms_days,
++      }
++    : { ...DEFAULT_BILLING_SETTINGS, wonStages: [...DEFAULT_BILLING_SETTINGS.wonStages] };
++}
++
++/** Record a new trigger setting (history); omitted values keep the current ones. */
++export async function setBillingSettings(
++  trx: Trx,
++  s: Partial<BillingSettings> & { companyId: string; setBy: string; reason: string },
++): Promise<void> {
++  const cur = await loadBillingSettings(trx, s.companyId);
++  const next = { ...cur, ...s };
++  await sql`
++    INSERT INTO app.salesforce_billing_settings
++      (company_id, trigger_source, won_stages, payment_terms_days, set_by, reason)
++    VALUES (${s.companyId}, ${next.triggerSource}, ${next.wonStages}::text[],
++            ${next.paymentTermsDays}, ${s.setBy}, ${s.reason})`.execute(trx);
++}
++
++// --- record state -------------------------------------------------------------------------------
++
++interface RecordRow {
++  entity: BillingEntity;
++  record_id: string;
++  parent_id: string | null;
++  state: 'live' | 'deleted';
++  fields: SfState;
++  commit_number: string | null;
++  sequence_number: number;
++  commit_at: Date;
++  last_key: string;
++  duplicates: number;
++  stale: number;
++  last_skipped_key: string | null;
++}
++
++const toRecord = (r: RecordRow): BillingRecord => ({
++  entity: r.entity,
++  recordId: r.record_id,
++  parentId: r.parent_id,
++  state: r.state,
++  fields: r.fields,
++  version: {
++    commitNumber: r.commit_number === null ? null : BigInt(r.commit_number),
++    sequenceNumber: r.sequence_number,
++    at: r.commit_at,
++  },
++  lastKey: r.last_key,
++  duplicates: r.duplicates,
++  stale: r.stale,
++  lastSkippedKey: r.last_skipped_key,
++});
++
++async function loadRecord(
++  trx: Trx,
++  companyId: string,
++  entity: BillingEntity,
++  recordId: string,
++  lock: boolean,
++): Promise<BillingRecord | null> {
++  const { rows } = await sql<RecordRow>`
++    SELECT entity, record_id, parent_id, state, fields, commit_number::text AS commit_number,
++           sequence_number, commit_at, last_key, duplicates, stale, last_skipped_key
++      FROM app.salesforce_billing_record
++     WHERE company_id = ${companyId} AND entity = ${entity} AND record_id = ${recordId}
++     ${lock ? sql`FOR UPDATE` : sql``}`.execute(trx);
++  const row = rows[0];
++  return row ? toRecord(row) : null;
++}
++
++export const getBillingRecord = (
++  trx: Trx,
++  companyId: string,
++  entity: BillingEntity,
++  recordId: string,
++) => loadRecord(trx, companyId, entity, recordId, false);
++
++async function saveRecord(
++  trx: Trx,
++  companyId: string,
++  c: BillingChange,
++  s: { parentId: string | null; state: 'live' | 'deleted'; fields: SfState },
++): Promise<void> {
++  const v = c.version;
++  await sql`
++    INSERT INTO app.salesforce_billing_record
++      (company_id, entity, record_id, parent_id, state, fields, commit_number, sequence_number,
++       commit_at, last_key)
++    VALUES (${companyId}, ${c.entity}, ${c.recordId}, ${s.parentId}, ${s.state},
++            ${JSON.stringify(s.fields)}::jsonb, ${v.commitNumber?.toString() ?? null}::bigint,
++            ${v.sequenceNumber}, ${v.at}, ${c.key})
++    ON CONFLICT (tenant_id, company_id, entity, record_id) DO UPDATE SET
++      parent_id = EXCLUDED.parent_id,
++      state = EXCLUDED.state,
++      fields = EXCLUDED.fields,
++      commit_number = EXCLUDED.commit_number,
++      sequence_number = EXCLUDED.sequence_number,
++      commit_at = EXCLUDED.commit_at,
++      last_key = EXCLUDED.last_key`.execute(trx);
++}
++
++async function countSkipped(
++  trx: Trx,
++  companyId: string,
++  c: BillingChange,
++  kind: 'duplicate' | 'stale',
++): Promise<void> {
++  const counter = kind === 'duplicate' ? sql`duplicates` : sql`stale`;
++  await sql`
++    UPDATE app.salesforce_billing_record
++       SET ${counter} = ${counter} + 1, last_skipped_key = ${c.key},
++           last_skipped_at = clock_timestamp()
++     WHERE company_id = ${companyId} AND entity = ${c.entity} AND record_id = ${c.recordId}`.execute(
++    trx,
++  );
++}
++
++// --- triggers and issues ------------------------------------------------------------------------
++
++interface TriggerRow {
++  id: string;
++  source_entity: SourceEntity;
++  record_id: string;
++  account_id: string;
++  invoice_id: string;
++  trigger_key: string;
++  source_date: string;
++  note: string | null;
++  warnings: DraftWarning[];
++  auto_approve: 'posted' | 'draft';
++  auto_reason: string | null;
++  later_events: number;
++  last_event_key: string | null;
++}
++
++async function loadTrigger(
++  trx: Trx,
++  companyId: string,
++  entity: SourceEntity,
++  recordId: string,
++): Promise<BillingTrigger | null> {
++  const { rows } = await sql<TriggerRow>`
++    SELECT id::text, source_entity, record_id, account_id, invoice_id::text, trigger_key,
++           to_char(source_date, 'YYYY-MM-DD') AS source_date, note, warnings, auto_approve,
++           auto_reason, later_events, last_event_key
++      FROM app.salesforce_billing_trigger
++     WHERE company_id = ${companyId} AND source_entity = ${entity} AND record_id = ${recordId}`.execute(
++    trx,
++  );
++  const r = rows[0];
++  if (!r) return null;
++  return {
++    id: r.id,
++    sourceEntity: r.source_entity,
++    recordId: r.record_id,
++    accountId: r.account_id,
++    invoiceId: r.invoice_id,
++    triggerKey: r.trigger_key,
++    sourceDate: r.source_date,
++    note: r.note,
++    warnings: r.warnings,
++    autoApprove: r.auto_approve,
++    autoReason: r.auto_reason,
++    laterEvents: r.later_events,
++    lastEventKey: r.last_event_key,
++  };
++}
++
++export const getBillingTrigger = loadTrigger;
++
++/** Raise (or bump) the live issue of `code` for a source; other live issues of it are resolved. */
++async function raiseIssue(
++  trx: Trx,
++  companyId: string,
++  src: { entity: SourceEntity; recordId: string },
++  code: BlockingCode,
++  message: string,
++  payload: SfState,
++  key: string,
++): Promise<void> {
++  const text = message.slice(0, 1000);
++  const updated = await sql`
++    UPDATE app.salesforce_billing_issue
++       SET occurrences = occurrences + 1, message = ${text},
++           payload = ${JSON.stringify(payload)}::jsonb, last_key = ${key},
++           last_seen_at = clock_timestamp()
++     WHERE company_id = ${companyId} AND source_entity = ${src.entity}
++       AND record_id = ${src.recordId} AND code = ${code} AND status IN ('open', 'ignored')`.execute(
++    trx,
++  );
++  if (Number(updated.numAffectedRows ?? 0n) === 0) {
++    await sql`
++      INSERT INTO app.salesforce_billing_issue
++        (company_id, source_entity, record_id, code, message, payload, last_key)
++      VALUES (${companyId}, ${src.entity}, ${src.recordId}, ${code}, ${text},
++              ${JSON.stringify(payload)}::jsonb, ${key})`.execute(trx);
++  }
++  await resolveIssues(trx, companyId, src, key, code);
++}
++
++/** Resolve the source's live issues (except `keep`): the problem no longer occurs. */
++async function resolveIssues(
++  trx: Trx,
++  companyId: string,
++  src: { entity: SourceEntity; recordId: string },
++  key: string,
++  keep: BlockingCode | null = null,
++): Promise<void> {
++  await sql`
++    UPDATE app.salesforce_billing_issue
++       SET status = 'resolved', resolved_at = clock_timestamp(), last_key = ${key}
++     WHERE company_id = ${companyId} AND source_entity = ${src.entity}
++       AND record_id = ${src.recordId} AND status IN ('open', 'ignored')
++       ${keep === null ? sql`` : sql`AND code <> ${keep}`}`.execute(trx);
++}
++
++export async function listBillingIssues(trx: Trx, companyId: string): Promise<BillingIssue[]> {
++  const { rows } = await sql<{
++    id: string;
++    source_entity: SourceEntity;
++    record_id: string;
++    code: BlockingCode;
++    message: string;
++    status: BillingIssue['status'];
++    occurrences: number;
++    last_key: string;
++    payload: SfState;
++  }>`
++    SELECT id::text, source_entity, record_id, code, message, status, occurrences, last_key, payload
++      FROM app.salesforce_billing_issue
++     WHERE company_id = ${companyId}
++     ORDER BY first_seen_at, id`.execute(trx);
++  return rows.map((r) => ({
++    id: r.id,
++    sourceEntity: r.source_entity,
++    recordId: r.record_id,
++    code: r.code,
++    message: r.message,
++    status: r.status,
++    occurrences: r.occurrences,
++    lastKey: r.last_key,
++    payload: r.payload,
++  }));
++}
++
++// --- evaluation ---------------------------------------------------------------------------------
++
++const addDays = (date: string, days: number): string => {
++  const d = new Date(`${date}T00:00:00Z`);
++  d.setUTCDate(d.getUTCDate() + days);
++  return d.toISOString().slice(0, 10);
++};
++
++/** The posting-profile refusals of the draft's lines, as warnings (UC-01 A2, SS-UC01-06). */
++async function draftWarnings(
++  trx: Trx,
++  companyId: string,
++  partyId: string,
++  productIds: readonly string[],
++): Promise<DraftWarning[]> {
++  const out: DraftWarning[] = [];
++  for (const [i, productId] of productIds.entries()) {
++    try {
++      await resolvePartyProductPosting(trx, {
++        companyId,
++        partyId,
++        productId,
++        direction: 'sale',
++        slot: 'revenue',
++      });
++    } catch (e) {
++      if (!(e instanceof PostingProfileResolutionError)) throw e;
++      out.push({ code: e.code, lineNo: i + 1, message: e.message, blocksAutoApprove: true });
++    }
++  }
++  return out;
++}
++
++/** Auto-approve in a savepoint: an engine refusal leaves the draft untouched, with the reason. */
++async function tryAutoApprove(
++  trx: Trx,
++  companyId: string,
++  invoiceId: string,
++  deps: BillingDeps,
++): Promise<AutoApproveResult | { outcome: 'draft'; reason: string }> {
++  const settings = await loadInvoiceSettings(trx, companyId);
++  await sql`SAVEPOINT lf_billing_auto`.execute(trx);
++  try {
++    const r = await autoApproveSalesInvoice(trx, {
++      id: invoiceId,
++      settings,
++      ...(deps.creditHold === undefined ? {} : { creditHold: deps.creditHold }),
++      ...(deps.postingOutbox === undefined ? {} : { outbox: deps.postingOutbox }),
++      ...(deps.notifier === undefined ? {} : { notifier: deps.notifier }),
++    });
++    await sql`RELEASE SAVEPOINT lf_billing_auto`.execute(trx);
++    return r;
++  } catch (e) {
++    if (!(e instanceof PostingError || e instanceof PeriodLockedError)) throw e;
++    await sql`ROLLBACK TO SAVEPOINT lf_billing_auto`.execute(trx);
++    await sql`RELEASE SAVEPOINT lf_billing_auto`.execute(trx);
++    return { outcome: 'draft', reason: e.code };
++  }
++}
++
++/** The write-back event with the invoice's final status (one per transaction, DL-0373). */
++async function writeBackEvent(
++  trx: Trx,
++  companyId: string,
++  src: { entity: SourceEntity; recordId: string },
++  accountId: string,
++  invoiceId: string,
++  deps: BillingDeps,
++): Promise<void> {
++  const doc = await getSalesInvoice(trx, invoiceId);
++  const posted = doc.status === 'posted';
++  const opportunity = src.entity === 'Opportunity' ? src.recordId : null;
++  const invoice: Record<string, unknown> = {
++    id: doc.id,
++    status: doc.status,
++    issueDate: doc.invoiceDate,
++    dueDate: doc.dueDate,
++    accountSfId: accountId,
++    ...(opportunity === null ? {} : { opportunitySfId: opportunity }),
++  };
++  if (posted) {
++    Object.assign(invoice, { number: doc.invoiceNo, total: doc.total, amountDue: doc.total });
++  }
++  const writeBack: Record<string, unknown> = { version: 1, invoices: [invoice] };
++  if (opportunity !== null) {
++    writeBack.opportunities = [
++      {
++        sfId: opportunity,
++        invoiceStatus: doc.status,
++        ...(posted ? { amountInvoiced: doc.total } : {}),
++      },
++    ];
++  }
++  await deps.outbox.enqueue(trx, {
++    companyId,
++    topic: posted ? INVOICE_STATUS_POSTED_TOPIC : INVOICE_DRAFTED_TOPIC,
++    aggregateType: SALES_INVOICE_AGGREGATE,
++    aggregateId: doc.id,
++    payload: { source: src, writeBack },
++  });
++}
++
++/**
++ * Evaluate one billing source after a change of it or of one of its lines. Never creates a
++ * second invoice for a source.
++ */
++export async function evaluateBillingSource(
++  trx: Trx,
++  companyId: string,
++  src: { entity: SourceEntity; recordId: string },
++  key: string,
++  deps: BillingDeps,
++): Promise<SourceResult> {
++  // The header row is the per-source lock (a line change arrives without it).
++  const header = await loadRecord(trx, companyId, src.entity, src.recordId, true);
++  const existing = await loadTrigger(trx, companyId, src.entity, src.recordId);
++  if (existing) {
++    if (existing.triggerKey !== key) {
++      await sql`
++        UPDATE app.salesforce_billing_trigger
++           SET later_events = later_events + 1, last_event_key = ${key}
++         WHERE id = ${existing.id}`.execute(trx);
++    }
++    return { status: 'already_drafted', invoiceId: existing.invoiceId };
++  }
++  const settings = await loadBillingSettings(trx, companyId);
++  if (TRIGGER_ENTITY[settings.triggerSource] !== src.entity) {
++    return { status: 'not_this_trigger', triggerSource: settings.triggerSource };
++  }
++  if (!header || header.state === 'deleted' || !isTriggered(src.entity, header.fields, settings)) {
++    await resolveIssues(trx, companyId, src, key);
++    return { status: 'not_triggered' };
++  }
++  const waiting = async (code: BlockingCode, message: string): Promise<SourceResult> => {
++    await raiseIssue(trx, companyId, src, code, message, header.fields, key);
++    return { status: 'waiting', code };
++  };
++
++  const { rows: lineRows } = await sql<{ record_id: string; fields: SfState }>`
++    SELECT record_id, fields FROM app.salesforce_billing_record
++     WHERE company_id = ${companyId} AND entity = ${LINE_OF[src.entity]}
++       AND parent_id = ${src.recordId} AND state = 'live'`.execute(trx);
++  const plan = planDraft(
++    src.entity,
++    header.fields,
++    lineRows.map((r) => ({ recordId: r.record_id, fields: r.fields })),
++  );
++  if (!plan.ok) return waiting(plan.code, plan.message);
++
++  const company = await trx
++    .selectFrom('app.company')
++    .select('base_currency')
++    .where('id', '=', companyId)
++    .executeTakeFirstOrThrow();
++  if (plan.currency !== null && plan.currency !== company.base_currency) {
++    return waiting(
++      'INVALID_SOURCE',
++      `${src.entity} currency ${plan.currency}: only the base currency ${company.base_currency} is invoiced today`,
++    );
++  }
++  const party = await trx
++    .selectFrom('app.party')
++    .select('id')
++    .where('company_id', '=', companyId)
++    .where('salesforce_account_id', '=', plan.accountId)
++    .executeTakeFirst();
++  if (!party) {
++    return waiting(
++      'UNKNOWN_ACCOUNT',
++      `Account ${plan.accountId} is not in LedgerForce (not synced yet, or rejected — see the inbound issues); the draft is created by the next change after it syncs`,
++    );
++  }
++  const sfProducts = [...new Set(plan.lines.map((l) => l.productId))];
++  const products = await trx
++    .selectFrom('app.product')
++    .select(['id', 'name', 'salesforce_product_id'])
++    .where('company_id', '=', companyId)
++    .where('salesforce_product_id', 'in', sfProducts)
++    .execute();
++  const bySf = new Map(products.map((p) => [p.salesforce_product_id, p]));
++  const missing = sfProducts.filter((p) => !bySf.has(p));
++  if (missing.length > 0) {
++    return waiting(
++      'UNKNOWN_PRODUCT',
++      `Product2 ${missing.join(', ')} not in LedgerForce (not synced yet, or rejected); the draft is created by the next change after it syncs`,
++    );
++  }
++
++  let date: { entryDate: string; note?: string };
++  try {
++    date = await resolvePostingDate(trx, {
++      companyId,
++      entryDate: plan.date,
++      sourceType: 'ar_invoice',
++    });
++  } catch (e) {
++    if (!(e instanceof PeriodLockedError)) throw e;
++    return waiting('PERIOD_LOCKED', e.message);
++  }
++
++  let created: { id: string };
++  try {
++    created = await createSalesInvoice(trx, {
++      input: {
++        companyId,
++        partyId: party.id,
++        invoiceDate: date.entryDate,
++        dueDate: addDays(date.entryDate, settings.paymentTermsDays),
++        amountsAre: 'exclusive',
++        ...(date.note === undefined ? {} : { memo: date.note }),
++        lines: plan.lines.map((l) => {
++          const p = bySf.get(l.productId);
++          const description = l.description ?? p?.name;
++          return {
++            productId: p?.id ?? '',
++            ...(description === undefined ? {} : { description }),
++            amount: l.amount,
++          };
++        }),
++      },
++      createdBy: null,
++      idempotencyKey: `sf:${src.entity}:${src.recordId}`,
++    });
++  } catch (e) {
++    if (!(e instanceof SalesInvoiceError)) throw e;
++    return waiting('INVOICE_REFUSED', e.message);
++  }
++
++  const warnings = await draftWarnings(
++    trx,
++    companyId,
++    party.id,
++    plan.lines.map((l) => bySf.get(l.productId)?.id ?? ''),
++  );
++  for (const skipped of plan.skipped) {
++    warnings.push({
++      code: 'ZERO_PRICE_LINE',
++      lineNo: null,
++      message: `line item ${skipped} has TotalPrice 0 and is not on the invoice`,
++      blocksAutoApprove: false,
++    });
++  }
++  const blocking = warnings.find((x) => x.blocksAutoApprove);
++  const auto =
++    blocking === undefined
++      ? await tryAutoApprove(trx, companyId, created.id, deps)
++      : ({ outcome: 'draft', reason: blocking.code } as const);
++
++  await writeBackEvent(trx, companyId, src, plan.accountId, created.id, deps);
++  await sql`
++    INSERT INTO app.salesforce_billing_trigger
++      (company_id, source_entity, record_id, account_id, invoice_id, trigger_key, source_date,
++       note, warnings, auto_approve, auto_reason)
++    VALUES (${companyId}, ${src.entity}, ${src.recordId}, ${plan.accountId}, ${created.id},
++            ${key}, ${plan.date}, ${date.note ?? null}, ${JSON.stringify(warnings)}::jsonb,
++            ${auto.outcome === 'posted' ? 'posted' : 'draft'},
++            ${auto.outcome === 'posted' ? null : auto.reason})`.execute(trx);
++  await resolveIssues(trx, companyId, src, key);
++  return { status: 'drafted', invoiceId: created.id, warnings, auto };
++}
++
++// --- entry points -------------------------------------------------------------------------------
++
++export async function applyBillingChange(
++  trx: Trx,
++  companyId: string,
++  change: BillingChange,
++  deps: BillingDeps,
++): Promise<BillingApplyResult> {
++  let recordId: string;
++  try {
++    recordId = toSalesforceId18(change.recordId);
++  } catch {
++    return { outcome: 'rejected', source: null };
++  }
++  const c: BillingChange = { ...change, recordId };
++  const prev = await loadRecord(trx, companyId, c.entity, recordId, true);
++  if (prev) {
++    const order = compareVersion(c.version, prev.version);
++    if (order !== 'newer') {
++      await countSkipped(trx, companyId, c, order === 'same' ? 'duplicate' : 'stale');
++      return { outcome: order === 'same' ? 'duplicate' : 'stale', source: null };
++    }
++  }
++  const fields =
++    c.op === 'delete' ? (prev?.fields ?? {}) : mergeState(prev?.fields ?? {}, c.fields);
++  const deleted = c.op === 'delete' || (c.op === 'upsert' && prev?.state === 'deleted');
++  const src = sourceOf(c.entity, recordId, fields);
++  const parentId = isLineEntity(c.entity) ? (src?.recordId ?? null) : null;
++  await saveRecord(trx, companyId, c, { parentId, state: deleted ? 'deleted' : 'live', fields });
++  if (src === null) return { outcome: 'applied', source: null };
++  // A line whose parent field changed also re-evaluates the source it left.
++  if (isLineEntity(c.entity) && prev?.parentId && prev.parentId !== parentId) {
++    await evaluateBillingSource(
++      trx,
++      companyId,
++      { entity: src.entity, recordId: prev.parentId },
++      c.key,
++      deps,
++    );
++  }
++  return {
++    outcome: 'applied',
++    source: await evaluateBillingSource(trx, companyId, src, c.key, deps),
++  };
++}
++
++/**
++ * The CDC subscriber handler (T-0064 `runSubscription`) for the Opportunity, OpportunityLineItem,
++ * Order and OrderItem channels of one company.
++ */
++export function salesforceBillingHandler(companyId: string, deps: BillingDeps): CdcHandler {
++  return async (trx, event, recordIds) => {
++    for (const change of billingChangesFromCdcEvent(event, recordIds)) {
++      await applyBillingChange(trx, companyId, change, deps);
++    }
++  };
++}
+diff --git a/packages/connectors/salesforce/src/billing/closed-won.db.test.ts b/packages/connectors/salesforce/src/billing/closed-won.db.test.ts
+new file mode 100644
+index 0000000..6e753ee
+--- /dev/null
++++ b/packages/connectors/salesforce/src/billing/closed-won.db.test.ts
+@@ -0,0 +1,614 @@
++/**
++ * Closed Won / Order activated → draft sales invoice (T-0069, UC-01; RQ-0124; migration 0044).
++ * Real PostgreSQL as lf_app. Account / Contact / Product2 reach LedgerForce through the T-0065
++ * inbound applier, Opportunity / OpportunityLineItem / Order / OrderItem through the billing
++ * applier, all built from the documented Avro fixtures exactly as production decodes them. The
++ * outbox is a recorder; its write-back payloads are checked through the T-0067 mapping. No org.
++ *
++ *  SS-UC01-01 Closed Won creates exactly one Draft from the Opportunity lines (PROFESSIONAL_SERVICES
++ *             and SUBSCRIPTION profiles, tax code GST); SS-UC01-02 backend half: the write-back
++ *             event sets Opportunity.LF_Invoice_Status__c = "Draft".
++ *  SS-UC01-04 Above the auto-approve threshold the draft stays Draft, no journal.
++ *  SS-UC01-06 A posting-profile gap leaves the draft with a PROFILE_GAP warning, nothing posts,
++ *             the gap check lists the combination (also TAX_CODE_CONFLICT).
++ *  SS-UC01-07 The same CDC event twice → one draft, the second logged as duplicate.
++ *  SS-UC01-08 Close date in a hard-locked October: "reject" → PERIOD_LOCKED billing issue, no
++ *             draft; "first open date" → invoice dated 2026-11-01 with the policy note.
++ */
++import { SfNumber } from '../writeback/batch.ts';
++import { mapToRecords, parseWriteBackPayload } from '../writeback/mapping.ts';
++import { getSalesInvoice, previewSalesInvoice, setInvoiceSettings } from '@ledgerforce/ar';
++import { DEFAULT_PERIOD_SETTINGS, setPeriodSettings } from '@ledgerforce/ledger';
++import { postingProfileGapCheck, resolvePartyProductPosting } from '@ledgerforce/products';
++import { sql } from 'kysely';
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import { billingCdc1, billingId, decodeBillingEvent, epochDay } from '../testing/billing-events.ts';
++import { nextCommit, startBillingWorld, type BillingWorld } from '../testing/billing-world.ts';
++import { sfId } from '../testing/master-data-events.ts';
++import {
++  getBillingRecord,
++  getBillingTrigger,
++  listBillingIssues,
++  salesforceBillingHandler,
++  setBillingSettings,
++} from './apply.ts';
++
++const T = '01900000-0000-7000-8000-000000006901';
++let w: BillingWorld;
++let PS: string;
++let SUB: string;
++let oppNo = 0;
++let lineNo = 0;
++
++const opp = () => billingId('006', (oppNo += 1));
++
++/** Two line items (services $1,000, subscription $250) on Opportunity `id`. */
++async function addLines(
++  id: string,
++  lines: { product: string; total: number; description?: string }[],
++): Promise<string[]> {
++  const ids: string[] = [];
++  for (const [i, l] of lines.entries()) {
++    const lineId = billingId('00k', (lineNo += 1));
++    ids.push(lineId);
++    await w.bill(
++      billingCdc1({
++        entity: 'OpportunityLineItem',
++        recordIds: [lineId],
++        changeType: 'CREATE',
++        commitNumber: nextCommit(),
++        fields: {
++          OpportunityId: id,
++          Product2Id: l.product,
++          Description: l.description ?? null,
++          Quantity: 1,
++          UnitPrice: l.total,
++          TotalPrice: l.total,
++          SortOrder: i + 1,
++        },
++      }),
++    );
++  }
++  return ids;
++}
++
++const createOpp = (id: string, account: string, closeDate: string, amount: number) =>
++  w.bill(
++    billingCdc1({
++      entity: 'Opportunity',
++      recordIds: [id],
++      changeType: 'CREATE',
++      commitNumber: nextCommit(),
++      fields: {
++        Name: `Deal ${id.slice(-6)}`,
++        AccountId: account,
++        StageName: 'Negotiation/Review',
++        IsClosed: false,
++        IsWon: false,
++        CloseDate: epochDay(closeDate),
++        Amount: amount,
++        CurrencyIsoCode: 'AUD',
++      },
++    }),
++  );
++
++const closedWonEvent = (id: string, commitNumber = nextCommit()) => ({
++  entity: 'Opportunity' as const,
++  recordIds: [id],
++  changeType: 'UPDATE' as const,
++  commitNumber,
++  fields: { StageName: 'Closed Won', IsClosed: true, IsWon: true },
++  changed: ['StageName', 'IsClosed', 'IsWon'],
++});
++const closeWon = (id: string) => w.bill(billingCdc1(closedWonEvent(id)));
++
++const invoicesOf = (sourceKey: string) =>
++  w.inTenant(async (trx) => {
++    const r = await sql<{ id: string; status: string }>`
++      SELECT id::text, status FROM app.sales_invoice
++       WHERE company_id = ${w.companyId} AND idempotency_key = ${sourceKey}`.execute(trx);
++    return r.rows;
++  });
++const autoApprove = (on: boolean, threshold: string) =>
++  w.inTenant((trx) =>
++    setInvoiceSettings(trx, {
++      companyId: w.companyId,
++      autoApprove: on,
++      threshold,
++      setBy: w.financeAdmin,
++      reason: `auto-approve ${String(on)} ≤ ${threshold}`,
++    }),
++  );
++const lockPolicy = (policy: 'reject' | 'post_to_first_open_date_with_note') =>
++  w.inTenant((trx) =>
++    setPeriodSettings(trx, {
++      settings: { ...DEFAULT_PERIOD_SETTINGS, lockDatePolicy: policy },
++      setBy: w.financeAdmin,
++      reason: `lock policy ${policy}`,
++    }),
++  );
++const profileCode = (id: string) =>
++  w.inTenant(async (trx) => {
++    const r = await sql<{ code: string | null }>`
++      SELECT pp.code FROM app.product p
++        LEFT JOIN app.product_posting_profile pp ON pp.id = p.product_posting_profile_id
++       WHERE p.id = ${id}`.execute(trx);
++    return r.rows[0]?.code ?? null;
++  });
++
++beforeAll(async () => {
++  w = await startBillingWorld(T);
++  PS = await w.product(1, 'Professional services', 'Professional Services', 'GST');
++  SUB = await w.product(2, 'Subscription', 'Subscription', 'GST');
++  await w.customer(1, { name: 'Acme Pty Ltd' });
++});
++
++afterAll(async () => {
++  await w?.close();
++});
++
++describe('SS-UC01-01: Closed Won creates a draft invoice from the template', () => {
++  it('an Opportunity with two line items moving to Closed Won → exactly one Draft with two mapped lines, tax code GST', async () => {
++    const id = opp();
++    const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++    await createOpp(id, account, '2026-11-05', 1250);
++    await addLines(id, [
++      { product: PS, total: 1000, description: 'Professional services' },
++      { product: SUB, total: 250, description: 'Subscription' },
++    ]);
++    expect(await invoicesOf(`sf:Opportunity:${id}`)).toEqual([]); // not won yet
++
++    const before = w.messages.length;
++    const r = await closeWon(id);
++    expect(r.outcome).toBe('applied');
++    expect(r.source).toMatchObject({ status: 'drafted', warnings: [] });
++
++    const invoices = await invoicesOf(`sf:Opportunity:${id}`);
++    expect(invoices).toHaveLength(1);
++    const invoiceId = invoices[0]?.id ?? '';
++    const doc = await w.inTenant((trx) => getSalesInvoice(trx, invoiceId));
++    expect(doc).toMatchObject({
++      status: 'draft',
++      invoiceDate: '2026-11-05',
++      dueDate: '2026-11-19', // payment terms default 14 days (RQ-0124 F6)
++      amountsAre: 'exclusive',
++      currency: 'AUD',
++      createdBy: null,
++      journalEntryId: null,
++    });
++    expect(doc.lines.map((l) => [l.amount, l.description, l.taxCode])).toEqual([
++      ['1000.0000', 'Professional services', null],
++      ['250.0000', 'Subscription', null],
++    ]);
++    expect(await Promise.all(doc.lines.map((l) => profileCode(l.productId)))).toEqual([
++      'PROFESSIONAL_SERVICES',
++      'SUBSCRIPTION',
++    ]);
++    const resolved = await w.inTenant((trx) =>
++      Promise.all(
++        doc.lines.map((l) =>
++          resolvePartyProductPosting(trx, {
++            companyId: w.companyId,
++            partyId: doc.partyId,
++            productId: l.productId,
++            direction: 'sale',
++            slot: 'revenue',
++          }),
++        ),
++      ),
++    );
++    expect(resolved.map((x) => x.taxCode)).toEqual(['GST', 'GST']);
++    const preview = await w.inTenant((trx) => previewSalesInvoice(trx, invoiceId));
++    expect([preview.netTotal, preview.taxTotal]).toEqual(['1250.0000', '125.0000']); // NUMERIC(19,4) text
++    expect(await w.countEntries()).toBe(0);
++
++    const trigger = await w.inTenant((trx) =>
++      getBillingTrigger(trx, w.companyId, 'Opportunity', id),
++    );
++    expect(trigger).toMatchObject({
++      invoiceId,
++      accountId: account,
++      sourceDate: '2026-11-05',
++      autoApprove: 'draft',
++      autoReason: 'AUTO_APPROVE_OFF',
++      warnings: [],
++      laterEvents: 0,
++    });
++
++    // SS-UC01-02 (backend half): one write-back event, Opportunity → "Draft", mirror upserted.
++    const sent = w.messages.slice(before);
++    expect(sent.map((m) => [m.topic, m.aggregateType, m.aggregateId])).toEqual([
++      ['invoice.drafted', 'sales_invoice', invoiceId],
++    ]);
++    const records = mapToRecords(parseWriteBackPayload(sent[0]?.payload));
++    expect(records).toEqual([
++      {
++        op: 'upsert',
++        sobject: 'LF_Invoice__c',
++        externalIdField: 'LF_Id__c',
++        key: invoiceId,
++        fields: {
++          LF_Status__c: 'Draft',
++          LF_Issue_Date__c: '2026-11-05',
++          LF_Due_Date__c: '2026-11-19',
++          LF_Account__c: account,
++          LF_Opportunity__c: id,
++        },
++      },
++      { op: 'update', sobject: 'Opportunity', key: id, fields: { LF_Invoice_Status__c: 'Draft' } },
++    ]);
++  });
++
++  it('the CDC handler takes the same path: decoded events, one draft', async () => {
++    const id = opp();
++    const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++    await createOpp(id, account, '2026-11-06', 250);
++    await addLines(id, [{ product: SUB, total: 250 }]);
++    const handler = salesforceBillingHandler(w.companyId, w.deps);
++    const event = decodeBillingEvent(closedWonEvent(id));
++    await w.inTenant((trx) => handler(trx, event, [id]));
++    expect(await invoicesOf(`sf:Opportunity:${id}`)).toHaveLength(1);
++  });
++});
++
++describe('SS-UC01-07: Duplicate CDC event is idempotent', () => {
++  it('the same Closed Won event (same record Id + commit number) twice → one draft, the second logged as duplicate', async () => {
++    const id = opp();
++    const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++    await createOpp(id, account, '2026-11-05', 1250);
++    await addLines(id, [
++      { product: PS, total: 1000 },
++      { product: SUB, total: 250 },
++    ]);
++    const event = closedWonEvent(id);
++    const first = await w.bill(billingCdc1(event));
++    const second = await w.bill(billingCdc1(event));
++    expect(first.source).toMatchObject({ status: 'drafted' });
++    expect(second).toEqual({ outcome: 'duplicate', source: null });
++    expect(await invoicesOf(`sf:Opportunity:${id}`)).toHaveLength(1);
++    const rec = await w.inTenant((trx) => getBillingRecord(trx, w.companyId, 'Opportunity', id));
++    expect(rec).toMatchObject({
++      duplicates: 1,
++      lastSkippedKey: `cdc:Opportunity:${id}:${event.commitNumber.toString()}:1`,
++    });
++  });
++
++  it('a later, different event of a drafted Opportunity creates nothing and is counted on the trigger', async () => {
++    const id = opp();
++    const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++    await createOpp(id, account, '2026-11-05', 250);
++    await addLines(id, [{ product: SUB, total: 250 }]);
++    await closeWon(id);
++    const later = billingCdc1({
++      entity: 'Opportunity',
++      recordIds: [id],
++      changeType: 'UPDATE',
++      commitNumber: nextCommit(),
++      fields: { Name: 'Renamed deal' },
++      changed: ['Name'],
++    });
++    const r = await w.bill(later);
++    expect(r).toMatchObject({ outcome: 'applied', source: { status: 'already_drafted' } });
++    expect(await invoicesOf(`sf:Opportunity:${id}`)).toHaveLength(1);
++    const trigger = await w.inTenant((trx) =>
++      getBillingTrigger(trx, w.companyId, 'Opportunity', id),
++    );
++    expect(trigger).toMatchObject({ laterEvents: 1, lastEventKey: later.key });
++  });
++
++  it('lines that arrive after Closed Won (other channel) are waited for, then one draft', async () => {
++    const id = opp();
++    const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++    await createOpp(id, account, '2026-11-05', 1250);
++    await addLines(id, [{ product: PS, total: 1000 }]);
++    const r = await closeWon(id);
++    expect(r.source).toEqual({ status: 'waiting', code: 'LINES_INCOMPLETE' });
++    expect(await invoicesOf(`sf:Opportunity:${id}`)).toEqual([]);
++    const issues = await w.inTenant((trx) => listBillingIssues(trx, w.companyId));
++    expect(issues.filter((i) => i.recordId === id)).toMatchObject([
++      { code: 'LINES_INCOMPLETE', status: 'open', sourceEntity: 'Opportunity' },
++    ]);
++    await addLines(id, [{ product: SUB, total: 250 }]);
++    expect(await invoicesOf(`sf:Opportunity:${id}`)).toHaveLength(1);
++    const after = await w.inTenant((trx) => listBillingIssues(trx, w.companyId));
++    expect(after.filter((i) => i.recordId === id)).toMatchObject([
++      { code: 'LINES_INCOMPLETE', status: 'resolved' },
++    ]);
++  });
++
++  it('an Account LedgerForce does not know raises UNKNOWN_ACCOUNT and no draft', async () => {
++    const id = opp();
++    await createOpp(id, sfId('001', 9999), '2026-11-05', 250);
++    await addLines(id, [{ product: SUB, total: 250 }]);
++    const r = await closeWon(id);
++    expect(r.source).toMatchObject({ status: 'waiting', code: 'UNKNOWN_ACCOUNT' });
++    expect(await invoicesOf(`sf:Opportunity:${id}`)).toEqual([]);
++  });
++});
++
++describe('SS-UC01-04: Above threshold stays Draft', () => {
++  it('auto-approve threshold $1,000 and a $1,375 invoice → Draft, reason ABOVE_THRESHOLD, no journal', async () => {
++    await autoApprove(true, '1000');
++    try {
++      const id = opp();
++      const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++      await createOpp(id, account, '2026-11-05', 1250);
++      await addLines(id, [
++        { product: PS, total: 1000 },
++        { product: SUB, total: 250 },
++      ]);
++      const before = await w.countEntries();
++      const r = await closeWon(id);
++      expect(r.source).toMatchObject({
++        status: 'drafted',
++        auto: { outcome: 'draft', reason: 'ABOVE_THRESHOLD' },
++      });
++      const [inv] = await invoicesOf(`sf:Opportunity:${id}`);
++      expect(inv?.status).toBe('draft');
++      expect(await w.countEntries()).toBe(before);
++    } finally {
++      await autoApprove(false, '0');
++    }
++  });
++
++  it('under the threshold the draft is approved and posted, and the write-back says Posted with the amount invoiced', async () => {
++    await autoApprove(true, '2000');
++    try {
++      const id = opp();
++      const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++      await createOpp(id, account, '2026-11-05', 1250);
++      await addLines(id, [
++        { product: PS, total: 1000 },
++        { product: SUB, total: 250 },
++      ]);
++      const before = await w.countEntries();
++      const sent = w.messages.length;
++      const r = await closeWon(id);
++      expect(r.source).toMatchObject({ status: 'drafted', auto: { outcome: 'posted' } });
++      const [inv] = await invoicesOf(`sf:Opportunity:${id}`);
++      expect(inv?.status).toBe('posted');
++      expect(await w.countEntries()).toBe(before + 1);
++      const doc = await w.inTenant((trx) => getSalesInvoice(trx, inv?.id ?? ''));
++      // One event with the final state (RQ-0124 F6, DL-0373): never a stale "Draft" after "Posted".
++      const events = w.messages.slice(sent);
++      expect(events.map((m) => m.topic)).toEqual(['invoice.posted']);
++      const recs = mapToRecords(parseWriteBackPayload(events[0]?.payload));
++      expect(recs.find((x) => x.sobject === 'Opportunity')?.fields).toEqual({
++        LF_Invoice_Status__c: 'Posted',
++        LF_Amount_Invoiced__c: new SfNumber('1375.00'),
++      });
++      expect(recs.find((x) => x.sobject === 'LF_Invoice__c')?.fields).toMatchObject({
++        Name: doc.invoiceNo,
++        LF_Status__c: 'Posted',
++        LF_Total__c: new SfNumber('1375.00'),
++        LF_Amount_Due__c: new SfNumber('1375.00'),
++      });
++    } finally {
++      await autoApprove(false, '0');
++    }
++  });
++});
++
++describe('SS-UC01-06: Posting-profile gap flagged, not posted', () => {
++  it('a product profile with no revenue account → draft with a PROFILE_GAP warning, nothing posts, the gap check lists it', async () => {
++    await w.inTenant(async (trx) => {
++      await sql`INSERT INTO app.product_posting_profile (company_id, code, name)
++                VALUES (${w.companyId}, 'DEMO_KIT', 'Demo kit')`.execute(trx);
++      await sql`INSERT INTO app.product_profile_mapping (company_id, sf_field, sf_value, product_posting_profile_id)
++                SELECT ${w.companyId}, 'Family', 'Demo Kit', id FROM app.product_posting_profile
++                 WHERE company_id = ${w.companyId} AND code = 'DEMO_KIT'`.execute(trx);
++    });
++    const demo = await w.product(3, 'Demo kit', 'Demo Kit', 'GST');
++    await autoApprove(true, '2000');
++    try {
++      const id = opp();
++      const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++      await createOpp(id, account, '2026-11-05', 300);
++      await addLines(id, [{ product: demo, total: 300 }]);
++      const before = await w.countEntries();
++      const r = await closeWon(id);
++      expect(r.source).toMatchObject({
++        status: 'drafted',
++        auto: { outcome: 'draft', reason: 'PROFILE_GAP' },
++        warnings: [{ code: 'PROFILE_GAP', lineNo: 1, blocksAutoApprove: true }],
++      });
++      const [inv] = await invoicesOf(`sf:Opportunity:${id}`);
++      expect(inv?.status).toBe('draft');
++      expect(await w.countEntries()).toBe(before);
++      const trigger = await w.inTenant((trx) =>
++        getBillingTrigger(trx, w.companyId, 'Opportunity', id),
++      );
++      expect(trigger?.warnings[0]?.message).toMatch(
++        /^PROFILE_GAP: no revenue account for DOMESTIC_CUSTOMER × DEMO_KIT/,
++      );
++      const gaps = await w.inTenant((trx) =>
++        postingProfileGapCheck(trx, { companyId: w.companyId, slots: ['revenue'] }),
++      );
++      expect(gaps.map((g) => [g.partyProfile.code, g.productProfile.code, g.slot])).toContainEqual([
++        'DOMESTIC_CUSTOMER',
++        'DEMO_KIT',
++        'revenue',
++      ]);
++    } finally {
++      await autoApprove(false, '0');
++    }
++  });
++
++  it('a product tax code that conflicts with the customer default → TAX_CODE_CONFLICT warning, stays draft', async () => {
++    const fre = await w.product(4, 'Export services', 'Professional Services', 'FRE');
++    await autoApprove(true, '2000');
++    try {
++      const id = opp();
++      const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++      await createOpp(id, account, '2026-11-05', 500);
++      await addLines(id, [{ product: fre, total: 500 }]);
++      const before = await w.countEntries();
++      const r = await closeWon(id);
++      expect(r.source).toMatchObject({
++        status: 'drafted',
++        auto: { outcome: 'draft', reason: 'TAX_CODE_CONFLICT' },
++        warnings: [{ code: 'TAX_CODE_CONFLICT', lineNo: 1 }],
++      });
++      expect(await w.countEntries()).toBe(before);
++    } finally {
++      await autoApprove(false, '0');
++    }
++  });
++});
++
++describe('SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy', () => {
++  it('October hard-locked, closed 2026-10-30: "reject" → PERIOD_LOCKED sync issue, no draft; "first open date" → invoice dated 2026-11-01 with a note', async () => {
++    await w.lockMonth('2026-10', 'hard_locked');
++    await lockPolicy('reject');
++    try {
++      const id = opp();
++      const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++      await createOpp(id, account, '2026-10-30', 250);
++      await addLines(id, [{ product: SUB, total: 250 }]);
++      const rejected = await closeWon(id);
++      expect(rejected.source).toEqual({ status: 'waiting', code: 'PERIOD_LOCKED' });
++      expect(await invoicesOf(`sf:Opportunity:${id}`)).toEqual([]);
++      const issues = await w.inTenant((trx) => listBillingIssues(trx, w.companyId));
++      const mine = issues.filter((i) => i.recordId === id);
++      expect(mine).toMatchObject([{ code: 'PERIOD_LOCKED', status: 'open', occurrences: 1 }]);
++      expect(mine[0]?.message).toMatch(/PERIOD_LOCKED: period 2026-10 is hard_locked/);
++
++      await lockPolicy('post_to_first_open_date_with_note');
++      // The next change of the Opportunity re-evaluates it under the new policy.
++      const retry = await w.bill(
++        billingCdc1({
++          entity: 'Opportunity',
++          recordIds: [id],
++          changeType: 'UPDATE',
++          commitNumber: nextCommit(),
++          fields: { Name: 'Deal (retry)' },
++          changed: ['Name'],
++        }),
++      );
++      expect(retry.source).toMatchObject({ status: 'drafted' });
++      const [inv] = await invoicesOf(`sf:Opportunity:${id}`);
++      const doc = await w.inTenant((trx) => getSalesInvoice(trx, inv?.id ?? ''));
++      expect(doc.invoiceDate).toBe('2026-11-01');
++      expect(doc.dueDate).toBe('2026-11-15');
++      expect(doc.memo).toMatch(
++        /^Dated 2026-10-30 in period 2026-10 \(hard_locked\); posted on the first open date 2026-11-01/,
++      );
++      const trigger = await w.inTenant((trx) =>
++        getBillingTrigger(trx, w.companyId, 'Opportunity', id),
++      );
++      expect(trigger).toMatchObject({ sourceDate: '2026-10-30', note: doc.memo });
++      const after = await w.inTenant((trx) => listBillingIssues(trx, w.companyId));
++      expect(after.filter((i) => i.recordId === id)).toMatchObject([
++        { code: 'PERIOD_LOCKED', status: 'resolved' },
++      ]);
++    } finally {
++      await lockPolicy('reject');
++    }
++  });
++});
++
++describe('Order activated (design §11.2 open: behind the trigger setting, default Opportunity)', () => {
++  it('with the default setting an activated Order drafts nothing; with trigger "order" it drafts one invoice', async () => {
++    const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++    const order = billingId('801', 1);
++    const item = billingId('802', 1);
++    await w.bill(
++      billingCdc1({
++        entity: 'OrderItem',
++        recordIds: [item],
++        changeType: 'CREATE',
++        commitNumber: nextCommit(),
++        fields: { OrderId: order, Product2Id: SUB, Quantity: 2, UnitPrice: 125, TotalPrice: 250 },
++      }),
++    );
++    const activate = (status: string, code: string) =>
++      w.bill(
++        billingCdc1({
++          entity: 'Order',
++          recordIds: [order],
++          changeType: 'CREATE',
++          commitNumber: nextCommit(),
++          fields: {
++            AccountId: account,
++            OrderNumber: '00000100',
++            Status: status,
++            StatusCode: code,
++            EffectiveDate: epochDay('2026-11-07'),
++            TotalAmount: 250,
++            CurrencyIsoCode: 'AUD',
++          },
++        }),
++      );
++    const ignored = await activate('Activated', 'Activated');
++    expect(ignored.source).toEqual({ status: 'not_this_trigger', triggerSource: 'opportunity' });
++    expect(await invoicesOf(`sf:Order:${order}`)).toEqual([]);
++
++    await w.inTenant((trx) =>
++      setBillingSettings(trx, {
++        companyId: w.companyId,
++        triggerSource: 'order',
++        setBy: w.financeAdmin,
++        reason: 'tenant invoices on Order activation',
++      }),
++    );
++    try {
++      const r = await w.bill(
++        billingCdc1({
++          entity: 'Order',
++          recordIds: [order],
++          changeType: 'UPDATE',
++          commitNumber: nextCommit(),
++          fields: { Status: 'Live' },
++          changed: ['Status'],
++        }),
++      );
++      expect(r.source).toMatchObject({ status: 'drafted' });
++      const [inv] = await invoicesOf(`sf:Order:${order}`);
++      const doc = await w.inTenant((trx) => getSalesInvoice(trx, inv?.id ?? ''));
++      expect(doc).toMatchObject({ status: 'draft', invoiceDate: '2026-11-07' });
++      expect(doc.lines.map((l) => l.amount)).toEqual(['250.0000']);
++      const last = w.messages.at(-1);
++      const recs = mapToRecords(parseWriteBackPayload(last?.payload));
++      // No Opportunity to update for an Order; the invoice mirror links the Account only.
++      expect(recs.map((x) => x.sobject)).toEqual(['LF_Invoice__c']);
++      expect(recs[0]?.fields).not.toHaveProperty('LF_Opportunity__c');
++    } finally {
++      await w.inTenant((trx) =>
++        setBillingSettings(trx, {
++          companyId: w.companyId,
++          triggerSource: 'opportunity',
++          setBy: w.financeAdmin,
++          reason: 'back to the default',
++        }),
++      );
++    }
++  });
++});
++
++describe('billing tables are append-only facts', () => {
++  it('lf_app cannot delete a trigger, change its invoice, or delete a billing record', async () => {
++    const id = opp();
++    const account = await w.customer(1, { name: 'Acme Pty Ltd' });
++    await createOpp(id, account, '2026-11-05', 250);
++    await addLines(id, [{ product: SUB, total: 250 }]);
++    await closeWon(id);
++    const refuse = (q: ReturnType<typeof sql>) =>
++      w
++        .inTenant((trx) => q.execute(trx))
++        .then(
++          () => 'accepted',
++          (e: unknown) => String((e as Error).message),
++        );
++    expect(
++      await refuse(sql`DELETE FROM app.salesforce_billing_trigger WHERE record_id = ${id}`),
++    ).toMatch(/permission denied/);
++    expect(
++      await refuse(
++        sql`UPDATE app.salesforce_billing_trigger SET invoice_id = invoice_id WHERE record_id = ${id}`,
++      ),
++    ).toMatch(/permission denied/);
++    expect(
++      await refuse(sql`DELETE FROM app.salesforce_billing_record WHERE record_id = ${id}`),
++    ).toMatch(/permission denied/);
++  });
++});
+diff --git a/packages/connectors/salesforce/src/billing/source.contract.test.ts b/packages/connectors/salesforce/src/billing/source.contract.test.ts
+new file mode 100644
+index 0000000..56d4471
+--- /dev/null
++++ b/packages/connectors/salesforce/src/billing/source.contract.test.ts
+@@ -0,0 +1,217 @@
++/**
++ * Billing-source contract (T-0069, UC-01, RQ-0124): Opportunity / OpportunityLineItem / Order /
++ * OrderItem change events from the documented fixture schemas (Avro encode → decode → changes,
++ * exactly as production), the won / activated rule, and the draft plan built from the remembered
++ * header and line states. No database, no org.
++ */
++import { describe, expect, it } from 'vitest';
++import { billingCdc1, billingId, epochDay } from '../testing/billing-events.ts';
++import { sfId } from '../testing/master-data-events.ts';
++import {
++  DEFAULT_BILLING_SETTINGS,
++  isTriggered,
++  planDraft,
++  sfDate,
++  sfMoney,
++  sourceOf,
++} from './source.ts';
++
++const OPP = billingId('006', 1);
++const ACC = sfId('001', 1);
++const PS = sfId('01t', 1);
++const SUB = sfId('01t', 2);
++
++describe('billing change events (documented fixture schemas)', () => {
++  it('an Opportunity UPDATE carries only the named fields, dates as YYYY-MM-DD and money as decimal text', () => {
++    const c = billingCdc1({
++      entity: 'Opportunity',
++      recordIds: [OPP],
++      changeType: 'UPDATE',
++      commitNumber: 501n,
++      fields: {
++        StageName: 'Closed Won',
++        IsWon: true,
++        CloseDate: epochDay('2026-11-05'),
++        Amount: 1250,
++      },
++      changed: ['StageName', 'IsWon', 'CloseDate', 'Amount'],
++    });
++    expect(c).toMatchObject({
++      entity: 'Opportunity',
++      recordId: OPP,
++      op: 'upsert',
++      key: `cdc:Opportunity:${OPP}:501:1`,
++      fields: { StageName: 'Closed Won', IsWon: true, CloseDate: '2026-11-05', Amount: '1250' },
++    });
++    expect(Object.keys(c.fields).sort()).toEqual(['Amount', 'CloseDate', 'IsWon', 'StageName']);
++  });
++
++  it('an OpportunityLineItem CREATE names its Opportunity (the source) and keeps cents exactly', () => {
++    const line = billingId('00k', 1);
++    const c = billingCdc1({
++      entity: 'OpportunityLineItem',
++      recordIds: [line],
++      changeType: 'CREATE',
++      commitNumber: 502n,
++      fields: {
++        OpportunityId: OPP,
++        Product2Id: PS,
++        Quantity: 1,
++        UnitPrice: 1000.1,
++        TotalPrice: 1000.1,
++      },
++    });
++    expect(c.fields).toMatchObject({ OpportunityId: OPP, TotalPrice: '1000.1', Quantity: '1' });
++    expect(sourceOf(c.entity, c.recordId, c.fields)).toEqual({
++      entity: 'Opportunity',
++      recordId: OPP,
++    });
++    expect(sourceOf('Opportunity', OPP, {})).toEqual({ entity: 'Opportunity', recordId: OPP });
++  });
++
++  it('an event with no new records gives no billing change', () => {
++    expect(() =>
++      billingCdc1({ entity: 'Order', recordIds: [], changeType: 'UPDATE', commitNumber: 1n }),
++    ).toThrow(/no change/);
++  });
++});
++
++describe('sfMoney / sfDate — no floating-point arithmetic, no rounding', () => {
++  it('turns Avro doubles into exact decimal text and refuses digits beyond the cent', () => {
++    expect(sfMoney(1000)).toBe('1000.00');
++    expect(sfMoney(250.5)).toBe('250.50');
++    expect(sfMoney('1375.0000')).toBe('1375.00');
++    expect(sfMoney(0)).toBe('0.00');
++    expect(sfMoney(null)).toBeNull();
++    expect(() => sfMoney(0.1 + 0.2)).toThrow(/beyond the cent/);
++    expect(() => sfMoney(1e21)).toThrow(/not a decimal/);
++    expect(() => sfMoney('abc')).toThrow(/not a decimal/);
++  });
++
++  it('turns Avro date ints into YYYY-MM-DD and accepts polled dates', () => {
++    expect(sfDate(epochDay('2026-10-30'))).toBe('2026-10-30');
++    expect(sfDate('2026-11-05')).toBe('2026-11-05');
++    expect(sfDate(null)).toBeNull();
++    expect(() => sfDate('2026-13-01')).toThrow(/not a date/);
++  });
++});
++
++describe('won / activated rule (RQ-0124 F2)', () => {
++  const s = DEFAULT_BILLING_SETTINGS;
++  it('Opportunity: IsWon true, or the stage is a won stage name', () => {
++    expect(isTriggered('Opportunity', { StageName: 'Closed Won' }, s)).toBe(true);
++    expect(isTriggered('Opportunity', { StageName: 'Signed', IsWon: true }, s)).toBe(true);
++    expect(isTriggered('Opportunity', { StageName: 'Negotiation', IsWon: false }, s)).toBe(false);
++    expect(isTriggered('Opportunity', { StageName: 'Closed Lost', IsWon: false }, s)).toBe(false);
++    expect(
++      isTriggered('Opportunity', { StageName: 'Signed' }, { ...s, wonStages: ['Signed'] }),
++    ).toBe(true);
++  });
++  it('Order: StatusCode Activated', () => {
++    expect(isTriggered('Order', { StatusCode: 'Activated', Status: 'Live' }, s)).toBe(true);
++    expect(isTriggered('Order', { StatusCode: 'Draft', Status: 'Ready' }, s)).toBe(false);
++  });
++});
++
++describe('draft plan from remembered header and lines', () => {
++  const header = { AccountId: ACC, CloseDate: '2026-11-05', Amount: '1250' };
++  const line = (
++    n: number,
++    product: string,
++    total: string,
++    extra: Record<string, unknown> = {},
++  ) => ({
++    recordId: billingId('00k', n),
++    fields: { OpportunityId: OPP, Product2Id: product, TotalPrice: total, ...extra },
++  });
++
++  it('two lines in SortOrder, amounts in cents, date and account from the Opportunity', () => {
++    const p = planDraft('Opportunity', header, [
++      line(2, SUB, '250', { SortOrder: '2', Description: 'Subscription' }),
++      line(1, PS, '1000', { SortOrder: '1', Description: 'Professional services' }),
++    ]);
++    expect(p).toEqual({
++      ok: true,
++      accountId: ACC,
++      date: '2026-11-05',
++      currency: null,
++      total: '1250.00',
++      lines: [
++        {
++          recordId: billingId('00k', 1),
++          productId: PS,
++          amount: '1000.00',
++          description: 'Professional services',
++        },
++        {
++          recordId: billingId('00k', 2),
++          productId: SUB,
++          amount: '250.00',
++          description: 'Subscription',
++        },
++      ],
++      skipped: [],
++    });
++  });
++
++  it('no lines → NO_LINES; lines short of the rolled-up Amount → LINES_INCOMPLETE (wait for them)', () => {
++    expect(planDraft('Opportunity', header, [])).toMatchObject({ ok: false, code: 'NO_LINES' });
++    expect(planDraft('Opportunity', header, [line(1, PS, '1000')])).toMatchObject({
++      ok: false,
++      code: 'LINES_INCOMPLETE',
++    });
++  });
++
++  it('a zero-priced line is skipped and reported; a negative or sub-cent line refuses the source', () => {
++    const p = planDraft('Opportunity', { ...header, Amount: '1000' }, [
++      line(1, PS, '1000'),
++      line(2, SUB, '0'),
++    ]);
++    expect(p).toMatchObject({
++      ok: true,
++      lines: [{ productId: PS }],
++      skipped: [billingId('00k', 2)],
++    });
++    expect(planDraft('Opportunity', header, [line(1, PS, '-5')])).toMatchObject({
++      ok: false,
++      code: 'INVALID_SOURCE',
++    });
++    expect(planDraft('Opportunity', header, [line(1, PS, '1250.001')])).toMatchObject({
++      ok: false,
++      code: 'INVALID_SOURCE',
++    });
++  });
++
++  it('missing account, date or product refuses the source with a reason', () => {
++    expect(
++      planDraft('Opportunity', { ...header, AccountId: null }, [line(1, PS, '1250')]),
++    ).toMatchObject({
++      ok: false,
++      code: 'INVALID_SOURCE',
++    });
++    expect(
++      planDraft('Opportunity', { ...header, CloseDate: null }, [line(1, PS, '1250')]),
++    ).toMatchObject({
++      ok: false,
++      code: 'INVALID_SOURCE',
++    });
++    expect(planDraft('Opportunity', header, [line(1, 'nope', '1250')])).toMatchObject({
++      ok: false,
++      code: 'INVALID_SOURCE',
++    });
++  });
++
++  it('Order: EffectiveDate and TotalAmount', () => {
++    const p = planDraft(
++      'Order',
++      { AccountId: ACC, EffectiveDate: '2026-11-07', TotalAmount: '250', CurrencyIsoCode: 'AUD' },
++      [
++        {
++          recordId: billingId('802', 1),
++          fields: { OrderId: billingId('801', 1), Product2Id: SUB, TotalPrice: '250' },
++        },
++      ],
++    );
++    expect(p).toMatchObject({ ok: true, date: '2026-11-07', currency: 'AUD', total: '250.00' });
++  });
++});
+diff --git a/packages/connectors/salesforce/src/billing/source.ts b/packages/connectors/salesforce/src/billing/source.ts
+new file mode 100644
+index 0000000..ca1e24b
+--- /dev/null
++++ b/packages/connectors/salesforce/src/billing/source.ts
+@@ -0,0 +1,299 @@
++/**
++ * Billing sources (T-0069, UC-01, design §4.3, §5.3; RQ-0124). An Opportunity with its
++ * OpportunityLineItems, or an Order with its OrderItems, is the Salesforce-owned billing source
++ * of one standard invoice (design §5.5). This file is pure: it turns CDC events into versioned
++ * per-record changes (the same patch rules as the T-0065 master data), normalises Avro values
++ * (dates, currency doubles) into text without floating-point arithmetic, decides whether a source
++ * is won / activated, and plans the draft invoice from the remembered header and line states.
++ */
++import { toSalesforceId18 } from '@ledgerforce/parties';
++import { Money } from '@ledgerforce/shared/money';
++import { cdcChangesOf, type EntityChange, type SfState } from '../inbound/changes.ts';
++import type { DecodedEvent } from '../pubsub/avro.ts';
++
++export type SourceEntity = 'Opportunity' | 'Order';
++export type LineEntity = 'OpportunityLineItem' | 'OrderItem';
++export type BillingEntity = SourceEntity | LineEntity;
++export const BILLING_ENTITIES: readonly BillingEntity[] = [
++  'Opportunity',
++  'OpportunityLineItem',
++  'Order',
++  'OrderItem',
++];
++
++export type BillingChange = EntityChange<BillingEntity>;
++
++/** The line entity of a source, the field naming its source, and the reverse. */
++export const LINE_OF: Readonly<Record<SourceEntity, LineEntity>> = {
++  Opportunity: 'OpportunityLineItem',
++  Order: 'OrderItem',
++};
++export const SOURCE_OF: Readonly<Record<LineEntity, SourceEntity>> = {
++  OpportunityLineItem: 'Opportunity',
++  OrderItem: 'Order',
++};
++export const PARENT_FIELD: Readonly<Record<LineEntity, string>> = {
++  OpportunityLineItem: 'OpportunityId',
++  OrderItem: 'OrderId',
++};
++/** Invoice date and the rolled-up total of a source (RQ-0124 F3, F6). */
++const DATE_FIELD: Readonly<Record<SourceEntity, string>> = {
++  Opportunity: 'CloseDate',
++  Order: 'EffectiveDate',
++};
++const TOTAL_FIELD: Readonly<Record<SourceEntity, string>> = {
++  Opportunity: 'Amount',
++  Order: 'TotalAmount',
++};
++const DATE_FIELDS = new Set(['CloseDate', 'EffectiveDate']);
++const NUMBER_FIELDS = new Set([
++  'Amount',
++  'TotalAmount',
++  'Quantity',
++  'UnitPrice',
++  'TotalPrice',
++  'SortOrder',
++]);
++
++const isBillingEntity = (e: string): e is BillingEntity =>
++  (BILLING_ENTITIES as string[]).includes(e);
++export const isLineEntity = (e: BillingEntity): e is LineEntity =>
++  e === 'OpportunityLineItem' || e === 'OrderItem';
++
++/** A Salesforce value the billing trigger cannot read (the source is refused with the reason). */
++export class BillingValueError extends Error {
++  constructor(message: string) {
++    super(message);
++    this.name = 'BillingValueError';
++  }
++}
++
++const DECIMAL_RE = /^-?\d+(\.\d+)?$/;
++
++/**
++ * Exact decimal text of a Salesforce currency/number value. An Avro `double` becomes its shortest
++ * round-trip decimal (ECMAScript Number→String) and is parsed as text; nothing is computed in
++ * floating point. Digits beyond the cent are refused, never rounded. Returns two decimals.
++ */
++export function sfMoney(v: unknown): string | null {
++  if (v === null || v === undefined) return null;
++  const text = typeof v === 'number' ? String(v) : typeof v === 'string' ? v.trim() : '';
++  if (!DECIMAL_RE.test(text)) {
++    throw new BillingValueError(`${JSON.stringify(v)} is not a decimal amount`);
++  }
++  const frac = text.split('.')[1] ?? '';
++  if (/[^0]/.test(frac.slice(2))) {
++    throw new BillingValueError(`${text} has digits beyond the cent`);
++  }
++  const [int = '0'] = text.split('.');
++  const cents = frac.slice(0, 2).padEnd(2, '0');
++  return `${int.replace(/^(-?)0+(?=\d)/, '$1')}.${cents}`;
++}
++
++/** YYYY-MM-DD of a Salesforce Date: Avro int days since 1970-01-01 (UTC) or polled text. */
++export function sfDate(v: unknown): string | null {
++  if (v === null || v === undefined) return null;
++  let d: Date;
++  if (typeof v === 'number' && Number.isSafeInteger(v)) d = new Date(v * 86_400_000);
++  else if (typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) d = new Date(`${v}T00:00:00Z`);
++  else throw new BillingValueError(`${JSON.stringify(v)} is not a date`);
++  const iso = Number.isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
++  if (iso === '' || (typeof v === 'string' && iso !== v)) {
++    throw new BillingValueError(`${JSON.stringify(v)} is not a date`);
++  }
++  return iso;
++}
++
++/**
++ * Field values as stored: dates as YYYY-MM-DD, numbers as decimal text (no float survives into
++ * the database). A value that cannot be read stays as delivered; planDraft refuses it by name.
++ */
++function normalise(fields: SfState): SfState {
++  const out: SfState = {};
++  for (const [k, v] of Object.entries(fields)) {
++    try {
++      if (DATE_FIELDS.has(k)) out[k] = sfDate(v);
++      else if (NUMBER_FIELDS.has(k) && typeof v === 'number') out[k] = String(v);
++      else out[k] = v;
++    } catch {
++      out[k] = v;
++    }
++  }
++  return out;
++}
++
++/** One change per new record of an Opportunity/OpportunityLineItem/Order/OrderItem CDC event. */
++export function billingChangesFromCdcEvent(
++  e: DecodedEvent,
++  recordIds: readonly string[],
++): BillingChange[] {
++  return cdcChangesOf(e, recordIds, isBillingEntity).map((c) => ({
++    ...c,
++    fields: normalise(c.fields),
++  }));
++}
++
++const id18 = (v: unknown): string | null => {
++  if (typeof v !== 'string') return null;
++  try {
++    return toSalesforceId18(v);
++  } catch {
++    return null;
++  }
++};
++
++/** The source a record belongs to: a header is its own source, a line names it. */
++export function sourceOf(
++  entity: BillingEntity,
++  recordId: string,
++  fields: SfState,
++): { entity: SourceEntity; recordId: string } | null {
++  if (!isLineEntity(entity)) return { entity, recordId };
++  const parent = id18(fields[PARENT_FIELD[entity]]);
++  return parent === null ? null : { entity: SOURCE_OF[entity], recordId: parent };
++}
++
++export interface BillingSettings {
++  /** Design §11.2 is open: both are built, default Opportunity (RQ-0124 F1). */
++  triggerSource: 'opportunity' | 'order';
++  wonStages: string[];
++  paymentTermsDays: number;
++}
++
++export const DEFAULT_BILLING_SETTINGS: Readonly<BillingSettings> = Object.freeze({
++  triggerSource: 'opportunity',
++  wonStages: ['Closed Won'],
++  paymentTermsDays: 14,
++});
++
++export const TRIGGER_ENTITY: Readonly<Record<BillingSettings['triggerSource'], SourceEntity>> = {
++  opportunity: 'Opportunity',
++  order: 'Order',
++};
++
++/** Won (IsWon, or a won stage name) / activated (StatusCode Activated) — RQ-0124 F2. */
++export function isTriggered(entity: SourceEntity, state: SfState, s: BillingSettings): boolean {
++  if (entity === 'Order') return state.StatusCode === 'Activated';
++  if (state.IsWon === true) return true;
++  return typeof state.StageName === 'string' && s.wonStages.includes(state.StageName);
++}
++
++export type BlockingCode =
++  | 'NO_LINES'
++  | 'LINES_INCOMPLETE'
++  | 'UNKNOWN_ACCOUNT'
++  | 'UNKNOWN_PRODUCT'
++  | 'INVALID_SOURCE'
++  | 'PERIOD_LOCKED'
++  | 'INVOICE_REFUSED';
++
++export interface PlannedLine {
++  recordId: string;
++  /** Salesforce Product2 Id (18). */
++  productId: string;
++  /** Tax-exclusive, two decimals. */
++  amount: string;
++  description: string | null;
++}
++
++export type DraftPlan =
++  | {
++      ok: true;
++      accountId: string;
++      date: string;
++      currency: string | null;
++      total: string;
++      lines: PlannedLine[];
++      /** Zero-priced line records left off the invoice (reported as a warning). */
++      skipped: string[];
++    }
++  | { ok: false; code: BlockingCode; message: string };
++
++const refuse = (code: BlockingCode, message: string): DraftPlan => ({ ok: false, code, message });
++
++const sortKey = (fields: SfState): number => {
++  const v = fields.SortOrder;
++  const n = typeof v === 'string' && /^\d+$/.test(v) ? Number.parseInt(v, 10) : Number.NaN;
++  return Number.isNaN(n) ? Number.MAX_SAFE_INTEGER : n;
++};
++
++/**
++ * The draft of a won / activated source from its remembered header and live line states, or the
++ * reason there is none yet. Lines must add up to the header's rolled-up total (cross-channel
++ * events are unordered, RQ-0124 F3).
++ */
++export function planDraft(
++  entity: SourceEntity,
++  header: SfState,
++  lines: readonly { recordId: string; fields: SfState }[],
++): DraftPlan {
++  const accountId = id18(header.AccountId);
++  if (accountId === null) {
++    return refuse('INVALID_SOURCE', `${entity} has no valid AccountId`);
++  }
++  let date: string | null;
++  let declared: string | null;
++  try {
++    date = sfDate(header[DATE_FIELD[entity]]);
++    declared = sfMoney(header[TOTAL_FIELD[entity]]);
++  } catch (e) {
++    return refuse('INVALID_SOURCE', `${entity}: ${(e as Error).message}`);
++  }
++  if (date === null) return refuse('INVALID_SOURCE', `${entity} has no ${DATE_FIELD[entity]}`);
++  const currency = typeof header.CurrencyIsoCode === 'string' ? header.CurrencyIsoCode : null;
++  if (lines.length === 0) {
++    return refuse(
++      'NO_LINES',
++      `${entity} has no line items in LedgerForce yet; the draft is created when they arrive`,
++    );
++  }
++  const planned: PlannedLine[] = [];
++  const skipped: string[] = [];
++  let total = Money.zero('XXX');
++  const ordered = [...lines].sort(
++    (a, b) => sortKey(a.fields) - sortKey(b.fields) || a.recordId.localeCompare(b.recordId),
++  );
++  for (const l of ordered) {
++    let amount: string | null;
++    try {
++      amount = sfMoney(l.fields.TotalPrice);
++    } catch (e) {
++      return refuse('INVALID_SOURCE', `line ${l.recordId}: ${(e as Error).message}`);
++    }
++    if (amount === null) return refuse('INVALID_SOURCE', `line ${l.recordId} has no TotalPrice`);
++    const m = Money.of(amount, 'XXX');
++    if (m.isNegative()) {
++      return refuse(
++        'INVALID_SOURCE',
++        `line ${l.recordId}: negative TotalPrice ${amount} (credit lines are not invoiced; issue a credit note)`,
++      );
++    }
++    total = total.add(m);
++    if (m.isZero()) {
++      skipped.push(l.recordId);
++      continue;
++    }
++    const productId = id18(l.fields.Product2Id);
++    if (productId === null) {
++      return refuse('INVALID_SOURCE', `line ${l.recordId} has no valid Product2Id`);
++    }
++    const d = l.fields.Description;
++    planned.push({
++      recordId: l.recordId,
++      productId,
++      amount,
++      description: typeof d === 'string' && d.trim() !== '' ? d.slice(0, 1000) : null,
++    });
++  }
++  const sum = sfMoney(total.toNumericString()) ?? '0.00';
++  if (declared !== null && !Money.of(declared, 'XXX').equals(total)) {
++    return refuse(
++      'LINES_INCOMPLETE',
++      `${entity} ${TOTAL_FIELD[entity]} is ${declared} but its line items in LedgerForce add up to ${sum}; the draft is created when the lines arrive`,
++    );
++  }
++  if (planned.length === 0) {
++    return refuse('NO_LINES', `${entity} has only zero-priced line items; nothing to invoice`);
++  }
++  return { ok: true, accountId, date, currency, total: sum, lines: planned, skipped };
++}
+diff --git a/packages/connectors/salesforce/src/inbound/changes.ts b/packages/connectors/salesforce/src/inbound/changes.ts
+index eed28b5..0283537 100644
+--- a/packages/connectors/salesforce/src/inbound/changes.ts
++++ b/packages/connectors/salesforce/src/inbound/changes.ts
+@@ -88,8 +88,25 @@ export function changesFromCdcEvent(
+   e: DecodedEvent,
+   recordIds: readonly string[],
+ ): InboundChange[] {
++  return cdcChangesOf(e, recordIds, isEntity);
++}
++
++/** A change of any entity set (T-0069 billing sources use the same patch and version rules). */
++export interface EntityChange<E extends string> extends Omit<InboundChange, 'entity'> {
++  entity: E;
++}
++
++/**
++ * The per-record changes of a CDC event for the entities `owns` accepts: CREATE / UNDELETE take
++ * every non-null field, UPDATE only the header-named ones (RQ-0098 F1–F2), DELETE none.
++ */
++export function cdcChangesOf<E extends string>(
++  e: DecodedEvent,
++  recordIds: readonly string[],
++  owns: (entity: string) => entity is E,
++): EntityChange<E>[] {
+   const h = e.header;
+-  if (!h || changeKind(e) !== 'change' || !isEntity(h.entityName)) return [];
++  if (!h || changeKind(e) !== 'change' || !owns(h.entityName)) return [];
+   const entity = h.entityName;
+   let op: InboundChange['op'];
+   let fields: SfState;
+diff --git a/packages/connectors/salesforce/src/testing/billing-events.ts b/packages/connectors/salesforce/src/testing/billing-events.ts
+new file mode 100644
+index 0000000..de3a261
+--- /dev/null
++++ b/packages/connectors/salesforce/src/testing/billing-events.ts
+@@ -0,0 +1,102 @@
++/**
++ * Test-only: Avro-encoded Opportunity / OpportunityLineItem / Order / OrderItem change events with
++ * the documented fixture schemas (RQ-0124; fixtures/documented/pubsub-billing-source-change-events
++ * .json), decoded and turned into changes the way production does (Avro encode → decode →
++ * billingChangesFromCdcEvent). Not used in production.
++ */
++import { readFileSync } from 'node:fs';
++import { toSalesforceId18 } from '@ledgerforce/parties';
++import { billingChangesFromCdcEvent, type BillingChange } from '../billing/source.ts';
++import {
++  decodeConsumerEvent,
++  parseEventSchema,
++  type ChangeType,
++  type DecodedEvent,
++  type EventSchema,
++} from '../pubsub/avro.ts';
++import { bitmaps } from './master-data-events.ts';
++
++export type BillingEventEntity = 'Opportunity' | 'OpportunityLineItem' | 'Order' | 'OrderItem';
++
++const fixture = JSON.parse(
++  readFileSync(
++    new URL('../../fixtures/documented/pubsub-billing-source-change-events.json', import.meta.url),
++    'utf8',
++  ),
++) as { schemas: Record<BillingEventEntity, { topic: string; schemaId: string; schema: unknown }> };
++
++export const billingSchemaJson = (e: BillingEventEntity): string =>
++  JSON.stringify(fixture.schemas[e].schema);
++
++const schemas = new Map<BillingEventEntity, EventSchema>(
++  (['Opportunity', 'OpportunityLineItem', 'Order', 'OrderItem'] as const).map((e) => [
++    e,
++    parseEventSchema(billingSchemaJson(e)),
++  ]),
++);
++
++/** A valid 18-character test Id for a billing record: 006 Opportunity, 00k line, 801 Order, 802 item. */
++export function billingId(prefix: '006' | '00k' | '801' | '802', n: number): string {
++  return toSalesforceId18(`${prefix}TEST${String(n).padStart(8, '0')}`);
++}
++
++/** Days since 1970-01-01 of a YYYY-MM-DD date (the Avro `date` int). */
++export const epochDay = (date: string): number =>
++  Math.round(Date.parse(`${date}T00:00:00Z`) / 86_400_000);
++
++export interface BillingEvent {
++  entity: BillingEventEntity;
++  recordIds: string[];
++  changeType: ChangeType;
++  commitNumber: bigint;
++  sequenceNumber?: number;
++  fields?: Record<string, unknown>;
++  changed?: string[];
++  nulled?: string[];
++}
++
++export function encodeBillingChange(c: BillingEvent): Buffer {
++  const schema = schemas.get(c.entity);
++  if (!schema) throw new TypeError(`no schema for ${c.entity}`);
++  const value: Record<string, unknown> = {
++    ChangeEventHeader: {
++      entityName: c.entity,
++      recordIds: c.recordIds,
++      changeType: c.changeType,
++      changeOrigin: 'com/salesforce/api/rest/62.0',
++      transactionKey: `tx-${c.commitNumber.toString()}`,
++      sequenceNumber: c.sequenceNumber ?? 1,
++      commitTimestamp: 1_761_350_000_000n + c.commitNumber,
++      commitNumber: c.commitNumber,
++      commitUser: '005TEST00000001AAA',
++      nulledFields: c.nulled && c.nulled.length > 0 ? bitmaps(schema, c.nulled) : [],
++      diffFields: [],
++      changedFields: c.changed && c.changed.length > 0 ? bitmaps(schema, c.changed) : [],
++    },
++  };
++  for (const name of schema.fieldNames) {
++    if (name === 'ChangeEventHeader') continue;
++    value[name] = c.fields?.[name] ?? null;
++  }
++  return schema.type.toBuffer(value);
++}
++
++/** The decoded event the subscriber would hand to a CDC handler. */
++export function decodeBillingEvent(c: BillingEvent): DecodedEvent {
++  return decodeConsumerEvent(parseEventSchema(billingSchemaJson(c.entity)), {
++    replayId: Buffer.from('0000000000000001', 'hex'),
++    event: { id: crypto.randomUUID(), schemaId: 'x', payload: encodeBillingChange(c) },
++  });
++}
++
++/** The changes production builds from this event (all of its records). */
++export function billingCdc(c: BillingEvent): BillingChange[] {
++  const e = decodeBillingEvent(c);
++  return billingChangesFromCdcEvent(e, e.header?.recordIds ?? []);
++}
++
++export function billingCdc1(c: BillingEvent): BillingChange {
++  const [one] = billingCdc(c);
++  if (!one) throw new Error('event produced no change');
++  return one;
++}
+diff --git a/packages/connectors/salesforce/src/testing/billing-world.ts b/packages/connectors/salesforce/src/testing/billing-world.ts
+new file mode 100644
+index 0000000..8628947
+--- /dev/null
++++ b/packages/connectors/salesforce/src/testing/billing-world.ts
+@@ -0,0 +1,156 @@
++/**
++ * Test-only world for the Closed Won db tests (T-0069): the T-0065 inbound world (AU chart, AU tax
++ * codes, AU services posting profiles with their Salesforce mapping) plus an AU fiscal year
++ * 2026/27, the invoice and journal number series and a Finance Admin. Master data reaches
++ * LedgerForce the production way — Account / Contact / Product2 change events through
++ * applyInboundChange — and billing events through applyBillingChange with a recording outbox.
++ * Not used in production.
++ */
++import type { Database } from '@ledgerforce/db';
++import type { OutboxMessage } from '@ledgerforce/outbox';
++import {
++  generateFiscalYear,
++  findPeriod,
++  setPeriodStatus,
++  type PeriodStatus,
++} from '@ledgerforce/ledger';
++import { randomUUID } from 'node:crypto';
++import { sql, type Transaction } from 'kysely';
++import { applyBillingChange, type BillingApplyResult, type BillingDeps } from '../billing/apply.ts';
++import type { BillingChange } from '../billing/source.ts';
++import { cdc1, startInboundWorld, type InboundWorld } from './inbound-world.ts';
++import { sfId } from './master-data-events.ts';
++
++type Trx = Transaction<Database>;
++
++export interface RecordedMessage extends OutboxMessage {
++  /** The event id the recording outbox gave it. */
++  id: string;
++}
++
++export interface BillingWorld extends InboundWorld {
++  financeAdmin: string;
++  /** Every outbox message the billing trigger wrote, in order. */
++  messages: RecordedMessage[];
++  deps: BillingDeps;
++  bill: (c: BillingChange, deps?: BillingDeps) => Promise<BillingApplyResult>;
++  /** A synced customer Account (Type Customer - Direct) with a Billing To Contact. */
++  customer: (n: number, opts?: { billingTo?: boolean; name?: string }) => Promise<string>;
++  /** A synced Product2 with a Family (and optional LF_Tax_Code__c). */
++  product: (n: number, name: string, family: string, taxCode?: string) => Promise<string>;
++  lockMonth: (month: string, status: PeriodStatus) => Promise<void>;
++  countEntries: () => Promise<number>;
++}
++
++let commit = 900_000n;
++/** A commit number above every other event of the world (master data and billing share it). */
++export const nextCommit = (): bigint => (commit += 1n);
++
++export async function startBillingWorld(tenantId: string): Promise<BillingWorld> {
++  const w = await startInboundWorld(tenantId);
++  const financeAdmin = await w.inTenant(async (trx) => {
++    await generateFiscalYear(trx, { companyId: w.companyId, convention: 'AU', startYear: 2026 });
++    await sql`
++      INSERT INTO app.number_series (company_id, code, prefix)
++      VALUES (${w.companyId}, 'ar_invoice', 'INV-'), (${w.companyId}, 'je_ar_invoice', 'ARJ-')
++      ON CONFLICT DO NOTHING`.execute(trx);
++    const user = await trx
++      .insertInto('app.app_user')
++      .values({
++        email: `finance-${randomUUID().slice(0, 8)}@example.test`,
++        display_name: 'Finance Admin',
++        status: 'active',
++      })
++      .returning('id')
++      .executeTakeFirstOrThrow();
++    await trx
++      .insertInto('app.user_role')
++      .values({ user_id: user.id, role: 'finance_admin' })
++      .execute();
++    return user.id;
++  });
++  const messages: RecordedMessage[] = [];
++  const deps: BillingDeps = {
++    outbox: {
++      enqueue: async (_trx: Trx, msg: OutboxMessage) => {
++        const id = randomUUID();
++        messages.push({ ...msg, id });
++        return id;
++      },
++    },
++  };
++  const bill = (c: BillingChange, d: BillingDeps = deps) =>
++    w.inTenant((trx) => applyBillingChange(trx, w.companyId, c, d));
++
++  async function customer(n: number, opts: { billingTo?: boolean; name?: string } = {}) {
++    const accountId = sfId('001', n);
++    await w.apply(
++      cdc1({
++        entity: 'Account',
++        recordIds: [accountId],
++        changeType: 'CREATE',
++        commitNumber: nextCommit(),
++        fields: {
++          Name: opts.name ?? `Customer ${String(n)} Pty Ltd`,
++          Type: 'Customer - Direct',
++          CurrencyIsoCode: 'AUD',
++        },
++      }),
++    );
++    if (opts.billingTo !== false) {
++      await w.apply(
++        cdc1({
++          entity: 'Contact',
++          recordIds: [sfId('003', n)],
++          changeType: 'CREATE',
++          commitNumber: nextCommit(),
++          fields: {
++            AccountId: accountId,
++            Name: { FirstName: 'Accounts', LastName: `Payable ${String(n)}` },
++            Email: `accounts${String(n)}@customer.example`,
++            LF_Billing_Role__c: 'Billing To',
++          },
++        }),
++      );
++    }
++    return accountId;
++  }
++
++  async function product(n: number, name: string, family: string, taxCode?: string) {
++    const productId = sfId('01t', n);
++    await w.apply(
++      cdc1({
++        entity: 'Product2',
++        recordIds: [productId],
++        changeType: 'CREATE',
++        commitNumber: nextCommit(),
++        fields: {
++          Name: name,
++          ProductCode: `P${String(n)}`,
++          Family: family,
++          IsActive: true,
++          ...(taxCode === undefined ? {} : { LF_Tax_Code__c: taxCode }),
++        },
++      }),
++    );
++    return productId;
++  }
++
++  const lockMonth = (month: string, status: PeriodStatus) =>
++    w.inTenant(async (trx) => {
++      const period = await findPeriod(trx, w.companyId, `${month}-15`);
++      if (!period) throw new Error(`no period ${month}`);
++      await setPeriodStatus(trx, { periodId: period.id, status, actorId: financeAdmin });
++    });
++
++  const countEntries = () =>
++    w.inTenant(async (trx) => {
++      const r = await sql<{ n: number }>`
++        SELECT count(*)::int AS n FROM app.journal_entry WHERE company_id = ${w.companyId}`.execute(
++        trx,
++      );
++      return r.rows[0]?.n ?? -1;
++    });
++
++  return { ...w, financeAdmin, messages, deps, bill, customer, product, lockMonth, countEntries };
++}
+diff --git a/packages/connectors/salesforce/src/testing/master-data-events.ts b/packages/connectors/salesforce/src/testing/master-data-events.ts
+index 6afc282..60bcbb2 100644
+--- a/packages/connectors/salesforce/src/testing/master-data-events.ts
++++ b/packages/connectors/salesforce/src/testing/master-data-events.ts
+@@ -43,7 +43,7 @@ export function sfId(prefix: '001' | '003' | '01t', n: number): string {
+ }
+ 
+ /** Hex bitmap entries for field names (inverse of bitmapFieldNames). */
+-function bitmaps(schema: EventSchema, names: readonly string[]): string[] {
++export function bitmaps(schema: EventSchema, names: readonly string[]): string[] {
+   let top = 0n;
+   const children = new Map<number, bigint>();
+   for (const name of names) {
+diff --git a/packages/db/migrations/0044_salesforce_billing_trigger.sql b/packages/db/migrations/0044_salesforce_billing_trigger.sql
+new file mode 100644
+index 0000000..a8d6039
+--- /dev/null
++++ b/packages/db/migrations/0044_salesforce_billing_trigger.sql
+@@ -0,0 +1,245 @@
++-- 0044 — Salesforce billing trigger: Closed Won Opportunity / activated Order → one draft sales
++-- invoice (T-0069, UC-01, design §4.3, §5.3, §5.5, §5.6 rules 1, 2, 5; RQ-0124; DL-0370..DL-0375).
++-- Owner: packages/connectors/salesforce (src/billing).
++--
++-- * app.salesforce_billing_record: last known Salesforce state and version of every billing-source
++--   record (Opportunity, OpportunityLineItem, Order, OrderItem), as app.salesforce_record_sync
++--   (0034) does for master data; 0034's entity CHECK cannot be widened (the runner refuses DROP
++--   CONSTRAINT), so billing sources get this sibling table. parent_id is the line's
++--   OpportunityId / OrderId (null for a header). Same version = duplicate, older = stale; both
++--   are counted with the key, never applied (design §5.6 rule 1).
++-- * app.salesforce_billing_trigger: at most one row per (company, source entity, source record
++--   Id), written in the same transaction as the draft invoice it links. It is the per-source
++--   idempotency record (a repeat or later event only bumps later_events), and it carries the
++--   draft-time warnings (PROFILE_GAP, TAX_CODE_CONFLICT, …), the lock-date note and the
++--   auto-approve outcome. The invoice link never changes once written.
++-- * app.salesforce_billing_issue: why a won/activated source has no draft yet (PERIOD_LOCKED under
++--   policy reject, NO_LINES, LINES_INCOMPLETE, UNKNOWN_ACCOUNT, UNKNOWN_PRODUCT, INVALID_SOURCE,
++--   INVOICE_REFUSED) — the billing side of the Sync issues inbox, same status words as 0034. One
++--   live issue per (source, code); a repeat bumps occurrences; drafting resolves them.
++-- * app.salesforce_billing_settings: the invoice trigger per company as an insert-only history
++--   (latest row wins): trigger_source (opportunity | order; design §11.2 is open, default
++--   opportunity), won stage names, payment terms in days.
++-- * All tenant-owned: RLS ENABLE + FORCE, tenant_isolation, explicit lf_app grants, no DELETE.
++
++CREATE TABLE app.salesforce_billing_record (
++  tenant_id         uuid        NOT NULL DEFAULT nullif(current_setting('app.tenant_id', true), '')::uuid
++                                REFERENCES app.tenant (id),
++  company_id        uuid        NOT NULL,
++  entity            text        NOT NULL
++                                CHECK (entity IN ('Opportunity', 'OpportunityLineItem', 'Order', 'OrderItem')),
++  record_id         text        NOT NULL CHECK (record_id ~ '^[A-Za-z0-9]{18}$'),
++  parent_id         text        CHECK (parent_id ~ '^[A-Za-z0-9]{18}$'),
++  state             text        NOT NULL CHECK (state IN ('live', 'deleted')),
++  fields            jsonb       NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(fields) = 'object'),
++  commit_number     bigint,
++  sequence_number   integer     NOT NULL DEFAULT 0 CHECK (sequence_number >= 0),
++  commit_at         timestamptz NOT NULL,
++  last_key          text        NOT NULL CHECK (last_key ~ '^(cdc|poll):[[:graph:]]+$' AND length(last_key) <= 300),
++  duplicates        integer     NOT NULL DEFAULT 0 CHECK (duplicates >= 0),
++  stale             integer     NOT NULL DEFAULT 0 CHECK (stale >= 0),
++  last_skipped_key  text        CHECK (length(last_skipped_key) <= 300),
++  last_skipped_at   timestamptz,
++  created_at        timestamptz NOT NULL DEFAULT clock_timestamp(),
++  updated_at        timestamptz NOT NULL DEFAULT clock_timestamp(),
++  PRIMARY KEY (tenant_id, company_id, entity, record_id),
++  FOREIGN KEY (tenant_id, company_id) REFERENCES app.company (tenant_id, id),
++  CONSTRAINT salesforce_billing_record_parent
++    CHECK ((entity IN ('OpportunityLineItem', 'OrderItem')) OR parent_id IS NULL)
++);
++COMMENT ON TABLE app.salesforce_billing_record IS
++  'Inbound Salesforce billing-source state and version per record (Opportunity, OpportunityLineItem, Order, OrderItem; design 5.6 rule 1). Never deleted.';
++CREATE INDEX salesforce_billing_record_parent_idx
++  ON app.salesforce_billing_record (tenant_id, company_id, entity, parent_id)
++  WHERE parent_id IS NOT NULL;
++
++CREATE FUNCTION app.salesforce_billing_record_guard() RETURNS trigger
++  LANGUAGE plpgsql
++AS $$
++BEGIN
++  IF (NEW.tenant_id, NEW.company_id, NEW.entity, NEW.record_id, NEW.created_at)
++     IS DISTINCT FROM (OLD.tenant_id, OLD.company_id, OLD.entity, OLD.record_id, OLD.created_at) THEN
++    RAISE EXCEPTION 'salesforce billing record %/%: identity columns never change', OLD.entity, OLD.record_id
++      USING ERRCODE = 'check_violation';
++  END IF;
++  IF NEW.duplicates < OLD.duplicates OR NEW.stale < OLD.stale THEN
++    RAISE EXCEPTION 'salesforce billing record %/%: counters never decrease', OLD.entity, OLD.record_id
++      USING ERRCODE = 'check_violation';
++  END IF;
++  NEW.updated_at := clock_timestamp();
++  RETURN NEW;
++END
++$$;
++CREATE TRIGGER salesforce_billing_record_guard BEFORE UPDATE ON app.salesforce_billing_record
++  FOR EACH ROW EXECUTE FUNCTION app.salesforce_billing_record_guard();
++CREATE TRIGGER salesforce_billing_record_never_deleted BEFORE DELETE ON app.salesforce_billing_record
++  FOR EACH ROW EXECUTE FUNCTION app.sod_never_changed();
++
++ALTER TABLE app.salesforce_billing_record ENABLE ROW LEVEL SECURITY;
++ALTER TABLE app.salesforce_billing_record FORCE ROW LEVEL SECURITY;
++CREATE POLICY tenant_isolation ON app.salesforce_billing_record
++  USING (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid)
++  WITH CHECK (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid);
++GRANT SELECT, INSERT ON app.salesforce_billing_record TO lf_app;
++GRANT UPDATE (parent_id, state, fields, commit_number, sequence_number, commit_at, last_key,
++              duplicates, stale, last_skipped_key, last_skipped_at, updated_at)
++  ON app.salesforce_billing_record TO lf_app;
++
++CREATE TABLE app.salesforce_billing_trigger (
++  id                uuid        PRIMARY KEY DEFAULT app.uuid_generate_v7(),
++  tenant_id         uuid        NOT NULL DEFAULT nullif(current_setting('app.tenant_id', true), '')::uuid
++                                REFERENCES app.tenant (id),
++  company_id        uuid        NOT NULL,
++  source_entity     text        NOT NULL CHECK (source_entity IN ('Opportunity', 'Order')),
++  record_id         text        NOT NULL CHECK (record_id ~ '^[A-Za-z0-9]{18}$'),
++  account_id        text        NOT NULL CHECK (account_id ~ '^[A-Za-z0-9]{18}$'),
++  invoice_id        uuid        NOT NULL,
++  trigger_key       text        NOT NULL CHECK (trigger_key ~ '^(cdc|poll):[[:graph:]]+$' AND length(trigger_key) <= 300),
++  source_date       date        NOT NULL,
++  note              text        CHECK (length(note) <= 1000),
++  warnings          jsonb       NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(warnings) = 'array'),
++  auto_approve      text        NOT NULL CHECK (auto_approve IN ('posted', 'draft')),
++  auto_reason       text        CHECK (auto_reason ~ '^[A-Z][A-Z0-9_]{1,59}$'),
++  later_events      integer     NOT NULL DEFAULT 0 CHECK (later_events >= 0),
++  last_event_key    text        CHECK (length(last_event_key) <= 300),
++  created_at        timestamptz NOT NULL DEFAULT clock_timestamp(),
++  updated_at        timestamptz NOT NULL DEFAULT clock_timestamp(),
++  UNIQUE (tenant_id, id),
++  UNIQUE (tenant_id, company_id, source_entity, record_id),
++  UNIQUE (tenant_id, invoice_id),
++  FOREIGN KEY (tenant_id, company_id) REFERENCES app.company (tenant_id, id),
++  FOREIGN KEY (tenant_id, company_id, invoice_id) REFERENCES app.sales_invoice (tenant_id, company_id, id),
++  CONSTRAINT salesforce_billing_trigger_reason CHECK ((auto_approve = 'draft') = (auto_reason IS NOT NULL))
++);
++COMMENT ON TABLE app.salesforce_billing_trigger IS
++  'One draft sales invoice per Salesforce billing source (Closed Won Opportunity or activated Order; UC-01, design 5.6 rule 1): link, draft-time warnings, lock-date note, auto-approve outcome. Never deleted.';
++
++CREATE FUNCTION app.salesforce_billing_trigger_guard() RETURNS trigger
++  LANGUAGE plpgsql
++AS $$
++BEGIN
++  IF (NEW.id, NEW.tenant_id, NEW.company_id, NEW.source_entity, NEW.record_id, NEW.account_id,
++      NEW.invoice_id, NEW.trigger_key, NEW.source_date, NEW.note, NEW.warnings, NEW.created_at)
++     IS DISTINCT FROM
++     (OLD.id, OLD.tenant_id, OLD.company_id, OLD.source_entity, OLD.record_id, OLD.account_id,
++      OLD.invoice_id, OLD.trigger_key, OLD.source_date, OLD.note, OLD.warnings, OLD.created_at) THEN
++    RAISE EXCEPTION 'salesforce billing trigger %: the source, its invoice and the draft facts never change', OLD.id
++      USING ERRCODE = 'check_violation';
++  END IF;
++  IF NEW.later_events < OLD.later_events THEN
++    RAISE EXCEPTION 'salesforce billing trigger %: later_events never decreases', OLD.id
++      USING ERRCODE = 'check_violation';
++  END IF;
++  NEW.updated_at := clock_timestamp();
++  RETURN NEW;
++END
++$$;
++CREATE TRIGGER salesforce_billing_trigger_guard BEFORE UPDATE ON app.salesforce_billing_trigger
++  FOR EACH ROW EXECUTE FUNCTION app.salesforce_billing_trigger_guard();
++CREATE TRIGGER salesforce_billing_trigger_never_deleted BEFORE DELETE ON app.salesforce_billing_trigger
++  FOR EACH ROW EXECUTE FUNCTION app.sod_never_changed();
++
++ALTER TABLE app.salesforce_billing_trigger ENABLE ROW LEVEL SECURITY;
++ALTER TABLE app.salesforce_billing_trigger FORCE ROW LEVEL SECURITY;
++CREATE POLICY tenant_isolation ON app.salesforce_billing_trigger
++  USING (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid)
++  WITH CHECK (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid);
++GRANT SELECT, INSERT ON app.salesforce_billing_trigger TO lf_app;
++GRANT UPDATE (auto_approve, auto_reason, later_events, last_event_key, updated_at)
++  ON app.salesforce_billing_trigger TO lf_app;
++
++CREATE TABLE app.salesforce_billing_issue (
++  id                 uuid        PRIMARY KEY DEFAULT app.uuid_generate_v7(),
++  tenant_id          uuid        NOT NULL DEFAULT nullif(current_setting('app.tenant_id', true), '')::uuid
++                                 REFERENCES app.tenant (id),
++  company_id         uuid        NOT NULL,
++  source_entity      text        NOT NULL CHECK (source_entity IN ('Opportunity', 'Order')),
++  record_id          text        NOT NULL CHECK (record_id ~ '^[A-Za-z0-9]{18}$'),
++  code               text        NOT NULL
++                                 CHECK (code IN ('PERIOD_LOCKED', 'NO_LINES', 'LINES_INCOMPLETE', 'UNKNOWN_ACCOUNT',
++                                                 'UNKNOWN_PRODUCT', 'INVALID_SOURCE', 'INVOICE_REFUSED')),
++  message            text        NOT NULL CHECK (length(message) BETWEEN 1 AND 1000),
++  payload            jsonb       NOT NULL DEFAULT '{}'::jsonb CHECK (jsonb_typeof(payload) = 'object'),
++  last_key           text        NOT NULL CHECK (last_key ~ '^(cdc|poll):[[:graph:]]+$' AND length(last_key) <= 300),
++  status             text        NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'resolved', 'ignored')),
++  occurrences        integer     NOT NULL DEFAULT 1 CHECK (occurrences >= 1),
++  note               text        CHECK (length(note) <= 500),
++  status_changed_by  uuid,
++  first_seen_at      timestamptz NOT NULL DEFAULT clock_timestamp(),
++  last_seen_at       timestamptz NOT NULL DEFAULT clock_timestamp(),
++  resolved_at        timestamptz,
++  UNIQUE (tenant_id, id),
++  FOREIGN KEY (tenant_id, company_id) REFERENCES app.company (tenant_id, id),
++  FOREIGN KEY (tenant_id, status_changed_by) REFERENCES app.app_user (tenant_id, id),
++  CONSTRAINT salesforce_billing_issue_resolved_at CHECK ((status = 'resolved') = (resolved_at IS NOT NULL))
++);
++COMMENT ON TABLE app.salesforce_billing_issue IS
++  'Why a Closed Won Opportunity / activated Order has no draft invoice yet (Sync issues inbox, design 5.6 rules 2 and 5). Never silently dropped, never deleted.';
++CREATE UNIQUE INDEX salesforce_billing_issue_live_idx
++  ON app.salesforce_billing_issue (tenant_id, company_id, source_entity, record_id, code)
++  WHERE status IN ('open', 'ignored');
++CREATE INDEX salesforce_billing_issue_status_idx
++  ON app.salesforce_billing_issue (tenant_id, company_id, status, last_seen_at DESC);
++
++CREATE FUNCTION app.salesforce_billing_issue_guard() RETURNS trigger
++  LANGUAGE plpgsql
++AS $$
++BEGIN
++  IF (NEW.id, NEW.tenant_id, NEW.company_id, NEW.source_entity, NEW.record_id, NEW.code, NEW.first_seen_at)
++     IS DISTINCT FROM
++     (OLD.id, OLD.tenant_id, OLD.company_id, OLD.source_entity, OLD.record_id, OLD.code, OLD.first_seen_at) THEN
++    RAISE EXCEPTION 'billing issue %: identity columns never change', OLD.id USING ERRCODE = 'check_violation';
++  END IF;
++  IF NEW.occurrences < OLD.occurrences THEN
++    RAISE EXCEPTION 'billing issue %: occurrences never decrease', OLD.id USING ERRCODE = 'check_violation';
++  END IF;
++  IF OLD.status = 'resolved' THEN
++    RAISE EXCEPTION 'billing issue %: a resolved issue never changes (a new problem is a new issue)', OLD.id
++      USING ERRCODE = 'check_violation';
++  END IF;
++  RETURN NEW;
++END
++$$;
++CREATE TRIGGER salesforce_billing_issue_guard BEFORE UPDATE ON app.salesforce_billing_issue
++  FOR EACH ROW EXECUTE FUNCTION app.salesforce_billing_issue_guard();
++CREATE TRIGGER salesforce_billing_issue_never_deleted BEFORE DELETE ON app.salesforce_billing_issue
++  FOR EACH ROW EXECUTE FUNCTION app.sod_never_changed();
++
++ALTER TABLE app.salesforce_billing_issue ENABLE ROW LEVEL SECURITY;
++ALTER TABLE app.salesforce_billing_issue FORCE ROW LEVEL SECURITY;
++CREATE POLICY tenant_isolation ON app.salesforce_billing_issue
++  USING (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid)
++  WITH CHECK (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid);
++GRANT SELECT, INSERT ON app.salesforce_billing_issue TO lf_app;
++GRANT UPDATE (message, payload, last_key, status, occurrences, note, status_changed_by,
++              last_seen_at, resolved_at)
++  ON app.salesforce_billing_issue TO lf_app;
++
++CREATE TABLE app.salesforce_billing_settings (
++  id                  uuid        PRIMARY KEY DEFAULT app.uuid_generate_v7(),
++  tenant_id           uuid        NOT NULL DEFAULT nullif(current_setting('app.tenant_id', true), '')::uuid
++                                  REFERENCES app.tenant (id),
++  company_id          uuid        NOT NULL,
++  trigger_source      text        NOT NULL DEFAULT 'opportunity' CHECK (trigger_source IN ('opportunity', 'order')),
++  won_stages          text[]      NOT NULL DEFAULT ARRAY['Closed Won']::text[]
++                                  CHECK (cardinality(won_stages) BETWEEN 1 AND 20),
++  payment_terms_days  integer     NOT NULL DEFAULT 14 CHECK (payment_terms_days BETWEEN 0 AND 365),
++  set_by              uuid        NOT NULL,
++  reason              text        NOT NULL CHECK (length(btrim(reason)) BETWEEN 1 AND 2000),
++  set_at              timestamptz NOT NULL DEFAULT clock_timestamp(),
++  FOREIGN KEY (tenant_id, company_id) REFERENCES app.company (tenant_id, id),
++  FOREIGN KEY (tenant_id, set_by) REFERENCES app.app_user (tenant_id, id)
++);
++COMMENT ON TABLE app.salesforce_billing_settings IS
++  'Invoice trigger per company as history; the latest row wins (design 4.3, 11.2 open: default opportunity). Insert-only.';
++CREATE INDEX salesforce_billing_settings_latest_idx
++  ON app.salesforce_billing_settings (tenant_id, company_id, set_at DESC, id DESC);
++CREATE TRIGGER salesforce_billing_settings_immutable BEFORE UPDATE OR DELETE ON app.salesforce_billing_settings
++  FOR EACH ROW EXECUTE FUNCTION app.sod_never_changed();
++
++ALTER TABLE app.salesforce_billing_settings ENABLE ROW LEVEL SECURITY;
++ALTER TABLE app.salesforce_billing_settings FORCE ROW LEVEL SECURITY;
++CREATE POLICY tenant_isolation ON app.salesforce_billing_settings
++  USING (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid)
++  WITH CHECK (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid);
++GRANT SELECT, INSERT ON app.salesforce_billing_settings TO lf_app;
+diff --git a/packages/db/src/testing/cross-tenant.ts b/packages/db/src/testing/cross-tenant.ts
+index 1472a08..06a3ea2 100644
+--- a/packages/db/src/testing/cross-tenant.ts
++++ b/packages/db/src/testing/cross-tenant.ts
+@@ -215,6 +215,37 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
+     last_key: () => `cdc:Account:${randomUUID()}`,
+     payload: () => '{}',
+   },
++  // Salesforce billing trigger (migration 0044, T-0069): a billing-source entity, 18-character
++  // ids, cdc: keys, a header has no parent; issue code; the trigger's warnings array and the
++  // auto-approve outcome with its reason.
++  'app.salesforce_billing_record': {
++    entity: () => 'Opportunity',
++    record_id: () => `006${randomBytes(6).toString('hex').slice(0, 12)}AAA`,
++    state: () => 'live',
++    last_key: () => `cdc:Opportunity:${randomUUID()}`,
++    fields: () => '{}',
++  },
++  'app.salesforce_billing_trigger': {
++    source_entity: () => 'Opportunity',
++    record_id: () => `006${randomBytes(6).toString('hex').slice(0, 12)}AAA`,
++    account_id: () => '001000000000001AAA',
++    trigger_key: () => `cdc:Opportunity:${randomUUID()}`,
++    warnings: () => '[]',
++    auto_approve: () => 'draft',
++    auto_reason: () => 'AUTO_APPROVE_OFF',
++  },
++  'app.salesforce_billing_issue': {
++    source_entity: () => 'Opportunity',
++    record_id: () => '006000000000001AAA',
++    code: () => 'NO_LINES',
++    status: () => 'open',
++    last_key: () => `cdc:Opportunity:${randomUUID()}`,
++    payload: () => '{}',
++  },
++  'app.salesforce_billing_settings': {
++    trigger_source: () => 'opportunity',
++    won_stages: () => '{"Closed Won"}',
++  },
+   // Open items and allocations (migration 0028). Seeded rows (superuser, no tenant set) are
+   // stored as generated: an AR item of +1, an allocation of 1 with no FX difference. A row
+   // inserted by lf_app is filled and checked by triggers (prerequisites below).
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index e10e9c1..df1050a 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -239,12 +239,24 @@ importers:
+       '@grpc/proto-loader':
+         specifier: 0.8.1
+         version: 0.8.1
++      '@ledgerforce/ar':
++        specifier: workspace:*
++        version: link:../../modules/ar
+       '@ledgerforce/db':
+         specifier: workspace:*
+         version: link:../../db
++      '@ledgerforce/ledger':
++        specifier: workspace:*
++        version: link:../../ledger
++      '@ledgerforce/outbox':
++        specifier: workspace:*
++        version: link:../../outbox
+       '@ledgerforce/parties':
+         specifier: workspace:*
+         version: link:../../modules/parties
++      '@ledgerforce/products':
++        specifier: workspace:*
++        version: link:../../modules/products
+       '@ledgerforce/shared':
+         specifier: workspace:*
+         version: link:../../shared
+@@ -258,9 +270,6 @@ importers:
+       '@ledgerforce/gl':
+         specifier: workspace:*
+         version: link:../../modules/gl
+-      '@ledgerforce/products':
+-        specifier: workspace:*
+-        version: link:../../modules/products
+       '@ledgerforce/tax':
+         specifier: workspace:*
+         version: link:../../modules/tax
+-- 
+2.43.0
+

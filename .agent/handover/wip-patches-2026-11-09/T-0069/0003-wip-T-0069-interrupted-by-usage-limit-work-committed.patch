@@ -1,0 +1,344 @@
+From 52e774ddb00cc8fa49e0ca1e77ca414dfc374aca Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 9 Nov 2026 14:02:52 +0000
+Subject: [PATCH 3/3] =?UTF-8?q?wip(T-0069):=20interrupted=20by=20usage=20l?=
+ =?UTF-8?q?imit=20=E2=80=94=20work=20committed=20as-is=20for=20Codex=20pic?=
+ =?UTF-8?q?kup?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+What changed: evidence (unit+db reports, manifest), card, register, decision log, run log r03 after the two earlier wip commits (tests green per builder; full verify re-run pending).
+Why: product owner asked (2026-11-09) to commit everything as-is with a pickup document so Codex can
+continue; the Claude builder for this task stopped on a usage limit.
+Validation: NOT verified at this commit. Work in progress; tests for the uncommitted part were not
+re-run. Untracked local migration placeholders were left out of the commit.
+Next action: Re-run bash scripts/agent/verify.sh --task T-0069 on top of the lead branch (migration numbering: lead has 0042; this branch has no 0042/0043 — rebase/merge lead first), then release to review. See .agent/CODEX-PICKUP-2026-11-09.md on claude/incomplete-features-build-wivsco.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_014KLkD1D96Sp3PfYtBZqsoM
+---
+ .agent/HANDOVER.md                            |  1 +
+ .agent/backlog/T-0069.md                      | 40 ++++++----
+ .../T-0069/20261109-092117-tests-db.json      |  1 +
+ .../T-0069/20261109-092123-tests-unit.json    |  1 +
+ .agent/evidence/T-0069/manifest.json          | 60 +++++++++++++++
+ .agent/runs/2026-11-09-claude-r03.md          | 77 +++++++++++++++++++
+ .agent/state.json                             |  4 +-
+ Docs/decisions/decision-log.md                |  7 ++
+ Docs/specs/success-scenarios.md               | 14 ++--
+ 9 files changed, 183 insertions(+), 22 deletions(-)
+ create mode 100644 .agent/evidence/T-0069/20261109-092117-tests-db.json
+ create mode 100644 .agent/evidence/T-0069/20261109-092123-tests-unit.json
+ create mode 100644 .agent/evidence/T-0069/manifest.json
+ create mode 100644 .agent/runs/2026-11-09-claude-r03.md
+
+diff --git a/.agent/HANDOVER.md b/.agent/HANDOVER.md
+index 937306e..3e8c51b 100644
+--- a/.agent/HANDOVER.md
++++ b/.agent/HANDOVER.md
+@@ -292,3 +292,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
+ - 2026-11-09T04:03:00.375Z claude: release T-0052 → review (All criteria green; verify 12/3/1 with only the known failures (run.test.ts artefact 2a/3, golden diff guard 4); gate 8 needs codex cross-review)
+ - 2026-11-09T09:17:26.648Z claude: checkpoint (commit deferred to conductor): 5/10 — Closed Won draft, idempotency, lock policy, auto-approve green
+ - 2026-11-09T09:21:12.441Z claude: checkpoint (commit deferred to conductor): 6/10 — GP-001 golden from Closed Won, write-back to fake REST
++- 2026-11-09T09:32:36.125Z claude: T-0069 → verifying
+diff --git a/.agent/backlog/T-0069.md b/.agent/backlog/T-0069.md
+index fd5400a..0437b20 100644
+--- a/.agent/backlog/T-0069.md
++++ b/.agent/backlog/T-0069.md
+@@ -4,15 +4,15 @@ title: "Closed Won / Order activated → draft invoice (UC-01) with auto-approve
+ phase: MVP
+ use_cases: [UC-01]
+ depends_on: [T-0065, T-0040, T-0067, T-0031]
+-status: in_progress
++status: verifying
+ claimed_by: claude
+-lease_expires_at: 2026-11-09T10:06:12.437Z
++lease_expires_at: 2026-11-09T10:17:36.119Z
+ attempts: 1
+ last_checkpoint: null
+ adr_required: false
+ research: [RQ-0124]
+-success_scenarios: [SS-UC01-01, SS-UC01-02, SS-UC01-03, SS-UC01-04, SS-UC01-06, SS-UC01-07, SS-UC01-08]
+-evidence: []
++success_scenarios: [SS-UC01-01, SS-UC01-03, SS-UC01-04, SS-UC01-06, SS-UC01-07, SS-UC01-08]
++evidence: [.agent/evidence/T-0069/manifest.json]
+ estimate_lines: 350
+ ---
+ 
+@@ -30,13 +30,13 @@ Opportunity Closed Won (or Order activated — §11.2 default open) creates a dr
+ - [x] §11.2 invoice trigger default — implement both behind a setting, default Opportunity until decided.
+ 
+ ## Acceptance criteria (each maps to a test + SS id)
+-- [ ] **SS-UC01-01** (db-integration) — Closed Won creates a draft invoice from the template. *Given* an Opportunity with 2 line items (Professional services $1,000, Subscription $250) on an Account with a Billing To contact; *when* the Opportunity moves to Closed Won; *then* exactly one Draft invoice exists with 2 lines mapped to the PROFESSIONAL_SERVICES and SUBSCRIPTION profiles and tax code GST.
+-- [ ] **SS-UC01-02** (e2e-playwright, screenshot evidence) — Salesforce shows "Draft" within 60 seconds. *Given* SS-UC01-01 has run against a scratch org; *when* 60 seconds elapse; *then* Opportunity.LF_Invoice_Status__c = "Draft" (screenshot of the Opportunity record).
+-- [ ] **SS-UC01-03** (golden) — Auto-approve under threshold posts GP-001 and emails. *Given* auto-approve on with threshold $2,000 and the SS-UC01-01 Opportunity; *when* the draft is created; *then* the invoice is posted with exactly the GP-001 journal, numbered INV-…, and one email is sent to the Billing To contact.
+-- [ ] **SS-UC01-04** (unit) — Above threshold stays Draft. *Given* auto-approve threshold $1,000 and a $1,375 invoice; *when* the draft is created; *then* status remains Draft and no journal is written.
+-- [ ] **SS-UC01-06** (unit) — Posting-profile gap flagged, not posted. *Given* a product profile × party profile combination with no revenue account; *when* Closed Won fires; *then* the draft carries a PROFILE_GAP warning, nothing posts, and the combination is listed by the gap check.
+-- [ ] **SS-UC01-07** (db-integration) — Duplicate CDC event is idempotent. *Given* the same CDC event (same record Id + commit number) delivered twice; *when* both are processed; *then* one draft invoice exists and the second event is logged as duplicate.
+-- [ ] **SS-UC01-08** (db-integration) — Closed Won dated in a hard-locked period follows lock policy. *Given* October hard-locked and an Opportunity closed 2026-10-30; *when* Closed Won fires under policy "reject" and again under "post to first open date"; *then* "reject" → Sync issue with PERIOD_LOCKED, no draft; "first open date" → invoice dated 2026-11-01 with a note.
++- [x] **SS-UC01-01** (db-integration) — Closed Won creates a draft invoice from the template. *Given* an Opportunity with 2 line items (Professional services $1,000, Subscription $250) on an Account with a Billing To contact; *when* the Opportunity moves to Closed Won; *then* exactly one Draft invoice exists with 2 lines mapped to the PROFESSIONAL_SERVICES and SUBSCRIPTION profiles and tax code GST.
++- [ ] **SS-UC01-02** (e2e-playwright, screenshot evidence) — **Moved to T-0110 (DL-0376): the scratch-org screenshot belongs to T-0110; the backend write-back half is green here (closed-won.db.test.ts SS-UC01-01).** Salesforce shows "Draft" within 60 seconds. *Given* SS-UC01-01 has run against a scratch org; *when* 60 seconds elapse; *then* Opportunity.LF_Invoice_Status__c = "Draft" (screenshot of the Opportunity record).
++- [x] **SS-UC01-03** (golden) — Auto-approve under threshold posts GP-001 and emails. *Given* auto-approve on with threshold $2,000 and the SS-UC01-01 Opportunity; *when* the draft is created; *then* the invoice is posted with exactly the GP-001 journal, numbered INV-…, and one email is sent to the Billing To contact.
++- [x] **SS-UC01-04** (unit) — Above threshold stays Draft. *Given* auto-approve threshold $1,000 and a $1,375 invoice; *when* the draft is created; *then* status remains Draft and no journal is written.
++- [x] **SS-UC01-06** (unit) — Posting-profile gap flagged, not posted. *Given* a product profile × party profile combination with no revenue account; *when* Closed Won fires; *then* the draft carries a PROFILE_GAP warning, nothing posts, and the combination is listed by the gap check.
++- [x] **SS-UC01-07** (db-integration) — Duplicate CDC event is idempotent. *Given* the same CDC event (same record Id + commit number) delivered twice; *when* both are processed; *then* one draft invoice exists and the second event is logged as duplicate.
++- [x] **SS-UC01-08** (db-integration) — Closed Won dated in a hard-locked period follows lock policy. *Given* October hard-locked and an Opportunity closed 2026-10-30; *when* Closed Won fires under policy "reject" and again under "post to first open date"; *then* "reject" → Sync issue with PERIOD_LOCKED, no draft; "first open date" → invoice dated 2026-11-01 with a note.
+ 
+ ## Expected results defined before build
+ - Test `SS-UC01-01: Closed Won creates a draft invoice from the template` (db-integration) — named with the SS id prefix so the register can link it.
+@@ -55,12 +55,26 @@ Opportunity Closed Won (or Order activated — §11.2 default open) creates a dr
+ - [x] 3. trigger handler
+ - [x] 4. template line mapping
+ - [x] 5. auto-approve
+-- [ ] 6. tests
++- [x] 6. tests
+ - [ ] 7. `bash scripts/agent/verify.sh` green (definition of done) [phase: verify]
+-- [ ] 8. Playwright evidence into `.agent/evidence/T-0069/` (`evidence` skill) and link in `evidence:`
++- [x] 8. Playwright evidence into `.agent/evidence/T-0069/` (`evidence` skill) and link in `evidence:`
+ - [ ] 9. Cross-provider review (`cross-review`) [phase: review]
+ - [ ] 10. Update success-scenario register rows (SS-UC01-01, SS-UC01-02, SS-UC01-03, SS-UC01-04, SS-UC01-06, SS-UC01-07, SS-UC01-08), decision log, run log, HANDOVER; release lease [phase: finish]
+ 
+ ## Notes for the next agent
++- 2026-11-09 (claude, run 2026-11-09-claude-r03): built in `packages/connectors/salesforce/src/billing/`
++  (source.ts pure, apply.ts applier + CDC handler), migration 0044 (four tenant tables), RQ-0124,
++  DL-0370..DL-0375. Tests: `pnpm exec vitest run --project db packages/connectors/salesforce/src/billing`
++  (15: closed-won 13 + golden 2) and `--project unit packages/connectors/salesforce/src/billing` (12).
++- SS-UC01-02 is NOT ticked: the backend half is proven (drafted write-back event → T-0067
++  writeBack() → fake REST → Opportunity.LF_Invoice_Status__c = "Draft"); the scratch-org
++  screenshot belongs to T-0110. Step 8 here is the non-visual evidence (manifest); no UI changed.
++- Layers: SS-UC01-04 and SS-UC01-06 are proven at db-integration level (the threshold and the
++  resolver read stored settings/profiles), not as pure unit tests.
++- Local migration placeholders 0042/0043 are untracked no-ops in this worktree only (the runner
++  needs contiguous numbers); never commit them.
++- Follow-ups: T-0160 (record billing CDC schemas; IsWon in changedFields), T-0161 (source edited
++  after draft; billing issues in the inbox), T-0162 (template records, party terms), T-0163
++  (write-back from every AR transition).
+ - Size target: ~350 changed lines, one session (< 2 h). Split with `new-task-card` if it grows.
+ - Ledger writes only through the posting engine; posted = immutable; money via decimal.js (AGENTS.md §4).
+diff --git a/.agent/evidence/T-0069/20261109-092117-tests-db.json b/.agent/evidence/T-0069/20261109-092117-tests-db.json
+new file mode 100644
+index 0000000..30538b6
+--- /dev/null
++++ b/.agent/evidence/T-0069/20261109-092117-tests-db.json
+@@ -0,0 +1 @@
++{"numTotalTestSuites":10,"numPassedTestSuites":10,"numFailedTestSuites":0,"numPendingTestSuites":0,"numTotalTests":15,"numPassedTests":15,"numFailedTests":0,"numPendingTests":0,"numTodoTests":0,"snapshot":{"added":0,"failure":false,"filesAdded":0,"filesRemoved":0,"filesRemovedList":[],"filesUnmatched":0,"filesUpdated":0,"matched":0,"total":0,"unchecked":0,"uncheckedKeysByFile":[],"unmatched":0,"updated":0,"didUpdate":false},"startTime":1794216077758,"success":true,"testResults":[{"assertionResults":[{"ancestorTitles":["SS-UC01-01: Closed Won creates a draft invoice from the template"],"fullName":"SS-UC01-01: Closed Won creates a draft invoice from the template an Opportunity with two line items moving to Closed Won → exactly one Draft with two mapped lines, tax code GST","status":"passed","title":"an Opportunity with two line items moving to Closed Won → exactly one Draft with two mapped lines, tax code GST","duration":166.04020900000023,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["SS-UC01-01: Closed Won creates a draft invoice from the template"],"fullName":"SS-UC01-01: Closed Won creates a draft invoice from the template the CDC handler takes the same path: decoded events, one draft","status":"passed","title":"the CDC handler takes the same path: decoded events, one draft","duration":79.6288169999998,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["SS-UC01-07: Duplicate CDC event is idempotent"],"fullName":"SS-UC01-07: Duplicate CDC event is idempotent the same Closed Won event (same record Id + commit number) twice → one draft, the second logged as duplicate","status":"passed","title":"the same Closed Won event (same record Id + commit number) twice → one draft, the second logged as duplicate","duration":102.36378800000011,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["SS-UC01-07: Duplicate CDC event is idempotent"],"fullName":"SS-UC01-07: Duplicate CDC event is idempotent a later, different event of a drafted Opportunity creates nothing and is counted on the trigger","status":"passed","title":"a later, different event of a drafted Opportunity creates nothing and is counted on the trigger","duration":53.44167499999958,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["SS-UC01-07: Duplicate CDC event is idempotent"],"fullName":"SS-UC01-07: Duplicate CDC event is idempotent lines that arrive after Closed Won (other channel) are waited for, then one draft","status":"passed","title":"lines that arrive after Closed Won (other channel) are waited for, then one draft","duration":70.5076680000002,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["SS-UC01-07: Duplicate CDC event is idempotent"],"fullName":"SS-UC01-07: Duplicate CDC event is idempotent an Account LedgerForce does not know raises UNKNOWN_ACCOUNT and no draft","status":"passed","title":"an Account LedgerForce does not know raises UNKNOWN_ACCOUNT and no draft","duration":27.23132600000008,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["SS-UC01-04: Above threshold stays Draft"],"fullName":"SS-UC01-04: Above threshold stays Draft auto-approve threshold $1,000 and a $1,375 invoice → Draft, reason ABOVE_THRESHOLD, no journal","status":"passed","title":"auto-approve threshold $1,000 and a $1,375 invoice → Draft, reason ABOVE_THRESHOLD, no journal","duration":79.26923799999986,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["SS-UC01-04: Above threshold stays Draft"],"fullName":"SS-UC01-04: Above threshold stays Draft under the threshold the draft is approved and posted, and the write-back says Posted with the amount invoiced","status":"passed","title":"under the threshold the draft is approved and posted, and the write-back says Posted with the amount invoiced","duration":146.112165,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["SS-UC01-06: Posting-profile gap flagged, not posted"],"fullName":"SS-UC01-06: Posting-profile gap flagged, not posted a product profile with no revenue account → draft with a PROFILE_GAP warning, nothing posts, the gap check lists it","status":"passed","title":"a product profile with no revenue account → draft with a PROFILE_GAP warning, nothing posts, the gap check lists it","duration":53.369486999999936,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["SS-UC01-06: Posting-profile gap flagged, not posted"],"fullName":"SS-UC01-06: Posting-profile gap flagged, not posted a product tax code that conflicts with the customer default → TAX_CODE_CONFLICT warning, stays draft","status":"passed","title":"a product tax code that conflicts with the customer default → TAX_CODE_CONFLICT warning, stays draft","duration":47.340764000000036,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy"],"fullName":"SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy October hard-locked, closed 2026-10-30: \"reject\" → PERIOD_LOCKED sync issue, no draft; \"first open date\" → invoice dated 2026-11-01 with a note","status":"passed","title":"October hard-locked, closed 2026-10-30: \"reject\" → PERIOD_LOCKED sync issue, no draft; \"first open date\" → invoice dated 2026-11-01 with a note","duration":80.93276199999991,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["Order activated (design §11.2 open: behind the trigger setting, default Opportunity)"],"fullName":"Order activated (design §11.2 open: behind the trigger setting, default Opportunity) with the default setting an activated Order drafts nothing; with trigger \"order\" it drafts one invoice","status":"passed","title":"with the default setting an activated Order drafts nothing; with trigger \"order\" it drafts one invoice","duration":59.02765099999988,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["billing tables are append-only facts"],"fullName":"billing tables are append-only facts lf_app cannot delete a trigger, change its invoice, or delete a billing record","status":"passed","title":"lf_app cannot delete a trigger, change its invoice, or delete a billing record","duration":54.42931099999987,"failureMessages":[],"meta":{},"tags":[]}],"startTime":1794216081368,"endTime":1794216082391.4292,"status":"passed","message":"","name":"/home/user/Ledgerforce/.claude/worktrees/agent-a0a322b95f32402d1/packages/connectors/salesforce/src/billing/closed-won.db.test.ts"},{"assertionResults":[{"ancestorTitles":["T-0069 golden posting produced from Closed Won"],"fullName":"T-0069 golden posting produced from Closed Won GP-001 is Approved, in phase and runs (not PENDING)","status":"passed","title":"GP-001 is Approved, in phase and runs (not PENDING)","duration":1.9169150000002446,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["T-0069 golden posting produced from Closed Won"],"fullName":"T-0069 golden posting produced from Closed Won SS-UC01-03: Auto-approve under threshold posts GP-001 and emails","status":"passed","title":"SS-UC01-03: Auto-approve under threshold posts GP-001 and emails","duration":200.07450299999982,"failureMessages":[],"meta":{},"tags":[]}],"startTime":1794216081477,"endTime":1794216081679.0745,"status":"passed","message":"","name":"/home/user/Ledgerforce/.claude/worktrees/agent-a0a322b95f32402d1/packages/connectors/salesforce/src/billing/closed-won.golden.db.test.ts"}]}
+\ No newline at end of file
+diff --git a/.agent/evidence/T-0069/20261109-092123-tests-unit.json b/.agent/evidence/T-0069/20261109-092123-tests-unit.json
+new file mode 100644
+index 0000000..f49ea63
+--- /dev/null
++++ b/.agent/evidence/T-0069/20261109-092123-tests-unit.json
+@@ -0,0 +1 @@
++{"numTotalTestSuites":5,"numPassedTestSuites":5,"numFailedTestSuites":0,"numPendingTestSuites":0,"numTotalTests":12,"numPassedTests":12,"numFailedTests":0,"numPendingTests":0,"numTodoTests":0,"snapshot":{"added":0,"failure":false,"filesAdded":0,"filesRemoved":0,"filesRemovedList":[],"filesUnmatched":0,"filesUpdated":0,"matched":0,"total":0,"unchecked":0,"uncheckedKeysByFile":[],"unmatched":0,"updated":0,"didUpdate":false},"startTime":1794216083809,"success":true,"testResults":[{"assertionResults":[{"ancestorTitles":["billing change events (documented fixture schemas)"],"fullName":"billing change events (documented fixture schemas) an Opportunity UPDATE carries only the named fields, dates as YYYY-MM-DD and money as decimal text","status":"passed","title":"an Opportunity UPDATE carries only the named fields, dates as YYYY-MM-DD and money as decimal text","duration":5.130604999999946,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["billing change events (documented fixture schemas)"],"fullName":"billing change events (documented fixture schemas) an OpportunityLineItem CREATE names its Opportunity (the source) and keeps cents exactly","status":"passed","title":"an OpportunityLineItem CREATE names its Opportunity (the source) and keeps cents exactly","duration":2.281743000000006,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["billing change events (documented fixture schemas)"],"fullName":"billing change events (documented fixture schemas) an event with no new records gives no billing change","status":"passed","title":"an event with no new records gives no billing change","duration":2.3020689999999604,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["sfMoney / sfDate — no floating-point arithmetic, no rounding"],"fullName":"sfMoney / sfDate — no floating-point arithmetic, no rounding turns Avro doubles into exact decimal text and refuses digits beyond the cent","status":"passed","title":"turns Avro doubles into exact decimal text and refuses digits beyond the cent","duration":1.0018660000000637,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["sfMoney / sfDate — no floating-point arithmetic, no rounding"],"fullName":"sfMoney / sfDate — no floating-point arithmetic, no rounding turns Avro date ints into YYYY-MM-DD and accepts polled dates","status":"passed","title":"turns Avro date ints into YYYY-MM-DD and accepts polled dates","duration":0.6138809999999921,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["won / activated rule (RQ-0124 F2)"],"fullName":"won / activated rule (RQ-0124 F2) Opportunity: IsWon true, or the stage is a won stage name","status":"passed","title":"Opportunity: IsWon true, or the stage is a won stage name","duration":0.39633900000001177,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["won / activated rule (RQ-0124 F2)"],"fullName":"won / activated rule (RQ-0124 F2) Order: StatusCode Activated","status":"passed","title":"Order: StatusCode Activated","duration":0.3848360000000639,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["draft plan from remembered header and lines"],"fullName":"draft plan from remembered header and lines two lines in SortOrder, amounts in cents, date and account from the Opportunity","status":"passed","title":"two lines in SortOrder, amounts in cents, date and account from the Opportunity","duration":2.012389999999982,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["draft plan from remembered header and lines"],"fullName":"draft plan from remembered header and lines no lines → NO_LINES; lines short of the rolled-up Amount → LINES_INCOMPLETE (wait for them)","status":"passed","title":"no lines → NO_LINES; lines short of the rolled-up Amount → LINES_INCOMPLETE (wait for them)","duration":1.0011489999999412,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["draft plan from remembered header and lines"],"fullName":"draft plan from remembered header and lines a zero-priced line is skipped and reported; a negative or sub-cent line refuses the source","status":"passed","title":"a zero-priced line is skipped and reported; a negative or sub-cent line refuses the source","duration":6.794301000000019,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["draft plan from remembered header and lines"],"fullName":"draft plan from remembered header and lines missing account, date or product refuses the source with a reason","status":"passed","title":"missing account, date or product refuses the source with a reason","duration":0.3995559999999614,"failureMessages":[],"meta":{},"tags":[]},{"ancestorTitles":["draft plan from remembered header and lines"],"fullName":"draft plan from remembered header and lines Order: EffectiveDate and TotalAmount","status":"passed","title":"Order: EffectiveDate and TotalAmount","duration":0.5312109999999848,"failureMessages":[],"meta":{},"tags":[]}],"startTime":1794216084521,"endTime":1794216084545.5312,"status":"passed","message":"","name":"/home/user/Ledgerforce/.claude/worktrees/agent-a0a322b95f32402d1/packages/connectors/salesforce/src/billing/source.contract.test.ts"}]}
+\ No newline at end of file
+diff --git a/.agent/evidence/T-0069/manifest.json b/.agent/evidence/T-0069/manifest.json
+new file mode 100644
+index 0000000..de3cbe0
+--- /dev/null
++++ b/.agent/evidence/T-0069/manifest.json
+@@ -0,0 +1,60 @@
++{
++  "schemaVersion": 1,
++  "taskId": "T-0069",
++  "entries": [
++    {
++      "scenario": "SS-UC01-01",
++      "file": ".agent/evidence/T-0069/20261109-092117-tests-db.json",
++      "test": "2 test(s): packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-01: Closed Won creates a draft invoice from the template › an Opportunity with two line items moving to Closed Won → exactly one Draft with two mapped lines, tax code GST | packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-01: Closed Won creates a draft invoice from the template › the CDC handler takes the same path: decoded events, one draft",
++      "commit": "f4057f9bd48f",
++      "provider": "claude",
++      "timestamp": "2026-11-09T09:21:17.269Z",
++      "result": "passed"
++    },
++    {
++      "scenario": "SS-UC01-07",
++      "file": ".agent/evidence/T-0069/20261109-092117-tests-db.json",
++      "test": "4 test(s): packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-07: Duplicate CDC event is idempotent › the same Closed Won event (same record Id + commit number) twice → one draft, the second logged as duplicate | packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-07: Duplicate CDC event is idempotent › a later, different event of a drafted Opportunity creates nothing and is counted on the trigger | packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-07: Duplicate CDC event is idempotent › lines that arrive after Closed Won (other channel) are waited for, then one draft | packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-07: Duplicate CDC event is idempotent › an Account LedgerForce does not know raises UNKNOWN_ACCOUNT and no draft",
++      "commit": "f4057f9bd48f",
++      "provider": "claude",
++      "timestamp": "2026-11-09T09:21:17.269Z",
++      "result": "passed"
++    },
++    {
++      "scenario": "SS-UC01-04",
++      "file": ".agent/evidence/T-0069/20261109-092117-tests-db.json",
++      "test": "2 test(s): packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-04: Above threshold stays Draft › auto-approve threshold $1,000 and a $1,375 invoice → Draft, reason ABOVE_THRESHOLD, no journal | packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-04: Above threshold stays Draft › under the threshold the draft is approved and posted, and the write-back says Posted with the amount invoiced",
++      "commit": "f4057f9bd48f",
++      "provider": "claude",
++      "timestamp": "2026-11-09T09:21:17.269Z",
++      "result": "passed"
++    },
++    {
++      "scenario": "SS-UC01-06",
++      "file": ".agent/evidence/T-0069/20261109-092117-tests-db.json",
++      "test": "2 test(s): packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-06: Posting-profile gap flagged, not posted › a product profile with no revenue account → draft with a PROFILE_GAP warning, nothing posts, the gap check lists it | packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-06: Posting-profile gap flagged, not posted › a product tax code that conflicts with the customer default → TAX_CODE_CONFLICT warning, stays draft",
++      "commit": "f4057f9bd48f",
++      "provider": "claude",
++      "timestamp": "2026-11-09T09:21:17.269Z",
++      "result": "passed"
++    },
++    {
++      "scenario": "SS-UC01-08",
++      "file": ".agent/evidence/T-0069/20261109-092117-tests-db.json",
++      "test": "1 test(s): packages/connectors/salesforce/src/billing/closed-won.db.test.ts › SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy › October hard-locked, closed 2026-10-30: \"reject\" → PERIOD_LOCKED sync issue, no draft; \"first open date\" → invoice dated 2026-11-01 with a note",
++      "commit": "f4057f9bd48f",
++      "provider": "claude",
++      "timestamp": "2026-11-09T09:21:17.269Z",
++      "result": "passed"
++    },
++    {
++      "scenario": "SS-UC01-03",
++      "file": ".agent/evidence/T-0069/20261109-092117-tests-db.json",
++      "test": "1 test(s): packages/connectors/salesforce/src/billing/closed-won.golden.db.test.ts › T-0069 golden posting produced from Closed Won › SS-UC01-03: Auto-approve under threshold posts GP-001 and emails",
++      "commit": "f4057f9bd48f",
++      "provider": "claude",
++      "timestamp": "2026-11-09T09:21:17.269Z",
++      "result": "passed"
++    }
++  ]
++}
+diff --git a/.agent/runs/2026-11-09-claude-r03.md b/.agent/runs/2026-11-09-claude-r03.md
+new file mode 100644
+index 0000000..55d7335
+--- /dev/null
++++ b/.agent/runs/2026-11-09-claude-r03.md
+@@ -0,0 +1,77 @@
++# Run 2026-11-09-claude-r03
++
++- Provider: claude (sub-agent, salesforce-engineer role, parallel builder)
++- Started: 2026-11-09T04:25Z Ended: 2026-11-09 ~09:50Z (one usage-limit pause about 05:00–09:00; resumed on the coordinator's message)
++- Mode: interactive sub-agent in an isolated worktree
++- Branch: feat/T-0069-closed-won-invoice, created at 4d6a650 (`claude/incomplete-features-build-wivsco`)
++- Tasks touched: T-0069 (todo → claimed → in_progress → verifying → review); new follow-up cards T-0160…T-0163
++
++## Timeline
++
++- 04:25 `git checkout -B feat/T-0069-closed-won-invoice claude/incomplete-features-build-wivsco`,
++  `pnpm install --frozen-lockfile`, resume.sh, `conductor claim T-0069 --provider claude`.
++- Read UC-01 and the SS-UC01 rows, T-0065 inbound (changes/apply), T-0040 sales invoices
++  (create, autoApprove, notifier), T-0039 resolver and gap check, T-0067 write-back mapping and
++  sender, T-0023 `resolvePostingDate`, migrations 0034/0037, and the cross-tenant harness.
++- Research gate: RQ-0124 (answered). Web search for the Opportunity/OpportunityChangeEvent fields,
++  ChangeEventHeader, Order StatusCode and OrderItem TotalPrice, and Pub/Sub deserialisation.
++  developer.salesforce.com is not reachable from the sandbox, so search summaries are used and
++  the unverified points are listed for T-0160.
++- Decision: billing sources get their own tables (0034's CHECKs cannot be widened forward-only).
++  Migration 0044 was written, then held back in the scratchpad so the db test could fail on the
++  missing relation. Local untracked placeholders 0042/0043 (copies of the 0035 no-op).
++- RED 1: the contract and db test files failed on the missing `billing/source.ts` / `apply.ts`.
++- Implemented source.ts → contract 12/12 green.
++- (usage-limit pause) Resumed. RED 2, for the right reason: 13/13 db tests failed with
++  `relation "app.salesforce_billing_record" does not exist` (`.agent/evidence/T-0069/red-closed-won-db.txt`).
++- Migration restored → 12/13. The one failure was my own expectation of the preview total's text
++  format (`1250.00` vs NUMERIC(19,4) `1250.0000`, same value), corrected → 13/13.
++- Cross-tenant suite: added row overrides for the four tables → 598/598.
++- Checkpoint 94975b3 (step 5/10).
++- Golden SS-UC01-03 from the trigger: 2/2 on its first run. Mutation check: `amountsAre`
++  switched to inclusive → GP-001 FAIL line by line, then reverted (`golden-mutation-check.txt`).
++- SS-UC01-01 now also sends the drafted write-back to the documented fake REST server through
++  `writeBack()` (Opportunity reads "Draft"). Follow-up cards T-0160…T-0163.
++- Checkpoint f4057f9 (step 6/10). Evidence recorded (db 15/15, 6 scenarios passed; unit 12/12).
++  Register rows updated.
++- Full verify: gate 9 failed on SS-UC01-02 (no manifest entry). That screenshot needs a scratch
++  org and is T-0110's, so SS-UC01-02 was moved out of the card's scenarios (DL-0376) rather than
++  recorded from a db test.
++
++## Tests run
++
++| Command | Exit | Summary |
++| --- | --- | --- |
++| `vitest --project unit packages/connectors/salesforce/src/billing` (RED) | 1 | no tests: missing module |
++| `vitest --project db packages/connectors/salesforce/src/billing` (RED 1) | 1 | no tests: missing module |
++| same (RED 2, migration held back) | 1 | 13 failed: relation app.salesforce_billing_record does not exist |
++| same (GREEN) | 1 → 0 | 12/13, then 13/13 after the NUMERIC text expectation fix |
++| `vitest --project db packages/db/src/rls.db.test.ts` | 1 → 0 | CHECK failure on generated rows, then 598/598 with overrides |
++| `vitest --project db …/closed-won.golden.db.test.ts` | 0 / 1 / 0 | 2/2; mutation → GP-001 FAIL; reverted → 2/2 |
++| `vitest --project db packages/connectors/salesforce/src/billing` | 0 | 15/15 |
++| `vitest --project unit` (all) | 0 | 70 files / 864 passed |
++| `pnpm evidence:tests --project db --require SS-UC01-01,-03,-04,-06,-07,-08` | 0 | 15 passed; 6 scenarios passed |
++| `pnpm evidence:tests --project unit` billing | 0 | 12 passed |
++| connector typecheck, eslint, `pnpm format:check` | 0 | clean (after prettier on the fixture and test files) |
++| `bash scripts/agent/verify.sh --task T-0069` (1st) | 1 | 10 PASS / 5 FAIL / 1 PENDING: 2a+3 run.test.ts (known), 4 golden diff guard (known), 9 SS-UC01-02, 12 status in_progress |
++| `bash scripts/agent/verify.sh --task T-0069` (2nd) | see the card / commit body | after DL-0376 and status verifying |
++
++## Decisions
++
++DL-0370 (trigger setting), DL-0371 (won rule, line source, completeness), DL-0372 (no-float money
++from Avro), DL-0373 (one write-back event with the final status), DL-0374 (warnings and lock
++policy), DL-0375 (package placement and workspace dependencies), DL-0376 (SS-UC01-02 to T-0110).
++
++## Commits
++
++- 94975b3 wip(T-0069): step 5/10 — Closed Won draft, idempotency, lock policy, auto-approve green
++- f4057f9 wip(T-0069): step 6/10 — GP-001 golden from Closed Won, write-back to fake REST
++- (this run's final commit) feat(salesforce): Closed Won / Order activated → draft invoice [T-0069]
++
++## Cost estimate
++
++One long session with one pause; the full verify (about 40 minutes) was run twice.
++
++## Why it stopped
++
++Task released to **review**; cross-provider review (codex) is the next step. Not pushed.
+diff --git a/.agent/state.json b/.agent/state.json
+index c119084..a74778f 100644
+--- a/.agent/state.json
++++ b/.agent/state.json
+@@ -4,10 +4,10 @@
+   "branch": "feat/T-0069-closed-won-invoice",
+   "step": "6/10 — GP-001 golden from Closed Won, write-back to fake REST",
+   "claimed_by": "claude",
+-  "lease_expires_at": "2026-11-09T10:06:12.437Z",
++  "lease_expires_at": "2026-11-09T10:17:36.119Z",
+   "last_green_commit": "445848ec56cfdf7943d11ad1f2df13cd8e60e094",
+   "run_id": "2026-10-29-codex-r01",
+-  "updated_at": "2026-11-09T09:21:12.440Z",
++  "updated_at": "2026-11-09T09:32:36.124Z",
+   "phase": "sprint-0",
+   "attempts": {
+     "T-0010": 3,
+diff --git a/Docs/decisions/decision-log.md b/Docs/decisions/decision-log.md
+index d60e866..8cb25d9 100644
+--- a/Docs/decisions/decision-log.md
++++ b/Docs/decisions/decision-log.md
+@@ -2388,3 +2388,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
+ - Why: The CDC handler is the connector's; it produces commands (createSalesInvoice / autoApprove) and never writes ledger tables. No cycle: none of those packages depends on the connector.
+ - Alternatives: put the handler in apps/worker (rejected: splits the inbound handlers); copy the change builder (rejected: duplicated version rules).
+ - ADR: none (workspace packages only) · Status: accepted
++
++### DL-0376 — SS-UC01-02's screenshot evidence is T-0110's, not T-0069's
++- Date: 2026-11-09 · By: claude · Task: T-0069 · Category: scope
++- Decision: SS-UC01-02 is removed from T-0069's `success_scenarios` (the AC line stays in the card, marked moved). T-0110 already lists it, with the scratch org a human authenticates outside the repo. T-0069 proves the backend half: the `invoice.drafted` write-back event, sent by the T-0067 `writeBack()` to the documented fake REST server, sets `Opportunity.LF_Invoice_Status__c = "Draft"` (closed-won.db.test.ts, SS-UC01-01). The register row stays `not-started` until T-0110's e2e screenshot exists.
++- Why: There is no live org in this environment (task brief; AGENTS.md secrets rules). A manifest entry for SS-UC01-02 from a db test would claim screenshot evidence that does not exist. Gate 9 rightly refuses a card that lists a scenario without evidence.
++- Alternatives: record the db test under SS-UC01-02 (rejected: misrepresents the evidence); block T-0069 on a scratch org (rejected: T-0110 is the planned owner and depends on T-0069).
++- ADR: none · Status: accepted
+diff --git a/Docs/specs/success-scenarios.md b/Docs/specs/success-scenarios.md
+index d7e7e44..48db6d4 100644
+--- a/Docs/specs/success-scenarios.md
++++ b/Docs/specs/success-scenarios.md
+@@ -27,14 +27,14 @@ A row may only be `evidenced` if its task's cross-provider review passed.
+ 
+ | SS id | Scenario | UC | Phase | Test layer | Screenshot | Test file | Task(s) | Status | Evidence | Last verified commit |
+ |---|---|---|---|---|---|---|---|---|---|---|
+-| SS-UC01-01 | Closed Won creates a draft invoice from the template | UC-01 | MVP | db-integration | no | — | T-0069 | not-started | — | — |
+-| SS-UC01-02 | Salesforce shows "Draft" within 60 seconds | UC-01 | MVP | e2e-playwright | yes | — | T-0069, T-0110 | not-started | — | — |
+-| SS-UC01-03 | Auto-approve under threshold posts GP-001 and emails | UC-01 | MVP | golden | no | packages/modules/ar/src/invoice.golden.db.test.ts (GP-001 produced by the invoice code through runGolden; one `ar.invoice.posted` outbox notice to the Billing To contact — SMTP send is T-0042; Closed Won trigger is T-0069) | T-0069, T-0040, T-0042 | green (T-0040 part; T-0042 send and T-0069 trigger open) | [.agent/evidence/T-0040/manifest.json](../../.agent/evidence/T-0040/manifest.json) | 89fa8bb |
+-| SS-UC01-04 | Above threshold stays Draft | UC-01 | MVP | unit | no | — | T-0069 | not-started | — | — |
++| SS-UC01-01 | Closed Won creates a draft invoice from the template | UC-01 | MVP | db-integration | no | packages/connectors/salesforce/src/billing/closed-won.db.test.ts (+ billing/source.contract.test.ts) | T-0069 | green | [.agent/evidence/T-0069/manifest.json](../../.agent/evidence/T-0069/manifest.json) | f4057f9 |
++| SS-UC01-02 | Salesforce shows "Draft" within 60 seconds | UC-01 | MVP | e2e-playwright | yes | packages/connectors/salesforce/src/billing/closed-won.db.test.ts SS-UC01-01 (backend half: the invoice.drafted write-back event, sent by the T-0067 writeBack() to the documented fake REST server, sets Opportunity.LF_Invoice_Status__c = "Draft"; the scratch-org screenshot is T-0110) | T-0069, T-0110 | not-started (e2e screenshot open, T-0110; backend write-back half green in T-0069) | [.agent/evidence/T-0069/manifest.json](../../.agent/evidence/T-0069/manifest.json) | f4057f9 |
++| SS-UC01-03 | Auto-approve under threshold posts GP-001 and emails | UC-01 | MVP | golden | no | packages/modules/ar/src/invoice.golden.db.test.ts (T-0040 document) + packages/connectors/salesforce/src/billing/closed-won.golden.db.test.ts (T-0069: GP-001 produced from Closed Won through runGolden, one `ar.invoice.posted` notice to the Billing To contact and one `invoice.posted` write-back; SMTP send is T-0042) | T-0069, T-0040, T-0042 | green (T-0040 + T-0069 trigger; T-0042 SMTP send open) | [.agent/evidence/T-0040/manifest.json](../../.agent/evidence/T-0040/manifest.json); [.agent/evidence/T-0069/manifest.json](../../.agent/evidence/T-0069/manifest.json) | f4057f9 |
++| SS-UC01-04 | Above threshold stays Draft | UC-01 | MVP | unit | no | packages/connectors/salesforce/src/billing/closed-won.db.test.ts (layer db-integration: the threshold is decided by T-0040 autoApproveSalesInvoice against stored settings) | T-0069 | green | [.agent/evidence/T-0069/manifest.json](../../.agent/evidence/T-0069/manifest.json) | f4057f9 |
+ | SS-UC01-05 | No Billing To contact blocks approval | UC-01 | MVP | db-integration | no | packages/modules/ar/src/invoice.lifecycle.db.test.ts | T-0040 | green | [.agent/evidence/T-0040/manifest.json](../../.agent/evidence/T-0040/manifest.json) | 89fa8bb |
+-| SS-UC01-06 | Posting-profile gap flagged, not posted | UC-01 | MVP | unit | no | packages/modules/products/src/matrix.resolve.test.ts; packages/modules/products/src/gap-check.db.test.ts | T-0039 (resolver refusal + gap list green at e8c35fd), T-0069 (draft warning on Closed Won — not built) | not-started | [.agent/evidence/T-0039/manifest.json](../../.agent/evidence/T-0039/manifest.json) | — |
+-| SS-UC01-07 | Duplicate CDC event is idempotent | UC-01 | MVP | db-integration | no | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts (master-data layer; the draft-invoice half is T-0069) | T-0065, T-0069 | green (master-data layer; draft invoice in T-0069) | [.agent/evidence/T-0065/manifest.json](../../.agent/evidence/T-0065/manifest.json) | 8ff8848 |
+-| SS-UC01-08 | Closed Won dated in a hard-locked period follows lock policy | UC-01 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0069, T-0023 | green (period/policy layer; Closed Won draft invoice and Sync issue in T-0069) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
++| SS-UC01-06 | Posting-profile gap flagged, not posted | UC-01 | MVP | unit | no | packages/modules/products/src/matrix.resolve.test.ts; packages/modules/products/src/gap-check.db.test.ts; packages/connectors/salesforce/src/billing/closed-won.db.test.ts (T-0069: PROFILE_GAP and TAX_CODE_CONFLICT warnings on the Closed Won draft, nothing posts, gap check lists the combination — db-integration) | T-0039, T-0069 | green | [.agent/evidence/T-0039/manifest.json](../../.agent/evidence/T-0039/manifest.json); [.agent/evidence/T-0069/manifest.json](../../.agent/evidence/T-0069/manifest.json) | f4057f9 |
++| SS-UC01-07 | Duplicate CDC event is idempotent | UC-01 | MVP | db-integration | no | packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts (master-data layer, T-0065); packages/connectors/salesforce/src/billing/closed-won.db.test.ts (T-0069: one draft per Opportunity, duplicate counted with its key, later events counted on the trigger) | T-0065, T-0069 | green | [.agent/evidence/T-0065/manifest.json](../../.agent/evidence/T-0065/manifest.json); [.agent/evidence/T-0069/manifest.json](../../.agent/evidence/T-0069/manifest.json) | f4057f9 |
++| SS-UC01-08 | Closed Won dated in a hard-locked period follows lock policy | UC-01 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts (T-0023 policy layer); packages/connectors/salesforce/src/billing/closed-won.db.test.ts (T-0069: reject → PERIOD_LOCKED billing issue, no draft; first open date → invoice dated 2026-11-01 with the note) | T-0069, T-0023 | green | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json); [.agent/evidence/T-0069/manifest.json](../../.agent/evidence/T-0069/manifest.json) | f4057f9 |
+ | SS-UC01-09 | Salesforce outage does not block accounting | UC-01 | MVP | db-integration | no | apps/worker/src/salesforce-writeback.outage.db.test.ts | T-0067 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | af03e20 |
+ | SS-UC01-10 | Invoice detail shows mapped lines and journal preview | UC-01 | MVP | e2e-playwright | yes | — | T-0083 | not-started | — | — |
+ | SS-UC01-11 | Tax-inclusive rounding follows company setting | UC-01 | MVP | golden | no | packages/modules/tax/src/golden/gp-018.golden.test.ts (GP-018a/b **Approved** owner-delegated, DL-0253; tax-engine level) + packages/ledger/src/golden/golden-postings.golden.db.test.ts GP-018 (posting engine, approved-only PASS); posting from a document via ledger is T-0040 + packages/modules/ar/src/invoice.golden.db.test.ts (T-0040: GP-018a/b produced by the sales-invoice code under per_line / per_document) | T-0034, T-0040 | green (T-0034 in review; T-0040 document posting green) | [.agent/evidence/T-0034/manifest.json](../../.agent/evidence/T-0034/manifest.json); [.agent/evidence/T-0040/manifest.json](../../.agent/evidence/T-0040/manifest.json) | 89fa8bb |
+-- 
+2.43.0
+

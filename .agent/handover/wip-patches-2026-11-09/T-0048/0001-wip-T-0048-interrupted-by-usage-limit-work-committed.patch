@@ -1,0 +1,688 @@
+From 4709ea5c91d833d4f0a58549906e4281c008ddab Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 9 Nov 2026 14:02:54 +0000
+Subject: [PATCH] =?UTF-8?q?wip(T-0048):=20interrupted=20by=20usage=20limit?=
+ =?UTF-8?q?=20=E2=80=94=20work=20committed=20as-is=20for=20Codex=20pickup?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+What changed: card claimed, RQ-0130, evidence dir, bad-debt journal builder and its unit test (unit test written first; RED/GREEN state not recorded at this commit).
+Why: product owner asked (2026-11-09) to commit everything as-is with a pickup document so Codex can
+continue; the Claude builder for this task stopped on a usage limit.
+Validation: NOT verified at this commit. Work in progress; tests for the uncommitted part were not
+re-run. Untracked local migration placeholders were left out of the commit.
+Next action: Run the unit test, then DB/golden tests for GP-007 and GP-007-A per the card (migration 0046). See .agent/CODEX-PICKUP-2026-11-09.md on claude/incomplete-features-build-wivsco.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_014KLkD1D96Sp3PfYtBZqsoM
+---
+ .agent/backlog/T-0048.md                      |   8 +-
+ .agent/evidence/T-0048/red-unit-20261109.txt  |   5 +
+ .agent/state.json                             |  13 +-
+ Docs/research/RQ-0130-bad-debt-write-off.md   |  96 +++++++
+ .../modules/ar/src/bad-debt-journal.test.ts   | 228 ++++++++++++++++
+ packages/modules/ar/src/bad-debt-journal.ts   | 249 ++++++++++++++++++
+ 6 files changed, 589 insertions(+), 10 deletions(-)
+ create mode 100644 .agent/evidence/T-0048/red-unit-20261109.txt
+ create mode 100644 Docs/research/RQ-0130-bad-debt-write-off.md
+ create mode 100644 packages/modules/ar/src/bad-debt-journal.test.ts
+ create mode 100644 packages/modules/ar/src/bad-debt-journal.ts
+
+diff --git a/.agent/backlog/T-0048.md b/.agent/backlog/T-0048.md
+index 2c3be3f..e00d119 100644
+--- a/.agent/backlog/T-0048.md
++++ b/.agent/backlog/T-0048.md
+@@ -4,10 +4,10 @@ title: "Bad debt write-off with GST decreasing adjustment"
+ phase: MVP
+ use_cases: []
+ depends_on: [T-0046, T-0035, T-0121, T-0124]
+-status: todo
+-claimed_by: null
+-lease_expires_at: null
+-attempts: 0
++status: claimed
++claimed_by: claude
++lease_expires_at: 2026-11-09T10:20:43.896Z
++attempts: 1
+ last_checkpoint: null
+ adr_required: false
+ research: [RQ-0090]
+diff --git a/.agent/evidence/T-0048/red-unit-20261109.txt b/.agent/evidence/T-0048/red-unit-20261109.txt
+new file mode 100644
+index 0000000..5e79d95
+--- /dev/null
++++ b/.agent/evidence/T-0048/red-unit-20261109.txt
+@@ -0,0 +1,5 @@
++⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
++ FAIL  |unit| packages/modules/ar/src/bad-debt-journal.test.ts [ packages/modules/ar/src/bad-debt-journal.test.ts ]
++Error: Cannot find module './bad-debt-journal.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-ab2a87bf189e9c0fa/packages/modules/ar/src/bad-debt-journal.test.ts
++      7|   BadDebtError,
++ Test Files  1 failed (1)
+diff --git a/.agent/state.json b/.agent/state.json
+index a5044c3..96f5a05 100644
+--- a/.agent/state.json
++++ b/.agent/state.json
+@@ -1,13 +1,13 @@
+ {
+   "schema_version": 1,
+-  "current_task": null,
+-  "branch": "feat/T-0054-payment-batches",
++  "current_task": "T-0048",
++  "branch": "feat/T-0048-bad-debt",
+   "step": null,
+-  "claimed_by": null,
+-  "lease_expires_at": null,
++  "claimed_by": "claude",
++  "lease_expires_at": "2026-11-09T10:20:43.896Z",
+   "last_green_commit": "638267bf0db6e1390a94770e66f764610a853a69",
+   "run_id": "2026-10-29-codex-r01",
+-  "updated_at": "2026-11-09T09:16:35.201Z",
++  "updated_at": "2026-11-09T09:35:43.907Z",
+   "phase": "sprint-0",
+   "attempts": {
+     "T-0010": 3,
+@@ -63,7 +63,8 @@
+     "T-0039": 1,
+     "T-0040": 1,
+     "T-0121": 1,
+-    "T-0054": 1
++    "T-0054": 1,
++    "T-0048": 1
+   },
+   "failures": {},
+   "providers": {},
+diff --git a/Docs/research/RQ-0130-bad-debt-write-off.md b/Docs/research/RQ-0130-bad-debt-write-off.md
+new file mode 100644
+index 0000000..32bd402
+--- /dev/null
++++ b/Docs/research/RQ-0130-bad-debt-write-off.md
+@@ -0,0 +1,96 @@
++---
++id: RQ-0130
++title: How does a bad-debt write-off document work — Div 21 eligibility, the GST decreasing adjustment, the ECL allowance path, and what stays out of scope?
++status: answered
++opened: 2026-11-09
++resolved: 2026-11-09
++opened_by: claude
++linked_tasks: [T-0048, T-0175, T-0176, T-0177]
++linked_adrs: []
++superseded_by:
++---
++
++# RQ-0130 — Bad-debt write-off (T-0048)
++
++## Question
++
++- **Q1.** When may a write-off carry the Div 21 decreasing adjustment (ADJ-BD), and what does the
++  document check (eligibility)?
++- **Q2.** How is the GST adjustment of a **partial** write-off computed, and of an invoice that is
++  not wholly taxable?
++- **Q3.** Accruals versus cash basis: does the ledger entry differ?
++- **Q4.** ECL allowance path (GP-007-A A2/A3): which balance limits the charge to the allowance,
++  and how is the leftover allowance (A4) released?
++- **Q5.** Where do `setting:ar.bad_debt_account` and `setting:ar.ecl_allowance_account` live?
++- **Q6.** Does the subledger close the invoice, and how do statements, ageing and BAS see it?
++- **Q7.** What is out of scope (recovery, automated ECL provision, maker-checker)?
++
++## Why it matters
++
++A write-off removes a receivable and reduces GST payable. If the adjustment is claimed when it is
++not available, or an allowance is over-used, BAS and the balance sheet are wrong (s 21-5; AASB 9).
++
++## Sources
++
++| # | Source | Accessed | Kind | What it says |
++|---|---|---|---|---|
++| S1 | `Docs/accounting/postings.md` GP-007 (Approved, DL-0253) and GP-007-A (Approved, DL-0282 / DL-0387) | 2026-11-09 | golden (human-owned) | GP-007 lines, ADJ-BD, partial write-off = amount × 1/11 half-up, cash basis same entry no BAS; GP-007-A A1–A4 and the *Allowance rule* (ex-GST charge, default the lesser of the ex-GST amount and the allowance credit balance, never a debit balance, excess to bad debts, residue by A4). |
++| S2 | RQ-0095 S2 (ATO "Types of adjustments") and S4 (GST Act Div 21, s 21-5, s 21-15) | 2026-11-08 (extracts; primary hosts return proxy 403) | primary (regulator / legislation) | Non-cash basis: decreasing adjustment if a taxable supply was made, the GST was attributed, and the debt is **written off as bad or overdue 12 months or more**; claimed in the period of write-off; recovery = increasing adjustment. Forgiven or set-off debts do not qualify. |
++| S3 | `.agent/evidence/T-0124/accounting-rereview-20261109.md` (persona, DL-0386) RC-1, m1, m2, Q13, Q14 | 2026-11-09 | review | The user states the allowance charge with a default and a cap; A1 is a `manual_journal`; A4 is a remeasurement manual journal; 1B at the write-off date is conservative. |
++| S4 | `packages/modules/tax/templates/au-tax-codes.json` (T-0035) | 2026-11-09 | code/data | ADJ-BD: 10 %, collected role GST_COLLECTED; BAS row `any → 1B, tax, debit, accruals`. Cash basis has no row, so the report shows nothing. |
++| S5 | `packages/modules/tax/src/bas-report.ts`, `bas-report.db.test.ts` "bad debt: GP-007" | 2026-11-09 | code | The cash-basis report attributes only settlements (receipts, refunds) to a document; an `ar_write_off` allocation is not consideration. |
++| S6 | `packages/modules/gl/templates/au-services-smb.v2.json` suggestedSettings | 2026-11-09 | data | `bad_debts_account` 6500, `ecl_allowance_account` 1290 (asset, receivable, credit normal, not control). |
++| S7 | Migration 0037 `app.ar_invoice_settings`, 0021 `app.sod_settings` | 2026-11-09 | code | Company settings are insert-only history tables, latest row wins. |
++
++## Findings
++
++1. **Eligibility (Q1).** The write-off document *is* the act of writing off as bad (s 21-5(1),
++   ground "written off"), so a posted write-off always meets the write-off ground. The document
++   also records whether the debt was overdue 12 months or more on the write-off date (the second
++   ground; GP-007-A m2). Further checks: the invoice is posted, it belongs to the party, the
++   write-off date is not before the invoice date and is **after the due date** (the card scopes
++   "an overdue invoice"), the amount is ≤ the invoice's AR open amount (a paid or forgiven part
++   cannot be written off), and the invoice is in the company's base currency (FX write-offs are a
++   follow-up; the engine posts base-currency lines here).
++2. **GST of a partial or mixed write-off (Q2).** GST = written-off amount × invoice tax total ÷
++   invoice total, half-up to cents. For a wholly taxable 10 % invoice this is the GP-007 rule
++   (amount × 1/11), up to the invoice's own line rounding; a GST-free part carries no adjustment;
++   a full write-off of an unpaid invoice returns exactly the GST raised (1,375.00 → 125.00). When
++   the GST is 0.00 the journal has no ADJ-BD line and no GST line.
++3. **Basis (Q3).** Same ledger lines on both bases (GP-007, RQ-0095 Q3). The BAS map makes the
++   difference: accruals → 1B, cash → none. The document stores the company's GST basis at
++   write-off time for display only.
++4. **Allowance (Q4).** The *available* allowance is the allowance account's credit balance, the
++   lesser of the balance at the write-off date and the latest balance (so a later-dated debit
++   cannot be over-drawn either), under a per-company advisory lock so two write-offs cannot both
++   spend it. The charge is ex-GST: default = min(ex-GST amount, available); a user-stated charge
++   must be ≤ both. The ADJ-BD tax of the allowance line = GST × charge ÷ ex-GST, half-up; the
++   bad-debt line takes the rest (A3: 100.00 + 25.00). The leftover (A2: 125.00) is released by an
++   adjusting **manual journal** (A4, Dr allowance / Cr bad debts) through the manual-journal
++   workflow (submit → approve → post); the module offers `allowanceReleaseLines` to draft it,
++   capped at the available balance. A1 stays a `manual_journal` (Q13).
++5. **Settings (Q5).** New insert-only history table `app.ar_write_off_settings` (latest row wins):
++   `bad_debt_account_id` (expense) and optional `ecl_allowance_account_id` (asset, not a control
++   account). Method `auto` (default) uses the allowance when the setting is present and the
++   available balance is > 0, else direct; `direct` and `allowance` are explicit user choices.
++6. **Subledger (Q6).** The AR credit line opens a write-off credit item that is allocated to the
++   invoice in the same savepoint: invoice open 0.00, status *written off* (GP-007 Subledger). The
++   statement shows the line as kind `write_off`; ageing reads open items, so nothing remains.
++7. **Out of scope (Q7).** Recovery (increasing adjustment at 1A, s 21-15) → T-0176. Automated ECL
++   provision (`ar.ecl_provision`, stored matrix inputs) → T-0175. Maker-checker approval (SoD) and
++   the write-off screen → T-0177; until then the write-off records `created_by` and is an API/module
++   action only. FX write-offs are refused (`FOREIGN_CURRENCY`) and listed on T-0177.
++
++## Conclusion
++
++Build the write-off as an insert-only document posted on creation through the engine (source type
++`ar_write_off`, key `ar_write_off:<id>`), with the checks of finding 1, the GST of finding 2, the
++allowance rule of finding 4, the settings of finding 5 and the allocation of finding 6. Prove it
++with GP-007 and GP-007-A A2/A3 produced by the code, A1/A4 through the manual-journal path, and the
++BAS report (1B 125.00 accruals, nothing on cash).
++
++## Confidence
++
++High for the ledger lines (Approved goldens). Medium for the "after due date" check (a scope
++choice; s 21-5 itself only needs the write-off). Primary legislation text is unverified here
++(proxy 403), as in RQ-0095.
+diff --git a/packages/modules/ar/src/bad-debt-journal.test.ts b/packages/modules/ar/src/bad-debt-journal.test.ts
+new file mode 100644
+index 0000000..145d1b7
+--- /dev/null
++++ b/packages/modules/ar/src/bad-debt-journal.test.ts
+@@ -0,0 +1,228 @@
++/**
++ * T-0048 bad-debt write-off builder (RQ-0130 findings 2 and 4; GP-007, GP-007-A A2/A3).
++ * INV-000140: 1,250.00 + GST 125.00 = 1,375.00, unpaid.
++ */
++import { describe, expect, it } from 'vitest';
++import {
++  BadDebtError,
++  allowanceReleaseLinesOf,
++  buildWriteOffJournal,
++  writeOffGst,
++  type WriteOffJournalInput,
++} from './bad-debt-journal.ts';
++
++const ADJ_BD = { id: 'adj-bd-v1', collectedAccountId: 'acct-2310' };
++
++const base = (over: Partial<WriteOffJournalInput> = {}): WriteOffJournalInput => ({
++  currency: 'AUD',
++  partyId: 'acme',
++  controlAccountId: 'acct-1200',
++  badDebtAccountId: 'acct-6500',
++  allowanceAccountId: 'acct-1290',
++  adjBd: ADJ_BD,
++  amount: '1375.00',
++  invoiceTotal: '1375.0000',
++  invoiceTax: '125.0000',
++  method: 'direct',
++  allowanceAvailable: '0',
++  writeOffDate: '2027-12-01',
++  ...over,
++});
++
++const codeOf = (fn: () => unknown): string | undefined => {
++  try {
++    fn();
++  } catch (e) {
++    if (e instanceof BadDebtError) return e.code;
++    throw e;
++  }
++  return undefined;
++};
++
++describe('writeOffGst — written-off amount × invoice tax ÷ invoice total, half-up to cents', () => {
++  it.each([
++    ['1375.00', '1375.0000', '125.0000', '125.0000'], // GP-007 full write-off
++    ['500.00', '1375.0000', '125.0000', '45.4500'], // partial: 500/11 = 45.4545… → 45.45
++    ['0.06', '0.0600', '0.0100', '0.0100'], // full write-off returns exactly the GST raised
++    ['100.00', '100.0000', '0.0000', '0.0000'], // GST-free invoice: no adjustment
++    ['55.00', '1100.0000', '50.0000', '2.5000'], // mixed: half taxable → 2.50 (not 5.00)
++    ['0.11', '1.1000', '0.0500', '0.0100'], // 0.005 → half-up 0.01
++  ])('%s of an invoice %s with tax %s → GST %s', (amount, total, tax, gst) => {
++    expect(writeOffGst({ amount, invoiceTotal: total, invoiceTax: tax, currency: 'AUD' })).toBe(
++      gst,
++    );
++  });
++});
++
++describe('buildWriteOffJournal', () => {
++  it('GP-007 direct: Dr bad debts 1,250.00 ADJ-BD (tax 125.00), Dr GST collected 125.00, Cr AR 1,375.00', () => {
++    const j = buildWriteOffJournal(base());
++    expect(j.lines).toEqual([
++      {
++        account: { id: 'acct-6500' },
++        debit: '1250.0000',
++        taxCodeId: 'adj-bd-v1',
++        taxAmount: '125.0000',
++        partyId: 'acme',
++      },
++      { account: { id: 'acct-2310' }, debit: '125.0000', taxCodeId: 'adj-bd-v1' },
++      { account: { id: 'acct-1200' }, credit: '1375.0000', partyId: 'acme', dueDate: '2027-12-01' },
++    ]);
++    expect(j).toMatchObject({
++      gst: '125.0000',
++      net: '1250.0000',
++      allowanceCharge: '0.0000',
++      badDebtAmount: '1250.0000',
++    });
++  });
++
++  it('GP-007-A A2: the default charge is the ex-GST amount when the allowance holds 1,375.00', () => {
++    const j = buildWriteOffJournal(base({ method: 'allowance', allowanceAvailable: '1375.0000' }));
++    expect(j.lines).toEqual([
++      {
++        account: { id: 'acct-1290' },
++        debit: '1250.0000',
++        taxCodeId: 'adj-bd-v1',
++        taxAmount: '125.0000',
++        partyId: 'acme',
++      },
++      { account: { id: 'acct-2310' }, debit: '125.0000', taxCodeId: 'adj-bd-v1' },
++      { account: { id: 'acct-1200' }, credit: '1375.0000', partyId: 'acme', dueDate: '2027-12-01' },
++    ]);
++    expect(j.allowanceCharge).toBe('1250.0000');
++    expect(j.badDebtAmount).toBe('0.0000');
++  });
++
++  it('GP-007-A A3: the default charge is capped at the allowance available (1,000.00); the excess goes to bad debts', () => {
++    const j = buildWriteOffJournal(base({ method: 'allowance', allowanceAvailable: '1000.0000' }));
++    expect(j.lines).toEqual([
++      {
++        account: { id: 'acct-1290' },
++        debit: '1000.0000',
++        taxCodeId: 'adj-bd-v1',
++        taxAmount: '100.0000',
++        partyId: 'acme',
++      },
++      {
++        account: { id: 'acct-6500' },
++        debit: '250.0000',
++        taxCodeId: 'adj-bd-v1',
++        taxAmount: '25.0000',
++        partyId: 'acme',
++      },
++      { account: { id: 'acct-2310' }, debit: '125.0000', taxCodeId: 'adj-bd-v1' },
++      { account: { id: 'acct-1200' }, credit: '1375.0000', partyId: 'acme', dueDate: '2027-12-01' },
++    ]);
++  });
++
++  it('a user-stated charge below the default is used; above the ex-GST amount or the available balance it is refused', () => {
++    const j = buildWriteOffJournal(
++      base({
++        method: 'allowance',
++        allowanceAvailable: '1375.0000',
++        allowanceRequested: '600.00',
++      }),
++    );
++    expect(j.allowanceCharge).toBe('600.0000');
++    expect(j.badDebtAmount).toBe('650.0000');
++    expect(j.allowanceTax).toBe('60.0000');
++    expect(j.badDebtTax).toBe('65.0000');
++    expect(
++      codeOf(() =>
++        buildWriteOffJournal(
++          base({
++            method: 'allowance',
++            allowanceAvailable: '1375.0000',
++            allowanceRequested: '1250.01',
++          }),
++        ),
++      ),
++    ).toBe('ALLOWANCE_EXCEEDED');
++    expect(
++      codeOf(() =>
++        buildWriteOffJournal(
++          base({ method: 'allowance', allowanceAvailable: '999.99', allowanceRequested: '1000.00' }),
++        ),
++      ),
++    ).toBe('ALLOWANCE_EXCEEDED');
++  });
++
++  it('the allowance path needs an allowance account and a credit balance; direct takes no charge', () => {
++    expect(
++      codeOf(() =>
++        buildWriteOffJournal(
++          base({ method: 'allowance', allowanceAccountId: null, allowanceAvailable: '10' }),
++        ),
++      ),
++    ).toBe('NO_ALLOWANCE_ACCOUNT');
++    expect(
++      codeOf(() => buildWriteOffJournal(base({ method: 'allowance', allowanceAvailable: '0' }))),
++    ).toBe('ALLOWANCE_EMPTY');
++    // a debit balance on the allowance is never "available"
++    expect(
++      codeOf(() =>
++        buildWriteOffJournal(base({ method: 'allowance', allowanceAvailable: '-5.0000' })),
++      ),
++    ).toBe('ALLOWANCE_EMPTY');
++    expect(
++      codeOf(() => buildWriteOffJournal(base({ method: 'direct', allowanceRequested: '10.00' }))),
++    ).toBe('INVALID_WRITE_OFF');
++  });
++
++  it('a partial write-off of 500.00 carries GST 45.45 (GP-007 partial rule)', () => {
++    const j = buildWriteOffJournal(base({ amount: '500.00' }));
++    expect(j.gst).toBe('45.4500');
++    expect(j.net).toBe('454.5500');
++  });
++
++  it('a GST-free write-off has no tax code, no GST line', () => {
++    const j = buildWriteOffJournal(
++      base({ amount: '100.00', invoiceTotal: '100.0000', invoiceTax: '0.0000', adjBd: null }),
++    );
++    expect(j.lines).toEqual([
++      { account: { id: 'acct-6500' }, debit: '100.0000', partyId: 'acme' },
++      { account: { id: 'acct-1200' }, credit: '100.0000', partyId: 'acme', dueDate: '2027-12-01' },
++    ]);
++  });
++
++  it('refuses a non-positive or sub-cent amount, and GST without the ADJ-BD code or its account', () => {
++    expect(codeOf(() => buildWriteOffJournal(base({ amount: '0' })))).toBe('INVALID_WRITE_OFF');
++    expect(codeOf(() => buildWriteOffJournal(base({ amount: '1.001' })))).toBe(
++      'INVALID_WRITE_OFF',
++    );
++    expect(codeOf(() => buildWriteOffJournal(base({ adjBd: null })))).toBe('TAX_CODE_MISSING');
++    expect(
++      codeOf(() =>
++        buildWriteOffJournal(base({ adjBd: { id: 'adj-bd-v1', collectedAccountId: null } })),
++      ),
++    ).toBe('TAX_ACCOUNT_MISSING');
++  });
++});
++
++describe('allowanceReleaseLinesOf — A4 remeasurement lines (manual journal)', () => {
++  it('Dr allowance / Cr bad debts, capped at the allowance credit balance', () => {
++    expect(
++      allowanceReleaseLinesOf({
++        currency: 'AUD',
++        allowanceAccountId: 'acct-1290',
++        badDebtAccountId: 'acct-6500',
++        amount: '125.00',
++        allowanceAvailable: '125.0000',
++      }),
++    ).toEqual([
++      { account: { id: 'acct-1290' }, debit: '125.0000' },
++      { account: { id: 'acct-6500' }, credit: '125.0000' },
++    ]);
++    expect(
++      codeOf(() =>
++        allowanceReleaseLinesOf({
++          currency: 'AUD',
++          allowanceAccountId: 'acct-1290',
++          badDebtAccountId: 'acct-6500',
++          amount: '125.01',
++          allowanceAvailable: '125.0000',
++        }),
++      ),
++    ).toBe('ALLOWANCE_EXCEEDED');
++  });
++});
+diff --git a/packages/modules/ar/src/bad-debt-journal.ts b/packages/modules/ar/src/bad-debt-journal.ts
+new file mode 100644
+index 0000000..b467ada
+--- /dev/null
++++ b/packages/modules/ar/src/bad-debt-journal.ts
+@@ -0,0 +1,249 @@
++/**
++ * Bad-debt write-off → posting-command lines (T-0048, design §3.8 row 5; RQ-0130; golden postings
++ * GP-007 Approved per DL-0253 and GP-007-A Approved per DL-0282/DL-0387). Pure: no I/O.
++ *
++ * GST (RQ-0130 finding 2): the Div 21 decreasing adjustment of the written-off amount is
++ * amount × invoice tax ÷ invoice total, half-up to cents (GP-007: amount × 1/11 for a wholly
++ * taxable 10 % invoice); a full write-off of an unpaid invoice returns exactly the GST raised.
++ *
++ * Journal (GP-007 / GP-007-A order). Every amount is non-negative; the side gives the direction:
++ *   1. allowance path only — Dr `setting:ar.ecl_allowance_account` the charge (ex-GST), ADJ-BD
++ *      with tax = GST × charge ÷ ex-GST (half-up), party.
++ *   2. Dr `setting:ar.bad_debt_account` the ex-GST amount not charged to the allowance, ADJ-BD
++ *      with the remaining tax, party.
++ *   3. Dr the ADJ-BD collected account (GST collected) the GST, ADJ-BD.
++ *   4. Cr AR control the written-off amount, party, due date = write-off date.
++ *
++ * Allowance rule (GP-007-A, persona RC-1): the charge is the user-stated ex-GST amount, default
++ * the lesser of the ex-GST amount and the allowance credit balance; it never exceeds either, so
++ * the allowance never goes to a debit balance.
++ */
++import type { PostingLineInput } from '@ledgerforce/ledger';
++import { DomainError } from '@ledgerforce/shared';
++import { Money } from '@ledgerforce/shared/money';
++
++export type BadDebtErrorCode =
++  | 'NOT_FOUND'
++  | 'INVALID_WRITE_OFF'
++  | 'INVOICE_NOT_POSTED'
++  | 'NOT_OVERDUE'
++  | 'DATE_BEFORE_INVOICE'
++  | 'EXCEEDS_OPEN_AMOUNT'
++  | 'FOREIGN_CURRENCY'
++  | 'NO_SETTINGS'
++  | 'INVALID_SETTINGS'
++  | 'NO_ALLOWANCE_ACCOUNT'
++  | 'ALLOWANCE_EMPTY'
++  | 'ALLOWANCE_EXCEEDED'
++  | 'TAX_CODE_MISSING'
++  | 'TAX_ACCOUNT_MISSING';
++
++/** A write-off refusal. Engine refusals (PERIOD_*, …) stay PostingError. */
++export class BadDebtError extends DomainError {
++  declare readonly code: BadDebtErrorCode;
++}
++
++export const refuseBadDebt = (code: BadDebtErrorCode, message: string): never => {
++  throw new BadDebtError(code, message);
++};
++
++export type WriteOffMethod = 'direct' | 'allowance';
++
++/** At most cents; NUMERIC(19,4) text ("200.0000") is accepted as 200.00. */
++const CENTS = /^\d+(\.\d{1,2}0{0,2})?$/;
++/** A signed NUMERIC text (a balance may be negative). */
++const SIGNED = /^-?\d+(\.\d{1,4})?$/;
++
++function cents(v: string, what: string, currency: string): Money {
++  if (!CENTS.test(v)) {
++    refuseBadDebt('INVALID_WRITE_OFF', `${what} ${JSON.stringify(v)} must be an amount in cents`);
++  }
++  return Money.of(v, currency);
++}
++
++/** Minor units (cents) of a non-negative cents amount, exactly. */
++const unitsOf = (m: Money): bigint => BigInt(m.roundToCents().toNumericString().replace('.', '')) / 100n;
++
++/** a × b ÷ c, half-up to cents, for non-negative cents amounts (exact integer arithmetic). */
++function proportion(a: Money, b: Money, c: Money, currency: string): Money {
++  const cu = unitsOf(c);
++  if (cu === 0n) return Money.zero(currency);
++  const q = (2n * unitsOf(a) * unitsOf(b) + cu) / (2n * cu);
++  return Money.fromMinorUnits(q, currency);
++}
++
++/** RQ-0130 finding 2: the GST decreasing adjustment of a written-off amount (NUMERIC text). */
++export function writeOffGst(i: {
++  amount: string;
++  invoiceTotal: string;
++  invoiceTax: string;
++  currency: string;
++}): string {
++  const amount = cents(i.amount, 'amount', i.currency);
++  const total = cents(i.invoiceTotal, 'invoice total', i.currency);
++  const tax = cents(i.invoiceTax, 'invoice tax', i.currency);
++  return proportion(amount, tax, total, i.currency).toNumericString();
++}
++
++export interface WriteOffJournalInput {
++  currency: string;
++  partyId: string;
++  /** The AR control account of the invoice's open item. */
++  controlAccountId: string;
++  badDebtAccountId: string;
++  /** setting:ar.ecl_allowance_account; null when the company holds no allowance setting. */
++  allowanceAccountId: string | null;
++  /** The ADJ-BD tax-code version valid on the write-off date; null when not loaded. */
++  adjBd: { id: string; collectedAccountId: string | null } | null;
++  /** The gross amount written off (cents, > 0). */
++  amount: string;
++  invoiceTotal: string;
++  invoiceTax: string;
++  method: WriteOffMethod;
++  /** The allowance account's credit balance (NUMERIC text; ≤ 0 means nothing available). */
++  allowanceAvailable: string;
++  /** The ex-GST charge to the allowance stated by the user; default per the allowance rule. */
++  allowanceRequested?: string;
++  /** YYYY-MM-DD; dates the credit open item. */
++  writeOffDate: string;
++}
++
++export interface WriteOffJournal {
++  lines: PostingLineInput[];
++  gst: string;
++  net: string;
++  allowanceCharge: string;
++  allowanceTax: string;
++  badDebtAmount: string;
++  badDebtTax: string;
++}
++
++export function buildWriteOffJournal(input: WriteOffJournalInput): WriteOffJournal {
++  const cur = input.currency;
++  const amount = cents(input.amount, 'amount', cur);
++  if (!amount.isPositive()) refuseBadDebt('INVALID_WRITE_OFF', 'the write-off amount must be > 0');
++  const gst = Money.of(writeOffGst({ ...input, amount: input.amount }), cur);
++  const net = amount.sub(gst);
++  const zero = Money.zero(cur);
++
++  let charge = zero;
++  if (input.method === 'direct') {
++    if (input.allowanceRequested !== undefined) {
++      refuseBadDebt('INVALID_WRITE_OFF', 'a direct write-off charges nothing to the allowance');
++    }
++  } else {
++    if (input.allowanceAccountId === null) {
++      refuseBadDebt(
++        'NO_ALLOWANCE_ACCOUNT',
++        'the company has no ECL allowance account (setting ar.ecl_allowance_account)',
++      );
++    }
++    if (!SIGNED.test(input.allowanceAvailable)) {
++      throw new Error(`allowance balance ${JSON.stringify(input.allowanceAvailable)} is not NUMERIC`);
++    }
++    const available = Money.of(input.allowanceAvailable, cur);
++    if (!available.isPositive()) {
++      refuseBadDebt(
++        'ALLOWANCE_EMPTY',
++        `the ECL allowance has no credit balance (${available.toNumericString()})`,
++      );
++    }
++    if (input.allowanceRequested === undefined) {
++      charge = net.compare(available) <= 0 ? net : available;
++    } else {
++      charge = cents(input.allowanceRequested, 'allowance charge', cur);
++      if (!charge.isPositive()) {
++        refuseBadDebt('INVALID_WRITE_OFF', 'the allowance charge must be > 0');
++      }
++      if (charge.compare(net) > 0 || charge.compare(available) > 0) {
++        refuseBadDebt(
++          'ALLOWANCE_EXCEEDED',
++          `allowance charge ${charge.toNumericString()} exceeds the ex-GST amount ${net.toNumericString()} or the allowance available ${available.toNumericString()}`,
++        );
++      }
++    }
++  }
++  const allowanceTax = charge.equals(net) ? gst : proportion(gst, charge, net, cur);
++  const badDebt = net.sub(charge);
++  const badDebtTax = gst.sub(allowanceTax);
++
++  let tax: { id: string; account: string } | null = null;
++  if (!gst.isZero()) {
++    if (input.adjBd === null) {
++      refuseBadDebt('TAX_CODE_MISSING', 'tax code ADJ-BD is not valid on the write-off date');
++    }
++    const acct = input.adjBd?.collectedAccountId ?? null;
++    if (acct === null) {
++      refuseBadDebt(
++        'TAX_ACCOUNT_MISSING',
++        'tax code ADJ-BD has no collected account (GST_COLLECTED role)',
++      );
++    }
++    tax = { id: input.adjBd?.id ?? '', account: acct ?? '' };
++  }
++  const taxed = (m: Money) =>
++    tax === null ? {} : { taxCodeId: tax.id, taxAmount: m.toNumericString() };
++
++  const lines: PostingLineInput[] = [];
++  if (charge.isPositive()) {
++    lines.push({
++      account: { id: input.allowanceAccountId ?? '' },
++      debit: charge.toNumericString(),
++      ...taxed(allowanceTax),
++      partyId: input.partyId,
++    });
++  }
++  if (badDebt.isPositive()) {
++    lines.push({
++      account: { id: input.badDebtAccountId },
++      debit: badDebt.toNumericString(),
++      ...taxed(badDebtTax),
++      partyId: input.partyId,
++    });
++  }
++  if (tax !== null) {
++    lines.push({ account: { id: tax.account }, debit: gst.toNumericString(), taxCodeId: tax.id });
++  }
++  lines.push({
++    account: { id: input.controlAccountId },
++    credit: amount.toNumericString(),
++    partyId: input.partyId,
++    dueDate: input.writeOffDate,
++  });
++  return {
++    lines,
++    gst: gst.toNumericString(),
++    net: net.toNumericString(),
++    allowanceCharge: charge.toNumericString(),
++    allowanceTax: allowanceTax.toNumericString(),
++    badDebtAmount: badDebt.toNumericString(),
++    badDebtTax: badDebtTax.toNumericString(),
++  };
++}
++
++/**
++ * GP-007-A A4: the lines of the adjusting manual journal that releases allowance left after a
++ * write-off (Dr allowance / Cr bad debts). Capped at the allowance credit balance, so the release
++ * never takes the allowance to a debit balance. Posted through the manual-journal workflow.
++ */
++export function allowanceReleaseLinesOf(i: {
++  currency: string;
++  allowanceAccountId: string;
++  badDebtAccountId: string;
++  amount: string;
++  allowanceAvailable: string;
++}): PostingLineInput[] {
++  const amount = cents(i.amount, 'release amount', i.currency);
++  if (!amount.isPositive()) refuseBadDebt('INVALID_WRITE_OFF', 'the release must be > 0');
++  const available = Money.of(i.allowanceAvailable, i.currency);
++  if (amount.compare(available) > 0) {
++    refuseBadDebt(
++      'ALLOWANCE_EXCEEDED',
++      `release ${amount.toNumericString()} exceeds the allowance available ${available.toNumericString()}`,
++    );
++  }
++  return [
++    { account: { id: i.allowanceAccountId }, debit: amount.toNumericString() },
++    { account: { id: i.badDebtAccountId }, credit: amount.toNumericString() },
++  ];
++}
+-- 
+2.43.0
+

@@ -1,0 +1,730 @@
+From f4057f9bd48f2cdc0639ef559b8ee56f5e6b9aec Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 9 Nov 2026 09:21:12 +0000
+Subject: [PATCH 2/3] =?UTF-8?q?wip(T-0069):=20step=206/10=20=E2=80=94=20GP?=
+ =?UTF-8?q?-001=20golden=20from=20Closed=20Won,=20write-back=20to=20fake?=
+ =?UTF-8?q?=20REST?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+What changed:
+- closed-won.golden.db.test.ts: SS-UC01-03 driven from the trigger — an Opportunity with the
+  GP-001 lines moving to Closed Won, auto-approve on at $2,000, posts exactly GP-001
+  (runGolden, Approved), INV-…, one ar.invoice.posted notice to the Billing To contact and one
+  invoice.posted write-back event, through the real pg-boss outbox.
+- closed-won.db.test.ts SS-UC01-01: the drafted event's records are sent with the T-0067
+  writeBack() to the documented fake REST server; the Opportunity reads "Draft" and the mirror
+  exists once (backend half of SS-UC01-02; the scratch-org screenshot stays with T-0110).
+- Follow-up cards T-0160 (record billing CDC schemas, IsWon in changedFields), T-0161 (source
+  edited after draft; billing issues in the inbox), T-0162 (template records, party payment
+  terms), T-0163 (write-back from every AR transition); README index rows.
+- RED evidence files and the golden mutation check in .agent/evidence/T-0069/.
+
+Why: T-0069 AC SS-UC01-03 and the write-back half of SS-UC01-02; scope found during the build
+is recorded as cards rather than grown into this task.
+
+Validation:
+- vitest db packages/connectors/salesforce/src/billing: 15/15 passed (13 closed-won + 2 golden).
+- The golden test passed on its first run (it composes already-implemented code); to show it
+  can fail, apply.ts was temporarily switched to amountsAre 'inclusive': GP-001 FAIL with
+  line-by-line differences (golden-mutation-check.txt), then reverted (no diff).
+- connector typecheck and eslint clean; prettier clean.
+
+Next action: evidence:tests for unit and db, register rows, card AC ticks, run log, full
+verify --task T-0069, release to review.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_014KLkD1D96Sp3PfYtBZqsoM
+---
+ .agent/HANDOVER.md                            |   1 +
+ .agent/backlog/README.md                      |   4 +
+ .agent/backlog/T-0069.md                      |   2 +-
+ .agent/backlog/T-0160.md                      |  49 ++++
+ .agent/backlog/T-0161.md                      |  48 ++++
+ .agent/backlog/T-0162.md                      |  48 ++++
+ .agent/backlog/T-0163.md                      |  48 ++++
+ .../evidence/T-0069/golden-mutation-check.txt |   8 +
+ .agent/evidence/T-0069/red-closed-won-db.txt  |  29 ++
+ .../evidence/T-0069/red-source-contract.txt   |  15 ++
+ .agent/state.json                             |   9 +-
+ .../src/billing/closed-won.db.test.ts         |  33 +++
+ .../src/billing/closed-won.golden.db.test.ts  | 254 ++++++++++++++++++
+ 13 files changed, 543 insertions(+), 5 deletions(-)
+ create mode 100644 .agent/backlog/T-0160.md
+ create mode 100644 .agent/backlog/T-0161.md
+ create mode 100644 .agent/backlog/T-0162.md
+ create mode 100644 .agent/backlog/T-0163.md
+ create mode 100644 .agent/evidence/T-0069/golden-mutation-check.txt
+ create mode 100644 .agent/evidence/T-0069/red-closed-won-db.txt
+ create mode 100644 .agent/evidence/T-0069/red-source-contract.txt
+ create mode 100644 packages/connectors/salesforce/src/billing/closed-won.golden.db.test.ts
+
+diff --git a/.agent/HANDOVER.md b/.agent/HANDOVER.md
+index b07d63a..937306e 100644
+--- a/.agent/HANDOVER.md
++++ b/.agent/HANDOVER.md
+@@ -291,3 +291,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
+ - 2026-11-08T23:20:40.187Z claude: T-0052 → verifying
+ - 2026-11-09T04:03:00.375Z claude: release T-0052 → review (All criteria green; verify 12/3/1 with only the known failures (run.test.ts artefact 2a/3, golden diff guard 4); gate 8 needs codex cross-review)
+ - 2026-11-09T09:17:26.648Z claude: checkpoint (commit deferred to conductor): 5/10 — Closed Won draft, idempotency, lock policy, auto-approve green
++- 2026-11-09T09:21:12.441Z claude: checkpoint (commit deferred to conductor): 6/10 — GP-001 golden from Closed Won, write-back to fake REST
+diff --git a/.agent/backlog/README.md b/.agent/backlog/README.md
+index 25a490b..d5855e0 100644
+--- a/.agent/backlog/README.md
++++ b/.agent/backlog/README.md
+@@ -169,6 +169,10 @@ graph LR
+ | [T-0067](T-0067.md) | Write-back to Salesforce via sObject Collections from the outbox | MVP | review | T-0063, T-0030 | UC-01, UC-03, UC-04, UC-11, UC-12 | 6 |
+ | [T-0068](T-0068.md) | Basic overdue reminders (UC-04 MVP scope) | MVP | todo | T-0049, T-0042, T-0067 | UC-04 | 4 |
+ | [T-0069](T-0069.md) | Closed Won / Order activated → draft invoice (UC-01) with auto-approve | MVP | todo | T-0065, T-0040, T-0067, T-0031 | UC-01 | 7 |
++| [T-0160](T-0160.md) | Record the billing-source CDC schemas from a scratch org (Opportunity, OpportunityLineItem, Order, OrderItem) and confirm IsWon in changedFields (follow-up to T-0069) (est. 150 lines) | MVP | todo | T-0069 | UC-01 | 0 |
++| [T-0161](T-0161.md) | Billing source edited after its draft: amend or flag the draft, and a Sync issues view for billing issues (follow-up to T-0069) (est. 300 lines) | MVP | todo | T-0069, T-0083 | UC-01 | 0 |
++| [T-0162](T-0162.md) | Invoice template records and party payment terms for Closed Won drafts (design §4.3, §4.2) (follow-up to T-0069) (est. 300 lines) | MVP | todo | T-0069 | UC-01 | 0 |
++| [T-0163](T-0163.md) | Write back the invoice status for every sales-invoice transition (manual approve, post, from the AR module) (follow-up to T-0069) (est. 200 lines) | MVP | todo | T-0040, T-0067, T-0069 | UC-01 | 0 |
+ | [T-0110](T-0110.md) | Salesforce write-back: scratch-org e2e and refund/aged-AR write-back scenarios | MVP | todo | T-0067, T-0069, T-0055, T-0049 | UC-01, UC-11, UC-12 | 3 |
+ | [T-0111](T-0111.md) | LWC Account component: scratch-org e2e with screenshot (sales rep sees the money) | MVP | todo | T-0072, T-0110 | UC-12 | 1 |
+ | [T-0070](T-0070.md) | Nightly reconciliation with Salesforce | MVP | todo | T-0066, T-0067 | — | 1 |
+diff --git a/.agent/backlog/T-0069.md b/.agent/backlog/T-0069.md
+index ee5df45..fd5400a 100644
+--- a/.agent/backlog/T-0069.md
++++ b/.agent/backlog/T-0069.md
+@@ -6,7 +6,7 @@ use_cases: [UC-01]
+ depends_on: [T-0065, T-0040, T-0067, T-0031]
+ status: in_progress
+ claimed_by: claude
+-lease_expires_at: 2026-11-09T10:02:26.638Z
++lease_expires_at: 2026-11-09T10:06:12.437Z
+ attempts: 1
+ last_checkpoint: null
+ adr_required: false
+diff --git a/.agent/backlog/T-0160.md b/.agent/backlog/T-0160.md
+new file mode 100644
+index 0000000..a60bf3c
+--- /dev/null
++++ b/.agent/backlog/T-0160.md
+@@ -0,0 +1,49 @@
++---
++id: T-0160
++title: "Record the billing-source CDC schemas from a scratch org (Opportunity, OpportunityLineItem, Order, OrderItem) and confirm IsWon in changedFields"
++phase: MVP
++use_cases: [UC-01]
++depends_on: [T-0069]
++status: todo
++claimed_by: null
++lease_expires_at: null
++attempts: 0
++last_checkpoint: null
++adr_required: false
++research: []
++success_scenarios: []
++evidence: []
++estimate_lines: 150
++---
++
++# T-0160 — Record the billing-source CDC schemas from a scratch org (Opportunity, OpportunityLineItem, Order, OrderItem) and confirm IsWon in changedFields
++
++## Goal
++T-0069 built the Closed Won trigger against documented, not recorded, Avro schemas (fixtures/documented/pubsub-billing-source-change-events.json, RQ-0124 F4). Record redacted change events from a scratch org into fixtures/recorded/ and replace the documented fixture in the contract test.
++
++## Context (design refs)
++- Created 2026-11-09 by claude as a follow-up of [T-0069](T-0069.md) (RQ-0124, DL-0370..DL-0375).
++- Specs: [UC-01](../../Docs/specs/UC-01.md)
++
++## Scope
++- Record OpportunityChangeEvent (stage change to Closed Won), OpportunityLineItemChangeEvent (create/update/delete), OrderChangeEvent (activation) and OrderItemChangeEvent with a scratch org, redacted (no real ids, users or tokens).
++- Confirm whether IsWon/IsClosed appear in changedFields on a stage change (RQ-0124 S4 open point), the Avro type of Date (int days) and Currency (double) fields, and update RQ-0124 with the finding.
++- Contract test runs against the recorded payloads; the documented fixture is kept and marked superseded (never deleted).
++
++## Open questions (→ research before start)
++- [ ] Needs a scratch org authenticated outside the repo (salesforce-engineer).
++
++## Acceptance criteria (each maps to a test + SS id; add an SS row at claim)
++- [ ] AC-1 (contract) The recorded events decode into the same billing changes as the documented ones (dates YYYY-MM-DD, amounts exact decimal text).
++- [ ] AC-2 (contract) A recorded Closed Won UPDATE is recognised as won by isTriggered.
++
++## Steps
++- [ ] 1. Resolve open questions → `Docs/research/RQ-NNNN-*.md` and link in `research:`
++- [ ] 2. Write failing tests for every AC (red, for the right reason) — `tdd-cycle`
++- [ ] 3. Implement
++- [ ] 4. `bash scripts/agent/verify.sh` green (definition of done) [phase: verify]
++- [ ] 5. Cross-provider review (`cross-review`) [phase: review]
++- [ ] 6. Update register, decision log, run log, HANDOVER; release lease [phase: finish]
++
++## Notes for the next agent
++- Ledger writes only through the posting engine; money via decimal.js (AGENTS.md §4).
+diff --git a/.agent/backlog/T-0161.md b/.agent/backlog/T-0161.md
+new file mode 100644
+index 0000000..ebbea09
+--- /dev/null
++++ b/.agent/backlog/T-0161.md
+@@ -0,0 +1,48 @@
++---
++id: T-0161
++title: "Billing source edited after its draft: amend or flag the draft, and a Sync issues view for billing issues"
++phase: MVP
++use_cases: [UC-01]
++depends_on: [T-0069, T-0083]
++status: todo
++claimed_by: null
++lease_expires_at: null
++attempts: 0
++last_checkpoint: null
++adr_required: false
++research: []
++success_scenarios: []
++evidence: []
++estimate_lines: 300
++---
++
++# T-0161 — Billing source edited after its draft: amend or flag the draft, and a Sync issues view for billing issues
++
++## Goal
++After T-0069 drafts the invoice for a Closed Won Opportunity / activated Order, later changes of the source (lines added, prices changed, Opportunity reopened) only bump salesforce_billing_trigger.later_events (DL-0373, RQ-0124 F5). Decide and build what a later change does to a still-draft invoice (rebuild the draft lines, or raise a billing issue for a person), and show app.salesforce_billing_issue rows in the Sync issues inbox.
++
++## Context (design refs)
++- Created 2026-11-09 by claude as a follow-up of [T-0069](T-0069.md) (RQ-0124, DL-0370..DL-0375).
++- Specs: [UC-01](../../Docs/specs/UC-01.md)
++
++## Scope
++- Research the rule (draft only; approved/posted invoices are never touched — credit note path).
++- Inbox: billing issues (PERIOD_LOCKED, LINES_INCOMPLETE, UNKNOWN_ACCOUNT, …) next to the inbound issues, with ignore/retry.
++
++## Open questions (→ research before start)
++- [ ] Amend vs flag is a product choice inside UC-01 A-flows; research first, log the decision.
++
++## Acceptance criteria (each maps to a test + SS id; add an SS row at claim)
++- [ ] AC-1 (db-integration) A line added to a drafted Opportunity changes the draft (or raises an issue) per the decided rule; a posted invoice is never changed.
++- [ ] AC-2 (e2e-playwright) Billing issues appear in the Sync issues inbox with code, source and message (screenshot).
++
++## Steps
++- [ ] 1. Resolve open questions → `Docs/research/RQ-NNNN-*.md` and link in `research:`
++- [ ] 2. Write failing tests for every AC (red, for the right reason) — `tdd-cycle`
++- [ ] 3. Implement
++- [ ] 4. `bash scripts/agent/verify.sh` green (definition of done) [phase: verify]
++- [ ] 5. Cross-provider review (`cross-review`) [phase: review]
++- [ ] 6. Update register, decision log, run log, HANDOVER; release lease [phase: finish]
++
++## Notes for the next agent
++- Ledger writes only through the posting engine; money via decimal.js (AGENTS.md §4).
+diff --git a/.agent/backlog/T-0162.md b/.agent/backlog/T-0162.md
+new file mode 100644
+index 0000000..bf33f3c
+--- /dev/null
++++ b/.agent/backlog/T-0162.md
+@@ -0,0 +1,48 @@
++---
++id: T-0162
++title: "Invoice template records and party payment terms for Closed Won drafts (design §4.3, §4.2)"
++phase: MVP
++use_cases: [UC-01]
++depends_on: [T-0069]
++status: todo
++claimed_by: null
++lease_expires_at: null
++attempts: 0
++last_checkpoint: null
++adr_required: false
++research: []
++success_scenarios: []
++evidence: []
++estimate_lines: 300
++---
++
++# T-0162 — Invoice template records and party payment terms for Closed Won drafts (design §4.3, §4.2)
++
++## Goal
++T-0069 drafts with a fixed template: one invoice per source, lines = line items, tax-exclusive TotalPrice, due date = invoice date + salesforce_billing_settings.payment_terms_days (default 14, GP-001 terms). Design §4.3 makes the format a template record (line source, grouping, tax treatment, numbering series, PDF layout, email template) and §4.2 gives the party its own payment terms.
++
++## Context (design refs)
++- Created 2026-11-09 by claude as a follow-up of [T-0069](T-0069.md) (RQ-0124, DL-0370..DL-0375).
++- Specs: [UC-01](../../Docs/specs/UC-01.md)
++
++## Scope
++- Template record (Standard invoice) with the fields T-0069 reads; party payment terms (column on party or a terms table, forward-only).
++- The trigger reads the template and the party terms; the setting default stays as fallback.
++
++## Open questions (→ research before start)
++- [ ] Template scope for MVP (which fields) — research against design §4.3 at claim.
++
++## Acceptance criteria (each maps to a test + SS id; add an SS row at claim)
++- [ ] AC-1 (db-integration) A party with 30-day terms gets a Closed Won draft due 30 days after the invoice date; without terms the template default applies.
++- [ ] AC-2 (db-integration) A template with grouping "per Account" is refused or implemented per the decision (record it).
++
++## Steps
++- [ ] 1. Resolve open questions → `Docs/research/RQ-NNNN-*.md` and link in `research:`
++- [ ] 2. Write failing tests for every AC (red, for the right reason) — `tdd-cycle`
++- [ ] 3. Implement
++- [ ] 4. `bash scripts/agent/verify.sh` green (definition of done) [phase: verify]
++- [ ] 5. Cross-provider review (`cross-review`) [phase: review]
++- [ ] 6. Update register, decision log, run log, HANDOVER; release lease [phase: finish]
++
++## Notes for the next agent
++- Ledger writes only through the posting engine; money via decimal.js (AGENTS.md §4).
+diff --git a/.agent/backlog/T-0163.md b/.agent/backlog/T-0163.md
+new file mode 100644
+index 0000000..4bee969
+--- /dev/null
++++ b/.agent/backlog/T-0163.md
+@@ -0,0 +1,48 @@
++---
++id: T-0163
++title: "Write back the invoice status for every sales-invoice transition (manual approve, post, from the AR module)"
++phase: MVP
++use_cases: [UC-01]
++depends_on: [T-0040, T-0067, T-0069]
++status: todo
++claimed_by: null
++lease_expires_at: null
++attempts: 0
++last_checkpoint: null
++adr_required: false
++research: []
++success_scenarios: []
++evidence: []
++estimate_lines: 200
++---
++
++# T-0163 — Write back the invoice status for every sales-invoice transition (manual approve, post, from the AR module)
++
++## Goal
++T-0069 writes one invoice.drafted / invoice.posted write-back event for invoices it creates (DL-0373). Invoices approved or posted later by a person (approveSalesInvoice / postSalesInvoice) write nothing back yet, so Opportunity.LF_Invoice_Status__c stays "Draft". Emit the T-0067 contract v1 snapshot from the AR lifecycle for every transition of an invoice that has a Salesforce source.
++
++## Context (design refs)
++- Created 2026-11-09 by claude as a follow-up of [T-0069](T-0069.md) (RQ-0124, DL-0370..DL-0375).
++- Specs: [UC-01](../../Docs/specs/UC-01.md)
++
++## Scope
++- A write-back hook in packages/modules/ar (like the notifier) fed with the Salesforce link from salesforce_billing_trigger.
++- One event per transaction with the final status (DL-0373); amount invoiced on the Opportunity.
++
++## Open questions (→ research before start)
++- [ ] none
++
++## Acceptance criteria (each maps to a test + SS id; add an SS row at claim)
++- [ ] AC-1 (db-integration) Manual approval then posting of a Closed Won draft writes one invoice.posted event; the Opportunity reads Posted with the amount invoiced.
++- [ ] AC-2 (db-integration) An invoice without a Salesforce source writes no write-back event.
++
++## Steps
++- [ ] 1. Resolve open questions → `Docs/research/RQ-NNNN-*.md` and link in `research:`
++- [ ] 2. Write failing tests for every AC (red, for the right reason) — `tdd-cycle`
++- [ ] 3. Implement
++- [ ] 4. `bash scripts/agent/verify.sh` green (definition of done) [phase: verify]
++- [ ] 5. Cross-provider review (`cross-review`) [phase: review]
++- [ ] 6. Update register, decision log, run log, HANDOVER; release lease [phase: finish]
++
++## Notes for the next agent
++- Ledger writes only through the posting engine; money via decimal.js (AGENTS.md §4).
+diff --git a/.agent/evidence/T-0069/golden-mutation-check.txt b/.agent/evidence/T-0069/golden-mutation-check.txt
+new file mode 100644
+index 0000000..268c633
+--- /dev/null
++++ b/.agent/evidence/T-0069/golden-mutation-check.txt
+@@ -0,0 +1,8 @@
++     × SS-UC01-03: Auto-approve under threshold posts GP-001 and emails 181ms
++⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
++AssertionError: GP-001 [APPROVED] FAIL — Sales invoice, two lines, GST exclusive
++    ✗ line 1 debit: expected 1375.0000, engine 1250.0000
++    ✗ line 2 credit: expected 1000.0000, engine 909.0900
++    ✗ line 2 tax amount: expected 100.0000, engine 90.9100
++    ✗ line 3 credit: expected 250.0000, engine 227.2700
++    ✗ line 3 tax amount: expected 25.0000, engine 22.7300
+diff --git a/.agent/evidence/T-0069/red-closed-won-db.txt b/.agent/evidence/T-0069/red-closed-won-db.txt
+new file mode 100644
+index 0000000..d24d55b
+--- /dev/null
++++ b/.agent/evidence/T-0069/red-closed-won-db.txt
+@@ -0,0 +1,29 @@
++     × an Opportunity with two line items moving to Closed Won → exactly one Draft with two mapped lines, tax code GST 35ms
++     × the CDC handler takes the same path: decoded events, one draft 20ms
++     × the same Closed Won event (same record Id + commit number) twice → one draft, the second logged as duplicate 18ms
++     × a later, different event of a drafted Opportunity creates nothing and is counted on the trigger 18ms
++     × lines that arrive after Closed Won (other channel) are waited for, then one draft 21ms
++     × an Account LedgerForce does not know raises UNKNOWN_ACCOUNT and no draft 6ms
++     × auto-approve threshold $1,000 and a $1,375 invoice → Draft, reason ABOVE_THRESHOLD, no journal 35ms
++     × under the threshold the draft is approved and posted, and the write-back says Posted with the amount invoiced 25ms
++     × a product profile with no revenue account → draft with a PROFILE_GAP warning, nothing posts, the gap check lists it 61ms
++     × a product tax code that conflicts with the customer default → TAX_CODE_CONFLICT warning, stays draft 29ms
++     × October hard-locked, closed 2026-10-30: "reject" → PERIOD_LOCKED sync issue, no draft; "first open date" → invoice dated 2026-11-01 with a note 32ms
++     × with the default setting an activated Order drafts nothing; with trigger "order" it drafts one invoice 21ms
++     × lf_app cannot delete a trigger, change its invoice, or delete a billing record 34ms
++⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-01: Closed Won creates a draft invoice from the template > an Opportunity with two line items moving to Closed Won → exactly one Draft with two mapped lines, tax code GST
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-01: Closed Won creates a draft invoice from the template > the CDC handler takes the same path: decoded events, one draft
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-07: Duplicate CDC event is idempotent > the same Closed Won event (same record Id + commit number) twice → one draft, the second logged as duplicate
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-07: Duplicate CDC event is idempotent > a later, different event of a drafted Opportunity creates nothing and is counted on the trigger
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-07: Duplicate CDC event is idempotent > lines that arrive after Closed Won (other channel) are waited for, then one draft
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-07: Duplicate CDC event is idempotent > an Account LedgerForce does not know raises UNKNOWN_ACCOUNT and no draft
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-04: Above threshold stays Draft > auto-approve threshold $1,000 and a $1,375 invoice → Draft, reason ABOVE_THRESHOLD, no journal
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-04: Above threshold stays Draft > under the threshold the draft is approved and posted, and the write-back says Posted with the amount invoiced
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-06: Posting-profile gap flagged, not posted > a product profile with no revenue account → draft with a PROFILE_GAP warning, nothing posts, the gap check lists it
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-06: Posting-profile gap flagged, not posted > a product tax code that conflicts with the customer default → TAX_CODE_CONFLICT warning, stays draft
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy > October hard-locked, closed 2026-10-30: "reject" → PERIOD_LOCKED sync issue, no draft; "first open date" → invoice dated 2026-11-01 with a note
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > Order activated (design §11.2 open: behind the trigger setting, default Opportunity) > with the default setting an activated Order drafts nothing; with trigger "order" it drafts one invoice
++ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts > billing tables are append-only facts > lf_app cannot delete a trigger, change its invoice, or delete a billing record
++error: relation "app.salesforce_billing_record" does not exist
++      Tests  13 failed (13)
+diff --git a/.agent/evidence/T-0069/red-source-contract.txt b/.agent/evidence/T-0069/red-source-contract.txt
+new file mode 100644
+index 0000000..80681fb
+--- /dev/null
++++ b/.agent/evidence/T-0069/red-source-contract.txt
+@@ -0,0 +1,15 @@
++      8| import { toSalesforceId18 } from '@ledgerforce/parties';
++      9| import { billingChangesFromCdcEvent, type BillingChange } from '../bil…
++       | ^
++     10| import {
++     11|   decodeConsumerEvent,
++ ❯ packages/connectors/salesforce/src/billing/source.contract.test.ts:8:1
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
++
++
++ Test Files  1 failed (1)
++      Tests  no tests
++   Start at  04:34:53
++   Duration  545ms (transform 197ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
++
+diff --git a/.agent/state.json b/.agent/state.json
+index 9a9d1ef..c119084 100644
+--- a/.agent/state.json
++++ b/.agent/state.json
+@@ -2,12 +2,12 @@
+   "schema_version": 1,
+   "current_task": "T-0069",
+   "branch": "feat/T-0069-closed-won-invoice",
+-  "step": "5/10 — Closed Won draft, idempotency, lock policy, auto-approve green",
++  "step": "6/10 — GP-001 golden from Closed Won, write-back to fake REST",
+   "claimed_by": "claude",
+-  "lease_expires_at": "2026-11-09T10:02:26.638Z",
++  "lease_expires_at": "2026-11-09T10:06:12.437Z",
+   "last_green_commit": "445848ec56cfdf7943d11ad1f2df13cd8e60e094",
+   "run_id": "2026-10-29-codex-r01",
+-  "updated_at": "2026-11-09T09:17:26.640Z",
++  "updated_at": "2026-11-09T09:21:12.440Z",
+   "phase": "sprint-0",
+   "attempts": {
+     "T-0010": 3,
+@@ -71,6 +71,7 @@
+     "1/8 — invoice journal builder green (unit+prop)",
+     "4/8 — migration 0037, approve rules, post via engine; golden green",
+     "2-4/8 — chart v2, profiles v2, EXS in au-gst v2; AC-1..AC-5 green",
+-    "5/10 — Closed Won draft, idempotency, lock policy, auto-approve green"
++    "5/10 — Closed Won draft, idempotency, lock policy, auto-approve green",
++    "6/10 — GP-001 golden from Closed Won, write-back to fake REST"
+   ]
+ }
+diff --git a/packages/connectors/salesforce/src/billing/closed-won.db.test.ts b/packages/connectors/salesforce/src/billing/closed-won.db.test.ts
+index 6e753ee..b5c0917 100644
+--- a/packages/connectors/salesforce/src/billing/closed-won.db.test.ts
++++ b/packages/connectors/salesforce/src/billing/closed-won.db.test.ts
+@@ -15,7 +15,10 @@
+  *  SS-UC01-08 Close date in a hard-locked October: "reject" → PERIOD_LOCKED billing issue, no
+  *             draft; "first open date" → invoice dated 2026-11-01 with the policy note.
+  */
++import { startFakeSalesforceRest } from '../testing/fake-salesforce-rest.ts';
+ import { SfNumber } from '../writeback/batch.ts';
++import { ApiUsageGate } from '../writeback/collections.ts';
++import { writeBack } from '../writeback/writeback.ts';
+ import { mapToRecords, parseWriteBackPayload } from '../writeback/mapping.ts';
+ import { getSalesInvoice, previewSalesInvoice, setInvoiceSettings } from '@ledgerforce/ar';
+ import { DEFAULT_PERIOD_SETTINGS, setPeriodSettings } from '@ledgerforce/ledger';
+@@ -237,6 +240,36 @@ describe('SS-UC01-01: Closed Won creates a draft invoice from the template', ()
+       },
+       { op: 'update', sobject: 'Opportunity', key: id, fields: { LF_Invoice_Status__c: 'Draft' } },
+     ]);
++
++    // Delivered through the T-0067 sender to the documented fake REST server (fields checked
++    // against the SFDX package): the Opportunity now reads "Draft", the mirror exists once.
++    const rest = await startFakeSalesforceRest({
++      instanceUrl: 'https://harbour-dev-ed.develop.my.salesforce.com',
++      acceptToken: (t) => t === 'test-access-token',
++    });
++    try {
++      rest.seed('Account', account, { Name: 'Acme Pty Ltd' });
++      rest.seed('Opportunity', id, { Name: 'Deal' });
++      const report = await writeBack(
++        {
++          http: rest.http,
++          instanceUrl: rest.instanceUrl,
++          accessToken: 'test-access-token',
++          gate: new ApiUsageGate(),
++        },
++        records,
++      );
++      expect(report).toMatchObject({ records: 2, created: 1, updated: 1 });
++      expect(rest.store.get('Opportunity')?.get(id)).toMatchObject({
++        LF_Invoice_Status__c: 'Draft',
++      });
++      expect(rest.store.get('LF_Invoice__c')?.get(invoiceId)).toMatchObject({
++        LF_Status__c: 'Draft',
++        LF_Opportunity__c: id,
++      });
++    } finally {
++      await rest.close();
++    }
+   });
+ 
+   it('the CDC handler takes the same path: decoded events, one draft', async () => {
+diff --git a/packages/connectors/salesforce/src/billing/closed-won.golden.db.test.ts b/packages/connectors/salesforce/src/billing/closed-won.golden.db.test.ts
+new file mode 100644
+index 0000000..0ff9b68
+--- /dev/null
++++ b/packages/connectors/salesforce/src/billing/closed-won.golden.db.test.ts
+@@ -0,0 +1,254 @@
++/**
++ * SS-UC01-03 from the trigger (T-0069): an Opportunity with the GP-001 lines moving to Closed Won,
++ * auto-approve on with a $2,000 threshold, posts exactly the Approved golden GP-001 (runGolden
++ * compares every line), numbered INV-…, with one `ar.invoice.posted` notice to the Billing To
++ * contact in the transactional outbox (the SMTP send is T-0042) and one `invoice.posted`
++ * write-back event. The invoice is produced by the billing trigger, the journal by T-0040's
++ * sales-invoice code through the posting engine. Real PostgreSQL and pg-boss outbox; no org.
++ */
++import { readFileSync } from 'node:fs';
++import { fileURLToPath } from 'node:url';
++import {
++  getSalesInvoice,
++  INVOICE_POSTED_TOPIC,
++  invoiceOutboxNotifier,
++  setInvoiceSettings,
++} from '@ledgerforce/ar';
++import { withTenant, type Database } from '@ledgerforce/db';
++import {
++  expectedLines,
++  goldenModeFrom,
++  parseGoldenPostings,
++  planGoldenRun,
++  repoGoldenGate,
++  runGolden,
++  type GoldenProducer,
++  type GoldenWorld,
++  type LineView,
++} from '@ledgerforce/ledger/golden';
++import { storedJournal } from '@ledgerforce/ledger/testing';
++import { createGoldenWorld, type GoldenFixture } from '@ledgerforce/ledger/testing/golden-world';
++import { ledgerOutbox } from '@ledgerforce/outbox';
++import { createOutboxHarness, type OutboxHarness } from '@ledgerforce/outbox/testing';
++import { addContact, setContactRole } from '@ledgerforce/parties';
++import {
++  createProduct,
++  loadPostingProfileTemplate,
++  auServicesSmbProfiles,
++} from '@ledgerforce/products';
++import { auTaxCodes, loadTaxCodes } from '@ledgerforce/tax';
++import { sql, type Transaction } from 'kysely';
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import { billingCdc1, billingId, epochDay } from '../testing/billing-events.ts';
++import { sfId } from '../testing/master-data-events.ts';
++import { applyBillingChange, billingOutbox, type BillingDeps } from './apply.ts';
++
++const POSTINGS = fileURLToPath(
++  new URL('../../../../../Docs/accounting/postings.md', import.meta.url),
++);
++const REPO = fileURLToPath(new URL('../../../../../', import.meta.url));
++const postings = parseGoldenPostings(readFileSync(POSTINGS, 'utf8')).filter(
++  (gp) => gp.id === 'GP-001',
++);
++const plan = planGoldenRun(postings, goldenModeFrom(process.env), repoGoldenGate(REPO));
++const BILLING_TO = 'accounts@acme.example';
++const ACME_SF = sfId('001', 1);
++const PS_SF = sfId('01t', 1);
++const SUB_SF = sfId('01t', 2);
++
++let g: GoldenFixture;
++let h: OutboxHarness;
++let boss: Awaited<ReturnType<OutboxHarness['startRuntime']>>;
++let world: GoldenWorld;
++let acme: string;
++let gstId: string;
++let commit = 50_000n;
++let opp = 0;
++const posted: { invoiceId: string; invoiceNo: string; entryId: string; opportunity: string }[] = [];
++
++const inTenant = <R>(fn: (trx: Transaction<Database>) => Promise<R>) =>
++  withTenant(h.app, g.fixture.tenantId, fn);
++
++const produce: GoldenProducer = async (gp, index) => {
++  const expected = expectedLines(gp, index, world);
++  const companyId = g.fixture.companyId;
++  const id = billingId('006', (opp += 1));
++  const deps: BillingDeps = {
++    outbox: billingOutbox(boss),
++    postingOutbox: ledgerOutbox(boss),
++    notifier: invoiceOutboxNotifier(boss),
++  };
++  // GP-001: INV dated 2026-11-05, terms 14 days; $1,000 services + $250 subscription ex GST.
++  const result = await inTenant(async (trx) => {
++    const lines = [
++      { product: PS_SF, total: 1000, description: 'Professional services' },
++      { product: SUB_SF, total: 250, description: 'Subscription' },
++    ];
++    for (const [i, l] of lines.entries()) {
++      await applyBillingChange(
++        trx,
++        companyId,
++        billingCdc1({
++          entity: 'OpportunityLineItem',
++          recordIds: [billingId('00k', opp * 10 + i)],
++          changeType: 'CREATE',
++          commitNumber: (commit += 1n),
++          fields: {
++            OpportunityId: id,
++            Product2Id: l.product,
++            Description: l.description,
++            Quantity: 1,
++            UnitPrice: l.total,
++            TotalPrice: l.total,
++            SortOrder: i + 1,
++          },
++        }),
++        deps,
++      );
++    }
++    const r = await applyBillingChange(
++      trx,
++      companyId,
++      billingCdc1({
++        entity: 'Opportunity',
++        recordIds: [id],
++        changeType: 'CREATE',
++        commitNumber: (commit += 1n),
++        fields: {
++          Name: 'Acme — implementation',
++          AccountId: ACME_SF,
++          StageName: 'Closed Won',
++          IsClosed: true,
++          IsWon: true,
++          CloseDate: epochDay('2026-11-05'),
++          Amount: 1250,
++          CurrencyIsoCode: 'AUD',
++        },
++      }),
++      deps,
++    );
++    if (r.source?.status !== 'drafted' || r.source.auto.outcome !== 'posted') {
++      throw new Error(`Closed Won did not auto-post: ${JSON.stringify(r.source)}`);
++    }
++    const doc = await getSalesInvoice(trx, r.source.invoiceId);
++    return {
++      invoiceId: doc.id,
++      invoiceNo: doc.invoiceNo ?? '',
++      entryId: r.source.auto.entryId,
++      journal: await storedJournal(trx, r.source.auto.entryId),
++      dueDate: doc.dueDate,
++    };
++  });
++  expect(result.dueDate).toBe('2026-11-19');
++  posted.push({ ...result, opportunity: id });
++  const actual: LineView[] = result.journal.lines.map((l) => ({
++    lineNo: l.lineNo,
++    accountId: l.accountId,
++    accountLabel: l.accountId,
++    debit: l.debit,
++    credit: l.credit,
++    taxCodeId: l.taxCodeId,
++    taxLabel: l.taxCodeId === gstId ? 'GST' : l.taxCodeId,
++    taxAmount: l.taxAmount,
++    partyId: l.partyId,
++    partyLabel: l.partyId === null ? null : world.partyLabel(l.partyId),
++  }));
++  return { expected, actual };
++};
++
++beforeAll(async () => {
++  g = await createGoldenWorld('01900000-0000-7000-8000-000000006903');
++  h = await createOutboxHarness(g.fixture.tdb);
++  boss = await h.startRuntime();
++  const companyId = g.fixture.companyId;
++  const party = g.world.partyId('Acme');
++  if (party === undefined) throw new Error('golden world has no Acme');
++  acme = party;
++  const financeAdmin = await g.fixture.addUser('finance_admin');
++  gstId = await inTenant(async (trx) => {
++    await loadTaxCodes(trx, companyId, auTaxCodes);
++    await loadPostingProfileTemplate(trx, companyId, auServicesSmbProfiles);
++    for (const [sf, name, profile] of [
++      [PS_SF, 'Professional services', 'PROFESSIONAL_SERVICES'],
++      [SUB_SF, 'Subscription', 'SUBSCRIPTION'],
++    ] as const) {
++      const p = await createProduct(trx, { companyId, name, productPostingProfileCode: profile });
++      await sql`UPDATE app.product SET salesforce_product_id = ${sf} WHERE id = ${p.id}`.execute(
++        trx,
++      );
++    }
++    await sql`INSERT INTO app.number_series (company_id, code, prefix)
++              VALUES (${companyId}, 'ar_invoice', 'INV-') ON CONFLICT DO NOTHING`.execute(trx);
++    // Acme as the synced Salesforce customer (T-0065 sets these from the Account).
++    await sql`
++      UPDATE app.party SET salesforce_account_id = ${ACME_SF}, customer_posting_profile_id = (
++        SELECT id FROM app.party_posting_profile WHERE company_id = ${companyId} AND code = 'DOMESTIC_CUSTOMER')
++       WHERE id = ${acme}`.execute(trx);
++    await sql`INSERT INTO app.party_role (company_id, party_id, role)
++              VALUES (${companyId}, ${acme}, 'customer') ON CONFLICT DO NOTHING`.execute(trx);
++    const contact = await addContact(trx, companyId, acme, { name: 'Accounts', email: BILLING_TO });
++    await setContactRole(trx, contact, 'billing_to', true);
++    await setInvoiceSettings(trx, {
++      companyId,
++      autoApprove: true,
++      threshold: '2000',
++      setBy: financeAdmin,
++      reason: 'SS-UC01-03: auto-approve ≤ $2,000',
++    });
++    const r = await sql<{ id: string }>`
++      SELECT id::text FROM app.tax_code WHERE company_id = ${companyId} AND code = 'GST'`.execute(
++      trx,
++    );
++    return r.rows[0]?.id ?? '';
++  });
++  world = { ...g.world, taxCodeId: (code) => (code === 'GST' ? gstId : undefined) };
++});
++
++afterAll(async () => {
++  await h?.close();
++  await g?.close();
++});
++
++describe('T-0069 golden posting produced from Closed Won', () => {
++  it('GP-001 is Approved, in phase and runs (not PENDING)', () => {
++    expect(plan.map((p) => [p.gp.id, p.label, p.run])).toEqual([['GP-001', 'APPROVED', true]]);
++  });
++
++  it('SS-UC01-03: Auto-approve under threshold posts GP-001 and emails', async () => {
++    const p = plan[0];
++    if (!p) throw new Error('GP-001 missing from postings.md');
++    const outcome = await runGolden(p, produce);
++    expect(outcome.status, outcome.report).toBe('PASS');
++    const doc = posted[0];
++    if (!doc) throw new Error('Closed Won posted nothing');
++    expect(doc.invoiceNo).toMatch(/^INV-\d{6}$/);
++    const events = await g.fixture.admin.query<{ topic: string; payload: Record<string, unknown> }>(
++      `SELECT topic, payload FROM app.outbox_event
++        WHERE tenant_id = $1 AND aggregate_id = $2 ORDER BY created_at, id`,
++      [g.fixture.tenantId, doc.invoiceId],
++    );
++    expect(events.rows.map((e) => e.topic).sort()).toEqual(
++      [INVOICE_POSTED_TOPIC, 'invoice.posted'].sort(),
++    );
++    const email = events.rows.find((e) => e.topic === INVOICE_POSTED_TOPIC);
++    expect(email?.payload).toMatchObject({
++      invoiceId: doc.invoiceId,
++      invoiceNo: doc.invoiceNo,
++      entryId: doc.entryId,
++      partyId: acme,
++      to: [BILLING_TO],
++      cc: [],
++      total: '1375.0000',
++    });
++    const writeBack = events.rows.find((e) => e.topic === 'invoice.posted');
++    expect(writeBack?.payload).toMatchObject({
++      source: { entity: 'Opportunity', recordId: doc.opportunity },
++      writeBack: {
++        version: 1,
++        opportunities: [
++          { sfId: doc.opportunity, invoiceStatus: 'posted', amountInvoiced: '1375.0000' },
++        ],
++      },
++    });
++  });
++});
+-- 
+2.43.0
+

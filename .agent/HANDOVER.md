@@ -1,3 +1,21 @@
+# Handover — 2026-11-09 (Claude lead session, parallel build)
+
+## Codex continuation prompt
+> Read `.agent/CODEX-PICKUP-2026-11-09.md` first. Branch `claude/incomplete-features-build-wivsco`.
+> Two parallel lines of work exist (this branch vs `origin/feat/T-*`, tip
+> `origin/feat/T-0070-sf-nightly-reconciliation`); get the owner's decision on which is canonical
+> before merging anything. Then cross-review the `review` cards Claude built and finish the four
+> interrupted tasks from `.agent/handover/wip-patches-2026-11-09/` (unverified).
+
+## Open questions for human
+- Which line of work is canonical (see pickup doc §1)?
+- T-0117: may a sales invoice's creator approve it? (security ADR)
+- Security ADRs 0016/0018/0023/0025/0026/0030 still Proposed; delegation DL-0282 covers accounting only.
+
+---
+
+## Previous handover (retained)
+
 # Handover — T-0007 golden approval, 2026-11-08 (claude, run 2026-11-08-claude-r06)
 
 ## Codex continuation prompt

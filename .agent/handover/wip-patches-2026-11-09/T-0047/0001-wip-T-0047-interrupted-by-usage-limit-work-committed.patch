@@ -1,0 +1,175 @@
+From 0fe6badfe252697ace8e562bd57e2d80ed534951 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 9 Nov 2026 14:02:53 +0000
+Subject: [PATCH] =?UTF-8?q?wip(T-0047):=20interrupted=20by=20usage=20limit?=
+ =?UTF-8?q?=20=E2=80=94=20work=20committed=20as-is=20for=20Codex=20pickup?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+What changed: card claimed and research record RQ-0128 drafted; no production code or tests yet.
+Why: product owner asked (2026-11-09) to commit everything as-is with a pickup document so Codex can
+continue; the Claude builder for this task stopped on a usage limit.
+Validation: NOT verified at this commit. Work in progress; tests for the uncommitted part were not
+re-run. Untracked local migration placeholders were left out of the commit.
+Next action: Finish RQ-0128, then build test-first per the card and ADR-0045 (migration 0045). See .agent/CODEX-PICKUP-2026-11-09.md on claude/incomplete-features-build-wivsco.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_014KLkD1D96Sp3PfYtBZqsoM
+---
+ .agent/backlog/T-0047.md                      |  8 +-
+ .agent/state.json                             | 13 +--
+ ...yments-deposits-and-single-supply-build.md | 89 +++++++++++++++++++
+ 3 files changed, 100 insertions(+), 10 deletions(-)
+ create mode 100644 Docs/research/RQ-0128-prepayments-deposits-and-single-supply-build.md
+
+diff --git a/.agent/backlog/T-0047.md b/.agent/backlog/T-0047.md
+index 80be0d6..7b1a213 100644
+--- a/.agent/backlog/T-0047.md
++++ b/.agent/backlog/T-0047.md
+@@ -4,10 +4,10 @@ title: "Customer prepayments, deposit invoices and application to final invoice"
+ phase: MVP
+ use_cases: []
+ depends_on: [T-0046, T-0035, T-0124]
+-status: todo
+-claimed_by: null
+-lease_expires_at: null
+-attempts: 0
++status: claimed
++claimed_by: claude
++lease_expires_at: 2026-11-09T10:22:09.334Z
++attempts: 1
+ last_checkpoint: null
+ adr_required: true          # gate: the separate accounting decision on gst_supply_pattern + GST_ATTRIBUTED_UNBILLED (ADR or DL under DL-0282) must be accepted before claim
+ research: []
+diff --git a/.agent/state.json b/.agent/state.json
+index a5044c3..b23e64e 100644
+--- a/.agent/state.json
++++ b/.agent/state.json
+@@ -1,13 +1,13 @@
+ {
+   "schema_version": 1,
+-  "current_task": null,
+-  "branch": "feat/T-0054-payment-batches",
++  "current_task": "T-0047",
++  "branch": "feat/T-0047-prepayments",
+   "step": null,
+-  "claimed_by": null,
+-  "lease_expires_at": null,
++  "claimed_by": "claude",
++  "lease_expires_at": "2026-11-09T10:22:09.334Z",
+   "last_green_commit": "638267bf0db6e1390a94770e66f764610a853a69",
+   "run_id": "2026-10-29-codex-r01",
+-  "updated_at": "2026-11-09T09:16:35.201Z",
++  "updated_at": "2026-11-09T09:37:09.341Z",
+   "phase": "sprint-0",
+   "attempts": {
+     "T-0010": 3,
+@@ -63,7 +63,8 @@
+     "T-0039": 1,
+     "T-0040": 1,
+     "T-0121": 1,
+-    "T-0054": 1
++    "T-0054": 1,
++    "T-0047": 1
+   },
+   "failures": {},
+   "providers": {},
+diff --git a/Docs/research/RQ-0128-prepayments-deposits-and-single-supply-build.md b/Docs/research/RQ-0128-prepayments-deposits-and-single-supply-build.md
+new file mode 100644
+index 0000000..255145a
+--- /dev/null
++++ b/Docs/research/RQ-0128-prepayments-deposits-and-single-supply-build.md
+@@ -0,0 +1,89 @@
++---
++id: RQ-0128
++title: How are prepayments, deposit invoices, their application on the final invoice and the ADR-0045 single-supply path built forward-only on the current schema?
++status: answered
++opened: 2026-11-09
++resolved: 2026-11-09
++opened_by: claude
++linked_tasks: [T-0047, T-0170, T-0171]
++linked_adrs: [ADR-0045, ADR-0044, ADR-0004, ADR-0017]
++superseded_by:
++---
++
++# RQ-0128 — Prepayments, deposits and the single-supply path (T-0047)
++
++## Question
++
++- **Q1.** The accounting questions of the card (postings.md Q7, Q10; the `gst_supply_pattern`
++  decision) — are any still open?
++- **Q2.** ADR-0045 R2 adds the system role `GST_ATTRIBUTED_UNBILLED` to "the SQL role CHECK of
++  `app.account_system_role` (additive migration that widens the list)". Can that CHECK be widened
++  forward-only?
++- **Q3.** ADR-0045 R6 leaves one choice to T-0047: how the G1 amount of a `GST-UB` line is carried —
++  `tax_grossed` (tax × (1 + rate) / rate) on the BAS map, or a new nullable
++  `journal_line.tax_base_amount`. Which one, and can either be stored forward-only?
++- **Q4.** Where do the classification (R1), the prepayment receipt, the deposit invoice and the
++  application on the final invoice live, given the ledger rules (documents outside `packages/ledger`,
++  posted = immutable, CUSTOMER_PREPAYMENTS is not a control account)?
++- **Q5.** What of R9 can be built now without new golden postings?
++
++## Sources
++
++| # | Source | Accessed | Kind | What it says |
++|---|---|---|---|---|
++| S1 | RQ-0095 Q7, Q10; `Docs/accounting/postings.md` GP-012…GP-015, GP-012-B, GP-015-B (Approved) | 2026-11-09 | record / golden | Option B at receipt; deposit invoice credits CUSTOMER_PREPAYMENTS; the final invoice nets the prepayment in one journal; single-supply variants. Q7/Q10 answered 2026-11-08. |
++| S2 | ADR-0045 (Accepted 2026-11-09, DL-0387), persona re-review `.agent/evidence/T-0124/accounting-rereview-20261109.md` (M3) | 2026-11-09 | ADR / review | R1–R9; R6 needs G1 = 7,700.00 for the 700.00 GST-UB line of GP-012-B; the carrier is open. |
++| S3 | `packages/db/src/migrate.ts` (policy RULES), migration 0005 (inline `role IN (...)` CHECK, `app.system_role_allows`, `account_guard_bound`), 0036 header and DL-0257/RQ-0102 finding 6 (the `subkind` precedent) | 2026-11-09 | code / record | The runner refuses any `DROP CONSTRAINT`; an inline CHECK cannot be replaced. 0036 refined `tax_code.kind` with an additive `subkind` column instead. `CREATE OR REPLACE FUNCTION` that keeps the contract is allowed (migration skill). |
++| S4 | PostgreSQL 16/17 manual, `ALTER TABLE` (prior knowledge; postgresql.org reachable in earlier sessions, RQ-0016) | 2026-11-09 | primary (prior knowledge) | A CHECK constraint's expression cannot be altered; only `DROP CONSTRAINT` + `ADD CONSTRAINT`. `CREATE VIEW ... WITH (security_invoker = true)` (PG ≥ 15) runs the view's table access with the caller's rights, so RLS of the base tables applies. |
++| S5 | `packages/ledger/src/hash-chain.ts`, RQ-0016 canonical form `lf-journal-v1` | 2026-11-09 | code / record | The hash covers a fixed list of `journal_line` columns. A new column would not be covered by v1, so its value could change undetected (posted rows are immutable by trigger, but the chain is the tamper evidence). Covering it needs a canonical v2 for every company. |
++| S6 | `packages/modules/tax/src/bas-compute.ts`, migration 0036 (`bas_label_map.amount` inline CHECK `gross|net|tax`) | 2026-11-09 | code | The map's `amount` cannot be widened in place either; a refining column following the `subkind` pattern can. |
++| S7 | `packages/modules/ar/src/sales-invoices.ts`, `receipts.ts`, `invoice-journal.ts`, migrations 0037, 0039 | 2026-11-09 | code | Invoice journal = AR, ROUNDING, revenue per (account, code), GST per code; receipts refuse `NO_ALLOCATION` and point to T-0047. Source types `ar.prepayment` and `ar.prepayment_application` exist in the period matrix and the cash-basis table (`immediate` / `settlement`). |
++
++## Findings
++
++1. **Q1 — nothing open.** Q7/Q10 are answered (S1) and ADR-0045 is Accepted (S2). The only open
++   accounting choice is Q3, which ADR-0045 delegates to T-0047.
++2. **Q2 — the CHECK cannot be widened; bind new roles in an additive table.** Following the 0036
++   precedent (S3), migration 0045 adds `app.account_system_role_ext` (tenant table, RLS ENABLE +
++   FORCE, same binding trigger as 0005) whose role CHECK calls a new IMMUTABLE function
++   `app.system_role_is_extended(role)` (today: `GST_ATTRIBUTED_UNBILLED`). A later role extends the
++   function with `CREATE OR REPLACE`, never a new table. `app.system_role_allows` is replaced with the
++   same contract plus `GST_ATTRIBUTED_UNBILLED → asset`; `app.account_guard_bound` is replaced to check
++   both binding tables. A `security_invoker` view `app.system_role_binding` (UNION ALL of both) is
++   what role resolution reads: the posting engine, the BAS line reader and the golden world.
++3. **Q3 — `tax_grossed`.** `journal_line.tax_base_amount` would sit outside the `lf-journal-v1`
++   hash (S5) unless every company's chain moved to a v2 canonical form — a ledger-wide change for one
++   BAS label. `tax_grossed` changes no ledger table: migration 0045 adds
++   `bas_label_map.amount_rule` (`tax_grossed` only; requires `amount = 'tax'`; fixed after insert),
++   and the BAS computes G1 = tax × (1 + rate) / rate, half-up to cents, with the rate of the tax-code
++   version on the line's date. Trade-off: the base is derived from a rounded tax, so for a base whose
++   GST rounds, G1 can differ from base + tax by at most 0.005 × 11 = 0.055 (10 % rate) — under one
++   cent per 0.01 of rounding on a label lodged in whole dollars. GP-012-B: 700.00 × 11 = 7,700.00
++   exactly. Recorded in DL-0390 and in an appended note to ADR-0045.
++4. **Q4 — documents in `packages/modules/ar`, ledger writes through `post()`.**
++   - Prepayment receipt: new document table `app.ar_prepayment` (immutable after insert), posted as
++     source type `ar_prepayment`. CUSTOMER_PREPAYMENTS is not a control account, so there is no
++     subledger item; "unapplied" is derived from the application table.
++   - Deposit invoice: a sales invoice with `billing_format = 'deposit'`; its lines credit
++     CUSTOMER_PREPAYMENTS (GP-014, Q10) instead of the profile's revenue account. Tax comes from the
++     same GST calculation.
++   - Classification (R1): `gst_supply_pattern` + `gst_supply_pattern_confirmed_by/_at` on both
++     documents, CHECKed, no default; on `sales_invoice` required when `billing_format = 'deposit'`.
++     `single_supply` also stores `supply_net_total` (R9(a)).
++   - Application: `app.ar_deposit_application` rows (final invoice → prepayment or deposit invoice),
++     written with the draft, each source applicable once (unique). The final invoice's journal gets
++     Dr CUSTOMER_PREPAYMENTS after the AR line, AR and GST collected reduced (GP-013/GP-015); for
++     `single_supply` the GP-015-B shape (no tax codes, GST_ATTRIBUTED_UNBILLED credited).
++   - Engine guard (R6): `GST-UB` only on the account bound to `GST_ATTRIBUTED_UNBILLED`, and no other
++     tax code on that account (`ATTRIBUTION_TAX_CODE`).
++5. **Q5 — R9(a) and R9(d) now; R9(b) and (c) need golden Drafts.** R9(a) is a refusal and R9(d) a
++   read-only listing. R9(b) (price variation) and R9(c) (cancellation) post journals whose golden
++   Drafts "are written by T-0047 before build"; this build may not edit `postings.md` (lead
++   instruction) and a Draft cannot be built before it is Approved, so both move to follow-up card
++   **T-0170**, and until then a final invoice whose GST differs from the GST attributed is refused
++   (`SINGLE_SUPPLY_VARIATION`) — never posted with a guessed adjustment.
++
++## Conclusion
++
++Build per findings 2–5; DL-0390 (G1 carrier), DL-0391 (role binding table), DL-0392 (documents and
++application), DL-0393 (scope split T-0170/T-0171).
+-- 
+2.43.0
+

@@ -1,0 +1,481 @@
+From f1b61b645c16df1a2555ead978996d208d9b9502 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Mon, 9 Nov 2026 14:02:55 +0000
+Subject: [PATCH] =?UTF-8?q?wip(T-0041):=20interrupted=20by=20usage=20limit?=
+ =?UTF-8?q?=20=E2=80=94=20work=20committed=20as-is=20for=20Codex=20pickup?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+What changed: card claimed, RQ-0132, ADR-0046 (PDF rendering via playwright-core, drafted), packages/modules/billing scaffold, lockfile change.
+Why: product owner asked (2026-11-09) to commit everything as-is with a pickup document so Codex can
+continue; the Claude builder for this task stopped on a usage limit.
+Validation: NOT verified at this commit. Work in progress; tests for the uncommitted part were not
+re-run. Untracked local migration placeholders were left out of the commit.
+Next action: Review ADR-0046 status, write failing tests, implement rendering per the card (migration 0047 only if needed). See .agent/CODEX-PICKUP-2026-11-09.md on claude/incomplete-features-build-wivsco.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_014KLkD1D96Sp3PfYtBZqsoM
+---
+ .agent/backlog/T-0041.md                      |   8 +-
+ .agent/state.json                             |  13 +-
+ ...ering-headless-chromium-playwright-core.md | 149 ++++++++++++++++++
+ Docs/research/README.md                       |   1 +
+ ...-0132-billing-formats-and-pdf-rendering.md | 115 ++++++++++++++
+ packages/modules/billing/package.json         |  27 ++++
+ packages/modules/billing/t0041-probe.ts       |  15 ++
+ packages/modules/billing/tsconfig.json        |   4 +
+ pnpm-lock.yaml                                |  31 ++++
+ 9 files changed, 353 insertions(+), 10 deletions(-)
+ create mode 100644 Docs/adr/0046-pdf-rendering-headless-chromium-playwright-core.md
+ create mode 100644 Docs/research/RQ-0132-billing-formats-and-pdf-rendering.md
+ create mode 100644 packages/modules/billing/package.json
+ create mode 100644 packages/modules/billing/t0041-probe.ts
+ create mode 100644 packages/modules/billing/tsconfig.json
+
+diff --git a/.agent/backlog/T-0041.md b/.agent/backlog/T-0041.md
+index 7989265..8b3a7e7 100644
+--- a/.agent/backlog/T-0041.md
++++ b/.agent/backlog/T-0041.md
+@@ -4,10 +4,10 @@ title: "Billing format templates and PDF rendering (headless Chromium)"
+ phase: MVP
+ use_cases: []
+ depends_on: [T-0040]
+-status: todo
+-claimed_by: null
+-lease_expires_at: null
+-attempts: 0
++status: claimed
++claimed_by: claude
++lease_expires_at: 2026-11-09T10:19:22.530Z
++attempts: 1
+ last_checkpoint: null
+ adr_required: false
+ research: []
+diff --git a/.agent/state.json b/.agent/state.json
+index a5044c3..f62941f 100644
+--- a/.agent/state.json
++++ b/.agent/state.json
+@@ -1,13 +1,13 @@
+ {
+   "schema_version": 1,
+-  "current_task": null,
+-  "branch": "feat/T-0054-payment-batches",
++  "current_task": "T-0041",
++  "branch": "feat/T-0041-invoice-pdf",
+   "step": null,
+-  "claimed_by": null,
+-  "lease_expires_at": null,
++  "claimed_by": "claude",
++  "lease_expires_at": "2026-11-09T10:19:22.530Z",
+   "last_green_commit": "638267bf0db6e1390a94770e66f764610a853a69",
+   "run_id": "2026-10-29-codex-r01",
+-  "updated_at": "2026-11-09T09:16:35.201Z",
++  "updated_at": "2026-11-09T09:34:22.541Z",
+   "phase": "sprint-0",
+   "attempts": {
+     "T-0010": 3,
+@@ -63,7 +63,8 @@
+     "T-0039": 1,
+     "T-0040": 1,
+     "T-0121": 1,
+-    "T-0054": 1
++    "T-0054": 1,
++    "T-0041": 1
+   },
+   "failures": {},
+   "providers": {},
+diff --git a/Docs/adr/0046-pdf-rendering-headless-chromium-playwright-core.md b/Docs/adr/0046-pdf-rendering-headless-chromium-playwright-core.md
+new file mode 100644
+index 0000000..2ea7783
+--- /dev/null
++++ b/Docs/adr/0046-pdf-rendering-headless-chromium-playwright-core.md
+@@ -0,0 +1,149 @@
++---
++adr: 0046
++title: "Render billing documents to PDF with headless Chromium driven by playwright-core (runtime dependency), sandboxed and deterministic"
++status: Proposed            # Proposed | Accepted | Rejected | Superseded by ADR-NNNN
++date: 2026-11-09
++author: claude
++category: architecture
++human_gate: no              # architecture (new runtime dependency); not accounting/security, not a design §11.2 item
++supersedes: none
++superseded_by: none
++---
++
++# ADR-0046: PDF rendering with headless Chromium via `playwright-core`
++
++## Status
++
++Proposed (claude, T-0041, 2026-11-09). Category `architecture`, `human_gate: no`: becomes
++**Accepted on green CI + cross-review by codex** (write-adr skill step 5). The reviewer should
++also confirm the sandbox rules below; if they judge the browser sandbox a security-model change,
++re-classify to `security` (human gate) in a superseding ADR rather than editing this one.
++
++## Context and problem statement
++
++Design §7.1 fixes the PDF technology: "HTML templates rendered by headless Chromium — same
++template engine as email and previews". Design §4.3 makes every billing format a **template
++record** (PDF layout, email template, …) that tenants clone and adjust. T-0041 must turn the
++posted sales invoice (T-0040), the adjustment note (T-0045) and the customer statement (T-0049)
++into PDFs that meet the AU tax-invoice and adjustment-note content rules (RQ-0132 Q1–Q2, from
++RQ-0009 and RQ-0114) and are provably reproducible.
++
++Running a browser in the API/worker at **runtime** is a new runtime dependency (AGENTS.md §4,
++design §10.6), so it needs this ADR. Until now Playwright was a dev dependency only
++(`@playwright/test` 1.63.0, e2e and evidence; ADR-0015).
++
++Observed facts (RQ-0132 S5–S7): `playwright-core` 1.63.0 already resolves in the lockfile (it is
++what `@playwright/test` runs on); it downloads no browser; `page.pdf()` is Chromium-only; two
++renders differ only in `/CreationDate` and `/ModDate`; Liberation Sans embeds as an extractable
++Type0 font while a variable font (Inter) becomes Type3 glyph fonts.
++
++## Decision drivers
++
++- Design §7.1: one HTML template engine for PDF, email and preview; headless Chromium named.
++- Determinism and auditability: a PDF must be reproducible and hashable (directive 8, RQ-0132 Q5).
++- Tenant content (names, footer, logo) is untrusted input to a browser: no script execution, no
++  network fetch (design §6, RQ-0132 Q6).
++- Minimise new supply-chain surface: prefer a package already pinned and reviewed in the repo.
++- Self-host (design §8.4 Docker Compose) and agent sandboxes: the Chromium binary location differs
++  per environment and must be configuration.
++
++## Considered options
++
++1. **`playwright-core` + system/pinned Chromium** — reuse the version the test suite pins.
++2. **`puppeteer-core` + Chromium** — the other mainstream CDP driver.
++3. **A JavaScript PDF library (`pdfkit` / `pdf-lib`)** — draw the PDF directly, no browser.
++4. **An external rendering service (Gotenberg container)** — HTTP API in front of Chromium.
++
++### Option 1 — playwright-core
++
++- Good, because it is already in the lockfile at 1.63.0 (same version as `@playwright/test`), so
++  the browser build the CI installs (`playwright install --with-deps chromium`) matches.
++- Good, because `launch({ executablePath })`, `newContext({ javaScriptEnabled: false })`,
++  `page.route()` and `page.pdf({ tagged: true })` cover the sandbox and accessibility needs.
++- Good, because the HTML renderer is exactly the one the e2e evidence screenshots use.
++- Bad, because Chromium is a large runtime binary (~150 MB) and must be patched with the image.
++- Bad, because a browser process per render is slow (~0.3–1 s); batch runs need a pooled browser.
++
++### Option 2 — puppeteer-core
++
++- Good, because it is purpose-built for headless Chrome and widely used for PDFs.
++- Bad, because it is a second driver and a new dependency tree, for the same Chromium.
++
++### Option 3 — pdfkit / pdf-lib
++
++- Good, because no browser binary; small and fast.
++- Bad, because it is a second layout engine: the PDF and the email/preview HTML would diverge,
++  contrary to design §7.1, and tenants could not adjust layout as data.
++
++### Option 4 — Gotenberg service
++
++- Good, because it isolates the browser in its own container.
++- Bad, because it adds a service to self-host (design §8.4 single VM), a network hop and an
++  unpinned API surface; the same isolation is achievable in-process with JS off and network
++  aborted. Can be revisited for scale.
++
++## Decision outcome
++
++Chosen option: **Option 1 — `playwright-core` 1.63.0 driving headless Chromium**, because it
++satisfies design §7.1 with the package and browser build the repo already pins, and the sandbox
++and determinism rules below are enforceable in code and tests.
++
++Rules (checkable):
++
++1. Only `packages/modules/billing/src/pdf-renderer.ts` imports `playwright-core` at runtime.
++   Its version is pinned exactly and equal to `@playwright/test`'s.
++2. The Chromium binary is configuration: `LF_CHROMIUM_PATH`, default `/opt/pw-browsers/chromium`;
++   a missing binary is a clear `ChromiumUnavailableError`, never a silent fallback or download.
++3. Every render runs in a fresh browser context with **JavaScript disabled** and **every network
++   request aborted** (`page.route('**/*', abort)`); images come only from `data:` URLs that the
++   template builds from stored logo bytes (PNG, JPEG, SVG; ≤ 256 KiB).
++4. Templates are pure functions of (document model, billing format) returning HTML; every
++   interpolated value is HTML-escaped; no arithmetic on money in templates (amounts are decimal
++   strings from the AR module, formatted with `Money` — never `number`).
++5. Output is deterministic: `/CreationDate` and `/ModDate` are set to the document date at the
++   same byte length, so identical inputs give identical bytes on the same Chromium build and fonts;
++   the SHA-256 is returned with the bytes. Font stack starts with **Liberation Sans** (not a
++   variable font).
++6. PDFs are tagged (`tagged: true`) A4 with backgrounds printed.
++
++## Consequences
++
++### Good
++
++- One template engine for PDF, email (T-0042) and the UI preview (T-0083).
++- Reproducible PDFs: tests snapshot the HTML and assert byte-identical re-renders and text content.
++- Tenant templates cannot execute code or reach the network.
++
++### Bad / accepted trade-offs
++
++- The API/worker image must ship Chromium and `fonts-liberation`; the self-host image grows.
++- Byte-identity holds per Chromium build and font set; a browser upgrade changes hashes (the HTML
++  snapshot and text assertions still hold). Stored hashes describe the stored bytes, not a
++  re-render on a newer build.
++- Rendering is slow relative to a PDF library; batch billing (T-0043) should reuse one browser
++  (`DocumentRenderer` keeps one browser open across renders and is closed explicitly).
++
++### Follow-ups
++
++- T-0180: persist renditions (attachment store, link from the invoice and `LF_Invoice__c` PDF link).
++- Infra: add Chromium + `fonts-liberation` to the worker/API container image (tracked on T-0180).
++
++## Compliance and verification
++
++| Check | Where | Gate |
++|---|---|---|
++| GP-001 invoice PDF text contains "Tax invoice", the number, the ABN, GST 125.00, total 1,375.00 | `packages/modules/billing/src/invoice-pdf.snapshot.db.test.ts` | `pnpm test:db` (verify gate 2) |
++| HTML is byte-equal to the committed snapshot; re-render gives identical PDF bytes and SHA-256 | `packages/modules/billing/src/documents.snapshot.test.ts` | `pnpm test` (verify gate 2) |
++| JS disabled and network aborted: a template with `<script>` and an external `<img>` makes no request and runs nothing | `packages/modules/billing/src/pdf-renderer.test.ts` | `pnpm test` |
++| Every interpolated value escaped | `packages/modules/billing/src/html.test.ts` | `pnpm test` |
++| Missing Chromium binary → `ChromiumUnavailableError` | `packages/modules/billing/src/pdf-renderer.test.ts` | `pnpm test` |
++| Only the renderer imports playwright-core at runtime | `grep -rn "playwright-core" packages apps --include=*.ts` in review checklist | cross-review |
++
++## Links
++
++- Design: §4.3, §6, §7.1 (PDF row), §8.4, §10.6
++- Research: RQ-0132 (this decision), RQ-0009, RQ-0114, RQ-0122
++- Decision log: DL-0411
++- Related ADRs: ADR-0015 (Playwright screenshot evidence)
++- External sources: playwright-core 1.63.0 type definitions (`Page.pdf`, `BrowserType.launch`),
++  read from the installed package 2026-11-09
+diff --git a/Docs/research/README.md b/Docs/research/README.md
+index bc1fcdc..c26e196 100644
+--- a/Docs/research/README.md
++++ b/Docs/research/README.md
+@@ -74,3 +74,4 @@ research is done but the conclusion waits on a human gate (e.g. golden postings)
+ | [RQ-0088](RQ-0088-ui-sync-states-salesforce.md) | How should Salesforce sync state and errors be shown in LedgerForce and in Salesforce? | resolved | - Sync state is a record: on each document (fields written, when), in history (failures and retries as events) and in a persistent issues list; never a toast only. - Name the Salesforce error in plain words with its code | Docs/ui/research, T-0009 |
+ | [RQ-0089](RQ-0089-ui-accessibility-colour-dark-mode.md) | What accessibility, colour-blind-safe status and dark-mode rules should LedgerForce follow? | resolved | - Status = word + shape + colour; each direction gives colour one meaning only. - Use blue/orange (or position, as in direction C) rather than red/green for in/out and good/bad. - Light theme by default; design dark sepa | Docs/ui/research, T-0009 |
+ | [RQ-0090](RQ-0090-golden-posting-tax-treatments.md) | AU GST treatments for the draft golden postings (accounting agent) | answered-pending-human | Bad-debt decreasing adjustment at 1B (accruals only); Stripe fees carry GST (see RQ-0010 for `fee_details`); deposit GST on receipt is a human decision; SG 12%. | Docs/accounting/postings.md, T-0007 |
++| [RQ-0132](RQ-0132-billing-formats-and-pdf-rendering.md) | Billing formats as data and PDF rendering (tax invoice, adjustment note, statement) with headless Chromium | answered | Tax invoice / adjustment note fields from RQ-0009/RQ-0114; playwright-core + configurable Chromium, JS off, network aborted; PDF dates pinned → byte-identical; app.billing_format (0047); no attachments module → T-0180 | packages/modules/billing, T-0041, T-0042, T-0083 |
+diff --git a/Docs/research/RQ-0132-billing-formats-and-pdf-rendering.md b/Docs/research/RQ-0132-billing-formats-and-pdf-rendering.md
+new file mode 100644
+index 0000000..79abea6
+--- /dev/null
++++ b/Docs/research/RQ-0132-billing-formats-and-pdf-rendering.md
+@@ -0,0 +1,115 @@
++---
++id: RQ-0132
++title: What must a LedgerForce tax invoice, adjustment note and customer statement show, how is a billing format stored as data, and how is it rendered to PDF deterministically with headless Chromium?
++status: answered
++opened: 2026-11-09
++resolved: 2026-11-09
++opened_by: claude
++linked_tasks: [T-0041, T-0042, T-0083, T-0180]
++linked_adrs: [ADR-0046]
++superseded_by:
++---
++
++# RQ-0132 — Billing formats and PDF rendering (T-0041)
++
++## Question
++
++- **Q1.** What must the sales tax invoice show (AU GST), including the $1,000 buyer-identity rule?
++- **Q2.** What must the adjustment note (every credit note, T-0045) show?
++- **Q3.** What does the customer statement document show (T-0049 `customerStatement`)?
++- **Q4.** Which engine and library render HTML to PDF at runtime (design §7.1 "HTML templates
++  rendered by headless Chromium")?
++- **Q5.** Can the output be deterministic, so it can be snapshotted and hashed?
++- **Q6.** Tenant data (logo, footer, names) reaches a browser: how is that made safe?
++- **Q7.** Where is the rendered PDF stored? (Card: "via the attachments module from T-0026 if it
++  exists".)
++- **Q8.** How do tests read the text of a PDF without a new runtime dependency?
++- **Q9.** What is the "template record" of design §4.3 as data, and does it need a migration?
++
++## Why it matters
++
++A tax invoice that misses a required field does not let the customer claim its GST credit
++(s 29-10(3), RQ-0095 S4); an adjustment note is required for a decreasing adjustment above $75
++(RQ-0095 S3). A PDF that changes from one render to the next cannot be proved or audited. A
++browser fed tenant text is an injection and SSRF surface.
++
++## Sources
++
++| # | Source | Accessed | Kind | What it says |
++|---|---|---|---|---|
++| S1 | [RQ-0009](RQ-0009-au-gst-bas-mvp.md) S1/S2 (ATO "Tax invoices"; GSTR 2013/1) | 2026-11-09 (re-read; ato.gov.au not reachable from this sandbox — proxy refused `www.ato.gov.au:443`) | primary via prior research | Under $1,000: words showing it is intended to be a tax invoice, seller identity, seller ABN, date of issue, description / quantity / price of what is sold, GST amount (or "total price includes GST" when the GST is exactly 1/11 of the total), the extent to which each sale is taxable. $1,000 or more (GST-inclusive): also the **buyer's identity or ABN**. |
++| S2 | [RQ-0114](RQ-0114-customer-credit-notes.md) S6; [RQ-0095](RQ-0095-golden-posting-open-questions.md) Q4, S3, S19 | 2026-11-09 | primary via prior research | Adjustment note: shows it is an adjustment note, supplier identity and ABN, date of issue, recipient identity or ABN (larger amounts), brief explanation, the difference in GST, enough to identify the original supply (original invoice number and date). Every credit note is issued as an adjustment note titled "Adjustment note" (`CREDIT_NOTE_TITLE`). |
++| S3 | [RQ-0122](RQ-0122-customer-statements-and-aged-receivables.md) Q5, `packages/modules/ar/src/customer-statement.ts`, `aged-receivables.ts` | 2026-11-09 | code / prior research | A statement has one section per currency: opening balance, lines with debit / credit / running balance, allocations, closing balance, ageing buckets; not a tax document. |
++| S4 | Design §4.3, §7.1 (PDF row), §6.6, §11.1 | 2026-11-09 | design | Template record: line source, grouping, tax treatment, numbering series, PDF layout, email template, payment-link behaviour; tenants clone and adjust templates. PDF = HTML templates rendered by headless Chromium, same template engine as email and previews. |
++| S5 | `node_modules/.pnpm/playwright-core@1.63.0/.../types/types.d.ts` (`Page.pdf`, `BrowserType.launch`, `BrowserContext` options, `Page.route`) | 2026-11-09 | primary (library types) | `page.pdf({ format, printBackground, preferCSSPageSize, tagged, outline, margin })` is Chromium-only; `launch({ executablePath })` runs a given Chromium binary; `newContext({ javaScriptEnabled: false })`; `page.route('**/*', r => r.abort())` intercepts every request. `playwright-core` downloads no browser. |
++| S6 | Experiment in this sandbox (`t0041-probe.ts`, untracked scratch): playwright-core 1.63.0 + `/opt/pw-browsers/chromium` (→ chromium-1243) | 2026-11-09 | primary (observed) | (a) Two renders of the same HTML differ **only** in `/CreationDate` and `/ModDate`; with both set to the same value the files are byte-identical (`cmp`). (b) A variable font (Inter) is embedded as one Type3 font per glyph run; Liberation Sans is embedded as a Type0 / Identity-H CID font with a `/ToUnicode` CMap and whole-word `Tj` strings. (c) `pdftotext` reads the result ("Tax invoice", "ABN 51 824 753 556", "Total 1,375.00"). (d) Chromium's PDF writer uses classic xref tables and FlateDecode streams (no object streams). |
++| S7 | `fc-list` in the sandbox; Playwright `install --with-deps chromium` (CI, `playwright.config.ts` comment) | 2026-11-09 | observed / prior knowledge | Liberation Sans / Serif / Mono and DejaVu are installed; Playwright's Linux dependency set for Chromium installs `fonts-liberation`. |
++| S8 | `grep -ril attachment` over migrations, `apps/api/src`, `packages/modules/*/src`; T-0026 card | 2026-11-09 | code | There is **no** attachments module. T-0026 is "Posting engine preview mode". Design mentions object storage only for backups (§6, §7). |
++| S9 | `Docs/ui/principles.md` P3 | 2026-11-09 | design | Amounts right-aligned, tabular figures, two decimals, thousands separators, currency shown once, no floating-point formatting. |
++
++## Findings
++
++1. **Q1 — tax invoice.** Print, on every posted sales invoice: the title **"Tax invoice"**; the
++   supplier's legal name (company `legal_name`, else `name`) and **ABN** (formatted `51 824 753 556`);
++   the invoice number and **date of issue** (invoice date) and due date; for each line its
++   description, tax code and amount; subtotal, **GST total** and total. Printing the GST amount
++   always satisfies both the amount and the "includes GST" alternative (S1), so the template does
++   not branch on the 1/11 test. For GST-inclusive invoices the total row reads "Total (includes
++   GST)". The buyer's legal name is **always** printed (and its ABN when held): the ≥ $1,000 rule
++   is met for every invoice, with no threshold branch to get wrong. A line's tax code (GST, FRE …)
++   shows the extent each sale is taxable on mixed invoices. A company without an ABN cannot issue
++   a tax invoice: refuse (`NO_SUPPLIER_ABN`). A draft or approved (unnumbered) invoice renders as
++   **"Draft invoice — not a tax invoice"**, never as a tax invoice.
++2. **Q2 — adjustment note.** Title "Adjustment note"; supplier name and ABN; credit-note number and
++   date of issue; recipient legal name (and ABN when held); the reason (brief explanation);
++   original invoice number and date; lines; net, **GST difference** and total. Unposted notes
++   render as "Draft adjustment note".
++3. **Q3 — statement.** Title "Statement"; supplier name and ABN; customer; period from–to; per
++   currency section: opening balance, lines (date, document, due date, debit, credit, balance),
++   closing balance, ageing (current, 1–30, 31–60, 61–90, 90+, unallocated credits, total).
++   Rendered from `customerStatement` unchanged — no arithmetic in the template.
++4. **Q4 — engine.** Use **`playwright-core` 1.63.0** (S5): the same pinned version the e2e suite
++   already resolves, no bundled browser download, Chromium-only `page.pdf`. The Chromium binary
++   is configuration: `LF_CHROMIUM_PATH`, default `/opt/pw-browsers/chromium`. Alternatives:
++   `puppeteer-core` (a second browser driver, new dependency tree, same Chromium), a JS PDF
++   library (`pdfkit`, `pdf-lib`: a second layout engine, so email/preview HTML and PDF would
++   diverge, contrary to S4). Runtime use of a browser is a new runtime dependency → ADR-0046.
++5. **Q5 — determinism.** HTML is a pure function of (document, format) — snapshot it exactly.
++   PDF: set `/CreationDate` and `/ModDate` to the document date (`D:YYYYMMDD000000+00'00'`, same
++   byte length as Chromium's value, so xref offsets stay valid) → identical bytes for identical
++   input on the same Chromium build and fonts (S6a); store the SHA-256. Use **Liberation Sans**
++   (not a variable font) so text is extractable and compact (S6b, S7).
++6. **Q6 — safety.** Every interpolated value is HTML-escaped; the footer is plain text (newlines →
++   `<br>`); the accent colour must match `^#[0-9a-f]{6}$`; the logo is embedded as a `data:` URL
++   only from bytes stored in the format (PNG, JPEG or SVG; ≤ 256 KiB; SVG in `<img>` runs no
++   script). The page runs with JavaScript disabled and **every network request aborted**, so a
++   template can neither run code nor fetch a URL (no SSRF, no tracking pixels).
++7. **Q7 — storage.** No attachments module exists (S8). `renderDocumentPdf` returns the bytes,
++   SHA-256, file name and media type; persisting renditions (object storage, an `attachment`
++   table, the Salesforce "PDF link" field) is follow-up **T-0180**.
++8. **Q8 — text extraction.** `pdftotext` exists here but is not guaranteed in CI. Write a small
++   test-only extractor for the subset Chromium emits (S6d): FlateDecode content streams,
++   Type0/Identity-H fonts with `/ToUnicode` (`bfchar`, `bfrange`), `Tf`/`Tm`/`Td`/`Tj`/`TJ`; a new
++   text line when the baseline moves. Cross-checked against `pdftotext` during development. It
++   lives under `src/testing/` (dev-only, no dependency).
++9. **Q9 — template record.** A tenant-owned table `app.billing_format` (migration 0047): per
++   company, `code`, `name`, `document_kind` (`invoice` | `adjustment_note` | `statement`),
++   `format_kind` (design §4.3 rows), `line_source`, `grouping`, `tax_treatment`, `number_series`,
++   `pdf_layout`, `email_template`, `payment_link`, `is_default` (one default per kind), `logo` +
++   `logo_media_type`, `footer_text`, `accent_color`; RLS ENABLE + FORCE; no DELETE grant (archive
++   with `status`). With no stored format a built-in default is used, so rendering never depends on
++   setup.
++
++## Conclusion
++
++Build `packages/modules/billing` (`@ledgerforce/billing`): billing-format model and store
++(migration 0047), document models built from the AR reads, pure HTML templates, a Chromium
++renderer on `playwright-core` (ADR-0046), and a test-only PDF text extractor. Decisions
++DL-0410…DL-0415.
++
++**Confidence:** high for Q4–Q9 (observed and code); high for Q1–Q2 field lists (two prior RQs
++with ATO sources agree), medium for exact ATO wording today (ato.gov.au unreachable from this
++sandbox; re-check when T-0042 or the BAS module next touches invoice content).
++
++**Affects:** `packages/modules/billing`, migration 0047, T-0042 (email attaches the PDF), T-0083
++(UI invoice view and download), T-0180 (persisting renditions).
+diff --git a/packages/modules/billing/package.json b/packages/modules/billing/package.json
+new file mode 100644
+index 0000000..3dbe7c1
+--- /dev/null
++++ b/packages/modules/billing/package.json
+@@ -0,0 +1,27 @@
++{
++  "name": "@ledgerforce/billing",
++  "version": "0.0.0",
++  "private": true,
++  "description": "Billing formats (template records) and document rendering: tax invoice, adjustment note and customer statement as HTML and PDF via headless Chromium (design §4.3, §7.1 PDF; ADR-0046)",
++  "type": "module",
++  "exports": {
++    ".": "./src/index.ts",
++    "./testing": "./src/testing/index.ts"
++  },
++  "scripts": {
++    "typecheck": "tsc -p tsconfig.json"
++  },
++  "dependencies": {
++    "@ledgerforce/ar": "workspace:*",
++    "@ledgerforce/db": "workspace:*",
++    "@ledgerforce/shared": "workspace:*",
++    "kysely": "0.29.7",
++    "playwright-core": "1.63.0"
++  },
++  "devDependencies": {
++    "@ledgerforce/ledger": "workspace:*",
++    "@ledgerforce/parties": "workspace:*",
++    "@types/node": "22.20.5",
++    "vitest": "4.1.12"
++  }
++}
+diff --git a/packages/modules/billing/t0041-probe.ts b/packages/modules/billing/t0041-probe.ts
+new file mode 100644
+index 0000000..d009324
+--- /dev/null
++++ b/packages/modules/billing/t0041-probe.ts
+@@ -0,0 +1,15 @@
++import { chromium } from 'playwright-core';
++import { writeFileSync } from 'node:fs';
++const out = process.argv[2] ?? 'probe.pdf';
++const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' });
++const ctx = await b.newContext({ javaScriptEnabled: false });
++const p = await ctx.newPage();
++await p.route('**/*', (r) => r.abort());
++await p.setContent(
++  '<html><head><title>Tax invoice INV-000001</title><style>body{font-family:"Liberation Sans",Arial,sans-serif}</style></head><body><h1>Tax invoice</h1><p>ABN 51 824 753 556</p><table><tr><td>GST</td><td>125.00</td></tr><tr><td>Total</td><td>1,375.00</td></tr></table></body></html>',
++  { waitUntil: 'load' },
++);
++const pdf = await p.pdf({ format: 'A4', printBackground: true, tagged: true });
++writeFileSync(out, pdf);
++await b.close();
++console.log(pdf.length);
+diff --git a/packages/modules/billing/tsconfig.json b/packages/modules/billing/tsconfig.json
+new file mode 100644
+index 0000000..60de564
+--- /dev/null
++++ b/packages/modules/billing/tsconfig.json
+@@ -0,0 +1,4 @@
++{
++  "extends": "../../../tsconfig.base.json",
++  "include": ["src/**/*.ts"]
++}
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index a523d2a..00fc0a1 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -435,6 +435,37 @@ importers:
+         specifier: 4.1.12
+         version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.5(@types/node@22.20.5)(yaml@2.9.1))
+ 
++  packages/modules/billing:
++    dependencies:
++      '@ledgerforce/ar':
++        specifier: workspace:*
++        version: link:../ar
++      '@ledgerforce/db':
++        specifier: workspace:*
++        version: link:../../db
++      '@ledgerforce/shared':
++        specifier: workspace:*
++        version: link:../../shared
++      kysely:
++        specifier: 0.29.7
++        version: 0.29.7
++      playwright-core:
++        specifier: 1.63.0
++        version: 1.63.0
++    devDependencies:
++      '@ledgerforce/ledger':
++        specifier: workspace:*
++        version: link:../../ledger
++      '@ledgerforce/parties':
++        specifier: workspace:*
++        version: link:../parties
++      '@types/node':
++        specifier: 22.20.5
++        version: 22.20.5
++      vitest:
++        specifier: 4.1.12
++        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.5(@types/node@22.20.5)(yaml@2.9.1))
++
+   packages/modules/gl:
+     dependencies:
+       '@ledgerforce/db':
+-- 
+2.43.0
+
