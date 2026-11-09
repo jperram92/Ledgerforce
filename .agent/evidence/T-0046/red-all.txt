@@ -1,0 +1,78 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-af40189fd0e892912
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:32771
+ ❯ |db| packages/modules/ar/src/receipts.prop.db.test.ts (0 test)
+ ❯ |db| packages/modules/ar/src/receipts.db.test.ts (0 test)
+ ❯ |db| packages/modules/ar/src/receipt.golden.db.test.ts (0 test)
+ ❯ |unit| packages/modules/ar/src/receipt-plan.test.ts (0 test)
+ ❯ |unit| packages/modules/ar/src/receipt-plan.prop.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/ar/src/receipt-plan.prop.test.ts [ packages/modules/ar/src/receipt-plan.prop.test.ts ]
+Error: Cannot find module './receipt-plan.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-af40189fd0e892912/packages/modules/ar/src/receipt-plan.prop.test.ts
+ ❯ packages/modules/ar/src/receipt-plan.prop.test.ts:12:1
+     10| import fc from 'fast-check';
+     11| import { describe, expect, it } from 'vitest';
+     12| import { ReceiptError, paymentStatusOf, planReceiptAllocations } from …
+       | ^
+     13|
+     14| /** Integer cents → plain decimal text (bigint arithmetic only, never …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  |unit| packages/modules/ar/src/receipt-plan.test.ts [ packages/modules/ar/src/receipt-plan.test.ts ]
+Error: Cannot find module './receipt-plan.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-af40189fd0e892912/packages/modules/ar/src/receipt-plan.test.ts
+ ❯ packages/modules/ar/src/receipt-plan.test.ts:6:1
+      4|  */
+      5| import { describe, expect, it } from 'vitest';
+      6| import { ReceiptError, paymentStatusOf, planReceiptAllocations } from …
+       | ^
+      7|
+      8| const codeOf = (fn: () => unknown): string => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |db| packages/modules/ar/src/receipt.golden.db.test.ts [ packages/modules/ar/src/receipt.golden.db.test.ts ]
+Error: Cannot find module './receipts.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-af40189fd0e892912/packages/modules/ar/src/receipt.golden.db.test.ts
+ ❯ packages/modules/ar/src/receipt.golden.db.test.ts:35:1
+     33| import type { Transaction } from 'kysely';
+     34| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     35| import { getReceipt, invoicePaymentStatus, recordReceipt } from './rec…
+       | ^
+     36| import { autoApproveSalesInvoice, createSalesInvoice } from './sales-i…
+     37| import {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |db| packages/modules/ar/src/receipts.db.test.ts [ packages/modules/ar/src/receipts.db.test.ts ]
+Error: Cannot find module './receipts.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-af40189fd0e892912/packages/modules/ar/src/receipts.db.test.ts
+ ❯ packages/modules/ar/src/receipts.db.test.ts:30:1
+     28| import { sql } from 'kysely';
+     29| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     30| import {
+       | ^
+     31|   ReceiptError,
+     32|   allocateReceipt,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |db| packages/modules/ar/src/receipts.prop.db.test.ts [ packages/modules/ar/src/receipts.prop.db.test.ts ]
+Error: Cannot find module './receipts.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-af40189fd0e892912/packages/modules/ar/src/receipts.prop.db.test.ts
+ ❯ packages/modules/ar/src/receipts.prop.db.test.ts:23:1
+     21| import { randomUUID } from 'node:crypto';
+     22| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     23| import {
+       | ^
+     24|   getReceipt,
+     25|   invoicePaymentStatus,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  5 failed (5)
+      Tests  no tests
+   Start at  18:33:30
+   Duration  1.85s (transform 980ms, setup 0ms, import 0ms, tests 0ms, environment 1ms)
+

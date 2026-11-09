@@ -2244,3 +2244,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: no migration for template-only data; a binding to an account missing from the golden world's chart would be a latent fault.
 - Alternatives: a `purchase_tax_code` column on `product_posting_profile` (rejected: superseded in effect by ADR-0044's tax_class, and needs migration plus resolver work); bind the golden key now (rejected as above).
 - ADR: none (ADR-0044 for the stored form) · Status: accepted
+
+### DL-0310 — Customer receipt: one GP-002 entry for the full amount, allocated in the same transaction, dated the receipt date
+- Date: 2026-11-08 · By: claude · Task: T-0046 · Category: accounting
+- Decision: `recordReceipt` posts Dr deposit account / Cr AR_CONTROL (party) for the full amount received (source type `ar_receipt`, key `ar_receipt:<receipt id>`), deposit account = the GL account of an active company bank account (GP-002 `bank:OPERATING`) or the UNDEPOSITED_FUNDS role (GP-002 variant), then allocates each requested invoice with the ledger's `allocate()` dated the receipt date, all in one savepoint. Methods eft/cheque/cash/other; card is Stripe (GP-003, T-0074).
+- Why: GP-002 is Approved (DL-0253); the cash-basis BAS (T-0035) attributes GST at the settlement allocation's date, which GP-002 says is the receipt date (RQ-0112 F1–F2).
+- Alternatives: post and allocate in separate calls (rejected: a crash would leave an unallocated receipt the user did not ask for); a receipt per invoice (rejected: one bank deposit, one entry).
+- ADR: none (within the Approved golden) · Status: accepted
+
+### DL-0311 — Over-payments stay an unallocated AR credit; a receipt with no invoice is refused (prepayment path)
+- Date: 2026-11-08 · By: claude · Task: T-0046 · Category: accounting
+- Decision: The part of a receipt not allocated remains the receipt's credit open item on AR control (no GST), allocatable later (`allocateReceipt`) or refundable (GP-006). Recording a receipt requires at least one allocation (NO_ALLOCATION); money with no invoice is an unsolicited prepayment and takes the GP-012 path in T-0047 (RQ-0095 Q7).
+- Why: RQ-0112 F4–F5; GST Act s 29-5(2) (cash basis "to the extent" consideration for the supply is received) and the BAS code releasing GST only through allocations to invoices. The journal shape is GP-002's; no golden changes.
+- Alternatives: post over-payments to CUSTOMER_PREPAYMENTS with GST (rejected: Q7 Option B is for prepayments of a supply, not over-payments of an invoiced one); allow unallocated receipts (rejected: collides with Q7). Medium confidence — flagged for the accountant-reviewer persona review (DL-0248).
+- ADR: none · Status: accepted
+
+### DL-0312 — Receipt document `app.ar_receipt` (migration 0039) is insert-only and written after the entry
+- Date: 2026-11-08 · By: claude · Task: T-0046 · Category: architecture
+- Decision: The receipt row is inserted after post() in the same transaction and never changes (lf_app SELECT/INSERT; a trigger refuses UPDATE/DELETE); an insert guard checks it names the posted `ar_receipt` entry whose `source_id` is the receipt id and whose credits equal the amount, and that a bank account is active and in the receipt currency. Unallocated credit and invoice status are derived from AR open items, never stored. Allocation listings read `app.allocation` (read only). The cross-tenant suite gets an override and a prerequisite for the table.
+- Why: receipts have no draft/approval in UC-03 A1; posted = immutable (AGENTS.md §4); RQ-0112 F7.
+- Alternatives: insert first then UPDATE journal_entry_id (rejected: needs an UPDATE grant on a posted document); a stored status column on sales_invoice (rejected: posted invoices are immutable, migration 0037 guard).
+- ADR: none · Status: accepted
+
+### DL-0313 — Invoice payment status derived from the AR open item; unallocate only by reversing allocation
+- Date: 2026-11-08 · By: claude · Task: T-0046 · Category: architecture
+- Decision: `invoicePaymentStatus` returns unpaid (open = original), part_paid (0 < open < original) or paid (open = 0) from the invoice's AR open item. `unallocateReceipt` only calls the ledger's `reverseAllocation` (negative allocation row) after checking the allocation is the receipt's; the receipt journal is never touched. `@ledgerforce/bank` is added to `@ledgerforce/ar` as a workspace devDependency for the test world's company bank account (internal package, no third-party dependency).
+- Why: RQ-0112 F3, F6; AGENTS.md §4 (corrections by reversal).
+- Alternatives: storing Paid on the invoice (rejected: immutable posted rows, drift risk).
+- ADR: none · Status: accepted

@@ -388,6 +388,9 @@ importers:
         specifier: 12.37.1
         version: 12.37.1(@opentelemetry/api@1.9.1)
     devDependencies:
+      '@ledgerforce/bank':
+        specifier: workspace:*
+        version: link:../bank
       '@ledgerforce/gl':
         specifier: workspace:*
         version: link:../gl

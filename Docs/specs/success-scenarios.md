@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 221 scenarios (25 need screenshots, recounted 2026-11-08 by the lead); SS-PLAT-100..103 added 2026-11-08 (T-0038); SS-PLAT-104..105 added 2026-11-08 (T-0039); SS-UC01-12..14 added 2026-11-08 (T-0065); SS-PLAT-130..134 added 2026-11-08 (T-0121..T-0125, ids 106..129 left for running builders); SS-PLAT-135..139 added 2026-11-08 (T-0123, T-0126, T-0047, T-0048; ADR-0044 re-review DL-0285/DL-0286). SS-PLAT-110..114 added 2026-11-08 (T-0035). SS-PLAT-120..122 added 2026-11-08 (T-0040). SS-UC05-09..10 added 2026-11-08 (T-0050).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 227 scenarios (25 need screenshots, recounted 2026-11-08 by the lead); SS-PLAT-100..103 added 2026-11-08 (T-0038); SS-PLAT-104..105 added 2026-11-08 (T-0039); SS-UC01-12..14 added 2026-11-08 (T-0065); SS-PLAT-130..134 added 2026-11-08 (T-0121..T-0125, ids 106..129 left for running builders); SS-PLAT-135..139 added 2026-11-08 (T-0123, T-0126, T-0047, T-0048; ADR-0044 re-review DL-0285/DL-0286). SS-PLAT-110..114 added 2026-11-08 (T-0035). SS-PLAT-120..122 added 2026-11-08 (T-0040). SS-UC05-09..10 added 2026-11-08 (T-0050). SS-PLAT-150..155 added 2026-11-08 (T-0046, T-0130).
 
 ## How to update (who, when)
 
@@ -55,8 +55,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC03-04 | Salesforce shows Paid with payment date | UC-03 | MVP | contract | no | packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts | T-0067, T-0074 | green | [.agent/evidence/T-0067/manifest.json](../../.agent/evidence/T-0067/manifest.json) | 5d25612 |
 | SS-UC03-05 | Duplicate webhook is idempotent | UC-03 | MVP | db-integration | no | — | T-0074 | not-started | — | — |
 | SS-UC03-06 | Invalid or replayed webhook rejected | UC-03 | MVP | unit | no | — | T-0074 | not-started | — | — |
-| SS-UC03-07 | Bank-transfer receipt posts GP-002 | UC-03 | MVP | golden | no | — | T-0046 | not-started | — | — |
-| SS-UC03-08 | Partial payment leaves the correct open amount | UC-03 | MVP | db-integration | no | — | T-0046 | not-started | — | — |
+| SS-UC03-07 | Bank-transfer receipt posts GP-002 | UC-03 | MVP | golden | no | packages/modules/ar/src/receipt.golden.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 420004b |
+| SS-UC03-08 | Partial payment leaves the correct open amount | UC-03 | MVP | db-integration | no | packages/modules/ar/src/receipts.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 420004b |
 | SS-UC03-09 | Late payout in an AR-locked period follows the period matrix | UC-03 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0075, T-0023 | green (period/matrix layer; payout cell is tenant setting `payout_under_ar_lock` awaiting product owner, RQ-0026; payout posting in T-0075) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
 | SS-UC03-10 | Receipt allocation screen | UC-03 | MVP | e2e-playwright | yes | — | T-0085 | not-started | — | — |
 | SS-UC04-01 | Reminder 1 at 7 days overdue | UC-04 | MVP | db-integration | no | — | T-0068 | not-started | — | — |
@@ -244,6 +244,12 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-137 | Deposit invoices and prepayment receipts carry a gst_supply_pattern shown on the BAS-prep report; a single_supply deposit is refused until the single-supply path exists, never posted as Div 156 | — | MVP | db-integration | no | — | T-0047 | not-started | — | — |
 | SS-PLAT-138 | Single-supply deposits attribute the whole GST at first payment (GP-012-B) and the final invoice clears GST_ATTRIBUTED_UNBILLED (GP-015-B), green in the golden runner | — | MVP | golden | no | — | T-0047 | not-started | — | — |
 | SS-PLAT-139 | Bad-debt write-off against the ECL allowance (GP-007-A) is green in the golden runner; any excess goes to the bad-debt account | — | MVP | golden | no | — | T-0048 | not-started | — | — |
+| SS-PLAT-150 | Customer receipt allocated to many invoices (Paid + Partially paid); an over-payment leaves an unallocated AR credit allocated later (allocateReceipt); a cheque before banking debits UNDEPOSITED_FUNDS (GP-002 variant); AR subledger = AR control | UC-03 | MVP | db-integration | no | packages/modules/ar/src/receipts.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 420004b |
+| SS-PLAT-151 | Unallocate a receipt only by reversal: a negative allocation is appended, the receipt journal is untouched, the invoice status is recomputed; a second unallocate (ALREADY_REVERSED) and another receipt's allocation (NOT_THIS_RECEIPT) are refused | UC-03 | MVP | db-integration | no | packages/modules/ar/src/receipts.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 420004b |
+| SS-PLAT-152 | Receipt preview shows the engine's journal and the allocation plan (open before/after, status after, unallocated) and writes nothing | UC-03 | MVP | db-integration | no | packages/modules/ar/src/receipts.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 420004b |
+| SS-PLAT-153 | Refused receipts write nothing: NO_ALLOCATION (prepayment path, RQ-0095 Q7), OVER_ALLOCATION, EXCEEDS_RECEIPT, PARTY_MISMATCH, INVOICE_NOT_POSTED, DUPLICATE_INVOICE, INVALID_RECEIPT (card, bad amount), DATE_BEFORE_INVOICE, UNKNOWN_BANK_ACCOUNT | UC-03 | MVP | db-integration | no | packages/modules/ar/src/receipts.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 420004b |
+| SS-PLAT-154 | Receipt idempotency (same key → same receipt, nothing written; different details → IDEMPOTENCY_CONFLICT); app.ar_receipt never changes and must name its own posted ar_receipt entry (database guard, migration 0039) | UC-03 | MVP | db-integration | no | packages/modules/ar/src/receipts.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 420004b |
+| SS-PLAT-155 | Bank deposit of undeposited funds posts its Approved golden (Dr bank / Cr UNDEPOSITED_FUNDS, GP-002 variant); each receipt deposited once | UC-03, UC-08 | MVP | golden, db-integration | no | — | T-0130 | not-started | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -689,6 +695,30 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-122 — Sales invoice approval refuses an unresolvable posting profile
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0040 (DL-0260)
 - **Given** a product whose default tax code differs from the customer profile's · **When** its invoice is approved · **Then** approval is refused TAX_CODE_CONFLICT naming both codes and asking for an explicit tax code on the line, nothing posts; with an explicit code it approves
+
+### SS-PLAT-150 — One receipt, many invoices; over-payment credit; undeposited funds
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0046 (RQ-0112, DL-0310, DL-0311)
+- **Given** posted invoices of one customer · **When** a receipt is recorded and allocated across them, or for more than they owe, or by cheque before banking · **Then** each invoice is Paid or Partially paid from its open amount, the remainder stays an unallocated AR credit that a later allocation uses, the cheque debits UNDEPOSITED_FUNDS, and AR subledger = AR control
+
+### SS-PLAT-151 — Unallocate a receipt only by reversal
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0046 (DL-0313)
+- **Given** a receipt allocated to an invoice · **When** the allocation is undone · **Then** a negative allocation is appended, the receipt journal is unchanged, the invoice is Unpaid again and the receipt credit restored; undoing it twice or undoing another receipt's allocation is refused
+
+### SS-PLAT-152 — Receipt preview writes nothing
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0046 (screen: T-0085)
+- **Given** an open invoice · **When** a receipt is previewed · **Then** it returns the engine's journal and the allocation plan, and the database is unchanged
+
+### SS-PLAT-153 — Refused receipts write nothing
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0046
+- **Given** invalid receipts (no allocation, too much, wrong party, unposted invoice, duplicate line, card, bad amount, date before the invoice, unknown bank account) · **When** they are recorded · **Then** each is refused with its code and no entry, receipt or allocation is written
+
+### SS-PLAT-154 — Idempotent, immutable receipt document
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0046 (DL-0312, migration 0039)
+- **Given** a recorded receipt · **When** its key is repeated, or its row is updated/deleted, or a receipt row names another document's entry · **Then** the repeat returns the first receipt and writes nothing (different details → IDEMPOTENCY_CONFLICT) and the database refuses the change and the foreign entry
+
+### SS-PLAT-155 — Bank deposit of undeposited funds
+- Phase: MVP · Layer: **golden, db-integration** · Screenshot evidence: no · Task(s): T-0130 (golden proposal first)
+- **Given** cash/cheque receipts on UNDEPOSITED_FUNDS · **When** they are deposited together · **Then** one entry equal to its Approved golden posts (Dr bank / Cr UNDEPOSITED_FUNDS) and each receipt is deposited once
 
 ## T-0112 PR integration regression evidence (2026-10-28)
 
