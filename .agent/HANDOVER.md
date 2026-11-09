@@ -1,3 +1,19 @@
+# Handover — canonical lineage selected
+
+## Codex continuation prompt
+> Resume on feat/T-0057-payment-confirmation at 96a6b93 plus the lineage documentation checkpoint. Run node scripts/agent/conductor.ts status, then read .agent/LINEAGE-RECONCILIATION-2026-11-10.md and .agent/runs/2026-11-09-codex-r01.md. Owner selected feat/T-* as canonical (DL-0308); port only reviewed missing Claude work. Preserve existing dirty T-0057 evidence. Next inspect saved T-0057 verification and CI results before rerunning checks. Codex cannot cross-approve its own date repair; Claude review remains required. The four interrupted source tasks already have canonical implementations in review; compare gaps before applying any source patch.
+
+From: codex, run 2026-11-09-codex-r01.
+Task: T-0057 (existing verification state preserved); lineage reconciliation documented.
+Done: fetched origin; confirmed source 872c4fa and SF line 3ba5481 share c1dfbca; recorded owner decision and initial ID/implementation comparison.
+In progress: product validation, independent reviews and selective ports remain unfinished. No product tests run in the lineage documentation step.
+Next action: node scripts/agent/conductor.ts status, then inspect saved T-0057 verification reports and CI for 96a6b93. Preserve dirty evidence before switching to another canonical task branch.
+Decisions taken: DL-0308. Previous source-branch continuation is superseded by selective porting into feat/T-*.
+Open questions for human: lineage resolved. Existing security and initial integration gates below remain; no new approval requested.
+Do not: merge source branch wholesale; overwrite colliding IDs; treat source review status as verification; self-approve Codex work; alter Approved goldens, tests or security gates.
+
+## Prior handover narrative (preserved as historical context)
+
 # Handover - T-0057 builder repair
 
 ## Codex continuation prompt
@@ -341,3 +357,5 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-06T23:20:08.444Z codex: T-0080 → verifying
 - 2026-11-07T05:48:40.310Z codex: release T-0080 → review (verify 14 PASS / 0 FAIL / 2 PENDING; fresh scenarios pass; independent review and API provenance finding pending)
 - 2026-11-07T22:43:42.883Z codex: T-0057 → verifying
+- 2026-11-07T22:44:04.348Z codex: checkpoint: repair green; full verification pending
+- 2026-11-09T21:11:01.628Z codex: handover: Owner selected canonical feat lineage; reconciliation inventory recorded, implementation reviews remain
