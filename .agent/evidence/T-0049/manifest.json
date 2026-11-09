@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0049",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-190",
+      "file": ".agent/evidence/T-0049/20261109-090427-tests-db.json",
+      "test": "4 test(s): packages/modules/ar/src/aged-ar.db.test.ts › SS-PLAT-190 (AC-1): aged AR buckets sum to the AR control balance at the date › SS-PLAT-190 (AC-1): ages by due date as at 2026-11-30, credits apart, total = AR control | packages/modules/ar/src/aged-ar.db.test.ts › SS-PLAT-190 (AC-1): aged AR buckets sum to the AR control balance at the date › SS-PLAT-190 (AC-1): as at a later date the 2026-12-05 receipt clears I1 and everything ages on | packages/modules/ar/src/aged-ar.db.test.ts › SS-PLAT-190 (AC-1): aged AR buckets sum to the AR control balance at the date › SS-PLAT-190 (AC-1): before any document the report is empty and still reconciles | packages/modules/ar/src/aged-ar.prop.db.test.ts › SS-PLAT-190: aged-AR invariants (INV-aged-ar-control, INV-aged-ar-party) › SS-PLAT-190 hold for every as-at date after every run",
+      "commit": "514f43e080a1",
+      "provider": "claude",
+      "timestamp": "2026-11-09T09:04:27.444Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC12-05",
+      "file": ".agent/evidence/T-0049/20261109-090427-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/aged-ar.db.test.ts › SS-UC12-05: Salesforce values reconcile to LedgerForce aged AR › SS-UC12-05: balance due and overdue amount per party equal its aged-AR totals",
+      "commit": "514f43e080a1",
+      "provider": "claude",
+      "timestamp": "2026-11-09T09:04:27.444Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-191",
+      "file": ".agent/evidence/T-0049/20261109-090427-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/aged-ar.db.test.ts › SS-PLAT-191: customer statement closes on the party AR subledger › SS-PLAT-191 Acme, November: opening, documents, allocations, closing = AR subledger for the party | packages/modules/ar/src/aged-ar.db.test.ts › SS-PLAT-191: customer statement closes on the party AR subledger › SS-PLAT-191 Bolt, November: the GP-005 shape closes in credit at −220.00 | packages/modules/ar/src/aged-ar.db.test.ts › SS-PLAT-191: customer statement closes on the party AR subledger › SS-PLAT-191 refuses an inverted or malformed range and an unknown party",
+      "commit": "514f43e080a1",
+      "provider": "claude",
+      "timestamp": "2026-11-09T09:04:27.444Z",
+      "result": "passed"
+    }
+  ]
+}

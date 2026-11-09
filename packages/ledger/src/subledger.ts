@@ -223,6 +223,135 @@ export async function openItems(
   return r.rows;
 }
 
+export interface OpenItemAsOf extends OpenItem {
+  /** The as-at date the two amounts below are computed for. */
+  asOf: string;
+  /** Transaction currency, signed: original less allocations dated on or before asOf. */
+  openAmountAsOf: string;
+  /** Base currency, signed: base original less base released by those allocations. */
+  baseOpenAmountAsOf: string;
+}
+
+/**
+ * Open items as at a date (T-0049, RQ-0122 finding 3) — the read that ageing and statements use.
+ * Items dated after `asOf` are excluded; open(asOf) = original − sign(original) × Σ allocation
+ * amounts dated ≤ asOf touching the item (reversals are negative rows, so they add back), and the
+ * same in base currency with each side's base release. `openOnly` hides items open at zero.
+ */
+export async function openItemsAsOf(
+  trx: Trx,
+  q: {
+    companyId: string;
+    asOf: string;
+    controlRole?: SubledgerRole;
+    partyId?: string;
+    openOnly?: boolean;
+  },
+): Promise<OpenItemAsOf[]> {
+  if (!validDate(q.asOf)) fail('INVALID_COMMAND', `asOf ${JSON.stringify(q.asOf)} is not a date`);
+  const companyId = checkUuid(q.companyId, 'companyId');
+  const partyId = q.partyId === undefined ? null : checkUuid(q.partyId, 'partyId');
+  const r = await sql<OpenItemAsOf>`
+    WITH items AS (
+      SELECT s.* FROM app.subledger_entry s
+       WHERE s.company_id = ${companyId}
+         AND s.document_date <= ${q.asOf}::date
+         AND (${q.controlRole ?? null}::text IS NULL OR s.control_role = ${q.controlRole ?? null})
+         AND (${partyId}::uuid IS NULL OR s.party_id = ${partyId}::uuid)
+    ),
+    moved AS (
+      SELECT i.id,
+             coalesce(sum(a.amount), 0) AS amount,
+             coalesce(sum(CASE WHEN a.from_entry_id = i.id THEN a.from_base_amount
+                               ELSE a.to_base_amount END), 0) AS base
+        FROM items i
+        JOIN app.allocation a ON a.tenant_id = i.tenant_id
+             AND (a.from_entry_id = i.id OR a.to_entry_id = i.id)
+       WHERE a.allocation_date <= ${q.asOf}::date
+       GROUP BY i.id
+    ),
+    asof AS (
+      SELECT i.*,
+             i.original_amount - sign(i.original_amount) * coalesce(mv.amount, 0) AS open_asof,
+             i.base_original_amount - sign(i.original_amount) * coalesce(mv.base, 0) AS base_open_asof
+        FROM items i LEFT JOIN moved mv ON mv.id = i.id
+    )
+    SELECT ${ITEM_COLUMNS}, ${q.asOf}::text AS "asOf",
+           to_char(open_asof, 'FM999999999999990.0000') AS "openAmountAsOf",
+           to_char(base_open_asof, 'FM999999999999990.0000') AS "baseOpenAmountAsOf"
+      FROM asof
+     WHERE NOT ${q.openOnly ?? false} OR open_asof <> 0
+     ORDER BY document_date, id`.execute(trx);
+  return r.rows;
+}
+
+export interface AllocationEntry extends Omit<AllocationResult, 'replayed'> {
+  controlRole: SubledgerRole;
+  partyId: string | null;
+}
+
+/**
+ * Allocations dated in [from, to] (from omitted = from the beginning), oldest first, with the
+ * control role and party of the items they pair (T-0049 statements). Reversals are negative rows.
+ */
+export async function allocationsBetween(
+  trx: Trx,
+  q: {
+    companyId: string;
+    from?: string;
+    to: string;
+    controlRole?: SubledgerRole;
+    partyId?: string;
+  },
+): Promise<AllocationEntry[]> {
+  if (!validDate(q.to)) fail('INVALID_COMMAND', `to ${JSON.stringify(q.to)} is not a date`);
+  if (q.from !== undefined && !validDate(q.from)) {
+    fail('INVALID_COMMAND', `from ${JSON.stringify(q.from)} is not a date`);
+  }
+  const companyId = checkUuid(q.companyId, 'companyId');
+  const partyId = q.partyId === undefined ? null : checkUuid(q.partyId, 'partyId');
+  const r = await sql<AllocationRow & { control_role: SubledgerRole; party_id: string | null }>`
+    SELECT ${sql.join([
+      sql`a.id::text`,
+      sql`a.company_id::text`,
+      sql`a.from_entry_id::text`,
+      sql`a.to_entry_id::text`,
+      sql`a.amount::text`,
+      sql`a.currency`,
+      sql`a.from_base_amount::text`,
+      sql`a.to_base_amount::text`,
+      sql`a.fx_difference::text`,
+      sql`to_char(a.allocation_date, 'YYYY-MM-DD') AS allocation_date`,
+      sql`a.reversal_of_id::text`,
+      sql`a.idempotency_key`,
+      sql`s.control_role`,
+      sql`s.party_id::text`,
+    ])}
+      FROM app.allocation a
+      JOIN app.subledger_entry s ON s.tenant_id = a.tenant_id AND s.id = a.from_entry_id
+     WHERE a.company_id = ${companyId}
+       AND (${q.from ?? null}::date IS NULL OR a.allocation_date >= ${q.from ?? null}::date)
+       AND a.allocation_date <= ${q.to}::date
+       AND (${q.controlRole ?? null}::text IS NULL OR s.control_role = ${q.controlRole ?? null})
+       AND (${partyId}::uuid IS NULL OR s.party_id = ${partyId}::uuid)
+     ORDER BY a.allocation_date, a.created_at, a.id`.execute(trx);
+  return r.rows.map((row) => ({
+    allocationId: row.id,
+    companyId: row.company_id,
+    fromEntryId: row.from_entry_id,
+    toEntryId: row.to_entry_id,
+    amount: Money.of(row.amount, X).toNumericString(),
+    currency: row.currency,
+    fromBaseAmount: row.from_base_amount,
+    toBaseAmount: row.to_base_amount,
+    fxDifference: row.fx_difference,
+    allocationDate: row.allocation_date,
+    reversalOfId: row.reversal_of_id,
+    controlRole: row.control_role,
+    partyId: row.party_id,
+  }));
+}
+
 interface AllocationRow {
   id: string;
   company_id: string;
