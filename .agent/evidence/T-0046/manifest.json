@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0046",
+  "entries": [
+    {
+      "scenario": "SS-UC03-07",
+      "file": ".agent/evidence/T-0046/20261108-230726-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/receipt.golden.db.test.ts › T-0046 golden posting GP-002 produced by the customer-receipt code › SS-UC03-07: Bank-transfer receipt posts GP-002",
+      "commit": "420004bdce44-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:07:26.213Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-08",
+      "file": ".agent/evidence/T-0046/20261108-230726-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/receipts.db.test.ts › SS-UC03-08: Partial payment leaves the correct open amount › SS-UC03-08: Partial payment leaves the correct open amount",
+      "commit": "420004bdce44-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:07:26.213Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-150",
+      "file": ".agent/evidence/T-0046/20261108-230726-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/receipts.db.test.ts › SS-PLAT-150: one receipt, many invoices; over-payment credit; undeposited funds › SS-PLAT-150 allocates one receipt across two invoices (Paid + Partially paid) | packages/modules/ar/src/receipts.db.test.ts › SS-PLAT-150: one receipt, many invoices; over-payment credit; undeposited funds › SS-PLAT-150 an over-payment leaves an unallocated credit, allocated to a later invoice | packages/modules/ar/src/receipts.db.test.ts › SS-PLAT-150: one receipt, many invoices; over-payment credit; undeposited funds › SS-PLAT-150 a cheque recorded before banking debits UNDEPOSITED_FUNDS (GP-002 variant)",
+      "commit": "420004bdce44-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:07:26.213Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-151",
+      "file": ".agent/evidence/T-0046/20261108-230726-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/receipts.db.test.ts › SS-PLAT-151: unallocate only by reversal › SS-PLAT-151 appends a reversing allocation; the journal is untouched; status recomputed | packages/modules/ar/src/receipts.db.test.ts › SS-PLAT-151: unallocate only by reversal › SS-PLAT-151 refuses an allocation that is not this receipt’s",
+      "commit": "420004bdce44-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:07:26.213Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-152",
+      "file": ".agent/evidence/T-0046/20261108-230726-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/receipts.db.test.ts › SS-PLAT-152: receipt preview writes nothing › SS-PLAT-152 shows the journal and the allocation plan; the database is unchanged",
+      "commit": "420004bdce44-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:07:26.213Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0046/20261108-230726-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/receipts.db.test.ts › SS-PLAT-153: refused receipts write nothing › SS-PLAT-153 refuses with a clear code and leaves no entry, receipt or allocation",
+      "commit": "420004bdce44-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:07:26.213Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-154",
+      "file": ".agent/evidence/T-0046/20261108-230726-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/receipts.db.test.ts › SS-PLAT-154: idempotent and immutable receipt document › SS-PLAT-154 a repeat with the same key returns the first receipt and writes nothing | packages/modules/ar/src/receipts.db.test.ts › SS-PLAT-154: idempotent and immutable receipt document › SS-PLAT-154 the receipt row never changes and must name its own ar_receipt entry",
+      "commit": "420004bdce44-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:07:26.213Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-08",
+      "file": ".agent/evidence/T-0046/20261108-230747-tests-unit.json",
+      "test": "1 test(s): packages/modules/ar/src/receipt-plan.test.ts › planReceiptAllocations › SS-UC03-08: 375.00 leaves 1,000.00 open, part paid",
+      "commit": "420004bdce44-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:07:47.757Z",
+      "result": "passed"
+    }
+  ]
+}

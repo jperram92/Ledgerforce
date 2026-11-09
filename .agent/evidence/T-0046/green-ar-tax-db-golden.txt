@@ -1,0 +1,12 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-af40189fd0e892912
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42037
+(node:4050) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ Test Files  30 passed (30)
+      Tests  760 passed (760)
+   Start at  23:05:23
+   Duration  23.26s (transform 2.76s, setup 0ms, import 11.74s, tests 44.52s, environment 3ms)
+

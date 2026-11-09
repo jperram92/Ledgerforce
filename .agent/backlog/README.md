@@ -141,7 +141,7 @@ graph LR
 | [T-0043](T-0043.md) | Batch billing run: selection and preview | MVP | todo | T-0040 | UC-02 | 2 |
 | [T-0044](T-0044.md) | Batch billing run: approve, post as one job with per-invoice isolation | MVP | todo | T-0043, T-0042, T-0024 | UC-02 | 5 |
 | [T-0045](T-0045.md) | Customer credit notes | MVP | todo | T-0040, T-0031 | UC-11 | 4 |
-| [T-0046](T-0046.md) | Customer receipts and allocations | MVP | todo | T-0040, T-0031 | UC-03 | 2 |
+| [T-0046](T-0046.md) | Customer receipts and allocations | MVP | review | T-0040, T-0031 | UC-03 | 2 |
 | [T-0047](T-0047.md) | Customer prepayments, deposit invoices and application to final invoice; gst_supply_pattern, single-supply path (GP-012-B/GP-015-B), BAS-prep display — gated on its accounting decision | MVP | todo | T-0046, T-0035, T-0124 | — | 2 |
 | [T-0048](T-0048.md) | Bad debt write-off with GST decreasing adjustment; write-off against the ECL allowance (GP-007-A) | MVP | todo | T-0046, T-0035, T-0121, T-0124 | — | 1 |
 | [T-0049](T-0049.md) | Customer statements and aged receivables | MVP | todo | T-0046 | UC-12 | 1 |
@@ -223,3 +223,4 @@ graph LR
 | [T-0115](T-0115.md) | Nightly posting-profile gap check job | MVP | todo | T-0039 | UC-01 | 0 |
 | [T-0116](T-0116.md) | Sales invoice API routes and Finance-Admin-only auto-approve setting | MVP | todo | T-0040 | UC-01 | 0 |
 | [T-0117](T-0117.md) | SoD rule for sales-invoice approval (creator ≠ approver) — proposal + security ADR | MVP | blocked | T-0040, T-0015 | UC-01 | 0 |
+| [T-0130](T-0130.md) | Bank deposit of undeposited funds (GP-002 variant; follow-up to T-0046, golden proposal first) (est. 250 lines) | MVP | todo | T-0046 | UC-03, UC-08 | 1 |
