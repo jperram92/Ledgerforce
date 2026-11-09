@@ -1,0 +1,5 @@
+# T-0045: writes to ledger tables outside packages/ledger in the files this task added/changed (expect only the harness seed lines, DL-0189)
+packages/db/src/testing/cross-tenant.ts:330:        `INSERT INTO app.journal_line (tenant_id, company_id, entry_id, line_no, account_id, debit,
+packages/db/src/testing/cross-tenant.ts:344:        `UPDATE app.subledger_entry t
+packages/db/src/testing/cross-tenant.ts:458:      `INSERT INTO app.journal_entry (id, tenant_id, company_id, entry_date, source_type, source_id,
+packages/db/src/testing/cross-tenant.ts:465:      `INSERT INTO app.journal_line (tenant_id, company_id, entry_id, line_no, account_id, debit,

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0045",
+  "entries": [
+    {
+      "scenario": "SS-UC11-01",
+      "file": ".agent/evidence/T-0045/20261108-232019-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/credit-note.golden.db.test.ts › T-0045 golden posting GP-005 produced by the credit-note code › SS-UC11-01: Partial credit note posts GP-005",
+      "commit": "af4156354390",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:20:19.745Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-02",
+      "file": ".agent/evidence/T-0045/20261108-232019-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/credit-note.golden.db.test.ts › T-0045 golden posting GP-005 produced by the credit-note code › SS-UC11-02: Credit on a paid invoice is held as customer credit",
+      "commit": "af4156354390",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:20:19.745Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-06",
+      "file": ".agent/evidence/T-0045/20261108-232019-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-UC11-06: Clerk cannot approve own credit note above threshold › SS-UC11-06: the AR Clerk who created a 1,100.00 credit note cannot approve it; another user can | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-UC11-06: Clerk cannot approve own credit note above threshold › SS-UC11-06: the database refuses the self-approval too (last line of defence) | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-UC11-06: Clerk cannot approve own credit note above threshold › SS-UC11-06: at or below the threshold the creator may approve (220.00)",
+      "commit": "af4156354390",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:20:19.745Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-160",
+      "file": ".agent/evidence/T-0045/20261108-232019-tests-db.json",
+      "test": "5 test(s): packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-160: credit-note lifecycle › SS-PLAT-160: draft → approved → posted through the engine; CN- number at post; replay | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-160: credit-note lifecycle › SS-PLAT-160: create is idempotent per key | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-160: credit-note lifecycle › SS-PLAT-160: refuses a draft invoice, a date before the invoice, a foreign invoice line | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-160: credit-note lifecycle › SS-PLAT-160: the creditable amount counts approved and posted credits (CREDIT_EXCEEDS_INVOICE) | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-160: credit-note lifecycle › SS-PLAT-160: posted credit notes and their lines never change; no DELETE",
+      "commit": "af4156354390",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:20:19.745Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0045/20261108-232019-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-161: credit-note lines inherit the invoice line (ADR-0044 W6) › SS-PLAT-161: the invoice post records each line posting; credit lines link to and copy it | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-161: credit-note lines inherit the invoice line (ADR-0044 W6) › SS-PLAT-161: a new GST version after the invoice does not change the credit (never re-resolved) | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-161: credit-note lines inherit the invoice line (ADR-0044 W6) › SS-PLAT-161: creditNoteAdjustmentLines exposes credit line → invoice line for the BAS report",
+      "commit": "af4156354390",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:20:19.745Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-162",
+      "file": ".agent/evidence/T-0045/20261108-232019-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-162: credit open item, allocation and preview › SS-PLAT-162: a posted credit note opens −220.00 and is allocated to the unpaid invoice | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-162: credit open item, allocation and preview › SS-PLAT-162: allocating a draft credit note is refused | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-162: credit open item, allocation and preview › SS-PLAT-162: the preview equals the posted journal and writes nothing",
+      "commit": "af4156354390",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:20:19.745Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-163",
+      "file": ".agent/evidence/T-0045/20261108-232019-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-163: adjustment note and later BAS period › SS-PLAT-163: same quarter → not a later period; next quarter → later period; always an adjustment note | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-163: adjustment note and later BAS period › SS-PLAT-163: monthly and annual BAS frequency | packages/modules/ar/src/credit-note.lifecycle.db.test.ts › SS-PLAT-163: adjustment note and later BAS period › SS-PLAT-163: app.bas_period_start (used by the posting guard) mirrors basPeriodOf",
+      "commit": "af4156354390",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:20:19.745Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-07",
+      "file": ".agent/evidence/T-0045/20261108-232030-tests-unit.json",
+      "test": "1 test(s): packages/modules/ar/src/credit-note-journal.test.ts › checkCreditable › SS-UC11-07: Credit cannot exceed the creditable amount",
+      "commit": "af4156354390",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:20:30.458Z",
+      "result": "passed"
+    }
+  ]
+}

@@ -7,7 +7,7 @@ Playwright screenshot evidence is required.
 - Use-case scenarios `SS-UCnn-mm` are defined in [UC-nn.md](README.md); platform invariants `SS-PLAT-nn` are defined here.
 - Status values: `not-started` → `red` (failing test exists, fails for the right reason) → `green` (passes in CI on the task
   branch) → `evidenced` (merged, evidence linked, verified at the commit shown).
-- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 227 scenarios (25 need screenshots, recounted 2026-11-08 by the lead); SS-PLAT-100..103 added 2026-11-08 (T-0038); SS-PLAT-104..105 added 2026-11-08 (T-0039); SS-UC01-12..14 added 2026-11-08 (T-0065); SS-PLAT-130..134 added 2026-11-08 (T-0121..T-0125, ids 106..129 left for running builders); SS-PLAT-135..139 added 2026-11-08 (T-0123, T-0126, T-0047, T-0048; ADR-0044 re-review DL-0285/DL-0286). SS-PLAT-110..114 added 2026-11-08 (T-0035). SS-PLAT-120..122 added 2026-11-08 (T-0040). SS-UC05-09..10 added 2026-11-08 (T-0050). SS-PLAT-150..155 added 2026-11-08 (T-0046, T-0130).
+- Generated on 2026-10-24; totals recomputed from the rows on 2026-10-26. Totals: 232 scenarios (25 need screenshots, recounted 2026-11-08 by the lead); SS-PLAT-100..103 added 2026-11-08 (T-0038); SS-PLAT-104..105 added 2026-11-08 (T-0039); SS-UC01-12..14 added 2026-11-08 (T-0065); SS-PLAT-130..134 added 2026-11-08 (T-0121..T-0125, ids 106..129 left for running builders); SS-PLAT-135..139 added 2026-11-08 (T-0123, T-0126, T-0047, T-0048; ADR-0044 re-review DL-0285/DL-0286). SS-PLAT-110..114 added 2026-11-08 (T-0035). SS-PLAT-120..122 added 2026-11-08 (T-0040). SS-UC05-09..10 added 2026-11-08 (T-0050). SS-PLAT-150..155 added 2026-11-08 (T-0046, T-0130). SS-PLAT-160..164 added 2026-11-09 (T-0045).
 
 ## How to update (who, when)
 
@@ -113,13 +113,13 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC10-08 | TB review step shows TB nets to zero | UC-10 | MVP | db-integration | no | packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts | T-0078, T-0076, T-0028 | green (TB and subledger = control layers, DL-0206; close checklist wiring T-0078) | [.agent/evidence/T-0076/manifest.json](../../.agent/evidence/T-0076/manifest.json) | fdc062f |
 | SS-UC10-09 | Void posts a reversal, never an edit | UC-10 | MVP | golden | no | packages/ledger/src/golden/gp-019.golden.db.test.ts, packages/ledger/src/reversal.db.test.ts, packages/ledger/src/reversal.prop.db.test.ts | T-0032 | green (2026-11-08: GP-019 Approved reproduced line for line by its own golden test; void rules RQ-0095 Q11 / DL-0270; INV-reversal property; the suite-wide runner keeps GP-019 PENDING via GOLDEN_REQUIRES until T-0032 is done, DL-0256/DL-0272) | [.agent/evidence/T-0032/manifest.json](../../.agent/evidence/T-0032/manifest.json) | — |
 | SS-UC10-10 | Close checklist screen | UC-10 | MVP | e2e-playwright | yes | — | T-0090 | not-started | — | — |
-| SS-UC11-01 | Partial credit note posts GP-005 | UC-11 | MVP | golden | no | — | T-0045 | not-started | — | — |
-| SS-UC11-02 | Credit on a paid invoice is held as customer credit | UC-11 | MVP | db-integration | no | — | T-0045 | not-started | — | — |
+| SS-UC11-01 | Partial credit note posts GP-005 | UC-11 | MVP | golden | no | packages/modules/ar/src/credit-note.golden.db.test.ts | T-0045 | green | [.agent/evidence/T-0045/manifest.json](../../.agent/evidence/T-0045/manifest.json) | af41563 |
+| SS-UC11-02 | Credit on a paid invoice is held as customer credit | UC-11 | MVP | db-integration | no | packages/modules/ar/src/credit-note.golden.db.test.ts | T-0045 | green | [.agent/evidence/T-0045/manifest.json](../../.agent/evidence/T-0045/manifest.json) | af41563 |
 | SS-UC11-03 | Refund via payment batch posts GP-006 | UC-11 | MVP | golden | no | — | T-0055 | not-started | — | — |
 | SS-UC11-04 | Refund via Stripe calls the refund API | UC-11 | MVP | contract | no | — | T-0055, T-0074 | not-started | — | — |
 | SS-UC11-05 | Salesforce shows net amount paid | UC-11 | MVP | contract | no | — | T-0055, T-0110 | not-started | — | — |
-| SS-UC11-06 | Clerk cannot approve own credit note above threshold | UC-11 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts | T-0045, T-0015 | green (SoD layer; credit-note endpoint in T-0045) | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
-| SS-UC11-07 | Credit cannot exceed the creditable amount | UC-11 | MVP | unit | no | — | T-0045 | not-started | — | — |
+| SS-UC11-06 | Clerk cannot approve own credit note above threshold | UC-11 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts, packages/modules/ar/src/credit-note.lifecycle.db.test.ts | T-0045, T-0015 | green | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json), [.agent/evidence/T-0045/manifest.json](../../.agent/evidence/T-0045/manifest.json) | af41563 |
+| SS-UC11-07 | Credit cannot exceed the creditable amount | UC-11 | MVP | unit | no | packages/modules/ar/src/credit-note-journal.test.ts | T-0045 | green | [.agent/evidence/T-0045/manifest.json](../../.agent/evidence/T-0045/manifest.json) | af41563 |
 | SS-UC11-08 | Credit note and refund screens | UC-11 | MVP | e2e-playwright | yes | — | T-0085 | not-started | — | — |
 | SS-UC12-01 | Component renders balance, overdue, last payment, 5 invoices | UC-12 | MVP | unit | no | salesforce/force-app/main/default/lwc/lfAccountSummary/__tests__/lfAccountSummary.test.js (LWC Jest, `pnpm test:lwc` inside `pnpm test`) | T-0072 | green | [.agent/evidence/T-0072/manifest.json](../../.agent/evidence/T-0072/manifest.json) | 6df7df2 |
 | SS-UC12-02 | Mirror fields are read-only for sales users | UC-12 | MVP | contract | no | salesforce/test/package-contract.test.ts (offline); salesforce/force-app/main/default/classes/LFReadOnlyMirrorTest.cls (org, not yet run) | T-0062 | green (metadata part, offline; org deploy needs Dev Hub) | [.agent/evidence/T-0062/manifest.json](../../.agent/evidence/T-0062/manifest.json) | 447b6c3 |
@@ -250,6 +250,11 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-153 | Refused receipts write nothing: NO_ALLOCATION (prepayment path, RQ-0095 Q7), OVER_ALLOCATION, EXCEEDS_RECEIPT, PARTY_MISMATCH, INVOICE_NOT_POSTED, DUPLICATE_INVOICE, INVALID_RECEIPT (card, bad amount), DATE_BEFORE_INVOICE, UNKNOWN_BANK_ACCOUNT | UC-03 | MVP | db-integration | no | packages/modules/ar/src/receipts.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 420004b |
 | SS-PLAT-154 | Receipt idempotency (same key → same receipt, nothing written; different details → IDEMPOTENCY_CONFLICT); app.ar_receipt never changes and must name its own posted ar_receipt entry (database guard, migration 0039) | UC-03 | MVP | db-integration | no | packages/modules/ar/src/receipts.db.test.ts | T-0046 | green | [.agent/evidence/T-0046/manifest.json](../../.agent/evidence/T-0046/manifest.json) | 420004b |
 | SS-PLAT-155 | Bank deposit of undeposited funds posts its Approved golden (Dr bank / Cr UNDEPOSITED_FUNDS, GP-002 variant); each receipt deposited once | UC-03, UC-08 | MVP | golden, db-integration | no | — | T-0130 | not-started | — | — |
+| SS-PLAT-160 | Credit-note lifecycle: draft → approved → posted only through the posting engine (ar_credit_note, key ar_credit_note:<id>, approver on the entry); CN- number at post; replay; idempotent create; refuses an unposted invoice, a date before the invoice, a foreign invoice line, and credit beyond the creditable amount incl. approved/posted credits; posted credit notes and lines immutable, no DELETE | UC-11 | MVP | db-integration | no | packages/modules/ar/src/credit-note.lifecycle.db.test.ts | T-0045 | green | [.agent/evidence/T-0045/manifest.json](../../.agent/evidence/T-0045/manifest.json) | af41563 |
+| SS-PLAT-161 | ADR-0044 W6: the invoice post records each line's account, tax-code version, net and tax; each credit-note line links to the invoice line it adjusts and takes its account and tax-code version (database-enforced), also after a later rate change; creditNoteAdjustmentLines exposes the link for the BAS report | UC-11 | MVP | db-integration | no | packages/modules/ar/src/credit-note.lifecycle.db.test.ts | T-0045 | green | [.agent/evidence/T-0045/manifest.json](../../.agent/evidence/T-0045/manifest.json) | af41563 |
+| SS-PLAT-162 | A posted credit note opens a credit open item on the invoice's AR control account that can be allocated to the invoice; a draft cannot be allocated; the preview equals the posted journal and writes nothing | UC-11 | MVP | db-integration | no | packages/modules/ar/src/credit-note.lifecycle.db.test.ts | T-0045 | green | [.agent/evidence/T-0045/manifest.json](../../.agent/evidence/T-0045/manifest.json) | af41563 |
+| SS-PLAT-163 | Every credit note is issued as an "Adjustment note" with the original invoice number and date, reason and GST difference; later_bas_period follows the company BAS frequency (quarterly default, monthly, annual) and is checked by the database | UC-11 | MVP | db-integration | no | packages/modules/ar/src/credit-note.lifecycle.db.test.ts | T-0045 | green | [.agent/evidence/T-0045/manifest.json](../../.agent/evidence/T-0045/manifest.json) | af41563 |
+| SS-PLAT-164 | BAS: a credit note in a later BAS period than its invoice reports 1B (G1 unchanged) by default; option sales_adjustment_presentation = net_G1_1A nets it into G1/1A | UC-11 | MVP | db-integration | no | — | T-0136 | not-started | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -719,6 +724,26 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-155 — Bank deposit of undeposited funds
 - Phase: MVP · Layer: **golden, db-integration** · Screenshot evidence: no · Task(s): T-0130 (golden proposal first)
 - **Given** cash/cheque receipts on UNDEPOSITED_FUNDS · **When** they are deposited together · **Then** one entry equal to its Approved golden posts (Dr bank / Cr UNDEPOSITED_FUNDS) and each receipt is deposited once
+
+### SS-PLAT-160 — Customer credit note goes draft → approved → posted through the engine
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0045 (RQ-0114, DL-0320)
+- **Given** a posted invoice · **When** a credit note is created, approved by another user and posted · **Then** the engine writes one ar_credit_note entry with the approver, the credit note gets the next CN- number at post, a second post returns the same entry, credits beyond the invoice line or invoice are refused CREDIT_EXCEEDS_INVOICE, and the database refuses any change to a posted credit note or its lines
+
+### SS-PLAT-161 — Credit-note lines inherit the invoice line (ADR-0044 W6)
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0045 (DL-0321)
+- **Given** a posted invoice whose line postings were recorded at post · **When** a credit note adjusts a line, also after GST got a new version · **Then** the credit line stores the invoice line id and that line's account and tax-code version (the database refuses another), the credit's GST uses the invoice's rate, and creditNoteAdjustmentLines returns credit line → invoice line, date and entry
+
+### SS-PLAT-162 — Credit open item, allocation to the invoice, preview
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0045
+- **Given** a posted credit note on an unpaid invoice · **When** it is allocated · **Then** the invoice's open amount falls by the credit and the credit item closes; AR subledger = AR control; a draft cannot be allocated; the preview equals the posted journal and writes nothing
+
+### SS-PLAT-163 — Adjustment note and later BAS period
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0045 (DL-0322, RQ-0095 Q4)
+- **Given** an invoice of 2026-11-05 · **When** credit notes are posted in the same and in a later BAS period under quarterly, monthly and annual frequency · **Then** each is titled "Adjustment note" with the original invoice number and date and the GST difference, and later_bas_period is true exactly for a later period
+
+### SS-PLAT-164 — Later-period credit notes at 1B
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0136
+- **Given** GP-001 on 2026-11-05 and a $200 ex GST credit note on 2027-01-10 (quarterly) · **When** the Jan–Mar BAS is run · **Then** 1B shows 20.00 and G1 is unchanged; with net_G1_1A it shows G1 −220.00 / 1A −20.00
 
 ## T-0112 PR integration regression evidence (2026-10-28)
 

@@ -46,6 +46,7 @@ import {
   buildInvoiceJournal,
   type InvoiceJournalLine,
 } from './invoice-journal.ts';
+import { recordInvoiceLinePostings } from './invoice-line-posting.ts';
 import { NO_NOTIFIER, type InvoiceNotifier } from './notifier.ts';
 
 type Trx = Transaction<Database>;
@@ -286,6 +287,9 @@ export interface BuiltInvoice {
   taxTotal: string;
   total: string;
   residue: string;
+  /** Per invoice line, in order: the resolved journal input (recorded at post, T-0045). */
+  resolvedLines: (InvoiceJournalLine & { lineNo: number })[];
+  rounding: TaxRounding;
 }
 
 /** The posting command of the document (RQ-0104 finding 1). Reads only. */
@@ -296,7 +300,7 @@ async function buildCommand(
 ): Promise<BuiltInvoice> {
   const rounding: TaxRounding = await getTaxRounding(trx, doc.companyId);
   let controlRole: string | undefined;
-  const lines: InvoiceJournalLine[] = [];
+  const lines: (InvoiceJournalLine & { lineNo: number })[] = [];
   for (const l of doc.lines) {
     let resolved;
     try {
@@ -336,6 +340,7 @@ async function buildCommand(
       throw e;
     }
     lines.push({
+      lineNo: l.lineNo,
       // NUMERIC(19,4) text; checkInput admitted at most cents, and the tax engine counts only
       // significant decimals, so "1000.0000" is accepted as 1000.00.
       amount: l.amount,
@@ -380,6 +385,8 @@ async function buildCommand(
     taxTotal: journal.taxTotal,
     total: journal.total,
     residue: journal.residue,
+    resolvedLines: lines,
+    rounding,
   };
 }
 
@@ -513,6 +520,15 @@ async function postLoaded(
       built.command,
       opts.outbox === undefined ? {} : { outbox: opts.outbox },
     );
+    // How each line posted, for credit notes (T-0045, ADR-0044 W6: never re-resolved).
+    await recordInvoiceLinePostings(trx, {
+      companyId: doc.companyId,
+      invoiceId: doc.id,
+      currency: doc.currency,
+      amountsAre: doc.amountsAre,
+      rounding: built.rounding,
+      lines: built.resolvedLines,
+    });
     await sql`
       UPDATE app.sales_invoice
          SET status = 'posted', invoice_no = ${invoiceNo}, posted_by = ${postedBy},

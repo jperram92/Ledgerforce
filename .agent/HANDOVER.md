@@ -283,3 +283,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T23:11:52.279Z claude: checkpoint (commit deferred to conductor): 4/7 — 10,000-document run evidenced twice; CI job; register
 - 2026-11-09T04:02:44.254Z claude: T-0033 → verifying
 - 2026-11-09T04:13:34.768Z claude: release T-0033 → review
+- 2026-11-08T18:33:53.447Z claude: checkpoint (commit deferred to conductor): 1/6 — RQ-0114; credit-note builder, creditable check, BAS period green (unit 11, prop 2)
+- 2026-11-08T23:20:01.100Z claude: checkpoint (commit deferred to conductor): 2/6 — migration 0040, credit-notes.ts, GP-005 golden PASS, lifecycle green; pnpm test:db 83/1253
+- 2026-11-08T23:21:06.653Z claude: T-0045 → verifying
+- 2026-11-09T04:16:27.392Z claude: release T-0045 → review (verify 12 PASS/3 FAIL (known: run.test.ts worktree path, gate 3 mirrors 2a, gate 4 golden guard)/1 PENDING (cross-review); GP-005 PASS via credit-note code; awaiting codex cross-review)
