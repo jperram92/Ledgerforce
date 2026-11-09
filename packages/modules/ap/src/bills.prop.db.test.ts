@@ -7,12 +7,14 @@
  *  open item       the bill's AP open item is −(the AP control credit), dated by the bill
  *  preview = post  previewBill's lines equal what postBill stored
  * Amounts are bigint cents formatted as decimal strings (no floating point).
+ * T-0052 (DL-0330): each bill is submitted and approved (without posting) before postBill.
  */
 import { subledgerEntriesOf, subledgerReconciliation } from '@ledgerforce/ledger';
 import { storedJournal } from '@ledgerforce/ledger/testing';
 import { Money } from '@ledgerforce/shared';
 import fc from 'fast-check';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { approveBill, submitBill } from './bill-approval.ts';
 import { createBill, postBill, previewBill } from './bills.ts';
 import { createBillWorld, type BillWorld } from './testing/bill-world.ts';
 
@@ -66,6 +68,15 @@ describe('bill posting invariants', () => {
             }),
           );
           const p = await w.inTenant((trx) => previewBill(trx, bill.id));
+          await w.inTenant(async (trx) => {
+            await submitBill(trx, { billId: bill.id, submittedBy: w.users.apClerk });
+            const a = await approveBill(trx, {
+              billId: bill.id,
+              approvedBy: w.users.approver,
+              post: false,
+            });
+            if (a.outcome !== 'approved') throw new Error(`approval denied: ${a.rule}`);
+          });
           const r = await w.inTenant((trx) => postBill(trx, bill.id));
           const j = await w.inTenant((trx) => storedJournal(trx, r.entryId));
 

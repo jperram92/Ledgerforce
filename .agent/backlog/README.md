@@ -138,6 +138,7 @@ graph LR
 | [T-0145](T-0145.md) | BAS calculation-worksheet labels: INP sales G4, purchases without GST G14 (follow-up to T-0121 AC-4, DL-0341) (est. 250 lines) | MVP | todo | T-0035, T-0121 | UC-05 | 1 |
 | [T-0135](T-0135.md) | Credit-note API routes: RBAC, @SoD credit_note.create/approve with the small-team exception path (follow-up to T-0045) (est. 250 lines) | MVP | todo | T-0045, T-0015 | UC-11 | 1 |
 | [T-0136](T-0136.md) | BAS: later-period credit notes at 1B with option sales_adjustment_presentation (RQ-0095 Q4; follow-up to T-0035/T-0045) (est. 200 lines) | MVP | todo | T-0035, T-0045 | UC-11 | 1 |
+| [T-0140](T-0140.md) | Bill API routes (submit/approve/reject/send back) and one shared SoD store for API and modules (follow-up to T-0052) (est. 300 lines) | MVP | todo | T-0052 | UC-05 | 0 |
 | [T-0040](T-0040.md) | Sales invoice lifecycle: draft → approve → post | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0015, T-0026, T-0031 | UC-01 | 3 |
 | [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | todo | T-0040 | — | 0 |
 | [T-0042](T-0042.md) | Email delivery (SMTP) via outbox for invoices, statements, reminders, remittances | MVP | todo | T-0041, T-0030, T-0031 | UC-01, UC-02, UC-06 | 3 |
@@ -150,7 +151,7 @@ graph LR
 | [T-0049](T-0049.md) | Customer statements and aged receivables | MVP | todo | T-0046 | UC-12 | 1 |
 | [T-0050](T-0050.md) | Supplier bills entry and suggested coding | MVP | review | T-0039, T-0025, T-0034, T-0028, T-0031 | UC-05 | 3 |
 | [T-0051](T-0051.md) | Bills inbox: inbound email PDF → draft bill | MVP | todo | T-0050 | UC-05 | 1 |
-| [T-0052](T-0052.md) | Bill approval workflow with SoD | MVP | todo | T-0050, T-0015, T-0031 | UC-05 | 4 |
+| [T-0052](T-0052.md) | Bill approval workflow with SoD | MVP | review | T-0050, T-0015, T-0031 | UC-05 | 4 |
 | [T-0053](T-0053.md) | Supplier/employee bank-detail change verification with cooling-off | MVP | review | T-0037, T-0015, T-0013 | UC-06 | 2 |
 | [T-0054](T-0054.md) | Payment batches with maker-checker and step-up release | MVP | todo | T-0052, T-0053, T-0013 | UC-06 | 5 |
 | [T-0055](T-0055.md) | Customer refunds (bank payment batch and Stripe) | MVP | todo | T-0046, T-0045, T-0054, T-0031 | UC-11 | 3 |

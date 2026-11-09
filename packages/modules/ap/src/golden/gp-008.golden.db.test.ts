@@ -8,8 +8,9 @@
  * lines (expectedLines), resolved in the same world (accounts, supplier, and the real
  * effective-dated tax-code ids the bill posts with).
  *
- * Until T-0052 the bill posts from draft with `approvedBy` given (DL-0292); the approver is stored
- * on the journal entry. In approved-only mode (default; CI) a Draft GP-008 would be PENDING.
+ * T-0052 (DL-0330): the AP Clerk submits the bill and the Approver approves it; the approval
+ * posts it (UC-05 step 4) and the approver is stored on the journal entry. In approved-only mode
+ * (default; CI) a Draft GP-008 would be PENDING.
  */
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -27,7 +28,8 @@ import {
 } from '@ledgerforce/ledger/golden';
 import { storedJournal } from '@ledgerforce/ledger/testing';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createBill, postBill } from '../bills.ts';
+import { approveBill, submitBill } from '../bill-approval.ts';
+import { createBill } from '../bills.ts';
 import { createBillWorld, type BillWorld } from '../testing/bill-world.ts';
 
 const REPO = fileURLToPath(new URL('../../../../../', import.meta.url));
@@ -78,9 +80,12 @@ const produceBill: GoldenProducer = async (gp, index) => {
       ],
     }),
   );
-  const r = await w.inTenant((trx) =>
-    postBill(trx, bill.id, { createdBy: w.users.apClerk, approvedBy: w.users.approver }),
+  await w.inTenant((trx) => submitBill(trx, { billId: bill.id, submittedBy: w.users.apClerk }));
+  const a = await w.inTenant((trx) =>
+    approveBill(trx, { billId: bill.id, approvedBy: w.users.approver }),
   );
+  if (a.outcome !== 'approved' || a.posted === null) throw new Error('GP-008 bill not posted');
+  const r = a.posted;
   posted = { billId: bill.id, billNo: bill.billNo, entryId: r.entryId };
   const journal = await w.inTenant((trx) => storedJournal(trx, r.entryId));
   const taxLabel = (id: string | null) =>

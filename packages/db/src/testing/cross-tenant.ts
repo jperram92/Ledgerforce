@@ -153,6 +153,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     kind: () => 'recorded_exception',
   },
   'app.sod_exception_ack': { week_start: () => '2026-10-19' },
+  // Bill approval trail (migration 0041, T-0052): a known action that needs no reason or rule.
+  'app.bill_approval_event': { action: () => 'submit' },
   'app.sod_settings': { report_timezone: () => 'Australia/Sydney' },
   // API tokens (migration 0022): a token-allowed scope, a SHA-256 digest, an expiry within 366
   // days of created_at, which is the database clock (default, and forced for lf_app).

@@ -486,6 +486,30 @@ export interface BillTable {
   journal_entry_id: string | null;
   posted_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
   created_at: Timestamp;
+  /** Approval facts (migration 0041, T-0052): set at submit, cleared when sent back to draft. */
+  submitted_by: ColumnType<string | null, string | null | undefined, string | null>;
+  submitted_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+  /** Gross bill total frozen at submit, NUMERIC(19,4) text (RQ-0116 F1). */
+  approval_amount: ColumnType<string | null, string | null | undefined, string | null>;
+  approved_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+}
+
+/** Bill approval trail (migration 0041, T-0052). Insert-only. */
+export type BillApprovalAction =
+  'submit' | 'approve' | 'approval_denied' | 'reject' | 'return_to_draft';
+export interface BillApprovalEventTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  bill_id: string;
+  action: BillApprovalAction;
+  actor_user_id: string;
+  reason: string | null;
+  /** NUMERIC(19,4) text. */
+  amount: string | null;
+  sod_rule: string | null;
+  sod_exception: Generated<boolean>;
+  occurred_at: Timestamp;
 }
 
 /** Supplier bill line (migration 0038). Changes only while the bill is draft. */
@@ -771,6 +795,7 @@ export interface Database {
   'app.product': ProductTable;
   'app.bill': BillTable;
   'app.bill_line': BillLineTable;
+  'app.bill_approval_event': BillApprovalEventTable;
   'app.party_profile_mapping': PartyProfileMappingTable;
   'app.product_profile_mapping': ProductProfileMappingTable;
   'app.party_role': PartyRoleTable;

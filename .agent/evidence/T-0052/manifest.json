@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0052",
+  "entries": [
+    {
+      "scenario": "SS-UC05-03",
+      "file": ".agent/evidence/T-0052/20261108-230450-tests-db.json",
+      "test": "3 test(s): packages/modules/ap/src/bill.approval.db.test.ts › SS-UC05-03: Coded bill routes to Approver; nothing posts before approval › SS-UC05-03: Coded bill routes to Approver; nothing posts before approval — submit puts it in the approver queue with the gross amount, and no journal exists | packages/modules/ap/src/bill.approval.db.test.ts › SS-UC05-03: Coded bill routes to Approver; nothing posts before approval › a draft or awaiting bill cannot be posted (approved bills only); nothing is written | packages/modules/ap/src/bill.approval.db.test.ts › SS-UC05-03: Coded bill routes to Approver; nothing posts before approval › the database refuses draft → posted and draft → approved directly",
+      "commit": "0e805b8b2128-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:04:50.345Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-05",
+      "file": ".agent/evidence/T-0052/20261108-230450-tests-db.json",
+      "test": "4 test(s): packages/modules/ap/src/bill.approval.db.test.ts › SS-UC05-05: SoD: clerk cannot approve own bill above $1,000 › SS-UC05-05: SoD: clerk cannot approve own bill above $1,000 — denied with SOD_BILL_SELF_APPROVAL, audited, bill unchanged | packages/modules/ap/src/bill.approval.db.test.ts › SS-UC05-05: SoD: clerk cannot approve own bill above $1,000 › routing by amount: at or below the threshold the enterer may approve their own bill | packages/modules/ap/src/bill.approval.db.test.ts › SS-UC05-05: SoD: clerk cannot approve own bill above $1,000 › whoever edits a bill counts as its enterer (RQ-0116 F4) | packages/modules/ap/src/bill.approval.db.test.ts › SS-UC05-05: SoD: clerk cannot approve own bill above $1,000 › the database repeats the check at commit: a direct self-approval above the threshold is refused",
+      "commit": "0e805b8b2128-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:04:50.345Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-06",
+      "file": ".agent/evidence/T-0052/20261108-230450-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/bill.approval.db.test.ts › SS-UC05-06: Small-team mode records a visible exception › SS-UC05-06: Small-team mode records a visible exception — the only user approves their own bill only with a recorded exception on the weekly report | packages/modules/ap/src/bill.approval.db.test.ts › SS-UC05-06: Small-team mode records a visible exception › outside small-team mode the same request is denied (the control is never weakened silently)",
+      "commit": "0e805b8b2128-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:04:50.345Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0052/20261108-230450-tests-db.json",
+      "test": "3 test(s): packages/modules/ap/src/bills.db.test.ts › bill entry › SS-UC05-09: Duplicate supplier invoice — the same supplier invoice number (any formatting) is a warning on entry, not a refusal | packages/modules/ap/src/bills.db.test.ts › preview and post › SS-UC05-09: Duplicate supplier invoice — a duplicate supplier invoice cannot post twice; nothing is written | packages/modules/ap/src/bills.db.test.ts › preview and post › SS-UC05-09: Duplicate supplier invoice — two copies approved before either posted: the second cannot post; nothing is written",
+      "commit": "0e805b8b2128-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:04:50.345Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-10",
+      "file": ".agent/evidence/T-0052/20261108-230450-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/bills.db.test.ts › preview and post › SS-UC05-10: Bill preview — builds the GP-008-shaped journal and writes nothing",
+      "commit": "0e805b8b2128-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:04:50.345Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-02",
+      "file": ".agent/evidence/T-0052/20261108-230450-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/bills.db.test.ts › suggested coding (UC-05 step 2) › SS-UC05-02 (db): suggests the account and tax code the supplier's posted bills used",
+      "commit": "0e805b8b2128-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:04:50.345Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-07",
+      "file": ".agent/evidence/T-0052/20261108-230450-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/bills.db.test.ts › SS-UC05-07: Bill in AP-locked period rejected › a bill dated 2026-10-20 posted without override in an AP-locked October is rejected with PERIOD_LOCKED; nothing is written | packages/modules/ap/src/bills.db.test.ts › SS-UC05-07: Bill in AP-locked period rejected › UC-05 A2: with a recorded override by a holder of period.lock.override the same bill posts",
+      "commit": "0e805b8b2128-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:04:50.345Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-04",
+      "file": ".agent/evidence/T-0052/20261108-230450-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/golden/gp-008.golden.db.test.ts › GP-008 through the bill producer (approved-only) › SS-UC05-04: Approved bill posts GP-008 — journal equals GP-008 line for line, AP open item 2,750.00",
+      "commit": "0e805b8b2128-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-08T23:04:50.345Z",
+      "result": "passed"
+    }
+  ]
+}

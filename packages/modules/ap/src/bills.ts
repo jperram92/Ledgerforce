@@ -6,12 +6,13 @@
  *  suggestBillLineCoding supplier history first, then the product posting profile (DL-0291)
  *  billCommand           the bill as a posting command: validate, resolve, build (pipeline 2–4)
  *  previewBill           the journal the bill would post; writes nothing (design §3.9)
- *  postBill              posts through the posting engine (the only ledger writer) and marks the
- *                        bill posted; the AP_CONTROL line becomes the AP open item (T-0028)
+ *  postBill              posts an APPROVED bill through the posting engine (the only ledger
+ *                        writer) and marks it posted; the AP_CONTROL line becomes the AP open
+ *                        item (T-0028); the bill's approver is the journal entry's approver
  *
  * Every function runs inside the caller's tenant transaction (withTenant). This module never
- * writes a ledger table. Approval/SoD is T-0052: until then a draft or approved bill posts
- * (DL-0292); `approvedBy` is recorded on the bill and the journal entry when given.
+ * writes a ledger table. Submit / approve / reject with SoD are in bill-approval.ts (T-0052;
+ * DL-0292 tightened by DL-0330: only approved bills post).
  */
 import type { Database } from '@ledgerforce/db';
 import {
@@ -240,7 +241,20 @@ export async function createBill(trx: Trx, input: CreateBillInput): Promise<Crea
       }),
     )
     .execute();
+  if (input.enteredBy !== undefined && input.enteredBy !== null) {
+    await recordBillEnter(trx, bill.id, input.enteredBy);
+  }
   return { id: bill.id, billNo, duplicates };
+}
+
+/**
+ * SoD step `bill.enter` (design §6.5 rule 3, ADR-0026): whoever enters or edits a bill is its
+ * enterer for SOD_BILL_SELF_APPROVAL (RQ-0116 F4).
+ */
+export async function recordBillEnter(trx: Trx, billId: string, actorId: string): Promise<void> {
+  await sql`
+    INSERT INTO app.sod_action (subject_type, subject_id, step, actor_user_id)
+    VALUES ('bill', ${billId}, 'bill.enter', ${actorId})`.execute(trx);
 }
 
 /** Lines of the supplier's posted bills, newest bills first (the history suggestCoding reads). */
@@ -537,12 +551,29 @@ async function resolveBill(
   return { command, lines: resolved };
 }
 
-const POSTABLE = new Set(['draft', 'approved']);
+/** Only an approved bill posts (design §6.5 rule 3, UC-05 step 4; DL-0330 tightens DL-0292). */
+const POSTABLE = new Set(['approved']);
+/** A bill not yet posted can be previewed (and is previewed at submit). */
+const PREVIEWABLE = new Set(['draft', 'awaiting_approval', 'approved']);
 
 async function assertPostable(trx: Trx, bill: BillRow): Promise<void> {
   if (!POSTABLE.has(bill.status)) {
+    throw new BillError(
+      'BILL_NOT_POSTABLE',
+      `bill ${bill.bill_no} is ${bill.status}; only an approved bill posts`,
+    );
+  }
+  await assertNotDuplicate(trx, bill);
+}
+
+async function assertPreviewable(trx: Trx, bill: BillRow): Promise<void> {
+  if (!PREVIEWABLE.has(bill.status)) {
     throw new BillError('BILL_NOT_POSTABLE', `bill ${bill.bill_no} is ${bill.status}`);
   }
+  await assertNotDuplicate(trx, bill);
+}
+
+async function assertNotDuplicate(trx: Trx, bill: BillRow): Promise<void> {
   const posted = (
     await findDuplicateBills(trx, {
       companyId: bill.company_id,
@@ -571,9 +602,31 @@ export async function previewBill(
   opts: { createdBy?: string; approvedBy?: string; periodOverride?: { reason: string } } = {},
 ): Promise<BillPreview> {
   const bill = await loadBill(trx, billId, false);
-  await assertPostable(trx, bill);
+  await assertPreviewable(trx, bill);
   const command = await billCommand(trx, billId, opts);
   return { command, entry: await preview(trx, command) };
+}
+
+async function freezeLines(trx: Trx, billId: string, lines: ResolvedBill['lines']): Promise<void> {
+  for (const l of lines) {
+    await trx
+      .updateTable('app.bill_line')
+      .set({ account_id: l.accountId, tax_code: l.taxCode })
+      .where('bill_id', '=', billId)
+      .where('line_no', '=', l.lineNo)
+      .where((eb) => eb.or([eb('account_id', 'is', null), eb('tax_code', 'is', null)]))
+      .execute();
+  }
+}
+
+/**
+ * Write the resolved coding (account, tax code) onto lines coded by product or by the supplier's
+ * default tax code, while the bill is still draft (lines change only in draft, 0038). Called at
+ * submit so the approver approves exactly the coding that will post (T-0052).
+ */
+export async function freezeBillCoding(trx: Trx, billId: string): Promise<void> {
+  const { lines } = await resolveBill(trx, billId, {});
+  await freezeLines(trx, billId, lines);
 }
 
 export interface PostedBill {
@@ -594,7 +647,6 @@ export async function postBill(
   billId: string,
   opts: {
     createdBy?: string;
-    approvedBy?: string;
     periodOverride?: { reason: string };
     outbox?: PostingOutbox;
   } = {},
@@ -615,26 +667,18 @@ export async function postBill(
     };
   }
   await assertPostable(trx, bill);
-  const { command, lines } = await resolveBill(trx, billId, opts);
+  // The approver is the bill's (frozen at approval); the journal entry carries it.
+  const { command, lines } = await resolveBill(trx, billId, {
+    ...(opts.createdBy === undefined ? {} : { createdBy: opts.createdBy }),
+    ...(opts.periodOverride === undefined ? {} : { periodOverride: opts.periodOverride }),
+  });
   const r = await post(trx, command, opts.outbox === undefined ? {} : { outbox: opts.outbox });
-  // Freeze the coding the bill posted with while it is still draft (the supplier history reads it).
-  for (const l of lines) {
-    await trx
-      .updateTable('app.bill_line')
-      .set({ account_id: l.accountId, tax_code: l.taxCode })
-      .where('bill_id', '=', billId)
-      .where('line_no', '=', l.lineNo)
-      .where((eb) => eb.or([eb('account_id', 'is', null), eb('tax_code', 'is', null)]))
-      .execute();
-  }
+  // The coding was frozen at submit (freezeBillCoding, while the bill was draft); this matches
+  // no line then, and keeps the supplier history complete for any line still uncoded.
+  await freezeLines(trx, billId, lines);
   await trx
     .updateTable('app.bill')
-    .set({
-      status: 'posted',
-      journal_entry_id: r.entryId,
-      posted_at: new Date(),
-      approved_by: command.approvedBy ?? null,
-    })
+    .set({ status: 'posted', journal_entry_id: r.entryId, posted_at: new Date() })
     .where('id', '=', billId)
     .execute();
   return {
