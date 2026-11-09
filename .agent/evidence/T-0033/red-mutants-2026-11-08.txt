@@ -1,0 +1,22 @@
+T-0033 RED proof by scratch mutants (2026-11-08, claude). Production code restored afterwards; `git status` showed
+no change to packages/ledger/src/reversal.ts or subledger.ts. Command for each:
+  T0033_MUTANT=<n> LF_INVARIANT_SEED=7 pnpm exec vitest run --project db packages/ledger/src/ledger.invariants.prop.db.test.ts
+(1000 documents, numRuns 100.)
+
+Mutant 1 — reversal.ts: `if (allocated !== undefined && process.env.T0033_MUTANT !== "1")` (void guard off)
+  Error: Property failed after 20 tests  { seed: 7, ... endOnFailure: true }
+  Shrunk 238 time(s)
+  Caused by: AssertionError: expected 'reversed' to be 'VOID_HAS_ALLOCATIONS'
+  Tests 1 failed (1)
+  -> the model predicts the void rule (RQ-0095 Q11); the engine without its guard reversed a partly allocated entry.
+
+Mutant 2 — subledger.ts: over-allocation check skipped when T0033_MUTANT=2
+  Error: Property failed after 12 tests
+  Shrunk 272 time(s)
+  Caused by: error: allocation: 0.0101 over-allocates (open -0.0100 and 0.0100)
+  Tests 1 failed (1)
+  -> the database backstop refuses; the property surfaces it (allocation the model says must be refused in code).
+
+Green on the unmutated code: seed 7, 1000 documents, 100 runs, 63.5 s (150 reversals, 3 reversals refused,
+21 allocations, 89 allocations refused, 5 allocation reversals, 78 refused commands); before the allocation
+pairing bias was raised (later runs: see invariants-*.json).

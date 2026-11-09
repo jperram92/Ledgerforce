@@ -279,3 +279,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T23:24:03.866Z claude: release T-0121 → review (AC-1..AC-5 green; persona PASS; verify only known/flaky failures; awaiting codex cross-review)
 - 2026-11-08T23:06:27.526Z claude: checkpoint (commit deferred to conductor): 5/8 — receipts, allocations, status, GP-002 golden green
 - 2026-11-08T23:37:26.165Z claude: release T-0046 → review (all ACs green; GP-002 PASS; verify known failures only (run.test.ts path artefact, inherited golden guard); awaiting codex cross-review)
+- 2026-11-08T18:31:20.198Z claude: checkpoint (commit deferred to conductor): 3/7 — invariant suite green at 1,000 documents; red proven by mutants
+- 2026-11-08T23:11:52.279Z claude: checkpoint (commit deferred to conductor): 4/7 — 10,000-document run evidenced twice; CI job; register
+- 2026-11-09T04:02:44.254Z claude: T-0033 → verifying
+- 2026-11-09T04:13:34.768Z claude: release T-0033 → review

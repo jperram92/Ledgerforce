@@ -1,0 +1,19 @@
+
+> ledgerforce@0.0.0 test:invariants /home/user/Ledgerforce/.claude/worktrees/agent-a46f2c4d06a391542
+> bash scripts/test/invariants.sh
+
+invariants.sh: 10000 documents, seed random, report /home/user/Ledgerforce/.claude/worktrees/agent-a46f2c4d06a391542/.agent/evidence/T-0033/invariants-10000-20261108-182949.json
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a46f2c4d06a391542
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:40199
+
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Start at  18:29:50
+   Duration  435.83s (transform 299ms, setup 0ms, import 510ms, tests 434.33s, environment 0ms)
+
+
+real	7m17.587s
+user	2m54.864s
+sys	0m15.500s

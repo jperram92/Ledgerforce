@@ -1,0 +1,17 @@
+{
+  "test": "SS-PLAT-11",
+  "seed": 1030103923,
+  "targetDocuments": 10000,
+  "numRuns": 100,
+  "documentsPerRun": 100,
+  "runs": 100,
+  "docs": 10000,
+  "reversals": 1366,
+  "reversalsRefused": 147,
+  "allocations": 1215,
+  "allocationsRefused": 1054,
+  "unallocations": 553,
+  "refused": 774,
+  "passed": true,
+  "durationMs": 512362
+}
