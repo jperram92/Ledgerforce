@@ -2186,3 +2186,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: making the newer Claude branch canonical or selecting the base task by task were offered; owner selected the broader feat family instead. This does not select T-0070 as the sole integration base: other feat branches contain independent work.
 - Guardrails: preserve existing dirty T-0057 verification records; do not overwrite canonical IDs, approved goldens, security approvals or tests. Keep archived source IDs qualified by their source commit until individually mapped. Accounting changes need researched superseding expectations and tests; security and integration gates remain intact. No task is marked done by this decision.
 - ADR: none · Status: accepted
+
+### DL-0309 — Apply the existing OS update policy to Node runtime images
+- Date: 2026-11-10 · By: codex · Task: T-0057 · Category: tooling
+- Decision: shared node-runtime installs available Alpine package updates before dropping privileges, matching the existing web-runtime policy in DL-0248. Keep digest, repositories, non-root user, scanner thresholds and exception list unchanged. Research RQ-0099.
+- Why: CI 42422632802 reports Critical zlib CVE-2026-4738 in API, worker and setup; their pinned base was never updated at build time. This fixes the shipped package set rather than suppressing the finding.
+- Alternatives: new scanner exception rejected; whole base replacement unnecessary if stable package updates clear the finding. Final image scanning remains required.
+- Validation: node runtime contract RED before Dockerfile change (missing patch step), GREEN after. Existing install contract invokes it so standard unit CI executes the regression.
+- ADR: none (existing DL-0248 mechanism; no new dependency or security model) · Status: accepted
