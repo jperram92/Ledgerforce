@@ -290,3 +290,5 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-08T23:03:21.513Z claude: checkpoint (commit deferred to conductor): step 4/7 — submit/approve/reject with SoD, migration 0041, T-0050 tests approve first (green)
 - 2026-11-08T23:20:40.187Z claude: T-0052 → verifying
 - 2026-11-09T04:03:00.375Z claude: release T-0052 → review (All criteria green; verify 12/3/1 with only the known failures (run.test.ts artefact 2a/3, golden diff guard 4); gate 8 needs codex cross-review)
+- 2026-11-09T04:37:32.044Z claude: T-0049 → in_progress
+- 2026-11-09T09:04:12.861Z claude: checkpoint (commit deferred to conductor): 4/7 — ageing, statements, as-at reads green

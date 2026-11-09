@@ -1,0 +1,5 @@
+# T-0049 ledger-table grep 2026-11-09T04:39:27Z
+## new AR files: any SQL reference to ledger tables (expect none)
+(none)
+## writes to ledger tables outside packages/ledger (non-test, non-testing .ts)
+(none)

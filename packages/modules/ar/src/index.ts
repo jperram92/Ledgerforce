@@ -4,3 +4,6 @@ export * from './sales-invoices.ts';
 export * from './receipts.ts';
 export * from './credit-note-journal.ts';
 export * from './credit-notes.ts';
+export * from './ageing.ts';
+export * from './customer-statement.ts';
+export * from './aged-receivables.ts';

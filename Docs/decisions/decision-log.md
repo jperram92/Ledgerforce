@@ -2346,3 +2346,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: design §6.5 rule 3 is about who put the content there; RQ-0116 F4. The fast-check property found a NULL `entered_by` case in the first version of the deferred trigger, fixed with IS NOT DISTINCT FROM.
 - Alternatives: only `entered_by` (rejected: an approver could edit then approve their own figures); DELETE lines on edit (rejected: directive 6, no DELETE grant).
 - ADR: none · Status: accepted
+
+### DL-0360 — Aged receivables: by due date, buckets current/1–30/31–60/61–90/90+, base currency, as at any date
+- Date: 2026-11-09 · By: claude · Task: T-0049 · Category: accounting
+- Decision: Aged AR ages open **debit** items by due date (days overdue = as-at − due date, calendar days; current ≤ 0, then 1–30, 31–60, 61–90, > 90) in base currency, from open amounts reconstructed **as at** the date (items dated ≤ as-at less allocations dated ≤ as-at). The report carries the reconciliation to the AR control account (control balance, unposted FX per DL-0187, difference) from `subledgerReconciliation(asOf)`. This is presentation only: no journal, no ledger write, no accounting-treatment change.
+- Why: T-0049 card (AC-1, "aged AR query by due date"), RQ-0122 findings 1, 3, 4; design §3.3/§8.1. Base currency is what reconciles to the control account.
+- Alternatives: document-date ageing (rejected: card says due date; can be a later option); ageing current open amounts only (rejected: an as-at report must not move when later receipts arrive).
+- ADR: none · Status: accepted
+
+### DL-0361 — Unallocated credits and over-payments are listed apart, not aged; parties in net credit stay on the ageing
+- Date: 2026-11-09 · By: claude · Task: T-0049 · Category: accounting
+- Decision: Open credit items as at the date (unallocated receipts, i.e. over-payments and unapplied cash, and unallocated credit notes) go into a separate `unallocatedCredits` column per party and in total, with the items listed; total = Σ buckets + unallocatedCredits = AR control. A party whose total is negative is flagged `inCredit`; the balance-sheet reclassification of such balances to a liability stays with T-0125 (DL-0280/DL-0283) and is not done here.
+- Why: product-owner instruction for T-0049 ("unallocated credits and over-payments are shown separately"); RQ-0122 finding 2; avoids overlapping T-0125.
+- Alternatives: age credits into buckets as negatives (rejected: hides unapplied cash inside overdue figures); drop parties in credit from the ageing (rejected: total would no longer equal the control account).
+- ADR: none · Status: accepted
+
+### DL-0362 — Customer statement document model: per transaction currency, opening/lines/allocations/closing = party subledger
+- Date: 2026-11-09 · By: claude · Task: T-0049 · Category: architecture
+- Decision: `customerStatement(companyId, partyId, from, to)` returns one section per transaction currency: opening balance (Σ originals before `from`), one line per AR item in the range with debit/credit/running balance and the document number (invoice no, credit-note no, receipt reference), allocations in the range for information, closing balance, the party's subledger as at `to` with a `reconciled` flag, and the party's ageing with unallocated credits. Data only; PDF and email remain T-0041/T-0042. The aged-AR side of SS-UC12-05 is `customerReceivableTotals` (balance due = net, overdue = Σ 1–30…90+); emitting the write-back stays T-0110.
+- Why: RQ-0122 finding 5–6; the card's "statement template" step is the document model because rendering belongs to T-0041.
+- Alternatives: base-currency statements (rejected: a customer is billed and pays in its own currency); render HTML now (rejected: overlaps T-0041).
+- ADR: none · Status: accepted
+
+### DL-0363 — Ledger read API for as-at open items and allocations; no migration for T-0049
+- Date: 2026-11-09 · By: claude · Task: T-0049 · Category: architecture
+- Decision: Add read-only `openItemsAsOf` and `allocationsBetween` to `packages/ledger/src/subledger.ts`; the AR module reads ledger figures only through them (and `subledgerReconciliation`), never through SQL on ledger tables. No migration (0043 not used): every figure is a read of existing tables (0028, 0037, 0039, 0040). Test files follow the repo convention `aged-ar.db.test.ts` / `aged-ar.prop.db.test.ts` instead of the card's `aged-ar.spec.ts`.
+- Why: packages/ledger/AGENTS.md (ledger tables are the ledger's); RQ-0122 findings 3 and 7; Docs/process/tdd.md naming.
+- Alternatives: SQL on subledger_entry inside the AR module (rejected: ownership rule); a reporting view via migration (rejected: not needed, adds a schema change).
+- ADR: none · Status: accepted

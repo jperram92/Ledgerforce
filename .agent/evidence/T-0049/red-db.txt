@@ -1,0 +1,20 @@
+ FAIL  |db| packages/modules/ar/src/aged-ar.db.test.ts [ packages/modules/ar/src/aged-ar.db.test.ts ]
+Error: Cannot find module './aged-receivables.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-afabac2c5a164fabe/packages/modules/ar/src/aged-ar.db.test.ts
+     24|   AgedReceivablesError,
+ FAIL  |db| packages/modules/ar/src/aged-ar.prop.db.test.ts [ packages/modules/ar/src/aged-ar.prop.db.test.ts ]
+Error: Cannot find module './ageing.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-afabac2c5a164fabe/packages/modules/ar/src/aged-ar.prop.db.test.ts
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |db| packages/ledger/src/subledger.asof.db.test.ts > openItemsAsOf > excludes items dated after the date and applies allocations dated on or before it
+TypeError: openItemsAsOf is not a function
+ FAIL  |db| packages/ledger/src/subledger.asof.db.test.ts > openItemsAsOf > adds a reversal back from its own date; today equals the stored open amounts
+TypeError: openItemsAsOf is not a function
+ FAIL  |db| packages/ledger/src/subledger.asof.db.test.ts > openItemsAsOf > filters by role and party; the base sum equals the reconciliation as at the date
+TypeError: openItemsAsOf is not a function
+ FAIL  |db| packages/ledger/src/subledger.asof.db.test.ts > openItemsAsOf > refuses a malformed date
+AssertionError: expected TypeError: (0 , __vite_ssr_import_4__.ope… to be an instance of AllocationError
+    211|     expect(e).toBeInstanceOf(AllocationError);
+    212|     expect((e as AllocationError).code).toBe('INVALID_COMMAND');
+ FAIL  |db| packages/ledger/src/subledger.asof.db.test.ts > allocationsBetween > lists allocations dated in the range with party and role, reversals as negative rows
+TypeError: allocationsBetween is not a function
+ Test Files  3 failed (3)
+      Tests  5 failed (5)
