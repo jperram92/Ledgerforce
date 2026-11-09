@@ -4,10 +4,10 @@
   "branch": "feat/T-0033-invariant-suite",
   "step": "4/7 — 10,000-document run evidenced twice; CI job; register",
   "claimed_by": "claude",
-  "lease_expires_at": "2026-11-08T23:56:52.276Z",
+  "lease_expires_at": "2026-11-09T04:47:44.246Z",
   "last_green_commit": "e8c35fd92f09476f6caa048fbd69add1f053f075",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-08T23:11:52.277Z",
+  "updated_at": "2026-11-09T04:02:44.254Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
