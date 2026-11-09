@@ -53,12 +53,24 @@ describe(`SS-PLAT-12 golden postings — file layer (${mode})`, () => {
       .map((gp) => ({ id: gp.id, g: gate(gp) }))
       .filter((x) => x.g !== null)
       .map((x) => `${x.id}:${x.g?.kind ?? ''}`);
-    for (const g of gated) expect(g).toMatch(/^GP-\d{3}:(out_of_phase|requires)$/);
+    for (const g of gated) expect(g).toMatch(/^GP-\d{3}(?:-[A-Z])?:(out_of_phase|requires)$/);
     // Every MVP entry other than those with a `requires` marker is enforced.
     for (const gp of postings) {
       if (phaseOf(gp) === 'MVP' && GOLDEN_REQUIRES[gp.id] === undefined) {
         expect(gate(gp), gp.id).toBeNull();
       }
     }
+  });
+
+  it('T-0124: GP-012-B/GP-015-B wait for T-0047 (GST_ATTRIBUTED_UNBILLED, ADR-0045); GP-007-A is enforced', () => {
+    for (const id of ['GP-012-B', 'GP-015-B']) {
+      expect(GOLDEN_REQUIRES[id]?.task, id).toBe('T-0047');
+      expect(GOLDEN_REQUIRES[id]?.why, id).toMatch(/GST_ATTRIBUTED_UNBILLED/);
+      // RC-2 (DL-0386): the attribution tax code is part of the missing capability.
+      expect(GOLDEN_REQUIRES[id]?.why, id).toMatch(/tax code GST-UB/);
+    }
+    expect(GOLDEN_REQUIRES['GP-007-A']).toBeUndefined();
+    const a = postings.find((p) => p.id === 'GP-007-A');
+    expect(a && phaseOf(a)).toBe('MVP');
   });
 });

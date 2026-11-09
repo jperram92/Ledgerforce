@@ -298,3 +298,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-09T09:04:12.861Z claude: checkpoint (commit deferred to conductor): 4/7 — ageing, statements, as-at reads green
 - 2026-11-09T09:05:03.993Z claude: T-0049 → verifying
 - 2026-11-09T09:17:18.135Z claude: release T-0049 → review (built by claude; verify 11/4/1 with only known failures (run.test.ts, golden diff guard) and a load-only coverage timeout in an untouched test; awaiting codex cross-review)
+- 2026-11-09T04:38:48.097Z claude: checkpoint: 2/7 — Drafts proposed; runner draft mode GP-007-A PASS
+- 2026-11-09T09:04:22.769Z claude: release T-0124 → verifying (awaiting persona re-review + delegated approval (DL-0282))
+- 2026-11-09T09:29:10.710Z claude: release T-0124 → review (RC-1..RC-5 applied; new entries approved and ADR-0045 accepted under DL-0282 after persona re-review DL-0386 (DL-0387); verify 12/3/1 with only known failures (run.test.ts 2a/3, golden diff guard 4); gate 8 needs codex cross-review)

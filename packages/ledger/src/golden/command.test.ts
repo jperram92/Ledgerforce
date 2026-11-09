@@ -58,6 +58,32 @@ const world: GoldenWorld = {
 };
 
 describe('SS-PLAT-12 command mapping', () => {
+  it('posts each of several journals on the date in its label, else on the scenario date [T-0124]', () => {
+    const two = only(`## GP-951 — Dated journals
+- **Status: Draft** · Phase: MVP · Source type: \`manual_journal\` + \`ar.write_off\` · Design: §3.8
+- **Scenario:** INV-1 dated 2026-11-05.
+
+**A1 — recognised 2027-06-30**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_CONTROL | 1200 | 5.00 | | — | Acme |
+| 2 | tax:GST.collected | 2310 | | 5.00 | — | — |
+| | **Total** | | **5.00** | **5.00** | | |
+
+**A2 — undated**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | tax:GST.collected | 2310 | 5.00 | | — | — |
+| 2 | system:AR_CONTROL | 1200 | | 5.00 | — | Acme |
+| | **Total** | | **5.00** | **5.00** | | |
+`);
+    const at = (i: number) => goldenCommand(two, i, world, { idempotencyKey: `k${String(i)}` });
+    expect([at(0).entryDate, at(1).entryDate]).toEqual(['2027-06-30', '2026-11-05']);
+    expect([at(0).sourceType, at(1).sourceType]).toEqual(['manual_journal', 'ar_write_off']);
+  });
+
   it('maps a golden journal to a raw command with exact 4-decimal amounts', () => {
     const cmd = goldenCommand(INVOICE, 0, world, { idempotencyKey: 'golden:GP-950:0' });
     expect(cmd).toEqual({

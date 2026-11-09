@@ -1,0 +1,10 @@
+ ✓ |db| packages/ledger/src/golden/golden-postings.golden.db.test.ts > SS-PLAT-12 golden postings — engine layer (approved-only) > GP-007-A [APPROVED] engine output equals the golden line for line — Bad debt write-off against an ECL a
+ ✓ |db| packages/ledger/src/golden/golden-postings.golden.db.test.ts > SS-PLAT-12 golden postings — engine layer (approved-only) > GP-012-B [APPROVED] PENDING — requires T-0047 (single-supply path: system role GST_ATTRIBUTED_UNBILLED,
+ ✓ |db| packages/ledger/src/golden/golden-postings.golden.db.test.ts > SS-PLAT-12 golden postings — engine layer (approved-only) > GP-015-B [APPROVED] PENDING — requires T-0047 (single-supply path: system role GST_ATTRIBUTED_UNBILLED,
+ ✓ |db| packages/ledger/src/golden/golden-runner.db.test.ts > golden world on chart v2 (T-0121 1290, T-0124 GP-007-A) > resolves setting:ar.ecl_allowance_account to chart v2 1290; the default v1 world refuses it 1ms
+ ✓ |db| packages/ledger/src/golden/golden-runner.db.test.ts > golden world on chart v2 (T-0121 1290, T-0124 GP-007-A) > keeps every v1 binding on the same account code in the v2 world 1ms
+ ✓ |db| packages/ledger/src/golden/golden-runner.db.test.ts > golden world on chart v2 (T-0121 1290, T-0124 GP-007-A) > posts a dated two-journal entry (allowance, then write-off against it) line for line 67ms
+[golden approved-only] golden postings: 15 passed, 0 failed, 8 PENDING (GP-010, GP-011, GP-016, GP-017, GP-019, GP-020, GP-012-B, GP-015-B)
+GP-012-B [APPROVED] PENDING — requires T-0047 (single-supply path: system role GST_ATTRIBUTED_UNBILLED, tax code GST-UB with its accruals-only BAS rows, and gst_supply_pattern (ADR-0045, T-0035) do not exist yet), which is not done (statu
+GP-015-B [APPROVED] PENDING — requires T-0047 (single-supply path: system role GST_ATTRIBUTED_UNBILLED, tax code GST-UB with its accruals-only BAS rows, and gst_supply_pattern (ADR-0045, T-0035) do not exist yet), which is not done (statu
+      Tests  31 passed (31)

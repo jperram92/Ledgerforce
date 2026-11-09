@@ -7,7 +7,7 @@
  */
 import { createDb, withTenant, type Database } from '@ledgerforce/db';
 import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
-import { auServicesSmb, loadChartTemplate } from '@ledgerforce/gl';
+import { auServicesSmb, loadChartTemplate, type ChartTemplate } from '@ledgerforce/gl';
 import { sql, type Kysely, type Transaction } from 'kysely';
 import { randomUUID } from 'node:crypto';
 import { dimensionSetId } from '../dimension-set.ts';
@@ -69,7 +69,16 @@ export interface LedgerFixture {
   close(): Promise<void>;
 }
 
-export async function createLedgerFixture(tenantId: string): Promise<LedgerFixture> {
+export interface LedgerFixtureOptions {
+  /** Chart template for every company of the fixture. Default: AU services SMB v1 (T-0018). */
+  template?: ChartTemplate;
+}
+
+export async function createLedgerFixture(
+  tenantId: string,
+  opts: LedgerFixtureOptions = {},
+): Promise<LedgerFixture> {
+  const template = opts.template ?? auServicesSmb;
   const tdb = await createTestDatabase({ migrate: true });
   const db = createDb(tdb.url('lf_app'), 4);
   const inTenant = <R>(fn: (trx: Transaction<Database>) => Promise<R>) =>
@@ -89,8 +98,8 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
       .returning('id')
       .execute();
     if (!c1 || !c2) throw new Error('fixture: company seed failed');
-    const main = await loadChartTemplate(trx, c1.id, auServicesSmb);
-    const other = await loadChartTemplate(trx, c2.id, auServicesSmb);
+    const main = await loadChartTemplate(trx, c1.id, template);
+    const other = await loadChartTemplate(trx, c2.id, template);
     await generateFiscalYear(trx, { companyId: c1.id, convention: 'AU', startYear: 2026 });
     await generateFiscalYear(trx, { companyId: c2.id, convention: 'AU', startYear: 2026 });
     return {
@@ -115,7 +124,7 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
         .values({ name, base_currency: 'AUD' })
         .returning('id')
         .executeTakeFirstOrThrow();
-      const chart = await loadChartTemplate(trx, c.id, auServicesSmb);
+      const chart = await loadChartTemplate(trx, c.id, template);
       await generateFiscalYear(trx, { companyId: c.id, convention: 'AU', startYear: 2026 });
       charts.set(c.id, {
         acct: Object.fromEntries(chart.accounts),

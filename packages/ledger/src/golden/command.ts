@@ -114,7 +114,8 @@ export function goldenCommand(
   opts: GoldenCommandOptions,
 ): PostingCommand {
   const j = journalOf(gp, index);
-  const entryDate = gp.entryDate ?? opts.defaultDate;
+  // A journal dated in its own label (GP-007-A A1/A2, T-0124) posts on that date.
+  const entryDate = j.date ?? gp.entryDate ?? opts.defaultDate;
   if (entryDate === undefined) {
     throw new GoldenMappingError(
       `${where(gp, index)}: the scenario states no date and no default was given`,

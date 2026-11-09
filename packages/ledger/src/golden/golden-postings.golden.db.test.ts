@@ -32,7 +32,9 @@ let g: GoldenFixture;
 
 beforeAll(async () => {
   // postings: a reversal golden (GP-019) posts the entry it reverses first (T-0032).
-  g = await createGoldenWorld('01900000-0000-7000-8000-000000003101', { postings });
+  // chart v2 (T-0121): GP-007-A needs 1290; every v1 binding keeps its code on v2 (golden-runner
+  // db test "keeps every v1 binding on the same account code"), so GP-001…GP-020 are unaffected.
+  g = await createGoldenWorld('01900000-0000-7000-8000-000000003101', { postings, chart: 'v2' });
 });
 
 afterAll(async () => {

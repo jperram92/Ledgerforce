@@ -165,6 +165,16 @@ describe('SS-PLAT-12 parser: GP sections', () => {
     expect(gp?.approval).toBe('JP, 2026-11-10');
   });
 
+  it('reads the delegated approval status of a re-reviewed entry with its full note [T-0124]', () => {
+    const note =
+      'owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09';
+    const [gp] = parseGoldenPostings(
+      entry(GP_A.replace('**Status: Draft**', `**Status: Approved (${note})**`)),
+    );
+    expect(gp?.status).toBe('Approved');
+    expect(gp?.approval).toBe(note);
+  });
+
   it('treats a proposal status "Draft (proposed by claude, T-0099)" as Draft', () => {
     const md = entry(
       GP_A.replace('**Status: Draft**', '**Status: Draft (proposed by claude, T-0099)**'),
@@ -226,17 +236,67 @@ describe('SS-PLAT-12 parser: GP sections', () => {
   it('refuses a duplicate GP id', () => {
     expect(() => parseGoldenPostings(entry(GP_A + '\n' + GP_A))).toThrow(/duplicate GP-901/);
   });
+
+  it('reads a variant id GP-NNN-X (a superseding Draft beside an Approved entry) [T-0124]', () => {
+    const md = entry(GP_A + '\n' + GP_A.replace('## GP-901 —', '## GP-901-A —'));
+    expect(parseGoldenPostings(md).map((p) => p.id)).toEqual(['GP-901', 'GP-901-A']);
+    // Only one capital letter: anything else is not a GP heading and is never half-read as one.
+    const odd = entry(GP_A.replace('## GP-901 —', '## GP-901-ab —'));
+    expect(parseGoldenPostings(odd)).toEqual([]);
+    expect(() =>
+      parseGoldenPostings(entry(GP_A.replace('## GP-901 —', '## GP-901-A —').repeat(2))),
+    ).toThrow(/duplicate GP-901-A/);
+  });
+
+  it('dates each journal from the first date in its label, else from the scenario [T-0124]', () => {
+    const two = `## GP-903 — Two dated journals
+
+- **Status: Draft** · Phase: MVP · Source type: \`manual_journal\` + \`ar.write_off\` · Design: §3.8
+- **Scenario:** INV-1 dated 2026-11-05.
+
+**A1 — allowance recognised 2027-06-30**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | setting:ar.bad_debt_account | 6500 | 5.00 | | — | — |
+| 2 | setting:ar.ecl_allowance_account | 1290 | | 5.00 | — | — |
+| | **Total** | | **5.00** | **5.00** | | |
+
+**A2 — write-off**
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | setting:ar.ecl_allowance_account | 1290 | 5.00 | | — | Acme |
+| 2 | system:AR_CONTROL | 1200 | | 5.00 | — | Acme |
+| | **Total** | | **5.00** | **5.00** | | |
+`;
+    const [gp] = parseGoldenPostings(entry(two));
+    expect(gp?.entryDate).toBe('2026-11-05');
+    expect(gp?.journals.map((j) => j.date)).toEqual(['2027-06-30', null]);
+    // A single table's label is prose: it never dates the journal.
+    const [one] = parseGoldenPostings(
+      entry(GP_A.replace('| # | Account', '**Lines on 2030-01-01**\n\n| # | Account')),
+    );
+    expect(one?.journals[0]?.date).toBeNull();
+  });
 });
 
 describe('SS-PLAT-12 parser: the real Docs/accounting/postings.md', () => {
   const md = readFileSync(POSTINGS, 'utf8');
   const postings = parseGoldenPostings(md);
 
-  it('reads every entry of the index, GP-001 … GP-020, with at least one journal each', () => {
+  it('reads every entry of the index, GP-001 … GP-020 and the T-0124 variants, with at least one journal each', () => {
     const ids = postings.map((p) => p.id);
-    expect(ids).toEqual(
-      Array.from({ length: 20 }, (_, i) => `GP-${String(i + 1).padStart(3, '0')}`),
-    );
+    expect(ids).toEqual([
+      ...Array.from({ length: 20 }, (_, i) => `GP-${String(i + 1).padStart(3, '0')}`),
+      // T-0124: superseding variants appended after GP-020 (never inside an Approved entry).
+      'GP-007-A',
+      'GP-012-B',
+      'GP-015-B',
+    ]);
+    // Every index row names a parsed entry and every entry has an index row.
+    const indexIds = [...md.matchAll(/^\| (GP-\d{3}(?:-[A-Z])?) \|/gm)].map((m) => m[1]);
+    expect(indexIds).toEqual(ids);
     for (const p of postings) {
       expect(p.journals.length, p.id).toBeGreaterThan(0);
       expect(p.sourceTypes.length, p.id).toBeGreaterThan(0);
@@ -249,7 +309,10 @@ describe('SS-PLAT-12 parser: the real Docs/accounting/postings.md', () => {
 
   it('agrees with the index table on every status (Draft or Approved, never anything else)', () => {
     const index = new Map(
-      [...md.matchAll(/^\| (GP-\d{3}) \|.*\| ([^|]+?) \|\s*$/gm)].map((m) => [m[1], m[2]?.trim()]),
+      [...md.matchAll(/^\| (GP-\d{3}(?:-[A-Z])?) \|.*\| ([^|]+?) \|\s*$/gm)].map((m) => [
+        m[1],
+        m[2]?.trim(),
+      ]),
     );
     for (const p of postings) {
       expect(['Draft', 'Approved'], p.id).toContain(p.status);
@@ -258,6 +321,57 @@ describe('SS-PLAT-12 parser: the real Docs/accounting/postings.md', () => {
         `${p.id} index says ${String(index.get(p.id))}`,
       ).toBe(true);
     }
+  });
+
+  it('reads the T-0124 entries: delegated approval (DL-0282/DL-0386), journals, per-journal dates and source types [T-0124]', () => {
+    const by = (id: string) => postings.find((p) => p.id === id);
+    const delegated =
+      'owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09';
+    for (const id of ['GP-007-A', 'GP-012-B', 'GP-015-B']) {
+      expect(by(id)?.status, id).toBe('Approved');
+      expect(by(id)?.approval, id).toBe(delegated);
+    }
+    // E-001…E-004 are not journals: their status lines and index rows carry the same approval.
+    for (const e of ['E-001', 'E-002', 'E-003', 'E-004']) {
+      expect(md, e).toMatch(new RegExp(`^\\| ${e} \\|.*\\| Approved \\|\\s*$`, 'm'));
+    }
+    expect(
+      md.match(new RegExp(`\\*\\*Status: Approved \\(${delegated}\\)\\*\\*`, 'g')),
+    ).toHaveLength(7);
+    for (let i = 1; i <= 20; i++) {
+      const id = `GP-${String(i).padStart(3, '0')}`;
+      expect(by(id)?.status, id).toBe('Approved');
+    }
+    const a = by('GP-007-A');
+    // RC-1 (persona re-review DL-0386): gross allowance A1 1,375.00 and the A4 remeasurement.
+    expect(a?.sourceTypes).toEqual([
+      'manual_journal',
+      'ar.write_off',
+      'ar.write_off',
+      'manual_journal',
+    ]);
+    expect(a?.journals.map((j) => j.date)).toEqual([
+      '2027-06-30',
+      '2027-12-01',
+      '2027-12-01',
+      '2027-12-31',
+    ]);
+    expect(a?.journals.map((j) => j.total.debit)).toEqual([
+      '1375.00',
+      '1375.00',
+      '1375.00',
+      '125.00',
+    ]);
+    // RC-2: GP-012-B line 2 carries the attribution code GST-UB.
+    expect(by('GP-012-B')?.journals[0]?.lines[1]?.tax).toEqual({
+      codes: ['GST-UB'],
+      amount: '700.00',
+      note: null,
+    });
+    expect(by('GP-012-B')?.sourceTypes).toEqual(['ar.prepayment']);
+    expect(by('GP-012-B')?.entryDate).toBe('2026-11-10');
+    expect(by('GP-015-B')?.sourceTypes).toEqual(['ar.invoice']);
+    expect(by('GP-015-B')?.entryDate).toBe('2026-12-15');
   });
 
   it('reads the original a reversal golden reverses from its Source type (GP-019 → GP-001) [T-0032]', () => {

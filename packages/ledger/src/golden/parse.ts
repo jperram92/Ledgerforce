@@ -54,6 +54,11 @@ export interface GoldenLine {
 export interface GoldenJournal {
   /** The bold label above the table ("Journal 13a — final invoice"), or null for the only one. */
   readonly label: string | null;
+  /**
+   * The first YYYY-MM-DD in the label of one of several journals ("A1 — … 2027-06-30"), else null;
+   * the journal is then dated by the scenario (GoldenPosting.entryDate) (T-0124).
+   */
+  readonly date: string | null;
   readonly lines: readonly GoldenLine[];
   readonly total: { readonly debit: string; readonly credit: string };
 }
@@ -137,7 +142,8 @@ export function parseTaxCell(cell: string): TaxCell {
   return { codes, amount, note: m[3]?.trim() ?? null };
 }
 
-const HEADING_RE = /^## (GP-\d{3}) — (.+)$/;
+/** `GP-NNN`, or a variant `GP-NNN-X` that sits beside an Approved entry (T-0124). */
+const HEADING_RE = /^## (GP-\d{3}(?:-[A-Z])?) — (.+)$/;
 const TABLE_HEADER_RE =
   /^\|\s*#\s*\|\s*Account\s*\|\s*Ref\s*\|\s*Debit\s*\|\s*Credit\s*\|\s*Tax code\s*\|\s*Party\s*\|\s*$/;
 const LABEL_RE = /^\*\*(.+?)\*\*/;
@@ -237,13 +243,18 @@ function parseSection(id: string, title: string, body: readonly string[]): Golde
     }
     if (!total) err(`journal ${label ?? '(unlabelled)'} has no **Total** row`);
     if (lines.length < 2) err(`journal ${label ?? '(unlabelled)'} has fewer than two lines`);
-    journals.push({ label, lines, total: total ?? { debit: '', credit: '' } });
+    journals.push({
+      label,
+      date: label === null ? null : (DATE_RE.exec(label)?.[1] ?? null),
+      lines,
+      total: total ?? { debit: '', credit: '' },
+    });
     label = null;
   }
   if (journals.length === 0) err('no journal table');
   if (journals.length === 1 && journals[0]) {
     // A single table's label (if any) is prose, not a journal name.
-    journals[0] = { ...journals[0], label: null };
+    journals[0] = { ...journals[0], label: null, date: null };
   }
   return {
     id,
