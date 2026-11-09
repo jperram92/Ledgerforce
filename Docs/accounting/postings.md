@@ -60,7 +60,7 @@
 
 ### Reference chart v2 — T-0018 / T-0121 codes (E-001)
 
-- **Status: Draft (proposed by claude, T-0124)** · **Proposes to supersede** the *Reference chart (AU services SMB
+- **Status: Approved (owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09)** · **Proposes to supersede** the *Reference chart (AU services SMB
   template — illustrative codes)* table above, which is retained unchanged. Review: DL-0280 MINOR "postings.md
   reference chart", DL-0283.
 - The illustrative codes above collide with different accounts in the real AU template (T-0018 v1, T-0121 v2). Tests
@@ -128,13 +128,13 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 | GP-018 | Rounding — per-line vs per-document GST (§3.4) | MVP | UC-01 | Approved |
 | GP-019 | Reversal (void) of a posted sales invoice (§3.3, principle 2) | MVP | UC-10 | Approved |
 | GP-020 | Pay run settled by provider debit — PAYROLL_CLEARING (§3.2, §3.8; RQ-0095 Q5) | Phase 1 | UC-07 | Approved |
-| GP-007-A | Bad debt write-off against an ECL allowance — AASB 9 variant (§3.8; supersedes GP-007 in part) | MVP | — | Draft |
-| GP-012-B | Uninvoiced part payment, single (non-Div 156) supply, accruals (§3.8; supersedes GP-012 in part; ADR-0045) | MVP | UC-09 | Draft |
-| GP-015-B | Final invoice after GP-012-B, single supply (§4.3; supersedes GP-015 in part; ADR-0045) | MVP | UC-09 | Draft |
-| E-001 | Reference chart v2 codes (header; proposes to supersede the illustrative table) | — | — | Draft |
-| E-002 | GP-020 erratum: PAYROLL_CLEARING is 2350 (supersedes GP-020 in part) | Phase 1 | UC-07 | Draft |
-| E-003 | GP-010/011/020 payday and Payday Super due date (supersedes GP-010 in part) | Phase 1 | UC-07 | Draft |
-| E-004 | GP-018b revenue presentation note (complements GP-018) | MVP | UC-01 | Draft |
+| GP-007-A | Bad debt write-off against an ECL allowance — AASB 9 variant (§3.8; supersedes GP-007 in part) | MVP | — | Approved |
+| GP-012-B | Uninvoiced part payment, single (non-Div 156) supply, accruals (§3.8; supersedes GP-012 in part; ADR-0045) | MVP | UC-09 | Approved |
+| GP-015-B | Final invoice after GP-012-B, single supply (§4.3; supersedes GP-015 in part; ADR-0045) | MVP | UC-09 | Approved |
+| E-001 | Reference chart v2 codes (header; proposes to supersede the illustrative table) | — | — | Approved |
+| E-002 | GP-020 erratum: PAYROLL_CLEARING is 2350 (supersedes GP-020 in part) | Phase 1 | UC-07 | Approved |
+| E-003 | GP-010/011/020 payday and Payday Super due date (supersedes GP-010 in part) | Phase 1 | UC-07 | Approved |
+| E-004 | GP-018b revenue presentation note (complements GP-018) | MVP | UC-01 | Approved |
 
 ---
 
@@ -616,7 +616,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 
 ## GP-007-A — Bad debt write-off against an ECL allowance (AASB 9 variant of GP-007)
 
-- **Status: Draft (proposed by claude, T-0124)** · Phase: MVP · Source type: `manual_journal` + `ar.write_off` + `ar.write_off` + `manual_journal` · Use cases: — (AR) · Design: §3.8 row 5 · Review: DL-0280 MAJOR 2, DL-0283, DL-0286 (M6)
+- **Status: Approved (owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09)** · Phase: MVP · Source type: `manual_journal` + `ar.write_off` + `ar.write_off` + `manual_journal` · Use cases: — (AR) · Design: §3.8 row 5 · Review: DL-0280 MAJOR 2, DL-0283, DL-0286 (M6)
 - **Variant of GP-007 (complements; GP-007 unchanged):** adds the allowance path beside GP-007. GP-007 stays valid for
   **direct write-off** (no allowance held — many non-reporting SMBs). This entry covers an entity that applies the
   AASB 9 simplified expected-credit-loss approach to trade receivables (AASB 9 ¶5.5.15) and writes off against the
@@ -703,7 +703,7 @@ In practice A4 is part of the next period-end remeasurement of the whole allowan
 
 ## GP-012-B — Uninvoiced part payment for a single (non-Div 156) supply, accruals basis (variant beside GP-012)
 
-- **Status: Draft (proposed by claude, T-0124)** · Phase: MVP · Source type: `ar.prepayment` · Use cases: UC-09 · Design: §3.8 row 10 · Review: DL-0280 MAJOR 1, DL-0283, DL-0286 (M6) · Decision: ADR-0045
+- **Status: Approved (owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09)** · Phase: MVP · Source type: `ar.prepayment` · Use cases: UC-09 · Design: §3.8 row 10 · Review: DL-0280 MAJOR 1, DL-0283, DL-0286 (M6) · Decision: ADR-0045
 - **Variant of GP-012; supersedes only GP-012's *Residual risk* note:** for receipts classified
   `gst_supply_pattern = single_supply`. GP-012, GP-013,
   GP-014 and GP-015 stay valid, unchanged, for `progressive_div156` (milestone or periodic services)
@@ -743,7 +743,7 @@ In practice A4 is part of the next period-end remeasurement of the whole allowan
 
 ## GP-015-B — Final invoice after GP-012-B (single supply, accruals basis)
 
-- **Status: Draft (proposed by claude, T-0124)** · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-09 · Design: §4.3 · Review: DL-0280 MAJOR 1, DL-0283, DL-0286 (M6) · Decision: ADR-0045
+- **Status: Approved (owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09)** · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-09 · Design: §4.3 · Review: DL-0280 MAJOR 1, DL-0283, DL-0286 (M6) · Decision: ADR-0045
 - **Variant of GP-015 (GP-013/GP-015 unchanged):** the final-invoice variant for `single_supply`; GP-013/GP-015 stay valid for
   `progressive_div156`. Cash basis: GP-013 unchanged.
 - **Scenario:** 2026-12-15 final invoice INV-000152 for the GP-012-B project: Professional services $10,000.00 ex GST,
@@ -777,11 +777,12 @@ In practice A4 is part of the next period-end remeasurement of the whole allowan
 ## Draft errata and notes (T-0124)
 
 Non-journal corrections from the accountant-reviewer persona review (DL-0280 MINORs, DL-0283). They change **no line**
-of any Approved entry; each says what it supersedes or complements. Each stays `Draft` until approved under DL-0282.
+of any Approved entry; each says what it supersedes or complements. Proposed as `Draft`; approved 2026-11-09 under
+DL-0282 after persona re-review DL-0386 (DL-0387).
 
 ### E-002 — GP-020 erratum: PAYROLL_CLEARING is 2350
 
-- **Status: Draft (proposed by claude, T-0124)** · **Supersedes GP-020 (part):** the *Ref* column (2330) and the
+- **Status: Approved (owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09)** · **Supersedes GP-020 (part):** the *Ref* column (2330) and the
   *Source types* note ("the reference code 2330 for payroll clearing … new").
 - `system:PAYROLL_CLEARING` is chart **2350 Payroll clearing** (control account), which the T-0018 chart already has.
   **2330 is SUPER_PAYABLE**; following the old note would create a code collision. No new account code is needed;
@@ -790,7 +791,7 @@ of any Approved entry; each says what it supersedes or complements. Each stays `
 
 ### E-003 — GP-010 / GP-011 / GP-020: payday and the Payday Super due date
 
-- **Status: Draft (proposed by claude, T-0124)** · **Supersedes GP-010 (part)** (the *Super* note's "by 2027-07-23")
+- **Status: Approved (owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09)** · **Supersedes GP-010 (part)** (the *Super* note's "by 2027-07-23")
   and complements GP-011/GP-020 scenarios.
 - Payday is the date the wages are **paid**, not the pay-period end (2027-07-14, a Wednesday).
   - **GP-010/GP-011** (`ledgerforce_batch`): payday **2027-07-15** (Thu, the GP-011 batch confirmation) → SG due within
@@ -803,7 +804,7 @@ of any Approved entry; each says what it supersedes or complements. Each stays `
 
 ### E-004 — GP-018b: revenue presentation note
 
-- **Status: Draft (proposed by claude, T-0124)** · Complements GP-018 (18b); no line changes.
+- **Status: Approved (owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09)** · Complements GP-018 (18b); no line changes.
 - Under `per_document` rounding the ex-GST transaction price is 10.05 − 0.91 = **9.14** (AASB 15 ¶47). The golden
   posts revenue 9.15 and a 0.01 ROUNDING expense (chart 6900); this is the **chosen** treatment (DL-0244, DL-0255):
   net profit is right and the difference is immaterial.
@@ -847,3 +848,4 @@ New doubts go below as Q12 onwards.
 | 2026-11-08 | claude (T-0007) | Applied RQ-0095 (still Draft): Q1 GP-003 fee at charge, GP-004 net only; Q2 GP-004 evidence note; Q3 GP-007 code `GST-ADJ` → `ADJ-BD`; Q4 GP-005 note; Q5 new GP-020 (Phase 1) + GP-010 notes; Q6 GP-009/011 notes; Q7 GP-012 → Option B, GP-013 → one net-of-prepayment journal (old 13a/13b kept as superseded); Q8 GP-018 `GST-INC` → `GST` + inclusive price mode; Q9 GP-006 notes; Q10 GP-014 note; Q11 GP-019 note; runner fixes F1 GP-008 tax line split by code + `CAP`, F2 GP-014 source type `ar.invoice` + provenance, F3 GP-017 note, F4 GP-015 and F5 GP-019 unsigned tax amounts. Q1–Q11 answered in place. Superseded draft text retained in each entry. |
 | 2026-11-08 | claude (T-0007, owner-delegated, DL-0253) | Validated with the golden runner (DL-0256): 14 MVP entries reproduced line for line by the posting engine; GP-019 PENDING (requires T-0032); GP-010/011/020 (Phase 1) and GP-016/017 (Phase 2) PENDING out of phase. All entries GP-001 … GP-020 and the file header set to **Approved (owner-delegated to claude per DL-0253, 2026-11-08)**. Accountant-reviewer persona review (DL-0248) required before production use. From here the file is human-owned. |
 | 2026-11-09 | claude (T-0124) | Proposed (Draft) superseding entries from the persona review DL-0280/DL-0283/DL-0286: GP-007-A (ECL allowance write-off, chart v2 1290), GP-012-B and GP-015-B (single-supply GST attribution, ADR-0045 Proposed, runner PENDING until T-0047), header E-001 (reference chart v2 codes), errata E-002 (GP-020 2350), E-003 (payday / SG due dates), E-004 (GP-018b revenue note); index rows; Q12–Q14. No line or status of GP-001 … GP-020 changed. |
+| 2026-11-09 | claude (T-0124, owner-delegated, DL-0282) | Persona re-review DL-0386 (`.agent/evidence/T-0124/accounting-rereview-20261109.md`, 0 BLOCKER) required changes RC-1 … RC-5 applied: GP-007-A gross allowance A1 1,375.00 + A4 remeasurement, allowance rule and policy note; GP-012-B line 2 and GP-015-B note use attribution code `GST-UB` (ADR-0045 Option B); E-003 GP-020 payday wording; variant wording; Q12–Q14 answered. GP-007-A (A1–A4) reproduced line for line by the runner; GP-012-B / GP-015-B PENDING (requires T-0047). GP-007-A, GP-012-B, GP-015-B and E-001 … E-004 set to **Approved (owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09)** (DL-0387). GP-001 … GP-020 unchanged. |

@@ -323,9 +323,21 @@ describe('SS-PLAT-12 parser: the real Docs/accounting/postings.md', () => {
     }
   });
 
-  it('reads the T-0124 Drafts: Draft status, journals, per-journal dates and source types [T-0124]', () => {
+  it('reads the T-0124 entries: delegated approval (DL-0282/DL-0386), journals, per-journal dates and source types [T-0124]', () => {
     const by = (id: string) => postings.find((p) => p.id === id);
-    for (const id of ['GP-007-A', 'GP-012-B', 'GP-015-B']) expect(by(id)?.status, id).toBe('Draft');
+    const delegated =
+      'owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09';
+    for (const id of ['GP-007-A', 'GP-012-B', 'GP-015-B']) {
+      expect(by(id)?.status, id).toBe('Approved');
+      expect(by(id)?.approval, id).toBe(delegated);
+    }
+    // E-001…E-004 are not journals: their status lines and index rows carry the same approval.
+    for (const e of ['E-001', 'E-002', 'E-003', 'E-004']) {
+      expect(md, e).toMatch(new RegExp(`^\\| ${e} \\|.*\\| Approved \\|\\s*$`, 'm'));
+    }
+    expect(
+      md.match(new RegExp(`\\*\\*Status: Approved \\(${delegated}\\)\\*\\*`, 'g')),
+    ).toHaveLength(7);
     for (let i = 1; i <= 20; i++) {
       const id = `GP-${String(i).padStart(3, '0')}`;
       expect(by(id)?.status, id).toBe('Approved');

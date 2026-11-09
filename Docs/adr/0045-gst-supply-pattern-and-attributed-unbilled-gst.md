@@ -1,11 +1,11 @@
 ---
 adr: 0045
 title: "GST attribution for deposits and part payments: a gst_supply_pattern classification on the deposit document and a GST_ATTRIBUTED_UNBILLED system role for single (non-Div 156) supplies"
-status: Proposed            # Proposed | Accepted | Rejected | Superseded by ADR-NNNN
+status: Accepted            # Proposed | Accepted | Rejected | Superseded by ADR-NNNN
 date: 2026-11-09
 author: claude
 category: accounting
-human_gate: yes             # accounting; claude may accept under DL-0282 only after an accountant-reviewer persona re-review with no BLOCKER
+human_gate: yes             # accounting; accepted by claude under DL-0282 after accountant-reviewer persona re-review DL-0386 (no BLOCKER)
 supersedes: none
 superseded_by: none
 ---
@@ -14,7 +14,10 @@ superseded_by: none
 
 ## Status
 
-Proposed (claude, T-0124, 2026-11-09) — human gate `accounting` (AGENTS.md §6). Under the owner's
+Accepted (owner-delegated to claude per DL-0282 after persona re-review DL-0386, 2026-11-09); RC-2 to RC-5 applied
+(DL-0387). Re-review evidence: `.agent/evidence/T-0124/accounting-rereview-20261109.md`.
+
+History: Proposed (claude, T-0124, 2026-11-09) — human gate `accounting` (AGENTS.md §6). Under the owner's
 extended delegation **DL-0282**, claude may accept it **only after** the accountant-reviewer persona
 (DL-0248) has re-reviewed this file together with the golden Drafts GP-012-B and GP-015-B and found no
 BLOCKER. The acceptance line must then read "Accepted <date> by claude under owner delegation DL-0282
@@ -101,7 +104,7 @@ the line carries no base for G1.
 
 ## Decision outcome
 
-Proposed: **Option B** (dedicated attribution tax code) on the Option A role and journal shape, per persona
+Chosen: **Option B** (dedicated attribution tax code) on the Option A role and journal shape, per persona
 re-review Q12 (DL-0386). The new role and the gross presentation of Option A are kept; the BAS stays purely
 data-driven (T-0035), the code's rows are accruals-only, and a posting-engine guard ties the code to the role.
 
