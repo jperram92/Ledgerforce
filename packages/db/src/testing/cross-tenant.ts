@@ -156,6 +156,11 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   // Bill approval trail (migration 0041, T-0052): a known action that needs no reason or rule.
   'app.bill_approval_event': { action: () => 'submit' },
   'app.sod_settings': { report_timezone: () => 'Australia/Sydney' },
+  // Payment batches (migration 0042, T-0054): one releaser, AUD (the generated company bank
+  // account is AUD); an exclusion without verified details has no payable_from.
+  'app.payment_batch': { currency: () => 'AUD', required_releasers: () => '1' },
+  'app.payment_batch_payment': { currency: () => 'AUD' },
+  'app.payment_batch_exclusion': { reason: () => 'NO_VERIFIED_BANK_DETAILS' },
   // API tokens (migration 0022): a token-allowed scope, a SHA-256 digest, an expiry within 366
   // days of created_at, which is the database clock (default, and forced for lf_app).
   'app.api_token': {
