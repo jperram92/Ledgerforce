@@ -155,12 +155,37 @@ export function parsePostings(markdown: string): GoldenEntry[] {
       tables,
     });
   }
+  // Approved predecessors are immutable. A successor can retire the whole entry with an
+  // explicit bold declaration; prose about correcting part of an entry is not sufficient.
+  const successors = new Map<string, string>();
+  for (const [index, entry] of entries.entries()) {
+    if (entry.status !== 'approved') continue;
+    const body = raw.find((r) => r.id === entry.id)?.body.join('\n') ?? '';
+    for (const match of body.matchAll(
+      /\*\*Supersedes (GP-\d{3})(?: for current implementation:?)?\*\*/g,
+    )) {
+      const predecessorId = match[1] ?? '';
+      const predecessor = entries.slice(0, index).find((e) => e.id === predecessorId);
+      if (!predecessor || predecessor.status === 'draft') {
+        throw new Error(`${entry.id} must supersede an earlier approved entry: ${predecessorId}`);
+      }
+      const existing = successors.get(predecessorId) ?? predecessor.supersededBy;
+      if (existing && existing !== entry.id) {
+        throw new Error(`Conflicting successors for ${predecessorId}: ${existing}, ${entry.id}`);
+      }
+      successors.set(predecessorId, entry.id);
+    }
+  }
   // An entry whose journal is "identical to GP-NNN" replays that entry's table(s).
   return entries.map((e) => {
-    if (e.tables.length > 0) return e;
+    const successor = successors.get(e.id);
+    const effective: GoldenEntry = successor
+      ? { ...e, status: 'superseded', supersededBy: successor }
+      : e;
+    if (e.tables.length > 0) return effective;
     const body = raw.find((r) => r.id === e.id)?.body.join('\n') ?? '';
     const same = /identical to (GP-\d{3})/.exec(body)?.[1];
-    return same ? { ...e, tables: tablesById.get(same) ?? [] } : e;
+    return same ? { ...effective, tables: tablesById.get(same) ?? [] } : effective;
   });
 }
 

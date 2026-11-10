@@ -2235,3 +2235,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Execution: separate Codex reviewer `/root/independent_review`, independent of builder `/root`, reviews immutable product checkpoints and actual CI evidence. Reports identify Codex honestly and retain findings and unrun checks. No report may be relabelled Claude or human.
 - Limits: no blanket exemption for unrelated future work, no weakening of tests or accounting gates. Existing automation may still report cross-provider PENDING until it supports this recorded owner exception; do not fabricate a green result.
 - ADR: 0052 · Status: accepted by explicit owner instruction
+
+### DL-0316 — Derive current golden selection from approved successor declarations
+- Date: 2026-11-10 · By: codex · Task: T-0166 · Category: tooling
+- Decision: parse explicit bold whole-entry `Supersedes GP-NNN` declarations in approved successors, including `for current implementation`. Derive the predecessor's effective superseded status without changing its approved source bytes or historical tables. Partial prose corrections do not retire an entry; draft successors have no authority. Reject conflicting replacements and non-prior targets.
+- Why: independent Codex review found the runner still selected GP-038 despite GP-039's explicit replacement. The real write-off regression already used GP-039; the defect was current golden selection, not customer posting behavior.
+- Validation: focused regression RED 9 failed / 4 passed, then GREEN 13/13. Two sandbox startup failures were package access failures, not RED evidence; unrestricted execution reproduced the assertions. Formatting, lint, typecheck, broader CI and independent re-review recorded separately. No approved golden bytes, journal writer, security gate or dependency changed.
+- ADR: none (implements existing successor decision DL-0311; no accounting treatment change) · Status: accepted
