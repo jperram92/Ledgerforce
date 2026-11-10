@@ -4,10 +4,10 @@
   "branch": "feat/T-0166-gross-ecl-reconciliation",
   "step": null,
   "claimed_by": "codex",
-  "lease_expires_at": "2026-11-10T00:53:51.083Z",
+  "lease_expires_at": "2026-11-10T01:27:35.872Z",
   "last_green_commit": "da5d6ecdcdfcf30b762f5b6e42fb68af125d1ca4",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-10T00:08:51.091Z",
+  "updated_at": "2026-11-10T00:42:35.925Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

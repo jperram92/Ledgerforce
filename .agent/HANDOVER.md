@@ -2,6 +2,12 @@
 
 ## Current Codex continuation prompt
 
+> Resume T-0166 on feat/T-0166-gross-ecl-reconciliation from product-tested ad56bb9 plus its evidence checkpoint. Read validation.md and manifest.json in .agent/evidence/T-0166. Next run the full verifier after the metadata checkpoint; obtain independent Claude review. Current contract is GP-039. Original goldens and GP-038 are preserved. Single-supply GST-UB and other source comparisons remain unfinished. Owner selected feat/T-* canonical (DL-0308); do not blind merge 872c4fa.
+
+Correction: origin/main e39a76c has a real baseline; CI coverage passed 73.39% vs 72.22%. Stale local-main coverage blocker below is superseded. Final verifier browser command passed; its evidence failure was only the missing task manifest. No security approval or cross-provider review has been granted.
+
+Validated product checkpoint: ad56bb9, CI 42729484847 passed static/unit, all 1292 database tests, standalone browser and fresh 10,000-document invariants. Security 42729484502 passed. Full verifier 12 PASS / 3 FAIL / 1 PENDING: golden approval guard, evidence/status metadata at tested commit, independent review. Follow-up saves manifest and logs; do not claim full green. GP-039 is the current lifecycle contract.
+
 Latest correction: CI on 57750a5 passed 1291 DB tests and failed the new lifecycle on GP-038's omitted customer tag. DL-0311 adds GP-039 as current expectation, preserving GP-038. Re-run corrected lifecycle and exact goldens; security CI 42726352427 passed. No product accounting code changed.
 
 > Resume feat/T-0166-gross-ecl-reconciliation, based on d32dfeb. Owner chose feat/T-* canonical (DL-0308). Read T-0166, RQ-0133, ADR-0051, DL-0310 and the latest run log. GP-038 appends the source gross allowance lifecycle without editing approved historical entries. Run the focused ledger golden and AR gross-allowance/write-off tests using .tmp/t0166-validate.sh in the existing WSL harness; inspect .agent/evidence/T-0166/focused-tests.log. No production accounting code changed. Finish verification and independent review, then continue separate source gaps, especially single-supply GST-UB. Do not blind merge source 872c4fa.
@@ -375,3 +381,4 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-09T23:59:08.790Z codex: release T-0057 → blocked (Product and security CI pass at 9eb7736; initial integration golden-approval provenance and authentic main coverage baseline unresolved; independent Claude review required)
 - 2026-11-10T00:00:39.258Z codex: T-0166 → researching
 - 2026-11-10T00:08:51.095Z codex: T-0166 → in_progress
+- 2026-11-10T00:42:35.927Z codex: T-0166 → verifying

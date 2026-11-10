@@ -1,0 +1,74 @@
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2500744Z  [32m?[39m [30m[45m db [49m[39m packages/ledger/src/ledger.invariants.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 158806[2mms[22m[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2505824Z      [33m[2m?[22m[39m SS-PLAT-11 INV-balance INV-tb-zero INV-ar-control INV-ap-control INV-reversal over 10,000 seeded documents [33m 157899[2mms[22m[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2579233Z 
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2582743Z [31m???????[39m[1m[41m Failed Tests 1 [49m[22m[31m???????[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2583250Z 
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2602948Z [41m[1m FAIL [22m[49m [30m[45m db [49m[39m packages/modules/ar/src/gross-allowance.db.test.ts[2m > [22mSS-PLAT-106 GP-038 preserves the residual until reassessment and reports relief only on accruals
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2606173Z [31m[1mAssertionError[22m: expected [ { code: '1220', …(3) }, …(2) ] to deeply equal [ { code: '1220', …(3) }, …(2) ][39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2607181Z 
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2607701Z [32m- Expected[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2608315Z [31m+ Received[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2608702Z 
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2609104Z [33m@@ -1,14 +1,14 @@[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2609712Z [2m  [[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2610246Z [2m    {[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2610883Z [2m      "code": "1220",[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2611586Z [2m      "credit": "0.0000",[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2612337Z [2m      "debit": "1250.0000",[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2613091Z [32m-     "party": null,[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2614040Z [31m+     "party": "01a1c2ce-4c24-778d-8212-aa706e8eeb02",[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2615267Z [2m    },[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2615871Z [2m    {[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2616518Z [32m-     "code": "2200",[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2617223Z [31m+     "code": "2310",[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2617937Z [2m      "credit": "0.0000",[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2618686Z [2m      "debit": "125.0000",[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2619378Z [2m      "party": null,[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2620006Z [2m    },[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2620556Z [2m    {[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2620916Z 
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2621801Z [36m [2m?[22m packages/modules/ar/src/gross-allowance.db.test.ts:[2m136:20[22m[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2676377Z     [90m134|[39m           )[33m.[39mrows[33m,[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2676896Z 
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2677230Z     [90m135|[39m       )[33m;[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2677975Z     [90m136|[39m       [34mexpect[39m(rows)[33m.[39m[34mtoEqual[39m(
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2679321Z     [90m   |[39m                    [31m^[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2680286Z     [90m137|[39m         goldens[index][33m?.[39mlines[33m.[39m[34mmap[39m((line) [33m=>[39m ({
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2681282Z     [90m138|[39m           code[33m:[39m bindings[line[33m.[39mbinding][33m,[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2681734Z 
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2682134Z [31m[2m????????????????????????[1/1]?[22m[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2682441Z 
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2706191Z [2m Test Files [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m95 passed[39m[22m[90m (96)[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2715098Z [2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m1291 passed[39m[22m[90m (1292)[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2716120Z [2m   Start at [22m 00:12:14
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2718800Z [2m   Duration [22m 195.78s[2m (transform 5.02s, setup 0ms, import 70.93s, tests 420.45s, environment 17ms)[22m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2720977Z 
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2750601Z 
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.2783908Z ##[error]AssertionError: expected [ { code: '1220', …(3) }, …(2) ] to deeply equal [ { code: '1220', …(3) }, …(2) ]
+db integration + cross-tenant RLS	Run pnpm test:db	
+db integration + cross-tenant RLS	Run pnpm test:db	- Expected
+db integration + cross-tenant RLS	Run pnpm test:db	+ Received
+db integration + cross-tenant RLS	Run pnpm test:db	
+db integration + cross-tenant RLS	Run pnpm test:db	@@ -1,14 +1,14 @@
+db integration + cross-tenant RLS	Run pnpm test:db	  [
+db integration + cross-tenant RLS	Run pnpm test:db	    {
+db integration + cross-tenant RLS	Run pnpm test:db	      "code": "1220",
+db integration + cross-tenant RLS	Run pnpm test:db	      "credit": "0.0000",
+db integration + cross-tenant RLS	Run pnpm test:db	      "debit": "1250.0000",
+db integration + cross-tenant RLS	Run pnpm test:db	-     "party": null,
+db integration + cross-tenant RLS	Run pnpm test:db	+     "party": "01a1c2ce-4c24-778d-8212-aa706e8eeb02",
+db integration + cross-tenant RLS	Run pnpm test:db	    },
+db integration + cross-tenant RLS	Run pnpm test:db	    {
+db integration + cross-tenant RLS	Run pnpm test:db	-     "code": "2200",
+db integration + cross-tenant RLS	Run pnpm test:db	+     "code": "2310",
+db integration + cross-tenant RLS	Run pnpm test:db	      "credit": "0.0000",
+db integration + cross-tenant RLS	Run pnpm test:db	      "debit": "125.0000",
+db integration + cross-tenant RLS	Run pnpm test:db	      "party": null,
+db integration + cross-tenant RLS	Run pnpm test:db	    },
+db integration + cross-tenant RLS	Run pnpm test:db	    {
+db integration + cross-tenant RLS	Run pnpm test:db	
+db integration + cross-tenant RLS	Run pnpm test:db	 ? packages/modules/ar/src/gross-allowance.db.test.ts:136:20
+db integration + cross-tenant RLS	Run pnpm test:db	
+db integration + cross-tenant RLS	Run pnpm test:db	
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.3399744Z ?ELIFECYCLE? Command failed with exit code 1.
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T00:15:30.3632225Z ##[error]Process completed with exit code 1.

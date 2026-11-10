@@ -1,0 +1,11 @@
+2026-11-10T00:44:28.7349343Z GATE 4 golden-postings: FAIL (Docs/accounting/postings.md:67: adds an Approved status — only the product owner approves golden postings)
+2026-11-10T00:45:54.8711435Z GATE 9 e2e-evidence: FAIL (pnpm test:e2e; missing .agent/evidence/T-0166/manifest.json for SS-PLAT-106)
+2026-11-10T00:45:55.1806178Z GATE 12 memory: FAIL (T-0166: status "in_progress" (expected verifying, review or done when verifying))
+2026-11-10T00:45:55.1818971Z === SUMMARY ===
+2026-11-10T00:45:55.1823697Z  4   | golden-postings       | FAIL (Docs/accounting/postings.md:67: adds an Approved status — only the product owner approves golden postings)
+2026-11-10T00:45:55.1826670Z  8   | cross-review          | PENDING (no review report by a provider other than the builder (codex) in .agent/evidence/T-0166/review-*.md)
+2026-11-10T00:45:55.1827302Z  9   | e2e-evidence          | FAIL (pnpm test:e2e; missing .agent/evidence/T-0166/manifest.json for SS-PLAT-106)
+2026-11-10T00:45:55.1828682Z  12  | memory                | FAIL (T-0166: status "in_progress" (expected verifying, review or done when verifying))
+2026-11-10T00:45:55.1829085Z PASS: 12   FAIL: 3   PENDING: 1
+2026-11-10T00:45:55.1829704Z !!! 1 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+2026-11-10T00:45:55.5697121Z  2026-11-10 00:42:22.729 UTC [557] ERROR:  reopen request 01a1c2e7-f07d-78de-8ec2-831a5e8436b2 is not pending (status approved)

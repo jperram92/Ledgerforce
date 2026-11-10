@@ -636,6 +636,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 - **Given** a prepayment for a progressive supply and a 30 % deposit invoice · **When** the final invoices are posted with the prepayment applied / deposit netted · **Then** every journal equals its golden posting, the final invoices are 7,700.00 open, and the BAS shows each project's GST once
 
 ### SS-PLAT-106 — Bad-debt write-off through the allowance
+
+Additional verified lifecycle (T-0166): GP-039 gross allowance 1,375.00, write-off net loss 1,250.00 plus GST relief 125.00, explicit later release 125.00, no automatic residual clearing, and accrual/cash BAS differences. Real PostgreSQL evidence at ad56bb9: [T-0166 manifest](../../.agent/evidence/T-0166/manifest.json), CI 42729484847, 1292/1292 database tests. This is product-test evidence; independent review and final integration gates remain open.
 - Phase: MVP · Layer: **golden + db-integration** · Task(s): T-0048 (GP-024, GP-025, Q3, DL-0276)
 - **Given** an unpaid 1,375.00 invoice and a funded ECL allowance · **When** it is written off with a reason · **Then** the journal equals GP-024, the invoice closes, BAS accruals show 1B +125.00 (cash: none), and a short allowance sends the remainder to the bad-debt expense
 

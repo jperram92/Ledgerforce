@@ -52,6 +52,14 @@ These are inventory findings, not cross-review PASS verdicts. No tests were reru
 
 ## Continuation
 
+## Verified selective port (2026-11-10)
+
+T-0166 on feat/T-0166-gross-ecl-reconciliation maps source GP-007-A to canonical GP-039 (GP-038's initial mapping correction is preserved; DL-0310..0312). CI 42729484847 at ad56bb9 passed static/unit, DB/RLS, browser and fresh-seed 10,000-document invariants. Exact allowance 1,375.00, write-off 1,250.00 plus GST 125.00, subsequent release 125.00 and cash/accrual BAS are now covered against real PostgreSQL. No accounting production code was needed. Final verifier and independent review remain separate gates.
+
+Single-supply comparison: canonical recordPrepayment refuses single supplies with known totals; canonical deposit invoices do not store a supply-pattern choice. Source ADR-0045 R1–R9 therefore identifies a real remaining gap, not a patch that can be applied unchanged. Canonical roles have a fixed SQL CHECK and BAS mapping differs from source. New work must design additive role/settings storage, explicit classification, GST-UB attribution, finalisation/price changes/cancellation and aged unbilled reporting together. Current full advance-invoice GP-021 remains valid. Do not silently turn ordinary deposits into whole-supply attribution.
+
+Security ADRs 0016/0018/0023/0025/0026/0030 are still Proposed on the canonical checkout too; source accounting delegation does not accept them.
+
 Preserve the current dirty verification records before switching branches. Resume T-0057
 verification from its evidence and require Claude review of the Codex repair. Independently
 cross-review Claude-built canonical cards. For each source gap, create a bounded fresh task,

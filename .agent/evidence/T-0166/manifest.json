@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0166",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-106",
+      "file": ".agent/evidence/T-0166/ci-passing-tests.log",
+      "test": "packages/modules/ar/src/gross-allowance.db.test.ts: GP-039 preserves the residual until reassessment and reports relief only on accruals",
+      "commit": "ad56bb92500d9d697b70a3d8a5277d4de9375437",
+      "provider": "ci",
+      "timestamp": "2026-11-10T00:39:09.175Z",
+      "result": "passed"
+    }
+  ]
+}
