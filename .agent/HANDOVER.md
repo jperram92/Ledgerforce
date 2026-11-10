@@ -2,14 +2,14 @@
 
 ## Codex continuation prompt
 
-> Resume `feat/T-0166-golden-successor-review`, based on `00e87c5` plus the successor repair checkpoint. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read T-0166, DL-0316 and both independent Codex T-0166 review reports. Owner explicitly chose Codex review (ADR-0052). Parser repair has RED 9 failed / 4 passed, GREEN 13/13, and independent 13/13 scoped PASS; verify the new commit in CI before claiming completion. The approved golden file is unchanged. T-0168 research is saved at 8fbf696 and RQ-0134 remains open: integrate canonical migration prerequisites and resolve cash-basis final settlement before GST-UB code. Keep feat/T-* canonical; never merge source 872c4fa blindly.
+> Resume `feat/T-0166-golden-successor-review` from `568f376` plus the fixture follow-up checkpoint. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read T-0166, DL-0316/0317 and independent Codex review reports. Owner explicitly chose Codex review (ADR-0052). Parser repair passes 1292 DB tests and all product/security CI jobs. Full verifier's agent test failure was locally reproduced as an unpinned package fixture; pinned fixture passes82/82 Linux tests and scoped independent review. Inspect fresh CI before claiming completion. The approved golden file is unchanged. T-0168 research is saved at 8fbf696 and RQ-0134 remains open: integrate canonical migration prerequisites and resolve cash-basis final settlement before GST-UB code. Keep feat/T-* canonical; never merge source872c4fa blindly.
 
 From: codex (run 2026-10-29-codex-r01)    Reason: Save independently reviewed golden successor repair; broader validation continues
 Task: T-0166 Reconcile gross ECL allowance and subsequent release from Claude source
 Branch: feat/T-0166-golden-successor-review   Last green commit: da5d6ec
 Done: 1. Research and accounting ADR; additive golden approval under standing delegation (RQ-0133, ADR-0051, DL-0310, GP-038).; 2. Golden inventory and real module lifecycle tests; existing production behavior sufficient. CI 42729484847 at ad56bb9: 1292/1292 DB tests passed.
-In progress: successor parser repair independently passes focused tests; broader ledger validation and new-head CI pending. Prior full verifier: 13 PASS / 2 FAIL / 1 PENDING (golden guard, card status, provider automation); no full green claim.
-Next action: finish ledger unit/lint checks, push the repair checkpoint, inspect fresh CI, then continue T-0168 research and bounded canonical schema integration.
+In progress: parser CI product/security passes; verifier first attempt11PASS/4FAIL/1PENDING, including agent tests81/82. Fixture repair passes82/82 Linux agent tests; fresh CI pending. Known approval/provenance automation gates remain; no full green claim.
+Next action: push fixture repair checkpoint and inspect its fresh CI; finish recording verification evidence, then continue T-0168 research and bounded canonical schema integration.
 Decisions taken: DL-0315 / ADR-0052 owner-directed independent Codex review; DL-0316 approved successor selection without editing historical goldens.
 Open questions for human: no new question; security ADRs remain Proposed and are outside this review authorization.
 Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
@@ -304,3 +304,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-10T07:12:04.581Z codex: release T-0166 → todo (Reopen for independent Codex review finding: explicit approved successor is ignored by golden selection)
 - 2026-11-10T07:12:08.084Z codex: T-0166 → in_progress
 - 2026-11-10T21:33:53.201Z codex: handover: Save independently reviewed golden successor repair; broader validation continues
+- 2026-11-10T22:39:50.393Z codex: T-0166 → verifying

@@ -10,6 +10,15 @@
       "provider": "ci",
       "timestamp": "2026-11-10T00:39:09.175Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-106",
+      "file": ".agent/evidence/T-0166/successor-ci-db-summary.log",
+      "test": "CI42906703669 DB/RLS: golden-engine and gross-allowance; 1292/1292 tests",
+      "commit": "568f376423e0c6f19c179ef721781b75ae815a1a",
+      "provider": "ci",
+      "timestamp": "2026-11-10T21:40:21.383Z",
+      "result": "passed"
     }
   ]
 }

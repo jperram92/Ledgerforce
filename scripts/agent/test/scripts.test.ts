@@ -98,7 +98,11 @@ test('verify.sh fails backlog consistency on a broken card', () => {
 
 test('verify.sh runs a package.json gate when its tooling exists', () => {
   const root = makeRepo();
-  writeFileSync(join(root, 'package.json'), JSON.stringify({ scripts: { typecheck: 'node -e "process.exit(0)"', lint: 'node -e "process.exit(3)"' } }));
+  const { packageManager } = JSON.parse(readText(join(import.meta.dirname, '../../..'), 'package.json'));
+  writeFileSync(join(root, 'package.json'), JSON.stringify({
+    packageManager,
+    scripts: { typecheck: 'node -e "process.exit(0)"', lint: 'node -e "process.exit(3)"' },
+  }));
   mkdirSync(join(root, 'node_modules'));
   const r = runBash(root, 'verify.sh', ['--quick']);
   assert.match(r.stdout, /GATE 1 typecheck: PASS/);

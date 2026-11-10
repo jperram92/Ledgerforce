@@ -2242,3 +2242,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: independent Codex review found the runner still selected GP-038 despite GP-039's explicit replacement. The real write-off regression already used GP-039; the defect was current golden selection, not customer posting behavior.
 - Validation: focused regression RED 9 failed / 4 passed, then GREEN 13/13. Two sandbox startup failures were package access failures, not RED evidence; unrestricted execution reproduced the assertions. Formatting, lint, typecheck, broader CI and independent re-review recorded separately. No approved golden bytes, journal writer, security gate or dependency changed.
 - ADR: none (implements existing successor decision DL-0311; no accounting treatment change) · Status: accepted
+
+### DL-0317 — Pin verifier test fixtures to the repository package manager
+- Date: 2026-11-11 · By: codex · Task: T-0166 · Category: tooling
+- Decision: the temporary package used by the verifier shell integration test inherits the root package.json packageManager field. Keep its successful typecheck and deliberately failing lint scripts and all assertions unchanged.
+- Evidence: CI 42906703669 at 568f376 passes product unit, 1292 DB, browser, fresh invariants and security, but verifier reports 81/82 agent tests with the failing detail truncated. Independent Linux reproduction identifies the unpinned fixture selecting pnpm 12.18 through Corepack rather than the repository's 10.28 pin. Pinning the fixture yields 82/82 Linux agent tests. This establishes the local cause; the original CI failure's exact identity remains unproven from its truncated output.
+- Limits: no verifier/security gate, dependency version, assertion or timeout changed. Native Windows shell-based suite also failed multiple cases and is retained as separate platform evidence, not conflated with Linux CI.
+- ADR: none (test fixture correction only) · Status: accepted
