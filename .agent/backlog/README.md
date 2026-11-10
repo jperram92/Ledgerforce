@@ -147,7 +147,8 @@ graph LR
 | [T-0054](T-0054.md) | Payment batches with maker-checker and step-up release | MVP | todo | T-0052, T-0053, T-0013 | UC-06 | 5 |
 | [T-0055](T-0055.md) | Customer refunds (bank payment batch and Stripe) | MVP | todo | T-0046, T-0045, T-0054, T-0031 | UC-11 | 3 |
 | [T-0056](T-0056.md) | ABA (Cemtex) file export | MVP | todo | T-0054 | UC-06 | 1 |
-| [T-0057](T-0057.md) | Payment confirmation posting and remittance advices | MVP | in_progress | T-0056, T-0042, T-0031 | UC-06 | 2 |
+| [T-0057](T-0057.md) | Payment confirmation posting and remittance advices | MVP | blocked | T-0056, T-0042, T-0031 | UC-06 | 2 |
+| [T-0166](T-0166.md) | Gross ECL allowance reconciliation from source lineage | MVP | in_progress | T-0031, T-0048 | — | 3 |
 | [T-0058](T-0058.md) | Bank accounts and statement import (CSV, OFX) | MVP | review | T-0018 | UC-08 | 2 |
 | [T-0059](T-0059.md) | CAMT extensions: batch entries (TxDtls), several statements per file, camt.052/054 | MVP | review | T-0058 | UC-08 | 1 |
 | [T-0060](T-0060.md) | Matching rules and auto-match | MVP | todo | T-0058, T-0046, T-0057 | UC-08 | 3 |

@@ -880,3 +880,38 @@ above has been changed.
 | 2026-11-01 | claude (T-0115) | Owner approved the RQ-0096 change list; added Draft entries GP-020…GP-035 and chart additions implementing it. Superseded entries left unchanged for the owner to mark. |
 | 2026-11-01 | claude (T-0115) | Owner delegated approval (DL-0256): entries Approved, GP-004/007/012/013/018 superseded, Q1–Q15 resolved. |
 | 2026-11-01 | claude (T-0116) | GP-036 supersedes GP-035 (control-account rule); DL-0258. |
+
+## GP-038 — Gross expected-credit-loss allowance and subsequent release
+
+- **Status: Approved (codex under the owner's standing accounting delegation, DL-0310, 2026-11-10; RQ-0133, ADR-0051)** · Phase: MVP · Source type: `ar.ecl_adjustment`, `ar.write_off`, `ar.ecl_adjustment`
+- **Scenario:** Calendar-year 2026 reporter; Acme's unpaid taxable invoice is 1,375.00 including GST. At 30 September the assessed contractual loss is 100%, with no material discounting and no statutory GST adjustment yet. On 1 December the debt is actually written off as unrecoverable. On 31 December reassessment confirms no remaining allowance is required for this isolated portfolio.
+- **Provenance:** ports source 872c4fa GP-007-A A1/A2/A4, using canonical accounts and GST-ADJ. Supersedes only the blanket ex-GST measurement wording in GP-024/025; those approved historical entries remain unchanged. GP-037 is reserved by the setup lineage.
+
+### A1 — Recognise the assessed gross loss
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | setting:ar.bad_debt_account | 6500 | 1,375.00 | | — | — |
+| 2 | system:AR_ECL_ALLOWANCE | 1220 | | 1,375.00 | — | — |
+| | **Total** | | **1,375.00** | **1,375.00** | | |
+
+### A2 — Write off the debt and recognise statutory relief
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_ECL_ALLOWANCE | 1220 | 1,250.00 | | GST-ADJ | — |
+| 2 | tax:GST.collected | 2200 | 125.00 | | — | — |
+| 3 | system:AR_CONTROL | 1200 | | 1,375.00 | — | Acme |
+| | **Total** | | **1,375.00** | **1,375.00** | | |
+
+Allowance remains 125.00 credit. BAS 1B increases 125.00 on accruals; no cash-basis adjustment. Actual write-off satisfies GST Act section 21-5; twelve months overdue is an alternative, not an additional condition.
+
+### A3 — Explicit reporting-date remeasurement
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_ECL_ALLOWANCE | 1220 | 125.00 | | — | — |
+| 2 | setting:ar.bad_debt_account | 6500 | | 125.00 | — | — |
+| | **Total** | | **125.00** | **125.00** | | |
+
+Allowance is zero; net impairment expense is 1,250.00. Release has no GST or subledger effect. Never automatically release a shared allowance that may cover other receivables. Partial loss estimates still require evidence; this example does not prescribe 100% provisioning for all debts.

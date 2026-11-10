@@ -1,3 +1,13 @@
+# Handover — T-0166 selective gross allowance port
+
+## Current Codex continuation prompt
+
+> Resume feat/T-0166-gross-ecl-reconciliation, based on d32dfeb. Owner chose feat/T-* canonical (DL-0308). Read T-0166, RQ-0133, ADR-0051, DL-0310 and the latest run log. GP-038 appends the source gross allowance lifecycle without editing approved historical entries. Run the focused ledger golden and AR gross-allowance/write-off tests using .tmp/t0166-validate.sh in the existing WSL harness; inspect .agent/evidence/T-0166/focused-tests.log. No production accounting code changed. Finish verification and independent review, then continue separate source gaps, especially single-supply GST-UB. Do not blind merge source 872c4fa.
+
+T-0057: runtime remediation 9eb7736 passed all nine security CI jobs; product tests passed, final definition-of-done still fails historical approval provenance/coverage/review gates (evidence/T-0057/ci-runtime-remediation-20261109.md). d32dfeb records this honestly; task remains blocked, not done. Security decisions and release/phase gates remain with owner.
+
+## Historical handover — superseded by the current continuation above
+
 # Handover — canonical lineage selected
 
 ## Codex continuation prompt
@@ -361,3 +371,5 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-09T21:11:01.628Z codex: handover: Owner selected canonical feat lineage; reconciliation inventory recorded, implementation reviews remain
 - 2026-11-09T21:20:47.883Z codex: T-0057 → in_progress
 - 2026-11-09T23:59:08.790Z codex: release T-0057 → blocked (Product and security CI pass at 9eb7736; initial integration golden-approval provenance and authentic main coverage baseline unresolved; independent Claude review required)
+- 2026-11-10T00:00:39.258Z codex: T-0166 → researching
+- 2026-11-10T00:08:51.095Z codex: T-0166 → in_progress

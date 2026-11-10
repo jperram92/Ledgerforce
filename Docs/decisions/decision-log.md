@@ -2194,3 +2194,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: new scanner exception rejected; whole base replacement unnecessary if stable package updates clear the finding. Final image scanning remains required.
 - Validation: node runtime contract RED before Dockerfile change (missing patch step), GREEN after. Existing install contract invokes it so standard unit CI executes the regression.
 - ADR: none (existing DL-0248 mechanism; no new dependency or security model) · Status: accepted
+
+### DL-0310 — Port the gross allowance lifecycle without colliding source IDs
+- Date: 2026-11-10 · By: codex · Task: T-0166 · Category: accounting
+- Decision: accept ADR-0051 and approve additive GP-038 under AGENTS.md section 6 standing delegation, on resolved RQ-0133. Map source 872c4fa GP-007-A A1/A2/A4 to canonical GP-038; preserve historical GP-024/025 and canonical account/tax bindings. Reserve GP-037 for the setup lineage.
+- Why: gross contractual receivable loss and later statutory GST relief are distinct; a subsequent portfolio reassessment releases the remaining 125.00. Existing write-off behavior already supports this scenario. Automatic company-wide allowance clearing is rejected because other debts may still require it.
+- Validation: new exact three-journal and real PostgreSQL lifecycle tests added; results are recorded in the T-0166 run/evidence. No production behavior changed and no RED-before-production claim is made for this documentation/test port. Independent review remains required.
+- ADR: 0051 · Status: accepted under standing accounting delegation
