@@ -1,114 +1,26 @@
-# Handover — T-0167 accounting-review persona port
-
-## Latest Codex continuation prompt
-
-> Resume feat/T-0167-accounting-review-persona, based on 9bcf08c. Read T-0167, .claude/agents/accountant-reviewer.md, its port-check.md evidence and DL-0313. Role port is documentation-only and does not supply independent review of Codex work. Next verify backlog/diff, obtain independent review, and continue the single-supply GST-UB gap described in .agent/LINEAGE-RECONCILIATION-2026-11-10.md. T-0166 product tests/security pass at ad56bb9 (1292 DB tests); full completion remains blocked by golden guard and independent review. Source lineage 872c4fa is never merged wholesale.
-
-## Prior task continuation (preserved)
-
-# Handover — T-0166 selective gross allowance port
-
-## Current Codex continuation prompt
-
-> Resume T-0166 on feat/T-0166-gross-ecl-reconciliation from product-tested ad56bb9 plus its evidence checkpoint. Read validation.md and manifest.json in .agent/evidence/T-0166. Next run the full verifier after the metadata checkpoint; obtain independent Claude review. Current contract is GP-039. Original goldens and GP-038 are preserved. Single-supply GST-UB and other source comparisons remain unfinished. Owner selected feat/T-* canonical (DL-0308); do not blind merge 872c4fa.
-
-Correction: origin/main e39a76c has a real baseline; CI coverage passed 73.39% vs 72.22%. Stale local-main coverage blocker below is superseded. Final verifier browser command passed; its evidence failure was only the missing task manifest. No security approval or cross-provider review has been granted.
-
-Validated product checkpoint: ad56bb9, CI 42729484847 passed static/unit, all 1292 database tests, standalone browser and fresh 10,000-document invariants. Security 42729484502 passed. Full verifier 12 PASS / 3 FAIL / 1 PENDING: golden approval guard, evidence/status metadata at tested commit, independent review. Follow-up saves manifest and logs; do not claim full green. GP-039 is the current lifecycle contract.
-
-Latest correction: CI on 57750a5 passed 1291 DB tests and failed the new lifecycle on GP-038's omitted customer tag. DL-0311 adds GP-039 as current expectation, preserving GP-038. Re-run corrected lifecycle and exact goldens; security CI 42726352427 passed. No product accounting code changed.
-
-> Resume feat/T-0166-gross-ecl-reconciliation, based on d32dfeb. Owner chose feat/T-* canonical (DL-0308). Read T-0166, RQ-0133, ADR-0051, DL-0310 and the latest run log. GP-038 appends the source gross allowance lifecycle without editing approved historical entries. Run the focused ledger golden and AR gross-allowance/write-off tests using .tmp/t0166-validate.sh in the existing WSL harness; inspect .agent/evidence/T-0166/focused-tests.log. No production accounting code changed. Finish verification and independent review, then continue separate source gaps, especially single-supply GST-UB. Do not blind merge source 872c4fa.
-
-T-0057: runtime remediation 9eb7736 passed all nine security CI jobs; product tests passed, final definition-of-done still fails historical approval provenance/coverage/review gates (evidence/T-0057/ci-runtime-remediation-20261109.md). d32dfeb records this honestly; task remains blocked, not done. Security decisions and release/phase gates remain with owner.
-
-## Historical handover — superseded by the current continuation above
-
-# Handover — canonical lineage selected
+# Handover - canonical pickup, T-0168 research and owner-authorized review
 
 ## Codex continuation prompt
-> Resume on feat/T-0057-payment-confirmation at 96a6b93 plus the lineage documentation checkpoint. Run node scripts/agent/conductor.ts status, then read .agent/LINEAGE-RECONCILIATION-2026-11-10.md and .agent/runs/2026-11-09-codex-r01.md. Owner selected feat/T-* as canonical (DL-0308); port only reviewed missing Claude work. Preserve existing dirty T-0057 evidence. Next inspect saved T-0057 verification and CI results before rerunning checks. Codex cannot cross-approve its own date repair; Claude review remains required. The four interrupted source tasks already have canonical implementations in review; compare gaps before applying any source patch.
 
-From: codex, run 2026-11-09-codex-r01.
-Task: T-0057 (existing verification state preserved); lineage reconciliation documented.
-Done: fetched origin; confirmed source 872c4fa and SF line 3ba5481 share c1dfbca; recorded owner decision and initial ID/implementation comparison.
-In progress: product validation, independent reviews and selective ports remain unfinished. No product tests run in the lineage documentation step.
-Next action: node scripts/agent/conductor.ts status, then inspect saved T-0057 verification reports and CI for 96a6b93. Preserve dirty evidence before switching to another canonical task branch.
-Decisions taken: DL-0308. Previous source-branch continuation is superseded by selective porting into feat/T-*.
-Open questions for human: lineage resolved. Existing security and initial integration gates below remain; no new approval requested.
-Do not: merge source branch wholesale; overwrite colliding IDs; treat source review status as verification; self-approve Codex work; alter Approved goldens, tests or security gates.
+> Resume feat/T-0168-single-supply-attribution from a8bf5db plus the next research checkpoint. Read T-0168, RQ-0134, the canonical migration map and DL-0314/0315. Owner chose feat/T-* canonical and explicitly requested Codex review instead of Claude; independent reviewer /root/independent_review is reviewing T-0057/0166/0167 under ADR-0052. Collect its reports and fix findings before claiming completion. GP-039 lifecycle passes 1292 DB tests at ad56bb9 and all product/security jobs; golden guard and automated review-policy mismatch remain explicit. RQ-0134 is OPEN: schema collision integration and cash-basis final settlement need resolution before GST-UB production code. Never add placeholders in reserved migration slots or merge source 872c4fa wholesale.
 
-## Prior handover narrative (preserved as historical context)
+Done: runtime remediation and gross allowance regression verified; persona port saved; canonical migration union pinned by hashes and source commits. Backlog lint and whitespace checks pass for research docs.
+Next action: collect independent Codex review reports; inspect canonical refund schema and its tests as first migration integration prerequisite. Respect T-0057's actual remaining gates; do not bypass the conductor by hiding dependencies.
+Decisions: DL-0308..0315; ADR-0051 and task-scoped ADR-0052. Security ADRs remain Proposed.
+Current work is not a full green release. Prior stale local-main baseline concern is superseded: origin/main e39a76c baseline exists and coverage passed.
 
-# Handover - T-0057 builder repair
+## Prior checkpoint skeleton (historical)
 
-## Codex continuation prompt
-> Resume T-0057 on feat/T-0057-payment-confirmation from the repository. Start with node scripts/agent/conductor.ts status and .agent/runs/2026-11-07-codex-r02.md. User explicitly authorized builder takeover and multiple sub-agents after review 5746638. Canonical RED reproduced 8 failures; minimal invalid-date guard now passes all 19 targeted tests. Check the newest builder verification/evidence before rerunning. Coverage main baseline remains unavailable: main d20af5c contains only Docs/Test.MD. Do not self-approve this Codex implementation; require another provider's review and preserve initial-integration gates.
-
-From: codex, run 2026-11-07-codex-r02.
-Done: added module/API regression cases for invalid months/days and rollover, with no posting/outbox effects on refusal; valid leap day stays accepted. Checked parsed date before ISO serialization, matching the posting engine pattern. RED 8 failed/11 passed; GREEN 19/19. Prior FAIL review retained as history.
-In progress: quick/full verification and fresh scenario evidence. Card claimed by codex as builder; root coordinates three user-requested sub-agents. They do not count as cross-provider review.
-Next action: finish builder verification, persist exact outcomes and scenario manifest, then hand to claude for independent review. Inspect /var/tmp/ledgerforce-t0057-review-20261107/results first; no changed assertions, deadlines or retries.
-Decisions: DL-0306. Authenticated remote main d20af5c has no executable source/test harness; historical 72.22% feature baseline is not main. Keep coverage comparison pending; document initial-integration baseline decision instead of inventing a value.
-Open questions for human: no new accounting/security choice; existing owner-plan gates below remain. Initial product integration must resolve how to establish the first genuine main baseline without misrepresenting or waiving the gate.
-Do not: treat prior review as approval of the fix; declare done/merge with pending gates; weaken tests; relabel feature coverage as main; edit Approved goldens or .env files.
-
-Prior continuation: T-0070 pushed 3ba5481 and T-0080 pushed 9c11388, both review; T-0061 blocked at 71da22e. No integration merges performed.
-
-## Owner's parallel-round plan (preserved from 0a178ed)
-# Handover — parallel build round to Codex; 2026-11-03
-## Codex continuation prompt
-> Resume from the repository, not the chat. Read AGENTS.md, run the resume skill, then this file. Claude built the cards below in parallel worktrees, one branch per task, stacked on four lines that all start from `feat/T-0054-payment-batches` (381cf74). Nothing is merged to main. (1) Finish the three WIP cards (T-0061, T-0070, T-0080) from the exact next steps in their cards' "Notes for the next agent". (2) Build the integration branch `integration/2026-11-mvp-ap-bank-stripe-sf` in the merge order below, renumbering migrations as listed (the runner rejects gaps; these files are unmerged, so renaming is allowed per DL-0162/DL-0182 — record a DL entry), then run `pnpm install`, full `pnpm exec vitest run` (only the openbao itest may fail without an OpenBao server), the RLS suite (0 skipped) and `bash scripts/agent/verify.sh`. (3) Cross-review every claude-built card in `review` with the cross-review skill (`node scripts/agent/conductor.ts status`). (4) Then `node scripts/agent/conductor.ts next`.
-
-From: claude (runs 2026-11-02 r02–r14, orchestrated; sub-agents in .claude/worktrees).
-
-### Branches (all pushed to origin)
-| Card | Branch | Head | Status | Based on |
-|---|---|---|---|---|
-| T-0052 bill approval | feat/T-0052-bill-approval | 2b4e1b3 | review | T-0051 line |
-| T-0054 payment batches | feat/T-0054-payment-batches | 381cf74 | review | T-0052 |
-| T-0056 ABA export | feat/T-0056-aba-export | 2b249d6 | review | T-0054 |
-| T-0057 payment confirmation GP-009 + remittances | feat/T-0057-payment-confirmation | d6775e9 | review | T-0056 |
-| T-0055 customer refunds GP-006 (batch) | feat/T-0055-customer-refunds | 378efc6 | review | T-0057 |
-| T-0077 GL detail + aged AP reports | feat/T-0077-gl-detail-aged-reports | aa39606 | review | T-0057 |
-| T-0080 setup wizard / opening balances GP-037 | feat/T-0080-setup-wizard | 81137b4 | **in_progress (verify not run)** | T-0055 |
-| T-0060 bank matching | feat/T-0060-bank-matching | bc6621b | review | T-0057 |
-| T-0061 bank reconciliation | feat/T-0061-bank-reconciliation | 8bfb1e7 | **in_progress (module + db test green; API route, RLS, verify left)** | T-0060 |
-| T-0073 Stripe payment links | feat/T-0073-stripe-payment-links | d00f8f9 | review | T-0054 |
-| T-0074 Stripe webhooks + Stripe refund (SS-UC11-04) | feat/T-0074-stripe-webhooks | eca1292 | review | T-0073 |
-| T-0065 SF inbound mapping | feat/T-0065-sf-inbound-mapping | 0cb12e4 | review | T-0054 |
-| T-0066 SF polling fallback | feat/T-0066-sf-polling-fallback | cdedaf4 | review | T-0065 |
-| T-0069 Closed Won → draft invoice | feat/T-0069-closed-won-invoice | 93d4d54 | review | T-0066 |
-| T-0070 SF nightly reconciliation | feat/T-0070-sf-nightly-reconciliation | 564c5d1 | **in_progress (verify not run)** | T-0069 |
-
-### Integration merge order and migration renumbering
-Merge in this order; rename only the files marked →.
-1. T-0057 line: 0046 bill submission, 0047 payment batch, 0048 ap_payment_confirmation (keep).
-2. T-0055: 0049 ar_customer_refund (keep). T-0077 (no migration).
-3. T-0060: 0050 bank_matching (keep). T-0061: 0051 bank_reconciliation (keep).
-4. T-0080: 0051_setup_opening_balance → **0052**.
-5. T-0073: 0048_payments_stripe_payment_link → **0053**. T-0074: 0049_payments_stripe_webhook → **0054**.
-6. T-0065: 0050_salesforce_inbound_change → **0055**; T-0066: 0051_salesforce_sync_object → **0056**; T-0069: 0052_salesforce_billing_source → **0057**; T-0070: 0053_salesforce_reconciliation → **0058**.
-Shared files will conflict textually (append-only lists): Docs/decisions/decision-log.md (DL-0280…DL-0294, keep all, in number order), Docs/specs/success-scenarios.md, packages/db/src/schema.ts, packages/db/src/testing/cross-tenant.ts (keep every override), apps/api/src/app.ts (keep every controller), infra/docker/nginx/default.conf.template (union of prefixes: ar, ap, gl, setup, webhooks), package.json files and pnpm-lock.yaml (regenerate with `pnpm install`), scripts/agent/test/run.test.ts (identical T-0056 fix on several branches). Check id collisions: SS-PLAT-108/109 (T-0077), SS-PLAT-115–117 (T-0080), GP-037 (T-0080), cards T-0122 (superseded by T-0074) and T-0123–T-0126 (T-0080 splits).
-
-### Decisions waiting for the product owner
-- ADR-0049 (security, Proposed): Stripe webhook tenant routing (one endpoint per deployment; tenant from Payment Link metadata verified against the stored link).
-- ADR-0050 (security, Proposed): let customers hold verified bank details so customer-only parties can be refunded by bank.
-- Design §11.2: invoice trigger default (Opportunity Closed Won vs Order activated; built as a per-company setting defaulting to opportunity), SoD thresholds (placeholders, ADR-0026 Proposed).
-- ADR-0048 (integration, Proposed): Stripe Payment Link per invoice — accept on green CI + cross-review.
-
-### Follow-ups found this round (no cards yet unless noted)
-- apps/worker registers no outbox handlers: register remittanceAdviceHandler (T-0057), salesforceInboundIssueHandler with billing deps (T-0065/T-0069), invoice email with the Stripe link provider (T-0073); start the CDC subscriber, runPollingCycle and nightly reconciliation (T-0066/T-0070) — fits T-0120.
-- UC-06 A3: bank rejects one payment line (cancel payment, re-open bill) — new card.
-- Rate limiting for public routes (design §6.9; /webhooks/stripe is public) — T-0097.
-- Opportunity amount-paid write-back after a Stripe refund (T-0074) and after batch refunds (wire opportunityWriteBack to the outbox, T-0110).
-- Real recordings to replace documented fixtures: Stripe test mode, Salesforce scratch org (CDC, queryAll pages).
-- Grouped bank matches and foreign-currency statement lines (T-0060).
-
-Next action: Codex — finish T-0061/T-0070/T-0080 per their card notes, then build the integration branch above.
-Open questions for human: the decisions listed above; run Codex for cross-reviews.
-Do not: edit Approved golden postings; commit the local `00NN_local_gap_placeholder.sql` files; weaken any test or gate; push to main.
-
+# Handover - 2026-11-10 06:41 UTC
+From: codex (run 2026-10-29-codex-r01)    Reason: Checkpoint T-0168 research; continue with bounded canonical refund schema integration before GST-UB implementation
+Task: T-0168 Reconcile and implement single-supply GST attribution
+Branch: feat/T-0168-single-supply-attribution   Last green commit: da5d6ec
+Done: nothing checked off yet
+In progress: 1. Reconcile source/canonical behavior and migration inventory. — [agent: what is half-done; failing tests with file paths]
+Next action: [agent: the single next command or edit to make]
+Decisions taken: [agent: DL/ADR ids taken this session, or "none new"]
+Open questions for human: [agent: questions that need the human, or "none"]
+Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -393,3 +305,6 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-10T00:53:38.173Z codex: release T-0166 → blocked (Product and security checks pass; full golden approval provenance gate and independent Claude review remain unresolved. Evidence metadata saved in 9c0c822; verifier rerun pending.)
 - 2026-11-10T00:55:09.048Z codex: T-0167 → in_progress
 - 2026-11-10T00:59:07.238Z codex: release T-0167 → blocked (Documentation criteria verified; independent cross-provider review remains unavailable. Parent canonical integration still has golden approval guard unresolved.)
+- 2026-11-10T01:01:12.237Z codex: T-0168 → researching
+- 2026-11-10T06:41:15.103Z codex: handover: Checkpoint T-0168 research; continue with bounded canonical refund schema integration before GST-UB implementation
+- 2026-11-10T06:49:58.940Z codex: T-0168 → researching

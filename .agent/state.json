@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0167-accounting-review-persona",
+  "current_task": "T-0168",
+  "branch": "feat/T-0168-single-supply-attribution",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "codex",
+  "lease_expires_at": "2026-11-10T07:34:58.900Z",
   "last_green_commit": "da5d6ecdcdfcf30b762f5b6e42fb68af125d1ca4",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-10T00:59:07.235Z",
+  "updated_at": "2026-11-10T06:49:58.938Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -88,7 +88,8 @@
     "T-0056": 1,
     "T-0057": 4,
     "T-0166": 1,
-    "T-0167": 1
+    "T-0167": 1,
+    "T-0168": 1
   },
   "failures": {},
   "providers": {},

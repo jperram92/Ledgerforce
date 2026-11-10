@@ -96,6 +96,7 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0046](0046-email-smtp-nodemailer.md) | Send document email over SMTP with nodemailer from outbox handlers | integration | no | Proposed |
 | [0047](0047-mime-parsing-postal-mime.md) | Parse inbound bill email with postal-mime | integration | no | Proposed |
 
-Next free number: **0052** (0048–0050 reserved by parallel canonical task branches; 0028, 0031, 0033 and 0041 remain historical unused slots).
+Next free number: **0053** (0048–0050 reserved by parallel canonical task branches; 0028, 0031, 0033 and 0041 remain historical unused slots).
 
 | [0051](0051-gross-ecl-allowance-remeasurement.md) | Gross ECL allowance and subsequent remeasurement | accounting | delegated | Accepted |
+| [0052](0052-owner-authorized-independent-codex-review.md) | Independent Codex review for the current pickup batch | process | owner instruction | Accepted |

@@ -149,7 +149,8 @@ graph LR
 | [T-0056](T-0056.md) | ABA (Cemtex) file export | MVP | todo | T-0054 | UC-06 | 1 |
 | [T-0057](T-0057.md) | Payment confirmation posting and remittance advices | MVP | blocked | T-0056, T-0042, T-0031 | UC-06 | 2 |
 | [T-0166](T-0166.md) | Gross ECL allowance reconciliation from source lineage | MVP | blocked | T-0031, T-0048 | — | 3 |
-| [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | in_progress | — | — | 1 |
+| [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
+| [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | researching | T-0047, T-0035 | UC-04 | 3 |
 | [T-0058](T-0058.md) | Bank accounts and statement import (CSV, OFX) | MVP | review | T-0018 | UC-08 | 2 |
 | [T-0059](T-0059.md) | CAMT extensions: batch entries (TxDtls), several statements per file, camt.052/054 | MVP | review | T-0058 | UC-08 | 1 |
 | [T-0060](T-0060.md) | Matching rules and auto-match | MVP | todo | T-0058, T-0046, T-0057 | UC-08 | 3 |

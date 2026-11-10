@@ -2221,3 +2221,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the owner-selected canonical line lacks this useful review procedure. Source wording implying practitioner status or fixed regulatory dates is replaced by explicit non-practitioner disclosure and applicable-period verification. No new professional service, security approval or self-review authority is created.
 - Validation: source/target comparison and AC checklist in .agent/evidence/T-0167/port-check.md; backlog and whitespace checks. Documentation-only: no runtime behavior or test expectations changed.
 - ADR: none · Status: accepted
+
+### DL-0314 — Reserve a collision-free integration sequence within the canonical family
+- Date: 2026-11-10 · By: codex · Task: T-0168 · Category: process
+- Decision: preserve the canonical 0048 prefix; reserve 0049 refunds, 0050 bank matching, 0051 bank reconciliation, 0052–0055 Salesforce inbound/polling/billing/reconciliation, 0056 Stripe webhook, 0057 setup and 0058 onward for new attribution work. Exact original paths/blobs/commits are recorded in the migration map and inventory.
+- Why: the owner-selected feat family itself contains different migrations with identical numbers. The migrator correctly refuses gaps/duplicates. Copying source GST work into the next local slot would recreate that collision.
+- Limits: reservation only; no source SQL applied, no historical file deleted, no deployed checksum rewritten, no schema declared verified. Port bounded feature groups and test main/0048 upgrades. Divergent feature databases require an explicit additive adoption path if used; never silently reset them.
+- ADR: none (integration sequencing; accounting storage remains open in RQ-0134) · Status: accepted
+
+### DL-0315 — Owner requests Codex review instead of Claude
+- Date: 2026-11-10 · By: human (instruction), recorded by codex · Tasks: T-0057, T-0166, T-0167 · Category: process
+- Owner instruction: review the prepared work in Codex rather than Claude, in response to the request to authenticate the Claude CLI. This overrides the cross-provider requirement for this review batch; it does not grant security/release approval or permit builder self-approval.
+- Execution: separate Codex reviewer `/root/independent_review`, independent of builder `/root`, reviews immutable product checkpoints and actual CI evidence. Reports identify Codex honestly and retain findings and unrun checks. No report may be relabelled Claude or human.
+- Limits: no blanket exemption for unrelated future work, no weakening of tests or accounting gates. Existing automation may still report cross-provider PENDING until it supports this recorded owner exception; do not fabricate a green result.
+- ADR: 0052 · Status: accepted by explicit owner instruction
