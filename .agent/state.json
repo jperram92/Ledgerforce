@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0166-gross-ecl-reconciliation",
+  "current_task": "T-0167",
+  "branch": "feat/T-0167-accounting-review-persona",
   "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "claimed_by": "codex",
+  "lease_expires_at": "2026-11-10T01:40:09.037Z",
   "last_green_commit": "da5d6ecdcdfcf30b762f5b6e42fb68af125d1ca4",
   "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-10T00:53:38.171Z",
+  "updated_at": "2026-11-10T00:55:09.045Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -87,7 +87,8 @@
     "T-0054": 1,
     "T-0056": 1,
     "T-0057": 4,
-    "T-0166": 1
+    "T-0166": 1,
+    "T-0167": 1
   },
   "failures": {},
   "providers": {},

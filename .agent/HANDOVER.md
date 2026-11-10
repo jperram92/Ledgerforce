@@ -1,3 +1,11 @@
+# Handover — T-0167 accounting-review persona port
+
+## Latest Codex continuation prompt
+
+> Resume feat/T-0167-accounting-review-persona, based on 9bcf08c. Read T-0167, .claude/agents/accountant-reviewer.md, its port-check.md evidence and DL-0313. Role port is documentation-only and does not supply independent review of Codex work. Next verify backlog/diff, obtain independent review, and continue the single-supply GST-UB gap described in .agent/LINEAGE-RECONCILIATION-2026-11-10.md. T-0166 product tests/security pass at ad56bb9 (1292 DB tests); full completion remains blocked by golden guard and independent review. Source lineage 872c4fa is never merged wholesale.
+
+## Prior task continuation (preserved)
+
 # Handover — T-0166 selective gross allowance port
 
 ## Current Codex continuation prompt
@@ -383,3 +391,4 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-10T00:08:51.095Z codex: T-0166 → in_progress
 - 2026-11-10T00:42:35.927Z codex: T-0166 → verifying
 - 2026-11-10T00:53:38.173Z codex: release T-0166 → blocked (Product and security checks pass; full golden approval provenance gate and independent Claude review remain unresolved. Evidence metadata saved in 9c0c822; verifier rerun pending.)
+- 2026-11-10T00:55:09.048Z codex: T-0167 → in_progress

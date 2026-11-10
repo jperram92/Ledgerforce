@@ -2214,3 +2214,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: the new module test maps tax:GST.collected to AU services account 2310, consistent with the existing template and golden binding registry. Golden Ref 2200 is illustrative, not a template account lookup.
 - Evidence: second CI 42728847404 passed 1291 DB tests; the new exact comparison failed only on 2200 versus 2310 after party and tax marker checks. Preserve full assertions, approved entries and production code; correct the erroneous test fixture binding.
 - ADR: none · Status: accepted
+
+### DL-0313 — Adopt the source accounting-review role with canonical boundaries
+- Date: 2026-11-10 · By: codex · Task: T-0167 · Category: process
+- Decision: port source 872c4fa's accountant-reviewer role, qualifying source DL-0248 and mapping authority to current AGENTS.md section 6. Keep explicit AI disclosure, read-only product scope, primary-source verification and complete proposed journals. Do not transplant colliding source ADR/RQ IDs.
+- Why: the owner-selected canonical line lacks this useful review procedure. Source wording implying practitioner status or fixed regulatory dates is replaced by explicit non-practitioner disclosure and applicable-period verification. No new professional service, security approval or self-review authority is created.
+- Validation: source/target comparison and AC checklist in .agent/evidence/T-0167/port-check.md; backlog and whitespace checks. Documentation-only: no runtime behavior or test expectations changed.
+- ADR: none · Status: accepted
