@@ -1,4 +1,4 @@
-/** GP-038: gross allowance, statutory GST relief, then explicit remeasurement. */
+/** GP-039: gross allowance, statutory GST relief, then explicit remeasurement. */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { post, subledgerEntriesOf } from '@ledgerforce/ledger';
@@ -12,12 +12,12 @@ import { approveInvoice, createDraftInvoice, setArSettings } from './invoices.ts
 import { writeOffInvoice } from './write-off.ts';
 import { seedBillableCustomers, seedBillingCompany } from './testing/batch-fixture.ts';
 
-it('SS-PLAT-106 GP-038 preserves the residual until reassessment and reports relief only on accruals', async () => {
+it('SS-PLAT-106 GP-039 preserves the residual until reassessment and reports relief only on accruals', async () => {
   const goldens = approvedTables(
     parsePostings(
       readFileSync(resolve(import.meta.dirname, '../../../../Docs/accounting/postings.md'), 'utf8'),
     ),
-  ).filter((t) => t.entryId === 'GP-038');
+  ).filter((t) => t.entryId === 'GP-039');
   expect(goldens).toHaveLength(3);
   const f = await createLedgerFixture('01900000-0000-7000-8000-000000016601');
   try {
@@ -113,6 +113,18 @@ it('SS-PLAT-106 GP-038 preserves the residual until reassessment and reports rel
     );
     expect(await balance('1220')).toBe('0.0000');
     expect(await balance('6500')).toBe('1250.0000');
+    const taxLines = await f.inTenant(
+      async (trx) =>
+        (
+          await sql<{
+            code: string;
+            tax: string;
+          }>`SELECT t.code, l.debit::text AS tax FROM app.journal_line l JOIN app.tax_code t ON t.id=l.tax_code_id WHERE l.entry_id=${writeoff.entryId}`.execute(
+            trx,
+          )
+        ).rows,
+    );
+    expect(taxLines).toEqual([{ code: 'GST-ADJ', tax: '125.0000' }]);
     const bindings: Record<string, string> = {
       'setting:ar.bad_debt_account': '6500',
       'system:AR_ECL_ALLOWANCE': '1220',

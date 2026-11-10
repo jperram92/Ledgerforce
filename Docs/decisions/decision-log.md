@@ -2201,3 +2201,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: gross contractual receivable loss and later statutory GST relief are distinct; a subsequent portfolio reassessment releases the remaining 125.00. Existing write-off behavior already supports this scenario. Automatic company-wide allowance clearing is rejected because other debts may still require it.
 - Validation: new exact three-journal and real PostgreSQL lifecycle tests added; results are recorded in the T-0166 run/evidence. No production behavior changed and no RED-before-production claim is made for this documentation/test port. Independent review remains required.
 - ADR: 0051 · Status: accepted under standing accounting delegation
+
+### DL-0311 — Correct source-to-canonical attribution through an additive successor
+- Date: 2026-11-10 · By: codex · Task: T-0166 · Category: accounting
+- Decision: approve GP-039 as successor to GP-038; retain every byte of GP-038. Preserve canonical GP-024's Acme tag on the allowance debit and GST-ADJ on the GST debit. Monetary expectations and accounting recognition are unchanged.
+- Evidence: CI 42726352115 had 1291 database tests pass and the new exact lifecycle fail on the omitted customer tag. Inspection of approved GP-024 and write-off.ts also found the misplaced tax marker in the new source mapping. This is a golden authoring correction, not a product fix or removal of an assertion. Add explicit tax-code/tax-amount verification to prevent recurrence.
+- Authority: standing accounting delegation; RQ-0133 still governs the recognition decision. GP-038 remains replayable history; GP-039 is the current module contract.
+- ADR: 0051 addendum · Status: accepted

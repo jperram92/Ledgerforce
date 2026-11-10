@@ -62,6 +62,8 @@ Complete other source gaps separately, especially single-supply deposits.
 
 ## Links
 
+Implementation addendum (DL-0311): GP-039 supersedes GP-038's incorrect source-to-canonical party/tax attribution. Keep historical GP-038 unchanged; use GP-039 for the module lifecycle. This does not alter the accounting amounts or remeasurement decision.
+
 - Design sections 3.8 and 3.10.
 - RQ-0133 (primary sources and inference limits).
 - DL-0308 (canonical lineage), DL-0310 (adoption and mapping).

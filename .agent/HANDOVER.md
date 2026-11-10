@@ -2,6 +2,8 @@
 
 ## Current Codex continuation prompt
 
+Latest correction: CI on 57750a5 passed 1291 DB tests and failed the new lifecycle on GP-038's omitted customer tag. DL-0311 adds GP-039 as current expectation, preserving GP-038. Re-run corrected lifecycle and exact goldens; security CI 42726352427 passed. No product accounting code changed.
+
 > Resume feat/T-0166-gross-ecl-reconciliation, based on d32dfeb. Owner chose feat/T-* canonical (DL-0308). Read T-0166, RQ-0133, ADR-0051, DL-0310 and the latest run log. GP-038 appends the source gross allowance lifecycle without editing approved historical entries. Run the focused ledger golden and AR gross-allowance/write-off tests using .tmp/t0166-validate.sh in the existing WSL harness; inspect .agent/evidence/T-0166/focused-tests.log. No production accounting code changed. Finish verification and independent review, then continue separate source gaps, especially single-supply GST-UB. Do not blind merge source 872c4fa.
 
 T-0057: runtime remediation 9eb7736 passed all nine security CI jobs; product tests passed, final definition-of-done still fails historical approval provenance/coverage/review gates (evidence/T-0057/ci-runtime-remediation-20261109.md). d32dfeb records this honestly; task remains blocked, not done. Security decisions and release/phase gates remain with owner.

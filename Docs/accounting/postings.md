@@ -915,3 +915,37 @@ Allowance remains 125.00 credit. BAS 1B increases 125.00 on accruals; no cash-ba
 | | **Total** | | **125.00** | **125.00** | | |
 
 Allowance is zero; net impairment expense is 1,250.00. Release has no GST or subledger effect. Never automatically release a shared allowance that may cover other receivables. Partial loss estimates still require evidence; this example does not prescribe 100% provisioning for all debts.
+
+## GP-039 — Gross allowance lifecycle with canonical customer and tax attribution
+
+- **Status: Approved (codex under the owner's standing accounting delegation, DL-0311, 2026-11-10; RQ-0133, ADR-0051)** · Phase: MVP · Source type: `ar.ecl_adjustment`, `ar.write_off`, `ar.ecl_adjustment`
+- **Supersedes GP-038 for current implementation:** same dates, amounts, portfolio assumptions and accounting rationale. GP-038's source-to-canonical mapping omitted Acme from the allowance debit and misplaced GST-ADJ. CI 42726352115 exposed the customer mismatch; comparison with approved GP-024 established both corrections. GP-038 remains unchanged as historical evidence, not the current implementation expectation.
+
+### A1 — Recognise the assessed gross loss
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | setting:ar.bad_debt_account | 6500 | 1,375.00 | | — | — |
+| 2 | system:AR_ECL_ALLOWANCE | 1220 | | 1,375.00 | — | — |
+| | **Total** | | **1,375.00** | **1,375.00** | | |
+
+### A2 — Write off the debt and recognise statutory relief
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_ECL_ALLOWANCE | 1220 | 1,250.00 | | — | Acme |
+| 2 | tax:GST.collected | 2200 | 125.00 | | GST-ADJ | — |
+| 3 | system:AR_CONTROL | 1200 | | 1,375.00 | — | Acme |
+| | **Total** | | **1,375.00** | **1,375.00** | | |
+
+Allowance remains 125.00 credit. BAS 1B increases 125.00 on accruals, zero on cash. The tax adjustment belongs to the GST line, matching canonical GP-024.
+
+### A3 — Explicit reporting-date remeasurement
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_ECL_ALLOWANCE | 1220 | 125.00 | | — | — |
+| 2 | setting:ar.bad_debt_account | 6500 | | 125.00 | — | — |
+| | **Total** | | **125.00** | **125.00** | | |
+
+Allowance zero; net impairment expense 1,250.00. No GST on remeasurement; no automatic release of allowances for other customers.

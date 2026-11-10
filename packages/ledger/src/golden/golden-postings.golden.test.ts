@@ -36,6 +36,7 @@ const SUPERSEDED: Record<string, string> = {
 const ALL = [
   ...Array.from({ length: 36 }, (_, i) => `GP-${String(i + 1).padStart(3, '0')}`),
   'GP-038',
+  'GP-039',
 ];
 
 /** Source types named by Approved entries that the engine does not accept yet (emptied in T-0116). */
@@ -64,7 +65,7 @@ describe('SS-PLAT-12: Every Approved golden posting is reproduced exactly — pa
   it('runs on Approved entries only and refuses a file that still has Draft entries', () => {
     const ids = new Set(approvedTables(entries).map((t) => t.entryId));
     for (const id of Object.keys(SUPERSEDED)) expect(ids.has(id), id).toBe(false);
-    expect(ids.size).toBe(31);
+    expect(ids.size).toBe(32);
     const draft = parsePostings(
       '## GP-900 — x\n\n- **Status: Draft** · Source type: `manual_journal`\n\n' +
         '| # | Account | Ref | Debit | Credit | Tax code | Party |\n|---|---|---|---:|---:|---|---|\n' +
@@ -76,7 +77,7 @@ describe('SS-PLAT-12: Every Approved golden posting is reproduced exactly — pa
 
   it('every Approved journal table balances and equals its Total row', () => {
     const tables = approvedTables(entries);
-    expect(tables.length).toBe(39); // GP-038 adds three journals; GP-037 is reserved on the setup branch.
+    expect(tables.length).toBe(42); // GP-038/039 add three journals each; GP-037 is reserved on the setup branch.
     for (const t of tables) {
       const d = t.lines.reduce((s, l) => s.add(Money.of(l.debit, 'AUD')), Money.zero('AUD'));
       const c = t.lines.reduce((s, l) => s.add(Money.of(l.credit, 'AUD')), Money.zero('AUD'));
