@@ -392,3 +392,4 @@ Do not: edit Approved golden postings; commit the local `00NN_local_gap_placehol
 - 2026-11-10T00:42:35.927Z codex: T-0166 → verifying
 - 2026-11-10T00:53:38.173Z codex: release T-0166 → blocked (Product and security checks pass; full golden approval provenance gate and independent Claude review remain unresolved. Evidence metadata saved in 9c0c822; verifier rerun pending.)
 - 2026-11-10T00:55:09.048Z codex: T-0167 → in_progress
+- 2026-11-10T00:59:07.238Z codex: release T-0167 → blocked (Documentation criteria verified; independent cross-provider review remains unavailable. Parent canonical integration still has golden approval guard unresolved.)
