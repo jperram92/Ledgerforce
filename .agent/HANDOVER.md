@@ -308,3 +308,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-10T01:01:12.237Z codex: T-0168 → researching
 - 2026-11-10T06:41:15.103Z codex: handover: Checkpoint T-0168 research; continue with bounded canonical refund schema integration before GST-UB implementation
 - 2026-11-10T06:49:58.940Z codex: T-0168 → researching
+- 2026-11-10T07:11:27.867Z codex: release T-0168 → todo (Research saved at 8fbf696; address independent review finding in T-0166 before continuing attribution research)

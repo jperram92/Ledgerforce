@@ -120,6 +120,9 @@ START ─▶ resume ─▶ claim ─▶ research gate ─▶ TDD loop ─▶ ver
    from the card and the success-scenario register.
 8. **Cross-provider review** (skill `cross-review`): code built by one provider is reviewed by
    the other against the checklist in `.claude/agents/reviewer.md`.
+   Owner-authorized exception for the current pickup batch only: T-0057, T-0166 and T-0167
+   use a separate independent Codex reviewer under Accepted ADR-0052 (DL-0315). The builder
+   cannot approve its own work; reports must identify Codex honestly. Other gates remain intact.
 9. **Finish.** Card `status: done`, success-scenario register updated, decision log updated,
    run log written (skill `run-log`), HANDOVER rewritten, lease released.
 
