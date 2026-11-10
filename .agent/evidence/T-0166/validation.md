@@ -12,3 +12,8 @@
 - CI 42726352115: static/unit, browser and 10,000-document invariants PASS. DB 1291 PASS / 1 FAIL: GP-038 omitted customer attribution on allowance line. Exact failure saved in ci-first-db-failure.log.
 - Security 42726352427: PASS.
 - DL-0311 adds GP-039 correcting canonical party and tax placement without editing GP-038. Strengthened regression verifies the tagged GST debit; canonical GST-ADJ reports its debit amount, not an explicit tax_amount field. Pending rerun.
+
+## Second CI on eb356f9
+
+- CI 42728847404: static/unit, browser and invariants PASS; DB 1291 PASS / 1 FAIL. Correct party and GST marker passed; exact comparison exposed a test binding error: AU services uses GST collected 2310, not the golden's illustrative Ref 2200.
+- Fixed only the test's chart binding to 2310, as independently specified by the existing canonical template and golden binding registry. All exact line, party and tax assertions remain. No golden or production changes required for this correction. Pending rerun.

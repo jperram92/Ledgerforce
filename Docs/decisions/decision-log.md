@@ -2208,3 +2208,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Evidence: CI 42726352115 had 1291 database tests pass and the new exact lifecycle fail on the omitted customer tag. Inspection of approved GP-024 and write-off.ts also found the misplaced tax marker in the new source mapping. This is a golden authoring correction, not a product fix or removal of an assertion. Add explicit tax-code/tax-amount verification to prevent recurrence.
 - Authority: standing accounting delegation; RQ-0133 still governs the recognition decision. GP-038 remains replayable history; GP-039 is the current module contract.
 - ADR: 0051 addendum · Status: accepted
+
+### DL-0312 — Use the canonical GST account binding in the module regression
+- Date: 2026-11-10 · By: codex · Task: T-0166 · Category: tooling
+- Decision: the new module test maps tax:GST.collected to AU services account 2310, consistent with the existing template and golden binding registry. Golden Ref 2200 is illustrative, not a template account lookup.
+- Evidence: second CI 42728847404 passed 1291 DB tests; the new exact comparison failed only on 2200 versus 2310 after party and tax marker checks. Preserve full assertions, approved entries and production code; correct the erroneous test fixture binding.
+- ADR: none · Status: accepted

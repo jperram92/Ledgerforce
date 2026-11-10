@@ -128,7 +128,7 @@ it('SS-PLAT-106 GP-039 preserves the residual until reassessment and reports rel
     const bindings: Record<string, string> = {
       'setting:ar.bad_debt_account': '6500',
       'system:AR_ECL_ALLOWANCE': '1220',
-      'tax:GST.collected': '2200',
+      'tax:GST.collected': '2310',
       'system:AR_CONTROL': '1200',
     };
     for (const [index, id] of [allowance.entryId, writeoff.entryId, release.entryId].entries()) {
