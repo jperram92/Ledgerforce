@@ -6,7 +6,7 @@
 
 ## Codex continuation prompt
 
-> Continue owner-requested pickup from `feat/T-0166-golden-successor-review` at `cf03cb0`. Run `bash scripts/agent/resume.sh`; T-0166 is blocked only on preserved golden guard and automated provider-review mismatch after verifier14PASS/1FAIL/1PENDING. Its product, DB, browser, invariant, security and memory checks pass. Save pending RQ-0135 and lineage notes, then switch to `feat/T-0041-pdf-format-repair` to fix the independently reviewed quantity bug with RED/GREEN tests. T-0041’s broader task remains review, not done; timeout bound and visual PDF evidence remain. T-0119 deployment gap research is open. Keep security/golden/release gates intact.
+> Continue from `feat/T-0041-pdf-format-repair` at `2000385`. T-0041 integer quantity formatter fix passes RED/GREEN (6/6), scoped lint, prettier and documents typecheck. Next implement a true whole-render deadline with lifecycle tests, preserving safe cleanup and shared browser ownership. Independent review also found cached failed launch and missing visual PDF evidence; keep them open until tested. Parallel read-only audits recorded: T-0047 single-supply gap remains RQ-0134; T-0048 impossible-date validation finding; T-0069 migration collision finding at older head. T-0166 is blocked on golden-provenance guard and provider automation mismatch despite product/full verifier14PASS/1FAIL/1PENDING. Do not weaken gates or claim full completion.
 From: human (run 2026-10-29-codex-r01)    Reason: T-0166 technical repairs verified; continue original pickup with T-0041 independent-review findings
 Task: none (no active task)
 Branch: feat/T-0166-golden-successor-review   Last green commit: da5d6ec
