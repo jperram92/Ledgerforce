@@ -1,4 +1,8 @@
-# Handover - 2026-11-10 23:02 UTC
+# Handover - 2026-11-11 T-0041 quantity fix
+
+## Codex continuation prompt
+
+> Resume `feat/T-0041-pdf-format-repair` and read `bash scripts/agent/resume.sh`, T-0041 and the independent T-0041 review. Quantity regression reproduced RED (1 fail/5 pass), formatter fixed, focused tests GREEN6/6, scoped lint and prettier pass; documents typecheck was started and needs exit confirmation. Next rerun typecheck, record review findings and verification, commit/push. T-0041 still has major whole-render timeout finding and visual evidence gap; no full completion claim. Parallel read-only T-0047 review found no fix authorized by existing goldens; RQ-0134 remains open. Two agent worktree attempts hit disk-full; avoid further checkout writes.
 
 ## Codex continuation prompt
 
@@ -306,3 +310,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-10T22:39:50.393Z codex: T-0166 → verifying
 - 2026-11-10T23:02:24.524Z codex: release T-0166 → blocked (cf03cb0 verifier14PASS/1FAIL/1PENDING: golden approval guard remains; automated other-provider rule does not recognize owner-authorized independent Codex review. Product, DB, browser, invariants and security pass.)
 - 2026-11-10T23:02:25.985Z human: handover: T-0166 technical repairs verified; continue original pickup with T-0041 independent-review findings
+- 2026-11-11T02:57:43.329Z codex: T-0041 → in_progress

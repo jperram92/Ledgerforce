@@ -2249,3 +2249,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Evidence: CI 42906703669 at 568f376 passes product unit, 1292 DB, browser, fresh invariants and security, but verifier reports 81/82 agent tests with the failing detail truncated. Independent Linux reproduction identifies the unpinned fixture selecting pnpm 12.18 through Corepack rather than the repository's 10.28 pin. Pinning the fixture yields 82/82 Linux agent tests. This establishes the local cause; the original CI failure's exact identity remains unproven from its truncated output.
 - Limits: no verifier/security gate, dependency version, assertion or timeout changed. Native Windows shell-based suite also failed multiple cases and is retained as separate platform evidence, not conflated with Linux CI.
 - ADR: none (test fixture correction only) · Status: accepted
+
+### DL-0318 — Preserve significant integer digits in invoice quantity formatting
+- Date: 2026-11-11 · By: codex · Task: T-0041 · Category: tooling
+- Decision: remove trailing zeros only from the fractional portion of quantity strings; preserve integer strings as supplied. Keep fixed-scale database values such as `10.0000` formatted as `10`.
+- Evidence: independent T-0041 review reproduced `10` and `100` rendering as `1`. New regression was RED1/5 then GREEN6/6; documents typecheck, scoped lint and formatting pass. No amounts, tax or posting behavior changed.
+- ADR: none (presentation formatting bug) · Status: accepted
