@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0047-prepayments",
-  "step": null,
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "current_task": "T-0048",
+  "branch": "feat/T-0048-write-off",
+  "step": "invalid-date validation scoped green; full verification pending",
+  "claimed_by": "codex",
+  "lease_expires_at": "2026-11-11T10:53:01.340Z",
   "last_green_commit": null,
-  "run_id": "2026-10-29-codex-r01",
-  "updated_at": "2026-11-01T21:30:18.761Z",
+  "run_id": "2026-11-11-codex-r02",
+  "updated_at": "2026-11-11T10:08:01.349Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -79,7 +79,7 @@
     "T-0045": 1,
     "T-0046": 1,
     "T-0047": 1,
-    "T-0048": 1
+    "T-0048": 2
   },
   "failures": {},
   "providers": {},

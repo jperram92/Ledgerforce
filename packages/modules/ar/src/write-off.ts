@@ -40,6 +40,22 @@ export interface WriteOffView {
 
 const numeric = (d: Decimal | string) => Money.of(d, 'XXX').toNumericString();
 const cents = (d: Decimal) => d.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
+const isCalendarDate = (value: string): boolean => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+
+  const [, yearText, monthText, dayText] = match;
+  if (!yearText || !monthText || !dayText) return false;
+  const year = Number.parseInt(yearText, 10);
+  const month = Number.parseInt(monthText, 10);
+  const day = Number.parseInt(dayText, 10);
+  if (year === 0 || month < 1 || month > 12) return false;
+
+  const leapYear = year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0);
+  const daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  const maxDay = daysInMonth[month - 1];
+  return maxDay !== undefined && day >= 1 && day <= maxDay;
+};
 
 export async function writeOffInvoice(
   trx: Trx,
@@ -56,8 +72,11 @@ export async function writeOffInvoice(
   if (c.reason.trim().length === 0) {
     throw new WriteOffError('INVALID_WRITE_OFF', 'a write-off needs a written reason (GP-024)');
   }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(c.writeOffDate)) {
-    throw new WriteOffError('INVALID_WRITE_OFF', 'write-off date is YYYY-MM-DD');
+  if (!isCalendarDate(c.writeOffDate)) {
+    throw new WriteOffError(
+      'INVALID_WRITE_OFF',
+      'write-off date must be a valid calendar date in YYYY-MM-DD format',
+    );
   }
   const settings = await trx
     .selectFrom('app.ar_settings')

@@ -1,8 +1,8 @@
 # Handover — T-0048 review failed; 2026-11-11
 ## Codex continuation prompt
-> Resume from the repository. Branch `feat/T-0048-write-off`, review commit `a272f81`. Read `AGENTS.md`, run `bash scripts/agent/resume.sh`, then read this file, `.agent/state.json`, `.agent/backlog/T-0048.md`, and `.agent/evidence/T-0048/review-codex-20261111-100000.md`. The cross-review failed: `packages/modules/ar/src/write-off.ts` accepts impossible dates such as `2026-99-99` by shape and leaks the database cast error. Next: add a failing regression test expecting typed `INVALID_WRITE_OFF`, prove RED, implement calendar-date validation, prove GREEN, rerun verification in an environment with working Bash and PostgreSQL, update evidence and request Codex re-review. Do not edit approved goldens. `.agent/state.json` still points to T-0047; check its lease/owner before reconciling it.
+> Resume from the repository. Branch `feat/T-0048-write-off`, latest implementation commit on this branch. Read `AGENTS.md`, run `bash scripts/agent/resume.sh`, then read this file, `.agent/state.json`, `.agent/backlog/T-0048.md`, and the T-0048 review and invalid-date RED/GREEN evidence. The Codex review finding is fixed: impossible ISO calendar dates now return typed `INVALID_WRITE_OFF` before database access. Scoped TDD, AR typecheck, targeted lint, and formatting pass. Next: run full `bash scripts/agent/verify.sh --task T-0048` and `pnpm test:db` with working Bash/PostgreSQL, resolve or classify the four unrelated workspace test failures from the prior run, then request independent Codex re-review. Do not edit approved goldens. Task remains in progress.
 
-From: codex (run 2026-11-11-codex-r01). T-0048 is back in progress for review fixes. Typecheck/lint/format pass; `pnpm test` had 4 unrelated failures, `test:db` cannot start without PostgreSQL, and `verify.sh` cannot start WSL Bash (`E_ACCESSDENIED`). See the review report for exact results.
+From: codex (run 2026-11-11-codex-r02). Date validation fix is scoped green. Run r01 review results: workspace typecheck/lint/format passed, full unit run had four unrelated failures, `test:db` had no PostgreSQL, and verify wrapper could not start WSL Bash (`E_ACCESSDENIED`). Run r02 reattempted verify with the same WSL error. Run r02 evidence records the RED/GREEN regression and scoped checks. Full verification and independent review remain.
 
 # Previous handover — T-0048 write-off in review; 2026-11-01
 ## Codex continuation prompt
@@ -256,3 +256,4 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01T21:17:10.930Z claude: release T-0047 → review (verify 14/0/2; awaiting codex cross-review)
 - 2026-11-01T21:23:44.716Z claude: T-0048 → verifying
 - 2026-11-01T21:30:18.762Z claude: release T-0048 → review (verify 14/0/2; awaiting codex cross-review)
+- 2026-11-11T10:08:01.351Z codex: T-0048 → in_progress
