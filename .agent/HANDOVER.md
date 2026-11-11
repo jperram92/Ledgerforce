@@ -1,4 +1,10 @@
-# Handover — T-0048 review failed; 2026-11-11
+# Handover — T-0048 verification recovery in progress; 2026-11-11 22:31 UTC
+## Codex continuation prompt
+> Resume T-0048 on `feat/T-0048-write-off` from repository HEAD (implementation `4cc7e9e`, previous documentation `61307c8`). Run `node scripts/agent/conductor.ts status` and inspect `.agent/evidence/T-0048/verify-20261111-r03-serial.log` before launching more tests. Run r03 has passed static checks, 963 Vitest tests, 8 Salesforce tests, 82 agent tests, and five focused write-off unit/DB tests. Full DB and remaining verification gates are running; do not claim completion. Environment: Node 22.22.0, Git Bash, isolated WSL PostgreSQL 16 on loopback port 55448 via `LF_TEST_DATABASE_URL`, and `VITEST_MAX_WORKERS=1`. Read run r03 and its verification evidence. Claude must cross-review the Codex-authored date fix after full verification.
+
+Current run: codex r03; DL-0277. No production code changed. Earlier environment blockers are resolved for focused tests. Full gate result remains pending. Do not start overlapping default-worker suites, edit approved goldens, weaken tests, or self-review Codex code.
+
+# Previous handover — T-0048 review failed; 2026-11-11
 ## Codex continuation prompt
 > Resume from the repository. Branch `feat/T-0048-write-off`, implementation checkpoint `4cc7e9e8ba68a1871edffa7c420f61c2abb20819`. Read `AGENTS.md`, run `bash scripts/agent/resume.sh`, then read this file, `.agent/state.json`, `.agent/backlog/T-0048.md`, and the T-0048 review and invalid-date RED/GREEN evidence. The Codex review finding is fixed: impossible ISO calendar dates now return typed `INVALID_WRITE_OFF` before database access. Scoped TDD, AR typecheck, targeted lint, and formatting pass. Next: run full `bash scripts/agent/verify.sh --task T-0048` and `pnpm test:db` with working Bash/PostgreSQL, resolve or classify the four unrelated workspace test failures from the prior run, then request independent Codex re-review. Do not edit approved goldens. Task remains in progress.
 

@@ -2112,3 +2112,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - The GST in the open amount (open × invoice GST ÷ gross, cents) is debited to GST collected with GST-ADJ, so the BAS query (DL-0264) reports a decreasing adjustment at 1B on accruals and nothing on cash (asserted). A written reason is mandatory (`app.bad_debt_write_off`, migration 0043, immutable).
 - The allowance and expense accounts are AR settings (template suggestedSettings 1220/6500) until system-role promotion (T-0117). Period-end allowance movements (GP-025, source ar_ecl_adjustment) post as journals; recoveries (GP-026) are a later flow.
 
+### DL-0277 — Recover T-0048 verification with an isolated database and one worker
+- Date: 2026-11-11 · By: codex · Task: T-0048 · Category: tooling
+- Decision: Use Node 22, Git Bash, and a disposable WSL PostgreSQL 16 cluster on loopback port 55448 with the existing external-database harness. Restore dependencies from the frozen lockfile and run full verification with `VITEST_MAX_WORKERS=1`.
+- Why: Sandbox WSL access and dependency resolution prevented verification; overlapping default-worker runs overloaded the Windows host. The focused write-off unit/database run now passes all five tests. See `.agent/evidence/T-0048/verification-20261111-r03.md`.
+- Alternatives: Reusing the existing database risks interfering with unrelated data; changing assertions or timeouts would weaken evidence. Neither was done.
+- ADR: none · Status: accepted
+
