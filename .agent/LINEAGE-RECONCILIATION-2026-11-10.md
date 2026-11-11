@@ -60,8 +60,18 @@ Single-supply comparison: canonical recordPrepayment refuses single supplies wit
 
 Security ADRs 0016/0018/0023/0025/0026/0030 are still Proposed on the canonical checkout too; source accounting delegation does not accept them.
 
-Preserve the current dirty verification records before switching branches. Resume T-0057
-verification from its evidence and require Claude review of the Codex repair. Independently
+Superseding review direction: owner authorized independent Codex review of T-0057/0166/0167
+under ADR-0052. Those scoped reports are saved, including the GP-038 selection defect and its
+reviewed repair. Full verification gates remain explicit. Independently
 cross-review Claude-built canonical cards. For each source gap, create a bounded fresh task,
 record its source mapping, research unclear behavior, demonstrate RED, implement and verify.
 Do not use review status, historical test totals or this inventory as completion evidence.
+
+## PDF delivery gap confirmed (2026-11-11)
+
+Canonical T-0041 supplies the renderer/template library; the actual worker has an empty handler
+registry and its runtime image has no Chromium. T-0119 already owns completion of that path.
+RQ-0135 records durable storage, image compatibility/security and event retry questions.
+Existing document_attachment stores bill/inbox files; do not assume it already permits invoices.
+The email handler attaches rendered bytes but does not persist them. These inspected facts are
+not a full T-0041 cross-review verdict or proof that deployed PDFs/email work.

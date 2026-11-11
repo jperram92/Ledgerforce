@@ -15,3 +15,12 @@ evidence does not establish the exact identity of the original CI failure.
 
 Native Windows agent-suite-reproduction.log has56/82pass and is separate platform evidence.
 It must not be substituted for Linux results or described as passing.
+
+## Superseding fixture follow-up result
+
+At `cf03cb0e44430917355e20f8c88a077780252ecd`, CI42918101779 passes all product jobs and
+full verifier gates2a (unit plus agent tests),2b (DB),3 (invariants),12 (memory), plus static,
+coverage73.48%/72.22%, RLS, migrations, security and browser evidence. Security42918101713 passes.
+Full verifier is14PASS/1FAIL/1PENDING: only approved-golden provenance guard FAIL and automated
+other-provider rule PENDING remain. See fixture-ci-gates.log. Independent Codex reviews remain
+valid under owner instruction ADR0052; the gate implementation has not been changed or bypassed.
