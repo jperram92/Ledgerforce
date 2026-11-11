@@ -6,7 +6,7 @@
 
 ## Codex continuation prompt
 
-> Continue from `feat/T-0041-pdf-format-repair` after timeout repair. Quantity fix `2000385` passes6/6. Whole-render deadline covers launch through bounded cleanup; focused tests2/2, documents typecheck/lint/format pass. RED baseline `pdf-timeout-red.log` showed launch80ms resolving after102ms despite timeout15. Late contexts close; failed launch cache resets. Remaining T-0041 work: visual PDF evidence and full verification. Parallel audits: T-0047 single-supply RQ0134, T-0048 impossible-date validation, T-0069 migration collision. T-0166 remains blocked on golden guard and provider automation; don't weaken gates.
+> Continue from `feat/T-0041-pdf-format-repair` at `abfa15a` plus the verification-status checkpoint. T-0041 is now `verifying` with active Codex lease. Quantity fix `2000385` passes6/6. Shared render deadline tests2/2, scoped lint/prettier/documents typecheck pass. Branch pushed; CI42992313531 / security42992313574 started at abfa15a. Keep verification/evidence gates honest; visual PDF evidence is still missing. Parallel audits: T-0047 single-supply RQ0134, T-0048 impossible-date validation, T-0069 migration collision. T-0166 remains blocked on golden guard/provider automation.
 From: human (run 2026-10-29-codex-r01)    Reason: T-0166 technical repairs verified; continue original pickup with T-0041 independent-review findings
 Task: none (no active task)
 Branch: feat/T-0166-golden-successor-review   Last green commit: da5d6ec
@@ -311,3 +311,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-10T23:02:24.524Z codex: release T-0166 → blocked (cf03cb0 verifier14PASS/1FAIL/1PENDING: golden approval guard remains; automated other-provider rule does not recognize owner-authorized independent Codex review. Product, DB, browser, invariants and security pass.)
 - 2026-11-10T23:02:25.985Z human: handover: T-0166 technical repairs verified; continue original pickup with T-0041 independent-review findings
 - 2026-11-11T02:57:43.329Z codex: T-0041 → in_progress
+- 2026-11-11T09:07:19.764Z codex: T-0041 → verifying
