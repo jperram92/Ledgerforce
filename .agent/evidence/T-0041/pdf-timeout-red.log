@@ -1,0 +1,8 @@
+Baseline before deadline implementation, corrected fake Browser fixture:
+
+FAIL: PdfRenderer timeout [T-0041] > applies the document deadline to browser startup
+AssertionError: promise resolved Uint8Array [1] instead of rejecting.
+
+Test configuration: mocked chromium.launch resolves after 80 ms; PdfRenderer.render called with
+timeoutMs 15. Observed the baseline renderer resolve successfully after ~102 ms, proving the
+configured timeout excluded browser launch and did not bound the whole render.

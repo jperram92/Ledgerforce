@@ -2255,3 +2255,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: remove trailing zeros only from the fractional portion of quantity strings; preserve integer strings as supplied. Keep fixed-scale database values such as `10.0000` formatted as `10`.
 - Evidence: independent T-0041 review reproduced `10` and `100` rendering as `1`. New regression was RED1/5 then GREEN6/6; documents typecheck, scoped lint and formatting pass. No amounts, tax or posting behavior changed.
 - ADR: none (presentation formatting bug) · Status: accepted
+
+### DL-0319 — Bound PDF rendering with one shared deadline
+- Date: 2026-11-11 · By: codex · Task: T-0041 · Category: tooling
+- Decision: compute one render deadline before browser launch and pass the remaining budget through context creation, routing, page creation, HTML loading, PDF generation and context cleanup. If context creation completes after timeout, close it immediately. Reset a rejected cached browser launch promise so later jobs can retry. Keep the shared browser alive across per-document timeouts.
+- Evidence: baseline fake-launch regression RED: launch80ms succeeds after~102ms despite timeout15. After change, tests cover launch deadline and late-context closure (2/2). Documents typecheck, lint and prettier pass. Existing real-Chromium/PostgreSQL integration remains part of full CI; no full run after this patch yet.
+- Limits: process/browser launch itself cannot be cancelled through Playwright; the render request returns by deadline and a late shared browser remains owned until renderer.close. Visual PDF evidence remains open.
+- ADR: none (implements ADR-0045 rule4) · Status: accepted

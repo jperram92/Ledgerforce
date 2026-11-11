@@ -6,7 +6,7 @@
 
 ## Codex continuation prompt
 
-> Continue from `feat/T-0041-pdf-format-repair` at `2000385`. T-0041 integer quantity formatter fix passes RED/GREEN (6/6), scoped lint, prettier and documents typecheck. Next implement a true whole-render deadline with lifecycle tests, preserving safe cleanup and shared browser ownership. Independent review also found cached failed launch and missing visual PDF evidence; keep them open until tested. Parallel read-only audits recorded: T-0047 single-supply gap remains RQ-0134; T-0048 impossible-date validation finding; T-0069 migration collision finding at older head. T-0166 is blocked on golden-provenance guard and provider automation mismatch despite product/full verifier14PASS/1FAIL/1PENDING. Do not weaken gates or claim full completion.
+> Continue from `feat/T-0041-pdf-format-repair` after timeout repair. Quantity fix `2000385` passes6/6. Whole-render deadline covers launch through bounded cleanup; focused tests2/2, documents typecheck/lint/format pass. RED baseline `pdf-timeout-red.log` showed launch80ms resolving after102ms despite timeout15. Late contexts close; failed launch cache resets. Remaining T-0041 work: visual PDF evidence and full verification. Parallel audits: T-0047 single-supply RQ0134, T-0048 impossible-date validation, T-0069 migration collision. T-0166 remains blocked on golden guard and provider automation; don't weaken gates.
 From: human (run 2026-10-29-codex-r01)    Reason: T-0166 technical repairs verified; continue original pickup with T-0041 independent-review findings
 Task: none (no active task)
 Branch: feat/T-0166-golden-successor-review   Last green commit: da5d6ec
