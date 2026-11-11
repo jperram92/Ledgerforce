@@ -1,12 +1,12 @@
-# Handover - 2026-11-11 T-0041 quantity fix
+# Handover - 2026-11-11 T-0041 PDF timeout verification
 
 ## Codex continuation prompt
 
-> Resume `feat/T-0041-pdf-format-repair` and read `bash scripts/agent/resume.sh`, T-0041 and the independent T-0041 review. Quantity regression reproduced RED (1 fail/5 pass), formatter fixed, focused tests GREEN6/6, scoped lint and prettier pass; documents typecheck was started and needs exit confirmation. Next rerun typecheck, record review findings and verification, commit/push. T-0041 still has major whole-render timeout finding and visual evidence gap; no full completion claim. Parallel read-only T-0047 review found no fix authorized by existing goldens; RQ-0134 remains open. Two agent worktree attempts hit disk-full; avoid further checkout writes.
+> Resume `feat/T-0041-pdf-format-repair` with `bash scripts/agent/resume.sh`; read this handover, `.agent/backlog/T-0041.md`, and `.agent/evidence/T-0041/review-codex-independent-20261111.md`. At `152594c`, timeout repair and security workflow passed; full CI reached 14 PASS / 1 FAIL / 1 PENDING. The FAIL is the expected approved-golden guard (owner merge-to-main gate); cross-review is pending because the current builder is Codex. Fresh read-only Codex reviewers found the whole-render deadline defect resolved; follow-up timeout/cleanup and launch-retry tests now pass 4/4. This follow-up's local documents typecheck failed to resolve the existing `pdfjs-dist/legacy/build/pdf.mjs` DB-test import although the file exists; CI typecheck passed on the preceding commit. Scoped lint and Prettier pass. After this checkpoint CI, capture visual PDF evidence and reconcile review status without changing global gates. Keep T-0041 in `verifying`; do not claim complete. T-0047 single-supply remains RQ-0134; T-0048 impossible-date validation and T-0069 migration collision are separate findings in this log.
 
 ## Codex continuation prompt
 
-> Continue from `feat/T-0041-pdf-format-repair` at `abfa15a` plus the verification-status checkpoint. T-0041 is now `verifying` with active Codex lease. Quantity fix `2000385` passes6/6. Shared render deadline tests2/2, scoped lint/prettier/documents typecheck pass. Branch pushed; CI42992313531 / security42992313574 started at abfa15a. Keep verification/evidence gates honest; visual PDF evidence is still missing. Parallel audits: T-0047 single-supply RQ0134, T-0048 impossible-date validation, T-0069 migration collision. T-0166 remains blocked on golden guard/provider automation.
+> Previous checkpoint: `152594c` (CI42992667248, security42992667204). CI static/typecheck/lint/format/unit and DB/RLS passed; verifier 14 PASS / 1 FAIL / 1 PENDING. Product work is not complete until visual PDF evidence and applicable review gates are resolved.
 From: human (run 2026-10-29-codex-r01)    Reason: T-0166 technical repairs verified; continue original pickup with T-0041 independent-review findings
 Task: none (no active task)
 Branch: feat/T-0166-golden-successor-review   Last green commit: da5d6ec
