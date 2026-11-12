@@ -1,16 +1,24 @@
-# Handover: Claude continuation from main
+# Handover: Claude lead, parallel integration round (2026-11-12)
 
 ## Codex continuation prompt
-> Read CLAUDE_NEXT.md and AGENTS.md. Resume T-0121 from main on a task branch; implementation commit accb6a6, earlier fixes 2ffd7b3 and 4cc7e9e. First command: bash scripts/agent/resume.sh. Diagnose the security workflow and missing nested Corepack pnpm installation, fetch actual GitHub main into the validation checkout, and rerun full verification. Claude independent review remains required. Do not label this integration green.
+> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file, DL-0282…DL-0286 and `.agent/evidence/T-0121/review-claude-20261112-120500.md`. Branch `claude/loving-lovelace-nozqpk` (from main 5c3a2e3). T-0121: security CI is green at e15a4d0 (run 43209264765); the full verifier at 4489329 gave 14 PASS. Claude's review of Codex's work FAILs on C6 (golden-approval self-attestation); steps 4a/4b are being fixed. Codex must cross-review Claude's T-0121 changes (4489329 Dockerfile/contract/.gitleaksignore, plus the 4a/4b fix). The owner chose Line A canonical (DL-0285). Parallel agents (DL-0286 ID ranges) are integrating Line A and building T-0083, T-0097, T-0119 and T-0120 on local branches the lead merges here. Check `git log` for merges `integrate/line-a`, `feat/T-0121-review-fixes`, `feat/T-0083-invoices-ui`, `feat/T-0097-pilot-hardening`, `feat/T-0119-pdf-worker`, `feat/T-0120-worker-batch-email`. Anything not merged here was lost with the session container: restart that slice from its card.
 
-From: codex (2026-11-12-codex-r01). Updated: 2026-11-12T11:18:01.441Z.
-Reason: owner requested latest work on main and a Markdown handover for Claude.
-Done: approval guard and focused 28/28 tests; native Linux coverage 684 tests pass. GitHub CI at accb6a6 passes.
-In progress: T-0121 verifying, T-0048 blocked. Full local verifier 11 PASS / 3 FAIL / 2 PENDING; agent suite 92/93 due missing Corepack pnpm module. Security CI fails history scan and image zlib vulnerability. Full details and links in CLAUDE_NEXT.md.
-Next action: read CLAUDE_NEXT.md and run the resume skill, then investigate failed security workflow 43151980363 and local scripts.test.ts:99 without weakening checks.
-Decisions: DL-0279, DL-0280, DL-0281; ADR-0047 Proposed.
-Open questions for human: none currently; retain security ADR/release/phase gates if needed by follow-up.
-Do not: edit Approved postings, delete history, weaken tests/security scans, read/edit secrets, or treat the owner-requested main integration as task completion.
+## State
+- Done: security workflow remediation (RQ-0100, DL-0282–0284), owner-approved Gitleaks exception, full verify 14 PASS, Claude cross-review of Codex's commits (FAIL C6).
+- In progress: the parallel round above. T-0048 stays blocked until T-0121 is review-complete.
+- Open questions for human: none new; Line A golden Approved markers may trip gate 4 after integration (the integrator reports this).
+- Do not: edit Approved goldens or CI security gates, merge Line B (claude/incomplete-features-build-wivsco) or feat/T-0048-bad-debt, rewrite history.
+
+# Handover - 2026-11-12 11:39 UTC
+From: claude (run 2026-11-12-codex-r01)    Reason: parallel round in progress (DL-0286); lead merging agent branches
+Task: T-0121 Reconcile verification coverage and golden approval evidence
+Branch: claude/loving-lovelace-nozqpk   Last green commit: none
+Done: AC-1: The unchanged coverage command passes `packages/testing/eslint-rules/no-float-money.config.test.ts`, including the negative control, and produces coverage evidence. Native Linux run: 684/684 passed; Windows limitations recorded, no timeout change.; AC-2: Researched ADR-0047 implementation reconciles `goldenGuard` with existing owner approvals; eleven adversarial acceptance tests and existing verifier regressions pass. No comparison-base override or unconditional bypass. Independent review remains step 5.; Why does loading the real ESLint configuration exceed the test timeout specifically under V8 coverage on this host? No deterministic assertion defect: unchanged focused run and native Linux full coverage pass. Windows runs also exposed WSL startup timing and transient manifest-lock EPERM. Exact timing variability is not proven; use the supported Linux validation runtime, retaining the failures as evidence.; What durable approval evidence can the guard verify while preserving immutable approved postings? RQ-0099 and Proposed ADR-0047; RED captured before implementation.; 1. Research both questions — RQ-0099; propose ADR-0047.; 2. RED tests for approval recognition, evidence recycling, and missing parent history.; 3. Implement and validate — 28/28 focused plus existing gate tests pass.; 3a. (claude) Security workflow 43151980363 diagnosed — RQ-0100. Gitleaks history: two T-0074 test fixtures, commit-scoped exception approved by owner (DL-0283). Image zlib CVE-2026-4738: `apk upgrade --no-cache` in node-runtime, contract test RED→GREEN (DL-0284); CI image gate must confirm. Nested pnpm: environmental, agent suite 93/93 unchanged (DL-0282).; 4. Full verification — claude 4489329: 14 PASS, gate 8 pending, gate 12 card-status only (`full-verify-claude-4489329.txt`); CI security 43209264765 all 9 jobs green at e15a4d0.
+In progress: AC-3: Full verifier passes all applicable gates after the change; pending baseline/review gates remain honestly identified [phase: verify] — [agent: what is half-done; failing tests with file paths]
+Next action: [agent: the single next command or edit to make]
+Decisions taken: [agent: DL/ADR ids taken this session, or "none new"]
+Open questions for human: [agent: questions that need the human, or "none"]
+Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -264,3 +272,4 @@ Do not: edit Approved postings, delete history, weaken tests/security scans, rea
 - 2026-11-12T11:24:27.587Z claude: T-0121 → in_progress
 - 2026-11-12T11:36:31.049Z claude: T-0121 → verifying
 - 2026-11-12T11:37:10.260Z claude: T-0121 → in_progress
+- 2026-11-12T11:39:33.547Z claude: handover: parallel round in progress (DL-0286); lead merging agent branches
