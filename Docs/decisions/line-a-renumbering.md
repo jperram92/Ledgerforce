@@ -60,3 +60,4 @@ Migrations are numbered in integration order with no gaps:
 | DL-0307 | DL-0309 | feat/T-0057-payment-confirmation | decision-log entry (title-matched) |
 | DL-0308 | DL-0310 | feat/T-0057-payment-confirmation | decision-log entry (title-matched) |
 | DL-0309 | DL-0311 | feat/T-0057-payment-confirmation | decision-log entry (title-matched) |
+| DL-0291 | DL-0312 | feat/T-0060-bank-matching | decision-log entry (title-matched) |

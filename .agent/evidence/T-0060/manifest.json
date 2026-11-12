@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0060",
+  "entries": [
+    {
+      "scenario": "SS-UC08-03",
+      "file": ".agent/evidence/T-0060/20261102-164111-tests-db.json",
+      "test": "3 test(s): packages/modules/ap/src/bank-match.db.test.ts › SS-UC08-03: Exact match auto-matches (supplier payment batch) › SS-UC08-03 a confirmed 2,200.00 batch and a −2,200.00 line naming its batch number are matched automatically | packages/modules/bank/src/matching.db.test.ts › SS-UC08-03: Exact match auto-matches › SS-UC08-03 a receipt of 1,375.00 ref INV-000123 and a statement line 1,375.00 \"INV-000123\" are matched automatically | packages/modules/bank/src/matching.db.test.ts › SS-UC08-03: Exact match auto-matches › the database refuses a match whose entry does not move the bank account by the line amount",
+      "commit": "b90804efd2fa-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T16:41:11.298Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-04",
+      "file": ".agent/evidence/T-0060/20261102-164111-tests-db.json",
+      "test": "1 test(s): packages/modules/bank/src/matching.db.test.ts › SS-UC08-04: Rule match is suggested, not applied (stored) › SS-UC08-04 a \"description contains STRIPE → Stripe clearing\" rule stores an open suggestion and the line stays unmatched",
+      "commit": "b90804efd2fa-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T16:41:11.298Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-05",
+      "file": ".agent/evidence/T-0060/20261102-164111-tests-db.json",
+      "test": "3 test(s): packages/modules/bank/src/matching.db.test.ts › SS-UC08-05: Unmatched line created as a transaction › SS-UC08-05 the 10.00 bank fee line becomes a balanced manual journal posted by the engine and the line is matched | packages/modules/bank/src/matching.db.test.ts › SS-UC08-05: Unmatched line created as a transaction › accepting the Stripe rule suggestion posts to Stripe clearing and closes the suggestion | packages/modules/bank/src/matching.db.test.ts › SS-UC08-05: Unmatched line created as a transaction › refuses lines that do not add up, control accounts (manual-journal rule) and matched lines",
+      "commit": "b90804efd2fa-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T16:41:11.298Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-04",
+      "file": ".agent/evidence/T-0060/20261102-164116-tests-unit.json",
+      "test": "5 test(s): packages/modules/bank/src/matcher.test.ts › SS-UC08-04: Rule match is suggested, not applied › SS-UC08-04 a \"description contains STRIPE → Stripe clearing\" rule creates a suggestion and nothing is auto-confirmed | packages/modules/bank/src/matcher.test.ts › SS-UC08-04: Rule match is suggested, not applied › a rule never turns into an automatic match, even when it is the only possible outcome | packages/modules/bank/src/matcher.test.ts › SS-UC08-04: Rule match is suggested, not applied › only the first matching rule by priority suggests; direction and amount bounds apply | packages/modules/bank/src/matcher.test.ts › SS-UC08-04: Rule match is suggested, not applied › \"any\" rules need one condition; \"all\" rules need every condition; equals is whole-field | packages/modules/bank/src/matcher.test.ts › SS-UC08-04: Rule match is suggested, not applied › refuses malformed rule definitions",
+      "commit": "b90804efd2fa-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T16:41:16.421Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-03",
+      "file": ".agent/evidence/T-0060/20261102-164116-tests-unit.json",
+      "test": "5 test(s): packages/modules/bank/src/matcher.test.ts › exact matching (SS-UC08-03, pure half) › amount + reference on a unique pair auto-matches; rules are not consulted for that line | packages/modules/bank/src/matcher.test.ts › exact matching (SS-UC08-03, pure half) › a different amount, a missing reference, the wrong direction or a far date never auto-matches | packages/modules/bank/src/matcher.test.ts › exact matching (SS-UC08-03, pure half) › two exact candidates for one line (or two lines for one candidate) become suggestions | packages/modules/bank/src/matcher.test.ts › exact matching (SS-UC08-03, pure half) › supplier payments match money out against the batch reference found in the description | packages/modules/bank/src/matcher.test.ts › exact matching (SS-UC08-03, pure half) › a reference is found as a whole token, case- and punctuation-insensitive",
+      "commit": "b90804efd2fa-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T16:41:16.421Z",
+      "result": "passed"
+    }
+  ]
+}
