@@ -1,7 +1,11 @@
-# Handover: T-0121 in review; parallel round paused on the usage limit (2026-11-12)
+# Handover: Line A integrated; coverage gate and owner gates open (2026-11-12)
 
 ## Codex continuation prompt
-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file. Branch `claude/loving-lovelace-nozqpk`. T-0121 is in **review**: act as reviewer (`.claude/skills/cross-review/SKILL.md`) for Claude's commits 4489329 (Alpine `apk upgrade` in node-runtime + contract test, owner-approved `.gitleaksignore` entries, RQ-0100, DL-0282–0284) and 6b2c4ce (base-only golden approval records, DL-0400, ADR-0047 amendment, date regression pins). Evidence: `.agent/evidence/T-0121/full-verify-claude-6b2c4ce.txt` (verify exit 0, 15 PASS, gate 8 pending); security CI 43209264765 green. If PASS: accept ADR-0047 (process ADR; acceptance conditions are CI plus review), finish T-0121, then re-verify T-0048 and unblock it. Then run the DL-0285/0286 parallel round (Line A integration, T-0083, T-0097, T-0119, T-0120), which did not start because of the usage limit.
+> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file, DL-0285/0286/0294/0296/0306 and `Docs/decisions/line-a-renumbering.md`. Branch `claude/loving-lovelace-nozqpk` at the commit after 4f8ca92. Line A (T-0049…T-0080, 18 tasks) is merged here with its IDs renumbered. Full verify at 4f8ca92 (`.agent/evidence/integration-line-a/verify-4f8ca92.txt`): 13 PASS, gate 2c coverage FAIL (58.48 % vs 72.22 %, card T-0128), gate 4 golden FAIL (Line A GP-037 differs from the snapshot approved on main; only the owner's merge clears it), gate 8 pending. Next: (1) Codex cross-reviews T-0121 (Claude commits 4489329, 6b2c4ce) and the Line A cards in review; (2) T-0128 coverage (research first; never weaken the gate); (3) integrate `origin/feat/T-0041-pdf-format-repair` with `/tmp`-free steps: merge, keep HANDOVER/state, renumber colliding DL/ADR/RQ (it uses DL-0315 and ADR-0052) into free numbers, keep blocked T-0166/0167/0168 statuses; (4) after the usage limit resets (2026-11-15 03:00 UTC), run the DL-0286 parallel builders T-0083, T-0097, T-0119, T-0120.
+
+## Open questions for human
+- Merge to main: the golden gate (gate 4) can only pass once the owner merges Line A's additive golden entries (GP-037; later T-0166 supersessions) to main.
+- Security ADR-0049 (Stripe webhook endpoint and tenant routing) is Proposed and needs the owner's acceptance.
 
 ## State
 - Done: security workflow remediation (RQ-0100, DL-0282–0284), owner-approved Gitleaks exception, full verify 14 PASS, Claude cross-review of Codex's commits (FAIL C6).

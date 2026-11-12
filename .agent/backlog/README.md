@@ -13,11 +13,12 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 
 | Status | Cards |
 |---|---:|
-| blocked | 2 |
+| blocked | 3 |
 | done | 3 |
-| review | 73 |
-| todo | 43 |
-| **total** | **121** |
+| in_progress | 2 |
+| review | 90 |
+| todo | 30 |
+| **total** | **128** |
 
 | Phase | Cards |
 |---|---:|
@@ -227,6 +228,7 @@ graph LR
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
+| [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | todo | — | — | 0 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
 
 ## Latest update — 2026-11-01
