@@ -1,7 +1,7 @@
-# Handover: Claude lead — stopped on the weekly usage limit (2026-11-12)
+# Handover: T-0121 in review; parallel round paused on the usage limit (2026-11-12)
 
 ## Codex continuation prompt
-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file, DL-0282…DL-0286 and `.agent/evidence/T-0121/review-claude-20261112-120500.md`. Branch `claude/loving-lovelace-nozqpk` (from main 5c3a2e3). T-0121 is in_progress. Security CI is green at e15a4d0 (run 43209264765); the full verifier at 4489329 gave 14 PASS. Next command: `git apply .agent/evidence/T-0121/review-fix-c6-wip-unverified.patch`. It adds three adversarial golden-approval tests (review item C6); they have NOT been run. Run them to capture RED, then implement step 4a (only approval records present at the comparison base may suppress goldenGuard), then step 4b (extra invalid-date tests). Codex must also cross-review Claude's 4489329 changes (Dockerfile `apk upgrade`, contract test, `.gitleaksignore`). After that: the Line A integration and the T-0083/T-0097/T-0119/T-0120 builds from DL-0286, which did not start (every agent hit the usage limit before committing anything).
+> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file. Branch `claude/loving-lovelace-nozqpk`. T-0121 is in **review**: act as reviewer (`.claude/skills/cross-review/SKILL.md`) for Claude's commits 4489329 (Alpine `apk upgrade` in node-runtime + contract test, owner-approved `.gitleaksignore` entries, RQ-0100, DL-0282–0284) and 6b2c4ce (base-only golden approval records, DL-0400, ADR-0047 amendment, date regression pins). Evidence: `.agent/evidence/T-0121/full-verify-claude-6b2c4ce.txt` (verify exit 0, 15 PASS, gate 8 pending); security CI 43209264765 green. If PASS: accept ADR-0047 (process ADR; acceptance conditions are CI plus review), finish T-0121, then re-verify T-0048 and unblock it. Then run the DL-0285/0286 parallel round (Line A integration, T-0083, T-0097, T-0119, T-0120), which did not start because of the usage limit.
 
 ## State
 - Done: security workflow remediation (RQ-0100, DL-0282–0284), owner-approved Gitleaks exception, full verify 14 PASS, Claude cross-review of Codex's commits (FAIL C6).
@@ -275,3 +275,5 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-12T11:39:33.547Z claude: handover: parallel round in progress (DL-0286); lead merging agent branches
 - 2026-11-12T11:41:44.298Z claude: release T-0121 → todo (usage limit; resume step 4a from saved patch)
 - 2026-11-12T11:42:08.939Z claude: T-0121 → in_progress
+- 2026-11-12T11:46:01.131Z claude: T-0121 → verifying
+- 2026-11-12T11:53:57.809Z claude: release T-0121 → review (verify exit 0 at 6b2c4ce (15 PASS, gate 8 pending); security CI green at e15a4d0; awaiting codex cross-review of claude changes 4489329 + 6b2c4ce)
