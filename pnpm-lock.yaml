@@ -68,6 +68,9 @@ importers:
 
   apps/api:
     dependencies:
+      '@ledgerforce/ap':
+        specifier: workspace:*
+        version: link:../../packages/modules/ap
       '@ledgerforce/ar':
         specifier: workspace:*
         version: link:../../packages/modules/ar

@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0052",
+  "entries": [
+    {
+      "scenario": "SS-UC05-03",
+      "file": ".agent/evidence/T-0052/20261101-222430-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-03: Submitted bill waits for the Approver › SS-UC05-03 a submitted bill is in the Approver queue, unposted, with no journal",
+      "commit": "47d927bb84d6",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:24:30.084Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-05",
+      "file": ".agent/evidence/T-0052/20261101-222430-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-05: AP Clerk cannot approve own bill › SS-UC05-05 the Clerk who entered a 2,750.00 bill is refused (SOD_BILL_SELF_APPROVAL, audited); another approver posts it",
+      "commit": "47d927bb84d6",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:24:30.084Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-06",
+      "file": ".agent/evidence/T-0052/20261101-222430-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-06: Small-team approval records an exception › SS-UC05-06 in small-team mode the sole user approves their own bill only with a recorded exception",
+      "commit": "47d927bb84d6",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:24:30.084Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-04",
+      "file": ".agent/evidence/T-0052/20261101-222435-tests-db.json",
+      "test": "3 test(s): packages/modules/ap/src/bills.db.test.ts › SS-UC05-04: Approved bill posts GP-008 › SS-UC05-04 approving BILL as in GP-008 posts exactly GP-008 and leaves an AP open item of 2,750.00 | packages/modules/ap/src/bills.db.test.ts › SS-UC05-04: Approved bill posts GP-008 › the same supplier invoice number cannot be entered twice (duplicate bill) | packages/modules/ap/src/bills.db.test.ts › SS-UC05-04: Approved bill posts GP-008 › SS-UC05-02 the suggestion for this supplier comes from its posted bills",
+      "commit": "47d927bb84d6",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:24:35.621Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-02",
+      "file": ".agent/evidence/T-0052/20261101-222435-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/bills.db.test.ts › SS-UC05-04: Approved bill posts GP-008 › SS-UC05-02 the suggestion for this supplier comes from its posted bills",
+      "commit": "47d927bb84d6",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:24:35.621Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-07",
+      "file": ".agent/evidence/T-0052/20261101-222435-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/bills.db.test.ts › SS-UC05-07: Bill in AP-locked period rejected › SS-UC05-07 a bill dated 2026-10-20 in an AP-locked October is rejected with PERIOD_LOCKED and nothing posts",
+      "commit": "47d927bb84d6",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:24:35.621Z",
+      "result": "passed"
+    }
+  ]
+}

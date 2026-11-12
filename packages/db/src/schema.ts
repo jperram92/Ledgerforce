@@ -719,6 +719,9 @@ export interface SupplierBillTable {
   entry_id: string | null;
   created_at: Timestamp;
   updated_at: Timestamp;
+  /** Migration 0046 (T-0052): submitted for approval. */
+  submitted_by: Generated<string | null>;
+  submitted_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
 }
 
 export interface SupplierBillLineTable {

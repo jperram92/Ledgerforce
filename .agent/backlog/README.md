@@ -143,7 +143,7 @@ graph LR
 | [T-0049](T-0049.md) | Customer statements and aged receivables | MVP | review | T-0046 | UC-12 | 1 |
 | [T-0050](T-0050.md) | Supplier bills entry and suggested coding | MVP | review | T-0039, T-0025, T-0034, T-0028, T-0031 | UC-05 | 3 |
 | [T-0051](T-0051.md) | Bills inbox: inbound email PDF → draft bill | MVP | review | T-0050 | UC-05 | 1 |
-| [T-0052](T-0052.md) | Bill approval workflow with SoD | MVP | todo | T-0050, T-0015, T-0031 | UC-05 | 4 |
+| [T-0052](T-0052.md) | Bill approval workflow with SoD | MVP | review | T-0050, T-0015, T-0031 | UC-05 | 4 |
 | [T-0053](T-0053.md) | Supplier/employee bank-detail change verification with cooling-off | MVP | review | T-0037, T-0015, T-0013 | UC-06 | 2 |
 | [T-0054](T-0054.md) | Payment batches with maker-checker and step-up release | MVP | todo | T-0052, T-0053, T-0013 | UC-06 | 5 |
 | [T-0055](T-0055.md) | Customer refunds (bank payment batch and Stripe) | MVP | todo | T-0046, T-0045, T-0054, T-0031 | UC-11 | 3 |
