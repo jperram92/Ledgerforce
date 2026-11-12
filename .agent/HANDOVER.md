@@ -281,3 +281,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-12T11:42:08.939Z claude: T-0121 → in_progress
 - 2026-11-12T11:46:01.131Z claude: T-0121 → verifying
 - 2026-11-12T11:53:57.809Z claude: release T-0121 → review (verify exit 0 at 6b2c4ce (15 PASS, gate 8 pending); security CI green at e15a4d0; awaiting codex cross-review of claude changes 4489329 + 6b2c4ce)
+- 2026-11-12T23:54:13.935Z claude: T-0061 → verifying
