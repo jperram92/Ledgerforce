@@ -111,6 +111,13 @@ export function ownershipClashes(): string[] {
   return clashes;
 }
 
+/**
+ * Lowest sequence number of a snapshot change (polling, reconcile — T-0066, RQ-0103). CDC sequence
+ * numbers are positions inside one transaction (at most 10,000 rows), so the ranges never meet and
+ * a processed-change row with a sequence number at or above this is a snapshot.
+ */
+export const SNAPSHOT_SEQUENCE_BASE = 2 ** 24;
+
 /** One record's change, from CDC or any other inbound source (polling, reconcile). */
 export interface InboundChange {
   /** Channel or source name, e.g. `/data/AccountChangeEvent`, `reconcile`. */
@@ -126,6 +133,11 @@ export interface InboundChange {
   changedFields: string[];
   nulledFields: string[];
   fields: Record<string, unknown>;
+  /**
+   * The record's full current state as of `commitTimestamp` (a polled or reconciled row, T-0066),
+   * not a CDC diff. Snapshots and CDC changes converge by timestamp (apply.ts, RQ-0103).
+   */
+  snapshot?: boolean;
 }
 
 const CHANGE_TYPES: ReadonlySet<string> = new Set(['CREATE', 'UPDATE', 'DELETE', 'UNDELETE']);

@@ -1,0 +1,66 @@
+{
+  "_source": "RQ-0103 S3, S7: REST API Developer Guide — Query (resources_query.htm), QueryAll (dome_queryall.htm), Query Options Header (headers_queryoptions.htm), Status Codes and Error Responses. Shapes as documented; values illustrative, no org data.",
+  "apiVersion": "67.0",
+  "maxBatchSize": 2000,
+  "minBatchSize": 200,
+  "page": {
+    "totalSize": 3,
+    "done": false,
+    "nextRecordsUrl": "/services/data/v67.0/query/01gD0000002HU6KIAW-2000",
+    "records": [
+      {
+        "attributes": {
+          "type": "Account",
+          "url": "/services/data/v67.0/sobjects/Account/001D000000IRFmaIAH"
+        },
+        "Id": "001D000000IRFmaIAH",
+        "SystemModstamp": "2026-10-30T01:02:03.000+0000",
+        "IsDeleted": false,
+        "Name": "Example Account"
+      }
+    ]
+  },
+  "lastPage": {
+    "totalSize": 3,
+    "done": true,
+    "records": []
+  },
+  "errors": {
+    "invalidField": {
+      "status": 400,
+      "body": [
+        {
+          "message": "\nSELECT Id, Foo__c FROM Account\n           ^\nERROR at Row:1:Column:12\nNo such column 'Foo__c' on entity 'Account'.",
+          "errorCode": "INVALID_FIELD"
+        }
+      ]
+    },
+    "malformedQuery": {
+      "status": 400,
+      "body": [{ "message": "unexpected token: FORM", "errorCode": "MALFORMED_QUERY" }]
+    },
+    "invalidQueryLocator": {
+      "status": 400,
+      "body": [{ "message": "invalid query locator", "errorCode": "INVALID_QUERY_LOCATOR" }]
+    },
+    "sessionExpired": {
+      "status": 401,
+      "body": [{ "message": "Session expired or invalid", "errorCode": "INVALID_SESSION_ID" }]
+    },
+    "requestLimit": {
+      "status": 403,
+      "body": [
+        { "message": "TotalRequests Limit exceeded.", "errorCode": "REQUEST_LIMIT_EXCEEDED" }
+      ]
+    }
+  },
+  "describe": {
+    "name": "Account",
+    "fields": [
+      { "name": "Id", "type": "id" },
+      { "name": "SystemModstamp", "type": "datetime" },
+      { "name": "IsDeleted", "type": "boolean" },
+      { "name": "Name", "type": "string" }
+    ]
+  }
+}

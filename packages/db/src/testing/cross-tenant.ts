@@ -314,6 +314,16 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     duplicate_count: () => '0',
     last_duplicate_source: () => '/data/AccountChangeEvent',
   },
+  // Per-object inbound sync mode and polling watermark (migration 0051, T-0066).
+  'app.salesforce_sync_object': {
+    entity_name: () => `Obj${randomBytes(4).toString('hex')}`,
+    mode: () => 'polling',
+    poll_interval_seconds: () => '900',
+    overlap_seconds: () => '300',
+    last_poll_source: () => 'poll:Account',
+    last_poll_records: () => '0',
+    last_poll_error: () => 'test error',
+  },
   // Open items and allocations (migration 0028). Seeded rows (superuser, no tenant set) are
   // stored as generated: an AR item of +1, an allocation of 1 with no FX difference. A row
   // inserted by lf_app is filled and checked by triggers (prerequisites below).

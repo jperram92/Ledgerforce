@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0066",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-26",
+      "file": ".agent/evidence/T-0066/20261102-063751-tests-db.json",
+      "test": "2 test(s): packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts › SS-PLAT-26: Missed Salesforce events recovered by nightly reconciliation › SS-PLAT-26: Missed Salesforce events recovered by nightly reconciliation — a 3-day outage beyond CDC retention is replayed once through the inbound mapping | packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts › SS-PLAT-26: Missed Salesforce events recovered by nightly reconciliation › SS-PLAT-26: an undelete seen by polling re-activates the archived party",
+      "commit": "0585ee95ef27-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:37:51.186Z",
+      "result": "passed"
+    }
+  ]
+}

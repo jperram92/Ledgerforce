@@ -5,6 +5,7 @@ export {
   lfOwnedFields,
   ownershipClashes,
   planChange,
+  SNAPSHOT_SEQUENCE_BASE,
   type InboundChange,
   type InboundChangeType,
   type InboundFieldRule,
@@ -38,4 +39,5 @@ export {
   type InboundContext,
   type InboundOutcome,
   type InboundResult,
+  type SkipCode,
 } from './apply.ts';

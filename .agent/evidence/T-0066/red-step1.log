@@ -1,0 +1,51 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aed2e0ccee8a4e1dd
+
+ ❯ |unit| packages/connectors/salesforce/src/polling/polling.delta.contract.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/polling/polling.delta.contract.test.ts [ packages/connectors/salesforce/src/polling/polling.delta.contract.test.ts ]
+Error: Cannot find module './index.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-aed2e0ccee8a4e1dd/packages/connectors/salesforce/src/polling/polling.delta.contract.test.ts
+ ❯ packages/connectors/salesforce/src/polling/polling.delta.contract.test.ts:16:1
+     14|   type FakeSalesforceQuery,
+     15| } from '../testing/fake-salesforce-query.ts';
+     16| import {
+       | ^
+     17|   deltaSoql,
+     18|   describeFields,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  06:23:13
+   Duration  666ms (transform 325ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aed2e0ccee8a4e1dd
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44205
+ ❯ |db| packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts [ packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts ]
+Error: Cannot find module './index.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-aed2e0ccee8a4e1dd/packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts
+ ❯ packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts:30:1
+     28|   type FakeSalesforceQuery,
+     29| } from '../testing/fake-salesforce-query.ts';
+     30| import {
+       | ^
+     31|   configureSyncObject,
+     32|   getSyncObject,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  06:23:15
+   Duration  2.38s (transform 455ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
