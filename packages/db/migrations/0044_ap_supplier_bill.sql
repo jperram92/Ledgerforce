@@ -1,4 +1,4 @@
--- 0044 — Supplier bills (T-0050, design §3.8 row 6, UC-05, GP-008, DL-0278). Owner: packages/modules/ap.
+-- 0044 — Supplier bills (T-0050, design §3.8 row 6, UC-05, GP-008, DL-0288). Owner: packages/modules/ap.
 --
 -- * app.supplier_bill: a supplier's tax invoice entered for payment. The supplier's own invoice
 --   number (supplier_ref) is unique per supplier, so the same bill cannot be entered twice.

@@ -1,5 +1,5 @@
 /**
- * Supplier bills (T-0050, design §3.8 row 6, UC-05, GP-008, DL-0278).
+ * Supplier bills (T-0050, design §3.8 row 6, UC-05, GP-008, DL-0288).
  *
  * createBill records a draft from the supplier's tax invoice: per line an expense or asset
  * account, an amount ex GST and a tax code (GST, GST-CAP for capital acquisitions, GST-FREE …);

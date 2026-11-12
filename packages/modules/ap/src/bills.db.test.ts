@@ -1,5 +1,5 @@
 /**
- * Supplier bills (T-0050, design §3.8 row 6, UC-05, GP-008, DL-0278), against a real PostgreSQL as
+ * Supplier bills (T-0050, design §3.8 row 6, UC-05, GP-008, DL-0288), against a real PostgreSQL as
  * lf_app. The approved bill's journal is compared line for line with the Approved GP-008.
  */
 import { readFileSync } from 'node:fs';
