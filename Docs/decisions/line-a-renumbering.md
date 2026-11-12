@@ -8,3 +8,4 @@ T-0127–T-0165). Old commit messages keep the old IDs; this table maps them.
 | Line A id | New id | Source branch | Note |
 |---|---|---|---|
 | DL-0277 | DL-0287 | feat/T-0049-aged-ar | aged receivables decision |
+| DL-0278 | DL-0288 | feat/T-0050-bills | decision-log entry (title-matched) |

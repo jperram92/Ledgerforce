@@ -1,0 +1,26 @@
+{
+  "name": "@ledgerforce/ap",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Accounts payable: supplier bills, suggested coding, approval and posting (design §3.8 row 6, UC-05)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/shared": "workspace:*",
+    "@ledgerforce/tax": "workspace:*",
+    "decimal.js": "10.6.0",
+    "kysely": "0.29.7"
+  },
+  "devDependencies": {
+    "@ledgerforce/ar": "workspace:*",
+    "@types/node": "22.20.5",
+    "vitest": "4.1.12"
+  }
+}

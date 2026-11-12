@@ -148,6 +148,15 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0050: supplier bills (draft so lines may be inserted; totals CHECKs).
+  'app.supplier_bill': {
+    status: () => 'draft',
+    currency: () => 'AUD',
+    net_total: () => '1',
+    tax_total: () => '0',
+    gross_total: () => '1',
+  },
+  'app.supplier_bill_line': { tax_code: () => 'GST' },
   // T-0048: write-off record (gross = allowance + expense + GST adjustment).
   'app.bad_debt_write_off': {
     gross: () => '1',

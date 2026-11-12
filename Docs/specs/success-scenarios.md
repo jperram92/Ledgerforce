@@ -63,12 +63,12 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-UC04-05 | Salesforce Task logged for the Account owner | UC-04 | Phase 1 | contract | no | — | T-0100 | not-started | — | — |
 | SS-UC04-06 | Credit hold at 30 days blocks auto-approve | UC-04 | Phase 1 | db-integration | no | — | T-0100 | not-started | — | — |
 | SS-UC05-01 | Emailed PDF becomes a draft bill | UC-05 | MVP | db-integration | no | — | T-0051 | not-started | — | — |
-| SS-UC05-02 | Suggested coding from past bills | UC-05 | MVP | unit | no | — | T-0050 | not-started | — | — |
+| SS-UC05-02 | Suggested coding from past bills | UC-05 | MVP | unit | no | packages/modules/ap/src/suggest.test.ts; packages/modules/ap/src/bills.db.test.ts | T-0050 | green | [.agent/evidence/T-0050/manifest.json](../../.agent/evidence/T-0050/manifest.json) | a0fc22b |
 | SS-UC05-03 | Coded bill routes to Approver; nothing posts before approval | UC-05 | MVP | db-integration | no | — | T-0052 | not-started | — | — |
-| SS-UC05-04 | Approved bill posts GP-008 | UC-05 | MVP | golden | no | — | T-0050, T-0052 | not-started | — | — |
+| SS-UC05-04 | Approved bill posts GP-008 | UC-05 | MVP | golden | no | packages/modules/ap/src/bills.db.test.ts (GP-008 line for line) | T-0050, T-0052 | green (approval workflow/SoD T-0052) | [.agent/evidence/T-0050/manifest.json](../../.agent/evidence/T-0050/manifest.json) | a0fc22b |
 | SS-UC05-05 | SoD: clerk cannot approve own bill above $1,000 | UC-05 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts | T-0052, T-0015 | green (SoD layer; bill endpoint in T-0052) | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
 | SS-UC05-06 | Small-team mode records a visible exception | UC-05 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts; packages/db/src/sod.db.test.ts | T-0015, T-0052 | green (SoD layer; bill endpoint in T-0052) | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |
-| SS-UC05-07 | Bill in AP-locked period rejected | UC-05 | MVP | db-integration | no | packages/ledger/src/period.enforce.db.test.ts | T-0050, T-0023 | green (period/matrix layer; bill posting in T-0050) | [.agent/evidence/T-0023/manifest.json](../../.agent/evidence/T-0023/manifest.json) | 0296919 |
+| SS-UC05-07 | Bill in AP-locked period rejected | UC-05 | MVP | db-integration | no | packages/modules/ap/src/bills.db.test.ts; packages/ledger/src/period.enforce.db.test.ts | T-0050, T-0023 | green | [.agent/evidence/T-0050/manifest.json](../../.agent/evidence/T-0050/manifest.json) | a0fc22b |
 | SS-UC05-08 | Bill entry and approval screens | UC-05 | MVP | e2e-playwright | yes | — | T-0086 | not-started | — | — |
 | SS-UC06-01 | Batch created from 12 due bills | UC-06 | MVP | db-integration | no | — | T-0054 | not-started | — | — |
 | SS-UC06-02 | Creator cannot release own batch | UC-06 | MVP | db-integration | no | apps/api/src/sod/sod.db.test.ts | T-0054, T-0015 | green (SoD layer; batch endpoint in T-0054) | [.agent/evidence/T-0015/manifest.json](../../.agent/evidence/T-0015/manifest.json) | 58f5048 |

@@ -95,10 +95,10 @@ graph LR
 | [T-0004](T-0004.md) | Seed ADRs 0001–0010 and decision log | Sprint 0 | review | — | — | 0 |
 | [T-0005](T-0005.md) | Sprint-0 research pack (stack, Salesforce, ABA, RLS, Playwright, UI) | Sprint 0 | review | — | — | 0 |
 | [T-0006](T-0006.md) | Backlog, use-case specs and success-scenario register | Sprint 0 | review | — | — | 0 |
-| [T-0007](T-0007.md) | Golden postings DRAFT (human gate: golden_postings) | Sprint 0 | blocked | — | — | 0 |
+| [T-0007](T-0007.md) | Golden postings DRAFT (human gate: golden_postings) | Sprint 0 | review | — | — | 0 |
 | [T-0008](T-0008.md) | DB test harness, platform baseline migration and RLS suite skeleton | Sprint 0 | review | T-0001 | — | 2 |
 | [T-0009](T-0009.md) | Playwright evidence harness and UI principles | Sprint 0 | review | T-0001 | — | 1 |
-| [T-0103](T-0103.md) | Conductor: Windows provider process-tree termination on missed heartbeat | Sprint 0 | todo | T-0003 | — | 1 |
+| [T-0103](T-0103.md) | Conductor: Windows provider process-tree termination on missed heartbeat | Sprint 0 | blocked | T-0003 | — | 1 |
 | [T-0010](T-0010.md) | Tenancy: tenant and company tables, RLS context middleware | MVP | review | T-0008 | — | 1 |
 | [T-0104](T-0104.md) | API skeleton: NestJS on SWC, health check, per-request tenant transaction | MVP | review | T-0010 | — | 1 |
 | [T-0105](T-0105.md) | Server-side sessions: idle/absolute timeouts, revoke-all, session TenantResolver | MVP | review | T-0104 | — | 1 |
@@ -122,26 +122,26 @@ graph LR
 | [T-0028](T-0028.md) | Subledger entries and allocations | MVP | review | T-0025 | — | 0 |
 | [T-0029](T-0029.md) | Manual journals with approval rule; control accounts reject manual journals | MVP | review | T-0025, T-0015 | — | 1 |
 | [T-0030](T-0030.md) | Transactional outbox and pg-boss worker | MVP | review | T-0025 | — | 1 |
-| [T-0031](T-0031.md) | Golden-posting test runner | MVP | todo | T-0025, T-0007 | — | 1 |
-| [T-0032](T-0032.md) | Reversal (void) of posted entries | MVP | todo | T-0025, T-0027, T-0028, T-0031 | UC-10 | 1 |
-| [T-0033](T-0033.md) | Accounting invariant property suite (10,000 random documents) | MVP | todo | T-0027, T-0028, T-0032, T-0029 | — | 1 |
-| [T-0034](T-0034.md) | Tax codes (effective-dated) and GST engine with rounding | MVP | todo | T-0018, T-0017, T-0031 | UC-01 | 1 |
-| [T-0035](T-0035.md) | BAS box mapping and tax report query (both GST bases) | MVP | todo | T-0034, T-0027 | — | 0 |
+| [T-0031](T-0031.md) | Golden-posting test runner | MVP | review | T-0025, T-0007 | — | 1 |
+| [T-0032](T-0032.md) | Reversal (void) of posted entries | MVP | review | T-0025, T-0027, T-0028, T-0031 | UC-10 | 1 |
+| [T-0033](T-0033.md) | Accounting invariant property suite (10,000 random documents) | MVP | review | T-0027, T-0028, T-0032, T-0029 | — | 1 |
+| [T-0034](T-0034.md) | Tax codes (effective-dated) and GST engine with rounding | MVP | review | T-0018, T-0017, T-0031 | UC-01 | 1 |
+| [T-0035](T-0035.md) | BAS box mapping and tax report query (both GST bases) | MVP | review | T-0034, T-0027 | — | 0 |
 | [T-0036](T-0036.md) | Parties, roles, contacts and billing contact roles | MVP | review | T-0010 | — | 0 |
 | [T-0037](T-0037.md) | Party bank details with envelope encryption and masking | MVP | review | T-0036 | — | 1 |
-| [T-0038](T-0038.md) | Products, party posting profiles and product posting profiles | MVP | todo | T-0036, T-0018, T-0034 | — | 0 |
-| [T-0039](T-0039.md) | Posting-profile matrix resolution and gap check | MVP | todo | T-0038 | UC-01 | 1 |
-| [T-0040](T-0040.md) | Sales invoice lifecycle: draft → approve → post | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0015, T-0026, T-0031 | UC-01 | 3 |
-| [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | todo | T-0040 | — | 0 |
-| [T-0042](T-0042.md) | Email delivery (SMTP) via outbox for invoices, statements, reminders, remittances | MVP | todo | T-0041, T-0030, T-0031 | UC-01, UC-02, UC-06 | 3 |
-| [T-0043](T-0043.md) | Batch billing run: selection and preview | MVP | todo | T-0040 | UC-02 | 2 |
-| [T-0044](T-0044.md) | Batch billing run: approve, post as one job with per-invoice isolation | MVP | todo | T-0043, T-0042, T-0024 | UC-02 | 5 |
-| [T-0045](T-0045.md) | Customer credit notes | MVP | todo | T-0040, T-0031 | UC-11 | 4 |
-| [T-0046](T-0046.md) | Customer receipts and allocations | MVP | todo | T-0040, T-0031 | UC-03 | 2 |
-| [T-0047](T-0047.md) | Customer prepayments, deposit invoices and application to final invoice | MVP | todo | T-0046 | — | 0 |
+| [T-0038](T-0038.md) | Products, party posting profiles and product posting profiles | MVP | review | T-0036, T-0018, T-0034 | — | 0 |
+| [T-0039](T-0039.md) | Posting-profile matrix resolution and gap check | MVP | review | T-0038 | UC-01 | 1 |
+| [T-0040](T-0040.md) | Sales invoice lifecycle: draft → approve → post | MVP | review | T-0039, T-0025, T-0034, T-0028, T-0015, T-0026, T-0031 | UC-01 | 3 |
+| [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | review | T-0040 | — | 0 |
+| [T-0042](T-0042.md) | Email delivery (SMTP) via outbox for invoices, statements, reminders, remittances | MVP | review | T-0041, T-0030, T-0031 | UC-01, UC-02, UC-06 | 3 |
+| [T-0043](T-0043.md) | Batch billing run: selection and preview | MVP | review | T-0040 | UC-02 | 2 |
+| [T-0044](T-0044.md) | Batch billing run: approve, post as one job with per-invoice isolation | MVP | review | T-0043, T-0042, T-0024 | UC-02 | 5 |
+| [T-0045](T-0045.md) | Customer credit notes | MVP | review | T-0040, T-0031 | UC-11 | 4 |
+| [T-0046](T-0046.md) | Customer receipts and allocations | MVP | review | T-0040, T-0031 | UC-03 | 2 |
+| [T-0047](T-0047.md) | Customer prepayments, deposit invoices and application to final invoice | MVP | review | T-0046 | — | 0 |
 | [T-0048](T-0048.md) | Bad debt write-off with GST decreasing adjustment | MVP | blocked | T-0046, T-0035 | — | 0 |
 | [T-0049](T-0049.md) | Customer statements and aged receivables | MVP | review | T-0046 | UC-12 | 1 |
-| [T-0050](T-0050.md) | Supplier bills entry and suggested coding | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0031 | UC-05 | 3 |
+| [T-0050](T-0050.md) | Supplier bills entry and suggested coding | MVP | review | T-0039, T-0025, T-0034, T-0028, T-0031 | UC-05 | 3 |
 | [T-0051](T-0051.md) | Bills inbox: inbound email PDF → draft bill | MVP | todo | T-0050 | UC-05 | 1 |
 | [T-0052](T-0052.md) | Bill approval workflow with SoD | MVP | todo | T-0050, T-0015, T-0031 | UC-05 | 4 |
 | [T-0053](T-0053.md) | Supplier/employee bank-detail change verification with cooling-off | MVP | review | T-0037, T-0015, T-0013 | UC-06 | 2 |
@@ -192,8 +192,8 @@ graph LR
 | [T-0092](T-0092.md) | UI: Salesforce sync issues inbox | MVP | review | T-0081, T-0071 | — | 0 |
 | [T-0093](T-0093.md) | UI: users, roles, SoD exceptions report and audit log viewer | MVP | review | T-0081, T-0016, T-0015 | — | 0 |
 | [T-0094](T-0094.md) | Self-hosted Docker Compose install (api, worker, web, postgres, keycloak) | MVP | review | T-0081, T-0030, T-0011 | — | 1 |
-| [T-0095](T-0095.md) | CI security gates: SAST, dependency, container and secret scanning, SBOM | MVP | todo | T-0001 | — | 1 |
-| [T-0096](T-0096.md) | DAST smoke test against the compose stack | MVP | todo | T-0094, T-0095 | — | 0 |
+| [T-0095](T-0095.md) | CI security gates: SAST, dependency, container and secret scanning, SBOM | MVP | review | T-0001 | — | 1 |
+| [T-0096](T-0096.md) | DAST smoke test against the compose stack | MVP | review | T-0094, T-0095 | — | 0 |
 | [T-0097](T-0097.md) | Pilot hardening: backups, restore drill, security headers, rate limits | MVP | todo | T-0094, T-0096 | — | 0 |
 | [T-0098](T-0098.md) | Pilot data migration (opening balances, open AR/AP) and dry run | MVP | todo | T-0080, T-0097 | — | 0 |
 | [T-0099](T-0099.md) | MVP gate: pilot month and gate evidence pack (human gate) | MVP | todo | T-0098, T-0082, T-0083, T-0084, T-0085, T-0086, T-0087, T-0088, T-0089, T-0090, T-0091, T-0092, T-0093, T-0069, T-0070, T-0072, T-0075, T-0068, T-0048, T-0047, T-0033, T-0031, T-0035 | — | 0 |
@@ -212,16 +212,16 @@ graph LR
 
 | Task | Title | Phase | Status | Depends on |
 |---|---|---|---|---|
-| [T-0112](T-0112.md) | Repair PR review build and outbox integration failures | MVP | in_progress | none (owner-requested repair) |
-| [T-0113](T-0113.md) | Install smoke: wait for completed setup reliably | MVP | todo | T-0094 |
-| [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | todo | T-0010 |
-| [T-0115](T-0115.md) | AASB alignment: research Australian Accounting Standards and update the solution design | MVP | todo | — |
-| [T-0116](T-0116.md) | Template roles, accounts and source types for the AASB/GST golden postings | MVP | todo | T-0031 |
+| [T-0112](T-0112.md) | Repair PR review build and outbox integration failures | MVP | done | none (owner-requested repair) |
+| [T-0113](T-0113.md) | Install smoke: wait for completed setup reliably | MVP | done | T-0094 |
+| [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | done | T-0010 |
+| [T-0115](T-0115.md) | AASB alignment: research Australian Accounting Standards and update the solution design | MVP | review | — |
+| [T-0116](T-0116.md) | Template roles, accounts and source types for the AASB/GST golden postings | MVP | review | T-0031 |
 | [T-0117](T-0117.md) | Promote period-end accounts to system roles (additive role binding) | Phase 1 | todo | T-0116 |
-| [T-0118](T-0118.md) | Tax codes in the database: effective-dated tax_code table, company rounding setting, line wiring | MVP | todo | T-0034 |
+| [T-0118](T-0118.md) | Tax codes in the database: effective-dated tax_code table, company rounding setting, line wiring | MVP | review | T-0034 |
 | [T-0119](T-0119.md) | Chromium in the worker image and PDF rendering as a worker job | MVP | todo | T-0041 |
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
-| [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | todo | — | — | 0 |
+| [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:
