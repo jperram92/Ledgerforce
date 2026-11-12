@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0049",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-107",
+      "file": ".agent/evidence/T-0049/20261101-213648-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/aged.db.test.ts › T-0049 AC-1: aged AR buckets sum to the AR control balance at date › SS-PLAT-107 ages every open item by due date as at 31 Dec 2026 and the buckets sum to AR control",
+      "commit": "dba541b21a03",
+      "provider": "claude",
+      "timestamp": "2026-11-01T21:36:48.719Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC12-05",
+      "file": ".agent/evidence/T-0049/20261101-213648-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/aged.db.test.ts › SS-UC12-05: Salesforce values reconcile to LedgerForce aged AR › SS-UC12-05 the Account write-back carries balance due and overdue amount equal to the aged-AR totals, and maps to LF_ fields",
+      "commit": "dba541b21a03",
+      "provider": "claude",
+      "timestamp": "2026-11-01T21:36:48.719Z",
+      "result": "passed"
+    }
+  ]
+}

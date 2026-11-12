@@ -2198,3 +2198,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Cross-review C6 (`review-claude-20261112-120500.md`) reproduced agent self-attestation. Approval authority belongs to the owner (AGENTS.md §6), and the owner's merge to main is the observable act.
 - Alternatives: Signed approvals (no key infrastructure, out of scope); requiring a human-authored commit (authorship is not verifiable in git).
 - ADR: ADR-0047 (process, Proposed) · Status: accepted
+
+### DL-0287 — Ageing by days past due as at a date; credits current; write-back snapshot from the same ageing (Line A DL-0277, renumbered on integration, DL-0285)
+- Date: 2026-11-01 · By: claude · Task: T-0049 · Category: implementation (AR reporting)
+- `agedReceivables` uses the subledger: open as at the date = original − allocations dated on or before it (the rule of subledgerReconciliation), so its total equals the AR control balance at the date (asserted). Buckets by days past the item's due date: current (not yet due), 1–30, 31–60, 61–90, 90+. Credits (unapplied receipts, credit notes) are never overdue — they sit in current, reducing the balance but not the overdue amount (a first version aged a 1-day-old receipt into 1–30).
+- `accountWriteBack` builds the §5.4 `accounts` snapshot (balance due, overdue amount, credit status current/overdue, last receipt date) from the same items, so Salesforce LF_Balance_Due__c / LF_Overdue_Amount__c reconcile to aged AR by construction (SS-UC12-05, checked through the connector's own parser). Emitting it on events is the write-back producer's job (T-0067/T-0110). `on_hold` waits for a credit-hold flag on the party.
+- `customerStatement` reads AR control journal lines of the party (opening, movements, closing); template statement-v1 in @ledgerforce/documents. Emailing statements uses the T-0042 recipients rule (Statements contact, fallback Billing To).
+
