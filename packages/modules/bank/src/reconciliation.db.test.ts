@@ -1,6 +1,6 @@
 /**
- * Bank reconciliation against a real PostgreSQL as lf_app (T-0061, UC-08 step 5 + A2, DL-0294,
- * migration 0051).
+ * Bank reconciliation against a real PostgreSQL as lf_app (T-0061, UC-08 step 5 + A2, DL-0326,
+ * migration 0057).
  *
  * SS-UC08-06 — with every November line matched, the reconciliation report shows statement closing
  * balance = book balance (the bank GL account at the statement date) and nothing unreconciled.

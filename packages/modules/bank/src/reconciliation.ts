@@ -1,5 +1,5 @@
 /**
- * Bank reconciliation (T-0061, UC-08 step 5 + A2, DL-0294, migration 0051).
+ * Bank reconciliation (T-0061, UC-08 step 5 + A2, DL-0326, migration 0057).
  *
  * - reconciliationReport: for one imported statement, as at its last date (period end, else its
  *   latest line), the statement closing balance against the book balance (net debit of the bank
@@ -9,13 +9,13 @@
  *       on or before as-of (unmatched, excluded, or matched to a later book entry);
  *     · outstanding book items — entries on the GL account dated from the reconciliation start
  *       (the bank account's first imported line) to as-of, not matched to a line dated on or
- *       before as-of. Entries before the start are the opening position (DL-0294), not items.
+ *       before as-of. Entries before the start are the opening position (DL-0326), not items.
  *   adjusted statement balance = closing − unreconciled lines + outstanding book items; it ties
  *   when it equals the book balance (difference 0).
  * - completeReconciliation: store the report figures once the statement ties (app.bank_reconciliation).
  * - unmatchLine: undo a line's active match. Refused when the line's period is hard-locked
  *   (SS-UC08-07, also enforced by the 0018 trigger) or a completed reconciliation covers the line
- *   (DL-0294, also enforced by the 0051 trigger). The posted entry stays posted (posted =
+ *   (DL-0326, also enforced by the 0057 trigger). The posted entry stays posted (posted =
  *   immutable); it becomes an outstanding book item again.
  *
  * Read-only on ledger tables; no posting is produced. Money via Money (decimal.js) only.
@@ -289,7 +289,7 @@ export interface CompleteReconciliationInput extends ReportInput {
 
 /**
  * Complete the reconciliation of a statement that ties. Its lines (and every earlier line of the
- * bank account) can then no longer be unmatched (DL-0294).
+ * bank account) can then no longer be unmatched (DL-0326).
  */
 export async function completeReconciliation(
   trx: Trx,

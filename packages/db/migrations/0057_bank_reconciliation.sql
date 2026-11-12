@@ -1,4 +1,4 @@
--- 0057 — Bank reconciliation (T-0061, UC-08 step 5, DL-0294). Owner: packages/modules/bank.
+-- 0057 — Bank reconciliation (T-0061, UC-08 step 5, DL-0326). Owner: packages/modules/bank.
 --
 -- * app.bank_reconciliation: a completed reconciliation of one imported statement — the figures of
 --   the reconciliation report at the time it was completed (statement closing balance, book
@@ -7,7 +7,7 @@
 --     statement_balance − unreconciled_lines_total + unreconciled_book_total = book_balance.
 --   One completed reconciliation per statement. status/reopened_* exist so a reopen flow (needs a
 --   reason; not built yet) needs no CHECK change later (a CHECK cannot be widened forward-only).
--- * Lock (DL-0294): while a completed reconciliation of a bank account has as_of on or after a
+-- * Lock (DL-0326): while a completed reconciliation of a bank account has as_of on or after a
 --   statement line's date, that line's match cannot be unmatched (guard below, BEFORE UPDATE OF
 --   status on app.bank_match). Independently, the period trigger of 0018 refuses any line status
 --   change in a hard-locked period (SS-UC08-07). A match, once unmatched, is history: it is never

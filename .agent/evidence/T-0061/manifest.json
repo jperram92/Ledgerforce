@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0061",
+  "entries": [
+    {
+      "scenario": "SS-UC10-02",
+      "file": ".agent/evidence/T-0061/20261112-235308-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-02: AR lock blocks AR posting except with override › AR Clerk rejected; override user succeeds and is audited; AP bills still post",
+      "commit": "31a4eb26d696",
+      "provider": "claude",
+      "timestamp": "2026-11-12T23:53:08.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-03",
+      "file": ".agent/evidence/T-0061/20261112-235308-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-03: AP lock allows journals only › bill and invoice rejected, manual journal accepted",
+      "commit": "31a4eb26d696",
+      "provider": "claude",
+      "timestamp": "2026-11-12T23:53:08.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-07",
+      "file": ".agent/evidence/T-0061/20261112-235308-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC05-07: Bill in AP-locked period rejected › a bill dated 2026-10-20 without override is rejected with PERIOD_LOCKED and nothing is stored",
+      "commit": "31a4eb26d696",
+      "provider": "claude",
+      "timestamp": "2026-11-12T23:53:08.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-04",
+      "file": ".agent/evidence/T-0061/20261112-235308-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-04: Soft close: Finance Admin override only › the Accountant is rejected (with or without asking for an override); the Finance Admin with override succeeds | packages/ledger/src/period.enforce.db.test.ts › SS-UC10-04: Soft close: Finance Admin override only › an override is personal: another user cannot post on the Finance Admin’s override",
+      "commit": "31a4eb26d696",
+      "provider": "claude",
+      "timestamp": "2026-11-12T23:53:08.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-05",
+      "file": ".agent/evidence/T-0061/20261112-235308-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-05: Hard lock rejects or redirects per policy › \"reject\" → PERIOD_LOCKED (even for a Finance Admin); \"first open date\" → dated 2026-11-01 with a note",
+      "commit": "31a4eb26d696",
+      "provider": "claude",
+      "timestamp": "2026-11-12T23:53:08.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-08",
+      "file": ".agent/evidence/T-0061/20261112-235308-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy › Closed Won on 2026-10-30: \"reject\" → PERIOD_LOCKED, nothing posted; \"first open date\" → invoice dated 2026-11-01 with a note | packages/ledger/src/period.enforce.db.test.ts › SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy › \"first open date\" skips every later period that does not allow the source type",
+      "commit": "31a4eb26d696",
+      "provider": "claude",
+      "timestamp": "2026-11-12T23:53:08.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-09",
+      "file": ".agent/evidence/T-0061/20261112-235308-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC03-09: Late payout in an AR-locked period follows the period matrix › a payout dated 2026-11-30 posts exactly when the matrix (with the tenant payout setting) allows it | packages/ledger/src/period.enforce.db.test.ts › SS-UC03-09: Late payout in an AR-locked period follows the period matrix › settings are history: every change is a new row; the latest wins; a user without period.lock cannot change them",
+      "commit": "31a4eb26d696",
+      "provider": "claude",
+      "timestamp": "2026-11-12T23:53:08.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-07",
+      "file": ".agent/evidence/T-0061/20261112-235308-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC08-07: Reconciled lines locked after hard lock › unmatching a November line after November is hard-locked is rejected; December still can be | packages/modules/bank/src/reconciliation.db.test.ts › SS-UC08-07: Reconciled lines locked after hard lock › SS-UC08-07 with November hard-locked, unmatching a November line is rejected; a December line can be unmatched",
+      "commit": "31a4eb26d696",
+      "provider": "claude",
+      "timestamp": "2026-11-12T23:53:08.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-06",
+      "file": ".agent/evidence/T-0061/20261112-235308-tests-db.json",
+      "test": "2 test(s): packages/modules/bank/src/reconciliation.db.test.ts › SS-UC08-06: Statement balance equals book balance › SS-UC08-06 with all November lines matched, statement closing balance = book balance and unreconciled = 0 | packages/modules/bank/src/reconciliation.db.test.ts › SS-UC08-06: Statement balance equals book balance › an outstanding book payment the bank has not cleared is listed and the adjusted balance still ties (December)",
+      "commit": "31a4eb26d696",
+      "provider": "claude",
+      "timestamp": "2026-11-12T23:53:08.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-126",
+      "file": ".agent/evidence/T-0061/20261112-235308-tests-db.json",
+      "test": "2 test(s): packages/modules/bank/src/reconciliation.db.test.ts › SS-PLAT-126: A completed reconciliation locks its lines against unmatching › SS-PLAT-126 a statement that does not tie cannot be completed | packages/modules/bank/src/reconciliation.db.test.ts › SS-PLAT-126: A completed reconciliation locks its lines against unmatching › SS-PLAT-126 completing November records the figures; its lines can then no longer be unmatched",
+      "commit": "31a4eb26d696",
+      "provider": "claude",
+      "timestamp": "2026-11-12T23:53:08.692Z",
+      "result": "passed"
+    }
+  ]
+}

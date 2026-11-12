@@ -2493,3 +2493,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Evidence: baseline fake-launch regression RED: launch80ms succeeds after~102ms despite timeout15. After change, tests cover launch deadline and late-context closure (2/2). Documents typecheck, lint and prettier pass. Existing real-Chromium/PostgreSQL integration remains part of full CI; no full run after this patch yet.
 - Limits: process/browser launch itself cannot be cancelled through Playwright; the render request returns by deadline and a late shared browser remains owned until renderer.close. Visual PDF evidence remains open.
 - ADR: none (implements ADR-0045 rule4) · Status: accepted
+
+### DL-0326 — Bank reconciliation: report, completion record and line lock (T-0061)
+- Date: 2026-11-12 · By: claude (recording Line A's T-0061 design, built 2026-11-03) · Task: T-0061 · Category: implementation (bank)
+- Decision: `reconciliationReport` compares, for one imported statement as at its last date, the statement closing balance with the book balance (net debit of the bank GL account over non-draft entries up to as-of). It lists unreconciled lines and outstanding book items. The adjusted balance (closing − unreconciled + outstanding) must equal the book balance, and entries before the account's first imported line are the opening position. `completeReconciliation` stores the figures once the statement ties (`app.bank_reconciliation`, migration 0057, one completed reconciliation per statement). `unmatchLine` is refused when the line's period is hard-locked (SS-UC08-07, period trigger) or a completed reconciliation covers it (SS-PLAT-126), enforced in both the module and the database trigger `bank_match_unmatch_guard`.
+- Why: UC-08 step 5 and A2; reconciled history must not change silently. Line A's code cited this decision as DL-0294 but never wrote the entry. That number is now DL-0294 (integration plan), so the references point here.
+- Validation: reconciliation + period tests 20/20; mutation check: removing the lock in both layers fails SS-PLAT-126 (`.agent/evidence/T-0061/`).
+- Alternatives: application-only lock (bypassable by any other writer); reopen flow (columns exist, no UI/API yet → T-0088 scope).
+- ADR: none · Status: accepted
