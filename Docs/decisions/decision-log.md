@@ -2176,3 +2176,18 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Line B's own pickup note (CODEX-PICKUP-2026-11-09 §1) requires an owner decision; Line A already matches main's numbering and history.
 - Alternatives: Line B canonical (more collisions with main); new cards only (leaves built work stranded).
 - ADR: none · Status: accepted
+
+### DL-0286 — ID ranges reserved per parallel agent (integration round 2026-11-12)
+- Date: 2026-11-12 · By: claude · Task: sprint integration · Category: process
+- Decision: Six sub-agents run in parallel in separate git worktrees, on local branches only; the lead merges them into `claude/loving-lovelace-nozqpk` and pushes. Each agent allocates new IDs only from its own range:
+  | Agent | DL | Migrations | ADR | RQ | New task cards |
+  |---|---|---|---|---|---|
+  | Line A integrator | 0287–0399 | 0044–0069 | 0048–0069 | 0101–0119 | T-0127–T-0165 |
+  | T-0121 fix | 0400–0404 | — | — | 0120 | — |
+  | T-0083 invoices UI | 0405–0414 | 0070–0072 | 0070–0071 | 0121–0122 | T-0170–T-0172 |
+  | T-0097 pilot hardening | 0415–0424 | 0073–0075 | 0072–0073 | 0123–0124 | T-0173–T-0175 |
+  | T-0119 Chromium PDF worker | 0425–0434 | 0076–0078 | 0074–0075 | 0125–0126 | T-0176–T-0178 |
+  | T-0120 batch/email worker | 0435–0444 | 0079–0081 | 0076–0077 | 0127–0128 | T-0179–T-0181 |
+- Why: Line A and main already collide on DL, ADR, RQ, task and migration numbers (DL-0285). Disjoint ranges make later merges mechanical. Gaps in numbering are acceptable; numbers are identifiers, not counts.
+- Alternatives: Sequential building (slower; the owner asked for parallel agents); renumbering after the fact (error-prone).
+- ADR: none · Status: accepted
