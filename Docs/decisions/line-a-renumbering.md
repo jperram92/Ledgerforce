@@ -48,3 +48,4 @@ Migrations are numbered in integration order with no gaps:
 | DL-0283 | DL-0297 | feat/T-0073-stripe-payment-links | decision-log entry (title-matched) |
 | DL-0286 | DL-0298 | feat/T-0066-sf-polling-fallback | decision-log entry (title-matched) |
 | DL-0287 | DL-0299 | feat/T-0074-stripe-webhooks | decision-log entry (title-matched) |
+| DL-0289 | DL-0300 | feat/T-0069-closed-won-invoice | decision-log entry (title-matched) |

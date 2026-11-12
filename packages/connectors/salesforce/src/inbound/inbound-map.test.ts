@@ -58,12 +58,20 @@ describe('field ownership is data (ADR-0006)', () => {
     expect(ownershipClashes()).toEqual([]);
   });
 
-  it('maps Account, Contact and Product2, and knows the LedgerForce-owned Account fields', () => {
+  it('maps Account, Contact, Product2 and the UC-01 billing sources (T-0069), and knows the LedgerForce-owned Account fields', () => {
     expect(INBOUND_FIELD_MAP.map((m) => [m.entity, m.target])).toEqual([
       ['Account', 'party'],
       ['Contact', 'contact'],
       ['Product2', 'product'],
+      ['Opportunity', 'billing_source'],
+      ['Order', 'billing_source'],
+      ['OpportunityLineItem', 'billing_line'],
+      ['OrderItem', 'billing_line'],
     ]);
+    // The Opportunity fields LedgerForce writes back are never read (one owner per field).
+    expect([...lfOwnedFields('Opportunity')]).toEqual(
+      expect.arrayContaining(['LF_Invoice_Status__c', 'LF_Amount_Invoiced__c']),
+    );
     expect([...lfOwnedFields('Account')]).toEqual(
       expect.arrayContaining(['LF_Balance_Due__c', 'LF_Credit_Status__c']),
     );
@@ -164,10 +172,7 @@ describe('CDC body semantics (RQ-0101)', () => {
   it('an entity without a map plans nothing', () => {
     const [c] = inboundChanges(
       'src',
-      event(
-        { entityName: 'Opportunity', changedFields: ['StageName'] },
-        { StageName: 'Closed Won' },
-      ),
+      event({ entityName: 'Lead', changedFields: ['Status'] }, { Status: 'Working' }),
       [ACC],
     );
     expect(planChange(must(c))).toEqual({

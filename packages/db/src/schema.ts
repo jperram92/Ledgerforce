@@ -446,8 +446,10 @@ export interface SalesInvoiceTable {
   billing_format_id: Generated<string | null>;
   /** Migration 0042 (T-0047): deposit invoices credit CUSTOMER_PREPAYMENTS. */
   kind: Generated<'standard' | 'deposit'>;
-  /** Migration 0049 (T-0074): the Salesforce Opportunity this invoice bills. */
+  /** Migration 0051 (T-0074): the Salesforce Opportunity this invoice bills. */
   salesforce_opportunity_id: Generated<string | null>;
+  /** Migration 0052 (T-0069): document note, e.g. the lock-date policy moved the date. */
+  note: Generated<string | null>;
 }
 
 /** Migration 0042 (T-0047): prepayment received before an invoice (GP-020). */
@@ -566,7 +568,7 @@ export interface EmailDeliveryTable {
   sent_at: Timestamp;
 }
 
-/** Migration 0048 (T-0073, RQ-0115): Stripe Payment Link per invoice and amount due. */
+/** Migration 0049 (T-0073, RQ-0115): Stripe Payment Link per invoice and amount due. */
 export interface StripePaymentLinkTable {
   id: Generated<string>;
   tenant_id: TenantId;
@@ -583,7 +585,7 @@ export interface StripePaymentLinkTable {
   deactivated_at: Date | null;
 }
 
-/** Migration 0049 (T-0074): Stripe connector settings per company (postings Q2). */
+/** Migration 0051 (T-0074): Stripe connector settings per company (postings Q2). */
 export interface StripeSettingsTable {
   tenant_id: TenantId;
   company_id: string;
@@ -591,7 +593,7 @@ export interface StripeSettingsTable {
   updated_at: Generated<Date>;
 }
 
-/** Migration 0049 (T-0074, ADR-0049): Stripe events acted on, stored once; insert-only. */
+/** Migration 0051 (T-0074, ADR-0049): Stripe events acted on, stored once; insert-only. */
 export interface StripeWebhookEventTable {
   id: Generated<string>;
   tenant_id: TenantId;
@@ -608,7 +610,7 @@ export interface StripeWebhookEventTable {
   received_at: Generated<Date>;
 }
 
-/** Migration 0049 (T-0074): customer-credit refund sent to Stripe (GP-006 Stripe variant). */
+/** Migration 0051 (T-0074): customer-credit refund sent to Stripe (GP-006 Stripe variant). */
 export interface StripeRefundTable {
   id: Generated<string>;
   tenant_id: TenantId;
