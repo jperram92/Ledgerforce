@@ -2148,3 +2148,24 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Validation: GitHub CI passes at accb6a6; security workflow fails. Full local verifier 11 PASS / 3 FAIL / 2 PENDING. T-0121 remains verifying and T-0048 blocked; ADR-0047 stays Proposed.
 - Alternatives: Waiting for review before integrating would not fulfill the latest explicit owner request. No security gate, test or approved posting is changed by this handoff.
 - Status: accepted for this owner-requested integration only.
+
+### DL-0282 — Claude resumes T-0121 on the session branch; nested pnpm failure is environmental
+- Date: 2026-11-12 · By: claude · Task: T-0121 · Category: tooling
+- Decision: Continue T-0121 on `claude/loving-lovelace-nozqpk` (the branch this cloud session may push to), started from main `5c3a2e3`, instead of `feat/T-0121-claude-followup` named in CLAUDE_NEXT.md. Classify the `scripts.test.ts:99` failure as environmental: the test's temp repo has no `packageManager` pin, so a Corepack pnpm shim fell back to an uncached pnpm 12.18.0. With a direct pnpm 10.28.0 install the unchanged agent suite passes 93/93.
+- Why: Session push restrictions; RQ-0100 Q3; evidence `.agent/evidence/T-0121/agent-suite-claude-20261112.txt`.
+- Alternatives: Pinning pnpm inside the test fixture (changes a test to suit one host, rejected); raising timeouts (forbidden).
+- ADR: none · Status: accepted
+
+### DL-0283 — Two commit-scoped Gitleaks history fingerprints for T-0074 test fixtures (owner approved)
+- Date: 2026-11-12 · By: claude, owner approval · Task: T-0121 · Category: security
+- Decision: Append exactly two `<commit>:<path>:generic-api-key:<line>` entries to `.gitleaksignore` for commits 2847774 and db48271 on `feat/T-0074-stripe-webhooks`: a runtime-built forged webhook secret and a test idempotency key. Owner approved interactively on 2026-11-12 ("Approve both").
+- Why: RQ-0100 Q1. `git show` proves both are test fixtures. CI scans all fetched refs, and history cannot be rewritten (AGENTS.md §0.6). Exception proposal: `.agent/evidence/T-0121/gitleaks-exception-proposal-claude-20261112.md`. Scanner, rules, workflow and thresholds are unchanged.
+- Alternatives: History rewrite or branch deletion (forbidden); excluding branches from the scan (weakens the gate).
+- ADR: ADR-0043 (rule 5 exception, human-reviewed) · Status: accepted
+
+### DL-0284 — Upgrade Alpine packages in the node-runtime stage (zlib CVE-2026-4738)
+- Date: 2026-11-12 · By: claude · Task: T-0121 · Category: security (remediation of gate findings)
+- Decision: Add `RUN apk upgrade --no-cache` to the `node-runtime` stage before `USER node`, as the web stage already does (DL-0248). Contract test RED→GREEN.
+- Why: RQ-0100 Q2. Grype reported Critical CVE-2026-4738 on zlib 1.3.2-r1 in api/worker/setup, fixed in 1.4-r0, which current Alpine branches ship. The pinned node:22.23.4-alpine base predates it. The web image, which upgrades, passed at the same commit. Docker and the Alpine CDN are unavailable in this sandbox, so the CI image gate is the proof.
+- Alternatives: Ignore or `ignore-unfixed` (forbidden by ADR-0043); repinning the base digest (no rebuilt upstream base is confirmed yet); pinning `zlib=1.4-r0` (narrower, but it would miss the next fixed package).
+- ADR: none (same remediation pattern as DL-0248) · Status: accepted

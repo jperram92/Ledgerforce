@@ -261,3 +261,4 @@ Do not: edit Approved postings, delete history, weaken tests/security scans, rea
 - 2026-11-12T03:57:10.805Z codex: T-0121 → verifying
 - 2026-11-12T11:15:15.743Z codex: handover: Owner requested main integration and Claude handover; verification and independent review remain incomplete
 - 2026-11-12T11:17:11.733Z codex: release T-0121 → verifying (Handing off to Claude at owner request; full verification and security CI remain unresolved)
+- 2026-11-12T11:24:27.587Z claude: T-0121 → in_progress

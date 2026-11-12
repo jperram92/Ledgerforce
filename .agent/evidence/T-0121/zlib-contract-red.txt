@@ -1,0 +1,25 @@
+ENV HOME=/tmp
+
+"
+
+ ❯ infra/test/security-workflow.contract.test.ts:85:21
+     83|     // Fixed Alpine packages newer than the pinned node base (zlib CVE…
+     84|     // 43151980363, RQ-0100); runs before the image drops to the unpri…
+     85|     expect(runtime).toMatch(/^RUN apk upgrade --no-cache/m);
+       |                     ^
+     86|     expect(runtime.search(/apk upgrade --no-cache/)).toBeLessThan(runt…
+     87|     // The web healthcheck uses busybox wget; curl is not needed at ru…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  11:23:00
+   Duration  245ms (transform 43ms, setup 0ms, import 73ms, tests 29ms, environment 0ms)
+
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice

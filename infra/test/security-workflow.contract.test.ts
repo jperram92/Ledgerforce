@@ -80,6 +80,10 @@ describe('approved security workflow contract [T-0095]', () => {
     ]) {
       expect(runtime, `node-runtime removes ${tool}`).toContain(tool);
     }
+    // Fixed Alpine packages newer than the pinned node base (zlib CVE-2026-4738 in run
+    // 43151980363, RQ-0100); runs before the image drops to the unprivileged user.
+    expect(runtime).toMatch(/^RUN apk upgrade --no-cache/m);
+    expect(runtime.search(/apk upgrade --no-cache/)).toBeLessThan(runtime.search(/^USER node$/m));
     // The web healthcheck uses busybox wget; curl is not needed at runtime.
     expect(stage('web')).toMatch(/apk del --no-cache curl/);
     // Fixed Alpine packages newer than the pinned base (brotli-libs, zlib in run 41270094206).
