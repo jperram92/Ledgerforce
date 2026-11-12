@@ -221,6 +221,15 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     purpose: () => 'invoice',
     to_addrs: () => '{to@example.test}',
   },
+  // T-0073: Stripe payment links (CHECK-constrained Stripe id, https URL, cents, status pairing).
+  'app.stripe_payment_link': {
+    amount_due: () => '1.00',
+    currency: () => 'AUD',
+    stripe_id: () => `plink_${randomBytes(6).toString('hex')}`,
+    url: () => `https://buy.stripe.com/test_${randomBytes(6).toString('hex')}`,
+    idempotency_key: () => `lf-plink-v1-${randomBytes(6).toString('hex')}`,
+    status: () => 'active',
+  },
   // T-0041: billing format template records (CHECK-constrained codes; posted needs a series).
   'app.billing_format': {
     code: () => `F_${randomBytes(4).toString('hex').toUpperCase()}`,

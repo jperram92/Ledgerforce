@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0073",
+  "entries": [
+    {
+      "scenario": "SS-UC03-01",
+      "file": ".agent/evidence/T-0073/20261102-015021-SS-UC03-01-invoice-email-pay-online-link.png",
+      "test": "packages/connectors/stripe/src/stripe-link.contract.db.test.ts › SS-UC03-01 the emailed posted invoice (payment method Stripe) has a test-mode Payment Link for the amount due in its PDF and email",
+      "commit": "dd4ee58d6826",
+      "provider": "claude",
+      "timestamp": "2026-11-02T01:50:21.731Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-01",
+      "file": ".agent/evidence/T-0073/20261102-015015-tests-db.json",
+      "test": "5 test(s): packages/connectors/stripe/src/stripe-link.contract.db.test.ts › SS-UC03-01: Invoice carries a Stripe payment link › SS-UC03-01 a create rolled back after the Stripe call is retried with the same idempotency key and stores one link | packages/connectors/stripe/src/stripe-link.contract.db.test.ts › SS-UC03-01: Invoice carries a Stripe payment link › SS-UC03-01 the emailed posted invoice (payment method Stripe) has a test-mode Payment Link for the amount due in its PDF and email | packages/connectors/stripe/src/stripe-link.contract.db.test.ts › SS-UC03-01: Invoice carries a Stripe payment link › SS-UC03-01 rendering again reuses the stored link without calling Stripe | packages/connectors/stripe/src/stripe-link.contract.db.test.ts › SS-UC03-01: Invoice carries a Stripe payment link › SS-UC03-01 an invoice whose billing format has no Stripe payment method gets no link and no Stripe call | packages/connectors/stripe/src/stripe-link.contract.db.test.ts › SS-UC03-01: Invoice carries a Stripe payment link › SS-UC03-01 after a part payment the old link is deactivated and a new one is created for the new amount due",
+      "commit": "dd4ee58d6826",
+      "provider": "claude",
+      "timestamp": "2026-11-02T01:50:15.369Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-104",
+      "file": ".agent/evidence/T-0073/20261102-015023-tests-unit.json",
+      "test": "2 test(s): packages/modules/documents/src/invoice-html.test.ts › Invoice HTML (T-0041) › SS-PLAT-104 shows a tax invoice with supplier ABN, number, dates, GST and total | packages/modules/documents/src/invoice-html.test.ts › Invoice HTML (T-0041) › SS-PLAT-104 escapes every value and contains no script",
+      "commit": "dd4ee58d6826",
+      "provider": "claude",
+      "timestamp": "2026-11-02T01:50:23.767Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-01",
+      "file": ".agent/evidence/T-0073/20261102-015023-tests-unit.json",
+      "test": "1 test(s): packages/modules/documents/src/invoice-html.test.ts › Invoice HTML payment link (T-0073) › SS-UC03-01 shows the Stripe payment link with the amount due, escaped, and nothing without one",
+      "commit": "dd4ee58d6826",
+      "provider": "claude",
+      "timestamp": "2026-11-02T01:50:23.767Z",
+      "result": "passed"
+    }
+  ]
+}

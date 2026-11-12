@@ -6,6 +6,8 @@
  *   email with the PDF attached and records it in app.email_delivery (dedupe key invoice:<id>), so
  *   redelivery or a second event for the same invoice sends nothing more (at-least-once only
  *   across a crash between send and commit).
+ *   With a payment-link provider (T-0073: Stripe), an invoice whose billing format offers online
+ *   payment carries a "Pay online" link for the amount due in the PDF, the HTML and the text body.
  * - sendRemittanceAdvice: one advice to the supplier's Remittance contact listing the bills paid
  *   (called by the payment-batch confirmation, T-0057).
  * Amounts are formatted from decimal strings (no floating point).
@@ -16,6 +18,7 @@ import {
   formatMoney,
   loadInvoiceDocument,
   renderInvoiceHtml,
+  type InvoicePaymentLinkProvider,
   type PdfRenderer,
 } from '@ledgerforce/documents';
 import type { OutboxEvent, OutboxHandler } from '@ledgerforce/outbox';
@@ -72,6 +75,8 @@ async function sendOnce(
 export function invoiceEmailHandler(deps: {
   sender: EmailSender;
   renderer: PdfRenderer;
+  /** Optional online payment link (T-0073); without it invoices carry no link. */
+  paymentLinks?: InvoicePaymentLinkProvider;
 }): OutboxHandler {
   return {
     name: 'email.invoice_posted',
@@ -91,7 +96,9 @@ export function invoiceEmailHandler(deps: {
           `invoice ${event.aggregateId}: the customer has no Billing To contact`,
         );
       }
-      const doc = await loadInvoiceDocument(trx, companyId, event.aggregateId);
+      const loaded = await loadInvoiceDocument(trx, companyId, event.aggregateId);
+      const link = await deps.paymentLinks?.ensure(trx, companyId, event.aggregateId);
+      const doc = link ? { ...loaded, paymentLink: link } : loaded;
       const html = renderInvoiceHtml(doc);
       const pdf = await deps.renderer.render(html);
       await sendOnce(trx, deps.sender, {
@@ -104,7 +111,8 @@ export function invoiceEmailHandler(deps: {
           subject: `Tax invoice ${doc.invoiceNo} from ${doc.supplier.legalName}`,
           text:
             `Please find attached tax invoice ${doc.invoiceNo} from ${doc.supplier.legalName}.\n` +
-            `Amount due: ${formatMoney(doc.gross)}, due ${formatDate(doc.dueDate)}.\n`,
+            `Amount due: ${formatMoney(link ? link.amountDue : doc.gross)}, due ${formatDate(doc.dueDate)}.\n` +
+            (link ? `Pay online: ${link.url}\n` : ''),
           html,
           attachments: [
             { filename: `${doc.invoiceNo}.pdf`, contentType: 'application/pdf', content: pdf },

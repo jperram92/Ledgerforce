@@ -45,3 +45,4 @@ Migrations are numbered in integration order with no gaps:
 | 0050_bank_matching | 0056 | feat/T-0060 |
 | 0051_bank_reconciliation | 0057 | feat/T-0061 |
 | 0051_setup_opening_balance | 0058 | feat/T-0080 |
+| DL-0283 | DL-0297 | feat/T-0073-stripe-payment-links | decision-log entry (title-matched) |
