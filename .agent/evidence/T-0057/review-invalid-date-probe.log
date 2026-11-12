@@ -1,0 +1,42 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/var/tmp/ledgerforce-t0057-review-20261107/repo[39m
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44757
+(node:1886) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[31m[Nest] 1886  - [39m11/07/2026, 5:52:35 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mRangeError: Invalid time value
+    at Date.toISOString (<anonymous>)
+    at isDate [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mpackages/modules/ap/src/payment-confirmation.ts:58:49[90m)[39m
+    at confirmPaymentBatch [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mpackages/modules/ap/src/payment-confirmation.ts:160:8[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at ApPaymentBatchesController.confirm [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mapps/api/src/ap/payment-batches.controller.ts:260:15[90m)[39m
+ [31m❯[39m .tmp/payment-confirmation-review-probe.db.test.ts [2m([22m[2m1 test[22m[2m | [22m[31m1 failed[39m[2m)[22m[33m 1716[2mms[22m[39m
+[31m     [31m×[31m SS-UC06-07 a releaser records the bank confirmation: GP-009 posts once with its outbox event, audited[39m[33m 379[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m .tmp/payment-confirmation-review-probe.db.test.ts[2m > [22mSS-UC06-07: Batch posts GP-009 on confirmation only[2m > [22mSS-UC06-07 a releaser records the bank confirmation: GP-009 posts once with its outbox event, audited
+[31m[1mAssertionError[22m: invalid calendar date should be a domain refusal: expected 500 to be 422 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 422[39m
+[31m+ 500[39m
+
+[36m [2m❯[22m .tmp/payment-confirmation-review-probe.db.test.ts:[2m126:82[22m[39m
+    [90m124|[39m     expect(await before.json()).toMatchObject({ error: 'INVALID_BATCH'…
+    [90m125|[39m     const malformed = await confirm(id, 'treasurer', { confirmed_on: '…
+    [90m126|[39m     expect(malformed.status, 'invalid calendar date should be a domain…
+    [90m   |[39m                                                                                  [31m^[39m
+    [90m127|[39m     expect(await malformed.json()).toMatchObject({ error: 'INVALID_BAT…
+    [90m128|[39m     const unqueued = await confirm(id, 'treasurer', { confirmed_on: '2…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m   Start at [22m 17:52:28
+[2m   Duration [22m 6.22s[2m (transform 1.44s, setup 0ms, import 3.24s, tests 1.72s, environment 0ms)[22m
+

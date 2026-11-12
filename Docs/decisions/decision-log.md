@@ -2356,3 +2356,41 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: The refund migration does `CREATE OR REPLACE FUNCTION app.payment_batch_confirmation_guard()`, defined by the confirmation migration. Applying refund first failed every DB test with "function already exists". In Line A's own branch the order was confirmation (0048) then refund (0049).
 - Alternatives: none; dependency order is mandatory.
 - ADR: none · Status: accepted
+
+### DL-0307 — Review eligible integration prerequisites before merging
+- Date: 2026-11-07 · By: codex · Task: T-0057 · Category: review/process
+- Decision: independently review Claude-built T-0057 while T-0070/T-0080 await another provider. Preserve claimed_by: claude and use read-only product review with an isolated native verifier.
+- Why: the owner requests integration and cross-reviews, while AGENTS.md requires green CI and cross-review before merging. T-0057 is the first integration line and remains eligible; repeating completed T-0070/T-0080 checks would not supply independent review.
+- Runtime: reuse pinned Node/pnpm/PostgreSQL, native tmpfs and one browser worker already validated on T-0070/T-0080. No test changes or new dependencies. No production edits in reviewer role.
+- Review result: FAIL. An isolated copy of the real API test reproduces confirmed_on 2026-13-01 returning HTTP 500 instead of INVALID_BATCH / 422 because isDate serializes Invalid Date. Required builder regression/fix and authentic main coverage comparison recorded in the review and card. Card returns to in_progress without creating a reviewer lease or changing claimed_by. SMTP retry before committed delivery is the explicitly documented ADR-0046 at-least-once limitation, not a new blocking finding. No PR exists; no external review comment sent.
+- ADR: none · Status: accepted
+
+### DL-0308 — Repair payment confirmation validation with parallel builder work
+- Date: 2026-11-07 · By: codex · Task: T-0057 · Category: implementation/process
+- Decision: at the owner's explicit request to continue fixing with multiple sub-agents, claim T-0057 as codex and leave reviewer mode. Delegate canonical test authoring, authentic coverage-baseline investigation and read-only repair inspection separately; root records RED before production changes, runs GREEN/verification and manages commits/state. Preserve the prior FAIL review as history. No same-provider agent is an independent cross-provider reviewer.
+- Why: the reproduced invalid-calendar-date HTTP 500 must become the existing typed INVALID_BATCH / 422 refusal without posting side effects. Coverage must be measured from actual source/configuration; a documentation-only main cannot be assigned an invented numeric baseline.
+- Implementation: mirror the existing posting-command.ts validDate pattern (guard NaN before ISO serialization, retain calendar round-trip). Canonical tests first reproduced 8 failures (4 module RangeError, 4 API 500); the minimal guard makes all 19 targeted tests pass. Main d20af5c was independently verified to contain only Docs/Test.MD, so retain coverage PENDING and document baseline establishment as an initial-integration prerequisite; historical feature baseline is not relabelled as main.
+- ADR: none (no new dependency, accounting or security policy change) · Status: accepted
+
+### DL-0309 — Owner-approved exact history exceptions for two Stripe fixture identifiers
+- Date: 2026-11-07 UTC (2026-11-08 Sydney) · By: codex, explicit owner approval · Task: T-0057 CI validation · Category: security
+- Owner decision: "Approve these two exact exceptions" in response to the concrete proposal `.agent/evidence/T-0057/security-history-proposal-20261107.md`. This supplies the separately human-reviewed exception required by Accepted ADR-0043 rule 5; DL-0244 is the mechanism precedent, not the authorization for this pair.
+- Scope: only `2847774e1f6934dbaed059d4313354a899a58ba1:apps/api/src/payments/stripe-webhook.db.test.ts:generic-api-key:149` and `db482717d614d5db1536a9c55a34a527f35d37fb:packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts:generic-api-key:529` in `.gitleaksignore`. Verified synthetic event/payment identifiers and fixture idempotency label, not authentication credentials. Both commits belong to T-0074 and are not ancestors of this repair; full-history scanning still sees them. Current tree scan is clean.
+- Guardrails: no other exception, rule/threshold/workflow change, history rewrite or narrowing of scanned history. Working-tree scan still ignores no findings. Validate with contracts and real history/tree scans; retain earlier failures and redacted evidence. Approval does not imply the checks passed.
+- ADR: ADR-0043 · Status: accepted by owner for this exact pair only
+
+### DL-0310 — Keep feat task lineage canonical and selectively port Claude gaps
+- Date: 2026-11-10 Sydney (2026-11-09 UTC) · By: codex, explicit owner decision · Task: sprint-0 · Category: process
+- Decision: owner selected "Keep feat/T-*; port missing Claude work (Recommended)" after reviewing the two-lineage question from source pickup section 1. The feat/T-* family is canonical. Preserve claude/incomplete-features-build-wivsco at 872c4fa1fc74bb53bb19114035c8fa23d0759ecc as source history; port only reviewed missing behavior, with explicit source-to-canonical ID mappings. Do not merge that whole branch or replay its interrupted patches blindly.
+- Why: both histories descend from c1dfbca but independently reuse task, research, decision, ADR, migration and golden identifiers. The canonical family already implements the four interrupted tasks T-0041, T-0047, T-0048 and T-0069; their review status is not proof of completion. See `.agent/LINEAGE-RECONCILIATION-2026-11-10.md`.
+- Alternatives: making the newer Claude branch canonical or selecting the base task by task were offered; owner selected the broader feat family instead. This does not select T-0070 as the sole integration base: other feat branches contain independent work.
+- Guardrails: preserve existing dirty T-0057 verification records; do not overwrite canonical IDs, approved goldens, security approvals or tests. Keep archived source IDs qualified by their source commit until individually mapped. Accounting changes need researched superseding expectations and tests; security and integration gates remain intact. No task is marked done by this decision.
+- ADR: none · Status: accepted
+
+### DL-0311 — Apply the existing OS update policy to Node runtime images
+- Date: 2026-11-10 · By: codex · Task: T-0057 · Category: tooling
+- Decision: shared node-runtime installs available Alpine package updates before dropping privileges, matching the existing web-runtime policy in DL-0248. Keep digest, repositories, non-root user, scanner thresholds and exception list unchanged. Research RQ-0113.
+- Why: CI 42422632802 reports Critical zlib CVE-2026-4738 in API, worker and setup; their pinned base was never updated at build time. This fixes the shipped package set rather than suppressing the finding.
+- Alternatives: new scanner exception rejected; whole base replacement unnecessary if stable package updates clear the finding. Final image scanning remains required.
+- Validation: node runtime contract RED before Dockerfile change (missing patch step), GREEN after. Existing install contract invokes it so standard unit CI executes the regression.
+- ADR: none (existing DL-0248 mechanism; no new dependency or security model) · Status: accepted

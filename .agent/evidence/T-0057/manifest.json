@@ -28,6 +28,33 @@
       "provider": "claude",
       "timestamp": "2026-11-02T06:29:35.946Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-07",
+      "file": ".agent/evidence/T-0057/20261107-224426-tests-db.json",
+      "test": "13 test(s): packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 a released batch posts nothing; the bank confirmation posts exactly GP-009 and pays the bill | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 one entry per batch: one AP_CONTROL line per bill with its supplier, one bank line for the total | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › two confirmations at the same time post one journal | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › only a released batch can be confirmed, never before its payment date; nothing is written on refusal | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › the database refuses a confirmation of an unreleased batch and cancelling a confirmed one | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 rejects invalid calendar date 2026-13-01 without posting [T-0057] | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 rejects invalid calendar date 2026-00-01 without posting [T-0057] | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 rejects invalid calendar date 2026-12-32 without posting [T-0057] | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 rejects invalid calendar date 2026-12-00 without posting [T-0057] | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 rejects invalid calendar date 2027-02-29 without posting [T-0057] | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 rejects invalid calendar date 2027-04-31 without posting [T-0057] | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 accepts a real leap day without changing the confirmation date [T-0057] | packages/modules/ap/src/payment-confirmation.prop.db.test.ts › GP-009 invariants › SS-UC06-07 any confirmed batch balances, pays every bill and keeps AP subledger = AP control",
+      "commit": "da5d6ecdcdfc",
+      "provider": "codex",
+      "timestamp": "2026-11-07T22:44:26.361Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-08",
+      "file": ".agent/evidence/T-0057/20261107-224426-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/remittance.db.test.ts › SS-UC06-08: Remittance advices emailed › SS-UC06-08 each supplier Remittance contact receives one advice listing the bills paid | packages/modules/ap/src/remittance.db.test.ts › SS-UC06-08: Remittance advices emailed › other posted entries (a bill) send no remittance; an unconfirmed batch cannot be remitted",
+      "commit": "da5d6ecdcdfc",
+      "provider": "codex",
+      "timestamp": "2026-11-07T22:44:26.361Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-07",
+      "file": ".agent/evidence/T-0057/20261107-224526-tests-api-db.json",
+      "test": "7 test(s): apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 a releaser records the bank confirmation: GP-009 posts once with its outbox event, audited | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2026-13-01 with no posting effects [T-0057] | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2026-00-01 with no posting effects [T-0057] | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2026-12-32 with no posting effects [T-0057] | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2026-12-00 with no posting effects [T-0057] | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2027-02-29 with no posting effects [T-0057] | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2027-04-31 with no posting effects [T-0057]",
+      "commit": "da5d6ecdcdfc-dirty",
+      "provider": "codex",
+      "timestamp": "2026-11-07T22:45:26.275Z",
+      "result": "passed"
     }
   ]
 }

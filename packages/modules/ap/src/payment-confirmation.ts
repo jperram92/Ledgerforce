@@ -71,8 +71,11 @@ export interface PaymentConfirmationView {
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const numeric = (d: Decimal | string) => Money.of(d, 'XXX').toNumericString();
-const isDate = (d: string) =>
-  DATE_RE.test(d) && new Date(`${d}T00:00:00Z`).toISOString().slice(0, 10) === d;
+const isDate = (d: string) => {
+  if (!DATE_RE.test(d)) return false;
+  const date = new Date(`${d}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === d;
+};
 
 /** The batch's payments with their bills' numbers and journal entries, in line order. */
 async function paymentsOf(trx: Trx, batch: PaymentBatchView) {

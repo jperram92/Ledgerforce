@@ -8,7 +8,7 @@
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { subledgerEntriesOf } from '@ledgerforce/ledger';
+import { generateFiscalYear, subledgerEntriesOf } from '@ledgerforce/ledger';
 import { approvedTables, parsePostings } from '@ledgerforce/ledger/golden';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
 import { sql } from 'kysely';
@@ -343,5 +343,50 @@ describe('SS-UC06-07: Batch posts GP-009 on confirmation only', () => {
         (e: unknown) => String(e),
       );
     expect(direct).toMatch(/released/);
+  });
+
+  it.each(['2026-13-01', '2026-00-01', '2026-12-32', '2026-12-00', '2027-02-29', '2027-04-31'])(
+    'SS-UC06-07 rejects invalid calendar date %s without posting [T-0057]',
+    async (date) => {
+      const supplier = await p.addSupplier(`Calendar validation ${date}`, 72);
+      const billId = await p.postBill(supplier, `DATE-${date}`, '45.00', '2026-12-28');
+      const batchId = await releasedBatch('2026-12-28');
+      const entriesBefore = await paymentEntries();
+
+      await expect(confirm(batchId, date)).rejects.toMatchObject({ code: 'INVALID_BATCH' });
+
+      expect(await paymentEntries()).toEqual(entriesBefore);
+      expect(await f.inTenant((trx) => getPaymentBatch(trx, f.companyId, batchId))).toMatchObject({
+        status: 'released',
+        confirmation: null,
+      });
+      const bill = await f.inTenant((trx) =>
+        trx
+          .selectFrom('app.supplier_bill')
+          .select('entry_id')
+          .where('id', '=', billId)
+          .executeTakeFirstOrThrow(),
+      );
+      const [item] = await f.inTenant((trx) => subledgerEntriesOf(trx, bill.entry_id ?? ''));
+      expect(item?.openAmount).toBe('-45.0000');
+    },
+  );
+
+  it('SS-UC06-07 accepts a real leap day without changing the confirmation date [T-0057]', async () => {
+    await f.inTenant((trx) =>
+      generateFiscalYear(trx, { companyId: f.companyId, convention: 'AU', startYear: 2027 }),
+    );
+    const supplier = await p.addSupplier('Leap day supplier', 72);
+    await p.postBill(supplier, 'LEAP-2028', '60.00', '2028-02-28');
+    const batchId = await releasedBatch('2028-02-28');
+
+    const confirmed = await confirm(batchId, '2028-02-29');
+
+    expect(confirmed).toMatchObject({ batchId, confirmedOn: '2028-02-29', replayed: false });
+    // A batch that pays a bill always posts GP-009 (only refund-only batches have no entry, T-0055).
+    const entryId = confirmed.entryId;
+    if (entryId === null) throw new Error('expected a GP-009 entry for a batch that pays a bill');
+    const [payment] = await f.inTenant((trx) => subledgerEntriesOf(trx, entryId));
+    expect(payment?.openAmount).toBe('0.0000');
   });
 });

@@ -53,7 +53,7 @@ RUN pnpm install --frozen-lockfile --offline --prod --ignore-scripts \
 FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS node-runtime
 ENV NODE_ENV=production
 # Packages with security fixes newer than the pinned base are upgraded (zlib CVE-2026-4738,
-# RQ-0100; same pattern as the web stage, DL-0248).
+# RQ-0100, RQ-0113; same pattern as the web stage, DL-0248).
 RUN apk upgrade --no-cache
 RUN rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx \
       /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg /opt/yarn-v*

@@ -18,6 +18,14 @@ const read = (p: string): string => readFileSync(resolve(ROOT, p), 'utf8');
 const DIGEST = /^[a-z0-9./_-]+:[A-Za-z0-9._-]+@sha256:[0-9a-f]{64}$/;
 const SECRET_NAME = /(PASSWORD|SECRET|TOKEN|PRIVATE_KEY)/i;
 
+it('runs the Node runtime package-update regression [T-0057]', () => {
+  const result = spawnSync(process.execPath, ['--test', 'infra/test/runtime-updates.test.mjs'], {
+    cwd: ROOT,
+    encoding: 'utf8',
+  });
+  expect(result.status, result.stdout + result.stderr).toBe(0);
+});
+
 interface Stage {
   name: string;
   from: string;
