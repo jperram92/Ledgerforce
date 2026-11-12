@@ -159,6 +159,20 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     amount: () => '1',
     excluded_reason: () => 'NO_VERIFIED_BANK_DETAILS',
   },
+  // T-0055: customer refunds (method/status CHECKs; requested, so the nullable entry_id/paid_on stay empty) and
+  // their batch lines (an exclusion needs no bank account).
+  'app.customer_refund': {
+    currency: () => 'AUD',
+    amount: () => '1',
+    method: () => 'bank_batch',
+    status: () => 'requested',
+  },
+  'app.payment_batch_refund': {
+    amount: () => '1',
+    excluded_reason: () => 'NO_VERIFIED_BANK_DETAILS',
+  },
+  // T-0057: bank confirmation of a batch (bank reference length CHECK).
+  'app.payment_batch_confirmation': { bank_reference: () => 'BANK-REF-1' },
   // T-0051: bills inbox and attachments (CHECK-constrained hashes and types).
   'app.bill_inbox_item': {
     message_id: () => `<${randomBytes(6).toString('hex')}@test>`,
@@ -501,6 +515,24 @@ export const PREREQUISITES: Readonly<
            FROM app.subledger_entry f
           WHERE t.tenant_id = $1 AND t.id = $2 AND f.tenant_id = $1 AND f.id = $3`,
         [row.get('tenant_id'), row.get('to_entry_id'), row.get('from_entry_id')],
+      ),
+    );
+  },
+  // A confirmation needs a released batch and the batch's own posted ap_payment entry
+  // (migration 0048 insert guard): release the generated batch (draft → released is allowed)
+  // and, as a seed step with triggers off, make the generated entry that batch's payment entry.
+  'app.payment_batch_confirmation': async (admin, row) => {
+    await admin.query(
+      `UPDATE app.payment_batch SET status = 'released' WHERE tenant_id = $1 AND id = $2`,
+      [row.get('tenant_id'), row.get('batch_id')],
+    );
+    await asReplica(admin, (q) =>
+      q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `UPDATE app.journal_entry SET status = 'posted', posted_at = coalesce(posted_at, now()), source_type = 'ap_payment',
+                source_id = $3
+          WHERE tenant_id = $1 AND id = $2`,
+        [row.get('tenant_id'), row.get('entry_id'), row.get('batch_id')],
       ),
     );
   },

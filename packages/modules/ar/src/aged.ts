@@ -150,6 +150,78 @@ export async function accountWriteBack(
   };
 }
 
+export interface OpportunityWriteBack {
+  readonly sfId: string;
+  /** Net cash paid against the Opportunity's invoices (NUMERIC text). */
+  readonly amountPaid: string;
+}
+
+/** Sources whose allocation to an invoice is cash received for it. */
+const CASH_IN = [
+  'ar_receipt',
+  'payments_stripe_charge',
+  'ar_prepayment',
+  'ar_prepayment_application',
+];
+
+/**
+ * The `opportunities` row of the Salesforce write-back snapshot (design §5.4, contract v1) with
+ * Opportunity.LF_Amount_Paid__c (SS-UC11-05, GP-006): the net amount paid on the given invoices of
+ * the Opportunity = cash allocated to them (receipts, Stripe charges, prepayments) − refunds paid
+ * out of their credit notes. A credit note alone does not change it (no cash moved); its refund
+ * does. Allocations net with their reversals (negative rows). Current state, not a delta.
+ * Invoices are passed in: the invoice → Opportunity link arrives with T-0069 and the producer that
+ * emits this snapshot on an event is T-0110 (DL-0305).
+ */
+export async function opportunityWriteBack(
+  trx: Trx,
+  q: { companyId: string; sfId: string; invoiceIds: readonly string[] },
+): Promise<OpportunityWriteBack> {
+  const companyId = q.companyId.toLowerCase();
+  const ids = [...new Set(q.invoiceIds.map((i) => i.toLowerCase()))];
+  const found = await trx
+    .selectFrom('app.sales_invoice')
+    .select('id')
+    .where('company_id', '=', companyId)
+    .where('id', 'in', ids.length > 0 ? ids : ['00000000-0000-0000-0000-000000000000'])
+    .execute();
+  if (found.length !== ids.length)
+    throw new RangeError(`not every invoice of Opportunity ${q.sfId} is in company ${companyId}`);
+  const r = (
+    await sql<{ paid: string; refunded: string }>`
+      WITH inv AS (
+        SELECT s.id FROM app.sales_invoice i
+          JOIN app.subledger_entry s ON s.tenant_id = i.tenant_id AND s.entry_id = i.entry_id
+                                    AND s.control_role = 'AR_CONTROL'
+         WHERE i.company_id = ${companyId} AND i.id = ANY(${ids}::uuid[])),
+      cn AS (
+        SELECT s.id FROM app.credit_note c
+          JOIN app.subledger_entry s ON s.tenant_id = c.tenant_id AND s.entry_id = c.entry_id
+                                    AND s.control_role = 'AR_CONTROL'
+         WHERE c.company_id = ${companyId} AND c.invoice_id = ANY(${ids}::uuid[])),
+      pairs AS (
+        SELECT a.amount,
+               CASE WHEN a.to_entry_id IN (SELECT id FROM inv) OR a.to_entry_id IN (SELECT id FROM cn)
+                    THEN a.to_entry_id ELSE a.from_entry_id END AS doc,
+               CASE WHEN a.to_entry_id IN (SELECT id FROM inv) OR a.to_entry_id IN (SELECT id FROM cn)
+                    THEN a.from_entry_id ELSE a.to_entry_id END AS other
+          FROM app.allocation a
+         WHERE a.company_id = ${companyId}
+           AND (a.to_entry_id IN (SELECT id FROM inv) OR a.from_entry_id IN (SELECT id FROM inv)
+             OR a.to_entry_id IN (SELECT id FROM cn) OR a.from_entry_id IN (SELECT id FROM cn)))
+      SELECT
+        coalesce(sum(p.amount) FILTER (WHERE p.doc IN (SELECT id FROM inv)
+                                         AND o.source_type = ANY(${CASH_IN}::text[])), 0)::text AS paid,
+        coalesce(sum(p.amount) FILTER (WHERE p.doc IN (SELECT id FROM cn)
+                                         AND o.source_type = 'ar_refund'), 0)::text AS refunded
+        FROM pairs p JOIN app.subledger_entry o ON o.id = p.other`.execute(trx)
+  ).rows[0];
+  return {
+    sfId: q.sfId,
+    amountPaid: numeric(new Decimal(r?.paid ?? '0').minus(r?.refunded ?? '0')),
+  };
+}
+
 export interface StatementLine {
   readonly date: string;
   readonly kind:

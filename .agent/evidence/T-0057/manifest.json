@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0057",
+  "entries": [
+    {
+      "scenario": "SS-UC06-07",
+      "file": ".agent/evidence/T-0057/20261102-062916-tests-db.json",
+      "test": "6 test(s): packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 a released batch posts nothing; the bank confirmation posts exactly GP-009 and pays the bill | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 one entry per batch: one AP_CONTROL line per bill with its supplier, one bank line for the total | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › two confirmations at the same time post one journal | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › only a released batch can be confirmed, never before its payment date; nothing is written on refusal | packages/modules/ap/src/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › the database refuses a confirmation of an unreleased batch and cancelling a confirmed one | packages/modules/ap/src/payment-confirmation.prop.db.test.ts › GP-009 invariants › SS-UC06-07 any confirmed batch balances, pays every bill and keeps AP subledger = AP control",
+      "commit": "8366a5ca9368-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:29:16.644Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-08",
+      "file": ".agent/evidence/T-0057/20261102-062916-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/remittance.db.test.ts › SS-UC06-08: Remittance advices emailed › SS-UC06-08 each supplier Remittance contact receives one advice listing the bills paid | packages/modules/ap/src/remittance.db.test.ts › SS-UC06-08: Remittance advices emailed › other posted entries (a bill) send no remittance; an unconfirmed batch cannot be remitted",
+      "commit": "8366a5ca9368-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:29:16.644Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-07",
+      "file": ".agent/evidence/T-0057/20261102-062935-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 a releaser records the bank confirmation: GP-009 posts once with its outbox event, audited",
+      "commit": "8366a5ca9368-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T06:29:35.946Z",
+      "result": "passed"
+    }
+  ]
+}

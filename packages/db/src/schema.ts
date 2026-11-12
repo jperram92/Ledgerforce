@@ -828,6 +828,52 @@ export interface PaymentBatchReleaseTable {
   released_at: Timestamp;
 }
 
+export interface PaymentBatchConfirmationTable {
+  tenant_id: TenantId;
+  company_id: string;
+  batch_id: string;
+  /** GP-009 entry; for a batch of customer refunds only, its first refund's GP-006 entry (0049). */
+  entry_id: string;
+  confirmed_on: ColumnType<Date, string, string>;
+  bank_reference: string | null;
+  confirmed_by: string | null;
+  confirmed_at: Timestamp;
+}
+
+/** Migration 0055 (T-0055): customer refunds (GP-006). */
+export interface CustomerRefundTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: string;
+  refund_no: string;
+  party_id: string;
+  refund_date: ColumnType<Date, string, string>;
+  amount: string;
+  currency: string;
+  method: 'bank_batch' | 'stripe';
+  reason: string | null;
+  status: Generated<'requested' | 'paid' | 'cancelled'>;
+  entry_id: string | null;
+  paid_on: ColumnType<Date | null, string | null | undefined, string | null>;
+  created_by: string | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
+/** Migration 0055 (T-0055): a customer refund paid (or excluded) in a payment batch. */
+export interface PaymentBatchRefundTable {
+  tenant_id: TenantId;
+  company_id: string;
+  batch_id: string;
+  line_no: number;
+  refund_id: string;
+  party_id: string;
+  amount: string;
+  bank_account_id: string | null;
+  excluded_reason: 'BANK_DETAILS_COOLING_OFF' | 'NO_VERIFIED_BANK_DETAILS' | null;
+  payable_from: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+}
+
 export interface SupplierBillLineTable {
   tenant_id: TenantId;
   company_id: string;
@@ -1125,6 +1171,9 @@ export interface Database {
   'app.payment_batch': PaymentBatchTable;
   'app.payment_batch_item': PaymentBatchItemTable;
   'app.payment_batch_release': PaymentBatchReleaseTable;
+  'app.payment_batch_confirmation': PaymentBatchConfirmationTable;
+  'app.customer_refund': CustomerRefundTable;
+  'app.payment_batch_refund': PaymentBatchRefundTable;
   'app.supplier_bill_line': SupplierBillLineTable;
   'app.bill_inbox_item': BillInboxItemTable;
   'app.document_attachment': DocumentAttachmentTable;

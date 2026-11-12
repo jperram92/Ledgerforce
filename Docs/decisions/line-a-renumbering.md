@@ -49,3 +49,9 @@ Migrations are numbered in integration order with no gaps:
 | DL-0286 | DL-0298 | feat/T-0066-sf-polling-fallback | decision-log entry (title-matched) |
 | DL-0287 | DL-0299 | feat/T-0074-stripe-webhooks | decision-log entry (title-matched) |
 | DL-0289 | DL-0300 | feat/T-0069-closed-won-invoice | decision-log entry (title-matched) |
+| DL-0285 | DL-0304 | feat/T-0055-customer-refunds | decision-log entry (title-matched) |
+| DL-0288 | DL-0305 | feat/T-0055-customer-refunds | decision-log entry (title-matched) |
+
+**Correction (DL-0306):** 0049_ar_customer_refund replaces `app.payment_batch_confirmation_guard()`, which
+0048_ap_payment_confirmation creates, so confirmation must apply first: 0048_ap_payment_confirmation → **0054**,
+0049_ar_customer_refund → **0055** (this supersedes the 0054/0055 rows above).

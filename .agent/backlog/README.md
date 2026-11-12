@@ -22,7 +22,7 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | Phase | Cards |
 |---|---:|
 | Sprint 0 | 9 |
-| MVP | 90 |
+| MVP | 91 |
 | Phase 1 | 1 |
 | Phase 2 | 1 |
 | Phase 3 | 1 |
@@ -146,9 +146,9 @@ graph LR
 | [T-0052](T-0052.md) | Bill approval workflow with SoD | MVP | review | T-0050, T-0015, T-0031 | UC-05 | 4 |
 | [T-0053](T-0053.md) | Supplier/employee bank-detail change verification with cooling-off | MVP | review | T-0037, T-0015, T-0013 | UC-06 | 2 |
 | [T-0054](T-0054.md) | Payment batches with maker-checker and step-up release | MVP | review | T-0052, T-0053, T-0013 | UC-06 | 5 |
-| [T-0055](T-0055.md) | Customer refunds (bank payment batch and Stripe) | MVP | todo | T-0046, T-0045, T-0054, T-0031 | UC-11 | 3 |
+| [T-0055](T-0055.md) | Customer refunds (bank payment batch and Stripe) | MVP | review | T-0046, T-0045, T-0054, T-0031, T-0057 | UC-11 | 2 |
 | [T-0056](T-0056.md) | ABA (Cemtex) file export | MVP | review | T-0054 | UC-06 | 1 |
-| [T-0057](T-0057.md) | Payment confirmation posting and remittance advices | MVP | todo | T-0056, T-0042, T-0031 | UC-06 | 2 |
+| [T-0057](T-0057.md) | Payment confirmation posting and remittance advices | MVP | review | T-0056, T-0042, T-0031 | UC-06 | 2 |
 | [T-0058](T-0058.md) | Bank accounts and statement import (CSV, OFX) | MVP | review | T-0018 | UC-08 | 2 |
 | [T-0059](T-0059.md) | CAMT extensions: batch entries (TxDtls), several statements per file, camt.052/054 | MVP | review | T-0058 | UC-08 | 1 |
 | [T-0060](T-0060.md) | Matching rules and auto-match | MVP | todo | T-0058, T-0046, T-0057 | UC-08 | 3 |
@@ -223,6 +223,7 @@ graph LR
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
+| [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:
