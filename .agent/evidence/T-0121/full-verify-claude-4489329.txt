@@ -2,3 +2,4 @@ LedgerForce verify — 2026-11-12T11:24:58Z — task T-0121
 GATE 1 typecheck: PASS (pnpm typecheck)
 GATE 1 lint: PASS (pnpm lint)
 GATE 1 format: PASS (pnpm format:check)
+GATE 2a unit-tests: PASS (pnpm test + node --test scripts/agent/test)
