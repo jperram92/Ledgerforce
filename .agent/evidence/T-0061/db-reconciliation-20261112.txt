@@ -1,0 +1,30 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:38557
+ ✓ |db| packages/modules/bank/src/reconciliation.db.test.ts > A2: Unmatched lines are listed as unreconciled > before matching, all 10 November lines are unreconciled and the adjusted statement balance ties to the book 13ms
+ ✓ |db| packages/modules/bank/src/reconciliation.db.test.ts > A2: Unmatched lines are listed as unreconciled > a CSV statement has no closing balance of its own: the report asks for one 7ms
+ ✓ |db| packages/modules/bank/src/reconciliation.db.test.ts > SS-UC08-06: Statement balance equals book balance > SS-UC08-06 with all November lines matched, statement closing balance = book balance and unreconciled = 0 378ms
+ ✓ |db| packages/modules/bank/src/reconciliation.db.test.ts > SS-UC08-06: Statement balance equals book balance > an outstanding book payment the bank has not cleared is listed and the adjusted balance still ties (December) 33ms
+ ✓ |db| packages/modules/bank/src/reconciliation.db.test.ts > SS-PLAT-126: A completed reconciliation locks its lines against unmatching > SS-PLAT-126 a statement that does not tie cannot be completed 7ms
+ ✓ |db| packages/modules/bank/src/reconciliation.db.test.ts > SS-PLAT-126: A completed reconciliation locks its lines against unmatching > SS-PLAT-126 completing November records the figures; its lines can then no longer be unmatched 26ms
+ ✓ |db| packages/modules/bank/src/reconciliation.db.test.ts > SS-UC08-07: Reconciled lines locked after hard lock > SS-UC08-07 with November hard-locked, unmatching a November line is rejected; a December line can be unmatched 363ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC10-02: AR lock blocks AR posting except with override > AR Clerk rejected; override user succeeds and is audited; AP bills still post 81ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC10-03: AP lock allows journals only > bill and invoice rejected, manual journal accepted 44ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC05-07: Bill in AP-locked period rejected > a bill dated 2026-10-20 without override is rejected with PERIOD_LOCKED and nothing is stored 39ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC10-04: Soft close: Finance Admin override only > the Accountant is rejected (with or without asking for an override); the Finance Admin with override succeeds 43ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC10-04: Soft close: Finance Admin override only > an override is personal: another user cannot post on the Finance Admin’s override 32ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC10-05: Hard lock rejects or redirects per policy > "reject" → PERIOD_LOCKED (even for a Finance Admin); "first open date" → dated 2026-11-01 with a note 50ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy > Closed Won on 2026-10-30: "reject" → PERIOD_LOCKED, nothing posted; "first open date" → invoice dated 2026-11-01 with a note 41ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy > "first open date" skips every later period that does not allow the source type 31ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC03-09: Late payout in an AR-locked period follows the period matrix > a payout dated 2026-11-30 posts exactly when the matrix (with the tenant payout setting) allows it 39ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC03-09: Late payout in an AR-locked period follows the period matrix > settings are history: every change is a new row; the latest wins; a user without period.lock cannot change them 4ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > SS-UC08-07: Reconciled lines locked after hard lock > unmatching a November line after November is hard-locked is rejected; December still can be 40ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > Invariant 3 (design §3.3): entry_date must fall in a period of the company > fills period_id from entry_date, refuses a wrong period_id, a date outside every period and an unknown source type 41ms
+ ✓ |db| packages/ledger/src/period.enforce.db.test.ts > Invariant 3 (design §3.3): entry_date must fall in a period of the company > a draft is not checked; drafts carry no period decision until they are posted 24ms
+
+ Test Files  2 passed (2)
+      Tests  20 passed (20)
+   Start at  23:51:56
+   Duration  4.76s (transform 492ms, setup 0ms, import 901ms, tests 2.90s, environment 0ms)
+

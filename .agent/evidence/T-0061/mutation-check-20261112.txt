@@ -1,0 +1,7 @@
+# Mutation check (claude 2026-11-12): hard-lock and completed-reconciliation guards in unmatchLine disabled temporarily; source restored after.
+      Tests  7 passed (7)
+# Mutation check 2 (claude 2026-11-12): completed-reconciliation guard removed in BOTH layers (unmatchLine check + DB trigger bank_match_unmatch_guard); restored after.
+     × SS-PLAT-126 completing November records the figures; its lines can then no longer be unmatched 26ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |db| packages/modules/bank/src/reconciliation.db.test.ts > SS-PLAT-126: A completed reconciliation locks its lines against unmatching > SS-PLAT-126 completing November records the figures; its lines can then no longer be unmatched
+      Tests  1 failed | 6 passed (7)
