@@ -64,7 +64,7 @@ class TestBillController {
   }
 }
 
-@Controller('ap/payment-batches')
+@Controller('test/ap/payment-batches')
 class TestPaymentBatchController {
   @Post()
   @HttpCode(201)
@@ -294,14 +294,14 @@ describe('SS-UC06-02: Creator cannot release own batch', () => {
   it('the batch created by user A: user A releasing it is denied with SOD_BATCH_SELF_RELEASE', async () => {
     expect(
       (
-        await call('POST', '/ap/payment-batches', 'userA', {
+        await call('POST', '/test/ap/payment-batches', 'userA', {
           id: 'PB-2026-11-01',
           amount: '18450.0000',
         })
       ).status,
     ).toBe(201);
     const mark = await auditMark();
-    const res = await call('POST', '/ap/payment-batches/PB-2026-11-01/release', 'userA');
+    const res = await call('POST', '/test/ap/payment-batches/PB-2026-11-01/release', 'userA');
     expect(res.status).toBe(403);
     expect(await res.json()).toMatchObject({
       error: 'sod_violation',
@@ -314,17 +314,17 @@ describe('SS-UC06-02: Creator cannot release own batch', () => {
   });
 
   it('the Owner is bound too (§6.4: cannot release a batch they created)', async () => {
-    await call('POST', '/ap/payment-batches', 'ownerA', { id: 'PB-OWNER', amount: '10.0000' });
-    const res = await call('POST', '/ap/payment-batches/PB-OWNER/release', 'ownerA');
+    await call('POST', '/test/ap/payment-batches', 'ownerA', { id: 'PB-OWNER', amount: '10.0000' });
+    const res = await call('POST', '/test/ap/payment-batches/PB-OWNER/release', 'ownerA');
     expect(res.status).toBe(403);
     expect(await res.json()).toMatchObject({ rule: 'SOD_BATCH_SELF_RELEASE' });
   });
 
   it('a different releaser may release; above $10,000 the same releaser cannot release twice', async () => {
     expect(
-      (await call('POST', '/ap/payment-batches/PB-2026-11-01/release', 'approver')).status,
+      (await call('POST', '/test/ap/payment-batches/PB-2026-11-01/release', 'approver')).status,
     ).toBe(200);
-    const again = await call('POST', '/ap/payment-batches/PB-2026-11-01/release', 'approver');
+    const again = await call('POST', '/test/ap/payment-batches/PB-2026-11-01/release', 'approver');
     expect(again.status).toBe(403);
     expect(await again.json()).toMatchObject({ rule: 'SOD_BATCH_SAME_RELEASER' });
   });
@@ -495,7 +495,7 @@ describe('SS-PLAT-63: SoD runs after MFA, permission and step-up, fails closed a
       acr: null,
       authTime: new Date(Date.now() - 3_600_000),
     });
-    const res = await fetch(`${api.url}/ap/payment-batches/PB-2026-11-01/release`, {
+    const res = await fetch(`${api.url}/test/ap/payment-batches/PB-2026-11-01/release`, {
       method: 'POST',
       headers: { cookie: `lf_session=${stale}` },
     });

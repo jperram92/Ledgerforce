@@ -1,4 +1,5 @@
 import { ApBillsController } from './ap/bills.controller.ts';
+import { ApPaymentBatchesController } from './ap/payment-batches.controller.ts';
 import { ArReceiptsController } from './ar/receipts.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArBatchesController } from './ar/batches.controller.ts';
@@ -104,6 +105,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ArCreditNotesController,
   ArReceiptsController,
   ApBillsController,
+  ApPaymentBatchesController,
   AuthController,
   LoginController,
 ];
@@ -142,6 +144,7 @@ class AppModule {
         ArCreditNotesController,
         ArReceiptsController,
         ApBillsController,
+        ApPaymentBatchesController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,

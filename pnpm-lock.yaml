@@ -332,6 +332,9 @@ importers:
       '@ledgerforce/ledger':
         specifier: workspace:*
         version: link:../../ledger
+      '@ledgerforce/parties':
+        specifier: workspace:*
+        version: link:../parties
       '@ledgerforce/shared':
         specifier: workspace:*
         version: link:../../shared

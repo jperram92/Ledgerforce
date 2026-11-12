@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0054",
+  "entries": [
+    {
+      "scenario": "SS-UC06-01",
+      "file": ".agent/evidence/T-0054/20261101-225200-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-01: Batch created from 12 due bills › SS-UC06-01 the AP Clerk builds a batch of 12 payments totalling the 12 bills",
+      "commit": "dd0d2e407bd1",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:52:00.878Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-02",
+      "file": ".agent/evidence/T-0054/20261101-225200-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-02: Creator cannot release own batch › SS-UC06-02 the Clerk who created the batch (fresh step-up) is denied with SOD_BATCH_SELF_RELEASE",
+      "commit": "dd0d2e407bd1",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:52:00.878Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-03",
+      "file": ".agent/evidence/T-0054/20261101-225200-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-03: Release requires step-up MFA › SS-UC06-03 user B without a fresh step-up gets step_up_required; after step-up the release succeeds",
+      "commit": "dd0d2e407bd1",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:52:00.878Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-04",
+      "file": ".agent/evidence/T-0054/20261101-225200-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-04: Batch over $10,000 needs two releasers › SS-UC06-04 a $25,000 batch is Partially released after one releaser; the same releaser cannot complete it; a second does",
+      "commit": "dd0d2e407bd1",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:52:00.878Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-05",
+      "file": ".agent/evidence/T-0054/20261101-225200-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-05: Recently changed bank details excluded with reason › SS-UC06-05 the supplier verified 3 hours ago is excluded with BANK_DETAILS_COOLING_OFF | apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-05: Recently changed bank details excluded with reason › a malformed request is refused before anything is written",
+      "commit": "dd0d2e407bd1",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:52:00.878Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-01",
+      "file": ".agent/evidence/T-0054/20261101-225206-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/payment-batches.db.test.ts › SS-UC06-01: Batch created from 12 due bills › SS-UC06-01 twelve posted bills due this week become twelve payments totalling their open amounts",
+      "commit": "dd0d2e407bd1",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:52:06.676Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-05",
+      "file": ".agent/evidence/T-0054/20261101-225206-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/payment-batches.db.test.ts › SS-UC06-05: Recently changed bank details excluded with reason › SS-UC06-05 a supplier verified 3 hours ago is excluded with BANK_DETAILS_COOLING_OFF; one without details with NO_VERIFIED_BANK_DETAILS",
+      "commit": "dd0d2e407bd1",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:52:06.676Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-04",
+      "file": ".agent/evidence/T-0054/20261101-225206-tests-db.json",
+      "test": "3 test(s): packages/modules/ap/src/payment-batches.db.test.ts › SS-UC06-04: Batch over $10,000 needs two releasers › SS-UC06-04 a $25,000 batch is partially released after one release and released after a second | packages/modules/ap/src/payment-batches.db.test.ts › SS-UC06-04: Batch over $10,000 needs two releasers › at or below the threshold one release completes the batch | packages/modules/ap/src/payment-batches.db.test.ts › SS-UC06-04: Batch over $10,000 needs two releasers › refuses a batch from a non-bank account or with a bad date",
+      "commit": "dd0d2e407bd1",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:52:06.676Z",
+      "result": "passed"
+    }
+  ]
+}
