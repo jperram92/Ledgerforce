@@ -1,0 +1,86 @@
+diff --git a/scripts/agent/test/golden-approvals.test.ts b/scripts/agent/test/golden-approvals.test.ts
+index e101174..41c5c44 100644
+--- a/scripts/agent/test/golden-approvals.test.ts
++++ b/scripts/agent/test/golden-approvals.test.ts
+@@ -19,10 +19,31 @@ function fixture() {
+   const commit = git(root, 'rev-parse', 'HEAD');
+   const record = { path, commit, decisions: ['DL-9999'] };
+   const write = (approvals: unknown = [record]) => writeFileSync(join(root, 'Docs/decisions/golden-approvals.json'), JSON.stringify({ schemaVersion: 1, approvals }));
++  // The owner merges the approval record to main (the comparison base); the feature branch
++  // then integrates main, so the record is present, unchanged, at the merge-base (review C6).
++  git(root, 'checkout', '-q', 'main');
+   write();
++  git(root, 'add', 'Docs/decisions/golden-approvals.json');
++  git(root, 'commit', '-q', '-m', 'owner merges approval record');
++  git(root, 'checkout', '-q', 'feat/T-0121-test');
++  git(root, 'merge', '-q', '--no-edit', 'main');
+   return { root, record, write, check: () => goldenGuard(makeCtx(root)) };
+ }
+ 
++/** A feature branch that adds an Approved posting and a DL entry claiming owner approval, with no record on main. */
++function selfApproval() {
++  const root = makeRepo();
++  git(root, 'checkout', '-q', '-b', 'feat/T-0999-self');
++  mkdirSync(join(root, 'Docs/accounting'), { recursive: true });
++  writeFileSync(join(root, path), approved);
++  writeFileSync(join(root, 'Docs/decisions/decision-log.md'), readText(root, 'Docs/decisions/decision-log.md') + '\n### DL-9999 — Owner approval\n- By: human (claimed by agent).\n');
++  git(root, 'add', '.');
++  git(root, 'commit', '-q', '-m', 'agent self-approval');
++  const record = { path, commit: git(root, 'rev-parse', 'HEAD'), decisions: ['DL-9999'] };
++  writeFileSync(join(root, 'Docs/decisions/golden-approvals.json'), JSON.stringify({ schemaVersion: 1, approvals: [record] }));
++  return { root, record, check: () => goldenGuard(makeCtx(root)) };
++}
++
+ test('explicit ancestor approval allows exactly the approved content [T-0121]', () => {
+   const f = fixture();
+   assert.equal(f.check().result, 'PASS');
+@@ -119,3 +140,49 @@ test('missing parent evidence cannot be treated as proof that a decision is new
+   f.write([{ ...f.record, commit: git(f.root, 'rev-parse', 'HEAD') }]);
+   assert.equal(f.check().result, 'FAIL');
+ });
++
++test('a branch-added record citing a branch-added decision cannot self-approve (review C6) [T-0121]', () => {
++  const f = selfApproval();
++  for (const commitRecord of [false, true]) {
++    if (commitRecord) {
++      git(f.root, 'add', 'Docs/decisions/golden-approvals.json');
++      git(f.root, 'commit', '-q', '-m', 'agent commits its own approval record');
++    }
++    const result = f.check();
++    assert.equal(result.result, 'FAIL', commitRecord ? 'committed on the branch' : 'uncommitted');
++    const text = result.lines.join('\n');
++    assert.match(text, /adds an Approved status — only the product owner approves golden postings/);
++    assert.match(text, /new approval records require the product owner's merge to main/);
++  }
++});
++
++test('a record present on the base still allows exactly the approved content only (review C6) [T-0121]', () => {
++  const f = fixture();
++  const result = f.check();
++  assert.equal(result.result, 'PASS');
++  assert.match(result.lines.join('\n'), /1 content-bound approved snapshot/);
++  writeFileSync(join(f.root, path), approved.replace('110.00', '111.00'));
++  assert.equal(f.check().result, 'FAIL', 'a base record never approves different content');
++});
++
++test('a base record modified on the branch no longer suppresses the guard (review C6) [T-0121]', () => {
++  const f = fixture();
++  // Re-anchor the same path to a new branch commit that introduces a branch-added decision.
++  writeFileSync(join(f.root, path), approved + 'Draft note appended on the branch.\n');
++  writeFileSync(join(f.root, 'Docs/decisions/decision-log.md'), readText(f.root, 'Docs/decisions/decision-log.md') + '\n### DL-9997 — Owner approval of the refreshed snapshot\n- By: human (claimed by agent).\n');
++  git(f.root, 'add', path, 'Docs/decisions/decision-log.md');
++  git(f.root, 'commit', '-q', '-m', 'agent refreshes the approved snapshot');
++  const modified = { ...f.record, commit: git(f.root, 'rev-parse', 'HEAD'), decisions: ['DL-9997'] };
++  for (const commitRecord of [false, true]) {
++    f.write([modified]);
++    if (commitRecord) {
++      git(f.root, 'add', 'Docs/decisions/golden-approvals.json');
++      git(f.root, 'commit', '-q', '-m', 'agent edits the approval record');
++    }
++    const result = f.check();
++    assert.equal(result.result, 'FAIL', commitRecord ? 'committed on the branch' : 'uncommitted');
++    const text = result.lines.join('\n');
++    assert.match(text, /adds an Approved status — only the product owner approves golden postings/);
++    assert.match(text, /new approval records require the product owner's merge to main/);
++  }
++});

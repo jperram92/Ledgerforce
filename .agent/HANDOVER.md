@@ -1,11 +1,11 @@
-# Handover: Claude lead, parallel integration round (2026-11-12)
+# Handover: Claude lead — stopped on the weekly usage limit (2026-11-12)
 
 ## Codex continuation prompt
-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file, DL-0282…DL-0286 and `.agent/evidence/T-0121/review-claude-20261112-120500.md`. Branch `claude/loving-lovelace-nozqpk` (from main 5c3a2e3). T-0121: security CI is green at e15a4d0 (run 43209264765); the full verifier at 4489329 gave 14 PASS. Claude's review of Codex's work FAILs on C6 (golden-approval self-attestation); steps 4a/4b are being fixed. Codex must cross-review Claude's T-0121 changes (4489329 Dockerfile/contract/.gitleaksignore, plus the 4a/4b fix). The owner chose Line A canonical (DL-0285). Parallel agents (DL-0286 ID ranges) are integrating Line A and building T-0083, T-0097, T-0119 and T-0120 on local branches the lead merges here. Check `git log` for merges `integrate/line-a`, `feat/T-0121-review-fixes`, `feat/T-0083-invoices-ui`, `feat/T-0097-pilot-hardening`, `feat/T-0119-pdf-worker`, `feat/T-0120-worker-batch-email`. Anything not merged here was lost with the session container: restart that slice from its card.
+> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file, DL-0282…DL-0286 and `.agent/evidence/T-0121/review-claude-20261112-120500.md`. Branch `claude/loving-lovelace-nozqpk` (from main 5c3a2e3). T-0121 is in_progress. Security CI is green at e15a4d0 (run 43209264765); the full verifier at 4489329 gave 14 PASS. Next command: `git apply .agent/evidence/T-0121/review-fix-c6-wip-unverified.patch`. It adds three adversarial golden-approval tests (review item C6); they have NOT been run. Run them to capture RED, then implement step 4a (only approval records present at the comparison base may suppress goldenGuard), then step 4b (extra invalid-date tests). Codex must also cross-review Claude's 4489329 changes (Dockerfile `apk upgrade`, contract test, `.gitleaksignore`). After that: the Line A integration and the T-0083/T-0097/T-0119/T-0120 builds from DL-0286, which did not start (every agent hit the usage limit before committing anything).
 
 ## State
 - Done: security workflow remediation (RQ-0100, DL-0282–0284), owner-approved Gitleaks exception, full verify 14 PASS, Claude cross-review of Codex's commits (FAIL C6).
-- In progress: the parallel round above. T-0048 stays blocked until T-0121 is review-complete.
+- In progress: none running. All six parallel agents stopped on the weekly usage limit (resets 2026-11-15 03:00 UTC) with no commits; only the T-0121 test WIP is saved (patch above). The DL-0286 ranges stay reserved; T-0083 was claimed only in a discarded worktree, so its card on this branch is untouched. T-0048 stays blocked until T-0121 is review-complete.
 - Open questions for human: none new; Line A golden Approved markers may trip gate 4 after integration (the integrator reports this).
 - Do not: edit Approved goldens or CI security gates, merge Line B (claude/incomplete-features-build-wivsco) or feat/T-0048-bad-debt, rewrite history.
 
@@ -273,3 +273,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-12T11:36:31.049Z claude: T-0121 → verifying
 - 2026-11-12T11:37:10.260Z claude: T-0121 → in_progress
 - 2026-11-12T11:39:33.547Z claude: handover: parallel round in progress (DL-0286); lead merging agent branches
+- 2026-11-12T11:41:44.298Z claude: release T-0121 → todo (usage limit; resume step 4a from saved patch)
