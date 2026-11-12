@@ -2140,3 +2140,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0099 records variable Windows failures, while native Linux executes the original test contracts successfully. No timeouts, assertions, coverage exclusions, or property counts changed.
 - Alternatives: Increasing timeouts or bypassing concurrency tests rejected. Linux tools/dependencies stay outside the shared Windows installation.
 - ADR: none · Status: accepted
+
+### DL-0281 — Owner-requested main integration and Claude handoff
+- Date: 2026-11-12 · By: codex · Task: T-0121 · Category: process
+- Decision: Follow the owner's explicit latest request to integrate accumulated work into main and provide CLAUDE_NEXT.md. This is a one-time integration instruction overriding the earlier branch-only rule for this handoff, not release approval or evidence that verification/review passed. Preserve all history and do not force-push.
+- Why: The owner wants Claude to resume building from shared main. Record outstanding security scans, local verifier failure, stale validation references and independent review as unfinished work.
+- Validation: GitHub CI passes at accb6a6; security workflow fails. Full local verifier 11 PASS / 3 FAIL / 2 PENDING. T-0121 remains verifying and T-0048 blocked; ADR-0047 stays Proposed.
+- Alternatives: Waiting for review before integrating would not fulfill the latest explicit owner request. No security gate, test or approved posting is changed by this handoff.
+- Status: accepted for this owner-requested integration only.

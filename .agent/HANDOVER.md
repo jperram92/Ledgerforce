@@ -1,23 +1,16 @@
-# Handover — T-0121 validation in progress
+# Handover: Claude continuation from main
+
 ## Codex continuation prompt
-> Resume T-0121 on `feat/T-0121-verification-gates`, branched from `2ffd7b3`. First command: `node scripts/agent/conductor.ts status`. Read T-0121, RQ-0099, Proposed ADR-0047 and evidence under .agent/evidence/T-0121. Golden approval repair has eleven adversarial tests and 28 passing gate regressions; unchanged native Linux coverage passed all 684 tests. Full verifier is next; no task is done. Do not alter Approved postings, weaken tests, or treat a record as independent review. Claude review and ADR acceptance remain.
+> Read CLAUDE_NEXT.md and AGENTS.md. Resume T-0121 from main on a task branch; implementation commit accb6a6, earlier fixes 2ffd7b3 and 4cc7e9e. First command: bash scripts/agent/resume.sh. Diagnose the security workflow and missing nested Corepack pnpm installation, fetch actual GitHub main into the validation checkout, and rerun full verification. Claude independent review remains required. Do not label this integration green.
 
-From: codex, run 2026-11-12-codex-r01. Decisions DL-0279/DL-0280.
-Next action: run full verifier on the committed task HEAD in a native Linux clone with complete Git history and installed browser dependencies; preserve all output in the Windows workspace before the Linux temporary environment exits.
-Open questions for human: none.
-
-# Handover — T-0048 blocked on verification gates
-## Codex continuation prompt
-> Resume from the repository on branch `feat/T-0048-write-off`. Implementation is `4cc7e9e`; recovery checkpoint is `063e215`; inspect the latest commit body for the fixture fix and final evidence. First command: `node scripts/agent/conductor.ts status`. Read T-0048, T-0121, RQ-0098 and `.agent/evidence/T-0048/verification-20261111-r03.md`. T-0048 is blocked, not complete: coverage times out in the real ESLint config test and the golden guard rejects inherited owner-approved content. Research T-0121's two open questions before changing gates. Do not increase timeouts, suppress checks, alter the comparison base, or edit approved goldens. Claude must review the Codex date fix and fixture correction after verification is green.
-
-From: codex (run 2026-11-11-codex-r03). Updated: 2026-11-12T03:27:49.345Z.
-Done: Node 22 + Git Bash + isolated PostgreSQL restored; static checks, 963 Vitest tests, 8 LWC tests, 82 agent tests, standalone full DB 1178/1178, E2E and audit passed. Fresh SS-PLAT-106 report and manifest appended. User-role fixture clock corrected; five affected API tests and targeted lint/format passed.
-In progress: full verifier result was 10 PASS / 5 FAIL / 1 PENDING. DB failure in that run caused derivative RLS/migration failures; fixture correction is targeted green but full verifier was not rerun afterward. Coverage retry remained red (683 pass / 1 timeout). Golden guard remains red. No independent Claude review exists.
-Next action: read T-0121 and research the repeated coverage timeout and a fail-closed approval-evidence design; use a task branch for any broader gate implementation. Re-run full verification after fixes, then request Claude review.
-Decisions: DL-0277, DL-0278. No production accounting code or approved golden changed in this run.
-Open questions for human: none; these are technical/process follow-ups. No new approval is being requested for already approved postings.
-Do not: weaken checks, change Approved expectations, mark pending coverage/review green, reuse the normal PostgreSQL cluster, or run overlapping default-worker suites.
-Environment: elevated Windows shell selected Node 22.22.0; Git Bash at C:/Program Files/Git/bin/bash.exe; temporary WSL PostgreSQL cluster /tmp/ledgerforce-t0048-r03 on loopback 55448. Use LF_TEST_DATABASE_URL only for this isolated cluster and VITEST_MAX_WORKERS=1. Cluster is stopped at session close; restart via its pg_ctl before DB tests. Secrets files were not accessed.
+From: codex (2026-11-12-codex-r01). Updated: 2026-11-12T11:18:01.441Z.
+Reason: owner requested latest work on main and a Markdown handover for Claude.
+Done: approval guard and focused 28/28 tests; native Linux coverage 684 tests pass. GitHub CI at accb6a6 passes.
+In progress: T-0121 verifying, T-0048 blocked. Full local verifier 11 PASS / 3 FAIL / 2 PENDING; agent suite 92/93 due missing Corepack pnpm module. Security CI fails history scan and image zlib vulnerability. Full details and links in CLAUDE_NEXT.md.
+Next action: read CLAUDE_NEXT.md and run the resume skill, then investigate failed security workflow 43151980363 and local scripts.test.ts:99 without weakening checks.
+Decisions: DL-0279, DL-0280, DL-0281; ADR-0047 Proposed.
+Open questions for human: none currently; retain security ADR/release/phase gates if needed by follow-up.
+Do not: edit Approved postings, delete history, weaken tests/security scans, read/edit secrets, or treat the owner-requested main integration as task completion.
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -266,3 +259,5 @@ Environment: elevated Windows shell selected Node 22.22.0; Git Bash at C:/Progra
 - 2026-11-12T03:26:25.827Z codex: release T-0048 → blocked (Coverage timeout and inherited golden-approval guard unresolved (T-0121); full DB standalone 1178 pass, fixture fix 5 pass; Claude cross-review required)
 - 2026-11-12T03:35:10.540Z codex: T-0121 → researching
 - 2026-11-12T03:57:10.805Z codex: T-0121 → verifying
+- 2026-11-12T11:15:15.743Z codex: handover: Owner requested main integration and Claude handover; verification and independent review remain incomplete
+- 2026-11-12T11:17:11.733Z codex: release T-0121 → verifying (Handing off to Claude at owner request; full verification and security CI remain unresolved)

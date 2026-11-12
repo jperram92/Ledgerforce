@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "current_task": "T-0121",
-  "branch": "feat/T-0121-verification-gates",
-  "step": "Approval guard and Linux coverage pass; full verification pending",
-  "claimed_by": "codex",
-  "lease_expires_at": "2026-11-12T04:42:10.795Z",
+  "branch": "main",
+  "step": "Claude handoff: security CI and local verifier unresolved; see CLAUDE_NEXT.md",
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": null,
   "run_id": "2026-11-12-codex-r01",
-  "updated_at": "2026-11-12T03:57:10.803Z",
+  "updated_at": "2026-11-12T11:18:01.441Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
