@@ -5,9 +5,13 @@
  * /ap/payment-batches/:id/release needs a fresh step-up (ADR-0025) and passes the SoD engine with
  * the batch total read from the database: creator ≠ releaser (SOD_BATCH_SELF_RELEASE) and, above
  * the two-releaser threshold, nobody releases twice (SOD_BATCH_SAME_RELEASER).
+ * POST /ap/payment-batches/:id/aba returns the ABA (Cemtex) file of a released batch as an
+ * attachment (T-0056, DL-0292): it unseals account numbers, so it is a POST — audited like a
+ * mutation — and needs ap.payment_batch.release; it changes nothing and can be repeated.
  */
 import {
   BadRequestException,
+  Inject,
   Body,
   Controller,
   Get,
@@ -18,27 +22,32 @@ import {
   Query,
   Req,
   Res,
+  ServiceUnavailableException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import {
+  AbaExportError,
   createPaymentBatch,
+  exportPaymentBatchAba,
   getPaymentBatch,
   PaymentBatchError,
   releasePaymentBatch,
   type PaymentBatchView,
 } from '@ledgerforce/ap';
+import type { Kms } from '@ledgerforce/shared/crypto';
 import type { Request, Response } from 'express';
 import { principalOf, tokenPrincipalOf } from '../auth/session-tenant-resolver.ts';
 import { RequirePermission, RequireStepUp } from '../authz/permission.decorator.ts';
 import { InvalidSodSubject, SoD, type SubjectFrom } from '../sod/sod.decorator.ts';
 import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
+import { KMS } from '../tokens.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const bad = (message: string): never => {
   throw new BadRequestException({ error: 'invalid_payment_batch', message });
 };
 const refusal = (e: unknown): never => {
-  if (e instanceof PaymentBatchError) {
+  if (e instanceof PaymentBatchError || e instanceof AbaExportError) {
     throw new UnprocessableEntityException({ error: e.code, message: e.message });
   }
   throw e;
@@ -99,6 +108,7 @@ export class ApPaymentBatchesController {
   constructor(
     private readonly tx: TenantTx,
     private readonly audit: AuditTrail,
+    @Inject(KMS) private readonly kms: Kms | null,
   ) {}
 
   @Put(':id')
@@ -167,5 +177,29 @@ export class ApPaymentBatchesController {
       },
     });
     return viewOf(b);
+  }
+
+  @Post(':id/aba')
+  @HttpCode(200)
+  @RequirePermission('ap.payment_batch.release')
+  async aba(
+    @Res({ passthrough: true }) res: Response,
+    @Param('id') id: string,
+    @Query('company_id') companyId: string | undefined,
+  ): Promise<string> {
+    if (!this.kms) throw new ServiceUnavailableException({ error: 'kms_not_configured' });
+    const file = await exportPaymentBatchAba(this.tx.get(), this.kms, {
+      companyId: uuid(companyId, 'company_id'),
+      batchId: uuid(id, 'id'),
+    }).catch(refusal);
+    this.audit.describe({
+      entityType: 'payment_batch',
+      entityId: file.batchId,
+      after: { aba_file: file.fileName, payment_count: file.paymentCount, total: file.total },
+    });
+    res.setHeader('Content-Type', 'text/plain; charset=us-ascii');
+    res.setHeader('Content-Disposition', `attachment; filename="${file.fileName}"`);
+    res.setHeader('Cache-Control', 'no-store');
+    return file.content;
   }
 }

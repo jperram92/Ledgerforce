@@ -12,6 +12,8 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@ledgerforce/bank": "workspace:*",
+    "@ledgerforce/connector-aba": "workspace:*",
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/ledger": "workspace:*",
     "@ledgerforce/parties": "workspace:*",
