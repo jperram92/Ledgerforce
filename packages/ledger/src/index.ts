@@ -1,6 +1,7 @@
 export * from './account-balance.ts';
 export * from './dimension-set.ts';
 export * from './journal.ts';
+export * from './ledger-detail.ts';
 export * from './hash-chain.ts';
 export * from './numbering.ts';
 export * from './period-matrix.ts';

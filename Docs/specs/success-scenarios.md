@@ -223,6 +223,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-105 | Prepayments and deposits: a progressive-supply prepayment posts GP-020 (GST at receipt); its application to the final invoice posts GP-022a/b and leaves 7,700.00 open; a deposit invoice posts GP-014 and the final invoice net of it GP-015; the BAS reports the project's GST once (300.00 then 700.00); a security deposit is untaxed | UC-01 | MVP | golden + db-integration | no | packages/modules/ar/src/prepayments.db.test.ts | T-0047 | green | [.agent/evidence/T-0047/manifest.json](../../.agent/evidence/T-0047/manifest.json) | 5d65967 |
 | SS-PLAT-106 | Bad-debt write-off: writing off a 1,375.00 invoice covered by the ECL allowance posts exactly GP-024 and closes it; the BAS shows 1B +125.00 on accruals and nothing on cash; a short allowance sends the rest to bad-debt expense; a written reason is required | UC-04 | MVP | golden + db-integration | no | packages/modules/ar/src/write-off.db.test.ts | T-0048 | green | [.agent/evidence/T-0048/manifest.json](../../.agent/evidence/T-0048/manifest.json) | 2a58b8f |
 | SS-PLAT-107 | Aged receivables: open items as at a date bucketed current / 1–30 / 31–60 / 61–90 / 90+ by days past due (credits current), summing to the AR control balance at that date; customer statement opening + movements = closing | UC-12 | MVP | db-integration | no | packages/modules/ar/src/aged.db.test.ts; packages/modules/documents/src/statement-html.test.ts | T-0049 | green | [.agent/evidence/T-0049/manifest.json](../../.agent/evidence/T-0049/manifest.json) | dba541b |
+| SS-PLAT-108 | GL detail for a date range or period, filtered by account, dimension values and party: opening balance (same filters), posted lines in date order with running balance, closing balance; drafts and other companies left out; unfiltered closing = trial balance at the end date | — | MVP | db-integration | no | packages/modules/reporting/src/reports.gl-detail.db.test.ts; apps/api/src/reports/reports.db.test.ts | T-0077 | green | [.agent/evidence/T-0077/manifest.json](../../.agent/evidence/T-0077/manifest.json) | bf1d5b6 |
+| SS-PLAT-109 | Aged payables: AP open items as at a date on the credit side, bucketed current / 1–30 / 31–60 / 61–90 / 90+ by days past due (supplier debits current), bills paid by a confirmed batch dropped, summing to the AP control balance at that date | — | MVP | db-integration | no | packages/modules/ap/src/aged.db.test.ts; apps/api/src/reports/reports.db.test.ts | T-0077 | green | [.agent/evidence/T-0077/manifest.json](../../.agent/evidence/T-0077/manifest.json) | bf1d5b6 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -645,6 +647,14 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-107 — Aged receivables and customer statements
 - Phase: MVP · Layer: **db-integration** · Task(s): T-0049 (DL-0287)
 - **Given** invoices in every ageing bucket, a part payment, an unapplied receipt and a payment after the date · **When** aged AR is run as at 31 Dec 2026 · **Then** the buckets per customer are right and sum to the AR control balance at that date; the statement's opening balance plus movements equals its closing balance
+
+### SS-PLAT-108 — General ledger detail
+- Phase: MVP · Layer: **db-integration** · Task(s): T-0077 (DL-0313)
+- **Given** postings before and in October with dimensions and a customer, a November entry, an October draft and another company · **When** GL detail is run for October (by dates or by the period), for one account, for a dimension value and for the party · **Then** each account shows the opening balance under the same filters, its lines with running balances and its closing balance; drafts, November and the other company are left out; unfiltered, every closing balance equals the trial balance at 31 October; bad filters are refused
+
+### SS-PLAT-109 — Aged payables
+- Phase: MVP · Layer: **db-integration** · Task(s): T-0077 (DL-0313)
+- **Given** bills in every ageing bucket, a part payment, an unapplied supplier payment, a bill paid by a confirmed batch, a bill paid after the date and a bill dated after it · **When** aged AP is run as at 31 Dec 2026 (and 15 Nov 2026) · **Then** each supplier's buckets are right on the credit side, the supplier debit is in current, and the totals equal the AP control balance at that date
 
 ## T-0112 PR integration regression evidence (2026-10-28)
 

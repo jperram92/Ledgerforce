@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0077",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-108",
+      "file": ".agent/evidence/T-0077/20261102-120306-tests-db.json",
+      "test": "5 test(s): packages/modules/reporting/src/reports.gl-detail.db.test.ts › SS-PLAT-108 GL detail with filters reconciling to the trial balance [T-0077] › SS-PLAT-108 one account for October: opening, each line with a running balance, closing | packages/modules/reporting/src/reports.gl-detail.db.test.ts › SS-PLAT-108 GL detail with filters reconciling to the trial balance [T-0077] › SS-PLAT-108 unfiltered October detail: every account in code order, closing = TB at the period end, drafts/November/other companies left out | packages/modules/reporting/src/reports.gl-detail.db.test.ts › SS-PLAT-108 GL detail with filters reconciling to the trial balance [T-0077] › SS-PLAT-108 a dimension filter keeps only lines tagged with every value; opening uses the same filter | packages/modules/reporting/src/reports.gl-detail.db.test.ts › SS-PLAT-108 GL detail with filters reconciling to the trial balance [T-0077] › SS-PLAT-108 a party filter keeps only that party’s lines, with its name | packages/modules/reporting/src/reports.gl-detail.db.test.ts › SS-PLAT-108 GL detail with filters reconciling to the trial balance [T-0077] › SS-PLAT-108 bad filters are refused with a report error",
+      "commit": "bf1d5b61bbcb-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T12:03:06.566Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-109",
+      "file": ".agent/evidence/T-0077/20261102-120314-tests-db.json",
+      "test": "3 test(s): packages/modules/ap/src/aged.db.test.ts › SS-PLAT-109 aged AP buckets sum to the AP control balance at date [T-0077] › SS-PLAT-109 ages every open AP item by due date as at 31 Dec 2026 on the credit side; the buckets sum to AP control | packages/modules/ap/src/aged.db.test.ts › SS-PLAT-109 aged AP buckets sum to the AP control balance at date [T-0077] › SS-PLAT-109 as at an earlier date: later bills, payments and allocations are ignored | packages/modules/ap/src/aged.db.test.ts › SS-PLAT-109 aged AP buckets sum to the AP control balance at date [T-0077] › SS-PLAT-109 leaves other companies out and refuses a malformed date",
+      "commit": "bf1d5b61bbcb-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T12:03:14.887Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-108",
+      "file": ".agent/evidence/T-0077/20261102-120324-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/reports/reports.db.test.ts › SS-PLAT-108/109 report routes [T-0077] › SS-PLAT-108 GET /gl/detail returns the AP control detail with decimal-string money | apps/api/src/reports/reports.db.test.ts › SS-PLAT-108/109 report routes [T-0077] › SS-PLAT-109 GET /ap/aged-payables ages the bill and totals the AP control balance | apps/api/src/reports/reports.db.test.ts › SS-PLAT-108/109 report routes [T-0077] › GET /ar/aged-receivables answers an AR reader | apps/api/src/reports/reports.db.test.ts › SS-PLAT-108/109 report routes [T-0077] › refuses an AP clerk GL detail and aged AR (403) and bad queries (400)",
+      "commit": "bf1d5b61bbcb-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T12:03:24.797Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-109",
+      "file": ".agent/evidence/T-0077/20261102-120324-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/reports/reports.db.test.ts › SS-PLAT-108/109 report routes [T-0077] › SS-PLAT-109 GET /ap/aged-payables ages the bill and totals the AP control balance",
+      "commit": "bf1d5b61bbcb-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T12:03:24.797Z",
+      "result": "passed"
+    }
+  ]
+}

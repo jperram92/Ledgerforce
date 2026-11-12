@@ -28,6 +28,7 @@ import { SodController } from './sod/sod.controller.ts';
 import { ApiTokensController, UserApiTokensController } from './tokens/api-tokens.controller.ts';
 import { UsersController } from './users/users.controller.ts';
 import { AccountsController } from './gl/accounts.controller.ts';
+import { ReportsController } from './reports/reports.controller.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
 import { PartyBankAccountsController } from './parties/bank-accounts.controller.ts';
@@ -119,6 +120,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ApBillsController,
   ApPaymentBatchesController,
   StripeWebhookController,
+  ReportsController,
   AuthController,
   LoginController,
 ];
@@ -161,6 +163,7 @@ class AppModule {
         ApBillsController,
         ApPaymentBatchesController,
         StripeWebhookController,
+        ReportsController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,

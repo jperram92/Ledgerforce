@@ -20,6 +20,7 @@
     "@ledgerforce/ledger": "workspace:*",
     "@ledgerforce/outbox": "workspace:*",
     "@ledgerforce/parties": "workspace:*",
+    "@ledgerforce/reporting": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
     "@nestjs/common": "12.1.2",
     "@nestjs/core": "12.1.2",
