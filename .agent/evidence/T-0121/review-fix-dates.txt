@@ -1,0 +1,7 @@
+# T-0121 step 4b: new cases pass against the unchanged implementation (regression pins, not RED).
+# Mutation check: leap-year rule and year-0 rule removed temporarily -> results below; source restored.
+      Tests  4 passed (4)
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |unit| packages/modules/ar/src/write-off.test.ts > writeOffInvoice input validation > rejects 2027-02-29 (non-leap Feb 29, year zero, 31 April) as INVALID_WRITE_OFF before database access
+ FAIL  |unit| packages/modules/ar/src/write-off.test.ts > writeOffInvoice input validation > rejects 0000-01-01 (non-leap Feb 29, year zero, 31 April) as INVALID_WRITE_OFF before database access
+      Tests  2 failed | 2 passed (4)

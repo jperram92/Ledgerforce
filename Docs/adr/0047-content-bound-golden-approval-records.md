@@ -42,6 +42,9 @@ Use `Docs/decisions/golden-approvals.json` schema version 1 with records `{path,
 
 At least one cited decision must be introduced in the approval commit, preventing a new content snapshot from recycling an earlier decision. Records do not override the existing prohibition on changing a file already Approved at the comparison base. The initial record covers only existing DL-0256 approval and DL-0258 supersession. Future records require the same approval authority as the golden entries themselves and an independent review; adding a record does not grant that authority.
 
+### Amendment 2026-11-12 (claude, after cross-review C6; DL-0400)
+A record suppresses the guard only if the identical record (same path, commit and decisions) is already committed in `golden-approvals.json` at the comparison base, i.e. it reached main through the owner's merge. A record added or changed on the branch is a claim by the branch's author: the original "adds an Approved status" failure stands, with an extra line saying that new approval records require the product owner's merge to main. This closes the self-attestation path, where a branch adds an Approved marker, a decision claiming owner approval and a record pointing at its own commit (reproduced in `.agent/evidence/T-0121/review-repro-self-approval.txt`). Tests: `golden-approvals.test.ts` cases 12–14.
+
 ## Consequences
 ### Good
 - An already approved file passes, while one-byte mutations, stale snapshots, invalid evidence and missing files fail.

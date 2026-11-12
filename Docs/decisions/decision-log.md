@@ -2191,3 +2191,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Line A and main already collide on DL, ADR, RQ, task and migration numbers (DL-0285). Disjoint ranges make later merges mechanical. Gaps in numbering are acceptable; numbers are identifiers, not counts.
 - Alternatives: Sequential building (slower; the owner asked for parallel agents); renumbering after the fact (error-prone).
 - ADR: none · Status: accepted
+
+### DL-0400 — Golden approval records count only when already on the comparison base
+- Date: 2026-11-12 · By: claude · Task: T-0121 · Category: process
+- Decision: `goldenGuard` trusts a `golden-approvals.json` record only if the identical record (same path, commit and decisions) is committed at the comparison base. Records added or changed on a branch do not suppress the "adds an Approved status" failure, and the guard adds a line saying the owner must merge new records to main. ADR-0047 amended; it stays Proposed.
+- Why: Cross-review C6 (`review-claude-20261112-120500.md`) reproduced agent self-attestation. Approval authority belongs to the owner (AGENTS.md §6), and the owner's merge to main is the observable act.
+- Alternatives: Signed approvals (no key infrastructure, out of scope); requiring a human-authored commit (authorship is not verifiable in git).
+- ADR: ADR-0047 (process, Proposed) · Status: accepted

@@ -1,0 +1,4 @@
+# no registry record: FAIL Docs/accounting/postings.md:2: adds an Approved status — only the product owner approves golden postings
+# with branch-added record: FAIL Docs/accounting/postings.md:2: adds an Approved status — only the product owner approves golden postings | Docs/accounting/postings.md: its approval record is not on the comparison base — new approval records require the product owner's merge to main
+# pass 0
+# fail 1

@@ -274,3 +274,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-12T11:37:10.260Z claude: T-0121 → in_progress
 - 2026-11-12T11:39:33.547Z claude: handover: parallel round in progress (DL-0286); lead merging agent branches
 - 2026-11-12T11:41:44.298Z claude: release T-0121 → todo (usage limit; resume step 4a from saved patch)
+- 2026-11-12T11:42:08.939Z claude: T-0121 → in_progress
