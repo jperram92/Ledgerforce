@@ -1,0 +1,29 @@
+
+ RUN  v4.1.12 C:/Users/james/Ledgerforce
+      Coverage enabled with v8
+
+ ❯ |unit| packages/testing/src/evidence/manifest.test.ts (16 tests | 1 failed) 459ms
+     × is safe under concurrent appends (no lost updates) 202ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/testing/src/evidence/manifest.test.ts > appendManifestEntries > is safe under concurrent appends (no lost updates)
+Error: EPERM: operation not permitted, mkdir 'C:\Users\james\AppData\Local\Temp\lf-evidence-L7J8BX\manifest.json.lock'
+ ❯ withLock packages/testing/src/evidence/manifest.ts:117:7
+    115|   for (;;) {
+    116|     try {
+    117|       await mkdir(lock);
+       |       ^
+    118|       break;
+    119|     } catch (error) {
+ ❯ appendManifestEntries packages/testing/src/evidence/manifest.ts:176:3
+ ❯ packages/testing/src/evidence/manifest.test.ts:98:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 52 passed (53)
+      Tests  1 failed | 683 passed (684)
+   Start at  14:46:13
+   Duration  98.57s (transform 3.52s, setup 0ms, import 25.47s, tests 19.47s, environment 15ms)
+

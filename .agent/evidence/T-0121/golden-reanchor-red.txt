@@ -1,0 +1,110 @@
+TAP version 13
+# Subtest: explicit ancestor approval allows exactly the approved content [T-0121]
+ok 1 - explicit ancestor approval allows exactly the approved content [T-0121]
+  ---
+  duration_ms: 10422.3106
+  type: 'test'
+  ...
+# Subtest: approval does not allow an amount mutation or trailing content [T-0121]
+ok 2 - approval does not allow an amount mutation or trailing content [T-0121]
+  ---
+  duration_ms: 3517.8395
+  type: 'test'
+  ...
+# Subtest: a missing protected file fails even when changedFiles excludes deletion [T-0121]
+ok 3 - a missing protected file fails even when changedFiles excludes deletion [T-0121]
+  ---
+  duration_ms: 1310.3934
+  type: 'test'
+  ...
+# Subtest: missing decision evidence and malformed commit fail closed [T-0121]
+ok 4 - missing decision evidence and malformed commit fail closed [T-0121]
+  ---
+  duration_ms: 1117.2152
+  type: 'test'
+  ...
+# Subtest: approval from an unrelated branch is not evidence for this HEAD [T-0121]
+ok 5 - approval from an unrelated branch is not evidence for this HEAD [T-0121]
+  ---
+  duration_ms: 1482.533
+  type: 'test'
+  ...
+# Subtest: malformed registry fails even when there are no accounting changes [T-0121]
+ok 6 - malformed registry fails even when there are no accounting changes [T-0121]
+  ---
+  duration_ms: 971.6729
+  type: 'test'
+  ...
+# Subtest: duplicate paths, traversal paths, and unknown schema versions fail [T-0121]
+ok 7 - duplicate paths, traversal paths, and unknown schema versions fail [T-0121]
+  ---
+  duration_ms: 1153.5177
+  type: 'test'
+  ...
+# Subtest: an approved file outside the registry is still rejected [T-0121]
+ok 8 - an approved file outside the registry is still rejected [T-0121]
+  ---
+  duration_ms: 1723.9265
+  type: 'test'
+  ...
+# Subtest: a new snapshot cannot recycle an earlier decision to approve changed amounts [T-0121]
+not ok 9 - a new snapshot cannot recycle an earlier decision to approve changed amounts [T-0121]
+  ---
+  duration_ms: 1704.7827
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\golden-approvals.test.ts:92:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    'PASS' !== 'FAIL'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'FAIL'
+  actual: 'PASS'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/golden-approvals.test.ts:98:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: records cannot override the existing protection of Approved content on main [T-0121]
+not ok 10 - records cannot override the existing protection of Approved content on main [T-0121]
+  ---
+  duration_ms: 1927.3221
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\golden-approvals.test.ts:101:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    'PASS' !== 'FAIL'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'FAIL'
+  actual: 'PASS'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/golden-approvals.test.ts:111:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 8
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 25999.7406

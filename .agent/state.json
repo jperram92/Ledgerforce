@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": null,
-  "branch": "feat/T-0048-write-off",
-  "step": "T-0048 blocked: coverage and golden guard; follow-up T-0121",
-  "claimed_by": null,
-  "lease_expires_at": null,
+  "current_task": "T-0121",
+  "branch": "feat/T-0121-verification-gates",
+  "step": "Approval guard and Linux coverage pass; full verification pending",
+  "claimed_by": "codex",
+  "lease_expires_at": "2026-11-12T04:42:10.795Z",
   "last_green_commit": null,
-  "run_id": "2026-11-11-codex-r03",
-  "updated_at": "2026-11-12T03:27:49.345Z",
+  "run_id": "2026-11-12-codex-r01",
+  "updated_at": "2026-11-12T03:57:10.803Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -79,7 +79,8 @@
     "T-0045": 1,
     "T-0046": 1,
     "T-0047": 1,
-    "T-0048": 4
+    "T-0048": 4,
+    "T-0121": 1
   },
   "failures": {},
   "providers": {},

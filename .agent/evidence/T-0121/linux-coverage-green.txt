@@ -1,0 +1,426 @@
+bash :   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+At line:2 char:1
++ bash .tmp/t0121-linux-coverage.sh *> .tmp/t0121-linux-coverage.log; G ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (  % Total    % ...  Time  Current:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+                                 Dload  Upload   Total   Spent    Left  Speed
+
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0
+ 34 29.3M   34 10.1M    0     0   9.8M      0  0:00:02  0:00:01  0:00:01  9.8M
+ 71 29.3M   71 21.1M    0     0  10.3M      0  0:00:02  0:00:02 --:--:-- 10.3M
+100 29.3M  100 29.3M    0     0  10.6M      0  0:00:02  0:00:02 --:--:-- 10.6M
+warning: in the working copy of '.agent/coverage-baseline.json', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of '.agent/evidence/T-0048/coverage-20261112-r03.txt', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of '.agent/evidence/T-0048/db-20261111-r03-serial.txt', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of '.agent/evidence/T-0048/user-role-clock-green-20261112.txt', CRLF will be replaced by 
+LF the next time Git touches it
+warning: in the working copy of '.agent/evidence/T-0048/verify-20261111-r03-serial.txt', CRLF will be replaced by LF 
+the next time Git touches it
+warning: in the working copy of '.agent/evidence/T-0103/pinned-sandbox-run.txt', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of '.agent/evidence/T-0103/pinned-unrestricted-run.txt', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of '.agent/evidence/T-0113/setup-wait-green.txt', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of '.agent/evidence/T-0113/setup-wait-red.txt', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of '.agent/runs/2026-11-01-codex-r01.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.agents/README.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of '.claude/agents/architect.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of '.claude/agents/db-engineer.md', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of '.claude/agents/ledger-engineer.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/agents/qa-evidence.md', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of '.claude/agents/researcher.md', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of '.claude/agents/reviewer.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of '.claude/agents/salesforce-engineer.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/agents/scribe.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of '.claude/agents/security-reviewer.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/agents/test-author.md', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of '.claude/agents/ui-engineer.md', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of '.claude/skills/checkpoint/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/claim-task/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/cross-review/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/evidence/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/golden-posting/SKILL.md', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of '.claude/skills/handover/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/log-decision/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/migration/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/new-task-card/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/research/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/resume/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/run-log/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/tdd-cycle/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/ui-screen/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/verify/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.claude/skills/write-adr/SKILL.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.editorconfig', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of '.github/ISSUE_TEMPLATE/human-gate.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.github/labels.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of '.github/pull_request_template.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of '.nvmrc', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'CHANGELOG.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/accounting/AGENTS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/accounting/CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/adr/0000-template.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/adr/0001-record-architecture-decisions.md', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/adr/0002-modular-monolith-typescript-pnpm.md', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'Docs/adr/0003-postgresql-forced-rls-tenancy.md', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/adr/0004-immutable-ledger-reversal-hash-chain.md', CRLF will be replaced by LF 
+the next time Git touches it
+warning: in the working copy of 'Docs/adr/0005-numeric-money-decimal-js.md', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'Docs/adr/0006-salesforce-commercial-system-of-record.md', CRLF will be replaced by LF 
+the next time Git touches it
+warning: in the working copy of 'Docs/adr/0007-salesforce-auth-eca-jwt-pkce.md', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/adr/0008-postgres-job-queue-transactional-outbox.md', CRLF will be replaced by 
+LF the next time Git touches it
+warning: in the working copy of 'Docs/adr/0009-licence.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/adr/0010-payroll-by-integration.md', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'Docs/adr/0011-repo-resident-state-dual-provider-failover.md', CRLF will be replaced 
+by LF the next time Git touches it
+warning: in the working copy of 'Docs/adr/0012-tdd-golden-postings-property-invariants.md', CRLF will be replaced by 
+LF the next time Git touches it
+warning: in the working copy of 'Docs/adr/0013-db-test-harness-testcontainers-local-pg.md', CRLF will be replaced by 
+LF the next time Git touches it
+warning: in the working copy of 'Docs/adr/0014-no-delete-superseding-forward-only-migrations.md', CRLF will be 
+replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/adr/0015-playwright-screenshot-evidence.md', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'Docs/decisions/README.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/process/README.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/process/definition-of-done.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/process/human-gates.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/process/loops.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/process/tdd.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0000-template.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/research/RQ-0001-codex-exec-noninteractive.md', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0002-claude-code-headless.md', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0003-cel-javascript-decimal.md', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0004-salesforce-pubsub-cdc.md', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0005-salesforce-auth-2026.md', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0006-aba-direct-entry-format.md', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0007-postgres-ledger-patterns.md', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0008-test-db-without-docker.md', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0009-au-gst-bas-mvp.md', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'Docs/research/RQ-0010-stripe-and-peppol-mvp.md', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0011-design-fact-check.md', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0012-design-review-checklist.md', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0013-tenant-context-pooling.md', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0080-ui-patterns-accessibility.md', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'Docs/research/RQ-0090-golden-posting-tax-treatments.md', CRLF will be replaced by LF 
+the next time Git touches it
+warning: in the working copy of 'Docs/research/assets/RQ-0007-verify.sql', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'Docs/specs/README.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/specs/UC-02.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/specs/UC-03.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/specs/UC-04.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/specs/UC-05.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/specs/UC-06.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/specs/UC-07.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/specs/UC-08.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/specs/UC-09.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/specs/UC-10.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/README.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/design-tokens.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/information-architecture.md', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/ui/mockups/01-home-dashboard.html', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'Docs/ui/mockups/02-invoice-list.html', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/ui/mockups/03-invoice-detail.html', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'Docs/ui/mockups/04-batch-billing-run.html', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'Docs/ui/mockups/05-payment-batch-release.html', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/ui/mockups/06-bank-reconciliation.html', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/ui/mockups/07-period-close-checklist.html', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/ui/mockups/08-setup-wizard.html', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/ui/mockups/09-sync-issues-inbox.html', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'Docs/ui/mockups/10-salesforce-account-lwc.html', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/ui/mockups/11-journal-rule-studio.html', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/ui/mockups/12-mobile-approvals.html', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'Docs/ui/mockups/index.html', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/mockups/shell.css', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/mockups/shell.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/research/directions/a-turns/fonts/OFL-LICENSE.txt', CRLF will be replaced by 
+LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/research/directions/a-turns/tokens.css', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'Docs/ui/research/directions/b-flows/fonts/OFL-LICENSE.txt', CRLF will be replaced by 
+LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/research/directions/c-timeline/fonts/OFL-LICENSE.txt', CRLF will be replaced 
+by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/research/tools/fonttest.mjs', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/ui/research/tools/sheet.mjs', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/ui/research/tools/shot.mjs', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/ui/screenshots/check-report.json', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/ui/tokens.css', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/tools/contrast.mjs', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/tools/screenshot-mockups.mjs', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/ui/v2/fonts/OFL-LICENSE.txt', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'Docs/ui/v2/mockups/03-invoice-detail.html', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'Docs/ui/v2/shell.css', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/v2/shell.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/v2/tokens.css', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/v2/tools/shot.mjs', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'Docs/ui/v2/visual-identity.md', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of 'apps/api/AGENTS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'apps/api/CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'apps/web/AGENTS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'apps/web/CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'apps/worker/AGENTS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'apps/worker/CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'infra/AGENTS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'infra/CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'infra/compose/README.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'packages/connectors/AGENTS.md', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of 'packages/connectors/CLAUDE.md', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of 'packages/db/AGENTS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'packages/db/CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'packages/db/README.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'packages/db/bootstrap/01_cluster_roles.sql', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'packages/db/bootstrap/02_database_grants.sql', CRLF will be replaced by LF the next 
+time Git touches it
+warning: in the working copy of 'packages/db/migrations/0001_platform_schemas.sql', CRLF will be replaced by LF the 
+next time Git touches it
+warning: in the working copy of 'packages/db/migrations/0002_tenancy.sql', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'packages/db/migrations/0003_audit_log.sql', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'packages/ledger/AGENTS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'packages/ledger/CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'packages/modules/AGENTS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'packages/modules/CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'packages/rules/AGENTS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'packages/rules/CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'salesforce/AGENTS.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'salesforce/CLAUDE.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'scripts/agent/README.md', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'scripts/agent/conductor.ts', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'scripts/agent/lib/backlog.ts', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of 'scripts/agent/lib/config.ts', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'scripts/agent/lib/frontmatter.ts', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'scripts/agent/lib/gates.ts', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'scripts/agent/lib/git.ts', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'scripts/agent/lib/review.ts', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'scripts/agent/lib/run.ts', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'scripts/agent/lib/yaml.ts', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'scripts/agent/test/backlog.test.ts', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'scripts/agent/test/cli.test.ts', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'scripts/agent/test/frontmatter.test.ts', CRLF will be replaced by LF the next time 
+Git touches it
+warning: in the working copy of 'scripts/agent/test/helpers.ts', CRLF will be replaced by LF the next time Git touches 
+it
+warning: in the working copy of 'scripts/agent/test/index.js', CRLF will be replaced by LF the next time Git touches it
+warning: in the working copy of 'scripts/agent/test/package.json', CRLF will be replaced by LF the next time Git 
+touches it
+warning: in the working copy of 'scripts/agent/test/yaml.test.ts', CRLF will be replaced by LF the next time Git 
+touches it
+v22.22.0
+Scope: all 21 workspace projects
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 1, reused 0, downloaded 0, added 0
+Packages: +1023
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 1023, reused 0, downloaded 43, added 41
+
+   ╭───────────────────────────────────────────────╮
+   │                                               │
+   │     Update available! 10.28.0 → 12.18.0.      │
+   │     Changelog: https://pnpm.io/v/12.18.0      │
+   │   To update, run: corepack use pnpm@12.18.0   │
+   │                                               │
+   ╰───────────────────────────────────────────────╯
+
+Progress: resolved 1023, reused 0, downloaded 187, added 190
+Progress: resolved 1023, reused 0, downloaded 467, added 473
+Progress: resolved 1023, reused 0, downloaded 560, added 566
+Progress: resolved 1023, reused 0, downloaded 652, added 657
+Progress: resolved 1023, reused 0, downloaded 769, added 774
+Progress: resolved 1023, reused 0, downloaded 867, added 873
+Progress: resolved 1023, reused 0, downloaded 961, added 967
+Progress: resolved 1023, reused 0, downloaded 1008, added 1014
+Progress: resolved 1023, reused 0, downloaded 1011, added 1017
+Progress: resolved 1023, reused 0, downloaded 1012, added 1018
+Progress: resolved 1023, reused 0, downloaded 1013, added 1018
+Progress: resolved 1023, reused 0, downloaded 1016, added 1022
+Progress: resolved 1023, reused 0, downloaded 1017, added 1023, done
+
+devDependencies:
++ @axe-core/playwright 4.13.0
++ @eslint/js 10.0.1
++ @ledgerforce/testing 0.0.0 <- packages/testing
++ @playwright/test 1.63.0
++ @salesforce/sfdx-lwc-jest 7.9.0
++ @swc/core 1.16.13
++ @types/node 22.20.5
++ @vitest/coverage-v8 4.1.12
++ eslint 10.13.0
++ fast-check 4.10.2
++ globals 17.13.0
++ prettier 3.9.10
++ typescript 6.0.3
++ typescript-eslint 8.72.0
++ unplugin-swc 2.0.0
++ vitest 4.1.12
++ yaml 2.9.1
+
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: @swc/core@1.16.13, cpu-features@0.0.10,             │
+│   protobufjs@7.6.6, ssh2@1.17.0.                                             │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Done in 16s using pnpm v10.28.0
+
+ RUN  v4.1.12 /tmp/ledgerforce-t0121-validation
+      Coverage enabled with v8
+
+ ✓  unit  packages/shared/src/crypto/transit-kms.test.ts (62 tests) 1224ms
+ ✓  unit  packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts (12 tests) 276ms
+ ✓  unit  packages/shared/src/sod/sod.rules.test.ts (37 tests) 206ms
+ ✓  unit  packages/modules/bank/src/parsers.test.ts (26 tests) 623ms
+ ✓  unit  salesforce/test/package-contract.test.ts (49 tests) 85ms
+ ✓  unit  infra/test/install-contract.test.ts (17 tests) 144ms
+ ✓  unit  packages/modules/bank/src/camt-extensions.test.ts (15 tests) 489ms
+ ✓  unit  packages/modules/reporting/src/statements.test.ts (8 tests) 287ms
+ ✓  unit  packages/ledger/src/posting-command.test.ts (15 tests) 73ms
+ ✓  unit  packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts (12 tests) 66ms
+ ✓  unit  packages/shared/src/rbac/rbac.matrix.test.ts (67 tests) 36ms
+ ✓  unit  apps/worker/src/setup/keycloak-admin.test.ts (6 tests) 200ms
+ ✓  unit  packages/ledger/src/period-matrix.test.ts (9 tests) 162ms
+ ✓  unit  packages/connectors/salesforce/src/jwt-bearer.contract.test.ts (10 tests) 238ms
+ ✓  unit  packages/shared/src/money/money.test.ts (33 tests) 33ms
+ ✓  unit  packages/modules/tax/src/gst.test.ts (9 tests) 547ms
+ ✓  unit  infra/test/security-workflow.contract.test.ts (6 tests) 86ms
+ ✓  unit  salesforce/test/lwc-contract.test.ts (9 tests) 66ms
+ ✓  unit  packages/testing/src/evidence/manifest.test.ts (16 tests) 207ms
+ ✓  unit  packages/ledger/src/golden/golden-postings.golden.test.ts (5 tests) 71ms
+ ✓  unit  packages/db/src/migrate.test.ts (36 tests) 165ms
+ ✓  unit  packages/connectors/salesforce/src/jwt.test.ts (8 tests) 179ms
+ ✓  unit  packages/shared/src/crypto/envelope.test.ts (8 tests) 34ms
+ ✓  unit  packages/db/src/env.test.ts (7 tests) 19ms
+ ✓  unit  packages/modules/bank/src/statement-import.test.ts (8 tests) 13ms
+ ✓  unit  packages/shared/src/money/money.property.test.ts (8 tests) 229ms
+ ✓  unit  packages/modules/gl/src/profiles.template.test.ts (6 tests) 10ms
+ ✓  unit  packages/ledger/src/posting-balance.prop.test.ts (2 tests) 134ms
+ ✓  unit  packages/modules/gl/src/templates.test.ts (5 tests) 14ms
+ ✓  unit  packages/testing/src/evidence/record-tests.test.ts (4 tests) 2726ms
+     ✓ records a passing scenario with literal spaces and shell metacharacters in paths  905ms
+     ✓ preserves real failed-test evidence and returns failure  764ms
+     ✓ rejects a missing required scenario without inventing a pass  687ms
+     ✓ reports runner failure without a report and creates no manifest  366ms
+ ✓  unit  packages/testing/src/evidence/test-report.test.ts (6 tests) 7ms
+ ✓  unit  apps/worker/src/setup/setup-config.test.ts (3 tests) 16ms
+ ✓  unit  packages/outbox/src/sync-issues.test.ts (3 tests) 13ms
+ ✓  unit  packages/modules/documents/src/invoice-html.test.ts (5 tests) 18ms
+ ✓  unit  packages/testing/eslint-rules/no-float-money.test.ts (34 tests) 615ms
+ ✓  unit  packages/connectors/salesforce/src/certificate.test.ts (6 tests) 223ms
+ ✓  unit  packages/outbox/src/deliver.test.ts (10 tests) 17ms
+ ✓  unit  packages/testing/eslint-rules/no-direct-ledger-write.test.ts (22 tests) 575ms
+       ✓ db.query('SELECT * FROM journal_entry WHERE id = $1');  312ms
+ ✓  unit  packages/modules/parties/src/identifiers.test.ts (7 tests) 52ms
+ ✓  unit  salesforce/test/xml.test.ts (21 tests) 16ms
+ ✓  unit  packages/modules/tax/src/gst.golden.test.ts (3 tests) 24ms
+ ✓  unit  packages/connectors/salesforce/src/testing/keys.test.ts (6 tests) 388ms
+ ✓  unit  packages/outbox/src/backoff.test.ts (3 tests) 12ms
+ ✓  unit  packages/db/src/testing/start-test-database.test.ts (7 tests) 30ms
+ ✓  unit  packages/modules/tax/src/au-tax-codes.test.ts (4 tests) 19ms
+ ✓  unit  packages/connectors/salesforce/src/writeback/budget.test.ts (2 tests) 46ms
+ ✓  unit  packages/testing/eslint-rules/no-float-money.config.test.ts (3 tests) 2849ms
+     ✓ reports lf/no-float-money in a money package (packages/ledger) under the real config  2689ms
+ ✓  unit  packages/testing/src/evidence/destination.test.ts (4 tests) 20ms
+ ✓  unit  packages/modules/ar/src/credit-notes.test.ts (3 tests) 34ms
+ ✓  unit  packages/testing/eslint-rules/no-session-tenant-context.test.ts (10 tests) 568ms
+       ✓ const q = sql`SELECT set_config('app.tenant_id', ${id}, true)`;  417ms
+ ✓  unit  packages/shared/src/result.test.ts (4 tests) 13ms
+ ✓  unit  infra/test/workflow-contract.test.ts (2 tests) 95ms
+ ✓  unit  packages/modules/ar/src/write-off.test.ts (1 test) 36ms
+
+ Test Files  53 passed (53)
+      Tests  684 passed (684)
+   Start at  14:48:53
+   Duration  43.85s (transform 1.82s, setup 0ms, import 11.26s, tests 14.33s, environment 12ms)
+

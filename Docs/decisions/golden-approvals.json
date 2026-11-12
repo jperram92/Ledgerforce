@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "approvals": [
+    {
+      "path": "Docs/accounting/postings.md",
+      "commit": "334a3f90997af48e8331247d0e4d8fdba91ce89d",
+      "decisions": ["DL-0256", "DL-0258"]
+    }
+  ]
+}

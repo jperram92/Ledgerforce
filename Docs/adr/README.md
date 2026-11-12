@@ -95,4 +95,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0045](0045-pdf-rendering-playwright-core.md) | Render document PDFs from HTML templates with playwright-core driving headless Chromium | architecture | no | Proposed |
 | [0046](0046-email-smtp-nodemailer.md) | Send document email over SMTP with nodemailer from outbox handlers | integration | no | Proposed |
 
-Next free number: **0047** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).
+| [0047](0047-content-bound-golden-approval-records.md) | Content-bound records of existing golden approvals | process | no | Proposed |
+
+Next free number: **0048** (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

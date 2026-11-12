@@ -1,0 +1,35 @@
+
+ RUN  v4.1.12 C:/Users/james/Ledgerforce
+      Coverage enabled with v8
+
+ ❯ |unit| infra/test/install-contract.test.ts (17 tests | 1 failed) 12923ms
+     × SS-PLAT-86 init-secrets.sh writes six distinct random secrets once and never overwrites 12885ms
+corepack : 
+At line:2 char:30
++ ... ORKERS='1'; corepack pnpm exec vitest run --project unit --coverage.e ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-86 generated secrets stay out of git > SS-PLAT-86 
+init-secrets.sh writes six distinct random secrets once and never overwrites
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ infra/test/install-contract.test.ts:309:3
+    307|   });
+    308|
+    309|   it('SS-PLAT-86 init-secrets.sh writes six distinct random secrets on…
+       |   ^
+    310|     // The install targets Linux. Use its native filesystem even from …
+    311|     // synthetic stat mode cannot prove chmod 0700. Pipe the exact scr…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 52 passed (53)
+      Tests  1 failed | 683 passed (684)
+   Start at  14:36:29
+   Duration  91.98s (transform 2.03s, setup 0ms, import 23.08s, tests 30.19s, environment 13ms)
+

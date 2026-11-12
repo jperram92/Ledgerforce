@@ -1,0 +1,136 @@
+TAP version 13
+# Subtest: explicit ancestor approval allows exactly the approved content [T-0121]
+not ok 1 - explicit ancestor approval allows exactly the approved content [T-0121]
+  ---
+  duration_ms: 1505.8023
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\golden-approvals.test.ts:26:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    'FAIL' !== 'PASS'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'PASS'
+  actual: 'FAIL'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/golden-approvals.test.ts:28:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: approval does not allow an amount mutation or trailing content [T-0121]
+not ok 2 - approval does not allow an amount mutation or trailing content [T-0121]
+  ---
+  duration_ms: 1360.0607
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\golden-approvals.test.ts:33:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /approved snapshot/i. Input:
+    
+    'Docs/accounting/postings.md:2: adds an Approved status — only the product owner approves golden postings'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: 'Docs/accounting/postings.md:2: adds an Approved status — only the product owner approves golden postings'
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/golden-approvals.test.ts:39:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: a missing protected file fails even when changedFiles excludes deletion [T-0121]
+not ok 3 - a missing protected file fails even when changedFiles excludes deletion [T-0121]
+  ---
+  duration_ms: 1215.6801
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\golden-approvals.test.ts:43:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    'PASS' !== 'FAIL'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'FAIL'
+  actual: 'PASS'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/golden-approvals.test.ts:46:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: missing decision evidence and malformed commit fail closed [T-0121]
+ok 4 - missing decision evidence and malformed commit fail closed [T-0121]
+  ---
+  duration_ms: 2269.6098
+  type: 'test'
+  ...
+# Subtest: approval from an unrelated branch is not evidence for this HEAD [T-0121]
+ok 5 - approval from an unrelated branch is not evidence for this HEAD [T-0121]
+  ---
+  duration_ms: 1796.6716
+  type: 'test'
+  ...
+# Subtest: malformed registry fails even when there are no accounting changes [T-0121]
+not ok 6 - malformed registry fails even when there are no accounting changes [T-0121]
+  ---
+  duration_ms: 1191.2357
+  type: 'test'
+  location: 'C:\\Users\\james\\Ledgerforce\\scripts\\agent\\test\\golden-approvals.test.ts:69:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    'PASS' !== 'FAIL'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 'FAIL'
+  actual: 'PASS'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///C:/Users/james/Ledgerforce/scripts/agent/test/golden-approvals.test.ts:73:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: duplicate paths, traversal paths, and unknown schema versions fail [T-0121]
+ok 7 - duplicate paths, traversal paths, and unknown schema versions fail [T-0121]
+  ---
+  duration_ms: 2317.8442
+  type: 'test'
+  ...
+# Subtest: an approved file outside the registry is still rejected [T-0121]
+ok 8 - an approved file outside the registry is still rejected [T-0121]
+  ---
+  duration_ms: 1487.8932
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 4
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 13645.0053

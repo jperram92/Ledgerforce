@@ -1,3 +1,11 @@
+# Handover — T-0121 validation in progress
+## Codex continuation prompt
+> Resume T-0121 on `feat/T-0121-verification-gates`, branched from `2ffd7b3`. First command: `node scripts/agent/conductor.ts status`. Read T-0121, RQ-0099, Proposed ADR-0047 and evidence under .agent/evidence/T-0121. Golden approval repair has eleven adversarial tests and 28 passing gate regressions; unchanged native Linux coverage passed all 684 tests. Full verifier is next; no task is done. Do not alter Approved postings, weaken tests, or treat a record as independent review. Claude review and ADR acceptance remain.
+
+From: codex, run 2026-11-12-codex-r01. Decisions DL-0279/DL-0280.
+Next action: run full verifier on the committed task HEAD in a native Linux clone with complete Git history and installed browser dependencies; preserve all output in the Windows workspace before the Linux temporary environment exits.
+Open questions for human: none.
+
 # Handover — T-0048 blocked on verification gates
 ## Codex continuation prompt
 > Resume from the repository on branch `feat/T-0048-write-off`. Implementation is `4cc7e9e`; recovery checkpoint is `063e215`; inspect the latest commit body for the fixture fix and final evidence. First command: `node scripts/agent/conductor.ts status`. Read T-0048, T-0121, RQ-0098 and `.agent/evidence/T-0048/verification-20261111-r03.md`. T-0048 is blocked, not complete: coverage times out in the real ESLint config test and the golden guard rejects inherited owner-approved content. Research T-0121's two open questions before changing gates. Do not increase timeouts, suppress checks, alter the comparison base, or edit approved goldens. Claude must review the Codex date fix and fixture correction after verification is green.
@@ -256,3 +264,5 @@ Environment: elevated Windows shell selected Node 22.22.0; Git Bash at C:/Progra
 - 2026-11-12T03:20:10.418Z codex: T-0048 → in_progress
 - 2026-11-12T03:25:15.925Z codex: handover: Write-off and complete standalone DB suite pass; fixture clock fixed; coverage and inherited golden approval gates remain red; Claude review pending
 - 2026-11-12T03:26:25.827Z codex: release T-0048 → blocked (Coverage timeout and inherited golden-approval guard unresolved (T-0121); full DB standalone 1178 pass, fixture fix 5 pass; Claude cross-review required)
+- 2026-11-12T03:35:10.540Z codex: T-0121 → researching
+- 2026-11-12T03:57:10.805Z codex: T-0121 → verifying

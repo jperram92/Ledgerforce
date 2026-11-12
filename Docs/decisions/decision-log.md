@@ -2126,3 +2126,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0098 traces the DB failure to mixing client/database clocks; the original full verifier records RED, and the corrected fixture's five tests pass. Coverage timeout reproduced on retry; existing golden guard cannot recognize the recorded owner approvals. Neither failure is suppressed.
 - Alternatives: Relaxing constraints/timeouts, bypassing the golden guard, or editing approved expectations were rejected. No full-green claim is made from targeted tests.
 - ADR: none for fixture; process ADR required for T-0121 gate design · Status: accepted
+
+### DL-0279 — Bind existing golden approval evidence to committed content
+- Date: 2026-11-12 · By: codex · Task: T-0121 · Category: process
+- Decision: Proposed ADR-0047 adds explicit approval records for exact ancestor snapshots and contemporaneous decision-log evidence; existing protection for Approved main content stays in place. Seed only DL-0256/DL-0258 at 334a3f9. Eleven adversarial tests and existing guard regressions pass.
+- Why: The diff-only gate could not represent already authorized changes. Missing history, mutations, duplicate records, irrelevant/missing decisions, and recycled decisions fail closed.
+- Alternatives: Broad exemptions and comparison-base overrides rejected. This is reviewable approval evidence, not cryptographic authority or a new accounting approval.
+- ADR: ADR-0047 · Status: proposed (awaiting green CI and cross-provider review)
+
+### DL-0280 — Validate unchanged coverage on native Linux
+- Date: 2026-11-12 · By: codex · Task: T-0121 · Category: tooling
+- Decision: Use a separate Linux checkout and Node 22 with frozen-lockfile dependencies for complete validation. All 684 unit coverage tests passed unchanged; retain Windows timing and EPERM failures as limitations.
+- Why: RQ-0099 records variable Windows failures, while native Linux executes the original test contracts successfully. No timeouts, assertions, coverage exclusions, or property counts changed.
+- Alternatives: Increasing timeouts or bypassing concurrency tests rejected. Linux tools/dependencies stay outside the shared Windows installation.
+- ADR: none · Status: accepted

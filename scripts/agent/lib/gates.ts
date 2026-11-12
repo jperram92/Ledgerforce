@@ -6,6 +6,7 @@ import { type Ctx, cards, getCard } from './commands.ts';
 import { lintBacklog } from './backlog.ts';
 import { latestCrossReview } from './review.ts';
 import { gitTry, currentBranch } from './git.ts';
+import { approvedGoldenPaths } from './golden-approvals.ts';
 
 export type GateResult = 'PASS' | 'FAIL' | 'PENDING';
 export interface Gate { result: GateResult; lines: string[] }
@@ -121,19 +122,27 @@ function isApprovedMarker(line: string): boolean {
 }
 
 export function goldenGuard(ctx: Ctx): Gate {
+  const approved = approvedGoldenPaths(ctx.root);
+  if (approved.errors.length) return { result: 'FAIL', lines: approved.errors };
   const base = baseRef(ctx.root);
   const changed = changedFiles(ctx.root, base, ['Docs/accounting']);
   if (!changed.length) return { result: 'PASS', lines: ['Docs/accounting unchanged vs ' + (base ? base.slice(0, 7) : 'HEAD')] };
   const bad: string[] = [];
   for (const f of changed) {
     const before = gitTry(ctx.root, ['show', `${base ?? 'HEAD'}:${f}`]);
-    if (before.code === 0 && before.out.split('\n').some(isApprovedMarker)) bad.push(`${f}: changes a file with Approved golden postings (human-owned)`);
+    if (before.code === 0 && before.out.split('\n').some(isApprovedMarker)) {
+      bad.push(`${f}: changes a file with Approved golden postings (human-owned)`);
+      continue;
+    }
+    if (approved.paths.has(f)) continue;
     const added = addedLines(ctx.root, base, (x) => x === f).filter((a) => isApprovedMarker(a.text));
     for (const a of added) if (!(before.code === 0 && before.out.includes(a.text))) bad.push(`${f}:${a.line}: adds an Approved status — only the product owner approves golden postings`);
   }
   return bad.length
     ? { result: 'FAIL', lines: bad }
-    : { result: 'PASS', lines: [`Draft-only changes in ${changed.join(', ')} — allowed only as a proposal with PR label golden_postings`] };
+    : { result: 'PASS', lines: [approved.paths.size
+      ? `${approved.paths.size} content-bound approved snapshot(s); other changes are Draft-only proposals`
+      : `Draft-only changes in ${changed.join(', ')} — allowed only as a proposal with PR label golden_postings`] };
 }
 
 // ---------------- gate 8: cross-review ----------------
