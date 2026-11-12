@@ -13,6 +13,7 @@
   "dependencies": {
     "@ledgerforce/ap": "workspace:*",
     "@ledgerforce/ar": "workspace:*",
+    "@ledgerforce/connector-stripe": "workspace:*",
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
     "@ledgerforce/journals": "workspace:*",

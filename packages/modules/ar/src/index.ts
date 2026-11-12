@@ -5,3 +5,4 @@ export * from './receipts.ts';
 export * from './prepayments.ts';
 export * from './write-off.ts';
 export * from './aged.ts';
+export * from './writeback.ts';

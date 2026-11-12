@@ -96,6 +96,7 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0046](0046-email-smtp-nodemailer.md) | Send document email over SMTP with nodemailer from outbox handlers | integration | no | Proposed |
 | [0047](0047-content-bound-golden-approval-records.md) | Content-bound records of existing golden approvals | process | no | Proposed |
 | [0048](0048-stripe-payment-link-per-invoice.md) | Stripe Payment Link per invoice and amount due, created at send time by a fetch-based client | integration | no | Proposed |
+| [0049](0049-stripe-webhook-endpoint-and-tenant-routing.md) | Stripe webhooks: one signed endpoint per deployment, tenant from signed Payment Link metadata | security | yes | Proposed |
 | [0053](0053-mime-parsing-postal-mime.md) | Parse inbound bill email with postal-mime | integration | no | Proposed |
 
 Next free number: **0054** (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

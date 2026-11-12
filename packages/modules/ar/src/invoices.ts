@@ -85,6 +85,8 @@ export interface DraftInvoiceInput {
   readonly kind?: 'standard' | 'deposit';
   /** Posted deposit invoices of the same customer this final invoice nets off (GP-015). */
   readonly depositInvoiceIds?: readonly string[];
+  /** The Salesforce Opportunity this invoice bills (write-back of amount paid, T-0074). */
+  readonly salesforceOpportunityId?: string;
   readonly createdBy?: string;
   readonly lines: readonly DraftLineInput[];
 }
@@ -410,6 +412,7 @@ export async function createDraftInvoice(
       reference: input.reference ?? null,
       source_key: input.sourceKey ?? null,
       kind: input.kind ?? 'standard',
+      salesforce_opportunity_id: input.salesforceOpportunityId ?? null,
       created_by: input.createdBy ?? null,
       warnings: JSON.stringify(warnings),
     })

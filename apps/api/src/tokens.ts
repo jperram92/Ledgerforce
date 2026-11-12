@@ -10,3 +10,7 @@ export const KMS = Symbol('KMS');
 export const SYNC_REQUEUE = Symbol('SYNC_REQUEUE');
 /** Transactional posting outbox; null makes manual posting unavailable. */
 export const POSTING_OUTBOX = Symbol('POSTING_OUTBOX');
+/** Stripe webhook signing configuration (ADR-0049); null makes POST /webhooks/stripe answer 503. */
+export const STRIPE_WEBHOOK = Symbol('STRIPE_WEBHOOK');
+/** Document event outbox (write-back snapshots); null makes routes that publish one answer 503. */
+export const DOCUMENT_OUTBOX = Symbol('DOCUMENT_OUTBOX');

@@ -446,6 +446,8 @@ export interface SalesInvoiceTable {
   billing_format_id: Generated<string | null>;
   /** Migration 0042 (T-0047): deposit invoices credit CUSTOMER_PREPAYMENTS. */
   kind: Generated<'standard' | 'deposit'>;
+  /** Migration 0049 (T-0074): the Salesforce Opportunity this invoice bills. */
+  salesforce_opportunity_id: Generated<string | null>;
 }
 
 /** Migration 0042 (T-0047): prepayment received before an invoice (GP-020). */
@@ -579,6 +581,49 @@ export interface StripePaymentLinkTable {
   status: Generated<'active' | 'deactivated'>;
   created_at: Generated<Date>;
   deactivated_at: Date | null;
+}
+
+/** Migration 0049 (T-0074): Stripe connector settings per company (postings Q2). */
+export interface StripeSettingsTable {
+  tenant_id: TenantId;
+  company_id: string;
+  clearing_account_id: string;
+  updated_at: Generated<Date>;
+}
+
+/** Migration 0049 (T-0074, ADR-0049): Stripe events acted on, stored once; insert-only. */
+export interface StripeWebhookEventTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  event_id: string;
+  event_type: 'payment_intent.succeeded';
+  livemode: boolean;
+  event_created_at: Date;
+  payment_intent_id: string;
+  invoice_id: string;
+  amount: Numeric;
+  currency: string;
+  receipt_id: string;
+  received_at: Generated<Date>;
+}
+
+/** Migration 0049 (T-0074): customer-credit refund sent to Stripe (GP-006 Stripe variant). */
+export interface StripeRefundTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  credit_note_id: string;
+  payment_intent_id: string;
+  amount: Numeric;
+  currency: string;
+  refund_date: ColumnType<Date, string, never>;
+  stripe_refund_id: string;
+  stripe_status: 'pending' | 'requires_action' | 'succeeded';
+  idempotency_key: string;
+  entry_id: string;
+  created_by: string | null;
+  created_at: Generated<Date>;
 }
 
 /** Migration 0036 (T-0041, design §4.3): billing format template record. */
@@ -1088,6 +1133,9 @@ export interface Database {
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;
   'app.stripe_payment_link': StripePaymentLinkTable;
+  'app.stripe_settings': StripeSettingsTable;
+  'app.stripe_webhook_event': StripeWebhookEventTable;
+  'app.stripe_refund': StripeRefundTable;
   'app.billing_line': BillingLineTable;
   'app.billing_batch': BillingBatchTable;
   'app.billing_batch_item': BillingBatchItemTable;
