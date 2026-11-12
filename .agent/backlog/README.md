@@ -142,7 +142,7 @@ graph LR
 | [T-0048](T-0048.md) | Bad debt write-off with GST decreasing adjustment | MVP | blocked | T-0046, T-0035 | — | 0 |
 | [T-0049](T-0049.md) | Customer statements and aged receivables | MVP | review | T-0046 | UC-12 | 1 |
 | [T-0050](T-0050.md) | Supplier bills entry and suggested coding | MVP | review | T-0039, T-0025, T-0034, T-0028, T-0031 | UC-05 | 3 |
-| [T-0051](T-0051.md) | Bills inbox: inbound email PDF → draft bill | MVP | todo | T-0050 | UC-05 | 1 |
+| [T-0051](T-0051.md) | Bills inbox: inbound email PDF → draft bill | MVP | review | T-0050 | UC-05 | 1 |
 | [T-0052](T-0052.md) | Bill approval workflow with SoD | MVP | todo | T-0050, T-0015, T-0031 | UC-05 | 4 |
 | [T-0053](T-0053.md) | Supplier/employee bank-detail change verification with cooling-off | MVP | review | T-0037, T-0015, T-0013 | UC-06 | 2 |
 | [T-0054](T-0054.md) | Payment batches with maker-checker and step-up release | MVP | todo | T-0052, T-0053, T-0013 | UC-06 | 5 |
@@ -222,6 +222,7 @@ graph LR
 | [T-0119](T-0119.md) | Chromium in the worker image and PDF rendering as a worker job | MVP | todo | T-0041 |
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
+| [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:

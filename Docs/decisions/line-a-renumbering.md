@@ -9,3 +9,7 @@ T-0127–T-0165). Old commit messages keep the old IDs; this table maps them.
 |---|---|---|---|
 | DL-0277 | DL-0287 | feat/T-0049-aged-ar | aged receivables decision |
 | DL-0278 | DL-0288 | feat/T-0050-bills | decision-log entry (title-matched) |
+| DL-0279 | DL-0289 | feat/T-0051-bills-inbox | decision-log entry (title-matched) |
+| ADR-0047 (postal-mime) | ADR-0048 | feat/T-0051-bills-inbox | file renamed to Docs/adr/0048-mime-parsing-postal-mime.md |
+| RQ-0098 (inbound bill email) | RQ-0101 | feat/T-0051-bills-inbox | file renamed to Docs/research/RQ-0101-inbound-bill-email.md |
+| T-0121 (bills inbox transports) | T-0127 | Line A card (arrives with T-0080's chain) | main's T-0121 is the golden-approval/verification task |

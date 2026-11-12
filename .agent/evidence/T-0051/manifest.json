@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0051",
+  "entries": [
+    {
+      "scenario": "SS-UC05-01",
+      "file": ".agent/evidence/T-0051/20261101-220230-tests-db.json",
+      "test": "3 test(s): packages/modules/ap/src/inbox.db.test.ts › SS-UC05-01: Emailed PDF becomes a draft bill › SS-UC05-01 ingest stores a draft with the PDF attached, matched to the supplier; nothing posts; re-ingest is idempotent | packages/modules/ap/src/inbox.db.test.ts › SS-UC05-01: Emailed PDF becomes a draft bill › SS-UC05-01 coding the inbox item creates a draft bill that keeps the PDF | packages/modules/ap/src/inbox.db.test.ts › SS-UC05-01: Emailed PDF becomes a draft bill › an unknown sender is kept for a person to assign; a message without a PDF is kept as no_attachment",
+      "commit": "d1c23cb5fc53",
+      "provider": "claude",
+      "timestamp": "2026-11-01T22:02:30.948Z",
+      "result": "passed"
+    }
+  ]
+}
