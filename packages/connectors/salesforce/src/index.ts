@@ -128,3 +128,4 @@ export {
   type WriteBackHandlerDeps,
   type WriteBackReport,
 } from './writeback/writeback.ts';
+export * from './inbound/index.ts';

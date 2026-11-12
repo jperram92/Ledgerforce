@@ -27,3 +27,21 @@ T-0127–T-0165). Old commit messages keep the old IDs; this table maps them.
 | migration 0051_setup_opening_balance | 0058 | feat/T-0080 | sibling collision |
 | migration 0052_salesforce_billing_source | 0059 | feat/T-0069 | must apply after 0056/0057 of its chain |
 | migration 0053_salesforce_reconciliation | 0060 | feat/T-0070 | follows 0059 |
+| DL-0284 | DL-0295 | feat/T-0065-sf-inbound-mapping | decision-log entry (title-matched) |
+
+**Correction (DL-0296):** Line A's migration runner is gapless, so the 0054–0060 rows above are superseded.
+Migrations are numbered in integration order with no gaps:
+
+| Line A migration | New number | Branch |
+|---|---|---|
+| 0050_salesforce_inbound_change | 0048 | feat/T-0065 |
+| 0048_payments_stripe_payment_link | 0049 | feat/T-0073 |
+| 0051_salesforce_sync_object | 0050 | feat/T-0066 |
+| 0049_payments_stripe_webhook | 0051 | feat/T-0074 |
+| 0052_salesforce_billing_source | 0052 (unchanged) | feat/T-0069 |
+| 0053_salesforce_reconciliation | 0053 (unchanged) | feat/T-0070 |
+| 0049_ar_customer_refund | 0054 | feat/T-0055 |
+| 0048_ap_payment_confirmation | 0055 | feat/T-0057 |
+| 0050_bank_matching | 0056 | feat/T-0060 |
+| 0051_bank_reconciliation | 0057 | feat/T-0061 |
+| 0051_setup_opening_balance | 0058 | feat/T-0080 |

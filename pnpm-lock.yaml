@@ -233,6 +233,9 @@ importers:
       '@ledgerforce/ledger':
         specifier: workspace:*
         version: link:../../packages/ledger
+      '@ledgerforce/parties':
+        specifier: workspace:*
+        version: link:../../packages/modules/parties
       '@ledgerforce/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -270,6 +273,12 @@ importers:
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../db
+      '@ledgerforce/parties':
+        specifier: workspace:*
+        version: link:../../modules/parties
+      '@ledgerforce/products':
+        specifier: workspace:*
+        version: link:../../modules/products
       '@ledgerforce/shared':
         specifier: workspace:*
         version: link:../../shared
@@ -280,6 +289,12 @@ importers:
         specifier: 0.29.7
         version: 0.29.7
     devDependencies:
+      '@ledgerforce/gl':
+        specifier: workspace:*
+        version: link:../../modules/gl
+      '@ledgerforce/ledger':
+        specifier: workspace:*
+        version: link:../../ledger
       '@types/node':
         specifier: 22.20.5
         version: 22.20.5

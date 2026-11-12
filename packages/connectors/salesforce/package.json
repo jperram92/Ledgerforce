@@ -15,11 +15,15 @@
     "@grpc/grpc-js": "1.14.6",
     "@grpc/proto-loader": "0.8.1",
     "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/parties": "workspace:*",
+    "@ledgerforce/products": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
     "avsc": "5.7.9",
     "kysely": "0.29.7"
   },
   "devDependencies": {
+    "@ledgerforce/gl": "workspace:*",
+    "@ledgerforce/ledger": "workspace:*",
     "@types/node": "22.20.5",
     "vitest": "4.1.12"
   }

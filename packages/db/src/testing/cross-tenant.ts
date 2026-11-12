@@ -289,6 +289,22 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     replay_id: () => '\\x01',
   },
   'app.salesforce_resync_request': { reason: () => 'replay_id_invalid' },
+  // Processed inbound changes (migration 0048, Line A 0050, T-0065): a settled issue row of a fresh key.
+  'app.salesforce_inbound_change': {
+    entity_name: () => 'Account',
+    record_id: () => `001${randomBytes(8).toString('hex').slice(0, 15)}`,
+    commit_number: () => String(randomBytes(4).readUInt32BE()),
+    sequence_number: () => '1',
+    change_type: () => 'UPDATE',
+    transaction_key: () => `tx-${randomUUID()}`,
+    source: () => '/data/AccountChangeEvent',
+    outcome: () => 'issue',
+    target_type: () => 'party',
+    issue_code: () => 'TEST_ISSUE',
+    issue_message: () => 'test issue',
+    duplicate_count: () => '0',
+    last_duplicate_source: () => '/data/AccountChangeEvent',
+  },
   // Open items and allocations (migration 0028). Seeded rows (superuser, no tenant set) are
   // stored as generated: an AR item of +1, an allocation of 1 with no FX difference. A row
   // inserted by lf_app is filled and checked by triggers (prerequisites below).
