@@ -1,5 +1,5 @@
 ---
-adr: 0048
+adr: 0053
 title: "Parse inbound bill email with postal-mime"
 status: Proposed
 date: 2026-11-01
@@ -10,14 +10,14 @@ supersedes: none
 superseded_by: none
 ---
 
-# ADR-0048: Parse inbound bill email with postal-mime
+# ADR-0053: Parse inbound bill email with postal-mime
 
 ## Status
 Proposed — becomes Accepted on green CI plus cross-review by codex (integration category, a new
 runtime dependency per design §10.6; no change to the security model).
 
 ## Context and problem statement
-T-0051 / UC-05: supplier PDFs emailed to the bills inbox become draft bills. RQ-0101 settles on a
+T-0051 / UC-05: supplier PDFs emailed to the bills inbox become draft bills. RQ-0111 settles on a
 transport-agnostic ingest of raw RFC 5322 messages, which needs a MIME parser.
 
 ## Considered options
@@ -36,4 +36,4 @@ suggest a supplier, never to post anything.
 - Follow-ups: IMAP polling and provider webhook adapters (T-0127).
 
 ## Links
-- RQ-0101, T-0051, DL-0289.
+- RQ-0111, T-0051, DL-0289.

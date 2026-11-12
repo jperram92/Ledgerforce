@@ -1,5 +1,5 @@
 /**
- * Bills inbox (T-0051, UC-05, RQ-0101, ADR-0048, DL-0289).
+ * Bills inbox (T-0051, UC-05, RQ-0111, ADR-0053, DL-0289).
  *
  * ingestBillEmail takes a raw RFC 5322 message — from IMAP polling, a provider webhook or a test —
  * and records an inbox item (the draft bill awaiting coding) with its PDF attachments stored.

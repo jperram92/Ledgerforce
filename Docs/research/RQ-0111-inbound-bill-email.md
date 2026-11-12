@@ -1,11 +1,11 @@
 ---
-id: RQ-0101
+id: RQ-0111
 status: answered   # open | answered | answered-pending-human | superseded
 opened: 2026-11-01
 opened_by: claude
 task: T-0051
 ---
-# RQ-0101 — How a self-hosted install receives supplier bills by email
+# RQ-0111 — How a self-hosted install receives supplier bills by email
 
 ## Question
 UC-05: a supplier PDF emailed to the tenant's bills inbox becomes a draft bill. Which inbound
@@ -37,5 +37,5 @@ handle?
   Nothing posts until the AP Clerk codes it (createBill) and it is approved.
 - Transports: IMAP polling is the self-host default and provider webhooks the SaaS path; both are
   adapters feeding the same function (follow-up card T-0121). SMTP receiving is not offered.
-- Parser: postal-mime (ADR-0048).
+- Parser: postal-mime (ADR-0053).
 - Limits: attachments over 10 MB are refused; only PDFs are kept (OCR/receipt capture is Phase 1).

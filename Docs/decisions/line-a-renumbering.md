@@ -10,9 +10,20 @@ T-0127–T-0165). Old commit messages keep the old IDs; this table maps them.
 | DL-0277 | DL-0287 | feat/T-0049-aged-ar | aged receivables decision |
 | DL-0278 | DL-0288 | feat/T-0050-bills | decision-log entry (title-matched) |
 | DL-0279 | DL-0289 | feat/T-0051-bills-inbox | decision-log entry (title-matched) |
-| ADR-0047 (postal-mime) | ADR-0048 | feat/T-0051-bills-inbox | file renamed to Docs/adr/0048-mime-parsing-postal-mime.md |
-| RQ-0098 (inbound bill email) | RQ-0101 | feat/T-0051-bills-inbox | file renamed to Docs/research/RQ-0101-inbound-bill-email.md |
+| ADR-0047 (postal-mime) | ADR-0053 | feat/T-0051-bills-inbox | file renamed to Docs/adr/0053-mime-parsing-postal-mime.md |
+| RQ-0098 (inbound bill email) | RQ-0111 | feat/T-0051-bills-inbox | file renamed to Docs/research/RQ-0111-inbound-bill-email.md |
 | T-0121 (bills inbox transports) | T-0127 | Line A card (arrives with T-0080's chain) | main's T-0121 is the golden-approval/verification task |
 | DL-0280 | DL-0290 | feat/T-0052-bill-approval | decision-log entry (title-matched) |
 | DL-0281 | DL-0291 | feat/T-0054-payment-batches | decision-log entry (title-matched) |
 | DL-0282 | DL-0292 | feat/T-0056-aba-export | decision-log entry (title-matched) |
+| ADR-0048 (postal-mime, first renumbering) | ADR-0053 | correction | ADR-0048 is Line A's Stripe payment-link ADR; the first choice collided |
+| RQ-0101 (inbound email, first renumbering) | RQ-0111 | correction | RQ-0101 is Line A's Salesforce CDC research |
+| RQ-0099 (node runtime package updates) | RQ-0113 | feat/T-0057-payment-confirmation | main's RQ-0099 is approval records |
+| RQ-0100 (Stripe invoice payment link) | RQ-0115 | feat/T-0073-stripe-payment-links | main's RQ-0100 is security workflow failures |
+| migration 0048_payments_stripe_payment_link | 0054 | feat/T-0073 | sibling collision with 0048_ap_payment_confirmation |
+| migration 0049_payments_stripe_webhook | 0055 | feat/T-0074 | sibling collision |
+| migration 0050_salesforce_inbound_change | 0056 | feat/T-0065 | sibling collision |
+| migration 0051_salesforce_sync_object | 0057 | feat/T-0066 | sibling collision |
+| migration 0051_setup_opening_balance | 0058 | feat/T-0080 | sibling collision |
+| migration 0052_salesforce_billing_source | 0059 | feat/T-0069 | must apply after 0056/0057 of its chain |
+| migration 0053_salesforce_reconciliation | 0060 | feat/T-0070 | follows 0059 |

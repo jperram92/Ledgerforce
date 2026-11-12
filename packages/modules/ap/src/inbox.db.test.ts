@@ -1,5 +1,5 @@
 /**
- * Bills inbox (T-0051, UC-05, RQ-0101, ADR-0048, DL-0289), against a real PostgreSQL as lf_app: a
+ * Bills inbox (T-0051, UC-05, RQ-0111, ADR-0053, DL-0289), against a real PostgreSQL as lf_app: a
  * raw RFC 5322 message with a PDF becomes a draft (inbox item with the PDF attached), matched to
  * the supplier by sender address; nothing posts; coding turns it into a draft bill that keeps the
  * PDF. The message is built with nodemailer's composer, as a real mail client would send it.

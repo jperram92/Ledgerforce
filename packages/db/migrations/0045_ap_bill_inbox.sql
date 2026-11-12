@@ -1,4 +1,4 @@
--- 0045 — Bills inbox and document attachments (T-0051, UC-05, RQ-0101, ADR-0048, DL-0289).
+-- 0045 — Bills inbox and document attachments (T-0051, UC-05, RQ-0111, ADR-0053, DL-0289).
 -- Owner: packages/modules/ap (inbox), packages/modules/documents (attachments).
 --
 -- * app.bill_inbox_item: one inbound email to the bills inbox — the draft bill awaiting coding.
