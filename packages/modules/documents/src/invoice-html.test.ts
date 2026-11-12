@@ -41,6 +41,18 @@ const doc: InvoiceDocument = {
 };
 
 describe('Invoice HTML (T-0041)', () => {
+  it('SS-PLAT-104 preserves significant integer quantity zeros [T-0041]', () => {
+    const html = renderInvoiceHtml({
+      ...doc,
+      lines: doc.lines.map((line, index) => ({
+        ...line,
+        quantity: index === 0 ? '10' : '100',
+      })),
+    });
+    expect(html).toContain('<td class="amount">10</td>');
+    expect(html).toContain('<td class="amount">100</td>');
+  });
+
   it('SS-PLAT-104 shows a tax invoice with supplier ABN, number, dates, GST and total', () => {
     const html = renderInvoiceHtml(doc);
     expect(html).toContain('Tax invoice');

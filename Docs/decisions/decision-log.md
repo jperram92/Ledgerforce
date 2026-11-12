@@ -2425,3 +2425,71 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Status: accepted · ADR: none. T-0070 is review, with coverage baseline and independent review pending; T-0061 remains blocked at 71da22e.
 
 - DL-0304 final validation (2026-11-07 local): full verifier exits 0 with 14 PASS / 0 FAIL / 2 PENDING. Fresh CSV/golden 9/9, opening module 14/14 and API 5/5 pass. Release to review while preserving missing main coverage baseline, independent-review gate and the original API RED provenance gap. No Approved golden or production code changed.
+
+### DL-0316 — Port the gross allowance lifecycle without colliding source IDs
+- Date: 2026-11-10 · By: codex · Task: T-0166 · Category: accounting
+- Decision: accept ADR-0051 and approve additive GP-038 under AGENTS.md section 6 standing delegation, on resolved RQ-0133. Map source 872c4fa GP-007-A A1/A2/A4 to canonical GP-038; preserve historical GP-024/025 and canonical account/tax bindings. Reserve GP-037 for the setup lineage.
+- Why: gross contractual receivable loss and later statutory GST relief are distinct; a subsequent portfolio reassessment releases the remaining 125.00. Existing write-off behavior already supports this scenario. Automatic company-wide allowance clearing is rejected because other debts may still require it.
+- Validation: new exact three-journal and real PostgreSQL lifecycle tests added; results are recorded in the T-0166 run/evidence. No production behavior changed and no RED-before-production claim is made for this documentation/test port. Independent review remains required.
+- ADR: 0051 · Status: accepted under standing accounting delegation
+
+### DL-0317 — Correct source-to-canonical attribution through an additive successor
+- Date: 2026-11-10 · By: codex · Task: T-0166 · Category: accounting
+- Decision: approve GP-039 as successor to GP-038; retain every byte of GP-038. Preserve canonical GP-024's Acme tag on the allowance debit and GST-ADJ on the GST debit. Monetary expectations and accounting recognition are unchanged.
+- Evidence: CI 42726352115 had 1291 database tests pass and the new exact lifecycle fail on the omitted customer tag. Inspection of approved GP-024 and write-off.ts also found the misplaced tax marker in the new source mapping. This is a golden authoring correction, not a product fix or removal of an assertion. Add explicit tax-code/tax-amount verification to prevent recurrence.
+- Authority: standing accounting delegation; RQ-0133 still governs the recognition decision. GP-038 remains replayable history; GP-039 is the current module contract.
+- ADR: 0051 addendum · Status: accepted
+
+### DL-0318 — Use the canonical GST account binding in the module regression
+- Date: 2026-11-10 · By: codex · Task: T-0166 · Category: tooling
+- Decision: the new module test maps tax:GST.collected to AU services account 2310, consistent with the existing template and golden binding registry. Golden Ref 2200 is illustrative, not a template account lookup.
+- Evidence: second CI 42728847404 passed 1291 DB tests; the new exact comparison failed only on 2200 versus 2310 after party and tax marker checks. Preserve full assertions, approved entries and production code; correct the erroneous test fixture binding.
+- ADR: none · Status: accepted
+
+### DL-0319 — Adopt the source accounting-review role with canonical boundaries
+- Date: 2026-11-10 · By: codex · Task: T-0167 · Category: process
+- Decision: port source 872c4fa's accountant-reviewer role, qualifying source DL-0248 and mapping authority to current AGENTS.md section 6. Keep explicit AI disclosure, read-only product scope, primary-source verification and complete proposed journals. Do not transplant colliding source ADR/RQ IDs.
+- Why: the owner-selected canonical line lacks this useful review procedure. Source wording implying practitioner status or fixed regulatory dates is replaced by explicit non-practitioner disclosure and applicable-period verification. No new professional service, security approval or self-review authority is created.
+- Validation: source/target comparison and AC checklist in .agent/evidence/T-0167/port-check.md; backlog and whitespace checks. Documentation-only: no runtime behavior or test expectations changed.
+- ADR: none · Status: accepted
+
+### DL-0320 — Reserve a collision-free integration sequence within the canonical family
+- Date: 2026-11-10 · By: codex · Task: T-0168 · Category: process
+- Decision: preserve the canonical 0048 prefix; reserve 0049 refunds, 0050 bank matching, 0051 bank reconciliation, 0052–0055 Salesforce inbound/polling/billing/reconciliation, 0056 Stripe webhook, 0057 setup and 0058 onward for new attribution work. Exact original paths/blobs/commits are recorded in the migration map and inventory.
+- Why: the owner-selected feat family itself contains different migrations with identical numbers. The migrator correctly refuses gaps/duplicates. Copying source GST work into the next local slot would recreate that collision.
+- Limits: reservation only; no source SQL applied, no historical file deleted, no deployed checksum rewritten, no schema declared verified. Port bounded feature groups and test main/0048 upgrades. Divergent feature databases require an explicit additive adoption path if used; never silently reset them.
+- ADR: none (integration sequencing; accounting storage remains open in RQ-0134) · Status: accepted
+
+### DL-0321 — Owner requests Codex review instead of Claude
+- Date: 2026-11-10 · By: human (instruction), recorded by codex · Tasks: T-0057, T-0166, T-0167 · Category: process
+- Owner instruction: review the prepared work in Codex rather than Claude, in response to the request to authenticate the Claude CLI. This overrides the cross-provider requirement for this review batch; it does not grant security/release approval or permit builder self-approval.
+- Execution: separate Codex reviewer `/root/independent_review`, independent of builder `/root`, reviews immutable product checkpoints and actual CI evidence. Reports identify Codex honestly and retain findings and unrun checks. No report may be relabelled Claude or human.
+- Limits: no blanket exemption for unrelated future work, no weakening of tests or accounting gates. Existing automation may still report cross-provider PENDING until it supports this recorded owner exception; do not fabricate a green result.
+- ADR: 0052 · Status: accepted by explicit owner instruction
+
+### DL-0322 — Derive current golden selection from approved successor declarations
+- Date: 2026-11-10 · By: codex · Task: T-0166 · Category: tooling
+- Decision: parse explicit bold whole-entry `Supersedes GP-NNN` declarations in approved successors, including `for current implementation`. Derive the predecessor's effective superseded status without changing its approved source bytes or historical tables. Partial prose corrections do not retire an entry; draft successors have no authority. Reject conflicting replacements and non-prior targets.
+- Why: independent Codex review found the runner still selected GP-038 despite GP-039's explicit replacement. The real write-off regression already used GP-039; the defect was current golden selection, not customer posting behavior.
+- Validation: focused regression RED 9 failed / 4 passed, then GREEN 13/13. Two sandbox startup failures were package access failures, not RED evidence; unrestricted execution reproduced the assertions. Formatting, lint, typecheck, broader CI and independent re-review recorded separately. No approved golden bytes, journal writer, security gate or dependency changed.
+- ADR: none (implements existing successor decision DL-0311; no accounting treatment change) · Status: accepted
+
+### DL-0323 — Pin verifier test fixtures to the repository package manager
+- Date: 2026-11-11 · By: codex · Task: T-0166 · Category: tooling
+- Decision: the temporary package used by the verifier shell integration test inherits the root package.json packageManager field. Keep its successful typecheck and deliberately failing lint scripts and all assertions unchanged.
+- Evidence: CI 42906703669 at 568f376 passes product unit, 1292 DB, browser, fresh invariants and security, but verifier reports 81/82 agent tests with the failing detail truncated. Independent Linux reproduction identifies the unpinned fixture selecting pnpm 12.18 through Corepack rather than the repository's 10.28 pin. Pinning the fixture yields 82/82 Linux agent tests. This establishes the local cause; the original CI failure's exact identity remains unproven from its truncated output.
+- Limits: no verifier/security gate, dependency version, assertion or timeout changed. Native Windows shell-based suite also failed multiple cases and is retained as separate platform evidence, not conflated with Linux CI.
+- ADR: none (test fixture correction only) · Status: accepted
+
+### DL-0324 — Preserve significant integer digits in invoice quantity formatting
+- Date: 2026-11-11 · By: codex · Task: T-0041 · Category: tooling
+- Decision: remove trailing zeros only from the fractional portion of quantity strings; preserve integer strings as supplied. Keep fixed-scale database values such as `10.0000` formatted as `10`.
+- Evidence: independent T-0041 review reproduced `10` and `100` rendering as `1`. New regression was RED1/5 then GREEN6/6; documents typecheck, scoped lint and formatting pass. No amounts, tax or posting behavior changed.
+- ADR: none (presentation formatting bug) · Status: accepted
+
+### DL-0325 — Bound PDF rendering with one shared deadline
+- Date: 2026-11-11 · By: codex · Task: T-0041 · Category: tooling
+- Decision: compute one render deadline before browser launch and pass the remaining budget through context creation, routing, page creation, HTML loading, PDF generation and context cleanup. If context creation completes after timeout, close it immediately. Reset a rejected cached browser launch promise so later jobs can retry. Keep the shared browser alive across per-document timeouts.
+- Evidence: baseline fake-launch regression RED: launch80ms succeeds after~102ms despite timeout15. After change, tests cover launch deadline and late-context closure (2/2). Documents typecheck, lint and prettier pass. Existing real-Chromium/PostgreSQL integration remains part of full CI; no full run after this patch yet.
+- Limits: process/browser launch itself cannot be cancelled through Playwright; the render request returns by deadline and a late shared browser remains owned until renderer.close. Visual PDF evidence remains open.
+- ADR: none (implements ADR-0045 rule4) · Status: accepted

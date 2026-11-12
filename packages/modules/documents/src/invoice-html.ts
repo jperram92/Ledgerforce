@@ -96,7 +96,10 @@ export function formatDate(d: string): string {
 }
 
 /** "3.0000" → "3"; "1.5000" → "1.5". */
-const quantity = (q: string) => q.replace(/\.?0+$/, '') || '0';
+const quantity = (q: string) => {
+  if (!q.includes('.')) return q || '0';
+  return q.replace(/0+$/, '').replace(/\.$/, '') || '0';
+};
 
 const STYLE = `
   @page { size: A4; margin: 18mm 16mm; }

@@ -1,0 +1,684 @@
+TAP version 13
+# Subtest: writeFileAtomic replaces content and leaves no temp files behind
+ok 1 - writeFileAtomic replaces content and leaves no temp files behind
+  ---
+  duration_ms: 8.521938
+  type: 'test'
+  ...
+# Subtest: a concurrent reader never sees a partial or empty file while writes are in progress
+ok 2 - a concurrent reader never sees a partial or empty file while writes are in progress
+  ---
+  duration_ms: 1624.384514
+  type: 'test'
+  ...
+# Subtest: loadCards reads only T-NNNN.md cards
+ok 3 - loadCards reads only T-NNNN.md cards
+  ---
+  duration_ms: 592.19847
+  type: 'test'
+  ...
+# Subtest: topoOrder respects depends_on, ties broken by id
+ok 4 - topoOrder respects depends_on, ties broken by id
+  ---
+  duration_ms: 432.739615
+  type: 'test'
+  ...
+# Subtest: nextClaimable picks first todo whose deps are done
+ok 5 - nextClaimable picks first todo whose deps are done
+  ---
+  duration_ms: 259.740423
+  type: 'test'
+  ...
+# Subtest: a claimed card with an expired lease is claimable again; an unexpired one is not
+ok 6 - a claimed card with an expired lease is claimable again; an unexpired one is not
+  ---
+  duration_ms: 296.534505
+  type: 'test'
+  ...
+# Subtest: lintBacklog passes on the fixture
+ok 7 - lintBacklog passes on the fixture
+  ---
+  duration_ms: 299.060105
+  type: 'test'
+  ...
+# Subtest: lintBacklog reports duplicate ids, missing deps, cycles, bad status, unknown scenarios, id/filename mismatch
+ok 8 - lintBacklog reports duplicate ids, missing deps, cycles, bad status, unknown scenarios, id/filename mismatch
+  ---
+  duration_ms: 325.130104
+  type: 'test'
+  ...
+# Subtest: lintBacklog skips the scenario check when the register does not exist
+ok 9 - lintBacklog skips the scenario check when the register does not exist
+  ---
+  duration_ms: 731.402439
+  type: 'test'
+  ...
+# Subtest: unmetDeps treats review as unmet by default and as met when satisfiedBy includes review
+ok 10 - unmetDeps treats review as unmet by default and as met when satisfiedBy includes review
+  ---
+  duration_ms: 147.880603
+  type: 'test'
+  ...
+# Subtest: a card in review is never offered to a builder by nextClaimable
+ok 11 - a card in review is never offered to a builder by nextClaimable
+  ---
+  duration_ms: 248.290432
+  type: 'test'
+  ...
+# Subtest: next prints the next claimable task in dependency order
+ok 12 - next prints the next claimable task in dependency order
+  ---
+  duration_ms: 2862.560283
+  type: 'test'
+  ...
+# Subtest: claim writes the lease to card and state.json
+ok 13 - claim writes the lease to card and state.json
+  ---
+  duration_ms: 1266.535826
+  type: 'test'
+  ...
+# Subtest: claim refuses: unknown provider, unmet deps, done task, missing task
+ok 14 - claim refuses: unknown provider, unmet deps, done task, missing task
+  ---
+  duration_ms: 3477.722465
+  type: 'test'
+  ...
+# Subtest: claim refuses while another unexpired lease exists; allows takeover after expiry
+ok 15 - claim refuses while another unexpired lease exists; allows takeover after expiry
+  ---
+  duration_ms: 2404.906364
+  type: 'test'
+  ...
+# Subtest: checkpoint commits work, records the sha, renews the lease and logs the step
+ok 16 - checkpoint commits work, records the sha, renews the lease and logs the step
+  ---
+  duration_ms: 1625.986785
+  type: 'test'
+  ...
+# Subtest: checkpoint does not create an empty commit when nothing changed
+ok 17 - checkpoint does not create an empty commit when nothing changed
+  ---
+  duration_ms: 1452.491227
+  type: 'test'
+  ...
+# Subtest: checkpoint refuses a task that is not claimed
+ok 18 - checkpoint refuses a task that is not claimed
+  ---
+  duration_ms: 1803.761256
+  type: 'test'
+  ...
+# Subtest: release: blocked needs a reason; done/blocked/todo clear the lease
+ok 19 - release: blocked needs a reason; done/blocked/todo clear the lease
+  ---
+  duration_ms: 6181.694211
+  type: 'test'
+  ...
+# Subtest: handover writes the §10.5 template from state + card and keeps the Log
+ok 20 - handover writes the §10.5 template from state + card and keeps the Log
+  ---
+  duration_ms: 2388.35989
+  type: 'test'
+  ...
+# Subtest: handover works with no active task and no git remote/network
+ok 21 - handover works with no active task and no git remote/network
+  ---
+  duration_ms: 1579.272616
+  type: 'test'
+  ...
+# Subtest: status prints state, lease, counts and next task
+ok 22 - status prints state, lease, counts and next task
+  ---
+  duration_ms: 1769.81178
+  type: 'test'
+  ...
+# Subtest: lease-check lists expired leases with exit 1, none with exit 0
+ok 23 - lease-check lists expired leases with exit 1, none with exit 0
+  ---
+  duration_ms: 2874.062999
+  type: 'test'
+  ...
+# Subtest: lint-backlog passes on the fixture and fails on a broken card
+ok 24 - lint-backlog passes on the fixture and fails on a broken card
+  ---
+  duration_ms: 1620.993537
+  type: 'test'
+  ...
+# Subtest: unknown subcommand prints usage and exits 1; help exits 0
+ok 25 - unknown subcommand prints usage and exits 1; help exits 0
+  ---
+  duration_ms: 1670.022977
+  type: 'test'
+  ...
+# Subtest: set-status moves through in-flight statuses keeping (and renewing) the lease
+ok 26 - set-status moves through in-flight statuses keeping (and renewing) the lease
+  ---
+  duration_ms: 3429.409642
+  type: 'test'
+  ...
+# Subtest: release accepts verifying and review, clears the lease and keeps the builder
+ok 27 - release accepts verifying and review, clears the lease and keeps the builder
+  ---
+  duration_ms: 1143.027005
+  type: 'test'
+  ...
+# Subtest: a card in review can only be claimed by the other provider; claimed_by stays the builder
+ok 28 - a card in review can only be claimed by the other provider; claimed_by stays the builder
+  ---
+  duration_ms: 3061.888456
+  type: 'test'
+  ...
+# Subtest: parseFrontmatter splits data and body
+ok 29 - parseFrontmatter splits data and body
+  ---
+  duration_ms: 15.642573
+  type: 'test'
+  ...
+# Subtest: parseFrontmatter rejects files without frontmatter
+ok 30 - parseFrontmatter rejects files without frontmatter
+  ---
+  duration_ms: 1.274472
+  type: 'test'
+  ...
+# Subtest: updateFrontmatter replaces in place, keeps comments and body, appends new keys
+ok 31 - updateFrontmatter replaces in place, keeps comments and body, appends new keys
+  ---
+  duration_ms: 2.089391
+  type: 'test'
+  ...
+# Subtest: updateFrontmatter quotes values that need it
+ok 32 - updateFrontmatter quotes values that need it
+  ---
+  duration_ms: 0.545762
+  type: 'test'
+  ...
+# Subtest: verifying permits explicitly marked current and later workflow steps [T-0010]
+ok 33 - verifying permits explicitly marked current and later workflow steps [T-0010]
+  ---
+  duration_ms: 436.674159
+  type: 'test'
+  ...
+# Subtest: review requires completed verification but permits review and finish [T-0010]
+ok 34 - review requires completed verification but permits review and finish [T-0010]
+  ---
+  duration_ms: 728.04918
+  type: 'test'
+  ...
+# Subtest: done requires every workflow step completed [T-0010]
+ok 35 - done requires every workflow step completed [T-0010]
+  ---
+  duration_ms: 867.920958
+  type: 'test'
+  ...
+# Subtest: implementation and unmarked steps remain mandatory during verification [T-0010]
+ok 36 - implementation and unmarked steps remain mandatory during verification [T-0010]
+  ---
+  duration_ms: 469.542681
+  type: 'test'
+  ...
+# Subtest: unknown and non-terminal phase markers cannot waive a step [T-0010]
+ok 37 - unknown and non-terminal phase markers cannot waive a step [T-0010]
+  ---
+  duration_ms: 799.793653
+  type: 'test'
+  ...
+# Subtest: run --dry-run prints the provider commands in failover order and changes nothing
+ok 38 - run --dry-run prints the provider commands in failover order and changes nothing
+  ---
+  duration_ms: 3280.857397
+  type: 'test'
+  ...
+# Subtest: run --dry-run honours configured args and --task
+ok 39 - run --dry-run honours configured args and --task
+  ---
+  duration_ms: 2680.538287
+  type: 'test'
+  ...
+# Subtest: FAILOVER: claude hits a credit/quota error, codex resumes on the same branch and finishes
+ok 40 - FAILOVER: claude hits a credit/quota error, codex resumes on the same branch and finishes
+  ---
+  duration_ms: 4629.702638
+  type: 'test'
+  ...
+# Subtest: a provider that is still exhausted is skipped on the next run
+ok 41 - a provider that is still exhausted is skipped on the next run
+  ---
+  duration_ms: 9489.43586
+  type: 'test'
+  ...
+# Subtest: all providers out of quota → exit 3, work saved, handover written, lease released
+ok 42 - all providers out of quota → exit 3, work saved, handover written, lease released
+  ---
+  duration_ms: 4365.514327
+  type: 'test'
+  ...
+# Subtest: non-quota failures rotate providers and block the task after max_attempts_per_task
+ok 43 - non-quota failures rotate providers and block the task after max_attempts_per_task
+  ---
+  duration_ms: 6207.61487
+  type: 'test'
+  ...
+# Subtest: missed heartbeat (lease expiry) kills the provider and fails over
+ok 44 - missed heartbeat (lease expiry) kills the provider and fails over
+  ---
+  duration_ms: 8736.475122
+  type: 'test'
+  ...
+# Subtest: agent marking the task blocked stops the loop with a notification
+ok 45 - agent marking the task blocked stops the loop with a notification
+  ---
+  duration_ms: 2767.589637
+  type: 'test'
+  ...
+# Subtest: daily budget: a provider whose run logs today exceed daily_usd is skipped
+ok 46 - daily budget: a provider whose run logs today exceed daily_usd is skipped
+  ---
+  duration_ms: 2558.072357
+  type: 'test'
+  ...
+# Subtest: run with nothing to do exits 0
+ok 47 - run with nothing to do exits 0
+  ---
+  duration_ms: 553.747265
+  type: 'test'
+  ...
+# Subtest: run without --once keeps working the backlog until empty
+ok 48 - run without --once keeps working the backlog until empty
+  ---
+  duration_ms: 7349.445656
+  type: 'test'
+  ...
+# Subtest: run routes a card in review to the provider that did NOT build it
+ok 49 - run routes a card in review to the provider that did NOT build it
+  ---
+  duration_ms: 4870.668104
+  type: 'test'
+  ...
+# Subtest: review with only the builder available → exit 3, never self-review
+ok 50 - review with only the builder available → exit 3, never self-review
+  ---
+  duration_ms: 1106.291217
+  type: 'test'
+  ...
+# Subtest: builder handing the card to review counts as a successful session (not a failure)
+ok 51 - builder handing the card to review counts as a successful session (not a failure)
+  ---
+  duration_ms: 3609.660143
+  type: 'test'
+  ...
+# Subtest: the real config matches the session-limit message that stopped a session, case-insensitively
+ok 52 - the real config matches the session-limit message that stopped a session, case-insensitively
+  ---
+  duration_ms: 9.001
+  type: 'test'
+  ...
+# Subtest: classifyOutput: stdout and stderr, is_error/subtype from the final result
+ok 53 - classifyOutput: stdout and stderr, is_error/subtype from the final result
+  ---
+  duration_ms: 5.1106
+  type: 'test'
+  ...
+# Subtest: FAILOVER on the real session-limit message printed to stdout
+ok 54 - FAILOVER on the real session-limit message printed to stdout
+  ---
+  duration_ms: 3879.631366
+  type: 'test'
+  ...
+# Subtest: commits: conductor — deferred checkpoints are committed by the conductor during and after the run
+ok 55 - commits: conductor — deferred checkpoints are committed by the conductor during and after the run
+  ---
+  duration_ms: 3699.371632
+  type: 'test'
+  ...
+# Subtest: checkpoint with LF_DEFER_COMMIT=1 records the step instead of touching .git
+ok 56 - checkpoint with LF_DEFER_COMMIT=1 records the step instead of touching .git
+  ---
+  duration_ms: 1456.819244
+  type: 'test'
+  ...
+# Subtest: resume.sh prints every section of the context pack
+ok 57 - resume.sh prints every section of the context pack
+  ---
+  duration_ms: 4226.803806
+  type: 'test'
+  ...
+# Subtest: resume.sh survives an empty directory that is not a git repo
+ok 58 - resume.sh survives an empty directory that is not a git repo
+  ---
+  duration_ms: 60.190806
+  type: 'test'
+  ...
+# Subtest: verify.sh --quick: unavailable gates are PENDING, not PASS, and do not fail
+ok 59 - verify.sh --quick: unavailable gates are PENDING, not PASS, and do not fail
+  ---
+  duration_ms: 1920.8378
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the no-skip guard on skipped/focused tests
+ok 60 - verify.sh fails the no-skip guard on skipped/focused tests
+  ---
+  duration_ms: 1563.579097
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the no-delete guard on a deleted tracked file (working tree, staged or committed)
+ok 61 - verify.sh fails the no-delete guard on a deleted tracked file (working tree, staged or committed)
+  ---
+  duration_ms: 3050.409187
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the secrets scan on a committed key pattern
+ok 62 - verify.sh fails the secrets scan on a committed key pattern
+  ---
+  duration_ms: 1768.127625
+  type: 'test'
+  ...
+# Subtest: verify.sh fails backlog consistency on a broken card
+ok 63 - verify.sh fails backlog consistency on a broken card
+  ---
+  duration_ms: 2235.640851
+  type: 'test'
+  ...
+# Subtest: verify.sh runs a package.json gate when its tooling exists
+not ok 64 - verify.sh runs a package.json gate when its tooling exists
+  ---
+  duration_ms: 3700.65859
+  type: 'test'
+  location: '/mnt/c/Users/james/Ledgerforce/scripts/agent/test/scripts.test.ts:99:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /GATE 1 typecheck: PASS/. Input:
+    
+    'LedgerForce verify — 2026-11-10T22:42:53Z — QUICK\n' +
+      'GATE 1 typecheck: FAIL (pnpm typecheck)\n' +
+      '----- output (last 40 lines) -----\n' +
+      '! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-12.18.0.tgz\n' +
+      'node:internal/modules/cjs/loader:1386\n' +
+      '  throw err;\n' +
+      '  ^\n' +
+      '\n' +
+      "Error: Cannot find module '/root/.cache/node/corepack/v1/pnpm/12.18.0/bin/pnpm.cjs'\n" +
+      '    at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)\n' +
+      '    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)\n' +
+      '    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)\n' +
+      '    at Function._load (node:internal/modules/cjs/loader:1192:37)\n' +
+      '    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n' +
+      '    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)\n' +
+      '    at executeUserEntryPoint (node:internal/modules/run_main:171:5)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {\n' +
+      "  code: 'MODULE_NOT_FOUND',\n" +
+      '  requireStack: []\n' +
+      '}\n' +
+      '\n' +
+      'Node.js v22.22.0\n' +
+      '----------------------------------\n' +
+      'GATE 1 lint: FAIL (pnpm lint)\n' +
+      '----- output (last 40 lines) -----\n' +
+      'node:internal/modules/cjs/loader:1386\n' +
+      '  throw err;\n' +
+      '  ^\n' +
+      '\n' +
+      "Error: Cannot find module '/root/.cache/node/corepack/v1/pnpm/12.18.0/bin/pnpm.cjs'\n" +
+      '    at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)\n' +
+      '    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)\n' +
+      '    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)\n' +
+      '    at Function._load (node:internal/modules/cjs/loader:1192:37)\n' +
+      '    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\n' +
+      '    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)\n' +
+      '    at executeUserEntryPoint (node:internal/modules/run_main:171:5)\n' +
+      '    at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {\n' +
+      "  code: 'MODULE_NOT_FOUND',\n" +
+      '  requireStack: []\n' +
+      '}\n' +
+      '\n' +
+      'Node.js v22.22.0\n' +
+      '----------------------------------\n' +
+      'GATE 1 format: NOT YET AVAILABLE (no package.json script "format:check")\n' +
+      'GATE 2a unit-tests: NOT YET AVAILABLE (no package.json test script / node_modules, no agent tests)\n' +
+      'GATE 2b db-tests: SKIPPED (--quick) — counts as PENDING\n' +
+      'GATE 2c coverage: SKIPPED (--quick) — counts as PENDING\n' +
+      'GATE 3 accounting-invariants: NOT YET AVAILABLE (no property test file(s) yet)\n' +
+      'GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; diff guard skipped by --quick)\n' +
+      'GATE 5 cross-tenant-rls: SKIPPED (--quick) — counts as PENDING\n' +
+      'GATE 6 migrations-forward: SKIPPED (--quick) — counts as PENDING\n' +
+      'GATE 7 security: PASS (secrets scan clean; audit + SAST skipped by --quick)\n' +
+      'GATE 8 cross-review: SKIPPED (--quick) — counts as PENDING\n' +
+      'GATE 9 e2e-evidence: SKIPPED (--quick) — counts as PENDING\n' +
+      'GATE 10 no-shortcuts: PASS (0 test file(s) scanned; diff vs HEAD clean)\n' +
+      'GATE 11 no-delete: PASS (staged + working tree)\n' +
+      'GATE 12 memory: PASS (backlog lint OK (4 cards); no task — card checks not run)\n' +
+      '\n' +
+      '=== SUMMARY ===\n' +
+      ' #   | gate                  | result\n' +
+      ' 1   | typecheck             | FAIL (pnpm typecheck)\n' +
+      ' 1   | lint                  | FAIL (pnpm lint)\n' +
+      ' 1   | format                | PENDING (no package.json script "format:check")\n' +
+      ' 2a  | unit-tests            | PENDING (no package.json test script / node_modules, no agent tests)\n' +
+      ' 2b  | db-tests              | SKIPPED (--quick)\n' +
+      ' 2c  | coverage              | SKIPPED (--quick)\n' +
+      ' 3   | accounting-invariants | PENDING (no property test file(s) yet)\n' +
+      ' 4   | golden-postings       | PENDING (no golden test file(s) yet; diff guard skipped by --quick)\n' +
+      ' 5   | cross-tenant-rls      | SKIPPED (--quick)\n' +
+      ' 6   | migrations-forward    | SKIPPED (--quick)\n' +
+      ' 7   | security              | PASS (secrets scan clean; audit + SAST skipped by --quick)\n' +
+      ' 8   | cross-review          | SKIPPED (--quick)\n' +
+      ' 9   | e2e-evidence          | SKIPPED (--quick)\n' +
+      ' 10  | no-shortcuts          | PASS (0 test file(s) scanned; diff vs HEAD clean)\n' +
+      ' 11  | no-delete             | PASS (staged + working tree)\n' +
+      ' 12  | memory                | PASS (backlog lint OK (4 cards); no task — card checks not run)\n' +
+      'PASS: 4   FAIL: 2   PENDING: 10\n' +
+      "!!! 10 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!\n" +
+      '(--quick never counts for verifying/review/done — run without --quick)\n' +
+      'VERIFY: FAIL\n'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    LedgerForce verify — 2026-11-10T22:42:53Z — QUICK
+    GATE 1 typecheck: FAIL (pnpm typecheck)
+    ----- output (last 40 lines) -----
+    ! Corepack is about to download https://registry.npmjs.org/pnpm/-/pnpm-12.18.0.tgz
+    node:internal/modules/cjs/loader:1386
+      throw err;
+      ^
+    
+    Error: Cannot find module '/root/.cache/node/corepack/v1/pnpm/12.18.0/bin/pnpm.cjs'
+        at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+        at Function._load (node:internal/modules/cjs/loader:1192:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+        at executeUserEntryPoint (node:internal/modules/run_main:171:5)
+        at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+    
+    Node.js v22.22.0
+    ----------------------------------
+    GATE 1 lint: FAIL (pnpm lint)
+    ----- output (last 40 lines) -----
+    node:internal/modules/cjs/loader:1386
+      throw err;
+      ^
+    
+    Error: Cannot find module '/root/.cache/node/corepack/v1/pnpm/12.18.0/bin/pnpm.cjs'
+        at Function._resolveFilename (node:internal/modules/cjs/loader:1383:15)
+        at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+        at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+        at Function._load (node:internal/modules/cjs/loader:1192:37)
+        at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+        at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+        at executeUserEntryPoint (node:internal/modules/run_main:171:5)
+        at process.processTicksAndRejections (node:internal/process/task_queues:89:21) {
+      code: 'MODULE_NOT_FOUND',
+      requireStack: []
+    }
+    
+    Node.js v22.22.0
+    ----------------------------------
+    GATE 1 format: NOT YET AVAILABLE (no package.json script "format:check")
+    GATE 2a unit-tests: NOT YET AVAILABLE (no package.json test script / node_modules, no agent tests)
+    GATE 2b db-tests: SKIPPED (--quick) — counts as PENDING
+    GATE 2c coverage: SKIPPED (--quick) — counts as PENDING
+    GATE 3 accounting-invariants: NOT YET AVAILABLE (no property test file(s) yet)
+    GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; diff guard skipped by --quick)
+    GATE 5 cross-tenant-rls: SKIPPED (--quick) — counts as PENDING
+    GATE 6 migrations-forward: SKIPPED (--quick) — counts as PENDING
+    GATE 7 security: PASS (secrets scan clean; audit + SAST skipped by --quick)
+    GATE 8 cross-review: SKIPPED (--quick) — counts as PENDING
+    GATE 9 e2e-evidence: SKIPPED (--quick) — counts as PENDING
+    GATE 10 no-shortcuts: PASS (0 test file(s) scanned; diff vs HEAD clean)
+    GATE 11 no-delete: PASS (staged + working tree)
+    GATE 12 memory: PASS (backlog lint OK (4 cards); no task — card checks not run)
+    
+    === SUMMARY ===
+     #   | gate                  | result
+     1   | typecheck             | FAIL (pnpm typecheck)
+     1   | lint                  | FAIL (pnpm lint)
+     1   | format                | PENDING (no package.json script "format:check")
+     2a  | unit-tests            | PENDING (no package.json test script / node_modules, no agent tests)
+     2b  | db-tests              | SKIPPED (--quick)
+     2c  | coverage              | SKIPPED (--quick)
+     3   | accounting-invariants | PENDING (no property test file(s) yet)
+     4   | golden-postings       | PENDING (no golden test file(s) yet; diff guard skipped by --quick)
+     5   | cross-tenant-rls      | SKIPPED (--quick)
+     6   | migrations-forward    | SKIPPED (--quick)
+     7   | security              | PASS (secrets scan clean; audit + SAST skipped by --quick)
+     8   | cross-review          | SKIPPED (--quick)
+     9   | e2e-evidence          | SKIPPED (--quick)
+     10  | no-shortcuts          | PASS (0 test file(s) scanned; diff vs HEAD clean)
+     11  | no-delete             | PASS (staged + working tree)
+     12  | memory                | PASS (backlog lint OK (4 cards); no task — card checks not run)
+    PASS: 4   FAIL: 2   PENDING: 10
+    !!! 10 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+    (--quick never counts for verifying/review/done — run without --quick)
+    VERIFY: FAIL
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///mnt/c/Users/james/Ledgerforce/scripts/agent/test/scripts.test.ts:104:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: checkpoint.sh and handover.sh wrap the conductor
+ok 65 - checkpoint.sh and handover.sh wrap the conductor
+  ---
+  duration_ms: 2732.028594
+  type: 'test'
+  ...
+# Subtest: gate review: PENDING without a report, PASS with a non-builder PASS, FAIL on FAIL, self-review ignored
+ok 66 - gate review: PENDING without a report, PASS with a non-builder PASS, FAIL on FAIL, self-review ignored
+  ---
+  duration_ms: 2980.202393
+  type: 'test'
+  ...
+# Subtest: gate memory: unticked steps, wrong status, open linked RQ and missing HANDOVER fail
+ok 67 - gate memory: unticked steps, wrong status, open linked RQ and missing HANDOVER fail
+  ---
+  duration_ms: 3228.419467
+  type: 'test'
+  ...
+# Subtest: gate evidence: each success scenario needs a passed manifest entry whose file exists
+ok 68 - gate evidence: each success scenario needs a passed manifest entry whose file exists
+  ---
+  duration_ms: 3442.571385
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): migration DROP/RENAME grep fails gate 6
+ok 69 - verify.sh (full): migration DROP/RENAME grep fails gate 6
+  ---
+  duration_ms: 4185.880031
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): a change under Docs/accounting versus main fails gate 4
+ok 70 - verify.sh (full): a change under Docs/accounting versus main fails gate 4
+  ---
+  duration_ms: 3208.282976
+  type: 'test'
+  ...
+# Subtest: verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+ok 71 - verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+  ---
+  duration_ms: 4308.090703
+  type: 'test'
+  ...
+# Subtest: verify.sh --quick: lowered numRuns and unlogged suppressions in the diff fail gate 10
+ok 72 - verify.sh --quick: lowered numRuns and unlogged suppressions in the diff fail gate 10
+  ---
+  duration_ms: 2435.606246
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): no false positives — protective TRUNCATE triggers, string literals, non-migration .sql, instructional golden text
+ok 73 - verify.sh (full): no false positives — protective TRUNCATE triggers, string literals, non-migration .sql, instructional golden text
+  ---
+  duration_ms: 6907.134744
+  type: 'test'
+  ...
+# Subtest: scalars: strings, numbers, booleans, null
+ok 74 - scalars: strings, numbers, booleans, null
+  ---
+  duration_ms: 12.971383
+  type: 'test'
+  ...
+# Subtest: comments: full-line and trailing, but not inside quotes or words
+ok 75 - comments: full-line and trailing, but not inside quotes or words
+  ---
+  duration_ms: 0.976525
+  type: 'test'
+  ...
+# Subtest: nested maps and block lists
+ok 76 - nested maps and block lists
+  ---
+  duration_ms: 0.880366
+  type: 'test'
+  ...
+# Subtest: list of maps (providers shape)
+ok 77 - list of maps (providers shape)
+  ---
+  duration_ms: 0.841041
+  type: 'test'
+  ...
+# Subtest: inline flow maps and lists, nested and empty
+ok 78 - inline flow maps and lists, nested and empty
+  ---
+  duration_ms: 7.285025
+  type: 'test'
+  ...
+# Subtest: literal block scalar
+ok 79 - literal block scalar
+  ---
+  duration_ms: 0.711516
+  type: 'test'
+  ...
+# Subtest: errors carry a line number
+ok 80 - errors carry a line number
+  ---
+  duration_ms: 1.491875
+  type: 'test'
+  ...
+# Subtest: parses the real .agent/config.yaml
+ok 81 - parses the real .agent/config.yaml
+  ---
+  duration_ms: 46.058557
+  type: 'test'
+  ...
+# Subtest: formatScalar round-trips through parseYaml
+ok 82 - formatScalar round-trips through parseYaml
+  ---
+  duration_ms: 1.736442
+  type: 'test'
+  ...
+1..82
+# tests 82
+# suites 0
+# pass 81
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 73023.247699

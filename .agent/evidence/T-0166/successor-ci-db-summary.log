@@ -1,0 +1,5 @@
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T21:38:28.4839071Z  [32m?[39m [30m[45m db [49m[39m packages/ledger/src/golden/golden-engine.db.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1286[2mms[22m[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T21:39:18.0251770Z  [32m?[39m [30m[45m db [49m[39m packages/modules/ar/src/gross-allowance.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 1126[2mms[22m[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T21:40:21.3826182Z [2m Test Files [22m [1m[32m96 passed[39m[22m[90m (96)[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T21:40:21.3836814Z [2m      Tests [22m [1m[32m1292 passed[39m[22m[90m (1292)[39m
+db integration + cross-tenant RLS	Run pnpm test:db	2026-11-10T21:40:21.3848812Z [2m   Duration [22m 175.98s[2m (transform 4.06s, setup 0ms, import 64.79s, tests 380.69s, environment 15ms)[22m

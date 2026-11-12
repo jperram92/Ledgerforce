@@ -13,12 +13,13 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 
 | Status | Cards |
 |---|---:|
-| blocked | 3 |
+| blocked | 6 |
 | done | 3 |
-| in_progress | 2 |
-| review | 90 |
-| todo | 30 |
-| **total** | **128** |
+| in_progress | 1 |
+| review | 89 |
+| todo | 31 |
+| verifying | 1 |
+| **total** | **131** |
 
 | Phase | Cards |
 |---|---:|
@@ -133,7 +134,7 @@ graph LR
 | [T-0038](T-0038.md) | Products, party posting profiles and product posting profiles | MVP | review | T-0036, T-0018, T-0034 | — | 0 |
 | [T-0039](T-0039.md) | Posting-profile matrix resolution and gap check | MVP | review | T-0038 | UC-01 | 1 |
 | [T-0040](T-0040.md) | Sales invoice lifecycle: draft → approve → post | MVP | review | T-0039, T-0025, T-0034, T-0028, T-0015, T-0026, T-0031 | UC-01 | 3 |
-| [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | review | T-0040 | — | 0 |
+| [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | verifying | T-0040 | — | 0 |
 | [T-0042](T-0042.md) | Email delivery (SMTP) via outbox for invoices, statements, reminders, remittances | MVP | review | T-0041, T-0030, T-0031 | UC-01, UC-02, UC-06 | 3 |
 | [T-0043](T-0043.md) | Batch billing run: selection and preview | MVP | review | T-0040 | UC-02 | 2 |
 | [T-0044](T-0044.md) | Batch billing run: approve, post as one job with per-invoice isolation | MVP | review | T-0043, T-0042, T-0024 | UC-02 | 5 |
@@ -149,7 +150,7 @@ graph LR
 | [T-0054](T-0054.md) | Payment batches with maker-checker and step-up release | MVP | review | T-0052, T-0053, T-0013 | UC-06 | 5 |
 | [T-0055](T-0055.md) | Customer refunds (bank payment batch and Stripe) | MVP | review | T-0046, T-0045, T-0054, T-0031, T-0057 | UC-11 | 2 |
 | [T-0056](T-0056.md) | ABA (Cemtex) file export | MVP | review | T-0054 | UC-06 | 1 |
-| [T-0057](T-0057.md) | Payment confirmation posting and remittance advices | MVP | in_progress | T-0056, T-0042, T-0031 | UC-06 | 2 |
+| [T-0057](T-0057.md) | Payment confirmation posting and remittance advices | MVP | blocked | T-0056, T-0042, T-0031 | UC-06 | 2 |
 | [T-0058](T-0058.md) | Bank accounts and statement import (CSV, OFX) | MVP | review | T-0018 | UC-08 | 2 |
 | [T-0059](T-0059.md) | CAMT extensions: batch entries (TxDtls), several statements per file, camt.052/054 | MVP | review | T-0058 | UC-08 | 1 |
 | [T-0060](T-0060.md) | Matching rules and auto-match | MVP | review | T-0058, T-0046, T-0057 | UC-08 | 3 |
@@ -229,6 +230,9 @@ graph LR
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
 | [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | todo | — | — | 0 |
+| [T-0166](T-0166.md) | Gross ECL allowance reconciliation from source lineage | MVP | blocked | T-0031, T-0048 | — | 3 |
+| [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
+| [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | todo | T-0047, T-0035 | UC-04 | 3 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
 
 ## Latest update — 2026-11-01

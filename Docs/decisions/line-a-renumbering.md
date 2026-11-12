@@ -64,3 +64,13 @@ Migrations are numbered in integration order with no gaps:
 | DL-0290 | DL-0313 | feat/T-0077-gl-detail-aged-reports | decision-log entry (title-matched) |
 | DL-0292 | DL-0314 | feat/T-0080-setup-wizard | decision-log entry (title-matched) |
 | DL-0304 | DL-0315 | feat/T-0080-setup-wizard | decision-log entry (title-matched) |
+| DL-0310 | DL-0316 | feat/T-0041-pdf-format-repair | decision-log entry (title-matched) |
+| DL-0311 | DL-0317 | feat/T-0041-pdf-format-repair | decision-log entry (title-matched) |
+| DL-0312 | DL-0318 | feat/T-0041-pdf-format-repair | decision-log entry (title-matched) |
+| DL-0313 | DL-0319 | feat/T-0041-pdf-format-repair | decision-log entry (title-matched) |
+| DL-0314 | DL-0320 | feat/T-0041-pdf-format-repair | decision-log entry (title-matched) |
+| DL-0315 | DL-0321 | feat/T-0041-pdf-format-repair | decision-log entry (title-matched) |
+| DL-0316 | DL-0322 | feat/T-0041-pdf-format-repair | decision-log entry (title-matched) |
+| DL-0317 | DL-0323 | feat/T-0041-pdf-format-repair | decision-log entry (title-matched) |
+| DL-0318 | DL-0324 | feat/T-0041-pdf-format-repair | decision-log entry (title-matched) |
+| DL-0319 | DL-0325 | feat/T-0041-pdf-format-repair | decision-log entry (title-matched) |
