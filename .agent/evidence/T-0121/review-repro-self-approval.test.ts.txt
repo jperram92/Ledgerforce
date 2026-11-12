@@ -1,0 +1,23 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { mkdirSync, writeFileSync, unlinkSync } from 'node:fs';
+import { join } from 'node:path';
+import { makeRepo, git, readText } from '/home/user/Ledgerforce/scripts/agent/test/helpers.ts';
+import { makeCtx } from '/home/user/Ledgerforce/scripts/agent/lib/commands.ts';
+import { goldenGuard } from '/home/user/Ledgerforce/scripts/agent/lib/gates.ts';
+test('branch author self-attests an approval', () => {
+  const root = makeRepo();
+  git(root, 'checkout', '-q', '-b', 'feat/T-0999-x');
+  mkdirSync(join(root, 'Docs/accounting'), { recursive: true });
+  const p = 'Docs/accounting/postings.md';
+  writeFileSync(join(root, p), '# G\n- **Status: Approved (owner)**\nDr AR 999.00 / Cr Sales 999.00\n');
+  writeFileSync(join(root, 'Docs/decisions/decision-log.md'), readText(root, 'Docs/decisions/decision-log.md') + '\n### DL-9999 — Owner approval\n- By: human (claimed by agent)\n');
+  git(root, 'add', '.'); git(root, 'commit', '-q', '-m', 'agent commit');
+  const without = goldenGuard(makeCtx(root));
+  console.log('no registry record:', without.result, without.lines.join(' | '));
+  writeFileSync(join(root, 'Docs/decisions/golden-approvals.json'), JSON.stringify({ schemaVersion: 1, approvals: [{ path: p, commit: git(root, 'rev-parse', 'HEAD'), decisions: ['DL-9999'] }] }));
+  const withRec = goldenGuard(makeCtx(root));
+  console.log('with branch-added record:', withRec.result, withRec.lines.join(' | '));
+  assert.equal(without.result, 'FAIL');
+  assert.equal(withRec.result, 'PASS');
+});
