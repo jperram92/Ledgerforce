@@ -2169,3 +2169,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0100 Q2. Grype reported Critical CVE-2026-4738 on zlib 1.3.2-r1 in api/worker/setup, fixed in 1.4-r0, which current Alpine branches ship. The pinned node:22.23.4-alpine base predates it. The web image, which upgrades, passed at the same commit. Docker and the Alpine CDN are unavailable in this sandbox, so the CI image gate is the proof.
 - Alternatives: Ignore or `ignore-unfixed` (forbidden by ADR-0043); repinning the base digest (no rebuilt upstream base is confirmed yet); pinning `zlib=1.4-r0` (narrower, but it would miss the next fixed package).
 - ADR: none (same remediation pattern as DL-0248) · Status: accepted
+
+### DL-0285 — Line A (origin/feat/T-0049…T-0080) is canonical; integrate it, then build in parallel
+- Date: 2026-11-12 · By: human (product owner), claude · Task: T-0121 / sprint integration · Category: process
+- Decision: The owner chose "Line A canonical" (2026-11-12, interactive). The chained branches `origin/feat/T-0049…T-0080` (leaves T-0061, T-0070, T-0074, T-0077, T-0080), the same lineage as main through T-0048, are integrated onto the working branch. Colliding decision-log IDs are renumbered on integration, with nothing removed. `claude/incomplete-features-build-wivsco` (Line B) and `feat/T-0048-bad-debt` (contains Line B) are not merged; only pieces Line A lacks are ported later, superseding rather than deleting. `feat/T-0041-pdf-format-repair` (carries blocked T-0166–0168 accounting-review work) is assessed separately. After integration, parallel sub-agents re-verify and build the remaining todo cards. The owner asked for multiple sub-agents building in parallel.
+- Why: Line B's own pickup note (CODEX-PICKUP-2026-11-09 §1) requires an owner decision; Line A already matches main's numbering and history.
+- Alternatives: Line B canonical (more collisions with main); new cards only (leaves built work stranded).
+- ADR: none · Status: accepted
