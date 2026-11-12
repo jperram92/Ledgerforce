@@ -13,10 +13,11 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 
 | Status | Cards |
 |---|---:|
-| todo | 92 |
-| review | 13 |
-| blocked | 1 |
-| **total** | **106** |
+| blocked | 2 |
+| done | 3 |
+| review | 73 |
+| todo | 43 |
+| **total** | **121** |
 
 | Phase | Cards |
 |---|---:|
@@ -138,7 +139,7 @@ graph LR
 | [T-0045](T-0045.md) | Customer credit notes | MVP | todo | T-0040, T-0031 | UC-11 | 4 |
 | [T-0046](T-0046.md) | Customer receipts and allocations | MVP | todo | T-0040, T-0031 | UC-03 | 2 |
 | [T-0047](T-0047.md) | Customer prepayments, deposit invoices and application to final invoice | MVP | todo | T-0046 | — | 0 |
-| [T-0048](T-0048.md) | Bad debt write-off with GST decreasing adjustment | MVP | todo | T-0046, T-0035 | — | 0 |
+| [T-0048](T-0048.md) | Bad debt write-off with GST decreasing adjustment | MVP | blocked | T-0046, T-0035 | — | 0 |
 | [T-0049](T-0049.md) | Customer statements and aged receivables | MVP | todo | T-0046 | UC-12 | 1 |
 | [T-0050](T-0050.md) | Supplier bills entry and suggested coding | MVP | todo | T-0039, T-0025, T-0034, T-0028, T-0031 | UC-05 | 3 |
 | [T-0051](T-0051.md) | Bills inbox: inbound email PDF → draft bill | MVP | todo | T-0050 | UC-05 | 1 |
@@ -220,6 +221,7 @@ graph LR
 | [T-0118](T-0118.md) | Tax codes in the database: effective-dated tax_code table, company rounding setting, line wiring | MVP | todo | T-0034 |
 | [T-0119](T-0119.md) | Chromium in the worker image and PDF rendering as a worker job | MVP | todo | T-0041 |
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
+| [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | todo | — | — | 0 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:

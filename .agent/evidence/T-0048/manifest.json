@@ -10,6 +10,15 @@
       "provider": "claude",
       "timestamp": "2026-11-01T21:23:39.961Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-106",
+      "file": ".agent/evidence/T-0048/20261111-223537-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/write-off.db.test.ts › T-0048: bad-debt write-off (GP-024) › SS-PLAT-106 writing off a 1,375.00 invoice fully covered by the allowance posts exactly GP-024 and closes the invoice | packages/modules/ar/src/write-off.db.test.ts › T-0048: bad-debt write-off (GP-024) › SS-PLAT-106 the BAS shows the decreasing adjustment 1B +125.00 on accruals and nothing on cash | packages/modules/ar/src/write-off.db.test.ts › T-0048: bad-debt write-off (GP-024) › SS-PLAT-106 when the allowance holds only 1,000.00 the rest goes to the bad-debt expense (GP-024 variant)",
+      "commit": "063e215c6cd9-dirty",
+      "provider": "codex",
+      "timestamp": "2026-11-11T22:35:37.523Z",
+      "result": "passed"
     }
   ]
 }

@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0048",
+  "current_task": null,
   "branch": "feat/T-0048-write-off",
-  "step": null,
-  "claimed_by": "codex",
-  "lease_expires_at": "2026-11-11T22:53:54.990Z",
+  "step": "T-0048 blocked: coverage and golden guard; follow-up T-0121",
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": null,
-  "run_id": "2026-11-11-codex-r02",
-  "updated_at": "2026-11-11T22:08:55.067Z",
+  "run_id": "2026-11-11-codex-r03",
+  "updated_at": "2026-11-12T03:27:49.345Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
@@ -79,7 +79,7 @@
     "T-0045": 1,
     "T-0046": 1,
     "T-0047": 1,
-    "T-0048": 3
+    "T-0048": 4
   },
   "failures": {},
   "providers": {},

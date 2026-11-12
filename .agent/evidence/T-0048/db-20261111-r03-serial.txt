@@ -1,0 +1,101 @@
+﻿
+> ledgerforce@0.0.0 test:db C:\Users\james\Ledgerforce
+> vitest run --project db --project api-db
+
+
+ RUN  v4.1.12 C:/Users/james/Ledgerforce
+
+[db] test PostgreSQL ready (external) on 127.0.0.1:55448
+[db] test PostgreSQL ready (external) on 127.0.0.1:55448
+corepack : (node:25428) DeprecationWarning: Calling client.query() when the client is already executing a query is 
+deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+At line:2 char:106
++ ... ORKERS='1'; corepack pnpm test:db *> .agent/evidence/T-0048/db-202611 ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ((node:25428) De...hanism instead.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[Nest] 25428  - 12/11/2026, 9:27:49 am   ERROR [ExceptionsHandler] error: permission denied for table job_common
+    at C:\Users\james\Ledgerforce\node_modules\.pnpm\pg@8.23.1\node_modules\pg\lib\client.js:694:17
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async PostgresConnection.executeQuery (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/node_
+modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28)
+    at async file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executo
+r/query-executor-base.js:39:24
+    at async 
+file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+    at async #run (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/
+single-connection-provider.js:24:16)
+    at async DefaultQueryExecutor.executeQuery (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/nod
+e_modules/kysely/dist/query-executor/query-executor-base.js:38:28)
+    at async Transaction.executeQuery 
+(file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:545:16)
+    at async Object.executeSql (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/pg-boss@12.37.1_@opentelemetry+ap
+i@1.9.1/node_modules/pg-boss/dist/adapters/kysely.js:4:28)
+    at async #createJob (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/pg-boss@12.37.1_@opentelemetry+api@1.9.1
+/node_modules/pg-boss/dist/manager.js:1372:32)
+    at PostgresConnection.executeQuery (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/node_module
+s/kysely/dist/dialect/postgres/postgres-driver.js:131:41)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executo
+r/query-executor-base.js:39:24
+    at async 
+file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+    at async #run (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/
+single-connection-provider.js:24:16)
+    at async DefaultQueryExecutor.executeQuery (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/nod
+e_modules/kysely/dist/query-executor/query-executor-base.js:38:28)
+    at async Transaction.executeQuery 
+(file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:545:16)
+    at async Object.executeSql (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/pg-boss@12.37.1_@opentelemetry+ap
+i@1.9.1/node_modules/pg-boss/dist/adapters/kysely.js:4:28)
+    at async #createJob (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/pg-boss@12.37.1_@opentelemetry+api@1.9.1
+/node_modules/pg-boss/dist/manager.js:1372:32)
+    at async Telemetry.send (file:///C:/Users/james/Ledgerforce/node_modules/.pnpm/pg-boss@12.37.1_@opentelemetry+api@1
+.9.1/node_modules/pg-boss/dist/telemetry.js:189:28) {
+  length: 98,
+  severity: 'ERROR',
+  code: '42501',
+  detail: undefined,
+  hint: undefined,
+  position: undefined,
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'aclchk.c',
+  line: '2812',
+  routine: 'aclcheck_error'
+}
+(node:24008) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and 
+will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:21196) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and 
+will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:23764) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and 
+will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:7432) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and 
+will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:19372) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and 
+will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:752) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and 
+will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:25644) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and 
+will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ Test Files  83 passed (83)
+      Tests  1178 passed (1178)
+   Start at  09:27:22
+   Duration  1107.10s (transform 8.20s, setup 0ms, import 168.69s, tests 900.01s, environment 19ms)
+

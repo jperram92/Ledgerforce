@@ -9,6 +9,7 @@ import 'reflect-metadata';
 import { createDb, withTenant } from '@ledgerforce/db';
 import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
 import { ALL_PERMISSIONS, ROLE_TEMPLATES } from '@ledgerforce/shared/rbac';
+import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApi, type Api } from '../app.ts';
 
@@ -76,7 +77,7 @@ beforeAll(async () => {
     await trx.insertInto('app.user_role').values({ user_id: CLERK, role: 'accountant' }).execute();
     await trx
       .updateTable('app.user_role')
-      .set({ revoked_at: new Date(), revoke_reason: 'moved to sales' })
+      .set({ revoked_at: sql<Date>`now()`, revoke_reason: 'moved to sales' })
       .where('user_id', '=', CLERK)
       .where('role', '=', 'accountant')
       .execute();

@@ -637,6 +637,7 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 ### SS-PLAT-106 — Bad-debt write-off through the allowance
 - Phase: MVP · Layer: **golden + db-integration** · Task(s): T-0048 (GP-024, GP-025, Q3, DL-0276)
 - **Given** an unpaid 1,375.00 invoice and a funded ECL allowance · **When** it is written off with a reason · **Then** the journal equals GP-024, the invoice closes, BAS accruals show 1B +125.00 (cash: none), and a short allowance sends the remainder to the bad-debt expense
+- 2026-11-11 verification: [fresh PostgreSQL test report](../../.agent/evidence/T-0048/20261111-223537-tests-db.json), four tests passed; manifest appended. Code remains at implementation `4cc7e9e`; evidence labels `063e215c6cd9-dirty` because task-status documentation was being updated. Full verification and Claude review remain separate gates.
 
 ## T-0112 PR integration regression evidence (2026-10-28)
 

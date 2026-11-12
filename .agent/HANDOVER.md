@@ -1,26 +1,15 @@
-# Handover — T-0048 verification recovery in progress; 2026-11-11 22:31 UTC
+# Handover — T-0048 blocked on verification gates
 ## Codex continuation prompt
-> Resume T-0048 on `feat/T-0048-write-off` from repository HEAD (implementation `4cc7e9e`, previous documentation `61307c8`). Run `node scripts/agent/conductor.ts status` and inspect `.agent/evidence/T-0048/verify-20261111-r03-serial.log` before launching more tests. Run r03 has passed static checks, 963 Vitest tests, 8 Salesforce tests, 82 agent tests, and five focused write-off unit/DB tests. Full DB and remaining verification gates are running; do not claim completion. Environment: Node 22.22.0, Git Bash, isolated WSL PostgreSQL 16 on loopback port 55448 via `LF_TEST_DATABASE_URL`, and `VITEST_MAX_WORKERS=1`. Read run r03 and its verification evidence. Claude must cross-review the Codex-authored date fix after full verification.
+> Resume from the repository on branch `feat/T-0048-write-off`. Implementation is `4cc7e9e`; recovery checkpoint is `063e215`; inspect the latest commit body for the fixture fix and final evidence. First command: `node scripts/agent/conductor.ts status`. Read T-0048, T-0121, RQ-0098 and `.agent/evidence/T-0048/verification-20261111-r03.md`. T-0048 is blocked, not complete: coverage times out in the real ESLint config test and the golden guard rejects inherited owner-approved content. Research T-0121's two open questions before changing gates. Do not increase timeouts, suppress checks, alter the comparison base, or edit approved goldens. Claude must review the Codex date fix and fixture correction after verification is green.
 
-Current run: codex r03; DL-0277. No production code changed. Earlier environment blockers are resolved for focused tests. Full gate result remains pending. Do not start overlapping default-worker suites, edit approved goldens, weaken tests, or self-review Codex code.
-
-# Previous handover — T-0048 review failed; 2026-11-11
-## Codex continuation prompt
-> Resume from the repository. Branch `feat/T-0048-write-off`, implementation checkpoint `4cc7e9e8ba68a1871edffa7c420f61c2abb20819`. Read `AGENTS.md`, run `bash scripts/agent/resume.sh`, then read this file, `.agent/state.json`, `.agent/backlog/T-0048.md`, and the T-0048 review and invalid-date RED/GREEN evidence. The Codex review finding is fixed: impossible ISO calendar dates now return typed `INVALID_WRITE_OFF` before database access. Scoped TDD, AR typecheck, targeted lint, and formatting pass. Next: run full `bash scripts/agent/verify.sh --task T-0048` and `pnpm test:db` with working Bash/PostgreSQL, resolve or classify the four unrelated workspace test failures from the prior run, then request independent Codex re-review. Do not edit approved goldens. Task remains in progress.
-
-From: codex (run 2026-11-11-codex-r02). Date validation fix is scoped green. Run r01 review results: workspace typecheck/lint/format passed, full unit run had four unrelated failures, `test:db` had no PostgreSQL, and verify wrapper could not start WSL Bash (`E_ACCESSDENIED`). Run r02 reattempted verify with the same WSL error. Run r02 evidence records the RED/GREEN regression and scoped checks. Full verification and independent review remain.
-
-# Previous handover — T-0048 write-off in review; 2026-11-01
-## Codex continuation prompt
-> Resume from the repository. Branch line: feat/T-0095-security-gates → feat/T-0096-dast-smoke → feat/T-0115-aasb-alignment → feat/T-0031-golden-runner → feat/T-0116-golden-bindings → feat/T-0032-reversal → feat/T-0034-tax-gst → feat/T-0118-tax-codes-db → feat/T-0033-invariant-suite → feat/T-0096-dast-smoke → feat/T-0035-bas-query → feat/T-0038-posting-profiles → feat/T-0039-profile-matrix → feat/T-0040-sales-invoice → feat/T-0041-invoice-pdf → feat/T-0042-email → feat/T-0043-batch-preview → feat/T-0044-batch-post → feat/T-0045-credit-notes → feat/T-0046-receipts → feat/T-0047-prepayments → feat/T-0048-write-off (each branched from the previous; T-0096 was fast-forwarded onto T-0033). (1) Cross-review the claude-built cards in review (`node scripts/agent/conductor.ts status`), starting with T-0031, T-0115, T-0007, T-0095, T-0116, T-0032, T-0034 T-0118 and T-0033 (SS-PLAT-11: packages/ledger/src/ledger.invariants.db.test.ts, 10,000 documents, CI `invariants` job with fresh seed; T-0118: migration 0032 app.tax_code + company.tax_rounding + journal_line FK; engine INVALID_TAX_CODE; packages/modules/tax/src/tax-codes.ts; SS-PLAT-100). (2) Owner accepted ADR-0044 and delegated accounting ADRs/golden postings (DL-0263; AGENTS.md §6 text to be added by the owner). Next build card: T-0096 (DAST, unblocked), then `node scripts/agent/conductor.ts next`. T-0117 (system-role promotion) needs a data-model ADR.
-
-From: claude (run 2026-10-31-claude-r01, continued 2026-11-01).
-Done this session: T-0095 security gates (review); codex tasks T-0112/T-0113/T-0114 cross-reviewed PASS (done); T-0096 DAST researched, ADR-0044 Proposed (blocked); T-0115 AASB research, design §3.10/§3.10.1 (review); golden postings Approved by owner instruction (DL-0255, DL-0256); T-0007, T-0031, T-0116, T-0032, T-0034 → review; T-0118 tax codes in the database and T-0033 invariant suite (verify 14/0/2 each) → review.
-In progress: nothing.
-Next action: T-0048 bad-debt write-off (migration 0043, DL-0276) in review. Next card: node scripts/agent/conductor.ts next, branching from the newest task branch. Use pnpm typecheck without -s.
-Decisions taken: DL-0243…DL-0263.
-Open questions for human: (1) Run Codex to clear cross-reviews (no Codex CLI/credentials in the cloud session).
-Do not: edit Approved golden postings (supersede instead); weaken the golden runner's PENDING pin (it must only shrink); change CI security gates without an accepted ADR; edit merged migrations (0032 is new on this branch).
+From: codex (run 2026-11-11-codex-r03). Updated: 2026-11-12T03:27:49.345Z.
+Done: Node 22 + Git Bash + isolated PostgreSQL restored; static checks, 963 Vitest tests, 8 LWC tests, 82 agent tests, standalone full DB 1178/1178, E2E and audit passed. Fresh SS-PLAT-106 report and manifest appended. User-role fixture clock corrected; five affected API tests and targeted lint/format passed.
+In progress: full verifier result was 10 PASS / 5 FAIL / 1 PENDING. DB failure in that run caused derivative RLS/migration failures; fixture correction is targeted green but full verifier was not rerun afterward. Coverage retry remained red (683 pass / 1 timeout). Golden guard remains red. No independent Claude review exists.
+Next action: read T-0121 and research the repeated coverage timeout and a fail-closed approval-evidence design; use a task branch for any broader gate implementation. Re-run full verification after fixes, then request Claude review.
+Decisions: DL-0277, DL-0278. No production accounting code or approved golden changed in this run.
+Open questions for human: none; these are technical/process follow-ups. No new approval is being requested for already approved postings.
+Do not: weaken checks, change Approved expectations, mark pending coverage/review green, reuse the normal PostgreSQL cluster, or run overlapping default-worker suites.
+Environment: elevated Windows shell selected Node 22.22.0; Git Bash at C:/Program Files/Git/bin/bash.exe; temporary WSL PostgreSQL cluster /tmp/ledgerforce-t0048-r03 on loopback 55448. Use LF_TEST_DATABASE_URL only for this isolated cluster and VITEST_MAX_WORKERS=1. Cluster is stopped at session close; restart via its pg_ctl before DB tests. Secrets files were not accessed.
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -263,3 +252,7 @@ Do not: edit Approved golden postings (supersede instead); weaken the golden run
 - 2026-11-01T21:23:44.716Z claude: T-0048 → verifying
 - 2026-11-01T21:30:18.762Z claude: release T-0048 → review (verify 14/0/2; awaiting codex cross-review)
 - 2026-11-11T10:08:01.351Z codex: T-0048 → in_progress
+- 2026-11-11T22:35:12.349Z codex: T-0048 → verifying
+- 2026-11-12T03:20:10.418Z codex: T-0048 → in_progress
+- 2026-11-12T03:25:15.925Z codex: handover: Write-off and complete standalone DB suite pass; fixture clock fixed; coverage and inherited golden approval gates remain red; Claude review pending
+- 2026-11-12T03:26:25.827Z codex: release T-0048 → blocked (Coverage timeout and inherited golden-approval guard unresolved (T-0121); full DB standalone 1178 pass, fixture fix 5 pass; Claude cross-review required)

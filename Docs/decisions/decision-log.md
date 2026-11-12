@@ -2119,3 +2119,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: Reusing the existing database risks interfering with unrelated data; changing assertions or timeouts would weaken evidence. Neither was done.
 - ADR: none · Status: accepted
 
+
+### DL-0278 — Correct fixture clock; preserve failed verification gates
+- Date: 2026-11-12 · By: codex · Task: T-0048 · Category: tooling
+- Decision: Use PostgreSQL transaction time for the user-role fixture revocation, matching its grant default. Retain the database constraint and all five API assertions. Record coverage/golden-gate follow-up as T-0121 and leave T-0048 blocked.
+- Why: RQ-0098 traces the DB failure to mixing client/database clocks; the original full verifier records RED, and the corrected fixture's five tests pass. Coverage timeout reproduced on retry; existing golden guard cannot recognize the recorded owner approvals. Neither failure is suppressed.
+- Alternatives: Relaxing constraints/timeouts, bypassing the golden guard, or editing approved expectations were rejected. No full-green claim is made from targeted tests.
+- ADR: none for fixture; process ADR required for T-0121 gate design · Status: accepted

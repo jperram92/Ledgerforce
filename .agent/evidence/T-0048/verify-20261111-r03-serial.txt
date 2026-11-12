@@ -1,0 +1,130 @@
+﻿LedgerForce verify â€” 2026-11-11T22:18:17Z â€” task T-0048
+GATE 1 typecheck: PASS (pnpm typecheck)
+GATE 1 lint: PASS (pnpm lint)
+GATE 1 format: PASS (pnpm format:check)
+GATE 2a unit-tests: PASS (pnpm test + node --test scripts/agent/test)
+GATE 2b db-tests: FAIL (pnpm test:db)
+----- output (last 40 lines) -----
+(node:20784) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯ Failed Suites 1 âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯
+
+ FAIL  |api-db| apps/api/src/users/users.list.db.test.ts [ apps/api/src/users/users.list.db.test.ts ]
+error: new row for relation "user_role" violates check constraint "user_role_check2"
+ â¯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ â¯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ â¯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ â¯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ â¯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ â¯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ â¯ UpdateQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/update-query-builder.js:455:24
+ â¯ apps/api/src/users/users.list.db.test.ts:77:5
+     75|   await withTenant(seed, A, async (trx) => {
+     76|     await trx.insertInto('app.user_role').values({ user_id: CLERK, rolâ€¦
+     77|     await trx
+       |     ^
+     78|       .updateTable('app.user_role')
+     79|       .set({ revoked_at: new Date(), revoke_reason: 'moved to sales' })
+ â¯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ â¯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ â¯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ â¯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ â¯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ â¯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ â¯ UpdateQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/update-query-builder.js:455:24
+ â¯ apps/api/src/users/users.list.db.test.ts:77:5
+ â¯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ â¯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+
+âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯[1/1]âŽ¯
+
+
+ Test Files  1 failed | 82 passed (83)
+      Tests  1173 passed | 5 skipped (1178)
+   Start at  09:27:47
+   Duration  1082.50s (transform 6.82s, setup 0ms, import 150.19s, tests 895.87s, environment 18ms)
+
+----------------------------------
+GATE 2c coverage: FAIL (coverage run failed)
+----- output (last 40 lines) -----
+
+ RUN  v4.1.12 C:/Users/james/Ledgerforce
+      Coverage enabled with v8
+
+ â¯ |unit| packages/testing/eslint-rules/no-float-money.config.test.ts (3 tests | 1 failed) 11053ms
+     Ã— reports lf/no-float-money in a money package (packages/ledger) under the real config 11011ms
+
+âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯ Failed Tests 1 âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯
+
+ FAIL  |unit| packages/testing/eslint-rules/no-float-money.config.test.ts > SS-PLAT-13: Float arithmetic on money is a lint error > reports lf/no-float-money in a money package (packages/ledger) under the real config
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ â¯ packages/testing/eslint-rules/no-float-money.config.test.ts:26:3
+     24|
+     25| describe('SS-PLAT-13: Float arithmetic on money is a lint error', () =â€¦
+     26|   it('reports lf/no-float-money in a money package (packages/ledger) uâ€¦
+       |   ^
+     27|     const ids = await ruleIds(FLOAT_ON_MONEY, 'packages/ledger/src/__fâ€¦
+     28|     expect(ids.filter((id) => id === 'lf/no-float-money').length).toBeâ€¦
+
+âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯âŽ¯[1/1]âŽ¯
+
+
+ Test Files  1 failed | 52 passed (53)
+      Tests  1 failed | 683 passed (684)
+   Start at  09:45:54
+   Duration  55.31s (transform 1.49s, setup 0ms, import 16.60s, tests 20.79s, environment 8ms)
+
+----------------------------------
+GATE 3 accounting-invariants: PASS (1 property test file(s) ran in gate 2a)
+GATE 4 golden-postings: FAIL (Docs/accounting/postings.md:67: adds an Approved status â€” only the product owner approves golden postings)
+  Docs/accounting/postings.md:68: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:69: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:71: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:72: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:74: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:75: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:76: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:77: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:80: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:81: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:82: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:83: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:85: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:86: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:87: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:88: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:89: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:90: adds an Approved status â€” only the product owner approves golden postings
+  Docs/accounting/postings.md:91: adds an Approved status â€” only the product owner approves golden postings
+GATE 5 cross-tenant-rls: FAIL (1 cross-tenant RLS test file(s); gate 2b failed)
+GATE 6 migrations-forward: FAIL (gate 2b failed; 13 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+GATE 7 security: PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep â€” runs in CI))
+GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (codex) in .agent/evidence/T-0048/review-*.md)
+GATE 9 e2e-evidence: PASS (pnpm test:e2e; 1 scenario(s) with passed evidence)
+GATE 10 no-shortcuts: PASS (188 test file(s) scanned; diff vs c1dfbca clean)
+GATE 11 no-delete: PASS (vs merge-base c1dfbca, staged + working tree)
+GATE 12 memory: PASS (T-0048: required steps ticked for status verifying, 2 linked RQ(s) resolved, HANDOVER present)
+
+=== SUMMARY ===
+ #   | gate                  | result
+ 1   | typecheck             | PASS (pnpm typecheck)
+ 1   | lint                  | PASS (pnpm lint)
+ 1   | format                | PASS (pnpm format:check)
+ 2a  | unit-tests            | PASS (pnpm test + node --test scripts/agent/test)
+ 2b  | db-tests              | FAIL (pnpm test:db)
+ 2c  | coverage              | FAIL (coverage run failed)
+ 3   | accounting-invariants | PASS (1 property test file(s) ran in gate 2a)
+ 4   | golden-postings       | FAIL (Docs/accounting/postings.md:67: adds an Approved status â€” only the product owner approves golden postings)
+ 5   | cross-tenant-rls      | FAIL (1 cross-tenant RLS test file(s); gate 2b failed)
+ 6   | migrations-forward    | FAIL (gate 2b failed; 13 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+ 7   | security              | PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep â€” runs in CI))
+ 8   | cross-review          | PENDING (no review report by a provider other than the builder (codex) in .agent/evidence/T-0048/review-*.md)
+ 9   | e2e-evidence          | PASS (pnpm test:e2e; 1 scenario(s) with passed evidence)
+ 10  | no-shortcuts          | PASS (188 test file(s) scanned; diff vs c1dfbca clean)
+ 11  | no-delete             | PASS (vs merge-base c1dfbca, staged + working tree)
+ 12  | memory                | PASS (T-0048: required steps ticked for status verifying, 2 linked RQ(s) resolved, HANDOVER present)
+PASS: 10   FAIL: 5   PENDING: 1
+!!! 1 gate(s) PENDING â€” not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+VERIFY: FAIL

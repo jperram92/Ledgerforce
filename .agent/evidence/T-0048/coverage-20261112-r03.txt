@@ -1,0 +1,35 @@
+﻿
+ RUN  v4.1.12 C:/Users/james/Ledgerforce
+      Coverage enabled with v8
+
+ ❯ |unit| packages/testing/eslint-rules/no-float-money.config.test.ts (3 tests | 1 failed) 15702ms
+     × reports lf/no-float-money in a money package (packages/ledger) under the real config 15662ms
+corepack : 
+At line:2 char:30
++ ... ORKERS='1'; corepack pnpm exec vitest run --project unit --coverage.e ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/testing/eslint-rules/no-float-money.config.test.ts > SS-PLAT-13: Float arithmetic on money is a 
+lint error > reports lf/no-float-money in a money package (packages/ledger) under the real config
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ packages/testing/eslint-rules/no-float-money.config.test.ts:26:3
+     24|
+     25| describe('SS-PLAT-13: Float arithmetic on money is a lint error', () =…
+     26|   it('reports lf/no-float-money in a money package (packages/ledger) u…
+       |   ^
+     27|     const ids = await ruleIds(FLOAT_ON_MONEY, 'packages/ledger/src/__f…
+     28|     expect(ids.filter((id) => id === 'lf/no-float-money').length).toBe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 52 passed (53)
+      Tests  1 failed | 683 passed (684)
+   Start at  14:21:31
+   Duration  116.37s (transform 3.55s, setup 0ms, import 46.07s, tests 32.11s, environment 14ms)
+

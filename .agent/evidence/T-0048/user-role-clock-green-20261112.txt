@@ -1,0 +1,10 @@
+﻿
+ RUN  v4.1.12 C:/Users/james/Ledgerforce
+
+[db] test PostgreSQL ready (external) on 127.0.0.1:55448
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  14:23:40
+   Duration  40.55s (transform 3.52s, setup 0ms, import 29.45s, tests 8.90s, environment 0ms)
+

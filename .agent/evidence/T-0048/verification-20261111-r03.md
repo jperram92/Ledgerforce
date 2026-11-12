@@ -25,4 +25,15 @@ Exit **0**: **2 files, 5 tests passed**, 15.47 seconds. Includes real PostgreSQL
 
 ## Full verification
 
-One-worker full verifier is running; final result pending. Typecheck and lint have passed.
+One-worker full verifier completed: **10 PASS / 5 FAIL / 1 PENDING**, exit 1. Typecheck, lint, formatting, 963 Vitest tests, 8 Salesforce Jest tests, 82 agent-tooling tests, security audit, E2E/evidence, no-shortcut/no-delete checks and memory passed.
+
+- Standalone full DB suite: **83 files / 1,178 tests passed**. See `db-20261111-r03-serial.txt`.
+- Verifier DB suite: 82 files passed; user-list fixture setup failed at `user_role_check2`, leaving five tests unrun. RLS/migration gates inherit that failure. See `verify-20261111-r03-serial.txt`.
+- Fixture correction: use database transaction time for revocation instead of the client clock. RQ-0098 documents the reasoning. All **five affected API tests passed**, as did targeted ESLint and Prettier. See `user-role-clock-green-20261112.txt`. No production code or constraint changed; full verifier has not been rerun after this test-only fix.
+- Coverage failed at the first real ESLint-config test's unchanged 5s timeout. Idle retry also failed: **683 passed, 1 failed**. See `coverage-20261112-r03.txt`.
+- Golden guard rejects Approved markers inherited since main despite recorded owner approvals DL-0256/DL-0263. It was not bypassed or modified. T-0121 tracks a researched, tested process repair.
+- Claude cross-review remains pending. No coverage baseline comparison was possible because coverage did not finish successfully.
+
+The earlier `job_common` error did not prevent the standalone DB suite passing; it is not established as a product defect. Prior interrupted results are superseded by the completed results above, not removed.
+
+Fresh scenario evidence: `20261111-223537-tests-db.json` (recorder exit 0, four DB tests passed, SS-PLAT-106 passed; manifest appended). The recorder honestly labels HEAD `063e215c6cd9-dirty`: only task-status/documentation changes were pending, with production code unchanged from `4cc7e9e`.
