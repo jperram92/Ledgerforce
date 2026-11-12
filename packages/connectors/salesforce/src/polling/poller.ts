@@ -39,6 +39,8 @@ export interface SyncObject {
   lastPollSource: string | null;
   lastPollRecords: number | null;
   lastPollError: string | null;
+  /** Salesforce time up to which deletions were checked for purges (T-0070); null = never. */
+  deletesCheckedUntil: Date | null;
 }
 
 /** Choose CDC or polling for an object (setup); omitted settings keep their current value. */
@@ -79,8 +81,9 @@ export async function getSyncObject(
     last_poll_source: string | null;
     last_poll_records: number | null;
     last_poll_error: string | null;
+    deletes_checked_until: Date | null;
   }>`SELECT mode, poll_interval_seconds, overlap_seconds, watermark, next_poll_at, last_polled_at,
-            last_poll_source, last_poll_records, last_poll_error
+            last_poll_source, last_poll_records, last_poll_error, deletes_checked_until
        FROM app.salesforce_sync_object
       WHERE company_id = ${companyId} AND entity_name = ${entity}`.execute(trx);
   const r = rows[0];
@@ -96,6 +99,7 @@ export async function getSyncObject(
     lastPollSource: r.last_poll_source,
     lastPollRecords: r.last_poll_records,
     lastPollError: r.last_poll_error,
+    deletesCheckedUntil: r.deletes_checked_until,
   };
 }
 

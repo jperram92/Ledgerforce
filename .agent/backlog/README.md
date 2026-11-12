@@ -163,7 +163,7 @@ graph LR
 | [T-0069](T-0069.md) | Closed Won / Order activated → draft invoice (UC-01) with auto-approve | MVP | review | T-0065, T-0040, T-0067, T-0031 | UC-01 | 7 |
 | [T-0110](T-0110.md) | Salesforce write-back: scratch-org e2e and refund/aged-AR write-back scenarios | MVP | todo | T-0067, T-0069, T-0055, T-0049 | UC-01, UC-11, UC-12 | 3 |
 | [T-0111](T-0111.md) | LWC Account component: scratch-org e2e with screenshot (sales rep sees the money) | MVP | todo | T-0072, T-0110 | UC-12 | 1 |
-| [T-0070](T-0070.md) | Nightly reconciliation with Salesforce | MVP | todo | T-0066, T-0067 | — | 1 |
+| [T-0070](T-0070.md) | Nightly reconciliation with Salesforce | MVP | review | T-0066, T-0067 | — | 1 |
 | [T-0071](T-0071.md) | Sync issues inbox, retry/backoff and API-limit throttling | MVP | review | T-0067 | — | 1 |
 | [T-0072](T-0072.md) | LWC Account component (balance, overdue, last payment, 5 recent invoices) | MVP | review | T-0067, T-0062 | UC-12 | 3 |
 | [T-0073](T-0073.md) | Stripe payment links on invoices | MVP | review | T-0042 | UC-03 | 1 |

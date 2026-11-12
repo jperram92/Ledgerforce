@@ -1,0 +1,28 @@
+{
+  "_source": "RQ-0110 S1, S2: REST API Developer Guide — sObject Get Deleted (resources_getdeleted.htm), Get a List of Deleted Records Within a Given Timeframe (dome_get_deleted.htm). Shapes as documented; values illustrative, no org data. The error code for a start date outside the delete log window is the replication-date fault of the SOAP getDeleted call (medium confidence); the connector never sends such a window.",
+  "apiVersion": "67.0",
+  "maxDaysBack": 15,
+  "maxIds": 600000,
+  "response": {
+    "deletedRecords": [
+      { "id": "001D000000IRFmaIAH", "deletedDate": "2026-10-28T03:04:00.000+0000" }
+    ],
+    "earliestDateAvailable": "2026-10-20T00:00:00.000+0000",
+    "latestDateCovered": "2026-10-30T00:00:00.000+0000"
+  },
+  "errors": {
+    "invalidReplicationDate": {
+      "status": 400,
+      "body": [
+        {
+          "message": "startDate must be within 15 days of the current date",
+          "errorCode": "INVALID_REPLICATION_DATE"
+        }
+      ]
+    },
+    "exceededIdLimit": {
+      "status": 400,
+      "body": [{ "message": "Too many ids", "errorCode": "EXCEEDED_ID_LIMIT" }]
+    }
+  }
+}

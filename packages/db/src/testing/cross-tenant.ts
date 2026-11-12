@@ -341,6 +341,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     last_poll_error: () => 'test error',
   },
   // Salesforce billing source (migration 0052, T-0069): trigger setting, mirrored headers/lines.
+  // Nightly reconciliation run log (migration 0053): a succeeded run has no error.
+  'app.salesforce_reconciliation_run': { outcome: () => 'succeeded' },
   'app.salesforce_billing_settings': {
     invoice_trigger: () => 'opportunity',
     won_stages: () => '{Closed Won}',
