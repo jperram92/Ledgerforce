@@ -63,6 +63,7 @@ const MEANS: Record<string, string> = {
   'system:ACCRUED_EXPENSES': 'Accrued expenses',
   'system:SGC_PAYABLE': 'Super guarantee charge payable',
   'system:PRIOR_PERIOD_ADJUSTMENTS': 'Prior-period adjustments',
+  'system:RETAINED_EARNINGS': 'Retained earnings',
   'setting:payroll.sgc_expense': 'Super guarantee charge expense',
   'expense: Office expenses': 'Office expenses',
   'expense: Electricity': 'Electricity',

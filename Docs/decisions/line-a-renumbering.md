@@ -62,3 +62,5 @@ Migrations are numbered in integration order with no gaps:
 | DL-0309 | DL-0311 | feat/T-0057-payment-confirmation | decision-log entry (title-matched) |
 | DL-0291 | DL-0312 | feat/T-0060-bank-matching | decision-log entry (title-matched) |
 | DL-0290 | DL-0313 | feat/T-0077-gl-detail-aged-reports | decision-log entry (title-matched) |
+| DL-0292 | DL-0314 | feat/T-0080-setup-wizard | decision-log entry (title-matched) |
+| DL-0304 | DL-0315 | feat/T-0080-setup-wizard | decision-log entry (title-matched) |

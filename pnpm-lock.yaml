@@ -98,6 +98,9 @@ importers:
       '@ledgerforce/reporting':
         specifier: workspace:*
         version: link:../../packages/modules/reporting
+      '@ledgerforce/setup':
+        specifier: workspace:*
+        version: link:../../packages/modules/setup
       '@ledgerforce/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -758,6 +761,40 @@ importers:
       fast-check:
         specifier: 4.10.2
         version: 4.10.2
+      vitest:
+        specifier: 4.1.12
+        version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.5(@types/node@22.20.5)(yaml@2.9.1))
+
+  packages/modules/setup:
+    dependencies:
+      '@ledgerforce/bank':
+        specifier: workspace:*
+        version: link:../bank
+      '@ledgerforce/db':
+        specifier: workspace:*
+        version: link:../../db
+      '@ledgerforce/ledger':
+        specifier: workspace:*
+        version: link:../../ledger
+      '@ledgerforce/shared':
+        specifier: workspace:*
+        version: link:../../shared
+      decimal.js:
+        specifier: 10.6.0
+        version: 10.6.0
+      kysely:
+        specifier: 0.29.7
+        version: 0.29.7
+    devDependencies:
+      '@ledgerforce/ar':
+        specifier: workspace:*
+        version: link:../ar
+      '@ledgerforce/gl':
+        specifier: workspace:*
+        version: link:../gl
+      '@types/node':
+        specifier: 22.20.5
+        version: 22.20.5
       vitest:
         specifier: 4.1.12
         version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@22.20.5)(@vitest/coverage-v8@4.1.12)(jsdom@30.1.2)(vite@8.3.5(@types/node@22.20.5)(yaml@2.9.1))

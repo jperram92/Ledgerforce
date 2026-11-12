@@ -95,6 +95,10 @@ export const SOURCE_TYPES: Readonly<
       st('revrec.release', 'journal'), // deferred revenue / contract liability release (GP-017, GP-021c)
       st('payroll.super_payment', 'ap'), // Payday Super (GP-033), as net pay batches
       st('payroll.sgc_assessment', 'ap'), // GP-034
+      // Opening balances at conversion (T-0080, GP-037, RQ-0109): journal class; its AR/AP control
+      // lines are the open items (posting-command.ts CONTROL_SUBLEDGERS). The module refuses any
+      // period that is not open, since the entry moves AR and AP.
+      st('ledger.opening_balance', 'journal'),
     ].map(([k, v]) => [k, Object.freeze(v)]),
   ),
 );

@@ -372,6 +372,9 @@ export function checkCommand(
 const goldenOf = (sourceType: string): string | undefined =>
   Object.hasOwn(SOURCE_TYPES, sourceType) ? SOURCE_TYPES[sourceType]?.golden : undefined;
 
+/** Stored source type of the opening balance at conversion (GP-037). */
+export const OPENING_BALANCE = 'ledger_opening_balance';
+
 /** Which subledger posts to each control role (design §3.2; DL-0136). */
 const CONTROL_SUBLEDGERS: Readonly<Record<string, (sourceType: string) => boolean>> = Object.freeze(
   {
@@ -379,9 +382,14 @@ const CONTROL_SUBLEDGERS: Readonly<Record<string, (sourceType: string) => boolea
     // A reversal mirrors a document that already posted to the control account; it is built
     // only by reverse() from the original's lines (raw commands cannot use it) and the database
     // checks the mirror (app.journal_mark_reversed, migration 0008) — T-0032, DL-0259.
-    AR_CONTROL: (st: string) => sourceClassOf(st) === 'ar' || sourceClassOf(st) === 'reversal',
+    // The opening balance at conversion (GP-037) carries one AR/AP line per open document: those
+    // lines are the subledger's open items, so both control accounts accept it (T-0080, RQ-0109).
+    AR_CONTROL: (st: string) =>
+      sourceClassOf(st) === 'ar' || sourceClassOf(st) === 'reversal' || st === OPENING_BALANCE,
     AP_CONTROL: (st: string) =>
-      goldenOf(st)?.startsWith('ap.') === true || sourceClassOf(st) === 'reversal',
+      goldenOf(st)?.startsWith('ap.') === true ||
+      sourceClassOf(st) === 'reversal' ||
+      st === OPENING_BALANCE,
     PAYROLL_CLEARING: (st: string) =>
       goldenOf(st)?.startsWith('payroll.') === true || sourceClassOf(st) === 'reversal',
   },

@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ab616a86226bcf702
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44649
+ ❯ |db| packages/modules/setup/src/opening-balances.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/setup/src/opening-balances.db.test.ts [ packages/modules/setup/src/opening-balances.db.test.ts ]
+Error: Cannot find module './opening-csv.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-ab616a86226bcf702/packages/modules/setup/src/opening-balances.db.test.ts
+ ❯ packages/modules/setup/src/opening-balances.db.test.ts:27:1
+     25| import { sql } from 'kysely';
+     26| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     27| import { parseOpenItemsCsv, parseTrialBalanceCsv } from './opening-csv…
+       | ^
+     28| import {
+     29|   openingBalanceOf,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  16:43:05
+   Duration  3.37s (transform 680ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
