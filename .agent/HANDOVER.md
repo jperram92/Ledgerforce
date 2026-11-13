@@ -335,3 +335,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-13T15:46:05.565Z claude: T-0151 → verifying
 - 2026-11-13T16:21:10.524Z claude: release T-0149 → review (verify at 6556ec7: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
 - 2026-11-13T16:21:10.705Z claude: release T-0151 → review (verify at 6556ec7: every gate PASS except 12 (this verify step was unticked and lacked its phase marker; fixed now); 2c PENDING; 8 awaits Codex)
+- 2026-11-13T16:26:35.701Z claude: T-0145 → verifying
