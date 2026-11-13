@@ -4,7 +4,7 @@
  *  - findRlsViolations(): every table with a tenant_id column, and every table in the app/audit
  *    schemas, must have RLS ENABLED + FORCED, at least one policy, a tenant_id column (unless it
  *    is in GLOBAL_TABLES), and lf_app must not own it or hold TRUNCATE/TRIGGER on it
- *    (TRUNCATE is not subject to RLS).
+ *    (TRUNCATE is not subject to RLS). Every view there must be security_invoker (ADR-0061).
  *  - defineCrossTenantSuite(): discovers every tenant_id table from information_schema at
  *    collection time and generates, per table, tests proving tenant A (as lf_app) cannot
  *    SELECT/aggregate, UPDATE, DELETE, TRUNCATE or INSERT-as-B tenant B's rows, plus positive
@@ -71,6 +71,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   },
   // Its generated parent account is an active, postable, non-control asset (overrides above).
   'app.account_system_role': { role: () => 'UNDEPOSITED_FUNDS' },
+  // Period-end roles (migration 0062): PREPAYMENTS takes the same active, postable asset account.
+  'app.account_system_role_ext': { role: () => 'PREPAYMENTS' },
   'app.dimension': { code: () => `dim_${randomBytes(4).toString('hex')}` },
   'app.dimension_value': { code: () => `v${randomBytes(4).toString('hex')}` },
   // Trigger-computed; the generator only needs to satisfy NOT NULL (the value is replaced).
@@ -776,6 +778,27 @@ export async function findRlsViolations(db: Queryable): Promise<RlsViolation[]> 
     if (r.app_trigger) problems.push('lf_app has TRIGGER');
     if (r.app_owner) problems.push('owned by lf_app');
     if (problems.length > 0) out.push({ table: r.qualified, problems });
+  }
+  // Views (ADR-0061): a view runs with its owner's rights unless security_invoker is set, so a
+  // view in app/audit, or one exposing tenant_id, must be security_invoker to keep caller RLS.
+  const views = await db.query<{ qualified: string }>(
+    `SELECT n.nspname || '.' || c.relname AS qualified
+       FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE c.relkind = 'v'
+        AND n.nspname NOT IN ('pg_catalog', 'information_schema') AND n.nspname NOT LIKE 'pg\\_%'
+        AND (n.nspname = ANY($1::text[])
+             OR EXISTS (SELECT 1 FROM pg_attribute a WHERE a.attrelid = c.oid
+                          AND a.attname = 'tenant_id' AND NOT a.attisdropped))
+        AND NOT coalesce('security_invoker=true' = ANY(c.reloptions)
+                         OR 'security_invoker=on' = ANY(c.reloptions), false)
+      ORDER BY 1`,
+    [RLS_SCHEMAS],
+  );
+  for (const v of views.rows) {
+    out.push({
+      table: v.qualified,
+      problems: ["view is not security_invoker (would bypass the caller's RLS)"],
+    });
   }
   return out;
 }

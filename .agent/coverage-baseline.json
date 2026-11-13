@@ -1,18 +1,22 @@
 {
-  "note": "unit-test coverage baseline; verify gate 2c fails if coverage drops below main",
-  "recorded": "2026-10-24",
+  "note": "coverage baseline for verify gate 2c; the gate fails if unit+db line coverage drops below the copy of this file on main, and is PENDING if main's measure differs (DL-0408, DL-0410, DL-0411). Supersedes the unit-only baseline recorded 2026-10-24 (lines 72.22, branches 69.37, functions 78.94, statements 70.78).",
+  "measure": "unit+db",
+  "command": "VITEST_MAX_WORKERS=1 pnpm -s exec vitest run --project unit --project db --coverage.enabled --coverage.reporter=json-summary",
+  "recorded": "2026-11-13",
+  "commit": "bcf4ab6",
+  "evidence": ".agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt",
   "total": {
     "lines": {
-      "pct": 72.22
+      "pct": 93.65
     },
     "branches": {
-      "pct": 69.37
+      "pct": 79.21
     },
     "functions": {
-      "pct": 78.94
+      "pct": 95.66
     },
     "statements": {
-      "pct": 70.78
+      "pct": 91.09
     }
   }
 }

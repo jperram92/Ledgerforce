@@ -7,6 +7,8 @@ import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
 type Timestamp = ColumnType<Date, Date | string | undefined, Date | string>;
 /** tenant_id defaults to current_setting('app.tenant_id') — optional on insert, never updated. */
 type TenantId = ColumnType<string, string | undefined, never>;
+/** A column of a view: selectable, never inserted or updated. */
+type ReadOnly<T> = ColumnType<T, never, never>;
 
 export interface TenantTable {
   id: Generated<string>;
@@ -168,6 +170,24 @@ export interface AccountSystemRoleTable {
   role: string;
   account_id: string;
   bound_at: Timestamp;
+}
+
+/**
+ * Period-end system role → account per company (migration 0062, ADR-0061): same shape and
+ * guards as app.account_system_role, for the roles app.system_role_is_extended() accepts.
+ */
+export type AccountSystemRoleExtTable = AccountSystemRoleTable;
+
+/**
+ * Every system role binding, core (0005) and period-end (0062): security_invoker view, read-only.
+ * Readers that resolve any role use this instead of either table (ADR-0061).
+ */
+export interface AccountRoleBindingView {
+  tenant_id: ReadOnly<string>;
+  company_id: ReadOnly<string>;
+  role: ReadOnly<string>;
+  account_id: ReadOnly<string>;
+  bound_at: ReadOnly<Date>;
 }
 
 /** Analysis dimension (migration 0006). code, company and primary_slot are immutable. */
@@ -1231,6 +1251,8 @@ export interface Database {
   'app.api_token': ApiTokenTable;
   'app.account': AccountTable;
   'app.account_system_role': AccountSystemRoleTable;
+  'app.account_system_role_ext': AccountSystemRoleExtTable;
+  'app.account_role_binding': AccountRoleBindingView;
   'app.dimension': DimensionTable;
   'app.dimension_value': DimensionValueTable;
   'app.dimension_set': DimensionSetTable;

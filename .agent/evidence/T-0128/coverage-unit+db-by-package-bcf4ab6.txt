@@ -1,0 +1,30 @@
+unit+db line coverage by package - tree bcf4ab6, measured 2026-11-13
+command: VITEST_MAX_WORKERS=1 pnpm -s exec vitest run --project unit --project db --coverage.enabled --coverage.reporter=json-summary
+package	files	covered/total	lines %
+apps/worker	6	166/170	97.65
+eslint.config.js	1	1/1	100.00
+packages/connectors/aba	2	69/69	100.00
+packages/connectors/salesforce	40	1729/1865	92.71
+packages/connectors/stripe	8	328/370	88.65
+packages/db	10	770/822	93.67
+packages/ledger	18	740/767	96.48
+packages/modules/ap	8	387/416	93.03
+packages/modules/ar	12	722/784	92.09
+packages/modules/bank	16	751/792	94.82
+packages/modules/documents	6	106/119	89.08
+packages/modules/email	6	116/134	86.57
+packages/modules/gl	5	87/98	88.78
+packages/modules/journals	2	59/74	79.73
+packages/modules/parties	5	131/136	96.32
+packages/modules/products	3	113/121	93.39
+packages/modules/reporting	5	186/190	97.89
+packages/modules/setup	3	206/220	93.64
+packages/modules/tax	5	88/90	97.78
+packages/outbox	8	169/179	94.41
+packages/shared	17	821/855	96.02
+packages/testing	8	174/187	93.05
+salesforce/test	2	152/159	95.60
+TOTAL lines		8071/8618	93.65
+TOTAL branches		5727/7230	79.21
+TOTAL functions		2074/2168	95.66
+TOTAL statements		8988/9867	91.09

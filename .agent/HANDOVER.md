@@ -1,9 +1,13 @@
-# Handover: merged to main (PR #4, 983cc91); two oversight-control changes need explicit owner OK (2026-11-13)
+# Handover: parallel round 2 running (DL-0409); main = PR #4 merge; golden gate green (2026-11-13)
 
 ## Codex continuation prompt
-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0405. Branch `claude/loving-lovelace-nozqpk` == main at 983cc91 (owner-authorised merge, https://github.com/jperram92/Ledgerforce/pull/4). Cards awaiting Codex cross-review: T-0121, T-0041, T-0061, T-0068, T-0075, T-0078 and the integrated Line A cards. Claude continues building the next dependency-ready cards (`node scripts/agent/conductor.ts next`).
+> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file, DL-0405, DL-0408 and DL-0409. Branch `claude/loving-lovelace-nozqpk` (main + this session's work since 983cc91). Six sub-agents were started in local worktrees on local branches: `feat/T-0128-coverage-measure`, `feat/T-0079-period-reopen`, `feat/T-0084-batch-billing-ui`, `feat/T-0086-bills-ui`, `feat/T-0089-reports-ui`, `feat/T-0097-pilot-hardening`, and `feat/T-0117-period-end-roles` (the only one allowed a migration: 0062). Merges into this branch appear in `git log`. T-0079 and T-0142 (T-0097 slice) are merged and validated. The other five agents stopped twice on the 5-hour usage limit; their unmerged, unverified work is saved as patch series under `.agent/wip/<card>/` (restore steps in `.agent/wip/README.md`). Resume the agents after the reset (13:10 UTC), or restore a card's patches and finish it. Cards awaiting Codex review: T-0121, T-0041, T-0061, T-0068, T-0075, T-0078, T-0131, T-0083 (verifying) and the integrated Line A cards.
 
 ## Open questions for human
+- **CSRF policy (T-0144, security ADR to write).** Should cookie-authenticated writes that carry neither Fetch-Metadata nor Origin be rejected (OWASP recommends it)? That changes ~25 session-based DB test files. Owner decision or explicit delegation needed.
+- **Network:** research for T-0143 (backups) needs postgresql.org, which the session proxy blocks; allowing it in the environment would help.
+- [adr:security] T-0142 Accept ADR-0054 (API security headers, strict CORS, per-address rate limits auth 30 / writes 300 / webhooks 600 per minute, `LF_TRUST_PROXY_HOPS`)?
+  Options: A) accept as proposed B) different limits or HSTS policy C) helmet/@nestjs/throttler instead. Recommendation: A (OWASP baseline, no new runtime dependency). See: Docs/adr/0054-api-security-headers-and-rate-limits.md, RQ-0141. Built test-first on `feat/T-0097-pilot-hardening-r2`.
 - **(Resolved 2026-11-13, owner approved, DL-0408)** Golden approval registry refresh (it had been blocked by the session's permission classifier as an oversight-control change).** After the merge, `goldenGuard` fails because `Docs/decisions/golden-approvals.json` pins postings.md to the old snapshot 334a3f9 and main now holds GP-037…039. Per ADR-0047 the remedy is a refreshed record `{path: Docs/accounting/postings.md, commit: 983cc919f4911c5dd55e6e8bf9ff1e1f6a2ff404, decisions: [DL-0405, DL-0263, DL-0256, DL-0258]}`. Please approve the edit (or make it yourself); until then gate 4 stays FAIL on every branch.
 - **(Approved 2026-11-13, DL-0408; implementation in T-0128)** Coverage gate measure (T-0128, RQ-0105).** Changing verify.sh gate 2c to unit+db coverage and re-recording main's baseline under that measure is also a change to a check. Not done without your explicit OK; the alternative is adding unit tests to recover about 13.7 points of unit-only coverage.
 
@@ -295,3 +299,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-13T03:26:04.884Z claude: T-0131 → verifying
 - 2026-11-13T03:37:42.985Z claude: release T-0131 → review (verify 14 PASS at da9ede8; 2c/4 known; awaiting codex review)
 - 2026-11-13T03:46:59.109Z claude: T-0083 → verifying
+- 2026-11-13T04:00:10.167Z claude: release T-0083 → review (verify 15 PASS at 99d574f; 2c pending T-0128; awaiting codex review)

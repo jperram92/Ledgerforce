@@ -1,0 +1,40 @@
+TAP version 13
+# Subtest: verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+ok 1 - verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+  ---
+  duration_ms: 871.522137
+  type: 'test'
+  ...
+# Subtest: verify.sh (full) with a task: 2c coverage measures unit+db with one worker and passes against a unit+db main baseline
+ok 2 - verify.sh (full) with a task: 2c coverage measures unit+db with one worker and passes against a unit+db main baseline
+  ---
+  duration_ms: 1026.863863
+  type: 'test'
+  ...
+# Subtest: verify.sh (full) with a task: 2c coverage fails when unit+db lines drop below the unit+db main baseline
+ok 3 - verify.sh (full) with a task: 2c coverage fails when unit+db lines drop below the unit+db main baseline
+  ---
+  duration_ms: 1098.73873
+  type: 'test'
+  ...
+# Subtest: verify.sh (full) with a task: 2c coverage is PENDING, never PASS, when main's baseline was taken with another measure
+ok 4 - verify.sh (full) with a task: 2c coverage is PENDING, never PASS, when main's baseline was taken with another measure
+  ---
+  duration_ms: 2116.516071
+  type: 'test'
+  ...
+# Subtest: verify.sh (full) with a task: 2c coverage is PENDING without a main baseline
+ok 5 - verify.sh (full) with a task: 2c coverage is PENDING without a main baseline
+  ---
+  duration_ms: 1039.545309
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6262.262043

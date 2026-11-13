@@ -5,6 +5,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { apiOptionsFromEnv } from './config.ts';
+import { DEFAULT_RATE_LIMITS } from './security/rate-limit.ts';
 
 const files: Record<string, string> = {
   '/run/secrets/lf_app_password': 'app-pw\n',
@@ -159,5 +160,31 @@ describe('T-0074 Stripe webhook signing secret from the environment (ADR-0049)',
         read,
       ),
     ).toThrow(/LF_STRIPE_MODE/);
+  });
+});
+
+describe('T-0142 AC-5 security headers and rate limits from the environment (ADR-0054)', () => {
+  it('AC-5 production always enables the default limits; no trusted proxy unless configured [T-0142]', () => {
+    const o = apiOptionsFromEnv(base, readFile);
+    expect(o.security).toEqual({ hsts: false, trustProxyHops: 0, rateLimits: DEFAULT_RATE_LIMITS });
+  });
+
+  it('AC-5 an https public URL turns HSTS on [T-0142]', () => {
+    const o = apiOptionsFromEnv(
+      { ...base, LF_PUBLIC_URL: 'https://ledger.example.com', LF_OIDC_ISSUER: '' },
+      readFile,
+    );
+    expect(o.security?.hsts).toBe(true);
+  });
+
+  it('AC-5 LF_TRUST_PROXY_HOPS is an integer 0–5; anything else is refused at start-up [T-0142]', () => {
+    const hops = (v: string): number | undefined =>
+      apiOptionsFromEnv({ ...base, LF_TRUST_PROXY_HOPS: v }, readFile).security?.trustProxyHops;
+    expect([hops('0'), hops('1'), hops('5')]).toEqual([0, 1, 5]);
+    for (const bad of ['6', '-1', 'true', '1.5', ' 1', '']) {
+      expect(() => apiOptionsFromEnv({ ...base, LF_TRUST_PROXY_HOPS: bad }, readFile)).toThrow(
+        /LF_TRUST_PROXY_HOPS/,
+      );
+    }
   });
 });

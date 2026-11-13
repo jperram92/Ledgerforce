@@ -123,6 +123,9 @@ services:
       LF_OIDC_ISSUER: ${LF_PUBLIC_URL}/realms/ledgerforce
       LF_OIDC_CLIENT_ID: ledgerforce
       LF_OIDC_CLIENT_SECRET_FILE: /run/secrets/oidc_client_secret
+      # Proxies whose X-Forwarded-For the API trusts for rate limits (ADR-0054): nginx = 1; set 2
+      # when your TLS proxy in front of `web` appends X-Forwarded-For (Docs/ops/install.md).
+      LF_TRUST_PROXY_HOPS: ${LF_TRUST_PROXY_HOPS:-1}
     secrets: [lf_app_password, oidc_client_secret]
     depends_on:
       setup: { condition: service_completed_successfully }

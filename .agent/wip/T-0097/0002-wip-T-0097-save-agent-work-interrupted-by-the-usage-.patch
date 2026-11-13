@@ -1,0 +1,967 @@
+From fd715e1974e11c8bfb8c18de0b212f362c508dde Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 08:12:18 +0000
+Subject: [PATCH 2/4] wip(T-0097): save agent work interrupted by the usage
+ limit (unverified)
+
+What changed: Uncommitted work of the T-0097 sub-agent, saved by the lead as-is.
+Why: The agent stopped on the 5-hour usage limit; the container may not survive.
+Validation: none by the lead; the agent resumes and validates.
+Next action: the agent continues from this commit.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .agent/backlog/README.md                      |  16 ++-
+ .agent/backlog/T-0097.md                      |   6 +-
+ .agent/backlog/T-0098.md                      |   2 +-
+ .agent/backlog/T-0142.md                      |  61 ++++++++
+ .agent/backlog/T-0143.md                      |  56 ++++++++
+ .agent/backlog/T-0144.md                      |  50 +++++++
+ ...54-api-security-headers-and-rate-limits.md | 131 +++++++++++++++++
+ Docs/adr/README.md                            |   3 +-
+ Docs/decisions/decision-log.md                |  21 +++
+ ...41-api-security-headers-and-rate-limits.md | 116 +++++++++++++++
+ apps/api/src/config.test.ts                   |  27 ++++
+ apps/api/src/security/rate-limit.db.test.ts   | 134 ++++++++++++++++++
+ apps/api/src/security/rate-limit.test.ts      |  77 ++++++++++
+ .../src/security/security-headers.db.test.ts  |  94 ++++++++++++
+ 14 files changed, 785 insertions(+), 9 deletions(-)
+ create mode 100644 .agent/backlog/T-0142.md
+ create mode 100644 .agent/backlog/T-0143.md
+ create mode 100644 .agent/backlog/T-0144.md
+ create mode 100644 Docs/adr/0054-api-security-headers-and-rate-limits.md
+ create mode 100644 Docs/research/RQ-0141-api-security-headers-and-rate-limits.md
+ create mode 100644 apps/api/src/security/rate-limit.db.test.ts
+ create mode 100644 apps/api/src/security/rate-limit.test.ts
+ create mode 100644 apps/api/src/security/security-headers.db.test.ts
+
+diff --git a/.agent/backlog/README.md b/.agent/backlog/README.md
+index 31451e3..e9e5e00 100644
+--- a/.agent/backlog/README.md
++++ b/.agent/backlog/README.md
+@@ -13,17 +13,18 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
+ 
+ | Status | Cards |
+ |---|---:|
+-| blocked | 6 |
++| blocked | 7 |
+ | done | 3 |
+ | review | 91 |
+-| todo | 31 |
++| in_progress | 1 |
++| todo | 32 |
+ | verifying | 1 |
+-| **total** | **132** |
++| **total** | **135** |
+ 
+ | Phase | Cards |
+ |---|---:|
+ | Sprint 0 | 9 |
+-| MVP | 91 |
++| MVP | 94 |
+ | Phase 1 | 1 |
+ | Phase 2 | 1 |
+ | Phase 3 | 1 |
+@@ -199,8 +200,11 @@ graph LR
+ | [T-0094](T-0094.md) | Self-hosted Docker Compose install (api, worker, web, postgres, keycloak) | MVP | review | T-0081, T-0030, T-0011 | — | 1 |
+ | [T-0095](T-0095.md) | CI security gates: SAST, dependency, container and secret scanning, SBOM | MVP | review | T-0001 | — | 1 |
+ | [T-0096](T-0096.md) | DAST smoke test against the compose stack | MVP | review | T-0094, T-0095 | — | 0 |
+-| [T-0097](T-0097.md) | Pilot hardening: backups, restore drill, security headers, rate limits | MVP | todo | T-0094, T-0096 | — | 0 |
+-| [T-0098](T-0098.md) | Pilot data migration (opening balances, open AR/AP) and dry run | MVP | todo | T-0080, T-0097 | — | 0 |
++| [T-0097](T-0097.md) | Pilot hardening: backups, restore drill, security headers, rate limits (superseded by T-0142, T-0143, T-0144) | MVP | blocked | T-0094, T-0096 | — | 0 |
++| [T-0142](T-0142.md) | Platform - API security headers, strict CORS and rate limits on auth and mutating routes | MVP | in_progress | T-0094 | — | 1 |
++| [T-0143](T-0143.md) | Ops - encrypted database backup and restore drill that proves the hash chain | MVP | todo | T-0094 | — | 0 |
++| [T-0144](T-0144.md) | Platform - CSRF guard with Fetch Metadata and Origin checks for cookie-authenticated mutations | MVP | todo | T-0142 | — | 0 |
++| [T-0098](T-0098.md) | Pilot data migration (opening balances, open AR/AP) and dry run | MVP | todo | T-0080, T-0142, T-0143, T-0144 | — | 0 |
+ | [T-0099](T-0099.md) | MVP gate: pilot month and gate evidence pack (human gate) | MVP | todo | T-0098, T-0082, T-0083, T-0084, T-0085, T-0086, T-0087, T-0088, T-0089, T-0090, T-0091, T-0092, T-0093, T-0069, T-0070, T-0072, T-0075, T-0068, T-0048, T-0047, T-0033, T-0031, T-0035 | — | 0 |
+ | [T-0100](T-0100.md) | EPIC — Phase 1 backlog (payroll bridge, BAS, collections, Rules Studio, …) | Phase 1 | todo | T-0099 | UC-04, UC-07, UC-09 | 12 |
+ | [T-0101](T-0101.md) | EPIC — Phase 2 backlog (multi-entity, deferred revenue, Peppol, …) | Phase 2 | todo | T-0100 | — | 0 |
+diff --git a/.agent/backlog/T-0097.md b/.agent/backlog/T-0097.md
+index 4475363..d508a2e 100644
+--- a/.agent/backlog/T-0097.md
++++ b/.agent/backlog/T-0097.md
+@@ -4,7 +4,8 @@ title: "Pilot hardening: backups, restore drill, security headers, rate limits"
+ phase: MVP
+ use_cases: []
+ depends_on: [T-0094, T-0096]
+-status: todo
++status: blocked
++blocked_reason: "Superseded by T-0142, T-0143, T-0144 (split, DL-0461)"
+ claimed_by: null
+ lease_expires_at: null
+ attempts: 0
+@@ -44,5 +45,8 @@ Nightly encrypted backups, documented restore drill, CSP/CSRF/CORS/rate limiting
+ - [ ] 6. Update success-scenario register rows (n/a), decision log, run log, HANDOVER; release lease [phase: finish]
+ 
+ ## Notes for the next agent
++- **Superseded by T-0142, T-0143, T-0144** (2026-11-13, claude, DL-0461): split because headers/CORS/rate
++  limits, backup + restore drill (this card's AC-1, now T-0143 AC-1) and the CSRF guard together
++  exceed ~400 changed lines. Kept, not deleted (directive 6).
+ - Size target: ~300 changed lines, one session (< 2 h). Split with `new-task-card` if it grows.
+ - Ledger writes only through the posting engine; posted = immutable; money via decimal.js (AGENTS.md §4).
+diff --git a/.agent/backlog/T-0098.md b/.agent/backlog/T-0098.md
+index f829de0..25e3e82 100644
+--- a/.agent/backlog/T-0098.md
++++ b/.agent/backlog/T-0098.md
+@@ -3,7 +3,7 @@ id: T-0098
+ title: "Pilot data migration (opening balances, open AR/AP) and dry run"
+ phase: MVP
+ use_cases: []
+-depends_on: [T-0080, T-0097]
++depends_on: [T-0080, T-0142, T-0143, T-0144]
+ status: todo
+ claimed_by: null
+ lease_expires_at: null
+diff --git a/.agent/backlog/T-0142.md b/.agent/backlog/T-0142.md
+new file mode 100644
+index 0000000..8dd5725
+--- /dev/null
++++ b/.agent/backlog/T-0142.md
+@@ -0,0 +1,61 @@
++---
++id: T-0142
++title: "Platform - API security headers, strict CORS and rate limits on auth and mutating routes"
++phase: MVP
++use_cases: []
++depends_on: [T-0094]
++status: in_progress
++claimed_by: claude
++lease_expires_at: null
++attempts: 1
++last_checkpoint: null
++adr_required: true
++research: [RQ-0141]
++success_scenarios: []
++evidence: []
++estimate_lines: 350
++---
++
++# T-0142 — API security headers, strict CORS and rate limits (split from T-0097)
++
++## Goal
++Supersedes T-0097 (part). Every API response carries the OWASP REST security headers, the API
++never grants cross-origin access, and authentication plus every state-changing route is rate
++limited per client address with `429` and `Retry-After` (design §6.9, apps/api AGENTS.md).
++Decision: [ADR-0054](../../Docs/adr/0054-api-security-headers-and-rate-limits.md) (security,
++Proposed — human gate). Research: [RQ-0141](../../Docs/research/RQ-0141-api-security-headers-and-rate-limits.md).
++
++## Acceptance criteria (each maps to a test)
++- AC-1 Given any API route (public health, authenticated, 404, 401) When it answers Then it sends
++  `Cache-Control: no-store`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`,
++  `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`,
++  `Cross-Origin-Resource-Policy: same-origin`, and no `X-Powered-By`; `Strict-Transport-Security`
++  only when the public URL is https → `apps/api/src/security/security-headers.db.test.ts`
++- AC-2 Given a preflight or a request from another origin When the API answers Then no
++  `Access-Control-Allow-*` header is sent (strict CORS: cross-origin access is never granted)
++  → same file (regression guard: Nest's default is already strict; see RED notes)
++- AC-3 Given the auth limit N When one client address makes N+1 login requests within the window
++  Then the last answers `429 {error:'rate_limited'}` with an integer `Retry-After`; another address
++  is unaffected; after the window the client is allowed again → `apps/api/src/security/rate-limit.db.test.ts`
++- AC-4 Given the mutating limit When a client exceeds it with POST/PUT/PATCH/DELETE Then `429`
++  before any handler or database work runs; GET reads are not limited; webhooks have their own
++  class → same file, plus unit tests `apps/api/src/security/rate-limit.test.ts`
++- AC-5 Production configuration always enables the limits with the ADR-0054 defaults, reads
++  `LF_TRUST_PROXY_HOPS` (0–5, default 0) and enables HSTS for an https public URL →
++  `apps/api/src/config.test.ts`; compose passes `LF_TRUST_PROXY_HOPS` → `infra/test/install-contract.test.ts`
++
++## Open questions
++- None open: RQ-0141 resolved. ADR-0054 is a security ADR and stays Proposed until the product
++  owner accepts it; the card cannot be `done` before that.
++
++## Steps (checked off as done)
++- [ ] 1. RQ-0141 resolved; ADR-0054 proposed; DL entries
++- [ ] 2. RED: AC-1..AC-5 tests, output saved under `.agent/evidence/T-0097/`
++- [ ] 3. GREEN: security middleware, rate limiter, config, compose
++- [ ] 4. Validation: typecheck, lint, format, unit/api/db tests, infra contract tests [phase: verify]
++- [ ] 5. Cross-provider review (`cross-review`) [phase: review]
++- [ ] 6. Owner accepts ADR-0054 (human gate) [phase: finish]
++
++## Notes for the next agent
++- Evidence for this slice lives under `.agent/evidence/T-0097/` (the lead's instruction for the
++  T-0097 split) with a pointer from this card.
+diff --git a/.agent/backlog/T-0143.md b/.agent/backlog/T-0143.md
+new file mode 100644
+index 0000000..f77bfcd
+--- /dev/null
++++ b/.agent/backlog/T-0143.md
+@@ -0,0 +1,56 @@
++---
++id: T-0143
++title: "Ops - encrypted database backup and restore drill that proves the hash chain"
++phase: MVP
++use_cases: []
++depends_on: [T-0094]
++status: todo
++claimed_by: null
++lease_expires_at: null
++attempts: 0
++last_checkpoint: null
++adr_required: true
++research: []
++success_scenarios: []
++evidence: []
++estimate_lines: 350
++---
++
++# T-0143 — Encrypted backup and restore drill (split from T-0097)
++
++## Goal
++Supersedes T-0097 (part; carries its AC-1). Nightly encrypted logical backups of the LedgerForce
++database and a scripted restore drill that restores a backup into a fresh database and runs the
++journal hash-chain verifier (`verifyChain`, ADR-0017) for every company; design §6.9 (backups,
++PITR targets RPO 15 min / RTO 4 h hosted, quarterly restore drills).
++
++## Acceptance criteria (each maps to a test)
++- AC-1 (was T-0097 AC-1) Given a migrated database with posted journals in two tenants When the
++  backup tool dumps it and the restore drill restores it into a fresh database Then the drill
++  reports every company's chain `ok` with the same entry counts and exits 0
++  → `packages/db/src/ops/restore-drill.db.test.ts` (local PostgreSQL 16 test harness)
++- AC-2 Given a backup whose bytes were altered, or a restored chain with a tampered line, When
++  the drill runs Then it exits non-zero naming the failure → same file
++- AC-3 The backup file at rest is encrypted (no plaintext table data in the file) and decrypts only
++  with the configured key → same file
++- AC-4 Compose ships a nightly backup service with a retention setting and a runbook in
++  `Docs/ops/backup-restore.md` → `infra/test/install-contract.test.ts` (compose run verified in CI
++  only: no Docker locally, DL-0007)
++
++## Open questions
++- Encryption tool for backups at rest (age vs `openssl cms`/`gpg` vs the KMS adapter, ADR-0038);
++  key custody for self-hosters → RQ-0142, and an ADR (security) for the choice.
++- PITR (WAL archiving, e.g. pgBackRest/WAL-G) for the hosted RPO 15 min: in this card or a later
++  hosted-ops card → RQ-0142.
++
++## Steps (checked off as done)
++- [ ] 1. RQ-0142 resolved; ADR proposed
++- [ ] 2. RED: AC-1..AC-3 db tests
++- [ ] 3. Backup + restore-drill tooling GREEN
++- [ ] 4. Compose backup service + runbook (CI-verified)
++- [ ] 5. `bash scripts/agent/verify.sh` green [phase: verify]
++- [ ] 6. Cross-provider review [phase: review]
++
++## Notes for the next agent
++- `pg_dump`/`pg_restore` 16 are on the local agent host; the db test harness gives a superuser URL
++  (`createTestDatabase`). `verifyChain` lives in `packages/ledger/src/hash-chain.ts`.
+diff --git a/.agent/backlog/T-0144.md b/.agent/backlog/T-0144.md
+new file mode 100644
+index 0000000..47c3e9b
+--- /dev/null
++++ b/.agent/backlog/T-0144.md
+@@ -0,0 +1,50 @@
++---
++id: T-0144
++title: "Platform - CSRF guard with Fetch Metadata and Origin checks for cookie-authenticated mutations"
++phase: MVP
++use_cases: []
++depends_on: [T-0142]
++status: todo
++claimed_by: null
++lease_expires_at: null
++attempts: 0
++last_checkpoint: null
++adr_required: true
++research: [RQ-0141]
++success_scenarios: []
++evidence: []
++estimate_lines: 300
++---
++
++# T-0144 — CSRF guard for cookie-authenticated mutations (split from T-0097)
++
++## Goal
++Supersedes T-0097 (part). Browser-session (`lf_session` cookie) requests with an unsafe method are
++accepted only from the LedgerForce origin: `Sec-Fetch-Site: same-origin`, or, without Fetch
++Metadata, an `Origin` equal to `LF_PUBLIC_URL`'s origin (OWASP CSRF cheat sheet, RQ-0141 F6–F8).
++Bearer API-token requests carry no ambient credential and are unaffected. Design §6.9.
++
++## Acceptance criteria (each maps to a test)
++- AC-1 Cookie-authenticated POST with `Sec-Fetch-Site: cross-site` or `same-site` → 403
++  `{error:'csrf_rejected'}`, no handler runs → `apps/api/src/security/csrf.db.test.ts`
++- AC-2 Cookie-authenticated POST with no Fetch Metadata and a foreign or `null` Origin → 403; with
++  the public origin → allowed → same file
++- AC-3 Cookie-authenticated POST with neither header → decision per the ADR (OWASP recommends
++  fail-safe reject); Bearer-token POST without headers → allowed → same file
++- AC-4 Existing session-based DB tests send `Sec-Fetch-Site: same-origin` through their shared
++  helpers (about 25 files under `apps/api/src/**`), no assertion weakened
++
++## Open questions
++- Fail-safe (reject cookie mutations lacking both headers) vs fail-open: OWASP recommends
++  fail-safe; it changes every session-based test helper → decide in a security ADR (human gate).
++
++## Steps (checked off as done)
++- [ ] 1. ADR (security) for the CSRF policy; DL entry
++- [ ] 2. RED: AC-1..AC-3
++- [ ] 3. Guard GREEN; test helpers send Fetch Metadata (AC-4)
++- [ ] 4. `bash scripts/agent/verify.sh` green [phase: verify]
++- [ ] 5. Cross-provider review [phase: review]
++
++## Notes for the next agent
++- Split out of T-0097 because the fail-safe rule touches ~25 existing test files, which would
++  have pushed the first slice far past ~400 changed lines (DL-0461).
+diff --git a/Docs/adr/0054-api-security-headers-and-rate-limits.md b/Docs/adr/0054-api-security-headers-and-rate-limits.md
+new file mode 100644
+index 0000000..92e3929
+--- /dev/null
++++ b/Docs/adr/0054-api-security-headers-and-rate-limits.md
+@@ -0,0 +1,131 @@
++---
++adr: 0054
++title: "Send REST security headers on every API response, keep CORS off, and rate limit auth and mutating routes per client address"
++status: Proposed
++date: 2026-11-13
++author: claude
++category: security
++human_gate: yes
++supersedes: none
++superseded_by: none
++---
++
++# ADR-0054: API security headers, strict CORS and rate limits
++
++## Status
++
++Proposed — security category, awaiting the product owner (AGENTS.md §6 gate 1; security ADRs are
++not covered by the DL-0263 delegation). Code is built test-first on the T-0142 branch; T-0142
++cannot be `done` until this is accepted.
++
++## Context and problem statement
++
++Design §6.9 requires rate limiting, CSP, CSRF protection and strict CORS (OWASP ASVS L2);
++apps/api AGENTS.md repeats it. Until T-0142 the API set no security headers of its own (only the
++nginx SPA location did), Express advertised `X-Powered-By: Express`, nothing was rate limited and
++`trust proxy` was off, so behind nginx every client had nginx's address. RQ-0141 collected the
++OWASP guidance (REST, HTTP headers, DoS, authentication and CSRF cheat sheets) and the Express
++5.2.1 / proxy-addr behaviour from source. CSRF is decided separately (T-0144).
++
++## Decision drivers
++
++- OWASP REST Security Cheat Sheet header baseline and "disable CORS headers if cross-domain calls
++  are not supported" (RQ-0141 S1, S2).
++- 429 on excess requests (S3); limits must not turn into an outage for everyone behind one proxy
++  (S8–S10).
++- No new runtime dependency without need (AGENTS.md §4); small, testable code.
++- Single-VM compose MVP with one API process (design §7.2).
++
++## Considered options
++
++1. **In-house Express middleware** for headers and a bounded fixed-window limiter.
++2. **helmet + @nestjs/throttler** (or express-rate-limit).
++3. **Edge only** — headers and limits in nginx / the operator's proxy.
++
++### Option 1 — In-house middleware
++
++- Good, because the rules are ~20 lines of headers and a counter; no runtime dependency or ADR for
++  one; exact control of the 429 body (`{error}` like every other API error) and of route classes.
++- Good, because it runs before routing, guards and the database: excess requests cost nothing.
++- Bad, because we own the code (mitigated by unit + DB tests) and counters are per process.
++
++### Option 2 — helmet + throttler
++
++- Good, because maintained defaults.
++- Bad, because two runtime dependencies (ADR + supply chain) for behaviour we still have to
++  configure route by route; helmet's defaults target HTML pages (e.g. a CSP with `script-src`),
++  not a JSON API; throttler also keeps in-memory counters by default (S11).
++
++### Option 3 — Edge only
++
++- Good, because no application code.
++- Bad, because the API is also reachable without nginx (tests, other topologies, hosted later) and
++  the headers would then silently disappear; nginx `limit_req` cannot tell route classes apart as
++  precisely without duplicating the API's route list again.
++
++## Decision outcome
++
++Chosen option: **Option 1, in-house middleware**, because it meets the OWASP baseline with no new
++dependency and keeps the policy next to the routes it protects, testable in the API's own suites.
++
++Rules:
++
++1. Every API response carries `Cache-Control: no-store`,
++   `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`,
++   `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`,
++   `Cross-Origin-Resource-Policy: same-origin`; no `X-Powered-By`.
++2. `Strict-Transport-Security: max-age=31536000` is sent only when the public URL is https
++   (no `includeSubDomains`, no `preload`: those are the operator's choice).
++3. CORS is never enabled (`enableCors` / `cors` option are not used); a test pins that no
++   `Access-Control-Allow-*` header is sent, even to a preflight.
++4. Rate limits, fixed 60-second windows, keyed on (class, `req.ip`):
++   - `auth` — `GET /t/:slug/auth/login`, `GET /auth/callback`, `GET /auth/step-up`: 30;
++   - `webhook` — unsafe methods on `/webhooks/*`: 600;
++   - `mutating` — any other POST/PUT/PATCH/DELETE: 300;
++   - safe methods outside `auth` are not limited.
++   Excess answers `429 {"error":"rate_limited"}` with `Retry-After` in whole seconds, before routing.
++   The key map is bounded (oldest keys evicted).
++5. `trust proxy` is the integer `LF_TRUST_PROXY_HOPS` (0–5, default 0), never `true`; compose
++   passes 1 (nginx). Operators with a TLS proxy that appends `X-Forwarded-For` set 2.
++6. Production configuration (`apiOptionsFromEnv`) always enables rules 1–5; `createApi` without
++   the `security.rateLimits` option (unit/DB test harness) applies rules 1–3 only.
++
++## Consequences
++
++### Good
++
++- OWASP REST header baseline on every route, including errors and redirects.
++- Floods of OIDC starts, callbacks or writes are cut off before guards and SQL.
++
++### Bad / accepted trade-offs
++
++- Counters are per process and reset on restart; a multi-process hosted deployment needs a shared
++  store or edge limiting (follow-up before hosted, RQ-0141 F8).
++- Users behind one NAT share a bucket; the defaults are sized for an SMB pilot and configurable in
++  code (`security.rateLimits`).
++- A wrong `LF_TRUST_PROXY_HOPS` either merges clients into one bucket (too low) or lets clients
++  pick their bucket via `X-Forwarded-For` (too high); documented in Docs/ops/install.md.
++
++### Follow-ups
++
++- T-0144 CSRF (Fetch Metadata + Origin) with its own security ADR.
++- Shared rate-limit store or edge limiting for hosted (not MVP).
++
++## Compliance and verification
++
++| Check | Where | Gate |
++|---|---|---|
++| Header set on public, authenticated, 404 and 401 responses; no X-Powered-By; HSTS only for https | `apps/api/src/security/security-headers.db.test.ts` | verify.sh unit/db gates |
++| No `Access-Control-Allow-*` on preflight or cross-origin request | same file | same |
++| 429 + Retry-After per class and per address, window reset, before handlers | `apps/api/src/security/rate-limit.db.test.ts`, `rate-limit.test.ts` | same |
++| Production config enables limits, parses `LF_TRUST_PROXY_HOPS`, HSTS for https | `apps/api/src/config.test.ts` | same |
++| Compose passes `LF_TRUST_PROXY_HOPS` to the API | `infra/test/install-contract.test.ts` | same |
++
++## Links
++
++- Design: §6.9, §7.2
++- Research: RQ-0141
++- Decision log: DL-0462
++- Related ADRs: ADR-0016 (sessions), ADR-0025 (step-up), ADR-0049 (Stripe webhook)
++- External sources: OWASP Cheat Sheet Series (REST Security, HTTP Headers, Denial of Service,
++  Authentication, CSRF Prevention), retrieved 2026-11-13 from the OWASP/CheatSheetSeries repository
+diff --git a/Docs/adr/README.md b/Docs/adr/README.md
+index 51add24..f83f507 100644
+--- a/Docs/adr/README.md
++++ b/Docs/adr/README.md
+@@ -101,5 +101,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
+ | [0051](0051-gross-ecl-allowance-remeasurement.md) | Gross ECL allowance and subsequent remeasurement | accounting | delegated | Accepted |
+ | [0052](0052-owner-authorized-independent-codex-review.md) | Independent Codex review for the current pickup batch | process | owner instruction | Accepted |
+ | [0053](0053-mime-parsing-postal-mime.md) | Parse inbound bill email with postal-mime | integration | no | Accepted |
++| [0054](0054-api-security-headers-and-rate-limits.md) | API security headers, strict CORS and rate limits on auth and mutating routes | security | yes | Proposed |
+ 
+-Next free number: **0054** (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).
++Next free number: **0055** (0055–0060 are reserved for the DL-0409 parallel round) (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).
+diff --git a/Docs/decisions/decision-log.md b/Docs/decisions/decision-log.md
+index 5f75603..29a43ac 100644
+--- a/Docs/decisions/decision-log.md
++++ b/Docs/decisions/decision-log.md
+@@ -2586,3 +2586,24 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
+   | T-0097 pilot hardening | 0460–0469 | 0054–0055 | 0141–0142 | T-0142–T-0144 |
+ - Why: The owner asked for parallel agents (DL-0408); disjoint ranges keep the merges mechanical.
+ - ADR: none · Status: accepted
++
++### DL-0460 — T-0097 round-2 branch name and start while T-0094/T-0096 are in review
++- Date: 2026-11-13 · By: claude · Task: T-0097 · Category: process
++- Decision: Work on local branch `feat/T-0097-pilot-hardening-r2` from `f8b10bd` (tip of `claude/loving-lovelace-nozqpk`, contains bcf4ab6). Start although T-0097's dependencies T-0094 and T-0096 are `review`, not `done`. `state.json` is not rewritten by this sub-agent.
++- Why: The lead assigned T-0097 to this agent (DL-0409). The name `feat/T-0097-pilot-hardening` is already held, at eba7510 with no T-0097 commits, by a lost round-1 worktree that this agent may not touch or delete (directive 6); the worktree's own HEAD (983cc91) predated bcf4ab6. The compose stack T-0094 built is what the slice hardens; review findings on it do not change the API middleware. `state.json` is shared by six parallel agents; the lead owns it during the round.
++- Alternatives: Force-moving the old branch (refused: checked out in another worktree, and rewriting refs of another session); waiting for T-0094/T-0096 review (blocks the round).
++- ADR: none · Status: accepted
++
++### DL-0461 — Split T-0097 into T-0142, T-0143 and T-0144
++- Date: 2026-11-13 · By: claude · Task: T-0097 · Category: scope
++- Decision: T-0097 is superseded (status blocked, kept) by T-0142 (API security headers, strict CORS, rate limits — built now), T-0143 (encrypted backup + restore drill with hash-chain verification; carries T-0097 AC-1) and T-0144 (CSRF Fetch-Metadata/Origin guard). T-0098 now depends on the three new cards.
++- Why: Together the work exceeds the ~400-line card limit (new-task-card skill). The CSRF fail-safe rule recommended by OWASP (RQ-0141 F7) changes the session helpers of ~25 existing DB test files and needs its own security ADR; backups need their own research (encryption, key custody, PITR, RQ-0142).
++- Alternatives: One large card (violates the size rule); dropping CSRF from scope (design §6.9 requires it).
++- ADR: none · Status: accepted
++
++### DL-0462 — API security headers, strict CORS and rate limits in-house (ADR-0054, Proposed)
++- Date: 2026-11-13 · By: claude · Task: T-0142 · Category: security
++- Decision: Resolve RQ-0141 and propose ADR-0054: OWASP REST header set on every API response, no X-Powered-By, HSTS only for an https public URL, CORS never enabled, fixed-window per-address limits (auth 30, mutating 300, webhook 600 per 60 s) answering 429 + Retry-After before routing, `trust proxy` = `LF_TRUST_PROXY_HOPS` (0–5, default 0; compose 1). Built as in-house Express middleware, no new runtime dependency.
++- Why: RQ-0141 (OWASP REST/HTTP-headers/DoS/CSRF cheat sheets; Express 5.2.1 and proxy-addr source). Libraries (helmet, @nestjs/throttler) would add runtime dependencies for ~100 lines of policy and keep in-memory counters too.
++- Alternatives: helmet + @nestjs/throttler; edge-only limits in nginx (see ADR-0054).
++- ADR: ADR-0054 · Status: proposed (awaiting human)
+diff --git a/Docs/research/RQ-0141-api-security-headers-and-rate-limits.md b/Docs/research/RQ-0141-api-security-headers-and-rate-limits.md
+new file mode 100644
+index 0000000..4b802ad
+--- /dev/null
++++ b/Docs/research/RQ-0141-api-security-headers-and-rate-limits.md
+@@ -0,0 +1,116 @@
++---
++id: RQ-0141
++title: Which security headers, CORS policy and rate limits must the LedgerForce API apply, and how (in-house or a library)?
++status: resolved
++opened: 2026-11-13
++resolved: 2026-11-13
++opened_by: claude
++linked_tasks: [T-0097, T-0142, T-0144]
++linked_adrs: [ADR-0054]
++superseded_by:
++---
++
++# RQ-0141 — API security headers, CORS and rate limits
++
++## Question
++
++- Q1. Which HTTP response headers should every LedgerForce API response carry (design §6.9,
++  apps/api AGENTS.md "Security headers, CSP, strict CORS, rate limiting")?
++- Q2. What does "strict CORS" mean for an API served on the same origin as the SPA (nginx, T-0094)?
++- Q3. Which routes are rate limited, keyed on what, with what response, and how is the client
++  address found behind the nginx proxy (and an operator's TLS terminator)?
++- Q4. Build the headers and the limiter in-house, or add `helmet` / `@nestjs/throttler` /
++  `express-rate-limit` (a new runtime dependency needs an ADR, AGENTS.md §4)?
++- Q5. What CSRF protection does a cookie-session API need beyond `SameSite=Lax` (input for T-0144)?
++
++## Why it matters
++
++Design §6.9 requires "Rate limiting, CSP, CSRF protection, strict CORS" and OWASP ASVS L2. Before
++this record the API sent none of these headers itself (only nginx's SPA `location` did, see
++`infra/docker/nginx/default.conf.template`), Express advertised `X-Powered-By: Express`, there was
++no rate limiting and `trust proxy` was off. Guessing the client address wrong behind a proxy either
++puts every user in one bucket (a self-inflicted outage) or lets clients spoof their bucket.
++
++## Sources consulted
++
++| # | Source (URL or command) | Accessed | Kind | What it says (short quote or paraphrase) |
++|---|---|---|---|---|
++| S1 | https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/REST_Security_Cheat_Sheet.md §"Security Headers" | 2026-11-13 | primary (OWASP) | "The following headers should be included in all API responses that may be consumed by browser clients": `Cache-Control: no-store`, `Content-Security-Policy: frame-ancestors 'none'`, `Content-Type`, `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`. For defence in depth when unsure whether HTML may be returned: `Content-Security-Policy: default-src 'none'`, `Permissions-Policy`, `Referrer-Policy: no-referrer`. |
++| S2 | same, §"CORS" | 2026-11-13 | primary | "Disable CORS headers if cross-domain calls are not supported/expected." |
++| S3 | same, §"API Keys" and status-code table | 2026-11-13 | primary | "Return `429 Too Many Requests` HTTP response code if requests are coming in too quickly"; 429 "is used when there may be DOS attack detected or the request is rejected due to rate limiting". |
++| S4 | https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/HTTP_Headers_Cheat_Sheet.md | 2026-11-13 | primary | X-Powered-By: "Remove all `X-Powered-By` headers". HSTS recommendation `max-age=63072000; includeSubDomains; preload` with the warning that a misconfigured HSTS or a TLS problem can lock users out; CORP `same-site` ("Limit current resource loading to the site and sub-domains only"); X-Frame-Options `DENY`. |
++| S5 | https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/Denial_of_Service_Cheat_Sheet.md §"Rate limiting" | 2026-11-13 | primary | Rate limiting "can be implemented on infrastructure as well as on an application level … based on (offending) IPs". |
++| S6 | https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/Authentication_Cheat_Sheet.md §"Login Throttling" | 2026-11-13 | primary | Login throttling; lockout counters "should be associated with the account itself, rather than the source IP address"; lockouts must not become a DoS on other users. |
++| S7 | https://raw.githubusercontent.com/OWASP/CheatSheetSeries/master/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.md §"Fetch Metadata headers", §"Using Standard Headers to Verify Origin" | 2026-11-13 | primary | Reject unsafe methods with `Sec-Fetch-Site: cross-site`; treat `same-site` as untrusted unless sibling subdomains are trusted; "a fallback to standard origin verification … is a mandatory requirement"; when headers are absent "Fail-safe (recommended for sensitive endpoints): … block the request"; "Missing headers and `Origin: null` are not evidence of a same-origin request"; target origin is best configured server-side; X-Forwarded-Host only from trusted proxies. |
++| S8 | `node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js` lines 94, 99; `lib/utils.js` `compileTrust`; `lib/request.js` `ip` getter | 2026-11-13 | source code | Express 5.2.1 enables `x-powered-by` and sets `trust proxy` to `false` by default; a numeric `trust proxy` trusts that many hops (`function(a, i){ return i < val }`); `req.ip` = `proxyaddr(req, trust)`. |
++| S9 | `node_modules/.pnpm/proxy-addr@2.0.8/node_modules/proxy-addr/index.js` `alladdrs` | 2026-11-13 | source code | Addresses are the socket address followed by `X-Forwarded-For` right to left; walking stops at the first untrusted hop, so with N trusted hops the client address is the (N+1)-th from the right — entries further left (client-supplied) are ignored. |
++| S10 | `infra/docker/nginx/default.conf.template` (repo) | 2026-11-13 | source code | nginx sets `X-Forwarded-For $proxy_add_x_forwarded_for` (appends `$remote_addr`) and is the only ingress to `api:3000` in compose; Docs/ops/install.md puts TLS termination in front of nginx. |
++| S11 | `curl https://registry.npmjs.org/{helmet,@nestjs/throttler,express-rate-limit}/latest` | 2026-11-13 | primary (registry) | helmet 8.3.0 (no deps); @nestjs/throttler 6.7.1 (peer Nest ≤12); express-rate-limit 8.7.4 (deps `debug`, `ip-address`). All three keep counters in process memory by default; shared stores are separate packages. |
++| S12 | `node_modules/@nestjs/core` `NestFactory.create` options (repo, Nest 12.1.2) and `apps/api/src/app.ts` | 2026-11-13 | source code | CORS is only enabled when `cors` is passed to `NestFactory.create` or `app.enableCors()` is called; `createApi` does neither, so no `Access-Control-Allow-*` header is ever sent. |
++
++Accessed through the session's proxy: the OWASP site, rfc-editor.org and expressjs.com were not
++reachable (DNS refused), so the OWASP cheat sheets were read from their source repository and the
++Express behaviour from the installed source (S8, S9) instead of its guide.
++
++## Findings
++
++1. **Headers (Q1).** S1 lists the REST baseline; S1's defence-in-depth table applies because some
++   API routes redirect (OIDC) and a future route may return HTML. S4 adds: remove `X-Powered-By`
++   (Express sends it by default, S8), CORP. *Inference:* CORP `same-origin` is stricter than S4's
++   `same-site` and fits because the SPA and API share one origin (S10).
++2. **HSTS (Q1).** HSTS is honoured only over https and misconfiguration can lock users out (S4).
++   *Inference:* send it only when `LF_PUBLIC_URL` is https; `max-age=31536000` without
++   `includeSubDomains`/`preload`, because a self-hoster's sibling subdomains and preload-list
++   membership are the operator's choice, not ours.
++3. **CORS (Q2).** Cross-domain calls are not expected (the SPA is same-origin via nginx), so CORS
++   stays disabled (S2); Nest already sends no CORS headers (S12). A regression test pins this.
++4. **Rate limiting (Q3).** OWASP asks for 429 on excess (S3) and allows IP-based application-level
++   limiting (S5). Login lockout by account (S6) does not apply: LedgerForce has no passwords —
++   Keycloak owns credentials and brute-force detection (RQ-0041); the API's auth routes start and
++   finish OIDC flows, so per-address throttling of those routes protects the API and the
++   pre-auth table from floods.
++5. **Client address (Q3).** With `trust proxy` off every request behind nginx has nginx's address
++   (S8, S10) — one bucket for everyone. A numeric hop count trusts exactly that many proxies and
++   ignores client-supplied entries further left (S9). Compose's topology is nginx (1 hop), plus 1
++   when the operator's TLS proxy appends `X-Forwarded-For` — so the hop count is deployment
++   configuration (`LF_TRUST_PROXY_HOPS`), never `true`.
++6. **Library vs in-house (Q4).** The rules needed are about 20 lines of header setting and a
++   fixed-window counter (S11 shows the libraries also keep in-memory counters per process by
++   default). In-house code avoids a runtime-dependency ADR and supply-chain surface; the counter
++   must be bounded (evict oldest keys) so an address-rotation flood cannot exhaust memory.
++7. **CSRF (Q5, for T-0144).** `SameSite=Lax` is defence in depth only; OWASP's Fetch-Metadata
++   policy with a mandatory Origin fallback and a fail-safe on missing headers is recommended (S7).
++   Bearer-token requests carry no ambient credential and are not CSRF targets.
++8. **Multi-instance caveat.** In-process counters are per API process. The MVP is a single-VM
++   compose install with one API process (design §7.2), so the limits hold; a scaled hosted
++   deployment needs a shared store or edge limiting (follow-up, not MVP).
++
++## Conclusion / decision
++
++- Add an Express middleware, first in the chain, that sets on every response:
++  `Cache-Control: no-store`, `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`,
++  `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`,
++  `Cross-Origin-Resource-Policy: same-origin`, and `Strict-Transport-Security: max-age=31536000`
++  when HSTS is on; disable `x-powered-by`. Never call `enableCors`.
++- Add an in-house fixed-window limiter keyed on (class, `req.ip`), before routing:
++  `auth` = the OIDC login/callback/step-up routes; `webhook` = `/webhooks/*`; `mutating` = any other
++  POST/PUT/PATCH/DELETE. Excess answers `429 {"error":"rate_limited"}` with `Retry-After` (whole
++  seconds). GET/HEAD/OPTIONS are not limited (except the auth routes). Bounded key map.
++- Production defaults (per client address per 60 s): auth 30, mutating 300, webhook 600; set
++  `trust proxy` to `LF_TRUST_PROXY_HOPS` (integer 0–5, default 0; compose passes 1).
++- Record it in a **security** ADR (ADR-0054, Proposed, human gate). CSRF goes to T-0144 with its
++  own ADR.
++
++## Confidence
++
++`high` for the header set, CORS and Express proxy semantics (OWASP primary text and executed
++library source). `medium` for the numeric defaults (30/300/600 per minute): there is no normative
++number; they are sized for an SMB pilot (≤ ~20 users behind one address) and are configurable.
++
++## Follow-ups
++
++- T-0144 CSRF guard (Finding 7). T-0143 backups (separate RQ-0142).
++- Shared-store or edge rate limiting before a multi-process hosted deployment (Finding 8).
++- Re-check the OWASP cheat sheets when the ASVS 5 mapping is done for the hosted offering.
++
++**Affects:** apps/api (app.ts, config.ts, new `security/`), infra/compose, Docs/ops/install.md, ADR-0054.
+diff --git a/apps/api/src/config.test.ts b/apps/api/src/config.test.ts
+index 998c1a1..39d1845 100644
+--- a/apps/api/src/config.test.ts
++++ b/apps/api/src/config.test.ts
+@@ -5,6 +5,7 @@
+  */
+ import { describe, expect, it } from 'vitest';
+ import { apiOptionsFromEnv } from './config.ts';
++import { DEFAULT_RATE_LIMITS } from './security/rate-limit.ts';
+ 
+ const files: Record<string, string> = {
+   '/run/secrets/lf_app_password': 'app-pw\n',
+@@ -161,3 +162,29 @@ describe('T-0074 Stripe webhook signing secret from the environment (ADR-0049)',
+     ).toThrow(/LF_STRIPE_MODE/);
+   });
+ });
++
++describe('T-0142 AC-5 security headers and rate limits from the environment (ADR-0054)', () => {
++  it('AC-5 production always enables the default limits; no trusted proxy unless configured [T-0142]', () => {
++    const o = apiOptionsFromEnv(base, readFile);
++    expect(o.security).toEqual({ hsts: false, trustProxyHops: 0, rateLimits: DEFAULT_RATE_LIMITS });
++  });
++
++  it('AC-5 an https public URL turns HSTS on [T-0142]', () => {
++    const o = apiOptionsFromEnv(
++      { ...base, LF_PUBLIC_URL: 'https://ledger.example.com', LF_OIDC_ISSUER: '' },
++      readFile,
++    );
++    expect(o.security?.hsts).toBe(true);
++  });
++
++  it('AC-5 LF_TRUST_PROXY_HOPS is an integer 0–5; anything else is refused at start-up [T-0142]', () => {
++    const hops = (v: string): number | undefined =>
++      apiOptionsFromEnv({ ...base, LF_TRUST_PROXY_HOPS: v }, readFile).security?.trustProxyHops;
++    expect([hops('0'), hops('1'), hops('5')]).toEqual([0, 1, 5]);
++    for (const bad of ['6', '-1', 'true', '1.5', ' 1', '']) {
++      expect(() => apiOptionsFromEnv({ ...base, LF_TRUST_PROXY_HOPS: bad }, readFile)).toThrow(
++        /LF_TRUST_PROXY_HOPS/,
++      );
++    }
++  });
++});
+diff --git a/apps/api/src/security/rate-limit.db.test.ts b/apps/api/src/security/rate-limit.db.test.ts
+new file mode 100644
+index 0000000..2fffbe6
+--- /dev/null
++++ b/apps/api/src/security/rate-limit.db.test.ts
+@@ -0,0 +1,134 @@
++/**
++ * T-0142 AC-3, AC-4 — per-address rate limits on the auth routes, on every state-changing route
++ * and on webhooks, answered with 429 + Retry-After before any handler runs (ADR-0054 rules 4–5,
++ * RQ-0141 F4–F5). The test acts as nginx (one trusted hop) and names clients with
++ * X-Forwarded-For; the window is driven by an injected clock.
++ */
++import 'reflect-metadata';
++import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
++import { Controller, Post } from '@nestjs/common';
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import { createApi, type Api } from '../app.ts';
++import { Public } from '../tenancy/public.decorator.ts';
++
++let handled = 0;
++
++@Controller('t0142-probe')
++class ProbeController {
++  @Public()
++  @Post('write')
++  write(): { ok: true } {
++    handled += 1;
++    return { ok: true };
++  }
++}
++
++let tdb: TestDatabase;
++let api: Api;
++let direct: Api;
++let now = Date.UTC(2026, 10, 13, 9, 0, 0);
++const LIMITS = { windowMs: 60_000, auth: 3, mutating: 2, webhook: 4 };
++
++beforeAll(async () => {
++  tdb = await createTestDatabase({ migrate: true });
++  api = await createApi({
++    databaseUrl: tdb.url('lf_app'),
++    sessions: {},
++    testControllers: [ProbeController],
++    security: { trustProxyHops: 1, rateLimits: LIMITS, now: () => now },
++  });
++  // No trusted proxy: X-Forwarded-For must be ignored (every caller is its socket address).
++  direct = await createApi({
++    databaseUrl: tdb.url('lf_app'),
++    testControllers: [ProbeController],
++    security: { rateLimits: LIMITS, now: () => now },
++  });
++});
++afterAll(async () => {
++  await api.close();
++  await direct.close();
++  await tdb.close();
++});
++
++const from = (ip: string, init: RequestInit = {}): RequestInit => ({
++  ...init,
++  headers: { ...(init.headers as Record<string, string> | undefined), 'X-Forwarded-For': ip },
++});
++const statuses = async (n: number, url: string, init: RequestInit): Promise<number[]> => {
++  const out: number[] = [];
++  for (let i = 0; i < n; i += 1) out.push((await fetch(url, init)).status);
++  return out;
++};
++
++describe('T-0142 AC-3 auth routes are limited per client address', () => {
++  it('AC-3 the (N+1)-th step-up request in the window answers 429 rate_limited with Retry-After [T-0142]', async () => {
++    const url = `${api.url}/auth/step-up`;
++    expect(await statuses(3, url, from('203.0.113.1'))).toEqual([401, 401, 401]);
++    now += 15_000;
++    const res = await fetch(url, from('203.0.113.1'));
++    expect(res.status).toBe(429);
++    expect(await res.json()).toEqual({ error: 'rate_limited' });
++    expect(res.headers.get('retry-after')).toBe('45');
++    expect(res.headers.get('x-content-type-options')).toBe('nosniff');
++  });
++
++  it('AC-3 another client address is unaffected [T-0142]', async () => {
++    expect((await fetch(`${api.url}/auth/step-up`, from('203.0.113.2'))).status).toBe(401);
++  });
++
++  it('AC-3 a forged left-most X-Forwarded-For entry does not escape the bucket [T-0142]', async () => {
++    const res = await fetch(`${api.url}/auth/step-up`, from('198.51.100.9, 203.0.113.1'));
++    expect(res.status).toBe(429);
++  });
++
++  it('AC-3 case and trailing-slash variants of an auth route share its bucket [T-0142]', async () => {
++    for (const path of ['/AUTH/step-up', '/auth/step-up/', '/t/acme/auth/login', '/auth/callback']) {
++      expect((await fetch(`${api.url}${path}`, from('203.0.113.1'))).status).toBe(429);
++    }
++  });
++
++  it('AC-3 after the window the client is allowed again [T-0142]', async () => {
++    now += 60_000;
++    expect((await fetch(`${api.url}/auth/step-up`, from('203.0.113.1'))).status).toBe(401);
++  });
++});
++
++describe('T-0142 AC-4 state-changing routes and webhooks are limited; reads are not', () => {
++  it('AC-4 the (N+1)-th POST answers 429 before the handler runs [T-0142]', async () => {
++    handled = 0;
++    const url = `${api.url}/t0142-probe/write`;
++    expect(await statuses(3, url, from('192.0.2.7', { method: 'POST' }))).toEqual([201, 201, 429]);
++    expect(handled).toBe(2);
++  });
++
++  it('AC-4 PUT, PATCH and DELETE count against the same bucket [T-0142]', async () => {
++    for (const method of ['PUT', 'PATCH', 'DELETE']) {
++      const res = await fetch(`${api.url}/t0142-probe/write`, from('192.0.2.7', { method }));
++      expect(res.status).toBe(429);
++    }
++  });
++
++  it('AC-4 GET reads are never limited [T-0142]', async () => {
++    expect(await statuses(6, `${api.url}/health`, from('192.0.2.7'))).toEqual(
++      Array<number>(6).fill(200),
++    );
++  });
++
++  it('AC-4 webhooks have their own bucket: an exhausted mutating bucket does not block them [T-0142]', async () => {
++    const url = `${api.url}/webhooks/stripe`;
++    const got = await statuses(5, url, from('192.0.2.7', { method: 'POST' }));
++    expect(got.slice(0, 4).every((s) => s !== 429)).toBe(true);
++    expect(got[4]).toBe(429);
++  });
++
++  it('AC-4 without a trusted proxy X-Forwarded-For is ignored: rotating it does not reset the limit [T-0142]', async () => {
++    handled = 0;
++    const url = `${direct.url}/t0142-probe/write`;
++    const got: number[] = [];
++    for (const ip of ['10.0.0.1', '10.0.0.2', '10.0.0.3']) {
++      got.push((await fetch(url, from(ip, { method: 'POST' }))).status);
++    }
++    expect(got).toEqual([201, 201, 429]);
++    expect(handled).toBe(2);
++  });
++});
+diff --git a/apps/api/src/security/rate-limit.test.ts b/apps/api/src/security/rate-limit.test.ts
+new file mode 100644
+index 0000000..2d50457
+--- /dev/null
++++ b/apps/api/src/security/rate-limit.test.ts
+@@ -0,0 +1,77 @@
++/**
++ * T-0142 AC-4 (unit) — route classes and the bounded fixed-window counter behind the rate limit
++ * middleware (ADR-0054 rule 4, RQ-0141 F6).
++ */
++import { describe, expect, it } from 'vitest';
++import { DEFAULT_RATE_LIMITS, FixedWindowLimiter, rateLimitClass } from './rate-limit.ts';
++
++describe('T-0142 rate limit route classes', () => {
++  it.each([
++    ['GET', '/t/acme/auth/login', 'auth'],
++    ['GET', '/auth/callback', 'auth'],
++    ['GET', '/auth/step-up', 'auth'],
++    ['HEAD', '/auth/callback', 'auth'],
++    ['GET', '/Auth//Callback/', 'auth'],
++    ['POST', '/webhooks/stripe', 'webhook'],
++    ['POST', '/WEBHOOKS/stripe/', 'webhook'],
++    ['POST', '/auth/logout', 'mutating'],
++    ['POST', '/ar/invoices', 'mutating'],
++    ['put', '/companies/1', 'mutating'],
++    ['PATCH', '/users/1', 'mutating'],
++    ['DELETE', '/api-tokens/1', 'mutating'],
++    ['GET', '/ar/invoices', null],
++    ['GET', '/webhooks/stripe', null],
++    ['OPTIONS', '/ar/invoices', null],
++    ['GET', '/t/acme/auth/login/extra', null],
++  ])('AC-4 %s %s → %s [T-0142]', (method, path, cls) => {
++    expect(rateLimitClass(method, path)).toBe(cls);
++  });
++});
++
++describe('T-0142 fixed-window limiter', () => {
++  const policy = { windowMs: 10_000, auth: 2, mutating: 1, webhook: 3 };
++
++  it('AC-4 allows the class limit per key, then refuses with the seconds left in the window [T-0142]', () => {
++    let t = 1_000_000;
++    const l = new FixedWindowLimiter(policy, () => t);
++    expect(l.hit('auth', 'a')).toEqual({ allowed: true });
++    t += 2_500;
++    expect(l.hit('auth', 'a')).toEqual({ allowed: true });
++    expect(l.hit('auth', 'a')).toEqual({ allowed: false, retryAfterSeconds: 8 });
++    expect(l.hit('auth', 'b')).toEqual({ allowed: true });
++    expect(l.hit('mutating', 'a')).toEqual({ allowed: true });
++    expect(l.hit('mutating', 'a')).toEqual({ allowed: false, retryAfterSeconds: 8 });
++    t += 7_500;
++    expect(l.hit('auth', 'a')).toEqual({ allowed: true });
++  });
++
++  it('AC-4 Retry-After is at least one second [T-0142]', () => {
++    let t = 0;
++    const l = new FixedWindowLimiter(policy, () => t);
++    l.hit('mutating', 'a');
++    t = 9_999;
++    expect(l.hit('mutating', 'a')).toEqual({ allowed: false, retryAfterSeconds: 1 });
++  });
++
++  it('AC-4 the key map is bounded: the oldest key is evicted, memory never exceeds maxKeys [T-0142]', () => {
++    const t = 0;
++    const l = new FixedWindowLimiter({ ...policy, maxKeys: 2 }, () => t);
++    l.hit('mutating', 'a');
++    l.hit('mutating', 'b');
++    l.hit('mutating', 'c');
++    expect(l.size).toBe(2);
++    // 'a' was evicted, so it starts a fresh window; 'c' is still counted.
++    expect(l.hit('mutating', 'a')).toEqual({ allowed: true });
++    expect(l.hit('mutating', 'c')).toEqual({ allowed: false, retryAfterSeconds: 10 });
++  });
++
++  it('AC-5 production defaults are 30 auth, 300 mutating, 600 webhook per 60 s [T-0142]', () => {
++    expect(DEFAULT_RATE_LIMITS).toEqual({
++      windowMs: 60_000,
++      auth: 30,
++      mutating: 300,
++      webhook: 600,
++      maxKeys: 50_000,
++    });
++  });
++});
+diff --git a/apps/api/src/security/security-headers.db.test.ts b/apps/api/src/security/security-headers.db.test.ts
+new file mode 100644
+index 0000000..c4b0e7a
+--- /dev/null
++++ b/apps/api/src/security/security-headers.db.test.ts
+@@ -0,0 +1,94 @@
++/**
++ * T-0142 AC-1, AC-2 — REST security headers on every API response and strict CORS (ADR-0054,
++ * RQ-0141 F1–F3; OWASP REST Security Cheat Sheet "Security Headers" and "CORS").
++ */
++import 'reflect-metadata';
++import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import { createApi, type Api } from '../app.ts';
++
++let tdb: TestDatabase;
++let api: Api;
++let https: Api;
++
++beforeAll(async () => {
++  tdb = await createTestDatabase({ migrate: true });
++  api = await createApi({ databaseUrl: tdb.url('lf_app'), sessions: {} });
++  https = await createApi({ databaseUrl: tdb.url('lf_app'), security: { hsts: true } });
++});
++afterAll(async () => {
++  await api.close();
++  await https.close();
++  await tdb.close();
++});
++
++const BASELINE: Record<string, string> = {
++  'cache-control': 'no-store',
++  'content-security-policy': "default-src 'none'; frame-ancestors 'none'",
++  'x-content-type-options': 'nosniff',
++  'x-frame-options': 'DENY',
++  'referrer-policy': 'no-referrer',
++  'cross-origin-resource-policy': 'same-origin',
++};
++
++function expectBaseline(res: Response): void {
++  const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, res.headers.get(h)]));
++  expect(got).toEqual(BASELINE);
++  expect(res.headers.get('x-powered-by')).toBeNull();
++}
++
++describe('T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2)', () => {
++  it('AC-1 a public route (GET /health, 200) carries the OWASP REST header set [T-0142]', async () => {
++    const res = await fetch(`${api.url}/health`);
++    expect(res.status).toBe(200);
++    expectBaseline(res);
++  });
++
++  it('AC-1 an authenticated route refused without credentials (401) carries it too [T-0142]', async () => {
++    const res = await fetch(`${api.url}/auth/me`);
++    expect(res.status).toBe(401);
++    expectBaseline(res);
++  });
++
++  it('AC-1 an unknown route (404) carries it too [T-0142]', async () => {
++    const res = await fetch(`${api.url}/no-such-route`);
++    expect(res.status).toBe(404);
++    expectBaseline(res);
++  });
++
++  it('AC-1 a refused mutation (POST without credentials) carries it too [T-0142]', async () => {
++    const res = await fetch(`${api.url}/auth/logout`, { method: 'POST' });
++    expect(res.status).toBe(401);
++    expectBaseline(res);
++  });
++
++  it('AC-1 HSTS only when the public URL is https (max-age one year, no preload) [T-0142]', async () => {
++    const plain = await fetch(`${api.url}/health`);
++    expect(plain.headers.get('strict-transport-security')).toBeNull();
++    const tls = await fetch(`${https.url}/health`);
++    expectBaseline(tls);
++    expect(tls.headers.get('strict-transport-security')).toBe('max-age=31536000');
++  });
++});
++
++describe('T-0142 AC-2 strict CORS: cross-origin access is never granted (ADR-0054 rule 3)', () => {
++  it('AC-2 a preflight from another origin gets no Access-Control-Allow-* header [T-0142]', async () => {
++    const res = await fetch(`${api.url}/auth/logout`, {
++      method: 'OPTIONS',
++      headers: {
++        Origin: 'https://evil.example',
++        'Access-Control-Request-Method': 'POST',
++        'Access-Control-Request-Headers': 'content-type',
++      },
++    });
++    const cors = [...res.headers.keys()].filter((h) => h.startsWith('access-control-'));
++    expect(cors).toEqual([]);
++  });
++
++  it('AC-2 a simple cross-origin GET gets no Access-Control-Allow-Origin [T-0142]', async () => {
++    const res = await fetch(`${api.url}/health`, { headers: { Origin: 'https://evil.example' } });
++    expect(res.status).toBe(200);
++    expect(res.headers.get('access-control-allow-origin')).toBeNull();
++    expect(res.headers.get('access-control-allow-credentials')).toBeNull();
++  });
++});
+-- 
+2.43.0
+

@@ -1,0 +1,34 @@
+LedgerForce verify — 2026-11-13T08:34:53Z — task T-0142
+GATE 1 typecheck: PASS (pnpm typecheck)
+GATE 1 lint: PASS (pnpm lint)
+GATE 1 format: PASS (pnpm format:check)
+GATE 2a unit-tests: PASS (pnpm test + node --test scripts/agent/test)
+GATE 2b db-tests: PASS (pnpm test:db)
+GATE 2c coverage: FAIL (lines 58.43% < main 72.22%)
+GATE 3 accounting-invariants: PASS (1 property test file(s) ran in gate 2a)
+GATE 4 golden-postings: PASS (2 golden test file(s) ran in gate 2a; Docs/accounting unchanged vs 983cc91)
+GATE 5 cross-tenant-rls: PASS (1 cross-tenant RLS test file(s) ran in gate 2b)
+GATE 6 migrations-forward: PASS (applied in 2b; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+GATE 7 security: PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep — runs in CI))
+GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (claude) in .agent/evidence/T-0142/review-*.md)
+GATE 9 e2e-evidence: PASS (pnpm test:e2e; card lists no success_scenarios)
+GATE 10 no-shortcuts: PASS (247 test file(s) scanned; diff vs 983cc91 clean)
+GATE 11 no-delete: PASS (vs merge-baseGATE 2c coverage: NOT YET AVAILABLE (unit+db lines 93.72% — main baseline measure is "unit", not "unit+db": re-record .agent/coverage-baseline.json on main with the unit+db measure; no comparison across measures)
+GATE 3 accounting-invariants: FAIL (1 property test file(s); gate 2a failed)
+GATE 4 golden-postings: FAIL (2 golden test file(s); gate 2a failed; Docs/accounting unchanged vs 983cc91)
+GATE 5 cross-tenant-rls: PASS (1 cross-tenant RLS test file(s) ran in gate 2b)
+GATE 6 migrations-forward: PASS (applied in 2b; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+GATE 7 security: PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep — runs in CI))
+GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (claude) in .agent/evidence/T-0128/review-*.md)
+ward    | PASS (applied in 2b; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+ 7   | security              | PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep — runs in CI))
+ 8   | cross-review          | PENDING (no review report by a provider other than the builder (claude) in .agent/evidence/T-0142/review-*.md)
+ 9   | e2e-evidence          | PASS (pnpm test:e2e; card lists no success_scenarios)
+ 10  | no-shortcuts          | PASS (247 test file(s) scanned; diff vs 983cc91 clean)
+ 11  | no-delete             | PASS (vs merge-base 983cc91, staged + working tree)
+ 12  | memory                | PASS (T-0142: required steps ticked for status verifying, 1 linked RQ(s) resolved, HANDOVER present)
+PASS: 14   FAIL: 1   PENDING: 1
+!!! 1 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+VERIFY: FAIL
+ FAIL
+EXIT=1
