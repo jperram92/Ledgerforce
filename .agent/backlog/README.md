@@ -17,8 +17,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 111 |
-| todo | 25 |
-| verifying | 2 |
+| todo | 24 |
+| verifying | 3 |
 | **total** | **150** |
 
 | Phase | Cards |
@@ -243,7 +243,7 @@ graph LR
 | [T-0130](T-0130.md) | Stripe payouts: fetch from the API, payout.paid webhook, bank line match | MVP | todo | T-0075, T-0060 | UC-03, UC-08 | 0 |
 | [T-0131](T-0131.md) | AR invoices read and journal-preview API (list, detail, Show me the journal, approve) | MVP | review | T-0040, T-0041 | UC-01 | 0 |
 | [T-0132](T-0132.md) | Approve one invoice over HTTP: permission, SoD and idempotent POST /ar/invoices/:id/approve | MVP | todo | T-0131 | UC-01 | 0 |
-| [T-0136](T-0136.md) | Bills inbox: HTTP routes and screen (list emailed bills, view PDF, code into a draft) | MVP | todo | T-0051, T-0086 | UC-05 | 0 |
+| [T-0136](T-0136.md) | Bills inbox: HTTP routes and screen (list emailed bills, view PDF, code into a draft) | MVP | verifying | T-0051, T-0086 | UC-05 | 1 |
 | [T-0166](T-0166.md) | Gross ECL allowance reconciliation from source lineage | MVP | blocked | T-0031, T-0048 | — | 3 |
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | todo | T-0047, T-0035 | UC-04 | 3 |

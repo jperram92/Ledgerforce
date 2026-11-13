@@ -21,7 +21,7 @@ import {
 import { useServices } from '../env.tsx';
 import { emptyLine, formToBody, type BillForm } from './bill-logic.ts';
 import { useApCompany } from './BillsPage.tsx';
-import type { BillCoding } from './client.ts';
+import type { BillBody, BillCoding } from './client.ts';
 
 export function BillFormPage() {
   const access = useAccess();
@@ -70,7 +70,7 @@ export function BillFormPage() {
         onRetry={() => void coding.refetch()}
       />
     );
-  else body = <Editor companyId={companyId} coding={coding.data} />;
+  else body = <EnterBill companyId={companyId} coding={coding.data} />;
 
   return (
     <>
@@ -83,13 +83,46 @@ export function BillFormPage() {
   );
 }
 
-function Editor({ companyId, coding }: { companyId: string; coding: BillCoding }) {
+function EnterBill({ companyId, coding }: { companyId: string; coding: BillCoding }) {
   const { purchases } = useServices();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  return (
+    <BillEditor
+      companyId={companyId}
+      coding={coding}
+      save={(billId, b) => purchases.enter(billId, b)}
+      onSaved={async (billId) => {
+        await queryClient.invalidateQueries({ queryKey: ['ap', 'bills'] });
+        await navigate({ to: '/purchases/bills/$billId', params: { billId } });
+      }}
+      cancel={{ to: '/purchases/bills', text: 'Back to bills without saving' }}
+    />
+  );
+}
+
+/**
+ * The bill coding form (T-0086), shared with coding an emailed bill (T-0136). The bill id is
+ * chosen once per form, so a double submit or a retry after a refusal cannot enter it twice.
+ */
+export function BillEditor({
+  companyId,
+  coding,
+  initialPartyId = '',
+  save: saveBill,
+  onSaved,
+  cancel,
+}: {
+  companyId: string;
+  coding: BillCoding;
+  initialPartyId?: string;
+  save: (billId: string, body: BillBody) => Promise<unknown>;
+  onSaved: (billId: string, body: BillBody) => Promise<void>;
+  cancel: { to: '/purchases/bills' | '/purchases/inbox'; text: string };
+}) {
   const [billId] = useState(() => crypto.randomUUID());
   const [form, setForm] = useState<BillForm>(() => ({
-    partyId: '',
+    partyId: initialPartyId,
     supplierRef: '',
     billDate: new Date().toISOString().slice(0, 10),
     dueDate: '',
@@ -97,11 +130,8 @@ function Editor({ companyId, coding }: { companyId: string; coding: BillCoding }
   }));
   const [problems, setProblems] = useState<string[]>([]);
   const save = useMutation({
-    mutationFn: (b: Parameters<typeof purchases.enter>[1]) => purchases.enter(billId, b),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['ap', 'bills'] });
-      await navigate({ to: '/purchases/bills/$billId', params: { billId } });
-    },
+    mutationFn: (b: BillBody) => saveBill(billId, b),
+    onSuccess: (_, b) => onSaved(billId, b),
   });
   useFailureRouting(save.error);
   const setLine = (i: number, k: keyof BillForm['lines'][number], v: string) => {
@@ -300,7 +330,7 @@ function Editor({ companyId, coding }: { companyId: string; coding: BillCoding }
         <Refusal error={save.error} />
       )}
       <p className="admin-note">
-        <Link to="/purchases/bills">Back to bills without saving</Link>
+        <Link to={cancel.to}>{cancel.text}</Link>
       </p>
     </section>
   );

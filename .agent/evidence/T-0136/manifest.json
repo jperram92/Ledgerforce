@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0136",
+  "entries": [
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184321-SS-UC05-09-bills-inbox-list-1440.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 1440 [T-0136]",
+      "commit": "cd5923281aa7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:43:21.401Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184324-SS-UC05-09-bills-inbox-list-390.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 390 [T-0136]",
+      "commit": "cd5923281aa7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:43:24.302Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184342-SS-UC05-09-bills-inbox-list-1440.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 1440 [T-0136]",
+      "commit": "cd5923281aa7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:43:42.186Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184343-SS-UC05-09-code-emailed-bill-form-1440.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 1440 [T-0136]",
+      "commit": "cd5923281aa7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:43:43.374Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184344-SS-UC05-09-coded-draft-on-bills-list-1440.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 1440 [T-0136]",
+      "commit": "cd5923281aa7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:43:44.149Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184345-SS-UC05-09-bills-inbox-list-390.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 390 [T-0136]",
+      "commit": "cd5923281aa7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:43:45.955Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184347-SS-UC05-09-code-emailed-bill-form-390.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 390 [T-0136]",
+      "commit": "cd5923281aa7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:43:47.333Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184348-SS-UC05-09-coded-draft-on-bills-list-390.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 390 [T-0136]",
+      "commit": "cd5923281aa7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:43:48.108Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184540-SS-UC05-09-bills-inbox-list-1440.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 1440 [T-0136]",
+      "commit": "0f20de160c55",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:40.448Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184541-SS-UC05-09-code-emailed-bill-form-1440.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 1440 [T-0136]",
+      "commit": "0f20de160c55",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:41.886Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184542-SS-UC05-09-coded-draft-on-bills-list-1440.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 1440 [T-0136]",
+      "commit": "0f20de160c55",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:42.608Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184544-SS-UC05-09-bills-inbox-list-390.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 390 [T-0136]",
+      "commit": "0f20de160c55",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:44.198Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184545-SS-UC05-09-code-emailed-bill-form-390.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 390 [T-0136]",
+      "commit": "0f20de160c55",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:45.215Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184546-SS-UC05-09-coded-draft-on-bills-list-390.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 390 [T-0136]",
+      "commit": "0f20de160c55",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:46.139Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): bill coding choices › lists active suppliers, postable expense/asset accounts and tax codes in force; needs ap.bill.enter | apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): bills list and one bill › lists every bill with supplier, dates and state; shows one bill with its coding and the people involved | apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): approval decision for the caller (SoD on the server) › a person who entered a 2,750.00 bill is told they may not approve it; another approver may | apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): the journal of a bill › previews GP-008 for a draft without writing, and shows the same posted entry after approval",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-03",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-03: Submitted bill waits for the Approver › SS-UC05-03 a submitted bill is in the Approver queue, unposted, with no journal",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-05",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-05: AP Clerk cannot approve own bill › SS-UC05-05 the Clerk who entered a 2,750.00 bill is refused (SOD_BILL_SELF_APPROVAL, audited); another approver posts it",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-06",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-06: Small-team approval records an exception › SS-UC05-06 in small-team mode the sole user approves their own bill only with a recorded exception",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "3 test(s): apps/api/src/ap/inbox.db.test.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox › SS-UC05-09 lists the emailed bill with its suggested supplier and PDF, downloads the PDF, and codes it into one draft bill (idempotent replay, SoD bill.enter, audited) | apps/api/src/ap/inbox.db.test.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox › SS-UC05-09 an email without a PDF is listed but cannot be coded (422, nothing entered) | apps/api/src/ap/inbox.db.test.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox › SS-UC05-09 a bill id that is already a bill is refused, not attached to the item",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-06",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-batch-aba.db.test.ts › SS-UC06-06: ABA file is byte-exact › SS-UC06-06 a releaser downloads the ABA file of a released batch (audited); a draft batch and an AP Clerk are refused",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-01",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-01: Batch created from 12 due bills › SS-UC06-01 the AP Clerk builds a batch of 12 payments totalling the 12 bills",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-02",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-02: Creator cannot release own batch › SS-UC06-02 the Clerk who created the batch (fresh step-up) is denied with SOD_BATCH_SELF_RELEASE",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-03",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-03: Release requires step-up MFA › SS-UC06-03 user B without a fresh step-up gets step_up_required; after step-up the release succeeds",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-04",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-04: Batch over $10,000 needs two releasers › SS-UC06-04 a $25,000 batch is Partially released after one releaser; the same releaser cannot complete it; a second does",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-05",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-05: Recently changed bank details excluded with reason › SS-UC06-05 the supplier verified 3 hours ago is excluded with BANK_DETAILS_COOLING_OFF | apps/api/src/ap/payment-batches.db.test.ts › SS-UC06-05: Recently changed bank details excluded with reason › a malformed request is refused before anything is written",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-07",
+      "file": ".agent/evidence/T-0136/20261113-184609-tests-api-db.json",
+      "test": "7 test(s): apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 a releaser records the bank confirmation: GP-009 posts once with its outbox event, audited | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2026-13-01 with no posting effects [T-0057] | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2026-00-01 with no posting effects [T-0057] | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2026-12-32 with no posting effects [T-0057] | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2026-12-00 with no posting effects [T-0057] | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2027-02-29 with no posting effects [T-0057] | apps/api/src/ap/payment-confirmation.db.test.ts › SS-UC06-07: Batch posts GP-009 on confirmation only › SS-UC06-07 returns INVALID_BATCH for calendar date 2027-04-31 with no posting effects [T-0057]",
+      "commit": "0f20de160c55",
+      "provider": "claude",
+      "timestamp": "2026-11-13T18:46:09.570Z",
+      "result": "passed"
+    }
+  ]
+}

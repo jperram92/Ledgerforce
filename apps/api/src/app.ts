@@ -1,4 +1,5 @@
 import { ApBillCodingController, ApBillsController } from './ap/bills.controller.ts';
+import { ApInboxController } from './ap/inbox.controller.ts';
 import { ApPaymentBatchesController } from './ap/payment-batches.controller.ts';
 import { ArReceiptsController } from './ar/receipts.controller.ts';
 import { OpeningBalancesController } from './setup/opening-balances.controller.ts';
@@ -130,6 +131,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ArReceiptsController,
   ApBillsController,
   ApBillCodingController,
+  ApInboxController,
   ApPaymentBatchesController,
   StripeWebhookController,
   ReportsController,
@@ -180,6 +182,7 @@ class AppModule {
         ArReceiptsController,
         ApBillsController,
         ApBillCodingController,
+        ApInboxController,
         ApPaymentBatchesController,
         StripeWebhookController,
         ReportsController,

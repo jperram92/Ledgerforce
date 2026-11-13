@@ -2947,4 +2947,37 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: `@ledgerforce/ar` (seedReminderSchedule, INVOICE_NUMBER_SERIES), `@ledgerforce/gl` (CORE_SYSTEM_ROLES) and `@ledgerforce/products` (profileGaps) become runtime dependencies of `@ledgerforce/setup` (ar and gl were dev-only); `@ledgerforce/connector-salesforce`, `@ledgerforce/documents`, `@ledgerforce/parties` and `@ledgerforce/tax` are dev-only for the wizard test. No third-party package is added, so no ADR is needed (design §10.6 covers new runtime dependencies from outside the workspace). No cycle: none of them depends on setup.
 - Why: validators must call the owning module (DL-0520).
 - Alternatives: copy the role list / gap logic into setup (rejected: duplication).
+
+### DL-0510 — Inbox PDFs are served as downloads, never inline (T-0136, RQ-0148)
+- Date: 2026-11-13 · By: claude · Task: T-0136 · Category: security
+- Decision: `GET /ap/inbox/:id/attachments/:n` (ap.read; n = 1-based, oldest first) answers `Content-Type: application/pdf`, `Content-Disposition: attachment` built by Express's `res.attachment()` (content-disposition 1.1.0, control characters replaced by `_` first), `Content-Length`, `Cache-Control: no-store`, `X-Content-Type-Options: nosniff` and `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; sandbox`. The screen offers a "Download <file> (<size>)" link only; there is no inline viewer.
+- Why: RQ-0148. The bytes come from any sender. A download keeps them out of the app's origin, and the response stays inside ADR-0054's headers.
+- Alternatives: an inline `<iframe>`/`<object>` viewer. It would need `frame-ancestors 'self'`, a relaxed X-Frame-Options and SPA CSP changes, which is a security ADR (a human gate) that UC-05 does not need. A hand-written header encoder was rejected: the encoder already ships with Express and was tested in the RQ spike.
+- ADR: none (stays within ADR-0054) · Status: accepted
+
+### DL-0511 — Coding an inbox item over HTTP: client bill id is the replay record (T-0136)
+- Date: 2026-11-13 · By: claude · Task: T-0136 · Category: api
+- Decision: `POST /ap/inbox/:id/code` `{company_id, bill_id, party_id?, supplier_ref, bill_date, due_date?, lines}` needs `ap.bill.enter` and an `Idempotency-Key` (400 `idempotency_key_required` without one). It records SoD `bill.enter` on `bill_id` (`fromBody('bill_id')`) and is audited as `bill_inbox_item`.
+  - The item's stored `bill_id` is the replay record, as with `PUT /ap/bills/:id` and DL-0420, so no schema is needed. The same bill id again is 200 `replayed: true` with that bill.
+  - Any other coding of a non-new item is 422 `NOT_CODABLE`. An item outside the tenant or company is 404.
+  - `codeInboxItem` takes the optional `billId` and refuses one that is already a bill. Otherwise `createBill` would return the existing bill and the item would be attached to it.
+  - New read models `listInboxItems` and `inboxAttachment` live in `packages/modules/ap/src/inbox.ts` and are SELECT only.
+- Why: AC-1 of T-0136. Directive "every mutating route has an idempotency key" without a migration (DL-0473 forbids one in this round).
+- Alternatives: storing the Idempotency-Key in a new table. That is a migration and adds nothing over the client-chosen id. A separate `GET /ap/inbox/:id` was not needed: the screen reads the list.
+- Tests: `apps/api/src/ap/inbox.db.test.ts` (5, RED first: all 404 before the routes).
+- ADR: none (additive routes, as DL-0440) · Status: accepted
+
+### DL-0512 — Inbox screens reuse the bill form; the draft is announced on the bills list (T-0136)
+- Date: 2026-11-13 · By: claude · Task: T-0136 · Category: ui
+- Decision: The T-0086 form becomes the exported `BillEditor` (props `save`, `onSaved`, `cancel`, `initialPartyId`), used by "Enter a bill" and by `/purchases/inbox/$itemId`. The inbox page starts with the supplier the sender matched; the bill id and Idempotency-Key are chosen once per form, so a retry after a refusal reuses both. After coding, the app goes to `/purchases/bills?coded=<id>`, where a status line names the new draft (AC-2: it appears on /purchases/bills). `/purchases/inbox` is listed under Purchases. The status words are "To code", "No PDF attached", "Coded into a bill" and "Rejected".
+- Why: one coding form, no drift. P2 state in words. The approval flow stays on the T-0086 screens.
+- Alternatives: a second copy of the form (drift); going to the bill page (AC-2 names the list).
+- Tests: `tests/e2e/web/bills-inbox.spec.ts` (SS-UC05-09 at 1440/390 plus refusal, Approver and forbidden tests), `apps/web/src/purchases/inbox-logic.test.ts`. In Chromium, a `<a download>` request does not pass through `page.route`, so the spec asserts the download's URL and file name. The bytes and headers are proven by the api-db test.
+- ADR: none · Status: accepted
+
+### DL-0513 — SS-UC05-09 registered for the bills inbox (T-0136)
+- Date: 2026-11-13 · By: claude · Task: T-0136 · Category: scope
+- Decision: The next free UC-05 id, SS-UC05-09 "Emailed bill coded into a draft from the inbox" (e2e-playwright, screenshots), is added to `Docs/specs/UC-05.md` and the register, as AC-2 asks.
+- Why: AC-2 asks for a new SS id under UC-05.
+- Alternatives: reusing SS-UC05-01 (ingest layer only) or SS-UC05-08 (manual entry); both are other scenarios.
 - ADR: none · Status: accepted

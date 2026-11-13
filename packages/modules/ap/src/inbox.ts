@@ -12,7 +12,7 @@ import { createHash } from 'node:crypto';
 import type { Database } from '@ledgerforce/db';
 import { sql, type Transaction } from 'kysely';
 import PostalMime from 'postal-mime';
-import { createBill, type BillLineInput, type BillView } from './bills.ts';
+import { createBill, getBill, type BillLineInput, type BillView } from './bills.ts';
 
 type Trx = Transaction<Database>;
 
@@ -164,6 +164,8 @@ export async function codeInboxItem(
   c: {
     companyId: string;
     itemId: string;
+    /** Client-chosen id of the new bill (T-0136); it must not already be a bill. */
+    billId?: string;
     /** Defaults to the supplier the sender address matched. */
     partyId?: string;
     supplierRef: string;
@@ -187,8 +189,13 @@ export async function codeInboxItem(
   const partyId = c.partyId ?? it.party_id;
   if (!partyId)
     throw new InboxError('NOT_CODABLE', 'choose the supplier: the sender did not match one');
+  if (c.billId && (await getBill(trx, companyId, c.billId).catch(() => null))) {
+    // createBill would return the existing bill; never attach an item to another bill.
+    throw new InboxError('NOT_CODABLE', `bill ${c.billId} already exists; code with a new bill id`);
+  }
   const bill = await createBill(trx, {
     companyId,
+    ...(c.billId ? { id: c.billId } : {}),
     partyId,
     supplierRef: c.supplierRef,
     billDate: c.billDate,
@@ -208,4 +215,108 @@ export async function codeInboxItem(
     .where('id', '=', c.itemId)
     .execute();
   return bill;
+}
+
+/** One inbox item as the inbox screen lists it (T-0136). */
+export interface InboxListItem {
+  readonly id: string;
+  readonly status: InboxItemView['status'];
+  readonly fromAddress: string | null;
+  readonly subject: string | null;
+  readonly receivedAt: Date;
+  readonly partyId: string | null;
+  readonly supplierName: string | null;
+  readonly billId: string | null;
+  /** n is the 1-based position (oldest first): the :n of the attachment route. */
+  readonly attachments: readonly {
+    n: number;
+    fileName: string;
+    contentType: string;
+    sizeBytes: number;
+  }[];
+}
+
+/** The company's inbox, newest first; `itemId` narrows it to one item (T-0136). */
+export async function listInboxItems(
+  trx: Trx,
+  c: { companyId: string; itemId?: string },
+): Promise<InboxListItem[]> {
+  const companyId = c.companyId.toLowerCase();
+  let q = trx
+    .selectFrom('app.bill_inbox_item as i')
+    .leftJoin('app.party as p', (j) =>
+      j.onRef('p.tenant_id', '=', 'i.tenant_id').onRef('p.id', '=', 'i.party_id'),
+    )
+    .select([
+      'i.id',
+      'i.status',
+      'i.from_address',
+      'i.subject',
+      'i.received_at',
+      'i.party_id',
+      'i.bill_id',
+      sql<string | null>`coalesce(p.trading_name, p.legal_name)`.as('supplier_name'),
+    ])
+    .where('i.company_id', '=', companyId);
+  if (c.itemId !== undefined) q = q.where('i.id', '=', c.itemId.toLowerCase());
+  const items = await q.orderBy('i.received_at', 'desc').orderBy('i.id', 'desc').execute();
+  if (items.length === 0) return [];
+  const atts = await trx
+    .selectFrom('app.document_attachment')
+    .select(['owner_id', 'file_name', 'content_type', 'size_bytes'])
+    .where('company_id', '=', companyId)
+    .where('owner_type', '=', 'bill_inbox_item')
+    .where(
+      'owner_id',
+      'in',
+      items.map((i) => i.id),
+    )
+    .orderBy('created_at')
+    .orderBy('id')
+    .execute();
+  return items.map((i) => ({
+    id: i.id,
+    status: i.status,
+    fromAddress: i.from_address,
+    subject: i.subject,
+    receivedAt: i.received_at,
+    partyId: i.party_id,
+    supplierName: i.supplier_name,
+    billId: i.bill_id,
+    attachments: atts
+      .filter((a) => a.owner_id === i.id)
+      .map((a, k) => ({
+        n: k + 1,
+        fileName: a.file_name,
+        contentType: a.content_type,
+        sizeBytes: a.size_bytes,
+      })),
+  }));
+}
+
+/** The n-th (1-based, oldest first) PDF of an inbox item, or null when there is none (T-0136). */
+export async function inboxAttachment(
+  trx: Trx,
+  c: { companyId: string; itemId: string; n: number },
+): Promise<{ fileName: string; contentType: string; sizeBytes: number; content: Buffer } | null> {
+  if (!Number.isInteger(c.n) || c.n < 1) return null;
+  const row = await trx
+    .selectFrom('app.document_attachment')
+    .select(['file_name', 'content_type', 'size_bytes', 'content'])
+    .where('company_id', '=', c.companyId.toLowerCase())
+    .where('owner_type', '=', 'bill_inbox_item')
+    .where('owner_id', '=', c.itemId.toLowerCase())
+    .orderBy('created_at')
+    .orderBy('id')
+    .offset(c.n - 1)
+    .limit(1)
+    .executeTakeFirst();
+  return row
+    ? {
+        fileName: row.file_name,
+        contentType: row.content_type,
+        sizeBytes: row.size_bytes,
+        content: Buffer.from(row.content),
+      }
+    : null;
 }

@@ -21,6 +21,7 @@ export interface SubPage {
     | '/sales/receipts'
     | '/sales/credit-notes'
     | '/purchases/bills'
+    | '/purchases/inbox'
     | '/reports/trial-balance'
     | '/reports/profit-and-loss'
     | '/reports/balance-sheet'
@@ -95,6 +96,12 @@ export const SECTIONS: readonly Section[] = [
         to: '/purchases/bills',
         name: 'Bills',
         text: 'Enter and code supplier bills, send them for approval and see what they post.',
+      },
+      // Bills inbox (T-0136).
+      {
+        to: '/purchases/inbox',
+        name: 'Bills inbox',
+        text: 'Bills suppliers emailed in: download the PDF and code it into a draft bill.',
       },
     ],
   },
