@@ -9,6 +9,7 @@
  * what is missing — walked step by step from an empty company to a complete wizard.
  */
 import { randomBytes, randomUUID } from 'node:crypto';
+import { setInvoiceSettings } from '@ledgerforce/ar';
 import { createCompanyBankAccount } from '@ledgerforce/bank';
 import { createJwtConnection } from '@ledgerforce/connector-salesforce';
 import {
@@ -28,7 +29,7 @@ import {
   type SeededProfiles,
 } from '@ledgerforce/products';
 import { LocalKeyringKms } from '@ledgerforce/shared/crypto';
-import { seedTaxCodes } from '@ledgerforce/tax';
+import { seedTaxCodes, setTaxSettings } from '@ledgerforce/tax';
 import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { parseTrialBalanceCsv } from './opening-csv.ts';
@@ -240,10 +241,23 @@ describe('SS-PLAT-119: each step validator reads its module and lists what is mi
     expect((await complete(2)).step.status).toBe('complete');
   });
 
-  it('SS-PLAT-119 AC-2 step 3 needs a tax code in force [T-0123]', async () => {
-    expect(await missing(3)).toEqual([`No tax code is in force on ${AS_OF}`]);
+  it('SS-PLAT-119 AC-2 step 3 needs a tax code in force, and (T-0158) the GST basis and BAS frequency [T-0123]', async () => {
+    const settings = [
+      'The GST accounting basis (cash or accrual) has not been set',
+      'The BAS reporting frequency (monthly, quarterly or annual) has not been set',
+    ];
+    expect(await missing(3)).toEqual([`No tax code is in force on ${AS_OF}`, ...settings]);
     expect((await refusal(complete(3))).code).toBe('STEP_INVALID');
     await f.inTenant((trx) => seedTaxCodes(trx, c));
+    expect(await missing(3)).toEqual(settings);
+    await f.inTenant((trx) =>
+      setTaxSettings(trx, {
+        companyId: c,
+        effectiveFrom: '2026-07-01',
+        gstBasis: 'accrual',
+        basFrequency: 'quarterly',
+      }),
+    );
     expect(await missing(3)).toEqual([]);
     await complete(3);
   });
@@ -373,10 +387,16 @@ describe('SS-PLAT-119: each step validator reads its module and lists what is mi
     await complete(7);
   });
 
-  it('SS-PLAT-119 AC-2 step 8 needs the invoice number series and a billing format [T-0123]', async () => {
+  it('SS-PLAT-119 AC-2 step 8 needs the invoice number series and a billing format, and (T-0158) branding, terms and methods [T-0123]', async () => {
+    const settings = [
+      'Invoice branding (a brand colour) has not been set',
+      'Default payment terms have not been set',
+      'No accepted payment method (bank transfer or Stripe) has been chosen',
+    ];
     expect(await missing(8)).toEqual([
       'No invoice number series (ar_invoice_document) has been set up',
       'No billing format has been set up',
+      ...settings,
     ]);
     await f.inTenant(async (trx) => {
       await trx
@@ -385,6 +405,14 @@ describe('SS-PLAT-119: each step validator reads its module and lists what is mi
         .execute();
       await seedBillingFormats(trx, c);
     });
+    expect(await missing(8)).toEqual(settings);
+    await f.inTenant((trx) =>
+      setInvoiceSettings(trx, c, {
+        brandColour: '#0B3D2E',
+        defaultPaymentTermsDays: 30,
+        acceptedPaymentMethods: ['bank_transfer'],
+      }),
+    );
     expect(await missing(8)).toEqual([]);
     await complete(8);
   });

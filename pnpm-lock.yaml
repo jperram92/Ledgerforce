@@ -800,6 +800,9 @@ importers:
       '@ledgerforce/shared':
         specifier: workspace:*
         version: link:../../shared
+      '@ledgerforce/tax':
+        specifier: workspace:*
+        version: link:../tax
       decimal.js:
         specifier: 10.6.0
         version: 10.6.0
@@ -816,9 +819,6 @@ importers:
       '@ledgerforce/parties':
         specifier: workspace:*
         version: link:../parties
-      '@ledgerforce/tax':
-        specifier: workspace:*
-        version: link:../tax
       '@types/node':
         specifier: 22.20.5
         version: 22.20.5

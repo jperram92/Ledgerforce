@@ -4,14 +4,16 @@
  * Each validator reads the state its owning module persists — never a copy — and returns what is
  * missing in plain words; [] means the step passes. Module functions are called where the module
  * exports one (profileGaps, openingBalanceOf, listCompanyBankAccounts); otherwise the
- * module's table is read. Settings no module persists yet (GST basis, BAS frequency, branding,
- * payment terms and methods) are added by their modules in T-0158, which extends steps 3, 8, 10.
+ * module's table is read. T-0158 (ADR-0071, RQ-0153) added the GST basis and BAS frequency (tax,
+ * step 3) and invoice branding, default payment terms and accepted payment methods (ar, step 8);
+ * step 10 needed nothing new.
  */
-import { INVOICE_NUMBER_SERIES } from '@ledgerforce/ar';
+import { INVOICE_NUMBER_SERIES, invoiceSettingsOf } from '@ledgerforce/ar';
 import { listCompanyBankAccounts } from '@ledgerforce/bank';
 import type { Database } from '@ledgerforce/db';
 import { CORE_SYSTEM_ROLES } from '@ledgerforce/gl';
 import { profileGaps } from '@ledgerforce/products';
+import { taxSettingsOf } from '@ledgerforce/tax';
 import { sql, type Transaction } from 'kysely';
 import { openingBalanceOf } from './opening-balances.ts';
 
@@ -76,7 +78,7 @@ const chart: StepValidator = async (trx, { companyId }) => {
   return out;
 };
 
-/** 3. Tax codes (tax). GST basis and BAS frequency join in T-0158. */
+/** 3. Tax codes, GST basis and BAS frequency in force on the as-of date (tax). */
 const tax: StepValidator = async (trx, { companyId, asOf }) => {
   const inForce = await exists(
     trx,
@@ -87,7 +89,12 @@ const tax: StepValidator = async (trx, { companyId, asOf }) => {
          AND (effective_to IS NULL OR effective_to >= ${asOf}::date)
        LIMIT 1`,
   );
-  return inForce ? [] : [`No tax code is in force on ${asOf}`];
+  const out = inForce ? [] : [`No tax code is in force on ${asOf}`];
+  if (!(await taxSettingsOf(trx, companyId, asOf))) {
+    out.push('The GST accounting basis (cash or accrual) has not been set');
+    out.push('The BAS reporting frequency (monthly, quarterly or annual) has not been set');
+  }
+  return out;
 };
 
 /** 4. Bank accounts, one with ABA details for batch payments (bank). */
@@ -173,7 +180,10 @@ const profiles: StepValidator = async (trx, { companyId, asOf }) => {
   return out;
 };
 
-/** 8. Invoice numbering and billing formats (ledger series, documents). More in T-0158. */
+/**
+ * 8. Invoice numbering and billing formats (ledger series, documents); branding, default payment
+ * terms and accepted payment methods (ar); Stripe set up when it is accepted (stripe connector).
+ */
 const numbering: StepValidator = async (trx, { companyId }) => {
   const out: string[] = [];
   const series = await trx
@@ -192,6 +202,21 @@ const numbering: StepValidator = async (trx, { companyId }) => {
     .limit(1)
     .executeTakeFirst();
   if (!format) out.push('No billing format has been set up');
+  const ar = await invoiceSettingsOf(trx, companyId);
+  if (!ar.brandColour) out.push('Invoice branding (a brand colour) has not been set');
+  if (ar.defaultPaymentTermsDays === null) out.push('Default payment terms have not been set');
+  if (!ar.acceptedPaymentMethods?.length)
+    out.push('No accepted payment method (bank transfer or Stripe) has been chosen');
+  if (ar.acceptedPaymentMethods?.includes('stripe')) {
+    const stripe = await exists(
+      trx,
+      sql<{ x: number }>`SELECT 1 AS x FROM app.stripe_settings WHERE company_id = ${companyId}`,
+    );
+    if (!stripe)
+      out.push(
+        'Stripe is an accepted payment method but Stripe is not set up (no clearing account)',
+      );
+  }
   return out;
 };
 
