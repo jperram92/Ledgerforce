@@ -2893,3 +2893,16 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - The create-transaction screen posts without first showing the journal (P4), because the module has no preview for it. This gap, accepting candidate suggestions, and large files are follow-up card T-0150.
 - Why: SS-UC08-08 and UC-08 steps 1–5. These follow the patterns of the close screen (T-0090) and the reports screens (T-0089).
 - ADR: none · Status: accepted
+
+### DL-0473 — Parallel round 4: T-0087, T-0136 and T-0123 agents; the lead takes T-0145
+- Date: 2026-11-13 · By: claude · Task: sprint · Category: process
+- Decision: Three sub-agents work in isolated worktrees on local branches, and the lead merges and verifies their work. Only T-0123 may add a migration, and only number 0065 (DL-0410a pattern). The lead takes no migration while the round runs.
+
+  | Agent | Card | DL | ADR | RQ | New cards |
+  |---|---|---|---|---|---|
+  | AP release UI | T-0087 | 0500–0509 | 0065 | 0147 | T-0153–T-0154 |
+  | Bills inbox | T-0136 | 0510–0519 | 0066 | 0148 | T-0155–T-0156 |
+  | Setup wizard | T-0123 (+ migration 0065) | 0520–0529 | 0067 | 0149 | T-0157–T-0158 |
+  | Lead | T-0145 and merges | 0474–0479 | 0068 | 0150 | T-0159+ |
+- Why: The owner asked for parallel sub-agents (DL-0408). The cards touch disjoint modules (ap screens, ap inbox, setup).
+- ADR: none · Status: accepted
