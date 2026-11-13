@@ -2,7 +2,7 @@
   "name": "@ledgerforce/bank",
   "version": "0.0.0",
   "private": true,
-  "description": "Bank: company bank accounts, statement import (CSV, OFX, CAMT.053), matching rules and auto-match (design §4.1 step 4, §5.7, UC-08)",
+  "description": "Bank: company bank accounts, statement import (CSV, OFX, CAMT.053), matching rules and auto-match (design \u00a74.1 step 4, \u00a75.7, UC-08)",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
@@ -20,6 +20,7 @@
   "devDependencies": {
     "@ledgerforce/ar": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
+    "@ledgerforce/reporting": "workspace:*",
     "@types/node": "22.20.5",
     "fast-check": "4.10.2",
     "vitest": "4.1.12"

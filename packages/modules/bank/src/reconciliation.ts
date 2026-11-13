@@ -387,3 +387,36 @@ export async function unmatchLine(
   }
   return { matchId: line.match_id };
 }
+
+export interface UnreconciledBankAccountRow {
+  readonly bankAccountId: string;
+  readonly name: string;
+  readonly unreconciledLines: number;
+}
+
+/**
+ * The company's bank accounts with statement lines dated on or before `asOf` that no completed
+ * reconciliation covers (UC-10 "bank recs complete", SS-UC10-07, DL-0404): a line is reconciled
+ * when a completed reconciliation of its account has as_of on or after the line date (the same
+ * rule as the line lock, DL-0326). Read-only.
+ */
+export async function unreconciledBankAccounts(
+  trx: Trx,
+  companyId: string,
+  asOf: string,
+): Promise<UnreconciledBankAccountRow[]> {
+  const rows = (
+    await sql<{ id: string; name: string; n: number }>`
+      SELECT a.id::text, a.name, count(*)::int AS n
+        FROM app.bank_statement_line l
+        JOIN app.bank_account a ON a.tenant_id = l.tenant_id AND a.id = l.bank_account_id
+       WHERE a.company_id = ${companyId.toLowerCase()} AND l.posted_on <= ${asOf}::date
+         AND NOT EXISTS (
+           SELECT 1 FROM app.bank_reconciliation r
+            WHERE r.tenant_id = l.tenant_id AND r.bank_account_id = l.bank_account_id
+              AND r.status = 'completed' AND r.as_of >= l.posted_on)
+       GROUP BY a.id, a.name
+       ORDER BY a.name`.execute(trx)
+  ).rows;
+  return rows.map((r) => ({ bankAccountId: r.id, name: r.name, unreconciledLines: r.n }));
+}

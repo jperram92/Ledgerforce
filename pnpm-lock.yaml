@@ -556,6 +556,9 @@ importers:
       '@ledgerforce/gl':
         specifier: workspace:*
         version: link:../gl
+      '@ledgerforce/reporting':
+        specifier: workspace:*
+        version: link:../reporting
       '@types/node':
         specifier: 22.20.5
         version: 22.20.5

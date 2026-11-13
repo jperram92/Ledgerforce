@@ -419,6 +419,18 @@ export interface ProductTable {
 }
 
 /** Migration 0035 (T-0040): sales invoice; frozen once posted. */
+/** Migration 0061 (T-0078): a completed month-end close checklist step (UC-10). Insert-only. */
+export interface CloseChecklistStepTable {
+  tenant_id: TenantId;
+  company_id: string;
+  period_id: string;
+  step: 'ar_lock' | 'ap_lock' | 'bank_recs' | 'accruals' | 'tb_review' | 'soft_close' | 'hard_lock';
+  completed_by: string;
+  completed_at: Timestamp;
+  period_status: 'open' | 'ar_locked' | 'ap_locked' | 'soft_closed' | 'hard_locked';
+  detail: ColumnType<unknown, string | undefined, never>;
+}
+
 /** Migration 0059 (T-0068): overdue reminder steps per company (UC-04). Steps are disabled, never deleted. */
 export interface ArReminderScheduleTable {
   tenant_id: TenantId;
@@ -1238,6 +1250,7 @@ export interface Database {
   'app.sales_invoice': SalesInvoiceTable;
   'app.ar_reminder_schedule': ArReminderScheduleTable;
   'app.ar_reminder': ArReminderTable;
+  'app.close_checklist_step': CloseChecklistStepTable;
   'app.sales_invoice_line': SalesInvoiceLineTable;
   'app.ar_settings': ArSettingsTable;
   'app.credit_note': CreditNoteTable;

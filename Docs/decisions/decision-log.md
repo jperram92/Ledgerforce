@@ -2528,3 +2528,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0107. GST is taken from Stripe's `tax` fee detail, never estimated as 10 %, and the Approved GP-027 is replayed line by line in the test.
 - Alternatives: computing GST as fee/11 (Stripe rounds per transaction, and the tax invoice is authoritative); a journal-line evidence attribute (schema change across the ledger, not needed until GP-028).
 - ADR: none (posting follows an Approved golden; no new dependency) · Status: accepted
+
+### DL-0404 — Month-end close checklist: ordered steps, insert-only record, bank and TB gates (T-0078)
+- Date: 2026-11-13 · By: claude · Task: T-0078 · Category: implementation (reporting, ledger periods, bank)
+- Decision: `completeCloseStep` / `closeChecklist` (@ledgerforce/reporting) run UC-10's steps in a fixed order: AR lock → AP lock → bank recs → accruals → TB review → soft close → hard lock. Each completed step is recorded once in insert-only `app.close_checklist_step` (migration 0061) with user, time, the resulting period status and the evidence checked. Status steps call `setPeriodStatus`, so the database's period.lock / period.close permissions apply to the acting user. Bank recs is refused (BANK_UNRECONCILED, naming each account and its line count) while `unreconciledBankAccounts` (@ledgerforce/bank: lines up to the period end not covered by a completed reconciliation, the DL-0326 rule) returns anything. TB review is refused unless `trialBalanceReview` nets to zero and AR/AP subledgers equal their controls. The bank check is a port, so reporting gains no runtime dependency on bank; @ledgerforce/bank takes @ledgerforce/reporting as a **dev-only** workspace dependency so SS-UC10-07 runs on real bank data.
+- Why: UC-10 ("each step recorded with user/time; preconditions enforced"), design §3.5.
+- Alternatives: steps as columns on fiscal_period (UPDATE path, no per-step history); a status-only close (no bank or TB gate).
+- Not in this card: lodgement tracking for "hard lock after BAS" (the human's sign-off); reopen (T-0079) starts a new checklist instead of editing this one.
+- ADR: none · Status: accepted

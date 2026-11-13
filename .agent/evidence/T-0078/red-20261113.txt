@@ -1,0 +1,64 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33033
+ ❯ |db| packages/modules/bank/src/reconciliation.db.test.ts (9 tests | 2 failed) 1749ms
+     × SS-UC10-07 with unreconciled December lines, marking "bank recs complete" is refused, listing the account 3ms
+     × the bank step passes for November, which the completed reconciliation covers 4ms
+ ❯ |db| packages/modules/reporting/src/close-checklist.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/reporting/src/close-checklist.db.test.ts [ packages/modules/reporting/src/close-checklist.db.test.ts ]
+Error: Cannot find module './close-checklist.ts' imported from /home/user/Ledgerforce/packages/modules/reporting/src/close-checklist.db.test.ts
+ ❯ packages/modules/reporting/src/close-checklist.db.test.ts:12:1
+     10| import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/…
+     11| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     12| import {
+       | ^
+     13|   CLOSE_STEPS,
+     14|   closeChecklist,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/bank/src/reconciliation.db.test.ts > SS-UC10-07: Close cannot pass with unreconciled bank > SS-UC10-07 with unreconciled December lines, marking "bank recs complete" is refused, listing the account
+TypeError: unreconciledBankAccounts is not a function
+ ❯ packages/modules/bank/src/reconciliation.db.test.ts:411:33
+    409|   it('SS-UC10-07 with unreconciled December lines, marking "bank recs …
+    410|     expect(
+    411|       await f.inTenant((trx) => unreconciledBankAccounts(trx, main.com…
+       |                                 ^
+    412|     ).toEqual([]);
+    413|     const december = await f.inTenant((trx) =>
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/bank/src/reconciliation.db.test.ts:411:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |db| packages/modules/bank/src/reconciliation.db.test.ts > SS-UC10-07: Close cannot pass with unreconciled bank > the bank step passes for November, which the completed reconciliation covers
+TypeError: completeCloseStep is not a function
+ ❯ packages/modules/bank/src/reconciliation.db.test.ts:400:7
+    398|   const closeStep = (periodId: string, step: 'ar_lock' | 'ap_lock' | '…
+    399|     f.inTenant((trx) =>
+    400|       completeCloseStep(
+       |       ^
+    401|         trx,
+    402|         { companyId: main.company, periodId, step, by: financeAdmin },
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/bank/src/reconciliation.db.test.ts:432:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 7 passed (9)
+   Start at  01:13:11
+   Duration  3.67s (transform 491ms, setup 0ms, import 702ms, tests 1.75s, environment 0ms)
+

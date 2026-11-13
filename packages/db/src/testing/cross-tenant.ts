@@ -281,6 +281,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     stripe_status: () => 'succeeded',
     idempotency_key: () => `lf-refund-v1-${randomBytes(6).toString('hex')}`,
   },
+  // T-0078: a completed close checklist step (step and period status are CHECK-constrained, 0061).
+  'app.close_checklist_step': { step: () => 'ar_lock', period_status: () => 'ar_locked' },
   // T-0075: a Stripe payout record (gross − fee − fee GST = amount, CHECK in migration 0060).
   'app.stripe_payout': {
     stripe_payout_id: () => `po_${randomBytes(6).toString('hex')}`,

@@ -26,6 +26,7 @@ import {
 } from '@ledgerforce/journals';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
 import { findPeriod, PeriodLockedError, setPeriodStatus } from '@ledgerforce/ledger';
+import { completeCloseStep } from '@ledgerforce/reporting';
 import { LocalKeyringKms } from '@ledgerforce/shared/crypto';
 import { DEFAULT_SOD_SETTINGS, type SodSettings } from '@ledgerforce/shared/sod';
 import { sql } from 'kysely';
@@ -40,6 +41,7 @@ import {
   unmatchLine,
 } from './reconciliation.ts';
 import { importStatement } from './statements.ts';
+import { unreconciledBankAccounts } from './reconciliation.ts';
 
 const SETTINGS: SodSettings = {
   ...DEFAULT_SOD_SETTINGS,
@@ -388,5 +390,51 @@ describe('SS-UC08-07: Reconciled lines locked after hard lock', () => {
     await expect(
       f.inTenant((trx) => unmatchLine(trx, { statementLineId: dec?.id ?? '', by: accountant })),
     ).rejects.toBeInstanceOf(BankMatchError);
+  });
+});
+
+describe('SS-UC10-07: Close cannot pass with unreconciled bank', () => {
+  // Runs after SS-PLAT-126 completed November's reconciliation of `main`; December is not reconciled.
+  const closeStep = (periodId: string, step: 'ar_lock' | 'ap_lock' | 'bank_recs') =>
+    f.inTenant((trx) =>
+      completeCloseStep(
+        trx,
+        { companyId: main.company, periodId, step, by: financeAdmin },
+        { unreconciledBank: unreconciledBankAccounts },
+      ),
+    );
+  const periodOf = (date: string) =>
+    f.inTenant(async (trx) => (await findPeriod(trx, main.company, date))?.id ?? '');
+
+  it('SS-UC10-07 with unreconciled December lines, marking "bank recs complete" is refused, listing the account', async () => {
+    expect(
+      await f.inTenant((trx) => unreconciledBankAccounts(trx, main.company, '2026-11-30')),
+    ).toEqual([]);
+    const december = await f.inTenant((trx) =>
+      unreconciledBankAccounts(trx, main.company, '2026-12-31'),
+    );
+    expect(december).toEqual([
+      {
+        bankAccountId: main.bankAccountId,
+        name: 'Operating',
+        unreconciledLines: expect.any(Number),
+      },
+    ]);
+    expect(december[0]?.unreconciledLines).toBeGreaterThan(0);
+
+    const dec = await periodOf('2026-12-15');
+    await closeStep(dec, 'ar_lock');
+    await closeStep(dec, 'ap_lock');
+    await expect(closeStep(dec, 'bank_recs')).rejects.toMatchObject({
+      code: 'BANK_UNRECONCILED',
+      message: expect.stringContaining('Operating'),
+    });
+  });
+
+  it('the bank step passes for November, which the completed reconciliation covers', async () => {
+    const nov = await periodOf('2026-11-15');
+    await closeStep(nov, 'ar_lock');
+    await closeStep(nov, 'ap_lock');
+    await expect(closeStep(nov, 'bank_recs')).resolves.toMatchObject({ step: 'bank_recs' });
   });
 });
