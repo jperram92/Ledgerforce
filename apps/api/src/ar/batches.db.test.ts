@@ -6,7 +6,13 @@
  * batch screen (T-0084, SS-UC02-08).
  */
 import 'reflect-metadata';
-import { addBillingLine, INVOICE_NUMBER_SERIES, runBatch } from '@ledgerforce/ar';
+import {
+  addBillingLine,
+  BATCH_APPROVED,
+  INVOICE_NUMBER_SERIES,
+  runBatch,
+  type DocumentEvent,
+} from '@ledgerforce/ar';
 import { createDb, withTenant } from '@ledgerforce/db';
 import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
 import { auServicesSmb, loadChartTemplate } from '@ledgerforce/gl';
@@ -29,6 +35,8 @@ let tdb: TestDatabase;
 let api: Api;
 let companyId = '';
 const cookies = new Map<string, string>();
+/** Events the API published through its document outbox (T-0120: approval hands off to the worker). */
+const published: DocumentEvent[] = [];
 
 async function call(method: string, path: string, who: Who, body?: unknown, key?: string) {
   const h: Record<string, string> = {};
@@ -108,7 +116,15 @@ beforeAll(async () => {
     return c.id;
   });
   await seed.destroy();
-  api = await createApi({ databaseUrl: tdb.url('lf_app'), sessions: {} });
+  api = await createApi({
+    databaseUrl: tdb.url('lf_app'),
+    sessions: {},
+    documentOutbox: {
+      publish: async (_trx, e) => {
+        published.push(e);
+      },
+    },
+  });
   if (!api.sessions) throw new Error('sessions not configured');
   for (const [who, p] of Object.entries(PEOPLE)) {
     cookies.set(
@@ -197,6 +213,10 @@ describe('SS-UC02-01 / SS-UC02-07: batch preview over HTTP', () => {
     const ok = await call('POST', `/ar/batches/${id}/approve?company_id=${companyId}`, 'approver');
     expect(ok.status).toBe(200);
     expect(await ok.json()).toMatchObject({ id, status: 'approved' });
+    // T-0120: the approval hands the batch to the worker through the outbox, exactly once.
+    expect(published.filter((e) => e.topic === BATCH_APPROVED)).toEqual([
+      expect.objectContaining({ aggregateType: 'billing_batch', aggregateId: id, companyId }),
+    ]);
     const again = await call(
       'POST',
       `/ar/batches/${id}/approve?company_id=${companyId}`,
@@ -204,6 +224,29 @@ describe('SS-UC02-01 / SS-UC02-07: batch preview over HTTP', () => {
     );
     expect(again.status).toBe(422);
     expect(await again.json()).toMatchObject({ error: 'BATCH_STATE' });
+  });
+});
+
+describe('T-0120: approval needs the document outbox', () => {
+  it('without an outbox the API refuses (503) before approving anything', async () => {
+    const bare = await createApi({ databaseUrl: tdb.url('lf_app'), sessions: {} });
+    try {
+      if (!bare.sessions) throw new Error('sessions not configured');
+      const cookie = await bare.sessions.create(A, {
+        userId: PEOPLE.approver.id,
+        amr: ['pwd', 'otp'],
+        acr: null,
+        authTime: new Date(Date.now() - 30 * 60 * 1000),
+      });
+      const r = await fetch(
+        `${bare.url}/ar/batches/${uid(0x120f)}/approve?company_id=${companyId}`,
+        { method: 'POST', headers: { cookie: `lf_session=${cookie}` } },
+      );
+      expect(r.status).toBe(503);
+      expect(await r.json()).toMatchObject({ error: 'outbox_unavailable' });
+    } finally {
+      await bare.close();
+    }
   });
 });
 

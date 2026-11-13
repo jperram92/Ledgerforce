@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:39155
+ ❯ |db| apps/worker/src/batch-jobs.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| apps/worker/src/batch-jobs.db.test.ts [ apps/worker/src/batch-jobs.db.test.ts ]
+Error: Cannot find module './batch-jobs.ts' imported from /home/user/Ledgerforce/apps/worker/src/batch-jobs.db.test.ts
+ ❯ apps/worker/src/batch-jobs.db.test.ts:27:1
+     25| import type { PgBoss } from 'pg-boss';
+     26| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     27| import { batchApprovedHandler, BATCH_RUN_QUEUE, parseBatchJob, runBatc…
+       | ^
+     28| import { AR_REMINDERS_QUEUE, DAILY_FANOUT_QUEUE } from './daily-jobs.t…
+     29| import { installQueue } from './queue-admin.ts';
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  11:48:18
+   Duration  2.04s (transform 586ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

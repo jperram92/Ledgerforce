@@ -11,6 +11,8 @@
 import { installOutboxQueues, ownerBossOptions } from '@ledgerforce/outbox';
 import pg from 'pg';
 import { PgBoss } from 'pg-boss';
+import { BATCH_RUN_QUEUE } from './batch-jobs.ts';
+import { AR_REMINDERS_QUEUE, DAILY_FANOUT_QUEUE } from './daily-jobs.ts';
 
 async function assertOwnerRole(url: string): Promise<void> {
   const client = new pg.Client({ connectionString: url });
@@ -25,12 +27,26 @@ async function assertOwnerRole(url: string): Promise<void> {
   }
 }
 
+/**
+ * The worker's job queues (T-0120). They are installed at deploy time with the outbox queues,
+ * so a worker never consumes a queue that does not exist yet, whichever service starts first.
+ * Idempotent.
+ */
+export async function installJobQueues(owner: PgBoss): Promise<void> {
+  for (const name of [DAILY_FANOUT_QUEUE, AR_REMINDERS_QUEUE, BATCH_RUN_QUEUE]) {
+    if (!(await owner.getQueue(name))) {
+      await owner.createQueue(name, { retryLimit: 3, retryDelay: 300, retryBackoff: true });
+    }
+  }
+}
+
 export async function installQueue(ownerUrl: string): Promise<void> {
   await assertOwnerRole(ownerUrl);
   const boss = new PgBoss(ownerBossOptions(ownerUrl));
   await boss.start();
   try {
     await installOutboxQueues(boss);
+    await installJobQueues(boss);
   } finally {
     await boss.stop({ graceful: false });
   }

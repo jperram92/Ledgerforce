@@ -2793,3 +2793,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - How it surfaced: T-0090 added a menu entry on /reports. That moved the layout at 390 px, so after the click the pointer rested on the link and SS-PLAT-94's axe check caught it.
 - Why: it is a real accessibility defect in shipped code, not a flaky test. The existing test is unchanged; a new, explicit test was added.
 - ADR: none · Status: accepted
+
+### DL-0471 — Approved batches run in the worker via outbox → job; job queues installed at deploy (T-0120)
+- Date: 2026-11-13 · By: claude · Task: T-0120 · Category: architecture
+- Decision:
+  1. `approveBatch` publishes `ar.batch.approved` in the approval transaction. The API's approve route passes its document outbox, and answers 503 `outbox_unavailable` without one, so a batch is never approved without a runner.
+  2. The worker's outbox handler `ar.batch_run` enqueues one `ar.batch.run` job, with a job id derived from the batch id (idempotent). A dedicated consumer runs `runBatch` (per-item transactions, posted items skipped). The handler does not run the batch inside the outbox transaction.
+  3. The worker registers `email.invoice_posted` (with a lazy PdfRenderer; Chromium arrives in T-0119) and `email.reminder_queued` when SMTP is configured.
+  4. `installQueue` (setup, lf_migrator) now also installs `daily.fanout`, `ar.reminders.run` and `ar.batch.run`.
+- Finding fixed: since T-0147, the worker consumed `ar.reminders.run`, which only the scheduler created. A worker starting before the scheduler would have hit a missing queue.
+- Why: UC-02 steps 4–5 must happen without a person calling functions. One effect per outbox event (apps/worker AGENTS.md).
+- Alternatives: running runBatch inside the outbox handler (one long handler transaction holding a connection while items open others; retries rerun the whole handler).
+- ADR: none (within ADR-0008) · Status: accepted

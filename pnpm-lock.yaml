@@ -226,6 +226,9 @@ importers:
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@ledgerforce/documents':
+        specifier: workspace:*
+        version: link:../../packages/modules/documents
       '@ledgerforce/email':
         specifier: workspace:*
         version: link:../../packages/modules/email

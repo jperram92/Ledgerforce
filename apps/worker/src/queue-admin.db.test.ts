@@ -7,6 +7,8 @@
 import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
 import { OUTBOX_DEAD_LETTER_QUEUE, OUTBOX_QUEUE, OUTBOX_QUEUE_OPTIONS } from '@ledgerforce/outbox';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { BATCH_RUN_QUEUE } from './batch-jobs.ts';
+import { AR_REMINDERS_QUEUE, DAILY_FANOUT_QUEUE } from './daily-jobs.ts';
 import { installQueue } from './queue-admin.ts';
 
 let tdb: TestDatabase;
@@ -34,10 +36,13 @@ describe('SS-PLAT-69 queue install', () => {
     expect(rows[0]).toEqual({ n: 0 });
   });
 
-  it('SS-PLAT-69 installs pg-boss and the outbox queues as lf_migrator, idempotently', async () => {
+  it('SS-PLAT-69 installs pg-boss, the outbox queues and the job queues (T-0120) as lf_migrator, idempotently', async () => {
     await installQueue(tdb.url('lf_migrator'));
     await installQueue(tdb.url('lf_migrator'));
     expect(await queues()).toEqual([
+      { name: BATCH_RUN_QUEUE, retry_limit: 3, dead_letter: null },
+      { name: AR_REMINDERS_QUEUE, retry_limit: 3, dead_letter: null },
+      { name: DAILY_FANOUT_QUEUE, retry_limit: 3, dead_letter: null },
       {
         name: OUTBOX_QUEUE,
         retry_limit: OUTBOX_QUEUE_OPTIONS.retryLimit,

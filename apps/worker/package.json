@@ -11,6 +11,7 @@
   "dependencies": {
     "@ledgerforce/ar": "workspace:*",
     "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/documents": "workspace:*",
     "@ledgerforce/email": "workspace:*",
     "@ledgerforce/outbox": "workspace:*",
     "kysely": "0.29.7",

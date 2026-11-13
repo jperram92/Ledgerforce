@@ -14,12 +14,14 @@ import {
   Get,
   Headers,
   HttpCode,
+  Inject,
   Param,
   Post,
   Query,
   Req,
   Res,
   UnprocessableEntityException,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import {
   approveBatch,
@@ -28,11 +30,13 @@ import {
   loadBatchPreview,
   previewBatch,
   type BatchPreview,
+  type DocumentOutbox,
 } from '@ledgerforce/ar';
 import type { Request, Response } from 'express';
 import { principalOf, tokenPrincipalOf } from '../auth/session-tenant-resolver.ts';
 import { RequirePermission } from '../authz/permission.decorator.ts';
 import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
+import { DOCUMENT_OUTBOX } from '../tokens.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -86,6 +90,7 @@ export class ArBatchesController {
   constructor(
     private readonly tx: TenantTx,
     private readonly audit: AuditTrail,
+    @Inject(DOCUMENT_OUTBOX) private readonly documents: DocumentOutbox | null,
   ) {}
 
   @Post('preview')
@@ -154,13 +159,21 @@ export class ArBatchesController {
     if (typeof companyId !== 'string' || !UUID.test(companyId)) bad('company_id must be a uuid');
     const approvedBy = principalOf(req)?.userId ?? tokenPrincipalOf(req)?.userId;
     if (!approvedBy) bad('an approving user is required');
+    // Approval hands the batch to the worker through the outbox (T-0120). Without an outbox the
+    // batch would stay approved and never post, so refuse rather than accept silently.
+    if (!this.documents) {
+      throw new ServiceUnavailableException({
+        error: 'outbox_unavailable',
+        message: 'batch approval needs the document outbox; the batch was not approved',
+      });
+    }
     const trx = this.tx.get();
     const company = (companyId as string).toLowerCase();
-    await approveBatch(trx, {
-      companyId: company,
-      batchId: id,
-      approvedBy: approvedBy as string,
-    }).catch(refusal);
+    await approveBatch(
+      trx,
+      { companyId: company, batchId: id, approvedBy: approvedBy as string },
+      { outbox: this.documents },
+    ).catch(refusal);
     const p = await loadBatchPreview(trx, company, id).catch(refusal);
     const summary = await batchSummary(trx, company, id);
     this.audit.describe({

@@ -9,10 +9,12 @@
  */
 import { writeFileSync } from 'node:fs';
 import { createDb, databaseUrlFromEnv } from '@ledgerforce/db';
-import { reminderEmailHandler, SmtpSender } from '@ledgerforce/email';
+import { PdfRenderer } from '@ledgerforce/documents';
+import { invoiceEmailHandler, reminderEmailHandler, SmtpSender } from '@ledgerforce/email';
 import { enqueue, HandlerRegistry, runtimeBossOptions } from '@ledgerforce/outbox';
 import { sql } from 'kysely';
 import { PgBoss } from 'pg-boss';
+import { batchApprovedHandler, startBatchWorker } from './batch-jobs.ts';
 import { startReminderWorker } from './daily-jobs.ts';
 import { startOutboxWorker } from './outbox-worker.ts';
 import { startSyncIssueWorker } from './sync-issue-worker.ts';
@@ -30,31 +32,45 @@ const db = createDb(url, 4);
 const boss = new PgBoss(runtimeBossOptions(url));
 boss.on('error', (error: Error) => console.error(`pg-boss: ${error.message}`));
 await boss.start();
+const documentOutbox = {
+  publish: async (
+    trx: Parameters<typeof enqueue>[0],
+    e: {
+      companyId: string;
+      topic: string;
+      aggregateType: string;
+      aggregateId: string;
+      payload: Record<string, unknown>;
+    },
+  ) => {
+    await enqueue(trx, boss, {
+      companyId: e.companyId,
+      topic: e.topic,
+      aggregateType: e.aggregateType,
+      aggregateId: e.aggregateId,
+      payload: e.payload,
+    });
+  },
+};
 const registry = new HandlerRegistry();
-// Overdue-reminder emails (T-0068, T-0147) need SMTP. Without LF_SMTP_URL / LF_SMTP_FROM the event is
-// delivered to no handler and recorded as such, and the gap is logged at start.
+// An approved batch becomes one ar.batch.run job (T-0120).
+registry.register(batchApprovedHandler({ boss }));
+// Emails (T-0042 invoices, T-0068 reminders) need SMTP. Without LF_SMTP_URL / LF_SMTP_FROM the events
+// are delivered to no email handler and recorded as such, and the gap is logged at start.
+// Invoice PDFs are rendered with Chromium (T-0119 adds it to the worker image).
+const renderer = new PdfRenderer();
 if (process.env['LF_SMTP_URL'] && process.env['LF_SMTP_FROM']) {
-  registry.register(reminderEmailHandler({ sender: SmtpSender.fromEnv(process.env) }));
+  const sender = SmtpSender.fromEnv(process.env);
+  registry.register(invoiceEmailHandler({ sender, renderer }));
+  registry.register(reminderEmailHandler({ sender }));
 } else {
-  console.warn('LF_SMTP_URL / LF_SMTP_FROM not set: overdue-reminder emails are not sent');
+  console.warn('LF_SMTP_URL / LF_SMTP_FROM not set: invoice and reminder emails are not sent');
 }
 await startOutboxWorker({ boss, db, registry });
+// Approved billing batches, one job per batch (T-0120).
+await startBatchWorker({ boss, db, outbox: documentOutbox });
 // The daily overdue-reminder run, one job per tenant fanned out by the scheduler (ADR-0062).
-await startReminderWorker({
-  boss,
-  db,
-  outbox: {
-    publish: async (trx, e) => {
-      await enqueue(trx, boss, {
-        companyId: e.companyId,
-        topic: e.topic,
-        aggregateType: e.aggregateType,
-        aggregateId: e.aggregateId,
-        payload: e.payload,
-      });
-    },
-  },
-});
+await startReminderWorker({ boss, db, outbox: documentOutbox });
 // Dead-lettered deliveries become Sync issues (design §5.6 rule 2, T-0071).
 await startSyncIssueWorker({ boss, db });
 
@@ -75,6 +91,7 @@ for (const signal of ['SIGTERM', 'SIGINT'] as const) {
     clearInterval(timer);
     void boss
       .stop({ graceful: true, timeout: 10_000 })
+      .then(() => renderer.close())
       .then(() => db.destroy())
       .then(() => process.exit(0));
   });

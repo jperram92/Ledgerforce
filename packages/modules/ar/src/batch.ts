@@ -21,6 +21,7 @@ import {
   creditHold,
   InvoiceError,
   priceInvoiceLines,
+  type DocumentOutbox,
   type InvoiceDeps,
   type LineRow,
 } from './invoices.ts';
@@ -369,10 +370,17 @@ export async function loadBatchPreview(
   };
 }
 
-/** Approve a previewed batch (UC-02 step 3). The job (runBatch) then posts it. */
+/** Outbox topic written when a batch is approved; the worker then runs the batch (T-0120). */
+export const BATCH_APPROVED = 'ar.batch.approved';
+
+/**
+ * Approve a previewed batch (UC-02 step 3). With `deps.outbox`, the same transaction publishes
+ * `ar.batch.approved`, and the worker then runs the job (runBatch) that posts it (T-0120).
+ */
 export async function approveBatch(
   trx: Trx,
   c: { companyId: string; batchId: string; approvedBy: string },
+  deps: { outbox?: DocumentOutbox } = {},
 ): Promise<void> {
   const r = await trx
     .updateTable('app.billing_batch')
@@ -388,6 +396,13 @@ export async function approveBatch(
   if (r.numUpdatedRows !== 1n) {
     throw new BatchError('BATCH_STATE', `batch ${c.batchId} is not a preview awaiting approval`);
   }
+  await deps.outbox?.publish(trx, {
+    companyId: c.companyId.toLowerCase(),
+    topic: BATCH_APPROVED,
+    aggregateType: 'billing_batch',
+    aggregateId: c.batchId,
+    payload: { batchId: c.batchId, approvedBy: c.approvedBy },
+  });
 }
 
 export interface BatchRunResult {

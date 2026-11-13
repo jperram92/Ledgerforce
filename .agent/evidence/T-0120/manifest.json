@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0120",
+  "entries": [
+    {
+      "scenario": "SS-UC02-09",
+      "file": ".agent/evidence/T-0120/20261113-134205-tests-db.json",
+      "test": "5 test(s): apps/worker/src/batch-jobs.db.test.ts › SS-UC02-09: an approved batch is posted and emailed by the worker › approving writes ar.batch.approved in the same transaction | apps/worker/src/batch-jobs.db.test.ts › SS-UC02-09: an approved batch is posted and emailed by the worker › the handler enqueues one batch job; delivering again adds none | apps/worker/src/batch-jobs.db.test.ts › SS-UC02-09: an approved batch is posted and emailed by the worker › SS-UC02-09 the batch job posts every item; a re-run posts nothing more | apps/worker/src/batch-jobs.db.test.ts › SS-UC02-09: an approved batch is posted and emailed by the worker › SS-UC02-09 each posted invoice is emailed once by the worker handler; redelivery sends nothing | apps/worker/src/batch-jobs.db.test.ts › SS-UC02-09: an approved batch is posted and emailed by the worker › job data must name tenant, company and batch",
+      "commit": "c639d4ff8ec1-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T13:42:05.539Z",
+      "result": "passed"
+    }
+  ]
+}
