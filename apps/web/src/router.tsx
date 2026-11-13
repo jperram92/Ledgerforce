@@ -41,6 +41,9 @@ import { ReceiptsPage } from './sales/ReceiptsPage.tsx';
 import { BillFormPage } from './purchases/BillFormPage.tsx';
 import { BillPage } from './purchases/BillPage.tsx';
 import { BillsPage } from './purchases/BillsPage.tsx';
+import { BankDetailsPage } from './purchases/BankDetailsPage.tsx';
+import { PaymentBatchPage } from './purchases/PaymentBatchPage.tsx';
+import { PaymentBatchesPage } from './purchases/PaymentBatchesPage.tsx';
 import { AgedPage } from './reports/AgedPage.tsx';
 import { BalanceSheetPage } from './reports/BalanceSheetPage.tsx';
 import { GlDetailPage } from './reports/GlDetailPage.tsx';
@@ -357,6 +360,35 @@ const billRoute = createRoute({
   },
 });
 
+// Supplier payments (T-0087, UC-06): batch release with step-up, bank-detail verification.
+const paymentBatchesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'purchases/payment-batches',
+  component: () => <PaymentBatchesPage />,
+});
+
+const paymentBatchRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'purchases/payment-batches/$batchId',
+  component: function PaymentBatchRoute() {
+    const { batchId } = paymentBatchRoute.useParams();
+    return <PaymentBatchPage key={batchId} batchId={batchId} />;
+  },
+});
+
+const bankDetailsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'purchases/bank-details',
+  validateSearch: (search: Record<string, unknown>): { change?: string } =>
+    typeof search['change'] === 'string' && search['change'] !== ''
+      ? { change: search['change'] }
+      : {},
+  component: function BankDetailsRoute() {
+    const { change } = bankDetailsRoute.useSearch();
+    return <BankDetailsPage {...(change ? { changeId: change } : {})} />;
+  },
+});
+
 // Ledger reports (T-0089, DL-0450): the web app owns /reports/*, the API serves /gl, /ar, /ap.
 const trialBalanceRoute = createRoute({
   getParentRoute: () => shellRoute,
@@ -438,6 +470,9 @@ const routeTree = rootRoute.addChildren([
     billsRoute,
     newBillRoute,
     billRoute,
+    paymentBatchesRoute,
+    paymentBatchRoute,
+    bankDetailsRoute,
     trialBalanceRoute,
     profitAndLossRoute,
     balanceSheetRoute,

@@ -30,3 +30,36 @@
     display: none;
   }
 }
+
+/* Supplier payments (T-0087): the step-up prompt stands out by its rule, not by a shadow, and a
+   bank-detail change reads as a short label/value list. */
+.step-up {
+  border-left: 4px solid var(--ink);
+  padding-left: var(--s3);
+}
+.bank-review textarea {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 40rem;
+}
+.bank-change {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--s1) var(--s3);
+  margin: 0 0 var(--s3);
+}
+.bank-change dt {
+  font-weight: 600;
+}
+.bank-change dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 600px) {
+  .bank-change {
+    grid-template-columns: 1fr;
+  }
+  .bank-change dd {
+    margin-bottom: var(--s2);
+  }
+}

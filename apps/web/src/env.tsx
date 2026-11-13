@@ -8,6 +8,7 @@ import type { AdminClient } from './admin/client.ts';
 import type { ApiClient } from './api.ts';
 import type { GlClient } from './gl/client.ts';
 import type { PurchasesClient } from './purchases/client.ts';
+import type { PaymentsClient } from './purchases/payments-client.ts';
 import type { BankClient } from './bank/client.ts';
 import type { CloseClient } from './close/client.ts';
 import type { ReportsClient } from './reports/client.ts';
@@ -42,6 +43,8 @@ export interface Services {
   sales: SalesClient;
   /** Supplier bills (T-0086). */
   purchases: PurchasesClient;
+  /** Supplier payment batches and bank-detail verification (T-0087). */
+  payments: PaymentsClient;
   /** Ledger reports (T-0089). */
   reports: ReportsClient;
   /** Month-end close (T-0090). */

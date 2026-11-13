@@ -21,6 +21,8 @@ export interface SubPage {
     | '/sales/receipts'
     | '/sales/credit-notes'
     | '/purchases/bills'
+    | '/purchases/payment-batches'
+    | '/purchases/bank-details'
     | '/reports/trial-balance'
     | '/reports/profit-and-loss'
     | '/reports/balance-sheet'
@@ -95,6 +97,17 @@ export const SECTIONS: readonly Section[] = [
         to: '/purchases/bills',
         name: 'Bills',
         text: 'Enter and code supplier bills, send them for approval and see what they post.',
+      },
+      // Supplier payments (T-0087, UC-06).
+      {
+        to: '/purchases/payment-batches',
+        name: 'Payment batches',
+        text: 'Release batches of supplier payments: who is paid, to which account, and what was left out.',
+      },
+      {
+        to: '/purchases/bank-details',
+        name: 'Bank details to verify',
+        text: 'Check a supplier’s new bank details with them and verify the change.',
       },
     ],
   },
