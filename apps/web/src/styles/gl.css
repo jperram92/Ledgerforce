@@ -20,6 +20,11 @@ a.secondary {
   display: inline-block;
   text-decoration: none;
 }
+/* timeline.css colours every hovered link teal; on the primary button's dark hover fill that was
+   1.17:1 (WCAG 1.4.3 fail). The button keeps its paper text on hover (T-0090 finding). */
+a.primary:hover {
+  color: var(--paper);
+}
 
 .gl-form {
   max-width: 60rem;

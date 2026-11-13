@@ -1,0 +1,33 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › tests/e2e/web/gl.spec.ts:542:3 › SS-PLAT-94 manual journals › T-0090 finding: the "New manual journal" link-button keeps its contrast on hover (1.5s)
+
+
+  1) [chromium] › tests/e2e/web/gl.spec.ts:542:3 › SS-PLAT-94 manual journals › T-0090 finding: the "New manual journal" link-button keeps its contrast on hover 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 3
+
+    - Array []
+    + Array [
+    +   "color-contrast",
+    + ]
+
+      551 |       .include('main')
+      552 |       .analyze();
+    > 553 |     expect(axe.violations.map((v) => v.id)).toEqual([]);
+          |                                             ^
+      554 |   });
+      555 |
+      556 |   for (const width of [1440, 390] as const) {
+        at /home/user/Ledgerforce/tests/e2e/web/gl.spec.ts:553:45
+
+    Error Context: test-results/web-gl-SS-PLAT-94-manual-j-60c05-keeps-its-contrast-on-hover-chromium/error-context.md
+
+    Error Context: test-results/web-gl-SS-PLAT-94-manual-j-60c05-keeps-its-contrast-on-hover-chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/e2e/web/gl.spec.ts:542:3 › SS-PLAT-94 manual journals › T-0090 finding: the "New manual journal" link-button keeps its contrast on hover 

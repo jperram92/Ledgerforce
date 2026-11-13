@@ -539,6 +539,20 @@ test.describe('SS-PLAT-93 chart of accounts', () => {
 });
 
 test.describe('SS-PLAT-94 manual journals', () => {
+  test('T-0090 finding: the "New manual journal" link-button keeps its contrast on hover', async ({
+    page,
+  }) => {
+    await fakeApi(page, 'accountant');
+    await open(page, '/accounting/journals', 1440);
+    const link = page.getByRole('link', { name: 'New manual journal' });
+    await link.hover();
+    const axe = await new AxeBuilder({ page })
+      .withRules(['color-contrast'])
+      .include('main')
+      .analyze();
+    expect(axe.violations.map((v) => v.id)).toEqual([]);
+  });
+
   for (const width of [1440, 390] as const) {
     test(`SS-PLAT-94: the journal list, newest first @ ${String(width)} [T-0082]`, async ({
       page,

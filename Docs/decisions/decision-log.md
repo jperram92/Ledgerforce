@@ -2783,3 +2783,13 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - Reopening a hard-locked period stays on its own two-approver flow (T-0079) and is not on this page.
 - Why: SS-UC10-10 and UC-10. The API enforces order, gates and permissions (T-0148), so the screen holds no accounting rules (apps/web AGENTS.md).
 - ADR: none · Status: accepted
+
+### DL-0470 — Primary link-buttons keep paper text on hover (contrast fix found by T-0090's verify)
+- Date: 2026-11-13 · By: claude · Task: T-0090 · Category: ui (accessibility defect)
+- Decision:
+  - The fix: `a.primary:hover { color: var(--paper); }` in apps/web/src/styles/gl.css.
+  - A new e2e test hovers "New manual journal" and runs axe color-contrast.
+  - The cause: timeline.css colours every hovered link `var(--now)` (#006d77), which overrode the `.primary` text colour on anchors. On the hover fill `--ink-2` (#4c5a61) that gives 1.17:1 (WCAG 1.4.3 needs 4.5:1).
+  - How it surfaced: T-0090 added a menu entry on /reports. That moved the layout at 390 px, so after the click the pointer rested on the link and SS-PLAT-94's axe check caught it.
+- Why: it is a real accessibility defect in shipped code, not a flaky test. The existing test is unchanged; a new, explicit test was added.
+- ADR: none · Status: accepted
