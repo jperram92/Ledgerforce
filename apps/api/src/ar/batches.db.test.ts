@@ -1,14 +1,16 @@
 /**
  * Batch billing preview over HTTP (T-0043, UC-02, DL-0271): POST /ar/batches/preview needs
  * ar.batch.run and an idempotency key, returns money as decimal strings and replays; the stored
- * preview is readable with ar.read. Real PostgreSQL (lf_app), real sessions.
+ * preview is readable with ar.read. Real PostgreSQL (lf_app), real sessions. The read carries the
+ * batch status and each item's result after the job (posted / failed with the reason) for the
+ * batch screen (T-0084, SS-UC02-08).
  */
 import 'reflect-metadata';
-import { addBillingLine } from '@ledgerforce/ar';
+import { addBillingLine, INVOICE_NUMBER_SERIES, runBatch } from '@ledgerforce/ar';
 import { createDb, withTenant } from '@ledgerforce/db';
 import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
 import { auServicesSmb, loadChartTemplate } from '@ledgerforce/gl';
-import { generateFiscalYear } from '@ledgerforce/ledger';
+import { entrySeriesFor, generateFiscalYear, SOURCE_TYPES } from '@ledgerforce/ledger';
 import { seedPostingProfiles, setPartyProfiles } from '@ledgerforce/products';
 import { seedTaxCodes } from '@ledgerforce/tax';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -202,5 +204,115 @@ describe('SS-UC02-01 / SS-UC02-07: batch preview over HTTP', () => {
     );
     expect(again.status).toBe(422);
     expect(await again.json()).toMatchObject({ error: 'BATCH_STATE' });
+  });
+});
+
+describe('SS-UC02-08: the batch screen reads the batch state and each item result (T-0084)', () => {
+  it('SS-UC02-08 GET /ar/batches/:id carries the batch status; after the run each item says posted (with its number) or failed (with the reason)', async () => {
+    const db = createDb(tdb.url('lf_app'), 1);
+    const parties = await withTenant(db, A, async (trx) => {
+      const rows = await trx
+        .selectFrom('app.party')
+        .select(['id', 'legal_name'])
+        .where('company_id', '=', companyId)
+        .orderBy('legal_name')
+        .execute();
+      const profile = await trx
+        .selectFrom('app.billing_line')
+        .select('product_profile_id')
+        .where('company_id', '=', companyId)
+        .executeTakeFirstOrThrow();
+      // The job numbers invoices and journals: the series the setup wizard would create.
+      const series = [...new Set(Object.keys(SOURCE_TYPES).map((s) => entrySeriesFor(s)))];
+      for (const [i, code] of series.entries()) {
+        await trx
+          .insertInto('app.number_series')
+          .values({ company_id: companyId, code, prefix: `J${String(i)}-` })
+          .onConflict((oc) => oc.doNothing())
+          .execute();
+      }
+      await trx
+        .insertInto('app.number_series')
+        .values({ company_id: companyId, code: INVOICE_NUMBER_SERIES, prefix: 'INV-' })
+        .onConflict((oc) => oc.doNothing())
+        .execute();
+      for (const p of rows) {
+        await addBillingLine(trx, companyId, {
+          partyId: p.id,
+          productProfileId: profile.product_profile_id,
+          description: 'Subscription December 2026',
+          quantity: '1',
+          unitPrice: '250.00',
+          billDate: '2026-12-01',
+        });
+      }
+      return rows;
+    });
+    const acme = parties[0]?.id ?? '';
+    const bolt = parties[1]?.id ?? '';
+    const created = await call(
+      'POST',
+      '/ar/batches/preview',
+      'arClerk',
+      { company_id: companyId, period_from: '2026-12-01', period_to: '2026-12-31' },
+      'dec-2026',
+    );
+    expect(created.status).toBe(201);
+    const { id } = (await created.json()) as { id: string };
+    const read = async () => {
+      const res = await call('GET', `/ar/batches/${id}?company_id=${companyId}`, 'auditor');
+      expect(res.status).toBe(200);
+      return (await res.json()) as {
+        status: string;
+        items: {
+          party_id: string;
+          status: string;
+          invoice_no: string | null;
+          failure_code: string | null;
+          failure_message: string | null;
+        }[];
+        outcome: { posted: number; failed: number; posted_gross: string };
+      };
+    };
+    const before = await read();
+    expect(before.status).toBe('preview');
+    expect(before.items.map((i) => [i.party_id, i.status, i.invoice_no, i.failure_code])).toEqual([
+      [acme, 'preview', null, null],
+      [bolt, 'preview', null, null],
+    ]);
+    expect(before.outcome).toEqual({ posted: 0, failed: 0, posted_gross: '0.0000' });
+
+    const ok = await call('POST', `/ar/batches/${id}/approve?company_id=${companyId}`, 'approver');
+    expect(ok.status).toBe(200);
+    expect((await read()).status).toBe('approved');
+
+    await withTenant(db, A, (trx) =>
+      trx.updateTable('app.party').set({ status: 'archived' }).where('id', '=', bolt).execute(),
+    );
+    const run = await runBatch(
+      db,
+      A,
+      { companyId, batchId: id },
+      { outbox: { publish: async () => {} } },
+    );
+    expect(run).toMatchObject({ posted: 1, failed: 1, status: 'posted' });
+    await withTenant(db, A, (trx) =>
+      trx.updateTable('app.party').set({ status: 'active' }).where('id', '=', bolt).execute(),
+    );
+    await db.destroy();
+
+    const after = await read();
+    expect(after.status).toBe('posted');
+    const [a, b] = after.items;
+    expect(a).toMatchObject({ party_id: acme, status: 'posted', failure_code: null });
+    expect(a?.invoice_no).toMatch(/^INV-\d+$/);
+    expect(b).toMatchObject({
+      party_id: bolt,
+      status: 'failed',
+      invoice_no: null,
+      failure_code: 'INVALID_PARTY',
+    });
+    expect(b?.failure_message).toEqual(expect.any(String));
+    expect(after.outcome).toEqual({ posted: 1, failed: 1, posted_gross: '275.0000' });
   });
 });

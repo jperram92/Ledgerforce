@@ -57,9 +57,13 @@ export interface BatchItem {
   readonly warnings: readonly BatchWarning[];
 }
 
+export type BatchStatus = 'preview' | 'approved' | 'posted' | 'cancelled';
+
 export interface BatchPreview {
   readonly batchId: string;
   readonly replayed: boolean;
+  /** preview → approved → posted (T-0044); read by the batch screen (T-0084). */
+  readonly status: BatchStatus;
   readonly periodFrom: string;
   readonly periodTo: string;
   readonly issueDate: string;
@@ -284,6 +288,7 @@ export async function previewBatch(
   return {
     batchId: batch.id,
     replayed: false,
+    status: 'preview',
     periodFrom: q.periodFrom,
     periodTo: q.periodTo,
     issueDate,
@@ -302,6 +307,7 @@ export async function loadBatchPreview(
   const b = (
     await sql<{
       id: string;
+      status: BatchStatus;
       period_from: string;
       period_to: string;
       issue_date: string;
@@ -311,7 +317,7 @@ export async function loadBatchPreview(
       tax_total: string;
       gross_total: string;
     }>`
-      SELECT id::text, to_char(period_from, 'YYYY-MM-DD') AS period_from,
+      SELECT id::text, status, to_char(period_from, 'YYYY-MM-DD') AS period_from,
              to_char(period_to, 'YYYY-MM-DD') AS period_to, to_char(issue_date, 'YYYY-MM-DD') AS issue_date,
              invoice_count, ready_count, net_total::text, tax_total::text, gross_total::text
         FROM app.billing_batch WHERE company_id = ${companyId} AND id = ${batchId}::uuid`.execute(
@@ -339,6 +345,7 @@ export async function loadBatchPreview(
   return {
     batchId: b.id,
     replayed,
+    status: b.status,
     periodFrom: b.period_from,
     periodTo: b.period_to,
     issueDate: b.issue_date,

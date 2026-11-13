@@ -3,7 +3,9 @@
  * @ledgerforce/ar. POST /ar/batches/preview needs ar.batch.run and an idempotency key (a repeat
  * returns the stored preview with 200); GET /ar/batches/:id needs ar.read. Money is returned as
  * decimal strings. POST /ar/batches/:id/approve needs ar.batch.approve (T-0044); the job that
- * posts an approved batch (runBatch) runs in the worker (T-0120).
+ * posts an approved batch (runBatch) runs in the worker (T-0120). Every answer carries the batch
+ * status and, per item, its result once the job has run (posted with its invoice number, or failed
+ * with the reason: the exception list) for the batch screen (T-0084, SS-UC02-08).
  */
 import {
   BadRequestException,
@@ -22,6 +24,7 @@ import {
 import {
   approveBatch,
   BatchError,
+  batchSummary,
   loadBatchPreview,
   previewBatch,
   type BatchPreview,
@@ -45,24 +48,36 @@ const refusal = (e: unknown): never => {
   throw e;
 };
 
-function viewOf(p: BatchPreview) {
+type Summary = Awaited<ReturnType<typeof batchSummary>>;
+
+function viewOf(p: BatchPreview, s: Summary) {
+  const result = new Map(s.rows.map((r) => [r.itemNo, r]));
   return {
     id: p.batchId,
     replayed: p.replayed,
+    status: p.status,
     period_from: p.periodFrom,
     period_to: p.periodTo,
     issue_date: p.issueDate,
-    items: p.items.map((i) => ({
-      item_no: i.itemNo,
-      party_id: i.partyId,
-      party_name: i.partyName,
-      line_count: i.lineCount,
-      net: i.net,
-      tax: i.tax,
-      gross: i.gross,
-      warnings: i.warnings,
-    })),
+    items: p.items.map((i) => {
+      const r = result.get(i.itemNo);
+      return {
+        item_no: i.itemNo,
+        party_id: i.partyId,
+        party_name: i.partyName,
+        line_count: i.lineCount,
+        net: i.net,
+        tax: i.tax,
+        gross: i.gross,
+        warnings: i.warnings,
+        status: r?.status ?? 'preview',
+        invoice_no: r?.invoiceNo ?? null,
+        failure_code: r?.failureCode ?? null,
+        failure_message: r?.failureMessage ?? null,
+      };
+    }),
     totals: p.totals,
+    outcome: { posted: s.totals.posted, failed: s.totals.failed, posted_gross: s.totals.gross },
   };
 }
 
@@ -104,6 +119,7 @@ export class ArBatchesController {
       idempotencyKey: key,
       ...(createdBy ? { createdBy } : {}),
     }).catch(refusal);
+    const summary = await batchSummary(this.tx.get(), companyId as string, p.batchId);
     if (p.replayed) {
       res.status(200);
     } else {
@@ -113,7 +129,7 @@ export class ArBatchesController {
         after: { ...p.totals, period_from: p.periodFrom, period_to: p.periodTo },
       });
     }
-    return viewOf(p);
+    return viewOf(p, summary);
   }
 
   @Get(':id')
@@ -121,10 +137,9 @@ export class ArBatchesController {
   async get(@Param('id') id: string, @Query('company_id') companyId: string | undefined) {
     if (!UUID.test(id)) bad('id must be a uuid');
     if (typeof companyId !== 'string' || !UUID.test(companyId)) bad('company_id must be a uuid');
-    const p = await loadBatchPreview(this.tx.get(), (companyId as string).toLowerCase(), id).catch(
-      refusal,
-    );
-    return viewOf(p);
+    const company = (companyId as string).toLowerCase();
+    const p = await loadBatchPreview(this.tx.get(), company, id).catch(refusal);
+    return viewOf(p, await batchSummary(this.tx.get(), company, id));
   }
 
   @Post(':id/approve')
@@ -147,11 +162,12 @@ export class ArBatchesController {
       approvedBy: approvedBy as string,
     }).catch(refusal);
     const p = await loadBatchPreview(trx, company, id).catch(refusal);
+    const summary = await batchSummary(trx, company, id);
     this.audit.describe({
       entityType: 'billing_batch',
       entityId: id,
       after: { status: 'approved' },
     });
-    return { ...viewOf(p), status: 'approved' };
+    return viewOf(p, summary);
   }
 }
