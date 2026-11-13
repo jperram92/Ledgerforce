@@ -19,6 +19,7 @@ import {
   BadRequestException,
   Inject,
   Body,
+  NotFoundException,
   Controller,
   Get,
   HttpCode,
@@ -37,7 +38,10 @@ import {
   createPaymentBatch,
   exportPaymentBatchAba,
   getPaymentBatch,
+  listPaymentBatches,
   PaymentBatchError,
+  paymentBatchNames,
+  type PaymentBatchNames,
   releasePaymentBatch,
   type PaymentBatchView,
   type PaymentConfirmationView,
@@ -121,6 +125,34 @@ const viewOf = (b: PaymentBatchView) => ({
     : null,
 });
 
+/** The view with names instead of bare ids, payee accounts masked (T-0153, for T-0087). */
+const namedViewOf = (b: PaymentBatchView, n: PaymentBatchNames) => {
+  const v = viewOf(b);
+  return {
+    ...v,
+    created_by: b.createdBy,
+    created_by_name: b.createdBy === null ? null : (n.users.get(b.createdBy) ?? null),
+    releases: b.releases.map((r, i) => ({
+      ...v.releases[i],
+      released_by_name: r.releasedBy === null ? null : (n.users.get(r.releasedBy) ?? null),
+    })),
+    payments: b.payments.map((p, i) => {
+      const a = n.accounts.get(p.bankAccountId);
+      return {
+        ...v.payments[i],
+        bill_no: n.bills.get(p.billId) ?? null,
+        party_name: n.parties.get(p.partyId) ?? null,
+        bank_account: a ? { bsb: a.bsb, account_number: a.accountNumber } : null,
+      };
+    }),
+    excluded: b.excluded.map((x, i) => ({
+      ...v.excluded[i],
+      bill_no: n.bills.get(x.billId) ?? null,
+      party_name: n.parties.get(x.partyId) ?? null,
+    })),
+  };
+};
+
 const confirmationOf = (c: PaymentConfirmationView) => ({
   batch_id: c.batchId,
   batch_no: c.batchNo,
@@ -178,14 +210,42 @@ export class ApPaymentBatchesController {
     return viewOf(batch);
   }
 
+  /** The company's batches, newest first (T-0153): what the release screen lists. */
+  @Get()
+  @RequirePermission('ap.read')
+  async list(@Query('company_id') companyId: string | undefined) {
+    const rows = await listPaymentBatches(this.tx.get(), uuid(companyId, 'company_id'));
+    return {
+      batches: rows.map((b) => ({
+        id: b.batchId,
+        batch_no: b.batchNo,
+        status: b.status,
+        payment_date: b.paymentDate,
+        total: b.total,
+        payment_count: b.paymentCount,
+        excluded_count: b.excludedCount,
+        releases_required: b.releasesRequired,
+        release_count: b.releaseCount,
+        created_by_name: b.createdByName,
+        created_at: b.createdAt.toISOString(),
+      })),
+    };
+  }
+
+  /** One batch with names (T-0153); a batch not in the caller's company is 404. */
   @Get(':id')
   @RequirePermission('ap.read')
   async get(@Param('id') id: string, @Query('company_id') companyId: string | undefined) {
-    return viewOf(
-      await getPaymentBatch(this.tx.get(), uuid(companyId, 'company_id'), uuid(id, 'id')).catch(
-        refusal,
-      ),
+    const trx = this.tx.get();
+    const b = await getPaymentBatch(trx, uuid(companyId, 'company_id'), uuid(id, 'id')).catch(
+      (e: unknown) => {
+        if (e instanceof PaymentBatchError && e.code === 'INVALID_BATCH') {
+          throw new NotFoundException({ error: 'not_found' });
+        }
+        return refusal(e);
+      },
     );
+    return namedViewOf(b, await paymentBatchNames(trx, b));
   }
 
   @Post(':id/release')

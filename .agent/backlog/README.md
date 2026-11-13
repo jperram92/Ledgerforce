@@ -18,8 +18,9 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | in_progress | 1 |
 | review | 111 |
 | todo | 24 |
-| verifying | 3 |
-| **total** | **150** |
+| verifying | 5 |
+| **total** | **152** |
+| **total** | **147** |
 
 | Phase | Cards |
 |---|---:|
@@ -194,7 +195,9 @@ graph LR
 | [T-0152](T-0152.md) | Customer refund over HTTP and the refund screen: permission decision, routes, UI (split from T-0085) | MVP | blocked | T-0055, T-0151 | UC-11 | 1 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | review | T-0081, T-0046, T-0045, T-0055, T-0151 | UC-03, UC-11 | 2 |
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | review | T-0081, T-0052, T-0051 | UC-05 | 1 |
-| [T-0087](T-0087.md) | UI: supplier bank-detail verification and payment batch release (step-up) | MVP | todo | T-0081, T-0054, T-0053, T-0056 | UC-06 | 1 |
+| [T-0153](T-0153.md) | AP release API for the T-0087 screens: batch list, named batch view, bank-detail change list | MVP | verifying | T-0054, T-0053 | UC-06 | 1 |
+| [T-0087](T-0087.md) | UI: supplier bank-detail verification and payment batch release (step-up) | MVP | verifying | T-0081, T-0054, T-0053, T-0056, T-0153 | UC-06 | 1 |
+| [T-0154](T-0154.md) | UI: bank file (ABA) download and bank confirmation on the payment batch screen | MVP | todo | T-0087, T-0056, T-0057 | UC-06 | 0 |
 | [T-0149](T-0149.md) | Bank reconciliation over HTTP (for the reconciliation screens) | MVP | review | T-0058, T-0059, T-0060, T-0061 | UC-08 | 3 |
 | [T-0088](T-0088.md) | UI: statement import and bank reconciliation | MVP | review | T-0081, T-0061, T-0059, T-0149 | UC-08 | 1 |
 | [T-0150](T-0150.md) | Bank: journal preview for a transaction from a line, candidate suggestions, large statement files | MVP | todo | T-0149, T-0088 | UC-08 | 1 |

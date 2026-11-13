@@ -102,7 +102,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 const numeric = (d: Decimal | string) => Money.of(d, 'XXX').toNumericString();
 
 /** The tenant's two-releaser threshold (latest SoD settings row, else the placeholder default). */
-async function twoReleaserThreshold(trx: Trx): Promise<string> {
+export async function twoReleaserThreshold(trx: Trx): Promise<string> {
   const r = await sql<{ t: string }>`
     SELECT batch_two_releasers_threshold::text AS t FROM app.sod_settings
      ORDER BY set_at DESC, id DESC LIMIT 1`.execute(trx);

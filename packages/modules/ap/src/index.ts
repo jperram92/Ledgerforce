@@ -6,3 +6,4 @@ export * from './aba-export.ts';
 export * from './payment-confirmation.ts';
 export * from './remittance.ts';
 export * from './aged.ts';
+export * from './payment-batch-read.ts';

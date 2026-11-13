@@ -1,0 +1,222 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0087",
+  "entries": [
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184552-SS-UC06-09-bank-details-to-verify-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 1440 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:52.241Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184553-SS-UC06-09-bank-details-step-up-prompt-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 1440 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:53.199Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184555-SS-UC06-09-bank-details-verified-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 1440 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:55.346Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184552-SS-UC06-10-batch-awaiting-release-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 1440 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:52.411Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184553-SS-UC06-10-release-step-up-prompt-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 1440 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:53.322Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184556-SS-UC06-10-batch-first-release-given-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 1440 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:56.091Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184557-SS-UC06-09-bank-details-to-verify-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 390 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:57.371Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184558-SS-UC06-09-bank-details-step-up-prompt-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 390 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:58.095Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184600-SS-UC06-09-bank-details-verified-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 390 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:46:00.209Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184558-SS-UC06-10-batch-awaiting-release-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 390 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:58.604Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184559-SS-UC06-10-release-step-up-prompt-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 390 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:45:59.448Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184601-SS-UC06-10-batch-first-release-given-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 390 [T-0087]",
+      "commit": "a6ff41ad8efa-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:46:01.606Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184934-SS-UC06-09-bank-details-to-verify-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 1440 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:34.390Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184935-SS-UC06-09-bank-details-step-up-prompt-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 1440 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:35.395Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184937-SS-UC06-09-bank-details-verified-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 1440 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:37.849Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184934-SS-UC06-10-batch-awaiting-release-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 1440 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:34.986Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184935-SS-UC06-10-release-step-up-prompt-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 1440 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:35.876Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184938-SS-UC06-10-batch-first-release-given-1440.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 1440 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:38.425Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184940-SS-UC06-09-bank-details-to-verify-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 390 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:40.368Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184941-SS-UC06-09-bank-details-step-up-prompt-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 390 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:41.146Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-09",
+      "file": ".agent/evidence/T-0087/20261113-184943-SS-UC06-09-bank-details-verified-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 390 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:43.324Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184941-SS-UC06-10-batch-awaiting-release-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 390 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:41.210Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184942-SS-UC06-10-release-step-up-prompt-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 390 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:42.410Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-10",
+      "file": ".agent/evidence/T-0087/20261113-184944-SS-UC06-10-batch-first-release-given-390.png",
+      "test": "web/payment-batch.spec.ts › SS-UC06-10 Release screen with step-up prompt @ 390 [T-0087]",
+      "commit": "cae776850c51",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T18:49:44.939Z",
+      "result": "passed"
+    }
+  ]
+}

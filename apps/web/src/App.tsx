@@ -7,6 +7,7 @@ import { createApiClient } from './api.ts';
 import { ServicesContext, type AppEnv } from './env.tsx';
 import { createGlClient } from './gl/client.ts';
 import { createPurchasesClient } from './purchases/client.ts';
+import { createPaymentsClient } from './purchases/payments-client.ts';
 import { createBankClient } from './bank/client.ts';
 import { createCloseClient } from './close/client.ts';
 import { createReportsClient } from './reports/client.ts';
@@ -22,6 +23,7 @@ export function App({ env, history }: { env: AppEnv; history?: RouterHistory }) 
       gl: createGlClient(env),
       sales: createSalesClient(env),
       purchases: createPurchasesClient(env),
+      payments: createPaymentsClient(env),
       reports: createReportsClient(env),
       close: createCloseClient(env),
       bank: createBankClient(env),
