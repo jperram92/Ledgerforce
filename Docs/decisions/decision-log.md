@@ -2564,3 +2564,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: company from the chart endpoint (AR clerks lack gl.account.read); always-on preview (P4: show on request).
 - Not here: the approve action on the detail page waits for T-0132 (permission decision).
 - ADR: none · Status: accepted
+
+### DL-0408 — Owner approved the golden registry refresh and the coverage-measure change
+- Date: 2026-11-13 · By: human (product owner), claude · Task: T-0121, T-0128 · Category: process
+- Owner reply (verbatim, 2026-11-13) to the two open questions in HANDOVER: "Approved - keep running spawn multiple subagents".
+- Decision 1 (done here): `Docs/decisions/golden-approvals.json` now pins `Docs/accounting/postings.md` to merge commit 983cc919 (PR #4), citing DL-0405 (introduced in that merge), DL-0263, DL-0256 and DL-0258. The previous record pinned the pre-merge snapshot 334a3f9. `conductor gate golden` → PASS.
+- Decision 2 (T-0128): gate 2c may measure unit+db coverage, with the main baseline re-recorded under the same measure (RQ-0105 remedy 2), implemented test-first with verifier tests.
+- Also: parallel sub-agents may run again (owner request). They take ID ranges per DL-0409 and add no migrations: the runner is gapless, so the lead adds migrations one at a time.
+- ADR: ADR-0047 (process, Accepted) · Status: accepted
