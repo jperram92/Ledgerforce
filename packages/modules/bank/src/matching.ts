@@ -12,6 +12,8 @@
  *   submitted and posted through @ledgerforce/journals, i.e. through the posting engine with the
  *   manual-journal rules (control accounts refused, approval threshold, period checks). The line is
  *   then matched to the posted entry (SS-UC08-05). Idempotent per line.
+ * - previewTransactionFromLine: the journal createTransactionFromLine would post, from the posting
+ *   engine's preview of the same command (one builder for both, T-0150, P4). Writes nothing.
  *
  * This module never writes ledger tables; the database guard (0050) re-checks every match.
  */
@@ -20,7 +22,10 @@ import {
   createManualJournal,
   getManualJournal,
   postManualJournal,
+  previewManualJournalInput,
   submitManualJournal,
+  type ManualJournalInput,
+  type ManualJournalPreview,
 } from '@ledgerforce/journals';
 import type { AccountRef, PostingLineInput, PostingOutbox } from '@ledgerforce/ledger';
 import { DomainError } from '@ledgerforce/shared';
@@ -355,6 +360,12 @@ export interface CreateTransactionResult {
   replayed: boolean;
 }
 
+/** The transaction fields a preview needs: no SoD settings, no outbox (nothing is posted). */
+export type PreviewTransactionInput = Omit<CreateTransactionInput, 'settings' | 'outbox'>;
+
+/** The journal a transaction from a line would post (the posting engine's preview). */
+export type TransactionPreview = ManualJournalPreview;
+
 interface LineRow {
   id: string;
   bank_account_id: string;
@@ -367,17 +378,8 @@ interface LineRow {
   base_currency: string;
 }
 
-/**
- * Create a transaction from an unmatched statement line: a manual journal posted through the
- * posting engine, then matched to the line (SS-UC08-05).
- */
-export async function createTransactionFromLine(
-  trx: Trx,
-  input: CreateTransactionInput,
-): Promise<CreateTransactionResult> {
-  if (!UUID_RE.test(input.statementLineId)) {
-    throw new BankMatchError('NOT_FOUND', `statement line ${input.statementLineId} not found`);
-  }
+async function statementLine(trx: Trx, id: string, lock: boolean): Promise<LineRow> {
+  if (!UUID_RE.test(id)) throw new BankMatchError('NOT_FOUND', `statement line ${id} not found`);
   const lr = await sql<LineRow>`
     SELECT l.id::text, l.bank_account_id::text, l.amount::text, l.description, l.reference,
            to_char(l.posted_on, 'YYYY-MM-DD') AS posted_on, l.status, s.currency,
@@ -385,51 +387,36 @@ export async function createTransactionFromLine(
       FROM app.bank_statement_line l
       JOIN app.bank_statement s ON s.tenant_id = l.tenant_id AND s.id = l.statement_id
       JOIN app.company c ON c.tenant_id = l.tenant_id AND c.id = l.company_id
-     WHERE l.id = ${input.statementLineId}
-       FOR UPDATE OF l`.execute(trx);
+     WHERE l.id = ${id}
+     ${lock ? sql`FOR UPDATE OF l` : sql``}`.execute(trx);
   const line = lr.rows[0];
-  if (!line) {
-    throw new BankMatchError('NOT_FOUND', `statement line ${input.statementLineId} not found`);
-  }
-  const bank = await bankAccount(trx, line.bank_account_id);
-  const key = `bank_line:${line.id}`;
+  if (!line) throw new BankMatchError('NOT_FOUND', `statement line ${id} not found`);
+  return line;
+}
 
-  if (line.status !== 'unmatched') {
-    const existing = await sql<{
-      match_id: string;
-      mj: string;
-      entry_id: string;
-      entry_no: string;
-    }>`
-      SELECT m.id::text AS match_id, m.source_id::text AS mj, m.journal_entry_id::text AS entry_id,
-             e.entry_no
-        FROM app.bank_match m JOIN app.journal_entry e ON e.tenant_id = m.tenant_id AND e.id = m.journal_entry_id
-       WHERE m.statement_line_id = ${line.id} AND m.status = 'matched' AND m.source_kind = 'bank_transaction'
-         AND EXISTS (SELECT 1 FROM app.manual_journal j WHERE j.id = m.source_id AND j.idempotency_key = ${key})`.execute(
-      trx,
-    );
-    const x = existing.rows[0];
-    if (x) {
-      return {
-        matchId: x.match_id,
-        manualJournalId: x.mj,
-        entryId: x.entry_id,
-        entryNo: x.entry_no,
-        replayed: true,
-      };
-    }
-    throw new BankMatchError(
-      'ALREADY_MATCHED',
-      `statement line ${line.id} is ${line.status}; unmatch it before creating a transaction`,
-    );
-  }
+const alreadyMatched = (line: LineRow) =>
+  new BankMatchError(
+    'ALREADY_MATCHED',
+    `statement line ${line.id} is ${line.status}; unmatch it before creating a transaction`,
+  );
+
+/**
+ * The manual journal a transaction from an unmatched line posts: the bank line on the bank's GL
+ * account plus the counter lines (or the accepted rule's account). The one builder of both the
+ * post and the preview (T-0150), so the preview shows what the post writes.
+ */
+async function transactionJournal(
+  trx: Trx,
+  line: LineRow,
+  bank: BankAccountRow,
+  input: PreviewTransactionInput,
+): Promise<{ journal: ManualJournalInput; ruleId: string | null }> {
   if (line.currency !== line.base_currency) {
     throw new BankMatchError(
       'INVALID_TRANSACTION',
       `the line is in ${line.currency}; creating a transaction needs the base currency ${line.base_currency}`,
     );
   }
-
   let counter: readonly CounterLine[];
   let ruleId: string | null = null;
   const amount = Money.of(line.amount, line.currency);
@@ -490,14 +477,77 @@ export async function createTransactionFromLine(
   const memo =
     input.memo ??
     `Bank ${line.posted_on}: ${line.description}${line.reference ? ` (${line.reference})` : ''}`;
-
-  const { id: manualJournalId } = await createManualJournal(trx, {
-    input: {
+  return {
+    journal: {
       companyId: bank.company_id,
       entryDate: input.entryDate ?? line.posted_on,
       memo: memo.slice(0, 500),
       lines,
     },
+    ruleId,
+  };
+}
+
+/**
+ * "Show me the journal" before a transaction is created from a line (T-0150, P4, design §3.9):
+ * the posting engine's preview of the manual journal createTransactionFromLine would post, with
+ * account names. Refuses what the post refuses (ALREADY_MATCHED, INVALID_TRANSACTION, the
+ * suggestion checks, and the engine's UNBALANCED, CONTROL_ACCOUNT, period refusals …). Takes no
+ * lock and writes nothing.
+ */
+export async function previewTransactionFromLine(
+  trx: Trx,
+  input: PreviewTransactionInput,
+): Promise<TransactionPreview> {
+  const line = await statementLine(trx, input.statementLineId, false);
+  if (line.status !== 'unmatched') throw alreadyMatched(line);
+  const bank = await bankAccount(trx, line.bank_account_id);
+  const { journal } = await transactionJournal(trx, line, bank, input);
+  return previewManualJournalInput(trx, { input: journal, createdBy: input.createdBy });
+}
+
+/**
+ * Create a transaction from an unmatched statement line: a manual journal posted through the
+ * posting engine, then matched to the line (SS-UC08-05).
+ */
+export async function createTransactionFromLine(
+  trx: Trx,
+  input: CreateTransactionInput,
+): Promise<CreateTransactionResult> {
+  const line = await statementLine(trx, input.statementLineId, true);
+  const bank = await bankAccount(trx, line.bank_account_id);
+  const key = `bank_line:${line.id}`;
+
+  if (line.status !== 'unmatched') {
+    const existing = await sql<{
+      match_id: string;
+      mj: string;
+      entry_id: string;
+      entry_no: string;
+    }>`
+      SELECT m.id::text AS match_id, m.source_id::text AS mj, m.journal_entry_id::text AS entry_id,
+             e.entry_no
+        FROM app.bank_match m JOIN app.journal_entry e ON e.tenant_id = m.tenant_id AND e.id = m.journal_entry_id
+       WHERE m.statement_line_id = ${line.id} AND m.status = 'matched' AND m.source_kind = 'bank_transaction'
+         AND EXISTS (SELECT 1 FROM app.manual_journal j WHERE j.id = m.source_id AND j.idempotency_key = ${key})`.execute(
+      trx,
+    );
+    const x = existing.rows[0];
+    if (x) {
+      return {
+        matchId: x.match_id,
+        manualJournalId: x.mj,
+        entryId: x.entry_id,
+        entryNo: x.entry_no,
+        replayed: true,
+      };
+    }
+    throw alreadyMatched(line);
+  }
+
+  const { journal, ruleId } = await transactionJournal(trx, line, bank, input);
+  const { id: manualJournalId } = await createManualJournal(trx, {
+    input: journal,
     createdBy: input.createdBy,
     idempotencyKey: key,
   });

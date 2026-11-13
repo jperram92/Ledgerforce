@@ -366,6 +366,84 @@ describe('T-0149: bank reconciliation over HTTP', () => {
     ).toBe(403);
   });
 
+  it('T-0150 AC-2 previews the journal of a transaction from a line (200, decimal strings) and writes nothing', async () => {
+    const fee = await lineBy('Account fee');
+    const suggestion = fee.suggestions[0]?.id;
+    const path = `/bank-rec/lines/${fee.id}/transaction/preview`;
+    const body = { company_id: f.companyId, from_suggestion_id: suggestion };
+    const written = async () =>
+      (
+        await f.admin.query<{ entries: number; journals: number; matches: number }>(
+          `SELECT (SELECT count(*)::int FROM app.journal_entry WHERE tenant_id = $1) AS entries,
+                  (SELECT count(*)::int FROM app.manual_journal WHERE tenant_id = $1) AS journals,
+                  (SELECT count(*)::int FROM app.bank_match WHERE tenant_id = $1) AS matches`,
+          [f.tenantId],
+        )
+      ).rows[0];
+    const before = await written();
+
+    expect((await call('POST', path, 'auditor', { body })).status).toBe(403);
+    expect((await call('POST', path, 'clerk', { body })).status).toBe(403);
+    expect(
+      (
+        await call('POST', `/bank-rec/lines/${foreign.lineId}/transaction/preview`, 'accountant', {
+          body: { company_id: f.companyId, lines: [{ account_id: acct('6110'), amount: '10.00' }] },
+        })
+      ).status,
+    ).toBe(404);
+    expect(
+      (
+        await call('POST', path, 'accountant', {
+          body: { company_id: f.companyId, lines: [{ account_id: acct('6110'), amount: 10 }] },
+        })
+      ).status,
+    ).toBe(400);
+
+    // A preview writes nothing, so it needs no Idempotency-Key.
+    const r = await call('POST', path, 'accountant', { body, key: null });
+    expect(r.status).toBe(200);
+    expect(await json(r)).toEqual({
+      entry_date: '2026-11-02',
+      requested_date: '2026-11-02',
+      redirected: false,
+      needs_override: false,
+      base_currency: 'AUD',
+      total: '10.0000',
+      lines: [
+        {
+          line_no: 1,
+          account_id: acct('1010'),
+          account_code: '1010',
+          account_name: expect.any(String) as unknown,
+          account_type: 'asset',
+          debit: '0.0000',
+          credit: '10.0000',
+          memo: 'Account fee',
+        },
+        {
+          line_no: 2,
+          account_id: acct('6110'),
+          account_code: '6110',
+          account_name: expect.any(String) as unknown,
+          account_type: 'expense',
+          debit: '10.0000',
+          credit: '0.0000',
+          memo: null,
+        },
+      ],
+    });
+
+    const refused = await call('POST', path, 'accountant', {
+      body: { company_id: f.companyId, lines: [{ account_id: acct('6110'), amount: '9.00' }] },
+    });
+    expect(refused.status).toBe(422);
+    expect(await json(refused)).toMatchObject({ error: 'UNBALANCED' });
+
+    expect(await written()).toEqual(before);
+    expect((await lineBy('Account fee')).status).toBe('unmatched');
+    expect(await audits('bank_transaction')).toBe(0);
+  });
+
   it('SS-UC08-05 accepting the rule suggestion creates and posts the transaction (201) and matches the line; replay 200', async () => {
     const fee = await lineBy('Account fee');
     const suggestion = fee.suggestions[0]?.id;

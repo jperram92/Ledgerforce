@@ -5,6 +5,8 @@
  * SS-UC08-04 (stored half) — a rule match is stored as an open suggestion, the line stays unmatched.
  * SS-UC08-05 — an unmatched line created as a transaction: a balanced manual journal posts through
  * the posting engine (manual-journal and control-account rules) and the line is matched.
+ * T-0150 — the journal preview of a transaction from a line: the posting engine's preview of the
+ * command the post uses; it refuses what the post refuses and writes nothing.
  *
  * The statement is the November Harbour CSV fixture used by T-0058 (1,375.00 "INV-000123" in,
  * 10.00 account fee out, 550.55 Stripe payout in, …).
@@ -23,6 +25,7 @@ import {
   createMatchRule,
   createTransactionFromLine,
   listLineMatching,
+  previewTransactionFromLine,
   runMatching,
   BankMatchError,
 } from './matching.ts';
@@ -323,5 +326,110 @@ describe('SS-UC08-05: Unmatched line created as a transaction', () => {
       ),
     ).rejects.toBeInstanceOf(BankMatchError);
     expect((await lineBy('BPAY Office Rent Pty')).status).toBe('unmatched');
+  });
+});
+
+describe('T-0150: journal preview of a transaction from a line', () => {
+  const written = (): Promise<{ entries: number; journals: number; matches: number }> =>
+    f.inTenant(async (trx) => {
+      const r = await sql<{ entries: number; journals: number; matches: number }>`
+        SELECT (SELECT count(*)::int FROM app.journal_entry) AS entries,
+               (SELECT count(*)::int FROM app.manual_journal) AS journals,
+               (SELECT count(*)::int FROM app.bank_match) AS matches`.execute(trx);
+      const row = r.rows[0];
+      if (!row) throw new Error('no counts');
+      return row;
+    });
+
+  it('T-0150 AC-1 previews the rent line as the journal the post then writes, and writes nothing', async () => {
+    const rent = await lineBy('BPAY Office Rent Pty');
+    const before = await written();
+    const p = await f.inTenant((trx) =>
+      previewTransactionFromLine(trx, {
+        statementLineId: rent.id,
+        lines: [{ account: { id: acct('6230') }, amount: '2200.00', memo: 'November rent' }],
+        createdBy: accountant,
+      }),
+    );
+    expect(p).toMatchObject({
+      entryDate: '2026-11-05',
+      requestedDate: '2026-11-05',
+      redirected: false,
+      baseCurrency: 'AUD',
+      total: '2200.0000',
+    });
+    expect(
+      p.lines.map((l) => ({ code: l.accountCode, debit: l.debit, credit: l.credit, memo: l.memo })),
+    ).toEqual([
+      { code: '1010', debit: '0.0000', credit: '2200.0000', memo: 'BPAY Office Rent Pty' },
+      { code: '6230', debit: '2200.0000', credit: '0.0000', memo: 'November rent' },
+    ]);
+    expect(p.lines.every((l) => l.accountName !== '' && l.accountType !== '')).toBe(true);
+    expect(await written()).toEqual(before);
+    expect((await lineBy('BPAY Office Rent Pty')).status).toBe('unmatched');
+
+    // The post writes exactly the previewed lines.
+    const r = await f.inTenant((trx) =>
+      createTransactionFromLine(trx, {
+        statementLineId: rent.id,
+        lines: [{ account: { id: acct('6230') }, amount: '2200.00', memo: 'November rent' }],
+        createdBy: accountant,
+        settings: DEFAULT_SOD_SETTINGS,
+      }),
+    );
+    const posted = await f.inTenant(
+      async (trx) =>
+        (
+          await sql<{ code: string; debit: string; credit: string; memo: string | null }>`
+            SELECT a.code, l.debit::text, l.credit::text, l.memo
+              FROM app.journal_line l JOIN app.account a ON a.id = l.account_id
+             WHERE l.entry_id = ${r.entryId} ORDER BY l.line_no`.execute(trx)
+        ).rows,
+    );
+    expect(posted).toEqual(
+      p.lines.map((l) => ({ code: l.accountCode, debit: l.debit, credit: l.credit, memo: l.memo })),
+    );
+  });
+
+  it('T-0150 AC-1 refuses what the post refuses: unbalanced lines, a control account and a matched line', async () => {
+    const telstra = await lineBy('Telstra direct debit November, mobile');
+    const before = await written();
+    await expect(
+      f.inTenant((trx) =>
+        previewTransactionFromLine(trx, {
+          statementLineId: telstra.id,
+          lines: [{ account: { id: acct('6230') }, amount: '80.00' }],
+          createdBy: accountant,
+        }),
+      ),
+    ).rejects.toMatchObject({ code: 'UNBALANCED' });
+    await expect(
+      f.inTenant((trx) =>
+        previewTransactionFromLine(trx, {
+          statementLineId: telstra.id,
+          lines: [{ account: { id: acct('2000') }, amount: '89.90' }],
+          createdBy: accountant,
+        }),
+      ),
+    ).rejects.toMatchObject({ code: 'CONTROL_ACCOUNT' });
+    const fee = await lineBy('Account fee');
+    await expect(
+      f.inTenant((trx) =>
+        previewTransactionFromLine(trx, {
+          statementLineId: fee.id,
+          lines: [{ account: { id: acct('6110') }, amount: '10.00' }],
+          createdBy: accountant,
+        }),
+      ),
+    ).rejects.toMatchObject({ code: 'ALREADY_MATCHED' });
+    await expect(
+      f.inTenant((trx) =>
+        previewTransactionFromLine(trx, {
+          statementLineId: telstra.id,
+          createdBy: accountant,
+        }),
+      ),
+    ).rejects.toMatchObject({ code: 'INVALID_TRANSACTION' });
+    expect(await written()).toEqual(before);
   });
 });

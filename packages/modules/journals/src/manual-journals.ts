@@ -499,7 +499,33 @@ export interface ManualJournalPreview {
  */
 export async function previewManualJournal(trx: Trx, id: string): Promise<ManualJournalPreview> {
   const doc = await load(trx, id, false);
-  const built = await preview(trx, commandOf(doc, doc.lines));
+  return previewOf(trx, await preview(trx, commandOf(doc, doc.lines)));
+}
+
+/**
+ * "Show me the journal" for a manual journal that is not stored yet (T-0150): the draft checks
+ * create makes (checkCommand: shape, scale, balance), then the posting engine's preview of the
+ * command submit and post build with commandOf, with account names added. Writes nothing.
+ */
+export async function previewManualJournalInput(
+  trx: Trx,
+  opts: { input: ManualJournalInput; createdBy: string },
+): Promise<ManualJournalPreview> {
+  checkDraft(opts.input);
+  const draft = {
+    id: '00000000-0000-0000-0000-000000000000',
+    companyId: opts.input.companyId,
+    entryDate: opts.input.entryDate,
+    memo: opts.input.memo ?? null,
+  };
+  return previewOf(
+    trx,
+    await preview(trx, commandOf(draft, opts.input.lines, { createdBy: opts.createdBy })),
+  );
+}
+
+/** A built entry with account names added, for "show me the journal". */
+async function previewOf(trx: Trx, built: BuiltEntry): Promise<ManualJournalPreview> {
   const ids = [...new Set(built.lines.map((l) => l.accountId))];
   const r = await sql<{ id: string; name: string; type: string }>`
     SELECT id::text, name, type FROM app.account
