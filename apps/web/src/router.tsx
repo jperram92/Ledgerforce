@@ -15,6 +15,7 @@ import { AUDIT_FILTER_KEYS, type AuditQuery } from './admin/client.ts';
 import { ControlExceptionsPage } from './admin/ControlExceptionsPage.tsx';
 import { UserPage } from './admin/UserPage.tsx';
 import { UsersPage } from './admin/UsersPage.tsx';
+import { ClosePage } from './close/ClosePage.tsx';
 import { ChartPage } from './gl/ChartPage.tsx';
 import { JournalFormPage } from './gl/JournalFormPage.tsx';
 import { JournalPage } from './gl/JournalPage.tsx';
@@ -137,6 +138,18 @@ const chartRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: 'accounting/chart',
   component: ChartPage,
+});
+
+// Month-end close checklist (T-0090, UC-10).
+const closeRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'accounting/close',
+  validateSearch: (search: Record<string, unknown>): { period?: string } =>
+    typeof search['period'] === 'string' ? { period: search['period'] } : {},
+  component: function CloseRoute() {
+    const { period } = closeRoute.useSearch();
+    return <ClosePage {...(period ? { periodId: period } : {})} />;
+  },
 });
 
 const journalsRoute = createRoute({
@@ -299,6 +312,7 @@ const routeTree = rootRoute.addChildren([
     syncIssuesRoute,
     syncIssueRoute,
     chartRoute,
+    closeRoute,
     journalsRoute,
     invoicesRoute,
     invoiceRoute,

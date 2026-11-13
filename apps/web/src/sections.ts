@@ -12,6 +12,7 @@ export interface SubPage {
     | '/settings/sync-issues'
     | '/accounting/journals'
     | '/accounting/chart'
+    | '/accounting/close'
     | '/sales/invoices'
     | '/sales/batches'
     | '/purchases/bills'
@@ -150,6 +151,11 @@ export const SECTIONS: readonly Section[] = [
         to: '/accounting/chart',
         name: 'Chart of accounts',
         text: 'The accounts your books are kept in, by number and type.',
+      },
+      {
+        to: '/accounting/close',
+        name: 'Month-end close',
+        text: 'Lock a month step by step: sales, purchases, bank, adjustments, review, close.',
       },
     ],
   },

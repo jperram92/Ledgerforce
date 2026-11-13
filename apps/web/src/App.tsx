@@ -7,6 +7,7 @@ import { createApiClient } from './api.ts';
 import { ServicesContext, type AppEnv } from './env.tsx';
 import { createGlClient } from './gl/client.ts';
 import { createPurchasesClient } from './purchases/client.ts';
+import { createCloseClient } from './close/client.ts';
 import { createReportsClient } from './reports/client.ts';
 import { createSalesClient } from './sales/client.ts';
 import { createAppRouter } from './router.tsx';
@@ -21,6 +22,7 @@ export function App({ env, history }: { env: AppEnv; history?: RouterHistory }) 
       sales: createSalesClient(env),
       purchases: createPurchasesClient(env),
       reports: createReportsClient(env),
+      close: createCloseClient(env),
     },
     // No automatic retries: a failed session check shows its error and a Retry button at once.
     queryClient: new QueryClient({ defaultOptions: { queries: { retry: false } } }),

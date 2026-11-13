@@ -1,0 +1,175 @@
+
+Running 6 tests using 2 workers
+
+  ✘  1 [chromium] › tests/e2e/web/close.spec.ts:207:3 › SS-UC10-10: Close checklist screen @ 1440 [T-0090] (6.5s)
+  ✘  2 [chromium] › tests/e2e/web/close.spec.ts:264:1 › T-0090: an Accountant sees the checklist but cannot complete steps (6.5s)
+  ✘  4 [chromium] › tests/e2e/web/close.spec.ts:274:1 › T-0090: a user without reports.run is told so, and nothing is listed (6.2s)
+  ✘  3 [chromium] › tests/e2e/web/close.spec.ts:207:3 › SS-UC10-10: Close checklist screen @ 390 [T-0090] (6.2s)
+  ✘  6 [chromium] › tests/e2e/web/close.spec.ts:282:1 › T-0090: without a period in the address, the latest period that is not hard-locked is shown (6.2s)
+  ✘  5 [chromium] › tests/e2e/web/close.spec.ts:241:1 › T-0090: a refused step explains why, naming the unreconciled bank accounts (30.0s)
+
+
+  1) [chromium] › tests/e2e/web/close.spec.ts:207:3 › SS-UC10-10: Close checklist screen @ 1440 [T-0090] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Month-end close', level: 1 })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: 'Month-end close', level: 1 }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: 'Month-end close', level: 1 })
+
+
+      211 |     const f = await fakeApi(page, 'fa');
+      212 |     await open(page, `/accounting/close?period=${OCT}`, width);
+    > 213 |     await expect(page.getByRole('heading', { level: 1, name: 'Month-end close' })).toBeVisible();
+          |                                                                                    ^
+      214 |     await expect(page.getByLabel('Period')).toHaveValue(OCT);
+      215 |     const table = page.getByRole('table', { name: 'Close checklist' });
+      216 |     await expect(table.getByRole('row')).toHaveCount(8);
+        at /home/user/Ledgerforce/tests/e2e/web/close.spec.ts:213:84
+
+    Error Context: test-results/web-close-SS-UC10-10-Close-checklist-screen-1440-T-0090--chromium/error-context.md
+
+    Error Context: test-results/web-close-SS-UC10-10-Close-checklist-screen-1440-T-0090--chromium/error-context.md
+
+  2) [chromium] › tests/e2e/web/close.spec.ts:207:3 › SS-UC10-10: Close checklist screen @ 390 [T-0090] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Month-end close', level: 1 })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: 'Month-end close', level: 1 }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: 'Month-end close', level: 1 })
+
+
+      211 |     const f = await fakeApi(page, 'fa');
+      212 |     await open(page, `/accounting/close?period=${OCT}`, width);
+    > 213 |     await expect(page.getByRole('heading', { level: 1, name: 'Month-end close' })).toBeVisible();
+          |                                                                                    ^
+      214 |     await expect(page.getByLabel('Period')).toHaveValue(OCT);
+      215 |     const table = page.getByRole('table', { name: 'Close checklist' });
+      216 |     await expect(table.getByRole('row')).toHaveCount(8);
+        at /home/user/Ledgerforce/tests/e2e/web/close.spec.ts:213:84
+
+    Error Context: test-results/web-close-SS-UC10-10-Close-checklist-screen-390-T-0090--chromium/error-context.md
+
+    Error Context: test-results/web-close-SS-UC10-10-Close-checklist-screen-390-T-0090--chromium/error-context.md
+
+  3) [chromium] › tests/e2e/web/close.spec.ts:241:1 › T-0090: a refused step explains why, naming the unreconciled bank accounts 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Complete: Bank reconciliations' })
+
+
+      252 |   });
+      253 |   await open(page, `/accounting/close?period=${OCT}`, 1440);
+    > 254 |   await page.getByRole('button', { name: 'Complete: Bank reconciliations' }).click();
+          |                                                                              ^
+      255 |   const alert = page.getByRole('alert');
+      256 |   await expect(alert).toContainText('Operating');
+      257 |   await expect(alert).toContainText('3 lines');
+        at /home/user/Ledgerforce/tests/e2e/web/close.spec.ts:254:78
+
+    Error Context: test-results/web-close-T-0090-a-refused-8dc37--unreconciled-bank-accounts-chromium/error-context.md
+
+    Error Context: test-results/web-close-T-0090-a-refused-8dc37--unreconciled-bank-accounts-chromium/error-context.md
+
+  4) [chromium] › tests/e2e/web/close.spec.ts:264:1 › T-0090: an Accountant sees the checklist but cannot complete steps 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('table', { name: 'Close checklist' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('table', { name: 'Close checklist' }) with timeout 5000ms
+      - waiting for getByRole('table', { name: 'Close checklist' })
+
+
+      265 |   const f = await fakeApi(page, 'accountant');
+      266 |   await open(page, `/accounting/close?period=${OCT}`, 1440);
+    > 267 |   await expect(page.getByRole('table', { name: 'Close checklist' })).toBeVisible();
+          |                                                                      ^
+      268 |   await expect(page.getByRole('button', { name: /^Complete/ })).toHaveCount(0);
+      269 |   await expect(page.getByText(/Owner or Finance Admin/)).toBeVisible();
+      270 |   expect(f.posts).toEqual([]);
+        at /home/user/Ledgerforce/tests/e2e/web/close.spec.ts:267:70
+
+    Error Context: test-results/web-close-T-0090-an-Accoun-32e40-t-but-cannot-complete-steps-chromium/error-context.md
+
+    Error Context: test-results/web-close-T-0090-an-Accoun-32e40-t-but-cannot-complete-steps-chromium/error-context.md
+
+  5) [chromium] › tests/e2e/web/close.spec.ts:274:1 › T-0090: a user without reports.run is told so, and nothing is listed 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/do not have access/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/do not have access/i) with timeout 5000ms
+      - waiting for getByText(/do not have access/i)
+
+
+      275 |   const f = await fakeApi(page, 'clerk');
+      276 |   await open(page, '/accounting/close', 1440);
+    > 277 |   await expect(page.getByText(/do not have access/i)).toBeVisible();
+          |                                                       ^
+      278 |   await expect(page.getByRole('table', { name: 'Close checklist' })).toHaveCount(0);
+      279 |   expect(f.errors).toEqual([]);
+      280 | });
+        at /home/user/Ledgerforce/tests/e2e/web/close.spec.ts:277:55
+
+    Error Context: test-results/web-close-T-0090-a-user-wi-c8419-ld-so-and-nothing-is-listed-chromium/error-context.md
+
+    Error Context: test-results/web-close-T-0090-a-user-wi-c8419-ld-so-and-nothing-is-listed-chromium/error-context.md
+
+  6) [chromium] › tests/e2e/web/close.spec.ts:282:1 › T-0090: without a period in the address, the latest period that is not hard-locked is shown 
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator: getByLabel('Period')
+    Expected: "01900000-0000-7000-8000-000000009010"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveValue" getByLabel('Period') with timeout 5000ms
+      - waiting for getByLabel('Period')
+
+
+      285 |   await fakeApi(page, 'fa');
+      286 |   await open(page, '/accounting/close', 1440);
+    > 287 |   await expect(page.getByLabel('Period')).toHaveValue(OCT);
+          |                                           ^
+      288 |   await expect(page.getByRole('table', { name: 'Close checklist' })).toBeVisible();
+      289 | });
+      290 |
+        at /home/user/Ledgerforce/tests/e2e/web/close.spec.ts:287:43
+
+    Error Context: test-results/web-close-T-0090-without-a-62e7f-is-not-hard-locked-is-shown-chromium/error-context.md
+
+    Error Context: test-results/web-close-T-0090-without-a-62e7f-is-not-hard-locked-is-shown-chromium/error-context.md
+
+  6 failed
+    [chromium] › tests/e2e/web/close.spec.ts:207:3 › SS-UC10-10: Close checklist screen @ 1440 [T-0090] 
+    [chromium] › tests/e2e/web/close.spec.ts:207:3 › SS-UC10-10: Close checklist screen @ 390 [T-0090] 
+    [chromium] › tests/e2e/web/close.spec.ts:241:1 › T-0090: a refused step explains why, naming the unreconciled bank accounts 
+    [chromium] › tests/e2e/web/close.spec.ts:264:1 › T-0090: an Accountant sees the checklist but cannot complete steps 
+    [chromium] › tests/e2e/web/close.spec.ts:274:1 › T-0090: a user without reports.run is told so, and nothing is listed 
+    [chromium] › tests/e2e/web/close.spec.ts:282:1 › T-0090: without a period in the address, the latest period that is not hard-locked is shown 

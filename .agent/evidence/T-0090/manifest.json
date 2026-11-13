@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0090",
+  "entries": [
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111242-SS-UC10-10-close-checklist-mid-close-1440.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 1440 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:12:42.835Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111243-SS-UC10-10-close-checklist-step-completed-1440.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 1440 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:12:43.507Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111244-SS-UC10-10-close-checklist-mid-close-390.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 390 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:12:44.681Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111245-SS-UC10-10-close-checklist-step-completed-390.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 390 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:12:45.251Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111258-SS-UC10-10-close-checklist-mid-close-1440.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 1440 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:12:58.258Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111258-SS-UC10-10-close-checklist-step-completed-1440.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 1440 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:12:58.967Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111300-SS-UC10-10-close-checklist-mid-close-390.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 390 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:13:00.193Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111300-SS-UC10-10-close-checklist-step-completed-390.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 390 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:13:00.763Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111313-SS-UC10-10-close-checklist-mid-close-1440.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 1440 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:13:13.873Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111314-SS-UC10-10-close-checklist-step-completed-1440.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 1440 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:13:14.590Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111315-SS-UC10-10-close-checklist-mid-close-390.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 390 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:13:15.768Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111316-SS-UC10-10-close-checklist-step-completed-390.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 390 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:13:16.385Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111328-SS-UC10-10-close-checklist-mid-close-1440.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 1440 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:13:28.270Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111329-SS-UC10-10-close-checklist-step-completed-1440.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 1440 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:13:29.055Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111330-SS-UC10-10-close-checklist-mid-close-390.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 390 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:13:30.333Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-10",
+      "file": ".agent/evidence/T-0090/20261113-111330-SS-UC10-10-close-checklist-step-completed-390.png",
+      "test": "web/close.spec.ts › SS-UC10-10: Close checklist screen @ 390 [T-0090]",
+      "commit": "8f4e173e0c84-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T11:13:30.950Z",
+      "result": "passed"
+    }
+  ]
+}

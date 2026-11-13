@@ -2772,3 +2772,14 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - This is an additive read/write route set over an existing module, so it needs no ADR (cf. DL-0313).
 - Why: T-0090's close screen needs these routes; T-0078 built the module only.
 - ADR: none · Status: accepted
+
+### DL-0469 — Close checklist screen: one page under Accounting, next step only, plain-word step names (T-0090)
+- Date: 2026-11-13 · By: claude · Task: T-0090 · Category: ui
+- Decision:
+  - `/accounting/close?period=` shows one period's seven steps (state, done by, when) and a single "Complete: <step>" button for the next step. The button is shown only with `period.lock`.
+  - The default period is the latest one that is not hard-locked, within a window from 12 months back to the start of the month after next.
+  - Steps carry plain names with the accounting term as a gloss (P12). Refusals (422/409) show the API's message, plus the unreconciled bank accounts by name.
+  - Each attempt gets a fresh Idempotency-Key.
+  - Reopening a hard-locked period stays on its own two-approver flow (T-0079) and is not on this page.
+- Why: SS-UC10-10 and UC-10. The API enforces order, gates and permissions (T-0148), so the screen holds no accounting rules (apps/web AGENTS.md).
+- ADR: none · Status: accepted
