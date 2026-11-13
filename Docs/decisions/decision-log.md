@@ -2906,3 +2906,21 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | Lead | T-0145 and merges | 0474–0479 | 0068 | 0150 | T-0159+ |
 - Why: The owner asked for parallel sub-agents (DL-0408). The cards touch disjoint modules (ap screens, ap inbox, setup).
 - ADR: none · Status: accepted
+
+### DL-0500 — T-0087 split: the AP release read routes become T-0153
+- Date: 2026-11-13 · By: claude · Task: T-0087 · Category: scope
+- Decision: T-0087's screens need three read routes that do not exist: a payment-batch list, names in the batch view (supplier, bill number, creator, releaser, masked payee account) and a list of bank-detail changes. They are card T-0153, and T-0087 depends on it.
+- Why: Without them the release screen cannot find a batch and would show bare ids, and the verification screen cannot find a change. With tests they come to about 300 lines, over the ~150 the brief allows inside a UI card (DL-0473). Same split as T-0090 → T-0148 (DL-0468) and T-0085 → T-0151 (DL-0490).
+- Alternatives: open a batch or change only by a pasted id (rejected: not usable, P1); compute names in the browser from other lists (rejected: more calls and no route lists changes at all).
+- ADR: none · Status: accepted
+
+### DL-0501 — Shape of the T-0153 read routes; batch view not found is 404
+- Date: 2026-11-13 · By: claude · Task: T-0153 · Category: architecture (AP, parties, API)
+- Decision:
+  - `GET /ap/payment-batches?company_id=` (`ap.read`) returns `{batches}` newest first, at most 200: number, status, payment date, total (decimal string), payment, exclusion and release counts, releases required, creator's name.
+  - `GET /ap/payment-batches/:id` adds fields only: `created_by`, `created_by_name`, `released_by_name`, and `bill_no` and `party_name` on payments and exclusions. Payments also get `bank_account {bsb, account_number: ***+last 3}`. A batch outside the caller's company or tenant answers 404 `not_found` instead of 422 `INVALID_BATCH`. This is the usual answer for "not yours or not there", and no client or test relied on 422 for GET.
+  - `GET /bank-detail-changes?company_id=&status=` (`parties.bank_account.read`, default `requested`) returns `{changes}`: party name, new and previous account masked, requester id and name, and the decision (who, when, payable from). An unknown status is 400 `invalid_filter`.
+  - The lookups are module functions (`listPaymentBatches`, `paymentBatchNames` in `@ledgerforce/ap`; `listBankDetailChanges` in `@ledgerforce/parties`). They read existing tables under RLS. There is no migration, no new permission and no decryption: masking uses the stored last 3 characters (ADR-0018).
+- Why: These are what the T-0087 screens show (UC-06 steps 1–2, design §6.5, §6.6). Read routes over existing data need no ADR, as with T-0148 and T-0151.
+- Alternatives: a single "awaiting release" endpoint (rejected: the screen also shows released batches, for context); returning the requester id only (rejected: the screen must name people).
+- ADR: none · Status: accepted

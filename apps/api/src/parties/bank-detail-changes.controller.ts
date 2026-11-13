@@ -4,11 +4,13 @@ import {
   ConflictException,
   Controller,
   ForbiddenException,
+  Get,
   HttpCode,
   Inject,
   NotFoundException,
   Param,
   Post,
+  Query,
   Req,
   ServiceUnavailableException,
 } from '@nestjs/common';
@@ -16,6 +18,9 @@ import {
   BankAccountValidationError,
   BankDetailChangeRefused,
   listBankAccounts,
+  listBankDetailChanges,
+  type BankDetailChangeStatus,
+  type MaskedAccount,
   rejectBankDetailChange,
   requestBankDetailChange,
   verifyBankDetailChange,
@@ -57,6 +62,13 @@ function text(body: unknown, field: string, max: number): string | null {
   return typeof v === 'string' && v.length <= max ? v : null;
 }
 
+const STATUSES: readonly BankDetailChangeStatus[] = ['requested', 'verified', 'rejected'];
+const maskedOf = (a: MaskedAccount) => ({
+  bsb: a.bsb,
+  account_name: a.accountName,
+  account_number: a.accountNumber,
+});
+
 /** Workflow refusals of the database (migration 0025) as HTTP answers. */
 function refusal(e: unknown): never {
   if (e instanceof BankDetailChangeRefused) {
@@ -94,6 +106,39 @@ export class BankDetailChangesController {
     private readonly audit: AuditTrail,
     @Inject(KMS) private readonly kms: Kms | null,
   ) {}
+
+  /**
+   * The company's bank-detail changes in one status, default `requested` (T-0153): what the
+   * verification screen lists. Accounts masked to the last 3 characters; never decrypts.
+   */
+  @Get('bank-detail-changes')
+  @RequirePermission('parties.bank_account.read')
+  async list(
+    @Query('company_id') companyId: string | undefined,
+    @Query('status') status: string | undefined,
+  ) {
+    const s = (status ?? 'requested') as BankDetailChangeStatus;
+    if (typeof companyId !== 'string' || !UUID.test(companyId) || !STATUSES.includes(s)) {
+      throw new BadRequestException({ error: 'invalid_filter' });
+    }
+    const rows = await listBankDetailChanges(this.tx.get(), companyId, s);
+    return {
+      changes: rows.map((c) => ({
+        id: c.id,
+        party_id: c.partyId,
+        party_name: c.partyName,
+        status: c.status,
+        bank_account: maskedOf(c.bankAccount),
+        previous_bank_account: c.previousBankAccount ? maskedOf(c.previousBankAccount) : null,
+        requested_by: c.requestedBy,
+        requested_by_name: c.requestedByName,
+        requested_at: c.requestedAt.toISOString(),
+        decided_by_name: c.decidedByName,
+        decided_at: c.decidedAt?.toISOString() ?? null,
+        payable_from: c.payableFrom?.toISOString() ?? null,
+      })),
+    };
+  }
 
   @Post('parties/:partyId/bank-accounts')
   @HttpCode(201)
