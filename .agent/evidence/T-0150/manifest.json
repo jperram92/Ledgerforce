@@ -172,6 +172,51 @@
       "provider": "unknown",
       "timestamp": "2026-11-13T20:29:09.166Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-205325-SS-UC08-08-transaction-journal-preview-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 1440 [T-0150]",
+      "commit": "a5ff609775c2",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:53:25.724Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-205327-SS-UC08-08-transaction-posted-after-preview-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 1440 [T-0150]",
+      "commit": "a5ff609775c2",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:53:27.195Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-205329-SS-UC08-08-transaction-journal-preview-390.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 390 [T-0150]",
+      "commit": "a5ff609775c2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:53:29.748Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-205331-SS-UC08-08-transaction-posted-after-preview-390.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 390 [T-0150]",
+      "commit": "a5ff609775c2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:53:31.661Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-205332-SS-UC08-08-transaction-preview-refused-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: a refused journal preview explains why and offers no posting [T-0150]",
+      "commit": "a5ff609775c2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:53:32.912Z",
+      "result": "passed"
     }
   ]
 }
