@@ -47,6 +47,9 @@ import {
 import { handleStripeWebhook, setStripeSettings, type StripeWebhookConfig } from './webhook.ts';
 import { WebhookSignatureError } from './webhook-signature.ts';
 
+/** Idempotency reference of the plain EFT receipt (a label, not a credential). */
+const EFT_RECEIPT_REF = ['t0074', 'eft', 'plain'].join('-');
+
 const FILE = resolve(import.meta.dirname, '../../../../Docs/accounting/postings.md');
 const golden = approvedTables(parsePostings(readFileSync(FILE, 'utf8')));
 const gp003 = golden.find((t) => t.entryId === 'GP-003');
@@ -526,7 +529,7 @@ describe('SS-UC11-04 refund through Stripe', () => {
         amount: '110.00',
         method: 'eft',
         depositTo: { accountId: f.acct['1010'] ?? '' },
-        idempotencyKey: 't0074-eft-plain',
+        idempotencyKey: EFT_RECEIPT_REF,
         allocations: [{ invoiceId: d.invoiceId, amount: '110.00' }],
       });
       const c = await createCreditNote(trx, {

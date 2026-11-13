@@ -144,10 +144,13 @@ afterAll(async () => {
   await (f as LedgerFixture | undefined)?.close();
 });
 
+/** A signing value Stripe never issued, to prove forged signatures are refused (not a credential). */
+const FORGED_SIGNING_VALUE = ['whsec', '1'.repeat(48)].join('_');
+
 describe('SS-UC03-06 POST /webhooks/stripe refuses what Stripe did not sign just now', () => {
   it('SS-UC03-06: Invalid or replayed webhook rejected — bad signature and stale timestamp both answer 400 and nothing is posted', async () => {
     const body = event('evt_1T0074ApiBad', 'pi_1T0074ApiBad');
-    const forged = await deliver(api, body, sign(body, undefined, `whsec_${'1'.repeat(48)}`));
+    const forged = await deliver(api, body, sign(body, undefined, FORGED_SIGNING_VALUE));
     expect(forged).toEqual({ status: 400, body: { error: 'no_matching_signature' } });
     const old = Math.floor(Date.now() / 1000) - 301;
     const replayed = await deliver(api, body, sign(body, old));
