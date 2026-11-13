@@ -2834,3 +2834,14 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: brief: "If a permission is missing, stop and report it; do not add one". AGENTS.md §6 gate 1 (security). DL-0305 already notes the refund route needs an ADR. Precedent: T-0131 → T-0132 for single-invoice approval.
 - Alternatives: reuse `ar.credit_note.create` for refunds (a silent security-model change); fake a refund route in the e2e test only (a screen that cannot work against the real API).
 - ADR: none yet (security ADR for T-0152, owner) · Status: accepted
+
+### DL-0492 — Receipt allocation and credit-note screens (T-0085)
+- Date: 2026-11-13 · By: claude · Task: T-0085 · Category: ui
+- Decision:
+  1. `/sales/receipts` lists the receipts waiting to be allocated (`GET /ar/receipts?unallocated=true`). "Allocate RCT-…" opens a form that offers only that customer's posted, numbered invoices. It shows the invoice's payment status and what is still owing from `payment-status`. The amount starts as the receipt's unallocated amount, trimmed to cents as text (`amountInput`: "1375.0000" → "1375.00"; anything finer than cents is left for the API to refuse). The form sends a fresh Idempotency-Key per attempt; a refused attempt gets a new key. After success the invoice's status is read back from the API ("INV-000123 is now Paid"). The browser never compares or subtracts amounts.
+  2. `/sales/credit-notes?invoice=…` (also reached from "Issue a credit note" on a posted invoice, or from the Sales page without an invoice, which shows a picker) drafts a credit note for part of one line. A client uuid is kept for the form's life, so a repeated PUT is the same draft. After creation the page moves to `?credit_note=…`, so the draft can be reopened, for example by an Approver. Net, GST and total come from the API. "Show me the journal" is the engine preview (T-0151). "Approve and post" appears only with `ar.credit_note.approve`; the SoD threshold stays the API's. Otherwise the page says an Approver posts it.
+  3. A "Refund" region says plainly that refunding the credit is not available here yet (T-0152). There is no disabled or fake refund button.
+  4. Reason codes are shown in plain words (P12): Price reduced, Goods returned, Less work than invoiced, Invoiced in error, Goodwill. Payment status words: Unpaid, Partly paid, Paid.
+- Why: SS-UC03-10 and the credit-note half of SS-UC11-08. P4: show the journal before it posts. apps/web: no accounting in the browser. Modelled on InvoicePage/JournalTable and ClosePage (mutation, key rotation, refusal in place).
+- Alternatives: computing min(receipt unallocated, invoice open) as the default amount (arithmetic on money in the browser: rejected); a separate route per receipt (more navigation for a one-step task); auto-loading the journal (P4 keeps it on request, like invoices).
+- ADR: none · Status: accepted

@@ -100,6 +100,105 @@
       "provider": "unknown",
       "timestamp": "2026-11-13T14:21:28.999Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0085/20261113-142444-SS-UC11-08-credit-note-form-1440.png",
+      "test": "web/credit-notes.spec.ts › SS-UC11-08: Credit note and refund screens @ 1440 [T-0085]",
+      "commit": "c34e91035aff",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:44.578Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0085/20261113-142446-SS-UC11-08-credit-note-journal-preview-1440.png",
+      "test": "web/credit-notes.spec.ts › SS-UC11-08: Credit note and refund screens @ 1440 [T-0085]",
+      "commit": "c34e91035aff",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:46.225Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-10",
+      "file": ".agent/evidence/T-0085/20261113-142447-SS-UC03-10-receipts-waiting-1440.png",
+      "test": "web/receipts.spec.ts › SS-UC03-10: Receipt allocation screen @ 1440 [T-0085]",
+      "commit": "c34e91035aff",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:47.258Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-10",
+      "file": ".agent/evidence/T-0085/20261113-142448-SS-UC03-10-receipt-allocate-form-1440.png",
+      "test": "web/receipts.spec.ts › SS-UC03-10: Receipt allocation screen @ 1440 [T-0085]",
+      "commit": "c34e91035aff",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:48.039Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-10",
+      "file": ".agent/evidence/T-0085/20261113-142448-SS-UC03-10-invoice-paid-1440.png",
+      "test": "web/receipts.spec.ts › SS-UC03-10: Receipt allocation screen @ 1440 [T-0085]",
+      "commit": "c34e91035aff",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:48.912Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0085/20261113-142448-SS-UC11-08-credit-note-form-390.png",
+      "test": "web/credit-notes.spec.ts › SS-UC11-08: Credit note and refund screens @ 390 [T-0085]",
+      "commit": "c34e91035aff-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:48.231Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0085/20261113-142449-SS-UC11-08-credit-note-journal-preview-390.png",
+      "test": "web/credit-notes.spec.ts › SS-UC11-08: Credit note and refund screens @ 390 [T-0085]",
+      "commit": "c34e91035aff-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:49.408Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0085/20261113-142452-SS-UC11-08-credit-note-posted-1440.png",
+      "test": "web/credit-notes.spec.ts › SS-UC11-08: an Approver opens the draft, sees the journal and posts it [T-0085]",
+      "commit": "c34e91035aff-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:52.060Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-10",
+      "file": ".agent/evidence/T-0085/20261113-142451-SS-UC03-10-receipts-waiting-390.png",
+      "test": "web/receipts.spec.ts › SS-UC03-10: Receipt allocation screen @ 390 [T-0085]",
+      "commit": "c34e91035aff-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:51.430Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-10",
+      "file": ".agent/evidence/T-0085/20261113-142452-SS-UC03-10-receipt-allocate-form-390.png",
+      "test": "web/receipts.spec.ts › SS-UC03-10: Receipt allocation screen @ 390 [T-0085]",
+      "commit": "c34e91035aff-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:52.733Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-10",
+      "file": ".agent/evidence/T-0085/20261113-142453-SS-UC03-10-invoice-paid-390.png",
+      "test": "web/receipts.spec.ts › SS-UC03-10: Receipt allocation screen @ 390 [T-0085]",
+      "commit": "c34e91035aff-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T14:24:53.807Z",
+      "result": "passed"
     }
   ]
 }
