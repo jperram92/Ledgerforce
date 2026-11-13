@@ -3045,3 +3045,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | Wizard settings | T-0158 (+ migration 0067) | 0550–0559 | 0071 | 0153 | T-0164–T-0165 |
 - Why: The owner asked for parallel sub-agents (DL-0408). The cards touch disjoint areas: bank, the ap payment file, and setup with tax and ar settings.
 - ADR: none · Status: accepted
+
+### DL-0530 — T-0150 split: candidate suggestions become T-0160, large statement files T-0161
+- Date: 2026-11-13 · By: claude · Task: T-0150 · Category: scope
+- Decision: T-0150 keeps the journal preview of a transaction from a line (module, route, screen). Accepting a candidate suggestion moves to T-0160 and large statement files to T-0161 (research RQ-0151). Both new cards are `todo` with their own acceptance criteria.
+- Why: The three parts together were well over the ~400 changed lines a card may have (new-task-card skill). The preview is the P4 gap the screen has today, so it goes first.
+- Alternatives: all three in one branch (rejected: too large to review); superseding T-0150 with three new cards (rejected: T-0150 already names the preview and its SS id).
+- ADR: none · Status: accepted
+
+### DL-0531 — Preview of a transaction from a line: one builder for preview and post, POST route without an idempotency key, no new golden posting
+- Date: 2026-11-13 · By: claude · Task: T-0150 · Category: architecture
+- Decision: `@ledgerforce/bank` builds the manual journal of a transaction from a line in one function (`transactionJournal`), used by both `createTransactionFromLine` and the new `previewTransactionFromLine`. The preview passes it to the new `previewManualJournalInput` of `@ledgerforce/journals`, which runs the same draft checks as create (`checkCommand`) and the posting engine's `preview` on the same `commandOf` command that submit and post use. It takes no lock and writes nothing. A matched line is refused with ALREADY_MATCHED, also when the line was matched by a transaction created earlier (the post would replay it; there is nothing new to preview). API: `POST /bank-rec/lines/:id/transaction/preview` (bank.reconcile, the permission of the post it previews; 200; no Idempotency-Key and no audit description, as the opening-balance preview of DL-0314). The response is the same shape as `GET /journals/:id/preview`.
+- Why: UI principle P4. One builder means the preview cannot drift from what posts; the db test checks that the posted lines equal the previewed lines. No golden posting is needed: a transaction from a line is a manual journal of the user's own lines (DL-0312, T-0029), and the preview adds no posting behaviour. No migration and no new permission.
+- Alternatives: storing a draft manual journal and previewing it with `previewManualJournal` (rejected: writes a row for every keystroke); a GET with the lines in the query string (rejected: counter lines are a body); a new `bank.preview` permission (rejected: a security change, and previewing is part of the reconcile action).
+- ADR: none · Status: accepted
+
+### DL-0532 — Large statement files: route-scoped JSON body limit of 10 MB, no multipart
+- Date: 2026-11-13 · By: claude · Task: T-0150 (built in T-0161) · Category: architecture
+- Decision: `POST /bank-rec/accounts/:id/statements` will accept JSON bodies up to 10 MB (the reverse proxy's `client_max_body_size`); every other route keeps the 100 kB default. No `multipart/form-data`. T-0161 builds it test-first and chooses between a dependency-free path-scoped JSON reader (recommended) and declaring `express` as a direct dependency (needs ADR-0069 first).
+- Why: RQ-0151. body-parser skips a request whose body was already read, so a parser mounted on one path before Nest's global one changes only that path (spike with the locked Express 5.2.1). Multipart needs multer as a direct dependency and changes the import contract for no gain at statement sizes.
+- Alternatives: raise the global limit (rejected: widens every JSON route); multipart with Nest's FileInterceptor (rejected, see above); split uploads into chunks (rejected: more state for files of a few MB).
+- ADR: none (ADR-0069 only if T-0161 picks the express dependency) · Status: accepted
+
+### DL-0533 — Create-transaction screen: the journal is built as the form changes; posting only while the shown journal is current
+- Date: 2026-11-13 · By: claude · Task: T-0150 · Category: ui
+- Decision: The create-transaction screen shows "The journal it will post" from the preview route. It asks again 300 ms after the account, amount or memo stops changing, and only when an account is chosen and the amount is a decimal string. "Post transaction" is enabled only while the journal on screen was built for what the form says now; the post sends the same request body. A refused preview shows the API's reason ("We could not build the journal: …") and a hint under the button. The preview query is not under the `['bank']` key, so posting does not ask again for a journal of the now-matched line. The T-0088 spec's fake API now answers the preview route (the screen waits for the journal before posting); no T-0088 assertion was changed.
+- Why: P4 (show the journal before you post; in review screens the preview is open by default with a Balanced indicator), P6 (controls explain themselves). It matches the manual journal screen, where Submit waits for a successful preview.
+- Alternatives: a "Show journal" button (rejected: P4 says open by default in review screens); posting allowed while the preview is loading or refused (rejected: the person would post a journal they did not see).
+- ADR: none · Status: accepted
