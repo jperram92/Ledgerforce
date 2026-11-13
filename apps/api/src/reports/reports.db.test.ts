@@ -149,7 +149,7 @@ type Section = {
   }[];
 };
 
-describe('SS-RPT-07 trial balance, P&L and balance sheet routes [T-0089]', () => {
+describe('SS-PLAT-76 trial balance, P&L and balance sheet routes [T-0089]', () => {
   it('GET /gl/trial-balance lists each account on its side with decimal-string totals', async () => {
     const res = await get(
       `/gl/trial-balance?company_id=${f.companyId}&from=2026-11-01&to=2026-11-30`,

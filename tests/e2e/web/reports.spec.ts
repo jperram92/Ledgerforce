@@ -419,7 +419,7 @@ const amountsIn = (page: Page, table: string, part = 'tbody') =>
     .evaluateAll((els) => els.map((e) => e.getAttribute('data-amount')));
 
 for (const width of [1440, 390]) {
-  test(`SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ ${String(width)} [T-0089]`, async ({
+  test(`SS-PLAT-76: Trial balance screen for a range, totals from the ledger, each account opens its detail @ ${String(width)} [T-0089]`, async ({
     page,
     evidence,
   }) => {
@@ -459,7 +459,7 @@ for (const width of [1440, 390]) {
     for (const row of await table.locator('tbody tr').all())
       await expect(row.getByRole('link')).toHaveCount(1);
     await assertPage(page, width);
-    await evidence('SS-RPT-01', `trial-balance-${String(width)}`);
+    await evidence('SS-PLAT-76', `trial-balance-screen-${String(width)}`);
 
     await table.getByRole('link', { name: /6220 Telephone and internet/ }).click();
     await expect(
@@ -472,7 +472,7 @@ for (const width of [1440, 390]) {
     expect(f.errors).toEqual([]);
   });
 
-  test(`SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ ${String(width)} [T-0089]`, async ({
+  test(`SS-PLAT-76: Profit and loss screen groups revenue and expenses with the net profit from the API @ ${String(width)} [T-0089]`, async ({
     page,
     evidence,
   }) => {
@@ -496,11 +496,11 @@ for (const width of [1440, 390]) {
     ]);
     expect(await amountsIn(page, 'Profit and loss', 'tfoot')).toEqual(['5350.00']);
     await assertPage(page, width);
-    await evidence('SS-RPT-02', `profit-and-loss-${String(width)}`);
+    await evidence('SS-PLAT-76', `profit-and-loss-screen-${String(width)}`);
     expect(f.errors).toEqual([]);
   });
 
-  test(`SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ ${String(width)} [T-0089]`, async ({
+  test(`SS-PLAT-76: Balance sheet screen balances, with computed earnings lines marked @ ${String(width)} [T-0089]`, async ({
     page,
     evidence,
   }) => {
@@ -524,11 +524,11 @@ for (const width of [1440, 390]) {
     await expect(page.getByText(/FY2027/)).toBeVisible();
     expect(f.calls).toEqual([`/gl/balance-sheet?company_id=${CO}&as_at=2026-11-30`]);
     await assertPage(page, width);
-    await evidence('SS-RPT-03', `balance-sheet-${String(width)}`);
+    await evidence('SS-PLAT-76', `balance-sheet-screen-${String(width)}`);
     expect(f.errors).toEqual([]);
   });
 
-  test(`SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ ${String(width)} [T-0089]`, async ({
+  test(`SS-PLAT-108: General ledger detail screen shows opening, lines with running balance and closing @ ${String(width)} [T-0089]`, async ({
     page,
     evidence,
   }) => {
@@ -552,11 +552,11 @@ for (const width of [1440, 390]) {
         .last(),
     ).toHaveAttribute('data-amount', '1100.00');
     await assertPage(page, width);
-    await evidence('SS-RPT-04', `gl-detail-${String(width)}`);
+    await evidence('SS-PLAT-108', `gl-detail-screen-${String(width)}`);
     expect(f.errors).toEqual([]);
   });
 
-  test(`SS-RPT-05: Aged receivables buckets each customer, totals from the API @ ${String(width)} [T-0089]`, async ({
+  test(`SS-PLAT-107: Aged receivables screen buckets each customer, totals from the API @ ${String(width)} [T-0089]`, async ({
     page,
     evidence,
   }) => {
@@ -576,11 +576,11 @@ for (const width of [1440, 390]) {
     ]);
     expect(f.calls).toEqual([`/ar/aged-receivables?company_id=${CO}&as_of=2026-11-30`]);
     await assertPage(page, width);
-    await evidence('SS-RPT-05', `aged-receivables-${String(width)}`);
+    await evidence('SS-PLAT-107', `aged-receivables-screen-${String(width)}`);
     expect(f.errors).toEqual([]);
   });
 
-  test(`SS-RPT-06: Aged payables buckets each supplier @ ${String(width)} [T-0089]`, async ({
+  test(`SS-PLAT-109: Aged payables screen buckets each supplier @ ${String(width)} [T-0089]`, async ({
     page,
     evidence,
   }) => {
@@ -599,12 +599,12 @@ for (const width of [1440, 390]) {
       '1100.00',
     ]);
     await assertPage(page, width);
-    await evidence('SS-RPT-06', `aged-payables-${String(width)}`);
+    await evidence('SS-PLAT-109', `aged-payables-screen-${String(width)}`);
     expect(f.errors).toEqual([]);
   });
 }
 
-test('SS-RPT-08: Download CSV writes the figures the API returned [T-0089]', async ({ page }) => {
+test('T-0089: Download CSV writes the figures the API returned', async ({ page }) => {
   const f = await fakeApi(page, 'accountant');
   await open(page, '/reports/trial-balance?from=2026-11-01&to=2026-11-30', 1440);
   await expect(page.getByRole('table', { name: 'Trial balance' })).toBeVisible();
