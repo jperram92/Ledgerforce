@@ -29,6 +29,12 @@ import { SyncIssuePage } from './sync/SyncIssuePage.tsx';
 import { SyncIssuesPage } from './sync/SyncIssuesPage.tsx';
 import { InvoicePage } from './sales/InvoicePage.tsx';
 import { InvoicesPage } from './sales/InvoicesPage.tsx';
+import { AgedPage } from './reports/AgedPage.tsx';
+import { BalanceSheetPage } from './reports/BalanceSheetPage.tsx';
+import { GlDetailPage } from './reports/GlDetailPage.tsx';
+import { dayParam, glDetailSearch, rangeSearch } from './reports/logic.ts';
+import { ProfitAndLossPage } from './reports/ProfitAndLossPage.tsx';
+import { TrialBalancePage } from './reports/TrialBalancePage.tsx';
 
 const rootRoute = createRootRoute({ component: Outlet });
 
@@ -184,6 +190,61 @@ const invoiceRoute = createRoute({
   },
 });
 
+// Ledger reports (T-0089, DL-0450): the web app owns /reports/*, the API serves /gl, /ar, /ap.
+const trialBalanceRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'reports/trial-balance',
+  validateSearch: rangeSearch,
+  component: function TrialBalanceRoute() {
+    return <TrialBalancePage search={trialBalanceRoute.useSearch()} />;
+  },
+});
+
+const profitAndLossRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'reports/profit-and-loss',
+  validateSearch: rangeSearch,
+  component: function ProfitAndLossRoute() {
+    return <ProfitAndLossPage search={profitAndLossRoute.useSearch()} />;
+  },
+});
+
+const balanceSheetRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'reports/balance-sheet',
+  validateSearch: dayParam('as_at'),
+  component: function BalanceSheetRoute() {
+    return <BalanceSheetPage search={balanceSheetRoute.useSearch()} />;
+  },
+});
+
+const glDetailRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'reports/gl-detail',
+  validateSearch: glDetailSearch,
+  component: function GlDetailRoute() {
+    return <GlDetailPage search={glDetailRoute.useSearch()} />;
+  },
+});
+
+const agedReceivablesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'reports/aged-receivables',
+  validateSearch: dayParam('as_of'),
+  component: function AgedReceivablesRoute() {
+    return <AgedPage kind="receivables" search={agedReceivablesRoute.useSearch()} />;
+  },
+});
+
+const agedPayablesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'reports/aged-payables',
+  validateSearch: dayParam('as_of'),
+  component: function AgedPayablesRoute() {
+    return <AgedPage kind="payables" search={agedPayablesRoute.useSearch()} />;
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   signInRoute,
   shellRoute.addChildren([
@@ -198,6 +259,12 @@ const routeTree = rootRoute.addChildren([
     journalsRoute,
     invoicesRoute,
     invoiceRoute,
+    trialBalanceRoute,
+    profitAndLossRoute,
+    balanceSheetRoute,
+    glDetailRoute,
+    agedReceivablesRoute,
+    agedPayablesRoute,
     newJournalRoute,
     journalRoute,
     editJournalRoute,

@@ -177,7 +177,10 @@ describe('SS-RPT-07 trial balance, P&L and balance sheet routes [T-0089]', () =>
       ['2000', '0.0000', '1100.0000'],
       ['6230', '1100.0000', '0.0000'],
     ]);
-    const open = await get(`/gl/trial-balance?company_id=${f.companyId}&to=2026-11-30`, 'accountant');
+    const open = await get(
+      `/gl/trial-balance?company_id=${f.companyId}&to=2026-11-30`,
+      'accountant',
+    );
     expect(((await open.json()) as { from: string | null }).from).toBeNull();
   });
 

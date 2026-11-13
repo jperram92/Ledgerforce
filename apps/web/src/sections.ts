@@ -11,7 +11,13 @@ export interface SubPage {
     | '/reports/audit-log'
     | '/settings/sync-issues'
     | '/accounting/journals'
-    | '/accounting/chart';
+    | '/accounting/chart'
+    | '/reports/trial-balance'
+    | '/reports/profit-and-loss'
+    | '/reports/balance-sheet'
+    | '/reports/gl-detail'
+    | '/reports/aged-receivables'
+    | '/reports/aged-payables';
   name: string;
   text: string;
 }
@@ -72,6 +78,37 @@ export const SECTIONS: readonly Section[] = [
     emptyHeading: 'No reports to show yet',
     emptyText: 'Reports are built from posted journals, and there are none yet.',
     pages: [
+      // Ledger reports (T-0089).
+      {
+        to: '/reports/trial-balance',
+        name: 'Trial balance',
+        text: 'Every account’s balance on its debit or credit side, and whether debits equal credits.',
+      },
+      {
+        to: '/reports/profit-and-loss',
+        name: 'Profit and loss',
+        text: 'What you earned and spent between two dates, and the profit or loss.',
+      },
+      {
+        to: '/reports/balance-sheet',
+        name: 'Balance sheet',
+        text: 'What the business owns, owes and is worth on one day.',
+      },
+      {
+        to: '/reports/gl-detail',
+        name: 'General ledger detail',
+        text: 'Every posted line behind an account, with the running balance.',
+      },
+      {
+        to: '/reports/aged-receivables',
+        name: 'Aged receivables',
+        text: 'What each customer owes you, by how late it is.',
+      },
+      {
+        to: '/reports/aged-payables',
+        name: 'Aged payables',
+        text: 'What you owe each supplier, by how late it is.',
+      },
       {
         to: '/reports/control-exceptions',
         name: 'Weekly control exceptions',

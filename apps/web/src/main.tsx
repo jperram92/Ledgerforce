@@ -5,6 +5,7 @@ import './styles/shell.css';
 import './styles/admin.css';
 import './styles/sync.css';
 import './styles/gl.css';
+import './styles/reports.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App.tsx';

@@ -22,7 +22,7 @@ describe('CSV export [T-0089]', () => {
         [csvText('1010'), csvText('Operating, main')],
         [csvText('3000'), csvText('Say "hi"\nthere')],
       ]),
-    ).toBe('﻿Code,Account\r\n1010,"Operating, main"\r\n3000,"Say ""hi""\nthere"\r\n');
+    ).toBe('\uFEFFCode,Account\r\n1010,"Operating, main"\r\n3000,"Say ""hi""\nthere"\r\n');
   });
 
   it('defuses spreadsheet formulas in text but keeps amounts as plain numbers', () => {

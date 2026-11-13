@@ -480,8 +480,8 @@ for (const width of [1440, 390]) {
     await open(page, '/reports/profit-and-loss?from=2026-11-01&to=2026-11-30', width);
     await expect(page.getByRole('heading', { level: 1, name: 'Profit and loss' })).toBeVisible();
     const table = page.getByRole('table', { name: 'Profit and loss' });
-    await expect(table.getByRole('rowheader', { name: 'Income' })).toBeVisible();
-    await expect(table.getByRole('rowheader', { name: 'Expenses' })).toBeVisible();
+    await expect(table.getByRole('rowheader', { name: 'Income', exact: true })).toBeVisible();
+    await expect(table.getByRole('rowheader', { name: 'Expenses', exact: true })).toBeVisible();
     await expect(table.getByRole('link', { name: /4110 Professional services/ })).toBeVisible();
     await expect(table.getByRole('link', { name: /6200 Rent/ })).toBeVisible();
     const net = table.getByRole('row', { name: /Net profit/ });

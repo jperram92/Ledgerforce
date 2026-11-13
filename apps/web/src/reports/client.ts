@@ -105,7 +105,13 @@ export interface GlDetail {
   total_credit: string;
 }
 
-export const AGE_BUCKETS = ['current', 'days1to30', 'days31to60', 'days61to90', 'days90plus'] as const;
+export const AGE_BUCKETS = [
+  'current',
+  'days1to30',
+  'days31to60',
+  'days61to90',
+  'days90plus',
+] as const;
 export type AgeBucket = (typeof AGE_BUCKETS)[number];
 
 export type AgedRow = { partyId: string; partyName: string; total: string } & Record<

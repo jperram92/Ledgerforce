@@ -1,0 +1,330 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0089",
+  "entries": [
+    {
+      "scenario": "SS-RPT-05",
+      "file": ".agent/evidence/T-0089/20261113-081642-SS-RPT-05-aged-receivables-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-05: Aged receivables buckets each customer, totals from the API @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:16:42.699Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-01",
+      "file": ".agent/evidence/T-0089/20261113-081643-SS-RPT-01-trial-balance-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:16:43.079Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-06",
+      "file": ".agent/evidence/T-0089/20261113-081647-SS-RPT-06-aged-payables-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-06: Aged payables buckets each supplier @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:16:47.472Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-03",
+      "file": ".agent/evidence/T-0089/20261113-081703-SS-RPT-03-balance-sheet-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:03.893Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-05",
+      "file": ".agent/evidence/T-0089/20261113-081717-SS-RPT-05-aged-receivables-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-05: Aged receivables buckets each customer, totals from the API @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:17.574Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-06",
+      "file": ".agent/evidence/T-0089/20261113-081721-SS-RPT-06-aged-payables-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-06: Aged payables buckets each supplier @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:21.921Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-01",
+      "file": ".agent/evidence/T-0089/20261113-081725-SS-RPT-01-trial-balance-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:25.679Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-03",
+      "file": ".agent/evidence/T-0089/20261113-081734-SS-RPT-03-balance-sheet-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:34.728Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-02",
+      "file": ".agent/evidence/T-0089/20261113-081756-SS-RPT-02-profit-and-loss-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:56.663Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-02",
+      "file": ".agent/evidence/T-0089/20261113-081756-SS-RPT-02-profit-and-loss-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:56.814Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-04",
+      "file": ".agent/evidence/T-0089/20261113-081800-SS-RPT-04-gl-detail-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:00.547Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-04",
+      "file": ".agent/evidence/T-0089/20261113-081801-SS-RPT-04-gl-detail-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:01.131Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-05",
+      "file": ".agent/evidence/T-0089/20261113-081836-SS-RPT-05-aged-receivables-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-05: Aged receivables buckets each customer, totals from the API @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:36.986Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-01",
+      "file": ".agent/evidence/T-0089/20261113-081837-SS-RPT-01-trial-balance-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:37.241Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-06",
+      "file": ".agent/evidence/T-0089/20261113-081841-SS-RPT-06-aged-payables-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-06: Aged payables buckets each supplier @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:41.524Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-02",
+      "file": ".agent/evidence/T-0089/20261113-081842-SS-RPT-02-profit-and-loss-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:42.373Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-03",
+      "file": ".agent/evidence/T-0089/20261113-081847-SS-RPT-03-balance-sheet-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:47.041Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-04",
+      "file": ".agent/evidence/T-0089/20261113-081852-SS-RPT-04-gl-detail-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:52.157Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-05",
+      "file": ".agent/evidence/T-0089/20261113-081857-SS-RPT-05-aged-receivables-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-05: Aged receivables buckets each customer, totals from the API @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:57.851Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-06",
+      "file": ".agent/evidence/T-0089/20261113-081903-SS-RPT-06-aged-payables-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-06: Aged payables buckets each supplier @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:03.656Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-01",
+      "file": ".agent/evidence/T-0089/20261113-081909-SS-RPT-01-trial-balance-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:09.389Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-02",
+      "file": ".agent/evidence/T-0089/20261113-081913-SS-RPT-02-profit-and-loss-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:13.734Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-03",
+      "file": ".agent/evidence/T-0089/20261113-081918-SS-RPT-03-balance-sheet-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:18.041Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-04",
+      "file": ".agent/evidence/T-0089/20261113-081921-SS-RPT-04-gl-detail-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:21.485Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-01",
+      "file": ".agent/evidence/T-0089/20261113-083528-SS-RPT-01-trial-balance-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:28.429Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-05",
+      "file": ".agent/evidence/T-0089/20261113-083532-SS-RPT-05-aged-receivables-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-05: Aged receivables buckets each customer, totals from the API @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:32.663Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-02",
+      "file": ".agent/evidence/T-0089/20261113-083532-SS-RPT-02-profit-and-loss-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:32.952Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-06",
+      "file": ".agent/evidence/T-0089/20261113-083536-SS-RPT-06-aged-payables-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-06: Aged payables buckets each supplier @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:36.360Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-03",
+      "file": ".agent/evidence/T-0089/20261113-083537-SS-RPT-03-balance-sheet-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:37.590Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-04",
+      "file": ".agent/evidence/T-0089/20261113-083542-SS-RPT-04-gl-detail-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:42.862Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-05",
+      "file": ".agent/evidence/T-0089/20261113-083547-SS-RPT-05-aged-receivables-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-05: Aged receivables buckets each customer, totals from the API @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:47.675Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-06",
+      "file": ".agent/evidence/T-0089/20261113-083553-SS-RPT-06-aged-payables-1440.png",
+      "test": "web/reports.spec.ts › SS-RPT-06: Aged payables buckets each supplier @ 1440 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:53.214Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-01",
+      "file": ".agent/evidence/T-0089/20261113-083558-SS-RPT-01-trial-balance-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:58.116Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-02",
+      "file": ".agent/evidence/T-0089/20261113-083602-SS-RPT-02-profit-and-loss-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:02.624Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-03",
+      "file": ".agent/evidence/T-0089/20261113-083606-SS-RPT-03-balance-sheet-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:06.919Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-RPT-04",
+      "file": ".agent/evidence/T-0089/20261113-083611-SS-RPT-04-gl-detail-390.png",
+      "test": "web/reports.spec.ts › SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ 390 [T-0089]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:11.500Z",
+      "result": "passed"
+    }
+  ]
+}

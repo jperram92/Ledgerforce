@@ -1,0 +1,139 @@
+/* Report screens (T-0089) in the Timeline direction (DL-0070): reuses admin.css and gl.css
+   (tables, filters, money cells). Statements and the trial balance keep their columns at every
+   width — the account column wraps — so amounts stay comparable digit by digit (P3); the wider
+   detail and ageing tables stack on narrow screens like every admin table. */
+
+.report-bar {
+  grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  align-items: start;
+}
+.report-bar .actions {
+  grid-column: 1 / -1;
+  align-items: stretch;
+}
+.report-bar .actions button {
+  margin: 0;
+}
+.report-hint {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.report-scope {
+  margin: var(--s3) 0;
+  color: var(--ink-2);
+}
+
+.report-table {
+  width: 100%;
+  max-width: 52rem;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.report-table th,
+.report-table td {
+  padding: var(--s2) var(--s3) var(--s2) 0;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+.report-table thead th {
+  font-weight: 600;
+  color: var(--ink-2);
+  border-bottom: 2px solid var(--ink);
+}
+.report-table tbody th {
+  font-weight: 400;
+}
+.report-table th.num,
+.report-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums lining-nums;
+  white-space: nowrap;
+  padding-right: 0;
+  padding-left: var(--s3);
+}
+.report-table a {
+  font-weight: 600;
+}
+.report-table tfoot th,
+.report-table tfoot td {
+  font-weight: 800;
+  border-top: 2px solid var(--ink);
+  border-bottom: 3px double var(--ink);
+}
+.report-table .report-section th {
+  font-weight: 800;
+  padding-top: var(--s4);
+  border-bottom: 2px solid var(--ink-2);
+}
+.report-table .report-group th {
+  font-weight: 600;
+  color: var(--ink-2);
+  padding-top: var(--s3);
+}
+.report-table .report-line {
+  padding-left: var(--s3);
+}
+.report-table .report-subtotal th,
+.report-table .report-subtotal td {
+  font-weight: 600;
+}
+.report-table .report-total th,
+.report-table .report-total td {
+  font-weight: 800;
+  border-top: 1px solid var(--ink);
+}
+.report-check {
+  margin-top: var(--s3);
+}
+.word[data-status='computed'] {
+  border-style: dotted;
+  font-size: 12px;
+}
+.word[data-status='unbalanced'] {
+  border-width: 2px;
+  border-style: dashed;
+}
+
+.report-account {
+  margin-top: var(--s4);
+}
+.report-account h2 {
+  font-size: 17px;
+  margin: 0 0 var(--s2);
+}
+.report-lines .report-edge td {
+  font-weight: 600;
+}
+.report-aged tbody th,
+.report-aged tfoot th {
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid var(--line);
+  padding: var(--s2) var(--s3) var(--s2) 0;
+}
+.report-aged tfoot th,
+.report-aged tfoot td {
+  font-weight: 800;
+  border-top: 2px solid var(--ink);
+}
+
+@media (min-width: 901px) {
+  .report-bar .field:has(select) {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 900px) {
+  .report-table .report-line {
+    padding-left: var(--s2);
+  }
+  .report-aged th[data-label] {
+    display: block;
+    border-bottom: 0;
+  }
+  .report-lines td[colspan] {
+    display: block;
+  }
+}
