@@ -3153,3 +3153,25 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: The history cannot be rewritten (directive 6), and the tree must scan clean (the scan.mjs policy). The findings are commit ids, not credentials.
 - Alternatives: leave security red; delete the patches (forbidden by directive 6); add a path allowlist to the Gitleaks config (would weaken the CI gate for every future commit).
 - ADR: none · Status: accepted
+
+### DL-0477 — Owner delegates the pending security decisions; decisions taken on established practice
+- Date: 2026-11-13 · By: human (product owner), recorded by claude · Task: sprint · Category: security
+- Owner instruction (2026-11-13): "Yes you are authorised to make all these decisions based off best practices." The list in question is HANDOVER's open questions. Each decision below is taken under that delegation. Its card writes the security ADR, Accepted on this basis, before code, and implements it test-first.
+- Decisions:
+  1. **Gitleaks WIP false positives (DL-0464):** commit-scoped ignores plus lossless gzip copies. The pointer files keep the paths, so nothing is deleted.
+  2. **Single-invoice approval (T-0132):** a new permission `ar.invoice.approve` for Owner, Finance Admin and Approver, the same set that holds `ar.credit_note.approve` and `ar.batch.approve`. SoD: the creator of a draft may not approve it, unless the tenant runs in small-team mode, matching the existing credit-note rule. Rationale: least privilege and maker-checker (COSO / OWASP ASVS V4 access control).
+  3. **Customer refunds (T-0152):**
+     - `ar.refund.create` (AR Clerk, Finance Admin, Owner) and `ar.refund.approve` (Approver, Finance Admin, Owner).
+     - SoD: the refund's creator may not approve it.
+     - A bank refund is paid only through the AP payment batch, with its existing release rules (two releasers above the threshold, step-up).
+     - A Stripe refund is sent only after approval.
+     - Rationale: money leaving the business is maker-checker controlled, the same as supplier payments (design §6.5).
+  4. **Setup wizard routes (T-0157):** a new permission `settings.setup.manage` for Owner and Finance Admin, not a reuse of `settings.chart.manage`. Rationale: least privilege and a clear audit trail; setup changes more than the chart.
+  5. **Payment files (T-0154/T-0162/T-0163):**
+     - Downloading the ABA file and recording the bank confirmation both need step-up (300 s), as release does.
+     - SoD: the person who records the bank confirmation may not be the batch's creator.
+     - Rationale: the ABA file can be altered after download and before upload to the bank. Payment-fraud guidance treats payment-file handling as a high-risk action.
+  6. **Statement upload size (T-0161):** a route-scoped 10 MB JSON limit only on statement import (RQ-0151, option A, no new dependency). Per-address write rate limits (ADR-0054) still apply. Rationale: smallest exception that meets the need.
+  7. **CSRF (T-0144):** OWASP's recommended defence-in-depth. Cookie-authenticated state-changing requests are rejected unless Fetch Metadata (`Sec-Fetch-Site: same-origin`/`none`) or a matching `Origin` header proves they are same-origin, failing closed. Test helpers send the headers a browser would.
+  8. **Network access** for research (ato.gov.au for RQ-0153 re-check; postgresql.org for T-0143): proposed to the environment through its approval prompt; not assumed.
+- ADR: one per card (security) · Status: accepted (owner delegation)
