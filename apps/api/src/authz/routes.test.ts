@@ -72,6 +72,17 @@ describe('SS-PLAT-49: Every endpoint checks a permission', () => {
     ]);
   });
 
+  it('SS-UC10-06 reopening a hard-locked period needs period.reopen (step-up by catalogue); listing needs reports.run [T-0079]', () => {
+    const byName = new Map(routes().map((r) => [r.name, r.access]));
+    expect(
+      ['request', 'approve', 'list'].map((k) => byName.get(`PeriodReopenController.${k}`)),
+    ).toEqual([
+      { kind: 'permission', permission: 'period.reopen' },
+      { kind: 'permission', permission: 'period.reopen' },
+      { kind: 'permission', permission: 'reports.run' },
+    ]);
+  });
+
   it('bank details and role administration need specific permissions', () => {
     const byName = new Map(routes().map((r) => [r.name, r.access]));
     expect(byName.get('PartyBankAccountsController.list')).toEqual({

@@ -101,5 +101,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0051](0051-gross-ecl-allowance-remeasurement.md) | Gross ECL allowance and subsequent remeasurement | accounting | delegated | Accepted |
 | [0052](0052-owner-authorized-independent-codex-review.md) | Independent Codex review for the current pickup batch | process | owner instruction | Accepted |
 | [0053](0053-mime-parsing-postal-mime.md) | Parse inbound bill email with postal-mime | integration | no | Accepted |
+| [0056](0056-period-reopen-http-routes.md) | HTTP routes to reopen a hard-locked period: request, approve, list | architecture | no | Accepted |
 
 Next free number: **0054** (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).
