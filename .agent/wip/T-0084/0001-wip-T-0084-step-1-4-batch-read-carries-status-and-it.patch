@@ -1,0 +1,385 @@
+From 6ede151250ecff2d834a32880b19a52229186c88 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 03:57:20 +0000
+Subject: [PATCH 1/3] =?UTF-8?q?wip(T-0084):=20step=201/4=20=E2=80=94=20bat?=
+ =?UTF-8?q?ch=20read=20carries=20status=20and=20item=20results=20[T-0084]?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+What changed:
+- packages/modules/ar: BatchPreview gains `status` (preview/approved/posted/cancelled);
+  loadBatchPreview reads it, a new preview is 'preview'.
+- apps/api GET /ar/batches/:id, POST preview and approve now return `status`, per item
+  `status`, `invoice_no`, `failure_code`, `failure_message` (from batchSummary) and
+  `outcome {posted, failed, posted_gross}`. Additive; approve still returns status 'approved'.
+- New api-db test SS-UC02-08 (December batch, one party archived before the run).
+
+Why: the batch screen (SS-UC02-08) must show the exception list after the job ran and must not
+offer Approve on a batch that is already approved; the read route had neither.
+
+Validation:
+- RED first: `pnpm exec vitest run --project api-db apps/api/src/ar/batches.db.test.ts`
+  failed on `status` undefined (.agent/evidence/T-0084/red-api-batch-status-20261113.txt).
+- GREEN: same file 6/6; `vitest run --project db packages/modules/ar/src/batch` 8/8.
+- eslint + prettier on touched files clean. Typecheck not yet run.
+
+Next action: Playwright spec tests/e2e/web/batch-billing.spec.ts (RED), then the screens.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../T-0084/red-api-batch-status-20261113.txt  |  34 +++++
+ apps/api/src/ar/batches.controller.ts         |  52 +++++---
+ apps/api/src/ar/batches.db.test.ts            | 118 +++++++++++++++++-
+ packages/modules/ar/src/batch.ts              |   9 +-
+ 4 files changed, 191 insertions(+), 22 deletions(-)
+ create mode 100644 .agent/evidence/T-0084/red-api-batch-status-20261113.txt
+
+diff --git a/.agent/evidence/T-0084/red-api-batch-status-20261113.txt b/.agent/evidence/T-0084/red-api-batch-status-20261113.txt
+new file mode 100644
+index 0000000..4d95d76
+--- /dev/null
++++ b/.agent/evidence/T-0084/red-api-batch-status-20261113.txt
+@@ -0,0 +1,34 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42
++
++[db] test PostgreSQL ready (local) on 127.0.0.1:39229
++ ❯ |api-db| apps/api/src/ar/batches.db.test.ts (6 tests | 1 failed) 1099ms
++     × SS-UC02-08 GET /ar/batches/:id carries the batch status; after the run each item says posted (with its number) or failed (with the reason) 105ms
++
++⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |api-db| apps/api/src/ar/batches.db.test.ts > SS-UC02-08: the batch screen reads the batch state and each item result (T-0084) > SS-UC02-08 GET /ar/batches/:id carries the batch status; after the run each item says posted (with its number) or failed (with the reason)
++AssertionError: expected undefined to be 'preview' // Object.is equality
++
++- Expected:
++"preview"
++
+++ Received:
++undefined
++
++ ❯ apps/api/src/ar/batches.db.test.ts:262:27
++    260|     };
++    261|     const before = await read();
++    262|     expect(before.status).toBe('preview');
++       |                           ^
++    263|     expect(before.items.map((i) => [i.party_id, i.status, i.invoice_no…
++    264|       [
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
++
++
++ Test Files  1 failed (1)
++      Tests  1 failed | 5 passed (6)
++   Start at  03:55:42
++   Duration  4.75s (transform 1.65s, setup 0ms, import 2.78s, tests 1.10s, environment 0ms)
++
+diff --git a/apps/api/src/ar/batches.controller.ts b/apps/api/src/ar/batches.controller.ts
+index e7e2665..7a0da27 100644
+--- a/apps/api/src/ar/batches.controller.ts
++++ b/apps/api/src/ar/batches.controller.ts
+@@ -3,7 +3,9 @@
+  * @ledgerforce/ar. POST /ar/batches/preview needs ar.batch.run and an idempotency key (a repeat
+  * returns the stored preview with 200); GET /ar/batches/:id needs ar.read. Money is returned as
+  * decimal strings. POST /ar/batches/:id/approve needs ar.batch.approve (T-0044); the job that
+- * posts an approved batch (runBatch) runs in the worker (T-0120).
++ * posts an approved batch (runBatch) runs in the worker (T-0120). Every answer carries the batch
++ * status and, per item, its result once the job has run (posted with its invoice number, or failed
++ * with the reason: the exception list) for the batch screen (T-0084, SS-UC02-08).
+  */
+ import {
+   BadRequestException,
+@@ -22,6 +24,7 @@ import {
+ import {
+   approveBatch,
+   BatchError,
++  batchSummary,
+   loadBatchPreview,
+   previewBatch,
+   type BatchPreview,
+@@ -45,24 +48,36 @@ const refusal = (e: unknown): never => {
+   throw e;
+ };
+ 
+-function viewOf(p: BatchPreview) {
++type Summary = Awaited<ReturnType<typeof batchSummary>>;
++
++function viewOf(p: BatchPreview, s: Summary) {
++  const result = new Map(s.rows.map((r) => [r.itemNo, r]));
+   return {
+     id: p.batchId,
+     replayed: p.replayed,
++    status: p.status,
+     period_from: p.periodFrom,
+     period_to: p.periodTo,
+     issue_date: p.issueDate,
+-    items: p.items.map((i) => ({
+-      item_no: i.itemNo,
+-      party_id: i.partyId,
+-      party_name: i.partyName,
+-      line_count: i.lineCount,
+-      net: i.net,
+-      tax: i.tax,
+-      gross: i.gross,
+-      warnings: i.warnings,
+-    })),
++    items: p.items.map((i) => {
++      const r = result.get(i.itemNo);
++      return {
++        item_no: i.itemNo,
++        party_id: i.partyId,
++        party_name: i.partyName,
++        line_count: i.lineCount,
++        net: i.net,
++        tax: i.tax,
++        gross: i.gross,
++        warnings: i.warnings,
++        status: r?.status ?? 'preview',
++        invoice_no: r?.invoiceNo ?? null,
++        failure_code: r?.failureCode ?? null,
++        failure_message: r?.failureMessage ?? null,
++      };
++    }),
+     totals: p.totals,
++    outcome: { posted: s.totals.posted, failed: s.totals.failed, posted_gross: s.totals.gross },
+   };
+ }
+ 
+@@ -104,6 +119,7 @@ export class ArBatchesController {
+       idempotencyKey: key,
+       ...(createdBy ? { createdBy } : {}),
+     }).catch(refusal);
++    const summary = await batchSummary(this.tx.get(), companyId as string, p.batchId);
+     if (p.replayed) {
+       res.status(200);
+     } else {
+@@ -113,7 +129,7 @@ export class ArBatchesController {
+         after: { ...p.totals, period_from: p.periodFrom, period_to: p.periodTo },
+       });
+     }
+-    return viewOf(p);
++    return viewOf(p, summary);
+   }
+ 
+   @Get(':id')
+@@ -121,10 +137,9 @@ export class ArBatchesController {
+   async get(@Param('id') id: string, @Query('company_id') companyId: string | undefined) {
+     if (!UUID.test(id)) bad('id must be a uuid');
+     if (typeof companyId !== 'string' || !UUID.test(companyId)) bad('company_id must be a uuid');
+-    const p = await loadBatchPreview(this.tx.get(), (companyId as string).toLowerCase(), id).catch(
+-      refusal,
+-    );
+-    return viewOf(p);
++    const company = (companyId as string).toLowerCase();
++    const p = await loadBatchPreview(this.tx.get(), company, id).catch(refusal);
++    return viewOf(p, await batchSummary(this.tx.get(), company, id));
+   }
+ 
+   @Post(':id/approve')
+@@ -147,11 +162,12 @@ export class ArBatchesController {
+       approvedBy: approvedBy as string,
+     }).catch(refusal);
+     const p = await loadBatchPreview(trx, company, id).catch(refusal);
++    const summary = await batchSummary(trx, company, id);
+     this.audit.describe({
+       entityType: 'billing_batch',
+       entityId: id,
+       after: { status: 'approved' },
+     });
+-    return { ...viewOf(p), status: 'approved' };
++    return viewOf(p, summary);
+   }
+ }
+diff --git a/apps/api/src/ar/batches.db.test.ts b/apps/api/src/ar/batches.db.test.ts
+index 3340ad6..fc565d5 100644
+--- a/apps/api/src/ar/batches.db.test.ts
++++ b/apps/api/src/ar/batches.db.test.ts
+@@ -1,14 +1,16 @@
+ /**
+  * Batch billing preview over HTTP (T-0043, UC-02, DL-0271): POST /ar/batches/preview needs
+  * ar.batch.run and an idempotency key, returns money as decimal strings and replays; the stored
+- * preview is readable with ar.read. Real PostgreSQL (lf_app), real sessions.
++ * preview is readable with ar.read. Real PostgreSQL (lf_app), real sessions. The read carries the
++ * batch status and each item's result after the job (posted / failed with the reason) for the
++ * batch screen (T-0084, SS-UC02-08).
+  */
+ import 'reflect-metadata';
+-import { addBillingLine } from '@ledgerforce/ar';
++import { addBillingLine, INVOICE_NUMBER_SERIES, runBatch } from '@ledgerforce/ar';
+ import { createDb, withTenant } from '@ledgerforce/db';
+ import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
+ import { auServicesSmb, loadChartTemplate } from '@ledgerforce/gl';
+-import { generateFiscalYear } from '@ledgerforce/ledger';
++import { entrySeriesFor, generateFiscalYear, SOURCE_TYPES } from '@ledgerforce/ledger';
+ import { seedPostingProfiles, setPartyProfiles } from '@ledgerforce/products';
+ import { seedTaxCodes } from '@ledgerforce/tax';
+ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+@@ -204,3 +206,113 @@ describe('SS-UC02-01 / SS-UC02-07: batch preview over HTTP', () => {
+     expect(await again.json()).toMatchObject({ error: 'BATCH_STATE' });
+   });
+ });
++
++describe('SS-UC02-08: the batch screen reads the batch state and each item result (T-0084)', () => {
++  it('SS-UC02-08 GET /ar/batches/:id carries the batch status; after the run each item says posted (with its number) or failed (with the reason)', async () => {
++    const db = createDb(tdb.url('lf_app'), 1);
++    const parties = await withTenant(db, A, async (trx) => {
++      const rows = await trx
++        .selectFrom('app.party')
++        .select(['id', 'legal_name'])
++        .where('company_id', '=', companyId)
++        .orderBy('legal_name')
++        .execute();
++      const profile = await trx
++        .selectFrom('app.billing_line')
++        .select('product_profile_id')
++        .where('company_id', '=', companyId)
++        .executeTakeFirstOrThrow();
++      // The job numbers invoices and journals: the series the setup wizard would create.
++      const series = [...new Set(Object.keys(SOURCE_TYPES).map((s) => entrySeriesFor(s)))];
++      for (const [i, code] of series.entries()) {
++        await trx
++          .insertInto('app.number_series')
++          .values({ company_id: companyId, code, prefix: `J${String(i)}-` })
++          .onConflict((oc) => oc.doNothing())
++          .execute();
++      }
++      await trx
++        .insertInto('app.number_series')
++        .values({ company_id: companyId, code: INVOICE_NUMBER_SERIES, prefix: 'INV-' })
++        .onConflict((oc) => oc.doNothing())
++        .execute();
++      for (const p of rows) {
++        await addBillingLine(trx, companyId, {
++          partyId: p.id,
++          productProfileId: profile.product_profile_id,
++          description: 'Subscription December 2026',
++          quantity: '1',
++          unitPrice: '250.00',
++          billDate: '2026-12-01',
++        });
++      }
++      return rows;
++    });
++    const acme = parties[0]?.id ?? '';
++    const bolt = parties[1]?.id ?? '';
++    const created = await call(
++      'POST',
++      '/ar/batches/preview',
++      'arClerk',
++      { company_id: companyId, period_from: '2026-12-01', period_to: '2026-12-31' },
++      'dec-2026',
++    );
++    expect(created.status).toBe(201);
++    const { id } = (await created.json()) as { id: string };
++    const read = async () => {
++      const res = await call('GET', `/ar/batches/${id}?company_id=${companyId}`, 'auditor');
++      expect(res.status).toBe(200);
++      return (await res.json()) as {
++        status: string;
++        items: {
++          party_id: string;
++          status: string;
++          invoice_no: string | null;
++          failure_code: string | null;
++          failure_message: string | null;
++        }[];
++        outcome: { posted: number; failed: number; posted_gross: string };
++      };
++    };
++    const before = await read();
++    expect(before.status).toBe('preview');
++    expect(before.items.map((i) => [i.party_id, i.status, i.invoice_no, i.failure_code])).toEqual([
++      [acme, 'preview', null, null],
++      [bolt, 'preview', null, null],
++    ]);
++    expect(before.outcome).toEqual({ posted: 0, failed: 0, posted_gross: '0.0000' });
++
++    const ok = await call('POST', `/ar/batches/${id}/approve?company_id=${companyId}`, 'approver');
++    expect(ok.status).toBe(200);
++    expect((await read()).status).toBe('approved');
++
++    await withTenant(db, A, (trx) =>
++      trx.updateTable('app.party').set({ status: 'archived' }).where('id', '=', bolt).execute(),
++    );
++    const run = await runBatch(
++      db,
++      A,
++      { companyId, batchId: id },
++      { outbox: { publish: async () => {} } },
++    );
++    expect(run).toMatchObject({ posted: 1, failed: 1, status: 'posted' });
++    await withTenant(db, A, (trx) =>
++      trx.updateTable('app.party').set({ status: 'active' }).where('id', '=', bolt).execute(),
++    );
++    await db.destroy();
++
++    const after = await read();
++    expect(after.status).toBe('posted');
++    const [a, b] = after.items;
++    expect(a).toMatchObject({ party_id: acme, status: 'posted', failure_code: null });
++    expect(a?.invoice_no).toMatch(/^INV-\d+$/);
++    expect(b).toMatchObject({
++      party_id: bolt,
++      status: 'failed',
++      invoice_no: null,
++      failure_code: 'INVALID_PARTY',
++    });
++    expect(b?.failure_message).toEqual(expect.any(String));
++    expect(after.outcome).toEqual({ posted: 1, failed: 1, posted_gross: '275.0000' });
++  });
++});
+diff --git a/packages/modules/ar/src/batch.ts b/packages/modules/ar/src/batch.ts
+index 9751bd4..6776f8d 100644
+--- a/packages/modules/ar/src/batch.ts
++++ b/packages/modules/ar/src/batch.ts
+@@ -57,9 +57,13 @@ export interface BatchItem {
+   readonly warnings: readonly BatchWarning[];
+ }
+ 
++export type BatchStatus = 'preview' | 'approved' | 'posted' | 'cancelled';
++
+ export interface BatchPreview {
+   readonly batchId: string;
+   readonly replayed: boolean;
++  /** preview → approved → posted (T-0044); read by the batch screen (T-0084). */
++  readonly status: BatchStatus;
+   readonly periodFrom: string;
+   readonly periodTo: string;
+   readonly issueDate: string;
+@@ -284,6 +288,7 @@ export async function previewBatch(
+   return {
+     batchId: batch.id,
+     replayed: false,
++    status: 'preview',
+     periodFrom: q.periodFrom,
+     periodTo: q.periodTo,
+     issueDate,
+@@ -302,6 +307,7 @@ export async function loadBatchPreview(
+   const b = (
+     await sql<{
+       id: string;
++      status: BatchStatus;
+       period_from: string;
+       period_to: string;
+       issue_date: string;
+@@ -311,7 +317,7 @@ export async function loadBatchPreview(
+       tax_total: string;
+       gross_total: string;
+     }>`
+-      SELECT id::text, to_char(period_from, 'YYYY-MM-DD') AS period_from,
++      SELECT id::text, status, to_char(period_from, 'YYYY-MM-DD') AS period_from,
+              to_char(period_to, 'YYYY-MM-DD') AS period_to, to_char(issue_date, 'YYYY-MM-DD') AS issue_date,
+              invoice_count, ready_count, net_total::text, tax_total::text, gross_total::text
+         FROM app.billing_batch WHERE company_id = ${companyId} AND id = ${batchId}::uuid`.execute(
+@@ -339,6 +345,7 @@ export async function loadBatchPreview(
+   return {
+     batchId: b.id,
+     replayed,
++    status: b.status,
+     periodFrom: b.period_from,
+     periodTo: b.period_to,
+     issueDate: b.issue_date,
+-- 
+2.43.0
+

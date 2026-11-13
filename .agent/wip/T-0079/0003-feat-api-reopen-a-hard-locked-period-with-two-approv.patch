@@ -1,0 +1,200 @@
+From 988abe7f2f313505660d53fd755fa372061d7096 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 08:19:25 +0000
+Subject: [PATCH 3/4] feat(api): reopen a hard-locked period with two
+ approvers, step-up and a reason [T-0079]
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+What changed: PeriodReopenController (apps/api/src/periods) adds
+POST /periods/:periodId/reopen-requests {to_status, reason},
+POST /periods/reopen-requests/:requestId/approve and
+GET /periods/:periodId/reopen-requests. The mutations need period.reopen,
+a 300 s step-up and the SoD engine (SOD_PERIOD_REOPEN_SELF_APPROVAL), and call
+@ledgerforce/ledger requestReopen/approveReopen (migration 0018 repeats
+every check and writes the audit rows). Replays are recognised by state.
+The api-db test SS-UC10-06 (11 cases) and a routes.test.ts access assertion
+come with it. nginx proxies /periods (SS-PLAT-86). ADR-0056 (Proposed), DL-0420,
+DL-0421 (a close checklist after reopen needs schema: reported, not built).
+This commit completes WIP 4e1d83d, which the lead saved at the usage limit.
+
+Why: Design §3.5, §6.2 and §6.5 rule 6; UC-10 A3. The database layer existed
+but there was no HTTP route.
+
+Validation: RED saved first (.agent/evidence/T-0079/red-SS-UC10-06.txt:
+11/11 failed with 404, because the routes did not exist). GREEN:
+pnpm -s typecheck exit 0; pnpm -s lint exit 0; pnpm -s format:check clean;
+VITEST_MAX_WORKERS=1 pnpm exec vitest run --project api-unit --project api-db apps/api
+→ 34 files, 321 passed, 0 skipped. The first full run failed
+nginx-routes.test.ts (periods not proxied); fixed in this commit.
+verify.sh and cross-review have not run.
+
+Next action: record evidence (evidence:tests --require SS-UC10-06), update the
+register row and the card; the lead decides the checklist-round migration (DL-0421).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ Docs/adr/0056-period-reopen-http-routes.md | 93 ++++++++++++++++++++++
+ Docs/adr/README.md                         |  1 +
+ Docs/decisions/decision-log.md             | 22 +++++
+ infra/docker/nginx/default.conf.template   |  2 +-
+ 4 files changed, 117 insertions(+), 1 deletion(-)
+ create mode 100644 Docs/adr/0056-period-reopen-http-routes.md
+
+diff --git a/Docs/adr/0056-period-reopen-http-routes.md b/Docs/adr/0056-period-reopen-http-routes.md
+new file mode 100644
+index 0000000..756d36f
+--- /dev/null
++++ b/Docs/adr/0056-period-reopen-http-routes.md
+@@ -0,0 +1,93 @@
++---
++adr: 0056
++title: "HTTP routes to reopen a hard-locked period: request, approve, list"
++status: Proposed
++date: 2026-11-13
++author: claude
++category: architecture
++human_gate: no
++supersedes: none
++superseded_by: none
++---
++
++# ADR-0056: HTTP routes to reopen a hard-locked period
++
++## Status
++Proposed. It becomes Accepted on green CI plus cross-review by codex. The category is
++architecture, a public API change. It adds no permission, table, migration or dependency, so it
++has no human gate.
++
++## Context and problem statement
++Design §3.5 says a hard-locked period is changed by nobody, and reopening it needs two approvers
++and an audit reason. §6.2 requires step-up re-authentication to reopen a locked period, and §6.5
++rule 6 requires two approvers plus a written reason. Migration 0018 already enforces this in the
++database (`app.period_reopen_request` and `app.period_reopen_approve`, SECURITY DEFINER), and
++`@ledgerforce/ledger` wraps it (`requestReopen` and `approveReopen`, SS-PLAT-56). The HTTP layer
++did not exist yet (T-0079).
++
++## Decision
++Add `PeriodReopenController` with three routes:
++
++| Route | Access | Body / answer |
++|---|---|---|
++| `POST /periods/:periodId/reopen-requests` | `period.reopen` + step-up 300 s + SoD step `period_reopen_request.request` | `{to_status, reason}`. `to_status` is one of open, ar_locked, ap_locked or soft_closed, and `reason` is a trimmed string of 1–2000 characters. Answers 201 with the request view. |
++| `POST /periods/reopen-requests/:requestId/approve` | `period.reopen` + step-up 300 s + SoD step `period_reopen_request.approve` (rule `SOD_PERIOD_REOPEN_SELF_APPROVAL`, never excepted) | Answers 200 with the request view, which now shows `status: approved` and the new `period_status`. |
++| `GET /periods/:periodId/reopen-requests` | `reports.run` | `{period_id, period_status, requests[]}` |
++
++The request view contains `id`, `period_id`, `company_id`, `to_status`, `reason`, `status`,
++`requested_by`, `requested_at`, `approved_by`, `approved_at` and `period_status`.
++
++Errors:
++
++| HTTP | Body | When |
++|---|---|---|
++| 400 | `reason_required` | The reason is missing or blank. |
++| 400 | `invalid_reopen_request` | `to_status` is invalid, or the id is not a uuid. |
++| 400 | `invalid_sod_subject` | The approve id is not a uuid. |
++| 401 | `step_up_required` | The caller has not stepped up recently enough. |
++| 403 | `forbidden` / `sod_violation` | The caller lacks the permission, or would approve their own request. |
++| 404 | — | The period or request is unknown, including another tenant's. |
++| 409 | `reopen_request_pending` | Another request for the period is already pending. |
++| 409 | `period_not_hard_locked` | The period is not hard-locked. |
++| 409 | `reopen_request_not_pending` | The request was already approved by someone else. |
++| 409 | `reopen_refused` | Any other refusal from the database function. |
++
++Every mutation is audited twice:
++
++- the database functions write `period.reopen_requested`, `period.reopen_approved` and `period.status_changed`;
++- the interceptor writes one HTTP row with the described before and after values.
++
++The step-up and SoD refusals are audited by the interceptor.
++
++**Idempotency.** The apps/api rule says every mutating route takes an idempotency key. But
++`app.period_reopen_request` has no key column, and this round may not add migrations (DL-0409).
++So replays are recognised by state, as payment-batch release and bank-detail verify already do:
++
++- The same requester, target and reason while the request is pending gets 200 with the same request.
++- The same approver of an approved request gets 200 with the same result.
++- Anyone else gets 409.
++
++An `Idempotency-Key` header that the server could not store would only look like a guarantee, so
++the routes do not take one. If a key column is wanted, it is a follow-up migration for the lead.
++
++**SoD subject of the request step.** The database function chooses the request id. So the route
++names a placeholder id before the handler runs, and the handler sets the real id on the same
++subject object. The interceptor then records `period_reopen_request.request` against the real id
++after the handler succeeds. The request step has no rule of its own, so the check itself does not
++change.
++
++## Consequences
++- The web close screen can drive the reopen flow. Approvers see pending requests through the GET route.
++- A reopened period cannot rerun the T-0078 close checklist: `app.close_checklist_step` has
++  primary key (tenant, period, step) and is insert-only. Supporting a second checklist round needs
++  schema work, for example a round or reopen-request column and a new key. It is reported as a
++  follow-up (DL-0421) and not done here.
++- No OpenAPI file exists in the repository yet, so this ADR records the contract.
++
++## Alternatives considered
++- **Accept an `Idempotency-Key` header without storing it.** Rejected, because it would be a
++  guarantee the server does not keep.
++- **Use the period id as the SoD subject.** Rejected, because a person who requested an earlier
++  reopen of the same period could never approve a later one.
++- **Read the request list with `period.reopen`.** Rejected, because that permission is in
++  STEP_UP_PERMISSIONS, so a plain read would demand step-up.
+diff --git a/Docs/adr/README.md b/Docs/adr/README.md
+index 51add24..603b64b 100644
+--- a/Docs/adr/README.md
++++ b/Docs/adr/README.md
+@@ -101,5 +101,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
+ | [0051](0051-gross-ecl-allowance-remeasurement.md) | Gross ECL allowance and subsequent remeasurement | accounting | delegated | Accepted |
+ | [0052](0052-owner-authorized-independent-codex-review.md) | Independent Codex review for the current pickup batch | process | owner instruction | Accepted |
+ | [0053](0053-mime-parsing-postal-mime.md) | Parse inbound bill email with postal-mime | integration | no | Accepted |
++| [0056](0056-period-reopen-http-routes.md) | HTTP routes to reopen a hard-locked period: request, approve, list | architecture | no | Proposed |
+ 
+ Next free number: **0054** (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).
+diff --git a/Docs/decisions/decision-log.md b/Docs/decisions/decision-log.md
+index 5f75603..f711aa2 100644
+--- a/Docs/decisions/decision-log.md
++++ b/Docs/decisions/decision-log.md
+@@ -2586,3 +2586,25 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
+   | T-0097 pilot hardening | 0460–0469 | 0054–0055 | 0141–0142 | T-0142–T-0144 |
+ - Why: The owner asked for parallel agents (DL-0408); disjoint ranges keep the merges mechanical.
+ - ADR: none · Status: accepted
++
++### DL-0420 — Period reopen over HTTP: routes, step-up, SoD subject, state-based replay (T-0079)
++- Date: 2026-11-13 · By: claude · Task: T-0079 · Category: api (+ security control wiring)
++- Decision: Three routes are added: `POST /periods/:periodId/reopen-requests` {to_status, reason}, `POST /periods/reopen-requests/:requestId/approve` and `GET /periods/:periodId/reopen-requests`.
++  - Both mutations need `period.reopen` and a 300 s step-up. The step-up is `@RequireStepUp(300)`, and the catalogue's STEP_UP_PERMISSIONS would demand it anyway.
++  - Both mutations pass the SoD engine (`period_reopen_request.request` / `.approve`, rule SOD_PERIOD_REOPEN_SELF_APPROVAL).
++  - A written reason is required (400 `reason_required`).
++  - Everything is wired to `requestReopen` / `approveReopen` in @ledgerforce/ledger, whose migration-0018 functions repeat every check and write the audit rows.
++  - GET needs `reports.run`, because a read with `period.reopen` would demand step-up.
++  - Replays are recognised by state: the same requester, target and reason, or the same approver. The reopen table has no idempotency-key column and this round adds no migrations (DL-0409).
++  - The request step's SoD subject is named before the handler as a placeholder, and set to the real id once the function returns it.
++  - `periods` is added to the nginx API prefixes (SS-PLAT-86).
++  - The card's file name `period.reopen.spec.ts` is read as the repo convention `apps/api/src/periods/period-reopen.db.test.ts`.
++- Why: Design §3.5, §6.2 and §6.5 rule 6; apps/api AGENTS.md (thin controllers, SoD in the interceptor, audit every mutation). There was no open question, so no RQ: the design text and migration 0018 settle the behaviour.
++- Alternatives: an unstored Idempotency-Key header (a false guarantee); the period id as SoD subject (blocks later reopens); see ADR-0056.
++- ADR: ADR-0056 (architecture, Proposed) · Status: accepted
++
++### DL-0421 — Close checklist after a reopen needs schema; reported, not built (T-0079)
++- Date: 2026-11-13 · By: claude · Task: T-0079 · Category: scope
++- Decision: A period reopened from hard lock cannot run the T-0078 close checklist again. `app.close_checklist_step` (migration 0061) has primary key (tenant_id, period_id, step) and is insert-only, so `completeCloseStep` answers ALREADY_DONE for every step that was completed before. Its comment says "a reopened period starts a new checklist", but that needs a schema change. One option is an additive `round` or `reopen_request_id` column with a new unique key, and `closeChecklist` reading the latest round. Under DL-0409 the agent adds no migration, so this is reported to the lead as follow-up work. Until then, a reopened period is re-locked with `setPeriodStatus` (period.lock / period.close, audited).
++- Why: DL-0409 (no migrations in parallel agents); directive 6 (no edits to merged migrations).
++- ADR: none · Status: accepted
+diff --git a/infra/docker/nginx/default.conf.template b/infra/docker/nginx/default.conf.template
+index ad3bd7d..41d12d9 100644
+--- a/infra/docker/nginx/default.conf.template
++++ b/infra/docker/nginx/default.conf.template
+@@ -46,7 +46,7 @@ server {
+     }
+ 
+     # LedgerForce API.
+-    location ~ ^/(auth|t|health|companies|users|parties|bank-detail-changes|api-tokens|audit-log|sod|manual-journals|accounts|sync-issues|ar|ap|webhooks|gl|setup)(/|$) { # lf:api-prefixes
++    location ~ ^/(auth|t|health|companies|users|parties|bank-detail-changes|api-tokens|audit-log|sod|manual-journals|accounts|sync-issues|ar|ap|webhooks|gl|setup|periods)(/|$) { # lf:api-prefixes
+         proxy_pass http://api:3000;
+     }
+ 
+-- 
+2.43.0
+

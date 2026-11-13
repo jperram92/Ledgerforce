@@ -1,0 +1,542 @@
+From 71d5d8d6c1b0ef7c7a0b9b0be3e2e5036c08b3f0 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 08:12:17 +0000
+Subject: [PATCH 2/4] wip(T-0086): save agent work interrupted by the usage
+ limit (unverified)
+
+What changed: Uncommitted work of the T-0086 sub-agent, saved by the lead as-is.
+Why: The agent stopped on the 5-hour usage limit; the container may not survive.
+Validation: none by the lead; the agent resumes and validates.
+Next action: the agent continues from this commit.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ tests/e2e/web/bills.spec.ts | 516 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 516 insertions(+)
+ create mode 100644 tests/e2e/web/bills.spec.ts
+
+diff --git a/tests/e2e/web/bills.spec.ts b/tests/e2e/web/bills.spec.ts
+new file mode 100644
+index 0000000..6e71d85
+--- /dev/null
++++ b/tests/e2e/web/bills.spec.ts
+@@ -0,0 +1,516 @@
++/**
++ * Bills screens (T-0086, UC-05, SS-UC05-08, DL-0441): the AP Clerk enters and codes the GP-008 bill
++ * (500.00 stationery, GST; 2,000.00 laptop, GST-CAP), sends it for approval; an Approver sees who
++ * entered it, opens "Show me the journal" (the engine's preview) and approves it; the bill then
++ * shows its posted journal. Someone who entered a bill above the self-approval limit sees Approve
++ * disabled with the rule in words (P6/P7). The app is served by Vite; the API is faked per test
++ * with `page.route` using the response shapes of the AP routes in apps/api/src/ap/bills.controller.ts
++ * (bills-read.db.test.ts proves them on a real database).
++ */
++import { mkdtempSync } from 'node:fs';
++import { tmpdir } from 'node:os';
++import { join, resolve } from 'node:path';
++import { AxeBuilder } from '@axe-core/playwright';
++import type { Page, Route } from '@playwright/test';
++import { createViteServer } from 'vitest/node';
++import { test, expect } from '@ledgerforce/testing/evidence';
++import { ROLE_TEMPLATES } from '../../../packages/shared/src/rbac/index.ts';
++import { genericnessProbe } from '../fixtures/genericness.ts';
++
++const WEB = resolve(import.meta.dirname, '..', '..', '..', 'apps', 'web');
++const id = (n: number) => `01900000-0000-7000-8000-${n.toString(16).padStart(12, '0')}`;
++const CO = id(0x86c1);
++const SUPPLIER = id(0x86a1);
++const OFFICE = id(0x8661);
++const LAPTOP = id(0x8662);
++const OLD = id(0x8601);
++const ENTRY = id(0x86e1);
++
++let server: Awaited<ReturnType<typeof createViteServer>> | undefined;
++let origin = '';
++
++test.use({ evidenceTaskId: 'T-0086', timezoneId: 'Australia/Sydney', locale: 'en-AU' });
++
++test.beforeAll(async () => {
++  server = await createViteServer({
++    root: WEB,
++    configFile: false,
++    cacheDir: mkdtempSync(join(tmpdir(), 'lf-web-')),
++    logLevel: 'error',
++    server: { host: '127.0.0.1', port: 0, strictPort: false, hmr: false },
++  });
++  await server.listen();
++  const addr = server.httpServer?.address();
++  if (!addr || typeof addr === 'string') throw new Error('web server has no port');
++  origin = `http://127.0.0.1:${String(addr.port)}`;
++});
++
++test.afterAll(async () => {
++  await server?.close();
++});
++
++type Role = keyof typeof ROLE_TEMPLATES;
++const ME: Record<string, { user_id: string; display_name: string; roles: Role[] }> = {
++  clerk: { user_id: id(0x8611), display_name: 'Lena Ortiz', roles: ['ap_clerk'] },
++  approver: { user_id: id(0x8612), display_name: 'Sam Nguyen', roles: ['approver'] },
++  both: { user_id: id(0x8613), display_name: 'Mei Tan', roles: ['ap_clerk', 'approver'] },
++  sales: { user_id: id(0x8614), display_name: 'Ari Cole', roles: ['ar_clerk'] },
++};
++
++const CODING = {
++  suppliers: [{ id: SUPPLIER, name: 'Officeworks-like Supplies Pty Ltd' }],
++  accounts: [
++    { id: LAPTOP, code: '1510', name: 'Computer equipment', type: 'asset' },
++    { id: OFFICE, code: '6100', name: 'Office expenses', type: 'expense' },
++  ],
++  tax_codes: [
++    { code: 'GST', name: 'GST on purchases', rate: '0.10000000' },
++    { code: 'GST-CAP', name: 'GST on capital purchases', rate: '0.10000000' },
++    { code: 'GST-FREE', name: 'GST-free purchases', rate: '0.00000000' },
++  ],
++};
++const ACCOUNT = new Map(CODING.accounts.map((a) => [a.id, a]));
++
++/** GP-008 as the engine previews and posts it. */
++const GP008 = [
++  ['6100', 'Office expenses', 'expense', '500.0000', '0.0000'],
++  ['1510', 'Computer equipment', 'asset', '2000.0000', '0.0000'],
++  ['2210', 'GST paid', 'asset', '250.0000', '0.0000'],
++  ['2100', 'Trade creditors', 'liability', '0.0000', '2750.0000'],
++].map(([code, name, type, debit, credit], i) => ({
++  line_no: i + 1,
++  account_id: id(0x8670 + i),
++  account_code: code,
++  account_name: name,
++  account_type: type,
++  debit,
++  credit,
++  party_id: i === 2 ? null : SUPPLIER,
++}));
++
++interface Step {
++  by: string;
++  you: boolean;
++  at: string;
++}
++interface FakeBill {
++  id: string;
++  bill_no: string | null;
++  status: 'draft' | 'posted';
++  awaiting_approval: boolean;
++  supplier_ref: string;
++  bill_date: string;
++  due_date: string;
++  lines: { description: string; account_id: string; tax_code: string; amount: string }[];
++  enteredBy: string;
++  submittedBy: string | null;
++  approvedBy: string | null;
++}
++
++interface Fake {
++  who: string;
++  errors: string[];
++  bills: Map<string, FakeBill>;
++  puts: unknown[];
++  calls: string[];
++}
++
++const posted: FakeBill = {
++  id: OLD,
++  bill_no: 'BILL-000044',
++  status: 'posted',
++  awaiting_approval: false,
++  supplier_ref: 'SUP-INV-700',
++  bill_date: '2026-10-20',
++  due_date: '2026-11-19',
++  lines: [{ description: 'Toner', account_id: OFFICE, tax_code: 'GST', amount: '80.00' }],
++  enteredBy: 'clerk',
++  submittedBy: 'clerk',
++  approvedBy: 'approver',
++};
++
++async function fakeApi(page: Page, who: string, seed: FakeBill[] = [posted]): Promise<Fake> {
++  const f: Fake = {
++    who,
++    errors: [],
++    bills: new Map(seed.map((b) => [b.id, structuredClone(b)])),
++    puts: [],
++    calls: [],
++  };
++  page.on('console', (m) => {
++    if (m.type() === 'error' && !/status of (401|403|404|409|422|503)/.test(m.text()))
++      f.errors.push(m.text());
++  });
++  page.on('pageerror', (e) => f.errors.push(String(e)));
++  const send = (route: Route, status: number, body: unknown) =>
++    route.fulfill({ status, json: body });
++  const totals = (b: FakeBill) =>
++    b.id === OLD
++      ? { net: '80.0000', tax: '8.0000', gross: '88.0000' }
++      : { net: '2500.0000', tax: '250.0000', gross: '2750.0000' };
++  const step = (key: string | null, at: string): Step | null => {
++    if (!key) return null;
++    const p = ME[key];
++    return { by: p?.display_name ?? '', you: key === f.who, at };
++  };
++  const row = (b: FakeBill) => ({
++    id: b.id,
++    bill_no: b.bill_no,
++    status: b.status,
++    awaiting_approval: b.awaiting_approval,
++    party_id: SUPPLIER,
++    supplier_name: 'Officeworks-like Supplies Pty Ltd',
++    supplier_ref: b.supplier_ref,
++    bill_date: b.bill_date,
++    due_date: b.due_date,
++    gross: totals(b).gross,
++  });
++  await page.route(
++    (url) => url.origin === origin && /^\/(auth|companies|ap)(\/|$)/.test(url.pathname),
++    async (route) => {
++      const req = route.request();
++      const url = new URL(req.url());
++      const path = url.pathname;
++      const me = ME[f.who];
++      if (!me) throw new Error(`unknown user ${f.who}`);
++      const perms = new Set(me.roles.flatMap((r) => ROLE_TEMPLATES[r].permissions));
++      const need = (p: string) =>
++        perms.has(p as never) ? null : send(route, 403, { error: 'forbidden', permission: p });
++      if (path === '/auth/me')
++        return send(route, 200, {
++          tenant_id: 't-harbour',
++          user_id: me.user_id,
++          display_name: me.display_name,
++        });
++      if (path === '/auth/me/access')
++        return send(route, 200, { roles: me.roles, permissions: [...perms] });
++      if (path === '/companies')
++        return send(route, 200, [{ id: CO, name: 'Harbour & Co Pty Ltd', base_currency: 'AUD' }]);
++      expect(url.searchParams.get('company_id')).toBe(CO);
++      f.calls.push(`${req.method()} ${path}`);
++      if (path === '/ap/bill-coding') return need('ap.bill.enter') ?? send(route, 200, CODING);
++      if (path === '/ap/bills' && req.method() === 'GET')
++        return (
++          need('ap.read') ??
++          send(route, 200, {
++            bills: [...f.bills.values()]
++              .sort((a, b) => (a.bill_date < b.bill_date ? 1 : -1))
++              .map(row),
++          })
++        );
++      const m = /^\/ap\/bills\/([^/]+)(?:\/(journal|submit|approve))?$/.exec(path);
++      if (!m?.[1]) return send(route, 404, { error: 'not_found' });
++      const billId = m[1];
++      const action = m[2];
++      if (req.method() === 'PUT') {
++        const denied = need('ap.bill.enter');
++        if (denied) return denied;
++        const body = req.postDataJSON() as Omit<FakeBill, 'id'> & { party_id: string };
++        f.puts.push(body);
++        f.bills.set(billId, {
++          id: billId,
++          bill_no: null,
++          status: 'draft',
++          awaiting_approval: false,
++          supplier_ref: body.supplier_ref,
++          bill_date: body.bill_date,
++          due_date: body.due_date || '2026-12-03',
++          lines: body.lines,
++          enteredBy: f.who,
++          submittedBy: null,
++          approvedBy: null,
++        });
++        return send(route, 201, { id: billId, status: 'draft', ...totals(f.bills.get(billId)!) });
++      }
++      const b = f.bills.get(billId);
++      if (!b) return send(route, 404, { error: 'not_found' });
++      if (action === 'submit') {
++        const denied = need('ap.bill.enter');
++        if (denied) return denied;
++        b.awaiting_approval = true;
++        b.submittedBy = f.who;
++        return send(route, 200, { id: b.id, status: 'draft', awaiting_approval: true });
++      }
++      if (action === 'approve') {
++        const denied = need('ap.bill.approve');
++        if (denied) return denied;
++        if (b.enteredBy === f.who)
++          return send(route, 403, { error: 'sod_violation', rule: 'SOD_BILL_SELF_APPROVAL' });
++        b.status = 'posted';
++        b.awaiting_approval = false;
++        b.bill_no = 'BILL-000045';
++        b.approvedBy = f.who;
++        return send(route, 200, { id: b.id, status: 'posted', bill_no: b.bill_no });
++      }
++      const denied = need('ap.read');
++      if (denied) return denied;
++      if (action === 'journal')
++        return send(route, 200, {
++          posted: b.status === 'posted',
++          entry_no: b.status === 'posted' ? 'JNL-000318' : null,
++          entry_date: b.bill_date,
++          requested_date: b.bill_date,
++          redirected: false,
++          base_currency: 'AUD',
++          total: '2750.0000',
++          lines: GP008,
++        });
++      const selfBlocked = b.enteredBy === f.who;
++      return send(route, 200, {
++        ...row(b),
++        currency: 'AUD',
++        ...totals(b),
++        entry_id: b.status === 'posted' ? ENTRY : null,
++        lines: b.lines.map((l, i) => ({
++          line_no: i + 1,
++          description: l.description,
++          account_id: l.account_id,
++          account_code: ACCOUNT.get(l.account_id)?.code ?? '',
++          account_name: ACCOUNT.get(l.account_id)?.name ?? '',
++          tax_code: l.tax_code,
++          amount: `${l.amount}00`,
++          net: null,
++          tax: null,
++          gross: null,
++        })),
++        entered: step(b.enteredBy, '2026-11-03T00:10:00.000Z'),
++        submitted: step(b.submittedBy, '2026-11-03T00:12:00.000Z'),
++        approved: step(b.approvedBy, '2026-11-03T03:30:00.000Z'),
++        approval: {
++          allowed: perms.has('ap.bill.approve') && !selfBlocked,
++          rule: selfBlocked ? 'SOD_BILL_SELF_APPROVAL' : null,
++          small_team_exception_required: false,
++          self_approval_threshold: '1000.0000',
++        },
++      });
++    },
++  );
++  return f;
++}
++
++async function open(page: Page, path: string, width: number) {
++  await page.setViewportSize({ width, height: width > 600 ? 900 : 844 });
++  await page.goto(`${origin}${path}`);
++  await expect(page.locator('h1')).toHaveCount(1);
++  await page.evaluate(() => document.fonts.ready);
++}
++
++async function assertPage(page: Page, width: number) {
++  expect((await page.title()).trim()).not.toBe('');
++  await expect(page.locator('main')).toHaveCount(1);
++  const sw = await page.evaluate(() => document.documentElement.scrollWidth);
++  expect(sw, 'no horizontal scroll').toBeLessThanOrEqual(width);
++  const axe = await new AxeBuilder({ page })
++    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
++    .analyze();
++  expect(
++    axe.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
++  ).toEqual([]);
++  expect(await page.evaluate(genericnessProbe)).toEqual({
++    shadows: [],
++    bigRadius: [],
++    caps: [],
++    purple: [],
++    dots: 0,
++    arrows: 0,
++  });
++  expect(await page.locator('main .primary').count()).toBeLessThanOrEqual(1);
++  for (const cell of await page.locator('main [data-amount]').all()) {
++    expect(await cell.getAttribute('data-amount')).toMatch(/^-?\d+\.\d{2}$/);
++  }
++}
++
++const journalAmounts = (page: Page, name: string) =>
++  page
++    .getByRole('table', { name })
++    .locator('tbody [data-amount]')
++    .evaluateAll((els) => els.map((e) => e.getAttribute('data-amount')));
++
++for (const width of [1440, 390]) {
++  test(`SS-UC05-08: Bill entry and approval screens @ ${String(width)} [T-0086]`, async ({
++    page,
++    evidence,
++  }) => {
++    const f = await fakeApi(page, 'clerk');
++    await open(page, '/purchases/bills', width);
++    await expect(page.getByRole('heading', { level: 1, name: 'Bills' })).toBeVisible();
++    const list = page.getByRole('table', { name: 'Bills' });
++    await expect(list.getByRole('row')).toHaveCount(2);
++    await expect(list.getByRole('row').nth(1)).toContainText('BILL-000044');
++    await expect(list.getByRole('row').nth(1)).toContainText('Posted');
++
++    // The AP Clerk enters and codes the GP-008 bill.
++    await page.getByRole('link', { name: 'Enter a bill' }).click();
++    await expect(page.getByRole('heading', { level: 1, name: 'Enter a bill' })).toBeVisible();
++    await page.getByLabel('Supplier', { exact: true }).selectOption({
++      label: 'Officeworks-like Supplies Pty Ltd',
++    });
++    await page.getByLabel("Supplier's invoice number").fill('SUP-INV-778');
++    await page.getByLabel('Bill date').fill('2026-11-03');
++    await page.getByLabel('Due date').fill('2026-11-30');
++    await page.getByLabel('Line 1 description').fill('Stationery and consumables');
++    await page.getByLabel('Line 1 account').selectOption({ label: '6100 Office expenses' });
++    await page.getByLabel('Line 1 tax code').selectOption('GST');
++    await page.getByLabel('Line 1 amount before GST').fill('500.00');
++    await page.getByRole('button', { name: 'Add a line' }).click();
++    await page.getByLabel('Line 2 description').fill('Laptop');
++    await page.getByLabel('Line 2 account').selectOption({ label: '1510 Computer equipment' });
++    await page.getByLabel('Line 2 tax code').selectOption('GST-CAP');
++    await page.getByLabel('Line 2 amount before GST').fill('2000.00');
++    await assertPage(page, width);
++    await evidence('SS-UC05-08', `bill-entry-coding-${String(width)}`);
++    await page.getByRole('button', { name: 'Save draft bill' }).click();
++
++    await expect(page.getByRole('heading', { level: 1, name: /^Draft bill/ })).toBeVisible();
++    expect(f.puts).toEqual([
++      {
++        company_id: CO,
++        party_id: SUPPLIER,
++        supplier_ref: 'SUP-INV-778',
++        bill_date: '2026-11-03',
++        due_date: '2026-11-30',
++        lines: [
++          {
++            description: 'Stationery and consumables',
++            account_id: OFFICE,
++            tax_code: 'GST',
++            amount: '500.00',
++          },
++          { description: 'Laptop', account_id: LAPTOP, tax_code: 'GST-CAP', amount: '2000.00' },
++        ],
++      },
++    ]);
++    const coding = page.getByRole('table', { name: 'Coding' });
++    await expect(coding.getByRole('row').nth(1)).toContainText('6100');
++    await expect(coding.getByRole('row').nth(1)).toContainText('Office expenses');
++    await expect(coding.getByRole('row').nth(1)).toContainText('GST');
++    await expect(coding.getByRole('row').nth(2)).toContainText('1510');
++    await expect(coding.getByRole('row').nth(2)).toContainText('GST-CAP');
++    expect(
++      await coding
++        .locator('[data-amount]')
++        .evaluateAll((els) => els.map((e) => e.getAttribute('data-amount'))),
++    ).toEqual(['500.00', '2000.00', '2500.00', '250.00', '2750.00']);
++
++    // Sent to the Approver queue; nothing posts.
++    await page.getByRole('button', { name: 'Send for approval' }).click();
++    await expect(page.getByText('Waiting for approval', { exact: true })).toBeVisible();
++    await expect(page.getByRole('button', { name: 'Send for approval' })).toHaveCount(0);
++    await assertPage(page, width);
++    await evidence('SS-UC05-08', `bill-sent-for-approval-${String(width)}`);
++    expect(f.calls.filter((c) => c.endsWith('/approve'))).toEqual([]);
++
++    // The Approver sees who entered it, the journal preview, and approves.
++    f.who = 'approver';
++    await page.reload();
++    await expect(page.getByRole('heading', { level: 1, name: /^Draft bill/ })).toBeVisible();
++    const people = page.getByRole('list', { name: 'People involved' });
++    await expect(people).toContainText('Entered by Lena Ortiz');
++    await expect(people).toContainText('Sent for approval by Lena Ortiz');
++    await expect(people).toContainText('Approver: Sam Nguyen (you)');
++    await page.getByRole('button', { name: 'Show me the journal' }).click();
++    await expect(page.getByRole('region', { name: 'Journal' })).toContainText(
++      'Nothing is posted yet.',
++    );
++    expect(await journalAmounts(page, 'Journal preview')).toEqual([
++      '500.00',
++      '2000.00',
++      '250.00',
++      '2750.00',
++    ]);
++    await expect(page.getByRole('table', { name: 'Journal preview' })).toContainText('Balanced');
++    await assertPage(page, width);
++    await evidence('SS-UC05-08', `bill-approval-preview-${String(width)}`);
++
++    await page.getByRole('button', { name: 'Approve and post' }).click();
++    await expect(page.getByRole('heading', { level: 1, name: 'Bill BILL-000045' })).toBeVisible();
++    await expect(page.getByText('Posted', { exact: true })).toBeVisible();
++    await expect(page.getByRole('list', { name: 'People involved' })).toContainText(
++      'Approved by Sam Nguyen (you)',
++    );
++    expect(await journalAmounts(page, 'Journal JNL-000318')).toEqual([
++      '500.00',
++      '2000.00',
++      '250.00',
++      '2750.00',
++    ]);
++    await expect(page.getByRole('region', { name: 'Journal' })).toContainText('posted');
++    await expect(page.getByRole('button', { name: /delete/i })).toHaveCount(0);
++    await assertPage(page, width);
++    await evidence('SS-UC05-08', `bill-posted-journal-${String(width)}`);
++    expect(f.errors).toEqual([]);
++  });
++}
++
++const waiting: FakeBill = {
++  id: id(0x8602),
++  bill_no: null,
++  status: 'draft',
++  awaiting_approval: true,
++  supplier_ref: 'SUP-INV-778',
++  bill_date: '2026-11-03',
++  due_date: '2026-11-30',
++  lines: [
++    {
++      description: 'Stationery and consumables',
++      account_id: OFFICE,
++      tax_code: 'GST',
++      amount: '500.00',
++    },
++    { description: 'Laptop', account_id: LAPTOP, tax_code: 'GST-CAP', amount: '2000.00' },
++  ],
++  enteredBy: 'both',
++  submittedBy: 'both',
++  approvedBy: null,
++};
++
++test('T-0086: whoever entered a bill above the limit sees Approve disabled, with the rule in words', async ({
++  page,
++}) => {
++  const f = await fakeApi(page, 'both', [waiting]);
++  await open(page, `/purchases/bills/${waiting.id}`, 1440);
++  const approve = page.getByRole('button', { name: 'Approve and post' });
++  await expect(approve).toBeDisabled();
++  const describedBy = await approve.getAttribute('aria-describedby');
++  expect(describedBy).toBeTruthy();
++  const why = (await page.locator(`[id="${describedBy ?? ''}"]`).textContent()) ?? '';
++  expect(why.length).toBeGreaterThanOrEqual(20);
++  expect(why).toContain('1,000.00');
++  await expect(page.getByRole('list', { name: 'People involved' })).toContainText(
++    'Entered by Mei Tan (you)',
++  );
++  await assertPage(page, 1440);
++  expect(f.calls.filter((c) => c.endsWith('/approve'))).toEqual([]);
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0086: an Approver cannot enter bills and sees the queue word', async ({ page }) => {
++  const f = await fakeApi(page, 'approver', [posted, waiting]);
++  await open(page, '/purchases/bills', 1440);
++  const list = page.getByRole('table', { name: 'Bills' });
++  await expect(list.getByRole('row')).toHaveCount(3);
++  await expect(list.getByRole('row').nth(1)).toContainText('Waiting for approval');
++  await expect(page.getByRole('link', { name: 'Enter a bill' })).toHaveCount(0);
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0086: a user without ap.read is told so, and nothing is listed', async ({ page }) => {
++  const f = await fakeApi(page, 'sales');
++  await open(page, '/purchases/bills', 1440);
++  await expect(page.getByText(/do not have access/i)).toBeVisible();
++  await expect(page.getByRole('table', { name: 'Bills' })).toHaveCount(0);
++  expect(f.calls).toEqual([]);
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0086: the entry form says what is missing and sends nothing', async ({ page }) => {
++  const f = await fakeApi(page, 'clerk');
++  await open(page, '/purchases/bills/new', 1440);
++  await page.getByLabel('Line 1 amount before GST').fill('12.345');
++  await page.getByRole('button', { name: 'Save draft bill' }).click();
++  const alert = page.getByRole('alert');
++  await expect(alert).toContainText('Choose the supplier');
++  await expect(alert).toContainText('Line 1: the amount needs at most two decimals');
++  expect(f.puts).toEqual([]);
++  expect(f.errors).toEqual([]);
++});
+-- 
+2.43.0
+

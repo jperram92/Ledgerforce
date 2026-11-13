@@ -1,0 +1,1415 @@
+From 10ecaae7d6fb5fac27308df2d31fbad175366884 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 08:12:17 +0000
+Subject: [PATCH 1/2] wip(T-0089): save agent work interrupted by the usage
+ limit (unverified)
+
+What changed: Uncommitted work of the T-0089 sub-agent, saved by the lead as-is.
+Why: The agent stopped on the 5-hour usage limit; the container may not survive.
+Validation: none by the lead; the agent resumes and validates.
+Next action: the agent continues from this commit.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .agent/evidence/T-0089/red-api.txt          |  30 +
+ .agent/evidence/T-0089/red-e2e-20261113.txt |  40 ++
+ apps/api/src/reports/reports.controller.ts  | 116 +++-
+ apps/api/src/reports/reports.db.test.ts     | 118 ++++
+ apps/web/src/reports/client.ts              | 210 ++++++
+ apps/web/src/reports/logic.test.ts          |  94 +++
+ tests/e2e/web/reports.spec.ts               | 707 ++++++++++++++++++++
+ 7 files changed, 1314 insertions(+), 1 deletion(-)
+ create mode 100644 .agent/evidence/T-0089/red-api.txt
+ create mode 100644 .agent/evidence/T-0089/red-e2e-20261113.txt
+ create mode 100644 apps/web/src/reports/client.ts
+ create mode 100644 apps/web/src/reports/logic.test.ts
+ create mode 100644 tests/e2e/web/reports.spec.ts
+
+diff --git a/.agent/evidence/T-0089/red-api.txt b/.agent/evidence/T-0089/red-api.txt
+new file mode 100644
+index 0000000..0e8784e
+--- /dev/null
++++ b/.agent/evidence/T-0089/red-api.txt
+@@ -0,0 +1,30 @@
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
++
++ FAIL  |api-db| apps/api/src/reports/reports.db.test.ts > SS-RPT-07 trial balance, P&L and balance sheet routes [T-0089] > needs reports.run (403 for an AP clerk), refuses bad queries (400) and dates outside any year (422)
++AssertionError: expected [ …(2) ] to deeply equal [ …(2) ]
++
++- Expected
+++ Received
++
++  [
++    "/gl/trial-balance?company_id=01a1d30b-042f-7e60-81de-783ecae9360a&to=2026-11-30",
++-   403,
+++   404,
++  ]
++
++ ❯ apps/api/src/reports/reports.db.test.ts:243:53
++    241|       `/gl/balance-sheet?company_id=${co}&as_at=2026-11-30`,
++    242|     ])
++    243|       expect([q, (await get(q, 'apClerk')).status]).toEqual([q, 403]);
++       |                                                     ^
++    244|     for (const q of [
++    245|       `/gl/trial-balance?company_id=nope&to=2026-11-30`,
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
++
++
++ Test Files  1 failed (1)
++      Tests  4 failed | 4 passed (8)
++   Start at  03:54:32
++   Duration  4.56s (transform 1.46s, setup 0ms, import 2.51s, tests 1.21s, environment 0ms)
++
+diff --git a/.agent/evidence/T-0089/red-e2e-20261113.txt b/.agent/evidence/T-0089/red-e2e-20261113.txt
+new file mode 100644
+index 0000000..23565bf
+--- /dev/null
++++ b/.agent/evidence/T-0089/red-e2e-20261113.txt
+@@ -0,0 +1,40 @@
++      702 |   ])
++    > 703 |     await expect(nav.getByRole('link', { name, exact: true })).toBeVisible();
++          |                                                                ^
++      704 |   expect(f.errors).toEqual([]);
++      705 | });
++      706 |
++        at /home/user/Ledgerforce/.claude/worktrees/agent-a5d9b8412f1498143/tests/e2e/web/reports.spec.ts:703:64
++
++    Error Context: test-results/web-reports-T-0089-the-Reports-page-lists-the-six-reports-chromium/error-context.md
++
++    Error Context: test-results/web-reports-T-0089-the-Reports-page-lists-the-six-reports-chromium/error-context.md
++
++    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
++    test-results/web-reports-T-0089-the-Reports-page-lists-the-six-reports-chromium/trace.zip
++    Usage:
++
++        pnpm exec playwright show-trace test-results/web-reports-T-0089-the-Reports-page-lists-the-six-reports-chromium/trace.zip
++
++    ────────────────────────────────────────────────────────────────────────────────────────────────
++
++  19 failed
++    [chromium] › tests/e2e/web/reports.spec.ts:422:3 › SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ 1440 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:475:3 › SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ 1440 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:503:3 › SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ 1440 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:531:3 › SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ 1440 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:559:3 › SS-RPT-05: Aged receivables buckets each customer, totals from the API @ 1440 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:583:3 › SS-RPT-06: Aged payables buckets each supplier @ 1440 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:422:3 › SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ 390 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:475:3 › SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ 390 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:503:3 › SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ 390 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:531:3 › SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ 390 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:559:3 › SS-RPT-05: Aged receivables buckets each customer, totals from the API @ 390 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:583:3 › SS-RPT-06: Aged payables buckets each supplier @ 390 [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:607:1 › SS-RPT-08: Download CSV writes the figures the API returned [T-0089] 
++    [chromium] › tests/e2e/web/reports.spec.ts:625:1 › T-0089: changing the dates asks the API again and the URL keeps them 
++    [chromium] › tests/e2e/web/reports.spec.ts:638:1 › T-0089: without dates the reports start at this month and today 
++    [chromium] › tests/e2e/web/reports.spec.ts:650:1 › T-0089: an AP clerk is told who can run the trial balance, and sees no figures 
++    [chromium] › tests/e2e/web/reports.spec.ts:663:1 › T-0089: a refused report says why, and a date with no fiscal year is explained 
++    [chromium] › tests/e2e/web/reports.spec.ts:679:1 › T-0089: a period with nothing posted says so instead of an empty table 
++    [chromium] › tests/e2e/web/reports.spec.ts:691:1 › T-0089: the Reports page lists the six reports 
+diff --git a/apps/api/src/reports/reports.controller.ts b/apps/api/src/reports/reports.controller.ts
+index 15949d5..dd651c9 100644
+--- a/apps/api/src/reports/reports.controller.ts
++++ b/apps/api/src/reports/reports.controller.ts
+@@ -4,6 +4,9 @@
+  *
+  *  - GET /gl/detail?company_id&(period_id | [from]&to)&account_id*&dimension_value_id*&party_id
+  *    → reports.run. account_id and dimension_value_id repeat or take comma-separated lists.
++ *  - GET /gl/trial-balance?company_id&[from]&to&dimension_value_id* → reports.run (T-0089)
++ *  - GET /gl/profit-and-loss?company_id&from&to&dimension_value_id* → reports.run (T-0089)
++ *  - GET /gl/balance-sheet?company_id&as_at → reports.run (T-0089)
+  *  - GET /ap/aged-payables?company_id&as_of → ap.read
+  *  - GET /ar/aged-receivables?company_id&as_of → ar.read
+  *
+@@ -19,7 +22,15 @@ import {
+ } from '@nestjs/common';
+ import { agedPayables } from '@ledgerforce/ap';
+ import { agedReceivables } from '@ledgerforce/ar';
+-import { glDetailReport, ReportError, type GlDetailReport } from '@ledgerforce/reporting';
++import {
++  balanceSheetReport,
++  glDetailReport,
++  profitAndLossReport,
++  ReportError,
++  trialBalanceReport,
++  type GlDetailReport,
++  type StatementSection,
++} from '@ledgerforce/reporting';
+ import { RequirePermission } from '../authz/permission.decorator.ts';
+ import { TenantTx } from '../tenancy/tenant-tx.ts';
+ 
+@@ -94,6 +105,25 @@ function glDetailView(r: GlDetailReport) {
+   };
+ }
+ 
++/** A P&L or balance-sheet section with its money as decimal strings (T-0089). */
++function sectionView(s: StatementSection) {
++  return {
++    type: s.type,
++    total: s.total.toNumericString(),
++    groups: s.groups.map((g) => ({
++      subtype: g.subtype,
++      total: g.total.toNumericString(),
++      lines: g.lines.map((l) => ({
++        account_id: l.accountId,
++        code: l.code,
++        name: l.name,
++        amount: l.amount.toNumericString(),
++        computed: l.computed === true,
++      })),
++    })),
++  };
++}
++
+ @Controller()
+ export class ReportsController {
+   constructor(private readonly tx: TenantTx) {}
+@@ -125,6 +155,90 @@ export class ReportsController {
+     return glDetailView(r);
+   }
+ 
++  @Get('gl/trial-balance')
++  @RequirePermission('reports.run')
++  async trialBalance(
++    @Query('company_id') companyId: unknown,
++    @Query('from') from: unknown,
++    @Query('to') to: unknown,
++    @Query('dimension_value_id') dimensionValueIds: unknown,
++  ) {
++    const f = optional(from, 'from');
++    const r = await trialBalanceReport(this.tx.get(), {
++      companyId: companyOf(companyId),
++      from: f === undefined ? null : dateOf(f, 'from'),
++      to: dateOf(to, 'to'),
++      dimensionValueIds: list(dimensionValueIds, 'dimension_value_id'),
++    }).catch(refusal);
++    return {
++      company_id: r.companyId,
++      currency: r.currency,
++      from: r.from,
++      to: r.to,
++      dimension_value_ids: r.dimensionValueIds,
++      rows: r.rows.map((row) => ({
++        account_id: row.accountId,
++        code: row.code,
++        name: row.name,
++        type: row.type,
++        subtype: row.subtype,
++        debit: row.debit.toNumericString(),
++        credit: row.credit.toNumericString(),
++      })),
++      total_debit: r.totalDebit.toNumericString(),
++      total_credit: r.totalCredit.toNumericString(),
++      nets_to_zero: r.netsToZero,
++    };
++  }
++
++  @Get('gl/profit-and-loss')
++  @RequirePermission('reports.run')
++  async profitAndLoss(
++    @Query('company_id') companyId: unknown,
++    @Query('from') from: unknown,
++    @Query('to') to: unknown,
++    @Query('dimension_value_id') dimensionValueIds: unknown,
++  ) {
++    const r = await profitAndLossReport(this.tx.get(), {
++      companyId: companyOf(companyId),
++      from: dateOf(from, 'from'),
++      to: dateOf(to, 'to'),
++      dimensionValueIds: list(dimensionValueIds, 'dimension_value_id'),
++    }).catch(refusal);
++    return {
++      company_id: r.companyId,
++      currency: r.currency,
++      from: r.from,
++      to: r.to,
++      dimension_value_ids: r.dimensionValueIds,
++      revenue: sectionView(r.revenue),
++      expenses: sectionView(r.expenses),
++      net_profit: r.netProfit.toNumericString(),
++    };
++  }
++
++  @Get('gl/balance-sheet')
++  @RequirePermission('reports.run')
++  async balanceSheet(@Query('company_id') companyId: unknown, @Query('as_at') asAt: unknown) {
++    const r = await balanceSheetReport(this.tx.get(), {
++      companyId: companyOf(companyId),
++      asAt: dateOf(asAt, 'as_at'),
++    }).catch(refusal);
++    return {
++      company_id: r.companyId,
++      currency: r.currency,
++      as_at: r.asAt,
++      fiscal_year: r.fiscalYear,
++      assets: sectionView(r.assets),
++      liabilities: sectionView(r.liabilities),
++      equity: sectionView(r.equity),
++      total_liabilities_and_equity: r.totalLiabilitiesAndEquity.toNumericString(),
++      prior_years_earnings: r.priorYearsEarnings.toNumericString(),
++      current_year_earnings: r.currentYearEarnings.toNumericString(),
++      balanced: r.balanced,
++    };
++  }
++
+   @Get('ap/aged-payables')
+   @RequirePermission('ap.read')
+   agedPayables(@Query('company_id') companyId: unknown, @Query('as_of') asOf: unknown) {
+diff --git a/apps/api/src/reports/reports.db.test.ts b/apps/api/src/reports/reports.db.test.ts
+index 668fa94..4d20a90 100644
+--- a/apps/api/src/reports/reports.db.test.ts
++++ b/apps/api/src/reports/reports.db.test.ts
+@@ -138,3 +138,121 @@ describe('SS-PLAT-108/109 report routes [T-0077]', () => {
+     ).toBe(422);
+   });
+ });
++
++type Section = {
++  type: string;
++  total: string;
++  groups: {
++    subtype: string;
++    total: string;
++    lines: { code: string; amount: string; computed: boolean }[];
++  }[];
++};
++
++describe('SS-RPT-07 trial balance, P&L and balance sheet routes [T-0089]', () => {
++  it('GET /gl/trial-balance lists each account on its side with decimal-string totals', async () => {
++    const res = await get(
++      `/gl/trial-balance?company_id=${f.companyId}&from=2026-11-01&to=2026-11-30`,
++      'accountant',
++    );
++    expect(res.status).toBe(200);
++    const body = (await res.json()) as {
++      currency: string;
++      from: string | null;
++      to: string;
++      rows: { code: string; type: string; debit: string; credit: string }[];
++      total_debit: string;
++      total_credit: string;
++      nets_to_zero: boolean;
++    };
++    expect(body).toMatchObject({
++      currency: 'AUD',
++      from: '2026-11-01',
++      to: '2026-11-30',
++      total_debit: '1100.0000',
++      total_credit: '1100.0000',
++      nets_to_zero: true,
++    });
++    expect(body.rows.map((r) => [r.code, r.debit, r.credit])).toEqual([
++      ['2000', '0.0000', '1100.0000'],
++      ['6230', '1100.0000', '0.0000'],
++    ]);
++    const open = await get(`/gl/trial-balance?company_id=${f.companyId}&to=2026-11-30`, 'accountant');
++    expect(((await open.json()) as { from: string | null }).from).toBeNull();
++  });
++
++  it('GET /gl/profit-and-loss groups expenses by subtype and returns the net profit', async () => {
++    const res = await get(
++      `/gl/profit-and-loss?company_id=${f.companyId}&from=2026-11-01&to=2026-11-30`,
++      'accountant',
++    );
++    expect(res.status).toBe(200);
++    const body = (await res.json()) as {
++      currency: string;
++      revenue: Section;
++      expenses: Section;
++      net_profit: string;
++    };
++    expect(body.currency).toBe('AUD');
++    expect(body.revenue).toEqual({ type: 'revenue', total: '0.0000', groups: [] });
++    expect(body.expenses.total).toBe('1100.0000');
++    expect(body.expenses.groups.flatMap((g) => g.lines.map((l) => [l.code, l.amount]))).toEqual([
++      ['6230', '1100.0000'],
++    ]);
++    expect(body.net_profit).toBe('-1100.0000');
++  });
++
++  it('GET /gl/balance-sheet balances, with the year to date on the current-year earnings line', async () => {
++    const res = await get(
++      `/gl/balance-sheet?company_id=${f.companyId}&as_at=2026-11-30`,
++      'accountant',
++    );
++    expect(res.status).toBe(200);
++    const body = (await res.json()) as {
++      as_at: string;
++      fiscal_year: { label: string; start: string; end: string };
++      assets: Section;
++      liabilities: Section;
++      equity: Section;
++      total_liabilities_and_equity: string;
++      current_year_earnings: string;
++      prior_years_earnings: string;
++      balanced: boolean;
++    };
++    expect(body).toMatchObject({
++      as_at: '2026-11-30',
++      total_liabilities_and_equity: '0.0000',
++      current_year_earnings: '-1100.0000',
++      prior_years_earnings: '0.0000',
++      balanced: true,
++    });
++    expect(body.fiscal_year.start).toBe('2026-07-01');
++    expect(body.assets.total).toBe('0.0000');
++    expect(body.liabilities.total).toBe('1100.0000');
++    const equity = body.equity.groups.flatMap((g) => g.lines);
++    expect(equity.filter((l) => l.computed).map((l) => l.amount)).toEqual(['0.0000', '-1100.0000']);
++  });
++
++  it('needs reports.run (403 for an AP clerk), refuses bad queries (400) and dates outside any year (422)', async () => {
++    const co = f.companyId;
++    for (const q of [
++      `/gl/trial-balance?company_id=${co}&to=2026-11-30`,
++      `/gl/profit-and-loss?company_id=${co}&from=2026-11-01&to=2026-11-30`,
++      `/gl/balance-sheet?company_id=${co}&as_at=2026-11-30`,
++    ])
++      expect([q, (await get(q, 'apClerk')).status]).toEqual([q, 403]);
++    for (const q of [
++      `/gl/trial-balance?company_id=nope&to=2026-11-30`,
++      `/gl/trial-balance?company_id=${co}`,
++      `/gl/trial-balance?company_id=${co}&from=2026-12-01&to=2026-11-30`,
++      `/gl/profit-and-loss?company_id=${co}&to=2026-11-30`,
++      `/gl/profit-and-loss?company_id=${co}&from=2026-11-01&to=2026-02-30`,
++      `/gl/balance-sheet?company_id=${co}`,
++      `/gl/balance-sheet?company_id=${co}&as_at=30-11-2026`,
++    ])
++      expect([q, (await get(q, 'accountant')).status]).toEqual([q, 400]);
++    expect(
++      (await get(`/gl/balance-sheet?company_id=${co}&as_at=2001-01-31`, 'accountant')).status,
++    ).toBe(422);
++  });
++});
+diff --git a/apps/web/src/reports/client.ts b/apps/web/src/reports/client.ts
+new file mode 100644
+index 0000000..cca37da
+--- /dev/null
++++ b/apps/web/src/reports/client.ts
+@@ -0,0 +1,210 @@
++/**
++ * Reports API client (T-0089): trial balance, profit and loss, balance sheet, general-ledger detail
++ * (apps/api ReportsController, T-0077/T-0089) and aged receivables / payables. Same origin, session
++ * cookie; failures are AdminApiError (status + error code). Money stays the API's decimal string:
++ * the screens format it for reading and never add it up.
++ */
++import type { AppEnv } from '../env.tsx';
++import { AdminApiError } from '../admin/client.ts';
++
++export interface ReportCompany {
++  id: string;
++  name: string;
++  base_currency: string;
++}
++
++export interface TrialBalanceRow {
++  account_id: string;
++  code: string;
++  name: string;
++  type: string;
++  subtype: string;
++  debit: string;
++  credit: string;
++}
++
++export interface TrialBalance {
++  currency: string;
++  from: string | null;
++  to: string;
++  rows: TrialBalanceRow[];
++  total_debit: string;
++  total_credit: string;
++  nets_to_zero: boolean;
++}
++
++export interface StatementLine {
++  account_id: string;
++  code: string;
++  name: string;
++  amount: string;
++  /** Worked out by the report (retained / current-year earnings), not a posted balance. */
++  computed: boolean;
++}
++
++export interface StatementSection {
++  type: string;
++  total: string;
++  groups: { subtype: string; total: string; lines: StatementLine[] }[];
++}
++
++export interface ProfitAndLoss {
++  currency: string;
++  from: string;
++  to: string;
++  revenue: StatementSection;
++  expenses: StatementSection;
++  net_profit: string;
++}
++
++export interface BalanceSheet {
++  currency: string;
++  as_at: string;
++  fiscal_year: { label: string; start: string; end: string };
++  assets: StatementSection;
++  liabilities: StatementSection;
++  equity: StatementSection;
++  total_liabilities_and_equity: string;
++  prior_years_earnings: string;
++  current_year_earnings: string;
++  balanced: boolean;
++}
++
++export interface GlDetailLine {
++  entry_id: string;
++  entry_no: string | null;
++  line_no: number;
++  date: string;
++  source_type: string;
++  memo: string | null;
++  party_id: string | null;
++  party_name: string | null;
++  debit: string;
++  credit: string;
++  balance: string;
++}
++
++export interface GlDetailAccount {
++  account_id: string;
++  code: string;
++  name: string;
++  type: string;
++  opening: string;
++  lines: GlDetailLine[];
++  total_debit: string;
++  total_credit: string;
++  closing: string;
++}
++
++export interface GlDetail {
++  currency: string;
++  from: string | null;
++  to: string;
++  accounts: GlDetailAccount[];
++  total_debit: string;
++  total_credit: string;
++}
++
++export const AGE_BUCKETS = ['current', 'days1to30', 'days31to60', 'days61to90', 'days90plus'] as const;
++export type AgeBucket = (typeof AGE_BUCKETS)[number];
++
++export type AgedRow = { partyId: string; partyName: string; total: string } & Record<
++  AgeBucket,
++  string
++>;
++
++export interface Aged {
++  asOf: string;
++  rows: AgedRow[];
++  totals: Record<AgeBucket | 'total', string>;
++}
++
++export interface RangeQuery {
++  from?: string | null | undefined;
++  to: string;
++}
++
++export interface GlDetailQuery extends RangeQuery {
++  accountId?: string | undefined;
++  partyId?: string | undefined;
++}
++
++export interface ReportsClient {
++  companies(): Promise<ReportCompany[]>;
++  trialBalance(companyId: string, q: RangeQuery): Promise<TrialBalance>;
++  profitAndLoss(companyId: string, q: { from: string; to: string }): Promise<ProfitAndLoss>;
++  balanceSheet(companyId: string, asAt: string): Promise<BalanceSheet>;
++  glDetail(companyId: string, q: GlDetailQuery): Promise<GlDetail>;
++  agedReceivables(companyId: string, asOf: string): Promise<Aged>;
++  agedPayables(companyId: string, asOf: string): Promise<Aged>;
++}
++
++/** `?company_id=…&from=…` in the given order, leaving out empty values. */
++export function query(pairs: [string, string | null | undefined][]): string {
++  const p = new URLSearchParams();
++  for (const [k, v] of pairs) if (v) p.append(k, v);
++  return `?${p.toString()}`;
++}
++
++export function createReportsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): ReportsClient {
++  async function get<T>(path: string): Promise<T> {
++    const res = await env.fetch(`${env.apiBase}${path}`, {
++      method: 'GET',
++      credentials: 'same-origin',
++      headers: { accept: 'application/json' },
++    });
++    const data: unknown = await res.json().catch(() => null);
++    if (!res.ok) throw new AdminApiError(res.status, data);
++    return data as T;
++  }
++  return {
++    companies: () => get('/companies'),
++    trialBalance: (co, q) =>
++      get(
++        `/gl/trial-balance${query([
++          ['company_id', co],
++          ['from', q.from],
++          ['to', q.to],
++        ])}`,
++      ),
++    profitAndLoss: (co, q) =>
++      get(
++        `/gl/profit-and-loss${query([
++          ['company_id', co],
++          ['from', q.from],
++          ['to', q.to],
++        ])}`,
++      ),
++    balanceSheet: (co, asAt) =>
++      get(
++        `/gl/balance-sheet${query([
++          ['company_id', co],
++          ['as_at', asAt],
++        ])}`,
++      ),
++    glDetail: (co, q) =>
++      get(
++        `/gl/detail${query([
++          ['company_id', co],
++          ['from', q.from],
++          ['to', q.to],
++          ['account_id', q.accountId],
++          ['party_id', q.partyId],
++        ])}`,
++      ),
++    agedReceivables: (co, asOf) =>
++      get(
++        `/ar/aged-receivables${query([
++          ['company_id', co],
++          ['as_of', asOf],
++        ])}`,
++      ),
++    agedPayables: (co, asOf) =>
++      get(
++        `/ap/aged-payables${query([
++          ['company_id', co],
++          ['as_of', asOf],
++        ])}`,
++      ),
++  };
++}
+diff --git a/apps/web/src/reports/logic.test.ts b/apps/web/src/reports/logic.test.ts
+new file mode 100644
+index 0000000..a1d401b
+--- /dev/null
++++ b/apps/web/src/reports/logic.test.ts
+@@ -0,0 +1,94 @@
++/** Report screen helpers (T-0089): CSV export, dates, search params, plain words. */
++import { describe, expect, it } from 'vitest';
++import { AdminApiError } from '../admin/client.ts';
++import {
++  csvAmount,
++  csvText,
++  dateRange,
++  dayOnly,
++  localToday,
++  monthStart,
++  readersOf,
++  reportMessage,
++  subtypeWord,
++  toCsv,
++} from './logic.ts';
++
++describe('CSV export [T-0089]', () => {
++  it('joins rows with CRLF behind a byte-order mark and quotes only when needed', () => {
++    expect(
++      toCsv([
++        ['Code', 'Account'],
++        [csvText('1010'), csvText('Operating, main')],
++        [csvText('3000'), csvText('Say "hi"\nthere')],
++      ]),
++    ).toBe('﻿Code,Account\r\n1010,"Operating, main"\r\n3000,"Say ""hi""\nthere"\r\n');
++  });
++
++  it('defuses spreadsheet formulas in text but keeps amounts as plain numbers', () => {
++    expect(csvText('=HYPERLINK("x")')).toBe(`"'=HYPERLINK(""x"")"`);
++    expect(csvText('+61 2')).toBe("'+61 2");
++    expect(csvText('-x')).toBe("'-x");
++    expect(csvText('@SUM')).toBe("'@SUM");
++    expect(csvAmount('-1100.0000')).toBe('-1100.00');
++    expect(csvAmount('12450.0000')).toBe('12450.00');
++    expect(csvAmount('0.005')).toBe('0.01');
++  });
++
++  it('refuses a JS number as an amount', () => {
++    expect(() => csvAmount(1.5 as unknown as string)).toThrow(TypeError);
++  });
++});
++
++describe('dates [T-0089]', () => {
++  it('reads today and the month start in local time', () => {
++    const d = new Date(2026, 10, 13, 23, 30);
++    expect(localToday(d)).toBe('2026-11-13');
++    expect(monthStart('2026-11-13')).toBe('2026-11-01');
++  });
++
++  it('keeps only real YYYY-MM-DD days from the URL', () => {
++    expect(dayOnly('2026-11-30')).toBe('2026-11-30');
++    expect(dayOnly('2026-02-30')).toBeUndefined();
++    expect(dayOnly('30-11-2026')).toBeUndefined();
++    expect(dayOnly(7)).toBeUndefined();
++  });
++
++  it('defaults a range to this month, and an open start only where the report allows it', () => {
++    expect(dateRange({}, '2026-11-13', true)).toEqual({ from: '2026-11-01', to: '2026-11-13' });
++    expect(dateRange({ to: '2026-10-31' }, '2026-11-13', true)).toEqual({
++      from: null,
++      to: '2026-10-31',
++    });
++    expect(dateRange({ to: '2026-10-31' }, '2026-11-13', false)).toEqual({
++      from: '2026-10-01',
++      to: '2026-10-31',
++    });
++    expect(dateRange({ from: '2026-07-01' }, '2026-11-13', false)).toEqual({
++      from: '2026-07-01',
++      to: '2026-11-13',
++    });
++  });
++});
++
++describe('plain words [T-0089]', () => {
++  it('names account kinds, and falls back to the subtype in words', () => {
++    expect(subtypeWord('operating_revenue')).toBe('Operating income');
++    expect(subtypeWord('receivable')).toBe('Money customers owe you');
++    expect(subtypeWord('made_up_kind')).toBe('Made up kind');
++  });
++
++  it('lists the roles that hold a permission from the role templates', () => {
++    expect(readersOf('reports.run')).toBe('Owners, Finance Admins, Accountants and Auditors');
++  });
++
++  it('explains report refusals, and keeps other errors to the shared wording', () => {
++    expect(
++      reportMessage(new AdminApiError(422, { error: 'NO_FISCAL_YEAR', message: 'x' })),
++    ).toMatch(/no financial year that holds this date/);
++    expect(
++      reportMessage(new AdminApiError(400, { error: 'invalid_report_query', message: 'x' })),
++    ).toMatch(/Check the dates/);
++    expect(reportMessage(new Error('offline'))).toMatch(/did not answer/);
++  });
++});
+diff --git a/tests/e2e/web/reports.spec.ts b/tests/e2e/web/reports.spec.ts
+new file mode 100644
+index 0000000..1554c42
+--- /dev/null
++++ b/tests/e2e/web/reports.spec.ts
+@@ -0,0 +1,707 @@
++/**
++ * Report screens (T-0089, design §8.1, DL-0450): trial balance, profit and loss, balance sheet,
++ * general-ledger detail and aged receivables / payables. Every figure on screen is the API's
++ * decimal string, formatted for reading; totals and the balanced flags come from the API, never
++ * from the browser. The app is served by Vite; the API is faked per test with `page.route` using
++ * the response shapes of GET /gl/trial-balance, /gl/profit-and-loss, /gl/balance-sheet,
++ * /gl/detail (apps/api ReportsController), /ar/aged-receivables and /ap/aged-payables.
++ */
++import { readFileSync, mkdtempSync } from 'node:fs';
++import { tmpdir } from 'node:os';
++import { join, resolve } from 'node:path';
++import { AxeBuilder } from '@axe-core/playwright';
++import type { Page, Route } from '@playwright/test';
++import { createViteServer } from 'vitest/node';
++import { test, expect } from '@ledgerforce/testing/evidence';
++import { ROLE_TEMPLATES } from '../../../packages/shared/src/rbac/index.ts';
++import { genericnessProbe } from '../fixtures/genericness.ts';
++
++const WEB = resolve(import.meta.dirname, '..', '..', '..', 'apps', 'web');
++const id = (n: number) => `01900000-0000-7000-8000-${n.toString(16).padStart(12, '0')}`;
++const CO = id(0x89c1);
++const ACME = id(0x89a1);
++const SALTBUSH = id(0x89a2);
++const TELCO = id(0x89a3);
++
++let server: Awaited<ReturnType<typeof createViteServer>> | undefined;
++let origin = '';
++
++test.use({ evidenceTaskId: 'T-0089', timezoneId: 'Australia/Sydney', locale: 'en-AU' });
++
++test.beforeAll(async () => {
++  server = await createViteServer({
++    root: WEB,
++    configFile: false,
++    cacheDir: mkdtempSync(join(tmpdir(), 'lf-web-')),
++    logLevel: 'error',
++    server: { host: '127.0.0.1', port: 0, strictPort: false, hmr: false },
++  });
++  await server.listen();
++  const addr = server.httpServer?.address();
++  if (!addr || typeof addr === 'string') throw new Error('web server has no port');
++  origin = `http://127.0.0.1:${String(addr.port)}`;
++});
++
++test.afterAll(async () => {
++  await server?.close();
++});
++
++const ME = {
++  accountant: { user_id: id(0x8911), display_name: 'Priya Natarajan', role: 'accountant' as const },
++  apClerk: { user_id: id(0x8912), display_name: 'Tom Walsh', role: 'ap_clerk' as const },
++};
++
++const ACCT: Record<string, { id: string; name: string; type: string; subtype: string }> = {
++  '1010': { id: id(0x8901), name: 'Operating account', type: 'asset', subtype: 'bank' },
++  '1200': { id: id(0x8902), name: 'Trade debtors', type: 'asset', subtype: 'receivable' },
++  '2000': { id: id(0x8903), name: 'Trade creditors', type: 'liability', subtype: 'payable' },
++  '2310': {
++    id: id(0x8904),
++    name: 'GST collected',
++    type: 'liability',
++    subtype: 'current_liability',
++  },
++  '3000': { id: id(0x8905), name: "Owner's capital", type: 'equity', subtype: 'equity' },
++  '3200': {
++    id: id(0x8906),
++    name: 'Retained earnings',
++    type: 'equity',
++    subtype: 'retained_earnings',
++  },
++  '3300': {
++    id: id(0x8907),
++    name: 'Current year earnings',
++    type: 'equity',
++    subtype: 'current_year_earnings',
++  },
++  '4110': {
++    id: id(0x8908),
++    name: 'Professional services',
++    type: 'revenue',
++    subtype: 'operating_revenue',
++  },
++  '6200': { id: id(0x8909), name: 'Rent', type: 'expense', subtype: 'operating_expense' },
++  '6220': {
++    id: id(0x890a),
++    name: 'Telephone and internet',
++    type: 'expense',
++    subtype: 'operating_expense',
++  },
++};
++const acct = (code: string) => {
++  const a = ACCT[code];
++  if (!a) throw new Error(`no account ${code}`);
++  return a;
++};
++
++const tbRow = (code: string, debit: string, credit: string) => ({
++  account_id: acct(code).id,
++  code,
++  name: acct(code).name,
++  type: acct(code).type,
++  subtype: acct(code).subtype,
++  debit,
++  credit,
++});
++
++/** November 2026, as GET /gl/trial-balance answers it (totals computed by the API). */
++const TB = {
++  company_id: CO,
++  currency: 'AUD',
++  from: '2026-11-01',
++  to: '2026-11-30',
++  dimension_value_ids: [],
++  rows: [
++    tbRow('1010', '12450.0000', '0.0000'),
++    tbRow('1200', '4400.0000', '0.0000'),
++    tbRow('2000', '0.0000', '1100.0000'),
++    tbRow('2310', '0.0000', '400.0000'),
++    tbRow('3000', '0.0000', '10000.0000'),
++    tbRow('4110', '0.0000', '8950.0000'),
++    tbRow('6200', '2500.0000', '0.0000'),
++    tbRow('6220', '1100.0000', '0.0000'),
++  ],
++  total_debit: '20450.0000',
++  total_credit: '20450.0000',
++  nets_to_zero: true,
++};
++
++const line = (code: string, amount: string, computed = false) => ({
++  account_id: acct(code).id,
++  code,
++  name: acct(code).name,
++  amount,
++  computed,
++});
++
++const PL = {
++  company_id: CO,
++  currency: 'AUD',
++  from: '2026-11-01',
++  to: '2026-11-30',
++  dimension_value_ids: [],
++  revenue: {
++    type: 'revenue',
++    total: '8950.0000',
++    groups: [
++      { subtype: 'operating_revenue', total: '8950.0000', lines: [line('4110', '8950.0000')] },
++    ],
++  },
++  expenses: {
++    type: 'expense',
++    total: '3600.0000',
++    groups: [
++      {
++        subtype: 'operating_expense',
++        total: '3600.0000',
++        lines: [line('6200', '2500.0000'), line('6220', '1100.0000')],
++      },
++    ],
++  },
++  net_profit: '5350.0000',
++};
++
++const BS = {
++  company_id: CO,
++  currency: 'AUD',
++  as_at: '2026-11-30',
++  fiscal_year: { label: 'FY2027', start: '2026-07-01', end: '2027-06-30' },
++  assets: {
++    type: 'asset',
++    total: '16850.0000',
++    groups: [
++      { subtype: 'bank', total: '12450.0000', lines: [line('1010', '12450.0000')] },
++      { subtype: 'receivable', total: '4400.0000', lines: [line('1200', '4400.0000')] },
++    ],
++  },
++  liabilities: {
++    type: 'liability',
++    total: '1500.0000',
++    groups: [
++      { subtype: 'payable', total: '1100.0000', lines: [line('2000', '1100.0000')] },
++      { subtype: 'current_liability', total: '400.0000', lines: [line('2310', '400.0000')] },
++    ],
++  },
++  equity: {
++    type: 'equity',
++    total: '15350.0000',
++    groups: [
++      { subtype: 'equity', total: '10000.0000', lines: [line('3000', '10000.0000')] },
++      {
++        subtype: 'retained_earnings',
++        total: '0.0000',
++        lines: [line('3200', '0.0000', true)],
++      },
++      {
++        subtype: 'current_year_earnings',
++        total: '5350.0000',
++        lines: [line('3300', '5350.0000', true)],
++      },
++    ],
++  },
++  total_liabilities_and_equity: '16850.0000',
++  prior_years_earnings: '0.0000',
++  current_year_earnings: '5350.0000',
++  balanced: true,
++};
++
++const glAccount = (code: string) => ({
++  account_id: acct(code).id,
++  code,
++  name: acct(code).name,
++  type: acct(code).type,
++  subtype: acct(code).subtype,
++  opening: '0.0000',
++  lines: [
++    {
++      entry_id: id(0x8931),
++      entry_no: 'AP-000014',
++      line_no: 1,
++      date: '2026-11-02',
++      source_type: 'ap_bill',
++      memo: 'November phone and internet',
++      party_id: TELCO,
++      party_name: 'Telco Pty Ltd',
++      debit: '1100.0000',
++      credit: '0.0000',
++      balance: '1100.0000',
++      txn_currency: 'AUD',
++      txn_amount: '1100.0000',
++    },
++  ],
++  total_debit: '1100.0000',
++  total_credit: '0.0000',
++  closing: '1100.0000',
++});
++
++const GL = (accountIds: string[]) => ({
++  company_id: CO,
++  currency: 'AUD',
++  from: '2026-11-01',
++  to: '2026-11-30',
++  period_id: null,
++  account_ids: accountIds,
++  dimension_value_ids: [],
++  party_id: null,
++  accounts: [glAccount('6220')],
++  total_debit: '1100.0000',
++  total_credit: '0.0000',
++});
++
++const zeroBuckets = {
++  current: '0.0000',
++  days1to30: '0.0000',
++  days31to60: '0.0000',
++  days61to90: '0.0000',
++  days90plus: '0.0000',
++};
++const AGED_AR = {
++  asOf: '2026-11-30',
++  rows: [
++    {
++      partyId: ACME,
++      partyName: 'Acme Pty Ltd',
++      ...zeroBuckets,
++      current: '1375.0000',
++      total: '1375.0000',
++    },
++    {
++      partyId: SALTBUSH,
++      partyName: 'Saltbush Co',
++      ...zeroBuckets,
++      days31to60: '3025.0000',
++      total: '3025.0000',
++    },
++  ],
++  totals: { ...zeroBuckets, current: '1375.0000', days31to60: '3025.0000', total: '4400.0000' },
++};
++const AGED_AP = {
++  asOf: '2026-11-30',
++  rows: [
++    {
++      partyId: TELCO,
++      partyName: 'Telco Pty Ltd',
++      ...zeroBuckets,
++      current: '1100.0000',
++      total: '1100.0000',
++    },
++  ],
++  totals: { ...zeroBuckets, current: '1100.0000', total: '1100.0000' },
++};
++
++const CHART = {
++  companies: [{ id: CO, name: 'Harbour & Co Pty Ltd', base_currency: 'AUD' }],
++  accounts: Object.entries(ACCT).map(([code, a]) => ({
++    id: a.id,
++    company_id: CO,
++    code,
++    name: a.name,
++    type: a.type,
++    subtype: a.subtype,
++    normal_balance: a.type === 'asset' || a.type === 'expense' ? 'debit' : 'credit',
++    currency: null,
++    postable: true,
++    is_control: code === '1200' || code === '2000',
++    status: 'active',
++    system_roles: [],
++  })),
++};
++
++interface Fake {
++  errors: string[];
++  /** Every report request: path and query string. */
++  calls: string[];
++  override: Map<string, { status: number; body: unknown }>;
++}
++
++const NEEDS: Record<string, string> = {
++  '/gl/trial-balance': 'reports.run',
++  '/gl/profit-and-loss': 'reports.run',
++  '/gl/balance-sheet': 'reports.run',
++  '/gl/detail': 'reports.run',
++  '/accounts': 'gl.account.read',
++  '/ar/aged-receivables': 'ar.read',
++  '/ap/aged-payables': 'ap.read',
++};
++
++async function fakeApi(page: Page, who: keyof typeof ME): Promise<Fake> {
++  const f: Fake = { errors: [], calls: [], override: new Map() };
++  page.on('console', (m) => {
++    if (m.type() === 'error' && !/status of (400|401|403|404|409|422|503)/.test(m.text()))
++      f.errors.push(m.text());
++  });
++  page.on('pageerror', (e) => f.errors.push(String(e)));
++  const send = (route: Route, status: number, body: unknown) =>
++    route.fulfill({ status, json: body });
++  await page.route(
++    (url) =>
++      url.origin === origin && /^\/(auth|companies|accounts|gl|ar|ap)(\/|$)/.test(url.pathname),
++    async (route) => {
++      const url = new URL(route.request().url());
++      const path = url.pathname;
++      const me = ME[who];
++      const perms: readonly string[] = ROLE_TEMPLATES[me.role].permissions;
++      if (path === '/auth/me')
++        return send(route, 200, {
++          tenant_id: 't-harbour',
++          user_id: me.user_id,
++          display_name: me.display_name,
++        });
++      if (path === '/auth/me/access')
++        return send(route, 200, { roles: [me.role], permissions: perms });
++      if (path === '/companies')
++        return send(route, 200, [{ id: CO, name: 'Harbour & Co Pty Ltd', base_currency: 'AUD' }]);
++      const needs = NEEDS[path];
++      if (!needs) return send(route, 404, { error: 'not_found' });
++      if (!perms.includes(needs))
++        return send(route, 403, { error: 'forbidden', permission: needs });
++      if (path === '/accounts') return send(route, 200, CHART);
++      f.calls.push(`${path}${url.search}`);
++      expect(url.searchParams.get('company_id')).toBe(CO);
++      const o = f.override.get(path);
++      if (o) return send(route, o.status, o.body);
++      if (path === '/gl/trial-balance') return send(route, 200, TB);
++      if (path === '/gl/profit-and-loss') return send(route, 200, PL);
++      if (path === '/gl/balance-sheet') return send(route, 200, BS);
++      if (path === '/gl/detail') return send(route, 200, GL(url.searchParams.getAll('account_id')));
++      if (path === '/ar/aged-receivables') return send(route, 200, AGED_AR);
++      return send(route, 200, AGED_AP);
++    },
++  );
++  return f;
++}
++
++async function open(page: Page, path: string, width: number) {
++  await page.setViewportSize({ width, height: width > 600 ? 900 : 844 });
++  await page.goto(`${origin}${path}`);
++  await expect(page.locator('h1')).toHaveCount(1);
++  await page.evaluate(() => document.fonts.ready);
++}
++
++async function assertPage(page: Page, width: number) {
++  expect((await page.title()).trim()).not.toBe('');
++  await expect(page.locator('main')).toHaveCount(1);
++  const sw = await page.evaluate(() => document.documentElement.scrollWidth);
++  expect(sw, 'no horizontal scroll').toBeLessThanOrEqual(width);
++  const axe = await new AxeBuilder({ page })
++    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
++    .analyze();
++  expect(
++    axe.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
++  ).toEqual([]);
++  expect(await page.evaluate(genericnessProbe)).toEqual({
++    shadows: [],
++    bigRadius: [],
++    caps: [],
++    purple: [],
++    dots: 0,
++    arrows: 0,
++  });
++  expect(await page.locator('main .primary').count()).toBeLessThanOrEqual(1);
++  const amounts = await page.locator('main [data-amount]').all();
++  expect(amounts.length).toBeGreaterThan(0);
++  for (const cell of amounts) {
++    expect(await cell.getAttribute('data-amount')).toMatch(/^-?\d+\.\d{2}$/);
++    // P3: right-aligned at desktop width, tabular figures always.
++    const style = await cell.evaluate((e) => {
++      const s = getComputedStyle(e.closest('td, th') ?? e);
++      return { align: s.textAlign, nums: getComputedStyle(e).fontVariantNumeric };
++    });
++    expect(style.nums).toContain('tabular-nums');
++    if (width > 900) expect(style.align).toBe('right');
++  }
++}
++
++const amountsIn = (page: Page, table: string, part = 'tbody') =>
++  page
++    .getByRole('table', { name: table })
++    .locator(`${part} [data-amount]`)
++    .evaluateAll((els) => els.map((e) => e.getAttribute('data-amount')));
++
++for (const width of [1440, 390]) {
++  test(`SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ ${String(width)} [T-0089]`, async ({
++    page,
++    evidence,
++  }) => {
++    const f = await fakeApi(page, 'accountant');
++    await open(page, '/reports/trial-balance?from=2026-11-01&to=2026-11-30', width);
++    await expect(page.getByRole('heading', { level: 1, name: 'Trial balance' })).toBeVisible();
++    await expect(page.getByLabel('From')).toHaveValue('2026-11-01');
++    await expect(page.getByLabel('To')).toHaveValue('2026-11-30');
++    const table = page.getByRole('table', { name: 'Trial balance' });
++    await expect(table.locator('tbody tr')).toHaveCount(8);
++    await expect(table.locator('tbody tr').first()).toContainText('1010');
++    await expect(table.locator('tbody tr').first()).toContainText('Operating account');
++    expect(await amountsIn(page, 'Trial balance')).toEqual([
++      '12450.00',
++      '0.00',
++      '4400.00',
++      '0.00',
++      '0.00',
++      '1100.00',
++      '0.00',
++      '400.00',
++      '0.00',
++      '10000.00',
++      '0.00',
++      '8950.00',
++      '2500.00',
++      '0.00',
++      '1100.00',
++      '0.00',
++    ]);
++    expect(await amountsIn(page, 'Trial balance', 'tfoot')).toEqual(['20450.00', '20450.00']);
++    await expect(page.getByText('Debits equal credits')).toBeVisible();
++    expect(f.calls).toEqual([
++      '/gl/trial-balance?company_id=' + CO + '&from=2026-11-01&to=2026-11-30',
++    ]);
++    // P1: every account row opens its general-ledger detail for the same range.
++    for (const row of await table.locator('tbody tr').all())
++      await expect(row.getByRole('link')).toHaveCount(1);
++    await assertPage(page, width);
++    await evidence('SS-RPT-01', `trial-balance-${String(width)}`);
++
++    await table.getByRole('link', { name: /6220 Telephone and internet/ }).click();
++    await expect(
++      page.getByRole('heading', { level: 1, name: 'General ledger detail' }),
++    ).toBeVisible();
++    await expect(page.getByRole('table', { name: '6220 Telephone and internet' })).toBeVisible();
++    expect(f.calls.at(-1)).toBe(
++      `/gl/detail?company_id=${CO}&from=2026-11-01&to=2026-11-30&account_id=${acct('6220').id}`,
++    );
++    expect(f.errors).toEqual([]);
++  });
++
++  test(`SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ ${String(width)} [T-0089]`, async ({
++    page,
++    evidence,
++  }) => {
++    const f = await fakeApi(page, 'accountant');
++    await open(page, '/reports/profit-and-loss?from=2026-11-01&to=2026-11-30', width);
++    await expect(page.getByRole('heading', { level: 1, name: 'Profit and loss' })).toBeVisible();
++    const table = page.getByRole('table', { name: 'Profit and loss' });
++    await expect(table.getByRole('rowheader', { name: 'Income' })).toBeVisible();
++    await expect(table.getByRole('rowheader', { name: 'Expenses' })).toBeVisible();
++    await expect(table.getByRole('link', { name: /4110 Professional services/ })).toBeVisible();
++    await expect(table.getByRole('link', { name: /6200 Rent/ })).toBeVisible();
++    const net = table.getByRole('row', { name: /Net profit/ });
++    await expect(net.locator('[data-amount]')).toHaveAttribute('data-amount', '5350.00');
++    // One group per section: the section total stands alone, no repeated subtotal.
++    expect(await amountsIn(page, 'Profit and loss')).toEqual([
++      '8950.00',
++      '8950.00',
++      '2500.00',
++      '1100.00',
++      '3600.00',
++    ]);
++    expect(await amountsIn(page, 'Profit and loss', 'tfoot')).toEqual(['5350.00']);
++    await assertPage(page, width);
++    await evidence('SS-RPT-02', `profit-and-loss-${String(width)}`);
++    expect(f.errors).toEqual([]);
++  });
++
++  test(`SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ ${String(width)} [T-0089]`, async ({
++    page,
++    evidence,
++  }) => {
++    const f = await fakeApi(page, 'accountant');
++    await open(page, '/reports/balance-sheet?as_at=2026-11-30', width);
++    await expect(page.getByRole('heading', { level: 1, name: 'Balance sheet' })).toBeVisible();
++    await expect(page.getByLabel('As at')).toHaveValue('2026-11-30');
++    const table = page.getByRole('table', { name: 'Balance sheet' });
++    for (const h of ['Assets', 'Liabilities', 'Equity'])
++      await expect(table.getByRole('rowheader', { name: h, exact: true })).toBeVisible();
++    await expect(table.getByRole('row', { name: /3300 Current year earnings/ })).toContainText(
++      'Worked out',
++    );
++    await expect(
++      table.getByRole('row', { name: /Total liabilities and equity/ }).locator('[data-amount]'),
++    ).toHaveAttribute('data-amount', '16850.00');
++    await expect(
++      table.getByRole('row', { name: /^Total assets/ }).locator('[data-amount]'),
++    ).toHaveAttribute('data-amount', '16850.00');
++    await expect(page.getByText('Balanced: assets equal liabilities plus equity')).toBeVisible();
++    await expect(page.getByText(/FY2027/)).toBeVisible();
++    expect(f.calls).toEqual([`/gl/balance-sheet?company_id=${CO}&as_at=2026-11-30`]);
++    await assertPage(page, width);
++    await evidence('SS-RPT-03', `balance-sheet-${String(width)}`);
++    expect(f.errors).toEqual([]);
++  });
++
++  test(`SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ ${String(width)} [T-0089]`, async ({
++    page,
++    evidence,
++  }) => {
++    const f = await fakeApi(page, 'accountant');
++    await open(
++      page,
++      `/reports/gl-detail?from=2026-11-01&to=2026-11-30&account_id=${acct('6220').id}`,
++      width,
++    );
++    await expect(
++      page.getByRole('heading', { level: 1, name: 'General ledger detail' }),
++    ).toBeVisible();
++    await expect(page.getByLabel('Account')).toHaveValue(acct('6220').id);
++    const table = page.getByRole('table', { name: '6220 Telephone and internet' });
++    await expect(table.getByRole('row', { name: /Opening balance/ })).toBeVisible();
++    await expect(table.getByRole('row', { name: /AP-000014/ })).toContainText('Telco Pty Ltd');
++    await expect(
++      table
++        .getByRole('row', { name: /Closing balance/ })
++        .locator('[data-amount]')
++        .last(),
++    ).toHaveAttribute('data-amount', '1100.00');
++    await assertPage(page, width);
++    await evidence('SS-RPT-04', `gl-detail-${String(width)}`);
++    expect(f.errors).toEqual([]);
++  });
++
++  test(`SS-RPT-05: Aged receivables buckets each customer, totals from the API @ ${String(width)} [T-0089]`, async ({
++    page,
++    evidence,
++  }) => {
++    const f = await fakeApi(page, 'accountant');
++    await open(page, '/reports/aged-receivables?as_of=2026-11-30', width);
++    await expect(page.getByRole('heading', { level: 1, name: 'Aged receivables' })).toBeVisible();
++    const table = page.getByRole('table', { name: 'Aged receivables' });
++    await expect(table.locator('tbody tr')).toHaveCount(2);
++    await expect(table.locator('tbody tr').nth(1)).toContainText('Saltbush Co');
++    expect(await amountsIn(page, 'Aged receivables', 'tfoot')).toEqual([
++      '1375.00',
++      '0.00',
++      '3025.00',
++      '0.00',
++      '0.00',
++      '4400.00',
++    ]);
++    expect(f.calls).toEqual([`/ar/aged-receivables?company_id=${CO}&as_of=2026-11-30`]);
++    await assertPage(page, width);
++    await evidence('SS-RPT-05', `aged-receivables-${String(width)}`);
++    expect(f.errors).toEqual([]);
++  });
++
++  test(`SS-RPT-06: Aged payables buckets each supplier @ ${String(width)} [T-0089]`, async ({
++    page,
++    evidence,
++  }) => {
++    const f = await fakeApi(page, 'apClerk');
++    await open(page, '/reports/aged-payables?as_of=2026-11-30', width);
++    await expect(page.getByRole('heading', { level: 1, name: 'Aged payables' })).toBeVisible();
++    const table = page.getByRole('table', { name: 'Aged payables' });
++    await expect(table.locator('tbody tr')).toHaveCount(1);
++    await expect(table.locator('tbody tr').first()).toContainText('Telco Pty Ltd');
++    expect(await amountsIn(page, 'Aged payables', 'tfoot')).toEqual([
++      '1100.00',
++      '0.00',
++      '0.00',
++      '0.00',
++      '0.00',
++      '1100.00',
++    ]);
++    await assertPage(page, width);
++    await evidence('SS-RPT-06', `aged-payables-${String(width)}`);
++    expect(f.errors).toEqual([]);
++  });
++}
++
++test('SS-RPT-08: Download CSV writes the figures the API returned [T-0089]', async ({ page }) => {
++  const f = await fakeApi(page, 'accountant');
++  await open(page, '/reports/trial-balance?from=2026-11-01&to=2026-11-30', 1440);
++  await expect(page.getByRole('table', { name: 'Trial balance' })).toBeVisible();
++  const [download] = await Promise.all([
++    page.waitForEvent('download'),
++    page.getByRole('button', { name: 'Download CSV' }).click(),
++  ]);
++  expect(download.suggestedFilename()).toBe('trial-balance-2026-11-01-to-2026-11-30.csv');
++  const path = await download.path();
++  const text = readFileSync(path, 'utf8');
++  expect(text.startsWith('\uFEFF'), 'UTF-8 byte-order mark for spreadsheets').toBe(true);
++  const csv = text.slice(1).split('\r\n');
++  expect(csv[0]).toBe('Code,Account,Debit,Credit');
++  expect(csv[1]).toBe('1010,Operating account,12450.00,0.00');
++  expect(csv[5]).toBe("3000,Owner's capital,0.00,10000.00");
++  expect(csv[9]).toBe(',Total,20450.00,20450.00');
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0089: changing the dates asks the API again and the URL keeps them', async ({ page }) => {
++  const f = await fakeApi(page, 'accountant');
++  await open(page, '/reports/profit-and-loss?from=2026-11-01&to=2026-11-30', 1440);
++  await expect(page.getByRole('table', { name: 'Profit and loss' })).toBeVisible();
++  await page.getByLabel('From').fill('2026-07-01');
++  await page.getByRole('button', { name: 'Show report' }).click();
++  await expect(page).toHaveURL(/from=2026-07-01&to=2026-11-30/);
++  await expect
++    .poll(() => f.calls.at(-1))
++    .toBe(`/gl/profit-and-loss?company_id=${CO}&from=2026-07-01&to=2026-11-30`);
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0089: without dates the reports start at this month and today', async ({ page }) => {
++  await page.clock.setFixedTime(new Date('2026-11-13T10:00:00+11:00'));
++  const f = await fakeApi(page, 'accountant');
++  await open(page, '/reports/trial-balance', 1440);
++  await expect(page.getByLabel('From')).toHaveValue('2026-11-01');
++  await expect(page.getByLabel('To')).toHaveValue('2026-11-13');
++  await expect
++    .poll(() => f.calls[0])
++    .toBe(`/gl/trial-balance?company_id=${CO}&from=2026-11-01&to=2026-11-13`);
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0089: an AP clerk is told who can run the trial balance, and sees no figures', async ({
++  page,
++}) => {
++  const f = await fakeApi(page, 'apClerk');
++  await open(page, '/reports/trial-balance?from=2026-11-01&to=2026-11-30', 1440);
++  await expect(page.getByText(/You do not have access to the trial balance/)).toBeVisible();
++  await expect(page.getByRole('table', { name: 'Trial balance' })).toHaveCount(0);
++  expect(f.calls).toEqual([]);
++  await open(page, '/reports/aged-receivables?as_of=2026-11-30', 1440);
++  await expect(page.getByText(/You do not have access to aged receivables/)).toBeVisible();
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0089: a refused report says why, and a date with no fiscal year is explained', async ({
++  page,
++}) => {
++  const f = await fakeApi(page, 'accountant');
++  f.override.set('/gl/balance-sheet', {
++    status: 422,
++    body: { error: 'NO_FISCAL_YEAR', message: 'no fiscal year holds 2001-01-31' },
++  });
++  await open(page, '/reports/balance-sheet?as_at=2001-01-31', 1440);
++  await expect(page.getByRole('alert')).toContainText(
++    'There is no financial year that holds this date',
++  );
++  await expect(page.getByRole('table', { name: 'Balance sheet' })).toHaveCount(0);
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0089: a period with nothing posted says so instead of an empty table', async ({ page }) => {
++  const f = await fakeApi(page, 'accountant');
++  f.override.set('/gl/trial-balance', {
++    status: 200,
++    body: { ...TB, rows: [], total_debit: '0.0000', total_credit: '0.0000' },
++  });
++  await open(page, '/reports/trial-balance?from=2026-11-01&to=2026-11-30', 1440);
++  await expect(page.getByRole('heading', { name: 'Nothing posted in these dates' })).toBeVisible();
++  await expect(page.getByRole('table', { name: 'Trial balance' })).toHaveCount(0);
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0089: the Reports page lists the six reports', async ({ page }) => {
++  const f = await fakeApi(page, 'accountant');
++  await open(page, '/reports', 1440);
++  const nav = page.getByRole('navigation', { name: 'In Reports' });
++  for (const name of [
++    'Trial balance',
++    'Profit and loss',
++    'Balance sheet',
++    'General ledger detail',
++    'Aged receivables',
++    'Aged payables',
++  ])
++    await expect(nav.getByRole('link', { name, exact: true })).toBeVisible();
++  expect(f.errors).toEqual([]);
++});
+-- 
+2.43.0
+

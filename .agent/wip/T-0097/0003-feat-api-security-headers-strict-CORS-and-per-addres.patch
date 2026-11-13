@@ -1,0 +1,1256 @@
+From b283bb8c903a5740c9e39ce68d93a3b51e9ee378 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 08:34:46 +0000
+Subject: [PATCH 3/4] feat(api): security headers, strict CORS and per-address
+ rate limits [T-0142]
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+What changed:
+- apps/api/src/security/security.ts: every API response now sends Cache-Control no-store,
+  CSP "default-src 'none'; frame-ancestors 'none'", nosniff, X-Frame-Options DENY,
+  Referrer-Policy no-referrer and CORP same-origin. It also sends HSTS (max-age one year) when
+  the public URL is https. X-Powered-By is removed, and trust proxy is set to a whole number of
+  hops (never true).
+- apps/api/src/security/rate-limit.ts: fixed-window limits per (class, client address), built
+  in-house, applied before routing. Classes are auth (OIDC login/callback/step-up), webhook and
+  mutating (all other POST/PUT/PATCH/DELETE). An over-limit request gets 429
+  {error:'rate_limited'} with Retry-After. Paths are normalised so case and trailing-slash
+  variants cannot slip out of their class. The key map is bounded (oldest key evicted).
+- config.ts: in production the limits are always on (auth 30, mutating 300, webhook 600 per
+  60 s). LF_TRUST_PROXY_HOPS must be 0-5 (default 0); HSTS is on for an https LF_PUBLIC_URL.
+- compose passes LF_TRUST_PROXY_HOPS=${LF_TRUST_PROXY_HOPS:-1} to api; install.md explains
+  when to set it to 2.
+- Card T-0142 set to verifying; HANDOVER now lists the ADR-0054 human gate.
+
+Why: design §6.9 and apps/api AGENTS.md require security headers, strict CORS and rate limits.
+RQ-0141 has the OWASP sources and the Express proxy semantics. ADR-0054 (security) is Proposed
+and awaits the owner. No new runtime dependency.
+
+Validation:
+- RED was captured before implementation (.agent/evidence/T-0097/red-*.txt): 19 unit, 12 DB
+  and 1 infra assertion failures.
+- GREEN: unit 32/32, DB 17/17, infra contract 27/27 (pnpm exec vitest run infra/test).
+- Regression: vitest unit+api-unit 916/916 (75 files) and api-db 223/223 (30 files), 0 skipped.
+- pnpm typecheck, pnpm lint and prettier --check all clean; verify.sh --quick gate 1 PASS
+  (the remaining quick gates did not finish within 10 minutes).
+- One unit test's setup was corrected: both windows now open together. The asserted 8 s is
+  unchanged.
+- Not run: the full verify.sh, docker compose and DAST (no Docker locally, DL-0007).
+
+Next action: run verify.sh; get codex cross-review; the owner decides on ADR-0054. Then T-0143
+(backup and restore drill, RQ-0142) and T-0144 (CSRF).
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .agent/HANDOVER.md                           |   2 +
+ .agent/backlog/README.md                     |   5 +-
+ .agent/backlog/T-0142.md                     |  26 +-
+ .agent/evidence/T-0097/green-db.txt          |  10 +
+ .agent/evidence/T-0097/green-infra.txt       |   9 +
+ .agent/evidence/T-0097/green-unit.txt        |   9 +
+ .agent/evidence/T-0097/red-db.txt            | 328 +++++++++++++++++++
+ .agent/evidence/T-0097/red-infra.txt         |  33 ++
+ .agent/evidence/T-0097/red-unit.txt          | 262 +++++++++++++++
+ .agent/evidence/T-0097/regression-api-db.txt |  57 ++++
+ .agent/evidence/T-0097/regression-unit.txt   |   9 +
+ Docs/ops/install.md                          |   7 +
+ apps/api/src/app.ts                          |   5 +
+ apps/api/src/config.ts                       |  18 +
+ apps/api/src/security/rate-limit.db.test.ts  |   7 +-
+ apps/api/src/security/rate-limit.test.ts     |   3 +-
+ apps/api/src/security/rate-limit.ts          | 102 ++++++
+ apps/api/src/security/security.ts            |  53 +++
+ infra/compose/compose.yaml                   |   3 +
+ infra/test/install-contract.test.ts          |   7 +
+ 20 files changed, 945 insertions(+), 10 deletions(-)
+ create mode 100644 .agent/evidence/T-0097/green-db.txt
+ create mode 100644 .agent/evidence/T-0097/green-infra.txt
+ create mode 100644 .agent/evidence/T-0097/green-unit.txt
+ create mode 100644 .agent/evidence/T-0097/red-db.txt
+ create mode 100644 .agent/evidence/T-0097/red-infra.txt
+ create mode 100644 .agent/evidence/T-0097/red-unit.txt
+ create mode 100644 .agent/evidence/T-0097/regression-api-db.txt
+ create mode 100644 .agent/evidence/T-0097/regression-unit.txt
+ create mode 100644 apps/api/src/security/rate-limit.ts
+ create mode 100644 apps/api/src/security/security.ts
+
+diff --git a/.agent/HANDOVER.md b/.agent/HANDOVER.md
+index aeba9bf..35c1ec5 100644
+--- a/.agent/HANDOVER.md
++++ b/.agent/HANDOVER.md
+@@ -4,6 +4,8 @@
+ > Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file, DL-0405, DL-0408 and DL-0409. Branch `claude/loving-lovelace-nozqpk` (main + this session's work since 983cc91). Six sub-agents were started in local worktrees on local branches: `feat/T-0128-coverage-measure`, `feat/T-0079-period-reopen`, `feat/T-0084-batch-billing-ui`, `feat/T-0086-bills-ui`, `feat/T-0089-reports-ui`, `feat/T-0097-pilot-hardening`. Merges into this branch appear in `git log`; an agent branch not merged here was lost with the container, so restart that card from its card file. Cards awaiting Codex review: T-0121, T-0041, T-0061, T-0068, T-0075, T-0078, T-0131, T-0083 (verifying) and the integrated Line A cards.
+ 
+ ## Open questions for human
++- [adr:security] T-0142 Accept ADR-0054 (API security headers, strict CORS, per-address rate limits auth 30 / writes 300 / webhooks 600 per minute, `LF_TRUST_PROXY_HOPS`)?
++  Options: A) accept as proposed B) different limits or HSTS policy C) helmet/@nestjs/throttler instead. Recommendation: A (OWASP baseline, no new runtime dependency). See: Docs/adr/0054-api-security-headers-and-rate-limits.md, RQ-0141. Built test-first on `feat/T-0097-pilot-hardening-r2`.
+ - **(Resolved 2026-11-13, owner approved, DL-0408)** Golden approval registry refresh (it had been blocked by the session's permission classifier as an oversight-control change).** After the merge, `goldenGuard` fails because `Docs/decisions/golden-approvals.json` pins postings.md to the old snapshot 334a3f9 and main now holds GP-037…039. Per ADR-0047 the remedy is a refreshed record `{path: Docs/accounting/postings.md, commit: 983cc919f4911c5dd55e6e8bf9ff1e1f6a2ff404, decisions: [DL-0405, DL-0263, DL-0256, DL-0258]}`. Please approve the edit (or make it yourself); until then gate 4 stays FAIL on every branch.
+ - **(Approved 2026-11-13, DL-0408; implementation in T-0128)** Coverage gate measure (T-0128, RQ-0105).** Changing verify.sh gate 2c to unit+db coverage and re-recording main's baseline under that measure is also a change to a check. Not done without your explicit OK; the alternative is adding unit tests to recover about 13.7 points of unit-only coverage.
+ 
+diff --git a/.agent/backlog/README.md b/.agent/backlog/README.md
+index e9e5e00..c93c62b 100644
+--- a/.agent/backlog/README.md
++++ b/.agent/backlog/README.md
+@@ -16,9 +16,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
+ | blocked | 7 |
+ | done | 3 |
+ | review | 91 |
+-| in_progress | 1 |
+ | todo | 32 |
+-| verifying | 1 |
++| verifying | 2 |
+ | **total** | **135** |
+ 
+ | Phase | Cards |
+@@ -201,7 +200,7 @@ graph LR
+ | [T-0095](T-0095.md) | CI security gates: SAST, dependency, container and secret scanning, SBOM | MVP | review | T-0001 | — | 1 |
+ | [T-0096](T-0096.md) | DAST smoke test against the compose stack | MVP | review | T-0094, T-0095 | — | 0 |
+ | [T-0097](T-0097.md) | Pilot hardening: backups, restore drill, security headers, rate limits (superseded by T-0142, T-0143, T-0144) | MVP | blocked | T-0094, T-0096 | — | 0 |
+-| [T-0142](T-0142.md) | Platform - API security headers, strict CORS and rate limits on auth and mutating routes | MVP | in_progress | T-0094 | — | 1 |
++| [T-0142](T-0142.md) | Platform - API security headers, strict CORS and rate limits on auth and mutating routes | MVP | verifying | T-0094 | — | 1 |
+ | [T-0143](T-0143.md) | Ops - encrypted database backup and restore drill that proves the hash chain | MVP | todo | T-0094 | — | 0 |
+ | [T-0144](T-0144.md) | Platform - CSRF guard with Fetch Metadata and Origin checks for cookie-authenticated mutations | MVP | todo | T-0142 | — | 0 |
+ | [T-0098](T-0098.md) | Pilot data migration (opening balances, open AR/AP) and dry run | MVP | todo | T-0080, T-0142, T-0143, T-0144 | — | 0 |
+diff --git a/.agent/backlog/T-0142.md b/.agent/backlog/T-0142.md
+index 8dd5725..06fbdf4 100644
+--- a/.agent/backlog/T-0142.md
++++ b/.agent/backlog/T-0142.md
+@@ -4,7 +4,7 @@ title: "Platform - API security headers, strict CORS and rate limits on auth and
+ phase: MVP
+ use_cases: []
+ depends_on: [T-0094]
+-status: in_progress
++status: verifying
+ claimed_by: claude
+ lease_expires_at: null
+ attempts: 1
+@@ -49,13 +49,29 @@ Proposed — human gate). Research: [RQ-0141](../../Docs/research/RQ-0141-api-se
+   owner accepts it; the card cannot be `done` before that.
+ 
+ ## Steps (checked off as done)
+-- [ ] 1. RQ-0141 resolved; ADR-0054 proposed; DL entries
+-- [ ] 2. RED: AC-1..AC-5 tests, output saved under `.agent/evidence/T-0097/`
+-- [ ] 3. GREEN: security middleware, rate limiter, config, compose
+-- [ ] 4. Validation: typecheck, lint, format, unit/api/db tests, infra contract tests [phase: verify]
++- [x] 1. RQ-0141 resolved; ADR-0054 proposed; DL entries
++- [x] 2. RED: AC-1..AC-5 tests, output saved under `.agent/evidence/T-0097/`
++- [x] 3. GREEN: security middleware, rate limiter, config, compose
++- [x] 4. Validation: typecheck, lint, format, unit/api/db tests, infra contract tests [phase: verify]
+ - [ ] 5. Cross-provider review (`cross-review`) [phase: review]
+ - [ ] 6. Owner accepts ADR-0054 (human gate) [phase: finish]
+ 
+ ## Notes for the next agent
+ - Evidence for this slice lives under `.agent/evidence/T-0097/` (the lead's instruction for the
+   T-0097 split) with a pointer from this card.
++- RED (2026-11-13, after a types-only skeleton so failures are assertions, not imports):
++  unit `api-unit` 19 failed / 13 passed (the 13 = existing config tests and the four
++  "not limited → null" class rows the skeleton satisfies) → `.agent/evidence/T-0097/red-unit.txt`;
++  DB 12 failed / 5 passed → `red-db.txt` (passing before build, as expected: the two AC-2 CORS
++  regression guards — Nest's default is already strict, RQ-0141 S12 — plus "other address
++  unaffected", "after the window" and "GET not limited", which a missing limiter also satisfies);
++  infra 1 failed / 18 passed → `red-infra.txt`.
++- Test fix during GREEN (not a weakened assertion): the limiter unit test expected 8 s left in a
++  mutating window opened 2.5 s after the auth window; per ADR-0054 every (class, key) window
++  opens at its own first hit, so the test now opens both windows together and still asserts 8 s.
++- GREEN: unit 32/32, DB 17/17, infra 27/27 (`green-*.txt`); regression `unit`+`api-unit`
++  916/916 (75 files), `api-db` 223/223 (30 files), 0 skipped (`regression-*.txt`); typecheck,
++  lint, prettier clean.
++- Not run here: `bash scripts/agent/verify.sh` (full DoD), compose/DAST (no Docker locally,
++  DL-0007 — the compose `LF_TRUST_PROXY_HOPS` value is checked by the contract test only).
++- Human gate: ADR-0054 is a security ADR, Proposed; the card cannot be `done` until accepted.
+diff --git a/.agent/evidence/T-0097/green-db.txt b/.agent/evidence/T-0097/green-db.txt
+new file mode 100644
+index 0000000..b37afc4
+--- /dev/null
++++ b/.agent/evidence/T-0097/green-db.txt
+@@ -0,0 +1,10 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
++
++[db] test PostgreSQL ready (local) on 127.0.0.1:40121
++
++ Test Files  2 passed (2)
++      Tests  17 passed (17)
++   Start at  08:14:32
++   Duration  5.06s (transform 3.15s, setup 0ms, import 6.00s, tests 1.97s, environment 0ms)
++
+diff --git a/.agent/evidence/T-0097/green-infra.txt b/.agent/evidence/T-0097/green-infra.txt
+new file mode 100644
+index 0000000..470bc30
+--- /dev/null
++++ b/.agent/evidence/T-0097/green-infra.txt
+@@ -0,0 +1,9 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
++
++
++ Test Files  3 passed (3)
++      Tests  27 passed (27)
++   Start at  08:14:14
++   Duration  619ms (transform 206ms, setup 0ms, import 430ms, tests 361ms, environment 0ms)
++
+diff --git a/.agent/evidence/T-0097/green-unit.txt b/.agent/evidence/T-0097/green-unit.txt
+new file mode 100644
+index 0000000..1222588
+--- /dev/null
++++ b/.agent/evidence/T-0097/green-unit.txt
+@@ -0,0 +1,9 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
++
++
++ Test Files  2 passed (2)
++      Tests  32 passed (32)
++   Start at  08:14:30
++   Duration  463ms (transform 205ms, setup 0ms, import 371ms, tests 25ms, environment 0ms)
++
+diff --git a/.agent/evidence/T-0097/red-db.txt b/.agent/evidence/T-0097/red-db.txt
+new file mode 100644
+index 0000000..87471dc
+--- /dev/null
++++ b/.agent/evidence/T-0097/red-db.txt
+@@ -0,0 +1,328 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
++
++[db] test PostgreSQL ready (local) on 127.0.0.1:40285
++ ❯ |api-db| apps/api/src/security/rate-limit.db.test.ts (10 tests | 7 failed) 1372ms
++     × AC-3 the (N+1)-th step-up request in the window answers 429 rate_limited with Retry-After [T-0142] 57ms
++     × AC-3 a forged left-most X-Forwarded-For entry does not escape the bucket [T-0142] 6ms
++     × AC-3 case and trailing-slash variants of an auth route share its bucket [T-0142] 4ms
++     × AC-4 the (N+1)-th POST answers 429 before the handler runs [T-0142] 14ms
++     × AC-4 PUT, PATCH and DELETE count against the same bucket [T-0142] 3ms
++     × AC-4 webhooks have their own bucket: an exhausted mutating bucket does not block them [T-0142] 13ms
++     × AC-4 without a trusted proxy X-Forwarded-For is ignored: rotating it does not reset the limit [T-0142] 13ms
++ ❯ |api-db| apps/api/src/security/security-headers.db.test.ts (7 tests | 5 failed) 1398ms
++     × AC-1 a public route (GET /health, 200) carries the OWASP REST header set [T-0142] 78ms
++     × AC-1 an authenticated route refused without credentials (401) carries it too [T-0142] 9ms
++     × AC-1 an unknown route (404) carries it too [T-0142] 10ms
++     × AC-1 a refused mutation (POST without credentials) carries it too [T-0142] 19ms
++     × AC-1 HSTS only when the public URL is https (max-age one year, no preload) [T-0142] 33ms
++
++⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-3 auth routes are limited per client address > AC-3 the (N+1)-th step-up request in the window answers 429 rate_limited with Retry-After [T-0142]
++AssertionError: expected 401 to be 429 // Object.is equality
++
++- Expected
+++ Received
++
++- 429
+++ 401
++
++ ❯ apps/api/src/security/rate-limit.db.test.ts:69:24
++     67|     now += 15_000;
++     68|     const res = await fetch(url, from('203.0.113.1'));
++     69|     expect(res.status).toBe(429);
++       |                        ^
++     70|     expect(await res.json()).toEqual({ error: 'rate_limited' });
++     71|     expect(res.headers.get('retry-after')).toBe('45');
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-3 auth routes are limited per client address > AC-3 a forged left-most X-Forwarded-For entry does not escape the bucket [T-0142]
++AssertionError: expected 401 to be 429 // Object.is equality
++
++- Expected
+++ Received
++
++- 429
+++ 401
++
++ ❯ apps/api/src/security/rate-limit.db.test.ts:81:24
++     79|   it('AC-3 a forged left-most X-Forwarded-For entry does not escape th…
++     80|     const res = await fetch(`${api.url}/auth/step-up`, from('198.51.10…
++     81|     expect(res.status).toBe(429);
++       |                        ^
++     82|   });
++     83|
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-3 auth routes are limited per client address > AC-3 case and trailing-slash variants of an auth route share its bucket [T-0142]
++AssertionError: expected 401 to be 429 // Object.is equality
++
++- Expected
+++ Received
++
++- 429
+++ 401
++
++ ❯ apps/api/src/security/rate-limit.db.test.ts:86:78
++     84|   it('AC-3 case and trailing-slash variants of an auth route share its…
++     85|     for (const path of ['/AUTH/step-up', '/auth/step-up/', '/t/acme/au…
++     86|       expect((await fetch(`${api.url}${path}`, from('203.0.113.1'))).s…
++       |                                                                              ^
++     87|     }
++     88|   });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-4 state-changing routes and webhooks are limited; reads are not > AC-4 the (N+1)-th POST answers 429 before the handler runs [T-0142]
++AssertionError: expected [ 201, 201, 201 ] to deeply equal [ 201, 201, 429 ]
++
++- Expected
+++ Received
++
++  [
++    201,
++    201,
++-   429,
+++   201,
++  ]
++
++ ❯ apps/api/src/security/rate-limit.db.test.ts:100:75
++     98|     handled = 0;
++     99|     const url = `${api.url}/t0142-probe/write`;
++    100|     expect(await statuses(3, url, from('192.0.2.7', { method: 'POST' }…
++       |                                                                           ^
++    101|     expect(handled).toBe(2);
++    102|   });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-4 state-changing routes and webhooks are limited; reads are not > AC-4 PUT, PATCH and DELETE count against the same bucket [T-0142]
++AssertionError: expected 404 to be 429 // Object.is equality
++
++- Expected
+++ Received
++
++- 429
+++ 404
++
++ ❯ apps/api/src/security/rate-limit.db.test.ts:107:26
++    105|     for (const method of ['PUT', 'PATCH', 'DELETE']) {
++    106|       const res = await fetch(`${api.url}/t0142-probe/write`, from('19…
++    107|       expect(res.status).toBe(429);
++       |                          ^
++    108|     }
++    109|   });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-4 state-changing routes and webhooks are limited; reads are not > AC-4 webhooks have their own bucket: an exhausted mutating bucket does not block them [T-0142]
++AssertionError: expected 503 to be 429 // Object.is equality
++
++- Expected
+++ Received
++
++- 429
+++ 503
++
++ ❯ apps/api/src/security/rate-limit.db.test.ts:121:20
++    119|     const got = await statuses(5, url, from('192.0.2.7', { method: 'PO…
++    120|     expect(got.slice(0, 4).every((s) => s !== 429)).toBe(true);
++    121|     expect(got[4]).toBe(429);
++       |                    ^
++    122|   });
++    123|
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-4 state-changing routes and webhooks are limited; reads are not > AC-4 without a trusted proxy X-Forwarded-For is ignored: rotating it does not reset the limit [T-0142]
++AssertionError: expected [ 201, 201, 201 ] to deeply equal [ 201, 201, 429 ]
++
++- Expected
+++ Received
++
++  [
++    201,
++    201,
++-   429,
+++   201,
++  ]
++
++ ❯ apps/api/src/security/rate-limit.db.test.ts:131:17
++    129|       got.push((await fetch(url, from(ip, { method: 'POST' }))).status…
++    130|     }
++    131|     expect(got).toEqual([201, 201, 429]);
++       |                 ^
++    132|     expect(handled).toBe(2);
++    133|   });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/security-headers.db.test.ts > T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2) > AC-1 a public route (GET /health, 200) carries the OWASP REST header set [T-0142]
++AssertionError: expected { 'cache-control': null, …(5) } to deeply equal { 'cache-control': 'no-store', …(5) }
++
++- Expected
+++ Received
++
++  {
++-   "cache-control": "no-store",
++-   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
++-   "cross-origin-resource-policy": "same-origin",
++-   "referrer-policy": "no-referrer",
++-   "x-content-type-options": "nosniff",
++-   "x-frame-options": "DENY",
+++   "cache-control": null,
+++   "content-security-policy": null,
+++   "cross-origin-resource-policy": null,
+++   "referrer-policy": null,
+++   "x-content-type-options": null,
+++   "x-frame-options": null,
++  }
++
++ ❯ expectBaseline apps/api/src/security/security-headers.db.test.ts:36:15
++     34| function expectBaseline(res: Response): void {
++     35|   const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, …
++     36|   expect(got).toEqual(BASELINE);
++       |               ^
++     37|   expect(res.headers.get('x-powered-by')).toBeNull();
++     38| }
++ ❯ apps/api/src/security/security-headers.db.test.ts:44:5
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/security-headers.db.test.ts > T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2) > AC-1 an authenticated route refused without credentials (401) carries it too [T-0142]
++AssertionError: expected { 'cache-control': null, …(5) } to deeply equal { 'cache-control': 'no-store', …(5) }
++
++- Expected
+++ Received
++
++  {
++-   "cache-control": "no-store",
++-   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
++-   "cross-origin-resource-policy": "same-origin",
++-   "referrer-policy": "no-referrer",
++-   "x-content-type-options": "nosniff",
++-   "x-frame-options": "DENY",
+++   "cache-control": null,
+++   "content-security-policy": null,
+++   "cross-origin-resource-policy": null,
+++   "referrer-policy": null,
+++   "x-content-type-options": null,
+++   "x-frame-options": null,
++  }
++
++ ❯ expectBaseline apps/api/src/security/security-headers.db.test.ts:36:15
++     34| function expectBaseline(res: Response): void {
++     35|   const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, …
++     36|   expect(got).toEqual(BASELINE);
++       |               ^
++     37|   expect(res.headers.get('x-powered-by')).toBeNull();
++     38| }
++ ❯ apps/api/src/security/security-headers.db.test.ts:50:5
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/security-headers.db.test.ts > T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2) > AC-1 an unknown route (404) carries it too [T-0142]
++AssertionError: expected { 'cache-control': null, …(5) } to deeply equal { 'cache-control': 'no-store', …(5) }
++
++- Expected
+++ Received
++
++  {
++-   "cache-control": "no-store",
++-   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
++-   "cross-origin-resource-policy": "same-origin",
++-   "referrer-policy": "no-referrer",
++-   "x-content-type-options": "nosniff",
++-   "x-frame-options": "DENY",
+++   "cache-control": null,
+++   "content-security-policy": null,
+++   "cross-origin-resource-policy": null,
+++   "referrer-policy": null,
+++   "x-content-type-options": null,
+++   "x-frame-options": null,
++  }
++
++ ❯ expectBaseline apps/api/src/security/security-headers.db.test.ts:36:15
++     34| function expectBaseline(res: Response): void {
++     35|   const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, …
++     36|   expect(got).toEqual(BASELINE);
++       |               ^
++     37|   expect(res.headers.get('x-powered-by')).toBeNull();
++     38| }
++ ❯ apps/api/src/security/security-headers.db.test.ts:56:5
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/security-headers.db.test.ts > T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2) > AC-1 a refused mutation (POST without credentials) carries it too [T-0142]
++AssertionError: expected { 'cache-control': null, …(5) } to deeply equal { 'cache-control': 'no-store', …(5) }
++
++- Expected
+++ Received
++
++  {
++-   "cache-control": "no-store",
++-   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
++-   "cross-origin-resource-policy": "same-origin",
++-   "referrer-policy": "no-referrer",
++-   "x-content-type-options": "nosniff",
++-   "x-frame-options": "DENY",
+++   "cache-control": null,
+++   "content-security-policy": null,
+++   "cross-origin-resource-policy": null,
+++   "referrer-policy": null,
+++   "x-content-type-options": null,
+++   "x-frame-options": null,
++  }
++
++ ❯ expectBaseline apps/api/src/security/security-headers.db.test.ts:36:15
++     34| function expectBaseline(res: Response): void {
++     35|   const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, …
++     36|   expect(got).toEqual(BASELINE);
++       |               ^
++     37|   expect(res.headers.get('x-powered-by')).toBeNull();
++     38| }
++ ❯ apps/api/src/security/security-headers.db.test.ts:62:5
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
++
++ FAIL  |api-db| apps/api/src/security/security-headers.db.test.ts > T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2) > AC-1 HSTS only when the public URL is https (max-age one year, no preload) [T-0142]
++AssertionError: expected { 'cache-control': null, …(5) } to deeply equal { 'cache-control': 'no-store', …(5) }
++
++- Expected
+++ Received
++
++  {
++-   "cache-control": "no-store",
++-   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
++-   "cross-origin-resource-policy": "same-origin",
++-   "referrer-policy": "no-referrer",
++-   "x-content-type-options": "nosniff",
++-   "x-frame-options": "DENY",
+++   "cache-control": null,
+++   "content-security-policy": null,
+++   "cross-origin-resource-policy": null,
+++   "referrer-policy": null,
+++   "x-content-type-options": null,
+++   "x-frame-options": null,
++  }
++
++ ❯ expectBaseline apps/api/src/security/security-headers.db.test.ts:36:15
++     34| function expectBaseline(res: Response): void {
++     35|   const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, …
++     36|   expect(got).toEqual(BASELINE);
++       |               ^
++     37|   expect(res.headers.get('x-powered-by')).toBeNull();
++     38| }
++ ❯ apps/api/src/security/security-headers.db.test.ts:69:5
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
++
++
++ Test Files  2 failed (2)
++      Tests  12 failed | 5 passed (17)
++   Start at  08:13:16
++   Duration  5.42s (transform 3.37s, setup 0ms, import 6.12s, tests 2.77s, environment 0ms)
++
+diff --git a/.agent/evidence/T-0097/red-infra.txt b/.agent/evidence/T-0097/red-infra.txt
+new file mode 100644
+index 0000000..3e2a125
+--- /dev/null
++++ b/.agent/evidence/T-0097/red-infra.txt
+@@ -0,0 +1,33 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
++
++ ❯ |unit| infra/test/install-contract.test.ts (19 tests | 1 failed) 316ms
++     × T-0142 AC-5 the api trusts exactly the nginx hop for the client address, overridable by the operator (ADR-0054) 9ms
++
++⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > T-0142 AC-5 the api trusts exactly the nginx hop for the client address, overridable by the operator (ADR-0054)
++AssertionError: expected undefined to be '${LF_TRUST_PROXY_HOPS:-1}' // Object.is equality
++
++- Expected:
++"${LF_TRUST_PROXY_HOPS:-1}"
++
+++ Received:
++undefined
++
++ ❯ infra/test/install-contract.test.ts:198:61
++    196|
++    197|   it('T-0142 AC-5 the api trusts exactly the nginx hop for the client …
++    198|     expect(svc('api').environment?.['LF_TRUST_PROXY_HOPS']).toBe('${LF…
++       |                                                             ^
++    199|     for (const n of ['worker', 'setup', 'web']) {
++    200|       expect(svc(n).environment?.['LF_TRUST_PROXY_HOPS']).toBeUndefine…
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
++
++
++ Test Files  1 failed (1)
++      Tests  1 failed | 18 passed (19)
++   Start at  08:12:53
++   Duration  684ms (transform 98ms, setup 0ms, import 192ms, tests 316ms, environment 0ms)
++
+diff --git a/.agent/evidence/T-0097/red-unit.txt b/.agent/evidence/T-0097/red-unit.txt
+new file mode 100644
+index 0000000..622104a
+--- /dev/null
++++ b/.agent/evidence/T-0097/red-unit.txt
+@@ -0,0 +1,262 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
++
++ ❯ |api-unit| apps/api/src/security/rate-limit.test.ts (20 tests | 16 failed) 22ms
++     × AC-4 GET /t/acme/auth/login → auth [T-0142] 7ms
++     × AC-4 GET /auth/callback → auth [T-0142] 1ms
++     × AC-4 GET /auth/step-up → auth [T-0142] 1ms
++     × AC-4 HEAD /auth/callback → auth [T-0142] 1ms
++     × AC-4 GET /Auth//Callback/ → auth [T-0142] 1ms
++     × AC-4 POST /webhooks/stripe → webhook [T-0142] 0ms
++     × AC-4 POST /WEBHOOKS/stripe/ → webhook [T-0142] 0ms
++     × AC-4 POST /auth/logout → mutating [T-0142] 0ms
++     × AC-4 POST /ar/invoices → mutating [T-0142] 1ms
++     × AC-4 put /companies/1 → mutating [T-0142] 0ms
++     × AC-4 PATCH /users/1 → mutating [T-0142] 0ms
++     × AC-4 DELETE /api-tokens/1 → mutating [T-0142] 0ms
++     × AC-4 allows the class limit per key, then refuses with the seconds left in the window [T-0142] 3ms
++     × AC-4 Retry-After is at least one second [T-0142] 1ms
++     × AC-4 the key map is bounded: the oldest key is evicted, memory never exceeds maxKeys [T-0142] 1ms
++     × AC-5 production defaults are 30 auth, 300 mutating, 600 webhook per 60 s [T-0142] 1ms
++ ❯ |api-unit| apps/api/src/config.test.ts (12 tests | 3 failed) 21ms
++     × AC-5 production always enables the default limits; no trusted proxy unless configured [T-0142] 6ms
++     × AC-5 an https public URL turns HSTS on [T-0142] 1ms
++     × AC-5 LF_TRUST_PROXY_HOPS is an integer 0–5; anything else is refused at start-up [T-0142] 3ms
++
++⎯⎯⎯⎯⎯⎯ Failed Tests 19 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |api-unit| apps/api/src/config.test.ts > T-0142 AC-5 security headers and rate limits from the environment (ADR-0054) > AC-5 production always enables the default limits; no trusted proxy unless configured [T-0142]
++AssertionError: expected undefined to deeply equal { hsts: false, …(2) }
++
++- Expected:
++{
++  "hsts": false,
++  "rateLimits": {
++    "auth": 0,
++    "mutating": 0,
++    "webhook": 0,
++    "windowMs": 0,
++  },
++  "trustProxyHops": 0,
++}
++
+++ Received:
++undefined
++
++ ❯ apps/api/src/config.test.ts:169:24
++    167|   it('AC-5 production always enables the default limits; no trusted pr…
++    168|     const o = apiOptionsFromEnv(base, readFile);
++    169|     expect(o.security).toEqual({ hsts: false, trustProxyHops: 0, rateL…
++       |                        ^
++    170|   });
++    171|
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/19]⎯
++
++ FAIL  |api-unit| apps/api/src/config.test.ts > T-0142 AC-5 security headers and rate limits from the environment (ADR-0054) > AC-5 an https public URL turns HSTS on [T-0142]
++AssertionError: expected undefined to be true // Object.is equality
++
++- Expected:
++true
++
+++ Received:
++undefined
++
++ ❯ apps/api/src/config.test.ts:177:30
++    175|       readFile,
++    176|     );
++    177|     expect(o.security?.hsts).toBe(true);
++       |                              ^
++    178|   });
++    179|
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/19]⎯
++
++ FAIL  |api-unit| apps/api/src/config.test.ts > T-0142 AC-5 security headers and rate limits from the environment (ADR-0054) > AC-5 LF_TRUST_PROXY_HOPS is an integer 0–5; anything else is refused at start-up [T-0142]
++AssertionError: expected [ undefined, undefined, undefined ] to deeply equal [ +0, 1, 5 ]
++
++- Expected
+++ Received
++
++  [
++-   0,
++-   1,
++-   5,
+++   undefined,
+++   undefined,
+++   undefined,
++  ]
++
++ ❯ apps/api/src/config.test.ts:183:47
++    181|     const hops = (v: string): number | undefined =>
++    182|       apiOptionsFromEnv({ ...base, LF_TRUST_PROXY_HOPS: v }, readFile)…
++    183|     expect([hops('0'), hops('1'), hops('5')]).toEqual([0, 1, 5]);
++       |                                               ^
++    184|     for (const bad of ['6', '-1', 'true', '1.5', ' 1', '']) {
++    185|       expect(() => apiOptionsFromEnv({ ...base, LF_TRUST_PROXY_HOPS: b…
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/19]⎯
++
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 GET /t/acme/auth/login → auth [T-0142]
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 GET /auth/callback → auth [T-0142]
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 GET /auth/step-up → auth [T-0142]
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 HEAD /auth/callback → auth [T-0142]
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 GET /Auth//Callback/ → auth [T-0142]
++AssertionError: expected null to be 'auth' // Object.is equality
++
++- Expected:
++"auth"
++
+++ Received:
++null
++
++ ❯ apps/api/src/security/rate-limit.test.ts:27:42
++     25|     ['GET', '/t/acme/auth/login/extra', null],
++     26|   ])('AC-4 %s %s → %s [T-0142]', (method, path, cls) => {
++     27|     expect(rateLimitClass(method, path)).toBe(cls);
++       |                                          ^
++     28|   });
++     29| });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/19]⎯
++
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 POST /webhooks/stripe → webhook [T-0142]
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 POST /WEBHOOKS/stripe/ → webhook [T-0142]
++AssertionError: expected null to be 'webhook' // Object.is equality
++
++- Expected:
++"webhook"
++
+++ Received:
++null
++
++ ❯ apps/api/src/security/rate-limit.test.ts:27:42
++     25|     ['GET', '/t/acme/auth/login/extra', null],
++     26|   ])('AC-4 %s %s → %s [T-0142]', (method, path, cls) => {
++     27|     expect(rateLimitClass(method, path)).toBe(cls);
++       |                                          ^
++     28|   });
++     29| });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/19]⎯
++
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 POST /auth/logout → mutating [T-0142]
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 POST /ar/invoices → mutating [T-0142]
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 put /companies/1 → mutating [T-0142]
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 PATCH /users/1 → mutating [T-0142]
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 DELETE /api-tokens/1 → mutating [T-0142]
++AssertionError: expected null to be 'mutating' // Object.is equality
++
++- Expected:
++"mutating"
++
+++ Received:
++null
++
++ ❯ apps/api/src/security/rate-limit.test.ts:27:42
++     25|     ['GET', '/t/acme/auth/login/extra', null],
++     26|   ])('AC-4 %s %s → %s [T-0142]', (method, path, cls) => {
++     27|     expect(rateLimitClass(method, path)).toBe(cls);
++       |                                          ^
++     28|   });
++     29| });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/19]⎯
++
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 fixed-window limiter > AC-4 allows the class limit per key, then refuses with the seconds left in the window [T-0142]
++AssertionError: expected { allowed: true } to deeply equal { Object (allowed, retryAfterSeconds) }
++
++- Expected
+++ Received
++
++  {
++-   "allowed": false,
++-   "retryAfterSeconds": 8,
+++   "allowed": true,
++  }
++
++ ❯ apps/api/src/security/rate-limit.test.ts:40:32
++     38|     t += 2_500;
++     39|     expect(l.hit('auth', 'a')).toEqual({ allowed: true });
++     40|     expect(l.hit('auth', 'a')).toEqual({ allowed: false, retryAfterSec…
++       |                                ^
++     41|     expect(l.hit('auth', 'b')).toEqual({ allowed: true });
++     42|     expect(l.hit('mutating', 'a')).toEqual({ allowed: true });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/19]⎯
++
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 fixed-window limiter > AC-4 Retry-After is at least one second [T-0142]
++AssertionError: expected { allowed: true } to deeply equal { Object (allowed, retryAfterSeconds) }
++
++- Expected
+++ Received
++
++  {
++-   "allowed": false,
++-   "retryAfterSeconds": 1,
+++   "allowed": true,
++  }
++
++ ❯ apps/api/src/security/rate-limit.test.ts:53:36
++     51|     l.hit('mutating', 'a');
++     52|     t = 9_999;
++     53|     expect(l.hit('mutating', 'a')).toEqual({ allowed: false, retryAfte…
++       |                                    ^
++     54|   });
++     55|
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/19]⎯
++
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 fixed-window limiter > AC-4 the key map is bounded: the oldest key is evicted, memory never exceeds maxKeys [T-0142]
++AssertionError: expected +0 to be 2 // Object.is equality
++
++- Expected
+++ Received
++
++- 2
+++ 0
++
++ ❯ apps/api/src/security/rate-limit.test.ts:62:20
++     60|     l.hit('mutating', 'b');
++     61|     l.hit('mutating', 'c');
++     62|     expect(l.size).toBe(2);
++       |                    ^
++     63|     // 'a' was evicted, so it starts a fresh window; 'c' is still coun…
++     64|     expect(l.hit('mutating', 'a')).toEqual({ allowed: true });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/19]⎯
++
++ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 fixed-window limiter > AC-5 production defaults are 30 auth, 300 mutating, 600 webhook per 60 s [T-0142]
++AssertionError: expected { windowMs: +0, auth: +0, …(2) } to deeply equal { windowMs: 60000, auth: 30, …(3) }
++
++- Expected
+++ Received
++
++  {
++-   "auth": 30,
++-   "maxKeys": 50000,
++-   "mutating": 300,
++-   "webhook": 600,
++-   "windowMs": 60000,
+++   "auth": 0,
+++   "mutating": 0,
+++   "webhook": 0,
+++   "windowMs": 0,
++  }
++
++ ❯ apps/api/src/security/rate-limit.test.ts:69:33
++     67|
++     68|   it('AC-5 production defaults are 30 auth, 300 mutating, 600 webhook …
++     69|     expect(DEFAULT_RATE_LIMITS).toEqual({
++       |                                 ^
++     70|       windowMs: 60_000,
++     71|       auth: 30,
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/19]⎯
++
++
++ Test Files  2 failed (2)
++      Tests  19 failed | 13 passed (32)
++   Start at  08:13:10
++   Duration  514ms (transform 216ms, setup 0ms, import 411ms, tests 42ms, environment 0ms)
++
+diff --git a/.agent/evidence/T-0097/regression-api-db.txt b/.agent/evidence/T-0097/regression-api-db.txt
+new file mode 100644
+index 0000000..9b33d5b
+--- /dev/null
++++ b/.agent/evidence/T-0097/regression-api-db.txt
+@@ -0,0 +1,57 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
++
++[db] test PostgreSQL ready (local) on 127.0.0.1:36773
++(node:16857) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
++(Use `node --trace-deprecation ...` to show where the warning was created)
++[31m[Nest] 16857  - [39m11/13/2026, 8:21:04 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39merror: permission denied for table job_common
++    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/pg@8.23.1/node_modules/[4mpg[24m/lib/client.js:694:17
++[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
++    at async PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:118:28[90m)[39m
++    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
++    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
++    at async #run [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
++    at async DefaultQueryExecutor.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
++    at async Transaction.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:545:16[90m)[39m
++    at async Object.executeSql [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/adapters/kysely.js:4:28[90m)[39m
++    at async #createJob [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/manager.js:1372:32[90m)[39m
++    at PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:131:41[90m)[39m
++[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
++    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
++    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
++    at async #run [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
++    at async DefaultQueryExecutor.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
++    at async Transaction.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:545:16[90m)[39m
++    at async Object.executeSql [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/adapters/kysely.js:4:28[90m)[39m
++    at async #createJob [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/manager.js:1372:32[90m)[39m
++    at async Telemetry.send [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/telemetry.js:189:28[90m)[39m {
++  length: [33m98[39m,
++  severity: [32m'ERROR'[39m,
++  code: [32m'42501'[39m,
++  detail: [90mundefined[39m,
++  hint: [90mundefined[39m,
++  position: [90mundefined[39m,
++  internalPosition: [90mundefined[39m,
++  internalQuery: [90mundefined[39m,
++  where: [90mundefined[39m,
++  schema: [90mundefined[39m,
++  table: [90mundefined[39m,
++  column: [90mundefined[39m,
++  dataType: [90mundefined[39m,
++  constraint: [90mundefined[39m,
++  file: [32m'aclchk.c'[39m,
++  line: [32m'2812'[39m,
++  routine: [32m'aclcheck_error'[39m
++}
++(node:17518) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
++(Use `node --trace-deprecation ...` to show where the warning was created)
++(node:17818) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
++(Use `node --trace-deprecation ...` to show where the warning was created)
++(node:18458) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
++(Use `node --trace-deprecation ...` to show where the warning was created)
++
++ Test Files  30 passed (30)
++      Tests  223 passed (223)
++   Start at  08:20:42
++   Duration  102.69s (transform 8.23s, setup 0ms, import 143.04s, tests 136.99s, environment 24ms)
++
+diff --git a/.agent/evidence/T-0097/regression-unit.txt b/.agent/evidence/T-0097/regression-unit.txt
+new file mode 100644
+index 0000000..71ca747
+--- /dev/null
++++ b/.agent/evidence/T-0097/regression-unit.txt
+@@ -0,0 +1,9 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
++
++
++ Test Files  75 passed (75)
++      Tests  916 passed (916)
++   Start at  08:20:03
++   Duration  37.10s (transform 11.66s, setup 0ms, import 45.80s, tests 26.11s, environment 11ms)
++
+diff --git a/Docs/ops/install.md b/Docs/ops/install.md
+index 75ab5d0..eb753cc 100644
+--- a/Docs/ops/install.md
++++ b/Docs/ops/install.md
+@@ -108,6 +108,13 @@ After the Owner's first sign-in, setup refuses to reissue.
+ 
+ - **TLS**: terminate TLS in your reverse proxy and forward to `127.0.0.1:${LF_HTTP_PORT}` with the
+   `Host` and `X-Forwarded-Proto: https` headers. Use TLS 1.2+ (1.3 preferred).
++- **Client addresses and rate limits** (ADR-0054): the API limits sign-in routes and every
++  write per client address (auth 30, writes 300, webhooks 600 per minute; excess answers 429 with
++  `Retry-After`). It finds the address from `X-Forwarded-For`, trusting `LF_TRUST_PROXY_HOPS`
++  proxies (default `1` = the `web` nginx). If your TLS proxy appends `X-Forwarded-For`, set
++  `LF_TRUST_PROXY_HOPS=2`; otherwise leave `1`. Too low merges every user into the proxy's bucket;
++  too high lets a client choose its own bucket. The API also sends `Cache-Control: no-store`,
++  CSP, `nosniff`, `X-Frame-Options: DENY` and, for an https `LF_PUBLIC_URL`, HSTS (one year).
+ - **Reachability**: the api container must reach `LF_PUBLIC_URL` (it fetches the OIDC discovery
+   document from it). With public DNS this works through your reverse proxy; check with
+   `docker compose … exec api node -e "fetch(process.env.LF_PUBLIC_URL+'/realms/ledgerforce').then(r=>console.log(r.status))"`.
+diff --git a/apps/api/src/app.ts b/apps/api/src/app.ts
+index fe2232b..66c08d2 100644
+--- a/apps/api/src/app.ts
++++ b/apps/api/src/app.ts
+@@ -46,6 +46,7 @@ import {
+ import { AuditTrail, TenantTx } from './tenancy/tenant-tx.ts';
+ import { AuditLogController } from './audit/audit-log.controller.ts';
+ import { requestIdMiddleware } from './audit/request-id.ts';
++import { applySecurity, type SecurityOptions } from './security/security.ts';
+ import { SyncIssuesController } from './sync/sync-issues.controller.ts';
+ import { CLOCK, DB, KMS, MFA_POLICY, SYNC_REQUEUE } from './tokens.ts';
+ import type { DeliveryRequeue } from '@ledgerforce/outbox';
+@@ -82,6 +83,8 @@ export interface ApiOptions {
+   stripeWebhook?: StripeWebhookOptions;
+   /** Document events (write-back snapshots), written in the request's transaction. */
+   documentOutbox?: DocumentOutbox;
++  /** Security headers, trusted proxy hops and rate limits (ADR-0054, T-0142). */
++  security?: SecurityOptions;
+   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
+   tenantResolver?: TenantResolver;
+   /** Test hook: extra controllers (stand-ins for routes of later tasks, e.g. SS-UC02-07). */
+@@ -252,6 +255,8 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
+       rawBody: true,
+     },
+   );
++  // First: headers on every answer (429s included), limits before routing and request ids (ADR-0054).
++  applySecurity(app, opts.security);
+   app.use(requestIdMiddleware);
+   await app.listen(opts.port ?? 0, opts.host ?? '127.0.0.1');
+   const addr = app.getHttpServer().address() as AddressInfo;
+diff --git a/apps/api/src/config.ts b/apps/api/src/config.ts
+index 7e3ca39..019422f 100644
+--- a/apps/api/src/config.ts
++++ b/apps/api/src/config.ts
+@@ -19,6 +19,7 @@ import {
+ } from '@ledgerforce/db';
+ import { readFileSync } from 'node:fs';
+ import type { ApiOptions } from './app.ts';
++import { DEFAULT_RATE_LIMITS } from './security/rate-limit.ts';
+ 
+ export type ApiRuntimeOptions = ApiOptions & { host: string; port: number };
+ 
+@@ -54,6 +55,17 @@ function port(env: Env): number {
+   return n;
+ }
+ 
++/**
++ * LF_TRUST_PROXY_HOPS (ADR-0054 rule 5): how many proxies in front of the API append trusted
++ * X-Forwarded-For entries — compose's nginx is 1, plus 1 for an operator's TLS proxy. Default 0.
++ */
++function trustProxyHops(env: Env): number {
++  const raw = env['LF_TRUST_PROXY_HOPS'];
++  if (raw === undefined) return 0;
++  if (!/^[0-5]$/.test(raw)) throw new ConfigError('LF_TRUST_PROXY_HOPS must be an integer 0–5');
++  return Number(raw);
++}
++
+ export function apiOptionsFromEnv(
+   env: Env,
+   readFile: ReadFile = (p) => readFileSync(p, 'utf8'),
+@@ -63,6 +75,12 @@ export function apiOptionsFromEnv(
+   const opts: ApiRuntimeOptions = {
+     databaseUrl,
+     sessions: {},
++    // ADR-0054: always on in production; HSTS only when the public origin is https.
++    security: {
++      hsts: !publicUrl.insecure,
++      trustProxyHops: trustProxyHops(env),
++      rateLimits: DEFAULT_RATE_LIMITS,
++    },
+     host: env['HOST'] ?? '127.0.0.1',
+     port: port(env),
+   };
+diff --git a/apps/api/src/security/rate-limit.db.test.ts b/apps/api/src/security/rate-limit.db.test.ts
+index 2fffbe6..af8d486 100644
+--- a/apps/api/src/security/rate-limit.db.test.ts
++++ b/apps/api/src/security/rate-limit.db.test.ts
+@@ -82,7 +82,12 @@ describe('T-0142 AC-3 auth routes are limited per client address', () => {
+   });
+ 
+   it('AC-3 case and trailing-slash variants of an auth route share its bucket [T-0142]', async () => {
+-    for (const path of ['/AUTH/step-up', '/auth/step-up/', '/t/acme/auth/login', '/auth/callback']) {
++    for (const path of [
++      '/AUTH/step-up',
++      '/auth/step-up/',
++      '/t/acme/auth/login',
++      '/auth/callback',
++    ]) {
+       expect((await fetch(`${api.url}${path}`, from('203.0.113.1'))).status).toBe(429);
+     }
+   });
+diff --git a/apps/api/src/security/rate-limit.test.ts b/apps/api/src/security/rate-limit.test.ts
+index 2d50457..9de96b5 100644
+--- a/apps/api/src/security/rate-limit.test.ts
++++ b/apps/api/src/security/rate-limit.test.ts
+@@ -35,11 +35,12 @@ describe('T-0142 fixed-window limiter', () => {
+     let t = 1_000_000;
+     const l = new FixedWindowLimiter(policy, () => t);
+     expect(l.hit('auth', 'a')).toEqual({ allowed: true });
++    // Each (class, key) has its own window, opened by its first hit.
++    expect(l.hit('mutating', 'a')).toEqual({ allowed: true });
+     t += 2_500;
+     expect(l.hit('auth', 'a')).toEqual({ allowed: true });
+     expect(l.hit('auth', 'a')).toEqual({ allowed: false, retryAfterSeconds: 8 });
+     expect(l.hit('auth', 'b')).toEqual({ allowed: true });
+-    expect(l.hit('mutating', 'a')).toEqual({ allowed: true });
+     expect(l.hit('mutating', 'a')).toEqual({ allowed: false, retryAfterSeconds: 8 });
+     t += 7_500;
+     expect(l.hit('auth', 'a')).toEqual({ allowed: true });
+diff --git a/apps/api/src/security/rate-limit.ts b/apps/api/src/security/rate-limit.ts
+new file mode 100644
+index 0000000..ac3baa7
+--- /dev/null
++++ b/apps/api/src/security/rate-limit.ts
+@@ -0,0 +1,102 @@
++/**
++ * Per-client-address rate limits (ADR-0054 rule 4, RQ-0141 F4–F6): fixed 60-second windows per
++ * (route class, address), answered with 429 + Retry-After before routing. Counters live in this
++ * process (single API process in the compose MVP); the key map is bounded.
++ */
++import type { NextFunction, Request, Response } from 'express';
++
++export type RateLimitClass = 'auth' | 'mutating' | 'webhook';
++
++export interface RateLimitPolicy {
++  windowMs: number;
++  /** Requests per window per client address, by class. */
++  auth: number;
++  mutating: number;
++  webhook: number;
++  /** Most (class, address) counters kept; the oldest is evicted beyond it. Default 50 000. */
++  maxKeys?: number;
++}
++
++export const DEFAULT_RATE_LIMITS: RateLimitPolicy = {
++  windowMs: 60_000,
++  auth: 30,
++  mutating: 300,
++  webhook: 600,
++  maxKeys: 50_000,
++};
++
++export type Hit = { allowed: true } | { allowed: false; retryAfterSeconds: number };
++
++const SAFE = new Set(['GET', 'HEAD', 'OPTIONS']);
++const AUTH = /^\/(?:t\/[^/]+\/auth\/login|auth\/(?:callback|step-up))$/;
++const WEBHOOK = /^\/webhooks(?:\/|$)/;
++
++/**
++ * The class a request counts against, or null when it is not limited. The path is normalised the
++ * way Express routes it (case-insensitive, trailing slash optional), plus repeated slashes, so a
++ * spelling variant of a route cannot fall outside its class.
++ */
++export function rateLimitClass(method: string, path: string): RateLimitClass | null {
++  const p = path
++    .toLowerCase()
++    .replace(/\/{2,}/g, '/')
++    .replace(/(.)\/+$/, '$1');
++  if (AUTH.test(p)) return 'auth';
++  if (SAFE.has(method.toUpperCase())) return null;
++  return WEBHOOK.test(p) ? 'webhook' : 'mutating';
++}
++
++export class FixedWindowLimiter {
++  // Insertion order = window start order (a new window re-inserts), so the first key is the oldest.
++  private readonly windows = new Map<string, { start: number; count: number }>();
++
++  constructor(
++    private readonly policy: RateLimitPolicy,
++    private readonly now: () => number,
++  ) {}
++
++  get size(): number {
++    return this.windows.size;
++  }
++
++  hit(cls: RateLimitClass, key: string): Hit {
++    const t = this.now();
++    const id = `${cls} ${key}`;
++    const w = this.windows.get(id);
++    if (w && t - w.start < this.policy.windowMs) {
++      if (w.count >= this.policy[cls]) {
++        const left = w.start + this.policy.windowMs - t;
++        return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil(left / 1000)) };
++      }
++      w.count += 1;
++      return { allowed: true };
++    }
++    this.windows.delete(id);
++    const max = this.policy.maxKeys ?? DEFAULT_RATE_LIMITS.maxKeys ?? 50_000;
++    while (this.windows.size >= max) {
++      const oldest = this.windows.keys().next().value;
++      if (oldest === undefined) break;
++      this.windows.delete(oldest);
++    }
++    this.windows.set(id, { start: t, count: 1 });
++    return { allowed: true };
++  }
++}
++
++/** Express middleware: refuse over-limit requests with 429 {error:'rate_limited'} + Retry-After. */
++export function rateLimitMiddleware(limiter: FixedWindowLimiter) {
++  return (req: Request, res: Response, next: NextFunction): void => {
++    const cls = rateLimitClass(req.method, req.path);
++    if (cls === null) {
++      next();
++      return;
++    }
++    const hit = limiter.hit(cls, (req.ip ?? 'unknown').replace(/^::ffff:/, ''));
++    if (hit.allowed) {
++      next();
++      return;
++    }
++    res.setHeader('Retry-After', String(hit.retryAfterSeconds));
++    res.status(429).json({ error: 'rate_limited' });
++  };
++}
+diff --git a/apps/api/src/security/security.ts b/apps/api/src/security/security.ts
+new file mode 100644
+index 0000000..8601ffb
+--- /dev/null
++++ b/apps/api/src/security/security.ts
+@@ -0,0 +1,53 @@
++/**
++ * Request-level hardening of the API (ADR-0054, RQ-0141): OWASP REST security headers on every
++ * response, no X-Powered-By, HSTS for an https public URL, the trusted proxy hop count, and the
++ * rate limits. CORS is deliberately never enabled (rule 3).
++ */
++import type { INestApplication } from '@nestjs/common';
++import type { Express, NextFunction, Request, Response } from 'express';
++import { FixedWindowLimiter, rateLimitMiddleware, type RateLimitPolicy } from './rate-limit.ts';
++
++export interface SecurityOptions {
++  /** Send Strict-Transport-Security (only when the public URL is https). */
++  hsts?: boolean;
++  /** Proxies in front of the API whose X-Forwarded-For entries are trusted (0–5). Default 0. */
++  trustProxyHops?: number;
++  /** Rate limits; absent = none (unit/DB test harness). Production always sets them (config.ts). */
++  rateLimits?: RateLimitPolicy;
++  /** Test hook: the limiter's clock (ms). */
++  now?: () => number;
++}
++
++const HEADERS: readonly (readonly [string, string])[] = [
++  ['Cache-Control', 'no-store'],
++  ['Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'"],
++  ['X-Content-Type-Options', 'nosniff'],
++  ['X-Frame-Options', 'DENY'],
++  ['Referrer-Policy', 'no-referrer'],
++  ['Cross-Origin-Resource-Policy', 'same-origin'],
++];
++const HSTS = ['Strict-Transport-Security', 'max-age=31536000'] as const;
++
++export function securityHeaders(hsts: boolean) {
++  const headers = hsts ? [...HEADERS, HSTS] : HEADERS;
++  return (_req: Request, res: Response, next: NextFunction): void => {
++    for (const [name, value] of headers) res.setHeader(name, value);
++    next();
++  };
++}
++
++/** Installs the hardening on the Express instance; call before any other middleware or route. */
++export function applySecurity(app: INestApplication, opts: SecurityOptions = {}): void {
++  const hops = opts.trustProxyHops ?? 0;
++  if (!Number.isInteger(hops) || hops < 0 || hops > 5) {
++    throw new Error('security.trustProxyHops must be an integer 0–5');
++  }
++  const express = app.getHttpAdapter().getInstance() as Express;
++  express.disable('x-powered-by');
++  express.set('trust proxy', hops);
++  app.use(securityHeaders(opts.hsts ?? false));
++  if (opts.rateLimits) {
++    const limiter = new FixedWindowLimiter(opts.rateLimits, opts.now ?? Date.now);
++    app.use(rateLimitMiddleware(limiter));
++  }
++}
+diff --git a/infra/compose/compose.yaml b/infra/compose/compose.yaml
+index fe1b9c2..efce9f3 100644
+--- a/infra/compose/compose.yaml
++++ b/infra/compose/compose.yaml
+@@ -123,6 +123,9 @@ services:
+       LF_OIDC_ISSUER: ${LF_PUBLIC_URL}/realms/ledgerforce
+       LF_OIDC_CLIENT_ID: ledgerforce
+       LF_OIDC_CLIENT_SECRET_FILE: /run/secrets/oidc_client_secret
++      # Proxies whose X-Forwarded-For the API trusts for rate limits (ADR-0054): nginx = 1; set 2
++      # when your TLS proxy in front of `web` appends X-Forwarded-For (Docs/ops/install.md).
++      LF_TRUST_PROXY_HOPS: ${LF_TRUST_PROXY_HOPS:-1}
+     secrets: [lf_app_password, oidc_client_secret]
+     depends_on:
+       setup: { condition: service_completed_successfully }
+diff --git a/infra/test/install-contract.test.ts b/infra/test/install-contract.test.ts
+index 43cc0dc..5be4233 100644
+--- a/infra/test/install-contract.test.ts
++++ b/infra/test/install-contract.test.ts
+@@ -194,6 +194,13 @@ describe('SS-PLAT-86 compose stack', () => {
+     expect(svc('web').secrets ?? []).toEqual([]);
+   });
+ 
++  it('T-0142 AC-5 the api trusts exactly the nginx hop for the client address, overridable by the operator (ADR-0054)', () => {
++    expect(svc('api').environment?.['LF_TRUST_PROXY_HOPS']).toBe('${LF_TRUST_PROXY_HOPS:-1}');
++    for (const n of ['worker', 'setup', 'web']) {
++      expect(svc(n).environment?.['LF_TRUST_PROXY_HOPS']).toBeUndefined();
++    }
++  });
++
+   it('SS-PLAT-86 the runtime connects as lf_app; only setup holds the migrator password', () => {
+     for (const n of ['api', 'worker']) {
+       const env = svc(n).environment ?? {};
+-- 
+2.43.0
+

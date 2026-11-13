@@ -1,0 +1,1957 @@
+From eb385138b6917cf7fe176bb86ab2ee7a25461846 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 08:48:27 +0000
+Subject: [PATCH 4/4] wip(T-0117): save agent work interrupted by the usage
+ limit again (unverified)
+
+What changed: Uncommitted work of the T-0117 sub-agent, saved by the lead as-is.
+Why: Second 5-hour usage-limit stop.
+Validation: none by the lead.
+Next action: the agent resumes after the reset.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .agent/backlog/README.md                      |   4 +-
+ .agent/backlog/T-0117.md                      |   8 +-
+ .agent/backlog/T-0145.md                      |  48 ++++
+ .agent/backlog/T-0146.md                      |  46 ++++
+ .agent/evidence/T-0117/red-ac2-db.txt         | 209 +++++++++++++++
+ .agent/evidence/T-0117/red-ac2-unit.txt       | 106 ++++++++
+ .agent/evidence/T-0117/red-ac2-view-check.txt |  36 +++
+ .agent/evidence/T-0117/red-ac3-golden-db.txt  |  33 +++
+ .agent/evidence/T-0117/red-ac3-unit.txt       |  41 +++
+ .../evidence/T-0117/rq-0143-probe-output.txt  |  33 +++
+ .../T-0117/rq-0143-probe.db.test.ts.txt       |  27 ++
+ .agent/state.json                             |  13 +-
+ Docs/adr/0061-additive-system-role-binding.md | 137 ++++++++++
+ .../RQ-0143-period-end-system-roles.md        | 107 ++++++++
+ .../0062_gl_period_end_system_roles.sql       | 120 +++++++++
+ packages/db/src/rls.db.test.ts                |  24 ++
+ packages/db/src/schema.ts                     |  22 ++
+ packages/db/src/testing/cross-tenant.ts       |  25 +-
+ packages/ledger/src/golden/postings.test.ts   |  20 +-
+ packages/ledger/src/golden/postings.ts        |  16 +-
+ packages/ledger/src/posting-engine.ts         |   4 +-
+ packages/ledger/src/subledger.ts              |   4 +-
+ packages/modules/gl/src/chart.db.test.ts      |   6 +-
+ packages/modules/gl/src/chart.ts              |  20 +-
+ .../gl/src/period-end-roles.db.test.ts        | 238 ++++++++++++++++++
+ packages/modules/gl/src/system-roles.test.ts  |  44 ++++
+ packages/modules/gl/src/system-roles.ts       |  41 ++-
+ packages/modules/gl/src/templates.test.ts     |  10 +-
+ .../modules/gl/templates/au-services-smb.json |  29 +--
+ packages/modules/reporting/src/reports.ts     |   2 +-
+ 30 files changed, 1424 insertions(+), 49 deletions(-)
+ create mode 100644 .agent/backlog/T-0145.md
+ create mode 100644 .agent/backlog/T-0146.md
+ create mode 100644 .agent/evidence/T-0117/red-ac2-db.txt
+ create mode 100644 .agent/evidence/T-0117/red-ac2-unit.txt
+ create mode 100644 .agent/evidence/T-0117/red-ac2-view-check.txt
+ create mode 100644 .agent/evidence/T-0117/red-ac3-golden-db.txt
+ create mode 100644 .agent/evidence/T-0117/red-ac3-unit.txt
+ create mode 100644 .agent/evidence/T-0117/rq-0143-probe-output.txt
+ create mode 100644 .agent/evidence/T-0117/rq-0143-probe.db.test.ts.txt
+ create mode 100644 Docs/adr/0061-additive-system-role-binding.md
+ create mode 100644 Docs/research/RQ-0143-period-end-system-roles.md
+ create mode 100644 packages/db/migrations/0062_gl_period_end_system_roles.sql
+ create mode 100644 packages/modules/gl/src/period-end-roles.db.test.ts
+ create mode 100644 packages/modules/gl/src/system-roles.test.ts
+
+diff --git a/.agent/backlog/README.md b/.agent/backlog/README.md
+index 21eb868..9e9c7fd 100644
+--- a/.agent/backlog/README.md
++++ b/.agent/backlog/README.md
+@@ -222,7 +222,7 @@ graph LR
+ | [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | done | T-0010 |
+ | [T-0115](T-0115.md) | AASB alignment: research Australian Accounting Standards and update the solution design | MVP | review | — |
+ | [T-0116](T-0116.md) | Template roles, accounts and source types for the AASB/GST golden postings | MVP | review | T-0031 |
+-| [T-0117](T-0117.md) | Promote period-end accounts to system roles (additive role binding) | Phase 1 | todo | T-0116 |
++| [T-0117](T-0117.md) | Promote period-end accounts to system roles (additive role binding) | Phase 1 | verifying | T-0116 |
+ | [T-0118](T-0118.md) | Tax codes in the database: effective-dated tax_code table, company rounding setting, line wiring | MVP | review | T-0034 |
+ | [T-0119](T-0119.md) | Chromium in the worker image and PDF rendering as a worker job | MVP | todo | T-0041 |
+ | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
+@@ -237,6 +237,8 @@ graph LR
+ | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
+ | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | todo | T-0047, T-0035 | UC-04 | 3 |
+ | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
++| [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | todo | T-0117 | UC-11 | 0 |
++| [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |
+ 
+ ## Latest update — 2026-11-01
+ Existing T-0095 work saved as WIP at user request:
+diff --git a/.agent/backlog/T-0117.md b/.agent/backlog/T-0117.md
+index e562928..1453c8b 100644
+--- a/.agent/backlog/T-0117.md
++++ b/.agent/backlog/T-0117.md
+@@ -4,10 +4,10 @@ title: "Promote period-end accounts to system roles (additive role binding)"
+ phase: Phase 1
+ use_cases: []
+ depends_on: [T-0116]
+-status: todo
+-claimed_by: null
+-lease_expires_at: null
+-attempts: 0
++status: claimed
++claimed_by: claude
++lease_expires_at: 2026-11-13T08:59:09.989Z
++attempts: 1
+ last_checkpoint: null
+ adr_required: true
+ research: [RQ-0095]
+diff --git a/.agent/backlog/T-0145.md b/.agent/backlog/T-0145.md
+new file mode 100644
+index 0000000..582367a
+--- /dev/null
++++ b/.agent/backlog/T-0145.md
+@@ -0,0 +1,48 @@
++---
++id: T-0145
++title: "AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role"
++phase: Phase 1
++use_cases: [UC-11]
++depends_on: [T-0117]
++status: todo
++claimed_by: null
++lease_expires_at: null
++attempts: 0
++last_checkpoint: null
++adr_required: false
++research: [RQ-0143]
++success_scenarios: []
++evidence: []
++---
++
++# T-0145 — AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role
++
++## Goal
++Design §3.2 resolves accounts by role. Since T-0117 (ADR-0061) AR_ECL_ALLOWANCE is a bound system
++role, but `packages/modules/ar/src/write-off.ts` still reads the allowance account from
++`app.ar_settings.ecl_allowance_account_id` and refuses a write-off when it is not set. Post the
++allowance line as `{ role: 'AR_ECL_ALLOWANCE' }` (GP-024, GP-038/039) and decide what the
++setting becomes (explicit override or deprecated: data shape change → DL entry, ADR if the
++column is deprecated).
++
++## Acceptance criteria (each maps to a test)
++- AC-1 Given a company whose template bound AR_ECL_ALLOWANCE and no ar_settings allowance,
++  when a debt is written off via the allowance, then the journal matches GP-024 line for line
++  → `packages/modules/ar/src/write-off.db.test.ts`.
++- AC-2 The gross-allowance lifecycle (GP-038/039) still replays → `packages/modules/ar/src/gross-allowance.db.test.ts`.
++- AC-3 The remaining-allowance query reads the role-bound account → `write-off.db.test.ts`.
++
++## Open questions
++- Keep `ecl_allowance_account_id` as an override of the role, or deprecate it (comment + ADR)?
++
++## Steps (checked off as done)
++- [ ] 1. RED: acceptance tests for AC-1..3
++- [ ] 2. Resolve by role; decide the setting
++- [ ] 3. verify.sh [phase: verify]
++- [ ] 4. Cross-provider review [phase: review]
++
++## Notes for the next agent
++- Created 2026-11-13 by claude from T-0117 (ADR-0061 follow-up).
++- The template keeps the `ecl_allowance_account` suggested setting for now because this
++  setting still feeds `ar_settings`; the six other period-end suggested settings were removed
++  in T-0117.
+diff --git a/.agent/backlog/T-0146.md b/.agent/backlog/T-0146.md
+new file mode 100644
+index 0000000..2025b97
+--- /dev/null
++++ b/.agent/backlog/T-0146.md
+@@ -0,0 +1,46 @@
++---
++id: T-0146
++title: "GL: re-bind a system role (core or period-end) through the API"
++phase: Phase 1
++use_cases: []
++depends_on: [T-0117, T-0082]
++status: todo
++claimed_by: null
++lease_expires_at: null
++attempts: 0
++last_checkpoint: null
++adr_required: false
++research: [RQ-0143]
++success_scenarios: []
++evidence: []
++---
++
++# T-0146 — GL: re-bind a system role (core or period-end) through the API
++
++## Goal
++Design §3.2: system roles are bound at setup and re-bound, never unbound. The database supports
++re-binding by UPDATE of `account_id` in `app.account_system_role` (0005) and
++`app.account_system_role_ext` (0062, ADR-0061), but no module function or API route does it.
++Add `rebindSystemRole(trx, { companyId, role, accountId })` in `packages/modules/gl` that writes
++to `bindingTableFor(role)`, audits the change, and an API route with a permission, so the chart
++UI and setup wizard can move a role to another account of an allowed type.
++
++## Acceptance criteria (each maps to a test)
++- AC-1 Re-binding a core role and a period-end role updates the right table and
++  `app.account_role_binding` shows the new account → `packages/modules/gl/src/rebind.db.test.ts`.
++- AC-2 A re-bind to an account of a disallowed type, archived, or non-postable is refused with
++  the database message → `rebind.db.test.ts`.
++- AC-3 The route needs the GL admin permission and writes an audit row → API test.
++
++## Open questions
++- Which permission (existing `gl.admin`-style permission or a new one)? Check the permission
++  catalogue first.
++
++## Steps (checked off as done)
++- [ ] 1. RED: acceptance tests for AC-1..3
++- [ ] 2. Module function and route
++- [ ] 3. verify.sh [phase: verify]
++- [ ] 4. Cross-provider review [phase: review]
++
++## Notes for the next agent
++- Created 2026-11-13 by claude from T-0117 (ADR-0061 follow-up).
+diff --git a/.agent/evidence/T-0117/red-ac2-db.txt b/.agent/evidence/T-0117/red-ac2-db.txt
+new file mode 100644
+index 0000000..9a98b07
+--- /dev/null
++++ b/.agent/evidence/T-0117/red-ac2-db.txt
+@@ -0,0 +1,209 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
++
++[db] test PostgreSQL ready (local) on 127.0.0.1:37737
++ ❯ |db| packages/modules/gl/src/period-end-roles.db.test.ts (8 tests | 8 failed) 1039ms
++     × AC-2 loading the template binds the seven period-end roles in the additive table [T-0117] 18ms
++     × AC-2 the account_role_binding view returns every core and period-end binding once [T-0117] 3ms
++     × AC-2 app.system_role_allows gives each period-end role exactly its researched type [T-0117] 24ms
++     × AC-2 a period-end bound account cannot be archived, made non-postable, made control or re-typed [T-0117] 8ms
++     × AC-2 a period-end role re-binds only to an account of its type [T-0117] 8ms
++     × AC-2 the additive table refuses core roles, unknown roles and a second binding [T-0117] 9ms
++     × AC-2 lf_app cannot delete period-end bindings (nothing is deleted) [T-0117] 4ms
++     × AC-2 the additive table forces RLS and the view is security_invoker, so another tenant sees nothing [T-0117] 2ms
++ ❯ |db| packages/modules/gl/src/chart.db.test.ts (10 tests | 1 failed) 1584ms
++     × loading the template creates every account and binds every system role once (both binding tables, ADR-0061) 16ms
++
++⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |db| packages/modules/gl/src/chart.db.test.ts > SS-PLAT-31: System-role accounts are protected by the database > loading the template creates every account and binds every system role once (both binding tables, ADR-0061)
++error: relation "app.account_role_binding" does not exist
++ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
++ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
++ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
++ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
++ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
++ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
++ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
++ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
++ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
++ ❯ packages/modules/gl/src/chart.db.test.ts:46:31
++     44| describe('SS-PLAT-31: System-role accounts are protected by the databa…
++     45|   it('loading the template creates every account and binds every syste…
++     46|     const [accounts, roles] = await inTenant((trx) =>
++       |                               ^
++     47|       Promise.all([
++     48|         trx
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
++
++ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 loading the template binds the seven period-end roles in the additive table [T-0117]
++error: relation "app.account_system_role_ext" does not exist
++ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
++ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
++ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
++ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
++ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
++ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:73:15
++     71| describe('ADR-0061: period-end system roles are bound and guarded by t…
++     72|   it('AC-2 loading the template binds the seven period-end roles in th…
++     73|     const r = await inTenant((trx) =>
++       |               ^
++     74|       sql<{ role: string; code: string }>`
++     75|         SELECT b.role, a.code FROM app.account_system_role_ext b
++ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
++ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
++ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
++ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
++ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:73:15
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
++
++ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 the account_role_binding view returns every core and period-end binding once [T-0117]
++error: relation "app.account_role_binding" does not exist
++ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
++ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
++ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
++ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
++ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
++ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:89:15
++     87|
++     88|   it('AC-2 the account_role_binding view returns every core and period…
++     89|     const r = await inTenant((trx) =>
++       |               ^
++     90|       sql<{ role: string; n: number }>`
++     91|         SELECT role, count(*)::int AS n FROM app.account_role_binding
++ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
++ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
++ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
++ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
++ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:89:15
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
++
++ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 app.system_role_allows gives each period-end role exactly its researched type [T-0117]
++AssertionError: AR_ECL_ALLOWANCE/asset: expected false to be true // Object.is equality
++
++- Expected
+++ Received
++
++- true
+++ false
++
++ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:105:50
++    103|       for (const type of TYPES) {
++    104|         const r = await sql<{ ok: boolean }>`SELECT app.system_role_al…
++    105|         expect(r.rows[0]?.ok, `${role}/${type}`).toBe(type === want);
++       |                                                  ^
++    106|       }
++    107|     }
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
++
++ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 a period-end bound account cannot be archived, made non-postable, made control or re-typed [T-0117]
++AssertionError: 1510 {"status":"archived"}: expected 'accepted (no error)' to match /bound to system role ACCUM_DEPRECIATI…/
++
++- Expected:
++/bound to system role ACCUM_DEPRECIATION/
++
+++ Received:
++"accepted (no error)"
++
++ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:123:88
++    121|         inTenant((trx) => trx.updateTable('app.account').set(change).w…
++    122|       );
++    123|       expect(e?.message ?? "accepted (no error)", `${code} ${JSON.stri…
++       |                                                                                        ^
++    124|         new RegExp(`bound to system role ${role}`),
++    125|       );
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
++
++ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 a period-end role re-binds only to an account of its type [T-0117]
++AssertionError: expected 'relation "app.account_system_role_ext…' to match /system role PREPAYMENTS: type liabili…/
++
++- Expected:
++/system role PREPAYMENTS: type liability is not allowed/
++
+++ Received:
++"relation \"app.account_system_role_ext\" does not exist"
++
++ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:137:28
++    135|       ),
++    136|     );
++    137|     expect(wrong?.message).toMatch(/system role PREPAYMENTS: type liab…
++       |                            ^
++    138|
++    139|     // Positive control: a second asset account takes the binding, the…
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
++
++ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 the additive table refuses core roles, unknown roles and a second binding [T-0117]
++AssertionError: expected '42P01' to be '23514' // Object.is equality
++
++Expected: "23514"
++Received: "42P01"
++
++ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:183:55
++    181|         ),
++    182|       );
++    183|     expect((await insert('UNDEPOSITED_FUNDS'))?.code).toBe('23514');
++       |                                                       ^
++    184|     expect((await insert('NOT_A_ROLE'))?.code).toBe('23514');
++    185|     expect((await insert('PREPAYMENTS'))?.code).toBe('23505');
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
++
++ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 lf_app cannot delete period-end bindings (nothing is deleted) [T-0117]
++AssertionError: expected '42P01' to be '42501' // Object.is equality
++
++Expected: "42501"
++Received: "42P01"
++
++ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:206:21
++    204|       ),
++    205|     );
++    206|     expect(e?.code).toBe('42501');
++       |                     ^
++    207|   });
++    208|
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
++
++ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 the additive table forces RLS and the view is security_invoker, so another tenant sees nothing [T-0117]
++error: relation "app.account_system_role_ext" does not exist
++ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
++ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:210:18
++    208|
++    209|   it('AC-2 the additive table forces RLS and the view is security_invo…
++    210|     const meta = await tdb.admin.query<{ rls: boolean; force: boolean;…
++       |                  ^
++    211|       `SELECT t.relrowsecurity AS rls, t.relforcerowsecurity AS force,
++    212|               coalesce('security_invoker=true' = ANY(v.reloptions), fa…
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
++
++
++ Test Files  2 failed (2)
++      Tests  9 failed | 9 passed (18)
++   Start at  08:18:03
++   Duration  3.63s (transform 433ms, setup 0ms, import 1.09s, tests 2.62s, environment 0ms)
++
+diff --git a/.agent/evidence/T-0117/red-ac2-unit.txt b/.agent/evidence/T-0117/red-ac2-unit.txt
+new file mode 100644
+index 0000000..d3f8317
+--- /dev/null
++++ b/.agent/evidence/T-0117/red-ac2-unit.txt
+@@ -0,0 +1,106 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
++
++ ❯ |unit| packages/modules/gl/src/templates.test.ts (5 tests | 1 failed) 38ms
++     × knows exactly the 17 core roles of design §3.2 plus the 7 period-end roles of §3.2/§3.10 [T-0117] 20ms
++ ❯ |unit| packages/modules/gl/src/system-roles.test.ts (4 tests | 3 failed) 18ms
++     × AC-2 the seven period-end roles are the extended roles [T-0117] 7ms
++     × AC-2 each period-end role allows exactly the researched account type [T-0117] 7ms
++     × AC-2 writes go to the additive table for period-end roles and the core table otherwise [T-0117] 0ms
++
++⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |unit| packages/modules/gl/src/system-roles.test.ts > ADR-0061: period-end system roles > AC-2 the seven period-end roles are the extended roles [T-0117]
++TypeError: EXTENDED_SYSTEM_ROLES is not iterable
++ ❯ packages/modules/gl/src/system-roles.test.ts:20:22
++     18| describe('ADR-0061: period-end system roles', () => {
++     19|   it('AC-2 the seven period-end roles are the extended roles [T-0117]'…
++     20|     expect([...roles.EXTENDED_SYSTEM_ROLES].sort()).toEqual(Object.key…
++       |                      ^
++     21|   });
++     22|
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
++
++ FAIL  |unit| packages/modules/gl/src/system-roles.test.ts > ADR-0061: period-end system roles > AC-2 each period-end role allows exactly the researched account type [T-0117]
++AssertionError: AR_ECL_ALLOWANCE: expected undefined to deeply equal [ 'asset' ]
++
++- Expected:
++[
++  "asset",
++]
++
+++ Received:
++undefined
++
++ ❯ packages/modules/gl/src/system-roles.test.ts:26:33
++     24|     const types = roles.ROLE_ACCOUNT_TYPES as Record<string, readonly …
++     25|     for (const [role, want] of Object.entries(PERIOD_END)) {
++     26|       expect(types[role], role).toEqual(want);
++       |                                 ^
++     27|     }
++     28|   });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
++
++ FAIL  |unit| packages/modules/gl/src/system-roles.test.ts > ADR-0061: period-end system roles > AC-2 writes go to the additive table for period-end roles and the core table otherwise [T-0117]
++TypeError: bindingTableFor is not a function
++ ❯ packages/modules/gl/src/system-roles.test.ts:39:20
++     37|   it('AC-2 writes go to the additive table for period-end roles and th…
++     38|     for (const role of roles.SYSTEM_ROLES) {
++     39|       expect(roles.bindingTableFor(role), role).toBe(
++       |                    ^
++     40|         role in PERIOD_END ? 'app.account_system_role_ext' : 'app.acco…
++     41|       );
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
++
++ FAIL  |unit| packages/modules/gl/src/templates.test.ts > SS-PLAT-32: AU services SMB chart template is valid > knows exactly the 17 core roles of design §3.2 plus the 7 period-end roles of §3.2/§3.10 [T-0117]
++AssertionError: expected [ 'AP_CONTROL', 'AR_CONTROL', …(15) ] to deeply equal [ 'ACCRUED_EXPENSES', …(23) ]
++
++- Expected
+++ Received
++
++  [
++-   "ACCRUED_EXPENSES",
++-   "ACCUM_DEPRECIATION",
++    "AP_CONTROL",
++    "AR_CONTROL",
++-   "AR_ECL_ALLOWANCE",
++    "CURRENT_YEAR_EARNINGS",
++    "CUSTOMER_PREPAYMENTS",
++    "DEFERRED_REVENUE",
++-   "DEPRECIATION_EXPENSE",
++    "FX_REALISED",
++    "FX_UNREALISED",
++    "GST_COLLECTED",
++    "GST_PAID",
++    "PAYG_WITHHOLDING",
++    "PAYROLL_CLEARING",
++-   "PREPAYMENTS",
++-   "PRIOR_PERIOD_ADJUSTMENTS",
++    "RETAINED_EARNINGS",
++    "ROUNDING",
++-   "SGC_PAYABLE",
++    "SUPER_PAYABLE",
++    "SUSPENSE",
++    "UNDEPOSITED_FUNDS",
++    "WAGES_PAYABLE",
++  ]
++
++ ❯ packages/modules/gl/src/templates.test.ts:25:38
++     23| describe('SS-PLAT-32: AU services SMB chart template is valid', () => {
++     24|   it('knows exactly the 17 core roles of design §3.2 plus the 7 period…
++     25|     expect([...SYSTEM_ROLES].sort()).toEqual(
++       |                                      ^
++     26|       [
++     27|         'AR_CONTROL',
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
++
++
++ Test Files  2 failed | 1 passed (3)
++      Tests  4 failed | 11 passed (15)
++   Start at  08:18:08
++   Duration  750ms (transform 157ms, setup 0ms, import 335ms, tests 63ms, environment 0ms)
++
+diff --git a/.agent/evidence/T-0117/red-ac2-view-check.txt b/.agent/evidence/T-0117/red-ac2-view-check.txt
+new file mode 100644
+index 0000000..0740156
+--- /dev/null
++++ b/.agent/evidence/T-0117/red-ac2-view-check.txt
+@@ -0,0 +1,36 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
++
++[db] test PostgreSQL ready (local) on 127.0.0.1:38073
++ ❯ |db| packages/db/src/rls.db.test.ts (839 tests | 1 failed | 838 skipped) 943ms
++     × FAILS for a view over tenant tables that is not security_invoker (ADR-0061) [T-0117] 938ms
++
++⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |db| packages/db/src/rls.db.test.ts > RLS completeness check > FAILS for a view over tenant tables that is not security_invoker (ADR-0061) [T-0117]
++AssertionError: expected undefined to deeply equal [ Array(1) ]
++
++- Expected:
++[
++  "view is not security_invoker (would bypass the caller's RLS)",
++]
++
+++ Received:
++undefined
++
++ ❯ packages/db/src/rls.db.test.ts:80:43
++     78|         (await findRlsViolations(tdb.admin)).map((x) => [x.table, x.pr…
++     79|       );
++     80|       expect(byTable['app.definer_view']).toEqual([
++       |                                           ^
++     81|         "view is not security_invoker (would bypass the caller's RLS)",
++     82|       ]);
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
++
++
++ Test Files  1 failed (1)
++      Tests  1 failed | 838 skipped (839)
++   Start at  08:21:49
++   Duration  4.08s (transform 280ms, setup 0ms, import 1.57s, tests 943ms, environment 0ms)
++
+diff --git a/.agent/evidence/T-0117/red-ac3-golden-db.txt b/.agent/evidence/T-0117/red-ac3-golden-db.txt
+new file mode 100644
+index 0000000..a45bf0d
+--- /dev/null
++++ b/.agent/evidence/T-0117/red-ac3-golden-db.txt
+@@ -0,0 +1,33 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
++
++[db] test PostgreSQL ready (local) on 127.0.0.1:42241
++ ❯ |db| packages/ledger/src/golden/golden-engine.db.test.ts (2 tests | 1 failed) 1034ms
++     × preview() reproduces every other Approved table line for line 271ms
++
++⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |db| packages/ledger/src/golden/golden-engine.db.test.ts > SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay > preview() reproduces every other Approved table line for line
++PostingError: line 1: system role AR_ECL_ALLOWANCE is not bound in this company
++ ❯ fail packages/ledger/src/posting-engine.ts:148:9
++    146|
++    147| function fail(code: PostingErrorCode, message: string, line?: number):…
++    148|   throw new PostingError(code, line === undefined ? message : `line ${…
++       |         ^
++    149|     ...(line === undefined ? {} : { line }),
++    150|   });
++ ❯ packages/ledger/src/posting-engine.ts:216:9
++ ❯ validateAndBuild packages/ledger/src/posting-engine.ts:212:36
++ ❯ preview packages/ledger/src/posting-engine.ts:699:21
++ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
++ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
++ ❯ packages/ledger/src/golden/golden-engine.db.test.ts:198:21
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
++
++
++ Test Files  1 failed (1)
++      Tests  1 failed | 1 passed (2)
++   Start at  08:19:35
++   Duration  3.24s (transform 356ms, setup 0ms, import 612ms, tests 1.03s, environment 0ms)
++
+diff --git a/.agent/evidence/T-0117/red-ac3-unit.txt b/.agent/evidence/T-0117/red-ac3-unit.txt
+new file mode 100644
+index 0000000..74568d7
+--- /dev/null
++++ b/.agent/evidence/T-0117/red-ac3-unit.txt
+@@ -0,0 +1,41 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
++
++ ❯ |unit| packages/ledger/src/golden/postings.test.ts (9 tests | 1 failed) 19ms
++     × AC-3 every system: golden binding resolves through a system role, never a code [T-0117] 6ms
++
++⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |unit| packages/ledger/src/golden/postings.test.ts > AU_SERVICES_BINDINGS (ADR-0061) > AC-3 every system: golden binding resolves through a system role, never a code [T-0117]
++AssertionError: expected [ 'system:PREPAYMENTS', …(6) ] to deeply equal []
++
++- Expected
+++ Received
++
++- []
+++ [
+++   "system:PREPAYMENTS",
+++   "system:ACCUM_DEPRECIATION",
+++   "system:DEPRECIATION_EXPENSE",
+++   "system:AR_ECL_ALLOWANCE",
+++   "system:ACCRUED_EXPENSES",
+++   "system:SGC_PAYABLE",
+++   "system:PRIOR_PERIOD_ADJUSTMENTS",
+++ ]
++
++ ❯ packages/ledger/src/golden/postings.test.ts:74:20
++     72|       .filter(([binding, target]) => binding.startsWith('system:') && …
++     73|       .map(([binding]) => binding);
++     74|     expect(byCode).toEqual([]);
++       |                    ^
++     75|     for (const [binding, target] of Object.entries(AU_SERVICES_BINDING…
++     76|       if (!binding.startsWith('system:') || !target || !('role' in tar…
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
++
++
++ Test Files  1 failed (1)
++      Tests  1 failed | 8 passed (9)
++   Start at  08:19:07
++   Duration  445ms (transform 110ms, setup 0ms, import 134ms, tests 19ms, environment 0ms)
++
+diff --git a/.agent/evidence/T-0117/rq-0143-probe-output.txt b/.agent/evidence/T-0117/rq-0143-probe-output.txt
+new file mode 100644
+index 0000000..3e30c2a
+--- /dev/null
++++ b/.agent/evidence/T-0117/rq-0143-probe-output.txt
+@@ -0,0 +1,33 @@
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
++[db] test PostgreSQL ready (local) on 127.0.0.1:33947
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++[{"version":"PostgreSQL 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit"}]
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++[]
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++ERR syntax error at or near "check"
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++ERR FOREIGN KEY constraints cannot be marked NOT VALID
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++[]
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++[]
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++ERR new row for relation "y" violates check constraint "y_r_check"
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++[]
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++[]
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++[]
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++[[],[],[],[],[],[]]
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++[[],[],[]]
++stdout | packages/db/src/zz-probe.db.test.ts > probe
++[[],[{"inv":"1","def":"2"}],[]]
++ ✓ |db| packages/db/src/zz-probe.db.test.ts > probe 130ms
++ Test Files  1 passed (1)
++      Tests  1 passed (1)
++   Start at  08:15:10
++   Duration  1.64s (transform 75ms, setup 0ms, import 314ms, tests 131ms, environment 0ms)
+diff --git a/.agent/evidence/T-0117/rq-0143-probe.db.test.ts.txt b/.agent/evidence/T-0117/rq-0143-probe.db.test.ts.txt
+new file mode 100644
+index 0000000..287b9f5
+--- /dev/null
++++ b/.agent/evidence/T-0117/rq-0143-probe.db.test.ts.txt
+@@ -0,0 +1,27 @@
++import { createTestDatabase } from './testing/test-db.ts';
++import { it } from 'vitest';
++it('probe', async () => {
++  const t = await createTestDatabase({ migrate: false });
++  const q = async (s: string) => {
++    try {
++      const r = await t.admin.query(s);
++      return JSON.stringify(Array.isArray(r) ? r.map((x) => x.rows) : r.rows);
++    } catch (e) {
++      return 'ERR ' + (e as Error).message;
++    }
++  };
++  console.log(await q('select version()'));
++  console.log(await q("create table x(r text check (r in ('A')))"));
++  console.log(await q("alter table x alter constraint x_r_check check (r in ('A','B'))"));
++  console.log(await q('alter table x alter constraint x_r_check not valid'));
++  console.log(await q("create function f(r text) returns boolean language sql immutable as $$ select r in ('A') $$"));
++  console.log(await q('create table y(r text check (f(r)))'));
++  console.log(await q("insert into y values ('B')"));
++  console.log(await q("create or replace function f(r text) returns boolean language sql immutable as $$ select r in ('A','B') $$"));
++  console.log(await q("insert into y values ('B')"));
++  console.log(await q('create role probe_r'));
++  console.log(await q('create table z(t int); alter table z enable row level security; alter table z force row level security; create policy p on z using (t = 1); insert into z values (1),(2); grant select on z to probe_r'));
++  console.log(await q('create view vz with (security_invoker = true) as select * from z; create view vd as select * from z; grant select on vz, vd to probe_r'));
++  console.log(await q('set role probe_r; select (select count(*) from vz) inv, (select count(*) from vd) def; reset role'));
++  await t.close();
++}, 60000);
+diff --git a/.agent/state.json b/.agent/state.json
+index 3b3077b..3fe1450 100644
+--- a/.agent/state.json
++++ b/.agent/state.json
+@@ -1,13 +1,13 @@
+ {
+   "schema_version": 1,
+-  "current_task": null,
+-  "branch": "claude/loving-lovelace-nozqpk",
++  "current_task": "T-0117",
++  "branch": "feat/T-0117-period-end-roles",
+   "step": null,
+-  "claimed_by": null,
+-  "lease_expires_at": null,
++  "claimed_by": "claude",
++  "lease_expires_at": "2026-11-13T08:59:09.989Z",
+   "last_green_commit": null,
+   "run_id": "2026-11-12-codex-r01",
+-  "updated_at": "2026-11-13T04:00:10.163Z",
++  "updated_at": "2026-11-13T08:14:09.995Z",
+   "phase": "sprint-0",
+   "attempts": {
+     "T-0010": 3,
+@@ -86,7 +86,8 @@
+     "T-0075": 1,
+     "T-0078": 1,
+     "T-0083": 2,
+-    "T-0131": 1
++    "T-0131": 1,
++    "T-0117": 1
+   },
+   "failures": {},
+   "providers": {},
+diff --git a/Docs/adr/0061-additive-system-role-binding.md b/Docs/adr/0061-additive-system-role-binding.md
+new file mode 100644
+index 0000000..050a1c3
+--- /dev/null
++++ b/Docs/adr/0061-additive-system-role-binding.md
+@@ -0,0 +1,137 @@
++---
++adr: 0061
++title: "Bind new system roles through an additive second binding table and a union view"
++status: Accepted
++date: 2026-11-13
++author: claude
++category: data
++human_gate: no
++supersedes: none
++superseded_by: none
++---
++
++# ADR-0061: Additive system-role binding for the period-end roles
++
++## Status
++
++Accepted 2026-11-13 by claude under the owner instruction DL-0405 ("accept all within risk"):
++category `data`, not accounting or security. It changes no accounting treatment and no golden
++posting, adds no table without `tenant_id`, grants `lf_app` nothing beyond what it already
++holds on `app.account_system_role`, and every rule is proven by DB tests on the branch.
++Cross-provider review (codex) of T-0117 still applies to the implementation.
++
++## Context and problem statement
++
++Design §3.2 makes the posting engine resolve accounts by **system role**, never by code.
++Design §3.2 "AASB note" and §3.10 (T-0115; RQ-0095, RQ-0096; owner decision DL-0256) add seven
++roles for period-end work: AR_ECL_ALLOWANCE (AASB 9), PREPAYMENTS and ACCRUED_EXPENSES
++(accrual basis), ACCUM_DEPRECIATION and DEPRECIATION_EXPENSE (AASB 116), SGC_PAYABLE (Payday
++Super / SG charge) and PRIOR_PERIOD_ADJUSTMENTS (AASB 108). The Approved golden postings
++GP-024…GP-036 and GP-038 name them as `system:<ROLE>` bindings.
++
++`app.account_system_role.role` (migration 0005) has an inline `CHECK (role IN (…17 roles…))`.
++PostgreSQL 16/17 cannot change a CHECK expression without `DROP CONSTRAINT`, and a NOT VALID
++replacement still needs the old one dropped (RQ-0143, verified on the local cluster). The
++forward-only gate (AGENTS.md §0.6, `packages/db` migration policy) forbids DROP. T-0116 therefore
++bound these accounts through template `suggestedSettings` and the golden map named them by code.
++
++## Decision drivers
++
++- Forward-only, additive SQL that runs on PostgreSQL 16 and 17 (DL-0007).
++- One rule for every role: the same type, postable, control and active checks, the same lock
++  ordering, the same "never unbound, never deleted" behaviour.
++- Tenant isolation identical to the existing table (RLS ENABLE + FORCE, cross-tenant suite).
++- Readers (posting engine, subledger checks, chart listing, reports) see one set of bindings.
++- The next role should not hit the same wall.
++
++## Considered options
++
++1. **Second binding table + union view (chosen).** `app.account_system_role_ext` with the same
++   columns, keys and foreign key, a role CHECK that calls an IMMUTABLE function, the existing
++   assert trigger function, RLS and grants; `app.account_role_binding` as a
++   `security_invoker` view over both tables.
++   - Good: purely additive; no rewrite of stored rows; future roles need only
++     `CREATE OR REPLACE` of two functions (the established `app.source_type_class()` pattern).
++   - Bad: two physical tables; a role's table must be known when writing (`bindingTableFor()`
++     in `system-roles.ts`).
++2. **New column/table that replaces the old one** (add `role_v2`, backfill, deprecate).
++   - Good: one table in the end.
++   - Bad: a two-phase shape change with a deprecation ADR, duplicate primary-key semantics
++     during transition, and every writer changed twice; no functional gain.
++3. **Keep binding by template setting (status quo).**
++   - Bad: the engine cannot resolve these roles; a re-typed or archived account is not guarded;
++     violates design §3.2.
++
++## Decision outcome
++
++Chosen option 1, as migration `0062_gl_period_end_system_roles.sql`:
++
++1. `app.system_role_is_extended(role)` — IMMUTABLE, true exactly for the seven roles. It may
++   only ever be **widened** (CREATE OR REPLACE), never narrowed, and must never return true
++   for a role that the 0005 CHECK accepts, so a role lives in exactly one table.
++2. `app.system_role_allows(role, type)` is replaced (same signature and contract) with the 17
++   existing rules plus: AR_ECL_ALLOWANCE, PREPAYMENTS, ACCUM_DEPRECIATION → `asset`;
++   DEPRECIATION_EXPENSE → `expense`; ACCRUED_EXPENSES, SGC_PAYABLE → `liability`;
++   PRIOR_PERIOD_ADJUSTMENTS → `equity` (RQ-0143 table, with sources). Contra accounts are typed
++   `asset` with a `credit` normal balance, as in the template and comparable systems.
++   None is a control role; all are postable (`app.system_role_is_control` and
++   `app.assert_account_fits_role` are unchanged).
++3. `app.account_system_role_ext` — identical shape to `app.account_system_role`:
++   `tenant_id` (default from `app.tenant_id`), `company_id`, `role CHECK
++   (app.system_role_is_extended(role))`, `account_id`, `bound_at`; PK
++   `(tenant_id, company_id, role)`; FK to `app.account (tenant_id, company_id, id)`; index
++   `(tenant_id, account_id)`; RLS ENABLE + FORCE; `tenant_isolation` USING + WITH CHECK;
++   `lf_app` SELECT, INSERT, UPDATE (no DELETE). The trigger reuses
++   `app.account_system_role_check()` unchanged (fits-role assert with `FOR SHARE` lock;
++   role/company immutable on re-bind).
++4. `app.account_guard_bound()` is replaced to check the account against the roles bound in
++   **both** tables.
++5. `app.account_role_binding` — `CREATE VIEW … WITH (security_invoker = true)` as
++   `UNION ALL` of both tables (columns `tenant_id, company_id, role, account_id, bound_at`);
++   `lf_app` SELECT. Every reader that resolves a role generically reads the view
++   (posting engine role resolution and control-role lookup, subledger reconciliation/drift,
++   chart listing, report role accounts). Readers of one fixed core role may keep reading the
++   core table.
++6. TypeScript: `SYSTEM_ROLES` grows to 24, `ROLE_ACCOUNT_TYPES` mirrors rule 2,
++   `EXTENDED_SYSTEM_ROLES` mirrors rule 1, `bindingTableFor(role)` routes writes;
++   `loadChartTemplate` binds each role into its table; the AU services template binds the
++   seven accounts by `systemRole`; the golden map `AU_SERVICES_BINDINGS` resolves the seven
++   `system:` bindings by role instead of by code.
++
++## Consequences
++
++### Good
++
++- The engine resolves the period-end roles; a bound period-end account cannot be archived,
++  made non-postable, given the control flag or re-typed out of its role's type.
++- No stored row changes; no migration is edited; no new table without `tenant_id`.
++- A future role is added by widening two functions in a new migration.
++
++### Bad / accepted trade-offs
++
++- Two physical binding tables. Writers must pick the table (`bindingTableFor`); a test
++  proves that no role is accepted by both.
++- A CHECK that calls a function relies on the function only being widened; the rule is
++  written in the function comment, this ADR and the migration header.
++
++### Follow-ups
++
++- T-0145: AR write-off (`packages/modules/ar/src/write-off.ts`) still reads the allowance
++  account from `ar_settings.ecl_allowance_account_id`; move it to the AR_ECL_ALLOWANCE role
++  (keeping the setting as an explicit override, or deprecating it) once its golden replay
++  allows.
++- T-0146: the setup wizard and chart UI should let a user re-bind the period-end roles
++  (UPDATE on `app.account_system_role_ext`) the same way as the core roles.
++
++## Compliance and verification
++
++| Check | Where | Gate |
++| --- | --- | --- |
++| Template binds all 24 roles once; 7 in the ext table; view returns all 24 | `packages/modules/gl/src/period-end-roles.db.test.ts` | test:db |
++| Type rule per new role (independent expectation) and TS mirror agreement | `period-end-roles.db.test.ts`, `chart.db.test.ts` | test:db |
++| Guard: archive / non-postable / control flag / re-type refused for ext-bound accounts | `period-end-roles.db.test.ts` | test:db |
++| Unknown role and core role refused by the ext table; no role in both | `period-end-roles.db.test.ts` | test:db |
++| lf_app cannot DELETE ext bindings; view hides other tenants (security_invoker) | `period-end-roles.db.test.ts` | test:db |
++| RLS ENABLE + FORCE, policy, grants, cross-tenant select/aggregate/update/delete/insert | `packages/db/src/rls.db.test.ts` (generated suite) | test:db |
++| Engine posts `{ role: 'PREPAYMENTS' }` etc.; golden runner replays GP-024…GP-038 via roles | `packages/ledger/src/golden/golden-engine.db.test.ts` | test:db, golden |
++| No DROP/RENAME in the migration | migration policy (`packages/db/src/migrate.ts`) | runner |
+diff --git a/Docs/research/RQ-0143-period-end-system-roles.md b/Docs/research/RQ-0143-period-end-system-roles.md
+new file mode 100644
+index 0000000..12bb1bc
+--- /dev/null
++++ b/Docs/research/RQ-0143-period-end-system-roles.md
+@@ -0,0 +1,107 @@
++---
++id: RQ-0143
++title: How can seven period-end system roles be added without widening the inline CHECK, and which account type does each role take?
++status: resolved
++opened: 2026-11-13
++resolved: 2026-11-13
++opened_by: claude
++linked_tasks: [T-0117]
++linked_adrs: [ADR-0061]
++superseded_by:
++---
++
++# RQ-0143: Period-end system roles, additive storage and account types
++
++## Question
++
++1. `app.account_system_role.role` (migration 0005) has an inline `CHECK (role IN (…17 roles…))`.
++   Can PostgreSQL 16/17 widen that list without `DROP CONSTRAINT`, which the forward-only
++   migration gate forbids? If not, what additive design works?
++2. Which account type(s) must each new role allow: AR_ECL_ALLOWANCE, PREPAYMENTS,
++   ACCUM_DEPRECIATION, DEPRECIATION_EXPENSE, ACCRUED_EXPENSES, SGC_PAYABLE,
++   PRIOR_PERIOD_ADJUSTMENTS?
++
++## Why it matters
++
++Design §3.2 says the posting engine finds accounts by role, never by code, and §3.10 (T-0115,
++RQ-0095/RQ-0096, owner decision DL-0256) adds these roles for AASB 9, AASB 116, AASB 108,
++accruals and Payday Super/SGC. T-0116 bound them through template `suggestedSettings` as a
++stop-gap. The type rule is enforced by `app.system_role_allows()` and mirrored in
++`packages/modules/gl/src/system-roles.ts`, so a wrong type would let a bound account be
++re-typed into the wrong statement section.
++
++## Sources consulted
++
++- PostgreSQL 16 and 17 manuals, `ALTER TABLE` (`ALTER CONSTRAINT` changes only the
++  deferrability of foreign-key constraints; a CHECK expression can only be changed by dropping
++  and re-adding it), `CREATE VIEW … WITH (security_invoker = true)` (since PostgreSQL 15: the
++  view's base relations are checked with the privileges and row-level-security policies of
++  the invoking user) and §5.4.1 "Check Constraints" (PostgreSQL assumes CHECK conditions are
++  immutable; a function in a CHECK is not re-evaluated for existing rows). postgresql.org was
++  not reachable from this environment (proxy 403), so each behaviour was **verified
++  empirically** on the local PostgreSQL 16.15 test cluster:
++  [`.agent/evidence/T-0117/rq-0143-probe-output.txt`](../../.agent/evidence/T-0117/rq-0143-probe-output.txt)
++  (probe source alongside). Results: `ALTER CONSTRAINT … CHECK (…)` is a syntax error;
++  `ALTER CONSTRAINT … NOT VALID` is refused; a CHECK calling an IMMUTABLE SQL function refuses
++  a value, and accepts it after `CREATE OR REPLACE FUNCTION` widens the list; a
++  `security_invoker` view over a FORCE-RLS table returns 1 of 2 rows to a non-owner role,
++  while an ordinary view owned by the table owner returns 2.
++  All features used exist unchanged in PostgreSQL 17 (security_invoker views since 15).
++- Repository precedent: `app.source_type_class()` (migrations 0018 → 0031) is a CASE
++  function widened forward-only with `CREATE OR REPLACE`, used by a CHECK; the payment-batch
++  guard (0047 → 0054) likewise.
++- Design §3.2 (system roles; "AASB note") and §3.10 / §3.10.1 table rows *Credit losses*,
++  *Capital assets / Depreciation*, *Accruals and prepayments*, *Payroll / Payday Super*,
++  *Prior-period errors*; RQ-0095 and RQ-0096 (with their sourcing caveat: official AASB/ATO
++  hosts were not reachable, findings rest on secondary text).
++- AASB 9 §5.5 and AASB 7 §16A: the loss allowance reduces the carrying amount of the
++  financial asset; it is not a liability. AASB 116 §73(d), §75: the gross carrying amount and
++  accumulated depreciation are disclosed for each class of property, plant and equipment, so
++  accumulated depreciation is a contra-asset; depreciation is recognised in profit or loss
++  (§48). AASB 108 §42: a prior-period error is corrected by restating the opening balance of
++  equity (retained earnings) — an equity account. Accrued expenses are a present obligation
++  (liability, Conceptual Framework §4.26); prepayments are a right to future goods/services
++  (asset). Superannuation Guarantee (Administration) Act 1992: the SG charge is a debt owed to
++  the Commissioner (liability).
++- Approved golden postings GP-024/025 (ECL), GP-030 (depreciation), GP-031 (accrual),
++  GP-032 (prepayment), GP-034 (SGC) and the prior-period adjustment entries: the bound accounts
++  sit on the side these types imply; the AU services template (T-0116) already gives the seven
++  accounts exactly these types (1220 asset, 1300 asset, 1510 asset, 6600 expense, 2360
++  liability, 2370 liability, 3400 equity).
++- How comparable systems model it: Xero and MYOB place "Less accumulated depreciation" and
++  "Allowance for doubtful debts" as negative lines inside the asset class with a credit
++  balance; neither offers a separate "contra" account type. LedgerForce does the same: the
++  type is `asset`, `normal_balance` is `credit`.
++
++## Findings
++
++1. A CHECK cannot be widened in place; DROP + ADD is the only route and is forbidden here.
++   A NOT VALID replacement constraint still requires dropping the old one, so it does not help.
++2. Additive options that work on 16 and 17: (a) a second binding table with the same shape,
++   RLS and triggers, plus a `security_invoker` view that unions the two; (b) a new column or
++   table plus a backfill that would eventually replace the old table (a two-phase shape change
++   with a deprecation, more churn for no gain). Option (a) can avoid repeating the problem by
++   gating its role column with a CHECK that calls an IMMUTABLE function, widened later with
++   `CREATE OR REPLACE` like `app.source_type_class()`. Widening never invalidates stored
++   rows, so the immutability assumption is safe as long as the function is only widened.
++3. Account types:
++
++   | Role | Allowed type | Basis |
++   | --- | --- | --- |
++   | AR_ECL_ALLOWANCE | asset (contra, credit normal balance) | AASB 9 §5.5, AASB 7 §16A |
++   | PREPAYMENTS | asset | accrual basis; Conceptual Framework asset definition |
++   | ACCUM_DEPRECIATION | asset (contra, credit normal balance) | AASB 116 §73(d) |
++   | DEPRECIATION_EXPENSE | expense | AASB 116 §48 |
++   | ACCRUED_EXPENSES | liability | accrual basis; present obligation |
++   | SGC_PAYABLE | liability | SG(A) Act 1992 debt to the Commissioner |
++   | PRIOR_PERIOD_ADJUSTMENTS | equity | AASB 108 §42 |
++
++   None is a control role (no subledger owns them) and all are postable.
++
++## Conclusion
++
++Use option (a): `app.account_system_role_ext` with an identical shape, a function-gated role
++CHECK, the same assert trigger, RLS ENABLE + FORCE, `tenant_isolation`, `lf_app`
++SELECT/INSERT/UPDATE; widen `app.system_role_allows()` with the seven type rules above; make
++`app.account_guard_bound()` read both tables; add the `security_invoker` view
++`app.account_role_binding` that every role reader uses. Recorded in ADR-0061 and DL-0470.
+diff --git a/packages/db/migrations/0062_gl_period_end_system_roles.sql b/packages/db/migrations/0062_gl_period_end_system_roles.sql
+new file mode 100644
+index 0000000..628561b
+--- /dev/null
++++ b/packages/db/migrations/0062_gl_period_end_system_roles.sql
+@@ -0,0 +1,120 @@
++-- 0062 — period-end system roles in an additive binding table (T-0117, ADR-0061, RQ-0143,
++-- design §3.2 AASB note and §3.10). Owner: packages/modules/gl.
++--
++-- The 0005 CHECK on app.account_system_role.role lists 17 roles and cannot be widened without
++-- DROP CONSTRAINT (forbidden: forward-only). So the seven period-end roles get their own table
++-- of identical shape, and readers use one view over both:
++--
++-- * app.system_role_is_extended(role): the roles of app.account_system_role_ext. It may only
++--   ever be WIDENED by CREATE OR REPLACE (stored rows stay valid), and must never return true
++--   for a role the 0005 CHECK accepts, so each role lives in exactly one table. A later role is
++--   added by widening this function and app.system_role_allows (pattern of source_type_class).
++-- * app.system_role_allows(role, type) keeps its signature and every existing rule and adds:
++--   AR_ECL_ALLOWANCE, PREPAYMENTS, ACCUM_DEPRECIATION → asset (the two allowances are
++--   contra-assets with a credit normal balance); DEPRECIATION_EXPENSE → expense;
++--   ACCRUED_EXPENSES, SGC_PAYABLE → liability; PRIOR_PERIOD_ADJUSTMENTS → equity.
++--   None is a control role and all are postable, so system_role_is_control and
++--   assert_account_fits_role are unchanged.
++-- * app.account_system_role_ext: same columns, keys, foreign key, index, RLS (ENABLE + FORCE,
++--   tenant_isolation) and lf_app grants (SELECT, INSERT, UPDATE; never DELETE) as
++--   app.account_system_role. Its trigger reuses app.account_system_role_check() unchanged
++--   (account locked FOR SHARE, fits-role assert, role and company immutable on re-bind).
++-- * app.account_role_binding: security_invoker view (PostgreSQL 15+, so 16 and 17) over both
++--   tables; RLS of the caller applies to each base table. Every generic role reader uses it.
++-- * app.account_guard_bound() is replaced to guard an account against the roles bound in
++--   either table.
++-- packages/modules/gl/src/system-roles.ts mirrors both functions; chart.db.test.ts and
++-- period-end-roles.db.test.ts prove they agree.
++
++CREATE FUNCTION app.system_role_is_extended(role text) RETURNS boolean
++  LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE
++AS $$
++  SELECT role IN ('AR_ECL_ALLOWANCE', 'PREPAYMENTS', 'ACCUM_DEPRECIATION', 'DEPRECIATION_EXPENSE',
++                  'ACCRUED_EXPENSES', 'SGC_PAYABLE', 'PRIOR_PERIOD_ADJUSTMENTS')
++$$;
++COMMENT ON FUNCTION app.system_role_is_extended(text) IS
++  'System roles bound in app.account_system_role_ext (ADR-0061). Widen only; never a 0005 role. Mirrored in modules/gl system-roles.ts.';
++GRANT EXECUTE ON FUNCTION app.system_role_is_extended(text) TO lf_app;
++
++CREATE OR REPLACE FUNCTION app.system_role_allows(role text, account_type text) RETURNS boolean
++  LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE
++AS $$
++  SELECT CASE role
++    WHEN 'AR_CONTROL'               THEN account_type = 'asset'
++    WHEN 'UNDEPOSITED_FUNDS'        THEN account_type = 'asset'
++    WHEN 'GST_PAID'                 THEN account_type = 'asset'
++    WHEN 'AP_CONTROL'               THEN account_type = 'liability'
++    WHEN 'GST_COLLECTED'            THEN account_type = 'liability'
++    WHEN 'PAYROLL_CLEARING'         THEN account_type = 'liability'
++    WHEN 'WAGES_PAYABLE'            THEN account_type = 'liability'
++    WHEN 'PAYG_WITHHOLDING'         THEN account_type = 'liability'
++    WHEN 'SUPER_PAYABLE'            THEN account_type = 'liability'
++    WHEN 'DEFERRED_REVENUE'         THEN account_type = 'liability'
++    WHEN 'CUSTOMER_PREPAYMENTS'     THEN account_type = 'liability'
++    WHEN 'RETAINED_EARNINGS'        THEN account_type = 'equity'
++    WHEN 'CURRENT_YEAR_EARNINGS'    THEN account_type = 'equity'
++    WHEN 'ROUNDING'                 THEN account_type IN ('expense', 'revenue')
++    WHEN 'FX_REALISED'              THEN account_type IN ('expense', 'revenue')
++    WHEN 'FX_UNREALISED'            THEN account_type IN ('expense', 'revenue')
++    WHEN 'SUSPENSE'                 THEN account_type IN ('asset', 'liability')
++    -- Period-end roles (0062, ADR-0061, RQ-0143).
++    WHEN 'AR_ECL_ALLOWANCE'         THEN account_type = 'asset'
++    WHEN 'PREPAYMENTS'              THEN account_type = 'asset'
++    WHEN 'ACCUM_DEPRECIATION'       THEN account_type = 'asset'
++    WHEN 'DEPRECIATION_EXPENSE'     THEN account_type = 'expense'
++    WHEN 'ACCRUED_EXPENSES'         THEN account_type = 'liability'
++    WHEN 'SGC_PAYABLE'              THEN account_type = 'liability'
++    WHEN 'PRIOR_PERIOD_ADJUSTMENTS' THEN account_type = 'equity'
++    ELSE false
++  END
++$$;
++COMMENT ON FUNCTION app.system_role_allows(text, text) IS
++  'Which account types a system role may bind to (design 3.2; 0062 adds the period-end roles). Mirrored in modules/gl system-roles.ts.';
++
++CREATE TABLE app.account_system_role_ext (
++  tenant_id   uuid        NOT NULL DEFAULT nullif(current_setting('app.tenant_id', true), '')::uuid
++                          REFERENCES app.tenant (id),
++  company_id  uuid        NOT NULL,
++  role        text        NOT NULL CHECK (app.system_role_is_extended(role)),
++  account_id  uuid        NOT NULL,
++  bound_at    timestamptz NOT NULL DEFAULT now(),
++  PRIMARY KEY (tenant_id, company_id, role),
++  FOREIGN KEY (tenant_id, company_id, account_id) REFERENCES app.account (tenant_id, company_id, id)
++);
++COMMENT ON TABLE app.account_system_role_ext IS
++  'Period-end system role → account per company (ADR-0061; same rules as account_system_role). Re-bind by UPDATE; never unbound.';
++CREATE INDEX account_system_role_ext_account_idx ON app.account_system_role_ext (tenant_id, account_id);
++
++ALTER TABLE app.account_system_role_ext ENABLE ROW LEVEL SECURITY;
++ALTER TABLE app.account_system_role_ext FORCE ROW LEVEL SECURITY;
++CREATE POLICY tenant_isolation ON app.account_system_role_ext
++  USING (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid)
++  WITH CHECK (tenant_id = nullif(current_setting('app.tenant_id', true), '')::uuid);
++GRANT SELECT, INSERT, UPDATE ON app.account_system_role_ext TO lf_app;
++
++CREATE TRIGGER account_system_role_check BEFORE INSERT OR UPDATE ON app.account_system_role_ext
++  FOR EACH ROW EXECUTE FUNCTION app.account_system_role_check();
++
++CREATE VIEW app.account_role_binding WITH (security_invoker = true) AS
++  SELECT tenant_id, company_id, role, account_id, bound_at FROM app.account_system_role
++  UNION ALL
++  SELECT tenant_id, company_id, role, account_id, bound_at FROM app.account_system_role_ext;
++COMMENT ON VIEW app.account_role_binding IS
++  'Every system role binding (core 0005 + period-end 0062, ADR-0061). security_invoker: the caller''s RLS applies.';
++GRANT SELECT ON app.account_role_binding TO lf_app;
++
++CREATE OR REPLACE FUNCTION app.account_guard_bound() RETURNS trigger
++  LANGUAGE plpgsql
++AS $$
++DECLARE
++  r text;
++BEGIN
++  FOR r IN
++    SELECT b.role FROM app.account_role_binding b
++     WHERE b.tenant_id = OLD.tenant_id AND b.company_id = OLD.company_id AND b.account_id = OLD.id
++  LOOP
++    PERFORM app.assert_account_fits_role(NEW, r);
++  END LOOP;
++  RETURN NEW;
++END
++$$;
+diff --git a/packages/db/src/rls.db.test.ts b/packages/db/src/rls.db.test.ts
+index d8c431e..8cdfdf6 100644
+--- a/packages/db/src/rls.db.test.ts
++++ b/packages/db/src/rls.db.test.ts
+@@ -63,6 +63,30 @@ describe('RLS completeness check', () => {
+       await tdb.close();
+     }
+   });
++
++  it('FAILS for a view over tenant tables that is not security_invoker (ADR-0061) [T-0117]', async () => {
++    const tdb = await createTestDatabase({ migrate: true });
++    try {
++      const m = new pg.Client({ connectionString: tdb.url('lf_migrator') });
++      await m.connect();
++      await m.query(`
++        CREATE VIEW app.definer_view AS SELECT tenant_id, id FROM app.account;
++        CREATE VIEW app.invoker_view WITH (security_invoker = true) AS SELECT tenant_id, id FROM app.account;
++      `);
++      await m.end();
++      const byTable = Object.fromEntries(
++        (await findRlsViolations(tdb.admin)).map((x) => [x.table, x.problems]),
++      );
++      expect(byTable['app.definer_view']).toEqual([
++        "view is not security_invoker (would bypass the caller's RLS)",
++      ]);
++      expect(byTable['app.invoker_view']).toBeUndefined();
++      // The shipped view passes (positive control within the same schema).
++      expect(byTable['app.account_role_binding']).toBeUndefined();
++    } finally {
++      await tdb.close();
++    }
++  });
+ });
+ 
+ // The generated suite: one describe block per tenant-owned table, discovered at collection time.
+diff --git a/packages/db/src/schema.ts b/packages/db/src/schema.ts
+index 468c1b0..8f3a0f8 100644
+--- a/packages/db/src/schema.ts
++++ b/packages/db/src/schema.ts
+@@ -7,6 +7,8 @@ import type { ColumnType, Generated, Insertable, Selectable } from 'kysely';
+ type Timestamp = ColumnType<Date, Date | string | undefined, Date | string>;
+ /** tenant_id defaults to current_setting('app.tenant_id') — optional on insert, never updated. */
+ type TenantId = ColumnType<string, string | undefined, never>;
++/** A column of a view: selectable, never inserted or updated. */
++type ReadOnly<T> = ColumnType<T, never, never>;
+ 
+ export interface TenantTable {
+   id: Generated<string>;
+@@ -170,6 +172,24 @@ export interface AccountSystemRoleTable {
+   bound_at: Timestamp;
+ }
+ 
++/**
++ * Period-end system role → account per company (migration 0062, ADR-0061): same shape and
++ * guards as app.account_system_role, for the roles app.system_role_is_extended() accepts.
++ */
++export type AccountSystemRoleExtTable = AccountSystemRoleTable;
++
++/**
++ * Every system role binding, core (0005) and period-end (0062): security_invoker view, read-only.
++ * Readers that resolve any role use this instead of either table (ADR-0061).
++ */
++export interface AccountRoleBindingView {
++  tenant_id: ReadOnly<string>;
++  company_id: ReadOnly<string>;
++  role: ReadOnly<string>;
++  account_id: ReadOnly<string>;
++  bound_at: ReadOnly<Date>;
++}
++
+ /** Analysis dimension (migration 0006). code, company and primary_slot are immutable. */
+ export interface DimensionTable {
+   id: Generated<string>;
+@@ -1231,6 +1251,8 @@ export interface Database {
+   'app.api_token': ApiTokenTable;
+   'app.account': AccountTable;
+   'app.account_system_role': AccountSystemRoleTable;
++  'app.account_system_role_ext': AccountSystemRoleExtTable;
++  'app.account_role_binding': AccountRoleBindingView;
+   'app.dimension': DimensionTable;
+   'app.dimension_value': DimensionValueTable;
+   'app.dimension_set': DimensionSetTable;
+diff --git a/packages/db/src/testing/cross-tenant.ts b/packages/db/src/testing/cross-tenant.ts
+index 3821407..1184c35 100644
+--- a/packages/db/src/testing/cross-tenant.ts
++++ b/packages/db/src/testing/cross-tenant.ts
+@@ -4,7 +4,7 @@
+  *  - findRlsViolations(): every table with a tenant_id column, and every table in the app/audit
+  *    schemas, must have RLS ENABLED + FORCED, at least one policy, a tenant_id column (unless it
+  *    is in GLOBAL_TABLES), and lf_app must not own it or hold TRUNCATE/TRIGGER on it
+- *    (TRUNCATE is not subject to RLS).
++ *    (TRUNCATE is not subject to RLS). Every view there must be security_invoker (ADR-0061).
+  *  - defineCrossTenantSuite(): discovers every tenant_id table from information_schema at
+  *    collection time and generates, per table, tests proving tenant A (as lf_app) cannot
+  *    SELECT/aggregate, UPDATE, DELETE, TRUNCATE or INSERT-as-B tenant B's rows, plus positive
+@@ -71,6 +71,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
+   },
+   // Its generated parent account is an active, postable, non-control asset (overrides above).
+   'app.account_system_role': { role: () => 'UNDEPOSITED_FUNDS' },
++  // Period-end roles (migration 0062): PREPAYMENTS takes the same active, postable asset account.
++  'app.account_system_role_ext': { role: () => 'PREPAYMENTS' },
+   'app.dimension': { code: () => `dim_${randomBytes(4).toString('hex')}` },
+   'app.dimension_value': { code: () => `v${randomBytes(4).toString('hex')}` },
+   // Trigger-computed; the generator only needs to satisfy NOT NULL (the value is replaced).
+@@ -777,6 +779,27 @@ export async function findRlsViolations(db: Queryable): Promise<RlsViolation[]>
+     if (r.app_owner) problems.push('owned by lf_app');
+     if (problems.length > 0) out.push({ table: r.qualified, problems });
+   }
++  // Views (ADR-0061): a view runs with its owner's rights unless security_invoker is set, so a
++  // view in app/audit, or one exposing tenant_id, must be security_invoker to keep caller RLS.
++  const views = await db.query<{ qualified: string }>(
++    `SELECT n.nspname || '.' || c.relname AS qualified
++       FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
++      WHERE c.relkind = 'v'
++        AND n.nspname NOT IN ('pg_catalog', 'information_schema') AND n.nspname NOT LIKE 'pg\\_%'
++        AND (n.nspname = ANY($1::text[])
++             OR EXISTS (SELECT 1 FROM pg_attribute a WHERE a.attrelid = c.oid
++                          AND a.attname = 'tenant_id' AND NOT a.attisdropped))
++        AND NOT coalesce('security_invoker=true' = ANY(c.reloptions)
++                         OR 'security_invoker=on' = ANY(c.reloptions), false)
++      ORDER BY 1`,
++    [RLS_SCHEMAS],
++  );
++  for (const v of views.rows) {
++    out.push({
++      table: v.qualified,
++      problems: ["view is not security_invoker (would bypass the caller's RLS)"],
++    });
++  }
+   return out;
+ }
+ 
+diff --git a/packages/ledger/src/golden/postings.test.ts b/packages/ledger/src/golden/postings.test.ts
+index bedccc3..ffe9ac0 100644
+--- a/packages/ledger/src/golden/postings.test.ts
++++ b/packages/ledger/src/golden/postings.test.ts
+@@ -1,5 +1,10 @@
+ import { describe, expect, it } from 'vitest';
+-import { approvedTables, GoldenDraftError, parsePostings } from './postings.ts';
++import {
++  AU_SERVICES_BINDINGS,
++  approvedTables,
++  GoldenDraftError,
++  parsePostings,
++} from './postings.ts';
+ 
+ const entry = (id: string, note = '', status = 'Approved') =>
+   `## ${id} — fixture\n\n- **Status: ${status}** · Source type: \`manual_journal\`\n${note}\n` +
+@@ -65,3 +70,16 @@ describe('append-only golden supersession [T-0166]', () => {
+     },
+   );
+ });
++
++describe('AU_SERVICES_BINDINGS (ADR-0061)', () => {
++  it('AC-3 every system: golden binding resolves through a system role, never a code [T-0117]', () => {
++    const byCode = Object.entries(AU_SERVICES_BINDINGS)
++      .filter(([binding, target]) => binding.startsWith('system:') && !(target && 'role' in target))
++      .map(([binding]) => binding);
++    expect(byCode).toEqual([]);
++    for (const [binding, target] of Object.entries(AU_SERVICES_BINDINGS)) {
++      if (!binding.startsWith('system:') || !target || !('role' in target)) continue;
++      expect(target.role, binding).toBe(binding.slice('system:'.length));
++    }
++  });
++});
+diff --git a/packages/ledger/src/golden/postings.ts b/packages/ledger/src/golden/postings.ts
+index c4826fa..0590ae4 100644
+--- a/packages/ledger/src/golden/postings.ts
++++ b/packages/ledger/src/golden/postings.ts
+@@ -264,14 +264,14 @@ export const AU_SERVICES_BINDINGS: Readonly<
+   'product:SUBSCRIPTION.revenue': { code: '4120' },
+   'asset: Computer equipment': { code: '1500' },
+   'expense: Insurance': { code: '6800' },
+-  // Accounts bound through template settings (suggestedSettings), not system roles yet (T-0117).
+-  'system:PREPAYMENTS': { code: '1300' },
+-  'system:ACCUM_DEPRECIATION': { code: '1510' },
+-  'system:DEPRECIATION_EXPENSE': { code: '6600' },
+-  'system:AR_ECL_ALLOWANCE': { code: '1220' },
+-  'system:ACCRUED_EXPENSES': { code: '2360' },
+-  'system:SGC_PAYABLE': { code: '2370' },
+-  'system:PRIOR_PERIOD_ADJUSTMENTS': { code: '3400' },
++  // Period-end roles (design §3.2/§3.10), bound in app.account_system_role_ext (ADR-0061, T-0117).
++  'system:PREPAYMENTS': { role: 'PREPAYMENTS' },
++  'system:ACCUM_DEPRECIATION': { role: 'ACCUM_DEPRECIATION' },
++  'system:DEPRECIATION_EXPENSE': { role: 'DEPRECIATION_EXPENSE' },
++  'system:AR_ECL_ALLOWANCE': { role: 'AR_ECL_ALLOWANCE' },
++  'system:ACCRUED_EXPENSES': { role: 'ACCRUED_EXPENSES' },
++  'system:SGC_PAYABLE': { role: 'SGC_PAYABLE' },
++  'system:PRIOR_PERIOD_ADJUSTMENTS': { role: 'PRIOR_PERIOD_ADJUSTMENTS' },
+   'system:RETAINED_EARNINGS': { role: 'RETAINED_EARNINGS' },
+   'setting:payroll.sgc_expense': { code: '6420' },
+   'expense: Office expenses': { code: '6230' },
+diff --git a/packages/ledger/src/posting-engine.ts b/packages/ledger/src/posting-engine.ts
+index d57540d..633fced 100644
+--- a/packages/ledger/src/posting-engine.ts
++++ b/packages/ledger/src/posting-engine.ts
+@@ -203,7 +203,7 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
+     roles.length === 0
+       ? []
+       : await trx
+-          .selectFrom('app.account_system_role')
++          .selectFrom('app.account_role_binding')
+           .select(['role', 'account_id'])
+           .where('company_id', '=', companyId)
+           .where('role', 'in', roles)
+@@ -247,7 +247,7 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
+     controlIds.length === 0
+       ? []
+       : await trx
+-          .selectFrom('app.account_system_role')
++          .selectFrom('app.account_role_binding')
+           .select(['account_id', 'role'])
+           .where('company_id', '=', companyId)
+           .where('account_id', 'in', controlIds)
+diff --git a/packages/ledger/src/subledger.ts b/packages/ledger/src/subledger.ts
+index 67214f4..68a51d9 100644
+--- a/packages/ledger/src/subledger.ts
++++ b/packages/ledger/src/subledger.ts
+@@ -526,7 +526,7 @@ export async function subledgerReconciliation(
+   const r = await sql<Omit<SubledgerReconciliation, 'difference' | 'reconciled'>>`
+     WITH roles(role) AS (SELECT unnest(${sql.val([...SUBLEDGER_ROLES])}::text[])),
+     accts AS (
+-      SELECT role, account_id FROM app.account_system_role
++      SELECT role, account_id FROM app.account_role_binding
+        WHERE company_id = ${companyId} AND role IN (SELECT role FROM roles)
+       UNION
+       SELECT control_role, account_id FROM app.subledger_entry WHERE company_id = ${companyId}
+@@ -592,7 +592,7 @@ export async function subledgerDrift(trx: Trx, companyId: string): Promise<Suble
+   const company = lc(companyId);
+   const r = await sql<SubledgerDrift>`
+     WITH accts AS (
+-      SELECT account_id FROM app.account_system_role
++      SELECT account_id FROM app.account_role_binding
+        WHERE company_id = ${company} AND role IN ('AR_CONTROL', 'AP_CONTROL')
+       UNION
+       SELECT account_id FROM app.subledger_entry WHERE company_id = ${company}
+diff --git a/packages/modules/gl/src/chart.db.test.ts b/packages/modules/gl/src/chart.db.test.ts
+index 76d5efa..200a3cb 100644
+--- a/packages/modules/gl/src/chart.db.test.ts
++++ b/packages/modules/gl/src/chart.db.test.ts
+@@ -42,14 +42,16 @@ afterAll(async () => {
+ });
+ 
+ describe('SS-PLAT-31: System-role accounts are protected by the database', () => {
+-  it('loading the template creates every account and binds all 17 roles once', async () => {
++  it('loading the template creates every account and binds every system role once (both binding tables, ADR-0061)', async () => {
+     const [accounts, roles] = await inTenant((trx) =>
+       Promise.all([
+         trx
+           .selectFrom('app.account')
+           .select(sql<number>`count(*)::int`.as('n'))
+           .executeTakeFirstOrThrow(),
+-        trx.selectFrom('app.account_system_role').select(['role']).execute(),
++        sql<{ role: string }>`SELECT role FROM app.account_role_binding`
++          .execute(trx)
++          .then((r) => r.rows),
+       ]),
+     );
+     expect(accounts.n).toBe(auServicesSmb.accounts.length);
+diff --git a/packages/modules/gl/src/chart.ts b/packages/modules/gl/src/chart.ts
+index 1bf7ced..9e2970d 100644
+--- a/packages/modules/gl/src/chart.ts
++++ b/packages/modules/gl/src/chart.ts
+@@ -5,6 +5,7 @@
+  */
+ import type { Database } from '@ledgerforce/db';
+ import { sql, type Transaction } from 'kysely';
++import { bindingTableFor } from './system-roles.ts';
+ import { validateTemplate, type ChartTemplate } from './templates.ts';
+ 
+ export class InvalidTemplateError extends Error {
+@@ -50,13 +51,26 @@ export async function loadChartTemplate(
+     .execute();
+   const accounts = new Map(rows.map((r) => [r.code, r.id]));
+ 
++  // Each role is bound in its own table (core 0005 or period-end 0062, ADR-0061).
+   const bindings = template.accounts.flatMap((a) => {
+     const id = accounts.get(a.code);
+     return a.systemRole && id
+-      ? [{ company_id: companyId, role: a.systemRole, account_id: id }]
++      ? [
++          {
++            table: bindingTableFor(a.systemRole),
++            company_id: companyId,
++            role: a.systemRole,
++            account_id: id,
++          },
++        ]
+       : [];
+   });
+-  await trx.insertInto('app.account_system_role').values(bindings).execute();
++  for (const table of ['app.account_system_role', 'app.account_system_role_ext'] as const) {
++    const rows = bindings
++      .filter((b) => b.table === table)
++      .map(({ company_id, role, account_id }) => ({ company_id, role, account_id }));
++    if (rows.length > 0) await trx.insertInto(table).values(rows).execute();
++  }
+   return { accounts, suggestedSettings: { ...template.suggestedSettings } };
+ }
+ 
+@@ -98,7 +112,7 @@ export async function listChart(
+   const r = await sql<ChartAccount>`
+     SELECT a.id::text, a.company_id::text, a.code, a.name, a.type, a.subtype, a.normal_balance,
+            a.currency::text AS currency, a.postable, a.is_control, a.status,
+-           coalesce((SELECT array_agg(r.role ORDER BY r.role) FROM app.account_system_role r
++           coalesce((SELECT array_agg(r.role ORDER BY r.role) FROM app.account_role_binding r
+                       WHERE r.tenant_id = a.tenant_id AND r.company_id = a.company_id
+                         AND r.account_id = a.id), '{}'::text[]) AS system_roles
+       FROM app.account a
+diff --git a/packages/modules/gl/src/period-end-roles.db.test.ts b/packages/modules/gl/src/period-end-roles.db.test.ts
+new file mode 100644
+index 0000000..da0adce
+--- /dev/null
++++ b/packages/modules/gl/src/period-end-roles.db.test.ts
+@@ -0,0 +1,238 @@
++/**
++ * T-0117 / ADR-0061 — the seven period-end system roles (design §3.2 AASB note, §3.10) are bound
++ * in the additive table app.account_system_role_ext (migration 0062) with the same database
++ * guards as the core roles, and every reader sees both tables through the security_invoker view
++ * app.account_role_binding. Runs as lf_app inside tenant transactions, as the API does.
++ * Expected codes and types come from the AU services template and RQ-0143, not from the code.
++ */
++import { createDb, withTenant, type Database } from '@ledgerforce/db';
++import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
++import { sql, type Kysely } from 'kysely';
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import { loadChartTemplate } from './chart.ts';
++import { auServicesSmb } from './templates.ts';
++
++const T = '01900000-0000-7000-8000-000000011701';
++const OTHER = '01900000-0000-7000-8000-000000011702';
++const TYPES = ['asset', 'liability', 'equity', 'revenue', 'expense'] as const;
++
++/** Role → template account code and the one account type it allows (RQ-0143). */
++const PERIOD_END: Record<string, { code: string; type: (typeof TYPES)[number] }> = {
++  AR_ECL_ALLOWANCE: { code: '1220', type: 'asset' },
++  PREPAYMENTS: { code: '1300', type: 'asset' },
++  ACCUM_DEPRECIATION: { code: '1510', type: 'asset' },
++  DEPRECIATION_EXPENSE: { code: '6600', type: 'expense' },
++  ACCRUED_EXPENSES: { code: '2360', type: 'liability' },
++  SGC_PAYABLE: { code: '2370', type: 'liability' },
++  PRIOR_PERIOD_ADJUSTMENTS: { code: '3400', type: 'equity' },
++};
++const CORE_COUNT = 17;
++
++let tdb: TestDatabase;
++let db: Kysely<Database>;
++let companyId: string;
++
++const inTenant = <R>(fn: Parameters<typeof withTenant<Database, R>>[2], tenant = T) =>
++  withTenant(db, tenant, fn);
++const accountId = (code: string) =>
++  inTenant((trx) =>
++    trx.selectFrom('app.account').select('id').where('code', '=', code).executeTakeFirstOrThrow(),
++  ).then((r) => r.id);
++const refused = (p: Promise<unknown>) =>
++  p.then(
++    () => undefined,
++    (e: unknown) => e as { code?: string; message?: string },
++  );
++
++beforeAll(async () => {
++  tdb = await createTestDatabase({ migrate: true });
++  db = createDb(tdb.url('lf_app'), 2);
++  companyId = await inTenant(async (trx) => {
++    await trx.insertInto('app.tenant').values({ id: T, name: 'Period End Pty Ltd' }).execute();
++    const c = await trx
++      .insertInto('app.company')
++      .values({ name: 'Period End Pty Ltd', base_currency: 'AUD' })
++      .returning('id')
++      .executeTakeFirstOrThrow();
++    return c.id;
++  });
++  await inTenant((trx) => loadChartTemplate(trx, companyId, auServicesSmb));
++  await inTenant(
++    (trx) => trx.insertInto('app.tenant').values({ id: OTHER, name: 'Other Pty Ltd' }).execute(),
++    OTHER,
++  );
++}, 120_000);
++
++afterAll(async () => {
++  await db.destroy();
++  await tdb.close();
++});
++
++describe('ADR-0061: period-end system roles are bound and guarded by the database', () => {
++  it('AC-2 loading the template binds the seven period-end roles in the additive table [T-0117]', async () => {
++    const r = await inTenant((trx) =>
++      sql<{ role: string; code: string }>`
++        SELECT b.role, a.code FROM app.account_system_role_ext b
++          JOIN app.account a ON a.tenant_id = b.tenant_id AND a.id = b.account_id
++         WHERE b.company_id = ${companyId} ORDER BY b.role`.execute(trx),
++    );
++    expect(Object.fromEntries(r.rows.map((x) => [x.role, x.code]))).toEqual(
++      Object.fromEntries(Object.entries(PERIOD_END).map(([role, v]) => [role, v.code])),
++    );
++    const core = await inTenant((trx) =>
++      sql<{ n: number }>`SELECT count(*)::int AS n FROM app.account_system_role`.execute(trx),
++    );
++    expect(core.rows[0]?.n).toBe(CORE_COUNT);
++  });
++
++  it('AC-2 the account_role_binding view returns every core and period-end binding once [T-0117]', async () => {
++    const r = await inTenant((trx) =>
++      sql<{ role: string; n: number }>`
++        SELECT role, count(*)::int AS n FROM app.account_role_binding
++         WHERE company_id = ${companyId} GROUP BY role`.execute(trx),
++    );
++    expect(r.rows).toHaveLength(CORE_COUNT + Object.keys(PERIOD_END).length);
++    expect(r.rows.every((x) => x.n === 1)).toBe(true);
++    for (const role of Object.keys(PERIOD_END)) {
++      expect(
++        r.rows.map((x) => x.role),
++        role,
++      ).toContain(role);
++    }
++  });
++
++  it('AC-2 app.system_role_allows gives each period-end role exactly its researched type [T-0117]', async () => {
++    for (const [role, { type: want }] of Object.entries(PERIOD_END)) {
++      for (const type of TYPES) {
++        const r = await sql<{
++          ok: boolean;
++        }>`SELECT app.system_role_allows(${role}, ${type}) AS ok`.execute(db);
++        expect(r.rows[0]?.ok, `${role}/${type}`).toBe(type === want);
++      }
++    }
++  });
++
++  it('AC-2 a period-end bound account cannot be archived, made non-postable, made control or re-typed [T-0117]', async () => {
++    const cases: [string, string, Record<string, unknown>][] = [
++      ['1510', 'ACCUM_DEPRECIATION', { status: 'archived' }],
++      ['3400', 'PRIOR_PERIOD_ADJUSTMENTS', { postable: false }],
++      ['2360', 'ACCRUED_EXPENSES', { is_control: true }],
++      ['6600', 'DEPRECIATION_EXPENSE', { type: 'revenue' }],
++      ['1220', 'AR_ECL_ALLOWANCE', { type: 'liability' }],
++    ];
++    for (const [code, role, change] of cases) {
++      const id = await accountId(code);
++      const e = await refused(
++        inTenant((trx) =>
++          trx.updateTable('app.account').set(change).where('id', '=', id).execute(),
++        ),
++      );
++      expect(e?.message ?? 'accepted (no error)', `${code} ${JSON.stringify(change)}`).toMatch(
++        new RegExp(`bound to system role ${role}`),
++      );
++    }
++  });
++
++  it('AC-2 a period-end role re-binds only to an account of its type [T-0117]', async () => {
++    const liability = await accountId('2500');
++    const wrong = await refused(
++      inTenant((trx) =>
++        sql`UPDATE app.account_system_role_ext SET account_id = ${liability}::uuid
++             WHERE role = 'PREPAYMENTS'`.execute(trx),
++      ),
++    );
++    expect(wrong?.message).toMatch(/system role PREPAYMENTS: type liability is not allowed/);
++
++    // Positive control: a second asset account takes the binding, then the original again.
++    const original = await accountId('1300');
++    const other = await inTenant((trx) =>
++      trx
++        .insertInto('app.account')
++        .values({
++          company_id: companyId,
++          code: '1310',
++          name: 'Prepaid insurance',
++          type: 'asset',
++          subtype: 'current_asset',
++          normal_balance: 'debit',
++        })
++        .returning('id')
++        .executeTakeFirstOrThrow(),
++    );
++    const bound = async () =>
++      (
++        await inTenant((trx) =>
++          sql<{ account_id: string }>`SELECT account_id::text FROM app.account_role_binding
++                                       WHERE role = 'PREPAYMENTS'`.execute(trx),
++        )
++      ).rows.map((x) => x.account_id);
++    await inTenant((trx) =>
++      sql`UPDATE app.account_system_role_ext SET account_id = ${other.id}::uuid
++           WHERE role = 'PREPAYMENTS'`.execute(trx),
++    );
++    expect(await bound()).toEqual([other.id]);
++    await inTenant((trx) =>
++      sql`UPDATE app.account_system_role_ext SET account_id = ${original}::uuid
++           WHERE role = 'PREPAYMENTS'`.execute(trx),
++    );
++    expect(await bound()).toEqual([original]);
++  });
++
++  it('AC-2 the additive table refuses core roles, unknown roles and a second binding [T-0117]', async () => {
++    const acct = await accountId('1020');
++    const insert = (role: string) =>
++      refused(
++        inTenant((trx) =>
++          sql`INSERT INTO app.account_system_role_ext (company_id, role, account_id)
++              VALUES (${companyId}::uuid, ${role}, ${acct}::uuid)`.execute(trx),
++        ),
++      );
++    expect((await insert('UNDEPOSITED_FUNDS'))?.code).toBe('23514');
++    expect((await insert('NOT_A_ROLE'))?.code).toBe('23514');
++    expect((await insert('PREPAYMENTS'))?.code).toBe('23505');
++    for (const role of Object.keys(PERIOD_END)) {
++      const r = await sql<{
++        ext: boolean;
++      }>`SELECT app.system_role_is_extended(${role}) AS ext`.execute(db);
++      expect(r.rows[0]?.ext, role).toBe(true);
++    }
++    // No role lives in both tables: every core role bound by the template is not extended.
++    const core = await tdb.admin.query<{ role: string; ext: boolean }>(
++      `SELECT role, app.system_role_is_extended(role) AS ext FROM app.account_system_role
++        WHERE tenant_id = $1 AND company_id = $2`,
++      [T, companyId],
++    );
++    expect(core.rows).toHaveLength(CORE_COUNT);
++    expect(core.rows.filter((x) => x.ext)).toEqual([]);
++  });
++
++  it('AC-2 lf_app cannot delete period-end bindings (nothing is deleted) [T-0117]', async () => {
++    const e = await refused(
++      inTenant((trx) =>
++        sql`DELETE FROM app.account_system_role_ext WHERE role = 'SGC_PAYABLE'`.execute(trx),
++      ),
++    );
++    expect(e?.code).toBe('42501');
++  });
++
++  it('AC-2 the additive table forces RLS and the view is security_invoker, so another tenant sees nothing [T-0117]', async () => {
++    const meta = await tdb.admin.query<{ rls: boolean; force: boolean; invoker: boolean }>(
++      `SELECT t.relrowsecurity AS rls, t.relforcerowsecurity AS force,
++              coalesce('security_invoker=true' = ANY(v.reloptions), false) AS invoker
++         FROM pg_class t, pg_class v
++        WHERE t.oid = 'app.account_system_role_ext'::regclass
++          AND v.oid = 'app.account_role_binding'::regclass`,
++    );
++    expect(meta.rows[0]).toEqual({ rls: true, force: true, invoker: true });
++    const seen = await inTenant(
++      (trx) =>
++        sql<{ n: number }>`SELECT count(*)::int AS n FROM app.account_role_binding`.execute(trx),
++      OTHER,
++    );
++    expect(seen.rows[0]?.n).toBe(0);
++    const own = await inTenant((trx) =>
++      sql<{ n: number }>`SELECT count(*)::int AS n FROM app.account_role_binding`.execute(trx),
++    );
++    expect(own.rows[0]?.n).toBe(CORE_COUNT + Object.keys(PERIOD_END).length);
++  });
++});
+diff --git a/packages/modules/gl/src/system-roles.test.ts b/packages/modules/gl/src/system-roles.test.ts
+new file mode 100644
+index 0000000..cff94e8
+--- /dev/null
++++ b/packages/modules/gl/src/system-roles.test.ts
+@@ -0,0 +1,44 @@
++/**
++ * T-0117 / ADR-0061 — the period-end system roles and where their bindings live. Expected types
++ * come from RQ-0143 (design §3.2 AASB note, §3.10), not from the code under test.
++ */
++import { describe, expect, it } from 'vitest';
++import * as roles from './system-roles.ts';
++
++const PERIOD_END: Record<string, string[]> = {
++  AR_ECL_ALLOWANCE: ['asset'],
++  PREPAYMENTS: ['asset'],
++  ACCUM_DEPRECIATION: ['asset'],
++  DEPRECIATION_EXPENSE: ['expense'],
++  ACCRUED_EXPENSES: ['liability'],
++  SGC_PAYABLE: ['liability'],
++  PRIOR_PERIOD_ADJUSTMENTS: ['equity'],
++};
++
++describe('ADR-0061: period-end system roles', () => {
++  it('AC-2 the seven period-end roles are the extended roles [T-0117]', () => {
++    expect([...roles.EXTENDED_SYSTEM_ROLES].sort()).toEqual(Object.keys(PERIOD_END).sort());
++  });
++
++  it('AC-2 each period-end role allows exactly the researched account type [T-0117]', () => {
++    const types = roles.ROLE_ACCOUNT_TYPES as Record<string, readonly string[] | undefined>;
++    for (const [role, want] of Object.entries(PERIOD_END)) {
++      expect(types[role], role).toEqual(want);
++    }
++  });
++
++  it('AC-2 none is a control role and all are postable [T-0117]', () => {
++    for (const role of Object.keys(PERIOD_END)) {
++      expect(roles.CONTROL_ROLES as readonly string[], role).not.toContain(role);
++      expect(roles.NON_POSTABLE_ROLES as readonly string[], role).not.toContain(role);
++    }
++  });
++
++  it('AC-2 writes go to the additive table for period-end roles and the core table otherwise [T-0117]', () => {
++    for (const role of roles.SYSTEM_ROLES) {
++      expect(roles.bindingTableFor(role), role).toBe(
++        role in PERIOD_END ? 'app.account_system_role_ext' : 'app.account_system_role',
++      );
++    }
++  });
++});
+diff --git a/packages/modules/gl/src/system-roles.ts b/packages/modules/gl/src/system-roles.ts
+index 1578c5d..94575d2 100644
+--- a/packages/modules/gl/src/system-roles.ts
++++ b/packages/modules/gl/src/system-roles.ts
+@@ -1,11 +1,15 @@
+ /**
+  * System roles (design §3.2): the posting engine finds accounts by role, never by code.
+- * ROLE_ACCOUNT_TYPES mirrors app.system_role_allows() in migration 0005; chart.db.test.ts
+- * proves the two agree for every role × type.
++ * ROLE_ACCOUNT_TYPES mirrors app.system_role_allows() (migrations 0005 and 0062);
++ * chart.db.test.ts proves the two agree for every role × type. EXTENDED_SYSTEM_ROLES mirrors
++ * app.system_role_is_extended() (0062, ADR-0061): those roles are bound in
++ * app.account_system_role_ext, the others in app.account_system_role; readers use the view
++ * app.account_role_binding.
+  */
+ import type { AccountType } from '@ledgerforce/db';
+ 
+-export const SYSTEM_ROLES = [
++/** The 17 roles of migration 0005 (its CHECK cannot be widened; ADR-0061). */
++export const CORE_SYSTEM_ROLES = [
+   'AR_CONTROL',
+   'AP_CONTROL',
+   'GST_COLLECTED',
+@@ -24,7 +28,21 @@ export const SYSTEM_ROLES = [
+   'DEFERRED_REVENUE',
+   'CUSTOMER_PREPAYMENTS',
+ ] as const;
++
++/** Period-end roles (design §3.2 AASB note, §3.10; migration 0062, ADR-0061, RQ-0143). */
++export const EXTENDED_SYSTEM_ROLES = [
++  'AR_ECL_ALLOWANCE',
++  'PREPAYMENTS',
++  'ACCUM_DEPRECIATION',
++  'DEPRECIATION_EXPENSE',
++  'ACCRUED_EXPENSES',
++  'SGC_PAYABLE',
++  'PRIOR_PERIOD_ADJUSTMENTS',
++] as const;
++
++export const SYSTEM_ROLES = [...CORE_SYSTEM_ROLES, ...EXTENDED_SYSTEM_ROLES] as const;
+ export type SystemRole = (typeof SYSTEM_ROLES)[number];
++export type ExtendedSystemRole = (typeof EXTENDED_SYSTEM_ROLES)[number];
+ 
+ export const ACCOUNT_TYPES: readonly AccountType[] = [
+   'asset',
+@@ -52,6 +70,14 @@ export const ROLE_ACCOUNT_TYPES: Readonly<Record<SystemRole, readonly AccountTyp
+   FX_REALISED: ['expense', 'revenue'],
+   FX_UNREALISED: ['expense', 'revenue'],
+   SUSPENSE: ['asset', 'liability'],
++  // Period-end roles (0062). The allowances are contra-assets: type asset, credit normal balance.
++  AR_ECL_ALLOWANCE: ['asset'],
++  PREPAYMENTS: ['asset'],
++  ACCUM_DEPRECIATION: ['asset'],
++  DEPRECIATION_EXPENSE: ['expense'],
++  ACCRUED_EXPENSES: ['liability'],
++  SGC_PAYABLE: ['liability'],
++  PRIOR_PERIOD_ADJUSTMENTS: ['equity'],
+ };
+ 
+ /** Control accounts: posted only by their subledger. */
+@@ -66,3 +92,12 @@ export const NON_POSTABLE_ROLES: readonly SystemRole[] = ['CURRENT_YEAR_EARNINGS
+ 
+ export const isSystemRole = (s: string): s is SystemRole =>
+   (SYSTEM_ROLES as readonly string[]).includes(s);
++
++export const isExtendedSystemRole = (s: string): s is ExtendedSystemRole =>
++  (EXTENDED_SYSTEM_ROLES as readonly string[]).includes(s);
++
++/** The table a role's binding is written to (ADR-0061). Read through app.account_role_binding. */
++export const bindingTableFor = (
++  role: SystemRole,
++): 'app.account_system_role' | 'app.account_system_role_ext' =>
++  isExtendedSystemRole(role) ? 'app.account_system_role_ext' : 'app.account_system_role';
+diff --git a/packages/modules/gl/src/templates.test.ts b/packages/modules/gl/src/templates.test.ts
+index bd87f1d..6c8a6df 100644
+--- a/packages/modules/gl/src/templates.test.ts
++++ b/packages/modules/gl/src/templates.test.ts
+@@ -21,7 +21,7 @@ const find = (t: ChartTemplate, pred: (a: TemplateAccount) => boolean, what: str
+   must(t.accounts.find(pred), what);
+ 
+ describe('SS-PLAT-32: AU services SMB chart template is valid', () => {
+-  it('knows exactly the 17 system roles listed in design §3.2', () => {
++  it('knows exactly the 17 core roles of design §3.2 plus the 7 period-end roles of §3.2/§3.10 [T-0117]', () => {
+     expect([...SYSTEM_ROLES].sort()).toEqual(
+       [
+         'AR_CONTROL',
+@@ -41,6 +41,14 @@ describe('SS-PLAT-32: AU services SMB chart template is valid', () => {
+         'SUPER_PAYABLE',
+         'DEFERRED_REVENUE',
+         'CUSTOMER_PREPAYMENTS',
++        // Period-end roles (design §3.2 AASB note, §3.10; ADR-0061, T-0117).
++        'AR_ECL_ALLOWANCE',
++        'PREPAYMENTS',
++        'ACCUM_DEPRECIATION',
++        'DEPRECIATION_EXPENSE',
++        'ACCRUED_EXPENSES',
++        'SGC_PAYABLE',
++        'PRIOR_PERIOD_ADJUSTMENTS',
+       ].sort(),
+     );
+     expect([...CONTROL_ROLES].sort()).toEqual(['AP_CONTROL', 'AR_CONTROL', 'PAYROLL_CLEARING']);
+diff --git a/packages/modules/gl/templates/au-services-smb.json b/packages/modules/gl/templates/au-services-smb.json
+index bb3e187..fdec878 100644
+--- a/packages/modules/gl/templates/au-services-smb.json
++++ b/packages/modules/gl/templates/au-services-smb.json
+@@ -59,7 +59,8 @@
+       "subtype": "receivable_allowance",
+       "normalBalance": "credit",
+       "postable": true,
+-      "control": false
++      "control": false,
++      "systemRole": "AR_ECL_ALLOWANCE"
+     },
+     {
+       "code": "1300",
+@@ -68,7 +69,8 @@
+       "subtype": "current_asset",
+       "normalBalance": "debit",
+       "postable": true,
+-      "control": false
++      "control": false,
++      "systemRole": "PREPAYMENTS"
+     },
+     {
+       "code": "1500",
+@@ -87,7 +89,8 @@
+       "subtype": "fixed_asset",
+       "normalBalance": "credit",
+       "postable": true,
+-      "control": false
++      "control": false,
++      "systemRole": "ACCUM_DEPRECIATION"
+     },
+     {
+       "code": "1820",
+@@ -166,7 +169,8 @@
+       "subtype": "current_liability",
+       "normalBalance": "credit",
+       "postable": true,
+-      "control": false
++      "control": false,
++      "systemRole": "ACCRUED_EXPENSES"
+     },
+     {
+       "code": "2370",
+@@ -175,7 +179,8 @@
+       "subtype": "current_liability",
+       "normalBalance": "credit",
+       "postable": true,
+-      "control": false
++      "control": false,
++      "systemRole": "SGC_PAYABLE"
+     },
+     {
+       "code": "2400",
+@@ -261,7 +266,8 @@
+       "subtype": "equity",
+       "normalBalance": "debit",
+       "postable": true,
+-      "control": false
++      "control": false,
++      "systemRole": "PRIOR_PERIOD_ADJUSTMENTS"
+     },
+     {
+       "code": "4110",
+@@ -457,7 +463,8 @@
+       "normalBalance": "debit",
+       "postable": true,
+       "control": false,
+-      "defaultTaxCode": "N-T"
++      "defaultTaxCode": "N-T",
++      "systemRole": "DEPRECIATION_EXPENSE"
+     },
+     {
+       "code": "6700",
+@@ -515,13 +522,7 @@
+     "merchant_fees_account": "6120",
+     "bad_debts_account": "6500",
+     "ecl_allowance_account": "1220",
+-    "prepayments_account": "1300",
+-    "accumulated_depreciation_account": "1510",
+-    "depreciation_expense_account": "6600",
+-    "accrued_expenses_account": "2360",
+-    "sgc_payable_account": "2370",
+-    "sgc_expense_account": "6420",
+-    "prior_period_adjustments_account": "3400"
++    "sgc_expense_account": "6420"
+   },
+   "partyProfiles": [
+     {
+diff --git a/packages/modules/reporting/src/reports.ts b/packages/modules/reporting/src/reports.ts
+index b6367f1..c74ea63 100644
+--- a/packages/modules/reporting/src/reports.ts
++++ b/packages/modules/reporting/src/reports.ts
+@@ -129,7 +129,7 @@ async function roleAccounts<R extends string>(
+   roles: readonly R[],
+ ): Promise<(EarningsAccount & { role: R })[]> {
+   const rows = await trx
+-    .selectFrom('app.account_system_role as r')
++    .selectFrom('app.account_role_binding as r')
+     .innerJoin('app.account as a', (j) =>
+       j.onRef('a.tenant_id', '=', 'r.tenant_id').onRef('a.id', '=', 'r.account_id'),
+     )
+-- 
+2.43.0
+

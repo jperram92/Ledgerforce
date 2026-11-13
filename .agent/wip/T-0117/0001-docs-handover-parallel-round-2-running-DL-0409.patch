@@ -1,0 +1,33 @@
+From f8b10bd27104e9284b0d046770fe7e812c86b295 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 03:53:07 +0000
+Subject: [PATCH 1/4] docs(handover): parallel round 2 running (DL-0409)
+
+What changed: HANDOVER continuation prompt names the six agent branches and the cards awaiting review.
+Why: The repository is the memory if the session or the agents stop.
+Validation: docs only.
+Next action: merge agent branches as they finish; T-0083 verify result.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_014KLkD11bJX3jq2TErt1dHV
+---
+ .agent/HANDOVER.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/.agent/HANDOVER.md b/.agent/HANDOVER.md
+index 0a2b3bc..aeba9bf 100644
+--- a/.agent/HANDOVER.md
++++ b/.agent/HANDOVER.md
+@@ -1,7 +1,7 @@
+-# Handover: merged to main (PR #4, 983cc91); two oversight-control changes need explicit owner OK (2026-11-13)
++# Handover: parallel round 2 running (DL-0409); main = PR #4 merge; golden gate green (2026-11-13)
+ 
+ ## Codex continuation prompt
+-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0405. Branch `claude/loving-lovelace-nozqpk` == main at 983cc91 (owner-authorised merge, https://github.com/jperram92/Ledgerforce/pull/4). Cards awaiting Codex cross-review: T-0121, T-0041, T-0061, T-0068, T-0075, T-0078 and the integrated Line A cards. Claude continues building the next dependency-ready cards (`node scripts/agent/conductor.ts next`).
++> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file, DL-0405, DL-0408 and DL-0409. Branch `claude/loving-lovelace-nozqpk` (main + this session's work since 983cc91). Six sub-agents were started in local worktrees on local branches: `feat/T-0128-coverage-measure`, `feat/T-0079-period-reopen`, `feat/T-0084-batch-billing-ui`, `feat/T-0086-bills-ui`, `feat/T-0089-reports-ui`, `feat/T-0097-pilot-hardening`. Merges into this branch appear in `git log`; an agent branch not merged here was lost with the container, so restart that card from its card file. Cards awaiting Codex review: T-0121, T-0041, T-0061, T-0068, T-0075, T-0078, T-0131, T-0083 (verifying) and the integrated Line A cards.
+ 
+ ## Open questions for human
+ - **(Resolved 2026-11-13, owner approved, DL-0408)** Golden approval registry refresh (it had been blocked by the session's permission classifier as an oversight-control change).** After the merge, `goldenGuard` fails because `Docs/decisions/golden-approvals.json` pins postings.md to the old snapshot 334a3f9 and main now holds GP-037…039. Per ADR-0047 the remedy is a refreshed record `{path: Docs/accounting/postings.md, commit: 983cc919f4911c5dd55e6e8bf9ff1e1f6a2ff404, decisions: [DL-0405, DL-0263, DL-0256, DL-0258]}`. Please approve the edit (or make it yourself); until then gate 4 stays FAIL on every branch.
+-- 
+2.43.0
+
