@@ -1,0 +1,40 @@
+LedgerForce verify — 2026-11-13T00:36:05Z — task T-0068
+GATE 1 typecheck: PASS (pnpm typecheck)
+GATE 1 lint: PASS (pnpm lint)
+GATE 1 format: PASS (pnpm format:check)
+GATE 2a unit-tests: PASS (pnpm test + node --test scripts/agent/test)
+GATE 2b db-tests: PASS (pnpm test:db)
+GATE 2c coverage: FAIL (lines 58.65% < main 72.22%)
+GATE 3 accounting-invariants: PASS (1 property test file(s) ran in gate 2a)
+GATE 4 golden-postings: FAIL (Docs/decisions/golden-approvals.json: Docs/accounting/postings.md: content differs from approved snapshot 334a3f90997af48e8331247d0e4d8fdba91ce89d)
+GATE 5 cross-tenant-rls: PASS (1 cross-tenant RLS test file(s) ran in gate 2b)
+GATE 6 migrations-forward: PASS (applied in 2b; 16 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+GATE 7 security: PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep — runs in CI))
+GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (claude) in .agent/evidence/T-0068/review-*.md)
+GATE 9 e2e-evidence: PASS (pnpm test:e2e; 4 scenario(s) with passed evidence)
+GATE 10 no-shortcuts: PASS (240 test file(s) scanned; diff vs 5c3a2e3 clean)
+GATE 11 no-delete: PASS (vs merge-base 5c3a2e3, staged + working tree)
+GATE 12 memory: PASS (T-0068: required steps ticked for status verifying, 0 linked RQ(s) resolved, HANDOVER present)
+
+=== SUMMARY ===
+ #   | gate                  | result
+ 1   | typecheck             | PASS (pnpm typecheck)
+ 1   | lint                  | PASS (pnpm lint)
+ 1   | format                | PASS (pnpm format:check)
+ 2a  | unit-tests            | PASS (pnpm test + node --test scripts/agent/test)
+ 2b  | db-tests              | PASS (pnpm test:db)
+ 2c  | coverage              | FAIL (lines 58.65% < main 72.22%)
+ 3   | accounting-invariants | PASS (1 property test file(s) ran in gate 2a)
+ 4   | golden-postings       | FAIL (Docs/decisions/golden-approvals.json: Docs/accounting/postings.md: content differs from approved snapshot 334a3f90997af48e8331247d0e4d8fdba91ce89d)
+ 5   | cross-tenant-rls      | PASS (1 cross-tenant RLS test file(s) ran in gate 2b)
+ 6   | migrations-forward    | PASS (applied in 2b; 16 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+ 7   | security              | PASS (secrets scan clean; pnpm audit --prod clean; SAST skipped locally (no semgrep — runs in CI))
+ 8   | cross-review          | PENDING (no review report by a provider other than the builder (claude) in .agent/evidence/T-0068/review-*.md)
+ 9   | e2e-evidence          | PASS (pnpm test:e2e; 4 scenario(s) with passed evidence)
+ 10  | no-shortcuts          | PASS (240 test file(s) scanned; diff vs 5c3a2e3 clean)
+ 11  | no-delete             | PASS (vs merge-base 5c3a2e3, staged + working tree)
+ 12  | memory                | PASS (T-0068: required steps ticked for status verifying, 0 linked RQ(s) resolved, HANDOVER present)
+PASS: 13   FAIL: 2   PENDING: 1
+!!! 1 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+VERIFY: FAIL
+exit=1

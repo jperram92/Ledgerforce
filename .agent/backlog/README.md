@@ -160,7 +160,7 @@ graph LR
 | [T-0065](T-0065.md) | Inbound mapping: Account/Contact/Product → Party/Product with idempotency | MVP | review | T-0064, T-0036, T-0038 | UC-01 | 1 |
 | [T-0066](T-0066.md) | Polling fallback (SystemModstamp delta) per object | MVP | review | T-0065 | — | 1 |
 | [T-0067](T-0067.md) | Write-back to Salesforce via sObject Collections from the outbox | MVP | review | T-0063, T-0030 | UC-01, UC-03, UC-04, UC-11, UC-12 | 6 |
-| [T-0068](T-0068.md) | Basic overdue reminders (UC-04 MVP scope) | MVP | verifying | T-0049, T-0042, T-0067 | UC-04 | 4 |
+| [T-0068](T-0068.md) | Basic overdue reminders (UC-04 MVP scope) | MVP | review | T-0049, T-0042, T-0067 | UC-04 | 4 |
 | [T-0069](T-0069.md) | Closed Won / Order activated → draft invoice (UC-01) with auto-approve | MVP | review | T-0065, T-0040, T-0067, T-0031 | UC-01 | 7 |
 | [T-0110](T-0110.md) | Salesforce write-back: scratch-org e2e and refund/aged-AR write-back scenarios | MVP | todo | T-0067, T-0069, T-0055, T-0049 | UC-01, UC-11, UC-12 | 3 |
 | [T-0111](T-0111.md) | LWC Account component: scratch-org e2e with screenshot (sales rep sees the money) | MVP | todo | T-0072, T-0110 | UC-12 | 1 |
