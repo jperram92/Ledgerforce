@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0068",
+  "entries": [
+    {
+      "scenario": "SS-UC04-01",
+      "file": ".agent/evidence/T-0068/20261113-003509-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/reminders.db.test.ts › T-0068: the daily reminder run › SS-UC04-01 queues reminder 1 for the invoice at 7 days overdue and publishes it | packages/modules/email/src/reminder-email.db.test.ts › SS-UC04-01: Reminder 1 at 7 days overdue › SS-UC04-01 the Billing To contact receives reminder 1 (SMTP sink), with Billing CC copied",
+      "commit": "84e58cd568e8",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:35:09.049Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC04-02",
+      "file": ".agent/evidence/T-0068/20261113-003509-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/reminders.db.test.ts › T-0068: the daily reminder run › SS-UC04-02 the write-back payload sets Account.LF_Credit_Status__c = \"Overdue\"",
+      "commit": "84e58cd568e8",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:35:09.049Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC04-03",
+      "file": ".agent/evidence/T-0068/20261113-003509-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/reminders.db.test.ts › T-0068: the daily reminder run › SS-UC04-03 running again the same day (and the next day) queues no second reminder | packages/modules/email/src/reminder-email.db.test.ts › SS-UC04-03: Reminders are idempotent per step › SS-UC04-03 a same-day re-run queues nothing and a re-delivered event sends no second email",
+      "commit": "84e58cd568e8",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:35:09.049Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC04-04",
+      "file": ".agent/evidence/T-0068/20261113-003518-tests-unit.json",
+      "test": "1 test(s): packages/modules/ar/src/reminders.test.ts › SS-UC04-04: Paid invoice gets no reminder › SS-UC04-04 an invoice paid on day 6 gets no reminder when the schedule runs on day 7",
+      "commit": "84e58cd568e8",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:35:18.099Z",
+      "result": "passed"
+    }
+  ]
+}

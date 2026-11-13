@@ -15,11 +15,10 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 |---|---:|
 | blocked | 6 |
 | done | 3 |
-| in_progress | 1 |
-| review | 89 |
+| review | 91 |
 | todo | 31 |
 | verifying | 1 |
-| **total** | **131** |
+| **total** | **132** |
 
 | Phase | Cards |
 |---|---:|
@@ -134,7 +133,7 @@ graph LR
 | [T-0038](T-0038.md) | Products, party posting profiles and product posting profiles | MVP | review | T-0036, T-0018, T-0034 | — | 0 |
 | [T-0039](T-0039.md) | Posting-profile matrix resolution and gap check | MVP | review | T-0038 | UC-01 | 1 |
 | [T-0040](T-0040.md) | Sales invoice lifecycle: draft → approve → post | MVP | review | T-0039, T-0025, T-0034, T-0028, T-0015, T-0026, T-0031 | UC-01 | 3 |
-| [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | verifying | T-0040 | — | 0 |
+| [T-0041](T-0041.md) | Billing format templates and PDF rendering (headless Chromium) | MVP | review | T-0040 | — | 0 |
 | [T-0042](T-0042.md) | Email delivery (SMTP) via outbox for invoices, statements, reminders, remittances | MVP | review | T-0041, T-0030, T-0031 | UC-01, UC-02, UC-06 | 3 |
 | [T-0043](T-0043.md) | Batch billing run: selection and preview | MVP | review | T-0040 | UC-02 | 2 |
 | [T-0044](T-0044.md) | Batch billing run: approve, post as one job with per-invoice isolation | MVP | review | T-0043, T-0042, T-0024 | UC-02 | 5 |
@@ -154,14 +153,14 @@ graph LR
 | [T-0058](T-0058.md) | Bank accounts and statement import (CSV, OFX) | MVP | review | T-0018 | UC-08 | 2 |
 | [T-0059](T-0059.md) | CAMT extensions: batch entries (TxDtls), several statements per file, camt.052/054 | MVP | review | T-0058 | UC-08 | 1 |
 | [T-0060](T-0060.md) | Matching rules and auto-match | MVP | review | T-0058, T-0046, T-0057 | UC-08 | 3 |
-| [T-0061](T-0061.md) | Bank reconciliation and reconciliation report | MVP | in_progress | T-0060 | UC-08 | 2 |
+| [T-0061](T-0061.md) | Bank reconciliation and reconciliation report | MVP | review | T-0060 | UC-08 | 2 |
 | [T-0062](T-0062.md) | Salesforce SFDX package: objects, fields, permission sets, platform event | MVP | review | T-0001 | UC-12 | 1 |
 | [T-0063](T-0063.md) | Salesforce auth: External Client App with JWT bearer and encrypted token store | MVP | review | T-0062, T-0037 | — | 0 |
 | [T-0064](T-0064.md) | CDC subscriber via Pub/Sub API with replay-id store | MVP | review | T-0063, T-0030 | — | 1 |
 | [T-0065](T-0065.md) | Inbound mapping: Account/Contact/Product → Party/Product with idempotency | MVP | review | T-0064, T-0036, T-0038 | UC-01 | 1 |
 | [T-0066](T-0066.md) | Polling fallback (SystemModstamp delta) per object | MVP | review | T-0065 | — | 1 |
 | [T-0067](T-0067.md) | Write-back to Salesforce via sObject Collections from the outbox | MVP | review | T-0063, T-0030 | UC-01, UC-03, UC-04, UC-11, UC-12 | 6 |
-| [T-0068](T-0068.md) | Basic overdue reminders (UC-04 MVP scope) | MVP | todo | T-0049, T-0042, T-0067 | UC-04 | 4 |
+| [T-0068](T-0068.md) | Basic overdue reminders (UC-04 MVP scope) | MVP | verifying | T-0049, T-0042, T-0067 | UC-04 | 4 |
 | [T-0069](T-0069.md) | Closed Won / Order activated → draft invoice (UC-01) with auto-approve | MVP | review | T-0065, T-0040, T-0067, T-0031 | UC-01 | 7 |
 | [T-0110](T-0110.md) | Salesforce write-back: scratch-org e2e and refund/aged-AR write-back scenarios | MVP | todo | T-0067, T-0069, T-0055, T-0049 | UC-01, UC-11, UC-12 | 3 |
 | [T-0111](T-0111.md) | LWC Account component: scratch-org e2e with screenshot (sales rep sees the money) | MVP | todo | T-0072, T-0110 | UC-12 | 1 |
@@ -230,6 +229,7 @@ graph LR
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
 | [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | todo | — | — | 0 |
+| [T-0129](T-0129.md) | Daily overdue-reminder job in the worker and per-party reminder pause | MVP | todo | T-0068 | UC-04 | 0 |
 | [T-0166](T-0166.md) | Gross ECL allowance reconciliation from source lineage | MVP | blocked | T-0031, T-0048 | — | 3 |
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | todo | T-0047, T-0035 | UC-04 | 3 |
