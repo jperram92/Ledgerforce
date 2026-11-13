@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0079",
+  "entries": [
+    {
+      "scenario": "SS-UC10-06",
+      "file": ".agent/evidence/T-0079/20261113-081926-tests-api-db.json",
+      "test": "11 test(s): apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 without a fresh step-up the request is refused with step_up_required (audited) | apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 a missing or blank reason is refused; nothing is requested | apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 a user without period.reopen is refused | apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 one approver requests: the request is pending and the period stays hard-locked; a replay returns the same request | apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 the same person cannot approve their own request | apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 the second approver needs a fresh step-up too | apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 after a second, distinct approver the period reopens and the audit log has both | apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 a replayed approval returns the same result; a third approver gets 409 | apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 the period lists its reopen requests with both approvers | apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 a period that is not hard-locked cannot take a reopen request | apps/api/src/periods/period-reopen.db.test.ts › SS-UC10-06: Reopen needs two approvers and a reason › SS-UC10-06 another tenant's period and unknown ids answer 404",
+      "commit": "988abe7f2f31",
+      "provider": "claude",
+      "timestamp": "2026-11-13T08:19:26.761Z",
+      "result": "passed"
+    }
+  ]
+}
