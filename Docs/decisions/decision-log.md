@@ -2844,4 +2844,52 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   4. Reason codes are shown in plain words (P12): Price reduced, Goods returned, Less work than invoiced, Invoiced in error, Goodwill. Payment status words: Unpaid, Partly paid, Paid.
 - Why: SS-UC03-10 and the credit-note half of SS-UC11-08. P4: show the journal before it posts. apps/web: no accounting in the browser. Modelled on InvoicePage/JournalTable and ClosePage (mutation, key rotation, refusal in place).
 - Alternatives: computing min(receipt unallocated, invoice open) as the default amount (arithmetic on money in the browser: rejected); a separate route per receipt (more navigation for a one-step task); auto-loading the journal (P4 keeps it on request, like invoices).
+
+### DL-0480 — T-0088 split: the bank module's HTTP routes become T-0149
+- Date: 2026-11-13 · By: claude · Task: T-0088 → T-0149 · Category: scope
+- Decision:
+  - New card T-0149 "Bank reconciliation over HTTP" holds the API routes the reconciliation screens need. T-0088 now depends on it and keeps the screens only.
+  - T-0149 lists SS-UC08-02, SS-UC08-05 and SS-UC08-06 as scenarios proved again over HTTP. Their register rows keep their module tests and gain the API test as an extra test file.
+- Why: T-0058…T-0061 built `@ledgerforce/bank` without routes. Routes and screens together exceed one card (~400 lines each). The same split was made for T-0090 → T-0148 (DL-0468).
+- ADR: none · Status: accepted
+
+### DL-0481 — Bank reconciliation over HTTP: `/bank-rec` prefix, state-based replay, base64 import (T-0149)
+- Date: 2026-11-13 · By: claude · Task: T-0149 · Category: api
+- Decision:
+  - Nine thin routes over `@ledgerforce/bank`, all under `/bank-rec`. The web app owns `/bank/*`, and nginx sends each first path segment to one side (DL-0313), so `bank-rec` is added to the nginx API prefixes.
+    - Reads need `bank.read`: accounts (masked `***678`), statements, lines with match and open suggestions, and the report.
+    - Import needs `bank.statement.import`.
+    - Matching runs, transaction from a line, unmatch and complete need `bank.reconcile`.
+  - Every POST requires an Idempotency-Key and is audited: `bank_statement`, `bank_matching_run`, `bank_transaction`, `bank_match` and `bank_reconciliation`. Replays are recognised from stored state, so no idempotency column or migration is needed (as in DL-0420 and DL-0468):
+    - Import: the file's SHA-256. The same file answers 200 `duplicate_file` with `replayed: true`.
+    - Transaction from a line: the module's own per-line key `bank_line:<id>` answers 200 `replayed`.
+    - Unmatch: the kept match row. If `unmatched_by` is the same user the answer is 200, otherwise 409 NOT_MATCHED.
+    - Complete: the completed row. If `completed_by` is the same user the answer is 200 with the report, otherwise 409 ALREADY_RECONCILED.
+    - A matching run is naturally idempotent: a re-run adds nothing.
+  - Other refusals:
+    - Module refusals (`DomainError`, `PeriodLockedError`) answer 422 with their code. Examples are APPROVAL_REQUIRED from the manual-journal rules, NOT_BALANCED, RECONCILED and CLOSING_BALANCE_REQUIRED.
+    - `StatementImportError` answers 422 STATEMENT_REFUSED.
+    - A row of another company or tenant answers 404.
+    - Creating a transaction answers 503 `queue_not_configured` without a posting outbox, like the manual-journal post route.
+  - The statement file arrives as base64 JSON (`content_base64`), so the API needs no multipart dependency. The default 100 kB body limit applies for now; T-0150 raises it.
+  - Lines are read with typed SQL in the controller (joins for entry numbers, rule names and account codes). The module's write behaviour is unchanged.
+- Why: The T-0088 screens need these routes. The routes are an additive public API over an existing module with existing permissions, so no ADR is needed (DL-0313, DL-0468).
+- Alternatives:
+  - multipart upload: rejected for now, because it needs a runtime dependency and an ADR.
+  - an idempotency-key table: rejected, because it needs a migration (DL-0472 forbids one here) and stored state already identifies the replay.
+  - a module function for the line listing: deferred. It is read-only and used by one screen.
+- ADR: none · Status: accepted
+
+### DL-0482 — Bank reconciliation screens: four pages under Bank, masked label first, no journal preview yet (T-0088)
+- Date: 2026-11-13 · By: claude · Task: T-0088 · Category: ui
+- Decision:
+  - Four pages under the Bank section, each with one primary action:
+    - `/bank/statements?account=`: choose the bank account, import a file, list statements.
+    - `/bank/match?account=&statement=`: find matches, see matches and suggestions, unmatch.
+    - `/bank/match/transaction?…&line=`: the bank line and an account/amount/memo form. A rule's suggested account is preselected. Keeping it sends `from_suggestion_id`, so the match records the rule.
+    - `/bank/reconciliation?…&closing=`: closing balance, figures, unreconciled lines and book items, and Complete.
+  - The account label is "Operating, account ending 678, BSB 062-000". The last 3 digits come early so they survive a cut-off select at 390 px. The client takes only the last 3 characters of whatever number arrives (design §6.6).
+  - No money arithmetic in the browser. The counter-line amount is the line's decimal string without its sign. The closing balance is validated as text and sent as a decimal string. All figures come from the API.
+  - The create-transaction screen posts without first showing the journal (P4), because the module has no preview for it. This gap, accepting candidate suggestions, and large files are follow-up card T-0150.
+- Why: SS-UC08-08 and UC-08 steps 1–5. These follow the patterns of the close screen (T-0090) and the reports screens (T-0089).
 - ADR: none · Status: accepted

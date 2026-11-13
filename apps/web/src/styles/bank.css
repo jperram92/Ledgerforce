@@ -1,0 +1,52 @@
+/* Bank reconciliation screens (T-0088) in the Timeline direction (DL-0070). Requires admin.css. */
+.bank-facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--s1) var(--s4);
+  margin: 0;
+  max-width: 48rem;
+}
+.bank-facts dt {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.bank-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.word[data-status='reconciled'],
+.word[data-status='done'] {
+  border-style: solid;
+}
+@media (max-width: 600px) {
+  .bank-facts {
+    grid-template-columns: 1fr;
+  }
+  .bank-facts dd {
+    margin-bottom: var(--s2);
+  }
+}
+/* Several links in one cell: each a 24px target with room between (WCAG 2.5.8). */
+.bank-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s2);
+}
+.bank-links a {
+  display: inline-block;
+  min-height: 24px;
+  line-height: 24px;
+}
+/* The bank account choice shows the whole label (name, BSB, last 3 digits). */
+.admin-filters .field.wide {
+  grid-column: 1 / -1;
+  max-width: 34rem;
+}
+.bank-closing .admin-note {
+  margin: 0;
+}
+.bank-closing .secondary {
+  justify-self: start;
+}

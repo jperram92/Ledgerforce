@@ -33,6 +33,7 @@ import { UsersController } from './users/users.controller.ts';
 import { AccountsController } from './gl/accounts.controller.ts';
 import { ReportsController } from './reports/reports.controller.ts';
 import { CloseChecklistController } from './periods/close-checklist.controller.ts';
+import { BankRecController } from './bank/bank-rec.controller.ts';
 import { PeriodReopenController } from './periods/period-reopen.controller.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
@@ -134,6 +135,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ReportsController,
   PeriodReopenController,
   CloseChecklistController,
+  BankRecController,
   OpeningBalancesController,
   AuthController,
   LoginController,
@@ -183,6 +185,7 @@ class AppModule {
         ReportsController,
         PeriodReopenController,
         CloseChecklistController,
+        BankRecController,
         OpeningBalancesController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
