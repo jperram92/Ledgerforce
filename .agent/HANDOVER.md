@@ -1,20 +1,18 @@
 # Handover: round 2 fully merged; T-0129 built (2026-11-13 09:50 UTC)
 
 ## Codex continuation prompt
-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0405, DL-0408, DL-0409, DL-0463 and DL-0465. Branch `claude/loving-lovelace-nozqpk`.
+> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0463 to DL-0470. Branch `claude/loving-lovelace-nozqpk`.
 >
-> Every round-2 agent branch is merged and validated on the combined tree (94d68aa): T-0079, T-0142, T-0117, T-0128, T-0084, T-0086 and T-0089. The validation was web+unit 954, api-db 247 and web E2E 96, all passing with 0 skipped.
+> Built, fully verified and moved to review since the round-2 merges (each VERIFY OK except 2c and 8, which are PENDING by design):
+> - T-0129: per-party reminder pause, migration 0063.
+> - T-0147: daily reminder fan-out per tenant, migration 0064, ADR-0062 accepted, new compose service `scheduler`.
+> - T-0148: close checklist HTTP routes.
+> - T-0090: close checklist screen, plus a contrast fix, DL-0470.
+> - T-0079 and T-0117 are also in review.
 >
-> T-0129 (per-party reminder pause, migration 0063) is built at 3f28cd3, and its full verify is running. The daily cross-tenant job is T-0147, blocked on security ADR-0062.
+> Next ready cards: T-0085, T-0087, T-0088, T-0110, T-0119, T-0120, T-0126, T-0127, T-0130, T-0143 and T-0168. The next migration is 0065.
 >
-> Next steps:
-> - Run `bash scripts/agent/verify.sh --task <T>` for T-0084, T-0086, T-0089 and T-0129, then release each to review.
-> - Next ready cards: T-0085, T-0087, T-0088, T-0090, T-0110, T-0119, T-0120, T-0126, T-0127, T-0130, T-0143 and T-0168.
-> - The next migration is 0064.
->
-> Codex cross-review is pending for all cards in review.
->
-> Gate 2c stays PENDING until main's baseline is re-recorded under unit+db with the next merge to main. The combined tree measures 93.45%, against 93.65% recorded at bcf4ab6.
+> Codex cross-review (gate 8) is pending for every card in review. Gate 2c stays PENDING until main's baseline is re-recorded as unit+db; the tree is at 93.63%.
 
 ## Open questions for human
 - **Security CI is red (Gitleaks, DL-0464, owner chose "Ignore + gzip").** The fix is in local stash `DL-0464 gitleaks WIP fix (awaiting owner permission)`. It is not pushed, because committing it was blocked as an oversight change: it edits the human-owned contract test `infra/test/security-workflow.contract.test.ts`, with an exception for commit 3a6bc91 only, .agent/wip T-0086/T-0089 only, and the rule sourcegraph-access-token only. The hits are 254 git object IDs in format-patch headers. To land it, run `git stash pop` and commit, or allow the commit.
@@ -325,3 +323,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-13T10:53:24.989Z claude: T-0148 → verifying
 - 2026-11-13T11:08:06.785Z claude: release T-0148 → review (full verify at e7e5b7b: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
 - 2026-11-13T11:15:19.289Z claude: T-0090 → verifying
+- 2026-11-13T11:46:47.806Z claude: release T-0090 → review (full verify at 3c50abf: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
