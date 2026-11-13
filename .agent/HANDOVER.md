@@ -11,7 +11,7 @@
 > - T-0120: approved batches posted and emailed by the worker; job queues installed at deploy, DL-0471.
 > - T-0079 and T-0117 are also in review.
 >
-> Parallel round 3 (DL-0472) is merged and validated on the combined tree: T-0151 and T-0085 (AR cash), T-0149 and T-0088 (bank reconciliation). Next: run verify.sh for each and release them to review. Follow-ups: T-0150 (bank preview and suggestions) and T-0152 (refunds, blocked on the owner).
+> Rounds 3 (DL-0472) and 4 (DL-0473) are merged, verified and in review: T-0151, T-0085, T-0149, T-0088, T-0145, T-0123 (wizard slice 1, migration 0065), T-0136, T-0153 and T-0087. Follow-ups: T-0150 (bank preview), T-0152 (refunds; blocked on the owner), T-0154 (ABA download), T-0157 (wizard routes; permission question), T-0158 (wizard settings) and T-0159 (ECL setting deprecation; needs the next migration, 0066).
 > T-0119 (Chromium in the worker image) needs docker image builds, a compose smoke run and the image scan, so it is better done where docker is available. Other ready cards: T-0087, T-0110, T-0119, T-0126, T-0127, T-0130, T-0143 and T-0168. The next migration is 0065.
 >
 > Codex cross-review (gate 8) is pending for every card in review. Gate 2c stays PENDING until main's baseline is re-recorded as unit+db; the tree is at 93.63%.
@@ -20,6 +20,7 @@
 - **Security CI is red (Gitleaks, DL-0464, owner chose "Ignore + gzip").** The fix is in local stash `DL-0464 gitleaks WIP fix (awaiting owner permission)`. It is not pushed, because committing it was blocked as an oversight change: it edits the human-owned contract test `infra/test/security-workflow.contract.test.ts`, with an exception for commit 3a6bc91 only, .agent/wip T-0086/T-0089 only, and the rule sourcegraph-access-token only. The hits are 254 git object IDs in format-patch headers. To land it, run `git stash pop` and commit, or allow the commit.
 - **(Resolved 2026-11-13, DL-0466)** ADR-0062: the owner accepted option 1 (fan-out from the lf_migrator maintenance instance). T-0147 is unblocked.
 - **Refund permission (T-0152, blocked).** The catalogue has no permission for customer refunds, so the refund routes and screen, and the refund half of SS-UC11-08, cannot be built without a security ADR. Which permission (for example `ar.refund.create` / `ar.refund.pay`), which role templates get it, and does paying a refund go through the payment-batch SoD rules? (DL-0491)
+- **T-0157 permission.** Should the setup wizard routes reuse `settings.chart.manage`, or get a new permission? A new permission is a security change (DL-0523).
 - **T-0132 needs a security ADR:** a new `ar.invoice.approve` permission and the role templates that get it (ADR-0023). It is the owner's decision; the card stays todo until then.
 - **CSRF policy (T-0144, security ADR to write).** Should cookie-authenticated writes that carry neither Fetch-Metadata nor Origin be rejected (OWASP recommends it)? That changes ~25 session-based DB test files. Owner decision or explicit delegation needed.
 - **Network:** research for T-0143 (backups) needs postgresql.org, which the session proxy blocks; allowing it in the environment would help.
@@ -337,3 +338,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-13T16:21:10.705Z claude: release T-0151 → review (verify at 6556ec7: every gate PASS except 12 (this verify step was unticked and lacked its phase marker; fixed now); 2c PENDING; 8 awaits Codex)
 - 2026-11-13T16:26:35.701Z claude: T-0145 → verifying
 - 2026-11-13T18:42:49.418Z claude: release T-0145 → review (full verify at a174907: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
+- 2026-11-13T20:07:49.344Z claude: release T-0153 → review (verify at ba72e04: VERIFY OK (2c PENDING by measure, 8 Codex))
+- 2026-11-13T20:07:49.505Z claude: release T-0087 → review (verify at ba72e04: VERIFY OK (2c PENDING by measure, 8 Codex))
+- 2026-11-13T20:07:49.633Z claude: release T-0136 → review (verify at ba72e04: every gate PASS except 12 (combined verify/review/finish step had no phase marker; split now); 2c PENDING; 8 Codex)
+- 2026-11-13T20:07:49.768Z claude: release T-0123 → review (verify at ba72e04: every gate PASS except 12 (step 5 moved to T-0157 was unticked; marked superseded now); 2c PENDING; 8 Codex)
