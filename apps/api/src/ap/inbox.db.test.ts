@@ -255,9 +255,7 @@ describe('SS-UC05-09: Emailed bill coded into a draft from the inbox', () => {
       "default-src 'none'; frame-ancestors 'none'; sandbox",
     );
     expect(Buffer.from(await pdf.arrayBuffer()).equals(PDF)).toBe(true);
-    expect((await call('GET', `/ap/inbox/${item}/attachments/2?${q()}`, 'clerk')).status).toBe(
-      404,
-    );
+    expect((await call('GET', `/ap/inbox/${item}/attachments/2?${q()}`, 'clerk')).status).toBe(404);
 
     const billId = randomUUID();
     const noKey = await code(item, 'clerk', coding(billId), null);
@@ -420,9 +418,7 @@ describe('SS-UC05-09: Emailed bill coded into a draft from the inbox', () => {
 describe('T-0136: permissions and tenant isolation', () => {
   it('T-0136 403 without ap.read (list, PDF) or ap.bill.enter (code)', async () => {
     expect((await call('GET', `/ap/inbox?${q()}`, 'sales')).status).toBe(403);
-    expect((await call('GET', `/ap/inbox/${item}/attachments/1?${q()}`, 'sales')).status).toBe(
-      403,
-    );
+    expect((await call('GET', `/ap/inbox/${item}/attachments/1?${q()}`, 'sales')).status).toBe(403);
     const approver = await code(bare, 'approver', coding(randomUUID()), randomUUID());
     expect(approver.status).toBe(403);
     expect(await approver.json()).toMatchObject({ permission: 'ap.bill.enter' });
