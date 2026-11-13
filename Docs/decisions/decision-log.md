@@ -2572,3 +2572,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision 2 (T-0128): gate 2c may measure unit+db coverage, with the main baseline re-recorded under the same measure (RQ-0105 remedy 2), implemented test-first with verifier tests.
 - Also: parallel sub-agents may run again (owner request). They take ID ranges per DL-0409 and add no migrations: the runner is gapless, so the lead adds migrations one at a time.
 - ADR: ADR-0047 (process, Accepted) · Status: accepted
+
+### DL-0409 — ID ranges for the second parallel round (2026-11-13)
+- Date: 2026-11-13 · By: claude · Task: sprint · Category: process
+- Decision: Six sub-agents in separate git worktrees, on local branches only; the lead merges them into `claude/loving-lovelace-nozqpk`. New IDs come only from each agent's range below. **No new migrations**: the runner is gapless (DL-0296), so an agent that needs schema reports it and the lead adds the migration one at a time.
+  | Agent | DL | ADR | RQ | New cards |
+  |---|---|---|---|---|
+  | T-0128 coverage measure | 0410–0419 | 0060 | 0136 | — |
+  | T-0079 reopen API with step-up | 0420–0429 | 0056 | 0137 | — |
+  | T-0084 batch billing UI | 0430–0439 | 0057 | 0138 | T-0133–T-0135 |
+  | T-0086 bills/inbox/approvals UI | 0440–0449 | 0058 | 0139 | T-0136–T-0138 |
+  | T-0089 reports UI | 0450–0459 | 0059 | 0140 | T-0139–T-0141 |
+  | T-0097 pilot hardening | 0460–0469 | 0054–0055 | 0141–0142 | T-0142–T-0144 |
+- Why: The owner asked for parallel agents (DL-0408); disjoint ranges keep the merges mechanical.
+- ADR: none · Status: accepted
