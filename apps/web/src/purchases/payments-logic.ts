@@ -80,3 +80,35 @@ export const STEP_UP_WHY_RELEASE =
   'Releasing a payment batch sends money out of your bank account, so LedgerForce asks you to confirm it is really you with your second sign-in step (multi-factor authentication). It asks whenever your last confirmation is more than 5 minutes old.';
 export const STEP_UP_WHY_VERIFY =
   'Verifying bank details decides where future payments go, so LedgerForce asks you to confirm it is really you with your second sign-in step (multi-factor authentication) before it accepts the verification.';
+
+// --- The bank file (T-0154, UC-06 step 3) ---------------------------------------------------
+
+/**
+ * The name to save the bank file under: the API's attachment name when it is a plain `*.aba`
+ * name (letters, digits, ".", "_", "-"; T-0056 only makes such names), else the batch number.
+ */
+export function abaFileName(contentDisposition: string | null, batchNo: string): string {
+  const m = /filename="([A-Za-z0-9_-][A-Za-z0-9._-]*\.aba)"/.exec(contentDisposition ?? '');
+  return m?.[1] ?? `${batchNo.replace(/[^A-Za-z0-9._-]/g, '_')}.aba`;
+}
+
+const message = (e: AdminApiError) =>
+  typeof e.body['message'] === 'string' ? e.body['message'] : '';
+
+/** A refusal of POST /ap/payment-batches/:id/aba in plain words (step-up is routed elsewhere). */
+export function bankFileRefusalWords(error: unknown): string {
+  if (error instanceof AdminApiError) {
+    if (error.code === 'BANK_NOT_CONFIGURED')
+      return `Set up the paying bank account for bank files first: its APCA user id, ABA user name and bank code (FI mnemonic), in Australian dollars. LedgerForce found: ${message(error)}.`;
+    if (error.code === 'NOT_RELEASED')
+      return 'The batch is not released yet, so there is no bank file. It can be made once every release is given.';
+    if (error.code === 'INVALID_ABA_DATA')
+      return `The bank file could not be written from the details on file: ${message(error)}. Fix them, then try again.`;
+    if (error.code === 'kms_not_configured')
+      return 'LedgerForce cannot open the sealed account numbers right now, so it cannot make the bank file. Nothing was made; try again later or ask the Owner.';
+  }
+  return refusalWords(error);
+}
+
+export const STEP_UP_WHY_BANK_FILE =
+  'The bank file holds the full account numbers of everyone in the batch, so LedgerForce asks you to confirm it is really you with your second sign-in step (multi-factor authentication) before it makes the file.';

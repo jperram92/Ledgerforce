@@ -8,6 +8,7 @@
  */
 import type { AppEnv } from '../env.tsx';
 import { AdminApiError } from '../admin/client.ts';
+import { abaFileName } from './payments-logic.ts';
 
 export type BatchStatus = 'draft' | 'partially_released' | 'released' | 'cancelled';
 export type ExclusionReason = 'BANK_DETAILS_COOLING_OFF' | 'NO_VERIFIED_BANK_DETAILS';
@@ -77,10 +78,20 @@ export interface BankDetailChange {
   payable_from: string | null;
 }
 
+export interface BankFile {
+  fileName: string;
+  content: Blob;
+}
+
 export interface PaymentsClient {
   batches(companyId: string): Promise<{ batches: BatchRow[] }>;
   batch(companyId: string, batchId: string): Promise<Batch>;
   release(companyId: string, batchId: string): Promise<unknown>;
+  /**
+   * The batch's ABA (Cemtex) file (POST, audited by the API, T-0056): the exact bytes, never
+   * decoded or shown, with the attachment's file name (T-0154).
+   */
+  abaFile(companyId: string, batchId: string, batchNo: string): Promise<BankFile>;
   changes(companyId: string): Promise<{ changes: BankDetailChange[] }>;
   verify(
     changeId: string,
@@ -111,6 +122,17 @@ export function createPaymentsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Pa
       send('GET', `/ap/payment-batches/${seg(batchId)}?company_id=${seg(companyId)}`),
     release: (companyId, batchId) =>
       send('POST', `/ap/payment-batches/${seg(batchId)}/release?company_id=${seg(companyId)}`),
+    abaFile: async (companyId, batchId, batchNo) => {
+      const res = await env.fetch(
+        `${env.apiBase}/ap/payment-batches/${seg(batchId)}/aba?company_id=${seg(companyId)}`,
+        { method: 'POST', credentials: 'same-origin', headers: { accept: 'text/plain' } },
+      );
+      if (!res.ok) throw new AdminApiError(res.status, await res.json().catch(() => null));
+      return {
+        fileName: abaFileName(res.headers.get('content-disposition'), batchNo),
+        content: await res.blob(),
+      };
+    },
     changes: (companyId) =>
       send('GET', `/bank-detail-changes?company_id=${seg(companyId)}&status=requested`),
     verify: (changeId, note) =>

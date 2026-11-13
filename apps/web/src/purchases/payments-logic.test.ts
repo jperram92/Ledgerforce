@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  abaFileName,
   accountLabel,
+  bankFileRefusalWords,
   exclusionText,
   refusalWords,
   releaseOutlook,
@@ -73,5 +75,45 @@ describe('payments logic [T-0087]', () => {
       refusalWords(new AdminApiError(422, { error: 'NOT_RELEASABLE', message: 'not draft' })),
     ).toBe('LedgerForce did not accept this: not draft');
     expect(refusalWords(new AdminApiError(403, { error: 'forbidden' }))).toMatch(/permission/);
+  });
+});
+
+describe('bank file words [T-0154]', () => {
+  it('takes the file name from the attachment header, and only a safe one', () => {
+    expect(abaFileName('attachment; filename="PB-0012-20261120.aba"', 'PB-0012')).toBe(
+      'PB-0012-20261120.aba',
+    );
+    expect(abaFileName('attachment; filename="../../x.aba"', 'PB-0012')).toBe('PB-0012.aba');
+    expect(abaFileName('attachment; filename="pay.exe"', 'PB-0012')).toBe('PB-0012.aba');
+    expect(abaFileName(null, 'PB 12/A')).toBe('PB_12_A.aba');
+  });
+
+  it('explains each bank-file refusal in plain words', () => {
+    expect(
+      bankFileRefusalWords(
+        new AdminApiError(422, { error: 'BANK_NOT_CONFIGURED', message: 'no active bank account' }),
+      ),
+    ).toMatch(/^Set up the paying bank account for bank files/);
+    expect(
+      bankFileRefusalWords(
+        new AdminApiError(422, { error: 'NOT_RELEASED', message: 'payment batch PB-1 is draft' }),
+      ),
+    ).toMatch(/^The batch is not released yet/);
+    expect(
+      bankFileRefusalWords(
+        new AdminApiError(422, { error: 'INVALID_ABA_DATA', message: 'BSB 06-000 is not valid' }),
+      ),
+    ).toBe(
+      'The bank file could not be written from the details on file: BSB 06-000 is not valid. Fix them, then try again.',
+    );
+    expect(bankFileRefusalWords(new AdminApiError(503, { error: 'kms_not_configured' }))).toMatch(
+      /cannot open the sealed account numbers right now/,
+    );
+    expect(
+      bankFileRefusalWords(
+        new AdminApiError(403, { error: 'sod_violation', rule: 'SOD_BATCH_SELF_RELEASE' }),
+      ),
+    ).toMatch(/^You created this batch\./);
+    expect(bankFileRefusalWords(new Error('offline'))).toMatch(/did not answer/);
   });
 });

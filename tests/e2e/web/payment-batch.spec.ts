@@ -7,7 +7,7 @@
  * step_up_required until the session has stepped up through /auth/step-up, and 403
  * sod_violation with the rule. Account numbers only ever arrive masked.
  */
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { AxeBuilder } from '@axe-core/playwright';
@@ -65,6 +65,8 @@ interface Fake {
   batch: Record<string, unknown>;
   requestedBy: string;
   refuseRelease: { status: number; body: unknown } | null;
+  abaCalls: string[];
+  refuseAba: { status: number; body: unknown } | null;
 }
 
 function batchOf(createdBy: string) {
@@ -124,10 +126,40 @@ function batchOf(createdBy: string) {
   };
 }
 
+/** Releases by two other people: the batch is released (T-0154 starts here). */
+function releasedBatch(b: Record<string, unknown>) {
+  return {
+    ...b,
+    status: 'released',
+    releases: [
+      {
+        released_by: PEOPLE.olivia.user_id,
+        released_by_name: 'Olivia Owner',
+        released_at: '2026-11-13T23:10:00.000Z',
+      },
+      {
+        released_by: PEOPLE.oscar.user_id,
+        released_by_name: 'Oscar Owner',
+        released_at: '2026-11-13T23:20:00.000Z',
+      },
+    ],
+  };
+}
+
+/** A stand-in Cemtex file (three records, CRLF): it carries full account numbers, as a real one does. */
+const ABA_NAME = 'PB-0012-20261120.aba';
+const FULL_ACCOUNT = '123456001';
+const ABA_FILE = [
+  `0                 01WBC       HARBOUR CO PTY LTD        301500PB-0012     201126${' '.repeat(40)}`,
+  `1062-000${FULL_ACCOUNT} 500001250000PAPER CO PTY LTD                BILL-0041         033-000999999999HARBOUR CO PTY LT00000000`,
+  `7999-999            001845000000184500000000000000000000000002${' '.repeat(40)}`,
+  '',
+].join('\r\n');
+
 async function fakeApi(
   page: Page,
   who: Who,
-  opts: { createdBy?: string; requestedBy?: string } = {},
+  opts: { createdBy?: string; requestedBy?: string; released?: boolean } = {},
 ): Promise<Fake> {
   const me = PEOPLE[who];
   const f: Fake = {
@@ -140,7 +172,10 @@ async function fakeApi(
     batch: batchOf(opts.createdBy ?? PEOPLE.casey.user_id),
     requestedBy: opts.requestedBy ?? PEOPLE.clerk.user_id,
     refuseRelease: null,
+    abaCalls: [],
+    refuseAba: null,
   };
+  if (opts.released) f.batch = releasedBatch(f.batch);
   page.on('console', (m) => {
     if (m.type() === 'error' && !/status of (401|403|404|409|422|503)/.test(m.text()))
       f.errors.push(m.text());
@@ -234,6 +269,27 @@ async function fakeApi(
             status: releases.length >= 2 ? 'released' : 'partially_released',
           };
           return send(route, 200, f.batch);
+        }
+        if (path === `/ap/payment-batches/${BATCH}/aba` && req.method() === 'POST') {
+          // T-0056: ap.payment_batch.release, released batches only, a text/plain attachment.
+          if (!perms.includes('ap.payment_batch.release'))
+            return send(route, 403, { error: 'forbidden', permission: 'ap.payment_batch.release' });
+          if (f.refuseAba) return send(route, f.refuseAba.status, f.refuseAba.body);
+          if (f.batch['status'] !== 'released')
+            return send(route, 422, {
+              error: 'NOT_RELEASED',
+              message: 'payment batch PB-0012 is draft; only a released batch has a bank file',
+            });
+          f.abaCalls.push(me.user_id);
+          return route.fulfill({
+            status: 200,
+            headers: {
+              'content-type': 'text/plain; charset=us-ascii',
+              'content-disposition': `attachment; filename="${ABA_NAME}"`,
+              'cache-control': 'no-store',
+            },
+            body: ABA_FILE,
+          });
         }
       }
       if (path === '/bank-detail-changes') {
@@ -494,4 +550,130 @@ test('T-0087: an Approver sees the changes but only the Owner verifies them', as
   await expect(page.getByRole('button', { name: 'Verify new bank details' })).toHaveCount(0);
   await expect(page.getByText(/Only the Owner verifies bank details/).first()).toBeVisible();
   expect(f.errors).toEqual([]);
+});
+
+/*
+ * T-0154 (UC-06 step 3): the bank file. A releaser of a released batch downloads the ABA file
+ * from POST /ap/payment-batches/:id/aba (T-0056, audited by the API); the file is a download only
+ * and the screen never shows the full account numbers it carries. The API decides who may have
+ * it; the screen hides the action from people without ap.payment_batch.release, explains every
+ * refusal in plain words and, should the API ask for a step-up or refuse on a separation-of-
+ * duties rule, shows the same prompt and words as the release.
+ */
+test.describe('bank file [T-0154]', () => {
+  test.use({ evidenceTaskId: 'T-0154' });
+
+  for (const width of [1440, 390]) {
+    test(`SS-UC06-11 Bank file download from a released batch @ ${String(width)} [T-0154]`, async ({
+      page,
+      evidence,
+    }) => {
+      const f = await fakeApi(page, 'riley', { released: true });
+      await open(page, `/purchases/payment-batches/${BATCH}`, width);
+      await expect(page.getByText('2 of 2 releases given')).toBeVisible();
+      const file = page.getByRole('region', { name: 'Bank file' });
+      await expect(file).toContainText('holds the full account numbers');
+      await assertPage(page, width);
+      await evidence('SS-UC06-11', `bank-file-ready-${String(width)}`);
+
+      const saved = page.waitForEvent('download');
+      await file.getByRole('button', { name: 'Download the bank file' }).click();
+      const download = await saved;
+      expect(download.suggestedFilename()).toBe(ABA_NAME);
+      expect(readFileSync(await download.path(), 'latin1')).toBe(ABA_FILE);
+      const made = page.getByRole('status').filter({ hasText: 'Bank file made' });
+      await expect(made).toContainText(ABA_NAME);
+      await expect(made).toContainText('recorded in the audit log');
+      expect(f.abaCalls).toEqual([PEOPLE.riley.user_id]);
+      await expect(page.locator('body')).not.toContainText(FULL_ACCOUNT);
+      await assertPage(page, width);
+      await evidence('SS-UC06-11', `bank-file-downloaded-${String(width)}`);
+      expect(f.errors).toEqual([]);
+    });
+  }
+
+  test('T-0154 AC-3: an AP Clerk sees the released batch but no bank-file action', async ({
+    page,
+  }) => {
+    const f = await fakeApi(page, 'clerk', { released: true });
+    await open(page, `/purchases/payment-batches/${BATCH}`, 1440);
+    const file = page.getByRole('region', { name: 'Bank file' });
+    await expect(file).toContainText('An Approver or the Owner downloads the bank file');
+    await expect(page.getByRole('button', { name: 'Download the bank file' })).toHaveCount(0);
+    expect(f.abaCalls).toEqual([]);
+    expect(f.errors).toEqual([]);
+  });
+
+  test('T-0154: before release there is no bank file to download, and the screen says why', async ({
+    page,
+  }) => {
+    const f = await fakeApi(page, 'riley');
+    await open(page, `/purchases/payment-batches/${BATCH}`, 1440);
+    const file = page.getByRole('region', { name: 'Bank file' });
+    await expect(file).toContainText('once the batch is released');
+    await expect(page.getByRole('button', { name: 'Download the bank file' })).toHaveCount(0);
+    expect(f.abaCalls).toEqual([]);
+    expect(f.errors).toEqual([]);
+  });
+
+  const refusals = [
+    {
+      name: 'the paying account is not set up for bank files',
+      answer: {
+        status: 422,
+        body: { error: 'BANK_NOT_CONFIGURED', message: 'no active bank account for 1100' },
+      },
+      words: 'Set up the paying bank account for bank files',
+    },
+    {
+      name: 'the file cannot be written from the details on file',
+      answer: {
+        status: 422,
+        body: { error: 'INVALID_ABA_DATA', message: 'account number longer than 9 characters' },
+      },
+      words: 'account number longer than 9 characters',
+    },
+    {
+      name: 'the key service is not available',
+      answer: { status: 503, body: { error: 'kms_not_configured' } },
+      words: 'cannot open the sealed account numbers right now',
+    },
+    {
+      name: 'a separation-of-duties rule',
+      answer: { status: 403, body: { error: 'sod_violation', rule: 'SOD_BATCH_SELF_RELEASE' } },
+      words: 'You created this batch',
+    },
+  ];
+  for (const r of refusals) {
+    test(`T-0154 AC-3: a bank-file refusal (${r.name}) is explained in plain words`, async ({
+      page,
+    }) => {
+      const f = await fakeApi(page, 'riley', { released: true });
+      f.refuseAba = r.answer;
+      await open(page, `/purchases/payment-batches/${BATCH}`, 1440);
+      let downloads = 0;
+      page.on('download', () => (downloads += 1));
+      await page.getByRole('button', { name: 'Download the bank file' }).click();
+      await expect(page.getByRole('alert')).toContainText(r.words);
+      await expect(page.getByRole('status').filter({ hasText: 'Bank file made' })).toHaveCount(0);
+      expect(downloads).toBe(0);
+      expect(f.errors).toEqual([]);
+    });
+  }
+
+  test('T-0154: if the API asks for a step-up, the bank file waits for a fresh sign-in and a fresh click', async ({
+    page,
+  }) => {
+    const f = await fakeApi(page, 'riley', { released: true });
+    f.refuseAba = { status: 401, body: { error: 'step_up_required', max_age: 300 } };
+    await open(page, `/purchases/payment-batches/${BATCH}`, 1440);
+    await page.getByRole('button', { name: 'Download the bank file' }).click();
+    const prompt = page.getByRole('region', { name: 'Confirm it’s you' });
+    await expect(prompt).toContainText('full account numbers');
+    await expect(page.getByRole('button', { name: 'Download the bank file' })).toHaveCount(0);
+    await prompt.getByRole('button', { name: 'Not now' }).click();
+    await expect(page.getByRole('button', { name: 'Download the bank file' })).toBeVisible();
+    expect(f.abaCalls).toEqual([]);
+    expect(f.errors).toEqual([]);
+  });
 });
