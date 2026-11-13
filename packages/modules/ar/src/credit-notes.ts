@@ -21,6 +21,7 @@ import {
   allocate,
   nextNumber,
   post,
+  preview,
   subledgerEntriesOf,
   type PostingLineInput,
   type PostOptions,
@@ -292,41 +293,47 @@ export async function createCreditNote(trx: Trx, c: CreditNoteInput): Promise<Cr
   return getCreditNote(trx, companyId, header.id);
 }
 
-/** Approve and post a draft credit note; apply it to its invoice while the invoice is open. */
-export async function approveCreditNote(
+interface ApprovalHeader {
+  id: string;
+  status: string;
+  party_id: string;
+  invoice_id: string;
+  issue_date: string;
+  tax_total: string;
+  gross_total: string;
+  created_by: string | null;
+  invoice_entry: string;
+  invoice_gross: string;
+}
+
+/**
+ * The draft credit note approval would post and its GP-005 journal. Shared by approveCreditNote
+ * and previewCreditNoteJournal (T-0151) so the preview cannot drift from the posting. Refuses as
+ * approval does: unknown note, not a draft, credit beyond the invoice.
+ */
+async function creditNoteJournal(
   trx: Trx,
-  c: { companyId: string; creditNoteId: string; approvedBy?: string },
-  deps: { outbox?: DocumentOutbox; posting?: PostOptions } = {},
-): Promise<CreditNoteView> {
-  const companyId = c.companyId.toLowerCase();
+  companyId: string,
+  creditNoteId: string,
+  lock: boolean,
+): Promise<{ h: ApprovalHeader; journal: PostingLineInput[] }> {
   const h = (
-    await sql<{
-      id: string;
-      status: string;
-      party_id: string;
-      invoice_id: string;
-      issue_date: string;
-      tax_total: string;
-      gross_total: string;
-      created_by: string | null;
-      invoice_entry: string;
-      invoice_gross: string;
-    }>`
+    await sql<ApprovalHeader>`
       SELECT n.id::text, n.status, n.party_id::text, n.invoice_id::text,
              to_char(n.issue_date, 'YYYY-MM-DD') AS issue_date, n.tax_total::text, n.gross_total::text,
              n.created_by::text, i.entry_id::text AS invoice_entry, i.gross_total::text AS invoice_gross
         FROM app.credit_note n
         JOIN app.sales_invoice i ON i.tenant_id = n.tenant_id AND i.id = n.invoice_id
-       WHERE n.company_id = ${companyId} AND n.id = ${c.creditNoteId}::uuid
-       FOR UPDATE OF n`.execute(trx)
+       WHERE n.company_id = ${companyId} AND n.id = ${creditNoteId}::uuid
+       ${lock ? sql`FOR UPDATE OF n` : sql``}`.execute(trx)
   ).rows[0];
   if (!h)
     throw new CreditNoteError(
       'INVALID_CREDIT_NOTE',
-      `credit note ${c.creditNoteId} is not in company ${companyId}`,
+      `credit note ${creditNoteId} is not in company ${companyId}`,
     );
   if (h.status !== 'draft')
-    throw new CreditNoteError('NOT_DRAFT', `credit note ${c.creditNoteId} is ${h.status}`);
+    throw new CreditNoteError('NOT_DRAFT', `credit note ${creditNoteId} is ${h.status}`);
   creditableAmount({
     invoiceGross: h.invoice_gross,
     creditedGross: await creditedGross(trx, companyId, h.invoice_id),
@@ -368,6 +375,84 @@ export async function approveCreditNote(
       : [{ account: { role: 'GST_COLLECTED' }, debit: h.tax_total }]),
     { account: { role: 'AR_CONTROL' }, credit: h.gross_total, partyId: h.party_id },
   ];
+  return { h, journal };
+}
+
+export interface CreditNoteJournalPreview {
+  readonly entryDate: string;
+  readonly requestedDate: string;
+  readonly redirected: boolean;
+  readonly needsOverride: boolean;
+  readonly baseCurrency: string;
+  readonly total: string;
+  readonly lines: readonly {
+    readonly lineNo: number;
+    readonly accountId: string;
+    readonly accountCode: string;
+    readonly accountName: string;
+    readonly accountType: string;
+    readonly debit: string;
+    readonly credit: string;
+    readonly partyId: string | null;
+  }[];
+}
+
+/**
+ * "Show me the journal" for a draft credit note (T-0151, SS-UC11-08, design §3.9): the posting
+ * engine's preview of the journal approveCreditNote would post (same builder, source type and
+ * date). Writes nothing: no number is taken, nothing is allocated or stored.
+ */
+export async function previewCreditNoteJournal(
+  trx: Trx,
+  q: { companyId: string; creditNoteId: string },
+): Promise<CreditNoteJournalPreview> {
+  const companyId = q.companyId.toLowerCase();
+  const { h, journal } = await creditNoteJournal(trx, companyId, q.creditNoteId, false);
+  const built = await preview(trx, {
+    companyId,
+    idempotencyKey: `ar-credit-note:${h.id}`,
+    entryDate: h.issue_date,
+    sourceType: 'ar_credit_note',
+    sourceId: h.id,
+    memo: 'Credit note (draft preview)',
+    lines: journal,
+  });
+  const ids = [...new Set(built.lines.map((l) => l.accountId))];
+  const names = new Map(
+    (
+      await sql<{ id: string; name: string; type: string }>`
+        SELECT id::text, name, type FROM app.account
+         WHERE company_id = ${companyId} AND id = ANY(${sql.val(ids)}::uuid[])`.execute(trx)
+    ).rows.map((a) => [a.id, a]),
+  );
+  return {
+    entryDate: built.entryDate,
+    requestedDate: built.requestedDate,
+    redirected: built.redirected,
+    needsOverride: built.needsOverride,
+    baseCurrency: built.baseCurrency,
+    total: built.total,
+    lines: built.lines.map((l) => ({
+      lineNo: l.lineNo,
+      accountId: l.accountId,
+      accountCode: l.accountCode,
+      accountName: names.get(l.accountId)?.name ?? l.accountCode,
+      accountType: names.get(l.accountId)?.type ?? '',
+      debit: l.debit,
+      credit: l.credit,
+      partyId: l.partyId,
+    })),
+  };
+}
+
+/** Approve and post a draft credit note; apply it to its invoice while the invoice is open. */
+export async function approveCreditNote(
+  trx: Trx,
+  c: { companyId: string; creditNoteId: string; approvedBy?: string },
+  deps: { outbox?: DocumentOutbox; posting?: PostOptions } = {},
+): Promise<CreditNoteView> {
+  const companyId = c.companyId.toLowerCase();
+  const { h, journal } = await creditNoteJournal(trx, companyId, c.creditNoteId, true);
   const creditNoteNo = await nextNumber(trx, companyId, CREDIT_NOTE_NUMBER_SERIES);
   const posted = await post(
     trx,

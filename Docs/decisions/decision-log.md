@@ -2816,3 +2816,21 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | AR cash: receipt/credit/refund routes as needed + T-0085 screens | T-0085 (+ split card) | 0490–0499 | 0064 | 0146 | T-0151–T-0152 |
 - Why: The owner asked for parallel sub-agents (DL-0408). Both UI cards need API work first, and they touch disjoint modules (bank vs ar).
 - ADR: none · Status: accepted
+
+### DL-0490 — AR cash API for the T-0085 screens: receipts list, keyed allocation, credit-note journal preview (T-0151)
+- Date: 2026-11-13 · By: claude · Task: T-0151 · Category: architecture (AR, API)
+- Decision:
+  1. `listReceipts` (@ledgerforce/ar) and `GET /ar/receipts?company_id=&unallocated=true` (ar.read). Unallocated = the receipt's own AR open item, read from the subledger like `ReceiptView.unallocated`. Party name is `legal_name`, as the invoice list uses.
+  2. `POST /ar/receipts/:id/allocations` now requires an Idempotency-Key (400 `idempotency_key_required` without one) and passes it to `allocateReceipt`, whose ledger allocation key becomes `ar-receipt-alloc:<receipt>:key:<key>`. A repeat skips the open-amount pre-check and reaches the ledger's own replay (`replayed: true`, no second allocation; a different body is the ledger's IDEMPOTENCY_CONFLICT → 422). A receipt outside the tenant or company is `RECEIPT_NOT_FOUND` → 404. The audit description is written only for a new allocation, as `POST /ar/receipts` does.
+  3. `approveCreditNote`'s journal construction is extracted verbatim into `creditNoteJournal`. `previewCreditNoteJournal` runs the engine's `preview()` on the same command (source ar_credit_note, entry date = issue date), as DL-0406 did for invoices. Route: `GET /ar/credit-notes/:id/journal` (ar.read). Not in the company → 404, not a draft → 422 NOT_DRAFT.
+- Why: the T-0085 screens need these and they did not exist. The allocation route broke the apps/api rule "every mutating endpoint requires an idempotency key": a browser retry would have allocated twice. One builder means the preview cannot drift from the posting (P4, design §3.9).
+- Alternatives: computing the credit-note journal in the browser or the API (banned: no accounting outside the engine); a separate idempotency table for allocations (needs a migration; the ledger's allocation key already stores and replays it); keeping the header optional on allocations (keeps the double-allocation hole).
+- Size: about 250 changed lines of API and module code plus tests, more than the ~150 the brief allowed in the UI card, so it is its own card T-0151 and T-0085 depends on it.
+- ADR: none (read routes and the idempotency header follow DL-0406 and the apps/api rule; no new permission) · Status: accepted
+
+### DL-0491 — T-0085 split: refund half of SS-UC11-08 to T-0152, blocked on a missing refund permission
+- Date: 2026-11-13 · By: claude · Task: T-0085 · Category: scope + security
+- Decision: T-0085 builds the receipt allocation screen (SS-UC03-10) and the credit-note screen with its journal preview (credit-note half of SS-UC11-08). Requesting a customer refund over HTTP and its screen move to the new card T-0152. That card is `blocked`: the RBAC catalogue has no refund permission, and choosing one (new `ar.refund.*` and its role templates, or reusing an existing one) is a security ADR that only the owner may accept. The credit-note screen shows the customer's credit after approval and names T-0152 instead of offering a refund button.
+- Why: brief: "If a permission is missing, stop and report it; do not add one". AGENTS.md §6 gate 1 (security). DL-0305 already notes the refund route needs an ADR. Precedent: T-0131 → T-0132 for single-invoice approval.
+- Alternatives: reuse `ar.credit_note.create` for refunds (a silent security-model change); fake a refund route in the e2e test only (a screen that cannot work against the real API).
+- ADR: none yet (security ADR for T-0152, owner) · Status: accepted

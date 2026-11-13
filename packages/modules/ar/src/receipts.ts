@@ -25,7 +25,7 @@ type Trx = Transaction<Database>;
 
 export const RECEIPT_NUMBER_SERIES = 'ar_receipt_document';
 
-export type ReceiptErrorCode = 'INVALID_RECEIPT' | 'OVER_ALLOCATED';
+export type ReceiptErrorCode = 'INVALID_RECEIPT' | 'OVER_ALLOCATED' | 'RECEIPT_NOT_FOUND';
 
 export class ReceiptError extends Error {
   readonly code: ReceiptErrorCode;
@@ -109,7 +109,7 @@ async function applyToInvoice(
     date: string;
     key: string;
   },
-): Promise<void> {
+): Promise<{ replayed: boolean }> {
   if (!AMOUNT_RE.test(c.amount) || !new Decimal(c.amount).gt(0)) {
     throw new ReceiptError('INVALID_RECEIPT', 'an allocation must be > 0 with ≤ 2 decimals');
   }
@@ -133,13 +133,24 @@ async function applyToInvoice(
   if (!from || !to)
     throw new ReceiptError('INVALID_RECEIPT', 'receipt or invoice has no open item');
   const amount = new Decimal(c.amount);
-  if (amount.gt(new Decimal(from.openAmount).abs()) || amount.gt(new Decimal(to.openAmount))) {
+  // A repeat of a key already recorded goes straight to the ledger, which replays it (or refuses
+  // IDEMPOTENCY_CONFLICT when the repeat differs); the open amounts no longer cover it (T-0151).
+  const prior = await trx
+    .selectFrom('app.allocation')
+    .select('id')
+    .where('company_id', '=', c.companyId)
+    .where('idempotency_key', '=', c.key)
+    .executeTakeFirst();
+  if (
+    !prior &&
+    (amount.gt(new Decimal(from.openAmount).abs()) || amount.gt(new Decimal(to.openAmount)))
+  ) {
     throw new ReceiptError(
       'OVER_ALLOCATED',
       `allocation ${numeric(amount)} exceeds the receipt's unallocated ${numeric(new Decimal(from.openAmount).abs())} or the invoice's open ${numeric(to.openAmount)}`,
     );
   }
-  await allocate(trx, {
+  return allocate(trx, {
     companyId: c.companyId,
     idempotencyKey: c.key,
     fromEntryId: from.id,
@@ -246,6 +257,11 @@ export async function allocateReceipt(
     invoiceId: string;
     amount: string;
     allocationDate: string;
+    /**
+     * The caller's idempotency key (the API's Idempotency-Key, T-0151): a repeat with the same key
+     * replays the allocation instead of allocating again. Without one, each call allocates anew.
+     */
+    idempotencyKey?: string;
   },
 ): Promise<ReceiptView> {
   const companyId = c.companyId.toLowerCase();
@@ -257,22 +273,88 @@ export async function allocateReceipt(
     .executeTakeFirst();
   if (!r)
     throw new ReceiptError(
-      'INVALID_RECEIPT',
+      'RECEIPT_NOT_FOUND',
       `receipt ${c.receiptId} is not in company ${companyId}`,
     );
-  const n = await sql<{ n: number }>`SELECT count(*)::int AS n FROM app.allocation a
-    JOIN app.subledger_entry s ON s.tenant_id = a.tenant_id AND s.id = a.from_entry_id
-   WHERE s.entry_id = ${r.entry_id}::uuid`.execute(trx);
-  await applyToInvoice(trx, {
+  let key: string;
+  if (c.idempotencyKey !== undefined) key = `ar-receipt-alloc:${r.id}:key:${c.idempotencyKey}`;
+  else {
+    const n = await sql<{ n: number }>`SELECT count(*)::int AS n FROM app.allocation a
+      JOIN app.subledger_entry s ON s.tenant_id = a.tenant_id AND s.id = a.from_entry_id
+     WHERE s.entry_id = ${r.entry_id}::uuid`.execute(trx);
+    key = `ar-receipt-alloc:${r.id}:later-${String((n.rows[0]?.n ?? 0) + 1)}`;
+  }
+  const { replayed } = await applyToInvoice(trx, {
     companyId,
     partyId: r.party_id,
     receiptEntryId: r.entry_id,
     invoiceId: c.invoiceId,
     amount: c.amount,
     date: c.allocationDate,
-    key: `ar-receipt-alloc:${r.id}:later-${String((n.rows[0]?.n ?? 0) + 1)}`,
+    key,
   });
-  return viewOf(trx, companyId, r.id, false);
+  return viewOf(trx, companyId, r.id, replayed);
+}
+
+export interface ReceiptSummary {
+  readonly receiptId: string;
+  readonly receiptNo: string;
+  readonly partyId: string;
+  readonly partyName: string;
+  readonly receiptDate: string;
+  readonly method: 'eft' | 'cheque' | 'cash' | 'card';
+  readonly reference: string | null;
+  readonly amount: string;
+  /** Still unallocated (customer credit), NUMERIC text. */
+  readonly unallocated: string;
+}
+
+/**
+ * The company's receipts, newest first, with what each still has unallocated — the receipt's own
+ * open item in the AR subledger (T-0151). `unallocatedOnly` keeps those with something left.
+ */
+export async function listReceipts(
+  trx: Trx,
+  q: { companyId: string; unallocatedOnly?: boolean },
+): Promise<ReceiptSummary[]> {
+  const companyId = q.companyId.toLowerCase();
+  const rows = (
+    await sql<{
+      id: string;
+      receipt_no: string;
+      party_id: string;
+      party_name: string;
+      receipt_date: string;
+      method: ReceiptSummary['method'];
+      reference: string | null;
+      amount: string;
+      unallocated: string;
+    }>`
+      SELECT r.id::text, r.receipt_no, r.party_id::text,
+             p.legal_name AS party_name,
+             to_char(r.receipt_date, 'YYYY-MM-DD') AS receipt_date, r.method, r.reference,
+             r.amount::text,
+             coalesce((SELECT abs(sum(s.open_amount)) FROM app.subledger_entry s
+                        WHERE s.entry_id = r.entry_id AND s.control_role = 'AR_CONTROL'), 0)::text
+               AS unallocated
+        FROM app.customer_receipt r
+        JOIN app.party p ON p.tenant_id = r.tenant_id AND p.id = r.party_id
+       WHERE r.company_id = ${companyId}
+       ORDER BY r.receipt_date DESC, r.receipt_no DESC`.execute(trx)
+  ).rows;
+  return rows
+    .map((x) => ({
+      receiptId: x.id,
+      receiptNo: x.receipt_no,
+      partyId: x.party_id,
+      partyName: x.party_name,
+      receiptDate: x.receipt_date,
+      method: x.method,
+      reference: x.reference,
+      amount: numeric(x.amount),
+      unallocated: numeric(x.unallocated),
+    }))
+    .filter((x) => !q.unallocatedOnly || !new Decimal(x.unallocated).isZero());
 }
 
 /** An invoice's payment status, derived from its open item (UC-03). */
