@@ -451,6 +451,20 @@ export interface CloseChecklistStepTable {
   detail: ColumnType<unknown, string | undefined, never>;
 }
 
+/**
+ * Migration 0065 (T-0123, ADR-0067): setup wizard completion record per company and step (1–10).
+ * Written once (ON CONFLICT DO NOTHING); 'no_history' only for step 9, with a reason.
+ */
+export interface SetupWizardStepTable {
+  tenant_id: TenantId;
+  company_id: string;
+  step: number;
+  outcome: 'validated' | 'no_history';
+  reason: string | null;
+  completed_by: string | null;
+  completed_at: Timestamp;
+}
+
 /** Migration 0059 (T-0068): overdue reminder steps per company (UC-04). Steps are disabled, never deleted. */
 export interface ArReminderScheduleTable {
   tenant_id: TenantId;
@@ -1287,6 +1301,7 @@ export interface Database {
   'app.ar_reminder': ArReminderTable;
   'app.ar_reminder_pause': ArReminderPauseTable;
   'app.close_checklist_step': CloseChecklistStepTable;
+  'app.setup_wizard_step': SetupWizardStepTable;
   'app.sales_invoice_line': SalesInvoiceLineTable;
   'app.ar_settings': ArSettingsTable;
   'app.credit_note': CreditNoteTable;
