@@ -9,9 +9,11 @@
  */
 import { writeFileSync } from 'node:fs';
 import { createDb, databaseUrlFromEnv } from '@ledgerforce/db';
-import { HandlerRegistry, runtimeBossOptions } from '@ledgerforce/outbox';
+import { reminderEmailHandler, SmtpSender } from '@ledgerforce/email';
+import { enqueue, HandlerRegistry, runtimeBossOptions } from '@ledgerforce/outbox';
 import { sql } from 'kysely';
 import { PgBoss } from 'pg-boss';
+import { startReminderWorker } from './daily-jobs.ts';
 import { startOutboxWorker } from './outbox-worker.ts';
 import { startSyncIssueWorker } from './sync-issue-worker.ts';
 
@@ -28,8 +30,31 @@ const db = createDb(url, 4);
 const boss = new PgBoss(runtimeBossOptions(url));
 boss.on('error', (error: Error) => console.error(`pg-boss: ${error.message}`));
 await boss.start();
-// No outbox handlers are registered yet: events are delivered to none and recorded as such.
-await startOutboxWorker({ boss, db, registry: new HandlerRegistry() });
+const registry = new HandlerRegistry();
+// Overdue-reminder emails (T-0068, T-0147) need SMTP. Without LF_SMTP_URL / LF_SMTP_FROM the event is
+// delivered to no handler and recorded as such, and the gap is logged at start.
+if (process.env['LF_SMTP_URL'] && process.env['LF_SMTP_FROM']) {
+  registry.register(reminderEmailHandler({ sender: SmtpSender.fromEnv(process.env) }));
+} else {
+  console.warn('LF_SMTP_URL / LF_SMTP_FROM not set: overdue-reminder emails are not sent');
+}
+await startOutboxWorker({ boss, db, registry });
+// The daily overdue-reminder run, one job per tenant fanned out by the scheduler (ADR-0062).
+await startReminderWorker({
+  boss,
+  db,
+  outbox: {
+    publish: async (trx, e) => {
+      await enqueue(trx, boss, {
+        companyId: e.companyId,
+        topic: e.topic,
+        aggregateType: e.aggregateType,
+        aggregateId: e.aggregateId,
+        payload: e.payload,
+      });
+    },
+  },
+});
 // Dead-lettered deliveries become Sync issues (design §5.6 rule 2, T-0071).
 await startSyncIssueWorker({ boss, db });
 

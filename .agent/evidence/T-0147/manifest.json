@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0147",
+  "entries": [
+    {
+      "scenario": "SS-UC04-08",
+      "file": ".agent/evidence/T-0147/20261113-100345-tests-db.json",
+      "test": "4 test(s): apps/worker/src/daily-jobs.db.test.ts › SS-UC04-08: the daily run for one tenant › the run date is the date in the tenant report time zone | apps/worker/src/daily-jobs.db.test.ts › SS-UC04-08: the daily run for one tenant › job data must name a tenant id | apps/worker/src/daily-jobs.db.test.ts › SS-UC04-08: the daily run for one tenant › SS-UC04-08 runs every company of the tenant on its local date; a re-run that day queues nothing | apps/worker/src/daily-jobs.db.test.ts › SS-UC04-08: the daily run for one tenant › a tenant job sees only its own tenant's companies",
+      "commit": "20404a21ecd0-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T10:03:45.119Z",
+      "result": "passed"
+    }
+  ]
+}

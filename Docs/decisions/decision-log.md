@@ -2748,3 +2748,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: ADR-0062 is accepted with option 1. The `lf_migrator` maintenance instance holds the daily pg-boss schedule and reads the active tenant ids through a SECURITY DEFINER function that only `lf_migrator` may execute. It enqueues one job per tenant, with `{tenantId}` in the job data. The `lf_app` worker runs each job inside `withTenant`. `lf_app` gains no cross-tenant privilege. T-0147 moves from blocked to todo.
 - Why: The owner said "accept ADR-0062 option 1, keep going" on 2026-11-13. Tenant enumeration stays with the role that already administers pg-boss (ADR-0008 rule 5).
 - ADR: ADR-0062 · Status: accepted
+
+### DL-0467 — Daily jobs: 14:05 UTC fan-out, deterministic per-tenant/day job ids, scheduler compose service (T-0147)
+- Date: 2026-11-13 · By: claude · Task: T-0147 · Category: architecture (implements ADR-0062)
+- Decision:
+  - The owner instance's pg-boss cron `daily.fanout` runs at `5 14 * * *` UTC, which is just after midnight in Sydney (00:05 in summer, 01:05 in winter).
+  - The fan-out sends one `ar.reminders.run` job per active tenant. The job id is a hash of queue, tenant and UTC day, so a repeated fan-out on the same day is a no-op.
+  - The worker computes the run date in the tenant's latest `sod_settings.report_timezone` and runs every company of the tenant inside withTenant.
+  - A compose service `scheduler` (worker image, `cli/scheduler.ts`, lf_migrator secret only, read-only, all capabilities dropped, heartbeat healthcheck) runs supervision, the timekeeper and the fan-out consumer. `startMaintenance` gains a `schedule` option.
+  - The worker registers the reminder-email handler only when SMTP is configured.
+- Why: ADR-0062 option 1 (accepted, DL-0466). Pilot tenants are Australian (design §7.2 default region). Idempotency is designed in at two levels: the job id and the `app.ar_reminder` primary key.
+- Alternatives: an hourly fan-out per local midnight (more jobs, no benefit for an AU pilot; revisit for multi-zone tenants); pg-boss singletonKey (depends on queue policy, while the job id works for any policy).
+- ADR: ADR-0062 · Status: accepted

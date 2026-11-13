@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37375
+ ❯ |db| apps/worker/src/daily-jobs.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| apps/worker/src/daily-jobs.db.test.ts [ apps/worker/src/daily-jobs.db.test.ts ]
+Error: Cannot find module './daily-jobs.ts' imported from /home/user/Ledgerforce/apps/worker/src/daily-jobs.db.test.ts
+ ❯ apps/worker/src/daily-jobs.db.test.ts:19:1
+     17| import { PgBoss } from 'pg-boss';
+     18| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     19| import {
+       | ^
+     20|   AR_REMINDERS_QUEUE,
+     21|   DAILY_FANOUT_CRON,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  09:57:25
+   Duration  1.56s (transform 506ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

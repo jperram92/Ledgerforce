@@ -106,6 +106,7 @@ describe('SS-PLAT-86 images', () => {
 type Service = {
   image?: string;
   build?: { context: string; dockerfile: string; target?: string };
+  command?: string[];
   environment?: Record<string, string>;
   secrets?: string[];
   ports?: string[];
@@ -130,10 +131,24 @@ const svc = (n: string): Service => {
 };
 
 describe('SS-PLAT-86 compose stack', () => {
-  it('SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup', () => {
+  it('SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup and the scheduler (ADR-0062)', () => {
     expect(Object.keys(compose.services).sort()).toEqual(
-      ['api', 'keycloak', 'postgres', 'setup', 'web', 'worker'].sort(),
+      ['api', 'keycloak', 'postgres', 'scheduler', 'setup', 'web', 'worker'].sort(),
     );
+  });
+
+  it('T-0147 the scheduler is the worker image running the owner-only scheduler CLI (ADR-0062 option 1)', () => {
+    expect(svc('scheduler').build).toEqual({
+      context: '../..',
+      dockerfile: 'infra/docker/Dockerfile',
+      target: 'worker',
+    });
+    expect(svc('scheduler').command).toEqual(['node', 'apps/worker/src/cli/scheduler.ts']);
+    const env = svc('scheduler').environment ?? {};
+    expect(env['LF_MIGRATOR_DB_PASSWORD_FILE']).toBe('/run/secrets/lf_migrator_password');
+    expect(env['LF_APP_DB_PASSWORD_FILE']).toBeUndefined();
+    expect(svc('scheduler').secrets).toEqual(['lf_migrator_password']);
+    expect(svc('scheduler').ports).toBeUndefined();
   });
 
   it('SS-PLAT-86 images are pinned; app services build the shared Dockerfile targets', () => {
@@ -186,7 +201,7 @@ describe('SS-PLAT-86 compose stack', () => {
       ].sort(),
     );
     expect(holders('postgres_password')).toEqual(['postgres']);
-    expect(holders('lf_migrator_password')).toEqual(['postgres', 'setup']);
+    expect(holders('lf_migrator_password')).toEqual(['postgres', 'scheduler', 'setup']);
     expect(holders('lf_app_password')).toEqual(['api', 'postgres', 'setup', 'worker']);
     expect(holders('keycloak_db_password')).toEqual(['keycloak', 'postgres']);
     expect(holders('oidc_client_secret')).toEqual(['api', 'keycloak']);
@@ -201,7 +216,7 @@ describe('SS-PLAT-86 compose stack', () => {
     }
   });
 
-  it('SS-PLAT-86 the runtime connects as lf_app; only setup holds the migrator password', () => {
+  it('SS-PLAT-86 the runtime connects as lf_app; only setup and the scheduler hold the migrator password', () => {
     for (const n of ['api', 'worker']) {
       const env = svc(n).environment ?? {};
       expect(env['LF_APP_DB_PASSWORD_FILE']).toBe('/run/secrets/lf_app_password');
@@ -228,7 +243,7 @@ describe('SS-PLAT-86 compose stack', () => {
       postgres: { condition: 'service_healthy' },
       keycloak: { condition: 'service_healthy' },
     });
-    for (const n of ['api', 'worker']) {
+    for (const n of ['api', 'worker', 'scheduler']) {
       expect(svc(n).depends_on?.['setup']).toEqual({
         condition: 'service_completed_successfully',
       });
@@ -237,7 +252,7 @@ describe('SS-PLAT-86 compose stack', () => {
       api: { condition: 'service_healthy' },
       keycloak: { condition: 'service_healthy' },
     });
-    for (const n of ['postgres', 'keycloak', 'api', 'worker', 'web']) {
+    for (const n of ['postgres', 'keycloak', 'api', 'worker', 'scheduler', 'web']) {
       expect(svc(n).healthcheck?.test, `${n} healthcheck`).toBeDefined();
     }
   });
@@ -246,7 +261,7 @@ describe('SS-PLAT-86 compose stack', () => {
     for (const [n, s] of Object.entries(compose.services)) {
       expect(s.security_opt, n).toContain('no-new-privileges:true');
     }
-    for (const n of ['api', 'worker', 'setup', 'web']) {
+    for (const n of ['api', 'worker', 'scheduler', 'setup', 'web']) {
       expect(svc(n).cap_drop, n).toEqual(['ALL']);
       expect(svc(n).read_only, n).toBe(true);
     }

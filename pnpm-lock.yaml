@@ -220,9 +220,15 @@ importers:
 
   apps/worker:
     dependencies:
+      '@ledgerforce/ar':
+        specifier: workspace:*
+        version: link:../../packages/modules/ar
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@ledgerforce/email':
+        specifier: workspace:*
+        version: link:../../packages/modules/email
       '@ledgerforce/outbox':
         specifier: workspace:*
         version: link:../../packages/outbox

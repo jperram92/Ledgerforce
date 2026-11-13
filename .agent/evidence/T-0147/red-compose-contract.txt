@@ -1,0 +1,105 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+ ❯ |unit| infra/test/install-contract.test.ts (20 tests | 5 failed) 372ms
+     × SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup and the scheduler (ADR-0062) 11ms
+     × T-0147 the scheduler is the worker image running the owner-only scheduler CLI (ADR-0062 option 1) 1ms
+     × SS-PLAT-86 each secret reaches only the services that need it 1ms
+     × SS-PLAT-86 start order: setup waits for a healthy database and IdP; api and worker wait for setup 1ms
+     × SS-PLAT-86 every service drops privileges it does not need 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup and the scheduler (ADR-0062)
+AssertionError: expected [ 'api', 'keycloak', 'postgres', …(3) ] to deeply equal [ 'api', 'keycloak', 'postgres', …(4) ]
+
+- Expected
++ Received
+
+  [
+    "api",
+    "keycloak",
+    "postgres",
+-   "scheduler",
+    "setup",
+    "web",
+    "worker",
+  ]
+
+ ❯ infra/test/install-contract.test.ts:135:50
+    133| describe('SS-PLAT-86 compose stack', () => {
+    134|   it('SS-PLAT-86 has exactly the design §7.2 services plus the one-sho…
+    135|     expect(Object.keys(compose.services).sort()).toEqual(
+       |                                                  ^
+    136|       ['api', 'keycloak', 'postgres', 'scheduler', 'setup', 'web', 'wo…
+    137|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > T-0147 the scheduler is the worker image running the owner-only scheduler CLI (ADR-0062 option 1)
+Error: no service scheduler
+ ❯ svc infra/test/install-contract.test.ts:129:17
+    127| const svc = (n: string): Service => {
+    128|   const s = compose.services[n];
+    129|   if (!s) throw new Error(`no service ${n}`);
+       |                 ^
+    130|   return s;
+    131| };
+ ❯ infra/test/install-contract.test.ts:141:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 each secret reaches only the services that need it
+AssertionError: expected [ 'postgres', 'setup' ] to deeply equal [ 'postgres', 'scheduler', 'setup' ]
+
+- Expected
++ Received
+
+  [
+    "postgres",
+-   "scheduler",
+    "setup",
+  ]
+
+ ❯ infra/test/install-contract.test.ts:204:45
+    202|     );
+    203|     expect(holders('postgres_password')).toEqual(['postgres']);
+    204|     expect(holders('lf_migrator_password')).toEqual(['postgres', 'sche…
+       |                                             ^
+    205|     expect(holders('lf_app_password')).toEqual(['api', 'postgres', 'se…
+    206|     expect(holders('keycloak_db_password')).toEqual(['keycloak', 'post…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 start order: setup waits for a healthy database and IdP; api and worker wait for setup
+Error: no service scheduler
+ ❯ svc infra/test/install-contract.test.ts:129:17
+    127| const svc = (n: string): Service => {
+    128|   const s = compose.services[n];
+    129|   if (!s) throw new Error(`no service ${n}`);
+       |                 ^
+    130|   return s;
+    131| };
+ ❯ infra/test/install-contract.test.ts:247:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 every service drops privileges it does not need
+Error: no service scheduler
+ ❯ svc infra/test/install-contract.test.ts:129:17
+    127| const svc = (n: string): Service => {
+    128|   const s = compose.services[n];
+    129|   if (!s) throw new Error(`no service ${n}`);
+       |                 ^
+    130|   return s;
+    131| };
+ ❯ infra/test/install-contract.test.ts:265:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 15 passed (20)
+   Start at  10:00:18
+   Duration  746ms (transform 52ms, setup 0ms, import 136ms, tests 372ms, environment 0ms)
+

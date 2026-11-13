@@ -36,7 +36,17 @@ export async function installQueue(ownerUrl: string): Promise<void> {
   }
 }
 
-export async function startMaintenance(ownerUrl: string): Promise<PgBoss> {
+export async function startMaintenance(
+  ownerUrl: string,
+  opts: { schedule?: boolean } = {},
+): Promise<PgBoss> {
   await assertOwnerRole(ownerUrl);
-  return new PgBoss(ownerBossOptions(ownerUrl, { migrate: false, supervise: true })).start();
+  // schedule: true runs pg-boss's cron timekeeper (the daily fan-out, ADR-0062, T-0147).
+  return new PgBoss(
+    ownerBossOptions(ownerUrl, {
+      migrate: false,
+      supervise: true,
+      schedule: opts.schedule ?? false,
+    }),
+  ).start();
 }
