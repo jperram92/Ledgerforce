@@ -2805,3 +2805,14 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: UC-02 steps 4–5 must happen without a person calling functions. One effect per outbox event (apps/worker AGENTS.md).
 - Alternatives: running runBatch inside the outbox handler (one long handler transaction holding a connection while items open others; retries rerun the whole handler).
 - ADR: none (within ADR-0008) · Status: accepted
+
+### DL-0472 — Parallel round 3: two agents for the bank reconciliation and AR cash slices
+- Date: 2026-11-13 · By: claude · Task: sprint · Category: process
+- Decision: Two sub-agents work in isolated git worktrees on local branches. The lead merges them into `claude/loving-lovelace-nozqpk`. No new migrations: if schema is needed, the agent reports it and the lead adds it, because the gapless runner allows one migration at a time (DL-0296). The next free migration number stays with the lead (0065).
+
+  | Agent | Cards | DL | ADR | RQ | New cards |
+  |---|---|---|---|---|---|
+  | Bank: reconciliation HTTP routes + T-0088 screens | T-0149 (new), T-0088 | 0480–0489 | 0063 | 0145 | T-0149–T-0150 |
+  | AR cash: receipt/credit/refund routes as needed + T-0085 screens | T-0085 (+ split card) | 0490–0499 | 0064 | 0146 | T-0151–T-0152 |
+- Why: The owner asked for parallel sub-agents (DL-0408). Both UI cards need API work first, and they touch disjoint modules (bank vs ar).
+- ADR: none · Status: accepted
