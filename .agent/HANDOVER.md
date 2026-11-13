@@ -8,9 +8,10 @@
 > - T-0147: daily reminder fan-out per tenant, migration 0064, ADR-0062 accepted, new compose service `scheduler`.
 > - T-0148: close checklist HTTP routes.
 > - T-0090: close checklist screen, plus a contrast fix, DL-0470.
+> - T-0120: approved batches posted and emailed by the worker; job queues installed at deploy, DL-0471.
 > - T-0079 and T-0117 are also in review.
 >
-> Next ready cards: T-0085, T-0087, T-0088, T-0110, T-0119, T-0120, T-0126, T-0127, T-0130, T-0143 and T-0168. The next migration is 0065.
+> Next ready cards: T-0085, T-0087, T-0088, T-0110, T-0119, T-0126, T-0127, T-0130, T-0143 and T-0168. The next migration is 0065.
 >
 > Codex cross-review (gate 8) is pending for every card in review. Gate 2c stays PENDING until main's baseline is re-recorded as unit+db; the tree is at 93.63%.
 
@@ -325,3 +326,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-13T11:15:19.289Z claude: T-0090 → verifying
 - 2026-11-13T11:46:47.806Z claude: release T-0090 → review (full verify at 3c50abf: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
 - 2026-11-13T13:43:25.785Z claude: T-0120 → verifying
+- 2026-11-13T14:01:15.099Z claude: release T-0120 → review (full verify at 38ccc90: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
