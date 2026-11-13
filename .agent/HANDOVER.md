@@ -18,7 +18,7 @@
 
 ## Open questions for human
 - **Security CI is red (Gitleaks, DL-0464, owner chose "Ignore + gzip").** The fix is in local stash `DL-0464 gitleaks WIP fix (awaiting owner permission)`. It is not pushed, because committing it was blocked as an oversight change: it edits the human-owned contract test `infra/test/security-workflow.contract.test.ts`, with an exception for commit 3a6bc91 only, .agent/wip T-0086/T-0089 only, and the rule sourcegraph-access-token only. The hits are 254 git object IDs in format-patch headers. To land it, run `git stash pop` and commit, or allow the commit.
-- **ADR-0062 (security, Proposed): how should a daily job reach every tenant?** Option 1 (recommended): the lf_migrator maintenance instance fans out one job per tenant. Option 2: an lf_app-executable function that returns only active tenant ids. This blocks T-0147, the daily reminder run, and will apply to later daily jobs too.
+- **(Resolved 2026-11-13, DL-0466)** ADR-0062: the owner accepted option 1 (fan-out from the lf_migrator maintenance instance). T-0147 is unblocked.
 - **T-0132 needs a security ADR:** a new `ar.invoice.approve` permission and the role templates that get it (ADR-0023). It is the owner's decision; the card stays todo until then.
 - **CSRF policy (T-0144, security ADR to write).** Should cookie-authenticated writes that carry neither Fetch-Metadata nor Origin be rejected (OWASP recommends it)? That changes ~25 session-based DB test files. Owner decision or explicit delegation needed.
 - **Network:** research for T-0143 (backups) needs postgresql.org, which the session proxy blocks; allowing it in the environment would help.

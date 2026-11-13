@@ -2742,3 +2742,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: Directive 6 forbids deleting evidence, and the lead asked that only this task's specs run.
 - Alternatives: removing the stray files (forbidden).
 - ADR: none · Status: accepted
+
+### DL-0466 — ADR-0062 accepted by the product owner: option 1, fan-out from the owner instance
+- Date: 2026-11-13 · By: human (product owner), recorded by claude · Task: T-0147 · Category: security
+- Decision: ADR-0062 is accepted with option 1. The `lf_migrator` maintenance instance holds the daily pg-boss schedule and reads the active tenant ids through a SECURITY DEFINER function that only `lf_migrator` may execute. It enqueues one job per tenant, with `{tenantId}` in the job data. The `lf_app` worker runs each job inside `withTenant`. `lf_app` gains no cross-tenant privilege. T-0147 moves from blocked to todo.
+- Why: The owner said "accept ADR-0062 option 1, keep going" on 2026-11-13. Tenant enumeration stays with the role that already administers pg-boss (ADR-0008 rule 5).
+- ADR: ADR-0062 · Status: accepted

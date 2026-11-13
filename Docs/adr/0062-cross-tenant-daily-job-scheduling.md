@@ -1,7 +1,7 @@
 ---
 adr: 0062
 title: "Reach every tenant from a scheduled daily job without widening lf_app"
-status: Proposed
+status: Accepted
 date: 2026-11-13
 author: claude
 category: security
@@ -13,7 +13,7 @@ superseded_by: none
 # ADR-0062: Reach every tenant from a scheduled daily job without widening lf_app
 
 ## Status
-Proposed. Category **security**, so it stays Proposed until the product owner decides (AGENTS.md §6).
+Accepted by the product owner on 2026-11-13 ("accept ADR-0062 option 1"), DL-0466. Category **security**.
 
 ## Context and problem statement
 UC-04 needs a daily overdue-reminder run for every company (T-0129 split, T-0147). The worker connects as `lf_app` under FORCE RLS and cannot see `app.tenant` rows other than the one in `app.tenant_id` (0002, `tenant_self`). Outbox jobs carry their tenant id because they are enqueued inside a tenant transaction. A schedule has no tenant. The only cross-tenant primitive today is `app.tenant_id_for_slug()` (ADR-0016), which is login only. ADR-0008 says the `lf_app` worker never installs, supervises or schedules. RQ-0144 F2 has the details.
@@ -30,7 +30,7 @@ UC-04 needs a daily overdue-reminder run for every company (T-0129 split, T-0147
 3. **External cron.** An operator cron calls a CLI per tenant. This pushes tenant enumeration into ops and does not work in hosted SaaS without the same primitive.
 
 ## Decision outcome
-**Recommended: option 1.** Enumeration stays with the owner role, which already administers pg-boss (ADR-0008 rule 5). `lf_app` gains nothing, and per-tenant work still runs under RLS. Option 2 is acceptable if the owner prefers a single process; then EXECUTE stays limited to `lf_app` and the function returns ids only. Pending owner decision.
+**Chosen: option 1** (accepted by the product owner on 2026-11-13). Enumeration stays with the owner role, which already administers pg-boss (ADR-0008 rule 5). `lf_app` gains nothing, and per-tenant work still runs under RLS. Option 2 is acceptable if the owner prefers a single process; then EXECUTE stays limited to `lf_app` and the function returns ids only.
 
 ## Consequences
 - Option 1 needs the maintenance instance running in every deployment. T-0094 compose already runs it as `queue-admin`, but supervision credentials are an open question (ADR-0029).
