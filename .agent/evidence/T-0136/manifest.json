@@ -235,6 +235,60 @@
       "provider": "claude",
       "timestamp": "2026-11-13T18:46:09.570Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-194739-SS-UC05-09-bills-inbox-list-1440.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 1440 [T-0136]",
+      "commit": "ba72e048d25c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T19:47:39.566Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-194740-SS-UC05-09-code-emailed-bill-form-1440.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 1440 [T-0136]",
+      "commit": "ba72e048d25c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T19:47:40.883Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-194741-SS-UC05-09-coded-draft-on-bills-list-1440.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 1440 [T-0136]",
+      "commit": "ba72e048d25c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T19:47:41.819Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-194743-SS-UC05-09-bills-inbox-list-390.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 390 [T-0136]",
+      "commit": "ba72e048d25c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T19:47:43.721Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-194745-SS-UC05-09-code-emailed-bill-form-390.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 390 [T-0136]",
+      "commit": "ba72e048d25c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T19:47:45.079Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-09",
+      "file": ".agent/evidence/T-0136/20261113-194745-SS-UC05-09-coded-draft-on-bills-list-390.png",
+      "test": "web/bills-inbox.spec.ts › SS-UC05-09: Emailed bill coded into a draft from the inbox @ 390 [T-0136]",
+      "commit": "ba72e048d25c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T19:47:45.845Z",
+      "result": "passed"
     }
   ]
 }
