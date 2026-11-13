@@ -16,10 +16,10 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 8 |
 | done | 3 |
 | in_progress | 1 |
-| review | 111 |
+| review | 116 |
 | todo | 24 |
-| verifying | 5 |
-| **total** | **152** |
+| verifying | 2 |
+| **total** | **154** |
 | **total** | **147** |
 
 | Phase | Cards |
@@ -197,7 +197,9 @@ graph LR
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | review | T-0081, T-0052, T-0051 | UC-05 | 1 |
 | [T-0153](T-0153.md) | AP release API for the T-0087 screens: batch list, named batch view, bank-detail change list | MVP | verifying | T-0054, T-0053 | UC-06 | 1 |
 | [T-0087](T-0087.md) | UI: supplier bank-detail verification and payment batch release (step-up) | MVP | verifying | T-0081, T-0054, T-0053, T-0056, T-0153 | UC-06 | 1 |
-| [T-0154](T-0154.md) | UI: bank file (ABA) download and bank confirmation on the payment batch screen | MVP | todo | T-0087, T-0056, T-0057 | UC-06 | 0 |
+| [T-0154](T-0154.md) | UI: bank file (ABA) download on the payment batch screen | MVP | verifying | T-0087, T-0056, T-0057 | UC-06 | 1 |
+| [T-0162](T-0162.md) | AP: preview the GP-009 confirmation journal from the posting engine (API) | MVP | todo | T-0057 | UC-06 | 0 |
+| [T-0163](T-0163.md) | UI: record the bank's confirmation of a payment batch, with the GP-009 preview | MVP | todo | T-0154, T-0162, T-0057 | UC-06 | 0 |
 | [T-0149](T-0149.md) | Bank reconciliation over HTTP (for the reconciliation screens) | MVP | review | T-0058, T-0059, T-0060, T-0061 | UC-08 | 3 |
 | [T-0088](T-0088.md) | UI: statement import and bank reconciliation | MVP | review | T-0081, T-0061, T-0059, T-0149 | UC-08 | 1 |
 | [T-0150](T-0150.md) | Bank: journal preview for a transaction from a line, candidate suggestions, large statement files | MVP | todo | T-0149, T-0088 | UC-08 | 1 |

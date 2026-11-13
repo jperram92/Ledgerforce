@@ -7,6 +7,11 @@
  * first of two releases). Pressing it calls the API, which runs the SoD engine and asks for a
  * fresh step-up: a `step_up_required` answer shows the step-up prompt; a `sod_violation` answer is
  * explained in plain words. Nothing here decides; the API does (P6).
+ *
+ * Once released, a releaser downloads the bank (ABA) file (T-0154, UC-06 step 3): a POST the API
+ * audits (T-0056), saved as a file and never shown, since it holds the full account numbers. The
+ * action follows the same rules as the release: hidden without ap.payment_batch.release, a
+ * step-up answer shows the prompt, and refusals (including separation-of-duties) are explained.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -20,12 +25,14 @@ import { PaymentsForbidden } from './PaymentBatchesPage.tsx';
 import type { Batch } from './payments-client.ts';
 import {
   accountLabel,
+  bankFileRefusalWords,
   BATCH_STATUS_WORD,
   exclusionText,
   refusalWords,
   releaseOutlook,
   releaseProgress,
   sodWords,
+  STEP_UP_WHY_BANK_FILE,
   STEP_UP_WHY_RELEASE,
 } from './payments-logic.ts';
 import { isStepUp, StepUpPrompt, useMutationFailureRouting } from './StepUpPrompt.tsx';
@@ -97,6 +104,7 @@ function BatchView({
         Total <Money value={batch.total} />
       </p>
       <Release batch={batch} companyId={companyId} can={can} />
+      <BankFile batch={batch} companyId={companyId} can={can} />
 
       <Region heading="Payments in this batch">
         <table className="admin-table" aria-label="Payments in this batch">
@@ -279,4 +287,104 @@ function Release({
       {action}
     </Region>
   );
+}
+
+/** Hands the browser the file to save; the bytes are never read or shown here. */
+function saveFile(fileName: string, content: Blob): void {
+  const url = URL.createObjectURL(content);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 0);
+}
+
+function BankFile({
+  batch,
+  companyId,
+  can,
+}: {
+  batch: Batch;
+  companyId: string;
+  can: (p: string) => boolean;
+}) {
+  const { payments } = useServices();
+  const [prompting, setPrompting] = useState(false);
+  const [made, setMade] = useState<{ fileName: string; at: string } | null>(null);
+  const file = useMutation({
+    mutationFn: () => payments.abaFile(companyId, batch.id, batch.batch_no),
+    onMutate: () => setMade(null),
+    onSuccess: (f) => {
+      saveFile(f.fileName, f.content);
+      setMade({ fileName: f.fileName, at: new Date().toISOString() });
+    },
+    onError: (e) => setPrompting(isStepUp(e)),
+  });
+  useMutationFailureRouting(file.error);
+
+  let body: ReactNode;
+  if (batch.status === 'cancelled')
+    body = <p className="admin-note">This batch was cancelled, so it has no bank file.</p>;
+  else if (batch.status !== 'released')
+    body = (
+      <p className="admin-note">
+        The bank file can be made once the batch is released. It is the file you upload to your
+        bank’s business banking to make the payments.
+      </p>
+    );
+  else if (!can('ap.payment_batch.release'))
+    body = (
+      <p className="admin-note">
+        An Approver or the Owner downloads the bank file. It holds full account numbers, so only the
+        people who release payments can have it.
+      </p>
+    );
+  else if (prompting && isStepUp(file.error))
+    body = (
+      <StepUpPrompt
+        error={file.error}
+        why={STEP_UP_WHY_BANK_FILE}
+        onCancel={() => {
+          setPrompting(false);
+          file.reset();
+        }}
+      />
+    );
+  else
+    body = (
+      <div className="gl-actions-col">
+        <p className="admin-note">
+          The bank file (ABA) holds the full account numbers of everyone paid in this batch. Upload
+          it to your bank’s business banking; do not email it or keep copies. Each download is
+          recorded in the audit log.
+        </p>
+        <div className="gl-actions">
+          <button
+            type="button"
+            className="primary"
+            disabled={file.isPending}
+            onClick={() => file.mutate()}
+          >
+            Download the bank file
+          </button>
+        </div>
+        {made ? (
+          <p role="status" className="admin-note">
+            Bank file made: {made.fileName}, saved to your downloads at {timeLabel(made.at)}. The
+            download is recorded in the audit log.
+          </p>
+        ) : null}
+        {file.isError && !isStepUp(file.error) ? (
+          <p className="refusal" role="alert">
+            {bankFileRefusalWords(file.error)}
+          </p>
+        ) : null}
+      </div>
+    );
+
+  return <Region heading="Bank file">{body}</Region>;
 }
