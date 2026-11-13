@@ -106,5 +106,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0062](0062-cross-tenant-daily-job-scheduling.md) | Reach every tenant from a scheduled daily job without widening lf_app | security | yes | Accepted |
 | [0056](0056-period-reopen-http-routes.md) | HTTP routes to reopen a hard-locked period: request, approve, list | architecture | no | Accepted |
 | [0057](0057-batch-read-status-and-item-results.md) | Batch billing responses carry the batch status and each item's result | architecture | no | Proposed |
+| [0067](0067-setup-wizard-completion-record.md) | Persist only the setup wizard's completion record; derive step status and validate from module state | data | no | Accepted |
 
 Next free number: **0055** (0055–0060 are reserved for the DL-0409 parallel round) (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

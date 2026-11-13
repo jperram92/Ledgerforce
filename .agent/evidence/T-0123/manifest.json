@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0123",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-118",
+      "file": ".agent/evidence/T-0123/20261113-tests-db-wizard.json",
+      "test": "7 test(s): packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-118 AC-1 a new company: step 1 is open (in progress), steps 2–10 are locked [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-118 AC-2 completing a later step first is refused STEP_LOCKED and writes nothing [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-118 AC-2 completing step 1 with details missing is refused STEP_INVALID listing them; nothing is written [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-118 AC-6 completing step 1 records who and when, unlocks step 2 and seeds the default reminder schedule (step 1 at 7 days); a repeat is a replay [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-118 the database refuses a malformed completion record and lf_app cannot delete one [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-118 another tenant cannot read or complete the company’s wizard [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-118 a malformed command is refused INVALID_COMMAND [T-0123]",
+      "result": "passed",
+      "captured": "2026-11-13"
+    },
+    {
+      "scenario": "SS-PLAT-119",
+      "file": ".agent/evidence/T-0123/20261113-tests-db-wizard.json",
+      "test": "11 test(s): packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 AC-2 step 2 lists an empty chart and every unbound core system role, then passes once the template is loaded [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 AC-2 step 3 needs a tax code in force [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 AC-2 step 4 needs a bank account, and one with ABA details for batch payments [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 AC-2 step 5 needs an active Salesforce connection and the invoicing trigger [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 AC-2 step 6 needs a party and a product imported from Salesforce; step 7 lists missing profiles [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 AC-2 step 7 lists each posting-profile gap from the gap check until it is filled [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 AC-2 step 8 needs the invoice number series and a billing format [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 AC-2 step 9 needs an opening balance or a no-history declaration with a reason; only step 9 may be declared [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 AC-2 step 10 needs an Owner or Finance Admin and saved approval thresholds; then the wizard is complete [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 a step whose module state regresses after completion stays complete but shows what is missing [T-0123] | packages/modules/setup/src/wizard.flow.db.test.ts › SS-PLAT-119 step 9 passes once an opening balance is posted, and no-history is then refused [T-0123]",
+      "result": "passed",
+      "captured": "2026-11-13"
+    },
+    {
+      "scenario": "RED",
+      "file": ".agent/evidence/T-0123/red-wizard-flow-db.log",
+      "test": "wizard.flow.db.test.ts before migration 0065 and the implementation: 18 failed",
+      "result": "failed (expected RED)",
+      "captured": "2026-11-13"
+    },
+    {
+      "scenario": "regression",
+      "file": ".agent/evidence/T-0123/20261113-tests-api-db-setup.log",
+      "test": "apps/api/src/setup (opening balances, SS-PLAT-117): 5 passed",
+      "result": "passed",
+      "captured": "2026-11-13"
+    }
+  ]
+}

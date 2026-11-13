@@ -285,6 +285,8 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   },
   // T-0078: a completed close checklist step (step and period status are CHECK-constrained, 0061).
   'app.close_checklist_step': { step: () => 'ar_lock', period_status: () => 'ar_locked' },
+  // T-0123: a setup wizard completion record (step 1–10 and outcome are CHECK-constrained, 0065).
+  'app.setup_wizard_step': { step: () => '1', outcome: () => 'validated' },
   // T-0075: a Stripe payout record (gross − fee − fee GST = amount, CHECK in migration 0060).
   'app.stripe_payout': {
     stripe_payout_id: () => `po_${randomBytes(6).toString('hex')}`,

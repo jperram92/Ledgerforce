@@ -2913,3 +2913,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: design §3.2 (accounts by role) and ADR-0061; one source of truth, so provisions and write-offs use the same account.
 - Alternatives: setting overrides role (two sources); dropping the column (forbidden).
 - ADR: ADR-0068 · Status: accepted
+
+### DL-0520 — Setup wizard: each step's validator reads the owning module; settings stay in modules
+- Date: 2026-11-13 · By: claude · Task: T-0123 · Category: architecture
+- Decision: The ten validators of design §4.1 read the state their owning module already persists (company + fiscal year, gl chart and core system-role bindings, tax codes in force, bank accounts with ABA details, active Salesforce connection and invoice trigger, Salesforce-linked parties and products, posting profiles and the T-0039 gap check, the `ar_invoice_document` series and billing formats, the opening balance, an Owner/Finance Admin and saved SoD settings) and list what is missing in plain words. Module functions are called where exported (`profileGaps`, `openingBalanceOf`, `listCompanyBankAccounts`); otherwise the module table is read. Only the 17 core system roles are required at step 2 (the AU templates do not bind the ADR-0061 period-end roles). GST basis/BAS frequency (tax), branding/payment terms/payment methods (ar) are owned by their modules and added in T-0158.
+- Why: RQ-0149 Q1/Q2; the card forbids the wizard owning or duplicating settings.
+- Alternatives: a wizard settings document (rejected, ADR-0067 option 3); requiring all 24 system roles (rejected: blocks every new company); calling the Salesforce connector's `listConnections` (rejected: pulls the gRPC connector into setup's runtime for one existence check).
+- ADR: ADR-0067 · Status: accepted
+
+### DL-0521 — Only step 9 may be completed without data (no-history declaration with a reason)
+- Date: 2026-11-13 · By: claude · Task: T-0123 · Category: scope
+- Decision: Step 9 (opening balances) may be completed by declaring the company has no history, with a reason of 1–500 characters, and only while no opening balance is posted; every other step completes only when its validator passes. Who may do it is the same permission that completes steps (fixed in T-0157).
+- Why: RQ-0149 Q3; the card names the new-business case; every other step sets up something the first invoice or payment needs (design §4 intro). Comparable products allow skipping (Business Central checklist), but LedgerForce's card requires validated completion.
+- Alternatives: a general "skip" on any step (rejected: a "complete" wizard could not post); no skip at all (rejected: a new business has nothing to convert).
+- ADR: ADR-0067 · Status: accepted
+
+### DL-0522 — Migration 0065 app.setup_wizard_step: completion record only, status derived
+- Date: 2026-11-13 · By: claude · Task: T-0123 · Category: architecture
+- Decision: Add `app.setup_wizard_step` (tenant_id, company_id, step 1–10, outcome validated|no_history, reason, completed_by, completed_at; PK tenant/company/step; CHECK no_history only for step 9 with a reason; RLS ENABLE + FORCE, tenant_isolation, lf_app SELECT/INSERT/UPDATE). Status is derived (row = complete, first step without a row = in progress, later = locked). Completion is INSERT … ON CONFLICT DO NOTHING (repeat = replay). Completing step 1 calls `seedReminderSchedule` (AC-6). Cross-tenant seed override added for the CHECK-constrained step/outcome.
+- Why: ADR-0067; DL-0473 grants this round's one migration (0065) to T-0123.
+- Alternatives: ten mutable status rows per company (rejected: seeding and transition guards for no gain).
+- ADR: ADR-0067 · Status: accepted
+
+### DL-0523 — T-0123 split: HTTP routes to T-0157, module-owned settings for steps 3/8/10 to T-0158
+- Date: 2026-11-13 · By: claude · Task: T-0123 · Category: scope
+- Decision: T-0123 keeps the state table, state machine, the ten validators over existing module state and AC-6 (SS-PLAT-118, SS-PLAT-119). AC-3 (`GET /setup/wizard`, `POST /setup/wizard/steps/:n/complete`) moves to T-0157 (SS-PLAT-120); the settings no module persists yet move to T-0158 (SS-PLAT-121). T-0091 (wizard UI) now also depends on T-0157.
+- Why: the full card is well over ~400 changed lines; the lead asked to build the first slice fully.
+- Alternatives: build everything partially in one branch (rejected by the lead's instruction).
+- ADR: none · Status: accepted
+
+### DL-0524 — @ledgerforce/setup takes ar, gl and products as runtime workspace dependencies
+- Date: 2026-11-13 · By: claude · Task: T-0123 · Category: architecture
+- Decision: `@ledgerforce/ar` (seedReminderSchedule, INVOICE_NUMBER_SERIES), `@ledgerforce/gl` (CORE_SYSTEM_ROLES) and `@ledgerforce/products` (profileGaps) become runtime dependencies of `@ledgerforce/setup` (ar and gl were dev-only); `@ledgerforce/connector-salesforce`, `@ledgerforce/documents`, `@ledgerforce/parties` and `@ledgerforce/tax` are dev-only for the wizard test. No third-party package is added, so no ADR is needed (design §10.6 covers new runtime dependencies from outside the workspace). No cycle: none of them depends on setup.
+- Why: validators must call the owning module (DL-0520).
+- Alternatives: copy the role list / gap logic into setup (rejected: duplication).
+- ADR: none · Status: accepted
