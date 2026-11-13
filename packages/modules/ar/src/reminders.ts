@@ -20,6 +20,7 @@ import { Decimal } from 'decimal.js';
 import { sql, type Transaction } from 'kysely';
 import { accountWriteBack } from './aged.ts';
 import type { DocumentOutbox } from './invoices.ts';
+import { pausedParties } from './reminder-pause.ts';
 
 type Trx = Transaction<Database>;
 
@@ -133,7 +134,7 @@ export async function runOverdueReminders(
   if (steps.length === 0) return { queued: [] };
 
   // Posted invoices with their AR open item as at the run date (allocations up to that date).
-  const items = (
+  const allItems = (
     await sql<{
       invoice_id: string;
       invoice_no: string;
@@ -155,6 +156,9 @@ export async function runOverdueReminders(
          AND s.due_date <= ${c.runDate}::date
        ORDER BY s.due_date, si.invoice_no`.execute(trx)
   ).rows;
+  // UC-04: parties whose reminders are paused (T-0129, migration 0063) get none.
+  const paused = await pausedParties(trx, companyId);
+  const items = allItems.filter((i) => !paused.has(i.party_id));
   if (items.length === 0) return { queued: [] };
 
   const sent = await trx

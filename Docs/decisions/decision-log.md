@@ -2654,3 +2654,18 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: DL-0408 approved re-recording main's baseline under the same measure. The number is what the tree measures, not a chosen target. It is 0.05 points below the 2026-11-12 reading of 6d7531d (93.70 %), a different tree, and 0.30 points below pre-integration main (93.95 %). That integration drop was accepted by the owner in DL-0405 item 3.
 - Alternatives: recording 93.95 % (pre-integration main) would make main fail its own gate, a manufactured baseline; waiting to measure on main itself (the agent may not push to main; the lead's merge carries the file).
 - ADR: none · Status: accepted
+
+### DL-0465 — T-0129 split: per-party reminder pause built; daily cross-tenant job → T-0147 (ADR-0062 Proposed)
+- Date: 2026-11-13 · By: claude · Task: T-0129 · Category: scope (+ data, security proposal)
+- Decision (RQ-0144):
+  1. The run date is the date in the tenant's `report_timezone`. There is no company time zone.
+  2. The daily job needs a way to reach every tenant, which is a security decision. ADR-0062 is Proposed, recommending a fan-out from the lf_migrator owner instance. The job moves to T-0147, which is blocked on the owner.
+  3. Seeding the default schedule for new companies moves to T-0123 (AC-6), because no production path creates companies yet.
+  4. T-0129 builds the per-party pause:
+     - Migration 0063 adds `app.ar_reminder_pause`, an insert-only history (latest row wins) with an idempotency key, lf_app SELECT and INSERT only, and RLS ENABLE + FORCE.
+     - `runOverdueReminders` skips paused parties.
+     - `POST /ar/parties/:id/reminder-pause` needs `ar.dunning.run` and an Idempotency-Key (201 new, 200 replay, 409 no change or key reuse, 422 missing reason) and is audited. `GET` needs `ar.read`.
+     - New scenario: SS-UC04-07.
+- Why: UC-04 asks that the AR Clerk can pause reminders per party, with an audit. `ar.dunning.run` already exists in the AR Clerk template, so the role templates do not change. Cross-tenant enumeration changes the tenant boundary, which is the owner's gate (AGENTS.md §6).
+- Alternatives: a pause flag column on app.party (loses who, when and why on resume, and is mutable); building the scheduler with an lf_app-executable tenant list (would widen lf_app without an accepted security ADR).
+- ADR: ADR-0062 · Status: accepted (scope); ADR-0062 proposed (awaiting human)

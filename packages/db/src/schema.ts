@@ -473,6 +473,19 @@ export interface ArReminderTable {
   created_at: Timestamp;
 }
 
+/** Migration 0063 (T-0129): per-party reminder pause, insert-only history; latest row wins. */
+export interface ArReminderPauseTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  paused: boolean;
+  reason: string;
+  set_by: string;
+  set_at: Timestamp;
+  idempotency_key: string;
+}
+
 export interface SalesInvoiceTable {
   id: Generated<string>;
   tenant_id: TenantId;
@@ -1272,6 +1285,7 @@ export interface Database {
   'app.sales_invoice': SalesInvoiceTable;
   'app.ar_reminder_schedule': ArReminderScheduleTable;
   'app.ar_reminder': ArReminderTable;
+  'app.ar_reminder_pause': ArReminderPauseTable;
   'app.close_checklist_step': CloseChecklistStepTable;
   'app.sales_invoice_line': SalesInvoiceLineTable;
   'app.ar_settings': ArSettingsTable;

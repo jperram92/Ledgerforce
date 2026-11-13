@@ -4,6 +4,7 @@ import { ArReceiptsController } from './ar/receipts.controller.ts';
 import { OpeningBalancesController } from './setup/opening-balances.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArInvoicesController } from './ar/invoices.controller.ts';
+import { ArReminderPauseController } from './ar/reminder-pause.controller.ts';
 import { ArBatchesController } from './ar/batches.controller.ts';
 import {
   StripeWebhookController,
@@ -123,6 +124,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ArBatchesController,
   ArCreditNotesController,
   ArInvoicesController,
+  ArReminderPauseController,
   ArReceiptsController,
   ApBillsController,
   ApPaymentBatchesController,
@@ -169,6 +171,7 @@ class AppModule {
         ArBatchesController,
         ArCreditNotesController,
         ArInvoicesController,
+        ArReminderPauseController,
         ArReceiptsController,
         ApBillsController,
         ApPaymentBatchesController,

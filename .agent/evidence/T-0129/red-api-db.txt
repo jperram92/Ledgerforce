@@ -1,0 +1,94 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:34367
+ ❯ |api-db| apps/api/src/ar/reminder-pause.db.test.ts (4 tests | 4 failed) 985ms
+     × refuses without ar.dunning.run (403) and records nothing 34ms
+     × requires an Idempotency-Key (400) and a reason (422) 11ms
+     × the AR Clerk pauses (201, audited); a replay answers 200 with the same row 3ms
+     × a second pause is a conflict (409); resume is 201 and audited; GET shows the history 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/reminder-pause.db.test.ts > SS-UC04-07: pause and resume reminders over HTTP > refuses without ar.dunning.run (403) and records nothing
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/ar/reminder-pause.db.test.ts:98:22
+     96|       'k-sales',
+     97|     );
+     98|     expect(r.status).toBe(403);
+       |                      ^
+     99|     expect(await audits()).toEqual([]);
+    100|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |api-db| apps/api/src/ar/reminder-pause.db.test.ts > SS-UC04-07: pause and resume reminders over HTTP > requires an Idempotency-Key (400) and a reason (422)
+AssertionError: expected 404 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 404
+
+ ❯ apps/api/src/ar/reminder-pause.db.test.ts:105:7
+    103|     expect(
+    104|       (await post('arClerk', { company_id: f.companyId, paused: true, …
+    105|     ).toBe(400);
+       |       ^
+    106|     const r = await post('arClerk', { company_id: f.companyId, paused:…
+    107|     expect(r.status).toBe(422);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |api-db| apps/api/src/ar/reminder-pause.db.test.ts > SS-UC04-07: pause and resume reminders over HTTP > the AR Clerk pauses (201, audited); a replay answers 200 with the same row
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ apps/api/src/ar/reminder-pause.db.test.ts:117:22
+    115|       'k-1',
+    116|     );
+    117|     expect(r.status).toBe(201);
+       |                      ^
+    118|     const body = (await r.json()) as Record<string, unknown>;
+    119|     expect(body).toMatchObject({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |api-db| apps/api/src/ar/reminder-pause.db.test.ts > SS-UC04-07: pause and resume reminders over HTTP > a second pause is a conflict (409); resume is 201 and audited; GET shows the history
+AssertionError: expected 404 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 404
+
+ ❯ apps/api/src/ar/reminder-pause.db.test.ts:144:26
+    142|       'k-2',
+    143|     );
+    144|     expect(again.status).toBe(409);
+       |                          ^
+    145|     const resume = await post(
+    146|       'arClerk',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  09:22:25
+   Duration  4.91s (transform 1.37s, setup 0ms, import 2.81s, tests 985ms, environment 0ms)
+

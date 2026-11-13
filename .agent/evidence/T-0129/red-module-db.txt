@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:36611
+ ❯ |db| packages/modules/ar/src/reminder-pause.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/reminder-pause.db.test.ts [ packages/modules/ar/src/reminder-pause.db.test.ts ]
+Error: Cannot find module './reminder-pause.ts' imported from /home/user/Ledgerforce/packages/modules/ar/src/reminder-pause.db.test.ts
+ ❯ packages/modules/ar/src/reminder-pause.db.test.ts:14:1
+     12| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     13| import { approveInvoice, createDraftInvoice, type DocumentEvent } from…
+     14| import { reminderPauseHistory, ReminderPauseError, setReminderPause } …
+       | ^
+     15| import { runOverdueReminders, seedReminderSchedule } from './reminders…
+     16| import { seedBillableCustomers, seedBillingCompany } from './testing/b…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  09:18:41
+   Duration  2.09s (transform 518ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
