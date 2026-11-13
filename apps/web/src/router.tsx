@@ -41,6 +41,7 @@ import { ReceiptsPage } from './sales/ReceiptsPage.tsx';
 import { BillFormPage } from './purchases/BillFormPage.tsx';
 import { BillPage } from './purchases/BillPage.tsx';
 import { BillsPage } from './purchases/BillsPage.tsx';
+import { InboxCodePage, InboxPage } from './purchases/InboxPage.tsx';
 import { AgedPage } from './reports/AgedPage.tsx';
 import { BalanceSheetPage } from './reports/BalanceSheetPage.tsx';
 import { GlDetailPage } from './reports/GlDetailPage.tsx';
@@ -339,7 +340,31 @@ const batchRoute = createRoute({
 const billsRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: 'purchases/bills',
-  component: () => <BillsPage />,
+  // ?coded=<bill id>: the bill just coded from the inbox (T-0136), announced on the list.
+  validateSearch: (s: Record<string, unknown>): { coded?: string } =>
+    typeof s['coded'] === 'string' && /^[0-9a-f-]{36}$/i.test(s['coded'])
+      ? { coded: s['coded'] }
+      : {},
+  component: function BillsRoute() {
+    const { coded } = billsRoute.useSearch();
+    return <BillsPage {...(coded ? { coded } : {})} />;
+  },
+});
+
+// Bills inbox (T-0136): emailed bills and coding one into a draft.
+const inboxRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'purchases/inbox',
+  component: () => <InboxPage />,
+});
+
+const inboxItemRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'purchases/inbox/$itemId',
+  component: function InboxItemRoute() {
+    const { itemId } = inboxItemRoute.useParams();
+    return <InboxCodePage key={itemId} itemId={itemId} />;
+  },
 });
 
 const newBillRoute = createRoute({
@@ -438,6 +463,8 @@ const routeTree = rootRoute.addChildren([
     billsRoute,
     newBillRoute,
     billRoute,
+    inboxRoute,
+    inboxItemRoute,
     trialBalanceRoute,
     profitAndLossRoute,
     balanceSheetRoute,

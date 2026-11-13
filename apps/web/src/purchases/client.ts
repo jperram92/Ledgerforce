@@ -1,6 +1,8 @@
 /**
  * Purchases API client (T-0086): supplier bills — the coding choices, the bills list, one bill,
  * its journal, and entering, sending for approval and approving (apps/api/src/ap/bills.controller.ts).
+ * Bills inbox (T-0136): emailed bills, their PDF download address and coding one into a draft
+ * (apps/api/src/ap/inbox.controller.ts).
  * Same origin, session cookie; failures are AdminApiError (status + error code). Money stays a
  * decimal string.
  */
@@ -88,6 +90,33 @@ export interface BillBody {
   lines: { description: string; account_id: string; tax_code: string; amount: string }[];
 }
 
+export type InboxStatus = 'new' | 'no_attachment' | 'coded' | 'rejected';
+
+export interface InboxItem {
+  id: string;
+  status: InboxStatus;
+  from_address: string | null;
+  subject: string | null;
+  received_at: string;
+  party_id: string | null;
+  supplier_name: string | null;
+  bill_id: string | null;
+  attachments: { n: number; file_name: string; content_type: string; size_bytes: number }[];
+}
+
+/** Coding an inbox item: the bill entry body plus the client-chosen bill id (supplier optional). */
+export interface InboxCodeBody extends Omit<BillBody, 'party_id'> {
+  bill_id: string;
+  party_id?: string;
+}
+
+export interface InboxCoded {
+  item_id: string;
+  status: 'coded';
+  replayed: boolean;
+  bill: { id: string; status: BillStatus; gross: string };
+}
+
 export interface PurchasesClient {
   companies(): Promise<{ id: string; name: string; base_currency: string }[]>;
   coding(companyId: string): Promise<BillCoding>;
@@ -98,17 +127,27 @@ export interface PurchasesClient {
   enter(id: string, body: BillBody): Promise<{ id: string; status: BillStatus }>;
   submit(companyId: string, id: string): Promise<unknown>;
   approve(companyId: string, id: string): Promise<unknown>;
+  inbox(companyId: string): Promise<{ items: InboxItem[] }>;
+  /** Code an emailed bill into a draft; the key and bill id are chosen once per form. */
+  code(itemId: string, idempotencyKey: string, body: InboxCodeBody): Promise<InboxCoded>;
+  /** Address of the n-th PDF (a download: RQ-0148). */
+  attachmentUrl(companyId: string, itemId: string, n: number): string;
 }
 
 export function createPurchasesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): PurchasesClient {
-  async function send<T>(method: 'GET' | 'POST' | 'PUT', path: string, body?: unknown): Promise<T> {
+  async function send<T>(
+    method: 'GET' | 'POST' | 'PUT',
+    path: string,
+    body?: unknown,
+    extra: Record<string, string> = {},
+  ): Promise<T> {
     const res = await env.fetch(`${env.apiBase}${path}`, {
       method,
       credentials: 'same-origin',
       headers:
         body === undefined
-          ? { accept: 'application/json' }
-          : { accept: 'application/json', 'content-type': 'application/json' },
+          ? { accept: 'application/json', ...extra }
+          : { accept: 'application/json', 'content-type': 'application/json', ...extra },
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
     const data: unknown = await res.json().catch(() => null);
@@ -126,5 +165,10 @@ export function createPurchasesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): P
     enter: (id, body) => send('PUT', `/ap/bills/${seg(id)}`, body),
     submit: (companyId, id) => send('POST', `/ap/bills/${seg(id)}/submit?${co(companyId)}`, {}),
     approve: (companyId, id) => send('POST', `/ap/bills/${seg(id)}/approve?${co(companyId)}`, {}),
+    inbox: (companyId) => send('GET', `/ap/inbox?${co(companyId)}`),
+    code: (itemId, key, body) =>
+      send('POST', `/ap/inbox/${seg(itemId)}/code`, body, { 'idempotency-key': key }),
+    attachmentUrl: (companyId, itemId, n) =>
+      `${env.apiBase}/ap/inbox/${seg(itemId)}/attachments/${String(n)}?${co(companyId)}`,
   };
 }

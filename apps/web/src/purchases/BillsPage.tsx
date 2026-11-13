@@ -36,7 +36,8 @@ export function useApCompany() {
   return { ...q, company: q.data?.[0] };
 }
 
-export function BillsPage() {
+/** `coded`: the bill just coded from an emailed bill (T-0136), announced once the list has it. */
+export function BillsPage({ coded }: { coded?: string } = {}) {
   const access = useAccess();
   const { purchases } = useServices();
   const canRead = access.can('ap.read');
@@ -47,6 +48,7 @@ export function BillsPage() {
     enabled: canRead && !!company.company,
   });
   useFailureRouting(list.error ?? company.error);
+  const justCoded = coded ? list.data?.bills.find((b) => b.id === coded) : undefined;
 
   let body;
   if (access.isPending || (canRead && company.isPending)) body = <Loading what="bills" />;
@@ -138,6 +140,16 @@ export function BillsPage() {
           <Link to="/purchases/bills/new" className="primary">
             Enter a bill
           </Link>
+        </p>
+      ) : null}
+      {canRead ? (
+        <p className="admin-note">
+          <Link to="/purchases/inbox">Bills suppliers emailed in</Link>
+        </p>
+      ) : null}
+      {justCoded ? (
+        <p className="admin-note" role="status">
+          {billName(justCoded)} was created from the email. Open it to send it for approval.
         </p>
       ) : null}
       {body}
