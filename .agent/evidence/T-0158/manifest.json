@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0158",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-121",
+      "file": ".agent/evidence/T-0158/20261113-tests-db.json",
+      "test": "8 test(s): packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121 AC-1 step 3 lists the GST basis and BAS frequency until a tax setting is in force on the as-of date [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121 AC-1 the setting in force is the latest from on or before the date; saving the same date corrects it [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121 AC-1 malformed tax settings are refused by the module and by the database [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121 AC-2 step 8 lists branding, payment terms and methods until the ar module stores each [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121 AC-2 accepting Stripe needs Stripe set up; a logo is optional and stored with its type [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121 AC-2 malformed AR invoice settings are refused by the module and by the database [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121 AC-3 another tenant cannot read or write the company settings [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121 step 10 asks for nothing beyond the users and the saved SoD thresholds (RQ-0153 Q4) [T-0158]",
+      "result": "passed",
+      "captured": "2026-11-13"
+    },
+    {
+      "scenario": "RED",
+      "file": ".agent/evidence/T-0158/red-wizard-settings-db.txt",
+      "test": "wizard-settings.db.test.ts before migration 0067 and the module code: 8 failed (7 for the missing behaviour; the step 10 guard on a fixture issue, fixed before GREEN)",
+      "result": "failed (expected RED)",
+      "captured": "2026-11-13"
+    },
+    {
+      "scenario": "regression",
+      "file": ".agent/evidence/T-0158/20261113-tests-db.json",
+      "test": "vitest --project db packages/db packages/modules/setup packages/modules/tax packages/modules/ar: 1052 passed, 0 failed, 0 skipped (incl. the rls.db.test.ts cross-tenant suite covering app.tax_settings)",
+      "result": "passed",
+      "captured": "2026-11-13"
+    }
+  ]
+}
