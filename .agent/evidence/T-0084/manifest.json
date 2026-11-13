@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0084",
+  "entries": [
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081653-SS-UC02-08-batch-start-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:16:53.375Z",
+      "result": "timedOut"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081659-SS-UC02-08-batch-preview-exceptions-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:16:59.746Z",
+      "result": "timedOut"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081710-SS-UC02-08-batch-approved-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:10.571Z",
+      "result": "timedOut"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081721-SS-UC02-08-batch-start-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:21.113Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081725-SS-UC02-08-batch-preview-exceptions-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:25.118Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081733-SS-UC02-08-batch-approved-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:33.633Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081740-SS-UC02-08-batch-posted-exceptions-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:40.080Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081809-SS-UC02-08-batch-start-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:09.235Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081811-SS-UC02-08-batch-preview-exceptions-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:11.274Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081816-SS-UC02-08-batch-approved-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:16.081Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081818-SS-UC02-08-batch-posted-exceptions-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:18.993Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081820-SS-UC02-08-batch-start-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:20.780Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081822-SS-UC02-08-batch-preview-exceptions-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:22.664Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081826-SS-UC02-08-batch-approved-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:26.629Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-081829-SS-UC02-08-batch-posted-exceptions-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "742689138c5f-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:29.499Z",
+      "result": "passed"
+    }
+  ]
+}

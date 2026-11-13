@@ -28,6 +28,7 @@ const item = (over: Partial<BatchItem>): BatchItem => ({
 describe('batch billing logic (T-0084)', () => {
   it('names the roles holding a permission from the role templates, never the service account', () => {
     expect(rolesWith('ar.batch.approve')).toBe('Owner, Finance Admin and Approver');
+    expect(rolesWith('ar.batch.approve', 'or')).toBe('Owner, Finance Admin or Approver');
     expect(rolesWith('ar.batch.run')).toContain('AR Clerk');
     expect(rolesWith('ar.batch.run')).not.toContain('Integration');
   });

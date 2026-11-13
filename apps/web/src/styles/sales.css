@@ -1,0 +1,45 @@
+/* Sales screens (T-0084) in the Timeline direction (DL-0070): batch totals as a row of labelled
+   figures and the result words of a batch (word + border style, never colour alone, P2).
+   Requires tokens.css, timeline.css, shell.css, admin.css and gl.css first. */
+
+.bb-state {
+  margin: 0 0 var(--s3);
+}
+.bb-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--s3);
+  margin: 0;
+  padding: var(--s3) 0;
+  border-top: 2px solid var(--ink);
+  border-bottom: 1px solid var(--line);
+}
+.bb-totals dt {
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 600;
+}
+.bb-totals dd {
+  margin: var(--s1) 0 0;
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.bb-approve {
+  display: grid;
+  gap: var(--s2);
+  justify-items: start;
+  margin-top: var(--s3);
+  max-width: 70ch;
+}
+.word[data-status='attention'] {
+  border-style: dashed;
+}
+.word[data-status='failed'] {
+  border-width: 2px;
+  border-style: dashed;
+  border-color: var(--ink);
+}
+.word[data-status='preview'] {
+  border-style: dotted;
+}

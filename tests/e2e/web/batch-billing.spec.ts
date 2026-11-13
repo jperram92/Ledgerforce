@@ -101,12 +101,21 @@ const NAMES = [
 ];
 const LIGHTHOUSE = 13;
 const ITEMS = NAMES.map((name, k) => {
-  const net = 100000n + BigInt(k) * 2500n;
-  const tax = net / 10n;
-  return { item_no: k + 1, party_id: id(0x8500 + k), party_name: name, net, tax, gross: net + tax };
+  const exCents = 100000n + BigInt(k) * 2500n;
+  const gstCents = exCents / 10n;
+  return {
+    item_no: k + 1,
+    party_id: id(0x8500 + k),
+    party_name: name,
+    net: exCents,
+    tax: gstCents,
+    gross: exCents + gstCents,
+  };
 });
 const sum = (f: (i: (typeof ITEMS)[number]) => bigint) => ITEMS.reduce((s, i) => s + f(i), 0n);
 const NO_BILLING_TO = 'the customer has no active Billing To contact with an email address';
+const NO_BILLING_TO_SENTENCE =
+  'The customer has no active Billing To contact with an email address.';
 
 type BatchStatus = 'preview' | 'approved' | 'posted';
 function batch(status: BatchStatus, replayed = false) {
@@ -195,7 +204,10 @@ async function fakeApi(page: Page, who: Who, status: BatchStatus = 'preview'): P
       if (req.method() === 'POST' && path === '/ar/batches/preview') {
         if (!perms.includes('ar.batch.run'))
           return send(route, 403, { error: 'forbidden', permission: 'ar.batch.run' });
-        f.previews.push({ key: req.headers()['idempotency-key'] ?? null, body: req.postDataJSON() });
+        f.previews.push({
+          key: req.headers()['idempotency-key'] ?? null,
+          body: req.postDataJSON(),
+        });
         return send(route, 201, batch('preview'));
       }
       if (req.method() === 'POST' && path === `/ar/batches/${BATCH}/approve`) {
@@ -245,12 +257,15 @@ async function assertPage(page: Page, width: number) {
     arrows: 0,
   });
   expect(await page.locator('main .primary').count()).toBeLessThanOrEqual(1);
-  for (const cell of await page.locator('main [data-amount]').all()) {
-    expect(await cell.getAttribute('data-amount')).toMatch(/^-?\d+\.\d{2}$/);
-  }
-  for (const s of await page.locator('main [data-status]').all()) {
-    expect((await s.textContent())?.trim()).not.toBe('');
-  }
+  // Read in one round trip each: a 40-invoice batch has hundreds of amounts.
+  const amounts = await page
+    .locator('main [data-amount]')
+    .evaluateAll((els) => els.map((e) => e.getAttribute('data-amount')));
+  for (const a of amounts) expect(a).toMatch(/^-?\d+\.\d{2}$/);
+  const words = await page
+    .locator('main [data-status]')
+    .evaluateAll((els) => els.map((e) => (e.textContent ?? '').trim()));
+  for (const w of words) expect(w).not.toBe('');
 }
 
 const amountsIn = (page: Page, name: string) =>

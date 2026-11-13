@@ -1,6 +1,7 @@
 /**
- * Sales API client (T-0083): companies and the AR invoice read routes (T-0131). Same origin, session
- * cookie; failures are AdminApiError (status + error code). Money stays a decimal string.
+ * Sales API client (T-0083): companies and the AR invoice read routes (T-0131); batch billing
+ * preview, read and approve (T-0043/T-0044, T-0084). Same origin, session cookie; failures are
+ * AdminApiError (status + error code). Money stays a decimal string.
  */
 import type { AppEnv } from '../env.tsx';
 import { AdminApiError } from '../admin/client.ts';
@@ -64,24 +65,81 @@ export interface InvoiceJournal {
   }[];
 }
 
+export type BatchStatus = 'preview' | 'approved' | 'posted' | 'cancelled';
+
+export interface BatchWarning {
+  code: 'PROFILE_GAP' | 'NO_BILLING_TO' | 'CREDIT_HOLD';
+  /** Billing-line position (1-based) for line warnings; 0 for the whole invoice. */
+  line: number;
+  message: string;
+}
+
+export interface BatchItem {
+  item_no: number;
+  party_id: string;
+  party_name: string;
+  line_count: number;
+  net: string | null;
+  tax: string | null;
+  gross: string | null;
+  warnings: BatchWarning[];
+  /** The item's result once the job has run. */
+  status: 'preview' | 'posted' | 'failed';
+  invoice_no: string | null;
+  failure_code: string | null;
+  failure_message: string | null;
+}
+
+export interface Batch {
+  id: string;
+  replayed: boolean;
+  status: BatchStatus;
+  period_from: string;
+  period_to: string;
+  issue_date: string;
+  items: BatchItem[];
+  totals: { invoices: number; ready: number; net: string; tax: string; gross: string };
+  outcome: { posted: number; failed: number; posted_gross: string };
+}
+
+export interface BatchRequest {
+  company_id: string;
+  period_from: string;
+  period_to: string;
+  issue_date?: string;
+}
+
 export interface SalesClient {
   companies(): Promise<Company[]>;
   invoices(companyId: string, status?: InvoiceStatus): Promise<{ invoices: InvoiceRow[] }>;
   invoice(companyId: string, id: string): Promise<Invoice>;
   journal(companyId: string, id: string): Promise<InvoiceJournal>;
+  previewBatch(body: BatchRequest, idempotencyKey: string): Promise<Batch>;
+  batch(companyId: string, id: string): Promise<Batch>;
+  approveBatch(companyId: string, id: string): Promise<Batch>;
 }
 
 export function createSalesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): SalesClient {
-  async function get<T>(path: string): Promise<T> {
+  async function send<T>(
+    method: 'GET' | 'POST',
+    path: string,
+    body?: unknown,
+    extra: Record<string, string> = {},
+  ): Promise<T> {
     const res = await env.fetch(`${env.apiBase}${path}`, {
-      method: 'GET',
+      method,
       credentials: 'same-origin',
-      headers: { accept: 'application/json' },
+      headers:
+        body === undefined
+          ? { accept: 'application/json', ...extra }
+          : { accept: 'application/json', 'content-type': 'application/json', ...extra },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
     const data: unknown = await res.json().catch(() => null);
     if (!res.ok) throw new AdminApiError(res.status, data);
     return data as T;
   }
+  const get = <T>(path: string) => send<T>('GET', path);
   const seg = encodeURIComponent;
   return {
     companies: () => get('/companies'),
@@ -89,5 +147,10 @@ export function createSalesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Sales
       get(`/ar/invoices?company_id=${seg(companyId)}${status ? `&status=${seg(status)}` : ''}`),
     invoice: (companyId, id) => get(`/ar/invoices/${seg(id)}?company_id=${seg(companyId)}`),
     journal: (companyId, id) => get(`/ar/invoices/${seg(id)}/journal?company_id=${seg(companyId)}`),
+    previewBatch: (body, key) =>
+      send('POST', '/ar/batches/preview', body, { 'idempotency-key': key }),
+    batch: (companyId, id) => get(`/ar/batches/${seg(id)}?company_id=${seg(companyId)}`),
+    approveBatch: (companyId, id) =>
+      send('POST', `/ar/batches/${seg(id)}/approve?company_id=${seg(companyId)}`, {}),
   };
 }
