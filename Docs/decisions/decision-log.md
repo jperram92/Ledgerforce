@@ -2654,3 +2654,24 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: DL-0408 approved re-recording main's baseline under the same measure. The number is what the tree measures, not a chosen target. It is 0.05 points below the 2026-11-12 reading of 6d7531d (93.70 %), a different tree, and 0.30 points below pre-integration main (93.95 %). That integration drop was accepted by the owner in DL-0405 item 3.
 - Alternatives: recording 93.95 % (pre-integration main) would make main fail its own gate, a manufactured baseline; waiting to measure on main itself (the agent may not push to main; the lead's merge carries the file).
 - ADR: none · Status: accepted
+
+### DL-0430 — Batch billing reads carry the batch status and each item's result (ADR-0057, T-0084)
+- Date: 2026-11-13 · By: claude · Task: T-0084 · Category: architecture (API)
+- Decision: `POST /ar/batches/preview`, `GET /ar/batches/:id` and `POST /ar/batches/:id/approve` return one view with added fields: `status`; per item `status` (preview/posted/failed), `invoice_no`, `failure_code`, `failure_message`; and `outcome {posted, failed, posted_gross}`. These come from `app.billing_batch.status` (now read by `loadBatchPreview`) and `batchSummary`. Existing fields are unchanged. Approve returns the stored status instead of a literal.
+- Why: SS-UC02-08. The screen must show the exception list before and after the job and must not offer Approve twice. The module already stored both; only the HTTP view lacked them. Proven by the SS-UC02-08 test in `apps/api/src/ar/batches.db.test.ts` (RED on `status` undefined, `.agent/evidence/T-0084/red-api-batch-status-20261113.txt`).
+- Alternatives: a separate results route (two round trips for one screen); deriving results in the browser (the browser must not compute accounting state).
+- ADR: ADR-0057 (architecture, no human gate) · Status: accepted (ADR Proposed until cross-review)
+
+### DL-0431 — Batch billing screens: /sales/batches (start) and /sales/batches/:id (one run) (T-0084)
+- Date: 2026-11-13 · By: claude · Task: T-0084 · Category: ui
+- Decision: Two screens under Sales. (1) `/sales/batches` is a period form with From and To, which default to the current calendar month, and an optional invoice date. The period is checked in the browser before sending. The form needs `ar.batch.run`, and it sends one Idempotency-Key (`bb-<uuid>`) per chosen period, so a double click previews once. (2) `/sales/batches/:id` shows Totals (ready or posted counts, and net, GST and gross as the API's decimal strings), Exceptions and every invoice with its result in a word. Exceptions are warnings before the run ("the other invoices still post") and failures after it ("the next batch picks them up"). Approve is shown only to holders of `ar.batch.approve` while the status is `preview`. Others see whose turn it is, with role names taken from the role templates. A `BATCH_STATE` refusal is explained in plain words. SPA paths avoid `/ar` (nginx proxies it to the API, DL-0271).
+- Why: UC-02 steps 1–3 and A1, principles P2/P6/P13, and the RBAC catalogue (ADR-0023). There is no money arithmetic in the browser: totals are the API's.
+- Alternatives: one combined page with the form above the run (rejected: a batch link must open on its own for the approver); hiding the exception table when empty (rejected: an explicit "No exceptions" line is clearer).
+- ADR: none · Status: accepted
+
+### DL-0432 — SS-UC02-08 e2e uses a route-faked API; the data layer is proven against PostgreSQL (T-0084)
+- Date: 2026-11-13 · By: claude · Task: T-0084 · Category: process (testing)
+- Decision: `tests/e2e/web/batch-billing.spec.ts` serves the real web app through Vite and fakes the API with `page.route`, using the exact response shapes of ADR-0057, for a 40-customer November batch with one exception (the SS-UC02-03 shape). This follows the T-0083 invoices spec. That the API really produces those shapes after a real `runBatch` with one failing party is asserted by the SS-UC02-08 test in `apps/api/src/ar/batches.db.test.ts`. Screenshots are taken at 1440 and 390 px through the evidence fixture. Evidence from the two interrupted earlier runs is kept (append-only), and the manifest gains the entries of the verified run.
+- Why: The e2e harness has no API plus database server in Playwright yet. Splitting the proof keeps both layers real where they matter: browser behaviour against the contract, and the contract against PostgreSQL.
+- Alternatives: booting the Nest app and a seeded database inside Playwright (no harness exists yet; out of this card's size).
+- ADR: none · Status: accepted

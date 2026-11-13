@@ -136,6 +136,114 @@
       "provider": "unknown",
       "timestamp": "2026-11-13T08:18:29.499Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-091003-SS-UC02-08-batch-start-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "f8faa97b7b5d",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:10:03.759Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-091006-SS-UC02-08-batch-preview-exceptions-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "f8faa97b7b5d",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:10:06.596Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-091011-SS-UC02-08-batch-approved-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "f8faa97b7b5d",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:10:11.212Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-091014-SS-UC02-08-batch-posted-exceptions-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "f8faa97b7b5d",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:10:14.220Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-091016-SS-UC02-08-batch-start-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "f8faa97b7b5d-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:10:16.200Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-091018-SS-UC02-08-batch-preview-exceptions-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "f8faa97b7b5d-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:10:18.106Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-091022-SS-UC02-08-batch-approved-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "f8faa97b7b5d-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:10:22.118Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-091025-SS-UC02-08-batch-posted-exceptions-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "f8faa97b7b5d-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:10:25.040Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-01",
+      "file": ".agent/evidence/T-0084/20261113-091815-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-07 an Auditor (no ar.batch.run) is refused 403 naming the permission | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › requires an idempotency key | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-01 the AR Clerk previews November: one row per account, decimal-string totals; a replay returns the same batch | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › refuses an invalid period with 422 and a body naming the problem | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-02 approval needs ar.batch.approve: the AR Clerk is refused, the Approver approves once",
+      "commit": "f8faa97b7b5d-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:18:15.248Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-07",
+      "file": ".agent/evidence/T-0084/20261113-091815-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-07 an Auditor (no ar.batch.run) is refused 403 naming the permission | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › requires an idempotency key | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-01 the AR Clerk previews November: one row per account, decimal-string totals; a replay returns the same batch | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › refuses an invalid period with 422 and a body naming the problem | apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-02 approval needs ar.batch.approve: the AR Clerk is refused, the Approver approves once",
+      "commit": "f8faa97b7b5d-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:18:15.248Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-02",
+      "file": ".agent/evidence/T-0084/20261113-091815-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ar/batches.db.test.ts › SS-UC02-01 / SS-UC02-07: batch preview over HTTP › SS-UC02-02 approval needs ar.batch.approve: the AR Clerk is refused, the Approver approves once",
+      "commit": "f8faa97b7b5d-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:18:15.248Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-091815-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ar/batches.db.test.ts › SS-UC02-08: the batch screen reads the batch state and each item result (T-0084) › SS-UC02-08 GET /ar/batches/:id carries the batch status; after the run each item says posted (with its number) or failed (with the reason)",
+      "commit": "f8faa97b7b5d-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:18:15.248Z",
+      "result": "passed"
     }
   ]
 }
