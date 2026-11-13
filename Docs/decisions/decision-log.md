@@ -2816,3 +2816,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | AR cash: receipt/credit/refund routes as needed + T-0085 screens | T-0085 (+ split card) | 0490–0499 | 0064 | 0146 | T-0151–T-0152 |
 - Why: The owner asked for parallel sub-agents (DL-0408). Both UI cards need API work first, and they touch disjoint modules (bank vs ar).
 - ADR: none · Status: accepted
+
+### DL-0480 — T-0088 split: the bank module's HTTP routes become T-0149
+- Date: 2026-11-13 · By: claude · Task: T-0088 → T-0149 · Category: scope
+- Decision:
+  - New card T-0149 "Bank reconciliation over HTTP" holds the API routes the reconciliation screens need. T-0088 now depends on it and keeps the screens only.
+  - T-0149 lists SS-UC08-02, SS-UC08-05 and SS-UC08-06 as scenarios proved again over HTTP. Their register rows keep their module tests and gain the API test as an extra test file.
+- Why: T-0058…T-0061 built `@ledgerforce/bank` without routes. Routes and screens together exceed one card (~400 lines each). The same split was made for T-0090 → T-0148 (DL-0468).
+- ADR: none · Status: accepted
