@@ -18,6 +18,9 @@ import {
   createDraftInvoice,
   InvoiceError,
   setArSettings,
+  getInvoice,
+  listInvoices,
+  previewInvoiceJournal,
   type DocumentEvent,
   type DocumentOutbox,
 } from './invoices.ts';
@@ -389,5 +392,84 @@ describe('Invoice rules (T-0040)', () => {
       )
       .catch((e: unknown) => e as Error);
     expect((lineErr as Error).message).toMatch(/posted invoice/);
+  });
+});
+
+describe('SS-UC01-10: Invoice detail shows mapped lines and journal preview (data layer, T-0131)', () => {
+  it('SS-UC01-10 a draft GP-001 invoice previews exactly GP-001 from the engine, writes nothing, and posts what it previewed', async () => {
+    await f.inTenant((trx) => setArSettings(trx, f.companyId, { autoApprove: false }));
+    // A fresh customer: Acme is near its credit limit after the earlier scenarios in this file.
+    const acme = await customer('Northwind', true);
+    const draft = await f.inTenant((trx) =>
+      createDraftInvoice(
+        trx,
+        {
+          companyId: f.companyId,
+          partyId: acme,
+          issueDate: '2026-11-05',
+          dueDate: '2026-11-19',
+          lines: gp001Lines(),
+        },
+        { outbox },
+      ),
+    );
+    expect(draft.status).toBe('draft');
+    const counts = () =>
+      f.inTenant(
+        async (trx) =>
+          (
+            await sql<{ entries: number; series: string }>`
+              SELECT (SELECT count(*)::int FROM app.journal_entry) AS entries,
+                     (SELECT string_agg(code || ':' || next_value::text, ',' ORDER BY code)
+                        FROM app.number_series) AS series`.execute(trx)
+          ).rows[0],
+      );
+    const before = await counts();
+
+    const preview = await f.inTenant((trx) =>
+      previewInvoiceJournal(trx, { companyId: f.companyId, invoiceId: draft.invoiceId }),
+    );
+    const gp001 = golden('GP-001');
+    expect(preview.lines).toHaveLength(gp001.lines.length);
+    gp001.lines.forEach((g, n) => {
+      const at = `GP-001 line ${String(n + 1)} (${g.binding})`;
+      expect(preview.lines[n]?.accountCode, at).toBe(codeOf[g.binding]);
+      expect(preview.lines[n]?.debit, at).toBe(money(g.debit));
+      expect(preview.lines[n]?.credit, at).toBe(money(g.credit));
+      expect(preview.lines[n]?.partyId ?? null, at).toBe(g.party ? acme : null);
+    });
+    expect(preview.lines.every((l) => l.accountName.length > 0)).toBe(true);
+    expect(preview.entryDate).toBe('2026-11-05');
+    expect(await counts()).toEqual(before);
+
+    const detail = await f.inTenant((trx) =>
+      getInvoice(trx, { companyId: f.companyId, invoiceId: draft.invoiceId }),
+    );
+    expect(detail).toMatchObject({
+      id: draft.invoiceId,
+      status: 'draft',
+      invoiceNo: null,
+      partyId: acme,
+    });
+    expect(detail.lines.map((l) => [l.description, l.quantity, l.unitPrice])).toEqual([
+      ['Professional services', '1.0000', '1000.0000'],
+      ['Subscription', '1.0000', '250.0000'],
+    ]);
+    const drafts = await f.inTenant((trx) =>
+      listInvoices(trx, { companyId: f.companyId, status: 'draft' }),
+    );
+    expect(drafts.map((i) => i.id)).toContain(draft.invoiceId);
+
+    const posted = await f.inTenant((trx) =>
+      approveInvoice(trx, { companyId: f.companyId, invoiceId: draft.invoiceId }, { outbox }),
+    );
+    expect(
+      (await journalOf(posted.entryId ?? '')).map((r) => [r.code, r.debit, r.credit, r.party_id]),
+    ).toEqual(preview.lines.map((l) => [l.accountCode, l.debit, l.credit, l.partyId]));
+    await expect(
+      f.inTenant((trx) =>
+        previewInvoiceJournal(trx, { companyId: f.companyId, invoiceId: draft.invoiceId }),
+      ),
+    ).rejects.toMatchObject({ code: 'NOT_DRAFT' });
   });
 });

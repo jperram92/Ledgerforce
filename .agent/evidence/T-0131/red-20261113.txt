@@ -1,0 +1,31 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41489
+ ❯ |db| packages/modules/ar/src/invoice.lifecycle.db.test.ts (9 tests | 1 failed) 1095ms
+     × SS-UC01-10 a draft GP-001 invoice previews exactly GP-001 from the engine, writes nothing, and posts what it previewed 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/invoice.lifecycle.db.test.ts > SS-UC01-10: Invoice detail shows mapped lines and journal preview (data layer, T-0131) > SS-UC01-10 a draft GP-001 invoice previews exactly GP-001 from the engine, writes nothing, and posts what it previewed
+TypeError: previewInvoiceJournal is not a function
+ ❯ packages/modules/ar/src/invoice.lifecycle.db.test.ts:423:7
+    421|
+    422|     const preview = await f.inTenant((trx) =>
+    423|       previewInvoiceJournal(trx, { companyId: f.companyId, invoiceId: …
+       |       ^
+    424|     );
+    425|     expectGolden(
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/invoice.lifecycle.db.test.ts:422:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  03:16:48
+   Duration  3.08s (transform 455ms, setup 0ms, import 891ms, tests 1.09s, environment 0ms)
+

@@ -17,7 +17,13 @@
  * T-0042). Segregation of duties is applied by the API before calling approve (as for journals).
  */
 import type { Database } from '@ledgerforce/db';
-import { nextNumber, post, type PostingLineInput, type PostOptions } from '@ledgerforce/ledger';
+import {
+  nextNumber,
+  post,
+  preview,
+  type PostingLineInput,
+  type PostOptions,
+} from '@ledgerforce/ledger';
 import { resolvePosting } from '@ledgerforce/products';
 import { Money } from '@ledgerforce/shared/money';
 import { computeTax } from '@ledgerforce/tax';
@@ -531,31 +537,18 @@ export async function createDraftInvoice(
   }
 }
 
-/** Approve a draft invoice and post it through the posting engine (same transaction). */
-export async function approveInvoice(
+/**
+ * The journal an invoice posts (GP-001 and its variants): priced lines, deposits netted off and
+ * revenue grouped by account and tax code. Shared by approveInvoice (which posts it) and
+ * previewInvoiceJournal (engine preview, writes nothing), so the preview is exactly what posts
+ * (T-0131). Reads only.
+ */
+async function invoiceJournal(
   trx: Trx,
-  c: { companyId: string; invoiceId: string; approvedBy?: string },
-  deps: InvoiceDeps,
-): Promise<InvoiceView> {
-  const companyId = c.companyId.toLowerCase();
-  const { inv, lines } = await loadInvoice(trx, companyId, c.invoiceId, true);
-  if (inv.status !== 'draft') {
-    throw new InvoiceError('NOT_DRAFT', `invoice ${inv.invoice_no ?? inv.id} is ${inv.status}`);
-  }
-  const recipients = (
-    await sql<{ email: string }>`
-      SELECT c.email FROM app.party_contact_role r
-        JOIN app.party_contact c ON c.tenant_id = r.tenant_id AND c.id = r.contact_id
-       WHERE r.company_id = ${companyId} AND r.party_id = ${inv.party_id}::uuid
-         AND r.role = 'billing_to' AND r.active AND c.status = 'active' AND c.email IS NOT NULL
-       ORDER BY c.email`.execute(trx)
-  ).rows.map((r) => r.email);
-  if (recipients.length === 0) {
-    throw new InvoiceError(
-      'NO_BILLING_TO',
-      'the customer has no active Billing To contact with an email address',
-    );
-  }
+  companyId: string,
+  inv: Awaited<ReturnType<typeof loadInvoice>>['inv'],
+  lines: Awaited<ReturnType<typeof loadInvoice>>['lines'],
+) {
   const resolved = await priceInvoiceLines(trx, companyId, inv, lines);
   if (!resolved.priced) {
     throw new InvoiceError(
@@ -593,9 +586,6 @@ export async function approveInvoice(
   if (!new Decimal(totals.gross).gt(0) || new Decimal(totals.tax).isNegative()) {
     throw new InvoiceError('INVALID_INVOICE', 'deposits applied exceed the invoice');
   }
-  await creditHold(trx, companyId, inv.party_id, totals.gross);
-
-  const invoiceNo = await nextNumber(trx, companyId, INVOICE_NUMBER_SERIES);
   const revenue = new Map<
     string,
     { accountId: string; taxCodeId: string; net: Decimal; tax: Decimal }
@@ -638,6 +628,37 @@ export async function approveInvoice(
       ? []
       : [{ account: { role: 'GST_COLLECTED' }, credit: totals.tax }]),
   ];
+  return { priced, totals, journal };
+}
+
+/** Approve a draft invoice and post it through the posting engine (same transaction). */
+export async function approveInvoice(
+  trx: Trx,
+  c: { companyId: string; invoiceId: string; approvedBy?: string },
+  deps: InvoiceDeps,
+): Promise<InvoiceView> {
+  const companyId = c.companyId.toLowerCase();
+  const { inv, lines } = await loadInvoice(trx, companyId, c.invoiceId, true);
+  if (inv.status !== 'draft') {
+    throw new InvoiceError('NOT_DRAFT', `invoice ${inv.invoice_no ?? inv.id} is ${inv.status}`);
+  }
+  const recipients = (
+    await sql<{ email: string }>`
+      SELECT c.email FROM app.party_contact_role r
+        JOIN app.party_contact c ON c.tenant_id = r.tenant_id AND c.id = r.contact_id
+       WHERE r.company_id = ${companyId} AND r.party_id = ${inv.party_id}::uuid
+         AND r.role = 'billing_to' AND r.active AND c.status = 'active' AND c.email IS NOT NULL
+       ORDER BY c.email`.execute(trx)
+  ).rows.map((r) => r.email);
+  if (recipients.length === 0) {
+    throw new InvoiceError(
+      'NO_BILLING_TO',
+      'the customer has no active Billing To contact with an email address',
+    );
+  }
+  const { priced, totals, journal } = await invoiceJournal(trx, companyId, inv, lines);
+  await creditHold(trx, companyId, inv.party_id, totals.gross);
+  const invoiceNo = await nextNumber(trx, companyId, INVOICE_NUMBER_SERIES);
   const posted = await post(
     trx,
     {
@@ -774,4 +795,192 @@ export async function setArSettings(
         .doUpdateSet({ ...values, updated_at: sql`clock_timestamp()` }),
     )
     .execute();
+}
+
+// ---------------- read and preview (T-0131, SS-UC01-10) ----------------
+
+export interface InvoiceSummary {
+  readonly id: string;
+  readonly invoiceNo: string | null;
+  readonly status: 'draft' | 'posted' | 'void';
+  readonly partyId: string;
+  readonly partyName: string;
+  readonly issueDate: string;
+  readonly dueDate: string;
+  /** NUMERIC text; null on a draft that has not been priced and posted. */
+  readonly grossTotal: string | null;
+}
+
+export interface InvoiceDetail extends InvoiceSummary {
+  readonly pricing: 'exclusive' | 'inclusive';
+  readonly kind: 'standard' | 'deposit';
+  readonly entryId: string | null;
+  readonly netTotal: string | null;
+  readonly taxTotal: string | null;
+  readonly warnings: readonly InvoiceWarning[];
+  readonly lines: readonly {
+    readonly lineNo: number;
+    readonly description: string;
+    readonly quantity: string;
+    readonly unitPrice: string;
+    readonly taxCode: string | null;
+    readonly net: string | null;
+    readonly tax: string | null;
+    readonly gross: string | null;
+  }[];
+}
+
+/** Invoices of a company, newest issue date first (optionally one status). Reads only. */
+export async function listInvoices(
+  trx: Trx,
+  q: { companyId: string; status?: 'draft' | 'posted' | 'void'; limit?: number },
+): Promise<InvoiceSummary[]> {
+  const companyId = q.companyId.toLowerCase();
+  const limit = Math.min(Math.max(q.limit ?? 100, 1), 500);
+  const rows = (
+    await sql<{
+      id: string;
+      invoice_no: string | null;
+      status: 'draft' | 'posted' | 'void';
+      party_id: string;
+      party_name: string;
+      issue_date: string;
+      due_date: string;
+      gross_total: string | null;
+    }>`
+      SELECT i.id::text, i.invoice_no, i.status, i.party_id::text, p.legal_name AS party_name,
+             to_char(i.issue_date, 'YYYY-MM-DD') AS issue_date, to_char(i.due_date, 'YYYY-MM-DD') AS due_date,
+             i.gross_total::text
+        FROM app.sales_invoice i
+        JOIN app.party p ON p.tenant_id = i.tenant_id AND p.id = i.party_id
+       WHERE i.company_id = ${companyId} ${q.status ? sql`AND i.status = ${q.status}` : sql``}
+       ORDER BY i.issue_date DESC, i.invoice_no DESC NULLS FIRST, i.id DESC
+       LIMIT ${limit}`.execute(trx)
+  ).rows;
+  return rows.map((r) => ({
+    id: r.id,
+    invoiceNo: r.invoice_no,
+    status: r.status,
+    partyId: r.party_id,
+    partyName: r.party_name,
+    issueDate: r.issue_date,
+    dueDate: r.due_date,
+    grossTotal: r.gross_total,
+  }));
+}
+
+/** One invoice with its lines (as entered; priced amounts once posted). Reads only. */
+export async function getInvoice(
+  trx: Trx,
+  q: { companyId: string; invoiceId: string },
+): Promise<InvoiceDetail> {
+  const companyId = q.companyId.toLowerCase();
+  const { inv } = await loadInvoice(trx, companyId, q.invoiceId, false);
+  const party = await trx
+    .selectFrom('app.party')
+    .select('legal_name')
+    .where('id', '=', inv.party_id)
+    .executeTakeFirstOrThrow();
+  const lines = await trx
+    .selectFrom('app.sales_invoice_line')
+    .select(['line_no', 'description', 'quantity', 'unit_price', 'tax_code', 'net', 'tax', 'gross'])
+    .where('invoice_id', '=', inv.id)
+    .orderBy('line_no')
+    .execute();
+  return {
+    id: inv.id,
+    invoiceNo: inv.invoice_no,
+    status: inv.status,
+    partyId: inv.party_id,
+    partyName: party.legal_name,
+    issueDate: inv.issue_date,
+    dueDate: inv.due_date,
+    grossTotal: inv.gross_total,
+    pricing: inv.pricing,
+    kind: inv.kind,
+    entryId: inv.entry_id,
+    netTotal: inv.net_total,
+    taxTotal: inv.tax_total,
+    warnings: inv.warnings,
+    lines: lines.map((l) => ({
+      lineNo: l.line_no,
+      description: l.description,
+      quantity: l.quantity,
+      unitPrice: l.unit_price,
+      taxCode: l.tax_code,
+      net: l.net,
+      tax: l.tax,
+      gross: l.gross,
+    })),
+  };
+}
+
+export interface InvoiceJournalPreview {
+  readonly entryDate: string;
+  readonly requestedDate: string;
+  readonly redirected: boolean;
+  readonly needsOverride: boolean;
+  readonly baseCurrency: string;
+  readonly total: string;
+  readonly lines: readonly {
+    readonly lineNo: number;
+    readonly accountId: string;
+    readonly accountCode: string;
+    readonly accountName: string;
+    readonly debit: string;
+    readonly credit: string;
+    readonly partyId: string | null;
+  }[];
+}
+
+/**
+ * "Show me the journal" for a draft invoice (design §3.9, SS-UC01-10): the posting engine's
+ * preview of the journal approveInvoice would post (same builder, same source type and date).
+ * Writes nothing: no number is taken, no credit hold is applied, nothing is stored. Refusals are
+ * InvoiceError (NOT_DRAFT, PROFILE_GAP, …) or the engine's PostingError.
+ */
+export async function previewInvoiceJournal(
+  trx: Trx,
+  q: { companyId: string; invoiceId: string },
+): Promise<InvoiceJournalPreview> {
+  const companyId = q.companyId.toLowerCase();
+  const { inv, lines } = await loadInvoice(trx, companyId, q.invoiceId, false);
+  if (inv.status !== 'draft') {
+    throw new InvoiceError('NOT_DRAFT', `invoice ${inv.invoice_no ?? inv.id} is ${inv.status}`);
+  }
+  const { journal } = await invoiceJournal(trx, companyId, inv, lines);
+  const built = await preview(trx, {
+    companyId,
+    idempotencyKey: `ar-invoice:${inv.id}`,
+    entryDate: inv.issue_date,
+    sourceType: 'ar_invoice',
+    sourceId: inv.id,
+    memo: 'Invoice (draft preview)',
+    lines: journal,
+  });
+  const ids = [...new Set(built.lines.map((l) => l.accountId))];
+  const names = new Map(
+    (
+      await sql<{ id: string; name: string }>`
+        SELECT id::text, name FROM app.account
+         WHERE company_id = ${companyId} AND id = ANY(${sql.val(ids)}::uuid[])`.execute(trx)
+    ).rows.map((a) => [a.id, a.name]),
+  );
+  return {
+    entryDate: built.entryDate,
+    requestedDate: built.requestedDate,
+    redirected: built.redirected,
+    needsOverride: built.needsOverride,
+    baseCurrency: built.baseCurrency,
+    total: built.total,
+    lines: built.lines.map((l) => ({
+      lineNo: l.lineNo,
+      accountId: l.accountId,
+      accountCode: l.accountCode,
+      accountName: names.get(l.accountId) ?? l.accountCode,
+      debit: l.debit,
+      credit: l.credit,
+      partyId: l.partyId,
+    })),
+  };
 }
