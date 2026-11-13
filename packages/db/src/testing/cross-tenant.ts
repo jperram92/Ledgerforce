@@ -344,6 +344,14 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     effective_from: () => '2000-07-01',
     effective_to: () => '2099-12-31',
   },
+  // T-0158 (migration 0067): a known basis and frequency; a random 1st of a month, so two rows of
+  // one company never share effective_from.
+  'app.tax_settings': {
+    effective_from: () =>
+      `${String(2000 + (randomBytes(1)[0] ?? 0))}-${String(1 + ((randomBytes(1)[0] ?? 0) % 12)).padStart(2, '0')}-01`,
+    gst_basis: () => 'accrual',
+    bas_frequency: () => 'quarterly',
+  },
   'app.sync_issue': {
     handler: () => 'test.handler',
     connector: () => 'test',

@@ -3072,4 +3072,47 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: The first green Playwright run happened before the screen was committed; its 4 SS-UC06-11 screenshots and manifest entries record `7675790d9e94-dirty` and provider `unknown`. They stay (evidence is append-only). The run at f7dfa03 with `LF_PROVIDER=claude` gives the 4 entries the card and register link. The T-0087 tests in the same spec were re-run with `LF_EVIDENCE_ONLY_TASK=T-0154`, so T-0087's evidence folder is unchanged.
 - Why: AGENTS.md §0.6 and the evidence skill (commit first so `commit` is real); DL-0503 is the precedent.
 - Alternatives: delete the first run (rejected: directive 6).
+
+### DL-0550 — RQ-0153: no GST basis/BAS frequency pair is refused; step 10 needs no new threshold
+- Date: 2026-11-13 · By: claude · Task: T-0158 · Category: scope
+- Decision: The tax settings accept any pair of GST basis (`cash | accrual`) and BAS frequency (`monthly | quarterly | annual`). Step 3 requires only that a setting is in force on the as-of date. Step 10 is unchanged: design §6.5's thresholds are all in `app.sod_settings` (bill, credit note, journal, batch), and the cooling-off is in `app.bank_detail_settings` (DL-0160).
+- Why: RQ-0153. Under the ATO rules, cash basis needs aggregated turnover under $10m (or ATO permission). Monthly reporting is required at $20m or more. Annual reporting is open to voluntary registrants under $75k ($150k for not-for-profits). Each pair is lawful for some business. LedgerForce holds no turnover, registration status or ATO direction, so a refusal could block a lawful company. The module documents the conditions so the UI can show them.
+- Alternatives: refuse cash + monthly, or annual (rejected: both are lawful for some businesses); store turnover to check eligibility (rejected: out of scope for the MVP, and the data would go stale).
+- ADR: ADR-0071 · Status: accepted
+
+### DL-0551 — ADR-0071: app.tax_settings and new app.ar_settings columns in migration 0067
+- Date: 2026-11-13 · By: claude · Task: T-0158 · Category: architecture
+- Decision: Migration `0067_tax_ar_wizard_settings.sql` adds:
+  - `app.tax_settings`: tenant-owned, RLS ENABLE + FORCE, a tenant_isolation policy, lf_app SELECT/INSERT/UPDATE. It is effective-dated from the 1st of a month and unique per company and date; saving the same date again corrects that row.
+  - Nullable `app.ar_settings` columns, each with CHECKs: brand colour, accent colour, logo with content type, default payment terms in days, and accepted payment methods.
+  The module API is tax `setTaxSettings`/`taxSettingsOf` and ar `setInvoiceSettings`/`invoiceSettingsOf`. The cross-tenant generator gets a row override for `app.tax_settings`.
+- Why: RQ-0149 Q2 assigned these settings to tax and ar. ADR-0067 forbids a copy in the wizard. Design §3.6 makes the GST basis a company setting.
+- Alternatives: a wizard-owned settings row (rejected: ADR-0067); columns on app.company (rejected: platform would own tax and AR concepts, and the columns would not be effective-dated).
+- ADR: ADR-0071 · Status: proposed (accepted on green CI + cross-review; category data, no human gate)
+
+### DL-0552 — What completes step 8: brand colour, terms and a method; logo optional; Stripe needs set-up; no SVG
+- Date: 2026-11-13 · By: claude · Task: T-0158 · Category: scope
+- Decision: Step 8 lists, in order, any of these that are missing: the brand colour, the default payment terms (0–365 days), and at least one accepted method. When `stripe` is accepted but `app.stripe_settings` has no row, it also lists "Stripe is not set up". The logo is optional. It must be PNG or JPEG, at most 512 KiB, and its magic bytes are checked by both the module and the database. SVG is refused. Once saved, the colour, terms and methods can be changed but not cleared.
+- Why: Design §4.1 step 8 and RQ-0153 conclusion 2. Many small businesses have no logo. SVG can carry script into rendered documents. Bank transfer needs only an active bank account, which step 4 already requires.
+- Alternatives: require a logo (rejected: it would block companies without one); accept SVG and sanitise it (rejected: needs a sanitiser dependency and adds risk for little gain).
+- ADR: ADR-0071 · Status: accepted
+
+### DL-0553 — @ledgerforce/setup depends on @ledgerforce/tax at runtime
+- Date: 2026-11-13 · By: claude · Task: T-0158 · Category: architecture
+- Decision: `@ledgerforce/tax` moves from setup's devDependencies to dependencies, because validator 3 calls `taxSettingsOf`. It is a workspace package, so no new third-party dependency is added. The lockfile importer entry changes.
+- Why: Validators call the owning module's reader where one exists (ADR-0067 rule 4).
+- Alternatives: read `app.tax_settings` with raw SQL in setup (rejected: it would duplicate the effective-date rule).
+- ADR: none · Status: accepted
+
+### DL-0554 — T-0123 flow test: steps 3 and 8 now set the T-0158 settings
+- Date: 2026-11-13 · By: claude · Task: T-0158 · Category: process
+- Decision: In `packages/modules/setup/src/wizard.flow.db.test.ts`, the step 3 and step 8 tests now also expect the new missing items, then save the tax and AR settings before the step completes. Every earlier assertion is kept.
+- Why: T-0158 extends validators 3 and 8 by design (RQ-0149 conclusion 2). Without the settings, the walk-through would stop at step 3.
+- Alternatives: none; changing the validators without updating the walk-through would leave it red.
+- ADR: none · Status: accepted
+
+### DL-0555 — Follow-up cards T-0164 (default terms set the due date) and T-0165 (branding on the invoice document)
+- Date: 2026-11-13 · By: claude · Task: T-0158 · Category: scope
+- Decision: T-0158 only stores and validates the settings. T-0164 makes `createInvoice` use `default_payment_terms_days` instead of the constant 14 when no due date is given. T-0165 renders the brand colour, logo and accepted payment methods on the invoice HTML/PDF. T-0165 has two open questions: which bank account is the remittance account, and where the Stripe payment link comes from.
+- Why: Card size (T-0158 is about 400 lines), and each use needs its own tests.
 - ADR: none · Status: accepted

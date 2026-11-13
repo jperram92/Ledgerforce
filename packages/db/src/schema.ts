@@ -835,6 +835,26 @@ export interface ArSettingsTable {
   /** Migration 0043 (T-0048). */
   ecl_allowance_account_id: Generated<string | null>;
   bad_debt_account_id: Generated<string | null>;
+  /** Migration 0067 (T-0158, ADR-0071): invoice branding, default terms, accepted methods. */
+  brand_colour: Generated<string | null>;
+  brand_accent_colour: Generated<string | null>;
+  logo: Generated<Buffer | null>;
+  logo_content_type: Generated<'image/png' | 'image/jpeg' | null>;
+  default_payment_terms_days: Generated<number | null>;
+  accepted_payment_methods: Generated<('bank_transfer' | 'stripe')[] | null>;
+}
+
+/** Migration 0067 (T-0158, ADR-0071): GST basis and BAS frequency per company, effective-dated. */
+export interface TaxSettingsTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  /** The 1st of a month; pg returns a Date, so readers select to_char(…, 'YYYY-MM-DD'). */
+  effective_from: ColumnType<Date, string, string>;
+  gst_basis: 'cash' | 'accrual';
+  bas_frequency: 'monthly' | 'quarterly' | 'annual';
+  set_by: string | null;
+  set_at: Timestamp;
 }
 
 /** Migration 0045 (T-0051): inbound bill email — the draft bill awaiting coding. */
@@ -1271,6 +1291,7 @@ export interface Database {
   'app.tenant': TenantTable;
   'app.company': CompanyTable;
   'app.tax_code': TaxCodeTable;
+  'app.tax_settings': TaxSettingsTable;
   'app.app_user': AppUserTable;
   'app.session': SessionTable;
   'app.auth_request': AuthRequestTable;

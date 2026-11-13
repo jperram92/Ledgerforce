@@ -1,0 +1,167 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a62e71adef7dbd5c1
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:32903
+ ❯ |db| packages/modules/setup/src/wizard-settings.db.test.ts (8 tests | 8 failed) 843ms
+     × SS-PLAT-121 AC-1 step 3 lists the GST basis and BAS frequency until a tax setting is in force on the as-of date [T-0158] 31ms
+     × SS-PLAT-121 AC-1 the setting in force is the latest from on or before the date; saving the same date corrects it [T-0158] 3ms
+     × SS-PLAT-121 AC-1 malformed tax settings are refused by the module and by the database [T-0158] 2ms
+     × SS-PLAT-121 AC-2 step 8 lists branding, payment terms and methods until the ar module stores each [T-0158] 13ms
+     × SS-PLAT-121 AC-2 accepting Stripe needs Stripe set up; a logo is optional and stored with its type [T-0158] 2ms
+     × SS-PLAT-121 AC-2 malformed AR invoice settings are refused by the module and by the database [T-0158] 2ms
+     × SS-PLAT-121 AC-3 another tenant cannot read or write the company settings [T-0158] 2ms
+     × SS-PLAT-121 step 10 asks for nothing beyond the users and the saved SoD thresholds (RQ-0153 Q4) [T-0158] 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard-settings.db.test.ts > SS-PLAT-121: step 3 requires the GST basis and BAS frequency (tax module) > SS-PLAT-121 AC-1 step 3 lists the GST basis and BAS frequency until a tax setting is in force on the as-of date [T-0158]
+AssertionError: expected [] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+- [
+-   "The GST accounting basis (cash or accrual) has not been set",
+-   "The BAS reporting frequency (monthly, quarterly or annual) has not been set",
+- ]
++ []
+
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:100:30
+     98| describe('SS-PLAT-121: step 3 requires the GST basis and BAS frequency…
+     99|   it('SS-PLAT-121 AC-1 step 3 lists the GST basis and BAS frequency un…
+    100|     expect(await missing(3)).toEqual([BASIS, FREQUENCY]);
+       |                              ^
+    101|     expect(await f.inTenant((trx) => taxSettingsOf(trx, c, AS_OF))).to…
+    102|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard-settings.db.test.ts > SS-PLAT-121: step 3 requires the GST basis and BAS frequency (tax module) > SS-PLAT-121 AC-1 the setting in force is the latest from on or before the date; saving the same date corrects it [T-0158]
+TypeError: taxSettingsOf is not a function
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:121:51
+    119|
+    120|   it('SS-PLAT-121 AC-1 the setting in force is the latest from on or b…
+    121|     const at = (d: string) => f.inTenant((trx) => taxSettingsOf(trx, c…
+       |                                                   ^
+    122|     expect(await at('2026-06-30')).toBeNull();
+    123|     expect(await at('2026-07-01')).toMatchObject({ gstBasis: 'cash', b…
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:122:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard-settings.db.test.ts > SS-PLAT-121: step 3 requires the GST basis and BAS frequency (tax module) > SS-PLAT-121 AC-1 malformed tax settings are refused by the module and by the database [T-0158]
+AssertionError: The instanceof assertion needs a constructor but undefined was given.
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:149:17
+    147|     ]) {
+    148|       const e = await refused(setTax(bad));
+    149|       expect(e).toBeInstanceOf(TaxSettingsError);
+       |                 ^
+    150|       expect(e.code).toBe('INVALID_TAX_SETTINGS');
+    151|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard-settings.db.test.ts > SS-PLAT-121: step 8 requires branding, payment terms and payment methods (ar module) > SS-PLAT-121 AC-2 step 8 lists branding, payment terms and methods until the ar module stores each [T-0158]
+AssertionError: expected [] to deeply equal [ …(3) ]
+
+- Expected
++ Received
+
+- [
+-   "Invoice branding (a brand colour) has not been set",
+-   "Default payment terms have not been set",
+-   "No accepted payment method (bank transfer or Stripe) has been chosen",
+- ]
++ []
+
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:168:30
+    166| describe('SS-PLAT-121: step 8 requires branding, payment terms and pay…
+    167|   it('SS-PLAT-121 AC-2 step 8 lists branding, payment terms and method…
+    168|     expect(await missing(8)).toEqual([BRANDING, TERMS, METHODS]);
+       |                              ^
+    169|     expect(await f.inTenant((trx) => invoiceSettingsOf(trx, c))).toEqu…
+    170|       brandColour: null,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard-settings.db.test.ts > SS-PLAT-121: step 8 requires branding, payment terms and payment methods (ar module) > SS-PLAT-121 AC-2 accepting Stripe needs Stripe set up; a logo is optional and stored with its type [T-0158]
+TypeError: setInvoiceSettings is not a function
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:62:64
+     60|     }),
+     61|   );
+     62| const setAr = (p: InvoiceSettingsPatch) => f.inTenant((trx) => setInvo…
+       |                                                                ^
+     63| const refused = async (p: Promise<unknown>): Promise<{ code: string; m…
+     64|   const e: unknown = await p.then(
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:195:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard-settings.db.test.ts > SS-PLAT-121: step 8 requires branding, payment terms and payment methods (ar module) > SS-PLAT-121 AC-2 malformed AR invoice settings are refused by the module and by the database [T-0158]
+AssertionError: The instanceof assertion needs a constructor but undefined was given.
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:242:17
+    240|     for (const p of bad) {
+    241|       const e = await refused(setAr(p));
+    242|       expect(e).toBeInstanceOf(InvoiceSettingsError);
+       |                 ^
+    243|       expect(e.code).toBe('INVALID_INVOICE_SETTINGS');
+    244|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard-settings.db.test.ts > SS-PLAT-121: tenant isolation and step 10 > SS-PLAT-121 AC-3 another tenant cannot read or write the company settings [T-0158]
+TypeError: taxSettingsOf is not a function
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:270:53
+    268|       trx.insertInto('app.tenant').values({ id: OTHER_T, name: 'Other …
+    269|     );
+    270|     expect(await withTenant(f.db, OTHER_T, (trx) => taxSettingsOf(trx,…
+       |                                                     ^
+    271|     expect((await withTenant(f.db, OTHER_T, (trx) => invoiceSettingsOf…
+    272|       null,
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:270:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard-settings.db.test.ts > SS-PLAT-121: tenant isolation and step 10 > SS-PLAT-121 step 10 asks for nothing beyond the users and the saved SoD thresholds (RQ-0153 Q4) [T-0158]
+error: user 01a1d68e-79c1-7119-a2e2-4b92d84d2335 does not hold settings.sod.manage
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:293:5
+    291|       'Approval thresholds (segregation-of-duties settings) have not b…
+    292|     ]);
+    293|     await f.inTenant((trx) =>
+       |     ^
+    294|       sql`INSERT INTO app.sod_settings (set_by, reason) VALUES (${user…
+    295|         trx,
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:293:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed (8)
+   Start at  20:16:58
+   Duration  5.17s (transform 1.70s, setup 0ms, import 3.27s, tests 843ms, environment 0ms)
+
