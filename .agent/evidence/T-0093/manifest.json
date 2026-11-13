@@ -631,6 +631,294 @@
       "provider": "unknown",
       "timestamp": "2026-10-26T00:13:30.569Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082842-SS-PLAT-78-disabled-person-1440-dark.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: a disabled person shows when, why and who took over [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:42.385Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082844-SS-PLAT-78-people-list-owner-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner sees people with roles and status @ 1440 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:44.215Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082846-SS-PLAT-78-step-up-redirect-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: a step-up challenge goes to /auth/step-up and returns here [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:46.065Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082848-SS-PLAT-78-people-list-owner-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner sees people with roles and status @ 390 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:48.735Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261113-082849-SS-PLAT-79-exceptions-week-owner-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 1440 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:49.828Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261113-082851-SS-PLAT-79-exceptions-acknowledged-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 1440 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:51.450Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082853-SS-PLAT-78-invite-form-filled-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner invites someone by keyboard [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:53.066Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082854-SS-PLAT-78-invite-sent-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner invites someone by keyboard [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:54.772Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261113-082855-SS-PLAT-79-exceptions-week-owner-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 390 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:55.307Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261113-082856-SS-PLAT-79-exceptions-acknowledged-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 390 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:56.662Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082858-SS-PLAT-78-people-list-auditor-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: an Auditor reads the list but is told who can change it [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:58.037Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261113-082859-SS-PLAT-79-exceptions-auditor-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: an Auditor sees whose turn it is, with no button [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:28:59.993Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082901-SS-PLAT-78-people-forbidden-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: a clerk without users.read sees the forbidden state [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:01.810Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082904-SS-PLAT-78-people-forbidden-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: a clerk without users.read sees the forbidden state [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:04.879Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261113-082903-SS-PLAT-79-exceptions-empty-week-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: an empty week, an error and the forbidden state [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:03.112Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261113-082905-SS-PLAT-79-exceptions-error-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: an empty week, an error and the forbidden state [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:05.831Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-79",
+      "file": ".agent/evidence/T-0093/20261113-082909-SS-PLAT-79-exceptions-forbidden-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: an empty week, an error and the forbidden state [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:09.208Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082907-SS-PLAT-78-people-loading-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: loading and error states, with Try again [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:07.572Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082911-SS-PLAT-78-people-error-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: loading and error states, with Try again [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:11.218Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261113-082914-SS-PLAT-80-audit-log-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: newest entries first, with details @ 1440 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:14.897Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082915-SS-PLAT-78-self-grant-refused-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner tries to give themselves a role and sees the refusal [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:15.520Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261113-082919-SS-PLAT-80-audit-log-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: newest entries first, with details @ 390 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:19.140Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082919-SS-PLAT-78-role-removed-finance-admin-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: a Finance Admin gives and removes a role, but not the Owner role [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:19.340Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082924-SS-PLAT-78-offboard-confirm-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner offboards a leaver with a successor @ 1440 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:24.024Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082925-SS-PLAT-78-offboard-done-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner offboards a leaver with a successor @ 1440 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:25.344Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261113-082924-SS-PLAT-80-audit-log-older-page-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: filters live in the address; older entries page by keyset [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:24.478Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261113-082926-SS-PLAT-80-audit-log-filtered-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: filters live in the address; older entries page by keyset [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:26.319Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082929-SS-PLAT-78-offboard-confirm-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner offboards a leaver with a successor @ 390 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:29.345Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-78",
+      "file": ".agent/evidence/T-0093/20261113-082930-SS-PLAT-78-offboard-done-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner offboards a leaver with a successor @ 390 [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:30.743Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261113-082929-SS-PLAT-80-audit-log-empty-390.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: no match, an invalid filter and the forbidden state [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:29.920Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261113-082933-SS-PLAT-80-audit-log-invalid-filter-1440.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: no match, an invalid filter and the forbidden state [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:33.979Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-80",
+      "file": ".agent/evidence/T-0093/20261113-082936-SS-PLAT-80-audit-log-forbidden-390-dark.png",
+      "test": "web/admin.spec.ts › SS-PLAT-80 audit log viewer › SS-PLAT-80: no match, an invalid filter and the forbidden state [T-0093]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:36.376Z",
+      "result": "passed"
     }
   ]
 }

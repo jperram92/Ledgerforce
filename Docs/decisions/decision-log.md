@@ -2586,3 +2586,22 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | T-0097 pilot hardening | 0460–0469 | 0054–0055 | 0141–0142 | T-0142–T-0144 |
 - Why: The owner asked for parallel agents (DL-0408); disjoint ranges keep the merges mechanical.
 - ADR: none · Status: accepted
+
+### DL-0440 — Bill read routes share approval's journal builder; SoD outlook for screens (T-0086)
+- Date: 2026-11-13 · By: claude · Task: T-0086 · Category: implementation (AP, API)
+- Decision: `approveBill`'s journal construction is extracted into a private `billJournal` (read-only); approval posts exactly as before (GP-008 db test unchanged and green). `previewBillJournal` runs the engine's `preview()` on the same command (idempotency key `ap-bill:<id>`, entry date = bill date), writing nothing. New read models in `packages/modules/ap/src/bills-read.ts`: `billCodingOptions`, `listBills`, `getBillDetail`, `billJournalView` (preview for a draft, the posted `journal_line`s once approved — SELECT only). API: `GET /ap/bills` without `queue` lists every bill (the `queue=awaiting_approval` shape is unchanged), `GET /ap/bills/:id`, `GET /ap/bills/:id/journal` (all `ap.read`), `GET /ap/bill-coding` (`ap.bill.enter`, because AP Clerks lack `gl.account.read` and `parties` has no list route). The detail carries `approval: {allowed, rule, small_team_exception_required, self_approval_threshold}` from a new read-only `sodOutlook()` in `apps/api/src/sod/sod.service.ts` — the same evaluator, history, settings and eligible-user count as `checkSod`, without lock, exception or record. The approve route still runs `checkSod`, so the outlook can only explain, never allow. A bill outside the company/tenant is 404.
+- Why: SS-UC05-08 needs to code, approve and show the posted journal; P6 needs the rule before the user tries.
+- Alternatives: rebuilding the journal in the API or browser (drift; no accounting in the browser); computing the SoD threshold comparison in the browser (money arithmetic in the browser, duplicate of the evaluator).
+- Tests: `apps/api/src/ap/bills-read.db.test.ts` (4, RED first), with `bills.db.test.ts` and the AP module db tests.
+- ADR: none (additive read routes, as DL-0406) · Status: accepted
+
+### DL-0441 — Bills screens under /purchases/bills (T-0086)
+- Date: 2026-11-13 · By: claude · Task: T-0086 · Category: ui
+- Decision: `apps/web/src/purchases/` — list, entry form and bill page on the GL/invoice patterns (PageHead, Loading/Empty/Forbidden/Failure, JournalTable). State words: Draft, Waiting for approval, Posted, Void; a "Who acts next" column (P13). The bill page has one primary action: "Send for approval" (AP Clerk) or "Approve and post" (Approver); "Show me the journal" is secondary. Posted bills load their journal automatically and say a correction is a reversal (P5); no delete anywhere. The entry form PUTs under a UUID chosen once per form, so a double submit returns the same draft. Amounts are only pattern-checked and stripped of thousands separators (strings, never numbers). Own `useApCompany()` on `/companies` instead of importing the sales hook, so the concurrent batch-billing work in `apps/web/src/sales` cannot break purchases. Purchases section page links to Bills (additive `pages` entry).
+- Why: SS-UC05-08; apps/web AGENTS.md; keep shared files additive for the parallel round.
+- ADR: none · Status: accepted
+
+### DL-0442 — Bills inbox screen split to T-0136
+- Date: 2026-11-13 · By: claude · Task: T-0086 · Category: scope
+- Decision: T-0086's acceptance criterion (SS-UC05-08: code and approve a draft, see the posted journal) is met through manual bill entry. The bills inbox (T-0051 items with the PDF, `codeInboxItem`) has no HTTP routes yet; listing inbox items, showing the PDF and coding an item into a draft bill moves to the new card T-0136 (API routes + screen), keeping T-0086 within one session.
+- ADR: none · Status: accepted
