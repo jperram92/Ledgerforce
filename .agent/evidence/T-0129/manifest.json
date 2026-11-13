@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0129",
+  "entries": [
+    {
+      "scenario": "SS-UC04-07",
+      "file": ".agent/evidence/T-0129/20261113-100210-tests-db.json",
+      "test": "8 test(s): packages/modules/ar/src/reminder-pause.db.test.ts › SS-UC04-07: per-party reminder pause › a reason is required | packages/modules/ar/src/reminder-pause.db.test.ts › SS-UC04-07: per-party reminder pause › only a party of the company can be paused | packages/modules/ar/src/reminder-pause.db.test.ts › SS-UC04-07: per-party reminder pause › pausing records who, when and why; a replay of the same key returns the same row | packages/modules/ar/src/reminder-pause.db.test.ts › SS-UC04-07: per-party reminder pause › a key reused for a different request is refused | packages/modules/ar/src/reminder-pause.db.test.ts › SS-UC04-07: per-party reminder pause › pausing an already paused party is refused (no silent duplicate) | packages/modules/ar/src/reminder-pause.db.test.ts › SS-UC04-07: per-party reminder pause › the daily run skips the paused party and reminds the other | packages/modules/ar/src/reminder-pause.db.test.ts › SS-UC04-07: per-party reminder pause › after resuming, the party gets its reminder on the next run; history keeps both rows | packages/modules/ar/src/reminder-pause.db.test.ts › SS-UC04-07: per-party reminder pause › the history is insert-only for lf_app (no UPDATE, no DELETE)",
+      "commit": "ebe04d471520-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T10:02:10.414Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC04-07",
+      "file": ".agent/evidence/T-0129/20261113-100213-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ar/reminder-pause.db.test.ts › SS-UC04-07: pause and resume reminders over HTTP › refuses without ar.dunning.run (403) and records nothing | apps/api/src/ar/reminder-pause.db.test.ts › SS-UC04-07: pause and resume reminders over HTTP › requires an Idempotency-Key (400) and a reason (422) | apps/api/src/ar/reminder-pause.db.test.ts › SS-UC04-07: pause and resume reminders over HTTP › the AR Clerk pauses (201, audited); a replay answers 200 with the same row | apps/api/src/ar/reminder-pause.db.test.ts › SS-UC04-07: pause and resume reminders over HTTP › a second pause is a conflict (409); resume is 201 and audited; GET shows the history",
+      "commit": "ebe04d471520-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T10:02:13.875Z",
+      "result": "passed"
+    }
+  ]
+}
