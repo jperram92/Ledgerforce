@@ -149,7 +149,7 @@ const FORGED_SIGNING_VALUE = ['whsec', '1'.repeat(48)].join('_');
 
 describe('SS-UC03-06 POST /webhooks/stripe refuses what Stripe did not sign just now', () => {
   it('SS-UC03-06: Invalid or replayed webhook rejected — bad signature and stale timestamp both answer 400 and nothing is posted', async () => {
-    const body = event('evt_1T0074ApiBad', 'pi_1T0074ApiBad');
+    const body = event('evt_1T0074BadSig', 'pi_1T0074BadSig');
     const forged = await deliver(api, body, sign(body, undefined, FORGED_SIGNING_VALUE));
     expect(forged).toEqual({ status: 400, body: { error: 'no_matching_signature' } });
     const old = Math.floor(Date.now() / 1000) - 301;
@@ -159,7 +159,7 @@ describe('SS-UC03-06 POST /webhooks/stripe refuses what Stripe did not sign just
   });
 
   it('SS-UC03-06 a missing header, a body altered after signing and a non-JSON body answer 400', async () => {
-    const body = event('evt_1T0074ApiAlt', 'pi_1T0074ApiAlt');
+    const body = event('evt_1T0074AltSig', 'pi_1T0074AltSig');
     expect((await deliver(api, body)).body).toEqual({ error: 'missing_header' });
     const altered = await deliver(api, body.replace('125000', '999900'), sign(body));
     expect(altered).toEqual({ status: 400, body: { error: 'no_matching_signature' } });
@@ -173,7 +173,7 @@ describe('SS-UC03-06 POST /webhooks/stripe refuses what Stripe did not sign just
   });
 
   it('SS-UC03-06 without a configured signing secret the route answers 503 and verifies nothing', async () => {
-    const body = event('evt_1T0074ApiOff', 'pi_1T0074ApiOff');
+    const body = event('evt_1T0074SigOff', 'pi_1T0074SigOff');
     expect(await deliver(unconfigured, body, sign(body))).toEqual({
       status: 503,
       body: { error: 'stripe_webhook_not_configured' },
@@ -183,7 +183,7 @@ describe('SS-UC03-06 POST /webhooks/stripe refuses what Stripe did not sign just
 
 describe('SS-UC03-05 a genuine delivery posts once', () => {
   it('SS-UC03-05 the signed payment posts one receipt; Stripe retrying the same event gets 200 duplicate', async () => {
-    const body = event('evt_1T0074ApiOk', 'pi_1T0074ApiOk');
+    const body = event('evt_1T0074SigOk', 'pi_1T0074SigOk');
     const first = await deliver(api, body, sign(body));
     expect(first.status).toBe(200);
     expect(first.body).toMatchObject({ received: true, outcome: 'receipt' });

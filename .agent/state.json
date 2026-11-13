@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
-  "current_task": "T-0078",
+  "current_task": null,
   "branch": "claude/loving-lovelace-nozqpk",
   "step": null,
-  "claimed_by": "claude",
-  "lease_expires_at": "2026-11-13T02:03:05.627Z",
+  "claimed_by": null,
+  "lease_expires_at": null,
   "last_green_commit": null,
   "run_id": "2026-11-12-codex-r01",
-  "updated_at": "2026-11-13T01:18:05.629Z",
+  "updated_at": "2026-11-13T01:33:48.180Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,

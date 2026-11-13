@@ -172,7 +172,7 @@ graph LR
 | [T-0075](T-0075.md) | Stripe payout reconciliation (net settlement, fees, GST on fees) | MVP | review | T-0074, T-0060, T-0031 | UC-03 | 2 |
 | [T-0076](T-0076.md) | Trial balance, profit & loss and balance sheet | MVP | review | T-0027 | UC-10 | 1 |
 | [T-0077](T-0077.md) | GL detail and aged AR/AP reports | MVP | review | T-0076, T-0028, T-0049 | — | 0 |
-| [T-0078](T-0078.md) | Month-end close checklist (UC-10) | MVP | verifying | T-0023, T-0061, T-0076 | UC-10 | 5 |
+| [T-0078](T-0078.md) | Month-end close checklist (UC-10) | MVP | review | T-0023, T-0061, T-0076 | UC-10 | 5 |
 | [T-0079](T-0079.md) | Hard-lock reopen with two approvers and audit reason | MVP | todo | T-0078, T-0015, T-0013 | UC-10 | 1 |
 | [T-0080](T-0080.md) | Setup wizard backend (10 steps) and opening balances | MVP | review | T-0018, T-0034, T-0058, T-0063, T-0039, T-0046, T-0050 | — | 3 |
 | [T-0123](T-0123.md) | Setup wizard state machine and step validators (steps 1–10) | MVP | todo | T-0080, T-0018, T-0034, T-0058, T-0063, T-0039 | — | 0 |
