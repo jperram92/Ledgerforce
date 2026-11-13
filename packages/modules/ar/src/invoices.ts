@@ -927,6 +927,7 @@ export interface InvoiceJournalPreview {
     readonly accountId: string;
     readonly accountCode: string;
     readonly accountName: string;
+    readonly accountType: string;
     readonly debit: string;
     readonly credit: string;
     readonly partyId: string | null;
@@ -961,10 +962,10 @@ export async function previewInvoiceJournal(
   const ids = [...new Set(built.lines.map((l) => l.accountId))];
   const names = new Map(
     (
-      await sql<{ id: string; name: string }>`
-        SELECT id::text, name FROM app.account
+      await sql<{ id: string; name: string; type: string }>`
+        SELECT id::text, name, type FROM app.account
          WHERE company_id = ${companyId} AND id = ANY(${sql.val(ids)}::uuid[])`.execute(trx)
-    ).rows.map((a) => [a.id, a.name]),
+    ).rows.map((a) => [a.id, a]),
   );
   return {
     entryDate: built.entryDate,
@@ -977,7 +978,8 @@ export async function previewInvoiceJournal(
       lineNo: l.lineNo,
       accountId: l.accountId,
       accountCode: l.accountCode,
-      accountName: names.get(l.accountId) ?? l.accountCode,
+      accountName: names.get(l.accountId)?.name ?? l.accountCode,
+      accountType: names.get(l.accountId)?.type ?? '',
       debit: l.debit,
       credit: l.credit,
       partyId: l.partyId,

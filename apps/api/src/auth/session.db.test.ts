@@ -76,7 +76,11 @@ describe('SS-PLAT-20: MFA and session policy for finance roles — sessions', ()
     expect(await me.json()).toEqual({ tenant_id: A, user_id: USER_A, display_name: 'Priya Shah' });
     const companies = await call('/companies', cookie);
     expect(await companies.json()).toEqual([
-      { name: 'Harbour & Co Pty Ltd', base_currency: 'AUD' },
+      {
+        id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+        name: 'Harbour & Co Pty Ltd',
+        base_currency: 'AUD',
+      },
     ]);
   });
 

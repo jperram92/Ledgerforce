@@ -2556,3 +2556,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: rebuilding the journal in the API (two code paths that would drift).
 - Not here: approving one invoice over HTTP. The RBAC catalogue has no single-invoice approve permission (only ar.batch.approve), and adding one changes the security model (ADR-0023 role templates) → T-0132.
 - ADR: none · Status: accepted
+
+### DL-0407 — Invoice screens: list and detail with "Show me the journal"; /companies returns id (T-0083)
+- Date: 2026-11-13 · By: claude · Task: T-0083 · Category: ui (+ additive API field)
+- Decision: `/sales/invoices` (list) and `/sales/invoices/$invoiceId` (detail) in apps/web, built on the GL screens' patterns (PageHead, Loading, Empty, Forbidden and Failure states, JournalTable from @ledgerforce/ui). The journal preview is fetched only when the user presses "Show me the journal" (P4), from `GET /ar/invoices/:id/journal`, so it is the engine's preview of what approving would post. Amounts are the API's decimal strings. Quantities drop trailing fractional zeros only (10.0000 → 10, the T-0041 lesson). `GET /companies` now also returns `id` (additive), because the AR clerk has `company.read` but not `gl.account.read`. The invoice preview response gains `account_type` for the plain-language gloss.
+- Why: SS-UC01-10, UI principles P2/P3/P4/P12, apps/web AGENTS.md (no accounting in the browser).
+- Alternatives: company from the chart endpoint (AR clerks lack gl.account.read); always-on preview (P4: show on request).
+- Not here: the approve action on the detail page waits for T-0132 (permission decision).
+- ADR: none · Status: accepted

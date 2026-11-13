@@ -129,6 +129,7 @@ export class ArInvoicesController {
         account_id: l.accountId,
         account_code: l.accountCode,
         account_name: l.accountName,
+        account_type: l.accountType,
         debit: l.debit,
         credit: l.credit,
         party_id: l.partyId,

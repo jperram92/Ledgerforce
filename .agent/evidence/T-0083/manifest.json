@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0083",
+  "entries": [
+    {
+      "scenario": "SS-UC01-10",
+      "file": ".agent/evidence/T-0083/20261113-034428-SS-UC01-10-invoice-list-1440.png",
+      "test": "web/invoices.spec.ts › SS-UC01-10: Invoice detail shows mapped lines and journal preview @ 1440 [T-0083]",
+      "commit": "4921268a2ede-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T03:44:28.283Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-10",
+      "file": ".agent/evidence/T-0083/20261113-034428-SS-UC01-10-invoice-journal-preview-1440.png",
+      "test": "web/invoices.spec.ts › SS-UC01-10: Invoice detail shows mapped lines and journal preview @ 1440 [T-0083]",
+      "commit": "4921268a2ede-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T03:44:28.996Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-10",
+      "file": ".agent/evidence/T-0083/20261113-034430-SS-UC01-10-invoice-list-390.png",
+      "test": "web/invoices.spec.ts › SS-UC01-10: Invoice detail shows mapped lines and journal preview @ 390 [T-0083]",
+      "commit": "4921268a2ede-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T03:44:30.069Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-10",
+      "file": ".agent/evidence/T-0083/20261113-034430-SS-UC01-10-invoice-journal-preview-390.png",
+      "test": "web/invoices.spec.ts › SS-UC01-10: Invoice detail shows mapped lines and journal preview @ 390 [T-0083]",
+      "commit": "4921268a2ede-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T03:44:30.858Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-10",
+      "file": ".agent/evidence/T-0083/20261113-034549-SS-UC01-10-invoice-list-1440.png",
+      "test": "web/invoices.spec.ts › SS-UC01-10: Invoice detail shows mapped lines and journal preview @ 1440 [T-0083]",
+      "commit": "4921268a2ede-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T03:45:49.333Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-10",
+      "file": ".agent/evidence/T-0083/20261113-034550-SS-UC01-10-invoice-journal-preview-1440.png",
+      "test": "web/invoices.spec.ts › SS-UC01-10: Invoice detail shows mapped lines and journal preview @ 1440 [T-0083]",
+      "commit": "4921268a2ede-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T03:45:50.023Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-10",
+      "file": ".agent/evidence/T-0083/20261113-034551-SS-UC01-10-invoice-list-390.png",
+      "test": "web/invoices.spec.ts › SS-UC01-10: Invoice detail shows mapped lines and journal preview @ 390 [T-0083]",
+      "commit": "4921268a2ede-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T03:45:51.037Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-10",
+      "file": ".agent/evidence/T-0083/20261113-034551-SS-UC01-10-invoice-journal-preview-390.png",
+      "test": "web/invoices.spec.ts › SS-UC01-10: Invoice detail shows mapped lines and journal preview @ 390 [T-0083]",
+      "commit": "4921268a2ede-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T03:45:51.837Z",
+      "result": "passed"
+    }
+  ]
+}

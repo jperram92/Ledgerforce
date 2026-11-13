@@ -67,7 +67,13 @@ describe('SS-PLAT-28: Every API request runs in its own tenant transaction', () 
       headers: { authorization: 'Bearer test-A' },
     });
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual([{ name: 'Harbour & Co Pty Ltd', base_currency: 'AUD' }]);
+    expect(await res.json()).toEqual([
+      {
+        id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+        name: 'Harbour & Co Pty Ltd',
+        base_currency: 'AUD',
+      },
+    ]);
   });
 
   it('tenant B, on the same pooled connection straight after, sees only B’s company', async () => {

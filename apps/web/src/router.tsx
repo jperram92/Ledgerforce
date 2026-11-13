@@ -27,6 +27,8 @@ import { SignInPage, type SignInReason } from './SignIn.tsx';
 import { inboxSearch } from './sync/logic.ts';
 import { SyncIssuePage } from './sync/SyncIssuePage.tsx';
 import { SyncIssuesPage } from './sync/SyncIssuesPage.tsx';
+import { InvoicePage } from './sales/InvoicePage.tsx';
+import { InvoicesPage } from './sales/InvoicesPage.tsx';
 
 const rootRoute = createRootRoute({ component: Outlet });
 
@@ -167,6 +169,21 @@ const notFoundRoute = createRoute({
   component: NotFoundPage,
 });
 
+const invoicesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'sales/invoices',
+  component: () => <InvoicesPage />,
+});
+
+const invoiceRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'sales/invoices/$invoiceId',
+  component: function InvoiceRoute() {
+    const { invoiceId } = invoiceRoute.useParams();
+    return <InvoicePage key={invoiceId} invoiceId={invoiceId} />;
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   signInRoute,
   shellRoute.addChildren([
@@ -179,6 +196,8 @@ const routeTree = rootRoute.addChildren([
     syncIssueRoute,
     chartRoute,
     journalsRoute,
+    invoicesRoute,
+    invoiceRoute,
     newJournalRoute,
     journalRoute,
     editJournalRoute,

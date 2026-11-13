@@ -1,0 +1,65 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:36053
+ ❯ |api-db| apps/api/src/auth/session.db.test.ts (10 tests | 1 failed) 1104ms
+     × a valid session resolves to its tenant and user, and RLS still filters 63ms
+ ❯ |api-db| apps/api/src/tenancy/tenant-transaction.db.test.ts (6 tests | 1 failed) 756ms
+     × a request resolved to tenant A sees only A’s company 50ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/auth/session.db.test.ts > SS-PLAT-20: MFA and session policy for finance roles — sessions > a valid session resolves to its tenant and user, and RLS still filters
+AssertionError: expected [ { …(2) } ] to deeply equal [ { id: StringMatching{…}, …(2) } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "base_currency": "AUD",
+-     "id": StringMatching /^[0-9a-f-]{36}$/,
+      "name": "Harbour & Co Pty Ltd",
+    },
+  ]
+
+ ❯ apps/api/src/auth/session.db.test.ts:78:36
+     76|     expect(await me.json()).toEqual({ tenant_id: A, user_id: USER_A, d…
+     77|     const companies = await call('/companies', cookie);
+     78|     expect(await companies.json()).toEqual([
+       |                                    ^
+     79|       {
+     80|         id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-db| apps/api/src/tenancy/tenant-transaction.db.test.ts > SS-PLAT-28: Every API request runs in its own tenant transaction > a request resolved to tenant A sees only A’s company
+AssertionError: expected [ { …(2) } ] to deeply equal [ { id: StringMatching{…}, …(2) } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "base_currency": "AUD",
+-     "id": StringMatching /^[0-9a-f-]{36}$/,
+      "name": "Harbour & Co Pty Ltd",
+    },
+  ]
+
+ ❯ apps/api/src/tenancy/tenant-transaction.db.test.ts:70:30
+     68|     });
+     69|     expect(res.status).toBe(200);
+     70|     expect(await res.json()).toEqual([
+       |                              ^
+     71|       {
+     72|         id: expect.stringMatching(/^[0-9a-f-]{36}$/),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 14 passed (16)
+   Start at  03:38:41
+   Duration  6.03s (transform 1.29s, setup 0ms, import 3.24s, tests 1.86s, environment 0ms)
+

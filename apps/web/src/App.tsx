@@ -6,6 +6,7 @@ import { createAdminClient } from './admin/client.ts';
 import { createApiClient } from './api.ts';
 import { ServicesContext, type AppEnv } from './env.tsx';
 import { createGlClient } from './gl/client.ts';
+import { createSalesClient } from './sales/client.ts';
 import { createAppRouter } from './router.tsx';
 
 export function App({ env, history }: { env: AppEnv; history?: RouterHistory }) {
@@ -15,6 +16,7 @@ export function App({ env, history }: { env: AppEnv; history?: RouterHistory }) 
       api: createApiClient(env),
       admin: createAdminClient(env),
       gl: createGlClient(env),
+      sales: createSalesClient(env),
     },
     // No automatic retries: a failed session check shows its error and a Retry button at once.
     queryClient: new QueryClient({ defaultOptions: { queries: { retry: false } } }),
