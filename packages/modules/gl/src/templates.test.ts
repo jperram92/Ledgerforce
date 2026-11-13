@@ -21,7 +21,7 @@ const find = (t: ChartTemplate, pred: (a: TemplateAccount) => boolean, what: str
   must(t.accounts.find(pred), what);
 
 describe('SS-PLAT-32: AU services SMB chart template is valid', () => {
-  it('knows exactly the 17 system roles listed in design §3.2', () => {
+  it('knows exactly the 17 core roles of design §3.2 plus the 7 period-end roles of §3.2/§3.10 [T-0117]', () => {
     expect([...SYSTEM_ROLES].sort()).toEqual(
       [
         'AR_CONTROL',
@@ -41,6 +41,14 @@ describe('SS-PLAT-32: AU services SMB chart template is valid', () => {
         'SUPER_PAYABLE',
         'DEFERRED_REVENUE',
         'CUSTOMER_PREPAYMENTS',
+        // Period-end roles (design §3.2 AASB note, §3.10; ADR-0061, T-0117).
+        'AR_ECL_ALLOWANCE',
+        'PREPAYMENTS',
+        'ACCUM_DEPRECIATION',
+        'DEPRECIATION_EXPENSE',
+        'ACCRUED_EXPENSES',
+        'SGC_PAYABLE',
+        'PRIOR_PERIOD_ADJUSTMENTS',
       ].sort(),
     );
     expect([...CONTROL_ROLES].sort()).toEqual(['AP_CONTROL', 'AR_CONTROL', 'PAYROLL_CLEARING']);

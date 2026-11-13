@@ -59,7 +59,8 @@
       "subtype": "receivable_allowance",
       "normalBalance": "credit",
       "postable": true,
-      "control": false
+      "control": false,
+      "systemRole": "AR_ECL_ALLOWANCE"
     },
     {
       "code": "1300",
@@ -68,7 +69,8 @@
       "subtype": "current_asset",
       "normalBalance": "debit",
       "postable": true,
-      "control": false
+      "control": false,
+      "systemRole": "PREPAYMENTS"
     },
     {
       "code": "1500",
@@ -87,7 +89,8 @@
       "subtype": "fixed_asset",
       "normalBalance": "credit",
       "postable": true,
-      "control": false
+      "control": false,
+      "systemRole": "ACCUM_DEPRECIATION"
     },
     {
       "code": "1820",
@@ -166,7 +169,8 @@
       "subtype": "current_liability",
       "normalBalance": "credit",
       "postable": true,
-      "control": false
+      "control": false,
+      "systemRole": "ACCRUED_EXPENSES"
     },
     {
       "code": "2370",
@@ -175,7 +179,8 @@
       "subtype": "current_liability",
       "normalBalance": "credit",
       "postable": true,
-      "control": false
+      "control": false,
+      "systemRole": "SGC_PAYABLE"
     },
     {
       "code": "2400",
@@ -261,7 +266,8 @@
       "subtype": "equity",
       "normalBalance": "debit",
       "postable": true,
-      "control": false
+      "control": false,
+      "systemRole": "PRIOR_PERIOD_ADJUSTMENTS"
     },
     {
       "code": "4110",
@@ -457,7 +463,8 @@
       "normalBalance": "debit",
       "postable": true,
       "control": false,
-      "defaultTaxCode": "N-T"
+      "defaultTaxCode": "N-T",
+      "systemRole": "DEPRECIATION_EXPENSE"
     },
     {
       "code": "6700",
@@ -515,13 +522,7 @@
     "merchant_fees_account": "6120",
     "bad_debts_account": "6500",
     "ecl_allowance_account": "1220",
-    "prepayments_account": "1300",
-    "accumulated_depreciation_account": "1510",
-    "depreciation_expense_account": "6600",
-    "accrued_expenses_account": "2360",
-    "sgc_payable_account": "2370",
-    "sgc_expense_account": "6420",
-    "prior_period_adjustments_account": "3400"
+    "sgc_expense_account": "6420"
   },
   "partyProfiles": [
     {

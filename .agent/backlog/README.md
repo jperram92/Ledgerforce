@@ -225,7 +225,7 @@ graph LR
 | [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | done | T-0010 |
 | [T-0115](T-0115.md) | AASB alignment: research Australian Accounting Standards and update the solution design | MVP | review | — |
 | [T-0116](T-0116.md) | Template roles, accounts and source types for the AASB/GST golden postings | MVP | review | T-0031 |
-| [T-0117](T-0117.md) | Promote period-end accounts to system roles (additive role binding) | Phase 1 | todo | T-0116 |
+| [T-0117](T-0117.md) | Promote period-end accounts to system roles (additive role binding) | Phase 1 | verifying | T-0116 |
 | [T-0118](T-0118.md) | Tax codes in the database: effective-dated tax_code table, company rounding setting, line wiring | MVP | review | T-0034 |
 | [T-0119](T-0119.md) | Chromium in the worker image and PDF rendering as a worker job | MVP | todo | T-0041 |
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
@@ -240,6 +240,8 @@ graph LR
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | todo | T-0047, T-0035 | UC-04 | 3 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
+| [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | todo | T-0117 | UC-11 | 0 |
+| [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:

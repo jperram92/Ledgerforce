@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { approvedTables, GoldenDraftError, parsePostings } from './postings.ts';
+import {
+  AU_SERVICES_BINDINGS,
+  approvedTables,
+  GoldenDraftError,
+  parsePostings,
+} from './postings.ts';
 
 const entry = (id: string, note = '', status = 'Approved') =>
   `## ${id} — fixture\n\n- **Status: ${status}** · Source type: \`manual_journal\`\n${note}\n` +
@@ -64,4 +69,17 @@ describe('append-only golden supersession [T-0166]', () => {
       ).toThrow(/earlier.*entry/i);
     },
   );
+});
+
+describe('AU_SERVICES_BINDINGS (ADR-0061)', () => {
+  it('AC-3 every system: golden binding resolves through a system role, never a code [T-0117]', () => {
+    const byCode = Object.entries(AU_SERVICES_BINDINGS)
+      .filter(([binding, target]) => binding.startsWith('system:') && !(target && 'role' in target))
+      .map(([binding]) => binding);
+    expect(byCode).toEqual([]);
+    for (const [binding, target] of Object.entries(AU_SERVICES_BINDINGS)) {
+      if (!binding.startsWith('system:') || !target || !('role' in target)) continue;
+      expect(target.role, binding).toBe(binding.slice('system:'.length));
+    }
+  });
 });

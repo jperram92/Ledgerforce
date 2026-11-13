@@ -63,6 +63,30 @@ describe('RLS completeness check', () => {
       await tdb.close();
     }
   });
+
+  it('FAILS for a view over tenant tables that is not security_invoker (ADR-0061) [T-0117]', async () => {
+    const tdb = await createTestDatabase({ migrate: true });
+    try {
+      const m = new pg.Client({ connectionString: tdb.url('lf_migrator') });
+      await m.connect();
+      await m.query(`
+        CREATE VIEW app.definer_view AS SELECT tenant_id, id FROM app.account;
+        CREATE VIEW app.invoker_view WITH (security_invoker = true) AS SELECT tenant_id, id FROM app.account;
+      `);
+      await m.end();
+      const byTable = Object.fromEntries(
+        (await findRlsViolations(tdb.admin)).map((x) => [x.table, x.problems]),
+      );
+      expect(byTable['app.definer_view']).toEqual([
+        "view is not security_invoker (would bypass the caller's RLS)",
+      ]);
+      expect(byTable['app.invoker_view']).toBeUndefined();
+      // The shipped view passes (positive control within the same schema).
+      expect(byTable['app.account_role_binding']).toBeUndefined();
+    } finally {
+      await tdb.close();
+    }
+  });
 });
 
 // The generated suite: one describe block per tenant-owned table, discovered at collection time.

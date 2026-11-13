@@ -2633,3 +2633,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Date: 2026-11-13 · By: claude under the owner's standing instruction · Task: T-0142 (split from T-0097) · Category: security
 - Decision: ADR-0054 is accepted. The owner instructed "accept all within risk" (DL-0405). The change only adds restrictions (response headers, strict CORS, per-address 429 limits on auth, mutating routes and webhooks; HSTS only behind https). It adds no runtime dependency (in-house limiter), and it is covered by 32 unit, 17 DB and 27 infra contract tests. Not covered and still a human question: T-0144's CSRF policy (reject cookie writes without Fetch-Metadata/Origin), which changes ~25 test files and gets its own ADR.
 - ADR: ADR-0054 · Status: accepted
+
+### DL-0463 — Period-end system roles get an additive binding table (ADR-0061 accepted, T-0117)
+- Date: 2026-11-13 · By: claude · Task: T-0117 · Category: data
+- Decision: The seven period-end roles (AR_ECL_ALLOWANCE, PREPAYMENTS, ACCUM_DEPRECIATION, DEPRECIATION_EXPENSE, ACCRUED_EXPENSES, SGC_PAYABLE, PRIOR_PERIOD_ADJUSTMENTS) are bound in a new table `app.account_system_role_ext` (migration 0062), with the same shape, RLS (ENABLE + FORCE), grants and check trigger as `app.account_system_role`. The engine and reporting now read the `security_invoker` view `app.account_role_binding`. The golden binding map resolves these accounts by role instead of by code. ADR-0061 (category data, no human gate) is accepted.
+- Why: the 0005 CHECK on `account_system_role.role` cannot be widened without DROP CONSTRAINT, which the forward-only rule forbids (RQ-0143 probe). Agent work was merged and re-validated on the combined branch: typecheck, lint and format were clean; gate golden PASS; db project (db, ledger, gl, ar, reporting) 1156/1156 with 0 skipped; unit (ledger, gl) 55/55.
+- Alternatives: DROP and re-add the CHECK (not forward-only); keep binding these accounts by code through template settings (the engine must find accounts by role, design §3.2).
+- ADR: ADR-0061 · Status: accepted
