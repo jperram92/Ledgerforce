@@ -2548,3 +2548,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   5. **Codex review** stays the process for every card in review. Merging does not mark any card done.
 - Why: The owner's explicit authority supersedes the earlier "waiting on owner" items (HANDOVER, DL-0285, RQ-0105).
 - ADR: none (records owner acceptance of the ADRs listed) · Status: accepted
+
+### DL-0406 — Invoice preview shares approval's journal builder; read routes under ar.read (T-0131)
+- Date: 2026-11-13 · By: claude · Task: T-0131 · Category: implementation (AR, API)
+- Decision: `approveInvoice`'s journal construction is extracted into `invoiceJournal` (read-only). Approve still applies the credit hold and takes the invoice number after building, then posts as before. `previewInvoiceJournal` runs the engine's `preview()` on the same command (source ar_invoice, entry date = issue date), so "Show me the journal" is exactly what approval posts and writes nothing. New `getInvoice` / `listInvoices`. API: `GET /ar/invoices`, `GET /ar/invoices/:id`, `GET /ar/invoices/:id/journal`, all `ar.read`. An invoice outside the tenant or company is 404.
+- Why: SS-UC01-10, design §3.9 (preview mode). One builder means preview and posting cannot drift.
+- Alternatives: rebuilding the journal in the API (two code paths that would drift).
+- Not here: approving one invoice over HTTP. The RBAC catalogue has no single-invoice approve permission (only ar.batch.approve), and adding one changes the security model (ADR-0023 role templates) → T-0132.
+- ADR: none · Status: accepted

@@ -1,0 +1,94 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:46263
+ ❯ |api-db| apps/api/src/ar/invoices.db.test.ts (4 tests | 4 failed) 1644ms
+     × lists the company invoices for ar.read, newest first, money as decimal strings 24ms
+     × shows one invoice with its lines 4ms
+     × SS-UC01-10 "Show me the journal" returns the engine preview (GP-001 totals) and writes nothing 4ms
+     × refuses without ar.read (403) and hides another tenant's invoice (404) 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > T-0131: invoice read routes > lists the company invoices for ar.read, newest first, money as decimal strings
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:104:22
+    102|   it('lists the company invoices for ar.read, newest first, money as d…
+    103|     const r = await call(`/ar/invoices?company_id=${f.companyId}&statu…
+    104|     expect(r.status).toBe(200);
+       |                      ^
+    105|     const body = (await r.json()) as { invoices: Record<string, unknow…
+    106|     expect(body.invoices).toEqual([
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > T-0131: invoice read routes > shows one invoice with its lines
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:120:22
+    118|   it('shows one invoice with its lines', async () => {
+    119|     const r = await call(`/ar/invoices/${draftId}?company_id=${f.compa…
+    120|     expect(r.status).toBe(200);
+       |                      ^
+    121|     const body = (await r.json()) as { lines: Record<string, unknown>[…
+    122|     expect(body).toMatchObject({ id: draftId, status: 'draft', pricing…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > T-0131: invoice read routes > SS-UC01-10 "Show me the journal" returns the engine preview (GP-001 totals) and writes nothing
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:134:22
+    132|     const before = await entries();
+    133|     const r = await call(`/ar/invoices/${draftId}/journal?company_id=$…
+    134|     expect(r.status).toBe(200);
+       |                      ^
+    135|     const body = (await r.json()) as { entry_date: string; total: stri…
+    136|     expect(body.entry_date).toBe('2026-11-05');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > T-0131: invoice read routes > refuses without ar.read (403) and hides another tenant's invoice (404)
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:148:84
+    146|
+    147|   it('refuses without ar.read (403) and hides another tenant\'s invoic…
+    148|     expect((await call(`/ar/invoices?company_id=${f.companyId}`, 'sale…
+       |                                                                                    ^
+    149|     expect((await call(`/ar/invoices/${foreignId}?company_id=${f.compa…
+    150|     expect((await call(`/ar/invoices/${foreignId}/journal?company_id=$…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  03:22:22
+   Duration  4.66s (transform 1.20s, setup 0ms, import 2.14s, tests 1.64s, environment 0ms)
+
