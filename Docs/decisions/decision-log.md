@@ -2586,3 +2586,24 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | T-0097 pilot hardening | 0460–0469 | 0054–0055 | 0141–0142 | T-0142–T-0144 |
 - Why: The owner asked for parallel agents (DL-0408); disjoint ranges keep the merges mechanical.
 - ADR: none · Status: accepted
+
+### DL-0460 — T-0097 round-2 branch name and start while T-0094/T-0096 are in review
+- Date: 2026-11-13 · By: claude · Task: T-0097 · Category: process
+- Decision: Work on local branch `feat/T-0097-pilot-hardening-r2` from `f8b10bd` (tip of `claude/loving-lovelace-nozqpk`, contains bcf4ab6). Start although T-0097's dependencies T-0094 and T-0096 are `review`, not `done`. `state.json` is not rewritten by this sub-agent.
+- Why: The lead assigned T-0097 to this agent (DL-0409). The name `feat/T-0097-pilot-hardening` is already held, at eba7510 with no T-0097 commits, by a lost round-1 worktree that this agent may not touch or delete (directive 6); the worktree's own HEAD (983cc91) predated bcf4ab6. The compose stack T-0094 built is what the slice hardens; review findings on it do not change the API middleware. `state.json` is shared by six parallel agents; the lead owns it during the round.
+- Alternatives: Force-moving the old branch (refused: checked out in another worktree, and rewriting refs of another session); waiting for T-0094/T-0096 review (blocks the round).
+- ADR: none · Status: accepted
+
+### DL-0461 — Split T-0097 into T-0142, T-0143 and T-0144
+- Date: 2026-11-13 · By: claude · Task: T-0097 · Category: scope
+- Decision: T-0097 is superseded (status blocked, kept) by T-0142 (API security headers, strict CORS, rate limits — built now), T-0143 (encrypted backup + restore drill with hash-chain verification; carries T-0097 AC-1) and T-0144 (CSRF Fetch-Metadata/Origin guard). T-0098 now depends on the three new cards.
+- Why: Together the work exceeds the ~400-line card limit (new-task-card skill). The CSRF fail-safe rule recommended by OWASP (RQ-0141 F7) changes the session helpers of ~25 existing DB test files and needs its own security ADR; backups need their own research (encryption, key custody, PITR, RQ-0142).
+- Alternatives: One large card (violates the size rule); dropping CSRF from scope (design §6.9 requires it).
+- ADR: none · Status: accepted
+
+### DL-0462 — API security headers, strict CORS and rate limits in-house (ADR-0054, Proposed)
+- Date: 2026-11-13 · By: claude · Task: T-0142 · Category: security
+- Decision: Resolve RQ-0141 and propose ADR-0054: OWASP REST header set on every API response, no X-Powered-By, HSTS only for an https public URL, CORS never enabled, fixed-window per-address limits (auth 30, mutating 300, webhook 600 per 60 s) answering 429 + Retry-After before routing, `trust proxy` = `LF_TRUST_PROXY_HOPS` (0–5, default 0; compose 1). Built as in-house Express middleware, no new runtime dependency.
+- Why: RQ-0141 (OWASP REST/HTTP-headers/DoS/CSRF cheat sheets; Express 5.2.1 and proxy-addr source). Libraries (helmet, @nestjs/throttler) would add runtime dependencies for ~100 lines of policy and keep in-memory counters too.
+- Alternatives: helmet + @nestjs/throttler; edge-only limits in nginx (see ADR-0054).
+- ADR: ADR-0054 · Status: proposed (awaiting human)
