@@ -11,7 +11,7 @@
 > - T-0120: approved batches posted and emailed by the worker; job queues installed at deploy, DL-0471.
 > - T-0079 and T-0117 are also in review.
 >
-> Rounds 3 (DL-0472) and 4 (DL-0473) are merged, verified and in review: T-0151, T-0085, T-0149, T-0088, T-0145, T-0123 (wizard slice 1, migration 0065), T-0136, T-0153 and T-0087. Follow-ups: T-0150 (bank preview), T-0152 (refunds; blocked on the owner), T-0154 (ABA download), T-0157 (wizard routes; permission question), T-0158 (wizard settings) and T-0159 (ECL setting deprecation; needs the next migration, 0066).
+> Rounds 3 (DL-0472) and 4 (DL-0473) are merged, verified and in review: T-0151, T-0085, T-0149, T-0088, T-0145, T-0123 (wizard slice 1, migration 0065), T-0136, T-0153 and T-0087. Follow-ups: T-0150 (bank preview), T-0152 (refunds; blocked on the owner), T-0154 (ABA download), T-0157 (wizard routes; permission question), T-0158 (wizard settings) and T-0159 (done: migration 0066, in review). Round 5 (DL-0476) is merged and validated: T-0154 (ABA download; depends on the blocked T-0057), T-0158 (wizard settings; migration 0067; ADR-0071 Proposed until cross-review) and T-0150 (bank journal preview). New cards: T-0160, T-0161, T-0162, T-0163, T-0164, T-0165. The next migration is 0068.
 > T-0119 (Chromium in the worker image) needs docker image builds, a compose smoke run and the image scan, so it is better done where docker is available. Other ready cards: T-0087, T-0110, T-0119, T-0126, T-0127, T-0130, T-0143 and T-0168. The next migration is 0065.
 >
 > Codex cross-review (gate 8) is pending for every card in review. Gate 2c stays PENDING until main's baseline is re-recorded as unit+db; the tree is at 93.63%.
@@ -21,6 +21,9 @@
 - **(Resolved 2026-11-13, DL-0466)** ADR-0062: the owner accepted option 1 (fan-out from the lf_migrator maintenance instance). T-0147 is unblocked.
 - **Refund permission (T-0152, blocked).** The catalogue has no permission for customer refunds, so the refund routes and screen, and the refund half of SS-UC11-08, cannot be built without a security ADR. Which permission (for example `ar.refund.create` / `ar.refund.pay`), which role templates get it, and does paying a refund go through the payment-batch SoD rules? (DL-0491)
 - **T-0157 permission.** Should the setup wizard routes reuse `settings.chart.manage`, or get a new permission? A new permission is a security change (DL-0523).
+- **Payment-file routes (DL-0541).** The ABA download and bank-confirmation routes check only `ap.payment_batch.release`: no SoD step and no step-up (DL-0292/DL-0304). Adding either changes the security model. The screen (T-0154) already handles both if they are added.
+- **Statement upload size (T-0161, RQ-0151).** Is a route-scoped 10 MB JSON body limit for statement import a security change under design §6.9? ADR-0054's rate limits still apply.
+- **Network: ato.gov.au** is blocked in this session. RQ-0153's ATO thresholds come from search results and should be re-checked against the pages.
 - **T-0132 needs a security ADR:** a new `ar.invoice.approve` permission and the role templates that get it (ADR-0023). It is the owner's decision; the card stays todo until then.
 - **CSRF policy (T-0144, security ADR to write).** Should cookie-authenticated writes that carry neither Fetch-Metadata nor Origin be rejected (OWASP recommends it)? That changes ~25 session-based DB test files. Owner decision or explicit delegation needed.
 - **Network:** research for T-0143 (backups) needs postgresql.org, which the session proxy blocks; allowing it in the environment would help.
