@@ -7,3 +7,4 @@ export * from './write-off.ts';
 export * from './aged.ts';
 export * from './writeback.ts';
 export * from './refunds.ts';
+export * from './reminders.ts';

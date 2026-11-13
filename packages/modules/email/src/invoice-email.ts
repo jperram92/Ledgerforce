@@ -39,7 +39,7 @@ export class EmailError extends Error {
   }
 }
 
-async function alreadySent(trx: Trx, companyId: string, key: string): Promise<boolean> {
+export async function alreadySent(trx: Trx, companyId: string, key: string): Promise<boolean> {
   const r = await trx
     .selectFrom('app.email_delivery')
     .select('id')
@@ -50,7 +50,7 @@ async function alreadySent(trx: Trx, companyId: string, key: string): Promise<bo
 }
 
 /** Send once per dedupe key: skip if recorded, send, then record (same transaction). */
-async function sendOnce(
+export async function sendOnce(
   trx: Trx,
   sender: EmailSender,
   c: { companyId: string; purpose: EmailPurpose; key: string; message: EmailMessage },

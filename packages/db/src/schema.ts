@@ -419,6 +419,28 @@ export interface ProductTable {
 }
 
 /** Migration 0035 (T-0040): sales invoice; frozen once posted. */
+/** Migration 0059 (T-0068): overdue reminder steps per company (UC-04). Steps are disabled, never deleted. */
+export interface ArReminderScheduleTable {
+  tenant_id: TenantId;
+  company_id: string;
+  step: number;
+  days_overdue: number;
+  enabled: Generated<boolean>;
+  created_at: Timestamp;
+}
+
+/** Migration 0059 (T-0068): overdue reminder log, one row per invoice and step. Insert-only. */
+export interface ArReminderTable {
+  tenant_id: TenantId;
+  company_id: string;
+  invoice_id: string;
+  step: number;
+  run_date: ColumnType<Date, string, never>;
+  days_overdue: number;
+  amount_due: string;
+  created_at: Timestamp;
+}
+
 export interface SalesInvoiceTable {
   id: Generated<string>;
   tenant_id: TenantId;
@@ -1191,6 +1213,8 @@ export interface Database {
   'app.salesforce_profile_mapping': SalesforceProfileMappingTable;
   'app.posting_profile_override': PostingProfileOverrideTable;
   'app.sales_invoice': SalesInvoiceTable;
+  'app.ar_reminder_schedule': ArReminderScheduleTable;
+  'app.ar_reminder': ArReminderTable;
   'app.sales_invoice_line': SalesInvoiceLineTable;
   'app.ar_settings': ArSettingsTable;
   'app.credit_note': CreditNoteTable;

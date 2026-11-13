@@ -1,0 +1,64 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+ ❯ |unit| packages/modules/ar/src/reminders.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/ar/src/reminders.test.ts [ packages/modules/ar/src/reminders.test.ts ]
+Error: Cannot find module './reminders.ts' imported from /home/user/Ledgerforce/packages/modules/ar/src/reminders.test.ts
+ ❯ packages/modules/ar/src/reminders.test.ts:5:1
+      3|  */
+      4| import { describe, expect, it } from 'vitest';
+      5| import { selectDueReminders, type ReminderCandidate } from './reminder…
+       | ^
+      6|
+      7| const STEP1 = [{ step: 1, daysOverdue: 7 }];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  00:29:28
+   Duration  174ms (transform 24ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41669
+ ❯ |db| packages/modules/ar/src/reminders.db.test.ts (0 test)
+ ❯ |db| packages/modules/email/src/reminder-email.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/reminders.db.test.ts [ packages/modules/ar/src/reminders.db.test.ts ]
+Error: Cannot find module './reminders.ts' imported from /home/user/Ledgerforce/packages/modules/ar/src/reminders.db.test.ts
+ ❯ packages/modules/ar/src/reminders.db.test.ts:11:1
+      9| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     10| import { approveInvoice, createDraftInvoice, type DocumentEvent } from…
+     11| import {
+       | ^
+     12|   INVOICE_OVERDUE,
+     13|   REMINDER_QUEUED,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |db| packages/modules/email/src/reminder-email.db.test.ts [ packages/modules/email/src/reminder-email.db.test.ts ]
+Error: Cannot find module './reminder-email.ts' imported from /home/user/Ledgerforce/packages/modules/email/src/reminder-email.db.test.ts
+ ❯ packages/modules/email/src/reminder-email.db.test.ts:16:1
+     14| import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/…
+     15| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     16| import { REMINDER_QUEUED_TOPIC, reminderEmailHandler } from './reminde…
+       | ^
+     17| import { SmtpSender } from './sender.ts';
+     18| import { SmtpSink } from './testing/smtp-sink.ts';
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  no tests
+   Start at  00:29:29
+   Duration  2.18s (transform 687ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

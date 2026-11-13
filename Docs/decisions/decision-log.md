@@ -2508,3 +2508,11 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: The card required real rendered-PDF evidence, not an HTML preview (Codex's note); Chromium is available in this environment.
 - Alternatives: PDF-to-image CLI (not installed, would be a new tool); HTML screenshot (does not prove the PDF).
 - ADR: none · Status: accepted
+
+### DL-0402 — Overdue reminders: schedule, insert-only log, two outbox events (T-0068)
+- Date: 2026-11-13 · By: claude · Task: T-0068 · Category: implementation (AR, email, Salesforce write-back)
+- Decision: Migration 0059 adds `app.ar_reminder_schedule` (steps per company, seeded step 1 at 7 days, disabled rather than deleted) and `app.ar_reminder` (one insert-only row per invoice and step). `runOverdueReminders` (AR) reads each posted invoice's AR open item as at the run date (allocations up to that date, same sign rule as ageing). It queues the latest enabled step reached, never a lower step after a higher one, and only for a positive open amount. In the same transaction it publishes `ar.reminder.queued` (email) and, for Salesforce-linked customers, `invoice.overdue` with the §5.4 contract-v1 `accounts` snapshot from `accountWriteBack`, which sets LF_Credit_Status__c = Overdue. The email handler `email.reminder_queued` reuses the idempotent `sendOnce` (now exported) with key `reminder:<invoice>:<step>`.
+- Why: UC-04 steps 1–3 and alternates A1/A2; configuration over code; the outbox keeps the email and the write-back retryable and transactional with the log.
+- Alternatives: sending email inside the run (not retryable and not transactional); a per-invoice reminder flag on sales_invoice (an UPDATE path on documents, with no history of steps); reminders on credit notes (credits are never overdue, same rule as ageing).
+- Not in this card: AR Clerk pausing reminders per party (UC-04 security note; needs the audited setting); Salesforce Task and credit hold (Phase 1, T-0100); the scheduled job wiring in apps/worker (it calls `runOverdueReminders` per company daily; the follow-up is in the card).
+- ADR: none · Status: accepted
