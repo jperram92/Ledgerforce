@@ -302,3 +302,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-13T03:37:42.985Z claude: release T-0131 → review (verify 14 PASS at da9ede8; 2c/4 known; awaiting codex review)
 - 2026-11-13T03:46:59.109Z claude: T-0083 → verifying
 - 2026-11-13T04:00:10.167Z claude: release T-0083 → review (verify 15 PASS at 99d574f; 2c pending T-0128; awaiting codex review)
+- 2026-11-13T09:33:22.094Z claude: release T-0117 → review (full verify 13 PASS; gate 12 failed only on an unrelated card's missing blocked_reason (fixed in 3f28cd3); 2c PENDING by design (main baseline measure); 8 awaits Codex)
