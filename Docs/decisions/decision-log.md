@@ -2906,3 +2906,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | Lead | T-0145 and merges | 0474–0479 | 0068 | 0150 | T-0159+ |
 - Why: The owner asked for parallel sub-agents (DL-0408). The cards touch disjoint modules (ap screens, ap inbox, setup).
 - ADR: none · Status: accepted
+
+### DL-0474 — Write-off finds the ECL allowance by role; the setting is deprecated and may only agree (T-0145, ADR-0068)
+- Date: 2026-11-13 · By: claude · Task: T-0145 · Category: data
+- Decision: `writeOffInvoice` posts the allowance line as `{ role: 'AR_ECL_ALLOWANCE' }` and reads the remaining allowance from the role-bound account. It needs only the bad-debt account in AR settings. A deprecated `ecl_allowance_account_id` that differs from the role binding is refused with NOT_CONFIGURED; when it agrees, as with the template default 1220, behaviour is unchanged. ADR-0068 is accepted (category data). The column comment and the template clean-up are T-0159, since the lead has no migration slot this round (DL-0473).
+- Why: design §3.2 (accounts by role) and ADR-0061; one source of truth, so provisions and write-offs use the same account.
+- Alternatives: setting overrides role (two sources); dropping the column (forbidden).
+- ADR: ADR-0068 · Status: accepted

@@ -1,0 +1,58 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:40371
+ ❯ |db| packages/modules/ar/src/write-off-role.db.test.ts (3 tests | 2 failed) 1078ms
+     × AC-1/AC-3 with no allowance setting, the write-off draws the role-bound allowance (GP-024 shape) 106ms
+     × a deprecated allowance setting that disagrees with the role is refused, nothing posted 100ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/write-off-role.db.test.ts > T-0145: write-off resolves the ECL allowance by role > AC-1/AC-3 with no allowance setting, the write-off draws the role-bound allowance (GP-024 shape)
+WriteOffError: set the ECL allowance and bad-debt accounts in AR settings
+ ❯ writeOffInvoice packages/modules/ar/src/write-off.ts:87:11
+     85|     .executeTakeFirst();
+     86|   if (!settings?.ecl_allowance_account_id || !settings.bad_debt_accoun…
+     87|     throw new WriteOffError(
+       |           ^
+     88|       'NOT_CONFIGURED',
+     89|       'set the ECL allowance and bad-debt accounts in AR settings',
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/write-off-role.db.test.ts:102:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |db| packages/modules/ar/src/write-off-role.db.test.ts > T-0145: write-off resolves the ECL allowance by role > a deprecated allowance setting that disagrees with the role is refused, nothing posted
+AssertionError: promise resolved "{ …(6) }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "allowance": "0.0000",
++   "entryId": "01a1d5b8-42d7-753b-abb8-4c9604f9aba5",
++   "expense": "1250.0000",
++   "gross": "1375.0000",
++   "gstAdjustment": "125.0000",
++   "writeOffId": "01a1d5b8-42ea-7999-b49a-b9e41d39b947",
+  }
+
+ ❯ packages/modules/ar/src/write-off-role.db.test.ts:146:6
+    144|         }),
+    145|       ),
+    146|     ).rejects.toMatchObject({
+       |      ^
+    147|       code: 'NOT_CONFIGURED',
+    148|       message: expect.stringMatching(/AR_ECL_ALLOWANCE/),
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  16:23:02
+   Duration  2.63s (transform 482ms, setup 0ms, import 729ms, tests 1.08s, environment 0ms)
+

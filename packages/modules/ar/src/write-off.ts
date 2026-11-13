@@ -83,10 +83,27 @@ export async function writeOffInvoice(
     .select(['ecl_allowance_account_id', 'bad_debt_account_id'])
     .where('company_id', '=', companyId)
     .executeTakeFirst();
-  if (!settings?.ecl_allowance_account_id || !settings.bad_debt_account_id) {
+  if (!settings?.bad_debt_account_id) {
+    throw new WriteOffError('NOT_CONFIGURED', 'set the bad-debt account in AR settings');
+  }
+  // The allowance is found by its system role (design §3.2, ADR-0061, ADR-0068, T-0145).
+  // ar_settings.ecl_allowance_account_id is deprecated: it may only agree with the role, so the
+  // write-off never draws on a second "allowance" account.
+  const eclAllowanceId = (
+    await sql<{ account_id: string }>`
+      SELECT account_id::text FROM app.account_role_binding
+       WHERE company_id = ${companyId} AND role = 'AR_ECL_ALLOWANCE'`.execute(trx)
+  ).rows[0]?.account_id;
+  if (!eclAllowanceId) {
     throw new WriteOffError(
       'NOT_CONFIGURED',
-      'set the ECL allowance and bad-debt accounts in AR settings',
+      'bind the AR_ECL_ALLOWANCE system role to the ECL allowance account',
+    );
+  }
+  if (settings.ecl_allowance_account_id && settings.ecl_allowance_account_id !== eclAllowanceId) {
+    throw new WriteOffError(
+      'NOT_CONFIGURED',
+      'the AR settings ECL allowance account differs from the account bound to AR_ECL_ALLOWANCE; clear the setting or re-bind the role',
     );
   }
   const inv = await trx
@@ -119,7 +136,7 @@ export async function writeOffInvoice(
       await sql<{ b: string }>`
         SELECT coalesce(sum(l.credit - l.debit), 0)::text AS b FROM app.journal_line l
           JOIN app.journal_entry e ON e.tenant_id = l.tenant_id AND e.id = l.entry_id
-         WHERE l.company_id = ${companyId} AND l.account_id = ${settings.ecl_allowance_account_id}::uuid
+         WHERE l.company_id = ${companyId} AND l.account_id = ${eclAllowanceId}::uuid
            AND e.status <> 'draft'`.execute(trx)
     ).rows[0]?.b ?? '0',
   );
@@ -149,7 +166,7 @@ export async function writeOffInvoice(
         ...(allowance.gt(0)
           ? [
               {
-                account: { id: settings.ecl_allowance_account_id },
+                account: { role: 'AR_ECL_ALLOWANCE' },
                 debit: numeric(allowance),
                 partyId: inv.party_id,
               },
