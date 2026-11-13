@@ -11,7 +11,8 @@
 > - T-0120: approved batches posted and emailed by the worker; job queues installed at deploy, DL-0471.
 > - T-0079 and T-0117 are also in review.
 >
-> Next ready cards: T-0085, T-0087, T-0088, T-0110, T-0119, T-0126, T-0127, T-0130, T-0143 and T-0168. The next migration is 0065.
+> Parallel round 3 (DL-0472) is running in isolated worktrees on local branches `feat/T-0088-bank-rec` (bank reconciliation routes T-0149 + screens T-0088) and `feat/T-0085-ar-cash` (AR cash routes + screens T-0085). Merge each after re-running its tests on the combined branch; if an agent stopped, its branch holds its wip commits.
+> T-0119 (Chromium in the worker image) needs docker image builds, a compose smoke run and the image scan, so it is better done where docker is available. Other ready cards: T-0087, T-0110, T-0119, T-0126, T-0127, T-0130, T-0143 and T-0168. The next migration is 0065.
 >
 > Codex cross-review (gate 8) is pending for every card in review. Gate 2c stays PENDING until main's baseline is re-recorded as unit+db; the tree is at 93.63%.
 
