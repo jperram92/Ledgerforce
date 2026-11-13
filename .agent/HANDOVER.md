@@ -1,12 +1,11 @@
-# Handover: Line A fully integrated; T-0061 verifying; coverage gate needs the owner (2026-11-12)
+# Handover: merged to main (PR #4, 983cc91); two oversight-control changes need explicit owner OK (2026-11-13)
 
 ## Codex continuation prompt
-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file. Branch `claude/loving-lovelace-nozqpk`. All Line A branches, including feat/T-0041-pdf-format-repair (6d7531d), are merged here; mapping in `Docs/decisions/line-a-renumbering.md`. T-0061 (bank reconciliation) is in verifying: if `.agent/evidence/T-0061/verify-*.txt` is missing, run `VITEST_MAX_WORKERS=1 bash scripts/agent/verify.sh --task T-0061`, save it there, and release to review if only gates 2c/4/8 are non-green (they are branch-wide: coverage → T-0128/RQ-0105, golden → owner merge, review → Codex). Then continue with the next dependency-ready card via `node scripts/agent/conductor.ts next`. Codex: cross-review T-0121 (4489329, 6b2c4ce) and the Line A cards in review.
+> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0405. Branch `claude/loving-lovelace-nozqpk` == main at 983cc91 (owner-authorised merge, https://github.com/jperram92/Ledgerforce/pull/4). Cards awaiting Codex cross-review: T-0121, T-0041, T-0061, T-0068, T-0075, T-0078 and the integrated Line A cards. Claude continues building the next dependency-ready cards (`node scripts/agent/conductor.ts next`).
 
 ## Open questions for human
-- Coverage gate 2c (RQ-0105): unit-only coverage counts DB-tested modules as untested (58.8 % vs 72.22 %). Like for like (unit+db) it is 93.70 % vs main's 93.95 %. Should gate 2c measure unit+db, with main's baseline re-recorded under that measure? T-0128 then closes the remaining 0.25-point gap with real tests either way.
-- Merge to main: the golden gate (gate 4) can only pass once the owner merges Line A's additive golden entries (GP-037; later T-0166 supersessions) to main.
-- Security ADR-0049 (Stripe webhook endpoint and tenant routing) is Proposed and needs the owner's acceptance.
+- **Golden approval registry refresh (blocked by the session's permission classifier as an oversight-control change).** After the merge, `goldenGuard` fails because `Docs/decisions/golden-approvals.json` pins postings.md to the old snapshot 334a3f9 and main now holds GP-037…039. Per ADR-0047 the remedy is a refreshed record `{path: Docs/accounting/postings.md, commit: 983cc919f4911c5dd55e6e8bf9ff1e1f6a2ff404, decisions: [DL-0405, DL-0263, DL-0256, DL-0258]}`. Please approve the edit (or make it yourself); until then gate 4 stays FAIL on every branch.
+- **Coverage gate measure (T-0128, RQ-0105).** Changing verify.sh gate 2c to unit+db coverage and re-recording main's baseline under that measure is also a change to a check. Not done without your explicit OK; the alternative is adding unit tests to recover about 13.7 points of unit-only coverage.
 
 ## State
 - Done: security workflow remediation (RQ-0100, DL-0282–0284), owner-approved Gitleaks exception, full verify 14 PASS, Claude cross-review of Codex's commits (FAIL C6).
