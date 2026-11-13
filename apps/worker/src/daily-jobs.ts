@@ -19,7 +19,7 @@
 import { createHash } from 'node:crypto';
 import { runOverdueReminders, type DocumentOutbox } from '@ledgerforce/ar';
 import { withTenant, type Database } from '@ledgerforce/db';
-import type { Kysely } from 'kysely';
+import { sql, type Kysely } from 'kysely';
 import pg from 'pg';
 import type { PgBoss } from 'pg-boss';
 
@@ -116,12 +116,12 @@ export async function runTenantReminders(
   now: Date,
 ): Promise<TenantReminderRun> {
   return withTenant(db, tenantId, async (trx) => {
-    const settings = await trx
-      .selectFrom('app.sod_settings')
-      .select('report_timezone')
-      .orderBy('set_at', 'desc')
-      .orderBy('id', 'desc')
-      .executeTakeFirst();
+    // app.sod_settings is history; the latest row wins (0021). Not in the Kysely schema, so plain SQL.
+    const { rows: zone } = await sql<{ report_timezone: string }>`
+      SELECT report_timezone FROM app.sod_settings ORDER BY set_at DESC, id DESC LIMIT 1`.execute(
+      trx,
+    );
+    const settings = zone[0];
     const runDate = localDate(now, settings?.report_timezone ?? DEFAULT_ZONE);
     const companies = await trx.selectFrom('app.company').select('id').orderBy('id').execute();
     const out: { companyId: string; queued: number }[] = [];

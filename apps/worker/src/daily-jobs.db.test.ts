@@ -93,7 +93,10 @@ afterAll(async () => {
   await (f as LedgerFixture | undefined)?.close();
 });
 
-const asRole = async <T>(role: string, fn: (c: pg.Client) => Promise<T>): Promise<T> => {
+const asRole = async <T>(
+  role: 'lf_app' | 'lf_migrator',
+  fn: (c: pg.Client) => Promise<T>,
+): Promise<T> => {
   const c = new pg.Client({ connectionString: f.tdb.url(role) });
   await c.connect();
   try {
