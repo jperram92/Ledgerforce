@@ -1,23 +1,42 @@
 /**
  * Create a transaction from a statement line (T-0088, UC-08 step 4, SS-UC08-08). The person picks
- * the account that takes the other side (a rule's suggestion is preselected) and posts. The API
- * (T-0149) builds the manual journal, puts the bank line on the bank account's GL account, and
- * posts it through the posting engine with the manual-journal rules: control accounts refused,
- * approval above the threshold, period checks. The screen does no arithmetic: the amount is the
- * line's own decimal string without its sign.
+ * the account that takes the other side (a rule's suggestion is preselected), sees the journal the
+ * posting engine would post (T-0150, P4 "show the journal before you post": rebuilt when the
+ * account, amount or memo changes; posting is offered only while the journal on screen is the one
+ * for what the form says) and posts. The API (T-0149) builds the manual journal, puts the bank
+ * line on the bank account's GL account, and posts it through the posting engine with the
+ * manual-journal rules: control accounts refused, approval above the threshold, period checks.
+ * The screen does no arithmetic: the amount is the line's own decimal string without its sign.
  */
-import { Money } from '@ledgerforce/ui';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { JournalTable, Money } from '@ledgerforce/ui';
+import { useMutation, useQuery, useQueryClient, type UseQueryResult } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Empty, Failure, Loading, PageHead, useFailureRouting } from '../admin/common.tsx';
 import { useServices } from '../env.tsx';
-import { accountLabel, counterAmount, lineIsMoneyIn, newKey } from './bank-logic.ts';
+import { typeGloss } from '../gl/gl-logic.ts';
+import {
+  accountLabel,
+  counterAmount,
+  lineIsMoneyIn,
+  newKey,
+  transactionInput,
+} from './bank-logic.ts';
 import { BankForbidden, BankRefusal, dateText, Region, useBankContext } from './common.tsx';
-import type { TransactionInput, TransactionResult } from './client.ts';
+import type { TransactionInput, TransactionPreview, TransactionResult } from './client.ts';
 
 const TITLE = 'Create a transaction';
 const GLOSS = 'Record a bank line that is not in your books yet, such as a bank fee or interest.';
+
+/** The value once it has stopped changing for `ms`, so typing does not ask the API each key. */
+function useSettled<T>(value: T, ms: number): T {
+  const [settled, setSettled] = useState(value);
+  useEffect(() => {
+    const t = setTimeout(() => setSettled(value), ms);
+    return () => clearTimeout(t);
+  }, [value, ms]);
+  return settled;
+}
 
 export function TransactionPage({
   accountId,
@@ -49,6 +68,25 @@ export function TransactionPage({
   const [memo, setMemo] = useState('');
   const [key, setKey] = useState(() => newKey('transaction'));
   const [done, setDone] = useState<TransactionResult | null>(null);
+  // One request body for the preview and the post, so the post sends what the preview showed.
+  const request = line
+    ? transactionInput(line, accountChoice ?? suggestion?.account_id ?? '', amount, memo)
+    : null;
+  const requestText = request === null ? null : JSON.stringify(request);
+  const settledText = useSettled(requestText, 300);
+  // Not under ['bank']: posting invalidates ['bank'], and the posted line has no journal to preview.
+  const preview = useQuery({
+    queryKey: ['bank-transaction-preview', ctx.companyId, lineId ?? '', settledText],
+    queryFn: () =>
+      bank.previewTransaction(
+        ctx.companyId,
+        lineId ?? '',
+        JSON.parse(settledText ?? '{}') as TransactionInput,
+      ),
+    enabled: enabled && settledText !== null && done === null && line?.status === 'unmatched',
+  });
+  /** The journal on screen is the one for what the form says now. */
+  const previewCurrent = settledText === requestText && preview.isSuccess && !preview.isFetching;
   const post = useMutation({
     mutationFn: (input: TransactionInput) =>
       bank.createTransaction(ctx.companyId, lineId ?? '', input, key),
@@ -108,14 +146,7 @@ export function TransactionPage({
   const amountText = amount ?? counterAmount(line.amount);
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    const trimmed = memo.trim();
-    post.mutate({
-      lines: [{ account_id: chosen, amount: amountText.trim() }],
-      ...(suggestion && suggestion.account_id === chosen
-        ? { from_suggestion_id: suggestion.id }
-        : {}),
-      ...(trimmed === '' ? {} : { memo: trimmed }),
-    });
+    if (request && previewCurrent) post.mutate(request);
   };
 
   return (
@@ -193,13 +224,77 @@ export function TransactionPage({
             </p>
             <label htmlFor="txn-memo">Memo (optional)</label>
             <input id="txn-memo" value={memo} onChange={(e) => setMemo(e.target.value)} />
-            <button type="submit" className="primary" disabled={post.isPending}>
+            <JournalPreview request={requestText} settled={settledText} preview={preview} />
+            <button
+              type="submit"
+              className="primary"
+              disabled={post.isPending || !previewCurrent}
+              aria-describedby="txn-post-hint"
+            >
               Post transaction
             </button>
+            <p className="admin-note" id="txn-post-hint">
+              {previewCurrent
+                ? 'Posting records exactly the journal shown above.'
+                : 'You can post once the journal above is built.'}
+            </p>
             {post.isError ? <BankRefusal error={post.error} what="post this transaction" /> : null}
           </form>
         )}
       </Region>
     </>
+  );
+}
+
+/** The posting engine's journal for the form as it is now, or why there is none (P4, P6). */
+function JournalPreview({
+  request,
+  settled,
+  preview,
+}: {
+  request: string | null;
+  settled: string | null;
+  preview: UseQueryResult<TransactionPreview>;
+}) {
+  let body;
+  if (request === null) {
+    body = (
+      <p className="admin-note">
+        Choose an account and enter the amount, like 10.00, to see the journal.
+      </p>
+    );
+  } else if (request !== settled || preview.isPending || preview.isFetching) {
+    body = <p className="admin-note">Building the journal LedgerForce would post…</p>;
+  } else if (preview.isError) {
+    body = <BankRefusal error={preview.error} what="build the journal" />;
+  } else {
+    const p = preview.data;
+    body = (
+      <>
+        <p className="admin-note">
+          This is the journal LedgerForce would post, from the posting engine itself. Nothing is
+          posted yet.
+          {p.redirected
+            ? ` The date ${p.requested_date} is in a closed period, so it would post on ${p.entry_date}.`
+            : ''}
+        </p>
+        <JournalTable
+          journal="preview"
+          currency={p.base_currency}
+          lines={p.lines.map((l) => ({
+            code: l.account_code,
+            account: l.account_name,
+            gloss: typeGloss(l.account_type),
+            ...(l.debit !== '0.0000' ? { debit: l.debit } : { credit: l.credit }),
+          }))}
+        />
+      </>
+    );
+  }
+  return (
+    <div className="bank-journal" aria-live="polite">
+      <h3>The journal it will post</h3>
+      {body}
+    </div>
   );
 }
