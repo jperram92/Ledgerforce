@@ -169,7 +169,7 @@ graph LR
 | [T-0072](T-0072.md) | LWC Account component (balance, overdue, last payment, 5 recent invoices) | MVP | review | T-0067, T-0062 | UC-12 | 3 |
 | [T-0073](T-0073.md) | Stripe payment links on invoices | MVP | review | T-0042 | UC-03 | 1 |
 | [T-0074](T-0074.md) | Stripe webhooks (signed, replay-protected) → receipt into clearing | MVP | review | T-0073, T-0046, T-0031 | UC-03, UC-11 | 5 |
-| [T-0075](T-0075.md) | Stripe payout reconciliation (net settlement, fees, GST on fees) | MVP | todo | T-0074, T-0060, T-0031 | UC-03 | 2 |
+| [T-0075](T-0075.md) | Stripe payout reconciliation (net settlement, fees, GST on fees) | MVP | verifying | T-0074, T-0060, T-0031 | UC-03 | 2 |
 | [T-0076](T-0076.md) | Trial balance, profit & loss and balance sheet | MVP | review | T-0027 | UC-10 | 1 |
 | [T-0077](T-0077.md) | GL detail and aged AR/AP reports | MVP | review | T-0076, T-0028, T-0049 | — | 0 |
 | [T-0078](T-0078.md) | Month-end close checklist (UC-10) | MVP | todo | T-0023, T-0061, T-0076 | UC-10 | 5 |
