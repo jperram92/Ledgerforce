@@ -1,7 +1,7 @@
 ---
 adr: 0010
 title: "Payroll by integration (payroll bridge) until Phase 3; no native payroll calculation or STP lodgement"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: accounting
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0010: Payroll by integration (payroll bridge) until Phase 3
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — design-committed (D5, §1 scope boundaries, §9.1, §11.1). It sets product scope and
 the accounting treatment of payroll (journals, liabilities), so the `adr:accounting` gate

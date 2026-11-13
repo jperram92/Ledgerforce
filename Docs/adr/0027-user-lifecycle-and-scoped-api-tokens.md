@@ -1,7 +1,7 @@
 ---
 adr: 0027
 title: "User lifecycle (joiner/mover/leaver) and scoped personal API tokens"
-status: Proposed
+status: Accepted
 date: 2026-10-25
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0027: User lifecycle (joiner/mover/leaver) and scoped personal API tokens
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, waiting for product-owner acceptance. It extends ADR-0016
 (sessions), ADR-0023 (roles), ADR-0025 (MFA and step-up) and ADR-0026 (SoD) without changing

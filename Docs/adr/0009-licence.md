@@ -1,7 +1,7 @@
 ---
 adr: 0009
 title: "Licence: AGPL-3.0 core, Apache-2.0 SDKs and Salesforce package (open decision)"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: process
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0009: Licence — AGPL-3.0 core, Apache-2.0 SDKs and Salesforce package (open decision)
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — **open decision for the product owner** (design §11.2 "Licence"; §7.4 says "the final
 call is ADR-0009"). Not design-committed: the design gives a recommendation and an alternative.

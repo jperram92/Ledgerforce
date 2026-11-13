@@ -70,36 +70,36 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0013](0013-db-test-harness-testcontainers-local-pg.md) | Database test harness: Testcontainers with local PostgreSQL fallback | tooling | no | Accepted |
 | [0014](0014-no-delete-superseding-forward-only-migrations.md) | No-delete policy; superseding; forward-only additive migrations | process | no | Accepted |
 | [0015](0015-playwright-screenshot-evidence.md) | Playwright screenshot evidence for every UI/report success scenario | process | no | Accepted |
-| [0016](0016-oidc-login-and-server-side-sessions.md) | OIDC login with tenant-scoped server-side sessions, idle/absolute timeouts and revoke-all | security | yes | Proposed |
-| [0017](0017-journal-hash-chain-canonical-form-v1.md) | Journal hash chain: canonical form v1 (netstrings), computed in the database at commit | accounting | yes | Proposed |
-| [0018](0018-envelope-encryption-local-keyring-kms.md) | Envelope encryption of bank account numbers with a pluggable KMS; local keyring for self-host MVP | security | yes | Proposed |
-| [0023](0023-role-templates-and-permission-checks.md) | Role templates as code, tenant-scoped role assignments, fail-closed permission checks | security | yes | Proposed |
-| [0024](0024-period-control-matrix-and-lock-policy.md) | Period control: §3.5 matrix as data, invariant 3 in the database, personal overrides, two-approver reopen, lock-date policy | accounting | yes | Proposed |
-| [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Proposed |
-| [0026](0026-segregation-of-duties-engine-and-small-team-mode.md) | Segregation-of-duties engine: rules as data, append-only action ledger, tenant thresholds, visible small-team exceptions | security | yes | Proposed |
-| [0027](0027-user-lifecycle-and-scoped-api-tokens.md) | User lifecycle (joiner/mover/leaver) and scoped personal API tokens | security | yes | Proposed |
-| [0029](0029-job-queue-privileges-and-supervision.md) | Job queue (pg-boss) privileges: lf_app DML on the shared pgboss schema, owner-run supervision | security | yes | Proposed |
-| [0030](0030-bank-detail-change-verification-and-cooling-off.md) | Bank-detail change verification: database-enforced workflow, requester ≠ verifier at commit, step-up proof, cooling-off eligibility, durable notices | security | yes | Proposed |
-| [0032](0032-salesforce-pubsub-grpc-client-and-avro-decoding.md) | Salesforce Pub/Sub API client: grpc-js + proto-loader on the vendored proto, avsc for Avro, replay id committed with the batch | integration | no | Proposed |
-| [0034](0034-audit-log-read-path-and-admin-read-routes.md) | Audit log read path: permission-checked SECURITY DEFINER reader instead of SELECT for lf_app; admin read routes (users, caller access, audit log) | security | yes | Proposed |
-| [0035](0035-subledger-open-items-and-allocations.md) | AR/AP open items signed like the GL, append-only allocations priced by the database, fx_difference recorded without an FX journal | accounting | yes | Proposed |
-| [0036](0036-salesforce-writeback-collections-contract.md) | Salesforce write-back: outbox handler with a versioned writeBack snapshot, mirrors upserted by LF_Id__c, Account/Opportunity updated by Salesforce id | integration | no | Proposed |
-| [0037](0037-self-hosted-install-owner-bootstrap-and-realm-mfa.md) | Self-hosted install: first Owner with a one-time IdP password, realm-wide MFA via the ACR mapping, file secrets, one public origin | security | yes | Proposed |
-| [0038](0038-openbao-transit-kms-adapter.md) | OpenBao/Vault transit KMS adapter: derived-key context binding, 60-byte wrapped key with versioned key id, HTTPS-only fetch without redirects, strict key policy | security | yes | Proposed |
-| [0039](0039-manual-journal-document-and-approval.md) | Manual journals as approvable documents posted only through the engine (approval above the threshold or on control/tax/equity accounts, preparer ≠ approver in API and database); control accounts closed to manual, imported and rule journals | security | yes | Proposed |
-| [0040](0040-sync-issues-inbox-dead-letters-and-api-budget-share.md) | Sync issues inbox: dead letters become tenant issues, failure log outside pg-boss, one-click retry as a new delivery job, API budget share as connection data | security | yes | Proposed |
-| [0042](0042-gl-read-routes-chart-journal-list-preview.md) | GL read routes for the web screens: chart of accounts, manual-journal list and the engine preview of a stored journal | architecture | no | Proposed |
+| [0016](0016-oidc-login-and-server-side-sessions.md) | OIDC login with tenant-scoped server-side sessions, idle/absolute timeouts and revoke-all | security | yes | Accepted |
+| [0017](0017-journal-hash-chain-canonical-form-v1.md) | Journal hash chain: canonical form v1 (netstrings), computed in the database at commit | accounting | yes | Accepted |
+| [0018](0018-envelope-encryption-local-keyring-kms.md) | Envelope encryption of bank account numbers with a pluggable KMS; local keyring for self-host MVP | security | yes | Accepted |
+| [0023](0023-role-templates-and-permission-checks.md) | Role templates as code, tenant-scoped role assignments, fail-closed permission checks | security | yes | Accepted |
+| [0024](0024-period-control-matrix-and-lock-policy.md) | Period control: §3.5 matrix as data, invariant 3 in the database, personal overrides, two-approver reopen, lock-date policy | accounting | yes | Accepted |
+| [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Accepted |
+| [0026](0026-segregation-of-duties-engine-and-small-team-mode.md) | Segregation-of-duties engine: rules as data, append-only action ledger, tenant thresholds, visible small-team exceptions | security | yes | Accepted |
+| [0027](0027-user-lifecycle-and-scoped-api-tokens.md) | User lifecycle (joiner/mover/leaver) and scoped personal API tokens | security | yes | Accepted |
+| [0029](0029-job-queue-privileges-and-supervision.md) | Job queue (pg-boss) privileges: lf_app DML on the shared pgboss schema, owner-run supervision | security | yes | Accepted |
+| [0030](0030-bank-detail-change-verification-and-cooling-off.md) | Bank-detail change verification: database-enforced workflow, requester ≠ verifier at commit, step-up proof, cooling-off eligibility, durable notices | security | yes | Accepted |
+| [0032](0032-salesforce-pubsub-grpc-client-and-avro-decoding.md) | Salesforce Pub/Sub API client: grpc-js + proto-loader on the vendored proto, avsc for Avro, replay id committed with the batch | integration | no | Accepted |
+| [0034](0034-audit-log-read-path-and-admin-read-routes.md) | Audit log read path: permission-checked SECURITY DEFINER reader instead of SELECT for lf_app; admin read routes (users, caller access, audit log) | security | yes | Accepted |
+| [0035](0035-subledger-open-items-and-allocations.md) | AR/AP open items signed like the GL, append-only allocations priced by the database, fx_difference recorded without an FX journal | accounting | yes | Accepted |
+| [0036](0036-salesforce-writeback-collections-contract.md) | Salesforce write-back: outbox handler with a versioned writeBack snapshot, mirrors upserted by LF_Id__c, Account/Opportunity updated by Salesforce id | integration | no | Accepted |
+| [0037](0037-self-hosted-install-owner-bootstrap-and-realm-mfa.md) | Self-hosted install: first Owner with a one-time IdP password, realm-wide MFA via the ACR mapping, file secrets, one public origin | security | yes | Accepted |
+| [0038](0038-openbao-transit-kms-adapter.md) | OpenBao/Vault transit KMS adapter: derived-key context binding, 60-byte wrapped key with versioned key id, HTTPS-only fetch without redirects, strict key policy | security | yes | Accepted |
+| [0039](0039-manual-journal-document-and-approval.md) | Manual journals as approvable documents posted only through the engine (approval above the threshold or on control/tax/equity accounts, preparer ≠ approver in API and database); control accounts closed to manual, imported and rule journals | security | yes | Accepted |
+| [0040](0040-sync-issues-inbox-dead-letters-and-api-budget-share.md) | Sync issues inbox: dead letters become tenant issues, failure log outside pg-boss, one-click retry as a new delivery job, API budget share as connection data | security | yes | Accepted |
+| [0042](0042-gl-read-routes-chart-journal-list-preview.md) | GL read routes for the web screens: chart of accounts, manual-journal list and the engine preview of a stored journal | architecture | no | Accepted |
 
 | [0043](0043-ci-security-scanners.md) | Fail-closed CI scans with local rules and verified tooling | security | yes | Accepted |
 | [0044](0044-ci-dast-baseline.md) | Run a passive ZAP baseline scan of the compose stack in CI and fail on High alerts | security | yes | Accepted |
-| [0045](0045-pdf-rendering-playwright-core.md) | Render document PDFs from HTML templates with playwright-core driving headless Chromium | architecture | no | Proposed |
-| [0046](0046-email-smtp-nodemailer.md) | Send document email over SMTP with nodemailer from outbox handlers | integration | no | Proposed |
-| [0047](0047-content-bound-golden-approval-records.md) | Content-bound records of existing golden approvals | process | no | Proposed |
-| [0048](0048-stripe-payment-link-per-invoice.md) | Stripe Payment Link per invoice and amount due, created at send time by a fetch-based client | integration | no | Proposed |
-| [0049](0049-stripe-webhook-endpoint-and-tenant-routing.md) | Stripe webhooks: one signed endpoint per deployment, tenant from signed Payment Link metadata | security | yes | Proposed |
-| [0050](0050-customer-bank-details-for-refunds.md) | Let customer-only parties hold verified bank details for refunds | security | yes | Proposed |
+| [0045](0045-pdf-rendering-playwright-core.md) | Render document PDFs from HTML templates with playwright-core driving headless Chromium | architecture | no | Accepted |
+| [0046](0046-email-smtp-nodemailer.md) | Send document email over SMTP with nodemailer from outbox handlers | integration | no | Accepted |
+| [0047](0047-content-bound-golden-approval-records.md) | Content-bound records of existing golden approvals | process | no | Accepted |
+| [0048](0048-stripe-payment-link-per-invoice.md) | Stripe Payment Link per invoice and amount due, created at send time by a fetch-based client | integration | no | Accepted |
+| [0049](0049-stripe-webhook-endpoint-and-tenant-routing.md) | Stripe webhooks: one signed endpoint per deployment, tenant from signed Payment Link metadata | security | yes | Accepted |
+| [0050](0050-customer-bank-details-for-refunds.md) | Let customer-only parties hold verified bank details for refunds | security | yes | Accepted |
 | [0051](0051-gross-ecl-allowance-remeasurement.md) | Gross ECL allowance and subsequent remeasurement | accounting | delegated | Accepted |
 | [0052](0052-owner-authorized-independent-codex-review.md) | Independent Codex review for the current pickup batch | process | owner instruction | Accepted |
-| [0053](0053-mime-parsing-postal-mime.md) | Parse inbound bill email with postal-mime | integration | no | Proposed |
+| [0053](0053-mime-parsing-postal-mime.md) | Parse inbound bill email with postal-mime | integration | no | Accepted |
 
 Next free number: **0054** (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

@@ -1,7 +1,7 @@
 ---
 adr: 0032
 title: "Salesforce Pub/Sub API client: @grpc/grpc-js + @grpc/proto-loader on the vendored proto, avsc for Avro, replay id committed with the batch"
-status: Proposed
+status: Accepted
 date: 2026-10-25
 author: claude
 category: integration
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0032: Salesforce Pub/Sub API client: @grpc/grpc-js + @grpc/proto-loader on the vendored proto, avsc for Avro, replay id committed with the batch
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — integration category, no human gate. Becomes Accepted on green CI + cross-review by
 codex (AGENTS.md §2 step 8). Adds three runtime dependencies to

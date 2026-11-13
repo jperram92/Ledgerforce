@@ -1,7 +1,7 @@
 ---
 adr: 0025
 title: "MFA enforcement for finance roles and step-up re-authentication on the existing session"
-status: Proposed
+status: Accepted
 date: 2026-10-25
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0025: MFA enforcement for finance roles and step-up re-authentication on the existing session
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, waiting for product-owner acceptance. It extends ADR-0016
 (sessions keep `amr`/`acr`, "enforcement is T-0013") and ADR-0023 (role templates carry

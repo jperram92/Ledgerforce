@@ -1,7 +1,7 @@
 ---
 adr: 0004
 title: "Immutable append-only ledger, corrections by reversal, per-company SHA-256 hash chain"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: accounting
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0004: Immutable append-only ledger, corrections by reversal, per-company SHA-256 hash chain
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — **Design-committed; awaiting product-owner acceptance.** Committed in design D2,
 design principles 1–2 and §3.3; accounting category, so the human gate applies (`adr:accounting`).

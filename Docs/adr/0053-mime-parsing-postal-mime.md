@@ -1,7 +1,7 @@
 ---
 adr: 0053
 title: "Parse inbound bill email with postal-mime"
-status: Proposed
+status: Accepted
 date: 2026-11-01
 author: claude
 category: integration
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0053: Parse inbound bill email with postal-mime
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 Proposed — becomes Accepted on green CI plus cross-review by codex (integration category, a new
 runtime dependency per design §10.6; no change to the security model).
 

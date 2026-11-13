@@ -1,7 +1,7 @@
 ---
 adr: 0005
 title: "Money as NUMERIC(19,4) in PostgreSQL and decimal.js in code; floating point banned"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: accounting
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0005: Money as `NUMERIC(19,4)` in PostgreSQL and decimal.js in code; floating point banned
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — **Design-committed; awaiting product-owner acceptance.** Committed in design §3.4 and
 §7.1; it determines rounding and therefore accounting results, so the `adr:accounting` gate applies.

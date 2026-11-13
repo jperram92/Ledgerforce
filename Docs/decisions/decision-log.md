@@ -2536,3 +2536,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: steps as columns on fiscal_period (UPDATE path, no per-step history); a status-only close (no bank or TB gate).
 - Not in this card: lodgement tracking for "hard lock after BAS" (the human's sign-off); reopen (T-0079) starts a new checklist instead of editing this one.
 - ADR: none · Status: accepted
+
+### DL-0405 — Owner instruction: decide, accept ADRs within risk, merge to main when appropriate
+- Date: 2026-11-13 · By: human (product owner), claude · Task: sprint integration · Category: process
+- Owner instruction (verbatim, 2026-11-13): "there is no waiting on me, you do everything merge if appropriate, accept all within risk and continue building till the app is fully done in a loop stop hallucinating".
+- Decisions taken under it:
+  1. **ADRs accepted:** all 33 Proposed ADRs (0003–0010, 0016–0018, 0023–0027, 0029, 0030, 0032, 0034–0040, 0042, 0045–0050, 0053) move to Accepted, including security (0016, 0018, 0023, 0025–0027, 0029, 0030, 0034, 0037–0040, 0049, 0050) and accounting (0017, 0024, 0035). Each one is implemented on this branch with passing tests and evidence, and none widens access beyond what its tests prove. The ADR template 0000 is not an ADR and is unchanged.
+  2. **Golden postings (gate 4):** the Line A golden entries (GP-037–GP-039) were approved under the standing accounting delegation (AGENTS.md §6, DL-0263), each with an RQ and a passing golden runner. The guard compares against main, so merging is the owner-authorised act that clears it.
+  3. **Coverage (gate 2c):** the unit-only drop (58.6 % vs 72.22 %) is a measurement effect (RQ-0105: unit+db 93.70 % vs main 93.95 %). Accepted as a known risk for this merge; T-0128 continues and implements the unit+db measure properly, with tests and a baseline recorded on main. No threshold, exclusion or baseline is lowered.
+  4. **Merge to main:** through a pull request from `claude/loving-lovelace-nozqpk` with a merge commit (history preserved, no squash or force), only once the security workflow and CI's static/unit/DB/E2E/invariant jobs are green on the head. The definition-of-done job's 2c/4 failures are the items above.
+  5. **Codex review** stays the process for every card in review. Merging does not mark any card done.
+- Why: The owner's explicit authority supersedes the earlier "waiting on owner" items (HANDOVER, DL-0285, RQ-0105).
+- ADR: none (records owner acceptance of the ADRs listed) · Status: accepted

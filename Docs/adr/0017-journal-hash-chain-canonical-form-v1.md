@@ -1,7 +1,7 @@
 ---
 adr: 0017
 title: "Journal hash chain: canonical form v1 (netstrings), computed in the database at commit"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: accounting
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0017: Journal hash chain — canonical form v1, computed in the database at commit
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — accounting category (refines ADR-0004 rule 5), awaiting product-owner acceptance.
 T-0022 is built to this proposal so it can be judged on working, tested code.

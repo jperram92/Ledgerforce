@@ -1,7 +1,7 @@
 ---
 adr: 0034
 title: "Audit log read path: a permission-checked SECURITY DEFINER reader instead of SELECT for lf_app; admin read routes for users, caller access and the audit log"
-status: Proposed
+status: Accepted
 date: 2026-10-25
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0034: Audit log read path and admin read routes
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, waiting for product-owner acceptance. It builds on ADR-0023 (role
 templates and permission checks), ADR-0025 (MFA and step-up) and ADR-0027 (user lifecycle and

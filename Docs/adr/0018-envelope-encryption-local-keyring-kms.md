@@ -1,7 +1,7 @@
 ---
 adr: 0018
 title: "Envelope encryption of bank account numbers with a pluggable KMS; local keyring for self-host MVP"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0018: Envelope encryption with a pluggable KMS; local keyring for the self-host MVP
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, awaiting product-owner acceptance. T-0037 is built to this
 proposal so it can be judged on working, tested code.

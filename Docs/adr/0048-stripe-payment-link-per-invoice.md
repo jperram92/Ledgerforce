@@ -1,7 +1,7 @@
 ---
 adr: 0048
 title: "Stripe Payment Link per invoice and amount due, created at send time by a fetch-based client"
-status: Proposed
+status: Accepted
 date: 2026-11-02
 author: claude
 category: integration
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0048: Stripe Payment Link per invoice and amount due, created at send time by a fetch-based client
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — becomes Accepted on green CI plus cross-review by codex (category integration: a new
 integration contract and table, design §10.6; no new runtime dependency). The Stripe secret key

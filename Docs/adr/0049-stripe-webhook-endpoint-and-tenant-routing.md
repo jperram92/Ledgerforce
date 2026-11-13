@@ -1,7 +1,7 @@
 ---
 adr: 0049
 title: "Stripe webhooks: one signed endpoint per deployment, tenant from signed Payment Link metadata"
-status: Proposed
+status: Accepted
 date: 2026-11-02
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0049: Stripe webhooks — one signed endpoint per deployment, tenant from signed Payment Link metadata
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — **security** category: stays Proposed until the product owner accepts it (AGENTS.md §6;
 security ADRs are not delegated). T-0074 implements the safe default described here so the build

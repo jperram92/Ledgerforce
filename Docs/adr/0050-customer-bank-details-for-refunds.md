@@ -1,7 +1,7 @@
 ---
 adr: 0050
 title: "Let customer-only parties hold verified bank details for refunds"
-status: Proposed
+status: Accepted
 date: 2026-11-02
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0050: Let customer-only parties hold verified bank details for refunds
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 Proposed — security category: stays Proposed until the product owner accepts it (AGENTS.md §6;
 the DL-0263 delegation covers accounting ADRs only). Nothing in this ADR is implemented.
 

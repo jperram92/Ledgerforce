@@ -1,7 +1,7 @@
 ---
 adr: 0047
 title: "Content-bound records of existing golden approvals"
-status: Proposed
+status: Accepted
 date: 2026-11-12
 author: codex
 category: process
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0047: Content-bound records of existing golden approvals
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 Proposed — acceptance requires green CI and cross-provider review. Does not supersede ADR-0012's approval requirement or authorize new accounting expectations.
 
 ## Context and problem statement

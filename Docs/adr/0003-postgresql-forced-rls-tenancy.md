@@ -1,7 +1,7 @@
 ---
 adr: 0003
 title: "PostgreSQL shared schema with forced row-level security for tenant isolation"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0003: PostgreSQL shared schema with forced row-level security for tenant isolation
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — **Design-committed; awaiting product-owner acceptance.** The design commits to this
 (D4, §6.7), but tenant isolation is a security decision and the human gate for `security`

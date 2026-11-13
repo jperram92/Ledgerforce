@@ -1,7 +1,7 @@
 ---
 adr: 0030
 title: "Bank-detail change verification: database-enforced workflow, requester ≠ verifier at commit, step-up proof, cooling-off eligibility and durable notices"
-status: Proposed
+status: Accepted
 date: 2026-10-25
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0030: Bank-detail change verification with cooling-off
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, waiting for product-owner acceptance. It builds on ADR-0018
 (envelope-encrypted bank details), ADR-0025 (MFA and step-up) and ADR-0026 (SoD engine) without

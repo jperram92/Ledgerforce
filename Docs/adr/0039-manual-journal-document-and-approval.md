@@ -1,7 +1,7 @@
 ---
 adr: 0039
 title: "Manual journals as approvable documents posted only through the engine; control accounts closed to them"
-status: Proposed
+status: Accepted
 date: 2026-10-26
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0039: Manual journal document, approval rule and control-account refusal
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category (segregation of duties, design §6.5), with an accounting
 interpretation (which accounts are "tax" accounts) and a new public API; waiting for the
