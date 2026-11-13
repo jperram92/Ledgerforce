@@ -325,6 +325,114 @@
       "provider": "unknown",
       "timestamp": "2026-11-13T08:36:11.500Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-107",
+      "file": ".agent/evidence/T-0089/20261113-092102-SS-PLAT-107-aged-receivables-screen-390.png",
+      "test": "web/reports.spec.ts › SS-PLAT-107: Aged receivables screen buckets each customer, totals from the API @ 390 [T-0089]",
+      "commit": "44a30901938a",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:02.238Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-76",
+      "file": ".agent/evidence/T-0089/20261113-092102-SS-PLAT-76-trial-balance-screen-1440.png",
+      "test": "web/reports.spec.ts › SS-PLAT-76: Trial balance screen for a range, totals from the ledger, each account opens its detail @ 1440 [T-0089]",
+      "commit": "44a30901938a",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:02.258Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-109",
+      "file": ".agent/evidence/T-0089/20261113-092105-SS-PLAT-109-aged-payables-screen-390.png",
+      "test": "web/reports.spec.ts › SS-PLAT-109: Aged payables screen buckets each supplier @ 390 [T-0089]",
+      "commit": "44a30901938a-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:05.745Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-76",
+      "file": ".agent/evidence/T-0089/20261113-092106-SS-PLAT-76-profit-and-loss-screen-1440.png",
+      "test": "web/reports.spec.ts › SS-PLAT-76: Profit and loss screen groups revenue and expenses with the net profit from the API @ 1440 [T-0089]",
+      "commit": "44a30901938a-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:06.169Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-76",
+      "file": ".agent/evidence/T-0089/20261113-092110-SS-PLAT-76-balance-sheet-screen-1440.png",
+      "test": "web/reports.spec.ts › SS-PLAT-76: Balance sheet screen balances, with computed earnings lines marked @ 1440 [T-0089]",
+      "commit": "44a30901938a-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:10.675Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-108",
+      "file": ".agent/evidence/T-0089/20261113-092114-SS-PLAT-108-gl-detail-screen-1440.png",
+      "test": "web/reports.spec.ts › SS-PLAT-108: General ledger detail screen shows opening, lines with running balance and closing @ 1440 [T-0089]",
+      "commit": "44a30901938a-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:14.086Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-107",
+      "file": ".agent/evidence/T-0089/20261113-092118-SS-PLAT-107-aged-receivables-screen-1440.png",
+      "test": "web/reports.spec.ts › SS-PLAT-107: Aged receivables screen buckets each customer, totals from the API @ 1440 [T-0089]",
+      "commit": "44a30901938a-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:18.402Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-109",
+      "file": ".agent/evidence/T-0089/20261113-092120-SS-PLAT-109-aged-payables-screen-1440.png",
+      "test": "web/reports.spec.ts › SS-PLAT-109: Aged payables screen buckets each supplier @ 1440 [T-0089]",
+      "commit": "44a30901938a-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:20.863Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-76",
+      "file": ".agent/evidence/T-0089/20261113-092123-SS-PLAT-76-trial-balance-screen-390.png",
+      "test": "web/reports.spec.ts › SS-PLAT-76: Trial balance screen for a range, totals from the ledger, each account opens its detail @ 390 [T-0089]",
+      "commit": "44a30901938a-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:23.828Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-76",
+      "file": ".agent/evidence/T-0089/20261113-092126-SS-PLAT-76-profit-and-loss-screen-390.png",
+      "test": "web/reports.spec.ts › SS-PLAT-76: Profit and loss screen groups revenue and expenses with the net profit from the API @ 390 [T-0089]",
+      "commit": "44a30901938a-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:26.810Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-76",
+      "file": ".agent/evidence/T-0089/20261113-092129-SS-PLAT-76-balance-sheet-screen-390.png",
+      "test": "web/reports.spec.ts › SS-PLAT-76: Balance sheet screen balances, with computed earnings lines marked @ 390 [T-0089]",
+      "commit": "44a30901938a-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:29.628Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-108",
+      "file": ".agent/evidence/T-0089/20261113-092132-SS-PLAT-108-gl-detail-screen-390.png",
+      "test": "web/reports.spec.ts › SS-PLAT-108: General ledger detail screen shows opening, lines with running balance and closing @ 390 [T-0089]",
+      "commit": "44a30901938a-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:21:32.599Z",
+      "result": "passed"
     }
   ]
 }
