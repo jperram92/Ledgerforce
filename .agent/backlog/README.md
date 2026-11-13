@@ -16,15 +16,15 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 7 |
 | done | 3 |
 | in_progress | 1 |
-| review | 101 |
-| todo | 29 |
+| review | 103 |
+| todo | 28 |
 | verifying | 3 |
-| **total** | **144** |
+| **total** | **145** |
 
 | Phase | Cards |
 |---|---:|
 | Sprint 0 | 9 |
-| MVP | 95 |
+| MVP | 96 |
 | Phase 1 | 1 |
 | Phase 2 | 1 |
 | Phase 3 | 1 |
@@ -191,8 +191,9 @@ graph LR
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | todo | T-0081, T-0046, T-0045, T-0055 | UC-03, UC-11 | 2 |
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | review | T-0081, T-0052, T-0051 | UC-05 | 1 |
 | [T-0087](T-0087.md) | UI: supplier bank-detail verification and payment batch release (step-up) | MVP | todo | T-0081, T-0054, T-0053, T-0056 | UC-06 | 1 |
-| [T-0149](T-0149.md) | Bank reconciliation over HTTP (for the reconciliation screens) | MVP | todo | T-0058, T-0059, T-0060, T-0061 | UC-08 | 3 |
-| [T-0088](T-0088.md) | UI: statement import and bank reconciliation | MVP | todo | T-0081, T-0061, T-0059, T-0149 | UC-08 | 1 |
+| [T-0149](T-0149.md) | Bank reconciliation over HTTP (for the reconciliation screens) | MVP | review | T-0058, T-0059, T-0060, T-0061 | UC-08 | 3 |
+| [T-0088](T-0088.md) | UI: statement import and bank reconciliation | MVP | review | T-0081, T-0061, T-0059, T-0149 | UC-08 | 1 |
+| [T-0150](T-0150.md) | Bank: journal preview for a transaction from a line, candidate suggestions, large statement files | MVP | todo | T-0149, T-0088 | UC-08 | 1 |
 | [T-0089](T-0089.md) | UI: TB, P&L, balance sheet, GL detail, aged AR/AP | MVP | review | T-0081, T-0077 | — | 4 |
 | [T-0090](T-0090.md) | UI: close checklist and period status | MVP | todo | T-0081, T-0078, T-0079, T-0148 | UC-10 | 1 |
 | [T-0091](T-0091.md) | UI: setup wizard | MVP | todo | T-0081, T-0080, T-0123 | — | 0 |
