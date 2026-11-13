@@ -104,3 +104,12 @@ describe('SS-PLAT-32: AU services SMB chart template is valid', () => {
     expect(errors).toMatch(/CURRENT_YEAR_EARNINGS .*postable/);
   });
 });
+
+describe('T-0159: the ECL allowance comes from its system role, not a suggested setting (ADR-0068)', () => {
+  it('suggests no ECL allowance setting; AR_ECL_ALLOWANCE stays bound to 1220', () => {
+    expect(Object.keys(auServicesSmb.suggestedSettings)).not.toContain('ecl_allowance_account');
+    expect(
+      auServicesSmb.accounts.filter((a) => a.systemRole === 'AR_ECL_ALLOWANCE').map((a) => a.code),
+    ).toEqual(['1220']);
+  });
+});

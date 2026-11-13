@@ -3027,3 +3027,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: T-0087 stops at release, which is what SS-UC06-10 asks for. Downloading the ABA file and recording the bank's confirmation (UC-06 steps 3–4, routes from T-0056 and T-0057) are follow-up card T-0154.
 - Why: Size (T-0087 is already about 900 lines with tests). The confirmation also shows a GP-009 journal, and whether it can be previewed needs checking first.
 - ADR: none · Status: accepted
+
+### DL-0475 — Migration 0066 comments the deprecated ECL setting; template drops the suggestion (T-0159)
+- Date: 2026-11-13 · By: claude · Task: T-0159 · Category: data
+- Decision: Migration 0066 only adds `COMMENT ON COLUMN app.ar_settings.ecl_allowance_account_id`, marking the column deprecated: AR_ECL_ALLOWANCE is the source, and the value must be NULL or equal the role-bound account. au-services-smb.json drops the `ecl_allowance_account` suggested setting; the 1220 role binding stays. Nothing read that suggestion.
+- Why: ADR-0068 and DL-0474. The schema now says what the code does.
+- ADR: ADR-0068 · Status: accepted

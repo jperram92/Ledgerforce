@@ -521,7 +521,6 @@
     "stripe_clearing_account": "1210",
     "merchant_fees_account": "6120",
     "bad_debts_account": "6500",
-    "ecl_allowance_account": "1220",
     "sgc_expense_account": "6420"
   },
   "partyProfiles": [

@@ -1,0 +1,60 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+ ❯ |unit| packages/modules/gl/src/templates.test.ts (6 tests | 1 failed) 21ms
+     × suggests no ECL allowance setting; AR_ECL_ALLOWANCE stays bound to 1220 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/gl/src/templates.test.ts > T-0159: the ECL allowance comes from its system role, not a suggested setting (ADR-0068) > suggests no ECL allowance setting; AR_ECL_ALLOWANCE stays bound to 1220
+AssertionError: expected [ 'stripe_clearing_account', …(4) ] to not include 'ecl_allowance_account'
+ ❯ packages/modules/gl/src/templates.test.ts:110:62
+    108| describe('T-0159: the ECL allowance comes from its system role, not a …
+    109|   it('suggests no ECL allowance setting; AR_ECL_ALLOWANCE stays bound …
+    110|     expect(Object.keys(auServicesSmb.suggestedSettings)).not.toContain…
+       |                                                              ^
+    111|     expect(
+    112|       auServicesSmb.accounts.filter((a) => a.systemRole === 'AR_ECL_AL…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  20:08:25
+   Duration  246ms (transform 69ms, setup 0ms, import 88ms, tests 21ms, environment 0ms)
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:39275
+ ❯ |db| packages/db/src/ecl-setting-deprecated.db.test.ts (1 test | 1 failed) 667ms
+     × the column is kept and its comment names the role and ADR-0068 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/db/src/ecl-setting-deprecated.db.test.ts > T-0159: deprecated ECL allowance setting > the column is kept and its comment names the role and ADR-0068
+AssertionError: expected '' to match /deprecated/i
+
+- Expected:
+/deprecated/i
+
++ Received:
+""
+
+ ❯ packages/db/src/ecl-setting-deprecated.db.test.ts:27:36
+     25|     );
+     26|     expect(rows).toHaveLength(1);
+     27|     expect(rows[0]?.comment ?? '').toMatch(/deprecated/i);
+       |                                    ^
+     28|     expect(rows[0]?.comment ?? '').toMatch(/AR_ECL_ALLOWANCE/);
+     29|     expect(rows[0]?.comment ?? '').toMatch(/ADR-0068/);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  20:08:26
+   Duration  1.70s (transform 62ms, setup 0ms, import 193ms, tests 667ms, environment 0ms)
+
