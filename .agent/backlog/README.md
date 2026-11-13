@@ -185,7 +185,7 @@ graph LR
 | [T-0109](T-0109.md) | verify.sh gate 9: e2e runs must not write evidence into other tasks' folders | MVP | review | T-0009 | — | 0 |
 | [T-0081](T-0081.md) | Web app shell (React, Vite, TanStack, shadcn/ui) with auth and navigation | MVP | review | T-0011, T-0009, T-0106 | — | 0 |
 | [T-0082](T-0082.md) | UI: chart of accounts, manual journal and "show me the journal" preview | MVP | review | T-0081, T-0026, T-0029 | — | 0 |
-| [T-0083](T-0083.md) | UI: invoices list, detail, approve and post | MVP | todo | T-0081, T-0040, T-0041, T-0131 | UC-01 | 1 |
+| [T-0083](T-0083.md) | UI: invoices list, detail, approve and post | MVP | claimed | T-0081, T-0040, T-0041, T-0131 | UC-01 | 1 |
 | [T-0084](T-0084.md) | UI: batch billing preview, approval and exception list | MVP | todo | T-0081, T-0044 | UC-02 | 1 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | todo | T-0081, T-0046, T-0045, T-0055 | UC-03, UC-11 | 2 |
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | todo | T-0081, T-0052, T-0051 | UC-05 | 1 |
@@ -231,7 +231,7 @@ graph LR
 | [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | todo | — | — | 0 |
 | [T-0129](T-0129.md) | Daily overdue-reminder job in the worker and per-party reminder pause | MVP | todo | T-0068 | UC-04 | 0 |
 | [T-0130](T-0130.md) | Stripe payouts: fetch from the API, payout.paid webhook, bank line match | MVP | todo | T-0075, T-0060 | UC-03, UC-08 | 0 |
-| [T-0131](T-0131.md) | AR invoices read and journal-preview API (list, detail, Show me the journal, approve) | MVP | verifying | T-0040, T-0041 | UC-01 | 0 |
+| [T-0131](T-0131.md) | AR invoices read and journal-preview API (list, detail, Show me the journal, approve) | MVP | review | T-0040, T-0041 | UC-01 | 0 |
 | [T-0132](T-0132.md) | Approve one invoice over HTTP: permission, SoD and idempotent POST /ar/invoices/:id/approve | MVP | todo | T-0131 | UC-01 | 0 |
 | [T-0166](T-0166.md) | Gross ECL allowance reconciliation from source lineage | MVP | blocked | T-0031, T-0048 | — | 3 |
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
