@@ -3045,3 +3045,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | Wizard settings | T-0158 (+ migration 0067) | 0550–0559 | 0071 | 0153 | T-0164–T-0165 |
 - Why: The owner asked for parallel sub-agents (DL-0408). The cards touch disjoint areas: bank, the ap payment file, and setup with tax and ar settings.
 - ADR: none · Status: accepted
+
+### DL-0540 — T-0154 split: ABA download here; GP-009 preview to T-0162, confirmation screen to T-0163
+- Date: 2026-11-13 · By: claude · Task: T-0154 · Category: scope
+- Decision: T-0154 keeps UC-06 step 3, the bank (ABA) file download on the payment batch screen (AC-1, and AC-3 for the download), with a new success scenario SS-UC06-11. Recording the bank's confirmation (old AC-2, and the NOT_CONFIRMABLE / queue_not_configured refusals of AC-3) moves to two new cards: **T-0162** builds the GP-009 confirmation preview in `@ledgerforce/ap` with the ledger's `preview()` and a read-only route, and **T-0163** builds the confirmation on the screen with that preview first. T-0163 drafts its own SS id at RED, so no untested SS id sits on a card.
+- Why: UI principle P4 needs the journal shown before it posts, and no preview path exists (DL-0542). Module + API + golden/contract tests + screen + e2e is well over the ~400-line card limit (new-task-card skill); the lead asked for a split in that case with the first slice finished. T-0057, which both new cards build on, is still `blocked` on golden-approval provenance review.
+- Alternatives: build the confirmation without a preview (rejected: breaks P4); compute the journal in the browser (rejected: no accounting in the browser); one card for preview + screen (rejected: size).
+- ADR: none · Status: accepted
+
+### DL-0541 — The bank file is fetched by POST and saved from a Blob; the screen follows the API's checks and adds none of its own
+- Date: 2026-11-13 · By: claude · Task: T-0154 · Category: implementation (web)
+- Decision: "Download the bank file" calls `POST /ap/payment-batches/:id/aba` (T-0056) with `fetch`, takes the body as a Blob (bytes untouched, CRLF kept) and saves it through a temporary `<a download>` and object URL, the pattern the reports CSV download already uses. The file name is the API's `Content-Disposition` name only when it is a plain `*.aba` name (letters, digits, `.`, `_`, `-`), else `<batch no>.aba`. The bytes are never decoded or shown. The action shows only for a released batch and only to people with `ap.payment_batch.release`; the API still decides. A 401 `step_up_required` shows the StepUpPrompt (nothing retried on its own), a 403 `sod_violation` and the T-0056 refusals (BANK_NOT_CONFIGURED, NOT_RELEASED, INVALID_ABA_DATA, 503 kms_not_configured) are put in plain words.
+- Why: the route is a POST so the API audits every download (DL-0292); a plain link (RQ-0148's GET pattern for inbox PDFs) cannot POST, and a form post would navigate away. The ABA and confirm routes carry no SoD step or step-up today (DL-0292, DL-0304: design §6.5 has no rule; adding one is a security-model change, a human gate), so the screen does not invent one; it handles those answers so an owner decision to add them needs no screen change.
+- Alternatives: a GET link (rejected: not audited, DL-0292); reading the body as text (rejected: could alter bytes); adding `@RequireStepUp`/`@SoD` to the routes here (rejected: security gate; raised for the owner instead).
+- ADR: none (no new dependency, no API change) · Status: accepted
+
+### DL-0542 — The GP-009 confirmation journal is previewed before it posts (answers T-0154's open question)
+- Date: 2026-11-13 · By: claude · Task: T-0154 · Category: product (UI principle)
+- Decision: Yes, the confirmation screen shows the GP-009 journal before the confirmation is recorded. T-0057 has no preview path, so T-0162 adds one: the same command `confirmPaymentBatch` posts, run through the ledger's `preview()` (the engine path minus the write), with a contract test that the preview equals what then posts. GP-009 (Approved) is used as it is; nothing in `Docs/accounting/` changes.
+- Why: P4 ("Show the journal before you post", Docs/ui/principles.md) lists every action that posts, and the bills/invoices/credit notes/manual journals already preview through the engine. No outside research is needed, so no RQ was opened.
+- Alternatives: show only the posted entry after confirmation (rejected: P4); a browser-side preview (rejected: no accounting in the browser).
+- ADR: none · Status: accepted
+
+### DL-0543 — T-0154 evidence: the pre-commit run is kept and marked dirty
+- Date: 2026-11-13 · By: claude · Task: T-0154 · Category: process
+- Decision: The first green Playwright run happened before the screen was committed; its 4 SS-UC06-11 screenshots and manifest entries record `7675790d9e94-dirty` and provider `unknown`. They stay (evidence is append-only). The run at f7dfa03 with `LF_PROVIDER=claude` gives the 4 entries the card and register link. The T-0087 tests in the same spec were re-run with `LF_EVIDENCE_ONLY_TASK=T-0154`, so T-0087's evidence folder is unchanged.
+- Why: AGENTS.md §0.6 and the evidence skill (commit first so `commit` is real); DL-0503 is the precedent.
+- Alternatives: delete the first run (rejected: directive 6).
+- ADR: none · Status: accepted

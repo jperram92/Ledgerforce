@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0154",
+  "entries": [
+    {
+      "scenario": "SS-UC06-11",
+      "file": ".agent/evidence/T-0154/20261113-201841-SS-UC06-11-bank-file-ready-1440.png",
+      "test": "web/payment-batch.spec.ts › bank file [T-0154] › SS-UC06-11 Bank file download from a released batch @ 1440 [T-0154]",
+      "commit": "7675790d9e94-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:18:41.238Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-11",
+      "file": ".agent/evidence/T-0154/20261113-201842-SS-UC06-11-bank-file-downloaded-1440.png",
+      "test": "web/payment-batch.spec.ts › bank file [T-0154] › SS-UC06-11 Bank file download from a released batch @ 1440 [T-0154]",
+      "commit": "7675790d9e94-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:18:42.313Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-11",
+      "file": ".agent/evidence/T-0154/20261113-201844-SS-UC06-11-bank-file-ready-390.png",
+      "test": "web/payment-batch.spec.ts › bank file [T-0154] › SS-UC06-11 Bank file download from a released batch @ 390 [T-0154]",
+      "commit": "7675790d9e94-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:18:44.722Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-11",
+      "file": ".agent/evidence/T-0154/20261113-201845-SS-UC06-11-bank-file-downloaded-390.png",
+      "test": "web/payment-batch.spec.ts › bank file [T-0154] › SS-UC06-11 Bank file download from a released batch @ 390 [T-0154]",
+      "commit": "7675790d9e94-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:18:45.491Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-11",
+      "file": ".agent/evidence/T-0154/20261113-202243-SS-UC06-11-bank-file-ready-1440.png",
+      "test": "web/payment-batch.spec.ts › bank file [T-0154] › SS-UC06-11 Bank file download from a released batch @ 1440 [T-0154]",
+      "commit": "f7dfa0371955",
+      "provider": "claude",
+      "timestamp": "2026-11-13T20:22:43.562Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-11",
+      "file": ".agent/evidence/T-0154/20261113-202244-SS-UC06-11-bank-file-downloaded-1440.png",
+      "test": "web/payment-batch.spec.ts › bank file [T-0154] › SS-UC06-11 Bank file download from a released batch @ 1440 [T-0154]",
+      "commit": "f7dfa0371955",
+      "provider": "claude",
+      "timestamp": "2026-11-13T20:22:44.437Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-11",
+      "file": ".agent/evidence/T-0154/20261113-202246-SS-UC06-11-bank-file-ready-390.png",
+      "test": "web/payment-batch.spec.ts › bank file [T-0154] › SS-UC06-11 Bank file download from a released batch @ 390 [T-0154]",
+      "commit": "f7dfa0371955",
+      "provider": "claude",
+      "timestamp": "2026-11-13T20:22:46.563Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-11",
+      "file": ".agent/evidence/T-0154/20261113-202247-SS-UC06-11-bank-file-downloaded-390.png",
+      "test": "web/payment-batch.spec.ts › bank file [T-0154] › SS-UC06-11 Bank file download from a released batch @ 390 [T-0154]",
+      "commit": "f7dfa0371955",
+      "provider": "claude",
+      "timestamp": "2026-11-13T20:22:47.242Z",
+      "result": "passed"
+    }
+  ]
+}
