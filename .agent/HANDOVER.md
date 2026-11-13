@@ -1,10 +1,24 @@
-# Handover: round 2 merges in progress; T-0117 and T-0128 merged (2026-11-13 09:20 UTC)
+# Handover: round 2 fully merged; T-0129 built (2026-11-13 09:50 UTC)
 
 ## Codex continuation prompt
-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0405, DL-0408, DL-0409 and DL-0463. Branch `claude/loving-lovelace-nozqpk`. Merged and validated on this branch: T-0079, T-0142, T-0117 (eaae925, migration 0062) and T-0128 (28b23bc, gate 2c = unit+db). Three agents are finishing T-0084, T-0086 and T-0089 in their worktrees (`.claude/worktrees/agent-*`, local branches `feat/T-0084-batch-billing-ui`, `feat/T-0086-bills-ui`, `feat/T-0089-reports-ui`). Merge each after re-running its tests on the combined branch. The lead is on T-0129 (overdue-reminder worker job; research first). The next migration number is 0063. Cards waiting for Codex review: T-0121, T-0041, T-0061, T-0068, T-0075, T-0078, T-0131, T-0083, T-0079, T-0142, T-0117, plus the Line A cards.
+> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0405, DL-0408, DL-0409, DL-0463 and DL-0465. Branch `claude/loving-lovelace-nozqpk`.
+>
+> Every round-2 agent branch is merged and validated on the combined tree (94d68aa): T-0079, T-0142, T-0117, T-0128, T-0084, T-0086 and T-0089. The validation was web+unit 954, api-db 247 and web E2E 96, all passing with 0 skipped.
+>
+> T-0129 (per-party reminder pause, migration 0063) is built at 3f28cd3, and its full verify is running. The daily cross-tenant job is T-0147, blocked on security ADR-0062.
+>
+> Next steps:
+> - Run `bash scripts/agent/verify.sh --task <T>` for T-0084, T-0086, T-0089 and T-0129, then release each to review.
+> - Next ready cards: T-0085, T-0087, T-0088, T-0090, T-0110, T-0119, T-0120, T-0126, T-0127, T-0130, T-0143 and T-0168.
+> - The next migration is 0064.
+>
+> Codex cross-review is pending for all cards in review.
+>
+> Gate 2c stays PENDING until main's baseline is re-recorded under unit+db with the next merge to main. The combined tree measures 93.45%, against 93.65% recorded at bcf4ab6.
 
 ## Open questions for human
 - **Security CI is red (Gitleaks, DL-0464, owner chose "Ignore + gzip").** The fix is in local stash `DL-0464 gitleaks WIP fix (awaiting owner permission)`. It is not pushed, because committing it was blocked as an oversight change: it edits the human-owned contract test `infra/test/security-workflow.contract.test.ts`, with an exception for commit 3a6bc91 only, .agent/wip T-0086/T-0089 only, and the rule sourcegraph-access-token only. The hits are 254 git object IDs in format-patch headers. To land it, run `git stash pop` and commit, or allow the commit.
+- **ADR-0062 (security, Proposed): how should a daily job reach every tenant?** Option 1 (recommended): the lf_migrator maintenance instance fans out one job per tenant. Option 2: an lf_app-executable function that returns only active tenant ids. This blocks T-0147, the daily reminder run, and will apply to later daily jobs too.
 - **T-0132 needs a security ADR:** a new `ar.invoice.approve` permission and the role templates that get it (ADR-0023). It is the owner's decision; the card stays todo until then.
 - **CSRF policy (T-0144, security ADR to write).** Should cookie-authenticated writes that carry neither Fetch-Metadata nor Origin be rejected (OWASP recommends it)? That changes ~25 session-based DB test files. Owner decision or explicit delegation needed.
 - **Network:** research for T-0143 (backups) needs postgresql.org, which the session proxy blocks; allowing it in the environment would help.
