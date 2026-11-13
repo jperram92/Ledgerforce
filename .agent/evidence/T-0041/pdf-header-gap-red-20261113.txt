@@ -1,0 +1,26 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › tests/e2e/documents/invoice-pdf.spec.ts:54:1 › SS-PLAT-104 the rendered GP-001 invoice PDF shows number, ABN, GST 125.00 and total 1,375.00 on one A4 page [T-0041] (647ms)
+
+
+  1) [chromium] › tests/e2e/documents/invoice-pdf.spec.ts:54:1 › SS-PLAT-104 the rendered GP-001 invoice PDF shows number, ABN, GST 125.00 and total 1,375.00 on one A4 page [T-0041] 
+
+    Error: expect(received).toBeGreaterThanOrEqual(expected)
+
+    Expected: >= 3
+    Received:    0.0014651849389792915
+
+      129 |   const value = result.boxes['INV-000123'];
+      130 |   expect(label && value, 'label and value are separate text items').toBeTruthy();
+    > 131 |   expect(value!.x - (label!.x + label!.w)).toBeGreaterThanOrEqual(3);
+          |                                            ^
+      132 |   await expect(page.locator('canvas')).toHaveCount(1);
+      133 |
+      134 |   await evidence('SS-PLAT-104', 'gp-001-invoice-pdf-page-1');
+        at /home/user/Ledgerforce/tests/e2e/documents/invoice-pdf.spec.ts:131:44
+
+    Error Context: test-results/documents-invoice-pdf-SS-P-727e8-5-00-on-one-A4-page-T-0041--chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/e2e/documents/invoice-pdf.spec.ts:54:1 › SS-PLAT-104 the rendered GP-001 invoice PDF shows number, ABN, GST 125.00 and total 1,375.00 on one A4 page [T-0041] 

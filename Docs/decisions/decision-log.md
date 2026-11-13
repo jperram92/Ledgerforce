@@ -2501,3 +2501,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Validation: reconciliation + period tests 20/20; mutation check: removing the lock in both layers fails SS-PLAT-126 (`.agent/evidence/T-0061/`).
 - Alternatives: application-only lock (bypassable by any other writer); reopen flow (columns exist, no UI/API yet → T-0088 scope).
 - ADR: none · Status: accepted
+
+### DL-0401 — Rendered-PDF evidence through pdfjs in the test browser; header label/value gap
+- Date: 2026-11-13 · By: claude · Task: T-0041 · Category: implementation (documents, evidence)
+- Decision: SS-PLAT-104 visual evidence is produced by `tests/e2e/documents/invoice-pdf.spec.ts`. The product's own `PdfRenderer` (headless Chromium) renders GP-001 to PDF bytes, and pdfjs-dist rasterises every page in the Playwright browser from a routed http origin (module scripts do not load from file://). The spec asserts page count, A4 size (±1 pt), the text layer and the header column gap, then saves the screenshot through the evidence fixture. The screenshot exposed "Invoice numberINV-000123" (no horizontal padding in `.meta td`). RED (gap 0.0015 pt), then the fix `.meta td:first-child { padding-right: 4mm; }`, then GREEN.
+- Why: The card required real rendered-PDF evidence, not an HTML preview (Codex's note); Chromium is available in this environment.
+- Alternatives: PDF-to-image CLI (not installed, would be a new tool); HTML screenshot (does not prove the PDF).
+- ADR: none · Status: accepted

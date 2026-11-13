@@ -114,6 +114,7 @@ const STYLE = `
   .totals th { text-align: left; font-weight: normal; }
   .totals tr.total th, .totals tr.total td { font-weight: bold; border-top: 1px solid #333; }
   .meta td { padding: 0.5mm 0; }
+  .meta td:first-child { padding-right: 4mm; }
   .pay { margin-top: 8mm; padding: 3mm 4mm; border: 1px solid #333; }
   .pay a { color: #0b3d91; word-break: break-all; }
 `;
