@@ -2924,3 +2924,32 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: These are what the T-0087 screens show (UC-06 steps 1–2, design §6.5, §6.6). Read routes over existing data need no ADR, as with T-0148 and T-0151.
 - Alternatives: a single "awaiting release" endpoint (rejected: the screen also shows released batches, for context); returning the requester id only (rejected: the screen must name people).
 - ADR: none · Status: accepted
+
+### DL-0502 — Supplier payment screens: release with an explicit step-up prompt; verification screen carries SS-UC06-09's screen half (T-0087)
+- Date: 2026-11-13 · By: claude · Task: T-0087 · Category: ui
+- Decision:
+  - Three pages under Purchases:
+    - `/purchases/payment-batches`: the batch list.
+    - `/purchases/payment-batches/:id`: payments, bills left out with the reason, and Release.
+    - `/purchases/bank-details[?change=]`: changes awaiting verification and the one being checked.
+  - Step-up: a `401 step_up_required` from release or verify does not navigate away at once, unlike the admin screens' `useFailureRouting`. It shows a "Confirm it's you" region that says why (money leaves the bank; payments are redirected) and offers "Confirm my sign-in", which goes to `/auth/step-up` with `return_to` set to this page. After coming back, the person presses the action again. Nothing is retried automatically, so money never moves without a fresh click. Other 401s still go to sign-in.
+  - SoD: the screen explains the rules before anyone tries. Release is disabled with the reason when the caller built the batch or already gave the first of two releases. The requester of a bank-detail change sees why someone else must verify it. Any `403 sod_violation` is put in plain words per rule. The API stays the authority.
+  - Masking: accounts show as "BSB 062-000, account ending 321". The client keeps only the last 3 characters of whatever arrives.
+  - The verification note typed before a step-up is kept in `sessionStorage` for that change only and cleared on success. It is the person's own note, not a secret.
+  - SS-UC06-09 (verifier ≠ requester) gets its screen half here, in the same spec. The card lists it, and the register row names both layers.
+- Why: SS-UC06-10, UC-06 steps 1–2, design §6.2, §6.5, §6.6. The brief asks that the UI explain step-up and SoD refusals in plain words and never bypass them. An immediate redirect would leave without saying why.
+- Alternatives: redirect immediately as the admin screens do (rejected: the person does not learn why they are leaving the page); retry the release automatically on return (rejected: money would move without a click after the redirect).
+- ADR: none · Status: accepted
+
+### DL-0503 — T-0087 evidence: the first-run entries are kept and marked dirty
+- Date: 2026-11-13 · By: claude · Task: T-0087 · Category: process
+- Decision: The first Playwright run happened before the screens were committed. Its 12 screenshots and manifest entries record the commit as `a6ff41ad8efa-dirty`. They stay, because evidence is append-only. The spec was re-run at cae7768, and the card links only those 12 files.
+- Why: AGENTS.md §0.6 (never delete evidence) and the evidence skill (commit first, so the `commit` field is real).
+- Alternatives: delete the first run (rejected: directive 6).
+- ADR: none · Status: accepted
+
+### DL-0504 — T-0154: ABA download and bank confirmation on the batch screen, after T-0087
+- Date: 2026-11-13 · By: claude · Task: T-0087 · Category: scope
+- Decision: T-0087 stops at release, which is what SS-UC06-10 asks for. Downloading the ABA file and recording the bank's confirmation (UC-06 steps 3–4, routes from T-0056 and T-0057) are follow-up card T-0154.
+- Why: Size (T-0087 is already about 900 lines with tests). The confirmation also shows a GP-009 journal, and whether it can be previewed needs checking first.
+- ADR: none · Status: accepted
