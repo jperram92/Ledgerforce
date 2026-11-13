@@ -138,3 +138,121 @@ describe('SS-PLAT-108/109 report routes [T-0077]', () => {
     ).toBe(422);
   });
 });
+
+type Section = {
+  type: string;
+  total: string;
+  groups: {
+    subtype: string;
+    total: string;
+    lines: { code: string; amount: string; computed: boolean }[];
+  }[];
+};
+
+describe('SS-RPT-07 trial balance, P&L and balance sheet routes [T-0089]', () => {
+  it('GET /gl/trial-balance lists each account on its side with decimal-string totals', async () => {
+    const res = await get(
+      `/gl/trial-balance?company_id=${f.companyId}&from=2026-11-01&to=2026-11-30`,
+      'accountant',
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      currency: string;
+      from: string | null;
+      to: string;
+      rows: { code: string; type: string; debit: string; credit: string }[];
+      total_debit: string;
+      total_credit: string;
+      nets_to_zero: boolean;
+    };
+    expect(body).toMatchObject({
+      currency: 'AUD',
+      from: '2026-11-01',
+      to: '2026-11-30',
+      total_debit: '1100.0000',
+      total_credit: '1100.0000',
+      nets_to_zero: true,
+    });
+    expect(body.rows.map((r) => [r.code, r.debit, r.credit])).toEqual([
+      ['2000', '0.0000', '1100.0000'],
+      ['6230', '1100.0000', '0.0000'],
+    ]);
+    const open = await get(`/gl/trial-balance?company_id=${f.companyId}&to=2026-11-30`, 'accountant');
+    expect(((await open.json()) as { from: string | null }).from).toBeNull();
+  });
+
+  it('GET /gl/profit-and-loss groups expenses by subtype and returns the net profit', async () => {
+    const res = await get(
+      `/gl/profit-and-loss?company_id=${f.companyId}&from=2026-11-01&to=2026-11-30`,
+      'accountant',
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      currency: string;
+      revenue: Section;
+      expenses: Section;
+      net_profit: string;
+    };
+    expect(body.currency).toBe('AUD');
+    expect(body.revenue).toEqual({ type: 'revenue', total: '0.0000', groups: [] });
+    expect(body.expenses.total).toBe('1100.0000');
+    expect(body.expenses.groups.flatMap((g) => g.lines.map((l) => [l.code, l.amount]))).toEqual([
+      ['6230', '1100.0000'],
+    ]);
+    expect(body.net_profit).toBe('-1100.0000');
+  });
+
+  it('GET /gl/balance-sheet balances, with the year to date on the current-year earnings line', async () => {
+    const res = await get(
+      `/gl/balance-sheet?company_id=${f.companyId}&as_at=2026-11-30`,
+      'accountant',
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      as_at: string;
+      fiscal_year: { label: string; start: string; end: string };
+      assets: Section;
+      liabilities: Section;
+      equity: Section;
+      total_liabilities_and_equity: string;
+      current_year_earnings: string;
+      prior_years_earnings: string;
+      balanced: boolean;
+    };
+    expect(body).toMatchObject({
+      as_at: '2026-11-30',
+      total_liabilities_and_equity: '0.0000',
+      current_year_earnings: '-1100.0000',
+      prior_years_earnings: '0.0000',
+      balanced: true,
+    });
+    expect(body.fiscal_year.start).toBe('2026-07-01');
+    expect(body.assets.total).toBe('0.0000');
+    expect(body.liabilities.total).toBe('1100.0000');
+    const equity = body.equity.groups.flatMap((g) => g.lines);
+    expect(equity.filter((l) => l.computed).map((l) => l.amount)).toEqual(['0.0000', '-1100.0000']);
+  });
+
+  it('needs reports.run (403 for an AP clerk), refuses bad queries (400) and dates outside any year (422)', async () => {
+    const co = f.companyId;
+    for (const q of [
+      `/gl/trial-balance?company_id=${co}&to=2026-11-30`,
+      `/gl/profit-and-loss?company_id=${co}&from=2026-11-01&to=2026-11-30`,
+      `/gl/balance-sheet?company_id=${co}&as_at=2026-11-30`,
+    ])
+      expect([q, (await get(q, 'apClerk')).status]).toEqual([q, 403]);
+    for (const q of [
+      `/gl/trial-balance?company_id=nope&to=2026-11-30`,
+      `/gl/trial-balance?company_id=${co}`,
+      `/gl/trial-balance?company_id=${co}&from=2026-12-01&to=2026-11-30`,
+      `/gl/profit-and-loss?company_id=${co}&to=2026-11-30`,
+      `/gl/profit-and-loss?company_id=${co}&from=2026-11-01&to=2026-02-30`,
+      `/gl/balance-sheet?company_id=${co}`,
+      `/gl/balance-sheet?company_id=${co}&as_at=30-11-2026`,
+    ])
+      expect([q, (await get(q, 'accountant')).status]).toEqual([q, 400]);
+    expect(
+      (await get(`/gl/balance-sheet?company_id=${co}&as_at=2001-01-31`, 'accountant')).status,
+    ).toBe(422);
+  });
+});

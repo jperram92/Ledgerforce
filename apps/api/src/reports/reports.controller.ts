@@ -4,6 +4,9 @@
  *
  *  - GET /gl/detail?company_id&(period_id | [from]&to)&account_id*&dimension_value_id*&party_id
  *    → reports.run. account_id and dimension_value_id repeat or take comma-separated lists.
+ *  - GET /gl/trial-balance?company_id&[from]&to&dimension_value_id* → reports.run (T-0089)
+ *  - GET /gl/profit-and-loss?company_id&from&to&dimension_value_id* → reports.run (T-0089)
+ *  - GET /gl/balance-sheet?company_id&as_at → reports.run (T-0089)
  *  - GET /ap/aged-payables?company_id&as_of → ap.read
  *  - GET /ar/aged-receivables?company_id&as_of → ar.read
  *
@@ -19,7 +22,15 @@ import {
 } from '@nestjs/common';
 import { agedPayables } from '@ledgerforce/ap';
 import { agedReceivables } from '@ledgerforce/ar';
-import { glDetailReport, ReportError, type GlDetailReport } from '@ledgerforce/reporting';
+import {
+  balanceSheetReport,
+  glDetailReport,
+  profitAndLossReport,
+  ReportError,
+  trialBalanceReport,
+  type GlDetailReport,
+  type StatementSection,
+} from '@ledgerforce/reporting';
 import { RequirePermission } from '../authz/permission.decorator.ts';
 import { TenantTx } from '../tenancy/tenant-tx.ts';
 
@@ -94,6 +105,25 @@ function glDetailView(r: GlDetailReport) {
   };
 }
 
+/** A P&L or balance-sheet section with its money as decimal strings (T-0089). */
+function sectionView(s: StatementSection) {
+  return {
+    type: s.type,
+    total: s.total.toNumericString(),
+    groups: s.groups.map((g) => ({
+      subtype: g.subtype,
+      total: g.total.toNumericString(),
+      lines: g.lines.map((l) => ({
+        account_id: l.accountId,
+        code: l.code,
+        name: l.name,
+        amount: l.amount.toNumericString(),
+        computed: l.computed === true,
+      })),
+    })),
+  };
+}
+
 @Controller()
 export class ReportsController {
   constructor(private readonly tx: TenantTx) {}
@@ -123,6 +153,90 @@ export class ReportsController {
       ...(party !== undefined ? { partyId: party } : {}),
     }).catch(refusal);
     return glDetailView(r);
+  }
+
+  @Get('gl/trial-balance')
+  @RequirePermission('reports.run')
+  async trialBalance(
+    @Query('company_id') companyId: unknown,
+    @Query('from') from: unknown,
+    @Query('to') to: unknown,
+    @Query('dimension_value_id') dimensionValueIds: unknown,
+  ) {
+    const f = optional(from, 'from');
+    const r = await trialBalanceReport(this.tx.get(), {
+      companyId: companyOf(companyId),
+      from: f === undefined ? null : dateOf(f, 'from'),
+      to: dateOf(to, 'to'),
+      dimensionValueIds: list(dimensionValueIds, 'dimension_value_id'),
+    }).catch(refusal);
+    return {
+      company_id: r.companyId,
+      currency: r.currency,
+      from: r.from,
+      to: r.to,
+      dimension_value_ids: r.dimensionValueIds,
+      rows: r.rows.map((row) => ({
+        account_id: row.accountId,
+        code: row.code,
+        name: row.name,
+        type: row.type,
+        subtype: row.subtype,
+        debit: row.debit.toNumericString(),
+        credit: row.credit.toNumericString(),
+      })),
+      total_debit: r.totalDebit.toNumericString(),
+      total_credit: r.totalCredit.toNumericString(),
+      nets_to_zero: r.netsToZero,
+    };
+  }
+
+  @Get('gl/profit-and-loss')
+  @RequirePermission('reports.run')
+  async profitAndLoss(
+    @Query('company_id') companyId: unknown,
+    @Query('from') from: unknown,
+    @Query('to') to: unknown,
+    @Query('dimension_value_id') dimensionValueIds: unknown,
+  ) {
+    const r = await profitAndLossReport(this.tx.get(), {
+      companyId: companyOf(companyId),
+      from: dateOf(from, 'from'),
+      to: dateOf(to, 'to'),
+      dimensionValueIds: list(dimensionValueIds, 'dimension_value_id'),
+    }).catch(refusal);
+    return {
+      company_id: r.companyId,
+      currency: r.currency,
+      from: r.from,
+      to: r.to,
+      dimension_value_ids: r.dimensionValueIds,
+      revenue: sectionView(r.revenue),
+      expenses: sectionView(r.expenses),
+      net_profit: r.netProfit.toNumericString(),
+    };
+  }
+
+  @Get('gl/balance-sheet')
+  @RequirePermission('reports.run')
+  async balanceSheet(@Query('company_id') companyId: unknown, @Query('as_at') asAt: unknown) {
+    const r = await balanceSheetReport(this.tx.get(), {
+      companyId: companyOf(companyId),
+      asAt: dateOf(asAt, 'as_at'),
+    }).catch(refusal);
+    return {
+      company_id: r.companyId,
+      currency: r.currency,
+      as_at: r.asAt,
+      fiscal_year: r.fiscalYear,
+      assets: sectionView(r.assets),
+      liabilities: sectionView(r.liabilities),
+      equity: sectionView(r.equity),
+      total_liabilities_and_equity: r.totalLiabilitiesAndEquity.toNumericString(),
+      prior_years_earnings: r.priorYearsEarnings.toNumericString(),
+      current_year_earnings: r.currentYearEarnings.toNumericString(),
+      balanced: r.balanced,
+    };
   }
 
   @Get('ap/aged-payables')

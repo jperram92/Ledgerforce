@@ -1,0 +1,30 @@
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |api-db| apps/api/src/reports/reports.db.test.ts > SS-RPT-07 trial balance, P&L and balance sheet routes [T-0089] > needs reports.run (403 for an AP clerk), refuses bad queries (400) and dates outside any year (422)
+AssertionError: expected [ …(2) ] to deeply equal [ …(2) ]
+
+- Expected
++ Received
+
+  [
+    "/gl/trial-balance?company_id=01a1d30b-042f-7e60-81de-783ecae9360a&to=2026-11-30",
+-   403,
++   404,
+  ]
+
+ ❯ apps/api/src/reports/reports.db.test.ts:243:53
+    241|       `/gl/balance-sheet?company_id=${co}&as_at=2026-11-30`,
+    242|     ])
+    243|       expect([q, (await get(q, 'apClerk')).status]).toEqual([q, 403]);
+       |                                                     ^
+    244|     for (const q of [
+    245|       `/gl/trial-balance?company_id=nope&to=2026-11-30`,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 4 passed (8)
+   Start at  03:54:32
+   Duration  4.56s (transform 1.46s, setup 0ms, import 2.51s, tests 1.21s, environment 0ms)
+
