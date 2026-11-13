@@ -11,7 +11,9 @@ export interface SubPage {
     | '/reports/audit-log'
     | '/settings/sync-issues'
     | '/accounting/journals'
-    | '/accounting/chart';
+    | '/accounting/chart'
+    | '/sales/invoices'
+    | '/sales/batches';
   name: string;
   text: string;
 }
@@ -45,6 +47,18 @@ export const SECTIONS: readonly Section[] = [
     emptyHeading: 'No invoices yet',
     emptyText:
       'Invoices appear here when a deal is closed won in Salesforce or someone creates one.',
+    pages: [
+      {
+        to: '/sales/invoices',
+        name: 'Invoices',
+        text: 'Every invoice to customers: drafts, posted and void, with the journal behind each.',
+      },
+      {
+        to: '/sales/batches',
+        name: 'Batch billing',
+        text: 'Invoice every customer with billing due in a period at once, after a preview.',
+      },
+    ],
   },
   {
     name: 'Purchases',

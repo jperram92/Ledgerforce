@@ -1,0 +1,174 @@
+
+Running 6 tests using 2 workers
+
+[1/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:363:1 › T-0084: someone without ar.read cannot open a batch
+[2/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]
+  1) [chromium] › tests/e2e/web/batch-billing.spec.ts:363:1 › T-0084: someone without ar.read cannot open a batch 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/do not have access/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/do not have access/i) with timeout 5000ms
+      - waiting for getByText(/do not have access/i)
+
+
+      364 |   const f = await fakeApi(page, 'sales');
+      365 |   await open(page, `/sales/batches/${BATCH}`, 1440);
+    > 366 |   await expect(page.getByText(/do not have access/i)).toBeVisible();
+          |                                                       ^
+      367 |   await expect(page.getByRole('table', { name: 'Exceptions' })).toHaveCount(0);
+      368 |   expect(f.errors).toEqual([]);
+      369 | });
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:366:55
+
+    Error Context: test-results/web-batch-billing-T-0084-s-3d12e-ar-read-cannot-open-a-batch-chromium/error-context.md
+
+    Error Context: test-results/web-batch-billing-T-0084-s-3d12e-ar-read-cannot-open-a-batch-chromium/error-context.md
+
+
+  2) [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Batch billing', level: 1 })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: 'Batch billing', level: 1 }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: 'Batch billing', level: 1 })
+
+
+      269 |     // The AR Clerk asks for a preview of November.
+      270 |     await open(page, '/sales/batches', width);
+    > 271 |     await expect(page.getByRole('heading', { level: 1, name: 'Batch billing' })).toBeVisible();
+          |                                                                                  ^
+      272 |     await page.getByLabel('From').fill('2026-11-01');
+      273 |     await page.getByLabel('To', { exact: true }).fill('2026-11-30');
+      274 |     await assertPage(page, width);
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:271:82
+
+    Error Context: test-results/web-batch-billing-SS-UC02--02dde-exception-list-1440-T-0084--chromium/error-context.md
+
+    Error Context: test-results/web-batch-billing-SS-UC02--02dde-exception-list-1440-T-0084--chromium/error-context.md
+
+
+[3/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:371:1 › T-0084: a period that ends before it starts is caught before anything is sent
+[4/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]
+  3) [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('heading', { name: 'Batch billing', level: 1 })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('heading', { name: 'Batch billing', level: 1 }) with timeout 5000ms
+      - waiting for getByRole('heading', { name: 'Batch billing', level: 1 })
+
+
+      269 |     // The AR Clerk asks for a preview of November.
+      270 |     await open(page, '/sales/batches', width);
+    > 271 |     await expect(page.getByRole('heading', { level: 1, name: 'Batch billing' })).toBeVisible();
+          |                                                                                  ^
+      272 |     await page.getByLabel('From').fill('2026-11-01');
+      273 |     await page.getByLabel('To', { exact: true }).fill('2026-11-30');
+      274 |     await assertPage(page, width);
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:271:82
+
+    Error Context: test-results/web-batch-billing-SS-UC02--2b8ad--exception-list-390-T-0084--chromium/error-context.md
+
+    Error Context: test-results/web-batch-billing-SS-UC02--2b8ad--exception-list-390-T-0084--chromium/error-context.md
+
+
+[5/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:351:1 › T-0084: someone without ar.batch.run is told who can run a batch, and nothing is sent
+  4) [chromium] › tests/e2e/web/batch-billing.spec.ts:351:1 › T-0084: someone without ar.batch.run is told who can run a batch, and nothing is sent 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/can preview a batch/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/can preview a batch/) with timeout 5000ms
+      - waiting for getByText(/can preview a batch/)
+
+
+      354 |   const f = await fakeApi(page, 'auditor');
+      355 |   await open(page, '/sales/batches', 1440);
+    > 356 |   await expect(page.getByText(/can preview a batch/)).toBeVisible();
+          |                                                       ^
+      357 |   await expect(page.getByText(/AR Clerk/)).toBeVisible();
+      358 |   await expect(page.getByRole('button', { name: 'Preview the invoices' })).toHaveCount(0);
+      359 |   expect(f.previews).toEqual([]);
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:356:55
+
+    Error Context: test-results/web-batch-billing-T-0084-s-60905-a-batch-and-nothing-is-sent-chromium/error-context.md
+
+    Error Context: test-results/web-batch-billing-T-0084-s-60905-a-batch-and-nothing-is-sent-chromium/error-context.md
+
+
+  5) [chromium] › tests/e2e/web/batch-billing.spec.ts:371:1 › T-0084: a period that ends before it starts is caught before anything is sent 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByLabel('From')
+
+
+      374 |   const f = await fakeApi(page, 'clerk');
+      375 |   await open(page, '/sales/batches', 1440);
+    > 376 |   await page.getByLabel('From').fill('2026-11-30');
+          |                                 ^
+      377 |   await page.getByLabel('To', { exact: true }).fill('2026-11-01');
+      378 |   await page.getByRole('button', { name: 'Preview the invoices' }).click();
+      379 |   await expect(page.getByRole('alert')).toContainText('The period ends before it starts');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:376:33
+
+    Error Context: test-results/web-batch-billing-T-0084-a-44948-ght-before-anything-is-sent-chromium/error-context.md
+
+    Error Context: test-results/web-batch-billing-T-0084-a-44948-ght-before-anything-is-sent-chromium/error-context.md
+
+
+[6/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:384:1 › T-0084: an approval the API refuses explains why and leaves the batch as it was
+  6) [chromium] › tests/e2e/web/batch-billing.spec.ts:384:1 › T-0084: an approval the API refuses explains why and leaves the batch as it was 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Approve and post 39 invoices' })
+
+
+      391 |   });
+      392 |   await open(page, `/sales/batches/${BATCH}`, 1440);
+    > 393 |   await page.getByRole('button', { name: 'Approve and post 39 invoices' }).click();
+          |                                                                            ^
+      394 |   await expect(page.getByRole('alert')).toContainText('no longer waiting for approval');
+      395 |   await expect(page.getByRole('button', { name: 'Approve and post 39 invoices' })).toBeVisible();
+      396 |   expect(f.errors).toEqual([]);
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:393:76
+
+    Error Context: test-results/web-batch-billing-T-0084-a-0ff9c--leaves-the-batch-as-it-was-chromium/error-context.md
+
+    Error Context: test-results/web-batch-billing-T-0084-a-0ff9c--leaves-the-batch-as-it-was-chromium/error-context.md
+
+
+  6 failed
+    [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084] 
+    [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084] 
+    [chromium] › tests/e2e/web/batch-billing.spec.ts:351:1 › T-0084: someone without ar.batch.run is told who can run a batch, and nothing is sent 
+    [chromium] › tests/e2e/web/batch-billing.spec.ts:363:1 › T-0084: someone without ar.read cannot open a batch 
+    [chromium] › tests/e2e/web/batch-billing.spec.ts:371:1 › T-0084: a period that ends before it starts is caught before anything is sent 
+    [chromium] › tests/e2e/web/batch-billing.spec.ts:384:1 › T-0084: an approval the API refuses explains why and leaves the batch as it was 

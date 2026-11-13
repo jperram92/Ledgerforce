@@ -27,6 +27,8 @@ import { SignInPage, type SignInReason } from './SignIn.tsx';
 import { inboxSearch } from './sync/logic.ts';
 import { SyncIssuePage } from './sync/SyncIssuePage.tsx';
 import { SyncIssuesPage } from './sync/SyncIssuesPage.tsx';
+import { BatchesPage } from './sales/BatchesPage.tsx';
+import { BatchPage } from './sales/BatchPage.tsx';
 import { InvoicePage } from './sales/InvoicePage.tsx';
 import { InvoicesPage } from './sales/InvoicesPage.tsx';
 
@@ -184,6 +186,22 @@ const invoiceRoute = createRoute({
   },
 });
 
+// Batch billing (T-0084, UC-02): choose a period and preview; one run with its exception list.
+const batchesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'sales/batches',
+  component: () => <BatchesPage />,
+});
+
+const batchRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'sales/batches/$batchId',
+  component: function BatchRoute() {
+    const { batchId } = batchRoute.useParams();
+    return <BatchPage key={batchId} batchId={batchId} />;
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   signInRoute,
   shellRoute.addChildren([
@@ -198,6 +216,8 @@ const routeTree = rootRoute.addChildren([
     journalsRoute,
     invoicesRoute,
     invoiceRoute,
+    batchesRoute,
+    batchRoute,
     newJournalRoute,
     journalRoute,
     editJournalRoute,

@@ -1,0 +1,34 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:39229
+ ❯ |api-db| apps/api/src/ar/batches.db.test.ts (6 tests | 1 failed) 1099ms
+     × SS-UC02-08 GET /ar/batches/:id carries the batch status; after the run each item says posted (with its number) or failed (with the reason) 105ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/batches.db.test.ts > SS-UC02-08: the batch screen reads the batch state and each item result (T-0084) > SS-UC02-08 GET /ar/batches/:id carries the batch status; after the run each item says posted (with its number) or failed (with the reason)
+AssertionError: expected undefined to be 'preview' // Object.is equality
+
+- Expected:
+"preview"
+
++ Received:
+undefined
+
+ ❯ apps/api/src/ar/batches.db.test.ts:262:27
+    260|     };
+    261|     const before = await read();
+    262|     expect(before.status).toBe('preview');
+       |                           ^
+    263|     expect(before.items.map((i) => [i.party_id, i.status, i.invoice_no…
+    264|       [
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  03:55:42
+   Duration  4.75s (transform 1.65s, setup 0ms, import 2.78s, tests 1.10s, environment 0ms)
+
