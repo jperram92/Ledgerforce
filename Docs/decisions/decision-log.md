@@ -2587,6 +2587,74 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: The owner asked for parallel agents (DL-0408); disjoint ranges keep the merges mechanical.
 - ADR: none · Status: accepted
 
+### DL-0410a — Seventh agent (T-0117) gets the round's only migration slot
+- Date: 2026-11-13 · By: claude · Task: T-0117 · Category: process
+- Decision: Adds to DL-0409. T-0117 (period-end system roles) runs as a seventh agent with exclusive use of migration 0062 and the ranges DL-0470–0479, ADR-0061, RQ-0143, T-0145–T-0146. No other agent adds a migration this round.
+- Why: The gapless runner allows only one schema change in flight at a time (DL-0296).
+### DL-0420 — Period reopen over HTTP: routes, step-up, SoD subject, state-based replay (T-0079)
+- Date: 2026-11-13 · By: claude · Task: T-0079 · Category: api (+ security control wiring)
+- Decision: Three routes are added: `POST /periods/:periodId/reopen-requests` {to_status, reason}, `POST /periods/reopen-requests/:requestId/approve` and `GET /periods/:periodId/reopen-requests`.
+  - Both mutations need `period.reopen` and a 300 s step-up. The step-up is `@RequireStepUp(300)`, and the catalogue's STEP_UP_PERMISSIONS would demand it anyway.
+  - Both mutations pass the SoD engine (`period_reopen_request.request` / `.approve`, rule SOD_PERIOD_REOPEN_SELF_APPROVAL).
+  - A written reason is required (400 `reason_required`).
+  - Everything is wired to `requestReopen` / `approveReopen` in @ledgerforce/ledger, whose migration-0018 functions repeat every check and write the audit rows.
+  - GET needs `reports.run`, because a read with `period.reopen` would demand step-up.
+  - Replays are recognised by state: the same requester, target and reason, or the same approver. The reopen table has no idempotency-key column and this round adds no migrations (DL-0409).
+  - The request step's SoD subject is named before the handler as a placeholder, and set to the real id once the function returns it.
+  - `periods` is added to the nginx API prefixes (SS-PLAT-86).
+  - The card's file name `period.reopen.spec.ts` is read as the repo convention `apps/api/src/periods/period-reopen.db.test.ts`.
+- Why: Design §3.5, §6.2 and §6.5 rule 6; apps/api AGENTS.md (thin controllers, SoD in the interceptor, audit every mutation). There was no open question, so no RQ: the design text and migration 0018 settle the behaviour.
+- Alternatives: an unstored Idempotency-Key header (a false guarantee); the period id as SoD subject (blocks later reopens); see ADR-0056.
+- ADR: ADR-0056 (architecture, Proposed) · Status: accepted
+
+### DL-0421 — Close checklist after a reopen needs schema; reported, not built (T-0079)
+- Date: 2026-11-13 · By: claude · Task: T-0079 · Category: scope
+- Decision: A period reopened from hard lock cannot run the T-0078 close checklist again. `app.close_checklist_step` (migration 0061) has primary key (tenant_id, period_id, step) and is insert-only, so `completeCloseStep` answers ALREADY_DONE for every step that was completed before. Its comment says "a reopened period starts a new checklist", but that needs a schema change. One option is an additive `round` or `reopen_request_id` column with a new unique key, and `closeChecklist` reading the latest round. Under DL-0409 the agent adds no migration, so this is reported to the lead as follow-up work. Until then, a reopened period is re-locked with `setPeriodStatus` (period.lock / period.close, audited).
+- Why: DL-0409 (no migrations in parallel agents); directive 6 (no edits to merged migrations).
+- ADR: none · Status: accepted
+### DL-0460 — T-0097 round-2 branch name and start while T-0094/T-0096 are in review
+- Date: 2026-11-13 · By: claude · Task: T-0097 · Category: process
+- Decision: Work on local branch `feat/T-0097-pilot-hardening-r2` from `f8b10bd` (tip of `claude/loving-lovelace-nozqpk`, contains bcf4ab6). Start although T-0097's dependencies T-0094 and T-0096 are `review`, not `done`. `state.json` is not rewritten by this sub-agent.
+- Why: The lead assigned T-0097 to this agent (DL-0409). The name `feat/T-0097-pilot-hardening` is already held, at eba7510 with no T-0097 commits, by a lost round-1 worktree that this agent may not touch or delete (directive 6); the worktree's own HEAD (983cc91) predated bcf4ab6. The compose stack T-0094 built is what the slice hardens; review findings on it do not change the API middleware. `state.json` is shared by six parallel agents; the lead owns it during the round.
+- Alternatives: Force-moving the old branch (refused: checked out in another worktree, and rewriting refs of another session); waiting for T-0094/T-0096 review (blocks the round).
+### DL-0461 — Split T-0097 into T-0142, T-0143 and T-0144
+- Date: 2026-11-13 · By: claude · Task: T-0097 · Category: scope
+- Decision: T-0097 is superseded (status blocked, kept) by T-0142 (API security headers, strict CORS, rate limits — built now), T-0143 (encrypted backup + restore drill with hash-chain verification; carries T-0097 AC-1) and T-0144 (CSRF Fetch-Metadata/Origin guard). T-0098 now depends on the three new cards.
+- Why: Together the work exceeds the ~400-line card limit (new-task-card skill). The CSRF fail-safe rule recommended by OWASP (RQ-0141 F7) changes the session helpers of ~25 existing DB test files and needs its own security ADR; backups need their own research (encryption, key custody, PITR, RQ-0142).
+- Alternatives: One large card (violates the size rule); dropping CSRF from scope (design §6.9 requires it).
+### DL-0462 — API security headers, strict CORS and rate limits in-house (ADR-0054, Proposed)
+- Date: 2026-11-13 · By: claude · Task: T-0142 · Category: security
+- Decision: Resolve RQ-0141 and propose ADR-0054: OWASP REST header set on every API response, no X-Powered-By, HSTS only for an https public URL, CORS never enabled, fixed-window per-address limits (auth 30, mutating 300, webhook 600 per 60 s) answering 429 + Retry-After before routing, `trust proxy` = `LF_TRUST_PROXY_HOPS` (0–5, default 0; compose 1). Built as in-house Express middleware, no new runtime dependency.
+- Why: RQ-0141 (OWASP REST/HTTP-headers/DoS/CSRF cheat sheets; Express 5.2.1 and proxy-addr source). Libraries (helmet, @nestjs/throttler) would add runtime dependencies for ~100 lines of policy and keep in-memory counters too.
+- Alternatives: helmet + @nestjs/throttler; edge-only limits in nginx (see ADR-0054).
+- ADR: ADR-0054 · Status: proposed (awaiting human)
+
+### DL-0411a — ADR-0054 (API security headers, CORS, in-house rate limits) accepted under DL-0405
+- Date: 2026-11-13 · By: claude under the owner's standing instruction · Task: T-0142 (split from T-0097) · Category: security
+- Decision: ADR-0054 is accepted. The owner instructed "accept all within risk" (DL-0405). The change only adds restrictions (response headers, strict CORS, per-address 429 limits on auth, mutating routes and webhooks; HSTS only behind https). It adds no runtime dependency (in-house limiter), and it is covered by 32 unit, 17 DB and 27 infra contract tests. Not covered and still a human question: T-0144's CSRF policy (reject cookie writes without Fetch-Metadata/Origin), which changes ~25 test files and gets its own ADR.
+- ADR: ADR-0054 · Status: accepted
+
+### DL-0463 — Period-end system roles get an additive binding table (ADR-0061 accepted, T-0117)
+- Date: 2026-11-13 · By: claude · Task: T-0117 · Category: data
+- Decision: The seven period-end roles (AR_ECL_ALLOWANCE, PREPAYMENTS, ACCUM_DEPRECIATION, DEPRECIATION_EXPENSE, ACCRUED_EXPENSES, SGC_PAYABLE, PRIOR_PERIOD_ADJUSTMENTS) are bound in a new table `app.account_system_role_ext` (migration 0062), with the same shape, RLS (ENABLE + FORCE), grants and check trigger as `app.account_system_role`. The engine and reporting now read the `security_invoker` view `app.account_role_binding`. The golden binding map resolves these accounts by role instead of by code. ADR-0061 (category data, no human gate) is accepted.
+- Why: the 0005 CHECK on `account_system_role.role` cannot be widened without DROP CONSTRAINT, which the forward-only rule forbids (RQ-0143 probe). Agent work was merged and re-validated on the combined branch: typecheck, lint and format were clean; gate golden PASS; db project (db, ledger, gl, ar, reporting) 1156/1156 with 0 skipped; unit (ledger, gl) 55/55.
+- Alternatives: DROP and re-add the CHECK (not forward-only); keep binding these accounts by code through template settings (the engine must find accounts by role, design §3.2).
+- ADR: ADR-0061 · Status: accepted
+
+### DL-0410 — Gate 2c measures unit+db coverage on one worker and never compares across measures (T-0128)
+- Date: 2026-11-13 · By: claude · Task: T-0128 · Category: process
+- Decision: `verify.sh` gate 2c runs `VITEST_MAX_WORKERS=1 pnpm -s exec vitest run --project unit --project db --coverage.enabled --coverage.reporter=json-summary` (measure `unit+db`) and compares total line % with `.agent/coverage-baseline.json` on `origin/main`, else `main`. The baseline file records `"measure"`. A file without it is the old unit-only measure (`unit`). If main's measure is not `unit+db`, the gate is **PENDING** and asks for main's baseline to be re-recorded under the same measure. It never PASSes or FAILs across measures. With no baseline on main it stays PENDING, and a baseline on the task branch is never used as the base. The worker count is pinned to 1 inside the gate, even if the caller exports more, so the measure matches how the baseline was taken (one shared test cluster, the setting used for RQ-0105's measurements). PASS/FAIL/PENDING messages name the measure. Covered by four new `verify.sh (full) with a task: 2c coverage …` tests (fake `pnpm` on PATH), RED → GREEN in `.agent/evidence/T-0128/`.
+- Why: Owner approved RQ-0105 remedy 2 (DL-0408). Unit-only coverage counts DB-tested modules (posting engine, AR, bank matching) as uncovered whenever a unit test imports them, while AGENTS.md requires those modules to be tested against a real PostgreSQL. Without the measure check, the new gate would have passed silently against the 72.22 % unit-only baseline (the RED run shows exactly that: "PASS (lines 94.1% vs main 72.22%)").
+- Alternatives: comparing unit+db with the unit-only baseline (passes trivially, two different measures, rejected in RQ-0105); FAIL on a measure mismatch (would block every branch until the merge, for a condition the branch cannot fix); honouring a caller's VITEST_MAX_WORKERS (makes the measure depend on the environment); adding `api-db`/`api-unit` (not the approved measure; a later change would follow the same re-record rule).
+- ADR: none (process change under ADR-0047, owner-approved in DL-0408) · Status: accepted
+
+### DL-0411 — Coverage baseline re-recorded under the unit+db measure at bcf4ab6 (T-0128)
+- Date: 2026-11-13 · By: claude · Task: T-0128 · Category: process
+- Decision: `.agent/coverage-baseline.json` is re-recorded with the gate's exact command over bcf4ab6 (the PR #4 merge 983cc91 plus T-0131's AR invoice read/preview code, T-0083's web screens and docs and process commits). Results: **lines 93.65 % (8,071 / 8,618)**, branches 79.21 % (5,727 / 7,230), functions 95.66 % (2,074 / 2,168), statements 91.09 % (8,988 / 9,867). 160 test files and 2,195 tests passed, none skipped, against a local PostgreSQL 16 cluster. The file now records `measure`, `command`, `recorded`, `commit` and the evidence path, and its `note` keeps the superseded unit-only values (72.22 / 69.37 / 78.94 / 70.78 from 2026-10-24). Per-package figures: `.agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt`. The file reaches main only through the lead's merge. Until then, gate 2c on branches is PENDING by design (DL-0410).
+- Why: DL-0408 approved re-recording main's baseline under the same measure. The number is what the tree measures, not a chosen target. It is 0.05 points below the 2026-11-12 reading of 6d7531d (93.70 %), a different tree, and 0.30 points below pre-integration main (93.95 %). That integration drop was accepted by the owner in DL-0405 item 3.
+- Alternatives: recording 93.95 % (pre-integration main) would make main fail its own gate, a manufactured baseline; waiting to measure on main itself (the agent may not push to main; the lead's merge carries the file).
+- ADR: none · Status: accepted
+
 ### DL-0440 — Bill read routes share approval's journal builder; SoD outlook for screens (T-0086)
 - Date: 2026-11-13 · By: claude · Task: T-0086 · Category: implementation (AP, API)
 - Decision: `approveBill`'s journal construction is extracted into a private `billJournal` (read-only); approval posts exactly as before (GP-008 db test unchanged and green). `previewBillJournal` runs the engine's `preview()` on the same command (idempotency key `ap-bill:<id>`, entry date = bill date), writing nothing. New read models in `packages/modules/ap/src/bills-read.ts`: `billCodingOptions`, `listBills`, `getBillDetail`, `billJournalView` (preview for a draft, the posted `journal_line`s once approved — SELECT only). API: `GET /ap/bills` without `queue` lists every bill (the `queue=awaiting_approval` shape is unchanged), `GET /ap/bills/:id`, `GET /ap/bills/:id/journal` (all `ap.read`), `GET /ap/bill-coding` (`ap.bill.enter`, because AP Clerks lack `gl.account.read` and `parties` has no list route). The detail carries `approval: {allowed, rule, small_team_exception_required, self_approval_threshold}` from a new read-only `sodOutlook()` in `apps/api/src/sod/sod.service.ts` — the same evaluator, history, settings and eligible-user count as `checkSod`, without lock, exception or record. The approve route still runs `checkSod`, so the outlook can only explain, never allow. A bill outside the company/tenant is 404.

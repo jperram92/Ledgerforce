@@ -1,0 +1,234 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ace2d146964caa140
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:46047
+ ❯ |api-db| apps/api/src/periods/period-reopen.db.test.ts (11 tests | 11 failed) 1043ms
+     × SS-UC10-06 without a fresh step-up the request is refused with step_up_required (audited) 38ms
+     × SS-UC10-06 a missing or blank reason is refused; nothing is requested 9ms
+     × SS-UC10-06 a user without period.reopen is refused 8ms
+     × SS-UC10-06 one approver requests: the request is pending and the period stays hard-locked; a replay returns the same request 3ms
+     × SS-UC10-06 the same person cannot approve their own request 7ms
+     × SS-UC10-06 the second approver needs a fresh step-up too 7ms
+     × SS-UC10-06 after a second, distinct approver the period reopens and the audit log has both 11ms
+     × SS-UC10-06 a replayed approval returns the same result; a third approver gets 409 3ms
+     × SS-UC10-06 the period lists its reopen requests with both approvers 8ms
+     × SS-UC10-06 a period that is not hard-locked cannot take a reopen request 13ms
+     × SS-UC10-06 another tenant's period and unknown ids answer 404 15ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 without a fresh step-up the request is refused with step_up_required (audited)
+AssertionError: expected 404 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:137:24
+    135|   it('SS-UC10-06 without a fresh step-up the request is refused with s…
+    136|     const res = await requestReopen('faA', { to_status: 'soft_closed',…
+    137|     expect(res.status).toBe(401);
+       |                        ^
+    138|     expect(await res.json()).toEqual({ error: 'step_up_required', max_…
+    139|     const a = await f.admin.query<{ n: string }>(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 a missing or blank reason is refused; nothing is requested
+AssertionError: expected 404 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:156:26
+    154|     ]) {
+    155|       const res = await requestReopen('faA', body);
+    156|       expect(res.status).toBe(400);
+       |                          ^
+    157|       expect(await res.json()).toMatchObject({ error: 'reason_required…
+    158|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 a user without period.reopen is refused
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:170:24
+    168|   it('SS-UC10-06 a user without period.reopen is refused', async () =>…
+    169|     const res = await requestReopen('acc', { to_status: 'soft_closed',…
+    170|     expect(res.status).toBe(403);
+       |                        ^
+    171|     expect(await res.json()).toMatchObject({ error: 'forbidden', permi…
+    172|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 one approver requests: the request is pending and the period stays hard-locked; a replay returns the same request
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:176:24
+    174|   it('SS-UC10-06 one approver requests: the request is pending and the…
+    175|     const res = await requestReopen('faA', { to_status: 'soft_closed',…
+    176|     expect(res.status).toBe(201);
+       |                        ^
+    177|     const body = (await res.json()) as Record<string, unknown>;
+    178|     expect(body).toMatchObject({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 the same person cannot approve their own request
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:205:24
+    203|   it('SS-UC10-06 the same person cannot approve their own request', as…
+    204|     const res = await approve('faA', requestId);
+    205|     expect(res.status).toBe(403);
+       |                        ^
+    206|     expect(await res.json()).toMatchObject({
+    207|       error: 'sod_violation',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 the second approver needs a fresh step-up too
+AssertionError: expected 404 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:215:24
+    213|   it('SS-UC10-06 the second approver needs a fresh step-up too', async…
+    214|     const res = await approve('faB', requestId);
+    215|     expect(res.status).toBe(401);
+       |                        ^
+    216|     expect(await res.json()).toEqual({ error: 'step_up_required', max_…
+    217|     expect(await periodStatus(october)).toBe('hard_locked');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 after a second, distinct approver the period reopens and the audit log has both
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:223:24
+    221|     await stepUp('faB');
+    222|     const res = await approve('faB', requestId);
+    223|     expect(res.status).toBe(200);
+       |                        ^
+    224|     expect(await res.json()).toMatchObject({
+    225|       id: requestId,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 a replayed approval returns the same result; a third approver gets 409
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:275:27
+    273|   it('SS-UC10-06 a replayed approval returns the same result; a third …
+    274|     const replay = await approve('faB', requestId);
+    275|     expect(replay.status).toBe(200);
+       |                           ^
+    276|     expect(await replay.json()).toMatchObject({ id: requestId, status:…
+    277|     const late = await approve('owner', requestId);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 the period lists its reopen requests with both approvers
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:285:24
+    283|   it('SS-UC10-06 the period lists its reopen requests with both approv…
+    284|     const res = await call('GET', `/periods/${october}/reopen-requests…
+    285|     expect(res.status).toBe(200);
+       |                        ^
+    286|     expect(await res.json()).toEqual({
+    287|       period_id: october,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 a period that is not hard-locked cannot take a reopen request
+AssertionError: expected 404 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:304:24
+    302|   it('SS-UC10-06 a period that is not hard-locked cannot take a reopen…
+    303|     const res = await requestReopen('owner', { to_status: 'open', reas…
+    304|     expect(res.status).toBe(409);
+       |                        ^
+    305|     expect(await res.json()).toMatchObject({ error: 'period_not_hard_l…
+    306|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/11]⎯
+
+ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 another tenant's period and unknown ids answer 404
+AssertionError: expected 404 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 404
+
+ ❯ apps/api/src/periods/period-reopen.db.test.ts:315:59
+    313|     );
+    314|     expect((await approve('owner', randomUUID())).status).toBe(404);
+    315|     expect((await approve('owner', 'not-a-uuid')).status).toBe(400);
+       |                                                           ^
+    316|   });
+    317| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/11]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  11 failed (11)
+   Start at  03:56:22
+   Duration  5.08s (transform 1.60s, setup 0ms, import 3.02s, tests 1.04s, environment 0ms)
+

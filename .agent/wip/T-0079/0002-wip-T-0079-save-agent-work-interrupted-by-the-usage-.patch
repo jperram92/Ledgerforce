@@ -1,0 +1,929 @@
+From 4e1d83dd88be191863e27c421abe2af18644df6b Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 08:12:16 +0000
+Subject: [PATCH 2/4] wip(T-0079): save agent work interrupted by the usage
+ limit (unverified)
+
+What changed: Uncommitted work of the T-0079 sub-agent, saved by the lead as-is.
+Why: The agent stopped on the 5-hour usage limit; the container may not survive.
+Validation: none by the lead; the agent resumes and validates.
+Next action: the agent continues from this commit.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .agent/evidence/T-0079/red-SS-UC10-06.txt     | 234 ++++++++++++
+ apps/api/src/app.ts                           |   3 +
+ apps/api/src/authz/routes.test.ts             |  11 +
+ .../src/periods/period-reopen.controller.ts   | 264 ++++++++++++++
+ apps/api/src/periods/period-reopen.db.test.ts | 337 ++++++++++++++++++
+ 5 files changed, 849 insertions(+)
+ create mode 100644 .agent/evidence/T-0079/red-SS-UC10-06.txt
+ create mode 100644 apps/api/src/periods/period-reopen.controller.ts
+ create mode 100644 apps/api/src/periods/period-reopen.db.test.ts
+
+diff --git a/.agent/evidence/T-0079/red-SS-UC10-06.txt b/.agent/evidence/T-0079/red-SS-UC10-06.txt
+new file mode 100644
+index 0000000..ed7127c
+--- /dev/null
++++ b/.agent/evidence/T-0079/red-SS-UC10-06.txt
+@@ -0,0 +1,234 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ace2d146964caa140
++
++[db] test PostgreSQL ready (local) on 127.0.0.1:46047
++ ❯ |api-db| apps/api/src/periods/period-reopen.db.test.ts (11 tests | 11 failed) 1043ms
++     × SS-UC10-06 without a fresh step-up the request is refused with step_up_required (audited) 38ms
++     × SS-UC10-06 a missing or blank reason is refused; nothing is requested 9ms
++     × SS-UC10-06 a user without period.reopen is refused 8ms
++     × SS-UC10-06 one approver requests: the request is pending and the period stays hard-locked; a replay returns the same request 3ms
++     × SS-UC10-06 the same person cannot approve their own request 7ms
++     × SS-UC10-06 the second approver needs a fresh step-up too 7ms
++     × SS-UC10-06 after a second, distinct approver the period reopens and the audit log has both 11ms
++     × SS-UC10-06 a replayed approval returns the same result; a third approver gets 409 3ms
++     × SS-UC10-06 the period lists its reopen requests with both approvers 8ms
++     × SS-UC10-06 a period that is not hard-locked cannot take a reopen request 13ms
++     × SS-UC10-06 another tenant's period and unknown ids answer 404 15ms
++
++⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 without a fresh step-up the request is refused with step_up_required (audited)
++AssertionError: expected 404 to be 401 // Object.is equality
++
++- Expected
+++ Received
++
++- 401
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:137:24
++    135|   it('SS-UC10-06 without a fresh step-up the request is refused with s…
++    136|     const res = await requestReopen('faA', { to_status: 'soft_closed',…
++    137|     expect(res.status).toBe(401);
++       |                        ^
++    138|     expect(await res.json()).toEqual({ error: 'step_up_required', max_…
++    139|     const a = await f.admin.query<{ n: string }>(
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 a missing or blank reason is refused; nothing is requested
++AssertionError: expected 404 to be 400 // Object.is equality
++
++- Expected
+++ Received
++
++- 400
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:156:26
++    154|     ]) {
++    155|       const res = await requestReopen('faA', body);
++    156|       expect(res.status).toBe(400);
++       |                          ^
++    157|       expect(await res.json()).toMatchObject({ error: 'reason_required…
++    158|     }
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 a user without period.reopen is refused
++AssertionError: expected 404 to be 403 // Object.is equality
++
++- Expected
+++ Received
++
++- 403
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:170:24
++    168|   it('SS-UC10-06 a user without period.reopen is refused', async () =>…
++    169|     const res = await requestReopen('acc', { to_status: 'soft_closed',…
++    170|     expect(res.status).toBe(403);
++       |                        ^
++    171|     expect(await res.json()).toMatchObject({ error: 'forbidden', permi…
++    172|   });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 one approver requests: the request is pending and the period stays hard-locked; a replay returns the same request
++AssertionError: expected 404 to be 201 // Object.is equality
++
++- Expected
+++ Received
++
++- 201
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:176:24
++    174|   it('SS-UC10-06 one approver requests: the request is pending and the…
++    175|     const res = await requestReopen('faA', { to_status: 'soft_closed',…
++    176|     expect(res.status).toBe(201);
++       |                        ^
++    177|     const body = (await res.json()) as Record<string, unknown>;
++    178|     expect(body).toMatchObject({
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 the same person cannot approve their own request
++AssertionError: expected 404 to be 403 // Object.is equality
++
++- Expected
+++ Received
++
++- 403
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:205:24
++    203|   it('SS-UC10-06 the same person cannot approve their own request', as…
++    204|     const res = await approve('faA', requestId);
++    205|     expect(res.status).toBe(403);
++       |                        ^
++    206|     expect(await res.json()).toMatchObject({
++    207|       error: 'sod_violation',
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 the second approver needs a fresh step-up too
++AssertionError: expected 404 to be 401 // Object.is equality
++
++- Expected
+++ Received
++
++- 401
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:215:24
++    213|   it('SS-UC10-06 the second approver needs a fresh step-up too', async…
++    214|     const res = await approve('faB', requestId);
++    215|     expect(res.status).toBe(401);
++       |                        ^
++    216|     expect(await res.json()).toEqual({ error: 'step_up_required', max_…
++    217|     expect(await periodStatus(october)).toBe('hard_locked');
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 after a second, distinct approver the period reopens and the audit log has both
++AssertionError: expected 404 to be 200 // Object.is equality
++
++- Expected
+++ Received
++
++- 200
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:223:24
++    221|     await stepUp('faB');
++    222|     const res = await approve('faB', requestId);
++    223|     expect(res.status).toBe(200);
++       |                        ^
++    224|     expect(await res.json()).toMatchObject({
++    225|       id: requestId,
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 a replayed approval returns the same result; a third approver gets 409
++AssertionError: expected 404 to be 200 // Object.is equality
++
++- Expected
+++ Received
++
++- 200
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:275:27
++    273|   it('SS-UC10-06 a replayed approval returns the same result; a third …
++    274|     const replay = await approve('faB', requestId);
++    275|     expect(replay.status).toBe(200);
++       |                           ^
++    276|     expect(await replay.json()).toMatchObject({ id: requestId, status:…
++    277|     const late = await approve('owner', requestId);
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 the period lists its reopen requests with both approvers
++AssertionError: expected 404 to be 200 // Object.is equality
++
++- Expected
+++ Received
++
++- 200
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:285:24
++    283|   it('SS-UC10-06 the period lists its reopen requests with both approv…
++    284|     const res = await call('GET', `/periods/${october}/reopen-requests…
++    285|     expect(res.status).toBe(200);
++       |                        ^
++    286|     expect(await res.json()).toEqual({
++    287|       period_id: october,
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 a period that is not hard-locked cannot take a reopen request
++AssertionError: expected 404 to be 409 // Object.is equality
++
++- Expected
+++ Received
++
++- 409
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:304:24
++    302|   it('SS-UC10-06 a period that is not hard-locked cannot take a reopen…
++    303|     const res = await requestReopen('owner', { to_status: 'open', reas…
++    304|     expect(res.status).toBe(409);
++       |                        ^
++    305|     expect(await res.json()).toMatchObject({ error: 'period_not_hard_l…
++    306|   });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/11]⎯
++
++ FAIL  |api-db| apps/api/src/periods/period-reopen.db.test.ts > SS-UC10-06: Reopen needs two approvers and a reason > SS-UC10-06 another tenant's period and unknown ids answer 404
++AssertionError: expected 404 to be 400 // Object.is equality
++
++- Expected
+++ Received
++
++- 400
+++ 404
++
++ ❯ apps/api/src/periods/period-reopen.db.test.ts:315:59
++    313|     );
++    314|     expect((await approve('owner', randomUUID())).status).toBe(404);
++    315|     expect((await approve('owner', 'not-a-uuid')).status).toBe(400);
++       |                                                           ^
++    316|   });
++    317| });
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/11]⎯
++
++
++ Test Files  1 failed (1)
++      Tests  11 failed (11)
++   Start at  03:56:22
++   Duration  5.08s (transform 1.60s, setup 0ms, import 3.02s, tests 1.04s, environment 0ms)
++
+diff --git a/apps/api/src/app.ts b/apps/api/src/app.ts
+index fe2232b..831a081 100644
+--- a/apps/api/src/app.ts
++++ b/apps/api/src/app.ts
+@@ -31,6 +31,7 @@ import { ApiTokensController, UserApiTokensController } from './tokens/api-token
+ import { UsersController } from './users/users.controller.ts';
+ import { AccountsController } from './gl/accounts.controller.ts';
+ import { ReportsController } from './reports/reports.controller.ts';
++import { PeriodReopenController } from './periods/period-reopen.controller.ts';
+ import { CompaniesController } from './companies/companies.controller.ts';
+ import { HealthController } from './health/health.controller.ts';
+ import { PartyBankAccountsController } from './parties/bank-accounts.controller.ts';
+@@ -124,6 +125,7 @@ export const API_CONTROLLERS: readonly Type[] = [
+   ApPaymentBatchesController,
+   StripeWebhookController,
+   ReportsController,
++  PeriodReopenController,
+   OpeningBalancesController,
+   AuthController,
+   LoginController,
+@@ -169,6 +171,7 @@ class AppModule {
+         ApPaymentBatchesController,
+         StripeWebhookController,
+         ReportsController,
++        PeriodReopenController,
+         OpeningBalancesController,
+         ...(sessions ? [AuthController] : []),
+         ...(oidc ? [LoginController] : []),
+diff --git a/apps/api/src/authz/routes.test.ts b/apps/api/src/authz/routes.test.ts
+index f6a7379..4f36bbc 100644
+--- a/apps/api/src/authz/routes.test.ts
++++ b/apps/api/src/authz/routes.test.ts
+@@ -72,6 +72,17 @@ describe('SS-PLAT-49: Every endpoint checks a permission', () => {
+     ]);
+   });
+ 
++  it('SS-UC10-06 reopening a hard-locked period needs period.reopen (step-up by catalogue); listing needs reports.run [T-0079]', () => {
++    const byName = new Map(routes().map((r) => [r.name, r.access]));
++    expect(
++      ['request', 'approve', 'list'].map((k) => byName.get(`PeriodReopenController.${k}`)),
++    ).toEqual([
++      { kind: 'permission', permission: 'period.reopen' },
++      { kind: 'permission', permission: 'period.reopen' },
++      { kind: 'permission', permission: 'reports.run' },
++    ]);
++  });
++
+   it('bank details and role administration need specific permissions', () => {
+     const byName = new Map(routes().map((r) => [r.name, r.access]));
+     expect(byName.get('PartyBankAccountsController.list')).toEqual({
+diff --git a/apps/api/src/periods/period-reopen.controller.ts b/apps/api/src/periods/period-reopen.controller.ts
+new file mode 100644
+index 0000000..424f64a
+--- /dev/null
++++ b/apps/api/src/periods/period-reopen.controller.ts
+@@ -0,0 +1,264 @@
++/**
++ * Reopening a hard-locked period over HTTP (T-0079, UC-10, design §3.5, §6.2, §6.5 rule 6,
++ * ADR-0056). Thin: validates and calls @ledgerforce/ledger requestReopen / approveReopen, whose
++ * SECURITY DEFINER functions (migration 0018) repeat every check and write the audit rows
++ * `period.reopen_requested`, `period.reopen_approved` and `period.status_changed`.
++ *
++ *  - POST /periods/:periodId/reopen-requests {to_status, reason} — the first approver asks.
++ *    period.reopen + fresh step-up (300 s); a written reason is required. 201 new; a replay by
++ *    the same person with the same target and reason answers 200 with the pending request.
++ *  - POST /periods/reopen-requests/:requestId/approve — a second, different holder of
++ *    period.reopen with a fresh step-up approves; the period then moves to `to_status`. SoD
++ *    SOD_PERIOD_REOPEN_SELF_APPROVAL refuses the requester (never excepted). A replay by the same
++ *    approver answers 200 with the approved request; anyone else gets 409.
++ *  - GET /periods/:periodId/reopen-requests — the period's requests (reports.run).
++ *
++ * Idempotency: the reopen request table has no idempotency-key column and this round may not add
++ * migrations (DL-0409), so replays are recognised by state, as payment-batch release and
++ * bank-detail verify do (ADR-0056).
++ */
++import {
++  BadRequestException,
++  Body,
++  ConflictException,
++  Controller,
++  ForbiddenException,
++  Get,
++  HttpCode,
++  NotFoundException,
++  Param,
++  Post,
++  Req,
++  Res,
++} from '@nestjs/common';
++import { approveReopen, requestReopen, type PeriodStatus } from '@ledgerforce/ledger';
++import type { Request, Response } from 'express';
++import { sql, type Transaction } from 'kysely';
++import type { Database } from '@ledgerforce/db';
++import { principalOf } from '../auth/session-tenant-resolver.ts';
++import { RequirePermission, RequireStepUp } from '../authz/permission.decorator.ts';
++import { InvalidSodSubject, SoD, type SodSubject, type SubjectFrom } from '../sod/sod.decorator.ts';
++import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
++
++type Trx = Transaction<Database>;
++
++/** Step-up window for reopening a hard-locked period (design §6.2, ADR-0025). */
++const STEP_UP_SECONDS = 300;
++const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
++/** Statuses a hard-locked period may reopen to (migration 0018 CHECK). */
++const REOPEN_TO: readonly PeriodStatus[] = ['open', 'ar_locked', 'ap_locked', 'soft_closed'];
++const MAX_REASON = 2000;
++
++/**
++ * The request step's SoD subject. The database function chooses the request id, so the route
++ * names a placeholder before the handler and the handler sets the real id; the interceptor records
++ * `period_reopen_request.request` against it after the handler succeeds (sod.service recordSod
++ * reads the same object). The request step has no rule of its own, so the check is unaffected.
++ */
++const plannedSubjects = new WeakMap<Request, SodSubject>();
++const newRequest: SubjectFrom = async (req, trx) => {
++  const r = await sql<{ id: string }>`SELECT app.uuid_generate_v7()::text AS id`.execute(trx);
++  const id = r.rows[0]?.id;
++  if (!id) throw new Error('no id generated');
++  const subject: SodSubject = { id };
++  plannedSubjects.set(req, subject);
++  return subject;
++};
++
++/** The request named by the route, canonical lower-case so SoD history matches. */
++const requestFromParam: SubjectFrom = (req) => {
++  const id = req.params.requestId;
++  if (typeof id !== 'string' || !UUID.test(id)) throw new InvalidSodSubject();
++  return { id: id.toLowerCase() };
++};
++
++interface RequestRow {
++  id: string;
++  period_id: string;
++  company_id: string;
++  to_status: PeriodStatus;
++  reason: string;
++  status: 'pending' | 'approved';
++  requested_by: string;
++  requested_at: string;
++  approved_by: string | null;
++  approved_at: string | null;
++  period_status: PeriodStatus;
++}
++
++export type ReopenRequestView = RequestRow;
++
++const SELECT_REQUESTS = sql`
++  SELECT r.id::text, r.period_id::text, r.company_id::text, r.to_status, r.reason, r.status,
++         r.requested_by::text, to_char(r.requested_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS requested_at,
++         r.approved_by::text,
++         to_char(r.approved_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS approved_at,
++         p.status AS period_status
++    FROM app.period_reopen_request r
++    JOIN app.fiscal_period p ON p.tenant_id = r.tenant_id AND p.id = r.period_id`;
++
++async function loadRequest(trx: Trx, id: string): Promise<RequestRow | undefined> {
++  const r = await sql<RequestRow>`${SELECT_REQUESTS} WHERE r.id = ${id}::uuid`.execute(trx);
++  return r.rows[0];
++}
++
++async function loadPeriod(
++  trx: Trx,
++  id: string,
++): Promise<{ id: string; status: PeriodStatus } | undefined> {
++  const r = await sql<{ id: string; status: PeriodStatus }>`
++    SELECT id::text, status FROM app.fiscal_period WHERE id = ${id}::uuid`.execute(trx);
++  return r.rows[0];
++}
++
++const invalid = (message: string): never => {
++  throw new BadRequestException({ error: 'invalid_reopen_request', message });
++};
++
++function periodIdOf(v: string): string {
++  return UUID.test(v) ? v.toLowerCase() : invalid('periodId must be a uuid');
++}
++
++/** Refusals of migration 0018's functions as HTTP answers (by SQLSTATE). */
++function refusal(e: unknown): never {
++  const code = (e as { code?: unknown } | null)?.code;
++  switch (code) {
++    case 'P0002': // no_data_found: unknown (or other tenant's) period / request
++      throw new NotFoundException({ error: 'not_found' });
++    case '42501': // insufficient_privilege: not a holder of period.reopen
++      throw new ForbiddenException({ error: 'forbidden', permission: 'period.reopen' });
++    case '23505': // the one-pending-request-per-period index
++      throw new ConflictException({ error: 'reopen_request_pending' });
++    case '23514': // check_violation: no longer hard-locked, not pending, same approver …
++      throw new ConflictException({ error: 'reopen_refused' });
++    default:
++      throw e;
++  }
++}
++
++@Controller('periods')
++export class PeriodReopenController {
++  constructor(
++    private readonly tx: TenantTx,
++    private readonly audit: AuditTrail,
++  ) {}
++
++  @Post(':periodId/reopen-requests')
++  @HttpCode(201)
++  @RequirePermission('period.reopen')
++  @RequireStepUp(STEP_UP_SECONDS)
++  @SoD('period_reopen_request.request', newRequest)
++  async request(
++    @Req() req: Request,
++    @Res({ passthrough: true }) res: Response,
++    @Param('periodId') periodIdParam: string,
++    @Body() body: unknown,
++  ): Promise<ReopenRequestView> {
++    const b = (typeof body === 'object' && body !== null ? body : {}) as Record<string, unknown>;
++    const periodId = periodIdOf(periodIdParam);
++    const toStatus = b['to_status'];
++    if (typeof toStatus !== 'string' || !(REOPEN_TO as readonly string[]).includes(toStatus)) {
++      invalid(`to_status must be one of ${REOPEN_TO.join(', ')}`);
++    }
++    const rawReason = b['reason'];
++    const reason = typeof rawReason === 'string' ? rawReason.trim() : '';
++    if (reason === '' || reason.length > MAX_REASON) {
++      throw new BadRequestException({
++        error: 'reason_required',
++        message: `a written reason (1–${String(MAX_REASON)} characters) is required to reopen a hard-locked period`,
++      });
++    }
++    const actor = principalOf(req)?.userId;
++    const subject = plannedSubjects.get(req);
++    if (!actor || !subject) throw new ForbiddenException({ error: 'forbidden' });
++    const trx = this.tx.get();
++
++    const period = await loadPeriod(trx, periodId);
++    if (!period) throw new NotFoundException({ error: 'not_found' });
++    const pending = (
++      await sql<RequestRow>`${SELECT_REQUESTS}
++        WHERE r.period_id = ${periodId}::uuid AND r.status = 'pending'`.execute(trx)
++    ).rows[0];
++    if (pending) {
++      if (
++        pending.requested_by === actor &&
++        pending.to_status === toStatus &&
++        pending.reason === reason
++      ) {
++        subject.id = pending.id; // replay: the same request, recorded against the same subject
++        res.status(200);
++        return pending;
++      }
++      throw new ConflictException({ error: 'reopen_request_pending', request_id: pending.id });
++    }
++    if (period.status !== 'hard_locked') {
++      throw new ConflictException({
++        error: 'period_not_hard_locked',
++        period_status: period.status,
++      });
++    }
++
++    const id = await requestReopen(trx, {
++      periodId,
++      toStatus: toStatus as PeriodStatus,
++      actorId: actor,
++      reason,
++    }).catch(refusal);
++    subject.id = id;
++    const view = await loadRequest(trx, id);
++    if (!view) throw new Error('reopen request not readable after insert');
++    this.audit.describe({
++      entityType: 'period_reopen_request',
++      entityId: id,
++      after: { period_id: periodId, to_status: toStatus, reason, status: 'pending' },
++    });
++    return view;
++  }
++
++  @Post('reopen-requests/:requestId/approve')
++  @HttpCode(200)
++  @RequirePermission('period.reopen')
++  @RequireStepUp(STEP_UP_SECONDS)
++  @SoD('period_reopen_request.approve', requestFromParam)
++  async approve(
++    @Req() req: Request,
++    @Param('requestId') requestIdParam: string,
++  ): Promise<ReopenRequestView> {
++    const requestId = requestIdParam.toLowerCase();
++    const actor = principalOf(req)?.userId;
++    if (!actor) throw new ForbiddenException({ error: 'forbidden' });
++    const trx = this.tx.get();
++    const before = await loadRequest(trx, requestId);
++    if (!before) throw new NotFoundException({ error: 'not_found' });
++    if (before.status === 'approved') {
++      if (before.approved_by === actor) return before; // replay
++      throw new ConflictException({ error: 'reopen_request_not_pending' });
++    }
++    await approveReopen(trx, { requestId, actorId: actor }).catch(refusal);
++    const after = await loadRequest(trx, requestId);
++    if (!after) throw new Error('reopen request not readable after approval');
++    this.audit.describe({
++      entityType: 'period_reopen_request',
++      entityId: requestId,
++      before: { status: before.status, period_status: before.period_status },
++      after: { status: after.status, period_status: after.period_status },
++    });
++    return after;
++  }
++
++  @Get(':periodId/reopen-requests')
++  @RequirePermission('reports.run')
++  async list(@Param('periodId') periodIdParam: string): Promise<{
++    period_id: string;
++    period_status: PeriodStatus;
++    requests: ReopenRequestView[];
++  }> {
++    const periodId = periodIdOf(periodIdParam);
++    const trx = this.tx.get();
++    const period = await loadPeriod(trx, periodId);
++    if (!period) throw new NotFoundException({ error: 'not_found' });
++    const r = await sql<RequestRow>`${SELECT_REQUESTS}
++      WHERE r.period_id = ${periodId}::uuid ORDER BY r.requested_at, r.id`.execute(trx);
++    return { period_id: periodId, period_status: period.status, requests: r.rows };
++  }
++}
+diff --git a/apps/api/src/periods/period-reopen.db.test.ts b/apps/api/src/periods/period-reopen.db.test.ts
+new file mode 100644
+index 0000000..cd2634c
+--- /dev/null
++++ b/apps/api/src/periods/period-reopen.db.test.ts
+@@ -0,0 +1,337 @@
++/**
++ * SS-UC10-06 — reopening a hard-locked period over HTTP (T-0079, UC-10, design §3.5, §6.2,
++ * §6.5 rule 6, ADR-0056). October is hard-locked; Finance Admin A asks to reopen it to soft close
++ * with a written reason, Finance Admin B approves. Both routes need period.reopen and a fresh
++ * step-up; the approver must be a different person (SoD SOD_PERIOD_REOPEN_SELF_APPROVAL, and
++ * migration 0018 again); one approval leaves the period hard-locked; after two it reopens and the
++ * audit log holds both people. Real PostgreSQL as lf_app, real sessions; step-up is recorded on
++ * the session as the IdP callback does (the IdP round trip is proven in mfa-step-up.db.test.ts).
++ */
++import 'reflect-metadata';
++import { randomUUID } from 'node:crypto';
++import { withTenant } from '@ledgerforce/db';
++import { generateFiscalYear, setPeriodStatus } from '@ledgerforce/ledger';
++import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import { createApi, type Api } from '../app.ts';
++
++const TENANT = '01900000-0000-7000-8000-000000007901';
++const OTHER_TENANT = '01900000-0000-7000-8000-000000007902';
++
++let f: LedgerFixture;
++let api: Api;
++let october = '';
++let otherTenantPeriod = '';
++const cookies = new Map<string, string>();
++const people: Record<string, { id: string; roles: string[] }> = {
++  faA: { id: randomUUID(), roles: ['finance_admin'] },
++  faB: { id: randomUUID(), roles: ['finance_admin'] },
++  owner: { id: randomUUID(), roles: ['owner'] },
++  acc: { id: randomUUID(), roles: ['accountant'] },
++};
++
++async function call(method: string, path: string, who: string, body?: unknown) {
++  const h: Record<string, string> = {};
++  const c = cookies.get(who);
++  if (c) h.cookie = `lf_session=${c}`;
++  if (body !== undefined) h['content-type'] = 'application/json';
++  return fetch(`${api.url}${path}`, {
++    method,
++    headers: h,
++    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
++  });
++}
++
++/** A session whose last (MFA) authentication was `ageMinutes` ago. */
++async function login(who: string, ageMinutes: number) {
++  if (!api.sessions) throw new Error('sessions not configured');
++  cookies.set(
++    who,
++    await api.sessions.create(f.tenantId, {
++      userId: people[who]?.id ?? '',
++      amr: ['pwd', 'otp'],
++      acr: null,
++      authTime: new Date(Date.now() - ageMinutes * 60 * 1000),
++    }),
++  );
++}
++
++/** Step-up: a new MFA authentication recorded on the same session (as the IdP callback does). */
++async function stepUp(who: string) {
++  const sessionId = cookies.get(who)?.split('.')[1] ?? '';
++  await f.inTenant(
++    (trx) =>
++      api.sessions?.reauthenticateInTx(trx, sessionId, {
++        amr: ['pwd', 'otp'],
++        acr: null,
++        authTime: new Date(),
++      }) ?? Promise.resolve(),
++  );
++}
++
++async function periodStatus(id: string): Promise<string> {
++  const r = await f.admin.query<{ status: string }>(
++    'SELECT status FROM app.fiscal_period WHERE id = $1',
++    [id],
++  );
++  return r.rows[0]?.status ?? 'missing';
++}
++
++beforeAll(async () => {
++  f = await createLedgerFixture(TENANT);
++  for (const [who, person] of Object.entries(people)) {
++    await f.admin.query(
++      `INSERT INTO app.app_user (id, tenant_id, email, display_name, status) VALUES ($1, $2, $3, $4, 'active')`,
++      [person.id, f.tenantId, `${who}@reopen.test`, who],
++    );
++    for (const role of person.roles) {
++      await f.admin.query(
++        'INSERT INTO app.user_role (tenant_id, user_id, role) VALUES ($1, $2, $3)',
++        [f.tenantId, person.id, role],
++      );
++    }
++  }
++  // October 2026 (FY2027 period 4) of the main company, hard-locked after BAS by Finance Admin A.
++  const p = await f.admin.query<{ id: string }>(
++    `SELECT id FROM app.fiscal_period WHERE company_id = $1 AND start_date = '2026-10-01'`,
++    [f.companyId],
++  );
++  october = p.rows[0]?.id ?? '';
++  await f.inTenant((trx) =>
++    setPeriodStatus(trx, {
++      periodId: october,
++      status: 'hard_locked',
++      actorId: people.faA?.id ?? '',
++    }),
++  );
++  // A second tenant's period, for isolation.
++  otherTenantPeriod = await withTenant(f.db, OTHER_TENANT, async (trx) => {
++    await trx
++      .insertInto('app.tenant')
++      .values({ id: OTHER_TENANT, name: 'Other Pty Ltd' })
++      .execute();
++    const c = await trx
++      .insertInto('app.company')
++      .values({ name: 'Other Pty Ltd', base_currency: 'AUD' })
++      .returning('id')
++      .executeTakeFirstOrThrow();
++    const fy = await generateFiscalYear(trx, {
++      companyId: c.id,
++      convention: 'AU',
++      startYear: 2026,
++    });
++    return fy.periods[3]?.id ?? '';
++  });
++  api = await createApi({ databaseUrl: f.tdb.url('lf_app'), sessions: {} });
++  await login('faA', 30);
++  await login('faB', 30);
++  await login('owner', 30);
++  await login('acc', 1);
++}, 180_000);
++
++afterAll(async () => {
++  await (api as Api | undefined)?.close();
++  await (f as LedgerFixture | undefined)?.close();
++});
++
++const REASON = 'BAS amendment: supplier invoice SI-2210 was missed in October';
++const requestReopen = (who: string, body: unknown, period = october) =>
++  call('POST', `/periods/${period}/reopen-requests`, who, body);
++const approve = (who: string, id: string) =>
++  call('POST', `/periods/reopen-requests/${id}/approve`, who);
++
++describe('SS-UC10-06: Reopen needs two approvers and a reason', () => {
++  let requestId = '';
++
++  it('SS-UC10-06 without a fresh step-up the request is refused with step_up_required (audited)', async () => {
++    const res = await requestReopen('faA', { to_status: 'soft_closed', reason: REASON });
++    expect(res.status).toBe(401);
++    expect(await res.json()).toEqual({ error: 'step_up_required', max_age: 300 });
++    const a = await f.admin.query<{ n: string }>(
++      `SELECT count(*)::text AS n FROM audit.audit_log
++        WHERE tenant_id = $1 AND action = 'step_up_required' AND actor_user_id = $2`,
++      [f.tenantId, people.faA?.id],
++    );
++    expect(a.rows[0]?.n).toBe('1');
++    expect(await periodStatus(october)).toBe('hard_locked');
++  });
++
++  it('SS-UC10-06 a missing or blank reason is refused; nothing is requested', async () => {
++    await stepUp('faA');
++    for (const body of [
++      { to_status: 'soft_closed' },
++      { to_status: 'soft_closed', reason: '   ' },
++      { to_status: 'soft_closed', reason: 42 },
++    ]) {
++      const res = await requestReopen('faA', body);
++      expect(res.status).toBe(400);
++      expect(await res.json()).toMatchObject({ error: 'reason_required' });
++    }
++    const bad = await requestReopen('faA', { to_status: 'hard_locked', reason: REASON });
++    expect(bad.status).toBe(400);
++    expect(await bad.json()).toMatchObject({ error: 'invalid_reopen_request' });
++    const r = await f.admin.query('SELECT 1 FROM app.period_reopen_request WHERE period_id = $1', [
++      october,
++    ]);
++    expect(r.rowCount).toBe(0);
++  });
++
++  it('SS-UC10-06 a user without period.reopen is refused', async () => {
++    const res = await requestReopen('acc', { to_status: 'soft_closed', reason: REASON });
++    expect(res.status).toBe(403);
++    expect(await res.json()).toMatchObject({ error: 'forbidden', permission: 'period.reopen' });
++  });
++
++  it('SS-UC10-06 one approver requests: the request is pending and the period stays hard-locked; a replay returns the same request', async () => {
++    const res = await requestReopen('faA', { to_status: 'soft_closed', reason: `  ${REASON} ` });
++    expect(res.status).toBe(201);
++    const body = (await res.json()) as Record<string, unknown>;
++    expect(body).toMatchObject({
++      period_id: october,
++      to_status: 'soft_closed',
++      reason: REASON,
++      status: 'pending',
++      requested_by: people.faA?.id,
++      approved_by: null,
++      period_status: 'hard_locked',
++    });
++    requestId = String(body.id);
++    expect(requestId).toMatch(/^[0-9a-f-]{36}$/);
++    expect(await periodStatus(october)).toBe('hard_locked'); // a single approval is not enough
++
++    const replay = await requestReopen('faA', { to_status: 'soft_closed', reason: REASON });
++    expect(replay.status).toBe(200);
++    expect(await replay.json()).toMatchObject({ id: requestId, status: 'pending' });
++
++    const other = await requestReopen('owner', { to_status: 'open', reason: 'Different idea' });
++    expect(other.status).toBe(401); // owner has not stepped up yet
++    await stepUp('owner');
++    const conflict = await requestReopen('owner', { to_status: 'open', reason: 'Different idea' });
++    expect(conflict.status).toBe(409);
++    expect(await conflict.json()).toMatchObject({ error: 'reopen_request_pending' });
++  });
++
++  it('SS-UC10-06 the same person cannot approve their own request', async () => {
++    const res = await approve('faA', requestId);
++    expect(res.status).toBe(403);
++    expect(await res.json()).toMatchObject({
++      error: 'sod_violation',
++      rule: 'SOD_PERIOD_REOPEN_SELF_APPROVAL',
++    });
++    expect(await periodStatus(october)).toBe('hard_locked');
++  });
++
++  it('SS-UC10-06 the second approver needs a fresh step-up too', async () => {
++    const res = await approve('faB', requestId);
++    expect(res.status).toBe(401);
++    expect(await res.json()).toEqual({ error: 'step_up_required', max_age: 300 });
++    expect(await periodStatus(october)).toBe('hard_locked');
++  });
++
++  it('SS-UC10-06 after a second, distinct approver the period reopens and the audit log has both', async () => {
++    await stepUp('faB');
++    const res = await approve('faB', requestId);
++    expect(res.status).toBe(200);
++    expect(await res.json()).toMatchObject({
++      id: requestId,
++      period_id: october,
++      status: 'approved',
++      requested_by: people.faA?.id,
++      approved_by: people.faB?.id,
++      reason: REASON,
++      period_status: 'soft_closed',
++    });
++    expect(await periodStatus(october)).toBe('soft_closed');
++
++    const audit = await f.admin.query<{
++      action: string;
++      actor_user_id: string;
++      entity_type: string;
++      entity_id: string;
++    }>(
++      `SELECT action, actor_user_id, entity_type, entity_id FROM audit.audit_log
++        WHERE tenant_id = $1 AND (entity_id = $2 OR entity_id = $3)
++        ORDER BY occurred_at, id`,
++      [f.tenantId, requestId, october],
++    );
++    const rows = audit.rows.map((r) => [r.action, r.actor_user_id, r.entity_type]);
++    expect(rows).toEqual(
++      expect.arrayContaining([
++        ['period.reopen_requested', people.faA?.id, 'period_reopen_request'],
++        ['POST /periods/:periodId/reopen-requests', people.faA?.id, 'period_reopen_request'],
++        ['period.reopen_approved', people.faB?.id, 'period_reopen_request'],
++        ['period.status_changed', people.faB?.id, 'fiscal_period'],
++        [
++          'POST /periods/reopen-requests/:requestId/approve',
++          people.faB?.id,
++          'period_reopen_request',
++        ],
++      ]),
++    );
++    const change = await f.admin.query<{ reason: string; reopen_request_id: string }>(
++      `SELECT reason, reopen_request_id FROM app.period_status_change
++        WHERE period_id = $1 AND from_status = 'hard_locked'`,
++      [october],
++    );
++    expect(change.rows).toEqual([{ reason: REASON, reopen_request_id: requestId }]);
++    const sod = await f.admin.query<{ step: string; actor_user_id: string }>(
++      `SELECT DISTINCT step, actor_user_id FROM app.sod_action
++        WHERE subject_type = 'period_reopen_request' AND subject_id = $1 ORDER BY step DESC`,
++      [requestId],
++    );
++    // Distinct: the SoD engine records the step again on a replayed request (as for batches).
++    expect(sod.rows).toEqual([
++      { step: 'period_reopen_request.request', actor_user_id: people.faA?.id },
++      { step: 'period_reopen_request.approve', actor_user_id: people.faB?.id },
++    ]);
++  });
++
++  it('SS-UC10-06 a replayed approval returns the same result; a third approver gets 409', async () => {
++    const replay = await approve('faB', requestId);
++    expect(replay.status).toBe(200);
++    expect(await replay.json()).toMatchObject({ id: requestId, status: 'approved' });
++    const late = await approve('owner', requestId);
++    expect(late.status).toBe(409);
++    expect(await late.json()).toMatchObject({ error: 'reopen_request_not_pending' });
++    expect(await periodStatus(october)).toBe('soft_closed');
++  });
++
++  it('SS-UC10-06 the period lists its reopen requests with both approvers', async () => {
++    const res = await call('GET', `/periods/${october}/reopen-requests`, 'acc');
++    expect(res.status).toBe(200);
++    expect(await res.json()).toEqual({
++      period_id: october,
++      period_status: 'soft_closed',
++      requests: [
++        expect.objectContaining({
++          id: requestId,
++          status: 'approved',
++          requested_by: people.faA?.id,
++          approved_by: people.faB?.id,
++          reason: REASON,
++          to_status: 'soft_closed',
++        }),
++      ],
++    });
++  });
++
++  it('SS-UC10-06 a period that is not hard-locked cannot take a reopen request', async () => {
++    const res = await requestReopen('owner', { to_status: 'open', reason: REASON });
++    expect(res.status).toBe(409);
++    expect(await res.json()).toMatchObject({ error: 'period_not_hard_locked' });
++  });
++
++  it("SS-UC10-06 another tenant's period and unknown ids answer 404", async () => {
++    const res = await requestReopen(
++      'owner',
++      { to_status: 'open', reason: REASON },
++      otherTenantPeriod,
++    );
++    expect(res.status).toBe(404);
++    expect((await call('GET', `/periods/${otherTenantPeriod}/reopen-requests`, 'acc')).status).toBe(
++      404,
++    );
++    expect((await approve('owner', randomUUID())).status).toBe(404);
++    expect((await approve('owner', 'not-a-uuid')).status).toBe(400);
++  });
++});
+-- 
+2.43.0
+

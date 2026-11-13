@@ -1,7 +1,7 @@
 // Tests for the shell entry points: resume.sh, verify.sh, checkpoint.sh, handover.sh.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, writeFileSync, unlinkSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync, unlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { makeRepo, runBash, runCli, git, readText, cardField } from './helpers.ts';
@@ -263,4 +263,83 @@ test('verify.sh (full): no false positives — protective TRUNCATE triggers, str
   assert.match(r2.stdout, /GATE 6 migrations-forward: FAIL/);
   assert.match(r2.stdout, /0004_bad\.sql:1/);
   assert.match(r2.stdout, /0004_bad\.sql:2/);
+});
+
+// ---- gate 2c: unit+db coverage measure (T-0128, RQ-0105 remedy 2, DL-0408) ----------------------
+// A temp repo with @vitest/coverage-v8 "installed" and a fake pnpm on PATH that records how it was
+// called and writes a coverage summary with the given line percentage. main's baseline is optional;
+// branchBaseline, when given, is committed on the task branch (it must never be used as the base).
+function coverageRepo(mainBaseline: object | null, pct: number, branchBaseline?: object) {
+  const root = makeRepo();
+  mkdirSync(join(root, 'node_modules/@vitest/coverage-v8'), { recursive: true });
+  writeFileSync(join(root, '.gitignore'), 'node_modules/\n');
+  if (mainBaseline) writeFileSync(join(root, '.agent/coverage-baseline.json'), JSON.stringify(mainBaseline, null, 2) + '\n');
+  git(root, 'add', '-A');
+  git(root, 'commit', '-q', '-m', 'baseline on main');
+  git(root, 'checkout', '-q', '-b', 'feat/T-0002-ledger-tables');
+  if (branchBaseline) {
+    writeFileSync(join(root, '.agent/coverage-baseline.json'), JSON.stringify(branchBaseline, null, 2) + '\n');
+    git(root, 'add', '-A');
+    git(root, 'commit', '-q', '-m', 'baseline on branch');
+  }
+  const bin = mkdtempSync(join(tmpdir(), 'lf-fakebin-'));
+  const log = join(bin, 'pnpm.log');
+  writeFileSync(join(bin, 'pnpm'), [
+    '#!/usr/bin/env bash',
+    'echo "ARGS $* WORKERS=${VITEST_MAX_WORKERS:-unset}" >> "$FAKE_PNPM_LOG"',
+    'case " $* " in',
+    '  *" exec vitest run "*)',
+    '    for a in "$@"; do case "$a" in --coverage.reportsDirectory=*) d="${a#--coverage.reportsDirectory=}";; esac; done',
+    '    mkdir -p "$d"',
+    '    p="$FAKE_COV_PCT"',
+    '    printf \'{"total":{"lines":{"pct":%s},"branches":{"pct":%s},"functions":{"pct":%s},"statements":{"pct":%s}}}\' "$p" "$p" "$p" "$p" > "$d/coverage-summary.json"',
+    '    ;;',
+    'esac',
+    'exit 0',
+    '',
+  ].join('\n'), { mode: 0o755 });
+  writeFileSync(log, '');
+  const env = { PATH: `${bin}:${process.env['PATH'] ?? ''}`, FAKE_PNPM_LOG: log, FAKE_COV_PCT: String(pct), VITEST_MAX_WORKERS: '8' };
+  return { root, env, log };
+}
+const unitDbBaseline = (pct: number) => ({
+  measure: 'unit+db', recorded: '2026-11-13', total: { lines: { pct }, branches: { pct }, functions: { pct }, statements: { pct } },
+});
+
+test('verify.sh (full) with a task: 2c coverage measures unit+db with one worker and passes against a unit+db main baseline', () => {
+  const { root, env, log } = coverageRepo(unitDbBaseline(93.5), 94.1);
+  const r = runBash(root, 'verify.sh', ['--task', 'T-0002'], env);
+  assert.match(r.stdout, /GATE 2c coverage: PASS \(unit\+db lines 94\.1% vs main 93\.5%\)/, r.stdout);
+  const calls = readFileSync(log, 'utf8');
+  // the measure is pinned: both projects, coverage on, one worker even if the caller set more
+  assert.match(calls, /ARGS -s exec vitest run --project unit --project db --coverage\.enabled .*WORKERS=1$/m, calls);
+});
+
+test('verify.sh (full) with a task: 2c coverage fails when unit+db lines drop below the unit+db main baseline', () => {
+  const { root, env } = coverageRepo(unitDbBaseline(93.95), 93.7);
+  const r = runBash(root, 'verify.sh', ['--task', 'T-0002'], env);
+  assert.equal(r.code, 1, r.stdout);
+  assert.match(r.stdout, /GATE 2c coverage: FAIL \(unit\+db lines 93\.7% < main 93\.95%\)/, r.stdout);
+});
+
+test('verify.sh (full) with a task: 2c coverage is PENDING, never PASS, when main\'s baseline was taken with another measure', () => {
+  // Legacy main baseline (no "measure" field = the old unit-only measure). Current is higher and the
+  // branch already carries a re-recorded unit+db baseline, but the branch file is never the base.
+  const legacy = { note: 'unit-test coverage baseline', recorded: '2026-10-24', total: { lines: { pct: 72.22 } } };
+  const a = coverageRepo(legacy, 94.1, unitDbBaseline(94.1));
+  const r = runBash(a.root, 'verify.sh', ['--task', 'T-0002'], a.env);
+  assert.match(r.stdout, /GATE 2c coverage: NOT YET AVAILABLE \(unit\+db lines 94\.1% — main baseline measure is "unit", not "unit\+db": re-record \.agent\/coverage-baseline\.json on main with the unit\+db measure; no comparison across measures\)/, r.stdout);
+  assert.doesNotMatch(r.stdout, /GATE 2c coverage: (PASS|FAIL)/);
+
+  // an explicit other measure, even with a base the current number would fail against, is PENDING too
+  const b = coverageRepo({ measure: 'unit', recorded: '2026-10-24', total: { lines: { pct: 99 } } }, 94.1);
+  const r2 = runBash(b.root, 'verify.sh', ['--task', 'T-0002'], b.env);
+  assert.match(r2.stdout, /GATE 2c coverage: NOT YET AVAILABLE \(unit\+db lines 94\.1% — main baseline measure is "unit", not "unit\+db"/, r2.stdout);
+  assert.doesNotMatch(r2.stdout, /GATE 2c coverage: (PASS|FAIL)/);
+});
+
+test('verify.sh (full) with a task: 2c coverage is PENDING without a main baseline', () => {
+  const { root, env } = coverageRepo(null, 94.1, unitDbBaseline(94.1));
+  const r = runBash(root, 'verify.sh', ['--task', 'T-0002'], env);
+  assert.match(r.stdout, /GATE 2c coverage: NOT YET AVAILABLE \(unit\+db lines 94\.1% — no baseline \.agent\/coverage-baseline\.json on main yet\)/, r.stdout);
 });

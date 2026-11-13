@@ -42,14 +42,16 @@ afterAll(async () => {
 });
 
 describe('SS-PLAT-31: System-role accounts are protected by the database', () => {
-  it('loading the template creates every account and binds all 17 roles once', async () => {
+  it('loading the template creates every account and binds every system role once (both binding tables, ADR-0061)', async () => {
     const [accounts, roles] = await inTenant((trx) =>
       Promise.all([
         trx
           .selectFrom('app.account')
           .select(sql<number>`count(*)::int`.as('n'))
           .executeTakeFirstOrThrow(),
-        trx.selectFrom('app.account_system_role').select(['role']).execute(),
+        sql<{ role: string }>`SELECT role FROM app.account_role_binding`
+          .execute(trx)
+          .then((r) => r.rows),
       ]),
     );
     expect(accounts.n).toBe(auServicesSmb.accounts.length);

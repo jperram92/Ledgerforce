@@ -13,17 +13,19 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 
 | Status | Cards |
 |---|---:|
-| blocked | 6 |
+| blocked | 7 |
+| claimed | 1 |
 | done | 3 |
-| review | 91 |
-| todo | 31 |
-| verifying | 1 |
-| **total** | **132** |
+| in_progress | 1 |
+| review | 96 |
+| todo | 30 |
+| verifying | 2 |
+| **total** | **140** |
 
 | Phase | Cards |
 |---|---:|
 | Sprint 0 | 9 |
-| MVP | 91 |
+| MVP | 94 |
 | Phase 1 | 1 |
 | Phase 2 | 1 |
 | Phase 3 | 1 |
@@ -173,7 +175,7 @@ graph LR
 | [T-0076](T-0076.md) | Trial balance, profit & loss and balance sheet | MVP | review | T-0027 | UC-10 | 1 |
 | [T-0077](T-0077.md) | GL detail and aged AR/AP reports | MVP | review | T-0076, T-0028, T-0049 | — | 0 |
 | [T-0078](T-0078.md) | Month-end close checklist (UC-10) | MVP | review | T-0023, T-0061, T-0076 | UC-10 | 5 |
-| [T-0079](T-0079.md) | Hard-lock reopen with two approvers and audit reason | MVP | todo | T-0078, T-0015, T-0013 | UC-10 | 1 |
+| [T-0079](T-0079.md) | Hard-lock reopen with two approvers and audit reason | MVP | verifying | T-0078, T-0015, T-0013 | UC-10 | 1 |
 | [T-0080](T-0080.md) | Setup wizard backend (10 steps) and opening balances | MVP | review | T-0018, T-0034, T-0058, T-0063, T-0039, T-0046, T-0050 | — | 3 |
 | [T-0123](T-0123.md) | Setup wizard state machine and step validators (steps 1–10) | MVP | todo | T-0080, T-0018, T-0034, T-0058, T-0063, T-0039 | — | 0 |
 | [T-0124](T-0124.md) | Receipts, refunds and payment batches settle opening AR/AP items | MVP | todo | T-0080, T-0046, T-0054, T-0057 | UC-03, UC-06 | 0 |
@@ -185,7 +187,7 @@ graph LR
 | [T-0109](T-0109.md) | verify.sh gate 9: e2e runs must not write evidence into other tasks' folders | MVP | review | T-0009 | — | 0 |
 | [T-0081](T-0081.md) | Web app shell (React, Vite, TanStack, shadcn/ui) with auth and navigation | MVP | review | T-0011, T-0009, T-0106 | — | 0 |
 | [T-0082](T-0082.md) | UI: chart of accounts, manual journal and "show me the journal" preview | MVP | review | T-0081, T-0026, T-0029 | — | 0 |
-| [T-0083](T-0083.md) | UI: invoices list, detail, approve and post | MVP | verifying | T-0081, T-0040, T-0041, T-0131 | UC-01 | 1 |
+| [T-0083](T-0083.md) | UI: invoices list, detail, approve and post | MVP | review | T-0081, T-0040, T-0041, T-0131 | UC-01 | 1 |
 | [T-0084](T-0084.md) | UI: batch billing preview, approval and exception list | MVP | todo | T-0081, T-0044 | UC-02 | 1 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | todo | T-0081, T-0046, T-0045, T-0055 | UC-03, UC-11 | 2 |
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | verifying | T-0081, T-0052, T-0051 | UC-05 | 1 |
@@ -199,8 +201,11 @@ graph LR
 | [T-0094](T-0094.md) | Self-hosted Docker Compose install (api, worker, web, postgres, keycloak) | MVP | review | T-0081, T-0030, T-0011 | — | 1 |
 | [T-0095](T-0095.md) | CI security gates: SAST, dependency, container and secret scanning, SBOM | MVP | review | T-0001 | — | 1 |
 | [T-0096](T-0096.md) | DAST smoke test against the compose stack | MVP | review | T-0094, T-0095 | — | 0 |
-| [T-0097](T-0097.md) | Pilot hardening: backups, restore drill, security headers, rate limits | MVP | todo | T-0094, T-0096 | — | 0 |
-| [T-0098](T-0098.md) | Pilot data migration (opening balances, open AR/AP) and dry run | MVP | todo | T-0080, T-0097 | — | 0 |
+| [T-0097](T-0097.md) | Pilot hardening: backups, restore drill, security headers, rate limits (superseded by T-0142, T-0143, T-0144) | MVP | blocked | T-0094, T-0096 | — | 0 |
+| [T-0142](T-0142.md) | Platform - API security headers, strict CORS and rate limits on auth and mutating routes | MVP | verifying | T-0094 | — | 1 |
+| [T-0143](T-0143.md) | Ops - encrypted database backup and restore drill that proves the hash chain | MVP | todo | T-0094 | — | 0 |
+| [T-0144](T-0144.md) | Platform - CSRF guard with Fetch Metadata and Origin checks for cookie-authenticated mutations | MVP | todo | T-0142 | — | 0 |
+| [T-0098](T-0098.md) | Pilot data migration (opening balances, open AR/AP) and dry run | MVP | todo | T-0080, T-0142, T-0143, T-0144 | — | 0 |
 | [T-0099](T-0099.md) | MVP gate: pilot month and gate evidence pack (human gate) | MVP | todo | T-0098, T-0082, T-0083, T-0084, T-0085, T-0086, T-0087, T-0088, T-0089, T-0090, T-0091, T-0092, T-0093, T-0069, T-0070, T-0072, T-0075, T-0068, T-0048, T-0047, T-0033, T-0031, T-0035 | — | 0 |
 | [T-0100](T-0100.md) | EPIC — Phase 1 backlog (payroll bridge, BAS, collections, Rules Studio, …) | Phase 1 | todo | T-0099 | UC-04, UC-07, UC-09 | 12 |
 | [T-0101](T-0101.md) | EPIC — Phase 2 backlog (multi-entity, deferred revenue, Peppol, …) | Phase 2 | todo | T-0100 | — | 0 |
@@ -222,13 +227,13 @@ graph LR
 | [T-0114](T-0114.md) | Evidence recorder: portable real Vitest launch | Sprint 0 | done | T-0010 |
 | [T-0115](T-0115.md) | AASB alignment: research Australian Accounting Standards and update the solution design | MVP | review | — |
 | [T-0116](T-0116.md) | Template roles, accounts and source types for the AASB/GST golden postings | MVP | review | T-0031 |
-| [T-0117](T-0117.md) | Promote period-end accounts to system roles (additive role binding) | Phase 1 | todo | T-0116 |
+| [T-0117](T-0117.md) | Promote period-end accounts to system roles (additive role binding) | Phase 1 | verifying | T-0116 |
 | [T-0118](T-0118.md) | Tax codes in the database: effective-dated tax_code table, company rounding setting, line wiring | MVP | review | T-0034 |
 | [T-0119](T-0119.md) | Chromium in the worker image and PDF rendering as a worker job | MVP | todo | T-0041 |
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
-| [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | todo | — | — | 0 |
+| [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | in_progress | — | — | 0 |
 | [T-0129](T-0129.md) | Daily overdue-reminder job in the worker and per-party reminder pause | MVP | todo | T-0068 | UC-04 | 0 |
 | [T-0130](T-0130.md) | Stripe payouts: fetch from the API, payout.paid webhook, bank line match | MVP | todo | T-0075, T-0060 | UC-03, UC-08 | 0 |
 | [T-0131](T-0131.md) | AR invoices read and journal-preview API (list, detail, Show me the journal, approve) | MVP | review | T-0040, T-0041 | UC-01 | 0 |
@@ -238,6 +243,8 @@ graph LR
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | todo | T-0047, T-0035 | UC-04 | 3 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
+| [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | todo | T-0117 | UC-11 | 0 |
+| [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:

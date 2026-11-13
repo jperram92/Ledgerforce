@@ -1,0 +1,48 @@
+From 15bface42f85c141d2199e56e5211265f2e1f0f7 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 04:00:56 +0000
+Subject: [PATCH 3/4] docs(process): T-0117 agent holds the only migration slot
+ (DL-0410a)
+
+What changed: Decision log and HANDOVER record the seventh agent and its exclusive migration 0062.
+Why: Gapless migration runner.
+Validation: docs only.
+Next action: merge agent branches as they finish.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_014KLkD11bJX3jq2TErt1dHV
+---
+ .agent/HANDOVER.md             | 2 +-
+ Docs/decisions/decision-log.md | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/.agent/HANDOVER.md b/.agent/HANDOVER.md
+index 8531fdf..a414829 100644
+--- a/.agent/HANDOVER.md
++++ b/.agent/HANDOVER.md
+@@ -1,7 +1,7 @@
+ # Handover: parallel round 2 running (DL-0409); main = PR #4 merge; golden gate green (2026-11-13)
+ 
+ ## Codex continuation prompt
+-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file, DL-0405, DL-0408 and DL-0409. Branch `claude/loving-lovelace-nozqpk` (main + this session's work since 983cc91). Six sub-agents were started in local worktrees on local branches: `feat/T-0128-coverage-measure`, `feat/T-0079-period-reopen`, `feat/T-0084-batch-billing-ui`, `feat/T-0086-bills-ui`, `feat/T-0089-reports-ui`, `feat/T-0097-pilot-hardening`. Merges into this branch appear in `git log`; an agent branch not merged here was lost with the container, so restart that card from its card file. Cards awaiting Codex review: T-0121, T-0041, T-0061, T-0068, T-0075, T-0078, T-0131, T-0083 (verifying) and the integrated Line A cards.
++> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file, DL-0405, DL-0408 and DL-0409. Branch `claude/loving-lovelace-nozqpk` (main + this session's work since 983cc91). Six sub-agents were started in local worktrees on local branches: `feat/T-0128-coverage-measure`, `feat/T-0079-period-reopen`, `feat/T-0084-batch-billing-ui`, `feat/T-0086-bills-ui`, `feat/T-0089-reports-ui`, `feat/T-0097-pilot-hardening`, and `feat/T-0117-period-end-roles` (the only one allowed a migration: 0062). Merges into this branch appear in `git log`; an agent branch not merged here was lost with the container, so restart that card from its card file. Cards awaiting Codex review: T-0121, T-0041, T-0061, T-0068, T-0075, T-0078, T-0131, T-0083 (verifying) and the integrated Line A cards.
+ 
+ ## Open questions for human
+ - **(Resolved 2026-11-13, owner approved, DL-0408)** Golden approval registry refresh (it had been blocked by the session's permission classifier as an oversight-control change).** After the merge, `goldenGuard` fails because `Docs/decisions/golden-approvals.json` pins postings.md to the old snapshot 334a3f9 and main now holds GP-037…039. Per ADR-0047 the remedy is a refreshed record `{path: Docs/accounting/postings.md, commit: 983cc919f4911c5dd55e6e8bf9ff1e1f6a2ff404, decisions: [DL-0405, DL-0263, DL-0256, DL-0258]}`. Please approve the edit (or make it yourself); until then gate 4 stays FAIL on every branch.
+diff --git a/Docs/decisions/decision-log.md b/Docs/decisions/decision-log.md
+index 5f75603..801bb41 100644
+--- a/Docs/decisions/decision-log.md
++++ b/Docs/decisions/decision-log.md
+@@ -2586,3 +2586,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
+   | T-0097 pilot hardening | 0460–0469 | 0054–0055 | 0141–0142 | T-0142–T-0144 |
+ - Why: The owner asked for parallel agents (DL-0408); disjoint ranges keep the merges mechanical.
+ - ADR: none · Status: accepted
++
++### DL-0410a — Seventh agent (T-0117) gets the round's only migration slot
++- Date: 2026-11-13 · By: claude · Task: T-0117 · Category: process
++- Decision: Adds to DL-0409. T-0117 (period-end system roles) runs as a seventh agent with exclusive use of migration 0062 and the ranges DL-0470–0479, ADR-0061, RQ-0143, T-0145–T-0146. No other agent adds a migration this round.
++- Why: The gapless runner allows only one schema change in flight at a time (DL-0296).
++- ADR: none · Status: accepted
+-- 
+2.43.0
+

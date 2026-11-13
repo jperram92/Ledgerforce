@@ -1,0 +1,209 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37737
+ ❯ |db| packages/modules/gl/src/period-end-roles.db.test.ts (8 tests | 8 failed) 1039ms
+     × AC-2 loading the template binds the seven period-end roles in the additive table [T-0117] 18ms
+     × AC-2 the account_role_binding view returns every core and period-end binding once [T-0117] 3ms
+     × AC-2 app.system_role_allows gives each period-end role exactly its researched type [T-0117] 24ms
+     × AC-2 a period-end bound account cannot be archived, made non-postable, made control or re-typed [T-0117] 8ms
+     × AC-2 a period-end role re-binds only to an account of its type [T-0117] 8ms
+     × AC-2 the additive table refuses core roles, unknown roles and a second binding [T-0117] 9ms
+     × AC-2 lf_app cannot delete period-end bindings (nothing is deleted) [T-0117] 4ms
+     × AC-2 the additive table forces RLS and the view is security_invoker, so another tenant sees nothing [T-0117] 2ms
+ ❯ |db| packages/modules/gl/src/chart.db.test.ts (10 tests | 1 failed) 1584ms
+     × loading the template creates every account and binds every system role once (both binding tables, ADR-0061) 16ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/gl/src/chart.db.test.ts > SS-PLAT-31: System-role accounts are protected by the database > loading the template creates every account and binds every system role once (both binding tables, ADR-0061)
+error: relation "app.account_role_binding" does not exist
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/gl/src/chart.db.test.ts:46:31
+     44| describe('SS-PLAT-31: System-role accounts are protected by the databa…
+     45|   it('loading the template creates every account and binds every syste…
+     46|     const [accounts, roles] = await inTenant((trx) =>
+       |                               ^
+     47|       Promise.all([
+     48|         trx
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 loading the template binds the seven period-end roles in the additive table [T-0117]
+error: relation "app.account_system_role_ext" does not exist
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:73:15
+     71| describe('ADR-0061: period-end system roles are bound and guarded by t…
+     72|   it('AC-2 loading the template binds the seven period-end roles in th…
+     73|     const r = await inTenant((trx) =>
+       |               ^
+     74|       sql<{ role: string; code: string }>`
+     75|         SELECT b.role, a.code FROM app.account_system_role_ext b
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:73:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 the account_role_binding view returns every core and period-end binding once [T-0117]
+error: relation "app.account_role_binding" does not exist
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:89:15
+     87|
+     88|   it('AC-2 the account_role_binding view returns every core and period…
+     89|     const r = await inTenant((trx) =>
+       |               ^
+     90|       sql<{ role: string; n: number }>`
+     91|         SELECT role, count(*)::int AS n FROM app.account_role_binding
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:89:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 app.system_role_allows gives each period-end role exactly its researched type [T-0117]
+AssertionError: AR_ECL_ALLOWANCE/asset: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:105:50
+    103|       for (const type of TYPES) {
+    104|         const r = await sql<{ ok: boolean }>`SELECT app.system_role_al…
+    105|         expect(r.rows[0]?.ok, `${role}/${type}`).toBe(type === want);
+       |                                                  ^
+    106|       }
+    107|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 a period-end bound account cannot be archived, made non-postable, made control or re-typed [T-0117]
+AssertionError: 1510 {"status":"archived"}: expected 'accepted (no error)' to match /bound to system role ACCUM_DEPRECIATI…/
+
+- Expected:
+/bound to system role ACCUM_DEPRECIATION/
+
++ Received:
+"accepted (no error)"
+
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:123:88
+    121|         inTenant((trx) => trx.updateTable('app.account').set(change).w…
+    122|       );
+    123|       expect(e?.message ?? "accepted (no error)", `${code} ${JSON.stri…
+       |                                                                                        ^
+    124|         new RegExp(`bound to system role ${role}`),
+    125|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 a period-end role re-binds only to an account of its type [T-0117]
+AssertionError: expected 'relation "app.account_system_role_ext…' to match /system role PREPAYMENTS: type liabili…/
+
+- Expected:
+/system role PREPAYMENTS: type liability is not allowed/
+
++ Received:
+"relation \"app.account_system_role_ext\" does not exist"
+
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:137:28
+    135|       ),
+    136|     );
+    137|     expect(wrong?.message).toMatch(/system role PREPAYMENTS: type liab…
+       |                            ^
+    138|
+    139|     // Positive control: a second asset account takes the binding, the…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 the additive table refuses core roles, unknown roles and a second binding [T-0117]
+AssertionError: expected '42P01' to be '23514' // Object.is equality
+
+Expected: "23514"
+Received: "42P01"
+
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:183:55
+    181|         ),
+    182|       );
+    183|     expect((await insert('UNDEPOSITED_FUNDS'))?.code).toBe('23514');
+       |                                                       ^
+    184|     expect((await insert('NOT_A_ROLE'))?.code).toBe('23514');
+    185|     expect((await insert('PREPAYMENTS'))?.code).toBe('23505');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 lf_app cannot delete period-end bindings (nothing is deleted) [T-0117]
+AssertionError: expected '42P01' to be '42501' // Object.is equality
+
+Expected: "42501"
+Received: "42P01"
+
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:206:21
+    204|       ),
+    205|     );
+    206|     expect(e?.code).toBe('42501');
+       |                     ^
+    207|   });
+    208|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 the additive table forces RLS and the view is security_invoker, so another tenant sees nothing [T-0117]
+error: relation "app.account_system_role_ext" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:210:18
+    208|
+    209|   it('AC-2 the additive table forces RLS and the view is security_invo…
+    210|     const meta = await tdb.admin.query<{ rls: boolean; force: boolean;…
+       |                  ^
+    211|       `SELECT t.relrowsecurity AS rls, t.relforcerowsecurity AS force,
+    212|               coalesce('security_invoker=true' = ANY(v.reloptions), fa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  9 failed | 9 passed (18)
+   Start at  08:18:03
+   Duration  3.63s (transform 433ms, setup 0ms, import 1.09s, tests 2.62s, environment 0ms)
+

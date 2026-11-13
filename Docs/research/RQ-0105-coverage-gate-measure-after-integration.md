@@ -1,9 +1,9 @@
 ---
 id: RQ-0105
 title: Why unit coverage fell after the Line A integration, and what gate 2c should measure
-status: answered-pending-human
+status: answered
 opened: 2026-11-12
-resolved:
+resolved: 2026-11-13
 opened_by: claude
 linked_tasks: [T-0128]
 linked_adrs: []
@@ -59,3 +59,20 @@ integrated tree (6d7531d) is **93.70 %**, so even under the like-for-like measur
 close that gap with assertion-bearing tests (unit or db) in the least-covered integrated files,
 whichever measure the owner chooses. Under the current unit-only measure the gap is
 13.7 points, almost all of it from DB-tested files.
+
+## Resolution (2026-11-13)
+**Status: answered.** The owner approved remedy 2 (DL-0408: "Approved"). Implemented in T-0128 (DL-0410, DL-0411):
+
+- Gate 2c measures `unit+db`: `VITEST_MAX_WORKERS=1 pnpm -s exec vitest run --project unit --project db --coverage.enabled --coverage.reporter=json-summary`.
+  It runs on one worker even if the caller sets more, so the measure is reproducible.
+- `.agent/coverage-baseline.json` records `"measure"`. A main baseline without that field is the old unit-only measure.
+  When main's measure differs from the gate's, the gate is **PENDING** and asks for main's baseline to be re-recorded
+  under the same measure. It never passes or fails across measures.
+- Baseline re-recorded with that exact command over bcf4ab6 (the PR #4 merge 983cc91 plus T-0131/T-0083 and docs commits): **lines 93.65 %**
+  (8,071 / 8,618), branches 79.21 %, functions 95.66 %, statements 91.09 %. 160 test files and 2,195 tests passed, none skipped.
+  Per-package figures: `.agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt`.
+- Until that baseline is on main, gate 2c on branches reports PENDING (main still holds the unit-only file). That is the intended
+  behaviour, not a pass.
+- The 0.25-point like-for-like drop measured on 2026-11-12 (93.95 % → 93.70 %) is now part of the main history: 983cc91 was merged
+  by the owner under DL-0405 item 3. The new baseline records the tree as it is (93.65 %). Raising it with assertion-bearing tests
+  is ordinary work and no longer a gate blocker.

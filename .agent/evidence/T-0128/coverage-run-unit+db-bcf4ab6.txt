@@ -1,0 +1,8 @@
+2026-11-13T03:55:47Z
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a9e1b2d93b78a687c
+      Coverage enabled with v8
+[db] test PostgreSQL ready (local) on 127.0.0.1:35423
+ Test Files  160 passed (160)
+      Tests  2195 passed (2195)
+EXIT 0
+2026-11-13T04:03:30Z
