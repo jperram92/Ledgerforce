@@ -190,7 +190,7 @@ graph LR
 | [T-0083](T-0083.md) | UI: invoices list, detail, approve and post | MVP | review | T-0081, T-0040, T-0041, T-0131 | UC-01 | 1 |
 | [T-0084](T-0084.md) | UI: batch billing preview, approval and exception list | MVP | todo | T-0081, T-0044 | UC-02 | 1 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | todo | T-0081, T-0046, T-0045, T-0055 | UC-03, UC-11 | 2 |
-| [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | verifying | T-0081, T-0052, T-0051 | UC-05 | 1 |
+| [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | review | T-0081, T-0052, T-0051 | UC-05 | 1 |
 | [T-0087](T-0087.md) | UI: supplier bank-detail verification and payment batch release (step-up) | MVP | todo | T-0081, T-0054, T-0053, T-0056 | UC-06 | 1 |
 | [T-0088](T-0088.md) | UI: statement import and bank reconciliation | MVP | todo | T-0081, T-0061, T-0059 | UC-08 | 1 |
 | [T-0089](T-0089.md) | UI: TB, P&L, balance sheet, GL detail, aged AR/AP | MVP | todo | T-0081, T-0077 | — | 0 |

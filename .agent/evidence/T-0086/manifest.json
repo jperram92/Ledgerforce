@@ -307,6 +307,114 @@
       "provider": "unknown",
       "timestamp": "2026-11-13T08:29:55.560Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091408-SS-UC05-08-bill-entry-coding-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5143458a9ca3",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:08.990Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091410-SS-UC05-08-bill-sent-for-approval-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5143458a9ca3",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:10.774Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091413-SS-UC05-08-bill-approval-preview-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5143458a9ca3",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:13.968Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091414-SS-UC05-08-bill-posted-journal-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5143458a9ca3",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:14.956Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091418-SS-UC05-08-bill-entry-coding-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:18.143Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091419-SS-UC05-08-bill-sent-for-approval-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:19.327Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091421-SS-UC05-08-bill-approval-preview-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:21.360Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091422-SS-UC05-08-bill-posted-journal-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:22.602Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-092450-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): bill coding choices › lists active suppliers, postable expense/asset accounts and tax codes in force; needs ap.bill.enter | apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): bills list and one bill › lists every bill with supplier, dates and state; shows one bill with its coding and the people involved | apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): approval decision for the caller (SoD on the server) › a person who entered a 2,750.00 bill is told they may not approve it; another approver may | apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): the journal of a bill › previews GP-008 for a draft without writing, and shows the same posted entry after approval",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:24:50.541Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-03",
+      "file": ".agent/evidence/T-0086/20261113-092450-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-03: Submitted bill waits for the Approver › SS-UC05-03 a submitted bill is in the Approver queue, unposted, with no journal",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:24:50.541Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-05",
+      "file": ".agent/evidence/T-0086/20261113-092450-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-05: AP Clerk cannot approve own bill › SS-UC05-05 the Clerk who entered a 2,750.00 bill is refused (SOD_BILL_SELF_APPROVAL, audited); another approver posts it",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:24:50.541Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-06",
+      "file": ".agent/evidence/T-0086/20261113-092450-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-06: Small-team approval records an exception › SS-UC05-06 in small-team mode the sole user approves their own bill only with a recorded exception",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:24:50.541Z",
+      "result": "passed"
     }
   ]
 }

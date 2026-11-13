@@ -2673,3 +2673,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Date: 2026-11-13 · By: claude · Task: T-0086 · Category: scope
 - Decision: T-0086's acceptance criterion (SS-UC05-08: code and approve a draft, see the posted journal) is met through manual bill entry. The bills inbox (T-0051 items with the PDF, `codeInboxItem`) has no HTTP routes yet; listing inbox items, showing the PDF and coding an item into a draft bill moves to the new card T-0136 (API routes + screen), keeping T-0086 within one session.
 - ADR: none · Status: accepted
+
+### DL-0443 — T-0086 re-verified after the lead merge; API tests carry the SS id; card to review
+- Date: 2026-11-13 · By: claude · Task: T-0086 · Category: process
+- Decision: After two usage-limit stops (e6a401b, 71d5d8d, saved unverified), the branch was merged with the lead's `claude/loving-lovelace-nozqpk` (28b23bc; conflicts kept both sides: T-0083 manifest entries, decision log) and every check was re-run on the merged tree: install (frozen lockfile), typecheck, lint, format:check, lint-backlog, vitest web+unit 939/939, api-db+db 1658/1658 on one worker (0 skipped), `bills.spec.ts` 6/6 with fresh SS-UC05-08 screenshots at 1440 and 390 (checked by eye). The four `describe` titles of `apps/api/src/ap/bills-read.db.test.ts` now start with `SS-UC05-08 (API, T-0086)` (titles only, assertions unchanged) so `pnpm evidence:tests --project api-db --require SS-UC05-08` can link the API half of the scenario, as `batches.db.test.ts` does for SS-UC02-xx. Only `bills.spec.ts` is run from now on, so other tasks' evidence is not churned; the T-0081/0082/0083/0092/0093 entries the earlier full-suite run appended stay (evidence is append-only). Card set to `review`; steps 4 (full `verify.sh`), 6 (cross-review) and 7 (run log, HANDOVER, lease: the lead's during the parallel round) stay open.
+- Why: Directive 3 (trust nothing unverified) and the lead's instruction; register links need the scenario id in a test title.
+- Alternatives: dropping `--require` (no scenario link); a new SS id for the API half (the register already lists both files under SS-UC05-08).
+- ADR: none · Status: accepted

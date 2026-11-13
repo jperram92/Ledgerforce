@@ -141,7 +141,7 @@ interface JournalBody {
 const amounts = (j: JournalBody) =>
   j.lines.map((l) => `${l.account_code} ${l.debit} ${l.credit}`).sort();
 
-describe('T-0086: bill coding choices', () => {
+describe('SS-UC05-08 (API, T-0086): bill coding choices', () => {
   it('lists active suppliers, postable expense/asset accounts and tax codes in force; needs ap.bill.enter', async () => {
     const res = await call('GET', `/ap/bill-coding?${q()}&date=2026-11-03`, 'clerk');
     expect(res.status).toBe(200);
@@ -164,7 +164,7 @@ describe('T-0086: bill coding choices', () => {
   });
 });
 
-describe('T-0086: bills list and one bill', () => {
+describe('SS-UC05-08 (API, T-0086): bills list and one bill', () => {
   it('lists every bill with supplier, dates and state; shows one bill with its coding and the people involved', async () => {
     const id = randomUUID();
     expect((await enter(id, 'clerk', 'SUP-R-1')).status).toBe(201);
@@ -228,7 +228,7 @@ describe('T-0086: bills list and one bill', () => {
   });
 });
 
-describe('T-0086: approval decision for the caller (SoD on the server)', () => {
+describe('SS-UC05-08 (API, T-0086): approval decision for the caller (SoD on the server)', () => {
   it('a person who entered a 2,750.00 bill is told they may not approve it; another approver may', async () => {
     const id = randomUUID();
     expect((await enter(id, 'clerkApprover', 'SUP-R-2')).status).toBe(201);
@@ -252,7 +252,7 @@ describe('T-0086: approval decision for the caller (SoD on the server)', () => {
   });
 });
 
-describe('T-0086: the journal of a bill', () => {
+describe('SS-UC05-08 (API, T-0086): the journal of a bill', () => {
   it('previews GP-008 for a draft without writing, and shows the same posted entry after approval', async () => {
     const id = randomUUID();
     expect((await enter(id, 'clerk', 'SUP-R-3')).status).toBe(201);
