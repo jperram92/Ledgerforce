@@ -230,6 +230,7 @@ graph LR
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
 | [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | todo | — | — | 0 |
 | [T-0129](T-0129.md) | Daily overdue-reminder job in the worker and per-party reminder pause | MVP | todo | T-0068 | UC-04 | 0 |
+| [T-0130](T-0130.md) | Stripe payouts: fetch from the API, payout.paid webhook, bank line match | MVP | todo | T-0075, T-0060 | UC-03, UC-08 | 0 |
 | [T-0166](T-0166.md) | Gross ECL allowance reconciliation from source lineage | MVP | blocked | T-0031, T-0048 | — | 3 |
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | todo | T-0047, T-0035 | UC-04 | 3 |
