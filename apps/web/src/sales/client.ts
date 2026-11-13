@@ -109,7 +109,72 @@ export interface BatchRequest {
   issue_date?: string;
 }
 
+/** GET /ar/receipts (T-0151). */
+export interface ReceiptRow {
+  id: string;
+  receipt_no: string;
+  party_id: string;
+  party_name: string;
+  receipt_date: string;
+  method: 'eft' | 'cheque' | 'cash' | 'card';
+  reference: string | null;
+  amount: string;
+  unallocated: string;
+}
+
+/** POST /ar/receipts/:id/allocations (T-0046, keyed since T-0151). */
+export interface ReceiptResult {
+  id: string;
+  receipt_no: string;
+  entry_id: string;
+  replayed: boolean;
+  amount: string;
+  unallocated: string;
+}
+
+export interface AllocationRequest {
+  company_id: string;
+  invoice_id: string;
+  amount: string;
+  allocation_date: string;
+}
+
+/** PUT /ar/credit-notes/:id, GET /ar/credit-notes/:id, POST …/approve (T-0045). */
+export interface CreditNote {
+  id: string;
+  replayed: boolean;
+  status: 'draft' | 'posted' | 'void';
+  credit_note_no: string | null;
+  invoice_id: string;
+  entry_id: string | null;
+  net: string;
+  tax: string;
+  gross: string;
+}
+
+export interface CreditNoteRequest {
+  company_id: string;
+  invoice_id: string;
+  issue_date: string;
+  reason_code: string;
+  lines: { invoice_line_no: number; amount: string }[];
+}
+
 export interface SalesClient {
+  receipts(companyId: string): Promise<{ receipts: ReceiptRow[] }>;
+  allocate(
+    receiptId: string,
+    body: AllocationRequest,
+    idempotencyKey: string,
+  ): Promise<ReceiptResult>;
+  paymentStatus(
+    companyId: string,
+    invoiceId: string,
+  ): Promise<{ status: 'unpaid' | 'partially_paid' | 'paid'; open: string }>;
+  createCreditNote(id: string, body: CreditNoteRequest): Promise<CreditNote>;
+  creditNote(companyId: string, id: string): Promise<CreditNote>;
+  creditNoteJournal(companyId: string, id: string): Promise<InvoiceJournal>;
+  approveCreditNote(companyId: string, id: string): Promise<CreditNote>;
   companies(): Promise<Company[]>;
   invoices(companyId: string, status?: InvoiceStatus): Promise<{ invoices: InvoiceRow[] }>;
   invoice(companyId: string, id: string): Promise<Invoice>;
@@ -121,7 +186,7 @@ export interface SalesClient {
 
 export function createSalesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): SalesClient {
   async function send<T>(
-    method: 'GET' | 'POST',
+    method: 'GET' | 'POST' | 'PUT',
     path: string,
     body?: unknown,
     extra: Record<string, string> = {},
@@ -141,7 +206,19 @@ export function createSalesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Sales
   }
   const get = <T>(path: string) => send<T>('GET', path);
   const seg = encodeURIComponent;
+  const co = (companyId: string) => `company_id=${seg(companyId)}`;
   return {
+    receipts: (companyId) => get(`/ar/receipts?${co(companyId)}&unallocated=true`),
+    allocate: (receiptId, body, key) =>
+      send('POST', `/ar/receipts/${seg(receiptId)}/allocations`, body, { 'idempotency-key': key }),
+    paymentStatus: (companyId, invoiceId) =>
+      get(`/ar/invoices/${seg(invoiceId)}/payment-status?${co(companyId)}`),
+    createCreditNote: (id, body) => send('PUT', `/ar/credit-notes/${seg(id)}`, body),
+    creditNote: (companyId, id) => get(`/ar/credit-notes/${seg(id)}?${co(companyId)}`),
+    creditNoteJournal: (companyId, id) =>
+      get(`/ar/credit-notes/${seg(id)}/journal?${co(companyId)}`),
+    approveCreditNote: (companyId, id) =>
+      send('POST', `/ar/credit-notes/${seg(id)}/approve?${co(companyId)}`, {}),
     companies: () => get('/companies'),
     invoices: (companyId, status) =>
       get(`/ar/invoices?company_id=${seg(companyId)}${status ? `&status=${seg(status)}` : ''}`),

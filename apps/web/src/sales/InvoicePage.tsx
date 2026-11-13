@@ -175,6 +175,13 @@ export function InvoicePage({ invoiceId }: { invoiceId: string }) {
           />
         )}
       </Region>
+      {inv.status === 'posted' && access.can('ar.credit_note.create') ? (
+        <p className="admin-note">
+          <Link to="/sales/credit-notes" search={{ invoice: inv.id }}>
+            Issue a credit note
+          </Link>
+        </p>
+      ) : null}
       <p className="admin-note">
         <Link to="/sales/invoices">All invoices</Link>
       </p>

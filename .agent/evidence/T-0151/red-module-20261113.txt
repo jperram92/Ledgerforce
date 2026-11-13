@@ -1,0 +1,30 @@
+    161|     ).rejects.toMatchObject({ code: 'RECEIPT_NOT_FOUND' } satisfies Pa…
+       |      ^
+    162|   });
+    163| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |db| packages/modules/ar/src/ar-cash.db.test.ts > T-0151 AC-2: credit-note journal preview > AC-2 the preview equals the journal approval posts (GP-005 builder) and writes nothing [T-0151]
+TypeError: previewCreditNoteJournal is not a function
+ ❯ packages/modules/ar/src/ar-cash.db.test.ts:181:7
+    179|     const entries = await count('journal_entry');
+    180|     const p = await f.inTenant((trx) =>
+    181|       previewCreditNoteJournal(trx, { companyId: f.companyId, creditNo…
+       |       ^
+    182|     );
+    183|     expect(await count('journal_entry')).toBe(entries);
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/ar-cash.db.test.ts:180:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  14:05:34
+   Duration  2.34s (transform 421ms, setup 0ms, import 610ms, tests 945ms, environment 0ms)
+
+EXIT 1

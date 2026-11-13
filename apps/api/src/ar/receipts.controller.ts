@@ -1,7 +1,9 @@
 /**
  * Customer receipts over HTTP (T-0046, UC-03, DL-0274). POST /ar/receipts records, posts and
  * allocates a receipt (ar.receipt.record, idempotency key; 201 new / 200 replay);
- * POST /ar/receipts/:id/allocations allocates an unallocated receipt later;
+ * POST /ar/receipts/:id/allocations allocates an unallocated receipt later (Idempotency-Key
+ * required since T-0151: a repeat replays, DL-0490); GET /ar/receipts lists receipts with their
+ * unallocated amount (ar.read, T-0151);
  * GET /ar/invoices/:id/payment-status reads Paid / Partially paid (ar.read).
  */
 import {
@@ -11,6 +13,7 @@ import {
   Get,
   Headers,
   HttpCode,
+  NotFoundException,
   Param,
   Post,
   Query,
@@ -21,6 +24,7 @@ import {
 import {
   allocateReceipt,
   invoicePaymentStatus,
+  listReceipts,
   ReceiptError,
   recordReceipt,
   type ReceiptView,
@@ -39,6 +43,9 @@ const bad = (message: string): never => {
   throw new BadRequestException({ error: 'invalid_receipt', message });
 };
 const refusal = (e: unknown): never => {
+  if (e instanceof ReceiptError && e.code === 'RECEIPT_NOT_FOUND') {
+    throw new NotFoundException({ error: 'not_found', message: 'receipt not found' });
+  }
   if (e instanceof ReceiptError || e instanceof PostingError || e instanceof AllocationError) {
     throw new UnprocessableEntityException({ error: e.code, message: e.message });
   }
@@ -115,10 +122,40 @@ export class ArReceiptsController {
     return viewOf(r);
   }
 
+  @Get('receipts')
+  @RequirePermission('ar.read')
+  async list(@Query('company_id') companyId: unknown, @Query('unallocated') unallocated: unknown) {
+    if (unallocated !== undefined && unallocated !== 'true' && unallocated !== 'false')
+      bad('unallocated must be true or false');
+    const rows = await listReceipts(this.tx.get(), {
+      companyId: uuid(companyId, 'company_id'),
+      unallocatedOnly: unallocated === 'true',
+    });
+    return {
+      receipts: rows.map((r) => ({
+        id: r.receiptId,
+        receipt_no: r.receiptNo,
+        party_id: r.partyId,
+        party_name: r.partyName,
+        receipt_date: r.receiptDate,
+        method: r.method,
+        reference: r.reference,
+        amount: r.amount,
+        unallocated: r.unallocated,
+      })),
+    };
+  }
+
   @Post('receipts/:id/allocations')
   @HttpCode(200)
   @RequirePermission('ar.receipt.record')
-  async allocate(@Param('id') id: string, @Body() body: unknown) {
+  async allocate(
+    @Headers('idempotency-key') key: string | undefined,
+    @Param('id') id: string,
+    @Body() body: unknown,
+  ) {
+    if (!key || key.length > 200)
+      throw new BadRequestException({ error: 'idempotency_key_required' });
     const b = obj(body);
     const date = str(b['allocation_date'], 'allocation_date');
     if (!DATE.test(date)) bad('allocation_date must be YYYY-MM-DD');
@@ -128,12 +165,14 @@ export class ArReceiptsController {
       invoiceId: uuid(b['invoice_id'], 'invoice_id'),
       amount: str(b['amount'], 'amount'),
       allocationDate: date,
+      idempotencyKey: key,
     }).catch(refusal);
-    this.audit.describe({
-      entityType: 'customer_receipt',
-      entityId: r.receiptId,
-      after: viewOf(r),
-    });
+    if (!r.replayed)
+      this.audit.describe({
+        entityType: 'customer_receipt',
+        entityId: r.receiptId,
+        after: viewOf(r),
+      });
     return viewOf(r);
   }
 

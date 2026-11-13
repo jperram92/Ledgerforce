@@ -1,0 +1,18 @@
+     × AC-3 GET /ar/receipts lists unallocated receipts as decimal strings; 403 without ar.read [T-0151] 32ms
+     × AC-4 POST allocations needs an Idempotency-Key and ar.receipt.record; a replay is the same allocation; another tenant is 404 [T-0151] 61ms
+     × AC-5 GET /ar/credit-notes/:id/journal previews GP-005 and writes nothing; 403 without ar.read; another tenant is 404 [T-0151] 3ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |api-db| apps/api/src/ar/ar-cash.db.test.ts > T-0151: AR cash routes > AC-3 GET /ar/receipts lists unallocated receipts as decimal strings; 403 without ar.read [T-0151]
+AssertionError: expected 404 to be 403 // Object.is equality
+- Expected
++ Received
+ FAIL  |api-db| apps/api/src/ar/ar-cash.db.test.ts > T-0151: AR cash routes > AC-4 POST allocations needs an Idempotency-Key and ar.receipt.record; a replay is the same allocation; another tenant is 404 [T-0151]
+AssertionError: expected 200 to be 400 // Object.is equality
+- Expected
++ Received
+ FAIL  |api-db| apps/api/src/ar/ar-cash.db.test.ts > T-0151: AR cash routes > AC-5 GET /ar/credit-notes/:id/journal previews GP-005 and writes nothing; 403 without ar.read; another tenant is 404 [T-0151]
+AssertionError: expected 404 to be 403 // Object.is equality
+- Expected
++ Received
+      Tests  3 failed (3)
+EXIT 1

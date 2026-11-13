@@ -1,0 +1,6 @@
+ Test Files  3 passed (3)
+      Tests  12 passed (12)
+EXIT 0
+ Test Files  6 passed (6)
+      Tests  24 passed (24)
+EXIT 0

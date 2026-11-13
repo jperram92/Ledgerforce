@@ -10,6 +10,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -23,6 +24,7 @@ import {
   createCreditNote,
   CreditNoteError,
   getCreditNote,
+  previewCreditNoteJournal,
   type CreditNoteView,
 } from '@ledgerforce/ar';
 import { PostingError } from '@ledgerforce/ledger';
@@ -160,6 +162,43 @@ export class ArCreditNotesController {
       after: viewOf(cn),
     });
     return viewOf(cn);
+  }
+
+  /**
+   * "Show me the journal" for a draft credit note (T-0151, SS-UC11-08): the posting engine's
+   * preview of exactly what approval posts (GP-005); writes nothing. Not in the company → 404.
+   */
+  @Get(':id/journal')
+  @RequirePermission('ar.read')
+  async journal(@Param('id') id: string, @Query('company_id') companyId: string | undefined) {
+    if (!UUID.test(id)) bad('id must be a uuid');
+    if (typeof companyId !== 'string' || !UUID.test(companyId)) bad('company_id must be a uuid');
+    const p = await previewCreditNoteJournal(this.tx.get(), {
+      companyId: companyId as string,
+      creditNoteId: id,
+    }).catch((e: unknown) => {
+      if (e instanceof CreditNoteError && e.code === 'INVALID_CREDIT_NOTE')
+        throw new NotFoundException({ error: 'not_found', message: 'credit note not found' });
+      return refusal(e);
+    });
+    return {
+      entry_date: p.entryDate,
+      requested_date: p.requestedDate,
+      redirected: p.redirected,
+      needs_override: p.needsOverride,
+      base_currency: p.baseCurrency,
+      total: p.total,
+      lines: p.lines.map((l) => ({
+        line_no: l.lineNo,
+        account_id: l.accountId,
+        account_code: l.accountCode,
+        account_name: l.accountName,
+        account_type: l.accountType,
+        debit: l.debit,
+        credit: l.credit,
+        party_id: l.partyId,
+      })),
+    };
   }
 
   @Get(':id')
