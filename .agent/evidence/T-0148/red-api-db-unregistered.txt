@@ -1,0 +1,94 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44083
+ ❯ |api-db| apps/api/src/periods/close-checklist.db.test.ts (4 tests | 4 failed) 1376ms
+     × lists the periods in a date range with their status (reports.run) 26ms
+     × shows the seven steps, none done; 403 without reports.run; 404 for another tenant 4ms
+     × completing a step needs period.lock and an Idempotency-Key; order is enforced 14ms
+     × SS-UC10-01 the Finance Admin completes the steps; each returns user, time and period status; replay is 200 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/periods/close-checklist.db.test.ts > T-0148: periods and the close checklist over HTTP > lists the periods in a date range with their status (reports.run)
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/periods/close-checklist.db.test.ts:94:22
+     92|       'accountant',
+     93|     );
+     94|     expect(r.status).toBe(200);
+       |                      ^
+     95|     const body = (await r.json()) as { periods: Record<string, unknown…
+     96|     expect(body.periods.map((p) => [p['start_date'], p['end_date'], p[…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |api-db| apps/api/src/periods/close-checklist.db.test.ts > T-0148: periods and the close checklist over HTTP > shows the seven steps, none done; 403 without reports.run; 404 for another tenant
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/periods/close-checklist.db.test.ts:109:22
+    107|   it('shows the seven steps, none done; 403 without reports.run; 404 f…
+    108|     const r = await call(`/periods/${october}/close-checklist?company_…
+    109|     expect(r.status).toBe(200);
+       |                      ^
+    110|     const body = (await r.json()) as { period: Record<string, unknown>…
+    111|     expect(body.period).toMatchObject({ id: october, status: 'open', e…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |api-db| apps/api/src/periods/close-checklist.db.test.ts > T-0148: periods and the close checklist over HTTP > completing a step needs period.lock and an Idempotency-Key; order is enforced
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/periods/close-checklist.db.test.ts:133:62
+    131|
+    132|   it('completing a step needs period.lock and an Idempotency-Key; orde…
+    133|     expect((await complete('ar_lock', 'accountant')).status).toBe(403);
+       |                                                              ^
+    134|     expect(
+    135|       (
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |api-db| apps/api/src/periods/close-checklist.db.test.ts > T-0148: periods and the close checklist over HTTP > SS-UC10-01 the Finance Admin completes the steps; each returns user, time and period status; replay is 200
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ apps/api/src/periods/close-checklist.db.test.ts:149:26
+    147|   it('SS-UC10-01 the Finance Admin completes the steps; each returns u…
+    148|     const first = await complete('ar_lock');
+    149|     expect(first.status).toBe(201);
+       |                          ^
+    150|     const body = (await first.json()) as Record<string, unknown>;
+    151|     expect(body).toMatchObject({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  10:22:56
+   Duration  4.31s (transform 1.21s, setup 0ms, import 2.10s, tests 1.38s, environment 0ms)
+

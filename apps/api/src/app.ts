@@ -32,6 +32,7 @@ import { ApiTokensController, UserApiTokensController } from './tokens/api-token
 import { UsersController } from './users/users.controller.ts';
 import { AccountsController } from './gl/accounts.controller.ts';
 import { ReportsController } from './reports/reports.controller.ts';
+import { CloseChecklistController } from './periods/close-checklist.controller.ts';
 import { PeriodReopenController } from './periods/period-reopen.controller.ts';
 import { CompaniesController } from './companies/companies.controller.ts';
 import { HealthController } from './health/health.controller.ts';
@@ -132,6 +133,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   StripeWebhookController,
   ReportsController,
   PeriodReopenController,
+  CloseChecklistController,
   OpeningBalancesController,
   AuthController,
   LoginController,
@@ -180,6 +182,7 @@ class AppModule {
         StripeWebhookController,
         ReportsController,
         PeriodReopenController,
+        CloseChecklistController,
         OpeningBalancesController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),

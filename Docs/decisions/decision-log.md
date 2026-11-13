@@ -2760,3 +2760,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: ADR-0062 option 1 (accepted, DL-0466). Pilot tenants are Australian (design §7.2 default region). Idempotency is designed in at two levels: the job id and the `app.ar_reminder` primary key.
 - Alternatives: an hourly fan-out per local midnight (more jobs, no benefit for an AU pilot; revisit for multi-zone tenants); pg-boss singletonKey (depends on queue policy, while the job id works for any policy).
 - ADR: ADR-0062 · Status: accepted
+
+### DL-0468 — Close checklist over HTTP: state-based replay, period.lock for every step, bank module wired in (T-0148)
+- Date: 2026-11-13 · By: claude · Task: T-0148 (split from T-0090) · Category: api
+- Decision:
+  - Three routes are added: `GET /periods` and `GET /periods/:id/close-checklist` (reports.run), and `POST /periods/:id/close-checklist/:step` (period.lock, Idempotency-Key, audited as `close_checklist_step`).
+  - Replays are recognised from the stored checklist row: a step completed by the same user returns 200 with that row, and one completed by another user returns 409 ALREADY_DONE. The table's (period, step) primary key already records it, so no idempotency column or migration is needed (same pattern as DL-0420).
+  - Module refusals (OUT_OF_ORDER, BANK_UNRECONCILED with accounts, TB_NOT_BALANCED, SUBLEDGER_DIFFERENCE) return 422.
+  - The bank step uses `@ledgerforce/bank` `unreconciledBankAccounts`, which moves from the API's devDependencies to its dependencies (a workspace package, not a new third-party dependency).
+  - Step and user ids are resolved to display names for the screen.
+  - This is an additive read/write route set over an existing module, so it needs no ADR (cf. DL-0313).
+- Why: T-0090's close screen needs these routes; T-0078 built the module only.
+- ADR: none · Status: accepted

@@ -74,6 +74,9 @@ importers:
       '@ledgerforce/ar':
         specifier: workspace:*
         version: link:../../packages/modules/ar
+      '@ledgerforce/bank':
+        specifier: workspace:*
+        version: link:../../packages/modules/bank
       '@ledgerforce/connector-stripe':
         specifier: workspace:*
         version: link:../../packages/connectors/stripe
@@ -132,9 +135,6 @@ importers:
         specifier: 7.8.2
         version: 7.8.2
     devDependencies:
-      '@ledgerforce/bank':
-        specifier: workspace:*
-        version: link:../../packages/modules/bank
       '@ledgerforce/products':
         specifier: workspace:*
         version: link:../../packages/modules/products

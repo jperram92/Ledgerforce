@@ -178,7 +178,7 @@ export class CloseChecklistController {
     } catch (e) {
       if (e instanceof CloseError && e.code === 'ALREADY_DONE') {
         const stored = (await this.steps(company, period.id)).find((s) => s.step === step);
-        if (stored?.completed_by === actor) {
+        if (stored && stored.completed_by === actor) {
           res.status(200);
           return {
             step,
