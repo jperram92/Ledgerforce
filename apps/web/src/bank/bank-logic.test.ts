@@ -15,7 +15,7 @@ describe('T-0088 bank logic', () => {
     expect(last3('12345678')).toBe('678');
     expect(last3('7')).toBe('7');
     expect(accountLabel({ name: 'Operating', bsb: '062-000', account_number: '12345678' })).toBe(
-      'Operating, BSB 062-000, account ending 678',
+      'Operating, account ending 678, BSB 062-000',
     );
   });
 

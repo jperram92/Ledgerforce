@@ -9,7 +9,7 @@ import type { BankAccount } from './client.ts';
 export const last3 = (accountNumber: string): string => accountNumber.slice(-3);
 
 export const accountLabel = (a: Pick<BankAccount, 'name' | 'bsb' | 'account_number'>): string =>
-  `${a.name}, BSB ${a.bsb}, account ending ${last3(a.account_number)}`;
+  `${a.name}, account ending ${last3(a.account_number)}, BSB ${a.bsb}`;
 
 /** A statement line's amount without its sign: the counter line's amount, as text. */
 export const counterAmount = (amount: string): string =>

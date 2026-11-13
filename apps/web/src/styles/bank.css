@@ -44,3 +44,9 @@
   grid-column: 1 / -1;
   max-width: 34rem;
 }
+.bank-closing .admin-note {
+  margin: 0;
+}
+.bank-closing .secondary {
+  justify-self: start;
+}

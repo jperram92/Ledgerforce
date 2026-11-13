@@ -126,7 +126,7 @@ export function ReportPage({
         </Link>
       </p>
       <div className="admin-filters">
-        <form className="field" onSubmit={submit} noValidate>
+        <form className="field wide bank-closing" onSubmit={submit} noValidate>
           <label htmlFor="closing-balance">Closing balance on the statement</label>
           <input
             id="closing-balance"

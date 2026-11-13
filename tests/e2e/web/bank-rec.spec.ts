@@ -397,7 +397,7 @@ for (const width of [1440, 390]) {
     await open(page, '/bank/statements', width);
     await expect(page.getByRole('heading', { level: 1, name: 'Bank statements' })).toBeVisible();
     await expect(page.getByLabel('Bank account')).toContainText(
-      'Operating, BSB 062-000, account ending 678',
+      'Operating, account ending 678, BSB 062-000',
     );
     const list = page.getByRole('table', { name: 'Imported statements' });
     await expect(list.getByRole('row')).toHaveCount(2);
