@@ -184,6 +184,33 @@ export async function checkSod(
   return { step, actorId, subject, decision, exception };
 }
 
+/**
+ * What checkSod would decide for the actor right now, without an exception, lock or record —
+ * for screens that explain a control before the user tries it (P6/P7, T-0086). Read-only; the
+ * route itself still runs checkSod, so this can never let anything through.
+ */
+export async function sodOutlook(
+  trx: Trx,
+  opts: { step: SodStep; actorId: string; permission: Permission; subject: SodSubject },
+): Promise<{ decision: SodDecision; settings: SodSettings }> {
+  const subjectType = subjectTypeOf(opts.step);
+  const history = await sql<{ step: string; actorId: string }>`
+    SELECT step, actor_user_id AS "actorId" FROM app.sod_action
+     WHERE subject_type = ${subjectType} AND subject_id = ${opts.subject.id}
+     ORDER BY occurred_at, id`.execute(trx);
+  const { settings } = await loadSodSettings(trx);
+  const decision = evaluateSod({
+    step: opts.step,
+    actorId: opts.actorId,
+    subject: { amount: opts.subject.amount ?? null },
+    history: history.rows,
+    settings,
+    otherEligible: await otherEligible(trx, opts.actorId, opts.permission),
+    exception: null,
+  });
+  return { decision, settings };
+}
+
 /** After the handler succeeded: the exception rows (if any), then the step itself. */
 export async function recordSod(trx: Trx, c: SodCheck, requestId: string | null): Promise<void> {
   const subjectType = subjectTypeOf(c.step);

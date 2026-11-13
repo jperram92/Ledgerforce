@@ -1,0 +1,112 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a87fbf6f410bb150c
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33739
+ ❯ |api-db| apps/api/src/ap/bills-read.db.test.ts (4 tests | 4 failed) 1056ms
+     × lists active suppliers, postable expense/asset accounts and tax codes in force; needs ap.bill.enter 29ms
+     × lists every bill with supplier, dates and state; shows one bill with its coding and the people involved 70ms
+     × a person who entered a 2,750.00 bill is told they may not approve it; another approver may 42ms
+     × previews GP-008 for a draft without writing, and shows the same posted entry after approval 41ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-read.db.test.ts > T-0086: bill coding choices > lists active suppliers, postable expense/asset accounts and tax codes in force; needs ap.bill.enter
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/ap/bills-read.db.test.ts:147:24
+    145|   it('lists active suppliers, postable expense/asset accounts and tax …
+    146|     const res = await call('GET', `/ap/bill-coding?${q()}&date=2026-11…
+    147|     expect(res.status).toBe(200);
+       |                        ^
+    148|     const body = (await res.json()) as {
+    149|       suppliers: { id: string; name: string }[];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-read.db.test.ts > T-0086: bills list and one bill > lists every bill with supplier, dates and state; shows one bill with its coding and the people involved
+AssertionError: expected 400 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 400
+
+ ❯ apps/api/src/ap/bills-read.db.test.ts:173:25
+    171|
+    172|     const list = await call('GET', `/ap/bills?${q()}`, 'clerk');
+    173|     expect(list.status).toBe(200);
+       |                         ^
+    174|     expect(await list.json()).toMatchObject({
+    175|       bills: expect.arrayContaining([
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-read.db.test.ts > T-0086: approval decision for the caller (SoD on the server) > a person who entered a 2,750.00 bill is told they may not approve it; another approver may
+AssertionError: expected { …(3) } to match object { awaiting_approval: true, …(3) }
+(3 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "approval": {
+-     "allowed": false,
+-     "rule": "SOD_BILL_SELF_APPROVAL",
+-     "self_approval_threshold": "1000.0000",
+-   },
+-   "awaiting_approval": true,
+-   "entered": {
+-     "by": "Mei Tan",
+-     "you": true,
+-   },
+-   "submitted": {
+-     "by": "Mei Tan",
+-     "you": true,
+-   },
++   "error": "Not Found",
++   "message": "Cannot GET /ap/bills/13661023-d2cb-48af-81f1-8b20a5ba39e5?company_id=01a1d30c-16f5-7753-a8de-64fd08dad924",
++   "statusCode": 404,
+  }
+
+ ❯ apps/api/src/ap/bills-read.db.test.ts:239:30
+    237|     );
+    238|     const own = await call('GET', `/ap/bills/${id}?${q()}`, 'clerkAppr…
+    239|     expect(await own.json()).toMatchObject({
+       |                              ^
+    240|       awaiting_approval: true,
+    241|       entered: { by: 'Mei Tan', you: true },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-read.db.test.ts > T-0086: the journal of a bill > previews GP-008 for a draft without writing, and shows the same posted entry after approval
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/ap/bills-read.db.test.ts:264:24
+    262|
+    263|     const pre = await call('GET', `/ap/bills/${id}/journal?${q()}`, 'c…
+    264|     expect(pre.status).toBe(200);
+       |                        ^
+    265|     const preview = (await pre.json()) as JournalBody;
+    266|     expect(preview).toMatchObject({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  03:55:42
+   Duration  4.86s (transform 1.63s, setup 0ms, import 2.91s, tests 1.06s, environment 0ms)
+

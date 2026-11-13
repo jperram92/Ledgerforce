@@ -1,4 +1,5 @@
 export * from './bills.ts';
+export * from './bills-read.ts';
 export * from './inbox.ts';
 export * from './payment-batches.ts';
 export * from './aba-export.ts';

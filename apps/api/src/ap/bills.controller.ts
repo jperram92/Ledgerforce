@@ -4,6 +4,10 @@
  * recorded against it); POST /ap/bills/:id/submit routes it to the Approver queue;
  * POST /ap/bills/:id/approve posts it after SOD_BILL_SELF_APPROVAL (with small-team exceptions)
  * is checked against the stored gross; GET /ap/bills?queue=awaiting_approval is the queue.
+ * Read routes for the bills screens (T-0086, DL-0440): GET /ap/bills (every bill), GET
+ * /ap/bills/:id (coding, people involved and the caller's SoD outlook for approval), GET
+ * /ap/bills/:id/journal (engine preview for a draft, the posted entry after approval), all ap.read;
+ * GET /ap/bill-coding (suppliers, accounts, tax codes) needs ap.bill.enter.
  */
 import {
   BadRequestException,
@@ -11,6 +15,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  NotFoundException,
   Param,
   Post,
   Put,
@@ -22,7 +27,11 @@ import {
 import {
   approveBill,
   BillError,
+  billCodingOptions,
+  billJournalView,
   billsAwaitingApproval,
+  getBillDetail,
+  listBills,
   createBill,
   getBill,
   submitBill,
@@ -33,6 +42,7 @@ import type { Request, Response } from 'express';
 import { principalOf, tokenPrincipalOf } from '../auth/session-tenant-resolver.ts';
 import { RequirePermission } from '../authz/permission.decorator.ts';
 import { InvalidSodSubject, SoD, type SubjectFrom } from '../sod/sod.decorator.ts';
+import { sodOutlook } from '../sod/sod.service.ts';
 import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -46,6 +56,13 @@ const refusal = (e: unknown): never => {
   }
   throw e;
 };
+const notFound = (e: unknown): never => {
+  if (e instanceof BillError && e.code === 'INVALID_BILL') {
+    throw new NotFoundException({ error: 'not_found', message: 'bill not found' });
+  }
+  return refusal(e);
+};
+const iso = (d: Date) => d.toISOString();
 const obj = (v: unknown) =>
   (typeof v === 'object' && v !== null ? v : {}) as Record<string, unknown>;
 const uuid = (v: unknown, name: string): string =>
@@ -181,8 +198,139 @@ export class ApBillsController {
     @Query('company_id') companyId: string | undefined,
     @Query('queue') queue: string | undefined,
   ) {
+    const company = uuid(companyId, 'company_id');
+    if (queue === undefined) {
+      const rows = await listBills(this.tx.get(), company);
+      return {
+        bills: rows.map((r) => ({
+          id: r.id,
+          bill_no: r.billNo,
+          status: r.status,
+          awaiting_approval: r.awaitingApproval,
+          party_id: r.partyId,
+          supplier_name: r.supplierName,
+          supplier_ref: r.supplierRef,
+          bill_date: r.billDate,
+          due_date: r.dueDate,
+          gross: r.gross,
+        })),
+      };
+    }
     if (queue !== 'awaiting_approval') bad('queue=awaiting_approval is the only queue');
-    const rows = await billsAwaitingApproval(this.tx.get(), uuid(companyId, 'company_id'));
+    const rows = await billsAwaitingApproval(this.tx.get(), company);
     return { items: rows.map(viewOf) };
+  }
+
+  @Get(':id')
+  @RequirePermission('ap.read')
+  async detail(
+    @Req() req: Request,
+    @Param('id') id: string,
+    @Query('company_id') companyId: string | undefined,
+  ) {
+    const trx = this.tx.get();
+    const b = await getBillDetail(trx, {
+      companyId: uuid(companyId, 'company_id'),
+      billId: uuid(id, 'id'),
+    }).catch(notFound);
+    const me = actorOf(req) ?? null;
+    const step = (s: { userId: string | null; name: string; at: Date } | null) =>
+      s && { by: s.name, you: me !== null && s.userId === me, at: iso(s.at) };
+    const outlook =
+      me === null
+        ? null
+        : await sodOutlook(trx, {
+            step: 'bill.approve',
+            actorId: me,
+            permission: 'ap.bill.approve',
+            subject: { id: b.id, amount: b.gross },
+          });
+    const denied = outlook?.decision.outcome === 'deny' ? outlook.decision : null;
+    return {
+      id: b.id,
+      bill_no: b.billNo,
+      status: b.status,
+      awaiting_approval: b.awaitingApproval,
+      party_id: b.partyId,
+      supplier_name: b.supplierName,
+      supplier_ref: b.supplierRef,
+      bill_date: b.billDate,
+      due_date: b.dueDate,
+      currency: b.currency,
+      net: b.net,
+      tax: b.tax,
+      gross: b.gross,
+      entry_id: b.entryId,
+      lines: b.lines.map((l) => ({
+        line_no: l.lineNo,
+        description: l.description,
+        account_id: l.accountId,
+        account_code: l.accountCode,
+        account_name: l.accountName,
+        tax_code: l.taxCode,
+        amount: l.amount,
+        net: l.net,
+        tax: l.tax,
+        gross: l.gross,
+      })),
+      entered: step(b.entered),
+      submitted: step(b.submitted),
+      approved: step(b.approved),
+      approval: {
+        allowed: outlook !== null && denied === null,
+        rule: denied?.rule ?? null,
+        small_team_exception_required: denied?.smallTeamExceptionRequired ?? false,
+        self_approval_threshold: outlook?.settings.thresholds.bill_self_approval ?? null,
+      },
+    };
+  }
+
+  @Get(':id/journal')
+  @RequirePermission('ap.read')
+  async journal(@Param('id') id: string, @Query('company_id') companyId: string | undefined) {
+    const j = await billJournalView(this.tx.get(), {
+      companyId: uuid(companyId, 'company_id'),
+      billId: uuid(id, 'id'),
+    }).catch(notFound);
+    return {
+      posted: j.posted,
+      entry_no: j.entryNo,
+      entry_date: j.entryDate,
+      requested_date: j.requestedDate,
+      redirected: j.redirected,
+      base_currency: j.baseCurrency,
+      total: j.total,
+      lines: j.lines.map((l) => ({
+        line_no: l.lineNo,
+        account_id: l.accountId,
+        account_code: l.accountCode,
+        account_name: l.accountName,
+        account_type: l.accountType,
+        debit: l.debit,
+        credit: l.credit,
+        party_id: l.partyId,
+      })),
+    };
+  }
+}
+
+/** What an AP Clerk may code a bill to (T-0086): the choices of the bill entry form. */
+@Controller('ap/bill-coding')
+export class ApBillCodingController {
+  constructor(private readonly tx: TenantTx) {}
+
+  @Get()
+  @RequirePermission('ap.bill.enter')
+  async options(
+    @Query('company_id') companyId: string | undefined,
+    @Query('date') date: string | undefined,
+  ) {
+    const company = uuid(companyId, 'company_id');
+    if (date !== undefined && !DATE.test(date)) bad('date must be YYYY-MM-DD');
+    const o = await billCodingOptions(this.tx.get(), {
+      companyId: company,
+      date: date ?? new Date().toISOString().slice(0, 10),
+    });
+    return { suppliers: o.suppliers, accounts: o.accounts, tax_codes: o.taxCodes };
   }
 }

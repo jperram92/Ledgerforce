@@ -13,7 +13,14 @@
  * The approval workflow with segregation of duties is T-0052.
  */
 import type { Database } from '@ledgerforce/db';
-import { nextNumber, post, type PostingLineInput, type PostOptions } from '@ledgerforce/ledger';
+import {
+  nextNumber,
+  post,
+  preview,
+  type BuiltEntry,
+  type PostingLineInput,
+  type PostOptions,
+} from '@ledgerforce/ledger';
 import { Money } from '@ledgerforce/shared/money';
 import { computeTax } from '@ledgerforce/tax';
 import { Decimal } from 'decimal.js';
@@ -275,35 +282,17 @@ export async function createBill(trx: Trx, c: BillInput): Promise<BillView> {
   };
 }
 
-/** Approve a draft bill and post it (GP-008). */
-export async function approveBill(
+/**
+ * The journal a bill posts (GP-008): per (account, tax code) the net with its tax, GST paid, and
+ * the AP control credit with the supplier and due date. Shared by approveBill (which posts it) and
+ * previewBillJournal (engine preview, writes nothing), so the preview is exactly what posts
+ * (T-0086, DL-0440). Reads only.
+ */
+async function billJournal(
   trx: Trx,
-  c: { companyId: string; billId: string; approvedBy?: string },
-  opts: PostOptions = {},
-): Promise<BillView> {
-  const companyId = c.companyId.toLowerCase();
-  const h = (
-    await sql<{
-      id: string;
-      status: string;
-      party_id: string;
-      bill_date: string;
-      due_date: string;
-      supplier_ref: string;
-      created_by: string | null;
-      submitted_at: Date | null;
-    }>`
-      SELECT id::text, status, party_id::text, submitted_at, to_char(bill_date, 'YYYY-MM-DD') AS bill_date,
-             to_char(due_date, 'YYYY-MM-DD') AS due_date, supplier_ref, created_by::text
-        FROM app.supplier_bill WHERE company_id = ${companyId} AND id = ${c.billId}::uuid FOR UPDATE`.execute(
-      trx,
-    )
-  ).rows[0];
-  if (!h) throw new BillError('INVALID_BILL', `bill ${c.billId} is not in company ${companyId}`);
-  if (h.status !== 'draft') throw new BillError('NOT_DRAFT', `bill ${c.billId} is ${h.status}`);
-  if (!h.submitted_at) {
-    throw new BillError('NOT_SUBMITTED', `bill ${c.billId} has not been submitted for approval`);
-  }
+  companyId: string,
+  h: { id: string; party_id: string; bill_date: string; due_date: string },
+) {
   const rows = await trx
     .selectFrom('app.supplier_bill_line')
     .select(['line_no', 'account_id', 'description', 'amount', 'tax_code'])
@@ -354,6 +343,39 @@ export async function approveBill(
       dueDate: h.due_date,
     },
   ];
+  return { rows, taxed, journal };
+}
+
+/** Approve a draft bill and post it (GP-008). */
+export async function approveBill(
+  trx: Trx,
+  c: { companyId: string; billId: string; approvedBy?: string },
+  opts: PostOptions = {},
+): Promise<BillView> {
+  const companyId = c.companyId.toLowerCase();
+  const h = (
+    await sql<{
+      id: string;
+      status: string;
+      party_id: string;
+      bill_date: string;
+      due_date: string;
+      supplier_ref: string;
+      created_by: string | null;
+      submitted_at: Date | null;
+    }>`
+      SELECT id::text, status, party_id::text, submitted_at, to_char(bill_date, 'YYYY-MM-DD') AS bill_date,
+             to_char(due_date, 'YYYY-MM-DD') AS due_date, supplier_ref, created_by::text
+        FROM app.supplier_bill WHERE company_id = ${companyId} AND id = ${c.billId}::uuid FOR UPDATE`.execute(
+      trx,
+    )
+  ).rows[0];
+  if (!h) throw new BillError('INVALID_BILL', `bill ${c.billId} is not in company ${companyId}`);
+  if (h.status !== 'draft') throw new BillError('NOT_DRAFT', `bill ${c.billId} is ${h.status}`);
+  if (!h.submitted_at) {
+    throw new BillError('NOT_SUBMITTED', `bill ${c.billId} has not been submitted for approval`);
+  }
+  const { rows, taxed, journal } = await billJournal(trx, companyId, h);
   const billNo = await nextNumber(trx, companyId, BILL_NUMBER_SERIES);
   const posted = await post(
     trx,
@@ -493,4 +515,45 @@ export async function billsAwaitingApproval(trx: Trx, companyId: string): Promis
   const out: BillSummary[] = [];
   for (const r of ids) out.push(await getBill(trx, companyId, r.id));
   return out;
+}
+
+/**
+ * "Show me the journal" for a draft bill (T-0086, P4, design §3.9): the posting engine's preview of
+ * exactly the command approveBill posts (same builder, same idempotency key and entry date).
+ * Writes nothing: no bill number is taken, no entry is stored. Refusals are BillError (NOT_DRAFT,
+ * INVALID_BILL) or the engine's PostingError / PeriodLockedError.
+ */
+export async function previewBillJournal(
+  trx: Trx,
+  q: { companyId: string; billId: string },
+): Promise<BuiltEntry> {
+  const companyId = q.companyId.toLowerCase();
+  const h = (
+    await sql<{
+      id: string;
+      status: string;
+      party_id: string;
+      bill_date: string;
+      due_date: string;
+      created_by: string | null;
+    }>`
+      SELECT id::text, status, party_id::text, to_char(bill_date, 'YYYY-MM-DD') AS bill_date,
+             to_char(due_date, 'YYYY-MM-DD') AS due_date, created_by::text
+        FROM app.supplier_bill WHERE company_id = ${companyId} AND id = ${q.billId}::uuid`.execute(
+      trx,
+    )
+  ).rows[0];
+  if (!h) throw new BillError('INVALID_BILL', `bill ${q.billId} is not in company ${companyId}`);
+  if (h.status !== 'draft') throw new BillError('NOT_DRAFT', `bill ${q.billId} is ${h.status}`);
+  const { journal } = await billJournal(trx, companyId, h);
+  return preview(trx, {
+    companyId,
+    idempotencyKey: `ap-bill:${h.id}`,
+    entryDate: h.bill_date,
+    sourceType: 'ap_bill',
+    sourceId: h.id,
+    memo: 'Bill (draft preview)',
+    ...(h.created_by ? { createdBy: h.created_by } : {}),
+    lines: journal,
+  });
 }
