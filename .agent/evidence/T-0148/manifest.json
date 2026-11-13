@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0148",
+  "entries": [
+    {
+      "scenario": "SS-UC10-01",
+      "file": ".agent/evidence/T-0148/20261113-105319-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/periods/close-checklist.db.test.ts › T-0148: periods and the close checklist over HTTP › SS-UC10-01 the Finance Admin completes the steps; each returns user, time and period status; replay is 200",
+      "commit": "b1860fa55267",
+      "provider": "claude",
+      "timestamp": "2026-11-13T10:53:19.509Z",
+      "result": "passed"
+    }
+  ]
+}
