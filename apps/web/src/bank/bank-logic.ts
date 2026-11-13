@@ -3,7 +3,7 @@
  * posting and the reconciliation figures come from the API (T-0149). Amounts are decimal strings
  * handled as text; nothing is converted to a number.
  */
-import type { BankAccount } from './client.ts';
+import type { BankAccount, StatementLine, Suggestion, TransactionInput } from './client.ts';
 
 /** The last 3 characters of an account number (design §6.6), whatever the API sent. */
 export const last3 = (accountNumber: string): string => accountNumber.slice(-3);
@@ -52,3 +52,33 @@ export const plural = (n: number, word: string): string =>
   `${String(n)} ${word}${n === 1 ? '' : 's'}`;
 
 export const newKey = (what: string): string => `bank-${what}-${crypto.randomUUID()}`;
+
+/** A typed amount the API can read: digits with up to 4 decimals, checked as text. */
+const AMOUNT_TEXT = /^\d{1,15}(\.\d{1,4})?$/;
+
+/**
+ * The request body for a transaction from a line (T-0150): the same body goes to the journal
+ * preview and to the post, so the post sends what the preview showed. A rule suggestion is
+ * accepted only while its account is the one chosen. Null until an account is chosen and the
+ * amount (default: the line's amount without its sign) is a decimal string.
+ */
+export function transactionInput(
+  line: Pick<StatementLine, 'amount'> & {
+    suggestions: readonly Pick<Suggestion, 'id' | 'kind' | 'account_id'>[];
+  },
+  account: string,
+  amount: string | null,
+  memo: string,
+): TransactionInput | null {
+  const text = (amount ?? counterAmount(line.amount)).trim();
+  if (account === '' || !AMOUNT_TEXT.test(text)) return null;
+  const suggestion = line.suggestions.find((s) => s.kind === 'rule' && s.account_id);
+  const note = memo.trim();
+  return {
+    lines: [{ account_id: account, amount: text }],
+    ...(suggestion && suggestion.account_id === account
+      ? { from_suggestion_id: suggestion.id }
+      : {}),
+    ...(note === '' ? {} : { memo: note }),
+  };
+}

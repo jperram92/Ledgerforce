@@ -317,6 +317,45 @@ async function fakeApi(page: Page, who: keyof typeof ME, opts: { imported?: bool
           }
           return send(route, 200, { lines_considered: 10, auto_matched: 1, suggested: 1 });
         }
+        // T-0150: the journal preview the transaction screen shows before posting. The fake
+        // answers with the line's own amount strings on each side (no arithmetic).
+        const pm = /^\/bank-rec\/lines\/([^/]+)\/transaction\/preview$/.exec(path);
+        const previewed = f.lines.find((l) => l.id === pm?.[1]);
+        if (pm && previewed) {
+          const counter = (body['lines'] as { account_id: string; amount: string }[])[0];
+          const out = previewed.amount.startsWith('-');
+          const amount = out ? previewed.amount.slice(1) : previewed.amount;
+          const side = (debit: boolean) =>
+            debit ? { debit: amount, credit: '0.0000' } : { debit: '0.0000', credit: amount };
+          return send(route, 200, {
+            entry_date: previewed.posted_on,
+            requested_date: previewed.posted_on,
+            redirected: false,
+            needs_override: false,
+            base_currency: 'AUD',
+            total: amount,
+            lines: [
+              {
+                line_no: 1,
+                account_id: GL_BANK,
+                account_code: '1010',
+                account_name: 'Operating account',
+                account_type: 'asset',
+                ...side(!out),
+                memo: previewed.description,
+              },
+              {
+                line_no: 2,
+                account_id: counter?.account_id,
+                account_code: counter?.account_id === GL_FEES ? '6110' : '4900',
+                account_name: counter?.account_id === GL_FEES ? 'Bank fees' : 'Interest income',
+                account_type: counter?.account_id === GL_FEES ? 'expense' : 'revenue',
+                ...side(out),
+                memo: null,
+              },
+            ],
+          });
+        }
         const tm = /^\/bank-rec\/lines\/([^/]+)\/transaction$/.exec(path);
         const line = f.lines.find((l) => l.id === tm?.[1]);
         if (tm && line) {

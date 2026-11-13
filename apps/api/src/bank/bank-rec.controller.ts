@@ -14,6 +14,8 @@
  *   match and open suggestions (bank.read).
  * - `POST /bank-rec/lines/:id/transaction` creates and posts a manual journal from an unmatched
  *   line (bank.reconcile). The module is idempotent per line, so a replay answers 200.
+ * - `POST /bank-rec/lines/:id/transaction/preview` the journal that body would post, from the
+ *   posting engine's preview (bank.reconcile, T-0150). Writes nothing: no Idempotency-Key.
  * - `POST /bank-rec/lines/:id/unmatch` undoes a match (bank.reconcile). The replay record is the
  *   kept match row: the same user gets 200, anyone else 409 NOT_MATCHED.
  * - `GET  /bank-rec/statements/:id/report?company_id=&closing_balance=` returns the
@@ -21,7 +23,7 @@
  * - `POST /bank-rec/statements/:id/reconciliation` completes a statement that ties
  *   (bank.reconcile). The completed row is the replay record: same user 200, anyone else 409.
  *
- * Every POST needs an Idempotency-Key and is audited. Money is a decimal string. Rows of another
+ * Every other POST needs an Idempotency-Key and is audited. Money is a decimal string. Rows of another
  * company or tenant are 404. Module refusals are 422 with the module's code and message.
  */
 import {
@@ -49,11 +51,13 @@ import {
   createTransactionFromLine,
   importStatement,
   listCompanyBankAccounts,
+  previewTransactionFromLine,
   reconciliationReport,
   runMatching,
   StatementImportError,
   unmatchLine,
   type CounterLine,
+  type PreviewTransactionInput,
   type ReconciliationReport,
   type StatementFormat,
 } from '@ledgerforce/bank';
@@ -158,6 +162,39 @@ function counterLine(raw: unknown, i: number): CounterLine {
     ...(memo === undefined ? {} : { memo }),
     ...(taxCodeId === undefined ? {} : { taxCodeId }),
     ...(taxAmount === undefined ? {} : { taxAmount }),
+  };
+}
+
+/** The body of a transaction from a line (create and preview): company and module input. */
+function transactionInput(
+  idParam: string,
+  body: unknown,
+  actor: string,
+): { company: string; input: PreviewTransactionInput } {
+  const b = obj(body);
+  const company = uuid(b['company_id'], 'company_id');
+  const id = uuid(idParam, 'id');
+  if (b['lines'] !== undefined && !Array.isArray(b['lines'])) bad('lines must be a list');
+  const lines = Array.isArray(b['lines'])
+    ? (b['lines'] as unknown[]).map((l, i) => counterLine(l, i))
+    : undefined;
+  const fromSuggestionId =
+    b['from_suggestion_id'] === undefined
+      ? undefined
+      : uuid(b['from_suggestion_id'], 'from_suggestion_id');
+  const entryDate = optStr(b['entry_date'], 'entry_date', 10);
+  if (entryDate !== undefined && !DATE.test(entryDate)) bad('entry_date must be YYYY-MM-DD');
+  const memo = optStr(b['memo'], 'memo', 500);
+  return {
+    company,
+    input: {
+      statementLineId: id,
+      createdBy: actor,
+      ...(lines === undefined ? {} : { lines }),
+      ...(fromSuggestionId === undefined ? {} : { fromSuggestionId }),
+      ...(entryDate === undefined ? {} : { entryDate }),
+      ...(memo === undefined ? {} : { memo }),
+    },
   };
 }
 
@@ -398,34 +435,15 @@ export class BankRecController {
     @Body() body: unknown,
   ) {
     requireKey(key);
-    const b = obj(body);
-    const company = uuid(b['company_id'], 'company_id');
-    const id = uuid(idParam, 'id');
-    if (b['lines'] !== undefined && !Array.isArray(b['lines'])) bad('lines must be a list');
-    const lines = Array.isArray(b['lines'])
-      ? (b['lines'] as unknown[]).map((l, i) => counterLine(l, i))
-      : undefined;
-    const fromSuggestionId =
-      b['from_suggestion_id'] === undefined
-        ? undefined
-        : uuid(b['from_suggestion_id'], 'from_suggestion_id');
-    const entryDate = optStr(b['entry_date'], 'entry_date', 10);
-    if (entryDate !== undefined && !DATE.test(entryDate)) bad('entry_date must be YYYY-MM-DD');
-    const memo = optStr(b['memo'], 'memo', 500);
-    const actor = actorOf(req);
-    await this.owned('app.bank_statement_line', id, company, 'statement line');
+    const { company, input } = transactionInput(idParam, body, actorOf(req));
+    await this.owned('app.bank_statement_line', input.statementLineId, company, 'statement line');
     if (!this.outbox) throw new ServiceUnavailableException({ error: 'queue_not_configured' });
     const trx = this.tx.get();
     const { settings } = await loadSodSettings(trx);
     const r = await createTransactionFromLine(trx, {
-      statementLineId: id,
-      createdBy: actor,
+      ...input,
       settings,
       outbox: this.outbox,
-      ...(lines === undefined ? {} : { lines }),
-      ...(fromSuggestionId === undefined ? {} : { fromSuggestionId }),
-      ...(entryDate === undefined ? {} : { entryDate }),
-      ...(memo === undefined ? {} : { memo }),
     }).catch(refusal);
     const view = {
       match_id: r.matchId,
@@ -437,6 +455,42 @@ export class BankRecController {
     if (r.replayed) res.status(200);
     else this.audit.describe({ entityType: 'bank_transaction', entityId: r.matchId, after: view });
     return view;
+  }
+
+  /**
+   * "Show me the journal" before posting (T-0150, P4): the posting engine's preview of the
+   * journal `POST lines/:id/transaction` would post for the same body. Writes nothing, so no
+   * Idempotency-Key and no audit description (as the opening-balance preview, DL-0314).
+   */
+  @Post('lines/:id/transaction/preview')
+  @HttpCode(200)
+  @RequirePermission('bank.reconcile')
+  async previewTransaction(
+    @Req() req: Request,
+    @Param('id') idParam: string,
+    @Body() body: unknown,
+  ) {
+    const { company, input } = transactionInput(idParam, body, actorOf(req));
+    await this.owned('app.bank_statement_line', input.statementLineId, company, 'statement line');
+    const p = await previewTransactionFromLine(this.tx.get(), input).catch(refusal);
+    return {
+      entry_date: p.entryDate,
+      requested_date: p.requestedDate,
+      redirected: p.redirected,
+      needs_override: p.needsOverride,
+      base_currency: p.baseCurrency,
+      total: p.total,
+      lines: p.lines.map((l) => ({
+        line_no: l.lineNo,
+        account_id: l.accountId,
+        account_code: l.accountCode,
+        account_name: l.accountName,
+        account_type: l.accountType,
+        debit: l.debit,
+        credit: l.credit,
+        memo: l.memo,
+      })),
+    };
   }
 
   @Post('lines/:id/unmatch')

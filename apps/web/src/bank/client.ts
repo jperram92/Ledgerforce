@@ -5,6 +5,7 @@
  */
 import type { AppEnv } from '../env.tsx';
 import { AdminApiError } from '../admin/client.ts';
+import type { Preview } from '../gl/client.ts';
 
 export interface BankAccount {
   id: string;
@@ -99,6 +100,9 @@ export interface TransactionResult {
   replayed: boolean;
 }
 
+/** The posting engine's preview of a transaction from a line: same shape as a journal preview. */
+export type TransactionPreview = Preview;
+
 export interface Report {
   statement_id: string;
   bank_account_id: string;
@@ -153,6 +157,12 @@ export interface BankClient {
     input: TransactionInput,
     key: string,
   ): Promise<TransactionResult>;
+  /** The journal createTransaction would post for the same input (T-0150). Writes nothing. */
+  previewTransaction(
+    companyId: string,
+    lineId: string,
+    input: TransactionInput,
+  ): Promise<TransactionPreview>;
   unmatch(companyId: string, lineId: string, key: string): Promise<unknown>;
   report(companyId: string, statementId: string, closingBalance?: string): Promise<Report>;
   complete(
@@ -215,6 +225,11 @@ export function createBankClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): BankCl
         { company_id: companyId, ...input },
         key,
       ),
+    previewTransaction: (companyId, lineId, input) =>
+      send('POST', `/bank-rec/lines/${seg(lineId)}/transaction/preview`, {
+        company_id: companyId,
+        ...input,
+      }),
     unmatch: (companyId, lineId, key) =>
       send('POST', `/bank-rec/lines/${seg(lineId)}/unmatch`, { company_id: companyId }, key),
     report: (companyId, statementId, closingBalance) =>

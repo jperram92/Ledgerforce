@@ -1,0 +1,177 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0150",
+  "entries": [
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202342-SS-UC08-08-transaction-preview-refused-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: a refused journal preview explains why and offers no posting [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:23:42.062Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202341-SS-UC08-08-transaction-journal-preview-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 1440 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:23:41.486Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202346-SS-UC08-08-transaction-journal-preview-390.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 390 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:23:46.851Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202356-SS-UC08-08-transaction-journal-preview-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 1440 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:23:56.013Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202408-SS-UC08-08-transaction-preview-refused-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: a refused journal preview explains why and offers no posting [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:24:08.995Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202408-SS-UC08-08-transaction-journal-preview-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 1440 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:24:08.526Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202410-SS-UC08-08-transaction-posted-after-preview-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 1440 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:24:10.814Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202412-SS-UC08-08-transaction-journal-preview-390.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 390 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:24:12.787Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202415-SS-UC08-08-transaction-posted-after-preview-390.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 390 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:24:15.040Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202500-SS-UC08-08-transaction-preview-refused-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: a refused journal preview explains why and offers no posting [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:25:00.468Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202500-SS-UC08-08-transaction-journal-preview-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 1440 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:25:00.029Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202501-SS-UC08-08-transaction-posted-after-preview-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 1440 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:25:01.775Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202505-SS-UC08-08-transaction-journal-preview-390.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 390 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:25:05.041Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202507-SS-UC08-08-transaction-posted-after-preview-390.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 390 [T-0150]",
+      "commit": "468b6672acee-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:25:07.202Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202903-SS-UC08-08-transaction-preview-refused-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: a refused journal preview explains why and offers no posting [T-0150]",
+      "commit": "521e58e062e4",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:29:03.624Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202903-SS-UC08-08-transaction-journal-preview-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 1440 [T-0150]",
+      "commit": "521e58e062e4",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:29:03.457Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202905-SS-UC08-08-transaction-posted-after-preview-1440.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 1440 [T-0150]",
+      "commit": "521e58e062e4",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:29:05.004Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202907-SS-UC08-08-transaction-journal-preview-390.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 390 [T-0150]",
+      "commit": "521e58e062e4",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:29:07.206Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0150/20261113-202909-SS-UC08-08-transaction-posted-after-preview-390.png",
+      "test": "web/bank-preview.spec.ts › SS-UC08-08: the journal is shown before a transaction posts @ 390 [T-0150]",
+      "commit": "521e58e062e4",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T20:29:09.166Z",
+      "result": "passed"
+    }
+  ]
+}

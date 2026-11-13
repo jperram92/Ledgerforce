@@ -7,7 +7,36 @@ import {
   counterAmount,
   last3,
   lineIsMoneyIn,
+  transactionInput,
 } from './bank-logic.ts';
+
+describe('T-0150 transaction request (one body for the journal preview and the post)', () => {
+  const line = {
+    amount: '-10.0000',
+    suggestions: [
+      { id: 'sug-1', kind: 'rule' as const, account_id: 'acct-fees' },
+      { id: 'sug-2', kind: 'candidate' as const, account_id: null },
+    ],
+  };
+
+  it('keeps the rule suggestion only while its account is chosen; the amount defaults to the line', () => {
+    expect(transactionInput(line, 'acct-fees', null, '')).toEqual({
+      lines: [{ account_id: 'acct-fees', amount: '10.0000' }],
+      from_suggestion_id: 'sug-1',
+    });
+    expect(transactionInput(line, 'acct-interest', ' 10.00 ', ' Fee ')).toEqual({
+      lines: [{ account_id: 'acct-interest', amount: '10.00' }],
+      memo: 'Fee',
+    });
+  });
+
+  it('asks nothing of the API until an account is chosen and the amount is a decimal string', () => {
+    expect(transactionInput(line, '', null, '')).toBeNull();
+    expect(transactionInput(line, 'acct-fees', '10.12345', '')).toBeNull();
+    expect(transactionInput(line, 'acct-fees', '1e3', '')).toBeNull();
+    expect(transactionInput(line, 'acct-fees', '-10', '')).toBeNull();
+  });
+});
 
 describe('T-0088 bank logic', () => {
   it('shows only the last 3 characters of an account number, even if more arrive', () => {
