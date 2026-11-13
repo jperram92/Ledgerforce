@@ -1,9 +1,9 @@
 ---
 id: RQ-0105
 title: Why unit coverage fell after the Line A integration, and what gate 2c should measure
-status: answered-pending-human
+status: answered
 opened: 2026-11-12
-resolved:
+resolved: 2026-11-13
 opened_by: claude
 linked_tasks: [T-0128]
 linked_adrs: []
