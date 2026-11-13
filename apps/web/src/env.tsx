@@ -8,6 +8,7 @@ import type { AdminClient } from './admin/client.ts';
 import type { ApiClient } from './api.ts';
 import type { GlClient } from './gl/client.ts';
 import type { PurchasesClient } from './purchases/client.ts';
+import type { BankClient } from './bank/client.ts';
 import type { CloseClient } from './close/client.ts';
 import type { ReportsClient } from './reports/client.ts';
 import type { SalesClient } from './sales/client.ts';
@@ -45,6 +46,8 @@ export interface Services {
   reports: ReportsClient;
   /** Month-end close (T-0090). */
   close: CloseClient;
+  /** Bank statements and reconciliation (T-0088). */
+  bank: BankClient;
 }
 
 export const ServicesContext = createContext<Services | null>(null);

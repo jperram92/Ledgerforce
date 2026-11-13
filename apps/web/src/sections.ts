@@ -13,6 +13,9 @@ export interface SubPage {
     | '/accounting/journals'
     | '/accounting/chart'
     | '/accounting/close'
+    | '/bank/statements'
+    | '/bank/match'
+    | '/bank/reconciliation'
     | '/sales/invoices'
     | '/sales/batches'
     | '/purchases/bills'
@@ -91,6 +94,24 @@ export const SECTIONS: readonly Section[] = [
       'Your bank accounts, their statements, and matching them to your books (reconciliation).',
     emptyHeading: 'No bank statements yet',
     emptyText: 'Statements appear here after one is imported from your bank.',
+    pages: [
+      // Bank reconciliation (T-0088, UC-08).
+      {
+        to: '/bank/statements',
+        name: 'Bank statements',
+        text: 'Import the statement files your bank sends: CSV, OFX or CAMT.053.',
+      },
+      {
+        to: '/bank/match',
+        name: 'Match statement lines',
+        text: 'Match each bank line to your books, or create a transaction for it.',
+      },
+      {
+        to: '/bank/reconciliation',
+        name: 'Reconciliation report',
+        text: 'Whether the statement agrees with your books, and what is left to explain.',
+      },
+    ],
   },
   {
     name: 'Reports',

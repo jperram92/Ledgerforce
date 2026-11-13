@@ -15,6 +15,10 @@ import { AUDIT_FILTER_KEYS, type AuditQuery } from './admin/client.ts';
 import { ControlExceptionsPage } from './admin/ControlExceptionsPage.tsx';
 import { UserPage } from './admin/UserPage.tsx';
 import { UsersPage } from './admin/UsersPage.tsx';
+import { MatchPage } from './bank/MatchPage.tsx';
+import { ReportPage } from './bank/ReportPage.tsx';
+import { StatementsPage } from './bank/StatementsPage.tsx';
+import { TransactionPage } from './bank/TransactionPage.tsx';
 import { ClosePage } from './close/ClosePage.tsx';
 import { ChartPage } from './gl/ChartPage.tsx';
 import { JournalFormPage } from './gl/JournalFormPage.tsx';
@@ -149,6 +153,81 @@ const closeRoute = createRoute({
   component: function CloseRoute() {
     const { period } = closeRoute.useSearch();
     return <ClosePage {...(period ? { periodId: period } : {})} />;
+  },
+});
+
+// Bank reconciliation (T-0088, UC-08): the web owns /bank/*, the API serves /bank-rec (T-0149).
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+interface BankSearch {
+  account?: string;
+  statement?: string;
+  line?: string;
+  closing?: string;
+}
+function bankSearch(search: Record<string, unknown>): BankSearch {
+  const out: BankSearch = {};
+  for (const k of ['account', 'statement', 'line'] as const) {
+    const v = search[k];
+    if (typeof v === 'string' && UUID.test(v)) out[k] = v;
+  }
+  const c = search['closing'];
+  if (typeof c === 'string' && /^-?\d{1,15}(\.\d{1,4})?$/.test(c)) out.closing = c;
+  return out;
+}
+const opt = <K extends string>(k: K, v: string | undefined) =>
+  (v === undefined ? {} : { [k]: v }) as Partial<Record<K, string>>;
+
+const bankStatementsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'bank/statements',
+  validateSearch: bankSearch,
+  component: function BankStatementsRoute() {
+    const { account } = bankStatementsRoute.useSearch();
+    return <StatementsPage key={account ?? ''} {...opt('accountId', account)} />;
+  },
+});
+
+const bankMatchRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'bank/match',
+  validateSearch: bankSearch,
+  component: function BankMatchRoute() {
+    const { account, statement } = bankMatchRoute.useSearch();
+    return <MatchPage {...opt('accountId', account)} {...opt('statementId', statement)} />;
+  },
+});
+
+const bankTransactionRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'bank/match/transaction',
+  validateSearch: bankSearch,
+  component: function BankTransactionRoute() {
+    const { account, statement, line } = bankTransactionRoute.useSearch();
+    return (
+      <TransactionPage
+        key={line ?? ''}
+        {...opt('accountId', account)}
+        {...opt('statementId', statement)}
+        {...opt('lineId', line)}
+      />
+    );
+  },
+});
+
+const bankReconciliationRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'bank/reconciliation',
+  validateSearch: bankSearch,
+  component: function BankReconciliationRoute() {
+    const { account, statement, closing } = bankReconciliationRoute.useSearch();
+    return (
+      <ReportPage
+        key={`${statement ?? ''}:${closing ?? ''}`}
+        {...opt('accountId', account)}
+        {...opt('statementId', statement)}
+        {...opt('closing', closing)}
+      />
+    );
   },
 });
 
@@ -313,6 +392,10 @@ const routeTree = rootRoute.addChildren([
     syncIssueRoute,
     chartRoute,
     closeRoute,
+    bankStatementsRoute,
+    bankMatchRoute,
+    bankTransactionRoute,
+    bankReconciliationRoute,
     journalsRoute,
     invoicesRoute,
     invoiceRoute,
