@@ -46,6 +46,15 @@
       "provider": "claude",
       "timestamp": "2026-11-13T00:14:32.373Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-104",
+      "file": ".agent/evidence/T-0041/20261113-002451-SS-PLAT-104-gp-001-invoice-pdf-page-1.png",
+      "test": "documents/invoice-pdf.spec.ts › SS-PLAT-104 the rendered GP-001 invoice PDF shows number, ABN, GST 125.00 and total 1,375.00 on one A4 page [T-0041]",
+      "commit": "a487310d67fa",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T00:24:51.977Z",
+      "result": "passed"
     }
   ]
 }
