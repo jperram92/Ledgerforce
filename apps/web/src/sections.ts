@@ -15,6 +15,8 @@ export interface SubPage {
     | '/accounting/close'
     | '/sales/invoices'
     | '/sales/batches'
+    | '/sales/receipts'
+    | '/sales/credit-notes'
     | '/purchases/bills'
     | '/reports/trial-balance'
     | '/reports/profit-and-loss'
@@ -65,6 +67,16 @@ export const SECTIONS: readonly Section[] = [
         to: '/sales/batches',
         name: 'Batch billing',
         text: 'Invoice every customer with billing due in a period at once, after a preview.',
+      },
+      {
+        to: '/sales/receipts',
+        name: 'Receipts',
+        text: 'Money customers paid that is not yet matched to an invoice: allocate it to one.',
+      },
+      {
+        to: '/sales/credit-notes',
+        name: 'Credit notes',
+        text: 'Credit part of a posted invoice, with the journal shown before it posts.',
       },
     ],
   },

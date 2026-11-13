@@ -32,6 +32,8 @@ import { BatchesPage } from './sales/BatchesPage.tsx';
 import { BatchPage } from './sales/BatchPage.tsx';
 import { InvoicePage } from './sales/InvoicePage.tsx';
 import { InvoicesPage } from './sales/InvoicesPage.tsx';
+import { CreditNotePage } from './sales/CreditNotePage.tsx';
+import { ReceiptsPage } from './sales/ReceiptsPage.tsx';
 import { BillFormPage } from './purchases/BillFormPage.tsx';
 import { BillPage } from './purchases/BillPage.tsx';
 import { BillsPage } from './purchases/BillsPage.tsx';
@@ -208,6 +210,36 @@ const invoiceRoute = createRoute({
   },
 });
 
+// Receipts and credit notes (T-0085, UC-03, UC-11).
+const receiptsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'sales/receipts',
+  component: () => <ReceiptsPage />,
+});
+
+const uuidParam = (v: unknown): string | undefined =>
+  typeof v === 'string' && /^[0-9a-f-]{36}$/i.test(v) ? v : undefined;
+
+const creditNotesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'sales/credit-notes',
+  validateSearch: (search: Record<string, unknown>): { invoice?: string; credit_note?: string } => {
+    const invoice = uuidParam(search['invoice']);
+    const note = uuidParam(search['credit_note']);
+    return { ...(invoice ? { invoice } : {}), ...(note ? { credit_note: note } : {}) };
+  },
+  component: function CreditNotesRoute() {
+    const { invoice, credit_note } = creditNotesRoute.useSearch();
+    return (
+      <CreditNotePage
+        key={`${invoice ?? ''}:${credit_note ?? ''}`}
+        {...(invoice ? { invoiceId: invoice } : {})}
+        {...(credit_note ? { creditNoteId: credit_note } : {})}
+      />
+    );
+  },
+});
+
 // Batch billing (T-0084, UC-02): choose a period and preview; one run with its exception list.
 const batchesRoute = createRoute({
   getParentRoute: () => shellRoute,
@@ -316,6 +348,8 @@ const routeTree = rootRoute.addChildren([
     journalsRoute,
     invoicesRoute,
     invoiceRoute,
+    receiptsRoute,
+    creditNotesRoute,
     batchesRoute,
     batchRoute,
     billsRoute,
