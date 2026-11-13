@@ -1,0 +1,128 @@
+{
+  "captured": "2026-11-10T01:02:59.035Z",
+  "base": "a8bf5db68c67e4552e5c702910f3d2df93ee71c6",
+  "migrations": [
+    {
+      "originalPath": "packages/db/migrations/0049_ar_customer_refund.sql",
+      "blob": "e1cd5b4feca6dd52f12aeb6200f1208832b2ab1a",
+      "refs": [
+        {
+          "ref": "origin/feat/T-0055-customer-refunds",
+          "commit": "378efc6ea8b78733b8331ad2ed19448d85b739df"
+        },
+        {
+          "ref": "origin/feat/T-0080-setup-wizard",
+          "commit": "9c11388aeeeee4aaa1199c3af1bc66f97c12a69b"
+        }
+      ]
+    },
+    {
+      "originalPath": "packages/db/migrations/0050_bank_matching.sql",
+      "blob": "b5cb38de2b932cbfed21b00c5ae1ad3d147a2a49",
+      "refs": [
+        {
+          "ref": "origin/feat/T-0060-bank-matching",
+          "commit": "bc6621b0969bd75300ca812e3d728be6778008c9"
+        },
+        {
+          "ref": "origin/feat/T-0061-bank-reconciliation",
+          "commit": "8bfb1e7c215fc8b64cd28bc742e6db6e5c217d09"
+        }
+      ]
+    },
+    {
+      "originalPath": "packages/db/migrations/0051_bank_reconciliation.sql",
+      "blob": "889f4db5fb7185ac29a3c85e99641f9123c1b69d",
+      "refs": [
+        {
+          "ref": "origin/feat/T-0061-bank-reconciliation",
+          "commit": "8bfb1e7c215fc8b64cd28bc742e6db6e5c217d09"
+        }
+      ]
+    },
+    {
+      "originalPath": "packages/db/migrations/0050_salesforce_inbound_change.sql",
+      "blob": "77f9a1762e1e58ccf2926418c84927f5ddbef5dc",
+      "refs": [
+        {
+          "ref": "origin/feat/T-0065-sf-inbound-mapping",
+          "commit": "0cb12e4377446418f9efc0329666b6d38a03e803"
+        },
+        {
+          "ref": "origin/feat/T-0066-sf-polling-fallback",
+          "commit": "cdedaf409eec22b0ba127ba10c76f590addf001d"
+        },
+        {
+          "ref": "origin/feat/T-0069-closed-won-invoice",
+          "commit": "93d4d54c5c4f0bfe524636aa1a725fb9ba689cf5"
+        },
+        {
+          "ref": "origin/feat/T-0070-sf-nightly-reconciliation",
+          "commit": "3ba54818223454849d0090b1246f9cc9f4320b81"
+        }
+      ]
+    },
+    {
+      "originalPath": "packages/db/migrations/0051_salesforce_sync_object.sql",
+      "blob": "4219f465261b7851a99365a07887a341af4ed00c",
+      "refs": [
+        {
+          "ref": "origin/feat/T-0066-sf-polling-fallback",
+          "commit": "cdedaf409eec22b0ba127ba10c76f590addf001d"
+        },
+        {
+          "ref": "origin/feat/T-0069-closed-won-invoice",
+          "commit": "93d4d54c5c4f0bfe524636aa1a725fb9ba689cf5"
+        },
+        {
+          "ref": "origin/feat/T-0070-sf-nightly-reconciliation",
+          "commit": "3ba54818223454849d0090b1246f9cc9f4320b81"
+        }
+      ]
+    },
+    {
+      "originalPath": "packages/db/migrations/0052_salesforce_billing_source.sql",
+      "blob": "0a17294a37115c2b4626b0b8c33f811e9ffcf661",
+      "refs": [
+        {
+          "ref": "origin/feat/T-0069-closed-won-invoice",
+          "commit": "93d4d54c5c4f0bfe524636aa1a725fb9ba689cf5"
+        },
+        {
+          "ref": "origin/feat/T-0070-sf-nightly-reconciliation",
+          "commit": "3ba54818223454849d0090b1246f9cc9f4320b81"
+        }
+      ]
+    },
+    {
+      "originalPath": "packages/db/migrations/0053_salesforce_reconciliation.sql",
+      "blob": "35da63c49e2090459d8b643e872c6762346c059a",
+      "refs": [
+        {
+          "ref": "origin/feat/T-0070-sf-nightly-reconciliation",
+          "commit": "3ba54818223454849d0090b1246f9cc9f4320b81"
+        }
+      ]
+    },
+    {
+      "originalPath": "packages/db/migrations/0049_payments_stripe_webhook.sql",
+      "blob": "6c97d950ed2874be71483d4c37094d2b58dd51e9",
+      "refs": [
+        {
+          "ref": "origin/feat/T-0074-stripe-webhooks",
+          "commit": "eca12922527ec522ff81ce50a27637e72c85f6e8"
+        }
+      ]
+    },
+    {
+      "originalPath": "packages/db/migrations/0051_setup_opening_balance.sql",
+      "blob": "c9ae1b87cbab447777ed4ea2dbbcb768a4eac7ff",
+      "refs": [
+        {
+          "ref": "origin/feat/T-0080-setup-wizard",
+          "commit": "9c11388aeeeee4aaa1199c3af1bc66f97c12a69b"
+        }
+      ]
+    }
+  ]
+}

@@ -6,7 +6,7 @@ import { type Ctx, cards, getCard } from './commands.ts';
 import { lintBacklog } from './backlog.ts';
 import { latestCrossReview } from './review.ts';
 import { gitTry, currentBranch } from './git.ts';
-import { approvedGoldenPaths } from './golden-approvals.ts';
+import { approvedGoldenPaths, baseApprovalKeys } from './golden-approvals.ts';
 
 export type GateResult = 'PASS' | 'FAIL' | 'PENDING';
 export interface Gate { result: GateResult; lines: string[] }
@@ -128,20 +128,29 @@ export function goldenGuard(ctx: Ctx): Gate {
   const changed = changedFiles(ctx.root, base, ['Docs/accounting']);
   if (!changed.length) return { result: 'PASS', lines: ['Docs/accounting unchanged vs ' + (base ? base.slice(0, 7) : 'HEAD')] };
   const bad: string[] = [];
+  // Only records already committed on the comparison base count (review C6): a record added or
+  // changed on this branch is a claim by the branch's author, not the owner's approval.
+  const trusted = baseApprovalKeys(ctx.root, base ?? 'HEAD');
+  const untrusted = new Set<string>();
   for (const f of changed) {
     const before = gitTry(ctx.root, ['show', `${base ?? 'HEAD'}:${f}`]);
     if (before.code === 0 && before.out.split('\n').some(isApprovedMarker)) {
       bad.push(`${f}: changes a file with Approved golden postings (human-owned)`);
       continue;
     }
-    if (approved.paths.has(f)) continue;
+    const key = approved.keys.get(f);
+    if (key && trusted.has(key)) continue;
+    if (key) untrusted.add(f);
     const added = addedLines(ctx.root, base, (x) => x === f).filter((a) => isApprovedMarker(a.text));
     for (const a of added) if (!(before.code === 0 && before.out.includes(a.text))) bad.push(`${f}:${a.line}: adds an Approved status — only the product owner approves golden postings`);
   }
+  for (const f of untrusted) if (bad.some((b) => b.startsWith(`${f}:`))) {
+    bad.push(`${f}: its approval record is not on the comparison base — new approval records require the product owner's merge to main`);
+  }
   return bad.length
     ? { result: 'FAIL', lines: bad }
-    : { result: 'PASS', lines: [approved.paths.size
-      ? `${approved.paths.size} content-bound approved snapshot(s); other changes are Draft-only proposals`
+    : { result: 'PASS', lines: [[...approved.keys.values()].some((k) => trusted.has(k))
+      ? `${[...approved.keys.values()].filter((k) => trusted.has(k)).length} content-bound approved snapshot(s) from the comparison base; other changes are Draft-only proposals`
       : `Draft-only changes in ${changed.join(', ')} — allowed only as a proposal with PR label golden_postings`] };
 }
 

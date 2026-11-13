@@ -44,7 +44,7 @@ interface Amounted {
   amount?: string;
 }
 
-@Controller('ap/bills')
+@Controller('test/ap/bills')
 class TestBillController {
   @Post()
   @HttpCode(201)
@@ -64,7 +64,7 @@ class TestBillController {
   }
 }
 
-@Controller('ap/payment-batches')
+@Controller('test/ap/payment-batches')
 class TestPaymentBatchController {
   @Post()
   @HttpCode(201)
@@ -218,10 +218,11 @@ afterAll(async () => {
 describe('SS-UC05-05: SoD: clerk cannot approve own bill above $1,000', () => {
   it('a $2,750 bill entered by user A: user A approving it is denied with SOD_BILL_SELF_APPROVAL and audited', async () => {
     expect(
-      (await call('POST', '/ap/bills', 'userA', { id: 'BILL-000045', amount: '2750.0000' })).status,
+      (await call('POST', '/test/ap/bills', 'userA', { id: 'BILL-000045', amount: '2750.0000' }))
+        .status,
     ).toBe(201);
     const mark = await auditMark();
-    const res = await call('POST', '/ap/bills/BILL-000045/approve', 'userA');
+    const res = await call('POST', '/test/ap/bills/BILL-000045/approve', 'userA');
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({
       error: 'sod_violation',
@@ -237,7 +238,7 @@ describe('SS-UC05-05: SoD: clerk cannot approve own bill above $1,000', () => {
         entity_id: 'BILL-000045',
         after: {
           method: 'POST',
-          route: '/ap/bills/:billId/approve',
+          route: '/test/ap/bills/:billId/approve',
           step: 'bill.approve',
           rule: 'SOD_BILL_SELF_APPROVAL',
         },
@@ -251,7 +252,7 @@ describe('SS-UC05-05: SoD: clerk cannot approve own bill above $1,000', () => {
 
   it('another approver may approve it; the step is recorded and the mutation audited', async () => {
     const mark = await auditMark();
-    const res = await call('POST', '/ap/bills/BILL-000045/approve', 'approver');
+    const res = await call('POST', '/test/ap/bills/BILL-000045/approve', 'approver');
     expect(res.status).toBe(200);
     expect(done.bills).toContain('BILL-000045');
     expect(await steps('BILL-000045')).toEqual([
@@ -259,18 +260,18 @@ describe('SS-UC05-05: SoD: clerk cannot approve own bill above $1,000', () => {
       { step: 'bill.approve', actor_user_id: PEOPLE.approver.id },
     ]);
     expect((await auditSince(mark)).map((r) => r.action)).toEqual([
-      'POST /ap/bills/:billId/approve',
+      'POST /test/ap/bills/:billId/approve',
     ]);
   });
 
   it('a $1,000.00 bill (not above the threshold) may be self-approved', async () => {
-    await call('POST', '/ap/bills', 'userA', { id: 'BILL-001000', amount: '1000.0000' });
-    expect((await call('POST', '/ap/bills/BILL-001000/approve', 'userA')).status).toBe(200);
+    await call('POST', '/test/ap/bills', 'userA', { id: 'BILL-001000', amount: '1000.0000' });
+    expect((await call('POST', '/test/ap/bills/BILL-001000/approve', 'userA')).status).toBe(200);
   });
 
   it('the threshold is a tenant setting: raised to $5,000 by the Owner, the $2,750 self-approval is allowed; restored, it is denied', async () => {
-    await call('POST', '/ap/bills', 'userA', { id: 'BILL-T1', amount: '2750.0000' });
-    await call('POST', '/ap/bills', 'userA', { id: 'BILL-T2', amount: '2750.0000' });
+    await call('POST', '/test/ap/bills', 'userA', { id: 'BILL-T1', amount: '2750.0000' });
+    await call('POST', '/test/ap/bills', 'userA', { id: 'BILL-T2', amount: '2750.0000' });
     const raise = await call('POST', '/sod/settings', 'ownerA', {
       thresholds: { bill_self_approval: '5000.0000' },
       reason: 'placeholder raised for test',
@@ -279,13 +280,13 @@ describe('SS-UC05-05: SoD: clerk cannot approve own bill above $1,000', () => {
     expect(((await raise.json()) as { thresholds: unknown }).thresholds).toMatchObject({
       bill_self_approval: '5000.0000',
     });
-    expect((await call('POST', '/ap/bills/BILL-T1/approve', 'userA')).status).toBe(200);
+    expect((await call('POST', '/test/ap/bills/BILL-T1/approve', 'userA')).status).toBe(200);
     const restore = await call('POST', '/sod/settings', 'ownerA', {
       thresholds: { bill_self_approval: '1000.0000' },
       reason: 'restore placeholder',
     });
     expect(restore.status).toBe(201);
-    expect((await call('POST', '/ap/bills/BILL-T2/approve', 'userA')).status).toBe(403);
+    expect((await call('POST', '/test/ap/bills/BILL-T2/approve', 'userA')).status).toBe(403);
   });
 });
 
@@ -293,14 +294,14 @@ describe('SS-UC06-02: Creator cannot release own batch', () => {
   it('the batch created by user A: user A releasing it is denied with SOD_BATCH_SELF_RELEASE', async () => {
     expect(
       (
-        await call('POST', '/ap/payment-batches', 'userA', {
+        await call('POST', '/test/ap/payment-batches', 'userA', {
           id: 'PB-2026-11-01',
           amount: '18450.0000',
         })
       ).status,
     ).toBe(201);
     const mark = await auditMark();
-    const res = await call('POST', '/ap/payment-batches/PB-2026-11-01/release', 'userA');
+    const res = await call('POST', '/test/ap/payment-batches/PB-2026-11-01/release', 'userA');
     expect(res.status).toBe(403);
     expect(await res.json()).toMatchObject({
       error: 'sod_violation',
@@ -313,17 +314,17 @@ describe('SS-UC06-02: Creator cannot release own batch', () => {
   });
 
   it('the Owner is bound too (§6.4: cannot release a batch they created)', async () => {
-    await call('POST', '/ap/payment-batches', 'ownerA', { id: 'PB-OWNER', amount: '10.0000' });
-    const res = await call('POST', '/ap/payment-batches/PB-OWNER/release', 'ownerA');
+    await call('POST', '/test/ap/payment-batches', 'ownerA', { id: 'PB-OWNER', amount: '10.0000' });
+    const res = await call('POST', '/test/ap/payment-batches/PB-OWNER/release', 'ownerA');
     expect(res.status).toBe(403);
     expect(await res.json()).toMatchObject({ rule: 'SOD_BATCH_SELF_RELEASE' });
   });
 
   it('a different releaser may release; above $10,000 the same releaser cannot release twice', async () => {
     expect(
-      (await call('POST', '/ap/payment-batches/PB-2026-11-01/release', 'approver')).status,
+      (await call('POST', '/test/ap/payment-batches/PB-2026-11-01/release', 'approver')).status,
     ).toBe(200);
-    const again = await call('POST', '/ap/payment-batches/PB-2026-11-01/release', 'approver');
+    const again = await call('POST', '/test/ap/payment-batches/PB-2026-11-01/release', 'approver');
     expect(again.status).toBe(403);
     expect(await again.json()).toMatchObject({ rule: 'SOD_BATCH_SAME_RELEASER' });
   });
@@ -362,8 +363,8 @@ describe('SS-UC05-06: Small-team mode records a visible exception', () => {
       reason: 'one-person business (design §6.3)',
     });
     expect(on.status).toBe(201);
-    await call('POST', '/ap/bills', 'solo', { id: 'BILL-S1', amount: '2750.0000' });
-    const res = await call('POST', '/ap/bills/BILL-S1/approve', 'solo');
+    await call('POST', '/test/ap/bills', 'solo', { id: 'BILL-S1', amount: '2750.0000' });
+    const res = await call('POST', '/test/ap/bills/BILL-S1/approve', 'solo');
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({
       error: 'sod_violation',
@@ -375,7 +376,7 @@ describe('SS-UC05-06: Small-team mode records a visible exception', () => {
 
   it('with a recorded exception the approval succeeds and the exception is written with it', async () => {
     const mark = await auditMark();
-    const res = await call('POST', '/ap/bills/BILL-S1/approve', 'solo', {
+    const res = await call('POST', '/test/ap/bills/BILL-S1/approve', 'solo', {
       sod_exception: { reason: 'sole trader; accountant reviews monthly' },
     });
     expect(res.status).toBe(200);
@@ -392,22 +393,22 @@ describe('SS-UC05-06: Small-team mode records a visible exception', () => {
     ]);
     expect((await auditSince(mark, S)).map((r) => r.action)).toEqual([
       'sod.exception_recorded',
-      'POST /ap/bills/:billId/approve',
+      'POST /test/ap/bills/:billId/approve',
     ]);
   });
 
   it('with an external reviewer (another active user) the exception names them; the actor cannot name themself', async () => {
-    await call('POST', '/ap/bills', 'solo', { id: 'BILL-S2', amount: '4000.0000' });
-    const self = await call('POST', '/ap/bills/BILL-S2/approve', 'solo', {
+    await call('POST', '/test/ap/bills', 'solo', { id: 'BILL-S2', amount: '4000.0000' });
+    const self = await call('POST', '/test/ap/bills/BILL-S2/approve', 'solo', {
       sod_exception: { reason: 'me', external_reviewer_id: PEOPLE.solo.id },
     });
     expect(self.status).toBe(403);
-    const unknown = await call('POST', '/ap/bills/BILL-S2/approve', 'solo', {
+    const unknown = await call('POST', '/test/ap/bills/BILL-S2/approve', 'solo', {
       sod_exception: { reason: 'x', external_reviewer_id: PEOPLE.userA.id }, // another tenant
     });
     expect(unknown.status).toBe(400);
     expect(await unknown.json()).toEqual({ error: 'invalid_sod_exception' });
-    const ok = await call('POST', '/ap/bills/BILL-S2/approve', 'solo', {
+    const ok = await call('POST', '/test/ap/bills/BILL-S2/approve', 'solo', {
       sod_exception: {
         reason: 'outside accountant reviews',
         external_reviewer_id: PEOPLE.outside.id,
@@ -458,8 +459,8 @@ describe('SS-UC05-06: Small-team mode records a visible exception', () => {
         })
       ).status,
     ).toBe(201);
-    await call('POST', '/ap/bills', 'userA', { id: 'BILL-A9', amount: '2750.0000' });
-    const res = await call('POST', '/ap/bills/BILL-A9/approve', 'userA', {
+    await call('POST', '/test/ap/bills', 'userA', { id: 'BILL-A9', amount: '2750.0000' });
+    const res = await call('POST', '/test/ap/bills/BILL-A9/approve', 'userA', {
       sod_exception: { reason: 'in a hurry' },
     });
     expect(res.status).toBe(403);
@@ -474,14 +475,14 @@ describe('SS-UC05-06: Small-team mode records a visible exception', () => {
 
 describe('SS-PLAT-63: SoD runs after MFA, permission and step-up, fails closed and is managed by the Owner', () => {
   it('permission first: a user without the permission gets forbidden, not sod_violation', async () => {
-    await call('POST', '/ap/bills', 'apClerk', { id: 'BILL-P1', amount: '2750.0000' });
-    const res = await call('POST', '/ap/bills/BILL-P1/approve', 'apClerk');
+    await call('POST', '/test/ap/bills', 'apClerk', { id: 'BILL-P1', amount: '2750.0000' });
+    const res = await call('POST', '/test/ap/bills/BILL-P1/approve', 'apClerk');
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({ error: 'forbidden', permission: 'ap.bill.approve' });
   });
 
   it('MFA first: a finance role without MFA gets mfa_required, not sod_violation', async () => {
-    const res = await call('POST', '/ap/bills/BILL-000045/approve', 'noMfa');
+    const res = await call('POST', '/test/ap/bills/BILL-000045/approve', 'noMfa');
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({ error: 'mfa_required' });
   });
@@ -494,7 +495,7 @@ describe('SS-PLAT-63: SoD runs after MFA, permission and step-up, fails closed a
       acr: null,
       authTime: new Date(Date.now() - 3_600_000),
     });
-    const res = await fetch(`${api.url}/ap/payment-batches/PB-2026-11-01/release`, {
+    const res = await fetch(`${api.url}/test/ap/payment-batches/PB-2026-11-01/release`, {
       method: 'POST',
       headers: { cookie: `lf_session=${stale}` },
     });
@@ -509,7 +510,7 @@ describe('SS-PLAT-63: SoD runs after MFA, permission and step-up, fails closed a
   });
 
   it('a subject without an id is refused as a bad request, and nothing is recorded', async () => {
-    const res = await call('POST', '/ap/bills', 'userA', { amount: '1.0000' });
+    const res = await call('POST', '/test/ap/bills', 'userA', { amount: '1.0000' });
     expect(res.status).toBe(400);
     expect(await res.json()).toEqual({ error: 'invalid_sod_subject' });
   });

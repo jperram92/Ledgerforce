@@ -1,7 +1,7 @@
 ---
 adr: 0006
 title: "Salesforce is the commercial system of record; field-level ownership table"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: integration
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0006: Salesforce is the commercial system of record; field-level ownership table
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — design-committed (D1, §5.5). Integration category: becomes Accepted when the
 integration contract is implemented in the connector task with green CI and cross-provider

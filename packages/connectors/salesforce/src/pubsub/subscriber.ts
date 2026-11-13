@@ -55,6 +55,12 @@ export interface SubscriberOptions {
   client: PubSubClient;
   auth: () => Promise<PubSubAuth>;
   handler: CdcHandler;
+  /**
+   * Called, in the batch transaction, with a change event's records whose idempotency keys were
+   * already seen (a redelivery or an overlapping replay), so the duplicate can be logged
+   * (T-0065). The handler itself never sees them.
+   */
+  onDuplicate?: CdcHandler;
   /** Events requested at a time; capped at 100 (RQ-0036 S5). Default 100. */
   batchSize?: number;
   signal?: AbortSignal;
@@ -171,9 +177,13 @@ async function applyEvent(
 ): Promise<number> {
   const keys = idempotencyKeys(e);
   const fresh = await claimIdempotencyKeys(trx, o.companyId, o.channel, keys, e.replayId);
-  if (fresh.size === 0) return 0;
   const h = e.header;
   const kind = changeKind(e);
+  if (h && kind === 'change' && o.onDuplicate && fresh.size < keys.length) {
+    const seen = h.recordIds.filter((_, i) => !fresh.has(keys[i] as string));
+    await o.onDuplicate(trx, e, seen);
+  }
+  if (fresh.size === 0) return 0;
   const recordIds = h ? h.recordIds.filter((_, i) => fresh.has(keys[i] as string)) : [];
   if (h && (kind === 'gap' || kind === 'overflow')) {
     await recordResyncRequest(trx, o.companyId, o.channel, {

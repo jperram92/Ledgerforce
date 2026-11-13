@@ -13,7 +13,13 @@ import { StatementParseError } from './errors.ts';
 import { decode, parseOfx } from './ofx.ts';
 import { LIMITS, type ParsedStatement, type StatementFormat } from './types.ts';
 
-export { CSV_DATE_FORMATS, validateCsvMapping, type CsvColumn, type CsvMapping } from './csv.ts';
+export {
+  CSV_DATE_FORMATS,
+  readCsvRecords,
+  validateCsvMapping,
+  type CsvColumn,
+  type CsvMapping,
+} from './csv.ts';
 export { StatementImportError, StatementParseError } from './errors.ts';
 export type { ParsedStatement, StatementFormat, StatementLine } from './types.ts';
 export type { CamtStatement } from './camt053.ts';

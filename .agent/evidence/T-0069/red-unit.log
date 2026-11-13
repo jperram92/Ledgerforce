@@ -1,0 +1,81 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a22ad83152e864a53
+
+ ❯ |unit| packages/connectors/salesforce/src/billing/billing-source.test.ts (0 test)
+ ❯ |unit| packages/modules/ar/src/auto-approve.test.ts (4 tests | 4 failed) 7ms
+     × SS-UC01-04 a $1,375.00 invoice with threshold $1,000.00 stays a draft (ABOVE_THRESHOLD) 4ms
+     × SS-UC01-04 the threshold itself is within (≤), one cent above is not 1ms
+     × SS-UC01-04 auto-approve off, no threshold, no settings or open warnings keep the draft 0ms
+     × compares exact decimals, never floats (0.1 + 0.2 style sums) 0ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/connectors/salesforce/src/billing/billing-source.test.ts [ packages/connectors/salesforce/src/billing/billing-source.test.ts ]
+Error: Cannot find module './billing-source.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a22ad83152e864a53/packages/connectors/salesforce/src/billing/billing-source.test.ts
+ ❯ packages/connectors/salesforce/src/billing/billing-source.test.ts:6:1
+      4|  */
+      5| import { describe, expect, it } from 'vitest';
+      6| import {
+       | ^
+      7|   billingReadiness,
+      8|   invoiceLineFor,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/ar/src/auto-approve.test.ts > SS-UC01-04: Above threshold stays Draft > SS-UC01-04 a $1,375.00 invoice with threshold $1,000.00 stays a draft (ABOVE_THRESHOLD)
+TypeError: autoApproveDecision is not a function
+ ❯ packages/modules/ar/src/auto-approve.test.ts:12:7
+     10|   it('SS-UC01-04 a $1,375.00 invoice with threshold $1,000.00 stays a …
+     11|     expect(
+     12|       autoApproveDecision(
+       |       ^
+     13|         { autoApprove: true, autoApproveThreshold: '1000.0000' },
+     14|         { gross: '1375.0000', warnings: 0 },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |unit| packages/modules/ar/src/auto-approve.test.ts > SS-UC01-04: Above threshold stays Draft > SS-UC01-04 the threshold itself is within (≤), one cent above is not
+TypeError: autoApproveDecision is not a function
+ ❯ packages/modules/ar/src/auto-approve.test.ts:21:12
+     19|   it('SS-UC01-04 the threshold itself is within (≤), one cent above is…
+     20|     const on = { autoApprove: true, autoApproveThreshold: '1375.00' };
+     21|     expect(autoApproveDecision(on, { gross: '1375.0000', warnings: 0 }…
+       |            ^
+     22|       approve: true,
+     23|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |unit| packages/modules/ar/src/auto-approve.test.ts > SS-UC01-04: Above threshold stays Draft > SS-UC01-04 auto-approve off, no threshold, no settings or open warnings keep the draft
+TypeError: autoApproveDecision is not a function
+ ❯ packages/modules/ar/src/auto-approve.test.ts:32:12
+     30|   it('SS-UC01-04 auto-approve off, no threshold, no settings or open w…
+     31|     const g = { gross: '10.00', warnings: 0 };
+     32|     expect(autoApproveDecision({ autoApprove: false, autoApproveThresh…
+       |            ^
+     33|       approve: false,
+     34|       reason: 'OFF',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |unit| packages/modules/ar/src/auto-approve.test.ts > SS-UC01-04: Above threshold stays Draft > compares exact decimals, never floats (0.1 + 0.2 style sums)
+TypeError: autoApproveDecision is not a function
+ ❯ packages/modules/ar/src/auto-approve.test.ts:51:7
+     49|   it('compares exact decimals, never floats (0.1 + 0.2 style sums)', (…
+     50|     expect(
+     51|       autoApproveDecision(
+       |       ^
+     52|         { autoApprove: true, autoApproveThreshold: '0.3' },
+     53|         { gross: '0.3000', warnings: 0 },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed (4)
+   Start at  06:57:00
+   Duration  1.48s (transform 991ms, setup 0ms, import 1.09s, tests 7ms, environment 0ms)
+

@@ -1,0 +1,83 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:43085
+ ❯ |db| packages/modules/ar/src/refunds.db.test.ts (0 test)
+ ❯ |db| packages/modules/ap/src/customer-refund.db.test.ts (5 tests | 5 failed) 727ms
+     × SS-UC11-03 the 220.00 credit refunded in a confirmed batch posts exactly GP-006 and the credit is cleared 13ms
+     × SS-UC11-03 a batch with a bill and a refund: GP-009 credits the bank for the bills, GP-006 for the refund; the ABA file pays both 75ms
+     × Q9: a customer whose bank details are cooling off is excluded with the reason; the refund stays requested 5ms
+     × a refund cannot exceed the customer credit, including refunds already requested 5ms
+     × SS-UC11-05 after the confirmed refund the Opportunity write-back carries LF_Amount_Paid__c = 1,155.00 6ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/refunds.db.test.ts [ packages/modules/ar/src/refunds.db.test.ts ]
+Error: Cannot find module './refunds.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/packages/modules/ar/src/refunds.db.test.ts
+ ❯ packages/modules/ar/src/refunds.db.test.ts:17:1
+     15| import { approveInvoice, createDraftInvoice, type DocumentOutbox } fro…
+     16| import { recordReceipt } from './receipts.ts';
+     17| import {
+       | ^
+     18|   createCustomerRefund,
+     19|   customerCredit,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ap/src/customer-refund.db.test.ts > SS-UC11-03: Refund via payment batch posts GP-006 > SS-UC11-03 the 220.00 credit refunded in a confirmed batch posts exactly GP-006 and the credit is cleared
+ FAIL  |db| packages/modules/ap/src/customer-refund.db.test.ts > SS-UC11-03: Refund via payment batch posts GP-006 > SS-UC11-03 a batch with a bill and a refund: GP-009 credits the bank for the bills, GP-006 for the refund; the ABA file pays both
+ FAIL  |db| packages/modules/ap/src/customer-refund.db.test.ts > SS-UC11-03: Refund via payment batch posts GP-006 > Q9: a customer whose bank details are cooling off is excluded with the reason; the refund stays requested
+ FAIL  |db| packages/modules/ap/src/customer-refund.db.test.ts > SS-UC11-03: Refund via payment batch posts GP-006 > a refund cannot exceed the customer credit, including refunds already requested
+error: bank details need the party to be an active supplier or employee
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ InsertQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/insert-query-builder.js:1101:24
+ ❯ addBankAccount packages/modules/parties/src/bank-accounts.ts:78:3
+     76|     aadFor(row.tenant_id, companyId, partyId, row.id),
+     77|   );
+     78|   await trx
+       |   ^
+     79|     .insertInto('app.party_bank_account')
+     80|     .values({
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ InsertQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/insert-query-builder.js:1101:24
+ ❯ addBankAccount packages/modules/parties/src/bank-accounts.ts:78:3
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |db| packages/modules/ap/src/customer-refund.db.test.ts > SS-UC11-05: Salesforce shows net amount paid > SS-UC11-05 after the confirmed refund the Opportunity write-back carries LF_Amount_Paid__c = 1,155.00
+TypeError: opportunityWriteBack is not a function
+ ❯ packages/modules/ap/src/customer-refund.db.test.ts:441:7
+    439|   it('SS-UC11-05 after the confirmed refund the Opportunity write-back…
+    440|     const snap = await f.inTenant((trx) =>
+    441|       opportunityWriteBack(trx, {
+       |       ^
+    442|         companyId: f.companyId,
+    443|         sfId: OPPORTUNITY,
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/customer-refund.db.test.ts:440:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  5 failed (5)
+   Start at  06:50:33
+   Duration  4.41s (transform 1.34s, setup 0ms, import 2.14s, tests 727ms, environment 0ms)
+

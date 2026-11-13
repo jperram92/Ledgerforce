@@ -1,7 +1,7 @@
 ---
 adr: 0016
 title: "OIDC login with tenant-scoped server-side sessions, idle/absolute timeouts and revoke-all"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0016: OIDC login with tenant-scoped server-side sessions, idle/absolute timeouts and revoke-all
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, waiting for product-owner acceptance (PR label `adr:security`).
 T-0105 and T-0011 are built to this proposal so it can be judged on working, tested code; any

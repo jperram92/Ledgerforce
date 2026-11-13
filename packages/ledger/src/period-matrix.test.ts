@@ -84,6 +84,8 @@ const EXPECTED_CLASS: Record<string, string> = {
   'revrec.release': 'journal',
   'payroll.super_payment': 'ap',
   'payroll.sgc_assessment': 'ap',
+  // Opening balances at conversion (T-0080, GP-037, RQ-0109).
+  'ledger.opening_balance': 'journal',
 };
 
 const SETTINGS: readonly PayoutUnderArLock[] = ['override', 'allow'];

@@ -1,7 +1,7 @@
 ---
 adr: 0040
 title: "Sync issues inbox: dead letters become tenant issues, failure log outside pg-boss, one-click retry as a new delivery job, API budget share as connection data"
-status: Proposed
+status: Accepted
 date: 2026-10-26
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0040: Sync issues inbox, dead letters, one-click retry and the API budget share
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — classed `security` because it adds tenant-owned tables (RLS), two permissions to the
 role catalogue (ADR-0023) and a public API resource. Human gate: the product owner accepts with

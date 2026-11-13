@@ -1,0 +1,14 @@
+     × SS-PLAT-108 GET /reports/gl-detail returns the AP control detail with decimal-string money 28ms
+     × SS-PLAT-109 GET /reports/aged-payables ages the bill and totals the AP control balance 5ms
+     × GET /reports/aged-receivables answers an AR reader 3ms
+     × refuses an AP clerk GL detail and aged AR (403) and bad queries (400) 3ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |api-db| apps/api/src/reports/reports.db.test.ts > SS-PLAT-108/109 report routes [T-0077] > SS-PLAT-108 GET /reports/gl-detail returns the AP control detail with decimal-string money
+AssertionError: expected 404 to be 200 // Object.is equality
+ FAIL  |api-db| apps/api/src/reports/reports.db.test.ts > SS-PLAT-108/109 report routes [T-0077] > SS-PLAT-109 GET /reports/aged-payables ages the bill and totals the AP control balance
+AssertionError: expected 404 to be 200 // Object.is equality
+ FAIL  |api-db| apps/api/src/reports/reports.db.test.ts > SS-PLAT-108/109 report routes [T-0077] > GET /reports/aged-receivables answers an AR reader
+AssertionError: expected 404 to be 200 // Object.is equality
+ FAIL  |api-db| apps/api/src/reports/reports.db.test.ts > SS-PLAT-108/109 report routes [T-0077] > refuses an AP clerk GL detail and aged AR (403) and bad queries (400)
+AssertionError: expected 404 to be 403 // Object.is equality
+      Tests  4 failed (4)

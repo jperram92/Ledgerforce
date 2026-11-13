@@ -1,7 +1,7 @@
 ---
 adr: 0035
 title: "AR/AP open items signed like the GL, append-only allocations priced by the database, fx_difference recorded without an FX journal"
-status: Proposed
+status: Accepted
 date: 2026-10-26
 author: claude
 category: accounting
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0035: Subledger open items and allocations
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — accounting category, waiting for product-owner acceptance (label `adr:accounting`).
 T-0028 is built to this proposal so it can be judged on working, tested code; it posts no

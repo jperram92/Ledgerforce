@@ -1,0 +1,706 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/var/tmp/ledgerforce-t0070-validation-20261106/repo[39m
+
+ [32m✓[39m [30m[45m api-unit [49m[39m apps/api/src/authz/mfa.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+ [32m✓[39m [30m[45m api-unit [49m[39m apps/api/src/config.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32m✓[39m [30m[45m api-unit [49m[39m apps/api/src/deploy/nginx-routes.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m [30m[45m api-unit [49m[39m apps/api/src/authz/routes.test.ts [2m([22m[2m63 tests[22m[2m)[22m[32m 65[2mms[22m[39m
+ [32m✓[39m [30m[45m api-unit [49m[39m apps/api/src/di.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 731[2mms[22m[39m
+     [33m[2m✓[22m[39m resolves a constructor dependency from its type alone (decorator metadata emitted) [33m 727[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/aggregate/aggregate.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 366[2mms[22m[39m
+     [33m[2m✓[22m[39m property: every amount lands in exactly one place and the sums are exact [33m 324[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/layout/lane-layout.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 326[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/components/TurnQueue.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1243[2mms[22m[39m
+     [33m[2m✓[22m[39m names who acts next and the date it blocks, on every open item [33m 642[2mms[22m[39m
+     [33m[2m✓[22m[39m moves with J/K and the arrow keys, jumps with Home/End, and opens with Enter [33m 552[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/components/Timeline.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 2174[2mms[22m[39m
+     [33m[2m✓[22m[39m starts on 5 weeks: 1 Oct to 9 Nov, Mondays on the axis, today marked [33m 511[2mms[22m[39m
+     [33m[2m✓[22m[39m switches to Quarter: weekly buckets, actual and expected kept apart [33m 655[2mms[22m[39m
+     [33m[2m✓[22m[39m switches to Year: monthly buckets [33m 527[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/money/format.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 81[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/components/Lane.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1375[2mms[22m[39m
+     [33m[2m✓[22m[39m draws each item on its row at its date, as a labelled list [33m 883[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/components/JournalTable.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 1356[2mms[22m[39m
+     [33m[2m✓[22m[39m shows each account with its code, term and plain gloss, Dr and Cr in separate columns [33m 821[2mms[22m[39m
+     [33m[2m✓[22m[39m totals the columns exactly and says it is balanced [33m 422[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/components/CashLane.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 535[2mms[22m[39m
+     [33m[2m✓[22m[39m gives the chart a text summary for screen readers [33m 314[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/components/Spine.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[33m 607[2mms[22m[39m
+     [33m[2m✓[22m[39m lists every event oldest first with a machine-readable date [33m 491[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/components/Money.test.tsx [2m([22m[2m5 tests[22m[2m)[22m[32m 166[2mms[22m[39m
+ [32m✓[39m [30m[45m ui [49m[39m packages/ui/src/time/dates.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 64[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/shared/src/crypto/transit-kms.test.ts [2m([22m[2m62 tests[22m[2m)[22m[33m 2371[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/writeback/writeback.payload.contract.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 299[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/shared/src/sod/sod.rules.test.ts [2m([22m[2m37 tests[22m[2m)[22m[33m 330[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/bank/src/parsers.test.ts [2m([22m[2m26 tests[22m[2m)[22m[33m 779[2mms[22m[39m
+       [33m[2m✓[22m[39m CSV: render → parse gives the same lines in the same order [33m 305[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m salesforce/test/package-contract.test.ts [2m([22m[2m49 tests[22m[2m)[22m[32m 260[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m infra/test/install-contract.test.ts [2m([22m[2m17 tests[22m[2m)[22m[32m 258[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/bank/src/camt-extensions.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 665[2mms[22m[39m
+       [33m[2m✓[22m[39m any split of an entry into k parts gives k lines with those exact amounts, summing to the entry [33m 336[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/reporting/src/statements.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 356[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-77 TB nets to zero, BS balances, CYE = profit of the year, RE = posted + prior profit [T-0076] [33m 306[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/ledger/src/posting-command.test.ts [2m([22m[2m15 tests[22m[2m)[22m[32m 83[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/pubsub/pubsub.decode.contract.test.ts [2m([22m[2m12 tests[22m[2m)[22m[32m 99[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/shared/src/rbac/rbac.matrix.test.ts [2m([22m[2m67 tests[22m[2m)[22m[32m 44[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m apps/worker/src/setup/keycloak-admin.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 378[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/ledger/src/period-matrix.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 366[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/polling/polling.delta.contract.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 158[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/jwt-bearer.contract.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 507[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/shared/src/money/money.test.ts [2m([22m[2m33 tests[22m[2m)[22m[32m 50[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/tax/src/gst.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 853[2mms[22m[39m
+     [33m[2m✓[22m[39m INV-gst-sum: Σnet + Σtax = Σgross exactly, and each line net + tax = its gross [33m 349[2mms[22m[39m
+     [33m[2m✓[22m[39m INV-gst-scale: every amount is a non-negative cent amount; the input side is kept [33m 324[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m infra/test/security-workflow.contract.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 173[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m salesforce/test/lwc-contract.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 112[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/inbound/inbound-map.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/billing/billing-source.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/testing/src/evidence/manifest.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 1142[2mms[22m[39m
+     [33m[2m✓[22m[39m finds the real repository root and its git commit [33m 875[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/ledger/src/golden/golden-postings.golden.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 124[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/reconcile/stale-writebacks.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/db/src/migrate.test.ts [2m([22m[2m36 tests[22m[2m)[22m[32m 299[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/jwt.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 205[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/shared/src/crypto/envelope.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 78[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/db/src/env.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 33[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/bank/src/statement-import.test.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/shared/src/money/money.property.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 479[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/gl/src/profiles.template.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 21[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/ledger/src/posting-balance.prop.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 257[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/gl/src/templates.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 49[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/testing/src/evidence/record-tests.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 7894[2mms[22m[39m
+     [33m[2m✓[22m[39m records a passing scenario with literal spaces and shell metacharacters in paths [33m 2220[2mms[22m[39m
+     [33m[2m✓[22m[39m preserves real failed-test evidence and returns failure [33m 2433[2mms[22m[39m
+     [33m[2m✓[22m[39m rejects a missing required scenario without inventing a pass [33m 2249[2mms[22m[39m
+     [33m[2m✓[22m[39m reports runner failure without a report and creates no manifest [33m 988[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/testing/src/evidence/test-report.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m apps/worker/src/setup/setup-config.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/outbox/src/sync-issues.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/documents/src/invoice-html.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/testing/eslint-rules/no-float-money.test.ts [2m([22m[2m34 tests[22m[2m)[22m[33m 433[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/certificate.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 90[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/outbox/src/deliver.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 22[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/testing/eslint-rules/no-direct-ledger-write.test.ts [2m([22m[2m22 tests[22m[2m)[22m[32m 244[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/parties/src/identifiers.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 38[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m salesforce/test/xml.test.ts [2m([22m[2m21 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/tax/src/gst.golden.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 10[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/testing/keys.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 461[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/outbox/src/backoff.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/ar/src/auto-approve.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/db/src/testing/start-test-database.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 16[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/tax/src/au-tax-codes.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/connectors/salesforce/src/writeback/budget.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/testing/eslint-rules/no-float-money.config.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 911[2mms[22m[39m
+     [33m[2m✓[22m[39m reports lf/no-float-money in a money package (packages/ledger) under the real config [33m 826[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/testing/src/evidence/destination.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/ar/src/credit-notes.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/documents/src/statement-html.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 9[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/testing/eslint-rules/no-session-tenant-context.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 128[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/modules/ap/src/suggest.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m packages/shared/src/result.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m [30m[42m unit [49m[39m infra/test/workflow-contract.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+ [32m✓[39m [30m[46m web [49m[39m apps/web/src/admin/admin.test.tsx [2m([22m[2m13 tests[22m[2m)[22m[33m 2735[2mms[22m[39m
+     [33m[2m✓[22m[39m lists people with roles and status, and the Owner can invite someone [33m 1076[2mms[22m[39m
+     [33m[2m✓[22m[39m shows entries with names, filters through the URL and pages to older entries [33m 363[2mms[22m[39m
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+ [32m✓[39m [30m[46m web [49m[39m apps/web/src/sync/sync.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 2060[2mms[22m[39m
+     [33m[2m✓[22m[39m lists open issues in plain words, from Settings, and pages forward and back [33m 788[2mms[22m[39m
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+ [32m✓[39m [30m[46m web [49m[39m apps/web/src/gl/gl.test.tsx [2m([22m[2m10 tests[22m[2m)[22m[33m 2173[2mms[22m[39m
+     [33m[2m✓[22m[39m is listed on Reports and shows accounts by type with roles and controls in words [33m 568[2mms[22m[39m
+     [33m[2m✓[22m[39m creates a draft with an Idempotency-Key and decimal-string amounts, then opens it [33m 706[2mms[22m[39m
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+ [32m✓[39m [30m[46m web [49m[39m apps/web/src/App.test.tsx [2m([22m[2m17 tests[22m[2m)[22m[33m 1294[2mms[22m[39m
+ [32m✓[39m [30m[46m web [49m[39m apps/web/src/sync/sync-logic.test.ts [2m([22m[2m26 tests[22m[2m)[22m[32m 34[2mms[22m[39m
+ [32m✓[39m [30m[46m web [49m[39m apps/web/src/gl/gl-logic.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+ [32m✓[39m [30m[46m web [49m[39m apps/web/src/admin/admin-logic.test.ts [2m([22m[2m33 tests[22m[2m)[22m[32m 65[2mms[22m[39m
+ [32m✓[39m [30m[46m web [49m[39m apps/web/src/api.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 36[2mms[22m[39m
+ [32m✓[39m [30m[46m web [49m[39m apps/web/src/slug.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 11[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m84 passed[39m[22m[90m (84)[39m
+[2m      Tests [22m [1m[32m1010 passed[39m[22m[90m (1010)[39m
+[2m   Start at [22m 09:18:46
+[2m   Duration [22m 165.53s[2m (transform 7.15s, setup 9.04s, import 47.98s, tests 39.04s, environment 37.38s)[22m
+
+PASS force-app/main/default/lwc/lfAccountSummary/__tests__/lfAccountSummary.test.js
+  SS-UC12-01: Component renders balance, overdue, last payment, 5 invoices
+    ✓ SS-UC12-01: shows balance due, overdue amount, last payment and the 5 most recent of 7 invoices (93 ms)
+    ✓ SS-UC12-01: asks UI API for the five newest invoices by issue date, sorted on the server (4 ms)
+    ✓ SS-UC12-01: money without a displayValue is formatted by lightning-formatted-number, never computed (27 ms)
+    ✓ SS-UC12-01: table is accessible (caption, column headers, row header per invoice) (32 ms)
+  SS-UC12-03: Empty state with no invoices
+    ✓ SS-UC12-03: an Account without invoices shows the empty state and no table (8 ms)
+  T-0072: loading and error states
+    ✓ shows a spinner until both wires have answered (21 ms)
+    ✓ shows an error and no money when the Account fields cannot be read (e.g. no FLS) (6 ms)
+    ✓ shows an error when the invoices cannot be read (3 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        2.314 s
+Ran all test suites.
+TAP version 13
+# Subtest: writeFileAtomic replaces content and leaves no temp files behind
+ok 1 - writeFileAtomic replaces content and leaves no temp files behind
+  ---
+  duration_ms: 3.06641
+  type: 'test'
+  ...
+# Subtest: a concurrent reader never sees a partial or empty file while writes are in progress
+ok 2 - a concurrent reader never sees a partial or empty file while writes are in progress
+  ---
+  duration_ms: 1558.812523
+  type: 'test'
+  ...
+# Subtest: loadCards reads only T-NNNN.md cards
+ok 3 - loadCards reads only T-NNNN.md cards
+  ---
+  duration_ms: 6.859246
+  type: 'test'
+  ...
+# Subtest: topoOrder respects depends_on, ties broken by id
+ok 4 - topoOrder respects depends_on, ties broken by id
+  ---
+  duration_ms: 1.581318
+  type: 'test'
+  ...
+# Subtest: nextClaimable picks first todo whose deps are done
+ok 5 - nextClaimable picks first todo whose deps are done
+  ---
+  duration_ms: 1.699825
+  type: 'test'
+  ...
+# Subtest: a claimed card with an expired lease is claimable again; an unexpired one is not
+ok 6 - a claimed card with an expired lease is claimable again; an unexpired one is not
+  ---
+  duration_ms: 2.141518
+  type: 'test'
+  ...
+# Subtest: lintBacklog passes on the fixture
+ok 7 - lintBacklog passes on the fixture
+  ---
+  duration_ms: 1.480951
+  type: 'test'
+  ...
+# Subtest: lintBacklog reports duplicate ids, missing deps, cycles, bad status, unknown scenarios, id/filename mismatch
+ok 8 - lintBacklog reports duplicate ids, missing deps, cycles, bad status, unknown scenarios, id/filename mismatch
+  ---
+  duration_ms: 1.965531
+  type: 'test'
+  ...
+# Subtest: lintBacklog skips the scenario check when the register does not exist
+ok 9 - lintBacklog skips the scenario check when the register does not exist
+  ---
+  duration_ms: 2.486985
+  type: 'test'
+  ...
+# Subtest: unmetDeps treats review as unmet by default and as met when satisfiedBy includes review
+ok 10 - unmetDeps treats review as unmet by default and as met when satisfiedBy includes review
+  ---
+  duration_ms: 0.767144
+  type: 'test'
+  ...
+# Subtest: a card in review is never offered to a builder by nextClaimable
+ok 11 - a card in review is never offered to a builder by nextClaimable
+  ---
+  duration_ms: 0.988385
+  type: 'test'
+  ...
+# Subtest: next prints the next claimable task in dependency order
+ok 12 - next prints the next claimable task in dependency order
+  ---
+  duration_ms: 425.903641
+  type: 'test'
+  ...
+# Subtest: claim writes the lease to card and state.json
+ok 13 - claim writes the lease to card and state.json
+  ---
+  duration_ms: 248.146618
+  type: 'test'
+  ...
+# Subtest: claim refuses: unknown provider, unmet deps, done task, missing task
+ok 14 - claim refuses: unknown provider, unmet deps, done task, missing task
+  ---
+  duration_ms: 989.989555
+  type: 'test'
+  ...
+# Subtest: claim refuses while another unexpired lease exists; allows takeover after expiry
+ok 15 - claim refuses while another unexpired lease exists; allows takeover after expiry
+  ---
+  duration_ms: 855.844725
+  type: 'test'
+  ...
+# Subtest: checkpoint commits work, records the sha, renews the lease and logs the step
+ok 16 - checkpoint commits work, records the sha, renews the lease and logs the step
+  ---
+  duration_ms: 456.888557
+  type: 'test'
+  ...
+# Subtest: checkpoint does not create an empty commit when nothing changed
+ok 17 - checkpoint does not create an empty commit when nothing changed
+  ---
+  duration_ms: 441.83789
+  type: 'test'
+  ...
+# Subtest: checkpoint refuses a task that is not claimed
+ok 18 - checkpoint refuses a task that is not claimed
+  ---
+  duration_ms: 438.583367
+  type: 'test'
+  ...
+# Subtest: release: blocked needs a reason; done/blocked/todo clear the lease
+ok 19 - release: blocked needs a reason; done/blocked/todo clear the lease
+  ---
+  duration_ms: 1555.047131
+  type: 'test'
+  ...
+# Subtest: handover writes the §10.5 template from state + card and keeps the Log
+ok 20 - handover writes the §10.5 template from state + card and keeps the Log
+  ---
+  duration_ms: 685.652922
+  type: 'test'
+  ...
+# Subtest: handover works with no active task and no git remote/network
+ok 21 - handover works with no active task and no git remote/network
+  ---
+  duration_ms: 469.604019
+  type: 'test'
+  ...
+# Subtest: status prints state, lease, counts and next task
+ok 22 - status prints state, lease, counts and next task
+  ---
+  duration_ms: 446.07319
+  type: 'test'
+  ...
+# Subtest: lease-check lists expired leases with exit 1, none with exit 0
+ok 23 - lease-check lists expired leases with exit 1, none with exit 0
+  ---
+  duration_ms: 603.814714
+  type: 'test'
+  ...
+# Subtest: lint-backlog passes on the fixture and fails on a broken card
+ok 24 - lint-backlog passes on the fixture and fails on a broken card
+  ---
+  duration_ms: 418.488048
+  type: 'test'
+  ...
+# Subtest: unknown subcommand prints usage and exits 1; help exits 0
+ok 25 - unknown subcommand prints usage and exits 1; help exits 0
+  ---
+  duration_ms: 489.318074
+  type: 'test'
+  ...
+# Subtest: set-status moves through in-flight statuses keeping (and renewing) the lease
+ok 26 - set-status moves through in-flight statuses keeping (and renewing) the lease
+  ---
+  duration_ms: 2310.468327
+  type: 'test'
+  ...
+# Subtest: release accepts verifying and review, clears the lease and keeps the builder
+ok 27 - release accepts verifying and review, clears the lease and keeps the builder
+  ---
+  duration_ms: 739.563437
+  type: 'test'
+  ...
+# Subtest: a card in review can only be claimed by the other provider; claimed_by stays the builder
+ok 28 - a card in review can only be claimed by the other provider; claimed_by stays the builder
+  ---
+  duration_ms: 1307.999339
+  type: 'test'
+  ...
+# Subtest: parseFrontmatter splits data and body
+ok 29 - parseFrontmatter splits data and body
+  ---
+  duration_ms: 5.36386
+  type: 'test'
+  ...
+# Subtest: parseFrontmatter rejects files without frontmatter
+ok 30 - parseFrontmatter rejects files without frontmatter
+  ---
+  duration_ms: 1.028094
+  type: 'test'
+  ...
+# Subtest: updateFrontmatter replaces in place, keeps comments and body, appends new keys
+ok 31 - updateFrontmatter replaces in place, keeps comments and body, appends new keys
+  ---
+  duration_ms: 5.257736
+  type: 'test'
+  ...
+# Subtest: updateFrontmatter quotes values that need it
+ok 32 - updateFrontmatter quotes values that need it
+  ---
+  duration_ms: 0.729154
+  type: 'test'
+  ...
+# Subtest: verifying permits explicitly marked current and later workflow steps [T-0010]
+ok 33 - verifying permits explicitly marked current and later workflow steps [T-0010]
+  ---
+  duration_ms: 87.963655
+  type: 'test'
+  ...
+# Subtest: review requires completed verification but permits review and finish [T-0010]
+ok 34 - review requires completed verification but permits review and finish [T-0010]
+  ---
+  duration_ms: 111.171608
+  type: 'test'
+  ...
+# Subtest: done requires every workflow step completed [T-0010]
+ok 35 - done requires every workflow step completed [T-0010]
+  ---
+  duration_ms: 104.287108
+  type: 'test'
+  ...
+# Subtest: implementation and unmarked steps remain mandatory during verification [T-0010]
+ok 36 - implementation and unmarked steps remain mandatory during verification [T-0010]
+  ---
+  duration_ms: 56.393859
+  type: 'test'
+  ...
+# Subtest: unknown and non-terminal phase markers cannot waive a step [T-0010]
+ok 37 - unknown and non-terminal phase markers cannot waive a step [T-0010]
+  ---
+  duration_ms: 61.374946
+  type: 'test'
+  ...
+# Subtest: run --dry-run prints the provider commands in failover order and changes nothing
+ok 38 - run --dry-run prints the provider commands in failover order and changes nothing
+  ---
+  duration_ms: 1144.650386
+  type: 'test'
+  ...
+# Subtest: run --dry-run honours configured args and --task
+ok 39 - run --dry-run honours configured args and --task
+  ---
+  duration_ms: 948.438543
+  type: 'test'
+  ...
+# Subtest: FAILOVER: claude hits a credit/quota error, codex resumes on the same branch and finishes
+ok 40 - FAILOVER: claude hits a credit/quota error, codex resumes on the same branch and finishes
+  ---
+  duration_ms: 1734.240038
+  type: 'test'
+  ...
+# Subtest: a provider that is still exhausted is skipped on the next run
+ok 41 - a provider that is still exhausted is skipped on the next run
+  ---
+  duration_ms: 2373.071967
+  type: 'test'
+  ...
+# Subtest: all providers out of quota → exit 3, work saved, handover written, lease released
+ok 42 - all providers out of quota → exit 3, work saved, handover written, lease released
+  ---
+  duration_ms: 1086.102174
+  type: 'test'
+  ...
+# Subtest: non-quota failures rotate providers and block the task after max_attempts_per_task
+ok 43 - non-quota failures rotate providers and block the task after max_attempts_per_task
+  ---
+  duration_ms: 1645.251183
+  type: 'test'
+  ...
+# Subtest: missed heartbeat (lease expiry) kills the provider and fails over
+ok 44 - missed heartbeat (lease expiry) kills the provider and fails over
+  ---
+  duration_ms: 4461.123376
+  type: 'test'
+  ...
+# Subtest: agent marking the task blocked stops the loop with a notification
+ok 45 - agent marking the task blocked stops the loop with a notification
+  ---
+  duration_ms: 765.476188
+  type: 'test'
+  ...
+# Subtest: daily budget: a provider whose run logs today exceed daily_usd is skipped
+ok 46 - daily budget: a provider whose run logs today exceed daily_usd is skipped
+  ---
+  duration_ms: 1021.314968
+  type: 'test'
+  ...
+# Subtest: run with nothing to do exits 0
+ok 47 - run with nothing to do exits 0
+  ---
+  duration_ms: 168.023766
+  type: 'test'
+  ...
+# Subtest: run without --once keeps working the backlog until empty
+ok 48 - run without --once keeps working the backlog until empty
+  ---
+  duration_ms: 4465.69569
+  type: 'test'
+  ...
+# Subtest: run routes a card in review to the provider that did NOT build it
+ok 49 - run routes a card in review to the provider that did NOT build it
+  ---
+  duration_ms: 2883.40944
+  type: 'test'
+  ...
+# Subtest: review with only the builder available → exit 3, never self-review
+ok 50 - review with only the builder available → exit 3, never self-review
+  ---
+  duration_ms: 487.688599
+  type: 'test'
+  ...
+# Subtest: builder handing the card to review counts as a successful session (not a failure)
+ok 51 - builder handing the card to review counts as a successful session (not a failure)
+  ---
+  duration_ms: 1821.744886
+  type: 'test'
+  ...
+# Subtest: the real config matches the session-limit message that stopped a session, case-insensitively
+ok 52 - the real config matches the session-limit message that stopped a session, case-insensitively
+  ---
+  duration_ms: 6.424607
+  type: 'test'
+  ...
+# Subtest: classifyOutput: stdout and stderr, is_error/subtype from the final result
+ok 53 - classifyOutput: stdout and stderr, is_error/subtype from the final result
+  ---
+  duration_ms: 2.52914
+  type: 'test'
+  ...
+# Subtest: FAILOVER on the real session-limit message printed to stdout
+ok 54 - FAILOVER on the real session-limit message printed to stdout
+  ---
+  duration_ms: 2686.331059
+  type: 'test'
+  ...
+# Subtest: commits: conductor — deferred checkpoints are committed by the conductor during and after the run
+ok 55 - commits: conductor — deferred checkpoints are committed by the conductor during and after the run
+  ---
+  duration_ms: 2736.840007
+  type: 'test'
+  ...
+# Subtest: checkpoint with LF_DEFER_COMMIT=1 records the step instead of touching .git
+ok 56 - checkpoint with LF_DEFER_COMMIT=1 records the step instead of touching .git
+  ---
+  duration_ms: 687.492911
+  type: 'test'
+  ...
+# Subtest: resume.sh prints every section of the context pack
+ok 57 - resume.sh prints every section of the context pack
+  ---
+  duration_ms: 918.12943
+  type: 'test'
+  ...
+# Subtest: resume.sh survives an empty directory that is not a git repo
+ok 58 - resume.sh survives an empty directory that is not a git repo
+  ---
+  duration_ms: 15.371712
+  type: 'test'
+  ...
+# Subtest: verify.sh --quick: unavailable gates are PENDING, not PASS, and do not fail
+ok 59 - verify.sh --quick: unavailable gates are PENDING, not PASS, and do not fail
+  ---
+  duration_ms: 516.462912
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the no-skip guard on skipped/focused tests
+ok 60 - verify.sh fails the no-skip guard on skipped/focused tests
+  ---
+  duration_ms: 453.683777
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the no-delete guard on a deleted tracked file (working tree, staged or committed)
+ok 61 - verify.sh fails the no-delete guard on a deleted tracked file (working tree, staged or committed)
+  ---
+  duration_ms: 888.926332
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the secrets scan on a committed key pattern
+ok 62 - verify.sh fails the secrets scan on a committed key pattern
+  ---
+  duration_ms: 440.927505
+  type: 'test'
+  ...
+# Subtest: verify.sh fails backlog consistency on a broken card
+ok 63 - verify.sh fails backlog consistency on a broken card
+  ---
+  duration_ms: 455.471456
+  type: 'test'
+  ...
+# Subtest: verify.sh runs a package.json gate when its tooling exists
+ok 64 - verify.sh runs a package.json gate when its tooling exists
+  ---
+  duration_ms: 1413.212091
+  type: 'test'
+  ...
+# Subtest: checkpoint.sh and handover.sh wrap the conductor
+ok 65 - checkpoint.sh and handover.sh wrap the conductor
+  ---
+  duration_ms: 566.153014
+  type: 'test'
+  ...
+# Subtest: gate review: PENDING without a report, PASS with a non-builder PASS, FAIL on FAIL, self-review ignored
+ok 66 - gate review: PENDING without a report, PASS with a non-builder PASS, FAIL on FAIL, self-review ignored
+  ---
+  duration_ms: 709.301076
+  type: 'test'
+  ...
+# Subtest: gate memory: unticked steps, wrong status, open linked RQ and missing HANDOVER fail
+ok 67 - gate memory: unticked steps, wrong status, open linked RQ and missing HANDOVER fail
+  ---
+  duration_ms: 688.866935
+  type: 'test'
+  ...
+# Subtest: gate evidence: each success scenario needs a passed manifest entry whose file exists
+ok 68 - gate evidence: each success scenario needs a passed manifest entry whose file exists
+  ---
+  duration_ms: 672.873685
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): migration DROP/RENAME grep fails gate 6
+ok 69 - verify.sh (full): migration DROP/RENAME grep fails gate 6
+  ---
+  duration_ms: 1124.351084
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): a change under Docs/accounting versus main fails gate 4
+ok 70 - verify.sh (full): a change under Docs/accounting versus main fails gate 4
+  ---
+  duration_ms: 1149.317135
+  type: 'test'
+  ...
+# Subtest: verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+ok 71 - verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+  ---
+  duration_ms: 1116.40782
+  type: 'test'
+  ...
+# Subtest: verify.sh --quick: lowered numRuns and unlogged suppressions in the diff fail gate 10
+ok 72 - verify.sh --quick: lowered numRuns and unlogged suppressions in the diff fail gate 10
+  ---
+  duration_ms: 945.897241
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): no false positives — protective TRUNCATE triggers, string literals, non-migration .sql, instructional golden text
+ok 73 - verify.sh (full): no false positives — protective TRUNCATE triggers, string literals, non-migration .sql, instructional golden text
+  ---
+  duration_ms: 2394.135998
+  type: 'test'
+  ...
+# Subtest: scalars: strings, numbers, booleans, null
+ok 74 - scalars: strings, numbers, booleans, null
+  ---
+  duration_ms: 3.351308
+  type: 'test'
+  ...
+# Subtest: comments: full-line and trailing, but not inside quotes or words
+ok 75 - comments: full-line and trailing, but not inside quotes or words
+  ---
+  duration_ms: 0.706971
+  type: 'test'
+  ...
+# Subtest: nested maps and block lists
+ok 76 - nested maps and block lists
+  ---
+  duration_ms: 0.509823
+  type: 'test'
+  ...
+# Subtest: list of maps (providers shape)
+ok 77 - list of maps (providers shape)
+  ---
+  duration_ms: 0.517709
+  type: 'test'
+  ...
+# Subtest: inline flow maps and lists, nested and empty
+ok 78 - inline flow maps and lists, nested and empty
+  ---
+  duration_ms: 0.575868
+  type: 'test'
+  ...
+# Subtest: literal block scalar
+ok 79 - literal block scalar
+  ---
+  duration_ms: 0.322829
+  type: 'test'
+  ...
+# Subtest: errors carry a line number
+ok 80 - errors carry a line number
+  ---
+  duration_ms: 0.705985
+  type: 'test'
+  ...
+# Subtest: parses the real .agent/config.yaml
+ok 81 - parses the real .agent/config.yaml
+  ---
+  duration_ms: 2.499237
+  type: 'test'
+  ...
+# Subtest: formatScalar round-trips through parseYaml
+ok 82 - formatScalar round-trips through parseYaml
+  ---
+  duration_ms: 1.248436
+  type: 'test'
+  ...
+1..82
+# tests 82
+# suites 0
+# pass 82
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 62258.034142

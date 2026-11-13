@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a22ad83152e864a53
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:46673
+ ❯ |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/billing/closed-won.db.test.ts [ packages/connectors/salesforce/src/billing/closed-won.db.test.ts ]
+Error: Cannot find module './index.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a22ad83152e864a53/packages/connectors/salesforce/src/billing/closed-won.db.test.ts
+ ❯ packages/connectors/salesforce/src/billing/closed-won.db.test.ts:44:1
+     42| import type { ChangeEventHeader, DecodedEvent } from '../pubsub/avro.t…
+     43| import { mapToRecords, parseWriteBackPayload } from '../writeback/mapp…
+     44| import { setSalesforceBillingSettings } from './index.ts';
+       | ^
+     45|
+     46| type Trx = Transaction<Database>;
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  06:57:02
+   Duration  4.08s (transform 1.08s, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

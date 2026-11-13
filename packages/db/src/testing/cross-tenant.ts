@@ -148,6 +148,73 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     error_code: () => 'SERVER_UNAVAILABLE',
     http_status: () => '503',
   },
+  // T-0054: payment batches (currency/total/count CHECKs; an item without a bank account is an exclusion).
+  'app.payment_batch': {
+    currency: () => 'AUD',
+    total: () => '1',
+    payment_count: () => '1',
+    status: () => 'draft',
+  },
+  'app.payment_batch_item': {
+    amount: () => '1',
+    excluded_reason: () => 'NO_VERIFIED_BANK_DETAILS',
+  },
+  // T-0055: customer refunds (method/status CHECKs; requested, so the nullable entry_id/paid_on stay empty) and
+  // their batch lines (an exclusion needs no bank account).
+  'app.customer_refund': {
+    currency: () => 'AUD',
+    amount: () => '1',
+    method: () => 'bank_batch',
+    status: () => 'requested',
+  },
+  'app.payment_batch_refund': {
+    amount: () => '1',
+    excluded_reason: () => 'NO_VERIFIED_BANK_DETAILS',
+  },
+  // T-0057: bank confirmation of a batch (bank reference length CHECK).
+  'app.payment_batch_confirmation': { bank_reference: () => 'BANK-REF-1' },
+  // T-0060: bank matching (migration 0050) — a rule's JSON definition; a manual match (no rule);
+  // a rule suggestion (its rule and account are set by the PREREQUISITES hook below).
+  'app.bank_match_rule': {
+    definition: () =>
+      '{"match": "all", "conditions": [{"field": "text", "op": "contains", "value": "x"}]}',
+  },
+  'app.bank_match': { source_kind: () => 'journal_entry', method: () => 'manual' },
+  'app.bank_match_suggestion': { kind: () => 'rule' },
+  // T-0080: opening balance at conversion (balance date = conversion date − 1) and its documents
+  // (kind, non-zero amount, GST of the same sign, due date not before the document date).
+  'app.opening_balance': {
+    conversion_date: () => '2026-11-01',
+    balance_date: () => '2026-10-31',
+  },
+  'app.opening_balance_item': {
+    kind: () => 'ar',
+    amount: () => '1',
+    gst_amount: () => '0',
+    document_date: () => '2026-10-01',
+    due_date: () => '2026-10-31',
+  },
+  // T-0051: bills inbox and attachments (CHECK-constrained hashes and types).
+  'app.bill_inbox_item': {
+    message_id: () => `<${randomBytes(6).toString('hex')}@test>`,
+    raw_sha256: () => randomBytes(32).toString('hex'),
+    status: () => 'new',
+  },
+  'app.document_attachment': {
+    owner_type: () => 'bill_inbox_item',
+    content_type: () => 'application/pdf',
+    size_bytes: () => '1',
+    sha256: () => randomBytes(32).toString('hex'),
+  },
+  // T-0050: supplier bills (draft so lines may be inserted; totals CHECKs).
+  'app.supplier_bill': {
+    status: () => 'draft',
+    currency: () => 'AUD',
+    net_total: () => '1',
+    tax_total: () => '0',
+    gross_total: () => '1',
+  },
+  'app.supplier_bill_line': { tax_code: () => 'GST' },
   // T-0048: write-off record (gross = allowance + expense + GST adjustment).
   'app.bad_debt_write_off': {
     gross: () => '1',
@@ -188,6 +255,42 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   'app.email_delivery': {
     purpose: () => 'invoice',
     to_addrs: () => '{to@example.test}',
+  },
+  // T-0073: Stripe payment links (CHECK-constrained Stripe id, https URL, cents, status pairing).
+  'app.stripe_payment_link': {
+    amount_due: () => '1.00',
+    currency: () => 'AUD',
+    stripe_id: () => `plink_${randomBytes(6).toString('hex')}`,
+    url: () => `https://buy.stripe.com/test_${randomBytes(6).toString('hex')}`,
+    idempotency_key: () => `lf-plink-v1-${randomBytes(6).toString('hex')}`,
+    status: () => 'active',
+  },
+  // T-0074: Stripe events acted on and refunds (CHECK-constrained Stripe ids, cents, status).
+  'app.stripe_webhook_event': {
+    event_id: () => `evt_${randomBytes(6).toString('hex')}`,
+    event_type: () => 'payment_intent.succeeded',
+    payment_intent_id: () => `pi_${randomBytes(6).toString('hex')}`,
+    amount: () => '1.00',
+    currency: () => 'AUD',
+  },
+  'app.stripe_refund': {
+    payment_intent_id: () => `pi_${randomBytes(6).toString('hex')}`,
+    amount: () => '1.00',
+    currency: () => 'AUD',
+    stripe_refund_id: () => `re_${randomBytes(6).toString('hex')}`,
+    stripe_status: () => 'succeeded',
+    idempotency_key: () => `lf-refund-v1-${randomBytes(6).toString('hex')}`,
+  },
+  // T-0078: a completed close checklist step (step and period status are CHECK-constrained, 0061).
+  'app.close_checklist_step': { step: () => 'ar_lock', period_status: () => 'ar_locked' },
+  // T-0075: a Stripe payout record (gross − fee − fee GST = amount, CHECK in migration 0060).
+  'app.stripe_payout': {
+    stripe_payout_id: () => `po_${randomBytes(6).toString('hex')}`,
+    currency: () => 'AUD',
+    amount: () => '1.00',
+    gross: () => '1.00',
+    fee: () => '0',
+    fee_gst: () => '0',
   },
   // T-0041: billing format template records (CHECK-constrained codes; posted needs a series).
   'app.billing_format': {
@@ -257,6 +360,51 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     replay_id: () => '\\x01',
   },
   'app.salesforce_resync_request': { reason: () => 'replay_id_invalid' },
+  // Processed inbound changes (migration 0048, Line A 0050, T-0065): a settled issue row of a fresh key.
+  'app.salesforce_inbound_change': {
+    entity_name: () => 'Account',
+    record_id: () => `001${randomBytes(8).toString('hex').slice(0, 15)}`,
+    commit_number: () => String(randomBytes(4).readUInt32BE()),
+    sequence_number: () => '1',
+    change_type: () => 'UPDATE',
+    transaction_key: () => `tx-${randomUUID()}`,
+    source: () => '/data/AccountChangeEvent',
+    outcome: () => 'issue',
+    target_type: () => 'party',
+    issue_code: () => 'TEST_ISSUE',
+    issue_message: () => 'test issue',
+    duplicate_count: () => '0',
+    last_duplicate_source: () => '/data/AccountChangeEvent',
+  },
+  // Per-object inbound sync mode and polling watermark (migration 0051, T-0066).
+  'app.salesforce_sync_object': {
+    entity_name: () => `Obj${randomBytes(4).toString('hex')}`,
+    mode: () => 'polling',
+    poll_interval_seconds: () => '900',
+    overlap_seconds: () => '300',
+    last_poll_source: () => 'poll:Account',
+    last_poll_records: () => '0',
+    last_poll_error: () => 'test error',
+  },
+  // Salesforce billing source (migration 0052, T-0069): trigger setting, mirrored headers/lines.
+  // Nightly reconciliation run log (migration 0053): a succeeded run has no error.
+  'app.salesforce_reconciliation_run': { outcome: () => 'succeeded' },
+  'app.salesforce_billing_settings': {
+    invoice_trigger: () => 'opportunity',
+    won_stages: () => '{Closed Won}',
+  },
+  'app.salesforce_billing_source': {
+    entity_name: () => 'Opportunity',
+    record_id: () => `006${randomBytes(8).toString('hex').slice(0, 15)}`,
+    account_record_id: () => `001${randomBytes(8).toString('hex').slice(0, 15)}`,
+    currency: () => 'AUD',
+  },
+  'app.salesforce_billing_source_line': {
+    entity_name: () => 'OpportunityLineItem',
+    record_id: () => `00k${randomBytes(8).toString('hex').slice(0, 15)}`,
+    parent_record_id: () => `006${randomBytes(8).toString('hex').slice(0, 15)}`,
+    product2_record_id: () => `01t${randomBytes(8).toString('hex').slice(0, 15)}`,
+  },
   // Open items and allocations (migration 0028). Seeded rows (superuser, no tenant set) are
   // stored as generated: an AR item of +1, an allocation of 1 with no FX difference. A row
   // inserted by lf_app is filled and checked by triggers (prerequisites below).
@@ -399,6 +547,113 @@ export const PREREQUISITES: Readonly<
            FROM app.subledger_entry f
           WHERE t.tenant_id = $1 AND t.id = $2 AND f.tenant_id = $1 AND f.id = $3`,
         [row.get('tenant_id'), row.get('to_entry_id'), row.get('from_entry_id')],
+      ),
+    );
+  },
+  // A confirmation needs a released batch and the batch's own posted ap_payment entry
+  // (migration 0048 insert guard): release the generated batch (draft → released is allowed)
+  // and, as a seed step with triggers off, make the generated entry that batch's payment entry.
+  'app.payment_batch_confirmation': async (admin, row) => {
+    await admin.query(
+      `UPDATE app.payment_batch SET status = 'released' WHERE tenant_id = $1 AND id = $2`,
+      [row.get('tenant_id'), row.get('batch_id')],
+    );
+    await asReplica(admin, (q) =>
+      q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `UPDATE app.journal_entry SET status = 'posted', posted_at = coalesce(posted_at, now()), source_type = 'ap_payment',
+                source_id = $3
+          WHERE tenant_id = $1 AND id = $2`,
+        [row.get('tenant_id'), row.get('entry_id'), row.get('batch_id')],
+      ),
+    );
+  },
+  // A match needs a line of its bank account and a posted entry that moves the bank's GL account
+  // by the line amount (migration 0050 insert guard): seed a statement and a 1.0000 line on the
+  // generated bank account, then, as a seed step with triggers off, post the generated entry with
+  // one 1.0000 debit on the bank's GL account. source_kind journal_entry names the entry itself.
+  'app.bank_match': async (admin, row) => {
+    const tenant = row.get('tenant_id') ?? '';
+    const company = row.get('company_id') ?? '';
+    const bank = await admin.query<{ gl: string; currency: string }>(
+      `SELECT gl_account_id::text AS gl, currency FROM app.bank_account WHERE tenant_id = $1 AND id = $2`,
+      [tenant, row.get('bank_account_id')],
+    );
+    const { gl = '', currency = 'AUD' } = bank.rows[0] ?? {};
+    const fixed = new Map([
+      ['company_id', company],
+      ['bank_account_id', row.get('bank_account_id') ?? ''],
+    ]);
+    const statement = await seedRow(
+      admin,
+      { schema: 'app', table: 'bank_statement', qualified: 'app.bank_statement' },
+      tenant,
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([...fixed, ['currency', currency]]),
+    );
+    const line = await seedRow(
+      admin,
+      { schema: 'app', table: 'bank_statement_line', qualified: 'app.bank_statement_line' },
+      tenant,
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([...fixed, ['statement_id', String(statement['id'])], ['amount', '1.0000']]),
+    );
+    row.set('statement_line_id', String(line['id']));
+    row.set('source_id', row.get('journal_entry_id') ?? '');
+    const set = await seedRow(
+      admin,
+      { schema: 'app', table: 'dimension_set', qualified: 'app.dimension_set' },
+      tenant,
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([
+        ['company_id', company],
+        ['hash', randomBytes(32).toString('hex')],
+      ]),
+    );
+    await asReplica(admin, async (q) => {
+      await q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `UPDATE app.journal_entry SET status = 'posted', posted_at = coalesce(posted_at, now())
+          WHERE tenant_id = $1 AND id = $2`,
+        [tenant, row.get('journal_entry_id')],
+      );
+      await q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `INSERT INTO app.journal_line (tenant_id, company_id, entry_id, line_no, account_id, debit,
+                                       credit, txn_currency, txn_amount, fx_rate, dimension_set_id)
+         VALUES ($1, $2, $3, 9001, $4, 1, 0, 'AUD', 1, 1, $5)`,
+        [tenant, company, row.get('journal_entry_id'), gl, set['id']],
+      );
+    });
+  },
+  // A rule suggestion names its rule and suggested account (CHECK, migration 0050): seed a rule of
+  // the same company and take the rule's account.
+  'app.bank_match_suggestion': async (admin, row) => {
+    const rule = await seedRow(
+      admin,
+      { schema: 'app', table: 'bank_match_rule', qualified: 'app.bank_match_rule' },
+      row.get('tenant_id') ?? '',
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([['company_id', row.get('company_id') ?? '']]),
+    );
+    row.set('rule_id', String(rule['id']));
+    row.set('account_id', String(rule['account_id']));
+  },
+  // An opening balance must point at its company's own posted ledger_opening_balance entry dated
+  // the balance date (migration 0058 insert guard): make the generated entry that, as a seed step
+  // with triggers off.
+  'app.opening_balance': async (admin, row) => {
+    await asReplica(admin, (q) =>
+      q.query(
+        // eslint-disable-next-line lf/no-direct-ledger-write -- superuser seed of generated test rows (DL-0189), as the generic seedRow does
+        `UPDATE app.journal_entry SET status = 'posted', posted_at = coalesce(posted_at, now()),
+                source_type = 'ledger_opening_balance', entry_date = $3
+          WHERE tenant_id = $1 AND id = $2`,
+        [row.get('tenant_id'), row.get('entry_id'), row.get('balance_date')],
       ),
     );
   },

@@ -1,7 +1,7 @@
 ---
 adr: 0045
 title: "Render document PDFs from HTML templates with playwright-core driving headless Chromium"
-status: Proposed
+status: Accepted
 date: 2026-11-01
 author: claude
 category: architecture
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0045: Render document PDFs from HTML templates with playwright-core
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — becomes Accepted on green CI plus cross-review by codex (category architecture, a new
 runtime dependency per design §10.6; it does not change the security model — see rules 3–4 — so

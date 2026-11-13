@@ -1,0 +1,4 @@
+# no registry record: FAIL Docs/accounting/postings.md:2: adds an Approved status — only the product owner approves golden postings
+# with branch-added record: PASS 1 content-bound approved snapshot(s); other changes are Draft-only proposals
+# pass 1
+# fail 0

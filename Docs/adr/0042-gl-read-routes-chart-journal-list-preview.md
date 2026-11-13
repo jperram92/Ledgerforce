@@ -1,7 +1,7 @@
 ---
 adr: 0042
 title: "GL read routes for the web screens: chart of accounts, manual-journal list and the engine preview of a stored journal"
-status: Proposed
+status: Accepted
 date: 2026-10-26
 author: claude
 category: architecture
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0042: GL read routes for the web screens
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — becomes Accepted on green CI plus cross-review by codex (category architecture, a
 public API change; no new permission, table or dependency, so no human gate).

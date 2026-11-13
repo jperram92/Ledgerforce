@@ -21,7 +21,12 @@ import {
 type Trx = Transaction<Database>;
 
 export type ReportErrorCode =
-  'INVALID_RANGE' | 'UNKNOWN_COMPANY' | 'NO_FISCAL_YEAR' | 'UNKNOWN_PERIOD' | 'UNBOUND_ROLE';
+  | 'INVALID_RANGE'
+  | 'INVALID_FILTER'
+  | 'UNKNOWN_COMPANY'
+  | 'NO_FISCAL_YEAR'
+  | 'UNKNOWN_PERIOD'
+  | 'UNBOUND_ROLE';
 
 export class ReportError extends Error {
   readonly code: ReportErrorCode;
@@ -85,11 +90,11 @@ export interface TrialBalanceReview {
   controls: ControlCheck[];
 }
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** A real calendar date written YYYY-MM-DD (2026-02-30 rolls over in Date, so it is refused). */
-function checkDate(value: string, field: string): string {
+export function checkDate(value: string, field: string): string {
   const d = DATE_RE.test(value) ? new Date(`${value}T00:00:00Z`) : null;
   if (!d || Number.isNaN(d.getTime()) || d.toISOString().slice(0, 10) !== value) {
     throw new ReportError('INVALID_RANGE', `${field} must be a date YYYY-MM-DD, got "${value}"`);
@@ -97,7 +102,7 @@ function checkDate(value: string, field: string): string {
   return value;
 }
 
-function checkRange(from: string | null, to: string): void {
+export function checkRange(from: string | null, to: string): void {
   checkDate(to, 'to');
   if (from !== null && checkDate(from, 'from') > to) {
     throw new ReportError('INVALID_RANGE', `from ${from} is after to ${to}`);
@@ -105,7 +110,7 @@ function checkRange(from: string | null, to: string): void {
 }
 
 /** The company's base currency (design §3.1); reports are in base currency. */
-async function baseCurrency(trx: Trx, companyId: string): Promise<string> {
+export async function baseCurrency(trx: Trx, companyId: string): Promise<string> {
   const c = UUID_RE.test(companyId)
     ? await trx
         .selectFrom('app.company')

@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0075",
+  "entries": [
+    {
+      "scenario": "SS-UC10-02",
+      "file": ".agent/evidence/T-0075/20261113-005810-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-02: AR lock blocks AR posting except with override › AR Clerk rejected; override user succeeds and is audited; AP bills still post",
+      "commit": "b1831a367191",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:58:10.318Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-03",
+      "file": ".agent/evidence/T-0075/20261113-005810-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-03: AP lock allows journals only › bill and invoice rejected, manual journal accepted",
+      "commit": "b1831a367191",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:58:10.318Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-07",
+      "file": ".agent/evidence/T-0075/20261113-005810-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC05-07: Bill in AP-locked period rejected › a bill dated 2026-10-20 without override is rejected with PERIOD_LOCKED and nothing is stored",
+      "commit": "b1831a367191",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:58:10.318Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-04",
+      "file": ".agent/evidence/T-0075/20261113-005810-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-04: Soft close: Finance Admin override only › the Accountant is rejected (with or without asking for an override); the Finance Admin with override succeeds | packages/ledger/src/period.enforce.db.test.ts › SS-UC10-04: Soft close: Finance Admin override only › an override is personal: another user cannot post on the Finance Admin’s override",
+      "commit": "b1831a367191",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:58:10.318Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-05",
+      "file": ".agent/evidence/T-0075/20261113-005810-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC10-05: Hard lock rejects or redirects per policy › \"reject\" → PERIOD_LOCKED (even for a Finance Admin); \"first open date\" → dated 2026-11-01 with a note",
+      "commit": "b1831a367191",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:58:10.318Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-08",
+      "file": ".agent/evidence/T-0075/20261113-005810-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy › Closed Won on 2026-10-30: \"reject\" → PERIOD_LOCKED, nothing posted; \"first open date\" → invoice dated 2026-11-01 with a note | packages/ledger/src/period.enforce.db.test.ts › SS-UC01-08: Closed Won dated in a hard-locked period follows lock policy › \"first open date\" skips every later period that does not allow the source type",
+      "commit": "b1831a367191",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:58:10.318Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-09",
+      "file": ".agent/evidence/T-0075/20261113-005810-tests-db.json",
+      "test": "2 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC03-09: Late payout in an AR-locked period follows the period matrix › a payout dated 2026-11-30 posts exactly when the matrix (with the tenant payout setting) allows it | packages/ledger/src/period.enforce.db.test.ts › SS-UC03-09: Late payout in an AR-locked period follows the period matrix › settings are history: every change is a new row; the latest wins; a user without period.lock cannot change them",
+      "commit": "b1831a367191",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:58:10.318Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-07",
+      "file": ".agent/evidence/T-0075/20261113-005810-tests-db.json",
+      "test": "1 test(s): packages/ledger/src/period.enforce.db.test.ts › SS-UC08-07: Reconciled lines locked after hard lock › unmatching a November line after November is hard-locked is rejected; December still can be",
+      "commit": "b1831a367191",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:58:10.318Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-03",
+      "file": ".agent/evidence/T-0075/20261113-005810-tests-db.json",
+      "test": "2 test(s): packages/connectors/stripe/src/payout.db.test.ts › SS-UC03-03: Stripe payout posts GP-004 net settlement › SS-UC03-03 the payout of the GP-003 charge (fee 23.68, GST 2.15) posts exactly GP-027 and nets Stripe clearing to 0.00 | packages/connectors/stripe/src/payout.db.test.ts › SS-UC03-03: Stripe payout posts GP-004 net settlement › processing the same payout again posts nothing and returns the first entry",
+      "commit": "b1831a367191",
+      "provider": "claude",
+      "timestamp": "2026-11-13T00:58:10.318Z",
+      "result": "passed"
+    }
+  ]
+}

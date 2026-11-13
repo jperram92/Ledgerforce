@@ -1,0 +1,11 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/var/tmp/ledgerforce-t0057-review-20261107/repo[39m
+
+ [32m✓[39m [30m[42m unit [49m[39m infra/test/install-contract.test.ts [2m([22m[2m18 tests[22m[2m)[22m[33m 867[2mms[22m[39m
+   [33m[2m✓[22m[39m runs the Node runtime package-update regression [T-0057] [33m 619[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m1 passed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[32m18 passed[39m[22m[90m (18)[39m
+[2m   Start at [22m 08:22:13
+[2m   Duration [22m 1.83s[2m (transform 138ms, setup 0ms, import 478ms, tests 867ms, environment 0ms)[22m
+

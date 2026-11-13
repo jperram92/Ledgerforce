@@ -1,7 +1,7 @@
 ---
 adr: 0037
 title: "Self-hosted install: first-Owner bootstrap with a one-time IdP password, realm-wide MFA through the ACR mapping, file secrets and one public origin"
-status: Proposed
+status: Accepted
 date: 2026-10-26
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0037: Self-hosted install — owner bootstrap, realm MFA, secrets and origin
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, waiting for product-owner acceptance. T-0094 is built to this
 proposal so it can be judged on working, tested code (SS-PLAT-23, SS-PLAT-85, SS-PLAT-86).

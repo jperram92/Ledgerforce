@@ -1,7 +1,7 @@
 ---
 adr: 0007
 title: "Salesforce auth: External Client App with JWT bearer (self-host) and authorization code + PKCE (hosted)"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0007: Salesforce auth — External Client App with JWT bearer (self-host) and authorization code + PKCE (hosted)
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — design-committed (§5.2). It defines how integration credentials are held, so it is
 both an integration contract and a **security** decision: the `adr:security` gate applies.

@@ -1,7 +1,7 @@
 ---
 adr: 0029
 title: "Job queue (pg-boss) privileges: lf_app DML on the shared pgboss schema, owner-run supervision"
-status: Proposed
+status: Accepted
 date: 2026-10-25
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0029: Job queue (pg-boss) privileges: lf_app DML on the shared pgboss schema, owner-run supervision
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, waiting for product-owner acceptance. It refines ADR-0008
 (Postgres job queue and transactional outbox, Accepted) and does not change it. T-0030 is built to

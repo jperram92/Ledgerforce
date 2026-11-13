@@ -1,7 +1,7 @@
 ---
 adr: 0024
 title: "Period control: the §3.5 matrix as data, database-enforced invariant 3, personal overrides, two-approver reopen and the tenant lock-date policy"
-status: Proposed
+status: Accepted
 date: 2026-10-25
 author: claude
 category: accounting
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0024: Period control — matrix as data, invariant 3 in the database, overrides, reopen, lock-date policy
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — accounting category, awaiting product-owner acceptance. T-0023 is built to this
 proposal so it can be judged on working, tested code. Three points need the product owner (see

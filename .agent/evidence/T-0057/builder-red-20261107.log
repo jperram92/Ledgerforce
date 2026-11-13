@@ -1,0 +1,108 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/var/tmp/ledgerforce-t0057-review-20261107/repo[39m
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:40369
+[db] test PostgreSQL ready (local) on 127.0.0.1:35213
+(node:515) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[31m[Nest] 515  - [39m11/07/2026, 6:11:19 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mRangeError: Invalid time value
+    at Date.toISOString (<anonymous>)
+    at isDate [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mpackages/modules/ap/src/payment-confirmation.ts:58:49[90m)[39m
+    at confirmPaymentBatch [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mpackages/modules/ap/src/payment-confirmation.ts:160:8[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at ApPaymentBatchesController.confirm [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mapps/api/src/ap/payment-batches.controller.ts:260:15[90m)[39m
+[31m[Nest] 515  - [39m11/07/2026, 6:11:19 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mRangeError: Invalid time value
+    at Date.toISOString (<anonymous>)
+    at isDate [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mpackages/modules/ap/src/payment-confirmation.ts:58:49[90m)[39m
+    at confirmPaymentBatch [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mpackages/modules/ap/src/payment-confirmation.ts:160:8[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at ApPaymentBatchesController.confirm [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mapps/api/src/ap/payment-batches.controller.ts:260:15[90m)[39m
+[31m[Nest] 515  - [39m11/07/2026, 6:11:19 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mRangeError: Invalid time value
+    at Date.toISOString (<anonymous>)
+    at isDate [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mpackages/modules/ap/src/payment-confirmation.ts:58:49[90m)[39m
+    at confirmPaymentBatch [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mpackages/modules/ap/src/payment-confirmation.ts:160:8[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at ApPaymentBatchesController.confirm [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mapps/api/src/ap/payment-batches.controller.ts:260:15[90m)[39m
+[31m[Nest] 515  - [39m11/07/2026, 6:11:19 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mRangeError: Invalid time value
+    at Date.toISOString (<anonymous>)
+    at isDate [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mpackages/modules/ap/src/payment-confirmation.ts:58:49[90m)[39m
+    at confirmPaymentBatch [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mpackages/modules/ap/src/payment-confirmation.ts:160:8[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at ApPaymentBatchesController.confirm [90m(/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mapps/api/src/ap/payment-batches.controller.ts:260:15[90m)[39m
+ [31m❯[39m [30m[43m api-db [49m[39m apps/api/src/ap/payment-confirmation.db.test.ts [2m([22m[2m7 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 2366[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC06-07 a releaser records the bank confirmation: GP-009 posts once with its outbox event, audited [33m 508[2mms[22m[39m
+[31m     [31m×[31m SS-UC06-07 returns INVALID_BATCH for calendar date 2026-13-01 with no posting effects [T-0057][39m[32m 113[2mms[22m[39m
+[31m     [31m×[31m SS-UC06-07 returns INVALID_BATCH for calendar date 2026-00-01 with no posting effects [T-0057][39m[32m 106[2mms[22m[39m
+[31m     [31m×[31m SS-UC06-07 returns INVALID_BATCH for calendar date 2026-12-32 with no posting effects [T-0057][39m[32m 88[2mms[22m[39m
+[31m     [31m×[31m SS-UC06-07 returns INVALID_BATCH for calendar date 2026-12-00 with no posting effects [T-0057][39m[32m 102[2mms[22m[39m
+     [32m✓[39m SS-UC06-07 returns INVALID_BATCH for calendar date 2027-02-29 with no posting effects [T-0057][32m 99[2mms[22m[39m
+     [32m✓[39m SS-UC06-07 returns INVALID_BATCH for calendar date 2027-04-31 with no posting effects [T-0057][32m 86[2mms[22m[39m
+ [31m❯[39m [30m[45m db [49m[39m packages/modules/ap/src/payment-confirmation.db.test.ts [2m([22m[2m12 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[33m 2184[2mms[22m[39m
+     [32m✓[39m SS-UC06-07 a released batch posts nothing; the bank confirmation posts exactly GP-009 and pays the bill[32m 229[2mms[22m[39m
+     [32m✓[39m SS-UC06-07 one entry per batch: one AP_CONTROL line per bill with its supplier, one bank line for the total[32m 214[2mms[22m[39m
+     [32m✓[39m two confirmations at the same time post one journal[32m 122[2mms[22m[39m
+     [32m✓[39m only a released batch can be confirmed, never before its payment date; nothing is written on refusal[32m 100[2mms[22m[39m
+     [32m✓[39m the database refuses a confirmation of an unreleased batch and cancelling a confirmed one[32m 197[2mms[22m[39m
+[31m     [31m×[31m SS-UC06-07 rejects invalid calendar date 2026-13-01 without posting [T-0057][39m[32m 86[2mms[22m[39m
+[31m     [31m×[31m SS-UC06-07 rejects invalid calendar date 2026-00-01 without posting [T-0057][39m[32m 65[2mms[22m[39m
+[31m     [31m×[31m SS-UC06-07 rejects invalid calendar date 2026-12-32 without posting [T-0057][39m[32m 69[2mms[22m[39m
+[31m     [31m×[31m SS-UC06-07 rejects invalid calendar date 2026-12-00 without posting [T-0057][39m[32m 59[2mms[22m[39m
+     [32m✓[39m SS-UC06-07 rejects invalid calendar date 2027-02-29 without posting [T-0057][32m 64[2mms[22m[39m
+     [32m✓[39m SS-UC06-07 rejects invalid calendar date 2027-04-31 without posting [T-0057][32m 66[2mms[22m[39m
+     [32m✓[39m SS-UC06-07 accepts a real leap day without changing the confirmation date [T-0057][32m 99[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 8 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m [30m[43m api-db [49m[39m apps/api/src/ap/payment-confirmation.db.test.ts[2m > [22mSS-UC06-07: Batch posts GP-009 on confirmation only[2m > [22mSS-UC06-07 returns INVALID_BATCH for calendar date 2026-13-01 with no posting effects [T-0057]
+[41m[1m FAIL [22m[49m [30m[43m api-db [49m[39m apps/api/src/ap/payment-confirmation.db.test.ts[2m > [22mSS-UC06-07: Batch posts GP-009 on confirmation only[2m > [22mSS-UC06-07 returns INVALID_BATCH for calendar date 2026-00-01 with no posting effects [T-0057]
+[41m[1m FAIL [22m[49m [30m[43m api-db [49m[39m apps/api/src/ap/payment-confirmation.db.test.ts[2m > [22mSS-UC06-07: Batch posts GP-009 on confirmation only[2m > [22mSS-UC06-07 returns INVALID_BATCH for calendar date 2026-12-32 with no posting effects [T-0057]
+[41m[1m FAIL [22m[49m [30m[43m api-db [49m[39m apps/api/src/ap/payment-confirmation.db.test.ts[2m > [22mSS-UC06-07: Batch posts GP-009 on confirmation only[2m > [22mSS-UC06-07 returns INVALID_BATCH for calendar date 2026-12-00 with no posting effects [T-0057]
+[31m[1mAssertionError[22m: expected 500 to be 422 // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 422[39m
+[31m+ 500[39m
+
+[36m [2m❯[22m apps/api/src/ap/payment-confirmation.db.test.ts:[2m225:26[22m[39m
+    [90m223|[39m       const res = await confirm(batchId, 'treasurer', { confirmed_on: …
+    [90m224|[39m
+    [90m225|[39m       [34mexpect[39m(res[33m.[39mstatus)[33m.[39m[34mtoBe[39m([34m422[39m)[33m;[39m
+    [90m   |[39m                          [31m^[39m
+    [90m226|[39m       expect(await res.json()).toMatchObject({ error: 'INVALID_BATCH' …
+    [90m227|[39m       [34mexpect[39m([35mawait[39m [34mpaymentState[39m())[33m.[39m[34mtoEqual[39m(before)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m [30m[45m db [49m[39m packages/modules/ap/src/payment-confirmation.db.test.ts[2m > [22mSS-UC06-07: Batch posts GP-009 on confirmation only[2m > [22mSS-UC06-07 rejects invalid calendar date 2026-13-01 without posting [T-0057]
+[41m[1m FAIL [22m[49m [30m[45m db [49m[39m packages/modules/ap/src/payment-confirmation.db.test.ts[2m > [22mSS-UC06-07: Batch posts GP-009 on confirmation only[2m > [22mSS-UC06-07 rejects invalid calendar date 2026-00-01 without posting [T-0057]
+[41m[1m FAIL [22m[49m [30m[45m db [49m[39m packages/modules/ap/src/payment-confirmation.db.test.ts[2m > [22mSS-UC06-07: Batch posts GP-009 on confirmation only[2m > [22mSS-UC06-07 rejects invalid calendar date 2026-12-32 without posting [T-0057]
+[41m[1m FAIL [22m[49m [30m[45m db [49m[39m packages/modules/ap/src/payment-confirmation.db.test.ts[2m > [22mSS-UC06-07: Batch posts GP-009 on confirmation only[2m > [22mSS-UC06-07 rejects invalid calendar date 2026-12-00 without posting [T-0057]
+[31m[1mAssertionError[22m: expected RangeError: Invalid time value to match object { code: 'INVALID_BATCH' }[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- {[39m
+[32m-   "code": "INVALID_BATCH",[39m
+[31m+ RangeError {[39m
+[31m+   "message": "Invalid time value",[39m
+[2m  }[22m
+
+[36m [2m❯[22m packages/modules/ap/src/payment-confirmation.db.test.ts:[2m356:43[22m[39m
+    [90m354|[39m       [35mconst[39m entriesBefore [33m=[39m [35mawait[39m [34mpaymentEntries[39m()[33m;[39m
+    [90m355|[39m
+    [90m356|[39m       await expect(confirm(batchId, date)).rejects.toMatchObject({ cod…
+    [90m   |[39m                                           [31m^[39m
+    [90m357|[39m
+    [90m358|[39m       [34mexpect[39m([35mawait[39m [34mpaymentEntries[39m())[33m.[39m[34mtoEqual[39m(entriesBefore)[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[31m8 failed[39m[22m[2m | [22m[1m[32m11 passed[39m[22m[90m (19)[39m
+[2m   Start at [22m 18:11:11
+[2m   Duration [22m 12.07s[2m (transform 1.95s, setup 0ms, import 4.89s, tests 4.55s, environment 0ms)[22m
+

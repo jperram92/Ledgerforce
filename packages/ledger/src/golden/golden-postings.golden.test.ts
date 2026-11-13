@@ -32,8 +32,13 @@ const SUPERSEDED: Record<string, string> = {
   'GP-013': 'GP-022',
   'GP-018': 'GP-023',
   'GP-035': 'GP-036',
+  'GP-038': 'GP-039',
 };
-const ALL = Array.from({ length: 36 }, (_, i) => `GP-${String(i + 1).padStart(3, '0')}`);
+const ALL = [
+  ...Array.from({ length: 37 }, (_, i) => `GP-${String(i + 1).padStart(3, '0')}`),
+  'GP-038',
+  'GP-039',
+];
 
 /** Source types named by Approved entries that the engine does not accept yet (emptied in T-0116). */
 const PENDING_SOURCE_TYPES: string[] = [];
@@ -46,7 +51,7 @@ const fakeId = (key: string) => {
 };
 
 describe('SS-PLAT-12: Every Approved golden posting is reproduced exactly — parser and commands', () => {
-  it('parses GP-001…GP-036 with their statuses; superseded entries point forward', () => {
+  it('parses GP-001…GP-037 with their statuses; superseded entries point forward', () => {
     expect(entries.map((e) => e.id)).toEqual(ALL);
     for (const e of entries) {
       if (e.id in SUPERSEDED) {
@@ -61,7 +66,7 @@ describe('SS-PLAT-12: Every Approved golden posting is reproduced exactly — pa
   it('runs on Approved entries only and refuses a file that still has Draft entries', () => {
     const ids = new Set(approvedTables(entries).map((t) => t.entryId));
     for (const id of Object.keys(SUPERSEDED)) expect(ids.has(id), id).toBe(false);
-    expect(ids.size).toBe(30);
+    expect(ids.size).toBe(32); // 30 base entries + GP-037 (T-0080) + GP-039 (T-0166); GP-038 is superseded by GP-039
     const draft = parsePostings(
       '## GP-900 — x\n\n- **Status: Draft** · Source type: `manual_journal`\n\n' +
         '| # | Account | Ref | Debit | Credit | Tax code | Party |\n|---|---|---|---:|---:|---|---|\n' +
@@ -73,7 +78,7 @@ describe('SS-PLAT-12: Every Approved golden posting is reproduced exactly — pa
 
   it('every Approved journal table balances and equals its Total row', () => {
     const tables = approvedTables(entries);
-    expect(tables.length).toBe(36); // 30 Approved entries; GP-021 has 3 tables, GP-022/023/031/032 have 2
+    expect(tables.length).toBe(40); // 36 base tables, GP-037 adds one, GP-039 adds three current journals; GP-038 remains superseded history.
     for (const t of tables) {
       const d = t.lines.reduce((s, l) => s.add(Money.of(l.debit, 'AUD')), Money.zero('AUD'));
       const c = t.lines.reduce((s, l) => s.add(Money.of(l.credit, 'AUD')), Money.zero('AUD'));

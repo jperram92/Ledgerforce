@@ -11,13 +11,17 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@ledgerforce/ap": "workspace:*",
     "@ledgerforce/ar": "workspace:*",
+    "@ledgerforce/connector-stripe": "workspace:*",
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
     "@ledgerforce/journals": "workspace:*",
     "@ledgerforce/ledger": "workspace:*",
     "@ledgerforce/outbox": "workspace:*",
     "@ledgerforce/parties": "workspace:*",
+    "@ledgerforce/reporting": "workspace:*",
+    "@ledgerforce/setup": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
     "@nestjs/common": "12.1.2",
     "@nestjs/core": "12.1.2",
@@ -30,6 +34,7 @@
     "rxjs": "7.8.2"
   },
   "devDependencies": {
+    "@ledgerforce/bank": "workspace:*",
     "@ledgerforce/products": "workspace:*",
     "@ledgerforce/tax": "workspace:*",
     "@nestjs/testing": "12.1.2",

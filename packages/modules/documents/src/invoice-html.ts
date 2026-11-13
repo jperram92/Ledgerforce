@@ -7,6 +7,8 @@
  * the date and number, each item with its GST, and the total GST and total payable.
  * Amounts are formatted from decimal strings (no floating point, AGENTS.md §4).
  */
+import type { Database } from '@ledgerforce/db';
+import type { Transaction } from 'kysely';
 
 export interface InvoiceDocumentLine {
   readonly description: string;
@@ -32,6 +34,29 @@ export interface InvoiceDocument {
   readonly net: string;
   readonly tax: string;
   readonly gross: string;
+  /**
+   * Online payment link for the amount due (T-0073: a Stripe Payment Link), when the invoice's
+   * billing format offers one. `amountDue` is NUMERIC text; the URL must be https.
+   */
+  readonly paymentLink?: InvoicePaymentLinkView;
+}
+
+export interface InvoicePaymentLinkView {
+  readonly url: string;
+  readonly amountDue: string;
+}
+
+/**
+ * Port for the payment link shown on an invoice (implemented by the Stripe connector, T-0073):
+ * returns the link for the invoice's current amount due, creating it if needed, or null when the
+ * invoice's billing format has no online payment method or nothing is due.
+ */
+export interface InvoicePaymentLinkProvider {
+  ensure(
+    trx: Transaction<Database>,
+    companyId: string,
+    invoiceId: string,
+  ): Promise<InvoicePaymentLinkView | null>;
 }
 
 const ESC: Record<string, string> = {
@@ -71,7 +96,10 @@ export function formatDate(d: string): string {
 }
 
 /** "3.0000" → "3"; "1.5000" → "1.5". */
-const quantity = (q: string) => q.replace(/\.?0+$/, '') || '0';
+const quantity = (q: string) => {
+  if (!q.includes('.')) return q || '0';
+  return q.replace(/0+$/, '').replace(/\.$/, '') || '0';
+};
 
 const STYLE = `
   @page { size: A4; margin: 18mm 16mm; }
@@ -86,7 +114,16 @@ const STYLE = `
   .totals th { text-align: left; font-weight: normal; }
   .totals tr.total th, .totals tr.total td { font-weight: bold; border-top: 1px solid #333; }
   .meta td { padding: 0.5mm 0; }
+  .meta td:first-child { padding-right: 4mm; }
+  .pay { margin-top: 8mm; padding: 3mm 4mm; border: 1px solid #333; }
+  .pay a { color: #0b3d91; word-break: break-all; }
 `;
+
+function paymentLinkHtml(p: InvoicePaymentLinkView): string {
+  if (!/^https:\/\/\S+$/.test(p.url)) throw new Error('payment link URL must be https');
+  const url = escapeHtml(p.url);
+  return `<div class="pay"><strong>Pay online</strong> — Amount due ${formatMoney(p.amountDue)}<br><a href="${url}">${url}</a></div>`;
+}
 
 export function renderInvoiceHtml(d: InvoiceDocument): string {
   const e = escapeHtml;
@@ -121,6 +158,7 @@ ${lines}
   <tr><th>GST</th><td class="amount">${formatMoney(d.tax)}</td></tr>
   <tr class="total"><th>Total</th><td class="amount">${formatMoney(d.gross)}</td></tr>
 </tbody></table>
+${d.paymentLink ? paymentLinkHtml(d.paymentLink) : ''}
 <p>Amounts in ${e(d.currency)}.</p>
 </body></html>`;
 }

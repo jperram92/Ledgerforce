@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0166",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-106",
+      "file": ".agent/evidence/T-0166/ci-passing-tests.log",
+      "test": "packages/modules/ar/src/gross-allowance.db.test.ts: GP-039 preserves the residual until reassessment and reports relief only on accruals",
+      "commit": "ad56bb92500d9d697b70a3d8a5277d4de9375437",
+      "provider": "ci",
+      "timestamp": "2026-11-10T00:39:09.175Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-106",
+      "file": ".agent/evidence/T-0166/successor-ci-db-summary.log",
+      "test": "CI42906703669 DB/RLS: golden-engine and gross-allowance; 1292/1292 tests",
+      "commit": "568f376423e0c6f19c179ef721781b75ae815a1a",
+      "provider": "ci",
+      "timestamp": "2026-11-10T21:40:21.383Z",
+      "result": "passed"
+    }
+  ]
+}

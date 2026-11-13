@@ -41,6 +41,18 @@ const doc: InvoiceDocument = {
 };
 
 describe('Invoice HTML (T-0041)', () => {
+  it('SS-PLAT-104 preserves significant integer quantity zeros [T-0041]', () => {
+    const html = renderInvoiceHtml({
+      ...doc,
+      lines: doc.lines.map((line, index) => ({
+        ...line,
+        quantity: index === 0 ? '10' : '100',
+      })),
+    });
+    expect(html).toContain('<td class="amount">10</td>');
+    expect(html).toContain('<td class="amount">100</td>');
+  });
+
   it('SS-PLAT-104 shows a tax invoice with supplier ABN, number, dates, GST and total', () => {
     const html = renderInvoiceHtml(doc);
     expect(html).toContain('Tax invoice');
@@ -93,5 +105,21 @@ describe('Billing formats (design §4.3)', () => {
     expect(validateBillingFormat(bad).join('\n')).toMatch(
       /layout nope[\s\S]*number series[\s\S]*grouping per_planet/,
     );
+  });
+});
+
+describe('Invoice HTML payment link (T-0073)', () => {
+  it('SS-UC03-01 shows the Stripe payment link with the amount due, escaped, and nothing without one', () => {
+    const html = renderInvoiceHtml({
+      ...doc,
+      paymentLink: { url: 'https://buy.stripe.com/test_a"b<c', amountDue: '375.0000' },
+    });
+    expect(html).toContain('Pay online');
+    expect(html).toContain('href="https://buy.stripe.com/test_a&quot;b&lt;c"');
+    expect(html).toContain('Amount due $375.00');
+    expect(renderInvoiceHtml(doc)).not.toContain('Pay online');
+    expect(() =>
+      renderInvoiceHtml({ ...doc, paymentLink: { url: 'javascript:alert(1)', amountDue: '1' } }),
+    ).toThrow(/https/);
   });
 });

@@ -1,0 +1,24 @@
+Unit-project line coverage by package at 4f8ca92 (vitest --project unit, v8, json-summary)
+total {'total': 6378, 'covered': 3731, 'skipped': 0, 'pct': 58.49}
+packages/modules/ar                               83/   676  12.3%
+packages/connectors/salesforce                   953/  1520  62.7%
+packages/ledger                                  237/   694  34.1%
+packages/modules/bank                            518/   790  65.6%
+packages/db                                      136/   280  48.6%
+packages/modules/products                          3/   121   2.5%
+packages/modules/parties                          32/   136  23.5%
+packages/outbox                                   48/   136  35.3%
+packages/modules/ap                               19/   103  18.4%
+packages/modules/journals                          5/    74   6.8%
+packages/modules/tax                              37/    90  41.1%
+packages/shared                                  821/   855  96.0%
+packages/connectors/stripe                       154/   181  85.1%
+packages/modules/documents                        49/    64  76.6%
+packages/testing                                 180/   187  96.3%
+salesforce/test                                  152/   159  95.6%
+packages/modules/gl                               77/    82  93.9%
+packages/modules/setup                            71/    73  97.3%
+apps/worker                                       39/    40  97.5%
+eslint.config.js                                   1/     1 100.0%
+packages/connectors/aba                           69/    69 100.0%
+packages/modules/reporting                        47/    47 100.0%

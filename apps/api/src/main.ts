@@ -1,4 +1,4 @@
-import { bossRequeue, ledgerOutbox, runtimeBossOptions } from '@ledgerforce/outbox';
+import { bossRequeue, enqueue, ledgerOutbox, runtimeBossOptions } from '@ledgerforce/outbox';
 import { PgBoss } from 'pg-boss';
 import { createApi } from './app.ts';
 import { apiOptionsFromEnv } from './config.ts';
@@ -23,6 +23,18 @@ const api = await createApi({
   ...options,
   syncRequeue: bossRequeue(boss),
   postingOutbox: ledgerOutbox(boss),
+  // Document events (e.g. the Stripe receipt's `payment.received` write-back, T-0074).
+  documentOutbox: {
+    publish: async (trx, e) => {
+      await enqueue(trx, boss, {
+        companyId: e.companyId,
+        topic: e.topic,
+        aggregateType: e.aggregateType,
+        aggregateId: e.aggregateId,
+        payload: e.payload,
+      });
+    },
+  },
 });
 console.log(`LedgerForce API listening on ${api.url}`);
 

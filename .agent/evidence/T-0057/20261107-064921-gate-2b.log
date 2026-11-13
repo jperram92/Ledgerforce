@@ -1,0 +1,254 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/var/tmp/ledgerforce-t0057-review-20261107/repo[39m
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42219
+[db] test PostgreSQL ready (local) on 127.0.0.1:42621
+[90mstderr[2m | apps/api/src/authz/mfa-step-up.db.test.ts
+[22m[39moidc-provider WARNING: a quick start development-only in-memory adapter is used, you MUST change it in order to not lose all stateful provider data upon restart and to be able to share these between processes
+oidc-provider WARNING: quick start development-only signing keys are used, you are expected to provide your own in the configuration "jwks" property
+
+[90mstdout[2m | apps/api/src/authz/mfa-step-up.db.test.ts[2m > [22m[2mSS-PLAT-20: MFA and session policy for finance roles[2m > [22m[2man Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited
+[22m[39moidc-provider NOTICE: default ttl.Interaction function called, you SHOULD change it in order to define the expiration for Interaction artifacts.
+
+[90mstdout[2m | apps/api/src/authz/mfa-step-up.db.test.ts[2m > [22m[2mSS-PLAT-20: MFA and session policy for finance roles[2m > [22m[2man Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited
+[22m[39moidc-provider NOTICE: default ttl.Grant function called, you SHOULD change it in order to define the expiration for Grant artifacts.
+
+[90mstdout[2m | apps/api/src/authz/mfa-step-up.db.test.ts[2m > [22m[2mSS-PLAT-20: MFA and session policy for finance roles[2m > [22m[2man Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited
+[22m[39moidc-provider NOTICE: default ttl.Session function called, you SHOULD change it in order to define the expiration for Session artifacts.
+
+[90mstdout[2m | apps/api/src/authz/mfa-step-up.db.test.ts[2m > [22m[2mSS-PLAT-20: MFA and session policy for finance roles[2m > [22m[2man Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited
+[22m[39moidc-provider NOTICE: default ttl.AccessToken function called, you SHOULD change it in order to define the expiration for AccessToken artifacts.
+
+[90mstdout[2m | apps/api/src/authz/mfa-step-up.db.test.ts[2m > [22m[2mSS-PLAT-20: MFA and session policy for finance roles[2m > [22m[2man Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited
+[22m[39moidc-provider NOTICE: default ttl.IdToken function called, you SHOULD change it in order to define the expiration for IdToken artifacts.
+
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/authz/mfa-step-up.db.test.ts [2m([22m[2m33 tests[22m[2m)[22m[33m 2899[2mms[22m[39m
+[90mstderr[2m | apps/api/src/auth/oidc.db.test.ts
+[22m[39moidc-provider WARNING: a quick start development-only in-memory adapter is used, you MUST change it in order to not lose all stateful provider data upon restart and to be able to share these between processes
+oidc-provider WARNING: quick start development-only signing keys are used, you are expected to provide your own in the configuration "jwks" property
+
+[90mstdout[2m | apps/api/src/auth/oidc.db.test.ts[2m > [22m[2mSS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce)[2m > [22m[2mthe callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works
+[22m[39moidc-provider NOTICE: default ttl.Interaction function called, you SHOULD change it in order to define the expiration for Interaction artifacts.
+
+[90mstdout[2m | apps/api/src/auth/oidc.db.test.ts[2m > [22m[2mSS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce)[2m > [22m[2mthe callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works
+[22m[39moidc-provider NOTICE: default ttl.Grant function called, you SHOULD change it in order to define the expiration for Grant artifacts.
+
+[90mstdout[2m | apps/api/src/auth/oidc.db.test.ts[2m > [22m[2mSS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce)[2m > [22m[2mthe callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works
+[22m[39moidc-provider NOTICE: default ttl.Session function called, you SHOULD change it in order to define the expiration for Session artifacts.
+
+[90mstdout[2m | apps/api/src/auth/oidc.db.test.ts[2m > [22m[2mSS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce)[2m > [22m[2mthe callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works
+[22m[39moidc-provider NOTICE: default ttl.AccessToken function called, you SHOULD change it in order to define the expiration for AccessToken artifacts.
+
+[90mstdout[2m | apps/api/src/auth/oidc.db.test.ts[2m > [22m[2mSS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce)[2m > [22m[2mthe callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works
+[22m[39moidc-provider NOTICE: default ttl.IdToken function called, you SHOULD change it in order to define the expiration for IdToken artifacts.
+
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/auth/oidc.db.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 1358[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/sod/sod.db.test.ts [2m([22m[2m21 tests[22m[2m)[22m[33m 1722[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/tokens/tokens.scope.db.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1735[2mms[22m[39m
+(node:7048) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[31m[Nest] 7048  - [39m11/07/2026, 5:53:31 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39merror: permission denied for table job_common
+    at [90m/var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/pg@8.23.1/node_modules/[4mpg[24m/lib/client.js:694:17
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at async PostgresConnection.executeQuery [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:118:28[90m)[39m
+    at async [90mfile:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
+    at async [90mfile:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
+    at async #run [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
+    at async DefaultQueryExecutor.executeQuery [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
+    at async Transaction.executeQuery [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:545:16[90m)[39m
+    at async Object.executeSql [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/adapters/kysely.js:4:28[90m)[39m
+    at async #createJob [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/manager.js:1372:32[90m)[39m
+    at PostgresConnection.executeQuery [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:131:41[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)[39m
+    at async [90mfile:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
+    at async [90mfile:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
+    at async #run [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
+    at async DefaultQueryExecutor.executeQuery [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
+    at async Transaction.executeQuery [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:545:16[90m)[39m
+    at async Object.executeSql [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/adapters/kysely.js:4:28[90m)[39m
+    at async #createJob [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/manager.js:1372:32[90m)[39m
+    at async Telemetry.send [90m(file:///var/tmp/ledgerforce-t0057-review-20261107/repo/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/telemetry.js:189:28[90m)[39m {
+  length: [33m98[39m,
+  severity: [32m'ERROR'[39m,
+  code: [32m'42501'[39m,
+  detail: [90mundefined[39m,
+  hint: [90mundefined[39m,
+  position: [90mundefined[39m,
+  internalPosition: [90mundefined[39m,
+  internalQuery: [90mundefined[39m,
+  where: [90mundefined[39m,
+  schema: [90mundefined[39m,
+  table: [90mundefined[39m,
+  column: [90mundefined[39m,
+  dataType: [90mundefined[39m,
+  constraint: [90mundefined[39m,
+  file: [32m'aclchk.c'[39m,
+  line: [32m'2812'[39m,
+  routine: [32m'aclcheck_error'[39m
+}
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/journals/manual-journals.db.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1806[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/authz/permissions.db.test.ts [2m([22m[2m16 tests[22m[2m)[22m[33m 1153[2mms[22m[39m
+(node:7084) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/journals/gl-screens.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1371[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/users/users.lifecycle.db.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1211[2mms[22m[39m
+(node:7118) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/sync/sync-issues.db.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1198[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/parties/bank-change.workflow.db.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1382[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/ap/bills.db.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 1406[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/audit/audit-log.db.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1147[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/ap/payment-batches.db.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1889[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC06-01 the AP Clerk builds a batch of 12 payments totalling the 12 bills [33m 633[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/ar/batches.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1255[2mms[22m[39m
+(node:7217) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/ap/payment-confirmation.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 2380[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC06-07 a releaser records the bank confirmation: GP-009 posts once with its outbox event, audited [33m 678[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/users/users.list.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1011[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/auth/session.db.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1173[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/ar/credit-notes.db.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 1268[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/ap/payment-batch-aba.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 1428[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/ar/receipts.db.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 1175[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/audit/audit.db.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 872[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/parties/bank-accounts.db.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 912[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/tenancy/tenant-transaction.db.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 830[2mms[22m[39m
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/health/health.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 791[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/subledger.allocation.db.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 2375[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/engine.pipeline.db.test.ts [2m([22m[2m15 tests[22m[2m)[22m[33m 1262[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/parties/src/bank-change.workflow.db.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 1401[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/period.enforce.db.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 1300[2mms[22m[39m
+(node:7457) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ [32m✓[39m [30m[45m db [49m[39m apps/worker/src/sync-issues.db.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1759[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-25: Sync failures back off then land in the Sync issues inbox [33m 728[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/db/src/user-lifecycle.db.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 920[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1212[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/account-balance.db.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1959[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-67 many concurrent postings to the same accounts all count, with no deadlock [T-0027] [33m 1093[2mms[22m[39m
+[90mstdout[2m | packages/ledger/src/ledger.invariants.db.test.ts[2m > [22m[2mSS-PLAT-11: Invariants hold over 10,000 random documents[2m > [22m[2mSS-PLAT-11 INV-balance INV-tb-zero INV-ar-control INV-ap-control INV-reversal over 10,000 seeded documents
+[22m[39m[SS-PLAT-11] fast-check seed 20261101 (reproduce with LF_FC_SEED=20261101)
+
+[90mstdout[2m | packages/ledger/src/ledger.invariants.db.test.ts[2m > [22m[2mSS-PLAT-11: Invariants hold over 10,000 random documents[2m > [22m[2mSS-PLAT-11 INV-balance INV-tb-zero INV-ar-control INV-ap-control INV-reversal over 10,000 seeded documents
+[22m[39m[SS-PLAT-11] 10000 documents, 3980 allocations, 313 voids, 660 voids refused (ALLOCATED)
+
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/ledger.invariants.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 128066[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-11 INV-balance INV-tb-zero INV-ar-control INV-ap-control INV-reversal over 10,000 seeded documents [33m 127368[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/period-control.db.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1609[2mms[22m[39m
+     [33m[2m✓[22m[39m the trigger enforces every status × source type cell, with and without an override [33m 715[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/bank/src/statements.db.test.ts [2m([22m[2m13 tests[22m[2m)[22m[33m 714[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 1044[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/connectors/salesforce/src/connection-store.db.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 1224[2mms[22m[39m
+     [33m[2m✓[22m[39m concurrent callers share one exchange (row lock, single flight) [33m 314[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/db/src/sod.db.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 713[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/journals/src/manual-journal.approval.db.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 933[2mms[22m[39m
+(node:7773) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ [32m✓[39m [30m[45m db [49m[39m apps/worker/src/salesforce-writeback.outage.db.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1171[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC01-09: Salesforce outage does not block accounting [33m 387[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ar/src/invoice.lifecycle.db.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 983[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/engine.preview.prop.db.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 20090[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-15 INV-preview for any valid command, preview changes nothing and equals the journal post stores [T-0026] [33m 8369[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-72 INV-preview-outcome for any command, preview and post refuse with the same code or both give the same journal [T-0026] [33m 11155[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/hash-chain.db.test.ts [2m([22m[2m11 tests[22m[2m)[22m[33m 4653[2mms[22m[39m
+     [33m[2m✓[22m[39m 100 posted entries form one chain (seq 1..100, each linked to the previous hash) that verifies [33m 933[2mms[22m[39m
+     [33m[2m✓[22m[39m a superuser altering one amount (kept balanced) is reported at that entry [33m 881[2mms[22m[39m
+     [33m[2m✓[22m[39m a superuser who re-hashes the altered entry breaks the next link instead [33m 487[2mms[22m[39m
+     [33m[2m✓[22m[39m a superuser deleting an entry leaves a sequence gap; deleting the last one mismatches the head [33m 317[2mms[22m[39m
+     [33m[2m✓[22m[39m property: the TypeScript canonical form equals the SQL one for any content [33m 607[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ap/src/payment-confirmation.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1502[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/dimension-set.db.test.ts [2m([22m[2m14 tests[22m[2m)[22m[33m 952[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/engine.preview.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 2252[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-15 preview of any document changes no row or sequence anywhere; post then stores exactly the previewed journal [T-0026] [33m 715[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-15 preview runs in a READ ONLY transaction: it issues no write statement at all [T-0026] [33m 327[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-72 a refused preview refuses with the same typed error as post, and neither changes anything [T-0026] [33m 382[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/db/src/audit-read.db.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 661[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/parties/src/parties.db.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 865[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/journal-immutability.db.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 859[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/bank/src/camt-extensions.db.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 724[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ar/src/prepayments.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1338[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/golden/golden-engine.db.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1371[2mms[22m[39m
+     [33m[2m✓[22m[39m preview() reproduces every other Approved table line for line [33m 412[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/reversal.db.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 2358[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m apps/worker/src/setup/setup.db.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 1134[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-85 first run: migrations and queue as lf_migrator, owner invited, one-time link printed [33m 630[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/control-accounts.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 2398[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-07 every source type outside the subledger is refused on every control account; the subledger itself posts [33m 1685[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ar/src/credit-note.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1053[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/subledger.prop.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 5558[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-82 INV-ar-control INV-ap-control INV-allocation: random postings and allocations keep the subledgers equal to the controls and never over-allocate [33m 4878[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ar/src/receipts.db.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1099[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/db/src/platform.db.test.ts [2m([22m[2m17 tests[22m[2m)[22m[33m 712[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/tax/src/bas.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 999[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/tax/src/tax-codes.db.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 1112[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ap/src/remittance.db.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1204[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC06-08 each supplier Remittance contact receives one advice listing the bills paid [33m 373[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/numbering.db.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 2252[2mms[22m[39m
+     [33m[2m✓[22m[39m 50 concurrent postings, 5 rolling back, leave 45 consecutive numbers [33m 883[2mms[22m[39m
+     [33m[2m✓[22m[39m a batch of 40, each in its own transaction, the 13th failing: the 39 posted are consecutive [33m 529[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/email/src/invoice-email.db.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 1798[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC01-03 SS-UC02-04 the posted invoice event sends one email To the Billing To contact, Cc the Billing CC, with the PDF attached; redelivery sends nothing [33m 853[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/engine.idempotency.db.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 1582[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-14 a concurrent repeat waits for the first post and replays it, even if it would now be refused [T-0025] [33m 336[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-14 a key committed concurrently outside the engine lock is replayed, not an error [T-0025] [33m 331[2mms[22m[39m
+(node:8416) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ [32m✓[39m [30m[45m db [49m[39m apps/worker/src/outbox.delivery.db.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1317[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-24: Outbox delivers at least once, handlers idempotent [33m 345[2mms[22m[39m
+(node:8445) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ [32m✓[39m [30m[45m db [49m[39m packages/outbox/src/outbox.db.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 922[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/journal-balance.db.test.ts [2m([22m[2m9 tests[22m[2m)[22m[33m 1439[2mms[22m[39m
+     [33m[2m✓[22m[39m property: any balanced entry commits; moving 0.0001 off either side makes it fail [33m 607[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ar/src/batch.post.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 5479[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC02-05 a run killed after 20 invoices, then re-run, leaves 40 invoices and no duplicates [33m 2259[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC02-03 with one party made inactive after the preview, 39 post and 1 is in the exception list with its reason [33m 1818[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/db/src/user-role.db.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 882[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ar/src/write-off.db.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1439[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/parties/src/bank-accounts.db.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 1028[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/account-balance.prop.db.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 16831[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-66 INV-balance-table and INV-tb-zero: balances equal the posted lines and the trial balance nets to zero [T-0027] [33m 4505[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-66 INV-reversal: posting the mirror of any entry restores every net balance [T-0027] [33m 11361[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/products/src/products.db.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 881[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ap/src/payment-batches.db.test.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 1901[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC06-01 twelve posted bills due this week become twelve payments totalling their open amounts [33m 692[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ar/src/batch.preview.db.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 1771[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC02-01 a November preview of 40 billable accounts returns 40 rows with totals and warnings and writes no journal [33m 584[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/account-movements.db.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 891[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/reporting/src/reports.prop.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 7228[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-77 TB nets to zero and matches the model, BS balances, P&L matches [T-0076] [33m 6475[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ap/src/bills.db.test.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 1046[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/documents/src/invoice-pdf.db.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 1695[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-104 the GP-001 invoice PDF contains number, ABN, GST 125.00 and total 1,375.00 [33m 479[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ap/src/inbox.db.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 960[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ar/src/aged.db.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 1267[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/products/src/matrix.db.test.ts [2m([22m[2m8 tests[22m[2m)[22m[33m 952[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/gl/src/chart.db.test.ts [2m([22m[2m10 tests[22m[2m)[22m[33m 856[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ap/src/payment-confirmation.prop.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 22001[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC06-07 any confirmed batch balances, pays every bill and keeps AP subledger = AP control [33m 21076[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/ledger/src/posting-invariants.prop.db.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 5389[2mms[22m[39m
+     [33m[2m✓[22m[39m INV-balance and INV-tb-zero any sequence of random balanced commands posts balanced entries and the trial balance nets to zero [T-0025] [33m 2386[2mms[22m[39m
+     [33m[2m✓[22m[39m INV-idempotent posting any command twice with its key adds exactly one entry [T-0025] [33m 2248[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/db/src/migrate.db.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 412[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/email/src/batch-email.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 7387[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC02-04 a batch of 40 with one inactive party sends 39 emails, each To its Billing To, Cc its CC, PDF attached [33m 6177[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/db/src/tenant-context.db.test.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 732[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ap/src/aba-export.db.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 1154[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC06-06 a released batch produces the expected ABA file byte for byte; a draft batch is refused [33m 326[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/db/src/rls.db.test.ts [2m([22m[2m638 tests[22m[2m)[22m[33m 11931[2mms[22m[39m
+     [33m[2m✓[22m[39m reports no violations on the migrated schema [33m 850[2mms[22m[39m
+     [33m[2m✓[22m[39m FAILS for a tenant table without RLS, without FORCE, or without a policy [33m 924[2mms[22m[39m
+(node:9615) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ [32m✓[39m [30m[45m db [49m[39m packages/outbox/src/preview.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 1277[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-PLAT-15 preview leaves every table (incl. outbox_event and pgboss.job) and sequence unchanged; post then writes the previewed journal, one event and one job [T-0026] [33m 365[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/db/src/company-abn.db.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 822[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m apps/worker/src/queue-admin.db.test.ts [2m([22m[2m2 tests[22m[2m)[22m[33m 867[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/db/src/testing/start-test-database.db.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 909[2mms[22m[39m
+     [33m[2m✓[22m[39m starts a real PostgreSQL >= 16 and tears it down completely [33m 906[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m95 passed[39m[22m[90m (95)[39m
+[2m      Tests [22m [1m[32m1278 passed[39m[22m[90m (1278)[39m
+[2m   Start at [22m 17:53:09
+[2m   Duration [22m 424.20s[2m (transform 4.16s, setup 0ms, import 63.62s, tests 342.21s, environment 14ms)[22m
+

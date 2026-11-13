@@ -1,0 +1,151 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41407
+[db] test PostgreSQL ready (local) on 127.0.0.1:43979
+(node:7672) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[31m[Nest] 7672  - [39m11/02/2026, 11:48:58 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39merror: permission denied for table job_common
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/pg@8.23.1/node_modules/[4mpg[24m/lib/client.js:694:17
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:118:28[90m)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
+    at async #run [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
+    at async DefaultQueryExecutor.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
+    at async Transaction.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:545:16[90m)[39m
+    at async Object.executeSql [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/adapters/kysely.js:4:28[90m)[39m
+    at async #createJob [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/manager.js:1372:32[90m)[39m
+    at PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:131:41[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
+    at async #run [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
+    at async DefaultQueryExecutor.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
+    at async Transaction.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:545:16[90m)[39m
+    at async Object.executeSql [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/adapters/kysely.js:4:28[90m)[39m
+    at async #createJob [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/manager.js:1372:32[90m)[39m
+    at async Telemetry.send [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/telemetry.js:189:28[90m)[39m {
+  length: [33m98[39m,
+  severity: [32m'ERROR'[39m,
+  code: [32m'42501'[39m,
+  detail: [90mundefined[39m,
+  hint: [90mundefined[39m,
+  position: [90mundefined[39m,
+  internalPosition: [90mundefined[39m,
+  internalQuery: [90mundefined[39m,
+  where: [90mundefined[39m,
+  schema: [90mundefined[39m,
+  table: [90mundefined[39m,
+  column: [90mundefined[39m,
+  dataType: [90mundefined[39m,
+  constraint: [90mundefined[39m,
+  file: [32m'aclchk.c'[39m,
+  line: [32m'2812'[39m,
+  routine: [32m'aclcheck_error'[39m
+}
+(node:7871) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:7918) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:8020) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:12620) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:12877) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:13107) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:14332) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:14558) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ |openbao| packages/shared/src/crypto/transit-kms.openbao.itest.ts (0 test)
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |openbao| packages/shared/src/crypto/transit-kms.openbao.itest.ts [ packages/shared/src/crypto/transit-kms.openbao.itest.ts ]
+Error: LF_OPENBAO_ADDR is not set — run this file through `pnpm test:openbao`
+ ❯ need packages/shared/src/crypto/transit-kms.openbao.itest.ts:24:17
+     22| function need(name: string): string {
+     23|   const v = process.env[name];
+     24|   if (!v) throw new Error(`${name} is not set — run this file through …
+       |                 ^
+     25|   return v;
+     26| }
+ ❯ packages/shared/src/crypto/transit-kms.openbao.itest.ts:29:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 178 passed (179)
+      Tests  2291 passed (2291)
+   Start at  11:48:51
+   Duration  340.17s (transform 18.06s, setup 8.75s, import 167.32s, tests 696.31s, environment 51.16s)
+
+[vitest-pool]: Timeout terminating forks worker for test files /home/user/Ledgerforce/.claude/worktrees/agent-a5d8c2be1a9bdb226/apps/web/src/api.test.ts.

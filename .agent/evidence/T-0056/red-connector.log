@@ -1,0 +1,206 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aa3c800f0b0ab6286
+
+ ❯ |unit| packages/connectors/aba/src/aba.contract.test.ts (2 tests | 2 failed) 7ms
+     × SS-UC06-06 a three-payment supplier batch matches the expected file byte for byte (header, details, trailer totals, CRLF) 5ms
+     × SS-UC06-06 the self-balancing variant adds one code-13 debit to the funding account and nets to zero 1ms
+ ❯ |unit| packages/connectors/aba/src/aba.test.ts (12 tests | 12 failed) 18ms
+     × writes one header, one detail per line and one trailer, each 120 characters, CRLF-terminated 7ms
+     × formats the processing date DDMMYY and zero-fills the APCA user id 1ms
+     × right-justifies account numbers with spaces and amounts with zeros 1ms
+     × uses the transaction code given on the line (53 for net pay) 1ms
+     × truncates text fields to their width and left-justifies them 1ms
+     × totals credits in the trailer and counts the detail records 0ms
+     × rejects characters outside the BECS set 2ms
+     × rejects an account number longer than 9 characters even without its hyphens 1ms
+     × rejects a malformed BSB, APCA user id, FI mnemonic or date 1ms
+     × rejects zero, negative, sub-cent and over-width amounts 1ms
+     × rejects an empty batch, more lines than the bank accepts, and totals over 10 digits 1ms
+     × transliterates accents and replaces other characters with spaces 0ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 14 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.contract.test.ts > SS-UC06-06: ABA file is byte-exact > SS-UC06-06 a three-payment supplier batch matches the expected file byte for byte (header, details, trailer totals, CRLF)
+TypeError: writeAba is not a function
+ ❯ packages/connectors/aba/src/aba.contract.test.ts:48:18
+     46| describe('SS-UC06-06: ABA file is byte-exact', () => {
+     47|   it('SS-UC06-06 a three-payment supplier batch matches the expected f…
+     48|     const file = writeAba(batch);
+       |                  ^
+     49|     expect(Buffer.from(file, 'ascii')).toEqual(expected('supplier-batc…
+     50|     for (const line of file.split('\r\n').slice(0, -1)) expect(line).t…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.contract.test.ts > SS-UC06-06: ABA file is byte-exact > SS-UC06-06 the self-balancing variant adds one code-13 debit to the funding account and nets to zero
+TypeError: writeAba is not a function
+ ❯ packages/connectors/aba/src/aba.contract.test.ts:54:18
+     52|
+     53|   it('SS-UC06-06 the self-balancing variant adds one code-13 debit to …
+     54|     const file = writeAba(batch, { selfBalancing: true, trailingCrlf: …
+       |                  ^
+     55|     expect(Buffer.from(file, 'ascii')).toEqual(expected('supplier-batc…
+     56|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA layout > writes one header, one detail per line and one trailer, each 120 characters, CRLF-terminated
+TypeError: writeAba is not a function
+ ❯ packages/connectors/aba/src/aba.test.ts:39:17
+     37| describe('ABA layout', () => {
+     38|   it('writes one header, one detail per line and one trailer, each 120…
+     39|     const out = writeAba(file());
+       |                 ^
+     40|     expect(out.endsWith('\r\n')).toBe(true);
+     41|     const r = out.split('\r\n');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA layout > formats the processing date DDMMYY and zero-fills the APCA user id
+TypeError: writeAba is not a function
+ ❯ records packages/connectors/aba/src/aba.test.ts:26:33
+     24|   ...over,
+     25| });
+     26| const records = (f: AbaFile) => writeAba(f).split('\r\n');
+       |                                 ^
+     27| const refused = (f: () => unknown): string => {
+     28|   try {
+ ❯ packages/connectors/aba/src/aba.test.ts:52:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA layout > right-justifies account numbers with spaces and amounts with zeros
+TypeError: writeAba is not a function
+ ❯ records packages/connectors/aba/src/aba.test.ts:26:33
+     24|   ...over,
+     25| });
+     26| const records = (f: AbaFile) => writeAba(f).split('\r\n');
+       |                                 ^
+     27| const refused = (f: () => unknown): string => {
+     28|   try {
+ ❯ packages/connectors/aba/src/aba.test.ts:59:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA layout > uses the transaction code given on the line (53 for net pay)
+TypeError: writeAba is not a function
+ ❯ records packages/connectors/aba/src/aba.test.ts:26:33
+     24|   ...over,
+     25| });
+     26| const records = (f: AbaFile) => writeAba(f).split('\r\n');
+       |                                 ^
+     27| const refused = (f: () => unknown): string => {
+     28|   try {
+ ❯ packages/connectors/aba/src/aba.test.ts:66:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA layout > truncates text fields to their width and left-justifies them
+TypeError: writeAba is not a function
+ ❯ records packages/connectors/aba/src/aba.test.ts:26:33
+     24|   ...over,
+     25| });
+     26| const records = (f: AbaFile) => writeAba(f).split('\r\n');
+       |                                 ^
+     27| const refused = (f: () => unknown): string => {
+     28|   try {
+ ❯ packages/connectors/aba/src/aba.test.ts:72:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA layout > totals credits in the trailer and counts the detail records
+TypeError: writeAba is not a function
+ ❯ records packages/connectors/aba/src/aba.test.ts:26:33
+     24|   ...over,
+     25| });
+     26| const records = (f: AbaFile) => writeAba(f).split('\r\n');
+       |                                 ^
+     27| const refused = (f: () => unknown): string => {
+     28|   try {
+ ❯ packages/connectors/aba/src/aba.test.ts:81:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA validation > rejects characters outside the BECS set
+AssertionError: The instanceof assertion needs a constructor but undefined was given.
+ ❯ refused packages/connectors/aba/src/aba.test.ts:31:15
+     29|     f();
+     30|   } catch (e) {
+     31|     expect(e).toBeInstanceOf(AbaFormatError);
+       |               ^
+     32|     return (e as Error).message;
+     33|   }
+ ❯ packages/connectors/aba/src/aba.test.ts:90:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA validation > rejects an account number longer than 9 characters even without its hyphens
+AssertionError: The instanceof assertion needs a constructor but undefined was given.
+ ❯ refused packages/connectors/aba/src/aba.test.ts:31:15
+     29|     f();
+     30|   } catch (e) {
+     31|     expect(e).toBeInstanceOf(AbaFormatError);
+       |               ^
+     32|     return (e as Error).message;
+     33|   }
+ ❯ packages/connectors/aba/src/aba.test.ts:100:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA validation > rejects a malformed BSB, APCA user id, FI mnemonic or date
+AssertionError: The instanceof assertion needs a constructor but undefined was given.
+ ❯ refused packages/connectors/aba/src/aba.test.ts:31:15
+     29|     f();
+     30|   } catch (e) {
+     31|     expect(e).toBeInstanceOf(AbaFormatError);
+       |               ^
+     32|     return (e as Error).message;
+     33|   }
+ ❯ packages/connectors/aba/src/aba.test.ts:114:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA validation > rejects zero, negative, sub-cent and over-width amounts
+AssertionError: The instanceof assertion needs a constructor but undefined was given.
+ ❯ refused packages/connectors/aba/src/aba.test.ts:31:15
+     29|     f();
+     30|   } catch (e) {
+     31|     expect(e).toBeInstanceOf(AbaFormatError);
+       |               ^
+     32|     return (e as Error).message;
+     33|   }
+ ❯ packages/connectors/aba/src/aba.test.ts:122:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > ABA validation > rejects an empty batch, more lines than the bank accepts, and totals over 10 digits
+AssertionError: The instanceof assertion needs a constructor but undefined was given.
+ ❯ refused packages/connectors/aba/src/aba.test.ts:31:15
+     29|     f();
+     30|   } catch (e) {
+     31|     expect(e).toBeInstanceOf(AbaFormatError);
+       |               ^
+     32|     return (e as Error).message;
+     33|   }
+ ❯ packages/connectors/aba/src/aba.test.ts:130:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/14]⎯
+
+ FAIL  |unit| packages/connectors/aba/src/aba.test.ts > toBecs > transliterates accents and replaces other characters with spaces
+TypeError: toBecs is not a function
+ ❯ packages/connectors/aba/src/aba.test.ts:144:12
+    142| describe('toBecs', () => {
+    143|   it('transliterates accents and replaces other characters with spaces…
+    144|     expect(toBecs('Café Noël & Sons')).toBe('Cafe Noel & Sons');
+       |            ^
+    145|     expect(toBecs('A|B  "C"\nD')).toBe('A B C D');
+    146|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/14]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  14 failed (14)
+   Start at  01:19:38
+   Duration  343ms (transform 111ms, setup 0ms, import 142ms, tests 26ms, environment 0ms)
+

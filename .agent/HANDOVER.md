@@ -1,16 +1,29 @@
-# Handover: Claude continuation from main
+# Handover: Line A fully integrated; T-0061 verifying; coverage gate needs the owner (2026-11-12)
 
 ## Codex continuation prompt
-> Read CLAUDE_NEXT.md and AGENTS.md. Resume T-0121 from main on a task branch; implementation commit accb6a6, earlier fixes 2ffd7b3 and 4cc7e9e. First command: bash scripts/agent/resume.sh. Diagnose the security workflow and missing nested Corepack pnpm installation, fetch actual GitHub main into the validation checkout, and rerun full verification. Claude independent review remains required. Do not label this integration green.
+> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file. Branch `claude/loving-lovelace-nozqpk`. All Line A branches, including feat/T-0041-pdf-format-repair (6d7531d), are merged here; mapping in `Docs/decisions/line-a-renumbering.md`. T-0061 (bank reconciliation) is in verifying: if `.agent/evidence/T-0061/verify-*.txt` is missing, run `VITEST_MAX_WORKERS=1 bash scripts/agent/verify.sh --task T-0061`, save it there, and release to review if only gates 2c/4/8 are non-green (they are branch-wide: coverage → T-0128/RQ-0105, golden → owner merge, review → Codex). Then continue with the next dependency-ready card via `node scripts/agent/conductor.ts next`. Codex: cross-review T-0121 (4489329, 6b2c4ce) and the Line A cards in review.
 
-From: codex (2026-11-12-codex-r01). Updated: 2026-11-12T11:18:01.441Z.
-Reason: owner requested latest work on main and a Markdown handover for Claude.
-Done: approval guard and focused 28/28 tests; native Linux coverage 684 tests pass. GitHub CI at accb6a6 passes.
-In progress: T-0121 verifying, T-0048 blocked. Full local verifier 11 PASS / 3 FAIL / 2 PENDING; agent suite 92/93 due missing Corepack pnpm module. Security CI fails history scan and image zlib vulnerability. Full details and links in CLAUDE_NEXT.md.
-Next action: read CLAUDE_NEXT.md and run the resume skill, then investigate failed security workflow 43151980363 and local scripts.test.ts:99 without weakening checks.
-Decisions: DL-0279, DL-0280, DL-0281; ADR-0047 Proposed.
-Open questions for human: none currently; retain security ADR/release/phase gates if needed by follow-up.
-Do not: edit Approved postings, delete history, weaken tests/security scans, read/edit secrets, or treat the owner-requested main integration as task completion.
+## Open questions for human
+- Coverage gate 2c (RQ-0105): unit-only coverage counts DB-tested modules as untested (58.8 % vs 72.22 %). Like for like (unit+db) it is 93.70 % vs main's 93.95 %. Should gate 2c measure unit+db, with main's baseline re-recorded under that measure? T-0128 then closes the remaining 0.25-point gap with real tests either way.
+- Merge to main: the golden gate (gate 4) can only pass once the owner merges Line A's additive golden entries (GP-037; later T-0166 supersessions) to main.
+- Security ADR-0049 (Stripe webhook endpoint and tenant routing) is Proposed and needs the owner's acceptance.
+
+## State
+- Done: security workflow remediation (RQ-0100, DL-0282–0284), owner-approved Gitleaks exception, full verify 14 PASS, Claude cross-review of Codex's commits (FAIL C6).
+- In progress: none running. All six parallel agents stopped on the weekly usage limit (resets 2026-11-15 03:00 UTC) with no commits; only the T-0121 test WIP is saved (patch above). The DL-0286 ranges stay reserved; T-0083 was claimed only in a discarded worktree, so its card on this branch is untouched. T-0048 stays blocked until T-0121 is review-complete.
+- Open questions for human: none new; Line A golden Approved markers may trip gate 4 after integration (the integrator reports this).
+- Do not: edit Approved goldens or CI security gates, merge Line B (claude/incomplete-features-build-wivsco) or feat/T-0048-bad-debt, rewrite history.
+
+# Handover - 2026-11-12 11:39 UTC
+From: claude (run 2026-11-12-codex-r01)    Reason: parallel round in progress (DL-0286); lead merging agent branches
+Task: T-0121 Reconcile verification coverage and golden approval evidence
+Branch: claude/loving-lovelace-nozqpk   Last green commit: none
+Done: AC-1: The unchanged coverage command passes `packages/testing/eslint-rules/no-float-money.config.test.ts`, including the negative control, and produces coverage evidence. Native Linux run: 684/684 passed; Windows limitations recorded, no timeout change.; AC-2: Researched ADR-0047 implementation reconciles `goldenGuard` with existing owner approvals; eleven adversarial acceptance tests and existing verifier regressions pass. No comparison-base override or unconditional bypass. Independent review remains step 5.; Why does loading the real ESLint configuration exceed the test timeout specifically under V8 coverage on this host? No deterministic assertion defect: unchanged focused run and native Linux full coverage pass. Windows runs also exposed WSL startup timing and transient manifest-lock EPERM. Exact timing variability is not proven; use the supported Linux validation runtime, retaining the failures as evidence.; What durable approval evidence can the guard verify while preserving immutable approved postings? RQ-0099 and Proposed ADR-0047; RED captured before implementation.; 1. Research both questions — RQ-0099; propose ADR-0047.; 2. RED tests for approval recognition, evidence recycling, and missing parent history.; 3. Implement and validate — 28/28 focused plus existing gate tests pass.; 3a. (claude) Security workflow 43151980363 diagnosed — RQ-0100. Gitleaks history: two T-0074 test fixtures, commit-scoped exception approved by owner (DL-0283). Image zlib CVE-2026-4738: `apk upgrade --no-cache` in node-runtime, contract test RED→GREEN (DL-0284); CI image gate must confirm. Nested pnpm: environmental, agent suite 93/93 unchanged (DL-0282).; 4. Full verification — claude 4489329: 14 PASS, gate 8 pending, gate 12 card-status only (`full-verify-claude-4489329.txt`); CI security 43209264765 all 9 jobs green at e15a4d0.
+In progress: AC-3: Full verifier passes all applicable gates after the change; pending baseline/review gates remain honestly identified [phase: verify] — [agent: what is half-done; failing tests with file paths]
+Next action: [agent: the single next command or edit to make]
+Decisions taken: [agent: DL/ADR ids taken this session, or "none new"]
+Open questions for human: [agent: questions that need the human, or "none"]
+Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked files; skip/weaken tests; push to main; edit .env*
 
 ## Log
 - 2026-10-24 04:00 control files committed (d64eb32)
@@ -261,3 +274,21 @@ Do not: edit Approved postings, delete history, weaken tests/security scans, rea
 - 2026-11-12T03:57:10.805Z codex: T-0121 → verifying
 - 2026-11-12T11:15:15.743Z codex: handover: Owner requested main integration and Claude handover; verification and independent review remain incomplete
 - 2026-11-12T11:17:11.733Z codex: release T-0121 → verifying (Handing off to Claude at owner request; full verification and security CI remain unresolved)
+- 2026-11-12T11:24:27.587Z claude: T-0121 → in_progress
+- 2026-11-12T11:36:31.049Z claude: T-0121 → verifying
+- 2026-11-12T11:37:10.260Z claude: T-0121 → in_progress
+- 2026-11-12T11:39:33.547Z claude: handover: parallel round in progress (DL-0286); lead merging agent branches
+- 2026-11-12T11:41:44.298Z claude: release T-0121 → todo (usage limit; resume step 4a from saved patch)
+- 2026-11-12T11:42:08.939Z claude: T-0121 → in_progress
+- 2026-11-12T11:46:01.131Z claude: T-0121 → verifying
+- 2026-11-12T11:53:57.809Z claude: release T-0121 → review (verify exit 0 at 6b2c4ce (15 PASS, gate 8 pending); security CI green at e15a4d0; awaiting codex cross-review of claude changes 4489329 + 6b2c4ce)
+- 2026-11-12T23:54:13.935Z claude: T-0061 → verifying
+- 2026-11-13T00:09:09.766Z claude: release T-0061 → review (verify 14 PASS at 11fe581; 2c/4 branch-wide (T-0128, owner merge); awaiting codex cross-review)
+- 2026-11-13T00:14:49.931Z claude: T-0041 → verifying
+- 2026-11-13T00:26:54.778Z claude: release T-0041 → review (verify 13 PASS at a487310; 2c/4 branch-wide; needs fresh codex review (prior codex review predates repairs))
+- 2026-11-13T00:35:47.105Z claude: T-0068 → verifying
+- 2026-11-13T00:47:44.225Z claude: release T-0068 → review (verify 14 PASS at 2344e0e; 2c/4 branch-wide; awaiting codex cross-review)
+- 2026-11-13T00:58:26.005Z claude: T-0075 → verifying
+- 2026-11-13T01:11:12.356Z claude: release T-0075 → review (verify 14 PASS at df9e094; 2c/4 branch-wide; awaiting codex cross-review)
+- 2026-11-13T01:18:05.630Z claude: T-0078 → verifying
+- 2026-11-13T01:33:48.181Z claude: release T-0078 → review (verify at ae59dc2; 2c/4 branch-wide (DL-0405); awaiting codex cross-review)

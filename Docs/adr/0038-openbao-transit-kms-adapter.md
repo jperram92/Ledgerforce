@@ -1,7 +1,7 @@
 ---
 adr: 0038
 title: "OpenBao/Vault transit KMS adapter: derived-key context binds the record, 60-byte wrapped key with versioned key id, HTTPS-only fetch with no redirects, strict key policy"
-status: Proposed
+status: Accepted
 date: 2026-10-26
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0038: OpenBao/Vault transit KMS adapter
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, waiting for product-owner acceptance. It adds the second `Kms`
 adapter that ADR-0018 named as a consequence ("an OpenBao/Vault transit adapter over HTTP, so no

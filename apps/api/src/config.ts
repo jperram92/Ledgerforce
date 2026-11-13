@@ -11,6 +11,7 @@
 import {
   ConfigError,
   databaseUrlFromEnv,
+  readSecret,
   requireEnv,
   requireSecret,
   type Env,
@@ -75,5 +76,28 @@ export function apiOptionsFromEnv(
       allowInsecureIssuer: issuer.insecure,
     };
   }
+  const webhook = stripeWebhook(env, readFile);
+  if (webhook) opts.stripeWebhook = webhook;
   return opts;
+}
+
+/**
+ * Stripe webhook signing (ADR-0049): LF_STRIPE_WEBHOOK_SECRET[_FILE], comma-separated `whsec_…`
+ * values during a secret roll, and LF_STRIPE_MODE (`test` by default). Unset: the route answers 503.
+ */
+function stripeWebhook(
+  env: Env,
+  readFile: ReadFile,
+): { secrets: string[]; mode: 'test' | 'live' } | undefined {
+  const raw = readSecret(env, 'LF_STRIPE_WEBHOOK_SECRET', readFile);
+  if (raw === undefined || raw === '') return undefined;
+  const secrets = raw.split(',').map((s) => s.trim());
+  if (secrets.some((s) => !/^whsec_\S+$/.test(s))) {
+    throw new ConfigError('LF_STRIPE_WEBHOOK_SECRET must be one or more whsec_… values');
+  }
+  const mode = env['LF_STRIPE_MODE'] ?? 'test';
+  if (mode !== 'test' && mode !== 'live') {
+    throw new ConfigError('LF_STRIPE_MODE must be test or live');
+  }
+  return { secrets, mode };
 }

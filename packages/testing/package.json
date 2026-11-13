@@ -7,6 +7,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./evidence": "./src/evidence/index.ts",
+    "./evidence/manifest": "./src/evidence/manifest.ts",
     "./eslint-rules": "./eslint-rules/index.ts"
   },
   "scripts": {

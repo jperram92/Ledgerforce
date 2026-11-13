@@ -74,7 +74,7 @@ const done = {
   payroll: [] as string[],
 };
 
-@Controller('ap/payment-batches')
+@Controller('test/ap/payment-batches')
 class TestPaymentBatchController {
   @Post(':batchId/release')
   @HttpCode(200)
@@ -235,7 +235,7 @@ async function stepUpAtIdp(
   session: string,
   who: Who,
   how: IdpLogin = {},
-  query = '?max_age=300&return_to=/ap/payment-batches',
+  query = '?max_age=300&return_to=/test/ap/payment-batches',
 ): Promise<StepUp> {
   const start = await beginStepUp(session, query);
   expect(start.status).toBe(302);
@@ -498,7 +498,7 @@ describe('SS-UC06-03: Release requires step-up MFA', () => {
     const session = await login('apr', { amr: ['pwd', 'otp'] });
     now += 6 * MIN; // the login is now older than the release's 300-second maximum age
     const mark = await auditMark();
-    const refused = await call('POST', '/ap/payment-batches/oct-2026/release', session);
+    const refused = await call('POST', '/test/ap/payment-batches/oct-2026/release', session);
     expect(refused.status).toBe(401);
     expect(await refused.json()).toEqual({ error: 'step_up_required', max_age: 300 });
     expect(done.releases).not.toContain('oct-2026');
@@ -508,16 +508,16 @@ describe('SS-UC06-03: Release requires step-up MFA', () => {
         action: 'step_up_required',
         entity_type: 'session',
         entity_id: sessionIdOf(session),
-        after: { method: 'POST', route: '/ap/payment-batches/:batchId/release', max_age: 300 },
+        after: { method: 'POST', route: '/test/ap/payment-batches/:batchId/release', max_age: 300 },
       }),
     ]);
 
     const s = await stepUpAtIdp(session, 'apr');
     const back = await finishStepUp(s, session);
     expect(back.status).toBe(303);
-    expect(back.headers.get('location')).toBe('/ap/payment-batches');
+    expect(back.headers.get('location')).toBe('/test/ap/payment-batches');
 
-    const ok = await call('POST', '/ap/payment-batches/oct-2026/release', session);
+    const ok = await call('POST', '/test/ap/payment-batches/oct-2026/release', session);
     expect(ok.status).toBe(200);
     expect(await ok.json()).toEqual({ batch_id: 'oct-2026', status: 'released' });
     expect(done.releases).toContain('oct-2026');
@@ -526,12 +526,14 @@ describe('SS-UC06-03: Release requires step-up MFA', () => {
   it('a fresh login without MFA is not a step-up: the Approver (no MFA needed to sign in) is refused', async () => {
     const session = await login('apr', { amr: ['pwd'], acr: PWD });
     expect((await call('GET', '/finance/company', session)).status).toBe(200);
-    const res = await call('POST', '/ap/payment-batches/nov-2026/release', session);
+    const res = await call('POST', '/test/ap/payment-batches/nov-2026/release', session);
     expect(res.status).toBe(401);
     expect(await res.json()).toEqual({ error: 'step_up_required', max_age: 300 });
     const s = await stepUpAtIdp(session, 'apr', { amr: ['pwd', 'otp'] });
     expect((await finishStepUp(s, session)).status).toBe(303);
-    expect((await call('POST', '/ap/payment-batches/nov-2026/release', session)).status).toBe(200);
+    expect((await call('POST', '/test/ap/payment-batches/nov-2026/release', session)).status).toBe(
+      200,
+    );
   });
 
   it('the step-up lasts its maximum age: 301 seconds later the release is refused again', async () => {
@@ -540,9 +542,11 @@ describe('SS-UC06-03: Release requires step-up MFA', () => {
     const s = await stepUpAtIdp(session, 'apr');
     expect((await finishStepUp(s, session)).status).toBe(303);
     now += 300_000;
-    expect((await call('POST', '/ap/payment-batches/dec-2026/release', session)).status).toBe(200);
+    expect((await call('POST', '/test/ap/payment-batches/dec-2026/release', session)).status).toBe(
+      200,
+    );
     now += 1000;
-    const res = await call('POST', '/ap/payment-batches/dec-2026/release', session);
+    const res = await call('POST', '/test/ap/payment-batches/dec-2026/release', session);
     expect(res.status).toBe(401);
     expect(await res.json()).toEqual({ error: 'step_up_required', max_age: 300 });
   });
@@ -593,7 +597,7 @@ describe('SS-PLAT-58: Step-up re-authenticates on the existing session', () => {
     const mark = await auditMark();
     const res = await finishStepUp(s, session);
     expect(res.status).toBe(303);
-    expect(res.headers.get('location')).toBe('/ap/payment-batches');
+    expect(res.headers.get('location')).toBe('/test/ap/payment-batches');
     expect(cookieValue(res, 'lf_session')).toBeUndefined();
     expect(cookieValue(res, 'lf_oidc')).toBe(''); // pre-auth cookie cleared
     expect(await sessionCount()).toBe(count);
@@ -657,7 +661,7 @@ describe('SS-PLAT-59: Step-up fails closed', () => {
         after: { reason: 'step_up_mismatch' },
       }),
     ]);
-    expect((await call('POST', '/ap/payment-batches/x1/release', session)).status).toBe(401);
+    expect((await call('POST', '/test/ap/payment-batches/x1/release', session)).status).toBe(401);
   });
 
   it('a step-up without MFA is refused (403 mfa_required) and does not touch the session', async () => {
@@ -727,7 +731,7 @@ describe('SS-PLAT-59: Step-up fails closed', () => {
 
   it('a session without a recorded auth_time never satisfies a step-up', async () => {
     const session = await directSession(PEOPLE.apr.id, ['pwd', 'otp'], null);
-    const res = await call('POST', '/ap/payment-batches/x2/release', session);
+    const res = await call('POST', '/test/ap/payment-batches/x2/release', session);
     expect(res.status).toBe(401);
     expect(await res.json()).toEqual({ error: 'step_up_required', max_age: 300 });
   });
@@ -762,7 +766,7 @@ describe('SS-PLAT-59: Step-up fails closed', () => {
 
   it('permission comes before step-up: a user without the permission gets 403 forbidden, not a step-up prompt', async () => {
     const session = await login('arc', { amr: ['pwd'], acr: PWD });
-    const res = await call('POST', '/ap/payment-batches/x3/release', session);
+    const res = await call('POST', '/test/ap/payment-batches/x3/release', session);
     expect(res.status).toBe(403);
     expect(await res.json()).toEqual({
       error: 'forbidden',

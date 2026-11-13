@@ -419,6 +419,40 @@ export interface ProductTable {
 }
 
 /** Migration 0035 (T-0040): sales invoice; frozen once posted. */
+/** Migration 0061 (T-0078): a completed month-end close checklist step (UC-10). Insert-only. */
+export interface CloseChecklistStepTable {
+  tenant_id: TenantId;
+  company_id: string;
+  period_id: string;
+  step: 'ar_lock' | 'ap_lock' | 'bank_recs' | 'accruals' | 'tb_review' | 'soft_close' | 'hard_lock';
+  completed_by: string;
+  completed_at: Timestamp;
+  period_status: 'open' | 'ar_locked' | 'ap_locked' | 'soft_closed' | 'hard_locked';
+  detail: ColumnType<unknown, string | undefined, never>;
+}
+
+/** Migration 0059 (T-0068): overdue reminder steps per company (UC-04). Steps are disabled, never deleted. */
+export interface ArReminderScheduleTable {
+  tenant_id: TenantId;
+  company_id: string;
+  step: number;
+  days_overdue: number;
+  enabled: Generated<boolean>;
+  created_at: Timestamp;
+}
+
+/** Migration 0059 (T-0068): overdue reminder log, one row per invoice and step. Insert-only. */
+export interface ArReminderTable {
+  tenant_id: TenantId;
+  company_id: string;
+  invoice_id: string;
+  step: number;
+  run_date: ColumnType<Date, string, never>;
+  days_overdue: number;
+  amount_due: string;
+  created_at: Timestamp;
+}
+
 export interface SalesInvoiceTable {
   id: Generated<string>;
   tenant_id: TenantId;
@@ -446,6 +480,10 @@ export interface SalesInvoiceTable {
   billing_format_id: Generated<string | null>;
   /** Migration 0042 (T-0047): deposit invoices credit CUSTOMER_PREPAYMENTS. */
   kind: Generated<'standard' | 'deposit'>;
+  /** Migration 0051 (T-0074): the Salesforce Opportunity this invoice bills. */
+  salesforce_opportunity_id: Generated<string | null>;
+  /** Migration 0052 (T-0069): document note, e.g. the lock-date policy moved the date. */
+  note: Generated<string | null>;
 }
 
 /** Migration 0042 (T-0047): prepayment received before an invoice (GP-020). */
@@ -564,6 +602,89 @@ export interface EmailDeliveryTable {
   sent_at: Timestamp;
 }
 
+/** Migration 0049 (T-0073, RQ-0115): Stripe Payment Link per invoice and amount due. */
+export interface StripePaymentLinkTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  invoice_id: string;
+  amount_due: Numeric;
+  currency: string;
+  stripe_id: string;
+  url: string;
+  livemode: boolean;
+  idempotency_key: string;
+  status: Generated<'active' | 'deactivated'>;
+  created_at: Generated<Date>;
+  deactivated_at: Date | null;
+}
+
+/** Migration 0051 (T-0074): Stripe connector settings per company (postings Q2). */
+export interface StripeSettingsTable {
+  tenant_id: TenantId;
+  company_id: string;
+  clearing_account_id: string;
+  /** Migration 0060 (T-0075): Stripe fees expense account (GP-027). */
+  fee_account_id: Generated<string | null>;
+  /** Migration 0060 (T-0075): the bank GL account payouts arrive in (GP-027). */
+  payout_account_id: Generated<string | null>;
+  /** Migration 0060 (T-0075): the Stripe supplier party named on the fee line (GP-027). */
+  stripe_party_id: Generated<string | null>;
+  updated_at: Generated<Date>;
+}
+
+/** Migration 0060 (T-0075): a Stripe payout and its GP-027 entry; insert-only. */
+export interface StripePayoutTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  stripe_payout_id: string;
+  arrival_date: ColumnType<Date, string, never>;
+  currency: string;
+  amount: string;
+  gross: string;
+  fee: string;
+  fee_gst: string;
+  gst_evidence: Generated<'pending_tax_invoice'>;
+  entry_id: string;
+  created_at: Timestamp;
+}
+
+/** Migration 0051 (T-0074, ADR-0049): Stripe events acted on, stored once; insert-only. */
+export interface StripeWebhookEventTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  event_id: string;
+  event_type: 'payment_intent.succeeded';
+  livemode: boolean;
+  event_created_at: Date;
+  payment_intent_id: string;
+  invoice_id: string;
+  amount: Numeric;
+  currency: string;
+  receipt_id: string;
+  received_at: Generated<Date>;
+}
+
+/** Migration 0051 (T-0074): customer-credit refund sent to Stripe (GP-006 Stripe variant). */
+export interface StripeRefundTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  credit_note_id: string;
+  payment_intent_id: string;
+  amount: Numeric;
+  currency: string;
+  refund_date: ColumnType<Date, string, never>;
+  stripe_refund_id: string;
+  stripe_status: 'pending' | 'requires_action' | 'succeeded';
+  idempotency_key: string;
+  entry_id: string;
+  created_by: string | null;
+  created_at: Generated<Date>;
+}
+
 /** Migration 0036 (T-0041, design §4.3): billing format template record. */
 export interface BillingFormatTable {
   id: Generated<string>;
@@ -667,6 +788,191 @@ export interface ArSettingsTable {
   /** Migration 0043 (T-0048). */
   ecl_allowance_account_id: Generated<string | null>;
   bad_debt_account_id: Generated<string | null>;
+}
+
+/** Migration 0045 (T-0051): inbound bill email — the draft bill awaiting coding. */
+export interface BillInboxItemTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  message_id: string;
+  raw_sha256: string;
+  from_address: string | null;
+  subject: string | null;
+  party_id: string | null;
+  status: Generated<'new' | 'no_attachment' | 'coded' | 'rejected'>;
+  bill_id: string | null;
+  received_at: Timestamp;
+}
+
+export interface DocumentAttachmentTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  owner_type: 'bill_inbox_item' | 'supplier_bill';
+  owner_id: string;
+  file_name: string;
+  content_type: 'application/pdf';
+  size_bytes: number;
+  sha256: string;
+  content: Buffer;
+  created_at: Timestamp;
+}
+
+/** Migration 0044 (T-0050): supplier bill; frozen once posted. */
+export interface SupplierBillTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  status: Generated<'draft' | 'posted' | 'void'>;
+  bill_no: string | null;
+  supplier_ref: string;
+  bill_date: ColumnType<Date, string, string>;
+  due_date: ColumnType<Date, string, string>;
+  currency: string;
+  net_total: string;
+  tax_total: string;
+  gross_total: string;
+  created_by: string | null;
+  approved_by: string | null;
+  approved_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+  entry_id: string | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+  /** Migration 0046 (T-0052): submitted for approval. */
+  submitted_by: Generated<string | null>;
+  submitted_at: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+}
+
+/** Migration 0047 (T-0054): supplier payment batches. */
+export interface PaymentBatchTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: string;
+  batch_no: string;
+  payment_date: ColumnType<Date, string, string>;
+  due_by: ColumnType<Date, string, string>;
+  account_id: string;
+  currency: string;
+  total: string;
+  payment_count: number;
+  status: Generated<'draft' | 'partially_released' | 'released' | 'cancelled'>;
+  created_by: string | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
+export interface PaymentBatchItemTable {
+  tenant_id: TenantId;
+  company_id: string;
+  batch_id: string;
+  line_no: number;
+  bill_id: string;
+  party_id: string;
+  amount: string;
+  bank_account_id: string | null;
+  excluded_reason: 'BANK_DETAILS_COOLING_OFF' | 'NO_VERIFIED_BANK_DETAILS' | null;
+  payable_from: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+}
+
+export interface PaymentBatchReleaseTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  batch_id: string;
+  released_by: string | null;
+  released_at: Timestamp;
+}
+
+export interface PaymentBatchConfirmationTable {
+  tenant_id: TenantId;
+  company_id: string;
+  batch_id: string;
+  /** GP-009 entry; for a batch of customer refunds only, its first refund's GP-006 entry (0049). */
+  entry_id: string;
+  confirmed_on: ColumnType<Date, string, string>;
+  bank_reference: string | null;
+  confirmed_by: string | null;
+  confirmed_at: Timestamp;
+}
+
+/** Migration 0058 (T-0080): opening balance at conversion (GP-037). Insert-only. */
+export interface OpeningBalanceTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  conversion_date: ColumnType<Date, string, never>;
+  balance_date: ColumnType<Date, string, never>;
+  entry_id: string;
+  idempotency_key: string;
+  created_by: string | null;
+  created_at: Timestamp;
+}
+
+/** Migration 0058 (T-0080): an open AR/AP document behind one opening control line. Insert-only. */
+export interface OpeningBalanceItemTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  opening_balance_id: string;
+  kind: 'ar' | 'ap';
+  line_no: number;
+  party_id: string;
+  document_no: string;
+  document_date: ColumnType<Date, string, never>;
+  due_date: ColumnType<Date, string, never>;
+  amount: string;
+  gst_amount: Generated<string>;
+}
+
+/** Migration 0055 (T-0055): customer refunds (GP-006). */
+export interface CustomerRefundTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: string;
+  refund_no: string;
+  party_id: string;
+  refund_date: ColumnType<Date, string, string>;
+  amount: string;
+  currency: string;
+  method: 'bank_batch' | 'stripe';
+  reason: string | null;
+  status: Generated<'requested' | 'paid' | 'cancelled'>;
+  entry_id: string | null;
+  paid_on: ColumnType<Date | null, string | null | undefined, string | null>;
+  created_by: string | null;
+  created_at: Timestamp;
+  updated_at: Timestamp;
+}
+
+/** Migration 0055 (T-0055): a customer refund paid (or excluded) in a payment batch. */
+export interface PaymentBatchRefundTable {
+  tenant_id: TenantId;
+  company_id: string;
+  batch_id: string;
+  line_no: number;
+  refund_id: string;
+  party_id: string;
+  amount: string;
+  bank_account_id: string | null;
+  excluded_reason: 'BANK_DETAILS_COOLING_OFF' | 'NO_VERIFIED_BANK_DETAILS' | null;
+  payable_from: ColumnType<Date | null, Date | string | null | undefined, Date | string | null>;
+}
+
+export interface SupplierBillLineTable {
+  tenant_id: TenantId;
+  company_id: string;
+  bill_id: string;
+  line_no: number;
+  account_id: string;
+  description: string;
+  amount: string;
+  tax_code: string;
+  tax_code_id: string | null;
+  net: string | null;
+  tax: string | null;
+  gross: string | null;
 }
 
 /** Migration 0043 (T-0048): written write-off record (GP-024). */
@@ -942,17 +1248,37 @@ export interface Database {
   'app.salesforce_profile_mapping': SalesforceProfileMappingTable;
   'app.posting_profile_override': PostingProfileOverrideTable;
   'app.sales_invoice': SalesInvoiceTable;
+  'app.ar_reminder_schedule': ArReminderScheduleTable;
+  'app.ar_reminder': ArReminderTable;
+  'app.close_checklist_step': CloseChecklistStepTable;
   'app.sales_invoice_line': SalesInvoiceLineTable;
   'app.ar_settings': ArSettingsTable;
   'app.credit_note': CreditNoteTable;
   'app.customer_receipt': CustomerReceiptTable;
   'app.bad_debt_write_off': BadDebtWriteOffTable;
+  'app.supplier_bill': SupplierBillTable;
+  'app.payment_batch': PaymentBatchTable;
+  'app.payment_batch_item': PaymentBatchItemTable;
+  'app.payment_batch_release': PaymentBatchReleaseTable;
+  'app.payment_batch_confirmation': PaymentBatchConfirmationTable;
+  'app.customer_refund': CustomerRefundTable;
+  'app.opening_balance': OpeningBalanceTable;
+  'app.opening_balance_item': OpeningBalanceItemTable;
+  'app.payment_batch_refund': PaymentBatchRefundTable;
+  'app.supplier_bill_line': SupplierBillLineTable;
+  'app.bill_inbox_item': BillInboxItemTable;
+  'app.document_attachment': DocumentAttachmentTable;
   'app.customer_prepayment': CustomerPrepaymentTable;
   'app.prepayment_application': PrepaymentApplicationTable;
   'app.sales_invoice_deposit': SalesInvoiceDepositTable;
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;
+  'app.stripe_payment_link': StripePaymentLinkTable;
+  'app.stripe_settings': StripeSettingsTable;
+  'app.stripe_payout': StripePayoutTable;
+  'app.stripe_webhook_event': StripeWebhookEventTable;
+  'app.stripe_refund': StripeRefundTable;
   'app.billing_line': BillingLineTable;
   'app.billing_batch': BillingBatchTable;
   'app.billing_batch_item': BillingBatchItemTable;

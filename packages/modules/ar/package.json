@@ -21,6 +21,7 @@
     "kysely": "0.29.7"
   },
   "devDependencies": {
+    "@ledgerforce/connector-salesforce": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
     "@types/node": "22.20.5",
     "vitest": "4.1.12"

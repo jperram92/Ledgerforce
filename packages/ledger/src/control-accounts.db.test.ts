@@ -132,9 +132,12 @@ describe('SS-PLAT-07: Control accounts reject manual journals, imports and rule 
       }
     }
     // AR: 9 AR-class types (8 + ar_recovery); AP: ap_bill, ap_payment; payroll: pay run, net-pay
-    // batch, super payment, SGC assessment (DL-0136, DL-0258). 24 non-reversal source types.
-    expect(accepted).toBe(2 * (9 + 2 + 4));
-    expect(refusedCount).toBe(2 * (3 * 24 - 15));
+    // batch, super payment, SGC assessment (DL-0136, DL-0258); plus the opening balance at
+    // conversion on AR and AP, whose control lines are the open items (GP-037, DL-0314).
+    // 25 non-reversal source types.
+    expect(accepted).toBe(2 * (9 + 2 + 4 + 2));
+    expect(refusedCount).toBe(2 * (3 * 25 - 17));
+    expect(controlAccountAccepts('PAYROLL_CLEARING', 'ledger_opening_balance')).toBe(false);
     // manual_journal is never among the accepted ones.
     for (const role of CONTROL_ROLES) {
       expect(controlAccountAccepts(role, 'manual_journal')).toBe(false);

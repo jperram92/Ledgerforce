@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41115
+ ❯ |db| packages/connectors/stripe/src/payout.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/connectors/stripe/src/payout.db.test.ts [ packages/connectors/stripe/src/payout.db.test.ts ]
+Error: Cannot find module './payout.ts' imported from /home/user/Ledgerforce/packages/connectors/stripe/src/payout.db.test.ts
+ ❯ packages/connectors/stripe/src/payout.db.test.ts:14:1
+     12| import { sql } from 'kysely';
+     13| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     14| import {
+       | ^
+     15|   processStripePayout,
+     16|   StripePayoutError,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  00:50:42
+   Duration  1.54s (transform 457ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

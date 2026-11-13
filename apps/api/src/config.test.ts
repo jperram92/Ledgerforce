@@ -120,3 +120,44 @@ describe('SS-PLAT-86 API configuration from the environment', () => {
     expect(o.sessions).toEqual({});
   });
 });
+
+describe('T-0074 Stripe webhook signing secret from the environment (ADR-0049)', () => {
+  const secretFiles: Record<string, string> = {
+    ...files,
+    '/run/secrets/stripe_webhook_secret': 'whsec_new,whsec_old\n',
+  };
+  const read = (p: string): string => {
+    const v = secretFiles[p];
+    if (v === undefined) throw new Error(`ENOENT ${p}`);
+    return v;
+  };
+
+  it('SS-UC03-06 no secret configured: the webhook route stays off (503), never unverified', () => {
+    expect(apiOptionsFromEnv(base, read).stripeWebhook).toBeUndefined();
+  });
+
+  it('SS-UC03-06 secrets from a file, comma-separated during a roll; test mode unless LF_STRIPE_MODE=live', () => {
+    const o = apiOptionsFromEnv(
+      { ...base, LF_STRIPE_WEBHOOK_SECRET_FILE: '/run/secrets/stripe_webhook_secret' },
+      read,
+    );
+    expect(o.stripeWebhook).toEqual({ secrets: ['whsec_new', 'whsec_old'], mode: 'test' });
+    const live = apiOptionsFromEnv(
+      { ...base, LF_STRIPE_WEBHOOK_SECRET: 'whsec_x', LF_STRIPE_MODE: 'live' },
+      read,
+    );
+    expect(live.stripeWebhook).toEqual({ secrets: ['whsec_x'], mode: 'live' });
+  });
+
+  it('SS-UC03-06 a secret that is not whsec_… or a bad mode is refused at start-up', () => {
+    expect(() =>
+      apiOptionsFromEnv({ ...base, LF_STRIPE_WEBHOOK_SECRET: 'sk_test_x' }, read),
+    ).toThrow(/LF_STRIPE_WEBHOOK_SECRET/);
+    expect(() =>
+      apiOptionsFromEnv(
+        { ...base, LF_STRIPE_WEBHOOK_SECRET: 'whsec_x', LF_STRIPE_MODE: 'prod' },
+        read,
+      ),
+    ).toThrow(/LF_STRIPE_MODE/);
+  });
+});

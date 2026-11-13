@@ -1,0 +1,6 @@
+
+Running 1 test using 1 worker
+
+  ✓  1 [chromium] › tests/e2e/documents/invoice-pdf.spec.ts:54:1 › SS-PLAT-104 the rendered GP-001 invoice PDF shows number, ABN, GST 125.00 and total 1,375.00 on one A4 page [T-0041] (662ms)
+
+  1 passed (1.8s)

@@ -1,0 +1,16 @@
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90m/var/tmp/ledgerforce-t0057-review-20261107/repo[39m
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:45137
+[db] test PostgreSQL ready (local) on 127.0.0.1:34015
+(node:497) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ [32m✓[39m [30m[43m api-db [49m[39m apps/api/src/ap/payment-confirmation.db.test.ts [2m([22m[2m7 tests[22m[2m)[22m[33m 2525[2mms[22m[39m
+     [33m[2m✓[22m[39m SS-UC06-07 a releaser records the bank confirmation: GP-009 posts once with its outbox event, audited [33m 430[2mms[22m[39m
+ [32m✓[39m [30m[45m db [49m[39m packages/modules/ap/src/payment-confirmation.db.test.ts [2m([22m[2m12 tests[22m[2m)[22m[33m 2262[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m19 passed[39m[22m[90m (19)[39m
+[2m   Start at [22m 18:11:59
+[2m   Duration [22m 12.68s[2m (transform 1.99s, setup 0ms, import 5.13s, tests 4.79s, environment 0ms)[22m
+

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0078",
+  "entries": [
+    {
+      "scenario": "SS-UC08-06",
+      "file": ".agent/evidence/T-0078/20261113-011750-tests-db.json",
+      "test": "2 test(s): packages/modules/bank/src/reconciliation.db.test.ts › SS-UC08-06: Statement balance equals book balance › SS-UC08-06 with all November lines matched, statement closing balance = book balance and unreconciled = 0 | packages/modules/bank/src/reconciliation.db.test.ts › SS-UC08-06: Statement balance equals book balance › an outstanding book payment the bank has not cleared is listed and the adjusted balance still ties (December)",
+      "commit": "c86268cf15be",
+      "provider": "claude",
+      "timestamp": "2026-11-13T01:17:50.217Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-126",
+      "file": ".agent/evidence/T-0078/20261113-011750-tests-db.json",
+      "test": "2 test(s): packages/modules/bank/src/reconciliation.db.test.ts › SS-PLAT-126: A completed reconciliation locks its lines against unmatching › SS-PLAT-126 a statement that does not tie cannot be completed | packages/modules/bank/src/reconciliation.db.test.ts › SS-PLAT-126: A completed reconciliation locks its lines against unmatching › SS-PLAT-126 completing November records the figures; its lines can then no longer be unmatched",
+      "commit": "c86268cf15be",
+      "provider": "claude",
+      "timestamp": "2026-11-13T01:17:50.217Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-07",
+      "file": ".agent/evidence/T-0078/20261113-011750-tests-db.json",
+      "test": "1 test(s): packages/modules/bank/src/reconciliation.db.test.ts › SS-UC08-07: Reconciled lines locked after hard lock › SS-UC08-07 with November hard-locked, unmatching a November line is rejected; a December line can be unmatched",
+      "commit": "c86268cf15be",
+      "provider": "claude",
+      "timestamp": "2026-11-13T01:17:50.217Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-07",
+      "file": ".agent/evidence/T-0078/20261113-011750-tests-db.json",
+      "test": "2 test(s): packages/modules/bank/src/reconciliation.db.test.ts › SS-UC10-07: Close cannot pass with unreconciled bank › SS-UC10-07 with unreconciled December lines, marking \"bank recs complete\" is refused, listing the account | packages/modules/bank/src/reconciliation.db.test.ts › SS-UC10-07: Close cannot pass with unreconciled bank › the bank step passes for November, which the completed reconciliation covers",
+      "commit": "c86268cf15be",
+      "provider": "claude",
+      "timestamp": "2026-11-13T01:17:50.217Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC10-01",
+      "file": ".agent/evidence/T-0078/20261113-011750-tests-db.json",
+      "test": "5 test(s): packages/modules/reporting/src/close-checklist.db.test.ts › SS-UC10-01: Checklist steps recorded with user and time › the checklist lists the seven steps in order, none done | packages/modules/reporting/src/close-checklist.db.test.ts › SS-UC10-01: Checklist steps recorded with user and time › a step cannot be completed before the step before it | packages/modules/reporting/src/close-checklist.db.test.ts › SS-UC10-01: Checklist steps recorded with user and time › a user without period.lock cannot complete the AR lock step (nothing recorded) | packages/modules/reporting/src/close-checklist.db.test.ts › SS-UC10-01: Checklist steps recorded with user and time › SS-UC10-01 the Finance Admin completes each step; each stores user, timestamp and resulting period status | packages/modules/reporting/src/close-checklist.db.test.ts › SS-UC10-01: Checklist steps recorded with user and time › a completed step cannot be completed twice",
+      "commit": "c86268cf15be",
+      "provider": "claude",
+      "timestamp": "2026-11-13T01:17:50.217Z",
+      "result": "passed"
+    }
+  ]
+}

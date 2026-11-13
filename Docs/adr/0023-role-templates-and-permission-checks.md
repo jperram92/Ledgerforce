@@ -1,7 +1,7 @@
 ---
 adr: 0023
 title: "Role templates as code, tenant-scoped role assignments, and a fail-closed permission check on every endpoint"
-status: Proposed
+status: Accepted
 date: 2026-10-24
 author: claude
 category: security
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0023: Role templates as code, tenant-scoped role assignments, fail-closed permission checks
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, awaiting product-owner acceptance. T-0012 is built to this
 proposal so it can be judged on working, tested code. The role → permission matrix in

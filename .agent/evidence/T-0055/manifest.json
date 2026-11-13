@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0055",
+  "entries": [
+    {
+      "scenario": "SS-UC11-03",
+      "file": ".agent/evidence/T-0055/20261102-113049-tests-db.json",
+      "test": "5 test(s): packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-03: Refund via payment batch posts GP-006 › SS-UC11-03 the 220.00 credit refunded in a confirmed batch posts exactly GP-006 and the credit is cleared | packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-03: Refund via payment batch posts GP-006 › SS-UC11-03 a batch with a bill and a refund: GP-009 credits the bank for the bills, GP-006 for the refund; the ABA file pays both | packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-03: Refund via payment batch posts GP-006 › Q9: a customer whose bank details are cooling off is excluded with the reason; the refund stays requested | packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-03: Refund via payment batch posts GP-006 › Q9: a customer without verified bank details (customer-only party) is excluded with NO_VERIFIED_BANK_DETAILS | packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-03: Refund via payment batch posts GP-006 › a refund cannot exceed the customer credit, including refunds already requested",
+      "commit": "ab27ab614918-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T11:30:49.195Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-05",
+      "file": ".agent/evidence/T-0055/20261102-113049-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-05: Salesforce shows net amount paid › SS-UC11-05 after the confirmed refund the Opportunity write-back carries LF_Amount_Paid__c = 1,155.00",
+      "commit": "ab27ab614918-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T11:30:49.195Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-03",
+      "file": ".agent/evidence/T-0055/20261102-115518-tests-db.json",
+      "test": "5 test(s): packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-03: Refund via payment batch posts GP-006 › SS-UC11-03 the 220.00 credit refunded in a confirmed batch posts exactly GP-006 and the credit is cleared | packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-03: Refund via payment batch posts GP-006 › SS-UC11-03 a batch with a bill and a refund: GP-009 credits the bank for the bills, GP-006 for the refund; the ABA file pays both | packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-03: Refund via payment batch posts GP-006 › Q9: a customer whose bank details are cooling off is excluded with the reason; the refund stays requested | packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-03: Refund via payment batch posts GP-006 › Q9: a customer without verified bank details (customer-only party) is excluded with NO_VERIFIED_BANK_DETAILS | packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-03: Refund via payment batch posts GP-006 › a refund cannot exceed the customer credit, including refunds already requested",
+      "commit": "053ab895600c-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T11:55:18.062Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-05",
+      "file": ".agent/evidence/T-0055/20261102-115518-tests-db.json",
+      "test": "1 test(s): packages/modules/ap/src/customer-refund.db.test.ts › SS-UC11-05: Salesforce shows net amount paid › SS-UC11-05 after the confirmed refund the Opportunity write-back carries LF_Amount_Paid__c = 1,155.00",
+      "commit": "053ab895600c-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-02T11:55:18.062Z",
+      "result": "passed"
+    }
+  ]
+}

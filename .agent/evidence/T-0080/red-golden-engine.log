@@ -1,0 +1,56 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ab616a86226bcf702
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:45703
+ ❯ |db| packages/ledger/src/golden/golden-engine.db.test.ts (2 tests | 2 failed) 1240ms
+     × the tables that cannot be replayed yet are exactly the pinned PENDING list 13ms
+     × preview() reproduces every other Approved table line for line 313ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/ledger/src/golden/golden-engine.db.test.ts > SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay > the tables that cannot be replayed yet are exactly the pinned PENDING list
+AssertionError: expected [ 'GP-037' ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "GP-037",
++ ]
+
+ ❯ packages/ledger/src/golden/golden-engine.db.test.ts:174:40
+    172|       if (why) actual[`${t.entryId}${t.label}`] = why;
+    173|     }
+    174|     expect(Object.keys(actual).sort()).toEqual(Object.keys(PENDING).so…
+       |                                        ^
+    175|     for (const [k, why] of Object.entries(actual)) expect(why, k).toBe…
+    176|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |db| packages/ledger/src/golden/golden-engine.db.test.ts > SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay > preview() reproduces every other Approved table line for line
+AssertionError: expected 36 to be 37 // Object.is equality
+
+- Expected
++ Received
+
+- 37
++ 36
+
+ ❯ packages/ledger/src/golden/golden-engine.db.test.ts:213:22
+    211|       replayed += 1;
+    212|     }
+    213|     expect(replayed).toBe(tables.length - Object.keys(PENDING).length);
+       |                      ^
+    214|   }, 120_000);
+    215| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  16:38:53
+   Duration  3.75s (transform 604ms, setup 0ms, import 847ms, tests 1.24s, environment 0ms)
+

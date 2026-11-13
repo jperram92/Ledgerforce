@@ -1,0 +1,568 @@
+TAP version 13
+# Subtest: writeFileAtomic replaces content and leaves no temp files behind
+ok 1 - writeFileAtomic replaces content and leaves no temp files behind
+  ---
+  duration_ms: 2.482329
+  type: 'test'
+  ...
+# Subtest: a concurrent reader never sees a partial or empty file while writes are in progress
+ok 2 - a concurrent reader never sees a partial or empty file while writes are in progress
+  ---
+  duration_ms: 1570.670379
+  type: 'test'
+  ...
+# Subtest: loadCards reads only T-NNNN.md cards
+ok 3 - loadCards reads only T-NNNN.md cards
+  ---
+  duration_ms: 5.111879
+  type: 'test'
+  ...
+# Subtest: topoOrder respects depends_on, ties broken by id
+ok 4 - topoOrder respects depends_on, ties broken by id
+  ---
+  duration_ms: 1.124911
+  type: 'test'
+  ...
+# Subtest: nextClaimable picks first todo whose deps are done
+ok 5 - nextClaimable picks first todo whose deps are done
+  ---
+  duration_ms: 1.493664
+  type: 'test'
+  ...
+# Subtest: a claimed card with an expired lease is claimable again; an unexpired one is not
+ok 6 - a claimed card with an expired lease is claimable again; an unexpired one is not
+  ---
+  duration_ms: 6.321292
+  type: 'test'
+  ...
+# Subtest: lintBacklog passes on the fixture
+ok 7 - lintBacklog passes on the fixture
+  ---
+  duration_ms: 1.186697
+  type: 'test'
+  ...
+# Subtest: lintBacklog reports duplicate ids, missing deps, cycles, bad status, unknown scenarios, id/filename mismatch
+ok 8 - lintBacklog reports duplicate ids, missing deps, cycles, bad status, unknown scenarios, id/filename mismatch
+  ---
+  duration_ms: 1.556817
+  type: 'test'
+  ...
+# Subtest: lintBacklog skips the scenario check when the register does not exist
+ok 9 - lintBacklog skips the scenario check when the register does not exist
+  ---
+  duration_ms: 2.924535
+  type: 'test'
+  ...
+# Subtest: unmetDeps treats review as unmet by default and as met when satisfiedBy includes review
+ok 10 - unmetDeps treats review as unmet by default and as met when satisfiedBy includes review
+  ---
+  duration_ms: 0.894255
+  type: 'test'
+  ...
+# Subtest: a card in review is never offered to a builder by nextClaimable
+ok 11 - a card in review is never offered to a builder by nextClaimable
+  ---
+  duration_ms: 0.94386
+  type: 'test'
+  ...
+# Subtest: next prints the next claimable task in dependency order
+ok 12 - next prints the next claimable task in dependency order
+  ---
+  duration_ms: 329.535097
+  type: 'test'
+  ...
+# Subtest: claim writes the lease to card and state.json
+ok 13 - claim writes the lease to card and state.json
+  ---
+  duration_ms: 217.450441
+  type: 'test'
+  ...
+# Subtest: claim refuses: unknown provider, unmet deps, done task, missing task
+ok 14 - claim refuses: unknown provider, unmet deps, done task, missing task
+  ---
+  duration_ms: 715.033309
+  type: 'test'
+  ...
+# Subtest: claim refuses while another unexpired lease exists; allows takeover after expiry
+ok 15 - claim refuses while another unexpired lease exists; allows takeover after expiry
+  ---
+  duration_ms: 580.00595
+  type: 'test'
+  ...
+# Subtest: checkpoint commits work, records the sha, renews the lease and logs the step
+ok 16 - checkpoint commits work, records the sha, renews the lease and logs the step
+  ---
+  duration_ms: 365.866918
+  type: 'test'
+  ...
+# Subtest: checkpoint does not create an empty commit when nothing changed
+ok 17 - checkpoint does not create an empty commit when nothing changed
+  ---
+  duration_ms: 366.387304
+  type: 'test'
+  ...
+# Subtest: checkpoint refuses a task that is not claimed
+ok 18 - checkpoint refuses a task that is not claimed
+  ---
+  duration_ms: 324.264445
+  type: 'test'
+  ...
+# Subtest: release: blocked needs a reason; done/blocked/todo clear the lease
+ok 19 - release: blocked needs a reason; done/blocked/todo clear the lease
+  ---
+  duration_ms: 1109.183822
+  type: 'test'
+  ...
+# Subtest: handover writes the §10.5 template from state + card and keeps the Log
+ok 20 - handover writes the §10.5 template from state + card and keeps the Log
+  ---
+  duration_ms: 470.13467
+  type: 'test'
+  ...
+# Subtest: handover works with no active task and no git remote/network
+ok 21 - handover works with no active task and no git remote/network
+  ---
+  duration_ms: 276.051
+  type: 'test'
+  ...
+# Subtest: status prints state, lease, counts and next task
+ok 22 - status prints state, lease, counts and next task
+  ---
+  duration_ms: 283.295312
+  type: 'test'
+  ...
+# Subtest: lease-check lists expired leases with exit 1, none with exit 0
+ok 23 - lease-check lists expired leases with exit 1, none with exit 0
+  ---
+  duration_ms: 388.926009
+  type: 'test'
+  ...
+# Subtest: lint-backlog passes on the fixture and fails on a broken card
+ok 24 - lint-backlog passes on the fixture and fails on a broken card
+  ---
+  duration_ms: 273.326978
+  type: 'test'
+  ...
+# Subtest: unknown subcommand prints usage and exits 1; help exits 0
+ok 25 - unknown subcommand prints usage and exits 1; help exits 0
+  ---
+  duration_ms: 270.94557
+  type: 'test'
+  ...
+# Subtest: set-status moves through in-flight statuses keeping (and renewing) the lease
+ok 26 - set-status moves through in-flight statuses keeping (and renewing) the lease
+  ---
+  duration_ms: 930.751159
+  type: 'test'
+  ...
+# Subtest: release accepts verifying and review, clears the lease and keeps the builder
+ok 27 - release accepts verifying and review, clears the lease and keeps the builder
+  ---
+  duration_ms: 276.632629
+  type: 'test'
+  ...
+# Subtest: a card in review can only be claimed by the other provider; claimed_by stays the builder
+ok 28 - a card in review can only be claimed by the other provider; claimed_by stays the builder
+  ---
+  duration_ms: 548.410475
+  type: 'test'
+  ...
+# Subtest: parseFrontmatter splits data and body
+ok 29 - parseFrontmatter splits data and body
+  ---
+  duration_ms: 6.730365
+  type: 'test'
+  ...
+# Subtest: parseFrontmatter rejects files without frontmatter
+ok 30 - parseFrontmatter rejects files without frontmatter
+  ---
+  duration_ms: 0.509676
+  type: 'test'
+  ...
+# Subtest: updateFrontmatter replaces in place, keeps comments and body, appends new keys
+ok 31 - updateFrontmatter replaces in place, keeps comments and body, appends new keys
+  ---
+  duration_ms: 0.9057
+  type: 'test'
+  ...
+# Subtest: updateFrontmatter quotes values that need it
+ok 32 - updateFrontmatter quotes values that need it
+  ---
+  duration_ms: 0.250373
+  type: 'test'
+  ...
+# Subtest: explicit ancestor approval allows exactly the approved content [T-0121]
+ok 33 - explicit ancestor approval allows exactly the approved content [T-0121]
+  ---
+  duration_ms: 188.418905
+  type: 'test'
+  ...
+# Subtest: approval does not allow an amount mutation or trailing content [T-0121]
+ok 34 - approval does not allow an amount mutation or trailing content [T-0121]
+  ---
+  duration_ms: 114.47223
+  type: 'test'
+  ...
+# Subtest: a missing protected file fails even when changedFiles excludes deletion [T-0121]
+ok 35 - a missing protected file fails even when changedFiles excludes deletion [T-0121]
+  ---
+  duration_ms: 104.320469
+  type: 'test'
+  ...
+# Subtest: missing decision evidence and malformed commit fail closed [T-0121]
+ok 36 - missing decision evidence and malformed commit fail closed [T-0121]
+  ---
+  duration_ms: 87.504038
+  type: 'test'
+  ...
+# Subtest: approval from an unrelated branch is not evidence for this HEAD [T-0121]
+ok 37 - approval from an unrelated branch is not evidence for this HEAD [T-0121]
+  ---
+  duration_ms: 71.315323
+  type: 'test'
+  ...
+# Subtest: malformed registry fails even when there are no accounting changes [T-0121]
+ok 38 - malformed registry fails even when there are no accounting changes [T-0121]
+  ---
+  duration_ms: 65.50941
+  type: 'test'
+  ...
+# Subtest: duplicate paths, traversal paths, and unknown schema versions fail [T-0121]
+ok 39 - duplicate paths, traversal paths, and unknown schema versions fail [T-0121]
+  ---
+  duration_ms: 73.274108
+  type: 'test'
+  ...
+# Subtest: an approved file outside the registry is still rejected [T-0121]
+ok 40 - an approved file outside the registry is still rejected [T-0121]
+  ---
+  duration_ms: 105.3582
+  type: 'test'
+  ...
+# Subtest: a new snapshot cannot recycle an earlier decision to approve changed amounts [T-0121]
+ok 41 - a new snapshot cannot recycle an earlier decision to approve changed amounts [T-0121]
+  ---
+  duration_ms: 69.782219
+  type: 'test'
+  ...
+# Subtest: records cannot override the existing protection of Approved content on main [T-0121]
+ok 42 - records cannot override the existing protection of Approved content on main [T-0121]
+  ---
+  duration_ms: 116.71874
+  type: 'test'
+  ...
+# Subtest: missing parent evidence cannot be treated as proof that a decision is new [T-0121]
+ok 43 - missing parent evidence cannot be treated as proof that a decision is new [T-0121]
+  ---
+  duration_ms: 74.481941
+  type: 'test'
+  ...
+# Subtest: verifying permits explicitly marked current and later workflow steps [T-0010]
+ok 44 - verifying permits explicitly marked current and later workflow steps [T-0010]
+  ---
+  duration_ms: 33.303334
+  type: 'test'
+  ...
+# Subtest: review requires completed verification but permits review and finish [T-0010]
+ok 45 - review requires completed verification but permits review and finish [T-0010]
+  ---
+  duration_ms: 86.121214
+  type: 'test'
+  ...
+# Subtest: done requires every workflow step completed [T-0010]
+ok 46 - done requires every workflow step completed [T-0010]
+  ---
+  duration_ms: 58.225065
+  type: 'test'
+  ...
+# Subtest: implementation and unmarked steps remain mandatory during verification [T-0010]
+ok 47 - implementation and unmarked steps remain mandatory during verification [T-0010]
+  ---
+  duration_ms: 60.06044
+  type: 'test'
+  ...
+# Subtest: unknown and non-terminal phase markers cannot waive a step [T-0010]
+ok 48 - unknown and non-terminal phase markers cannot waive a step [T-0010]
+  ---
+  duration_ms: 57.682315
+  type: 'test'
+  ...
+# Subtest: run --dry-run prints the provider commands in failover order and changes nothing
+ok 49 - run --dry-run prints the provider commands in failover order and changes nothing
+  ---
+  duration_ms: 505.867071
+  type: 'test'
+  ...
+# Subtest: run --dry-run honours configured args and --task
+ok 50 - run --dry-run honours configured args and --task
+  ---
+  duration_ms: 574.715752
+  type: 'test'
+  ...
+# Subtest: FAILOVER: claude hits a credit/quota error, codex resumes on the same branch and finishes
+ok 51 - FAILOVER: claude hits a credit/quota error, codex resumes on the same branch and finishes
+  ---
+  duration_ms: 1266.215959
+  type: 'test'
+  ...
+# Subtest: a provider that is still exhausted is skipped on the next run
+ok 52 - a provider that is still exhausted is skipped on the next run
+  ---
+  duration_ms: 1882.415094
+  type: 'test'
+  ...
+# Subtest: all providers out of quota → exit 3, work saved, handover written, lease released
+ok 53 - all providers out of quota → exit 3, work saved, handover written, lease released
+  ---
+  duration_ms: 1049.792529
+  type: 'test'
+  ...
+# Subtest: non-quota failures rotate providers and block the task after max_attempts_per_task
+ok 54 - non-quota failures rotate providers and block the task after max_attempts_per_task
+  ---
+  duration_ms: 1343.453566
+  type: 'test'
+  ...
+# Subtest: missed heartbeat (lease expiry) kills the provider and fails over
+ok 55 - missed heartbeat (lease expiry) kills the provider and fails over
+  ---
+  duration_ms: 4107.997192
+  type: 'test'
+  ...
+# Subtest: agent marking the task blocked stops the loop with a notification
+ok 56 - agent marking the task blocked stops the loop with a notification
+  ---
+  duration_ms: 662.828285
+  type: 'test'
+  ...
+# Subtest: daily budget: a provider whose run logs today exceed daily_usd is skipped
+ok 57 - daily budget: a provider whose run logs today exceed daily_usd is skipped
+  ---
+  duration_ms: 701.33892
+  type: 'test'
+  ...
+# Subtest: run with nothing to do exits 0
+ok 58 - run with nothing to do exits 0
+  ---
+  duration_ms: 125.49766
+  type: 'test'
+  ...
+# Subtest: run without --once keeps working the backlog until empty
+ok 59 - run without --once keeps working the backlog until empty
+  ---
+  duration_ms: 1693.134205
+  type: 'test'
+  ...
+# Subtest: run routes a card in review to the provider that did NOT build it
+ok 60 - run routes a card in review to the provider that did NOT build it
+  ---
+  duration_ms: 1034.326027
+  type: 'test'
+  ...
+# Subtest: review with only the builder available → exit 3, never self-review
+ok 61 - review with only the builder available → exit 3, never self-review
+  ---
+  duration_ms: 156.48809
+  type: 'test'
+  ...
+# Subtest: builder handing the card to review counts as a successful session (not a failure)
+ok 62 - builder handing the card to review counts as a successful session (not a failure)
+  ---
+  duration_ms: 629.502693
+  type: 'test'
+  ...
+# Subtest: the real config matches the session-limit message that stopped a session, case-insensitively
+ok 63 - the real config matches the session-limit message that stopped a session, case-insensitively
+  ---
+  duration_ms: 2.888538
+  type: 'test'
+  ...
+# Subtest: classifyOutput: stdout and stderr, is_error/subtype from the final result
+ok 64 - classifyOutput: stdout and stderr, is_error/subtype from the final result
+  ---
+  duration_ms: 1.101691
+  type: 'test'
+  ...
+# Subtest: FAILOVER on the real session-limit message printed to stdout
+ok 65 - FAILOVER on the real session-limit message printed to stdout
+  ---
+  duration_ms: 970.456359
+  type: 'test'
+  ...
+# Subtest: commits: conductor — deferred checkpoints are committed by the conductor during and after the run
+ok 66 - commits: conductor — deferred checkpoints are committed by the conductor during and after the run
+  ---
+  duration_ms: 1215.37552
+  type: 'test'
+  ...
+# Subtest: checkpoint with LF_DEFER_COMMIT=1 records the step instead of touching .git
+ok 67 - checkpoint with LF_DEFER_COMMIT=1 records the step instead of touching .git
+  ---
+  duration_ms: 277.361814
+  type: 'test'
+  ...
+# Subtest: resume.sh prints every section of the context pack
+ok 68 - resume.sh prints every section of the context pack
+  ---
+  duration_ms: 599.888549
+  type: 'test'
+  ...
+# Subtest: resume.sh survives an empty directory that is not a git repo
+ok 69 - resume.sh survives an empty directory that is not a git repo
+  ---
+  duration_ms: 14.428429
+  type: 'test'
+  ...
+# Subtest: verify.sh --quick: unavailable gates are PENDING, not PASS, and do not fail
+ok 70 - verify.sh --quick: unavailable gates are PENDING, not PASS, and do not fail
+  ---
+  duration_ms: 477.992965
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the no-skip guard on skipped/focused tests
+ok 71 - verify.sh fails the no-skip guard on skipped/focused tests
+  ---
+  duration_ms: 379.484095
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the no-delete guard on a deleted tracked file (working tree, staged or committed)
+ok 72 - verify.sh fails the no-delete guard on a deleted tracked file (working tree, staged or committed)
+  ---
+  duration_ms: 916.155498
+  type: 'test'
+  ...
+# Subtest: verify.sh fails the secrets scan on a committed key pattern
+ok 73 - verify.sh fails the secrets scan on a committed key pattern
+  ---
+  duration_ms: 380.972287
+  type: 'test'
+  ...
+# Subtest: verify.sh fails backlog consistency on a broken card
+ok 74 - verify.sh fails backlog consistency on a broken card
+  ---
+  duration_ms: 353.978245
+  type: 'test'
+  ...
+# Subtest: verify.sh runs a package.json gate when its tooling exists
+ok 75 - verify.sh runs a package.json gate when its tooling exists
+  ---
+  duration_ms: 1190.605437
+  type: 'test'
+  ...
+# Subtest: checkpoint.sh and handover.sh wrap the conductor
+ok 76 - checkpoint.sh and handover.sh wrap the conductor
+  ---
+  duration_ms: 448.143103
+  type: 'test'
+  ...
+# Subtest: gate review: PENDING without a report, PASS with a non-builder PASS, FAIL on FAIL, self-review ignored
+ok 77 - gate review: PENDING without a report, PASS with a non-builder PASS, FAIL on FAIL, self-review ignored
+  ---
+  duration_ms: 545.847702
+  type: 'test'
+  ...
+# Subtest: gate memory: unticked steps, wrong status, open linked RQ and missing HANDOVER fail
+ok 78 - gate memory: unticked steps, wrong status, open linked RQ and missing HANDOVER fail
+  ---
+  duration_ms: 606.50688
+  type: 'test'
+  ...
+# Subtest: gate evidence: each success scenario needs a passed manifest entry whose file exists
+ok 79 - gate evidence: each success scenario needs a passed manifest entry whose file exists
+  ---
+  duration_ms: 439.945868
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): migration DROP/RENAME grep fails gate 6
+ok 80 - verify.sh (full): migration DROP/RENAME grep fails gate 6
+  ---
+  duration_ms: 748.820881
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): a change under Docs/accounting versus main fails gate 4
+ok 81 - verify.sh (full): a change under Docs/accounting versus main fails gate 4
+  ---
+  duration_ms: 776.781022
+  type: 'test'
+  ...
+# Subtest: verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+ok 82 - verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+  ---
+  duration_ms: 763.683706
+  type: 'test'
+  ...
+# Subtest: verify.sh --quick: lowered numRuns and unlogged suppressions in the diff fail gate 10
+ok 83 - verify.sh --quick: lowered numRuns and unlogged suppressions in the diff fail gate 10
+  ---
+  duration_ms: 597.787198
+  type: 'test'
+  ...
+# Subtest: verify.sh (full): no false positives — protective TRUNCATE triggers, string literals, non-migration .sql, instructional golden text
+ok 84 - verify.sh (full): no false positives — protective TRUNCATE triggers, string literals, non-migration .sql, instructional golden text
+  ---
+  duration_ms: 1674.418308
+  type: 'test'
+  ...
+# Subtest: scalars: strings, numbers, booleans, null
+ok 85 - scalars: strings, numbers, booleans, null
+  ---
+  duration_ms: 2.855802
+  type: 'test'
+  ...
+# Subtest: comments: full-line and trailing, but not inside quotes or words
+ok 86 - comments: full-line and trailing, but not inside quotes or words
+  ---
+  duration_ms: 0.481659
+  type: 'test'
+  ...
+# Subtest: nested maps and block lists
+ok 87 - nested maps and block lists
+  ---
+  duration_ms: 0.405553
+  type: 'test'
+  ...
+# Subtest: list of maps (providers shape)
+ok 88 - list of maps (providers shape)
+  ---
+  duration_ms: 0.366501
+  type: 'test'
+  ...
+# Subtest: inline flow maps and lists, nested and empty
+ok 89 - inline flow maps and lists, nested and empty
+  ---
+  duration_ms: 0.532649
+  type: 'test'
+  ...
+# Subtest: literal block scalar
+ok 90 - literal block scalar
+  ---
+  duration_ms: 0.455863
+  type: 'test'
+  ...
+# Subtest: errors carry a line number
+ok 91 - errors carry a line number
+  ---
+  duration_ms: 1.930124
+  type: 'test'
+  ...
+# Subtest: parses the real .agent/config.yaml
+ok 92 - parses the real .agent/config.yaml
+  ---
+  duration_ms: 1.877596
+  type: 'test'
+  ...
+# Subtest: formatScalar round-trips through parseYaml
+ok 93 - formatScalar round-trips through parseYaml
+  ---
+  duration_ms: 0.632579
+  type: 'test'
+  ...
+1..93
+# tests 93
+# suites 0
+# pass 93
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 20031.289477

@@ -1,7 +1,7 @@
 ---
 adr: 0046
 title: "Send document email over SMTP with nodemailer from outbox handlers"
-status: Proposed
+status: Accepted
 date: 2026-11-01
 author: claude
 category: integration
@@ -13,6 +13,7 @@ superseded_by: none
 # ADR-0046: Send document email over SMTP with nodemailer from outbox handlers
 
 ## Status
+Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — becomes Accepted on green CI plus cross-review by codex (category integration, a new
 runtime dependency per design §10.6; credentials stay in the environment's secret store, so no

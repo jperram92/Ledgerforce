@@ -8,10 +8,34 @@ const REGISTRY = 'Docs/decisions/golden-approvals.json';
 const DECISIONS = 'Docs/decisions/decision-log.md';
 const lf = (text: string) => text.replaceAll('\r\n', '\n');
 
-export function approvedGoldenPaths(root: string): { paths: Set<string>; errors: string[] } {
+/** Identity of an approval record: the same path, commit and decisions in the same order. */
+export const recordKey = (r: { path: string; commit: string; decisions: string[] }): string =>
+  JSON.stringify([r.path, r.commit, r.decisions]);
+
+/**
+ * Keys of the approval records committed at `ref` (review C6). A record suppresses the golden
+ * guard only if it is already on the comparison base, i.e. the product owner merged it to main.
+ * Unreadable or malformed base registries yield no trusted records (fail closed).
+ */
+export function baseApprovalKeys(root: string, ref: string): Set<string> {
+  const keys = new Set<string>();
+  const shown = gitTry(root, ['show', `${ref}:${REGISTRY}`]);
+  if (shown.code !== 0) return keys;
+  try {
+    const registry = JSON.parse(shown.out);
+    if (registry?.schemaVersion !== 1 || !Array.isArray(registry.approvals)) return keys;
+    for (const r of registry.approvals) {
+      if (r && typeof r.path === 'string' && typeof r.commit === 'string' && Array.isArray(r.decisions)) keys.add(recordKey(r));
+    }
+  } catch { /* malformed base registry: trust nothing */ }
+  return keys;
+}
+
+export function approvedGoldenPaths(root: string): { paths: Set<string>; errors: string[]; keys: Map<string, string> } {
   const paths = new Set<string>();
+  const keys = new Map<string, string>();
   const errors: string[] = [];
-  if (!existsSync(join(root, REGISTRY))) return { paths, errors };
+  if (!existsSync(join(root, REGISTRY))) return { paths, errors, keys };
   try {
     const registry = JSON.parse(readFileSync(join(root, REGISTRY), 'utf8'));
     if (registry?.schemaVersion !== 1 || !Array.isArray(registry.approvals)) {
@@ -52,9 +76,10 @@ export function approvedGoldenPaths(root: string): { paths: Set<string>; errors:
         throw new Error(`${record.path}: content differs from approved snapshot ${record.commit}`);
       }
       paths.add(record.path);
+      keys.set(record.path, recordKey(record));
     }
   } catch (error) {
     errors.push(`${REGISTRY}: ${error instanceof Error ? error.message : String(error)}`);
   }
-  return { paths, errors };
+  return { paths, errors, keys };
 }
