@@ -14,11 +14,13 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | Status | Cards |
 |---|---:|
 | blocked | 7 |
+| claimed | 1 |
 | done | 3 |
-| review | 91 |
-| todo | 32 |
+| in_progress | 1 |
+| review | 96 |
+| todo | 30 |
 | verifying | 2 |
-| **total** | **135** |
+| **total** | **140** |
 
 | Phase | Cards |
 |---|---:|
@@ -231,7 +233,7 @@ graph LR
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
-| [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | todo | — | — | 0 |
+| [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | in_progress | — | — | 0 |
 | [T-0129](T-0129.md) | Daily overdue-reminder job in the worker and per-party reminder pause | MVP | todo | T-0068 | UC-04 | 0 |
 | [T-0130](T-0130.md) | Stripe payouts: fetch from the API, payout.paid webhook, bank line match | MVP | todo | T-0075, T-0060 | UC-03, UC-08 | 0 |
 | [T-0131](T-0131.md) | AR invoices read and journal-preview API (list, detail, Show me the journal, approve) | MVP | review | T-0040, T-0041 | UC-01 | 0 |
