@@ -35,11 +35,12 @@ describe('T-0142 fixed-window limiter', () => {
     let t = 1_000_000;
     const l = new FixedWindowLimiter(policy, () => t);
     expect(l.hit('auth', 'a')).toEqual({ allowed: true });
+    // Each (class, key) has its own window, opened by its first hit.
+    expect(l.hit('mutating', 'a')).toEqual({ allowed: true });
     t += 2_500;
     expect(l.hit('auth', 'a')).toEqual({ allowed: true });
     expect(l.hit('auth', 'a')).toEqual({ allowed: false, retryAfterSeconds: 8 });
     expect(l.hit('auth', 'b')).toEqual({ allowed: true });
-    expect(l.hit('mutating', 'a')).toEqual({ allowed: true });
     expect(l.hit('mutating', 'a')).toEqual({ allowed: false, retryAfterSeconds: 8 });
     t += 7_500;
     expect(l.hit('auth', 'a')).toEqual({ allowed: true });

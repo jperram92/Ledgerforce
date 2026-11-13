@@ -82,7 +82,12 @@ describe('T-0142 AC-3 auth routes are limited per client address', () => {
   });
 
   it('AC-3 case and trailing-slash variants of an auth route share its bucket [T-0142]', async () => {
-    for (const path of ['/AUTH/step-up', '/auth/step-up/', '/t/acme/auth/login', '/auth/callback']) {
+    for (const path of [
+      '/AUTH/step-up',
+      '/auth/step-up/',
+      '/t/acme/auth/login',
+      '/auth/callback',
+    ]) {
       expect((await fetch(`${api.url}${path}`, from('203.0.113.1'))).status).toBe(429);
     }
   });

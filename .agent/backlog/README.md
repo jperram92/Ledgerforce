@@ -16,9 +16,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 7 |
 | done | 3 |
 | review | 91 |
-| in_progress | 1 |
 | todo | 32 |
-| verifying | 1 |
+| verifying | 2 |
 | **total** | **135** |
 
 | Phase | Cards |
@@ -201,7 +200,7 @@ graph LR
 | [T-0095](T-0095.md) | CI security gates: SAST, dependency, container and secret scanning, SBOM | MVP | review | T-0001 | — | 1 |
 | [T-0096](T-0096.md) | DAST smoke test against the compose stack | MVP | review | T-0094, T-0095 | — | 0 |
 | [T-0097](T-0097.md) | Pilot hardening: backups, restore drill, security headers, rate limits (superseded by T-0142, T-0143, T-0144) | MVP | blocked | T-0094, T-0096 | — | 0 |
-| [T-0142](T-0142.md) | Platform - API security headers, strict CORS and rate limits on auth and mutating routes | MVP | in_progress | T-0094 | — | 1 |
+| [T-0142](T-0142.md) | Platform - API security headers, strict CORS and rate limits on auth and mutating routes | MVP | verifying | T-0094 | — | 1 |
 | [T-0143](T-0143.md) | Ops - encrypted database backup and restore drill that proves the hash chain | MVP | todo | T-0094 | — | 0 |
 | [T-0144](T-0144.md) | Platform - CSRF guard with Fetch Metadata and Origin checks for cookie-authenticated mutations | MVP | todo | T-0142 | — | 0 |
 | [T-0098](T-0098.md) | Pilot data migration (opening balances, open AR/AP) and dry run | MVP | todo | T-0080, T-0142, T-0143, T-0144 | — | 0 |

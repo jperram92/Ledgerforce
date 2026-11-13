@@ -1,0 +1,33 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
+
+ ❯ |unit| infra/test/install-contract.test.ts (19 tests | 1 failed) 316ms
+     × T-0142 AC-5 the api trusts exactly the nginx hop for the client address, overridable by the operator (ADR-0054) 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > T-0142 AC-5 the api trusts exactly the nginx hop for the client address, overridable by the operator (ADR-0054)
+AssertionError: expected undefined to be '${LF_TRUST_PROXY_HOPS:-1}' // Object.is equality
+
+- Expected:
+"${LF_TRUST_PROXY_HOPS:-1}"
+
++ Received:
+undefined
+
+ ❯ infra/test/install-contract.test.ts:198:61
+    196|
+    197|   it('T-0142 AC-5 the api trusts exactly the nginx hop for the client …
+    198|     expect(svc('api').environment?.['LF_TRUST_PROXY_HOPS']).toBe('${LF…
+       |                                                             ^
+    199|     for (const n of ['worker', 'setup', 'web']) {
+    200|       expect(svc(n).environment?.['LF_TRUST_PROXY_HOPS']).toBeUndefine…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 18 passed (19)
+   Start at  08:12:53
+   Duration  684ms (transform 98ms, setup 0ms, import 192ms, tests 316ms, environment 0ms)
+
