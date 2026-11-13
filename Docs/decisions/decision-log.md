@@ -2586,3 +2586,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | T-0097 pilot hardening | 0460–0469 | 0054–0055 | 0141–0142 | T-0142–T-0144 |
 - Why: The owner asked for parallel agents (DL-0408); disjoint ranges keep the merges mechanical.
 - ADR: none · Status: accepted
+
+### DL-0410a — Seventh agent (T-0117) gets the round's only migration slot
+- Date: 2026-11-13 · By: claude · Task: T-0117 · Category: process
+- Decision: Adds to DL-0409. T-0117 (period-end system roles) runs as a seventh agent with exclusive use of migration 0062 and the ranges DL-0470–0479, ADR-0061, RQ-0143, T-0145–T-0146. No other agent adds a migration this round.
+- Why: The gapless runner allows only one schema change in flight at a time (DL-0296).
+- ADR: none · Status: accepted
