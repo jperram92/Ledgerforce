@@ -129,7 +129,7 @@ async function roleAccounts<R extends string>(
   roles: readonly R[],
 ): Promise<(EarningsAccount & { role: R })[]> {
   const rows = await trx
-    .selectFrom('app.account_system_role as r')
+    .selectFrom('app.account_role_binding as r')
     .innerJoin('app.account as a', (j) =>
       j.onRef('a.tenant_id', '=', 'r.tenant_id').onRef('a.id', '=', 'r.account_id'),
     )

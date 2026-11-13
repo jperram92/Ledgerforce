@@ -526,7 +526,7 @@ export async function subledgerReconciliation(
   const r = await sql<Omit<SubledgerReconciliation, 'difference' | 'reconciled'>>`
     WITH roles(role) AS (SELECT unnest(${sql.val([...SUBLEDGER_ROLES])}::text[])),
     accts AS (
-      SELECT role, account_id FROM app.account_system_role
+      SELECT role, account_id FROM app.account_role_binding
        WHERE company_id = ${companyId} AND role IN (SELECT role FROM roles)
       UNION
       SELECT control_role, account_id FROM app.subledger_entry WHERE company_id = ${companyId}
@@ -592,7 +592,7 @@ export async function subledgerDrift(trx: Trx, companyId: string): Promise<Suble
   const company = lc(companyId);
   const r = await sql<SubledgerDrift>`
     WITH accts AS (
-      SELECT account_id FROM app.account_system_role
+      SELECT account_id FROM app.account_role_binding
        WHERE company_id = ${company} AND role IN ('AR_CONTROL', 'AP_CONTROL')
       UNION
       SELECT account_id FROM app.subledger_entry WHERE company_id = ${company}

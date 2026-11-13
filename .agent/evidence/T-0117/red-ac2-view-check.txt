@@ -1,0 +1,36 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:38073
+ ❯ |db| packages/db/src/rls.db.test.ts (839 tests | 1 failed | 838 skipped) 943ms
+     × FAILS for a view over tenant tables that is not security_invoker (ADR-0061) [T-0117] 938ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/db/src/rls.db.test.ts > RLS completeness check > FAILS for a view over tenant tables that is not security_invoker (ADR-0061) [T-0117]
+AssertionError: expected undefined to deeply equal [ Array(1) ]
+
+- Expected:
+[
+  "view is not security_invoker (would bypass the caller's RLS)",
+]
+
++ Received:
+undefined
+
+ ❯ packages/db/src/rls.db.test.ts:80:43
+     78|         (await findRlsViolations(tdb.admin)).map((x) => [x.table, x.pr…
+     79|       );
+     80|       expect(byTable['app.definer_view']).toEqual([
+       |                                           ^
+     81|         "view is not security_invoker (would bypass the caller's RLS)",
+     82|       ]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 838 skipped (839)
+   Start at  08:21:49
+   Duration  4.08s (transform 280ms, setup 0ms, import 1.57s, tests 943ms, environment 0ms)
+
