@@ -3033,3 +3033,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: Migration 0066 only adds `COMMENT ON COLUMN app.ar_settings.ecl_allowance_account_id`, marking the column deprecated: AR_ECL_ALLOWANCE is the source, and the value must be NULL or equal the role-bound account. au-services-smb.json drops the `ecl_allowance_account` suggested setting; the 1220 role binding stays. Nothing read that suggestion.
 - Why: ADR-0068 and DL-0474. The schema now says what the code does.
 - ADR: ADR-0068 · Status: accepted
+
+### DL-0476 — Parallel round 5: T-0150, T-0154 and T-0158 agents
+- Date: 2026-11-13 · By: claude · Task: sprint · Category: process
+- Decision: Three sub-agents work in isolated worktrees, and the lead merges and verifies their work. Only T-0158 may add a migration, numbered 0067.
+
+  | Agent | Card | DL | ADR | RQ | New cards |
+  |---|---|---|---|---|---|
+  | Bank follow-ups | T-0150 | 0530–0539 | 0069 | 0151 | T-0160–T-0161 |
+  | ABA download + bank confirmation | T-0154 | 0540–0549 | 0070 | 0152 | T-0162–T-0163 |
+  | Wizard settings | T-0158 (+ migration 0067) | 0550–0559 | 0071 | 0153 | T-0164–T-0165 |
+- Why: The owner asked for parallel sub-agents (DL-0408). The cards touch disjoint areas: bank, the ap payment file, and setup with tax and ar settings.
+- ADR: none · Status: accepted
