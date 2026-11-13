@@ -1,0 +1,347 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aff36b925214ac899
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44773
+ ❯ |db| packages/modules/setup/src/wizard.flow.db.test.ts (18 tests | 18 failed) 938ms
+     × SS-PLAT-118 AC-1 a new company: step 1 is open (in progress), steps 2–10 are locked [T-0123] 12ms
+     × SS-PLAT-118 AC-2 completing a later step first is refused STEP_LOCKED and writes nothing [T-0123] 5ms
+     × SS-PLAT-118 AC-2 completing step 1 with details missing is refused STEP_INVALID listing them; nothing is written [T-0123] 2ms
+     × SS-PLAT-118 AC-6 completing step 1 records who and when, unlocks step 2 and seeds the default reminder schedule (step 1 at 7 days); a repeat is a replay [T-0123] 15ms
+     × SS-PLAT-118 the database refuses a malformed completion record and lf_app cannot delete one [T-0123] 5ms
+     × SS-PLAT-118 another tenant cannot read or complete the company’s wizard [T-0123] 3ms
+     × SS-PLAT-118 a malformed command is refused INVALID_COMMAND [T-0123] 1ms
+     × SS-PLAT-119 AC-2 step 2 lists an empty chart and every unbound core system role, then passes once the template is loaded [T-0123] 1ms
+     × SS-PLAT-119 AC-2 step 3 needs a tax code in force [T-0123] 1ms
+     × SS-PLAT-119 AC-2 step 4 needs a bank account, and one with ABA details for batch payments [T-0123] 1ms
+     × SS-PLAT-119 AC-2 step 5 needs an active Salesforce connection and the invoicing trigger [T-0123] 1ms
+     × SS-PLAT-119 AC-2 step 6 needs a party and a product imported from Salesforce; step 7 lists missing profiles [T-0123] 1ms
+     × SS-PLAT-119 AC-2 step 7 lists each posting-profile gap from the gap check until it is filled [T-0123] 1ms
+     × SS-PLAT-119 AC-2 step 8 needs the invoice number series and a billing format [T-0123] 1ms
+     × SS-PLAT-119 AC-2 step 9 needs an opening balance or a no-history declaration with a reason; only step 9 may be declared [T-0123] 1ms
+     × SS-PLAT-119 AC-2 step 10 needs an Owner or Finance Admin and saved approval thresholds; then the wizard is complete [T-0123] 1ms
+     × SS-PLAT-119 a step whose module state regresses after completion stays complete but shows what is missing [T-0123] 2ms
+     × SS-PLAT-119 step 9 passes once an opening balance is posted, and no-history is then refused [T-0123] 18ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 18 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-118: the wizard unlocks steps in order and completes a step only when it validates > SS-PLAT-118 AC-1 a new company: step 1 is open (in progress), steps 2–10 are locked [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:95:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-118: the wizard unlocks steps in order and completes a step only when it validates > SS-PLAT-118 AC-2 completing a later step first is refused STEP_LOCKED and writes nothing [T-0123]
+AssertionError: expected Error: not implemented to be an instance of WizardError
+ ❯ refusal packages/modules/setup/src/wizard.flow.db.test.ts:65:13
+     63|     (err: unknown) => err,
+     64|   );
+     65|   expect(e).toBeInstanceOf(WizardError);
+       |             ^
+     66|   return e as WizardError;
+     67| };
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:118:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-118: the wizard unlocks steps in order and completes a step only when it validates > SS-PLAT-118 AC-2 completing step 1 with details missing is refused STEP_INVALID listing them; nothing is written [T-0123]
+AssertionError: expected Error: not implemented to be an instance of WizardError
+ ❯ refusal packages/modules/setup/src/wizard.flow.db.test.ts:65:13
+     63|     (err: unknown) => err,
+     64|   );
+     65|   expect(e).toBeInstanceOf(WizardError);
+       |             ^
+     66|   return e as WizardError;
+     67| };
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:125:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-118: the wizard unlocks steps in order and completes a step only when it validates > SS-PLAT-118 AC-6 completing step 1 records who and when, unlocks step 2 and seeds the default reminder schedule (step 1 at 7 days); a repeat is a replay [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:153:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-118: the wizard unlocks steps in order and completes a step only when it validates > SS-PLAT-118 the database refuses a malformed completion record and lf_app cannot delete one [T-0123]
+AssertionError: expected [Function] to throw error matching /check constraint/ but got 'relation "app.setup_wizard_step" does…'
+
+- Expected:
+/check constraint/
+
++ Received:
+"relation \"app.setup_wizard_step\" does not exist"
+
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:192:48
+    190|             VALUES (${c}, ${step}, ${outcome}, ${reason}, ${clerk})`.e…
+    191|       );
+    192|     await expect(insert(11, 'validated', null)).rejects.toThrow(/check…
+       |                                                ^
+    193|     await expect(insert(3, 'no_history', 'none')).rejects.toThrow(/che…
+    194|     await expect(insert(9, 'no_history', null)).rejects.toThrow(/check…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-118: the wizard unlocks steps in order and completes a step only when it validates > SS-PLAT-118 another tenant cannot read or complete the company’s wizard [T-0123]
+AssertionError: expected Error: not implemented to be an instance of WizardError
+ ❯ refusal packages/modules/setup/src/wizard.flow.db.test.ts:65:13
+     63|     (err: unknown) => err,
+     64|   );
+     65|   expect(e).toBeInstanceOf(WizardError);
+       |             ^
+     66|   return e as WizardError;
+     67| };
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:210:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-118: the wizard unlocks steps in order and completes a step only when it validates > SS-PLAT-118 a malformed command is refused INVALID_COMMAND [T-0123]
+AssertionError: expected Error: not implemented to be an instance of WizardError
+ ❯ refusal packages/modules/setup/src/wizard.flow.db.test.ts:65:13
+     63|     (err: unknown) => err,
+     64|   );
+     65|   expect(e).toBeInstanceOf(WizardError);
+       |             ^
+     66|   return e as WizardError;
+     67| };
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:223:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 AC-2 step 2 lists an empty chart and every unbound core system role, then passes once the template is loaded [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:232:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 AC-2 step 3 needs a tax code in force [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:244:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 AC-2 step 4 needs a bank account, and one with ABA details for batch payments [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:253:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 AC-2 step 5 needs an active Salesforce connection and the invoicing trigger [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:278:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 AC-2 step 6 needs a party and a product imported from Salesforce; step 7 lists missing profiles [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:310:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 AC-2 step 7 lists each posting-profile gap from the gap check until it is filled [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:342:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 AC-2 step 8 needs the invoice number series and a billing format [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:372:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 AC-2 step 9 needs an opening balance or a no-history declaration with a reason; only step 9 may be declared [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:388:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 AC-2 step 10 needs an Owner or Finance Admin and saved approval thresholds; then the wizard is complete [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:416:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 a step whose module state regresses after completion stays complete but shows what is missing [T-0123]
+error: invalid input syntax for type uuid: ""
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ UpdateQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/update-query-builder.js:455:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ UpdateQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/update-query-builder.js:455:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:433:5
+    431|
+    432|   it('SS-PLAT-119 a step whose module state regresses after completion…
+    433|     await f.inTenant((trx) =>
+       |     ^
+    434|       trx
+    435|         .updateTable('app.account')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/18]⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard.flow.db.test.ts > SS-PLAT-119: each step validator reads its module and lists what is missing > SS-PLAT-119 step 9 passes once an opening balance is posted, and no-history is then refused [T-0123]
+Error: not implemented
+ ❯ wizardOf packages/modules/setup/src/wizard.ts:40:25
+     38|
+     39| export function wizardOf(_trx: Trx, _companyId: string, _o: { asOf: st…
+     40|   return Promise.reject(new Error('not implemented'));
+       |                         ^
+     41| }
+     42|
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:53:53
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ missing packages/modules/setup/src/wizard.flow.db.test.ts:55:4
+ ❯ packages/modules/setup/src/wizard.flow.db.test.ts:459:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/18]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  18 failed (18)
+   Start at  16:30:06
+   Duration  4.59s (transform 1.52s, setup 0ms, import 2.55s, tests 938ms, environment 0ms)
+
