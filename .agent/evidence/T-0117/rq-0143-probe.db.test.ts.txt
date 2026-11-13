@@ -1,0 +1,27 @@
+import { createTestDatabase } from './testing/test-db.ts';
+import { it } from 'vitest';
+it('probe', async () => {
+  const t = await createTestDatabase({ migrate: false });
+  const q = async (s: string) => {
+    try {
+      const r = await t.admin.query(s);
+      return JSON.stringify(Array.isArray(r) ? r.map((x) => x.rows) : r.rows);
+    } catch (e) {
+      return 'ERR ' + (e as Error).message;
+    }
+  };
+  console.log(await q('select version()'));
+  console.log(await q("create table x(r text check (r in ('A')))"));
+  console.log(await q("alter table x alter constraint x_r_check check (r in ('A','B'))"));
+  console.log(await q('alter table x alter constraint x_r_check not valid'));
+  console.log(await q("create function f(r text) returns boolean language sql immutable as $$ select r in ('A') $$"));
+  console.log(await q('create table y(r text check (f(r)))'));
+  console.log(await q("insert into y values ('B')"));
+  console.log(await q("create or replace function f(r text) returns boolean language sql immutable as $$ select r in ('A','B') $$"));
+  console.log(await q("insert into y values ('B')"));
+  console.log(await q('create role probe_r'));
+  console.log(await q('create table z(t int); alter table z enable row level security; alter table z force row level security; create policy p on z using (t = 1); insert into z values (1),(2); grant select on z to probe_r'));
+  console.log(await q('create view vz with (security_invoker = true) as select * from z; create view vd as select * from z; grant select on vz, vd to probe_r'));
+  console.log(await q('set role probe_r; select (select count(*) from vz) inv, (select count(*) from vd) def; reset role'));
+  await t.close();
+}, 60000);

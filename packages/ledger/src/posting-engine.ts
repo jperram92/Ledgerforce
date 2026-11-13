@@ -203,7 +203,7 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     roles.length === 0
       ? []
       : await trx
-          .selectFrom('app.account_system_role')
+          .selectFrom('app.account_role_binding')
           .select(['role', 'account_id'])
           .where('company_id', '=', companyId)
           .where('role', 'in', roles)
@@ -247,7 +247,7 @@ async function validateAndBuild(trx: Trx, checked: CheckedCommand): Promise<Buil
     controlIds.length === 0
       ? []
       : await trx
-          .selectFrom('app.account_system_role')
+          .selectFrom('app.account_role_binding')
           .select(['account_id', 'role'])
           .where('company_id', '=', companyId)
           .where('account_id', 'in', controlIds)

@@ -1,0 +1,33 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42241
+ ❯ |db| packages/ledger/src/golden/golden-engine.db.test.ts (2 tests | 1 failed) 1034ms
+     × preview() reproduces every other Approved table line for line 271ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/ledger/src/golden/golden-engine.db.test.ts > SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay > preview() reproduces every other Approved table line for line
+PostingError: line 1: system role AR_ECL_ALLOWANCE is not bound in this company
+ ❯ fail packages/ledger/src/posting-engine.ts:148:9
+    146|
+    147| function fail(code: PostingErrorCode, message: string, line?: number):…
+    148|   throw new PostingError(code, line === undefined ? message : `line ${…
+       |         ^
+    149|     ...(line === undefined ? {} : { line }),
+    150|   });
+ ❯ packages/ledger/src/posting-engine.ts:216:9
+ ❯ validateAndBuild packages/ledger/src/posting-engine.ts:212:36
+ ❯ preview packages/ledger/src/posting-engine.ts:699:21
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/ledger/src/golden/golden-engine.db.test.ts:198:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  08:19:35
+   Duration  3.24s (transform 356ms, setup 0ms, import 612ms, tests 1.03s, environment 0ms)
+

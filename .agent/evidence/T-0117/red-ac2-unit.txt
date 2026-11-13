@@ -1,0 +1,106 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
+
+ ❯ |unit| packages/modules/gl/src/templates.test.ts (5 tests | 1 failed) 38ms
+     × knows exactly the 17 core roles of design §3.2 plus the 7 period-end roles of §3.2/§3.10 [T-0117] 20ms
+ ❯ |unit| packages/modules/gl/src/system-roles.test.ts (4 tests | 3 failed) 18ms
+     × AC-2 the seven period-end roles are the extended roles [T-0117] 7ms
+     × AC-2 each period-end role allows exactly the researched account type [T-0117] 7ms
+     × AC-2 writes go to the additive table for period-end roles and the core table otherwise [T-0117] 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/gl/src/system-roles.test.ts > ADR-0061: period-end system roles > AC-2 the seven period-end roles are the extended roles [T-0117]
+TypeError: EXTENDED_SYSTEM_ROLES is not iterable
+ ❯ packages/modules/gl/src/system-roles.test.ts:20:22
+     18| describe('ADR-0061: period-end system roles', () => {
+     19|   it('AC-2 the seven period-end roles are the extended roles [T-0117]'…
+     20|     expect([...roles.EXTENDED_SYSTEM_ROLES].sort()).toEqual(Object.key…
+       |                      ^
+     21|   });
+     22|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |unit| packages/modules/gl/src/system-roles.test.ts > ADR-0061: period-end system roles > AC-2 each period-end role allows exactly the researched account type [T-0117]
+AssertionError: AR_ECL_ALLOWANCE: expected undefined to deeply equal [ 'asset' ]
+
+- Expected:
+[
+  "asset",
+]
+
++ Received:
+undefined
+
+ ❯ packages/modules/gl/src/system-roles.test.ts:26:33
+     24|     const types = roles.ROLE_ACCOUNT_TYPES as Record<string, readonly …
+     25|     for (const [role, want] of Object.entries(PERIOD_END)) {
+     26|       expect(types[role], role).toEqual(want);
+       |                                 ^
+     27|     }
+     28|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |unit| packages/modules/gl/src/system-roles.test.ts > ADR-0061: period-end system roles > AC-2 writes go to the additive table for period-end roles and the core table otherwise [T-0117]
+TypeError: bindingTableFor is not a function
+ ❯ packages/modules/gl/src/system-roles.test.ts:39:20
+     37|   it('AC-2 writes go to the additive table for period-end roles and th…
+     38|     for (const role of roles.SYSTEM_ROLES) {
+     39|       expect(roles.bindingTableFor(role), role).toBe(
+       |                    ^
+     40|         role in PERIOD_END ? 'app.account_system_role_ext' : 'app.acco…
+     41|       );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |unit| packages/modules/gl/src/templates.test.ts > SS-PLAT-32: AU services SMB chart template is valid > knows exactly the 17 core roles of design §3.2 plus the 7 period-end roles of §3.2/§3.10 [T-0117]
+AssertionError: expected [ 'AP_CONTROL', 'AR_CONTROL', …(15) ] to deeply equal [ 'ACCRUED_EXPENSES', …(23) ]
+
+- Expected
++ Received
+
+  [
+-   "ACCRUED_EXPENSES",
+-   "ACCUM_DEPRECIATION",
+    "AP_CONTROL",
+    "AR_CONTROL",
+-   "AR_ECL_ALLOWANCE",
+    "CURRENT_YEAR_EARNINGS",
+    "CUSTOMER_PREPAYMENTS",
+    "DEFERRED_REVENUE",
+-   "DEPRECIATION_EXPENSE",
+    "FX_REALISED",
+    "FX_UNREALISED",
+    "GST_COLLECTED",
+    "GST_PAID",
+    "PAYG_WITHHOLDING",
+    "PAYROLL_CLEARING",
+-   "PREPAYMENTS",
+-   "PRIOR_PERIOD_ADJUSTMENTS",
+    "RETAINED_EARNINGS",
+    "ROUNDING",
+-   "SGC_PAYABLE",
+    "SUPER_PAYABLE",
+    "SUSPENSE",
+    "UNDEPOSITED_FUNDS",
+    "WAGES_PAYABLE",
+  ]
+
+ ❯ packages/modules/gl/src/templates.test.ts:25:38
+     23| describe('SS-PLAT-32: AU services SMB chart template is valid', () => {
+     24|   it('knows exactly the 17 core roles of design §3.2 plus the 7 period…
+     25|     expect([...SYSTEM_ROLES].sort()).toEqual(
+       |                                      ^
+     26|       [
+     27|         'AR_CONTROL',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  4 failed | 11 passed (15)
+   Start at  08:18:08
+   Duration  750ms (transform 157ms, setup 0ms, import 335ms, tests 63ms, environment 0ms)
+

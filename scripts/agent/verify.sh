@@ -116,25 +116,36 @@ gate_script 1 format "format:check" 1
 # 2b DB integration tests (real PostgreSQL, DL-0007)
 gate_script 2b db-tests "test:db" 0
 
-# 2c coverage does not drop vs the main baseline
+# 2c coverage does not drop vs the main baseline.
+# Measure "unit+db" (RQ-0105 remedy 2, DL-0408, DL-0410): line coverage of the unit and db vitest
+# projects together, one worker. The baseline on main records the measure it was taken with
+# ("measure"; a file without one is the old unit-only measure). Different measures are never
+# compared: the gate is PENDING until main's baseline is re-recorded with this measure.
 {
+  COV_MEASURE="unit+db"
   if [ "$QUICK" = 1 ]; then record 2c coverage SKIPPED "--quick"
   elif [ ! -d node_modules/@vitest/coverage-v8 ] && [ ! -d node_modules/@vitest/coverage-istanbul ]; then
     record 2c coverage PENDING "no @vitest/coverage-v8 installed"
   else
     out="$TMP/2c.log"; rm -rf "$TMP/cov"
-    if pnpm -s exec vitest run --project unit --coverage.enabled --coverage.reporter=json-summary --coverage.reportsDirectory="$TMP/cov" >"$out" 2>&1 \
+    if VITEST_MAX_WORKERS=1 pnpm -s exec vitest run --project unit --project db --coverage.enabled --coverage.reporter=json-summary --coverage.reportsDirectory="$TMP/cov" >"$out" 2>&1 \
        && [ -f "$TMP/cov/coverage-summary.json" ]; then
       cur="$(node -e 'console.log(JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")).total.lines.pct)' "$TMP/cov/coverage-summary.json")"
-      BASEFILE=".agent/coverage-baseline.json"; basepct=""
+      BASEFILE=".agent/coverage-baseline.json"; basepct=""; basemeasure=""
       for ref in origin/main main; do
-        b="$(git show "$ref:$BASEFILE" 2>/dev/null)" && { basepct="$(printf '%s' "$b" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log(JSON.parse(s).total.lines.pct)}catch(e){}})')"; break; }
+        if b="$(git show "$ref:$BASEFILE" 2>/dev/null)"; then
+          # prints "<measure> <lines pct>"; an unparsable file or one without lines.pct prints nothing
+          read -r basemeasure basepct < <(printf '%s' "$b" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);const p=j.total.lines.pct;if(typeof p==="number")console.log(`${j.measure||"unit"} ${p}`)}catch(e){}})')
+          break
+        fi
       done
-      if [ -z "$basepct" ]; then record 2c coverage PENDING "lines ${cur}% — no baseline $BASEFILE on main yet"
+      if [ -z "$basepct" ]; then record 2c coverage PENDING "$COV_MEASURE lines ${cur}% — no baseline $BASEFILE on main yet"
+      elif [ "$basemeasure" != "$COV_MEASURE" ]; then
+        record 2c coverage PENDING "$COV_MEASURE lines ${cur}% — main baseline measure is \"$basemeasure\", not \"$COV_MEASURE\": re-record $BASEFILE on main with the $COV_MEASURE measure; no comparison across measures"
       elif node -e 'process.exit(Number(process.argv[1]) + 1e-9 >= Number(process.argv[2]) ? 0 : 1)' "$cur" "$basepct"; then
-        record 2c coverage PASS "lines ${cur}% vs main ${basepct}%"
-      else record 2c coverage FAIL "lines ${cur}% < main ${basepct}%"; fi
-    else record 2c coverage FAIL "coverage run failed"; show_tail "$out"; fi
+        record 2c coverage PASS "$COV_MEASURE lines ${cur}% vs main ${basepct}%"
+      else record 2c coverage FAIL "$COV_MEASURE lines ${cur}% < main ${basepct}%"; fi
+    else record 2c coverage FAIL "$COV_MEASURE coverage run failed"; show_tail "$out"; fi
   fi
 }
 

@@ -1,0 +1,262 @@
+From d81ee970bbfe35636c1ebb1a528ecc6aa4251250 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 08:23:11 +0000
+Subject: [PATCH 2/2] feat(verify): gate 2c measures unit+db coverage; baseline
+ re-recorded with its measure [T-0128]
+
+What changed:
+- scripts/agent/verify.sh gate 2c (in the lead's WIP save 47ab51e, validated here): runs
+  `VITEST_MAX_WORKERS=1 pnpm -s exec vitest run --project unit --project db --coverage...`
+  (measure "unit+db", one worker pinned). Compares total line % with .agent/coverage-baseline.json
+  on origin/main (else main). If main's baseline was taken with another measure (no "measure"
+  field = old unit-only), the gate is PENDING and asks for a re-record on main. It never compares
+  across measures.
+- scripts/agent/test/scripts.test.ts: four new 'verify.sh (full) with a task: 2c coverage ...'
+  tests (fake pnpm on PATH): unit+db + one worker + PASS, FAIL on a drop, PENDING on a legacy or
+  'unit' main baseline even if the branch has its own baseline, PENDING with no baseline.
+- .agent/coverage-baseline.json re-recorded with the gate's exact command over bcf4ab6:
+  measure unit+db, lines 93.65 (8071/8618), branches 79.21, functions 95.66,
+  statements 91.09; records command, date, commit and evidence path. The old unit-only values
+  are kept in its note.
+- Docs: definition-of-done gate 2c wording; RQ-0105 answered with resolution; DL-0410, DL-0411;
+  T-0128 card (steps 1-2, AC-2, new AC-3 ticked; AC-1 waits for the baseline on main) and backlog
+  index row and counts.
+- Evidence in .agent/evidence/T-0128/: RED and GREEN agent-test output, the coverage run summary
+  and the per-package unit+db breakdown.
+
+Why: The owner approved RQ-0105 remedy 2 (DL-0408). Unit-only coverage counts DB-tested modules
+as uncovered. The RED run showed that, without a measure check, the new measure would have
+passed silently against the 72.22 % unit-only baseline.
+
+Validation:
+- RED: node --test --test-name-pattern="2c coverage" -> 4 fail (old gate: --project unit only,
+  "PASS (lines 94.1% vs main 72.22%)"). GREEN: 5/5 pass.
+- node --test scripts/agent/test/*.test.ts -> 100 pass, 0 fail, 0 skipped, 0 todo.
+- Gate command over bcf4ab6 -> 160 files / 2195 tests passed, 0 skipped (local PG 16), exit 0.
+- bash scripts/agent/verify.sh --quick --task T-0128 -> PASS 10, FAIL 0, PENDING 6 (all
+  "--quick" skips); typecheck, lint, format:check, pnpm test all PASS.
+- Full verify.sh (real gate 2c) not yet run at this commit; it follows next.
+
+Next action: run full `bash scripts/agent/verify.sh --task T-0128`. Expected 2c is PENDING
+(main still holds the unit-only baseline). The lead merges the branch. After the baseline is on
+main, re-run verify (2c should PASS, AC-1), then Codex cross-review.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .agent/backlog/README.md                      |  5 ++--
+ .agent/backlog/T-0128.md                      | 18 ++++++-----
+ .agent/coverage-baseline.json                 | 16 ++++++----
+ .../T-0128/coverage-run-unit+db-bcf4ab6.txt   |  8 +++++
+ .../coverage-unit+db-by-package-bcf4ab6.txt   | 30 +++++++++++++++++++
+ Docs/decisions/decision-log.md                | 14 +++++++++
+ ...coverage-gate-measure-after-integration.md | 17 +++++++++++
+ 7 files changed, 93 insertions(+), 15 deletions(-)
+ create mode 100644 .agent/evidence/T-0128/coverage-run-unit+db-bcf4ab6.txt
+ create mode 100644 .agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt
+
+diff --git a/.agent/backlog/README.md b/.agent/backlog/README.md
+index 31451e3..952028d 100644
+--- a/.agent/backlog/README.md
++++ b/.agent/backlog/README.md
+@@ -15,8 +15,9 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
+ |---|---:|
+ | blocked | 6 |
+ | done | 3 |
++| in_progress | 1 |
+ | review | 91 |
+-| todo | 31 |
++| todo | 30 |
+ | verifying | 1 |
+ | **total** | **132** |
+ 
+@@ -228,7 +229,7 @@ graph LR
+ | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
+ | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
+ | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
+-| [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | todo | — | — | 0 |
++| [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | in_progress | — | — | 0 |
+ | [T-0129](T-0129.md) | Daily overdue-reminder job in the worker and per-party reminder pause | MVP | todo | T-0068 | UC-04 | 0 |
+ | [T-0130](T-0130.md) | Stripe payouts: fetch from the API, payout.paid webhook, bank line match | MVP | todo | T-0075, T-0060 | UC-03, UC-08 | 0 |
+ | [T-0131](T-0131.md) | AR invoices read and journal-preview API (list, detail, Show me the journal, approve) | MVP | review | T-0040, T-0041 | UC-01 | 0 |
+diff --git a/.agent/backlog/T-0128.md b/.agent/backlog/T-0128.md
+index 522c364..27a78db 100644
+--- a/.agent/backlog/T-0128.md
++++ b/.agent/backlog/T-0128.md
+@@ -4,15 +4,15 @@ title: "Restore the unit-coverage gate after the Line A integration"
+ phase: MVP
+ use_cases: []
+ depends_on: []
+-status: todo
+-claimed_by: null
++status: in_progress
++claimed_by: claude
+ lease_expires_at: null
+ attempts: 0
+ last_checkpoint: null
+ adr_required: false
+ research: [RQ-0105]
+ success_scenarios: []
+-evidence: [.agent/evidence/integration-line-a/verify-4f8ca92.txt, .agent/evidence/integration-line-a/coverage-by-package-4f8ca92.txt]
++evidence: [.agent/evidence/integration-line-a/verify-4f8ca92.txt, .agent/evidence/integration-line-a/coverage-by-package-4f8ca92.txt, .agent/evidence/T-0128/red-agent-tests-2c.txt, .agent/evidence/T-0128/green-agent-tests-2c.txt, .agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt, .agent/evidence/T-0128/coverage-run-unit+db-bcf4ab6.txt]
+ estimate_lines: 400
+ ---
+ 
+@@ -27,17 +27,21 @@ denominator. Per-package breakdown: `.agent/evidence/integration-line-a/coverage
+ 
+ ## Acceptance criteria
+ - [ ] AC-1: Gate 2c passes on the integrated tree without lowering the baseline, excluding files, or changing the comparison base.
+-- [ ] AC-2: Every added test asserts behaviour (no coverage-only tests without assertions), and the evidence records before/after per-package numbers.
++  _(2026-11-13: under the owner-approved remedy 2 (DL-0408), "comparison base" means main's baseline under the same measure. It cannot PASS until the re-recorded unit+db baseline is on main. Until then the gate is PENDING by design. To verify after the lead's merge: `bash scripts/agent/verify.sh`, gate 2c.)_
++- [x] AC-2: Every added test asserts behaviour (no coverage-only tests without assertions), and the evidence records before/after per-package numbers.
++  _(The four new verifier tests assert gate output and the vitest invocation. Before: `.agent/evidence/integration-line-a/coverage-by-package-4f8ca92.txt` (unit-only). After: `.agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt` (unit+db).)_
++- [x] AC-3 (added 2026-11-13, DL-0408/DL-0410): gate 2c measures unit+db on one worker, the baseline records its measure, and a main baseline taken with another measure is PENDING, never PASS or FAIL. Covered by four `verify.sh (full) with a task: 2c coverage …` tests (RED → GREEN in `.agent/evidence/T-0128/`).
+ 
+ ## Open questions
+-- [ ] Is adding pure unit tests for the DB-tested module logic the right remedy, or should the gate also count `--project db` coverage? The second changes how the gate measures and needs a research record, a decision-log entry and cross-provider review, and the main baseline would have to be re-recorded under the same measure. Do not change the gate without that.
++- [x] (Answered 2026-11-13 by the owner: remedy 2, DL-0408; RQ-0105 answered.) Is adding pure unit tests for the DB-tested module logic the right remedy, or should the gate also count `--project db` coverage? The second changes how the gate measures and needs a research record, a decision-log entry and cross-provider review, and the main baseline would have to be re-recorded under the same measure. Do not change the gate without that.
+ 
+ ## Steps
+-- [ ] 1. Research the two options (RQ in the integrator range RQ-0105/0107/0117–0119) and decide.
+-- [ ] 2. Implement test-first; capture per-package before/after.
++- [x] 1. Research the two options (RQ in the integrator range RQ-0105/0107/0117–0119) and decide.
++- [x] 2. Implement test-first; capture per-package before/after.
+ - [ ] 3. Full verify.sh [phase: verify]
+ - [ ] 4. Cross-provider review [phase: review]
+ 
+ ## Notes for the next agent
+ - Do not weaken: no `coverage.exclude` additions, no threshold edits, no baseline rewrite (AGENTS.md §0.3).
+ - 2026-11-12 claude: RQ-0105 measured both sides. Unit-only 58.81 % vs baseline 72.22 %; unit+db 93.70 % (integrated) vs 93.95 % (main 5c3a2e3). Gate change (remedy 2) is the owner's call per the handoff ("do not change gate comparison logic or manufacture a baseline"); recorded under Open questions for human. Independently of that choice, closing the 0.25-point like-for-like gap with assertion-bearing tests is buildable work.
++- 2026-11-13 claude (branch feat/T-0128-coverage-measure, local, from bcf4ab6): owner approved remedy 2 (DL-0408). Gate 2c now measures unit+db with VITEST_MAX_WORKERS=1, the baseline file carries `"measure"`, and a measure mismatch is PENDING (DL-0410). Baseline re-recorded with the gate's exact command over bcf4ab6: lines 93.65 %, branches 79.21 %, functions 95.66 %, statements 91.09 % (DL-0411). The "no baseline rewrite" note above predates the owner's approval and still applies to everything except this approved re-record under a new measure. Next: the lead merges the branch; once the baseline is on main, run the full verify.sh (step 3; 2c should then PASS), then Codex cross-review (step 4). The lead updates the HANDOVER and state.json entries for this task when merging.
+diff --git a/.agent/coverage-baseline.json b/.agent/coverage-baseline.json
+index e0e1ec7..74fe221 100644
+--- a/.agent/coverage-baseline.json
++++ b/.agent/coverage-baseline.json
+@@ -1,18 +1,22 @@
+ {
+-  "note": "unit-test coverage baseline; verify gate 2c fails if coverage drops below main",
+-  "recorded": "2026-10-24",
++  "note": "coverage baseline for verify gate 2c; the gate fails if unit+db line coverage drops below the copy of this file on main, and is PENDING if main's measure differs (DL-0408, DL-0410, DL-0411). Supersedes the unit-only baseline recorded 2026-10-24 (lines 72.22, branches 69.37, functions 78.94, statements 70.78).",
++  "measure": "unit+db",
++  "command": "VITEST_MAX_WORKERS=1 pnpm -s exec vitest run --project unit --project db --coverage.enabled --coverage.reporter=json-summary",
++  "recorded": "2026-11-13",
++  "commit": "bcf4ab6",
++  "evidence": ".agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt",
+   "total": {
+     "lines": {
+-      "pct": 72.22
++      "pct": 93.65
+     },
+     "branches": {
+-      "pct": 69.37
++      "pct": 79.21
+     },
+     "functions": {
+-      "pct": 78.94
++      "pct": 95.66
+     },
+     "statements": {
+-      "pct": 70.78
++      "pct": 91.09
+     }
+   }
+ }
+diff --git a/.agent/evidence/T-0128/coverage-run-unit+db-bcf4ab6.txt b/.agent/evidence/T-0128/coverage-run-unit+db-bcf4ab6.txt
+new file mode 100644
+index 0000000..518b081
+--- /dev/null
++++ b/.agent/evidence/T-0128/coverage-run-unit+db-bcf4ab6.txt
+@@ -0,0 +1,8 @@
++2026-11-13T03:55:47Z
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a9e1b2d93b78a687c
++      Coverage enabled with v8
++[db] test PostgreSQL ready (local) on 127.0.0.1:35423
++ Test Files  160 passed (160)
++      Tests  2195 passed (2195)
++EXIT 0
++2026-11-13T04:03:30Z
+diff --git a/.agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt b/.agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt
+new file mode 100644
+index 0000000..0df3ba3
+--- /dev/null
++++ b/.agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt
+@@ -0,0 +1,30 @@
++unit+db line coverage by package - tree bcf4ab6, measured 2026-11-13
++command: VITEST_MAX_WORKERS=1 pnpm -s exec vitest run --project unit --project db --coverage.enabled --coverage.reporter=json-summary
++package	files	covered/total	lines %
++apps/worker	6	166/170	97.65
++eslint.config.js	1	1/1	100.00
++packages/connectors/aba	2	69/69	100.00
++packages/connectors/salesforce	40	1729/1865	92.71
++packages/connectors/stripe	8	328/370	88.65
++packages/db	10	770/822	93.67
++packages/ledger	18	740/767	96.48
++packages/modules/ap	8	387/416	93.03
++packages/modules/ar	12	722/784	92.09
++packages/modules/bank	16	751/792	94.82
++packages/modules/documents	6	106/119	89.08
++packages/modules/email	6	116/134	86.57
++packages/modules/gl	5	87/98	88.78
++packages/modules/journals	2	59/74	79.73
++packages/modules/parties	5	131/136	96.32
++packages/modules/products	3	113/121	93.39
++packages/modules/reporting	5	186/190	97.89
++packages/modules/setup	3	206/220	93.64
++packages/modules/tax	5	88/90	97.78
++packages/outbox	8	169/179	94.41
++packages/shared	17	821/855	96.02
++packages/testing	8	174/187	93.05
++salesforce/test	2	152/159	95.60
++TOTAL lines		8071/8618	93.65
++TOTAL branches		5727/7230	79.21
++TOTAL functions		2074/2168	95.66
++TOTAL statements		8988/9867	91.09
+diff --git a/Docs/decisions/decision-log.md b/Docs/decisions/decision-log.md
+index 5f75603..c3801f1 100644
+--- a/Docs/decisions/decision-log.md
++++ b/Docs/decisions/decision-log.md
+@@ -2586,3 +2586,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
+   | T-0097 pilot hardening | 0460–0469 | 0054–0055 | 0141–0142 | T-0142–T-0144 |
+ - Why: The owner asked for parallel agents (DL-0408); disjoint ranges keep the merges mechanical.
+ - ADR: none · Status: accepted
++
++### DL-0410 — Gate 2c measures unit+db coverage on one worker and never compares across measures (T-0128)
++- Date: 2026-11-13 · By: claude · Task: T-0128 · Category: process
++- Decision: `verify.sh` gate 2c runs `VITEST_MAX_WORKERS=1 pnpm -s exec vitest run --project unit --project db --coverage.enabled --coverage.reporter=json-summary` (measure `unit+db`) and compares total line % with `.agent/coverage-baseline.json` on `origin/main`, else `main`. The baseline file records `"measure"`. A file without it is the old unit-only measure (`unit`). If main's measure is not `unit+db`, the gate is **PENDING** and asks for main's baseline to be re-recorded under the same measure. It never PASSes or FAILs across measures. With no baseline on main it stays PENDING, and a baseline on the task branch is never used as the base. The worker count is pinned to 1 inside the gate, even if the caller exports more, so the measure matches how the baseline was taken (one shared test cluster, the setting used for RQ-0105's measurements). PASS/FAIL/PENDING messages name the measure. Covered by four new `verify.sh (full) with a task: 2c coverage …` tests (fake `pnpm` on PATH), RED → GREEN in `.agent/evidence/T-0128/`.
++- Why: Owner approved RQ-0105 remedy 2 (DL-0408). Unit-only coverage counts DB-tested modules (posting engine, AR, bank matching) as uncovered whenever a unit test imports them, while AGENTS.md requires those modules to be tested against a real PostgreSQL. Without the measure check, the new gate would have passed silently against the 72.22 % unit-only baseline (the RED run shows exactly that: "PASS (lines 94.1% vs main 72.22%)").
++- Alternatives: comparing unit+db with the unit-only baseline (passes trivially, two different measures, rejected in RQ-0105); FAIL on a measure mismatch (would block every branch until the merge, for a condition the branch cannot fix); honouring a caller's VITEST_MAX_WORKERS (makes the measure depend on the environment); adding `api-db`/`api-unit` (not the approved measure; a later change would follow the same re-record rule).
++- ADR: none (process change under ADR-0047, owner-approved in DL-0408) · Status: accepted
++
++### DL-0411 — Coverage baseline re-recorded under the unit+db measure at bcf4ab6 (T-0128)
++- Date: 2026-11-13 · By: claude · Task: T-0128 · Category: process
++- Decision: `.agent/coverage-baseline.json` is re-recorded with the gate's exact command over bcf4ab6 (the PR #4 merge 983cc91 plus T-0131's AR invoice read/preview code, T-0083's web screens and docs and process commits). Results: **lines 93.65 % (8,071 / 8,618)**, branches 79.21 % (5,727 / 7,230), functions 95.66 % (2,074 / 2,168), statements 91.09 % (8,988 / 9,867). 160 test files and 2,195 tests passed, none skipped, against a local PostgreSQL 16 cluster. The file now records `measure`, `command`, `recorded`, `commit` and the evidence path, and its `note` keeps the superseded unit-only values (72.22 / 69.37 / 78.94 / 70.78 from 2026-10-24). Per-package figures: `.agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt`. The file reaches main only through the lead's merge. Until then, gate 2c on branches is PENDING by design (DL-0410).
++- Why: DL-0408 approved re-recording main's baseline under the same measure. The number is what the tree measures, not a chosen target. It is 0.05 points below the 2026-11-12 reading of 6d7531d (93.70 %), a different tree, and 0.30 points below pre-integration main (93.95 %). That integration drop was accepted by the owner in DL-0405 item 3.
++- Alternatives: recording 93.95 % (pre-integration main) would make main fail its own gate, a manufactured baseline; waiting to measure on main itself (the agent may not push to main; the lead's merge carries the file).
++- ADR: none · Status: accepted
+diff --git a/Docs/research/RQ-0105-coverage-gate-measure-after-integration.md b/Docs/research/RQ-0105-coverage-gate-measure-after-integration.md
+index 83d6ca7..2d6feb5 100644
+--- a/Docs/research/RQ-0105-coverage-gate-measure-after-integration.md
++++ b/Docs/research/RQ-0105-coverage-gate-measure-after-integration.md
+@@ -59,3 +59,20 @@ integrated tree (6d7531d) is **93.70 %**, so even under the like-for-like measur
+ close that gap with assertion-bearing tests (unit or db) in the least-covered integrated files,
+ whichever measure the owner chooses. Under the current unit-only measure the gap is
+ 13.7 points, almost all of it from DB-tested files.
++
++## Resolution (2026-11-13)
++**Status: answered.** The owner approved remedy 2 (DL-0408: "Approved"). Implemented in T-0128 (DL-0410, DL-0411):
++
++- Gate 2c measures `unit+db`: `VITEST_MAX_WORKERS=1 pnpm -s exec vitest run --project unit --project db --coverage.enabled --coverage.reporter=json-summary`.
++  It runs on one worker even if the caller sets more, so the measure is reproducible.
++- `.agent/coverage-baseline.json` records `"measure"`. A main baseline without that field is the old unit-only measure.
++  When main's measure differs from the gate's, the gate is **PENDING** and asks for main's baseline to be re-recorded
++  under the same measure. It never passes or fails across measures.
++- Baseline re-recorded with that exact command over bcf4ab6 (the PR #4 merge 983cc91 plus T-0131/T-0083 and docs commits): **lines 93.65 %**
++  (8,071 / 8,618), branches 79.21 %, functions 95.66 %, statements 91.09 %. 160 test files and 2,195 tests passed, none skipped.
++  Per-package figures: `.agent/evidence/T-0128/coverage-unit+db-by-package-bcf4ab6.txt`.
++- Until that baseline is on main, gate 2c on branches reports PENDING (main still holds the unit-only file). That is the intended
++  behaviour, not a pass.
++- The 0.25-point like-for-like drop measured on 2026-11-12 (93.95 % → 93.70 %) is now part of the main history: 983cc91 was merged
++  by the owner under DL-0405 item 3. The new baseline records the tree as it is (93.65 %). Raising it with assertion-bearing tests
++  is ordinary work and no longer a gate blocker.
+-- 
+2.43.0
+

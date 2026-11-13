@@ -5,6 +5,7 @@
  */
 import type { Database } from '@ledgerforce/db';
 import { sql, type Transaction } from 'kysely';
+import { bindingTableFor } from './system-roles.ts';
 import { validateTemplate, type ChartTemplate } from './templates.ts';
 
 export class InvalidTemplateError extends Error {
@@ -50,13 +51,26 @@ export async function loadChartTemplate(
     .execute();
   const accounts = new Map(rows.map((r) => [r.code, r.id]));
 
+  // Each role is bound in its own table (core 0005 or period-end 0062, ADR-0061).
   const bindings = template.accounts.flatMap((a) => {
     const id = accounts.get(a.code);
     return a.systemRole && id
-      ? [{ company_id: companyId, role: a.systemRole, account_id: id }]
+      ? [
+          {
+            table: bindingTableFor(a.systemRole),
+            company_id: companyId,
+            role: a.systemRole,
+            account_id: id,
+          },
+        ]
       : [];
   });
-  await trx.insertInto('app.account_system_role').values(bindings).execute();
+  for (const table of ['app.account_system_role', 'app.account_system_role_ext'] as const) {
+    const rows = bindings
+      .filter((b) => b.table === table)
+      .map(({ company_id, role, account_id }) => ({ company_id, role, account_id }));
+    if (rows.length > 0) await trx.insertInto(table).values(rows).execute();
+  }
   return { accounts, suggestedSettings: { ...template.suggestedSettings } };
 }
 
@@ -98,7 +112,7 @@ export async function listChart(
   const r = await sql<ChartAccount>`
     SELECT a.id::text, a.company_id::text, a.code, a.name, a.type, a.subtype, a.normal_balance,
            a.currency::text AS currency, a.postable, a.is_control, a.status,
-           coalesce((SELECT array_agg(r.role ORDER BY r.role) FROM app.account_system_role r
+           coalesce((SELECT array_agg(r.role ORDER BY r.role) FROM app.account_role_binding r
                       WHERE r.tenant_id = a.tenant_id AND r.company_id = a.company_id
                         AND r.account_id = a.id), '{}'::text[]) AS system_roles
       FROM app.account a

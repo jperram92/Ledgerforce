@@ -1,0 +1,41 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a690879849dd84b39
+
+ ❯ |unit| packages/ledger/src/golden/postings.test.ts (9 tests | 1 failed) 19ms
+     × AC-3 every system: golden binding resolves through a system role, never a code [T-0117] 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/ledger/src/golden/postings.test.ts > AU_SERVICES_BINDINGS (ADR-0061) > AC-3 every system: golden binding resolves through a system role, never a code [T-0117]
+AssertionError: expected [ 'system:PREPAYMENTS', …(6) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "system:PREPAYMENTS",
++   "system:ACCUM_DEPRECIATION",
++   "system:DEPRECIATION_EXPENSE",
++   "system:AR_ECL_ALLOWANCE",
++   "system:ACCRUED_EXPENSES",
++   "system:SGC_PAYABLE",
++   "system:PRIOR_PERIOD_ADJUSTMENTS",
++ ]
+
+ ❯ packages/ledger/src/golden/postings.test.ts:74:20
+     72|       .filter(([binding, target]) => binding.startsWith('system:') && …
+     73|       .map(([binding]) => binding);
+     74|     expect(byCode).toEqual([]);
+       |                    ^
+     75|     for (const [binding, target] of Object.entries(AU_SERVICES_BINDING…
+     76|       if (!binding.startsWith('system:') || !target || !('role' in tar…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  08:19:07
+   Duration  445ms (transform 110ms, setup 0ms, import 134ms, tests 19ms, environment 0ms)
+

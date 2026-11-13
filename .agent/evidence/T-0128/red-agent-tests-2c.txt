@@ -1,0 +1,445 @@
+TAP version 13
+# Subtest: verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+ok 1 - verify.sh (full) with a task: review PENDING, memory and evidence FAIL, 2c coverage reported
+  ---
+  duration_ms: 891.73636
+  type: 'test'
+  ...
+# Subtest: verify.sh (full) with a task: 2c coverage measures unit+db with one worker and passes against a unit+db main baseline
+not ok 2 - verify.sh (full) with a task: 2c coverage measures unit+db with one worker and passes against a unit+db main baseline
+  ---
+  duration_ms: 1013.645307
+  type: 'test'
+  location: '/home/user/Ledgerforce/.claude/worktrees/agent-a9e1b2d93b78a687c/scripts/agent/test/scripts.test.ts:309:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    LedgerForce verify — 2026-11-13T03:55:01Z — task T-0002
+    GATE 1 typecheck: NOT YET AVAILABLE (no package.json script "typecheck")
+    GATE 1 lint: NOT YET AVAILABLE (no package.json script "lint")
+    GATE 1 format: NOT YET AVAILABLE (no package.json script "format:check")
+    GATE 2a unit-tests: NOT YET AVAILABLE (no package.json test script / node_modules, no agent tests)
+    GATE 2b db-tests: NOT YET AVAILABLE (no package.json script "test:db")
+    GATE 2c coverage: PASS (lines 94.1% vs main 93.5%)
+    GATE 3 accounting-invariants: NOT YET AVAILABLE (no property test file(s) yet)
+    GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; Docs/accounting unchanged vs 18c4dee)
+    GATE 5 cross-tenant-rls: NOT YET AVAILABLE (no cross-tenant RLS test file(s) yet)
+    GATE 6 migrations-forward: NOT YET AVAILABLE (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+    GATE 7 security: PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+    GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+    GATE 9 e2e-evidence: FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+    GATE 10 no-shortcuts: PASS (0 test file(s) scanned; diff vs 18c4dee clean)
+    GATE 11 no-delete: PASS (vs merge-base 18c4dee, staged + working tree)
+    GATE 12 memory: FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+      T-0002: unticked step: - [ ] 2. Deferred balance constraint trigger
+      T-0002: unticked step: - [ ] 3. Immutability trigger + tests
+      .agent/HANDOVER.md missing
+    
+    === SUMMARY ===
+     #   | gate                  | result
+     1   | typecheck             | PENDING (no package.json script "typecheck")
+     1   | lint                  | PENDING (no package.json script "lint")
+     1   | format                | PENDING (no package.json script "format:check")
+     2a  | unit-tests            | PENDING (no package.json test script / node_modules, no agent tests)
+     2b  | db-tests              | PENDING (no package.json script "test:db")
+     2c  | coverage              | PASS (lines 94.1% vs main 93.5%)
+     3   | accounting-invariants | PENDING (no property test file(s) yet)
+     4   | golden-postings       | PENDING (no golden test file(s) yet; Docs/accounting unchanged vs 18c4dee)
+     5   | cross-tenant-rls      | PENDING (no cross-tenant RLS test file(s) yet)
+     6   | migrations-forward    | PENDING (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+     7   | security              | PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+     8   | cross-review          | PENDING (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+     9   | e2e-evidence          | FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+     10  | no-shortcuts          | PASS (0 test file(s) scanned; diff vs 18c4dee clean)
+     11  | no-delete             | PASS (vs merge-base 18c4dee, staged + working tree)
+     12  | memory                | FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+    PASS: 4   FAIL: 2   PENDING: 10
+    !!! 10 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+    VERIFY: FAIL
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    LedgerForce verify — 2026-11-13T03:55:01Z — task T-0002
+    GATE 1 typecheck: NOT YET AVAILABLE (no package.json script "typecheck")
+    GATE 1 lint: NOT YET AVAILABLE (no package.json script "lint")
+    GATE 1 format: NOT YET AVAILABLE (no package.json script "format:check")
+    GATE 2a unit-tests: NOT YET AVAILABLE (no package.json test script / node_modules, no agent tests)
+    GATE 2b db-tests: NOT YET AVAILABLE (no package.json script "test:db")
+    GATE 2c coverage: PASS (lines 94.1% vs main 93.5%)
+    GATE 3 accounting-invariants: NOT YET AVAILABLE (no property test file(s) yet)
+    GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; Docs/accounting unchanged vs 18c4dee)
+    GATE 5 cross-tenant-rls: NOT YET AVAILABLE (no cross-tenant RLS test file(s) yet)
+    GATE 6 migrations-forward: NOT YET AVAILABLE (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+    GATE 7 security: PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+    GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+    GATE 9 e2e-evidence: FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+    GATE 10 no-shortcuts: PASS (0 test file(s) scanned; diff vs 18c4dee clean)
+    GATE 11 no-delete: PASS (vs merge-base 18c4dee, staged + working tree)
+    GATE 12 memory: FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+      T-0002: unticked step: - [ ] 2. Deferred balance constraint trigger
+      T-0002: unticked step: - [ ] 3. Immutability trigger + tests
+      .agent/HANDOVER.md missing
+    
+    === SUMMARY ===
+     #   | gate                  | result
+     1   | typecheck             | PENDING (no package.json script "typecheck")
+     1   | lint                  | PENDING (no package.json script "lint")
+     1   | format                | PENDING (no package.json script "format:check")
+     2a  | unit-tests            | PENDING (no package.json test script / node_modules, no agent tests)
+     2b  | db-tests              | PENDING (no package.json script "test:db")
+     2c  | coverage              | PASS (lines 94.1% vs main 93.5%)
+     3   | accounting-invariants | PENDING (no property test file(s) yet)
+     4   | golden-postings       | PENDING (no golden test file(s) yet; Docs/accounting unchanged vs 18c4dee)
+     5   | cross-tenant-rls      | PENDING (no cross-tenant RLS test file(s) yet)
+     6   | migrations-forward    | PENDING (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+     7   | security              | PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+     8   | cross-review          | PENDING (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+     9   | e2e-evidence          | FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+     10  | no-shortcuts          | PASS (0 test file(s) scanned; diff vs 18c4dee clean)
+     11  | no-delete             | PASS (vs merge-base 18c4dee, staged + working tree)
+     12  | memory                | FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+    PASS: 4   FAIL: 2   PENDING: 10
+    !!! 10 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+    VERIFY: FAIL
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/Ledgerforce/.claude/worktrees/agent-a9e1b2d93b78a687c/scripts/agent/test/scripts.test.ts:312:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+  ...
+# Subtest: verify.sh (full) with a task: 2c coverage fails when unit+db lines drop below the unit+db main baseline
+not ok 3 - verify.sh (full) with a task: 2c coverage fails when unit+db lines drop below the unit+db main baseline
+  ---
+  duration_ms: 1026.278352
+  type: 'test'
+  location: '/home/user/Ledgerforce/.claude/worktrees/agent-a9e1b2d93b78a687c/scripts/agent/test/scripts.test.ts:318:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    LedgerForce verify — 2026-11-13T03:55:02Z — task T-0002
+    GATE 1 typecheck: NOT YET AVAILABLE (no package.json script "typecheck")
+    GATE 1 lint: NOT YET AVAILABLE (no package.json script "lint")
+    GATE 1 format: NOT YET AVAILABLE (no package.json script "format:check")
+    GATE 2a unit-tests: NOT YET AVAILABLE (no package.json test script / node_modules, no agent tests)
+    GATE 2b db-tests: NOT YET AVAILABLE (no package.json script "test:db")
+    GATE 2c coverage: FAIL (lines 93.7% < main 93.95%)
+    GATE 3 accounting-invariants: NOT YET AVAILABLE (no property test file(s) yet)
+    GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; Docs/accounting unchanged vs a083042)
+    GATE 5 cross-tenant-rls: NOT YET AVAILABLE (no cross-tenant RLS test file(s) yet)
+    GATE 6 migrations-forward: NOT YET AVAILABLE (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+    GATE 7 security: PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+    GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+    GATE 9 e2e-evidence: FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+    GATE 10 no-shortcuts: PASS (0 test file(s) scanned; diff vs a083042 clean)
+    GATE 11 no-delete: PASS (vs merge-base a083042, staged + working tree)
+    GATE 12 memory: FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+      T-0002: unticked step: - [ ] 2. Deferred balance constraint trigger
+      T-0002: unticked step: - [ ] 3. Immutability trigger + tests
+      .agent/HANDOVER.md missing
+    
+    === SUMMARY ===
+     #   | gate                  | result
+     1   | typecheck             | PENDING (no package.json script "typecheck")
+     1   | lint                  | PENDING (no package.json script "lint")
+     1   | format                | PENDING (no package.json script "format:check")
+     2a  | unit-tests            | PENDING (no package.json test script / node_modules, no agent tests)
+     2b  | db-tests              | PENDING (no package.json script "test:db")
+     2c  | coverage              | FAIL (lines 93.7% < main 93.95%)
+     3   | accounting-invariants | PENDING (no property test file(s) yet)
+     4   | golden-postings       | PENDING (no golden test file(s) yet; Docs/accounting unchanged vs a083042)
+     5   | cross-tenant-rls      | PENDING (no cross-tenant RLS test file(s) yet)
+     6   | migrations-forward    | PENDING (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+     7   | security              | PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+     8   | cross-review          | PENDING (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+     9   | e2e-evidence          | FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+     10  | no-shortcuts          | PASS (0 test file(s) scanned; diff vs a083042 clean)
+     11  | no-delete             | PASS (vs merge-base a083042, staged + working tree)
+     12  | memory                | FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+    PASS: 3   FAIL: 3   PENDING: 10
+    !!! 10 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+    VERIFY: FAIL
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    LedgerForce verify — 2026-11-13T03:55:02Z — task T-0002
+    GATE 1 typecheck: NOT YET AVAILABLE (no package.json script "typecheck")
+    GATE 1 lint: NOT YET AVAILABLE (no package.json script "lint")
+    GATE 1 format: NOT YET AVAILABLE (no package.json script "format:check")
+    GATE 2a unit-tests: NOT YET AVAILABLE (no package.json test script / node_modules, no agent tests)
+    GATE 2b db-tests: NOT YET AVAILABLE (no package.json script "test:db")
+    GATE 2c coverage: FAIL (lines 93.7% < main 93.95%)
+    GATE 3 accounting-invariants: NOT YET AVAILABLE (no property test file(s) yet)
+    GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; Docs/accounting unchanged vs a083042)
+    GATE 5 cross-tenant-rls: NOT YET AVAILABLE (no cross-tenant RLS test file(s) yet)
+    GATE 6 migrations-forward: NOT YET AVAILABLE (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+    GATE 7 security: PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+    GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+    GATE 9 e2e-evidence: FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+    GATE 10 no-shortcuts: PASS (0 test file(s) scanned; diff vs a083042 clean)
+    GATE 11 no-delete: PASS (vs merge-base a083042, staged + working tree)
+    GATE 12 memory: FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+      T-0002: unticked step: - [ ] 2. Deferred balance constraint trigger
+      T-0002: unticked step: - [ ] 3. Immutability trigger + tests
+      .agent/HANDOVER.md missing
+    
+    === SUMMARY ===
+     #   | gate                  | result
+     1   | typecheck             | PENDING (no package.json script "typecheck")
+     1   | lint                  | PENDING (no package.json script "lint")
+     1   | format                | PENDING (no package.json script "format:check")
+     2a  | unit-tests            | PENDING (no package.json test script / node_modules, no agent tests)
+     2b  | db-tests              | PENDING (no package.json script "test:db")
+     2c  | coverage              | FAIL (lines 93.7% < main 93.95%)
+     3   | accounting-invariants | PENDING (no property test file(s) yet)
+     4   | golden-postings       | PENDING (no golden test file(s) yet; Docs/accounting unchanged vs a083042)
+     5   | cross-tenant-rls      | PENDING (no cross-tenant RLS test file(s) yet)
+     6   | migrations-forward    | PENDING (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+     7   | security              | PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+     8   | cross-review          | PENDING (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+     9   | e2e-evidence          | FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+     10  | no-shortcuts          | PASS (0 test file(s) scanned; diff vs a083042 clean)
+     11  | no-delete             | PASS (vs merge-base a083042, staged + working tree)
+     12  | memory                | FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+    PASS: 3   FAIL: 3   PENDING: 10
+    !!! 10 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+    VERIFY: FAIL
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/Ledgerforce/.claude/worktrees/agent-a9e1b2d93b78a687c/scripts/agent/test/scripts.test.ts:322:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: verify.sh (full) with a task: 2c coverage is PENDING, never PASS, when main's baseline was taken with another measure
+not ok 4 - verify.sh (full) with a task: 2c coverage is PENDING, never PASS, when main's baseline was taken with another measure
+  ---
+  duration_ms: 1077.620288
+  type: 'test'
+  location: '/home/user/Ledgerforce/.claude/worktrees/agent-a9e1b2d93b78a687c/scripts/agent/test/scripts.test.ts:325:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    LedgerForce verify — 2026-11-13T03:55:03Z — task T-0002
+    GATE 1 typecheck: NOT YET AVAILABLE (no package.json script "typecheck")
+    GATE 1 lint: NOT YET AVAILABLE (no package.json script "lint")
+    GATE 1 format: NOT YET AVAILABLE (no package.json script "format:check")
+    GATE 2a unit-tests: NOT YET AVAILABLE (no package.json test script / node_modules, no agent tests)
+    GATE 2b db-tests: NOT YET AVAILABLE (no package.json script "test:db")
+    GATE 2c coverage: PASS (lines 94.1% vs main 72.22%)
+    GATE 3 accounting-invariants: NOT YET AVAILABLE (no property test file(s) yet)
+    GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; Docs/accounting unchanged vs 350d148)
+    GATE 5 cross-tenant-rls: NOT YET AVAILABLE (no cross-tenant RLS test file(s) yet)
+    GATE 6 migrations-forward: NOT YET AVAILABLE (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+    GATE 7 security: PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+    GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+    GATE 9 e2e-evidence: FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+    GATE 10 no-shortcuts: PASS (0 test file(s) scanned; diff vs 350d148 clean)
+    GATE 11 no-delete: PASS (vs merge-base 350d148, staged + working tree)
+    GATE 12 memory: FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+      T-0002: unticked step: - [ ] 2. Deferred balance constraint trigger
+      T-0002: unticked step: - [ ] 3. Immutability trigger + tests
+      .agent/HANDOVER.md missing
+    
+    === SUMMARY ===
+     #   | gate                  | result
+     1   | typecheck             | PENDING (no package.json script "typecheck")
+     1   | lint                  | PENDING (no package.json script "lint")
+     1   | format                | PENDING (no package.json script "format:check")
+     2a  | unit-tests            | PENDING (no package.json test script / node_modules, no agent tests)
+     2b  | db-tests              | PENDING (no package.json script "test:db")
+     2c  | coverage              | PASS (lines 94.1% vs main 72.22%)
+     3   | accounting-invariants | PENDING (no property test file(s) yet)
+     4   | golden-postings       | PENDING (no golden test file(s) yet; Docs/accounting unchanged vs 350d148)
+     5   | cross-tenant-rls      | PENDING (no cross-tenant RLS test file(s) yet)
+     6   | migrations-forward    | PENDING (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+     7   | security              | PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+     8   | cross-review          | PENDING (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+     9   | e2e-evidence          | FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+     10  | no-shortcuts          | PASS (0 test file(s) scanned; diff vs 350d148 clean)
+     11  | no-delete             | PASS (vs merge-base 350d148, staged + working tree)
+     12  | memory                | FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+    PASS: 4   FAIL: 2   PENDING: 10
+    !!! 10 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+    VERIFY: FAIL
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    LedgerForce verify — 2026-11-13T03:55:03Z — task T-0002
+    GATE 1 typecheck: NOT YET AVAILABLE (no package.json script "typecheck")
+    GATE 1 lint: NOT YET AVAILABLE (no package.json script "lint")
+    GATE 1 format: NOT YET AVAILABLE (no package.json script "format:check")
+    GATE 2a unit-tests: NOT YET AVAILABLE (no package.json test script / node_modules, no agent tests)
+    GATE 2b db-tests: NOT YET AVAILABLE (no package.json script "test:db")
+    GATE 2c coverage: PASS (lines 94.1% vs main 72.22%)
+    GATE 3 accounting-invariants: NOT YET AVAILABLE (no property test file(s) yet)
+    GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; Docs/accounting unchanged vs 350d148)
+    GATE 5 cross-tenant-rls: NOT YET AVAILABLE (no cross-tenant RLS test file(s) yet)
+    GATE 6 migrations-forward: NOT YET AVAILABLE (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+    GATE 7 security: PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+    GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+    GATE 9 e2e-evidence: FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+    GATE 10 no-shortcuts: PASS (0 test file(s) scanned; diff vs 350d148 clean)
+    GATE 11 no-delete: PASS (vs merge-base 350d148, staged + working tree)
+    GATE 12 memory: FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+      T-0002: unticked step: - [ ] 2. Deferred balance constraint trigger
+      T-0002: unticked step: - [ ] 3. Immutability trigger + tests
+      .agent/HANDOVER.md missing
+    
+    === SUMMARY ===
+     #   | gate                  | result
+     1   | typecheck             | PENDING (no package.json script "typecheck")
+     1   | lint                  | PENDING (no package.json script "lint")
+     1   | format                | PENDING (no package.json script "format:check")
+     2a  | unit-tests            | PENDING (no package.json test script / node_modules, no agent tests)
+     2b  | db-tests              | PENDING (no package.json script "test:db")
+     2c  | coverage              | PASS (lines 94.1% vs main 72.22%)
+     3   | accounting-invariants | PENDING (no property test file(s) yet)
+     4   | golden-postings       | PENDING (no golden test file(s) yet; Docs/accounting unchanged vs 350d148)
+     5   | cross-tenant-rls      | PENDING (no cross-tenant RLS test file(s) yet)
+     6   | migrations-forward    | PENDING (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+     7   | security              | PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+     8   | cross-review          | PENDING (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+     9   | e2e-evidence          | FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+     10  | no-shortcuts          | PASS (0 test file(s) scanned; diff vs 350d148 clean)
+     11  | no-delete             | PASS (vs merge-base 350d148, staged + working tree)
+     12  | memory                | FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+    PASS: 4   FAIL: 2   PENDING: 10
+    !!! 10 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+    VERIFY: FAIL
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/Ledgerforce/.claude/worktrees/agent-a9e1b2d93b78a687c/scripts/agent/test/scripts.test.ts:331:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: verify.sh (full) with a task: 2c coverage is PENDING without a main baseline
+not ok 5 - verify.sh (full) with a task: 2c coverage is PENDING without a main baseline
+  ---
+  duration_ms: 1058.992402
+  type: 'test'
+  location: '/home/user/Ledgerforce/.claude/worktrees/agent-a9e1b2d93b78a687c/scripts/agent/test/scripts.test.ts:341:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    LedgerForce verify — 2026-11-13T03:55:05Z — task T-0002
+    GATE 1 typecheck: NOT YET AVAILABLE (no package.json script "typecheck")
+    GATE 1 lint: NOT YET AVAILABLE (no package.json script "lint")
+    GATE 1 format: NOT YET AVAILABLE (no package.json script "format:check")
+    GATE 2a unit-tests: NOT YET AVAILABLE (no package.json test script / node_modules, no agent tests)
+    GATE 2b db-tests: NOT YET AVAILABLE (no package.json script "test:db")
+    GATE 2c coverage: NOT YET AVAILABLE (lines 94.1% — no baseline .agent/coverage-baseline.json on main yet)
+    GATE 3 accounting-invariants: NOT YET AVAILABLE (no property test file(s) yet)
+    GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; Docs/accounting unchanged vs b7ad4ee)
+    GATE 5 cross-tenant-rls: NOT YET AVAILABLE (no cross-tenant RLS test file(s) yet)
+    GATE 6 migrations-forward: NOT YET AVAILABLE (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+    GATE 7 security: PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+    GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+    GATE 9 e2e-evidence: FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+    GATE 10 no-shortcuts: PASS (0 test file(s) scanned; diff vs b7ad4ee clean)
+    GATE 11 no-delete: PASS (vs merge-base b7ad4ee, staged + working tree)
+    GATE 12 memory: FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+      T-0002: unticked step: - [ ] 2. Deferred balance constraint trigger
+      T-0002: unticked step: - [ ] 3. Immutability trigger + tests
+      .agent/HANDOVER.md missing
+    
+    === SUMMARY ===
+     #   | gate                  | result
+     1   | typecheck             | PENDING (no package.json script "typecheck")
+     1   | lint                  | PENDING (no package.json script "lint")
+     1   | format                | PENDING (no package.json script "format:check")
+     2a  | unit-tests            | PENDING (no package.json test script / node_modules, no agent tests)
+     2b  | db-tests              | PENDING (no package.json script "test:db")
+     2c  | coverage              | PENDING (lines 94.1% — no baseline .agent/coverage-baseline.json on main yet)
+     3   | accounting-invariants | PENDING (no property test file(s) yet)
+     4   | golden-postings       | PENDING (no golden test file(s) yet; Docs/accounting unchanged vs b7ad4ee)
+     5   | cross-tenant-rls      | PENDING (no cross-tenant RLS test file(s) yet)
+     6   | migrations-forward    | PENDING (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+     7   | security              | PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+     8   | cross-review          | PENDING (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+     9   | e2e-evidence          | FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+     10  | no-shortcuts          | PASS (0 test file(s) scanned; diff vs b7ad4ee clean)
+     11  | no-delete             | PASS (vs merge-base b7ad4ee, staged + working tree)
+     12  | memory                | FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+    PASS: 3   FAIL: 2   PENDING: 11
+    !!! 11 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+    VERIFY: FAIL
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    LedgerForce verify — 2026-11-13T03:55:05Z — task T-0002
+    GATE 1 typecheck: NOT YET AVAILABLE (no package.json script "typecheck")
+    GATE 1 lint: NOT YET AVAILABLE (no package.json script "lint")
+    GATE 1 format: NOT YET AVAILABLE (no package.json script "format:check")
+    GATE 2a unit-tests: NOT YET AVAILABLE (no package.json test script / node_modules, no agent tests)
+    GATE 2b db-tests: NOT YET AVAILABLE (no package.json script "test:db")
+    GATE 2c coverage: NOT YET AVAILABLE (lines 94.1% — no baseline .agent/coverage-baseline.json on main yet)
+    GATE 3 accounting-invariants: NOT YET AVAILABLE (no property test file(s) yet)
+    GATE 4 golden-postings: NOT YET AVAILABLE (no golden test file(s) yet; Docs/accounting unchanged vs b7ad4ee)
+    GATE 5 cross-tenant-rls: NOT YET AVAILABLE (no cross-tenant RLS test file(s) yet)
+    GATE 6 migrations-forward: NOT YET AVAILABLE (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+    GATE 7 security: PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+    GATE 8 cross-review: NOT YET AVAILABLE (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+    GATE 9 e2e-evidence: FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+    GATE 10 no-shortcuts: PASS (0 test file(s) scanned; diff vs b7ad4ee clean)
+    GATE 11 no-delete: PASS (vs merge-base b7ad4ee, staged + working tree)
+    GATE 12 memory: FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+      T-0002: unticked step: - [ ] 2. Deferred balance constraint trigger
+      T-0002: unticked step: - [ ] 3. Immutability trigger + tests
+      .agent/HANDOVER.md missing
+    
+    === SUMMARY ===
+     #   | gate                  | result
+     1   | typecheck             | PENDING (no package.json script "typecheck")
+     1   | lint                  | PENDING (no package.json script "lint")
+     1   | format                | PENDING (no package.json script "format:check")
+     2a  | unit-tests            | PENDING (no package.json test script / node_modules, no agent tests)
+     2b  | db-tests              | PENDING (no package.json script "test:db")
+     2c  | coverage              | PENDING (lines 94.1% — no baseline .agent/coverage-baseline.json on main yet)
+     3   | accounting-invariants | PENDING (no property test file(s) yet)
+     4   | golden-postings       | PENDING (no golden test file(s) yet; Docs/accounting unchanged vs b7ad4ee)
+     5   | cross-tenant-rls      | PENDING (no cross-tenant RLS test file(s) yet)
+     6   | migrations-forward    | PENDING (gate 2b pending; 0 new/changed .sql file(s); no DROP/RENAME/TRUNCATE/DISABLE TRIGGER)
+     7   | security              | PASS (secrets scan clean; dependency audit NOT AVAILABLE (no pnpm-lock.yaml); SAST skipped locally (no semgrep — runs in CI))
+     8   | cross-review          | PENDING (no review report by a provider other than the builder (unknown) in .agent/evidence/T-0002/review-*.md)
+     9   | e2e-evidence          | FAIL (no package.json script "test:e2e"; missing .agent/evidence/T-0002/manifest.json for SS-01)
+     10  | no-shortcuts          | PASS (0 test file(s) scanned; diff vs b7ad4ee clean)
+     11  | no-delete             | PASS (vs merge-base b7ad4ee, staged + working tree)
+     12  | memory                | FAIL (T-0002: status "todo" (expected verifying, review or done when verifying))
+    PASS: 3   FAIL: 2   PENDING: 11
+    !!! 11 gate(s) PENDING — not yet verifiable. PENDING is NOT a pass: a task cannot be 'done' on a gate that applies to it and is pending. !!!
+    VERIFY: FAIL
+    
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/Ledgerforce/.claude/worktrees/agent-a9e1b2d93b78a687c/scripts/agent/test/scripts.test.ts:344:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 1
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 5200.04643

@@ -1,0 +1,1223 @@
+From 71951b55337f7eee7627aae46794f4e5ff7df6fc Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 04:00:28 +0000
+Subject: [PATCH 1/4] =?UTF-8?q?wip(T-0086):=20step=201/4=20=E2=80=94=20bil?=
+ =?UTF-8?q?l=20read=20routes=20for=20the=20bills=20screens?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+What changed: @ledgerforce/ap gains read models (bills-read.ts: billCodingOptions, listBills,
+getBillDetail, billJournalView) and previewBillJournal, which runs the engine preview on the
+same journal builder approveBill posts (billJournal extracted from approveBill, behaviour
+unchanged). API: GET /ap/bills (all bills; ?queue=awaiting_approval unchanged), GET
+/ap/bills/:id (coding, people involved, caller's SoD outlook for approval via new read-only
+sodOutlook), GET /ap/bills/:id/journal (preview for a draft, posted entry after approval),
+all ap.read; GET /ap/bill-coding (suppliers, expense/asset accounts, tax codes) ap.bill.enter.
+
+Why: SS-UC05-08 needs screens that code, approve and show the posted journal; the API had
+only enter/submit/approve and the approval queue (DL-0440).
+
+Validation: apps/api/src/ap/bills-read.db.test.ts RED first (4 failing: 404/400, saved to
+.agent/evidence/T-0086/red-api-bills-read.txt), now green with bills.db.test.ts (7 tests);
+packages/modules/ap db tests 39/39 (GP-008 unchanged); api-unit 103/103; eslint + prettier
+clean on touched files. Full typecheck not run yet.
+
+Next action: Playwright spec tests/e2e/web/bills.spec.ts RED, then the purchases screens.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .agent/evidence/T-0086/red-api-bills-read.txt | 112 ++++++
+ apps/api/src/ap/bills-read.db.test.ts         | 298 ++++++++++++++++
+ apps/api/src/ap/bills.controller.ts           | 150 +++++++-
+ apps/api/src/app.ts                           |   4 +-
+ apps/api/src/sod/sod.service.ts               |  27 ++
+ packages/modules/ap/src/bills-read.ts         | 327 ++++++++++++++++++
+ packages/modules/ap/src/bills.ts              | 121 +++++--
+ packages/modules/ap/src/index.ts              |   1 +
+ 8 files changed, 1009 insertions(+), 31 deletions(-)
+ create mode 100644 .agent/evidence/T-0086/red-api-bills-read.txt
+ create mode 100644 apps/api/src/ap/bills-read.db.test.ts
+ create mode 100644 packages/modules/ap/src/bills-read.ts
+
+diff --git a/.agent/evidence/T-0086/red-api-bills-read.txt b/.agent/evidence/T-0086/red-api-bills-read.txt
+new file mode 100644
+index 0000000..e354b51
+--- /dev/null
++++ b/.agent/evidence/T-0086/red-api-bills-read.txt
+@@ -0,0 +1,112 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a87fbf6f410bb150c
++
++[db] test PostgreSQL ready (local) on 127.0.0.1:33739
++ ❯ |api-db| apps/api/src/ap/bills-read.db.test.ts (4 tests | 4 failed) 1056ms
++     × lists active suppliers, postable expense/asset accounts and tax codes in force; needs ap.bill.enter 29ms
++     × lists every bill with supplier, dates and state; shows one bill with its coding and the people involved 70ms
++     × a person who entered a 2,750.00 bill is told they may not approve it; another approver may 42ms
++     × previews GP-008 for a draft without writing, and shows the same posted entry after approval 41ms
++
++⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |api-db| apps/api/src/ap/bills-read.db.test.ts > T-0086: bill coding choices > lists active suppliers, postable expense/asset accounts and tax codes in force; needs ap.bill.enter
++AssertionError: expected 404 to be 200 // Object.is equality
++
++- Expected
+++ Received
++
++- 200
+++ 404
++
++ ❯ apps/api/src/ap/bills-read.db.test.ts:147:24
++    145|   it('lists active suppliers, postable expense/asset accounts and tax …
++    146|     const res = await call('GET', `/ap/bill-coding?${q()}&date=2026-11…
++    147|     expect(res.status).toBe(200);
++       |                        ^
++    148|     const body = (await res.json()) as {
++    149|       suppliers: { id: string; name: string }[];
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
++
++ FAIL  |api-db| apps/api/src/ap/bills-read.db.test.ts > T-0086: bills list and one bill > lists every bill with supplier, dates and state; shows one bill with its coding and the people involved
++AssertionError: expected 400 to be 200 // Object.is equality
++
++- Expected
+++ Received
++
++- 200
+++ 400
++
++ ❯ apps/api/src/ap/bills-read.db.test.ts:173:25
++    171|
++    172|     const list = await call('GET', `/ap/bills?${q()}`, 'clerk');
++    173|     expect(list.status).toBe(200);
++       |                         ^
++    174|     expect(await list.json()).toMatchObject({
++    175|       bills: expect.arrayContaining([
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
++
++ FAIL  |api-db| apps/api/src/ap/bills-read.db.test.ts > T-0086: approval decision for the caller (SoD on the server) > a person who entered a 2,750.00 bill is told they may not approve it; another approver may
++AssertionError: expected { …(3) } to match object { awaiting_approval: true, …(3) }
++(3 matching properties omitted from actual)
++
++- Expected
+++ Received
++
++  {
++-   "approval": {
++-     "allowed": false,
++-     "rule": "SOD_BILL_SELF_APPROVAL",
++-     "self_approval_threshold": "1000.0000",
++-   },
++-   "awaiting_approval": true,
++-   "entered": {
++-     "by": "Mei Tan",
++-     "you": true,
++-   },
++-   "submitted": {
++-     "by": "Mei Tan",
++-     "you": true,
++-   },
+++   "error": "Not Found",
+++   "message": "Cannot GET /ap/bills/13661023-d2cb-48af-81f1-8b20a5ba39e5?company_id=01a1d30c-16f5-7753-a8de-64fd08dad924",
+++   "statusCode": 404,
++  }
++
++ ❯ apps/api/src/ap/bills-read.db.test.ts:239:30
++    237|     );
++    238|     const own = await call('GET', `/ap/bills/${id}?${q()}`, 'clerkAppr…
++    239|     expect(await own.json()).toMatchObject({
++       |                              ^
++    240|       awaiting_approval: true,
++    241|       entered: { by: 'Mei Tan', you: true },
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
++
++ FAIL  |api-db| apps/api/src/ap/bills-read.db.test.ts > T-0086: the journal of a bill > previews GP-008 for a draft without writing, and shows the same posted entry after approval
++AssertionError: expected 404 to be 200 // Object.is equality
++
++- Expected
+++ Received
++
++- 200
+++ 404
++
++ ❯ apps/api/src/ap/bills-read.db.test.ts:264:24
++    262|
++    263|     const pre = await call('GET', `/ap/bills/${id}/journal?${q()}`, 'c…
++    264|     expect(pre.status).toBe(200);
++       |                        ^
++    265|     const preview = (await pre.json()) as JournalBody;
++    266|     expect(preview).toMatchObject({
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
++
++
++ Test Files  1 failed (1)
++      Tests  4 failed (4)
++   Start at  03:55:42
++   Duration  4.86s (transform 1.63s, setup 0ms, import 2.91s, tests 1.06s, environment 0ms)
++
+diff --git a/apps/api/src/ap/bills-read.db.test.ts b/apps/api/src/ap/bills-read.db.test.ts
+new file mode 100644
+index 0000000..41313f3
+--- /dev/null
++++ b/apps/api/src/ap/bills-read.db.test.ts
+@@ -0,0 +1,298 @@
++/**
++ * Bill read routes for the bills screens (T-0086, UC-05, SS-UC05-08, DL-0440): the coding choices
++ * an AP Clerk needs (suppliers, expense/asset accounts, tax codes in force), the bills list, one
++ * bill with its coding, the people involved and whether the caller may approve it (SoD evaluated
++ * on the server, design §6.5 rule 3), and its journal — the posting engine's preview while it is a
++ * draft (writes nothing) and the posted entry once approved (same lines, GP-008).
++ * Real PostgreSQL as lf_app, real sessions.
++ */
++import 'reflect-metadata';
++import { randomUUID } from 'node:crypto';
++import { seedBillingCompany } from '@ledgerforce/ar/testing';
++import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
++import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++import { createApi, type Api } from '../app.ts';
++
++let f: LedgerFixture;
++let api: Api;
++let supplier = '';
++let customer = '';
++const cookies = new Map<string, string>();
++const people: Record<string, { id: string; name: string; roles: string[] }> = {
++  clerk: { id: randomUUID(), name: 'Lena Ortiz', roles: ['ap_clerk'] },
++  clerkApprover: { id: randomUUID(), name: 'Mei Tan', roles: ['ap_clerk', 'approver'] },
++  approver: { id: randomUUID(), name: 'Sam Nguyen', roles: ['approver'] },
++  arClerk: { id: randomUUID(), name: 'Ari Cole', roles: ['ar_clerk'] },
++};
++
++async function call(method: string, path: string, who: string, body?: unknown) {
++  const h: Record<string, string> = {};
++  const c = cookies.get(who);
++  if (c) h.cookie = `lf_session=${c}`;
++  if (body !== undefined) h['content-type'] = 'application/json';
++  return fetch(`${api.url}${path}`, {
++    method,
++    headers: h,
++    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
++  });
++}
++
++async function journalCount(): Promise<number> {
++  const { rows } = await f.admin.query<{ n: number }>(
++    'SELECT count(*)::int AS n FROM app.journal_entry WHERE tenant_id = $1',
++    [f.tenantId],
++  );
++  return rows[0]?.n ?? 0;
++}
++
++beforeAll(async () => {
++  f = await createLedgerFixture('01900000-0000-7000-8000-000000008601');
++  for (const [who, p] of Object.entries(people)) {
++    await f.admin.query(
++      `INSERT INTO app.app_user (id, tenant_id, email, display_name, status) VALUES ($1, $2, $3, $4, 'active')`,
++      [p.id, f.tenantId, `${who}@bills-read.test`, p.name],
++    );
++    for (const role of p.roles) {
++      await f.admin.query(
++        'INSERT INTO app.user_role (tenant_id, user_id, role) VALUES ($1, $2, $3)',
++        [f.tenantId, p.id, role],
++      );
++    }
++  }
++  await seedBillingCompany(f);
++  [supplier, customer] = await f.inTenant(async (trx) => {
++    const ids: string[] = [];
++    for (const [name, role] of [
++      ['Paper Supplies Pty Ltd', 'supplier'],
++      ['Acme Customer Pty Ltd', 'customer'],
++    ] as const) {
++      const p = await trx
++        .insertInto('app.party')
++        .values({ company_id: f.companyId, legal_name: name, status: 'active' })
++        .returning('id')
++        .executeTakeFirstOrThrow();
++      await trx
++        .insertInto('app.party_role')
++        .values({ company_id: f.companyId, party_id: p.id, role })
++        .execute();
++      ids.push(p.id);
++    }
++    await trx
++      .insertInto('app.number_series')
++      .values({ company_id: f.companyId, code: 'ap_bill_document', prefix: 'BILL-' })
++      .execute();
++    return ids as [string, string];
++  });
++  api = await createApi({ databaseUrl: f.tdb.url('lf_app'), sessions: {} });
++  if (!api.sessions) throw new Error('sessions not configured');
++  for (const [who, p] of Object.entries(people)) {
++    cookies.set(
++      who,
++      await api.sessions.create(f.tenantId, {
++        userId: p.id,
++        amr: ['pwd', 'otp'],
++        acr: null,
++        authTime: new Date(Date.now() - 30 * 60 * 1000),
++      }),
++    );
++  }
++}, 180_000);
++
++afterAll(async () => {
++  await (api as Api | undefined)?.close();
++  await (f as LedgerFixture | undefined)?.close();
++});
++
++const q = () => `company_id=${f.companyId}`;
++/** The GP-008 bill: 500.00 stationery (GST) + 2,000.00 laptop (GST-CAP) = 2,750.00 gross. */
++const enter = (id: string, who: string, ref: string) =>
++  call('PUT', `/ap/bills/${id}`, who, {
++    company_id: f.companyId,
++    party_id: supplier,
++    supplier_ref: ref,
++    bill_date: '2026-11-03',
++    due_date: '2026-11-30',
++    lines: [
++      {
++        account_id: f.acct['6230'],
++        description: 'Stationery and consumables',
++        amount: '500.00',
++        tax_code: 'GST',
++      },
++      { account_id: f.acct['1500'], description: 'Laptop', amount: '2000.00', tax_code: 'GST-CAP' },
++    ],
++  });
++
++interface JournalBody {
++  posted: boolean;
++  entry_no: string | null;
++  entry_date: string;
++  base_currency: string;
++  total: string;
++  lines: {
++    line_no: number;
++    account_code: string;
++    account_name: string;
++    account_type: string;
++    debit: string;
++    credit: string;
++  }[];
++}
++const amounts = (j: JournalBody) =>
++  j.lines.map((l) => `${l.account_code} ${l.debit} ${l.credit}`).sort();
++
++describe('T-0086: bill coding choices', () => {
++  it('lists active suppliers, postable expense/asset accounts and tax codes in force; needs ap.bill.enter', async () => {
++    const res = await call('GET', `/ap/bill-coding?${q()}&date=2026-11-03`, 'clerk');
++    expect(res.status).toBe(200);
++    const body = (await res.json()) as {
++      suppliers: { id: string; name: string }[];
++      accounts: { id: string; code: string; name: string; type: string }[];
++      tax_codes: { code: string; name: string; rate: string }[];
++    };
++    expect(body.suppliers).toEqual([{ id: supplier, name: 'Paper Supplies Pty Ltd' }]);
++    expect(body.suppliers.map((s) => s.id)).not.toContain(customer);
++    const codes = body.accounts.map((a) => a.code);
++    expect(codes).toEqual(expect.arrayContaining(['6230', '1500']));
++    expect(codes).not.toContain('2100');
++    expect(body.accounts.every((a) => a.type === 'expense' || a.type === 'asset')).toBe(true);
++    expect(body.tax_codes.map((t) => t.code)).toEqual(expect.arrayContaining(['GST', 'GST-CAP']));
++    expect(body.tax_codes.find((t) => t.code === 'GST')?.rate).toMatch(/^0\.1/);
++
++    expect((await call('GET', `/ap/bill-coding?${q()}`, 'approver')).status).toBe(403);
++    expect((await call('GET', `/ap/bill-coding?company_id=nope`, 'clerk')).status).toBe(400);
++  });
++});
++
++describe('T-0086: bills list and one bill', () => {
++  it('lists every bill with supplier, dates and state; shows one bill with its coding and the people involved', async () => {
++    const id = randomUUID();
++    expect((await enter(id, 'clerk', 'SUP-R-1')).status).toBe(201);
++
++    const list = await call('GET', `/ap/bills?${q()}`, 'clerk');
++    expect(list.status).toBe(200);
++    expect(await list.json()).toMatchObject({
++      bills: expect.arrayContaining([
++        {
++          id,
++          bill_no: null,
++          status: 'draft',
++          awaiting_approval: false,
++          party_id: supplier,
++          supplier_name: 'Paper Supplies Pty Ltd',
++          supplier_ref: 'SUP-R-1',
++          bill_date: '2026-11-03',
++          due_date: '2026-11-30',
++          gross: '2750.0000',
++        },
++      ]),
++    });
++    expect((await call('GET', `/ap/bills?${q()}`, 'arClerk')).status).toBe(403);
++    expect((await call('GET', `/ap/bills?${q()}&queue=other`, 'clerk')).status).toBe(400);
++
++    const one = await call('GET', `/ap/bills/${id}?${q()}`, 'clerk');
++    expect(one.status).toBe(200);
++    expect(await one.json()).toMatchObject({
++      id,
++      status: 'draft',
++      awaiting_approval: false,
++      supplier_name: 'Paper Supplies Pty Ltd',
++      supplier_ref: 'SUP-R-1',
++      net: '2500.0000',
++      tax: '250.0000',
++      gross: '2750.0000',
++      currency: 'AUD',
++      lines: [
++        {
++          line_no: 1,
++          description: 'Stationery and consumables',
++          account_code: '6230',
++          account_name: expect.any(String),
++          tax_code: 'GST',
++          amount: '500.0000',
++        },
++        {
++          line_no: 2,
++          description: 'Laptop',
++          account_code: '1500',
++          account_name: expect.any(String),
++          tax_code: 'GST-CAP',
++          amount: '2000.0000',
++        },
++      ],
++      entered: { by: 'Lena Ortiz', you: true, at: expect.any(String) },
++      submitted: null,
++      approved: null,
++    });
++    expect((await call('GET', `/ap/bills/${randomUUID()}?${q()}`, 'clerk')).status).toBe(404);
++  });
++});
++
++describe('T-0086: approval decision for the caller (SoD on the server)', () => {
++  it('a person who entered a 2,750.00 bill is told they may not approve it; another approver may', async () => {
++    const id = randomUUID();
++    expect((await enter(id, 'clerkApprover', 'SUP-R-2')).status).toBe(201);
++    expect((await call('POST', `/ap/bills/${id}/submit?${q()}`, 'clerkApprover')).status).toBe(200);
++    const own = await call('GET', `/ap/bills/${id}?${q()}`, 'clerkApprover');
++    expect(await own.json()).toMatchObject({
++      awaiting_approval: true,
++      entered: { by: 'Mei Tan', you: true },
++      submitted: { by: 'Mei Tan', you: true },
++      approval: {
++        allowed: false,
++        rule: 'SOD_BILL_SELF_APPROVAL',
++        self_approval_threshold: '1000.0000',
++      },
++    });
++    const other = await call('GET', `/ap/bills/${id}?${q()}`, 'approver');
++    expect(await other.json()).toMatchObject({
++      entered: { by: 'Mei Tan', you: false },
++      approval: { allowed: true, rule: null, self_approval_threshold: '1000.0000' },
++    });
++  });
++});
++
++describe('T-0086: the journal of a bill', () => {
++  it('previews GP-008 for a draft without writing, and shows the same posted entry after approval', async () => {
++    const id = randomUUID();
++    expect((await enter(id, 'clerk', 'SUP-R-3')).status).toBe(201);
++    const before = await journalCount();
++
++    const pre = await call('GET', `/ap/bills/${id}/journal?${q()}`, 'clerk');
++    expect(pre.status).toBe(200);
++    const preview = (await pre.json()) as JournalBody;
++    expect(preview).toMatchObject({
++      posted: false,
++      entry_no: null,
++      entry_date: '2026-11-03',
++      base_currency: 'AUD',
++      total: '2750.0000',
++    });
++    expect(preview.lines).toHaveLength(4);
++    expect(preview.lines.map((l) => l.account_type)).toEqual(
++      expect.arrayContaining(['expense', 'asset', 'liability']),
++    );
++    expect(await journalCount()).toBe(before);
++
++    expect((await call('POST', `/ap/bills/${id}/submit?${q()}`, 'clerk')).status).toBe(200);
++    expect((await call('POST', `/ap/bills/${id}/approve?${q()}`, 'approver')).status).toBe(200);
++    expect(await journalCount()).toBe(before + 1);
++
++    const res = await call('GET', `/ap/bills/${id}/journal?${q()}`, 'clerk');
++    expect(res.status).toBe(200);
++    const posted = (await res.json()) as JournalBody;
++    expect(posted).toMatchObject({ posted: true, entry_date: '2026-11-03', total: '2750.0000' });
++    expect(posted.entry_no).toEqual(expect.any(String));
++    expect(amounts(posted)).toEqual(amounts(preview));
++
++    const detail = await call('GET', `/ap/bills/${id}?${q()}`, 'clerk');
++    expect(await detail.json()).toMatchObject({
++      status: 'posted',
++      bill_no: expect.stringMatching(/^BILL-/),
++      entered: { by: 'Lena Ortiz', you: true },
++      submitted: { by: 'Lena Ortiz' },
++      approved: { by: 'Sam Nguyen', you: false, at: expect.any(String) },
++    });
++    expect((await call('GET', `/ap/bills/${id}/journal?${q()}`, 'arClerk')).status).toBe(403);
++  });
++});
+diff --git a/apps/api/src/ap/bills.controller.ts b/apps/api/src/ap/bills.controller.ts
+index 39c8cd3..b3063a5 100644
+--- a/apps/api/src/ap/bills.controller.ts
++++ b/apps/api/src/ap/bills.controller.ts
+@@ -4,6 +4,10 @@
+  * recorded against it); POST /ap/bills/:id/submit routes it to the Approver queue;
+  * POST /ap/bills/:id/approve posts it after SOD_BILL_SELF_APPROVAL (with small-team exceptions)
+  * is checked against the stored gross; GET /ap/bills?queue=awaiting_approval is the queue.
++ * Read routes for the bills screens (T-0086, DL-0440): GET /ap/bills (every bill), GET
++ * /ap/bills/:id (coding, people involved and the caller's SoD outlook for approval), GET
++ * /ap/bills/:id/journal (engine preview for a draft, the posted entry after approval), all ap.read;
++ * GET /ap/bill-coding (suppliers, accounts, tax codes) needs ap.bill.enter.
+  */
+ import {
+   BadRequestException,
+@@ -11,6 +15,7 @@ import {
+   Controller,
+   Get,
+   HttpCode,
++  NotFoundException,
+   Param,
+   Post,
+   Put,
+@@ -22,7 +27,11 @@ import {
+ import {
+   approveBill,
+   BillError,
++  billCodingOptions,
++  billJournalView,
+   billsAwaitingApproval,
++  getBillDetail,
++  listBills,
+   createBill,
+   getBill,
+   submitBill,
+@@ -33,6 +42,7 @@ import type { Request, Response } from 'express';
+ import { principalOf, tokenPrincipalOf } from '../auth/session-tenant-resolver.ts';
+ import { RequirePermission } from '../authz/permission.decorator.ts';
+ import { InvalidSodSubject, SoD, type SubjectFrom } from '../sod/sod.decorator.ts';
++import { sodOutlook } from '../sod/sod.service.ts';
+ import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
+ 
+ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+@@ -46,6 +56,13 @@ const refusal = (e: unknown): never => {
+   }
+   throw e;
+ };
++const notFound = (e: unknown): never => {
++  if (e instanceof BillError && e.code === 'INVALID_BILL') {
++    throw new NotFoundException({ error: 'not_found', message: 'bill not found' });
++  }
++  return refusal(e);
++};
++const iso = (d: Date) => d.toISOString();
+ const obj = (v: unknown) =>
+   (typeof v === 'object' && v !== null ? v : {}) as Record<string, unknown>;
+ const uuid = (v: unknown, name: string): string =>
+@@ -181,8 +198,139 @@ export class ApBillsController {
+     @Query('company_id') companyId: string | undefined,
+     @Query('queue') queue: string | undefined,
+   ) {
++    const company = uuid(companyId, 'company_id');
++    if (queue === undefined) {
++      const rows = await listBills(this.tx.get(), company);
++      return {
++        bills: rows.map((r) => ({
++          id: r.id,
++          bill_no: r.billNo,
++          status: r.status,
++          awaiting_approval: r.awaitingApproval,
++          party_id: r.partyId,
++          supplier_name: r.supplierName,
++          supplier_ref: r.supplierRef,
++          bill_date: r.billDate,
++          due_date: r.dueDate,
++          gross: r.gross,
++        })),
++      };
++    }
+     if (queue !== 'awaiting_approval') bad('queue=awaiting_approval is the only queue');
+-    const rows = await billsAwaitingApproval(this.tx.get(), uuid(companyId, 'company_id'));
++    const rows = await billsAwaitingApproval(this.tx.get(), company);
+     return { items: rows.map(viewOf) };
+   }
++
++  @Get(':id')
++  @RequirePermission('ap.read')
++  async detail(
++    @Req() req: Request,
++    @Param('id') id: string,
++    @Query('company_id') companyId: string | undefined,
++  ) {
++    const trx = this.tx.get();
++    const b = await getBillDetail(trx, {
++      companyId: uuid(companyId, 'company_id'),
++      billId: uuid(id, 'id'),
++    }).catch(notFound);
++    const me = actorOf(req) ?? null;
++    const step = (s: { userId: string | null; name: string; at: Date } | null) =>
++      s && { by: s.name, you: me !== null && s.userId === me, at: iso(s.at) };
++    const outlook =
++      me === null
++        ? null
++        : await sodOutlook(trx, {
++            step: 'bill.approve',
++            actorId: me,
++            permission: 'ap.bill.approve',
++            subject: { id: b.id, amount: b.gross },
++          });
++    const denied = outlook?.decision.outcome === 'deny' ? outlook.decision : null;
++    return {
++      id: b.id,
++      bill_no: b.billNo,
++      status: b.status,
++      awaiting_approval: b.awaitingApproval,
++      party_id: b.partyId,
++      supplier_name: b.supplierName,
++      supplier_ref: b.supplierRef,
++      bill_date: b.billDate,
++      due_date: b.dueDate,
++      currency: b.currency,
++      net: b.net,
++      tax: b.tax,
++      gross: b.gross,
++      entry_id: b.entryId,
++      lines: b.lines.map((l) => ({
++        line_no: l.lineNo,
++        description: l.description,
++        account_id: l.accountId,
++        account_code: l.accountCode,
++        account_name: l.accountName,
++        tax_code: l.taxCode,
++        amount: l.amount,
++        net: l.net,
++        tax: l.tax,
++        gross: l.gross,
++      })),
++      entered: step(b.entered),
++      submitted: step(b.submitted),
++      approved: step(b.approved),
++      approval: {
++        allowed: outlook !== null && denied === null,
++        rule: denied?.rule ?? null,
++        small_team_exception_required: denied?.smallTeamExceptionRequired ?? false,
++        self_approval_threshold: outlook?.settings.thresholds.bill_self_approval ?? null,
++      },
++    };
++  }
++
++  @Get(':id/journal')
++  @RequirePermission('ap.read')
++  async journal(@Param('id') id: string, @Query('company_id') companyId: string | undefined) {
++    const j = await billJournalView(this.tx.get(), {
++      companyId: uuid(companyId, 'company_id'),
++      billId: uuid(id, 'id'),
++    }).catch(notFound);
++    return {
++      posted: j.posted,
++      entry_no: j.entryNo,
++      entry_date: j.entryDate,
++      requested_date: j.requestedDate,
++      redirected: j.redirected,
++      base_currency: j.baseCurrency,
++      total: j.total,
++      lines: j.lines.map((l) => ({
++        line_no: l.lineNo,
++        account_id: l.accountId,
++        account_code: l.accountCode,
++        account_name: l.accountName,
++        account_type: l.accountType,
++        debit: l.debit,
++        credit: l.credit,
++        party_id: l.partyId,
++      })),
++    };
++  }
++}
++
++/** What an AP Clerk may code a bill to (T-0086): the choices of the bill entry form. */
++@Controller('ap/bill-coding')
++export class ApBillCodingController {
++  constructor(private readonly tx: TenantTx) {}
++
++  @Get()
++  @RequirePermission('ap.bill.enter')
++  async options(
++    @Query('company_id') companyId: string | undefined,
++    @Query('date') date: string | undefined,
++  ) {
++    const company = uuid(companyId, 'company_id');
++    if (date !== undefined && !DATE.test(date)) bad('date must be YYYY-MM-DD');
++    const o = await billCodingOptions(this.tx.get(), {
++      companyId: company,
++      date: date ?? new Date().toISOString().slice(0, 10),
++    });
++    return { suppliers: o.suppliers, accounts: o.accounts, tax_codes: o.taxCodes };
++  }
+ }
+diff --git a/apps/api/src/app.ts b/apps/api/src/app.ts
+index fe2232b..aeeb2ce 100644
+--- a/apps/api/src/app.ts
++++ b/apps/api/src/app.ts
+@@ -1,4 +1,4 @@
+-import { ApBillsController } from './ap/bills.controller.ts';
++import { ApBillCodingController, ApBillsController } from './ap/bills.controller.ts';
+ import { ApPaymentBatchesController } from './ap/payment-batches.controller.ts';
+ import { ArReceiptsController } from './ar/receipts.controller.ts';
+ import { OpeningBalancesController } from './setup/opening-balances.controller.ts';
+@@ -121,6 +121,7 @@ export const API_CONTROLLERS: readonly Type[] = [
+   ArInvoicesController,
+   ArReceiptsController,
+   ApBillsController,
++  ApBillCodingController,
+   ApPaymentBatchesController,
+   StripeWebhookController,
+   ReportsController,
+@@ -166,6 +167,7 @@ class AppModule {
+         ArInvoicesController,
+         ArReceiptsController,
+         ApBillsController,
++        ApBillCodingController,
+         ApPaymentBatchesController,
+         StripeWebhookController,
+         ReportsController,
+diff --git a/apps/api/src/sod/sod.service.ts b/apps/api/src/sod/sod.service.ts
+index 4ee5d5d..9075bb4 100644
+--- a/apps/api/src/sod/sod.service.ts
++++ b/apps/api/src/sod/sod.service.ts
+@@ -184,6 +184,33 @@ export async function checkSod(
+   return { step, actorId, subject, decision, exception };
+ }
+ 
++/**
++ * What checkSod would decide for the actor right now, without an exception, lock or record —
++ * for screens that explain a control before the user tries it (P6/P7, T-0086). Read-only; the
++ * route itself still runs checkSod, so this can never let anything through.
++ */
++export async function sodOutlook(
++  trx: Trx,
++  opts: { step: SodStep; actorId: string; permission: Permission; subject: SodSubject },
++): Promise<{ decision: SodDecision; settings: SodSettings }> {
++  const subjectType = subjectTypeOf(opts.step);
++  const history = await sql<{ step: string; actorId: string }>`
++    SELECT step, actor_user_id AS "actorId" FROM app.sod_action
++     WHERE subject_type = ${subjectType} AND subject_id = ${opts.subject.id}
++     ORDER BY occurred_at, id`.execute(trx);
++  const { settings } = await loadSodSettings(trx);
++  const decision = evaluateSod({
++    step: opts.step,
++    actorId: opts.actorId,
++    subject: { amount: opts.subject.amount ?? null },
++    history: history.rows,
++    settings,
++    otherEligible: await otherEligible(trx, opts.actorId, opts.permission),
++    exception: null,
++  });
++  return { decision, settings };
++}
++
+ /** After the handler succeeded: the exception rows (if any), then the step itself. */
+ export async function recordSod(trx: Trx, c: SodCheck, requestId: string | null): Promise<void> {
+   const subjectType = subjectTypeOf(c.step);
+diff --git a/packages/modules/ap/src/bills-read.ts b/packages/modules/ap/src/bills-read.ts
+new file mode 100644
+index 0000000..d7022d0
+--- /dev/null
++++ b/packages/modules/ap/src/bills-read.ts
+@@ -0,0 +1,327 @@
++/**
++ * Read models for the bills screens (T-0086, UC-05, SS-UC05-08, DL-0440). Reads only — nothing
++ * here writes a bill or the ledger:
++ *   billCodingOptions — what an AP Clerk may code a bill to: active suppliers, active postable
++ *     non-control expense/asset accounts (createBill's rule) and tax codes in force on a date;
++ *   listBills         — every bill of the company with supplier and state, newest first;
++ *   getBillDetail     — one bill with its coded lines and the people who entered, submitted and
++ *     approved it (display names, times);
++ *   billJournalView   — the journal behind a bill: the engine preview while it is a draft
++ *     (previewBillJournal) and the posted entry once approved, as the same line shape.
++ * Money stays NUMERIC text; the only arithmetic is decimal.js summing posted debits.
++ */
++import type { Database } from '@ledgerforce/db';
++import { Money } from '@ledgerforce/shared/money';
++import { Decimal } from 'decimal.js';
++import { sql, type Transaction } from 'kysely';
++import { BillError, previewBillJournal } from './bills.ts';
++
++type Trx = Transaction<Database>;
++
++export interface BillCodingOptions {
++  readonly suppliers: readonly { id: string; name: string }[];
++  readonly accounts: readonly { id: string; code: string; name: string; type: string }[];
++  readonly taxCodes: readonly { code: string; name: string; rate: string }[];
++}
++
++export async function billCodingOptions(
++  trx: Trx,
++  q: { companyId: string; date: string },
++): Promise<BillCodingOptions> {
++  const companyId = q.companyId.toLowerCase();
++  const suppliers = await sql<{ id: string; name: string }>`
++    SELECT p.id::text, coalesce(p.trading_name, p.legal_name) AS name
++      FROM app.party p JOIN app.party_role r ON r.company_id = p.company_id AND r.party_id = p.id
++     WHERE p.company_id = ${companyId} AND r.role = 'supplier' AND r.active AND p.status = 'active'
++     ORDER BY 2, 1`.execute(trx);
++  const accounts = await sql<{ id: string; code: string; name: string; type: string }>`
++    SELECT id::text, code, name, type FROM app.account
++     WHERE company_id = ${companyId} AND status = 'active' AND postable AND NOT is_control
++       AND type IN ('expense', 'asset')
++     ORDER BY code`.execute(trx);
++  const taxCodes = await sql<{ code: string; name: string; rate: string }>`
++    SELECT code, name, rate::text FROM app.tax_code
++     WHERE company_id = ${companyId} AND status = 'active'
++       AND effective_from <= ${q.date}::date AND (effective_to IS NULL OR effective_to >= ${q.date}::date)
++     ORDER BY code`.execute(trx);
++  return { suppliers: suppliers.rows, accounts: accounts.rows, taxCodes: taxCodes.rows };
++}
++
++export interface BillListRow {
++  readonly id: string;
++  readonly billNo: string | null;
++  readonly status: 'draft' | 'posted' | 'void';
++  readonly awaitingApproval: boolean;
++  readonly partyId: string;
++  readonly supplierName: string;
++  readonly supplierRef: string;
++  readonly billDate: string;
++  readonly dueDate: string;
++  readonly gross: string;
++}
++
++interface HeaderRow {
++  id: string;
++  bill_no: string | null;
++  status: 'draft' | 'posted' | 'void';
++  submitted_at: Date | null;
++  party_id: string;
++  supplier_name: string;
++  supplier_ref: string;
++  bill_date: string;
++  due_date: string;
++  gross_total: string;
++}
++
++const HEADER = sql`
++  b.id::text, b.bill_no, b.status, b.submitted_at, b.party_id::text,
++  coalesce(p.trading_name, p.legal_name) AS supplier_name, b.supplier_ref,
++  to_char(b.bill_date, 'YYYY-MM-DD') AS bill_date, to_char(b.due_date, 'YYYY-MM-DD') AS due_date,
++  b.gross_total::text`;
++
++const rowOf = (r: HeaderRow): BillListRow => ({
++  id: r.id,
++  billNo: r.bill_no,
++  status: r.status,
++  awaitingApproval: r.status === 'draft' && r.submitted_at !== null,
++  partyId: r.party_id,
++  supplierName: r.supplier_name,
++  supplierRef: r.supplier_ref,
++  billDate: r.bill_date,
++  dueDate: r.due_date,
++  gross: r.gross_total,
++});
++
++/** Every bill of the company, newest bill date first. */
++export async function listBills(trx: Trx, companyId: string): Promise<BillListRow[]> {
++  const r = await sql<HeaderRow>`
++    SELECT ${HEADER}
++      FROM app.supplier_bill b JOIN app.party p ON p.company_id = b.company_id AND p.id = b.party_id
++     WHERE b.company_id = ${companyId.toLowerCase()}
++     ORDER BY b.bill_date DESC, b.created_at DESC, b.id`.execute(trx);
++  return r.rows.map(rowOf);
++}
++
++export interface BillStep {
++  /** The user id, or null when the step was taken by a service without a user. */
++  readonly userId: string | null;
++  readonly name: string;
++  readonly at: Date;
++}
++
++export interface BillDetail extends BillListRow {
++  readonly currency: string;
++  readonly net: string;
++  readonly tax: string;
++  readonly entryId: string | null;
++  readonly lines: readonly {
++    lineNo: number;
++    description: string;
++    accountId: string;
++    accountCode: string;
++    accountName: string;
++    taxCode: string;
++    amount: string;
++    net: string | null;
++    tax: string | null;
++    gross: string | null;
++  }[];
++  readonly entered: BillStep;
++  readonly submitted: BillStep | null;
++  readonly approved: BillStep | null;
++}
++
++export async function getBillDetail(
++  trx: Trx,
++  q: { companyId: string; billId: string },
++): Promise<BillDetail> {
++  const companyId = q.companyId.toLowerCase();
++  const h = (
++    await sql<
++      HeaderRow & {
++        currency: string;
++        net_total: string;
++        tax_total: string;
++        entry_id: string | null;
++        created_by: string | null;
++        created_at: Date;
++        submitted_by: string | null;
++        approved_by: string | null;
++        approved_at: Date | null;
++      }
++    >`
++      SELECT ${HEADER}, b.currency, b.net_total::text, b.tax_total::text, b.entry_id::text,
++             b.created_by::text, b.created_at, b.submitted_by::text, b.approved_by::text, b.approved_at
++        FROM app.supplier_bill b JOIN app.party p ON p.company_id = b.company_id AND p.id = b.party_id
++       WHERE b.company_id = ${companyId} AND b.id = ${q.billId}::uuid`.execute(trx)
++  ).rows[0];
++  if (!h) throw new BillError('INVALID_BILL', `bill ${q.billId} is not in company ${companyId}`);
++  const lines = await sql<{
++    line_no: number;
++    description: string;
++    account_id: string;
++    code: string;
++    name: string;
++    tax_code: string;
++    amount: string;
++    net: string | null;
++    tax: string | null;
++    gross: string | null;
++  }>`
++    SELECT l.line_no, l.description, l.account_id::text, a.code, a.name, l.tax_code,
++           l.amount::text, l.net::text, l.tax::text, l.gross::text
++      FROM app.supplier_bill_line l JOIN app.account a ON a.id = l.account_id
++     WHERE l.bill_id = ${h.id}::uuid ORDER BY l.line_no`.execute(trx);
++  const ids = [h.created_by, h.submitted_by, h.approved_by].filter((x): x is string => !!x);
++  const names = new Map(
++    ids.length === 0
++      ? []
++      : (
++          await sql<{ id: string; display_name: string }>`
++            SELECT id::text, display_name FROM app.app_user WHERE id = ANY(${sql.val(ids)}::uuid[])`.execute(
++            trx,
++          )
++        ).rows.map((u) => [u.id, u.display_name]),
++  );
++  const step = (userId: string | null, at: Date): BillStep => ({
++    userId,
++    name: userId ? (names.get(userId) ?? 'A former user') : 'LedgerForce',
++    at,
++  });
++  return {
++    ...rowOf(h),
++    currency: h.currency,
++    net: h.net_total,
++    tax: h.tax_total,
++    entryId: h.entry_id,
++    lines: lines.rows.map((l) => ({
++      lineNo: l.line_no,
++      description: l.description,
++      accountId: l.account_id,
++      accountCode: l.code,
++      accountName: l.name,
++      taxCode: l.tax_code,
++      amount: l.amount,
++      net: l.net,
++      tax: l.tax,
++      gross: l.gross,
++    })),
++    entered: step(h.created_by, h.created_at),
++    submitted: h.submitted_at ? step(h.submitted_by, h.submitted_at) : null,
++    approved: h.approved_at ? step(h.approved_by, h.approved_at) : null,
++  };
++}
++
++export interface BillJournalView {
++  /** False: the engine's preview of what approval would post. True: the posted entry. */
++  readonly posted: boolean;
++  readonly entryNo: string | null;
++  readonly entryDate: string;
++  readonly requestedDate: string;
++  readonly redirected: boolean;
++  readonly baseCurrency: string;
++  readonly total: string;
++  readonly lines: readonly {
++    lineNo: number;
++    accountId: string;
++    accountCode: string;
++    accountName: string;
++    accountType: string;
++    debit: string;
++    credit: string;
++    partyId: string | null;
++  }[];
++}
++
++async function accountsById(trx: Trx, companyId: string, ids: readonly string[]) {
++  const r = await sql<{ id: string; code: string; name: string; type: string }>`
++    SELECT id::text, code, name, type FROM app.account
++     WHERE company_id = ${companyId} AND id = ANY(${sql.val([...new Set(ids)])}::uuid[])`.execute(
++    trx,
++  );
++  return new Map(r.rows.map((a) => [a.id, a]));
++}
++
++/** The journal behind a bill: engine preview for a draft, the posted entry once approved. */
++export async function billJournalView(
++  trx: Trx,
++  q: { companyId: string; billId: string },
++): Promise<BillJournalView> {
++  const companyId = q.companyId.toLowerCase();
++  const b = (
++    await sql<{ status: string; entry_id: string | null }>`
++      SELECT status, entry_id::text FROM app.supplier_bill
++       WHERE company_id = ${companyId} AND id = ${q.billId}::uuid`.execute(trx)
++  ).rows[0];
++  if (!b) throw new BillError('INVALID_BILL', `bill ${q.billId} is not in company ${companyId}`);
++  if (b.status === 'draft') {
++    const p = await previewBillJournal(trx, q);
++    const acc = await accountsById(
++      trx,
++      companyId,
++      p.lines.map((l) => l.accountId),
++    );
++    return {
++      posted: false,
++      entryNo: null,
++      entryDate: p.entryDate,
++      requestedDate: p.requestedDate,
++      redirected: p.redirected,
++      baseCurrency: p.baseCurrency,
++      total: p.total,
++      lines: p.lines.map((l) => ({
++        lineNo: l.lineNo,
++        accountId: l.accountId,
++        accountCode: l.accountCode,
++        accountName: acc.get(l.accountId)?.name ?? l.accountCode,
++        accountType: acc.get(l.accountId)?.type ?? '',
++        debit: l.debit,
++        credit: l.credit,
++        partyId: l.partyId,
++      })),
++    };
++  }
++  if (!b.entry_id) throw new BillError('INVALID_BILL', `bill ${q.billId} has no journal`);
++  const e = (
++    await sql<{ entry_no: string | null; entry_date: string; base_currency: string }>`
++      SELECT e.entry_no, to_char(e.entry_date, 'YYYY-MM-DD') AS entry_date, c.base_currency
++        FROM app.journal_entry e JOIN app.company c ON c.id = e.company_id
++       WHERE e.company_id = ${companyId} AND e.id = ${b.entry_id}::uuid`.execute(trx)
++  ).rows[0];
++  if (!e) throw new BillError('INVALID_BILL', `bill ${q.billId} has no journal`);
++  const lines = await sql<{
++    line_no: number;
++    account_id: string;
++    debit: string;
++    credit: string;
++    party_id: string | null;
++  }>`
++    SELECT line_no, account_id::text, debit::text, credit::text, party_id::text
++      FROM app.journal_line WHERE company_id = ${companyId} AND entry_id = ${b.entry_id}::uuid
++     ORDER BY line_no`.execute(trx);
++  const acc = await accountsById(
++    trx,
++    companyId,
++    lines.rows.map((l) => l.account_id),
++  );
++  const total = lines.rows.reduce((s, l) => s.plus(l.debit), new Decimal(0));
++  return {
++    posted: true,
++    entryNo: e.entry_no,
++    entryDate: e.entry_date,
++    requestedDate: e.entry_date,
++    redirected: false,
++    baseCurrency: e.base_currency,
++    total: Money.of(total, 'XXX').toNumericString(),
++    lines: lines.rows.map((l) => ({
++      lineNo: l.line_no,
++      accountId: l.account_id,
++      accountCode: acc.get(l.account_id)?.code ?? '',
++      accountName: acc.get(l.account_id)?.name ?? '',
++      accountType: acc.get(l.account_id)?.type ?? '',
++      debit: l.debit,
++      credit: l.credit,
++      partyId: l.party_id,
++    })),
++  };
++}
+diff --git a/packages/modules/ap/src/bills.ts b/packages/modules/ap/src/bills.ts
+index 9ed998b..f2ab646 100644
+--- a/packages/modules/ap/src/bills.ts
++++ b/packages/modules/ap/src/bills.ts
+@@ -13,7 +13,14 @@
+  * The approval workflow with segregation of duties is T-0052.
+  */
+ import type { Database } from '@ledgerforce/db';
+-import { nextNumber, post, type PostingLineInput, type PostOptions } from '@ledgerforce/ledger';
++import {
++  nextNumber,
++  post,
++  preview,
++  type BuiltEntry,
++  type PostingLineInput,
++  type PostOptions,
++} from '@ledgerforce/ledger';
+ import { Money } from '@ledgerforce/shared/money';
+ import { computeTax } from '@ledgerforce/tax';
+ import { Decimal } from 'decimal.js';
+@@ -275,35 +282,17 @@ export async function createBill(trx: Trx, c: BillInput): Promise<BillView> {
+   };
+ }
+ 
+-/** Approve a draft bill and post it (GP-008). */
+-export async function approveBill(
++/**
++ * The journal a bill posts (GP-008): per (account, tax code) the net with its tax, GST paid, and
++ * the AP control credit with the supplier and due date. Shared by approveBill (which posts it) and
++ * previewBillJournal (engine preview, writes nothing), so the preview is exactly what posts
++ * (T-0086, DL-0440). Reads only.
++ */
++async function billJournal(
+   trx: Trx,
+-  c: { companyId: string; billId: string; approvedBy?: string },
+-  opts: PostOptions = {},
+-): Promise<BillView> {
+-  const companyId = c.companyId.toLowerCase();
+-  const h = (
+-    await sql<{
+-      id: string;
+-      status: string;
+-      party_id: string;
+-      bill_date: string;
+-      due_date: string;
+-      supplier_ref: string;
+-      created_by: string | null;
+-      submitted_at: Date | null;
+-    }>`
+-      SELECT id::text, status, party_id::text, submitted_at, to_char(bill_date, 'YYYY-MM-DD') AS bill_date,
+-             to_char(due_date, 'YYYY-MM-DD') AS due_date, supplier_ref, created_by::text
+-        FROM app.supplier_bill WHERE company_id = ${companyId} AND id = ${c.billId}::uuid FOR UPDATE`.execute(
+-      trx,
+-    )
+-  ).rows[0];
+-  if (!h) throw new BillError('INVALID_BILL', `bill ${c.billId} is not in company ${companyId}`);
+-  if (h.status !== 'draft') throw new BillError('NOT_DRAFT', `bill ${c.billId} is ${h.status}`);
+-  if (!h.submitted_at) {
+-    throw new BillError('NOT_SUBMITTED', `bill ${c.billId} has not been submitted for approval`);
+-  }
++  companyId: string,
++  h: { id: string; party_id: string; bill_date: string; due_date: string },
++) {
+   const rows = await trx
+     .selectFrom('app.supplier_bill_line')
+     .select(['line_no', 'account_id', 'description', 'amount', 'tax_code'])
+@@ -354,6 +343,39 @@ export async function approveBill(
+       dueDate: h.due_date,
+     },
+   ];
++  return { rows, taxed, journal };
++}
++
++/** Approve a draft bill and post it (GP-008). */
++export async function approveBill(
++  trx: Trx,
++  c: { companyId: string; billId: string; approvedBy?: string },
++  opts: PostOptions = {},
++): Promise<BillView> {
++  const companyId = c.companyId.toLowerCase();
++  const h = (
++    await sql<{
++      id: string;
++      status: string;
++      party_id: string;
++      bill_date: string;
++      due_date: string;
++      supplier_ref: string;
++      created_by: string | null;
++      submitted_at: Date | null;
++    }>`
++      SELECT id::text, status, party_id::text, submitted_at, to_char(bill_date, 'YYYY-MM-DD') AS bill_date,
++             to_char(due_date, 'YYYY-MM-DD') AS due_date, supplier_ref, created_by::text
++        FROM app.supplier_bill WHERE company_id = ${companyId} AND id = ${c.billId}::uuid FOR UPDATE`.execute(
++      trx,
++    )
++  ).rows[0];
++  if (!h) throw new BillError('INVALID_BILL', `bill ${c.billId} is not in company ${companyId}`);
++  if (h.status !== 'draft') throw new BillError('NOT_DRAFT', `bill ${c.billId} is ${h.status}`);
++  if (!h.submitted_at) {
++    throw new BillError('NOT_SUBMITTED', `bill ${c.billId} has not been submitted for approval`);
++  }
++  const { rows, taxed, journal } = await billJournal(trx, companyId, h);
+   const billNo = await nextNumber(trx, companyId, BILL_NUMBER_SERIES);
+   const posted = await post(
+     trx,
+@@ -494,3 +516,44 @@ export async function billsAwaitingApproval(trx: Trx, companyId: string): Promis
+   for (const r of ids) out.push(await getBill(trx, companyId, r.id));
+   return out;
+ }
++
++/**
++ * "Show me the journal" for a draft bill (T-0086, P4, design §3.9): the posting engine's preview of
++ * exactly the command approveBill posts (same builder, same idempotency key and entry date).
++ * Writes nothing: no bill number is taken, no entry is stored. Refusals are BillError (NOT_DRAFT,
++ * INVALID_BILL) or the engine's PostingError / PeriodLockedError.
++ */
++export async function previewBillJournal(
++  trx: Trx,
++  q: { companyId: string; billId: string },
++): Promise<BuiltEntry> {
++  const companyId = q.companyId.toLowerCase();
++  const h = (
++    await sql<{
++      id: string;
++      status: string;
++      party_id: string;
++      bill_date: string;
++      due_date: string;
++      created_by: string | null;
++    }>`
++      SELECT id::text, status, party_id::text, to_char(bill_date, 'YYYY-MM-DD') AS bill_date,
++             to_char(due_date, 'YYYY-MM-DD') AS due_date, created_by::text
++        FROM app.supplier_bill WHERE company_id = ${companyId} AND id = ${q.billId}::uuid`.execute(
++      trx,
++    )
++  ).rows[0];
++  if (!h) throw new BillError('INVALID_BILL', `bill ${q.billId} is not in company ${companyId}`);
++  if (h.status !== 'draft') throw new BillError('NOT_DRAFT', `bill ${q.billId} is ${h.status}`);
++  const { journal } = await billJournal(trx, companyId, h);
++  return preview(trx, {
++    companyId,
++    idempotencyKey: `ap-bill:${h.id}`,
++    entryDate: h.bill_date,
++    sourceType: 'ap_bill',
++    sourceId: h.id,
++    memo: 'Bill (draft preview)',
++    ...(h.created_by ? { createdBy: h.created_by } : {}),
++    lines: journal,
++  });
++}
+diff --git a/packages/modules/ap/src/index.ts b/packages/modules/ap/src/index.ts
+index 3583a3a..4c048ce 100644
+--- a/packages/modules/ap/src/index.ts
++++ b/packages/modules/ap/src/index.ts
+@@ -1,4 +1,5 @@
+ export * from './bills.ts';
++export * from './bills-read.ts';
+ export * from './inbox.ts';
+ export * from './payment-batches.ts';
+ export * from './aba-export.ts';
+-- 
+2.43.0
+

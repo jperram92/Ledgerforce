@@ -1,0 +1,58 @@
+From 3ee38ac1aac624279b49ca3b86de18ace29d37e1 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 08:48:26 +0000
+Subject: [PATCH 4/4] wip(T-0097): save agent work interrupted by the usage
+ limit again (unverified)
+
+What changed: Uncommitted work of the T-0097 sub-agent, saved by the lead as-is.
+Why: Second 5-hour usage-limit stop.
+Validation: none by the lead.
+Next action: the agent resumes after the reset.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .agent/runs/2026-11-13-claude-r02.md | 32 ++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+ create mode 100644 .agent/runs/2026-11-13-claude-r02.md
+
+diff --git a/.agent/runs/2026-11-13-claude-r02.md b/.agent/runs/2026-11-13-claude-r02.md
+new file mode 100644
+index 0000000..fc4b560
+--- /dev/null
++++ b/.agent/runs/2026-11-13-claude-r02.md
+@@ -0,0 +1,32 @@
++# Run 2026-11-13-claude-r02
++- Provider: claude (sub-agent of the parallel round DL-0409, local worktree; ID range DL-0460–0469, ADR-0054–0055, RQ-0141–0142, T-0142–T-0144)
++- Started: 2026-11-13 (≈07:30Z); interrupted by the 5-hour usage limit (the lead saved WIP as fd715e1); resumed 08:12Z
++- Branch: `feat/T-0097-pilot-hardening-r2` from f8b10bd (DL-0460: the name `feat/T-0097-pilot-hardening` is held by a lost round-1 worktree at eba7510 with no T-0097 commits). Not pushed.
++- Tasks touched: T-0097 (split, superseded → blocked), T-0142 (built → verifying), T-0143 and T-0144 (new, todo), T-0098 (depends_on updated)
++
++## Timeline
++- Research RQ-0141 (resolved). OWASP site, rfc-editor.org and expressjs.com were not reachable through the session proxy; OWASP cheat sheets were read from raw.githubusercontent.com, the npm registry for library metadata, and the Express 5.2.1 and proxy-addr source in node_modules.
++- Split T-0097 (DL-0461); ADR-0054 security, Proposed (DL-0462).
++- RED first, via a types-only skeleton so that failures were assertions: unit 19 failed, DB 12 failed, infra 1 failed (`.agent/evidence/T-0097/red-*.txt`).
++- GREEN after implementing the middleware, limiter, config and compose. One unit-test setup was corrected (see the T-0142 notes); no assertion was weakened.
++
++## Tests run
++| Command | Exit | Result |
++|---|---:|---|
++| vitest --project api-unit security/rate-limit.test.ts config.test.ts | 0 | 32/32 |
++| vitest --project api-db apps/api/src/security | 0 | 17/17 |
++| vitest run infra/test | 0 | 27/27 (3 files) |
++| vitest --project unit --project api-unit | 0 | 916/916, 75 files, 0 skipped |
++| vitest --project api-db | 0 | 223/223, 30 files, 0 skipped |
++| pnpm typecheck / pnpm lint / prettier --check . | 0 | clean |
++| verify.sh --quick | timeout | gate 1 PASS (typecheck, lint, format); stopped at 10 min |
++| verify.sh --task T-0142 (full) | see below | |
++
++## Commits
++fd715e1 (lead's WIP save), b283bb8 (feature), plus the run-log/verify commit.
++
++## Not verified locally
++- docker compose config/up, DAST: no Docker (DL-0007). The compose value is checked only by the contract test.
++
++## Stopped because
++Slice T-0142 finished, pending verify, cross-review and the ADR-0054 human gate.
+-- 
+2.43.0
+

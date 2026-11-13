@@ -1,0 +1,751 @@
+From 742689138c5f24c8edfba01222ab9cdc05b26490 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Fri, 13 Nov 2026 08:12:17 +0000
+Subject: [PATCH 2/3] wip(T-0084): save agent work interrupted by the usage
+ limit (unverified)
+
+What changed: Uncommitted work of the T-0084 sub-agent, saved by the lead as-is.
+Why: The agent stopped on the 5-hour usage limit; the container may not survive.
+Validation: none by the lead; the agent resumes and validates.
+Next action: the agent continues from this commit.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ .../T-0084/red-e2e-batch-billing-20261113.txt | 174 ++++++++
+ .../T-0084/red-web-batch-logic-20261113.txt   |  32 ++
+ apps/web/src/sales/batch-logic.test.ts        |  98 +++++
+ tests/e2e/web/batch-billing.spec.ts           | 397 ++++++++++++++++++
+ 4 files changed, 701 insertions(+)
+ create mode 100644 .agent/evidence/T-0084/red-e2e-batch-billing-20261113.txt
+ create mode 100644 .agent/evidence/T-0084/red-web-batch-logic-20261113.txt
+ create mode 100644 apps/web/src/sales/batch-logic.test.ts
+ create mode 100644 tests/e2e/web/batch-billing.spec.ts
+
+diff --git a/.agent/evidence/T-0084/red-e2e-batch-billing-20261113.txt b/.agent/evidence/T-0084/red-e2e-batch-billing-20261113.txt
+new file mode 100644
+index 0000000..80f0c42
+--- /dev/null
++++ b/.agent/evidence/T-0084/red-e2e-batch-billing-20261113.txt
+@@ -0,0 +1,174 @@
++
++Running 6 tests using 2 workers
++
++[1/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:363:1 › T-0084: someone without ar.read cannot open a batch
++[2/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]
++  1) [chromium] › tests/e2e/web/batch-billing.spec.ts:363:1 › T-0084: someone without ar.read cannot open a batch 
++
++    Error: expect(locator).toBeVisible() failed
++
++    Locator: getByText(/do not have access/i)
++    Expected: visible
++    Timeout: 5000ms
++    Error: element(s) not found
++
++    Call log:
++      - Expect "toBeVisible" getByText(/do not have access/i) with timeout 5000ms
++      - waiting for getByText(/do not have access/i)
++
++
++      364 |   const f = await fakeApi(page, 'sales');
++      365 |   await open(page, `/sales/batches/${BATCH}`, 1440);
++    > 366 |   await expect(page.getByText(/do not have access/i)).toBeVisible();
++          |                                                       ^
++      367 |   await expect(page.getByRole('table', { name: 'Exceptions' })).toHaveCount(0);
++      368 |   expect(f.errors).toEqual([]);
++      369 | });
++        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:366:55
++
++    Error Context: test-results/web-batch-billing-T-0084-s-3d12e-ar-read-cannot-open-a-batch-chromium/error-context.md
++
++    Error Context: test-results/web-batch-billing-T-0084-s-3d12e-ar-read-cannot-open-a-batch-chromium/error-context.md
++
++
++  2) [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084] 
++
++    Error: expect(locator).toBeVisible() failed
++
++    Locator: getByRole('heading', { name: 'Batch billing', level: 1 })
++    Expected: visible
++    Timeout: 5000ms
++    Error: element(s) not found
++
++    Call log:
++      - Expect "toBeVisible" getByRole('heading', { name: 'Batch billing', level: 1 }) with timeout 5000ms
++      - waiting for getByRole('heading', { name: 'Batch billing', level: 1 })
++
++
++      269 |     // The AR Clerk asks for a preview of November.
++      270 |     await open(page, '/sales/batches', width);
++    > 271 |     await expect(page.getByRole('heading', { level: 1, name: 'Batch billing' })).toBeVisible();
++          |                                                                                  ^
++      272 |     await page.getByLabel('From').fill('2026-11-01');
++      273 |     await page.getByLabel('To', { exact: true }).fill('2026-11-30');
++      274 |     await assertPage(page, width);
++        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:271:82
++
++    Error Context: test-results/web-batch-billing-SS-UC02--02dde-exception-list-1440-T-0084--chromium/error-context.md
++
++    Error Context: test-results/web-batch-billing-SS-UC02--02dde-exception-list-1440-T-0084--chromium/error-context.md
++
++
++[3/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:371:1 › T-0084: a period that ends before it starts is caught before anything is sent
++[4/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]
++  3) [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084] 
++
++    Error: expect(locator).toBeVisible() failed
++
++    Locator: getByRole('heading', { name: 'Batch billing', level: 1 })
++    Expected: visible
++    Timeout: 5000ms
++    Error: element(s) not found
++
++    Call log:
++      - Expect "toBeVisible" getByRole('heading', { name: 'Batch billing', level: 1 }) with timeout 5000ms
++      - waiting for getByRole('heading', { name: 'Batch billing', level: 1 })
++
++
++      269 |     // The AR Clerk asks for a preview of November.
++      270 |     await open(page, '/sales/batches', width);
++    > 271 |     await expect(page.getByRole('heading', { level: 1, name: 'Batch billing' })).toBeVisible();
++          |                                                                                  ^
++      272 |     await page.getByLabel('From').fill('2026-11-01');
++      273 |     await page.getByLabel('To', { exact: true }).fill('2026-11-30');
++      274 |     await assertPage(page, width);
++        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:271:82
++
++    Error Context: test-results/web-batch-billing-SS-UC02--2b8ad--exception-list-390-T-0084--chromium/error-context.md
++
++    Error Context: test-results/web-batch-billing-SS-UC02--2b8ad--exception-list-390-T-0084--chromium/error-context.md
++
++
++[5/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:351:1 › T-0084: someone without ar.batch.run is told who can run a batch, and nothing is sent
++  4) [chromium] › tests/e2e/web/batch-billing.spec.ts:351:1 › T-0084: someone without ar.batch.run is told who can run a batch, and nothing is sent 
++
++    Error: expect(locator).toBeVisible() failed
++
++    Locator: getByText(/can preview a batch/)
++    Expected: visible
++    Timeout: 5000ms
++    Error: element(s) not found
++
++    Call log:
++      - Expect "toBeVisible" getByText(/can preview a batch/) with timeout 5000ms
++      - waiting for getByText(/can preview a batch/)
++
++
++      354 |   const f = await fakeApi(page, 'auditor');
++      355 |   await open(page, '/sales/batches', 1440);
++    > 356 |   await expect(page.getByText(/can preview a batch/)).toBeVisible();
++          |                                                       ^
++      357 |   await expect(page.getByText(/AR Clerk/)).toBeVisible();
++      358 |   await expect(page.getByRole('button', { name: 'Preview the invoices' })).toHaveCount(0);
++      359 |   expect(f.previews).toEqual([]);
++        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:356:55
++
++    Error Context: test-results/web-batch-billing-T-0084-s-60905-a-batch-and-nothing-is-sent-chromium/error-context.md
++
++    Error Context: test-results/web-batch-billing-T-0084-s-60905-a-batch-and-nothing-is-sent-chromium/error-context.md
++
++
++  5) [chromium] › tests/e2e/web/batch-billing.spec.ts:371:1 › T-0084: a period that ends before it starts is caught before anything is sent 
++
++    Test timeout of 30000ms exceeded.
++
++    Error: locator.fill: Test timeout of 30000ms exceeded.
++    Call log:
++      - waiting for getByLabel('From')
++
++
++      374 |   const f = await fakeApi(page, 'clerk');
++      375 |   await open(page, '/sales/batches', 1440);
++    > 376 |   await page.getByLabel('From').fill('2026-11-30');
++          |                                 ^
++      377 |   await page.getByLabel('To', { exact: true }).fill('2026-11-01');
++      378 |   await page.getByRole('button', { name: 'Preview the invoices' }).click();
++      379 |   await expect(page.getByRole('alert')).toContainText('The period ends before it starts');
++        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:376:33
++
++    Error Context: test-results/web-batch-billing-T-0084-a-44948-ght-before-anything-is-sent-chromium/error-context.md
++
++    Error Context: test-results/web-batch-billing-T-0084-a-44948-ght-before-anything-is-sent-chromium/error-context.md
++
++
++[6/6] [chromium] › tests/e2e/web/batch-billing.spec.ts:384:1 › T-0084: an approval the API refuses explains why and leaves the batch as it was
++  6) [chromium] › tests/e2e/web/batch-billing.spec.ts:384:1 › T-0084: an approval the API refuses explains why and leaves the batch as it was 
++
++    Test timeout of 30000ms exceeded.
++
++    Error: locator.click: Test timeout of 30000ms exceeded.
++    Call log:
++      - waiting for getByRole('button', { name: 'Approve and post 39 invoices' })
++
++
++      391 |   });
++      392 |   await open(page, `/sales/batches/${BATCH}`, 1440);
++    > 393 |   await page.getByRole('button', { name: 'Approve and post 39 invoices' }).click();
++          |                                                                            ^
++      394 |   await expect(page.getByRole('alert')).toContainText('no longer waiting for approval');
++      395 |   await expect(page.getByRole('button', { name: 'Approve and post 39 invoices' })).toBeVisible();
++      396 |   expect(f.errors).toEqual([]);
++        at /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/tests/e2e/web/batch-billing.spec.ts:393:76
++
++    Error Context: test-results/web-batch-billing-T-0084-a-0ff9c--leaves-the-batch-as-it-was-chromium/error-context.md
++
++    Error Context: test-results/web-batch-billing-T-0084-a-0ff9c--leaves-the-batch-as-it-was-chromium/error-context.md
++
++
++  6 failed
++    [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084] 
++    [chromium] › tests/e2e/web/batch-billing.spec.ts:263:3 › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084] 
++    [chromium] › tests/e2e/web/batch-billing.spec.ts:351:1 › T-0084: someone without ar.batch.run is told who can run a batch, and nothing is sent 
++    [chromium] › tests/e2e/web/batch-billing.spec.ts:363:1 › T-0084: someone without ar.read cannot open a batch 
++    [chromium] › tests/e2e/web/batch-billing.spec.ts:371:1 › T-0084: a period that ends before it starts is caught before anything is sent 
++    [chromium] › tests/e2e/web/batch-billing.spec.ts:384:1 › T-0084: an approval the API refuses explains why and leaves the batch as it was 
+diff --git a/.agent/evidence/T-0084/red-web-batch-logic-20261113.txt b/.agent/evidence/T-0084/red-web-batch-logic-20261113.txt
+new file mode 100644
+index 0000000..fa7f97e
+--- /dev/null
++++ b/.agent/evidence/T-0084/red-web-batch-logic-20261113.txt
+@@ -0,0 +1,32 @@
++
++ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42
++
++ ❯ |web| apps/web/src/sales/batch-logic.test.ts (0 test)
++
++⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
++
++ FAIL  |web| apps/web/src/sales/batch-logic.test.ts [ apps/web/src/sales/batch-logic.test.ts ]
++Error: Failed to resolve import "./batch-logic.ts" from "apps/web/src/sales/batch-logic.test.ts". Does the file exist?
++  Plugin: vite:import-analysis
++  File: /home/user/Ledgerforce/.claude/worktrees/agent-a5fd4cb96d2e53e42/apps/web/src/sales/batch-logic.test.ts:9:7
++  1  |  import { describe, expect, it } from "vitest";
++  2  |  import { batchTitle, checkPeriod, exceptionsOf, itemResult, monthOf, rolesWith } from "./batch-logic.ts";
++     |                                                                                         ^
++  3  |  const item = (over) => ({
++  4  |  	item_no: 1,
++ ❯ TransformPluginContext._formatLog node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:8803:39
++ ❯ TransformPluginContext.error node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:8800:14
++ ❯ resolveId node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:26594:18
++ ❯ node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:26693:23
++ ❯ TransformPluginContext.transform node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:26666:4
++ ❯ EnvironmentPluginContainer.transform node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:8582:14
++ ❯ loadAndTransform node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:20155:26
++
++⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
++
++
++ Test Files  1 failed (1)
++      Tests  no tests
++   Start at  04:01:19
++   Duration  1.30s (transform 39ms, setup 223ms, import 0ms, tests 0ms, environment 757ms)
++
+diff --git a/apps/web/src/sales/batch-logic.test.ts b/apps/web/src/sales/batch-logic.test.ts
+new file mode 100644
+index 0000000..5f024e9
+--- /dev/null
++++ b/apps/web/src/sales/batch-logic.test.ts
+@@ -0,0 +1,98 @@
++import { describe, expect, it } from 'vitest';
++import {
++  batchTitle,
++  checkPeriod,
++  exceptionsOf,
++  itemResult,
++  monthOf,
++  rolesWith,
++} from './batch-logic.ts';
++import type { BatchItem } from './client.ts';
++
++const item = (over: Partial<BatchItem>): BatchItem => ({
++  item_no: 1,
++  party_id: 'p1',
++  party_name: 'Acme Pty Ltd',
++  line_count: 1,
++  net: '100.0000',
++  tax: '10.0000',
++  gross: '110.0000',
++  warnings: [],
++  status: 'preview',
++  invoice_no: null,
++  failure_code: null,
++  failure_message: null,
++  ...over,
++});
++
++describe('batch billing logic (T-0084)', () => {
++  it('names the roles holding a permission from the role templates, never the service account', () => {
++    expect(rolesWith('ar.batch.approve')).toBe('Owner, Finance Admin and Approver');
++    expect(rolesWith('ar.batch.run')).toContain('AR Clerk');
++    expect(rolesWith('ar.batch.run')).not.toContain('Integration');
++  });
++
++  it('titles a whole calendar month by name and any other period by its dates', () => {
++    expect(batchTitle('2026-11-01', '2026-11-30')).toBe('November 2026 batch');
++    expect(batchTitle('2028-02-01', '2028-02-29')).toBe('February 2028 batch');
++    expect(batchTitle('2026-02-01', '2026-02-28')).toBe('February 2026 batch');
++    expect(batchTitle('2026-11-01', '2026-11-29')).toBe('Batch for 2026-11-01 to 2026-11-29');
++    expect(batchTitle('2026-11-01', '2026-12-31')).toBe('Batch for 2026-11-01 to 2026-12-31');
++  });
++
++  it('offers the calendar month of a day as the default period', () => {
++    expect(monthOf('2026-11-13')).toEqual({ from: '2026-11-01', to: '2026-11-30' });
++    expect(monthOf('2028-02-10')).toEqual({ from: '2028-02-01', to: '2028-02-29' });
++    expect(monthOf('2026-12-31')).toEqual({ from: '2026-12-01', to: '2026-12-31' });
++  });
++
++  it('checks the period before sending it', () => {
++    expect(checkPeriod({ from: '2026-11-01', to: '2026-11-30', issue: '' })).toEqual([]);
++    expect(checkPeriod({ from: '', to: '2026-11-30', issue: '' })).toEqual([
++      'Choose the first day of the period.',
++    ]);
++    expect(checkPeriod({ from: '2026-11-30', to: '2026-11-01', issue: '' })).toEqual([
++      'The period ends before it starts. Check the dates.',
++    ]);
++    expect(checkPeriod({ from: '2026-11-01', to: '2026-11-30', issue: '2026-13-01' })).toEqual([
++      'The invoice date is not a real day.',
++    ]);
++  });
++
++  it('says what each invoice of the batch is, in a word', () => {
++    expect(itemResult(item({}))).toEqual({ word: 'Ready', status: 'ready' });
++    expect(
++      itemResult(item({ warnings: [{ code: 'CREDIT_HOLD', line: 0, message: 'on hold' }] })),
++    ).toEqual({ word: 'Needs attention', status: 'attention' });
++    expect(itemResult(item({ status: 'posted', invoice_no: 'INV-000101' }))).toEqual({
++      word: 'Posted INV-000101',
++      status: 'posted',
++    });
++    expect(itemResult(item({ status: 'failed', failure_message: 'x' }))).toEqual({
++      word: 'Failed',
++      status: 'failed',
++    });
++  });
++
++  it('lists warnings before the run and failures after it as the exception list', () => {
++    const warned = item({
++      item_no: 2,
++      party_name: 'Lighthouse Learning',
++      warnings: [
++        { code: 'PROFILE_GAP', line: 1, message: 'no revenue account for SUBSCRIPTION' },
++        { code: 'NO_BILLING_TO', line: 0, message: 'no Billing To contact' },
++      ],
++    });
++    expect(exceptionsOf([item({}), warned])).toEqual([
++      {
++        item: warned,
++        issue: 'Line 1: no revenue account for SUBSCRIPTION. No Billing To contact.',
++        next: expect.stringContaining('the other invoices still post'),
++      },
++    ]);
++    const failed = item({ item_no: 3, status: 'failed', failure_message: 'party is not active' });
++    expect(exceptionsOf([item({ status: 'posted' }), failed])).toEqual([
++      { item: failed, issue: 'Party is not active.', next: expect.stringContaining('next batch') },
++    ]);
++  });
++});
+diff --git a/tests/e2e/web/batch-billing.spec.ts b/tests/e2e/web/batch-billing.spec.ts
+new file mode 100644
+index 0000000..d29f7dd
+--- /dev/null
++++ b/tests/e2e/web/batch-billing.spec.ts
+@@ -0,0 +1,397 @@
++/**
++ * Batch billing screens (T-0084, UC-02, SS-UC02-08): the AR Clerk previews November for 40
++ * customers, sees the totals and the exception list (one customer has no Billing To contact), the
++ * Approver approves, and after the job ran the exception list holds the one invoice that failed
++ * while the other 39 posted (the SS-UC02-03 batch). The app is served by Vite; the API is faked per
++ * test with `page.route` using the response shapes of POST /ar/batches/preview, GET /ar/batches/:id
++ * and POST /ar/batches/:id/approve (apps/api, T-0043/T-0044/T-0084).
++ */
++import { mkdtempSync } from 'node:fs';
++import { tmpdir } from 'node:os';
++import { join, resolve } from 'node:path';
++import { AxeBuilder } from '@axe-core/playwright';
++import type { Page, Route } from '@playwright/test';
++import { createViteServer } from 'vitest/node';
++import { test, expect } from '@ledgerforce/testing/evidence';
++import { ROLE_TEMPLATES } from '../../../packages/shared/src/rbac/index.ts';
++import { genericnessProbe } from '../fixtures/genericness.ts';
++
++const WEB = resolve(import.meta.dirname, '..', '..', '..', 'apps', 'web');
++const id = (n: number) => `01900000-0000-7000-8000-${n.toString(16).padStart(12, '0')}`;
++const CO = id(0x84c1);
++const BATCH = id(0x8401);
++
++let server: Awaited<ReturnType<typeof createViteServer>> | undefined;
++let origin = '';
++
++test.use({ evidenceTaskId: 'T-0084', timezoneId: 'Australia/Sydney', locale: 'en-AU' });
++
++test.beforeAll(async () => {
++  server = await createViteServer({
++    root: WEB,
++    configFile: false,
++    cacheDir: mkdtempSync(join(tmpdir(), 'lf-web-')),
++    logLevel: 'error',
++    server: { host: '127.0.0.1', port: 0, strictPort: false, hmr: false },
++  });
++  await server.listen();
++  const addr = server.httpServer?.address();
++  if (!addr || typeof addr === 'string') throw new Error('web server has no port');
++  origin = `http://127.0.0.1:${String(addr.port)}`;
++});
++
++test.afterAll(async () => {
++  await server?.close();
++});
++
++const ME = {
++  clerk: { user_id: id(0x8411), display_name: 'Lena Ortiz', role: 'ar_clerk' as const },
++  approver: { user_id: id(0x8412), display_name: 'Mei Tan', role: 'approver' as const },
++  auditor: { user_id: id(0x8413), display_name: 'Ari Patel', role: 'auditor' as const },
++  sales: { user_id: id(0x8414), display_name: 'Sam Reyes', role: 'sales_user' as const },
++};
++type Who = keyof typeof ME;
++
++/** Test data only: fixed-point text from whole cents (BigInt, never floating point). */
++const money = (cents: bigint) => {
++  const s = cents.toString().padStart(3, '0');
++  return `${s.slice(0, -2)}.${s.slice(-2)}00`;
++};
++const NAMES = [
++  'Acme Pty Ltd',
++  'Banksia Bakery',
++  'Bondi Coastal Physio',
++  'Coral Bay Tourism',
++  'Daintree Coffee Co',
++  'Emu Plains Joinery',
++  'Flinders Freight Co',
++  'Gidgee Design',
++  'Hawkesbury Nurseries',
++  'Ironbark Legal',
++  'Jarrah Joinery',
++  'Kestrel Logistics Pty Ltd',
++  'Lighthouse Learning',
++  'Mallee Motors',
++  'Murray River Organics',
++  'Ningaloo Dive',
++  'Otway Brewing',
++  'Pinnacle Dental Group',
++  'Quokka Creative',
++  'Redgum Ventures',
++  'Saltbush Studio',
++  'Tasman Tiles',
++  'Uluru Outfitters',
++  'Victor Harbor Vets',
++  'Wattle Accounting',
++  'Xanthorrhoea Gardens',
++  'Yarra Valley Wines',
++  'Zigzag Printing',
++  'Arnhem Air',
++  'Barossa Barrels',
++  'Cockatoo Cleaning',
++  'Dandenong Dental',
++  'Eyre Peninsula Fishing',
++  'Fremantle Fitness',
++  'Gippsland Grain',
++  'Hobart Hardware',
++  'Illawarra IT',
++  'Jindabyne Lodge',
++  'Kimberley Kitchens',
++  'Launceston Labels',
++];
++const LIGHTHOUSE = 13;
++const ITEMS = NAMES.map((name, k) => {
++  const net = 100000n + BigInt(k) * 2500n;
++  const tax = net / 10n;
++  return { item_no: k + 1, party_id: id(0x8500 + k), party_name: name, net, tax, gross: net + tax };
++});
++const sum = (f: (i: (typeof ITEMS)[number]) => bigint) => ITEMS.reduce((s, i) => s + f(i), 0n);
++const NO_BILLING_TO = 'the customer has no active Billing To contact with an email address';
++
++type BatchStatus = 'preview' | 'approved' | 'posted';
++function batch(status: BatchStatus, replayed = false) {
++  const ran = status === 'posted';
++  const items = ITEMS.map((i) => {
++    const bad = i.item_no === LIGHTHOUSE;
++    return {
++      item_no: i.item_no,
++      party_id: i.party_id,
++      party_name: i.party_name,
++      line_count: 1 + (i.item_no % 3),
++      net: money(i.net),
++      tax: money(i.tax),
++      gross: money(i.gross),
++      warnings: bad ? [{ code: 'NO_BILLING_TO', line: 0, message: NO_BILLING_TO }] : [],
++      status: !ran ? 'preview' : bad ? 'failed' : 'posted',
++      invoice_no: ran && !bad ? `INV-${String(1100 + i.item_no).padStart(6, '0')}` : null,
++      failure_code: ran && bad ? 'NO_BILLING_TO' : null,
++      failure_message: ran && bad ? NO_BILLING_TO : null,
++    };
++  });
++  const posted = ITEMS.filter((i) => ran && i.item_no !== LIGHTHOUSE);
++  return {
++    id: BATCH,
++    replayed,
++    status,
++    period_from: '2026-11-01',
++    period_to: '2026-11-30',
++    issue_date: '2026-11-30',
++    items,
++    totals: {
++      invoices: 40,
++      ready: 39,
++      net: money(sum((i) => i.net)),
++      tax: money(sum((i) => i.tax)),
++      gross: money(sum((i) => i.gross)),
++    },
++    outcome: {
++      posted: posted.length,
++      failed: ran ? 1 : 0,
++      posted_gross: money(posted.reduce((s, i) => s + i.gross, 0n)),
++    },
++  };
++}
++const TOTAL_GROSS = money(sum((i) => i.gross));
++const POSTED_GROSS = money(sum((i) => (i.item_no === LIGHTHOUSE ? 0n : i.gross)));
++
++interface Fake {
++  who: Who;
++  status: BatchStatus;
++  errors: string[];
++  previews: { key: string | null; body: unknown }[];
++  approvals: number;
++  override: Map<string, { status: number; body: unknown }>;
++}
++
++async function fakeApi(page: Page, who: Who, status: BatchStatus = 'preview'): Promise<Fake> {
++  const f: Fake = { who, status, errors: [], previews: [], approvals: 0, override: new Map() };
++  page.on('console', (m) => {
++    if (m.type() === 'error' && !/status of (401|403|404|409|422|503)/.test(m.text()))
++      f.errors.push(m.text());
++  });
++  page.on('pageerror', (e) => f.errors.push(String(e)));
++  const send = (route: Route, code: number, body: unknown) =>
++    route.fulfill({ status: code, json: body });
++  await page.route(
++    (url) => url.origin === origin && /^\/(auth|companies|ar)(\/|$)/.test(url.pathname),
++    async (route) => {
++      const req = route.request();
++      const url = new URL(req.url());
++      const path = url.pathname;
++      const me = ME[f.who];
++      const perms: readonly string[] = ROLE_TEMPLATES[me.role].permissions;
++      const o = f.override.get(`${req.method()} ${path}`);
++      if (o) return send(route, o.status, o.body);
++      if (path === '/auth/me')
++        return send(route, 200, {
++          tenant_id: 't-harbour',
++          user_id: me.user_id,
++          display_name: me.display_name,
++        });
++      if (path === '/auth/me/access')
++        return send(route, 200, { roles: [me.role], permissions: perms });
++      if (path === '/companies')
++        return send(route, 200, [{ id: CO, name: 'Harbour & Co Pty Ltd', base_currency: 'AUD' }]);
++      if (req.method() === 'POST' && path === '/ar/batches/preview') {
++        if (!perms.includes('ar.batch.run'))
++          return send(route, 403, { error: 'forbidden', permission: 'ar.batch.run' });
++        f.previews.push({ key: req.headers()['idempotency-key'] ?? null, body: req.postDataJSON() });
++        return send(route, 201, batch('preview'));
++      }
++      if (req.method() === 'POST' && path === `/ar/batches/${BATCH}/approve`) {
++        if (!perms.includes('ar.batch.approve'))
++          return send(route, 403, { error: 'forbidden', permission: 'ar.batch.approve' });
++        expect(url.searchParams.get('company_id')).toBe(CO);
++        f.approvals += 1;
++        f.status = 'approved';
++        return send(route, 200, batch('approved'));
++      }
++      if (!perms.includes('ar.read'))
++        return send(route, 403, { error: 'forbidden', permission: 'ar.read' });
++      if (req.method() === 'GET' && path === `/ar/batches/${BATCH}`) {
++        expect(url.searchParams.get('company_id')).toBe(CO);
++        return send(route, 200, batch(f.status));
++      }
++      return send(route, 404, { error: 'not_found' });
++    },
++  );
++  return f;
++}
++
++async function open(page: Page, path: string, width: number) {
++  await page.setViewportSize({ width, height: width > 600 ? 900 : 844 });
++  await page.goto(`${origin}${path}`);
++  await expect(page.locator('h1')).toHaveCount(1);
++  await page.evaluate(() => document.fonts.ready);
++}
++
++async function assertPage(page: Page, width: number) {
++  expect((await page.title()).trim()).not.toBe('');
++  await expect(page.locator('main')).toHaveCount(1);
++  const sw = await page.evaluate(() => document.documentElement.scrollWidth);
++  expect(sw, 'no horizontal scroll').toBeLessThanOrEqual(width);
++  const axe = await new AxeBuilder({ page })
++    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
++    .analyze();
++  expect(
++    axe.violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`),
++  ).toEqual([]);
++  expect(await page.evaluate(genericnessProbe)).toEqual({
++    shadows: [],
++    bigRadius: [],
++    caps: [],
++    purple: [],
++    dots: 0,
++    arrows: 0,
++  });
++  expect(await page.locator('main .primary').count()).toBeLessThanOrEqual(1);
++  for (const cell of await page.locator('main [data-amount]').all()) {
++    expect(await cell.getAttribute('data-amount')).toMatch(/^-?\d+\.\d{2}$/);
++  }
++  for (const s of await page.locator('main [data-status]').all()) {
++    expect((await s.textContent())?.trim()).not.toBe('');
++  }
++}
++
++const amountsIn = (page: Page, name: string) =>
++  page
++    .getByRole('region', { name })
++    .locator('[data-amount]')
++    .evaluateAll((els) => els.map((e) => e.getAttribute('data-amount')));
++
++for (const width of [1440, 390]) {
++  test(`SS-UC02-08: Batch screens show preview and exception list @ ${String(width)} [T-0084]`, async ({
++    page,
++    evidence,
++  }) => {
++    const f = await fakeApi(page, 'clerk');
++
++    // The AR Clerk asks for a preview of November.
++    await open(page, '/sales/batches', width);
++    await expect(page.getByRole('heading', { level: 1, name: 'Batch billing' })).toBeVisible();
++    await page.getByLabel('From').fill('2026-11-01');
++    await page.getByLabel('To', { exact: true }).fill('2026-11-30');
++    await assertPage(page, width);
++    await evidence('SS-UC02-08', `batch-start-${String(width)}`);
++    await page.getByRole('button', { name: 'Preview the invoices' }).click();
++
++    // Preview: totals, the exception list and every invoice; nothing is posted.
++    await expect(page).toHaveURL(new RegExp(`/sales/batches/${BATCH}$`));
++    await expect(
++      page.getByRole('heading', { level: 1, name: 'November 2026 batch' }),
++    ).toBeVisible();
++    expect(f.previews).toHaveLength(1);
++    expect(f.previews[0]?.key).toMatch(/^bb-[0-9a-f-]{36}$/);
++    expect(f.previews[0]?.body).toEqual({
++      company_id: CO,
++      period_from: '2026-11-01',
++      period_to: '2026-11-30',
++    });
++    const totals = page.getByRole('region', { name: 'Totals' });
++    await expect(totals).toContainText('39 of 40');
++    expect(await amountsIn(page, 'Totals')).toEqual([
++      batch('preview').totals.net.slice(0, -2),
++      batch('preview').totals.tax.slice(0, -2),
++      TOTAL_GROSS.slice(0, -2),
++    ]);
++    const exceptions = page.getByRole('table', { name: 'Exceptions' });
++    await expect(exceptions.getByRole('row')).toHaveCount(2);
++    await expect(exceptions.getByRole('row').nth(1)).toContainText('Lighthouse Learning');
++    await expect(exceptions.getByRole('row').nth(1)).toContainText(NO_BILLING_TO_SENTENCE);
++    await expect(exceptions.getByRole('row').nth(1)).toContainText('the other invoices still post');
++    const invoices = page.getByRole('table', { name: 'Invoices in this batch' });
++    await expect(invoices.getByRole('row')).toHaveCount(41);
++    await expect(invoices.getByRole('row').nth(13)).toContainText('Needs attention');
++    await expect(invoices.getByRole('row').nth(1)).toContainText('Ready');
++    await expect(page.getByText('Nothing is posted yet.')).toBeVisible();
++    // The clerk cannot approve: the page says whose turn it is instead (P6, P13).
++    await expect(page.getByRole('button', { name: /Approve/ })).toHaveCount(0);
++    await expect(page.getByText(/Waiting for approval/)).toBeVisible();
++    await assertPage(page, width);
++    await evidence('SS-UC02-08', `batch-preview-exceptions-${String(width)}`);
++
++    // The Approver approves; one job will post every invoice on its own.
++    f.who = 'approver';
++    await page.reload();
++    await expect(
++      page.getByRole('heading', { level: 1, name: 'November 2026 batch' }),
++    ).toBeVisible();
++    const approve = page.getByRole('button', { name: 'Approve and post 39 invoices' });
++    await expect(approve).toBeVisible();
++    await assertPage(page, width);
++    await approve.click();
++    await expect(page.getByRole('status').filter({ hasText: 'Approved' })).toBeVisible();
++    expect(f.approvals).toBe(1);
++    await expect(page.getByRole('button', { name: /Approve/ })).toHaveCount(0);
++    await assertPage(page, width);
++    await evidence('SS-UC02-08', `batch-approved-${String(width)}`);
++
++    // After the job: 39 posted with their numbers, one in the exception list with its reason.
++    f.status = 'posted';
++    f.who = 'clerk';
++    await page.reload();
++    await expect(
++      page.getByRole('heading', { level: 1, name: 'November 2026 batch' }),
++    ).toBeVisible();
++    await expect(totals).toContainText('39 of 40 posted');
++    expect(await amountsIn(page, 'Totals')).toContain(POSTED_GROSS.slice(0, -2));
++    await expect(exceptions.getByRole('row')).toHaveCount(2);
++    await expect(exceptions.getByRole('row').nth(1)).toContainText('Lighthouse Learning');
++    await expect(exceptions.getByRole('row').nth(1)).toContainText('Failed');
++    await expect(exceptions.getByRole('row').nth(1)).toContainText(NO_BILLING_TO_SENTENCE);
++    await expect(exceptions.getByRole('row').nth(1)).toContainText('next batch');
++    await expect(invoices.getByRole('row').nth(1)).toContainText('INV-001101');
++    await expect(invoices.getByRole('row').nth(13)).toContainText('Failed');
++    await assertPage(page, width);
++    await evidence('SS-UC02-08', `batch-posted-exceptions-${String(width)}`);
++    expect(f.errors).toEqual([]);
++  });
++}
++
++test('T-0084: someone without ar.batch.run is told who can run a batch, and nothing is sent', async ({
++  page,
++}) => {
++  const f = await fakeApi(page, 'auditor');
++  await open(page, '/sales/batches', 1440);
++  await expect(page.getByText(/can preview a batch/)).toBeVisible();
++  await expect(page.getByText(/AR Clerk/)).toBeVisible();
++  await expect(page.getByRole('button', { name: 'Preview the invoices' })).toHaveCount(0);
++  expect(f.previews).toEqual([]);
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0084: someone without ar.read cannot open a batch', async ({ page }) => {
++  const f = await fakeApi(page, 'sales');
++  await open(page, `/sales/batches/${BATCH}`, 1440);
++  await expect(page.getByText(/do not have access/i)).toBeVisible();
++  await expect(page.getByRole('table', { name: 'Exceptions' })).toHaveCount(0);
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0084: a period that ends before it starts is caught before anything is sent', async ({
++  page,
++}) => {
++  const f = await fakeApi(page, 'clerk');
++  await open(page, '/sales/batches', 1440);
++  await page.getByLabel('From').fill('2026-11-30');
++  await page.getByLabel('To', { exact: true }).fill('2026-11-01');
++  await page.getByRole('button', { name: 'Preview the invoices' }).click();
++  await expect(page.getByRole('alert')).toContainText('The period ends before it starts');
++  expect(f.previews).toEqual([]);
++  expect(f.errors).toEqual([]);
++});
++
++test('T-0084: an approval the API refuses explains why and leaves the batch as it was', async ({
++  page,
++}) => {
++  const f = await fakeApi(page, 'approver');
++  f.override.set(`POST /ar/batches/${BATCH}/approve`, {
++    status: 422,
++    body: { error: 'BATCH_STATE', message: `batch ${BATCH} is not a preview awaiting approval` },
++  });
++  await open(page, `/sales/batches/${BATCH}`, 1440);
++  await page.getByRole('button', { name: 'Approve and post 39 invoices' }).click();
++  await expect(page.getByRole('alert')).toContainText('no longer waiting for approval');
++  await expect(page.getByRole('button', { name: 'Approve and post 39 invoices' })).toBeVisible();
++  expect(f.errors).toEqual([]);
++});
+-- 
+2.43.0
+

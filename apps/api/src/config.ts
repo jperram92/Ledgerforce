@@ -19,6 +19,7 @@ import {
 } from '@ledgerforce/db';
 import { readFileSync } from 'node:fs';
 import type { ApiOptions } from './app.ts';
+import { DEFAULT_RATE_LIMITS } from './security/rate-limit.ts';
 
 export type ApiRuntimeOptions = ApiOptions & { host: string; port: number };
 
@@ -54,6 +55,17 @@ function port(env: Env): number {
   return n;
 }
 
+/**
+ * LF_TRUST_PROXY_HOPS (ADR-0054 rule 5): how many proxies in front of the API append trusted
+ * X-Forwarded-For entries — compose's nginx is 1, plus 1 for an operator's TLS proxy. Default 0.
+ */
+function trustProxyHops(env: Env): number {
+  const raw = env['LF_TRUST_PROXY_HOPS'];
+  if (raw === undefined) return 0;
+  if (!/^[0-5]$/.test(raw)) throw new ConfigError('LF_TRUST_PROXY_HOPS must be an integer 0–5');
+  return Number(raw);
+}
+
 export function apiOptionsFromEnv(
   env: Env,
   readFile: ReadFile = (p) => readFileSync(p, 'utf8'),
@@ -63,6 +75,12 @@ export function apiOptionsFromEnv(
   const opts: ApiRuntimeOptions = {
     databaseUrl,
     sessions: {},
+    // ADR-0054: always on in production; HSTS only when the public origin is https.
+    security: {
+      hsts: !publicUrl.insecure,
+      trustProxyHops: trustProxyHops(env),
+      rateLimits: DEFAULT_RATE_LIMITS,
+    },
     host: env['HOST'] ?? '127.0.0.1',
     port: port(env),
   };
