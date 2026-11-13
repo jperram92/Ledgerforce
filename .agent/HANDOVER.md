@@ -290,3 +290,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-13T00:47:44.225Z claude: release T-0068 → review (verify 14 PASS at 2344e0e; 2c/4 branch-wide; awaiting codex cross-review)
 - 2026-11-13T00:58:26.005Z claude: T-0075 → verifying
 - 2026-11-13T01:11:12.356Z claude: release T-0075 → review (verify 14 PASS at df9e094; 2c/4 branch-wide; awaiting codex cross-review)
+- 2026-11-13T01:18:05.630Z claude: T-0078 → verifying
