@@ -347,3 +347,6 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-13T20:07:49.768Z claude: release T-0123 → review (verify at ba72e04: every gate PASS except 12 (step 5 moved to T-0157 was unticked; marked superseded now); 2c PENDING; 8 Codex)
 - 2026-11-13T20:11:20.519Z claude: T-0159 → verifying
 - 2026-11-13T20:33:09.447Z claude: release T-0159 → review (verify at 05ab7ce: VERIFY OK (2c PENDING by measure, 8 Codex))
+- 2026-11-13T21:28:46.227Z claude: release T-0150 → review (verify at a5ff609: every gate PASS except 12 (verify step text after phase marker; ticked now); 2c PENDING; 8 Codex)
+- 2026-11-13T21:28:46.355Z claude: release T-0158 → review (verify at a5ff609: VERIFY OK (2c PENDING, 8 Codex))
+- 2026-11-13T21:28:46.483Z claude: release T-0154 → review (verify at a5ff609: VERIFY OK (2c PENDING, 8 Codex); depends on blocked T-0057 for done)
