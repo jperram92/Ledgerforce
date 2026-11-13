@@ -487,6 +487,78 @@
       "provider": "unknown",
       "timestamp": "2026-11-13T09:39:14.872Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-094333-SS-UC05-08-bill-entry-coding-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:33.731Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-094334-SS-UC05-08-bill-sent-for-approval-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:34.655Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-094336-SS-UC05-08-bill-approval-preview-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:36.059Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-094336-SS-UC05-08-bill-posted-journal-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:36.983Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-094338-SS-UC05-08-bill-entry-coding-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:38.876Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-094339-SS-UC05-08-bill-sent-for-approval-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:39.816Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-094341-SS-UC05-08-bill-approval-preview-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:41.232Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-094342-SS-UC05-08-bill-posted-journal-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:42.061Z",
+      "result": "passed"
     }
   ]
 }

@@ -343,6 +343,348 @@
       "provider": "unknown",
       "timestamp": "2026-11-13T08:31:11.490Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-083559-SS-PLAT-52-sign-in-1440-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: a visitor without a session signs in through the tenant login URL [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:59.380Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-083559-SS-PLAT-52-sign-in-invalid-name-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: a visitor without a session signs in through the tenant login URL [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:35:59.955Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-083603-SS-PLAT-52-sign-in-390-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-in page @ 390 light [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:03.529Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-083607-SS-PLAT-52-sign-in-390-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-in page @ 390 dark [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:07.037Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-083610-SS-PLAT-52-user-menu-open-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-out from the user menu by keyboard ends the session [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:10.440Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-083610-SS-PLAT-52-signed-out-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-out from the user menu by keyboard ends the session [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:10.608Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-083614-SS-PLAT-52-session-check-error-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: a failing session check shows an error with Retry, not a loop [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:14.497Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083616-SS-PLAT-53-shell-home-390-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 390 light [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:16.215Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083618-SS-PLAT-53-shell-home-1440-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 1440 light [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:18.342Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083620-SS-PLAT-53-shell-home-390-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 390 dark [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:20.433Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083621-SS-PLAT-53-shell-home-1440-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 1440 dark [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:21.414Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083626-SS-PLAT-53-section-sales-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:26.746Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083628-SS-PLAT-53-section-purchases-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:28.183Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083629-SS-PLAT-53-section-bank-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:29.362Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083631-SS-PLAT-53-section-reports-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:31.067Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083632-SS-PLAT-53-section-settings-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:32.947Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083635-SS-PLAT-53-keyboard-focus-nav-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: keyboard path: skip link, navigation and focus on the new heading [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:35.510Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083638-SS-PLAT-53-not-found-390.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: an unknown path shows not-found inside the shell [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:38.246Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-083641-SS-PLAT-53-user-menu-390-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: user menu at 390 dark stays inside the screen [T-0081]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:41.597Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-094421-SS-PLAT-52-sign-in-1440-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: a visitor without a session signs in through the tenant login URL [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:21.736Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-094422-SS-PLAT-52-sign-in-invalid-name-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: a visitor without a session signs in through the tenant login URL [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:22.237Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-094423-SS-PLAT-52-sign-in-390-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-in page @ 390 light [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:23.695Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-094424-SS-PLAT-52-sign-in-390-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-in page @ 390 dark [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:24.985Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-094426-SS-PLAT-52-user-menu-open-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-out from the user menu by keyboard ends the session [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:26.478Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-094426-SS-PLAT-52-signed-out-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: sign-out from the user menu by keyboard ends the session [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:26.572Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-52",
+      "file": ".agent/evidence/T-0081/20261113-094427-SS-PLAT-52-session-check-error-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-52 sign-in and session handling › SS-PLAT-52: a failing session check shows an error with Retry, not a loop [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:27.846Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094429-SS-PLAT-53-shell-home-1440-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 1440 light [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:29.467Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094430-SS-PLAT-53-shell-home-390-light.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 390 light [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:30.252Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094430-SS-PLAT-53-shell-home-1440-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 1440 dark [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:30.910Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094431-SS-PLAT-53-shell-home-390-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: shell home @ 390 dark [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:31.686Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094433-SS-PLAT-53-section-sales-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:33.761Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094434-SS-PLAT-53-section-purchases-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:34.397Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094434-SS-PLAT-53-section-bank-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:34.922Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094435-SS-PLAT-53-section-reports-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:35.558Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094436-SS-PLAT-53-section-settings-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: every section renders its empty state and becomes current [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:36.219Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094436-SS-PLAT-53-keyboard-focus-nav-1440.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: keyboard path: skip link, navigation and focus on the new heading [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:36.986Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094438-SS-PLAT-53-not-found-390.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: an unknown path shows not-found inside the shell [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:38.344Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-53",
+      "file": ".agent/evidence/T-0081/20261113-094439-SS-PLAT-53-user-menu-390-dark.png",
+      "test": "web/shell.spec.ts › SS-PLAT-53 authenticated shell, navigation and states › SS-PLAT-53: user menu at 390 dark stays inside the screen [T-0081]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:39.812Z",
+      "result": "passed"
     }
   ]
 }

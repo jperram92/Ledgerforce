@@ -7,6 +7,7 @@ import './styles/sync.css';
 import './styles/gl.css';
 import './styles/sales.css';
 import './styles/purchases.css';
+import './styles/reports.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App.tsx';

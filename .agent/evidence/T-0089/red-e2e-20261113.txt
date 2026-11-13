@@ -1,0 +1,40 @@
+      702 |   ])
+    > 703 |     await expect(nav.getByRole('link', { name, exact: true })).toBeVisible();
+          |                                                                ^
+      704 |   expect(f.errors).toEqual([]);
+      705 | });
+      706 |
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a5d9b8412f1498143/tests/e2e/web/reports.spec.ts:703:64
+
+    Error Context: test-results/web-reports-T-0089-the-Reports-page-lists-the-six-reports-chromium/error-context.md
+
+    Error Context: test-results/web-reports-T-0089-the-Reports-page-lists-the-six-reports-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/web-reports-T-0089-the-Reports-page-lists-the-six-reports-chromium/trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace test-results/web-reports-T-0089-the-Reports-page-lists-the-six-reports-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  19 failed
+    [chromium] › tests/e2e/web/reports.spec.ts:422:3 › SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ 1440 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:475:3 › SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ 1440 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:503:3 › SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ 1440 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:531:3 › SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ 1440 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:559:3 › SS-RPT-05: Aged receivables buckets each customer, totals from the API @ 1440 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:583:3 › SS-RPT-06: Aged payables buckets each supplier @ 1440 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:422:3 › SS-RPT-01: Trial balance for a range, totals from the ledger, each account opens its detail @ 390 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:475:3 › SS-RPT-02: Profit and loss groups revenue and expenses with the net profit from the API @ 390 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:503:3 › SS-RPT-03: Balance sheet balances, with computed earnings lines marked @ 390 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:531:3 › SS-RPT-04: General ledger detail shows opening, lines with running balance and closing @ 390 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:559:3 › SS-RPT-05: Aged receivables buckets each customer, totals from the API @ 390 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:583:3 › SS-RPT-06: Aged payables buckets each supplier @ 390 [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:607:1 › SS-RPT-08: Download CSV writes the figures the API returned [T-0089] 
+    [chromium] › tests/e2e/web/reports.spec.ts:625:1 › T-0089: changing the dates asks the API again and the URL keeps them 
+    [chromium] › tests/e2e/web/reports.spec.ts:638:1 › T-0089: without dates the reports start at this month and today 
+    [chromium] › tests/e2e/web/reports.spec.ts:650:1 › T-0089: an AP clerk is told who can run the trial balance, and sees no figures 
+    [chromium] › tests/e2e/web/reports.spec.ts:663:1 › T-0089: a refused report says why, and a date with no fiscal year is explained 
+    [chromium] › tests/e2e/web/reports.spec.ts:679:1 › T-0089: a period with nothing posted says so instead of an empty table 
+    [chromium] › tests/e2e/web/reports.spec.ts:691:1 › T-0089: the Reports page lists the six reports 

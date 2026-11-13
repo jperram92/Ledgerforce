@@ -480,24 +480,6 @@
       "result": "passed"
     },
     {
-      "scenario": "SS-PLAT-99",
-      "file": ".agent/evidence/T-0092/20261026-145930-tests-web.json",
-      "test": "11 test(s): apps/web/src/sync/sync-logic.test.ts › SS-PLAT-99: which action each status allows › retry for open and ignored; ignore for open only; otherwise a reason | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-99: refusals in plain words › sync_issue_not_retryable | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-99: refusals in plain words › sync_issue_not_ignorable | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-99: refusals in plain words › queue_not_configured | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-99: refusals in plain words › invalid_note | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-99: refusals in plain words › falls back to the shared messages (permission refusals name the permission) | apps/web/src/sync/sync.test.tsx › SS-PLAT-99: retry and ignore › Retry asks first; Cancel sends nothing; Yes sends the retry and shows the new status | apps/web/src/sync/sync.test.tsx › SS-PLAT-99: retry and ignore › Ignore takes an optional note after confirmation | apps/web/src/sync/sync.test.tsx › SS-PLAT-99: retry and ignore › an Auditor sees both actions disabled, each with a reason naming who can act | apps/web/src/sync/sync.test.tsx › SS-PLAT-99: retry and ignore › a 409 from a change elsewhere is said in plain words and the issue reloads | apps/web/src/sync/sync.test.tsx › SS-PLAT-99: retry and ignore › a step-up challenge leaves for /auth/step-up and comes back here",
-      "commit": "e9b312c98c33",
-      "provider": "claude",
-      "timestamp": "2026-10-26T14:59:30.102Z",
-      "result": "passed"
-    },
-    {
-      "scenario": "SS-PLAT-98",
-      "file": ".agent/evidence/T-0092/20261026-145930-tests-web.json",
-      "test": "13 test(s): apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › kind session_expired has its own heading and a next step | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › kind unavailable has its own heading and a next step | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › kind rate_limited has its own heading and a next step | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › kind request_limit has its own heading and a next step | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › kind throttled has its own heading and a next step | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › kind rejected has its own heading and a next step | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › kind malformed_response has its own heading and a next step | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › kind abandoned has its own heading and a next step | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › covers every kind the Salesforce connector and the outbox produce | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › a refused record (WriteBackRecordError) is named, and an unknown failure still guides | apps/web/src/sync/sync-logic.test.ts › SS-PLAT-98: the error in plain words (P6, P9) › a known Salesforce code gives a specific step, from the code or from the message | apps/web/src/sync/sync.test.tsx › SS-PLAT-98: one issue › shows the error in plain words, the payload reference, attempts and the payload | apps/web/src/sync/sync.test.tsx › SS-PLAT-98: one issue › an unknown issue shows not found",
-      "commit": "e9b312c98c33",
-      "provider": "claude",
-      "timestamp": "2026-10-26T14:59:30.102Z",
-      "result": "passed"
-    },
-    {
       "scenario": "SS-PLAT-97",
       "file": ".agent/evidence/T-0092/20261026-151308-SS-PLAT-97-inbox-open-accountant-1440.png",
       "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: an Accountant opens the inbox from Settings @ 1440 [T-0092]",
@@ -963,6 +945,474 @@
       "commit": "71d5d8d6c1b0-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-13T08:31:52.639Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-083626-SS-PLAT-97-inbox-open-accountant-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: an Accountant opens the inbox from Settings @ 1440 [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:26.743Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-083631-SS-PLAT-97-inbox-open-accountant-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: an Accountant opens the inbox from Settings @ 390 [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:31.019Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-083635-SS-PLAT-97-inbox-ignored-filter-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: filter by status and page through all issues [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:35.038Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-083636-SS-PLAT-97-inbox-all-second-page-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: filter by status and page through all issues [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:36.967Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083646-SS-PLAT-99-retry-confirm-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: the Owner retries after confirming @ 1440 [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:46.861Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083648-SS-PLAT-99-retry-sent-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: the Owner retries after confirming @ 1440 [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:48.587Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-083639-SS-PLAT-97-inbox-loading-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: loading, empty, error with Try again, and forbidden [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:39.421Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-083642-SS-PLAT-97-inbox-empty-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: loading, empty, error with Try again, and forbidden [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:42.913Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-083645-SS-PLAT-97-inbox-error-390-dark.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: loading, empty, error with Try again, and forbidden [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:45.923Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-083649-SS-PLAT-97-inbox-forbidden-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: loading, empty, error with Try again, and forbidden [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:49.205Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-083652-SS-PLAT-97-inbox-forbidden-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: loading, empty, error with Try again, and forbidden [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:52.970Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083652-SS-PLAT-99-retry-confirm-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: the Owner retries after confirming @ 390 [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:52.345Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083653-SS-PLAT-99-retry-sent-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: the Owner retries after confirming @ 390 [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:53.763Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-98",
+      "file": ".agent/evidence/T-0092/20261113-083657-SS-PLAT-98-issue-detail-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-98 one sync issue › SS-PLAT-98: error in plain words, payload reference and attempts @ 1440 [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:57.561Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083657-SS-PLAT-99-ignore-confirm-note-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: an Accountant ignores with a note, by keyboard; Cancel sends nothing [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:57.983Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083659-SS-PLAT-99-ignored-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: an Accountant ignores with a note, by keyboard; Cancel sends nothing [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:36:59.866Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-98",
+      "file": ".agent/evidence/T-0092/20261113-083701-SS-PLAT-98-issue-detail-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-98 one sync issue › SS-PLAT-98: error in plain words, payload reference and attempts @ 390 [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:37:01.883Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083703-SS-PLAT-99-actions-disabled-auditor-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: an Auditor sees the actions disabled with the reason @ 1440 [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:37:03.697Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083707-SS-PLAT-99-actions-disabled-auditor-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: an Auditor sees the actions disabled with the reason @ 390 [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:37:07.974Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-98",
+      "file": ".agent/evidence/T-0092/20261113-083706-SS-PLAT-98-issue-record-refused-1440-dark.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-98 one sync issue › SS-PLAT-98: a refused record names the Salesforce code; an unknown id is not found [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:37:06.370Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-98",
+      "file": ".agent/evidence/T-0092/20261113-083708-SS-PLAT-98-issue-not-found-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-98 one sync issue › SS-PLAT-98: a refused record names the Salesforce code; an unknown id is not found [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:37:08.966Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083711-SS-PLAT-99-ignored-issue-actions-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:37:11.437Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083714-SS-PLAT-99-fixed-issue-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:37:14.386Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083717-SS-PLAT-99-retry-queue-down-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:37:17.067Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083720-SS-PLAT-99-ignore-conflict-reloaded-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:37:20.336Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-083722-SS-PLAT-99-step-up-redirect-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092]",
+      "commit": "10ecaae7d6fb-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:37:22.643Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-094433-SS-PLAT-97-inbox-open-accountant-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: an Accountant opens the inbox from Settings @ 1440 [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:33.040Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-094434-SS-PLAT-97-inbox-open-accountant-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: an Accountant opens the inbox from Settings @ 390 [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:34.635Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-094436-SS-PLAT-97-inbox-ignored-filter-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: filter by status and page through all issues [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:36.306Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-094437-SS-PLAT-97-inbox-all-second-page-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: filter by status and page through all issues [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:37.123Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-094438-SS-PLAT-97-inbox-loading-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: loading, empty, error with Try again, and forbidden [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:38.099Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-094439-SS-PLAT-97-inbox-empty-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: loading, empty, error with Try again, and forbidden [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:39.266Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-094440-SS-PLAT-97-inbox-error-390-dark.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: loading, empty, error with Try again, and forbidden [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:40.416Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-094441-SS-PLAT-97-inbox-forbidden-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: loading, empty, error with Try again, and forbidden [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:41.732Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-97",
+      "file": ".agent/evidence/T-0092/20261113-094442-SS-PLAT-97-inbox-forbidden-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-97 sync issues inbox › SS-PLAT-97: loading, empty, error with Try again, and forbidden [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:42.862Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094441-SS-PLAT-99-retry-confirm-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: the Owner retries after confirming @ 1440 [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:41.987Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094442-SS-PLAT-99-retry-sent-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: the Owner retries after confirming @ 1440 [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:42.780Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-98",
+      "file": ".agent/evidence/T-0092/20261113-094444-SS-PLAT-98-issue-detail-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-98 one sync issue › SS-PLAT-98: error in plain words, payload reference and attempts @ 1440 [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:44.612Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094444-SS-PLAT-99-retry-confirm-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: the Owner retries after confirming @ 390 [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:44.494Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094445-SS-PLAT-99-retry-sent-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: the Owner retries after confirming @ 390 [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:45.272Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-98",
+      "file": ".agent/evidence/T-0092/20261113-094446-SS-PLAT-98-issue-detail-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-98 one sync issue › SS-PLAT-98: error in plain words, payload reference and attempts @ 390 [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:46.363Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094446-SS-PLAT-99-ignore-confirm-note-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: an Accountant ignores with a note, by keyboard; Cancel sends nothing [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:46.590Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094447-SS-PLAT-99-ignored-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: an Accountant ignores with a note, by keyboard; Cancel sends nothing [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:47.653Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-98",
+      "file": ".agent/evidence/T-0092/20261113-094448-SS-PLAT-98-issue-record-refused-1440-dark.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-98 one sync issue › SS-PLAT-98: a refused record names the Salesforce code; an unknown id is not found [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:48.027Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-98",
+      "file": ".agent/evidence/T-0092/20261113-094449-SS-PLAT-98-issue-not-found-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-98 one sync issue › SS-PLAT-98: a refused record names the Salesforce code; an unknown id is not found [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:49.329Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094449-SS-PLAT-99-actions-disabled-auditor-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: an Auditor sees the actions disabled with the reason @ 1440 [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:49.336Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094450-SS-PLAT-99-actions-disabled-auditor-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: an Auditor sees the actions disabled with the reason @ 390 [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:50.734Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094452-SS-PLAT-99-ignored-issue-actions-390.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:52.299Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094453-SS-PLAT-99-fixed-issue-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:53.402Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094454-SS-PLAT-99-retry-queue-down-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:54.632Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094455-SS-PLAT-99-ignore-conflict-reloaded-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:55.836Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-99",
+      "file": ".agent/evidence/T-0092/20261113-094456-SS-PLAT-99-step-up-redirect-1440.png",
+      "test": "web/sync-issues.spec.ts › SS-PLAT-99 retry and ignore › SS-PLAT-99: status decides the actions; refusals in plain words; step-up [T-0092]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:44:56.527Z",
       "result": "passed"
     }
   ]

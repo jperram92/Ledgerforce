@@ -17,8 +17,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | claimed | 1 |
 | done | 3 |
 | in_progress | 1 |
-| review | 99 |
-| todo | 28 |
+| review | 100 |
+| todo | 27 |
 | verifying | 2 |
 | **total** | **142** |
 
@@ -193,7 +193,7 @@ graph LR
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | review | T-0081, T-0052, T-0051 | UC-05 | 1 |
 | [T-0087](T-0087.md) | UI: supplier bank-detail verification and payment batch release (step-up) | MVP | todo | T-0081, T-0054, T-0053, T-0056 | UC-06 | 1 |
 | [T-0088](T-0088.md) | UI: statement import and bank reconciliation | MVP | todo | T-0081, T-0061, T-0059 | UC-08 | 1 |
-| [T-0089](T-0089.md) | UI: TB, P&L, balance sheet, GL detail, aged AR/AP | MVP | todo | T-0081, T-0077 | — | 0 |
+| [T-0089](T-0089.md) | UI: TB, P&L, balance sheet, GL detail, aged AR/AP | MVP | review | T-0081, T-0077 | — | 4 |
 | [T-0090](T-0090.md) | UI: close checklist and period status | MVP | todo | T-0081, T-0078, T-0079 | UC-10 | 1 |
 | [T-0091](T-0091.md) | UI: setup wizard | MVP | todo | T-0081, T-0080, T-0123 | — | 0 |
 | [T-0092](T-0092.md) | UI: Salesforce sync issues inbox | MVP | review | T-0081, T-0071 | — | 0 |

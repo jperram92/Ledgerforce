@@ -388,6 +388,78 @@
       "provider": "unknown",
       "timestamp": "2026-11-13T09:39:20.147Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-094327-SS-UC02-08-batch-start-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:27.839Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-094329-SS-UC02-08-batch-preview-exceptions-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:29.754Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-094333-SS-UC02-08-batch-approved-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:33.546Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-094335-SS-UC02-08-batch-posted-exceptions-1440.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 1440 [T-0084]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:35.678Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-094337-SS-UC02-08-batch-start-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:37.231Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-094338-SS-UC02-08-batch-preview-exceptions-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:38.815Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-094342-SS-UC02-08-batch-approved-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:42.532Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-08",
+      "file": ".agent/evidence/T-0084/20261113-094345-SS-UC02-08-batch-posted-exceptions-390.png",
+      "test": "web/batch-billing.spec.ts › SS-UC02-08: Batch screens show preview and exception list @ 390 [T-0084]",
+      "commit": "29b4cea80c88-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:43:45.065Z",
+      "result": "passed"
     }
   ]
 }
