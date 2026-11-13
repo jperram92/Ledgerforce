@@ -1,0 +1,32 @@
+/* Bills screens (T-0086) in the Timeline direction (DL-0070): reuses admin.css and gl.css; adds
+   the bill-line editor grid (wide enough that account and tax-code choices are readable) and the
+   coding table's total rows. Requires admin.css and gl.css first. */
+
+.bill-form {
+  max-width: 72rem;
+}
+.bill-form .gl-line {
+  grid-template-columns:
+    minmax(10rem, 1.2fr) minmax(14rem, 1.8fr) minmax(17rem, 2fr)
+    minmax(11rem, 1fr);
+}
+.bill-totals td {
+  font-weight: 600;
+}
+
+/* Between tablet and wide desktop the four minimums do not fit: two per row. */
+@media (max-width: 1100px) {
+  .bill-form .gl-line {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .bill-form .gl-line {
+    grid-template-columns: 1fr;
+  }
+  /* The amount cell carries its own label (data-label) when rows become stacks. */
+  .bill-totals td.bill-total-label {
+    display: none;
+  }
+}

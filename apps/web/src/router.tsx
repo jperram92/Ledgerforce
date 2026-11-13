@@ -31,6 +31,9 @@ import { BatchesPage } from './sales/BatchesPage.tsx';
 import { BatchPage } from './sales/BatchPage.tsx';
 import { InvoicePage } from './sales/InvoicePage.tsx';
 import { InvoicesPage } from './sales/InvoicesPage.tsx';
+import { BillFormPage } from './purchases/BillFormPage.tsx';
+import { BillPage } from './purchases/BillPage.tsx';
+import { BillsPage } from './purchases/BillsPage.tsx';
 
 const rootRoute = createRootRoute({ component: Outlet });
 
@@ -202,6 +205,28 @@ const batchRoute = createRoute({
   },
 });
 
+// Supplier bills (T-0086).
+const billsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'purchases/bills',
+  component: () => <BillsPage />,
+});
+
+const newBillRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'purchases/bills/new',
+  component: () => <BillFormPage />,
+});
+
+const billRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'purchases/bills/$billId',
+  component: function BillRoute() {
+    const { billId } = billRoute.useParams();
+    return <BillPage key={billId} billId={billId} />;
+  },
+});
+
 const routeTree = rootRoute.addChildren([
   signInRoute,
   shellRoute.addChildren([
@@ -218,6 +243,9 @@ const routeTree = rootRoute.addChildren([
     invoiceRoute,
     batchesRoute,
     batchRoute,
+    billsRoute,
+    newBillRoute,
+    billRoute,
     newJournalRoute,
     journalRoute,
     editJournalRoute,

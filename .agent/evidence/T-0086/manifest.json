@@ -1,0 +1,492 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0086",
+  "entries": [
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081702-SS-UC05-08-bill-entry-coding-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:02.918Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081712-SS-UC05-08-bill-entry-coding-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:12.909Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081741-SS-UC05-08-bill-entry-coding-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:41.190Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081743-SS-UC05-08-bill-sent-for-approval-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:43.130Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081745-SS-UC05-08-bill-approval-preview-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:45.590Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081746-SS-UC05-08-bill-posted-journal-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:46.835Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081750-SS-UC05-08-bill-entry-coding-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:50.068Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081752-SS-UC05-08-bill-sent-for-approval-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:52.216Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081756-SS-UC05-08-bill-approval-preview-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:56.068Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081757-SS-UC05-08-bill-posted-journal-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:17:57.440Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081859-SS-UC05-08-bill-entry-coding-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:18:59.604Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081902-SS-UC05-08-bill-sent-for-approval-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:02.099Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081905-SS-UC05-08-bill-approval-preview-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:05.809Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081907-SS-UC05-08-bill-posted-journal-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:07.769Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081912-SS-UC05-08-bill-entry-coding-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:12.176Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081913-SS-UC05-08-bill-sent-for-approval-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:13.993Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081917-SS-UC05-08-bill-approval-preview-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:17.545Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081919-SS-UC05-08-bill-posted-journal-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:19.020Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081955-SS-UC05-08-bill-entry-coding-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:55.596Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-081957-SS-UC05-08-bill-sent-for-approval-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:19:57.663Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082001-SS-UC05-08-bill-approval-preview-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:20:01.020Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082002-SS-UC05-08-bill-posted-journal-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:20:02.492Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082006-SS-UC05-08-bill-entry-coding-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:20:06.753Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082008-SS-UC05-08-bill-sent-for-approval-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:20:08.724Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082011-SS-UC05-08-bill-approval-preview-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:20:11.682Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082013-SS-UC05-08-bill-posted-journal-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:20:13.398Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082937-SS-UC05-08-bill-entry-coding-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:37.594Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082939-SS-UC05-08-bill-sent-for-approval-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:39.556Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082942-SS-UC05-08-bill-approval-preview-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:42.776Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082944-SS-UC05-08-bill-posted-journal-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:44.416Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082949-SS-UC05-08-bill-entry-coding-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:49.215Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082950-SS-UC05-08-bill-sent-for-approval-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:50.954Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082954-SS-UC05-08-bill-approval-preview-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:54.502Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-082955-SS-UC05-08-bill-posted-journal-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "71d5d8d6c1b0-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T08:29:55.560Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091408-SS-UC05-08-bill-entry-coding-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5143458a9ca3",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:08.990Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091410-SS-UC05-08-bill-sent-for-approval-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5143458a9ca3",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:10.774Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091413-SS-UC05-08-bill-approval-preview-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5143458a9ca3",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:13.968Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091414-SS-UC05-08-bill-posted-journal-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5143458a9ca3",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:14.956Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091418-SS-UC05-08-bill-entry-coding-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:18.143Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091419-SS-UC05-08-bill-sent-for-approval-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:19.327Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091421-SS-UC05-08-bill-approval-preview-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:21.360Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-091422-SS-UC05-08-bill-posted-journal-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:14:22.602Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-092450-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): bill coding choices › lists active suppliers, postable expense/asset accounts and tax codes in force; needs ap.bill.enter | apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): bills list and one bill › lists every bill with supplier, dates and state; shows one bill with its coding and the people involved | apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): approval decision for the caller (SoD on the server) › a person who entered a 2,750.00 bill is told they may not approve it; another approver may | apps/api/src/ap/bills-read.db.test.ts › SS-UC05-08 (API, T-0086): the journal of a bill › previews GP-008 for a draft without writing, and shows the same posted entry after approval",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:24:50.541Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-03",
+      "file": ".agent/evidence/T-0086/20261113-092450-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-03: Submitted bill waits for the Approver › SS-UC05-03 a submitted bill is in the Approver queue, unposted, with no journal",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:24:50.541Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-05",
+      "file": ".agent/evidence/T-0086/20261113-092450-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-05: AP Clerk cannot approve own bill › SS-UC05-05 the Clerk who entered a 2,750.00 bill is refused (SOD_BILL_SELF_APPROVAL, audited); another approver posts it",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:24:50.541Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-06",
+      "file": ".agent/evidence/T-0086/20261113-092450-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ap/bills.db.test.ts › SS-UC05-06: Small-team approval records an exception › SS-UC05-06 in small-team mode the sole user approves their own bill only with a recorded exception",
+      "commit": "5143458a9ca3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T09:24:50.541Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-093907-SS-UC05-08-bill-entry-coding-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5b42f26e9b6e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:39:07.194Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-093908-SS-UC05-08-bill-sent-for-approval-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5b42f26e9b6e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:39:08.076Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-093909-SS-UC05-08-bill-approval-preview-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5b42f26e9b6e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:39:09.340Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-093910-SS-UC05-08-bill-posted-journal-1440.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 1440 [T-0086]",
+      "commit": "5b42f26e9b6e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:39:10.202Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-093911-SS-UC05-08-bill-entry-coding-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5b42f26e9b6e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:39:11.989Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-093912-SS-UC05-08-bill-sent-for-approval-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5b42f26e9b6e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:39:12.757Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-093914-SS-UC05-08-bill-approval-preview-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5b42f26e9b6e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:39:14.078Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-08",
+      "file": ".agent/evidence/T-0086/20261113-093914-SS-UC05-08-bill-posted-journal-390.png",
+      "test": "web/bills.spec.ts › SS-UC05-08: Bill entry and approval screens @ 390 [T-0086]",
+      "commit": "5b42f26e9b6e-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T09:39:14.872Z",
+      "result": "passed"
+    }
+  ]
+}
