@@ -52,6 +52,11 @@ describe('approved security workflow contract [T-0095]', () => {
     for (const entry of entries) {
       // <commit sha>:<path>:<rule>:<line> — a bare path:rule:line entry would excuse the tree.
       expect(entry).toMatch(/^[a-f0-9]{40}:[^:\s]+:[a-z0-9-]+:\d+$/);
+      // DL-0464 (owner OK 2026-11-13): git object ids in the format-patch headers of the WIP
+      // series added by exactly one commit. No other commit, path or rule is excused.
+      const wipObjectIds =
+        /^3a6bc914e363d3cfe84d4fdf25580218182da7fe:\.agent\/wip\/T-00(86|89)\/[^:\s]+\.patch:sourcegraph-access-token:\d+$/;
+      if (wipObjectIds.test(entry)) continue;
       expect(entry, 'only the generic rule has reviewed false positives').toContain(
         ':generic-api-key:',
       );

@@ -3142,4 +3142,36 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: The create-transaction screen shows "The journal it will post" from the preview route. It asks again 300 ms after the account, amount or memo stops changing, and only when an account is chosen and the amount is a decimal string. "Post transaction" is enabled only while the journal on screen was built for what the form says now; the post sends the same request body. A refused preview shows the API's reason ("We could not build the journal: …") and a hint under the button. The preview query is not under the `['bank']` key, so posting does not ask again for a journal of the now-matched line. The T-0088 spec's fake API now answers the preview route (the screen waits for the journal before posting); no T-0088 assertion was changed.
 - Why: P4 (show the journal before you post; in review screens the preview is open by default with a Balanced indicator), P6 (controls explain themselves). It matches the manual journal screen, where Submit waits for a successful preview.
 - Alternatives: a "Show journal" button (rejected: P4 says open by default in review screens); posting allowed while the preview is loading or refused (rejected: the person would post a journal they did not see).
+
+### DL-0464 — Gitleaks false positives in the WIP patch series: commit-scoped ignores plus lossless gzip
+- Date: 2026-11-13 · By: claude · Task: sprint · Category: security (owner-approved 2026-11-13; re-authorised "make all these decisions based on best practices", DL-0477)
+- Decision: Security CI failed on 057457b. The `sourcegraph-access-token` rule includes a bare 40-hex alternative, and it matched 254 git object ids in the patch headers (`From <sha>`, `index <sha>..<sha>`) of two `git format-patch` files added in 3a6bc91 (`.agent/wip/T-0086/0004-…`, `.agent/wip/T-0089/0002-…`). Every finding line was checked to be such a header. The owner chose "Ignore + gzip":
+  1. 254 commit-scoped `.gitleaksignore` entries for 3a6bc91 cover the history scan.
+  2. The two patch paths stay, with their content replaced by a short pointer (restore command and original sha256). The original bytes are added as new `.patch.gz` files; decompressed, their SHA-256 equals the original (c214d3b9…, 2d658daa…). Nothing is renamed or deleted, so verify gate 11 (no-delete counts renames as deletes) stays green. The working-tree scan never reads the ignore file, and Gitleaks 8.30 does not open archives by default.
+  3. `.agent/wip/README.md` explains how to restore them.
+  4. Later WIP saves do not commit format-patch output with object-id headers; work is carried in local branches.
+- Why: The history cannot be rewritten (directive 6), and the tree must scan clean (the scan.mjs policy). The findings are commit ids, not credentials.
+- Alternatives: leave security red; delete the patches (forbidden by directive 6); add a path allowlist to the Gitleaks config (would weaken the CI gate for every future commit).
 - ADR: none · Status: accepted
+
+### DL-0477 — Owner delegates the pending security decisions; decisions taken on established practice
+- Date: 2026-11-13 · By: human (product owner), recorded by claude · Task: sprint · Category: security
+- Owner instruction (2026-11-13): "Yes you are authorised to make all these decisions based off best practices." The list in question is HANDOVER's open questions. Each decision below is taken under that delegation. Its card writes the security ADR, Accepted on this basis, before code, and implements it test-first.
+- Decisions:
+  1. **Gitleaks WIP false positives (DL-0464):** commit-scoped ignores plus lossless gzip copies. The pointer files keep the paths, so nothing is deleted.
+  2. **Single-invoice approval (T-0132):** a new permission `ar.invoice.approve` for Owner, Finance Admin and Approver, the same set that holds `ar.credit_note.approve` and `ar.batch.approve`. SoD: the creator of a draft may not approve it, unless the tenant runs in small-team mode, matching the existing credit-note rule. Rationale: least privilege and maker-checker (COSO / OWASP ASVS V4 access control).
+  3. **Customer refunds (T-0152):**
+     - `ar.refund.create` (AR Clerk, Finance Admin, Owner) and `ar.refund.approve` (Approver, Finance Admin, Owner).
+     - SoD: the refund's creator may not approve it.
+     - A bank refund is paid only through the AP payment batch, with its existing release rules (two releasers above the threshold, step-up).
+     - A Stripe refund is sent only after approval.
+     - Rationale: money leaving the business is maker-checker controlled, the same as supplier payments (design §6.5).
+  4. **Setup wizard routes (T-0157):** a new permission `settings.setup.manage` for Owner and Finance Admin, not a reuse of `settings.chart.manage`. Rationale: least privilege and a clear audit trail; setup changes more than the chart.
+  5. **Payment files (T-0154/T-0162/T-0163):**
+     - Downloading the ABA file and recording the bank confirmation both need step-up (300 s), as release does.
+     - SoD: the person who records the bank confirmation may not be the batch's creator.
+     - Rationale: the ABA file can be altered after download and before upload to the bank. Payment-fraud guidance treats payment-file handling as a high-risk action.
+  6. **Statement upload size (T-0161):** a route-scoped 10 MB JSON limit only on statement import (RQ-0151, option A, no new dependency). Per-address write rate limits (ADR-0054) still apply. Rationale: smallest exception that meets the need.
+  7. **CSRF (T-0144):** OWASP's recommended defence-in-depth. Cookie-authenticated state-changing requests are rejected unless Fetch Metadata (`Sec-Fetch-Site: same-origin`/`none`) or a matching `Origin` header proves they are same-origin, failing closed. Test helpers send the headers a browser would.
+  8. **Network access** for research (ato.gov.au for RQ-0153 re-check; postgresql.org for T-0143): proposed to the environment through its approval prompt; not assumed.
+- ADR: one per card (security) · Status: accepted (owner delegation)
