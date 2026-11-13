@@ -132,18 +132,33 @@ function paymentIntentOf(event: StripeEvent): PaymentIntentFacts | IgnoredReason
   };
 }
 
-/** The Stripe connector settings (postings Q2): the clearing account GP-003 debits. */
+/**
+ * The Stripe connector settings (postings Q2): the clearing account GP-003 debits and, for payouts
+ * (GP-027, T-0075), the fees expense account, the bank GL account payouts arrive in and the Stripe
+ * supplier party. Omitted payout fields keep their stored values.
+ */
 export async function setStripeSettings(
   trx: Trx,
   companyId: string,
-  s: { clearingAccountId: string },
+  s: {
+    clearingAccountId: string;
+    feeAccountId?: string;
+    payoutAccountId?: string;
+    stripePartyId?: string;
+  },
 ): Promise<void> {
+  const payout = {
+    ...(s.feeAccountId ? { fee_account_id: s.feeAccountId } : {}),
+    ...(s.payoutAccountId ? { payout_account_id: s.payoutAccountId } : {}),
+    ...(s.stripePartyId ? { stripe_party_id: s.stripePartyId } : {}),
+  };
   await trx
     .insertInto('app.stripe_settings')
-    .values({ company_id: companyId, clearing_account_id: s.clearingAccountId })
+    .values({ company_id: companyId, clearing_account_id: s.clearingAccountId, ...payout })
     .onConflict((oc) =>
       oc.columns(['tenant_id', 'company_id']).doUpdateSet({
         clearing_account_id: s.clearingAccountId,
+        ...payout,
         updated_at: sql<Date>`clock_timestamp()`,
       }),
     )

@@ -2516,3 +2516,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: sending email inside the run (not retryable and not transactional); a per-invoice reminder flag on sales_invoice (an UPDATE path on documents, with no history of steps); reminders on credit notes (credits are never overdue, same rule as ageing).
 - Not in this card: AR Clerk pausing reminders per party (UC-04 security note; needs the audited setting); Salesforce Task and credit hold (Phase 1, T-0100); the scheduled job wiring in apps/worker (it calls `runOverdueReminders` per company daily; the follow-up is in the card).
 - ADR: none · Status: accepted
+
+### DL-0403 — Stripe payout journal from balance transactions; payout record; settings columns (T-0075)
+- Date: 2026-11-13 · By: claude · Task: T-0075 · Category: implementation (payments, accounting via Approved GP-027)
+- Decision: `processStripePayout` posts GP-027 through the engine (source payments_stripe_payout) from the payout's balance transactions:
+  - Dr payout bank account (net);
+  - Dr Stripe fees (fee excl. GST, GST tax code, Stripe party);
+  - Dr GST_PAID (Σ `tax` fee_details);
+  - Cr Stripe clearing (Σ gross of the payout's transactions).
+  The engine's idempotency key is `stripe-payout:<po_id>`, and a unique `app.stripe_payout` row records the figures with `gst_evidence = pending_tax_invoice` (GP-028 reconciles later). A payout is refused when it does not net to its transactions, contains `withheld_tax` or another unknown fee type, is not AUD, or the settings are incomplete. Migration 0060 adds nullable `fee_account_id`, `payout_account_id` and `stripe_party_id` to `stripe_settings` (additive) and the insert-only `stripe_payout` table (with a gross − fee − GST = amount CHECK).
+- Why: RQ-0107. GST is taken from Stripe's `tax` fee detail, never estimated as 10 %, and the Approved GP-027 is replayed line by line in the test.
+- Alternatives: computing GST as fee/11 (Stripe rounds per transaction, and the tax invoice is authoritative); a journal-line evidence attribute (schema change across the ledger, not needed until GP-028).
+- ADR: none (posting follows an Approved golden; no new dependency) · Status: accepted

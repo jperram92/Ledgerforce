@@ -281,6 +281,15 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     stripe_status: () => 'succeeded',
     idempotency_key: () => `lf-refund-v1-${randomBytes(6).toString('hex')}`,
   },
+  // T-0075: a Stripe payout record (gross − fee − fee GST = amount, CHECK in migration 0060).
+  'app.stripe_payout': {
+    stripe_payout_id: () => `po_${randomBytes(6).toString('hex')}`,
+    currency: () => 'AUD',
+    amount: () => '1.00',
+    gross: () => '1.00',
+    fee: () => '0',
+    fee_gst: () => '0',
+  },
   // T-0041: billing format template records (CHECK-constrained codes; posted needs a series).
   'app.billing_format': {
     code: () => `F_${randomBytes(4).toString('hex').toUpperCase()}`,

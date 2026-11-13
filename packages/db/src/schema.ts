@@ -612,7 +612,30 @@ export interface StripeSettingsTable {
   tenant_id: TenantId;
   company_id: string;
   clearing_account_id: string;
+  /** Migration 0060 (T-0075): Stripe fees expense account (GP-027). */
+  fee_account_id: Generated<string | null>;
+  /** Migration 0060 (T-0075): the bank GL account payouts arrive in (GP-027). */
+  payout_account_id: Generated<string | null>;
+  /** Migration 0060 (T-0075): the Stripe supplier party named on the fee line (GP-027). */
+  stripe_party_id: Generated<string | null>;
   updated_at: Generated<Date>;
+}
+
+/** Migration 0060 (T-0075): a Stripe payout and its GP-027 entry; insert-only. */
+export interface StripePayoutTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  stripe_payout_id: string;
+  arrival_date: ColumnType<Date, string, never>;
+  currency: string;
+  amount: string;
+  gross: string;
+  fee: string;
+  fee_gst: string;
+  gst_evidence: Generated<'pending_tax_invoice'>;
+  entry_id: string;
+  created_at: Timestamp;
 }
 
 /** Migration 0051 (T-0074, ADR-0049): Stripe events acted on, stored once; insert-only. */
@@ -1240,6 +1263,7 @@ export interface Database {
   'app.email_delivery': EmailDeliveryTable;
   'app.stripe_payment_link': StripePaymentLinkTable;
   'app.stripe_settings': StripeSettingsTable;
+  'app.stripe_payout': StripePayoutTable;
   'app.stripe_webhook_event': StripeWebhookEventTable;
   'app.stripe_refund': StripeRefundTable;
   'app.billing_line': BillingLineTable;
