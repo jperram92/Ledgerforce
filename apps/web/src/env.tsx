@@ -7,6 +7,7 @@ import { createContext, useContext } from 'react';
 import type { AdminClient } from './admin/client.ts';
 import type { ApiClient } from './api.ts';
 import type { GlClient } from './gl/client.ts';
+import type { PurchasesClient } from './purchases/client.ts';
 import type { SalesClient } from './sales/client.ts';
 
 export interface AppEnv {
@@ -36,6 +37,8 @@ export interface Services {
   gl: GlClient;
   /** Companies and AR invoices (T-0083). */
   sales: SalesClient;
+  /** Supplier bills (T-0086). */
+  purchases: PurchasesClient;
 }
 
 export const ServicesContext = createContext<Services | null>(null);

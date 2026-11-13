@@ -186,7 +186,8 @@ async function fakeApi(page: Page, who: string, seed: FakeBill[] = [posted]): Pr
         return send(route, 200, { roles: me.roles, permissions: [...perms] });
       if (path === '/companies')
         return send(route, 200, [{ id: CO, name: 'Harbour & Co Pty Ltd', base_currency: 'AUD' }]);
-      expect(url.searchParams.get('company_id')).toBe(CO);
+      // PUT carries company_id in its body (asserted through f.puts); every other route in the query.
+      if (req.method() !== 'PUT') expect(url.searchParams.get('company_id')).toBe(CO);
       f.calls.push(`${req.method()} ${path}`);
       if (path === '/ap/bill-coding') return need('ap.bill.enter') ?? send(route, 200, CODING);
       if (path === '/ap/bills' && req.method() === 'GET')
@@ -207,7 +208,7 @@ async function fakeApi(page: Page, who: string, seed: FakeBill[] = [posted]): Pr
         if (denied) return denied;
         const body = req.postDataJSON() as Omit<FakeBill, 'id'> & { party_id: string };
         f.puts.push(body);
-        f.bills.set(billId, {
+        const entered: FakeBill = {
           id: billId,
           bill_no: null,
           status: 'draft',
@@ -219,8 +220,9 @@ async function fakeApi(page: Page, who: string, seed: FakeBill[] = [posted]): Pr
           enteredBy: f.who,
           submittedBy: null,
           approvedBy: null,
-        });
-        return send(route, 201, { id: billId, status: 'draft', ...totals(f.bills.get(billId)!) });
+        };
+        f.bills.set(billId, entered);
+        return send(route, 201, { id: billId, status: 'draft', ...totals(entered) });
       }
       const b = f.bills.get(billId);
       if (!b) return send(route, 404, { error: 'not_found' });

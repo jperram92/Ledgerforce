@@ -11,7 +11,8 @@ export interface SubPage {
     | '/reports/audit-log'
     | '/settings/sync-issues'
     | '/accounting/journals'
-    | '/accounting/chart';
+    | '/accounting/chart'
+    | '/purchases/bills';
   name: string;
   text: string;
 }
@@ -53,6 +54,13 @@ export const SECTIONS: readonly Section[] = [
     gloss: 'Bills from suppliers and the payments you make to them (accounts payable).',
     emptyHeading: 'No bills yet',
     emptyText: 'Bills appear here when suppliers email them in or someone enters one.',
+    pages: [
+      {
+        to: '/purchases/bills',
+        name: 'Bills',
+        text: 'Enter and code supplier bills, send them for approval and see what they post.',
+      },
+    ],
   },
   {
     name: 'Bank',
