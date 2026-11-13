@@ -14,13 +14,12 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | Status | Cards |
 |---|---:|
 | blocked | 7 |
-| claimed | 1 |
 | done | 3 |
 | in_progress | 1 |
-| review | 100 |
+| review | 101 |
 | todo | 28 |
-| verifying | 2 |
-| **total** | **142** |
+| verifying | 3 |
+| **total** | **143** |
 
 | Phase | Cards |
 |---|---:|
@@ -194,7 +193,7 @@ graph LR
 | [T-0087](T-0087.md) | UI: supplier bank-detail verification and payment batch release (step-up) | MVP | todo | T-0081, T-0054, T-0053, T-0056 | UC-06 | 1 |
 | [T-0088](T-0088.md) | UI: statement import and bank reconciliation | MVP | todo | T-0081, T-0061, T-0059 | UC-08 | 1 |
 | [T-0089](T-0089.md) | UI: TB, P&L, balance sheet, GL detail, aged AR/AP | MVP | review | T-0081, T-0077 | — | 4 |
-| [T-0090](T-0090.md) | UI: close checklist and period status | MVP | todo | T-0081, T-0078, T-0079 | UC-10 | 1 |
+| [T-0090](T-0090.md) | UI: close checklist and period status | MVP | todo | T-0081, T-0078, T-0079, T-0148 | UC-10 | 1 |
 | [T-0091](T-0091.md) | UI: setup wizard | MVP | todo | T-0081, T-0080, T-0123 | — | 0 |
 | [T-0092](T-0092.md) | UI: Salesforce sync issues inbox | MVP | review | T-0081, T-0071 | — | 0 |
 | [T-0093](T-0093.md) | UI: users, roles, SoD exceptions report and audit log viewer | MVP | review | T-0081, T-0016, T-0015 | — | 0 |
@@ -246,6 +245,7 @@ graph LR
 | [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | todo | T-0117 | UC-11 | 0 |
 | [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |
 | [T-0147](T-0147.md) | Worker: daily overdue-reminder run for every company (cross-tenant scheduling) | MVP | todo | T-0129 | — | 0 |
+| [T-0148](T-0148.md) | Close checklist and period list over HTTP (for the close screen) | MVP | todo | T-0078, T-0079 | UC-10 | 0 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:
