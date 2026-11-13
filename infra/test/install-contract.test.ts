@@ -194,6 +194,13 @@ describe('SS-PLAT-86 compose stack', () => {
     expect(svc('web').secrets ?? []).toEqual([]);
   });
 
+  it('T-0142 AC-5 the api trusts exactly the nginx hop for the client address, overridable by the operator (ADR-0054)', () => {
+    expect(svc('api').environment?.['LF_TRUST_PROXY_HOPS']).toBe('${LF_TRUST_PROXY_HOPS:-1}');
+    for (const n of ['worker', 'setup', 'web']) {
+      expect(svc(n).environment?.['LF_TRUST_PROXY_HOPS']).toBeUndefined();
+    }
+  });
+
   it('SS-PLAT-86 the runtime connects as lf_app; only setup holds the migrator password', () => {
     for (const n of ['api', 'worker']) {
       const env = svc(n).environment ?? {};

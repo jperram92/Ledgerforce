@@ -47,6 +47,7 @@ import {
 import { AuditTrail, TenantTx } from './tenancy/tenant-tx.ts';
 import { AuditLogController } from './audit/audit-log.controller.ts';
 import { requestIdMiddleware } from './audit/request-id.ts';
+import { applySecurity, type SecurityOptions } from './security/security.ts';
 import { SyncIssuesController } from './sync/sync-issues.controller.ts';
 import { CLOCK, DB, KMS, MFA_POLICY, SYNC_REQUEUE } from './tokens.ts';
 import type { DeliveryRequeue } from '@ledgerforce/outbox';
@@ -83,6 +84,8 @@ export interface ApiOptions {
   stripeWebhook?: StripeWebhookOptions;
   /** Document events (write-back snapshots), written in the request's transaction. */
   documentOutbox?: DocumentOutbox;
+  /** Security headers, trusted proxy hops and rate limits (ADR-0054, T-0142). */
+  security?: SecurityOptions;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
   tenantResolver?: TenantResolver;
   /** Test hook: extra controllers (stand-ins for routes of later tasks, e.g. SS-UC02-07). */
@@ -255,6 +258,8 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
       rawBody: true,
     },
   );
+  // First: headers on every answer (429s included), limits before routing and request ids (ADR-0054).
+  applySecurity(app, opts.security);
   app.use(requestIdMiddleware);
   await app.listen(opts.port ?? 0, opts.host ?? '127.0.0.1');
   const addr = app.getHttpServer().address() as AddressInfo;

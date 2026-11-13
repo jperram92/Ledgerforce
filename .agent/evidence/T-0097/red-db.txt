@@ -1,0 +1,328 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:40285
+ ❯ |api-db| apps/api/src/security/rate-limit.db.test.ts (10 tests | 7 failed) 1372ms
+     × AC-3 the (N+1)-th step-up request in the window answers 429 rate_limited with Retry-After [T-0142] 57ms
+     × AC-3 a forged left-most X-Forwarded-For entry does not escape the bucket [T-0142] 6ms
+     × AC-3 case and trailing-slash variants of an auth route share its bucket [T-0142] 4ms
+     × AC-4 the (N+1)-th POST answers 429 before the handler runs [T-0142] 14ms
+     × AC-4 PUT, PATCH and DELETE count against the same bucket [T-0142] 3ms
+     × AC-4 webhooks have their own bucket: an exhausted mutating bucket does not block them [T-0142] 13ms
+     × AC-4 without a trusted proxy X-Forwarded-For is ignored: rotating it does not reset the limit [T-0142] 13ms
+ ❯ |api-db| apps/api/src/security/security-headers.db.test.ts (7 tests | 5 failed) 1398ms
+     × AC-1 a public route (GET /health, 200) carries the OWASP REST header set [T-0142] 78ms
+     × AC-1 an authenticated route refused without credentials (401) carries it too [T-0142] 9ms
+     × AC-1 an unknown route (404) carries it too [T-0142] 10ms
+     × AC-1 a refused mutation (POST without credentials) carries it too [T-0142] 19ms
+     × AC-1 HSTS only when the public URL is https (max-age one year, no preload) [T-0142] 33ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 12 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-3 auth routes are limited per client address > AC-3 the (N+1)-th step-up request in the window answers 429 rate_limited with Retry-After [T-0142]
+AssertionError: expected 401 to be 429 // Object.is equality
+
+- Expected
++ Received
+
+- 429
++ 401
+
+ ❯ apps/api/src/security/rate-limit.db.test.ts:69:24
+     67|     now += 15_000;
+     68|     const res = await fetch(url, from('203.0.113.1'));
+     69|     expect(res.status).toBe(429);
+       |                        ^
+     70|     expect(await res.json()).toEqual({ error: 'rate_limited' });
+     71|     expect(res.headers.get('retry-after')).toBe('45');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-3 auth routes are limited per client address > AC-3 a forged left-most X-Forwarded-For entry does not escape the bucket [T-0142]
+AssertionError: expected 401 to be 429 // Object.is equality
+
+- Expected
++ Received
+
+- 429
++ 401
+
+ ❯ apps/api/src/security/rate-limit.db.test.ts:81:24
+     79|   it('AC-3 a forged left-most X-Forwarded-For entry does not escape th…
+     80|     const res = await fetch(`${api.url}/auth/step-up`, from('198.51.10…
+     81|     expect(res.status).toBe(429);
+       |                        ^
+     82|   });
+     83|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-3 auth routes are limited per client address > AC-3 case and trailing-slash variants of an auth route share its bucket [T-0142]
+AssertionError: expected 401 to be 429 // Object.is equality
+
+- Expected
++ Received
+
+- 429
++ 401
+
+ ❯ apps/api/src/security/rate-limit.db.test.ts:86:78
+     84|   it('AC-3 case and trailing-slash variants of an auth route share its…
+     85|     for (const path of ['/AUTH/step-up', '/auth/step-up/', '/t/acme/au…
+     86|       expect((await fetch(`${api.url}${path}`, from('203.0.113.1'))).s…
+       |                                                                              ^
+     87|     }
+     88|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-4 state-changing routes and webhooks are limited; reads are not > AC-4 the (N+1)-th POST answers 429 before the handler runs [T-0142]
+AssertionError: expected [ 201, 201, 201 ] to deeply equal [ 201, 201, 429 ]
+
+- Expected
++ Received
+
+  [
+    201,
+    201,
+-   429,
++   201,
+  ]
+
+ ❯ apps/api/src/security/rate-limit.db.test.ts:100:75
+     98|     handled = 0;
+     99|     const url = `${api.url}/t0142-probe/write`;
+    100|     expect(await statuses(3, url, from('192.0.2.7', { method: 'POST' }…
+       |                                                                           ^
+    101|     expect(handled).toBe(2);
+    102|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-4 state-changing routes and webhooks are limited; reads are not > AC-4 PUT, PATCH and DELETE count against the same bucket [T-0142]
+AssertionError: expected 404 to be 429 // Object.is equality
+
+- Expected
++ Received
+
+- 429
++ 404
+
+ ❯ apps/api/src/security/rate-limit.db.test.ts:107:26
+    105|     for (const method of ['PUT', 'PATCH', 'DELETE']) {
+    106|       const res = await fetch(`${api.url}/t0142-probe/write`, from('19…
+    107|       expect(res.status).toBe(429);
+       |                          ^
+    108|     }
+    109|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-4 state-changing routes and webhooks are limited; reads are not > AC-4 webhooks have their own bucket: an exhausted mutating bucket does not block them [T-0142]
+AssertionError: expected 503 to be 429 // Object.is equality
+
+- Expected
++ Received
+
+- 429
++ 503
+
+ ❯ apps/api/src/security/rate-limit.db.test.ts:121:20
+    119|     const got = await statuses(5, url, from('192.0.2.7', { method: 'PO…
+    120|     expect(got.slice(0, 4).every((s) => s !== 429)).toBe(true);
+    121|     expect(got[4]).toBe(429);
+       |                    ^
+    122|   });
+    123|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/rate-limit.db.test.ts > T-0142 AC-4 state-changing routes and webhooks are limited; reads are not > AC-4 without a trusted proxy X-Forwarded-For is ignored: rotating it does not reset the limit [T-0142]
+AssertionError: expected [ 201, 201, 201 ] to deeply equal [ 201, 201, 429 ]
+
+- Expected
++ Received
+
+  [
+    201,
+    201,
+-   429,
++   201,
+  ]
+
+ ❯ apps/api/src/security/rate-limit.db.test.ts:131:17
+    129|       got.push((await fetch(url, from(ip, { method: 'POST' }))).status…
+    130|     }
+    131|     expect(got).toEqual([201, 201, 429]);
+       |                 ^
+    132|     expect(handled).toBe(2);
+    133|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/security-headers.db.test.ts > T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2) > AC-1 a public route (GET /health, 200) carries the OWASP REST header set [T-0142]
+AssertionError: expected { 'cache-control': null, …(5) } to deeply equal { 'cache-control': 'no-store', …(5) }
+
+- Expected
++ Received
+
+  {
+-   "cache-control": "no-store",
+-   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+-   "cross-origin-resource-policy": "same-origin",
+-   "referrer-policy": "no-referrer",
+-   "x-content-type-options": "nosniff",
+-   "x-frame-options": "DENY",
++   "cache-control": null,
++   "content-security-policy": null,
++   "cross-origin-resource-policy": null,
++   "referrer-policy": null,
++   "x-content-type-options": null,
++   "x-frame-options": null,
+  }
+
+ ❯ expectBaseline apps/api/src/security/security-headers.db.test.ts:36:15
+     34| function expectBaseline(res: Response): void {
+     35|   const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, …
+     36|   expect(got).toEqual(BASELINE);
+       |               ^
+     37|   expect(res.headers.get('x-powered-by')).toBeNull();
+     38| }
+ ❯ apps/api/src/security/security-headers.db.test.ts:44:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/security-headers.db.test.ts > T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2) > AC-1 an authenticated route refused without credentials (401) carries it too [T-0142]
+AssertionError: expected { 'cache-control': null, …(5) } to deeply equal { 'cache-control': 'no-store', …(5) }
+
+- Expected
++ Received
+
+  {
+-   "cache-control": "no-store",
+-   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+-   "cross-origin-resource-policy": "same-origin",
+-   "referrer-policy": "no-referrer",
+-   "x-content-type-options": "nosniff",
+-   "x-frame-options": "DENY",
++   "cache-control": null,
++   "content-security-policy": null,
++   "cross-origin-resource-policy": null,
++   "referrer-policy": null,
++   "x-content-type-options": null,
++   "x-frame-options": null,
+  }
+
+ ❯ expectBaseline apps/api/src/security/security-headers.db.test.ts:36:15
+     34| function expectBaseline(res: Response): void {
+     35|   const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, …
+     36|   expect(got).toEqual(BASELINE);
+       |               ^
+     37|   expect(res.headers.get('x-powered-by')).toBeNull();
+     38| }
+ ❯ apps/api/src/security/security-headers.db.test.ts:50:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/security-headers.db.test.ts > T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2) > AC-1 an unknown route (404) carries it too [T-0142]
+AssertionError: expected { 'cache-control': null, …(5) } to deeply equal { 'cache-control': 'no-store', …(5) }
+
+- Expected
++ Received
+
+  {
+-   "cache-control": "no-store",
+-   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+-   "cross-origin-resource-policy": "same-origin",
+-   "referrer-policy": "no-referrer",
+-   "x-content-type-options": "nosniff",
+-   "x-frame-options": "DENY",
++   "cache-control": null,
++   "content-security-policy": null,
++   "cross-origin-resource-policy": null,
++   "referrer-policy": null,
++   "x-content-type-options": null,
++   "x-frame-options": null,
+  }
+
+ ❯ expectBaseline apps/api/src/security/security-headers.db.test.ts:36:15
+     34| function expectBaseline(res: Response): void {
+     35|   const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, …
+     36|   expect(got).toEqual(BASELINE);
+       |               ^
+     37|   expect(res.headers.get('x-powered-by')).toBeNull();
+     38| }
+ ❯ apps/api/src/security/security-headers.db.test.ts:56:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/security-headers.db.test.ts > T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2) > AC-1 a refused mutation (POST without credentials) carries it too [T-0142]
+AssertionError: expected { 'cache-control': null, …(5) } to deeply equal { 'cache-control': 'no-store', …(5) }
+
+- Expected
++ Received
+
+  {
+-   "cache-control": "no-store",
+-   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+-   "cross-origin-resource-policy": "same-origin",
+-   "referrer-policy": "no-referrer",
+-   "x-content-type-options": "nosniff",
+-   "x-frame-options": "DENY",
++   "cache-control": null,
++   "content-security-policy": null,
++   "cross-origin-resource-policy": null,
++   "referrer-policy": null,
++   "x-content-type-options": null,
++   "x-frame-options": null,
+  }
+
+ ❯ expectBaseline apps/api/src/security/security-headers.db.test.ts:36:15
+     34| function expectBaseline(res: Response): void {
+     35|   const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, …
+     36|   expect(got).toEqual(BASELINE);
+       |               ^
+     37|   expect(res.headers.get('x-powered-by')).toBeNull();
+     38| }
+ ❯ apps/api/src/security/security-headers.db.test.ts:62:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/12]⎯
+
+ FAIL  |api-db| apps/api/src/security/security-headers.db.test.ts > T-0142 AC-1 security headers on every API response (ADR-0054 rule 1–2) > AC-1 HSTS only when the public URL is https (max-age one year, no preload) [T-0142]
+AssertionError: expected { 'cache-control': null, …(5) } to deeply equal { 'cache-control': 'no-store', …(5) }
+
+- Expected
++ Received
+
+  {
+-   "cache-control": "no-store",
+-   "content-security-policy": "default-src 'none'; frame-ancestors 'none'",
+-   "cross-origin-resource-policy": "same-origin",
+-   "referrer-policy": "no-referrer",
+-   "x-content-type-options": "nosniff",
+-   "x-frame-options": "DENY",
++   "cache-control": null,
++   "content-security-policy": null,
++   "cross-origin-resource-policy": null,
++   "referrer-policy": null,
++   "x-content-type-options": null,
++   "x-frame-options": null,
+  }
+
+ ❯ expectBaseline apps/api/src/security/security-headers.db.test.ts:36:15
+     34| function expectBaseline(res: Response): void {
+     35|   const got = Object.fromEntries(Object.keys(BASELINE).map((h) => [h, …
+     36|   expect(got).toEqual(BASELINE);
+       |               ^
+     37|   expect(res.headers.get('x-powered-by')).toBeNull();
+     38| }
+ ❯ apps/api/src/security/security-headers.db.test.ts:69:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/12]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  12 failed | 5 passed (17)
+   Start at  08:13:16
+   Duration  5.42s (transform 3.37s, setup 0ms, import 6.12s, tests 2.77s, environment 0ms)
+

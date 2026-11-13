@@ -1,0 +1,262 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae3e0f4bdceeed9d8
+
+ ❯ |api-unit| apps/api/src/security/rate-limit.test.ts (20 tests | 16 failed) 22ms
+     × AC-4 GET /t/acme/auth/login → auth [T-0142] 7ms
+     × AC-4 GET /auth/callback → auth [T-0142] 1ms
+     × AC-4 GET /auth/step-up → auth [T-0142] 1ms
+     × AC-4 HEAD /auth/callback → auth [T-0142] 1ms
+     × AC-4 GET /Auth//Callback/ → auth [T-0142] 1ms
+     × AC-4 POST /webhooks/stripe → webhook [T-0142] 0ms
+     × AC-4 POST /WEBHOOKS/stripe/ → webhook [T-0142] 0ms
+     × AC-4 POST /auth/logout → mutating [T-0142] 0ms
+     × AC-4 POST /ar/invoices → mutating [T-0142] 1ms
+     × AC-4 put /companies/1 → mutating [T-0142] 0ms
+     × AC-4 PATCH /users/1 → mutating [T-0142] 0ms
+     × AC-4 DELETE /api-tokens/1 → mutating [T-0142] 0ms
+     × AC-4 allows the class limit per key, then refuses with the seconds left in the window [T-0142] 3ms
+     × AC-4 Retry-After is at least one second [T-0142] 1ms
+     × AC-4 the key map is bounded: the oldest key is evicted, memory never exceeds maxKeys [T-0142] 1ms
+     × AC-5 production defaults are 30 auth, 300 mutating, 600 webhook per 60 s [T-0142] 1ms
+ ❯ |api-unit| apps/api/src/config.test.ts (12 tests | 3 failed) 21ms
+     × AC-5 production always enables the default limits; no trusted proxy unless configured [T-0142] 6ms
+     × AC-5 an https public URL turns HSTS on [T-0142] 1ms
+     × AC-5 LF_TRUST_PROXY_HOPS is an integer 0–5; anything else is refused at start-up [T-0142] 3ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 19 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-unit| apps/api/src/config.test.ts > T-0142 AC-5 security headers and rate limits from the environment (ADR-0054) > AC-5 production always enables the default limits; no trusted proxy unless configured [T-0142]
+AssertionError: expected undefined to deeply equal { hsts: false, …(2) }
+
+- Expected:
+{
+  "hsts": false,
+  "rateLimits": {
+    "auth": 0,
+    "mutating": 0,
+    "webhook": 0,
+    "windowMs": 0,
+  },
+  "trustProxyHops": 0,
+}
+
++ Received:
+undefined
+
+ ❯ apps/api/src/config.test.ts:169:24
+    167|   it('AC-5 production always enables the default limits; no trusted pr…
+    168|     const o = apiOptionsFromEnv(base, readFile);
+    169|     expect(o.security).toEqual({ hsts: false, trustProxyHops: 0, rateL…
+       |                        ^
+    170|   });
+    171|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/19]⎯
+
+ FAIL  |api-unit| apps/api/src/config.test.ts > T-0142 AC-5 security headers and rate limits from the environment (ADR-0054) > AC-5 an https public URL turns HSTS on [T-0142]
+AssertionError: expected undefined to be true // Object.is equality
+
+- Expected:
+true
+
++ Received:
+undefined
+
+ ❯ apps/api/src/config.test.ts:177:30
+    175|       readFile,
+    176|     );
+    177|     expect(o.security?.hsts).toBe(true);
+       |                              ^
+    178|   });
+    179|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/19]⎯
+
+ FAIL  |api-unit| apps/api/src/config.test.ts > T-0142 AC-5 security headers and rate limits from the environment (ADR-0054) > AC-5 LF_TRUST_PROXY_HOPS is an integer 0–5; anything else is refused at start-up [T-0142]
+AssertionError: expected [ undefined, undefined, undefined ] to deeply equal [ +0, 1, 5 ]
+
+- Expected
++ Received
+
+  [
+-   0,
+-   1,
+-   5,
++   undefined,
++   undefined,
++   undefined,
+  ]
+
+ ❯ apps/api/src/config.test.ts:183:47
+    181|     const hops = (v: string): number | undefined =>
+    182|       apiOptionsFromEnv({ ...base, LF_TRUST_PROXY_HOPS: v }, readFile)…
+    183|     expect([hops('0'), hops('1'), hops('5')]).toEqual([0, 1, 5]);
+       |                                               ^
+    184|     for (const bad of ['6', '-1', 'true', '1.5', ' 1', '']) {
+    185|       expect(() => apiOptionsFromEnv({ ...base, LF_TRUST_PROXY_HOPS: b…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/19]⎯
+
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 GET /t/acme/auth/login → auth [T-0142]
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 GET /auth/callback → auth [T-0142]
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 GET /auth/step-up → auth [T-0142]
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 HEAD /auth/callback → auth [T-0142]
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 GET /Auth//Callback/ → auth [T-0142]
+AssertionError: expected null to be 'auth' // Object.is equality
+
+- Expected:
+"auth"
+
++ Received:
+null
+
+ ❯ apps/api/src/security/rate-limit.test.ts:27:42
+     25|     ['GET', '/t/acme/auth/login/extra', null],
+     26|   ])('AC-4 %s %s → %s [T-0142]', (method, path, cls) => {
+     27|     expect(rateLimitClass(method, path)).toBe(cls);
+       |                                          ^
+     28|   });
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/19]⎯
+
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 POST /webhooks/stripe → webhook [T-0142]
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 POST /WEBHOOKS/stripe/ → webhook [T-0142]
+AssertionError: expected null to be 'webhook' // Object.is equality
+
+- Expected:
+"webhook"
+
++ Received:
+null
+
+ ❯ apps/api/src/security/rate-limit.test.ts:27:42
+     25|     ['GET', '/t/acme/auth/login/extra', null],
+     26|   ])('AC-4 %s %s → %s [T-0142]', (method, path, cls) => {
+     27|     expect(rateLimitClass(method, path)).toBe(cls);
+       |                                          ^
+     28|   });
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/19]⎯
+
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 POST /auth/logout → mutating [T-0142]
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 POST /ar/invoices → mutating [T-0142]
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 put /companies/1 → mutating [T-0142]
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 PATCH /users/1 → mutating [T-0142]
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 DELETE /api-tokens/1 → mutating [T-0142]
+AssertionError: expected null to be 'mutating' // Object.is equality
+
+- Expected:
+"mutating"
+
++ Received:
+null
+
+ ❯ apps/api/src/security/rate-limit.test.ts:27:42
+     25|     ['GET', '/t/acme/auth/login/extra', null],
+     26|   ])('AC-4 %s %s → %s [T-0142]', (method, path, cls) => {
+     27|     expect(rateLimitClass(method, path)).toBe(cls);
+       |                                          ^
+     28|   });
+     29| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/19]⎯
+
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 fixed-window limiter > AC-4 allows the class limit per key, then refuses with the seconds left in the window [T-0142]
+AssertionError: expected { allowed: true } to deeply equal { Object (allowed, retryAfterSeconds) }
+
+- Expected
++ Received
+
+  {
+-   "allowed": false,
+-   "retryAfterSeconds": 8,
++   "allowed": true,
+  }
+
+ ❯ apps/api/src/security/rate-limit.test.ts:40:32
+     38|     t += 2_500;
+     39|     expect(l.hit('auth', 'a')).toEqual({ allowed: true });
+     40|     expect(l.hit('auth', 'a')).toEqual({ allowed: false, retryAfterSec…
+       |                                ^
+     41|     expect(l.hit('auth', 'b')).toEqual({ allowed: true });
+     42|     expect(l.hit('mutating', 'a')).toEqual({ allowed: true });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/19]⎯
+
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 fixed-window limiter > AC-4 Retry-After is at least one second [T-0142]
+AssertionError: expected { allowed: true } to deeply equal { Object (allowed, retryAfterSeconds) }
+
+- Expected
++ Received
+
+  {
+-   "allowed": false,
+-   "retryAfterSeconds": 1,
++   "allowed": true,
+  }
+
+ ❯ apps/api/src/security/rate-limit.test.ts:53:36
+     51|     l.hit('mutating', 'a');
+     52|     t = 9_999;
+     53|     expect(l.hit('mutating', 'a')).toEqual({ allowed: false, retryAfte…
+       |                                    ^
+     54|   });
+     55|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/19]⎯
+
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 fixed-window limiter > AC-4 the key map is bounded: the oldest key is evicted, memory never exceeds maxKeys [T-0142]
+AssertionError: expected +0 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ apps/api/src/security/rate-limit.test.ts:62:20
+     60|     l.hit('mutating', 'b');
+     61|     l.hit('mutating', 'c');
+     62|     expect(l.size).toBe(2);
+       |                    ^
+     63|     // 'a' was evicted, so it starts a fresh window; 'c' is still coun…
+     64|     expect(l.hit('mutating', 'a')).toEqual({ allowed: true });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/19]⎯
+
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 fixed-window limiter > AC-5 production defaults are 30 auth, 300 mutating, 600 webhook per 60 s [T-0142]
+AssertionError: expected { windowMs: +0, auth: +0, …(2) } to deeply equal { windowMs: 60000, auth: 30, …(3) }
+
+- Expected
++ Received
+
+  {
+-   "auth": 30,
+-   "maxKeys": 50000,
+-   "mutating": 300,
+-   "webhook": 600,
+-   "windowMs": 60000,
++   "auth": 0,
++   "mutating": 0,
++   "webhook": 0,
++   "windowMs": 0,
+  }
+
+ ❯ apps/api/src/security/rate-limit.test.ts:69:33
+     67|
+     68|   it('AC-5 production defaults are 30 auth, 300 mutating, 600 webhook …
+     69|     expect(DEFAULT_RATE_LIMITS).toEqual({
+       |                                 ^
+     70|       windowMs: 60_000,
+     71|       auth: 30,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/19]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  19 failed | 13 passed (32)
+   Start at  08:13:10
+   Duration  514ms (transform 216ms, setup 0ms, import 411ms, tests 42ms, environment 0ms)
+

@@ -108,6 +108,13 @@ After the Owner's first sign-in, setup refuses to reissue.
 
 - **TLS**: terminate TLS in your reverse proxy and forward to `127.0.0.1:${LF_HTTP_PORT}` with the
   `Host` and `X-Forwarded-Proto: https` headers. Use TLS 1.2+ (1.3 preferred).
+- **Client addresses and rate limits** (ADR-0054): the API limits sign-in routes and every
+  write per client address (auth 30, writes 300, webhooks 600 per minute; excess answers 429 with
+  `Retry-After`). It finds the address from `X-Forwarded-For`, trusting `LF_TRUST_PROXY_HOPS`
+  proxies (default `1` = the `web` nginx). If your TLS proxy appends `X-Forwarded-For`, set
+  `LF_TRUST_PROXY_HOPS=2`; otherwise leave `1`. Too low merges every user into the proxy's bucket;
+  too high lets a client choose its own bucket. The API also sends `Cache-Control: no-store`,
+  CSP, `nosniff`, `X-Frame-Options: DENY` and, for an https `LF_PUBLIC_URL`, HSTS (one year).
 - **Reachability**: the api container must reach `LF_PUBLIC_URL` (it fetches the OIDC discovery
   document from it). With public DNS this works through your reverse proxy; check with
   `docker compose … exec api node -e "fetch(process.env.LF_PUBLIC_URL+'/realms/ledgerforce').then(r=>console.log(r.status))"`.
