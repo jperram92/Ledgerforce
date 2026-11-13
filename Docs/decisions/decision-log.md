@@ -2586,3 +2586,25 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | T-0097 pilot hardening | 0460–0469 | 0054–0055 | 0141–0142 | T-0142–T-0144 |
 - Why: The owner asked for parallel agents (DL-0408); disjoint ranges keep the merges mechanical.
 - ADR: none · Status: accepted
+
+### DL-0420 — Period reopen over HTTP: routes, step-up, SoD subject, state-based replay (T-0079)
+- Date: 2026-11-13 · By: claude · Task: T-0079 · Category: api (+ security control wiring)
+- Decision: Three routes are added: `POST /periods/:periodId/reopen-requests` {to_status, reason}, `POST /periods/reopen-requests/:requestId/approve` and `GET /periods/:periodId/reopen-requests`.
+  - Both mutations need `period.reopen` and a 300 s step-up. The step-up is `@RequireStepUp(300)`, and the catalogue's STEP_UP_PERMISSIONS would demand it anyway.
+  - Both mutations pass the SoD engine (`period_reopen_request.request` / `.approve`, rule SOD_PERIOD_REOPEN_SELF_APPROVAL).
+  - A written reason is required (400 `reason_required`).
+  - Everything is wired to `requestReopen` / `approveReopen` in @ledgerforce/ledger, whose migration-0018 functions repeat every check and write the audit rows.
+  - GET needs `reports.run`, because a read with `period.reopen` would demand step-up.
+  - Replays are recognised by state: the same requester, target and reason, or the same approver. The reopen table has no idempotency-key column and this round adds no migrations (DL-0409).
+  - The request step's SoD subject is named before the handler as a placeholder, and set to the real id once the function returns it.
+  - `periods` is added to the nginx API prefixes (SS-PLAT-86).
+  - The card's file name `period.reopen.spec.ts` is read as the repo convention `apps/api/src/periods/period-reopen.db.test.ts`.
+- Why: Design §3.5, §6.2 and §6.5 rule 6; apps/api AGENTS.md (thin controllers, SoD in the interceptor, audit every mutation). There was no open question, so no RQ: the design text and migration 0018 settle the behaviour.
+- Alternatives: an unstored Idempotency-Key header (a false guarantee); the period id as SoD subject (blocks later reopens); see ADR-0056.
+- ADR: ADR-0056 (architecture, Proposed) · Status: accepted
+
+### DL-0421 — Close checklist after a reopen needs schema; reported, not built (T-0079)
+- Date: 2026-11-13 · By: claude · Task: T-0079 · Category: scope
+- Decision: A period reopened from hard lock cannot run the T-0078 close checklist again. `app.close_checklist_step` (migration 0061) has primary key (tenant_id, period_id, step) and is insert-only, so `completeCloseStep` answers ALREADY_DONE for every step that was completed before. Its comment says "a reopened period starts a new checklist", but that needs a schema change. One option is an additive `round` or `reopen_request_id` column with a new unique key, and `closeChecklist` reading the latest round. Under DL-0409 the agent adds no migration, so this is reported to the lead as follow-up work. Until then, a reopened period is re-locked with `setPeriodStatus` (period.lock / period.close, audited).
+- Why: DL-0409 (no migrations in parallel agents); directive 6 (no edits to merged migrations).
+- ADR: none · Status: accepted
