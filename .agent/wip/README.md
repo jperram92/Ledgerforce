@@ -11,6 +11,10 @@ git switch -c feat/T-NNNN-<slug> bcf4ab6
 git am .agent/wip/T-NNNN/*.patch
 ```
 
+Two patches are stored gzip-compressed, byte for byte, beside a short pointer file of the same name without `.gz` (DL-0464): `T-0086/0004-…patch.gz` and
+`T-0089/0002-…patch.gz`. Their headers' git object ids match a Gitleaks rule, and the working-tree
+scan reads no ignore file. Before `git am`, decompress them: `gunzip -kf .agent/wip/T-NNNN/*.patch.gz`.
+
 Then finish the card normally (TDD, validation with 0 skipped tests, evidence), and merge it into the
 working branch. Delete nothing here afterwards: mark the folder superseded in this README instead.
 
