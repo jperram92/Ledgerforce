@@ -325,6 +325,96 @@
       "provider": "unknown",
       "timestamp": "2026-11-13T14:26:54.365Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0088/20261113-154321-SS-UC08-08-statement-imported-1440.png",
+      "test": "web/bank-rec.spec.ts › SS-UC08-08: Reconciliation screens @ 1440 [T-0088]",
+      "commit": "a9fdace431a6",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T15:43:21.267Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0088/20261113-154322-SS-UC08-08-match-lines-suggestion-1440.png",
+      "test": "web/bank-rec.spec.ts › SS-UC08-08: Reconciliation screens @ 1440 [T-0088]",
+      "commit": "a9fdace431a6",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T15:43:22.515Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0088/20261113-154323-SS-UC08-08-create-transaction-form-1440.png",
+      "test": "web/bank-rec.spec.ts › SS-UC08-08: Reconciliation screens @ 1440 [T-0088]",
+      "commit": "a9fdace431a6",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T15:43:23.393Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0088/20261113-154324-SS-UC08-08-reconciliation-report-ties-1440.png",
+      "test": "web/bank-rec.spec.ts › SS-UC08-08: Reconciliation screens @ 1440 [T-0088]",
+      "commit": "a9fdace431a6",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T15:43:24.608Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0088/20261113-154325-SS-UC08-08-reconciliation-completed-1440.png",
+      "test": "web/bank-rec.spec.ts › SS-UC08-08: Reconciliation screens @ 1440 [T-0088]",
+      "commit": "a9fdace431a6",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T15:43:25.408Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0088/20261113-154327-SS-UC08-08-statement-imported-390.png",
+      "test": "web/bank-rec.spec.ts › SS-UC08-08: Reconciliation screens @ 390 [T-0088]",
+      "commit": "a9fdace431a6-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T15:43:27.660Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0088/20261113-154328-SS-UC08-08-match-lines-suggestion-390.png",
+      "test": "web/bank-rec.spec.ts › SS-UC08-08: Reconciliation screens @ 390 [T-0088]",
+      "commit": "a9fdace431a6-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T15:43:28.825Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0088/20261113-154329-SS-UC08-08-create-transaction-form-390.png",
+      "test": "web/bank-rec.spec.ts › SS-UC08-08: Reconciliation screens @ 390 [T-0088]",
+      "commit": "a9fdace431a6-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T15:43:29.576Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0088/20261113-154330-SS-UC08-08-reconciliation-report-ties-390.png",
+      "test": "web/bank-rec.spec.ts › SS-UC08-08: Reconciliation screens @ 390 [T-0088]",
+      "commit": "a9fdace431a6-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T15:43:30.622Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0088/20261113-154331-SS-UC08-08-reconciliation-completed-390.png",
+      "test": "web/bank-rec.spec.ts › SS-UC08-08: Reconciliation screens @ 390 [T-0088]",
+      "commit": "a9fdace431a6-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-13T15:43:31.406Z",
+      "result": "passed"
     }
   ]
 }

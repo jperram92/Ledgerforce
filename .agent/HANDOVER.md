@@ -329,3 +329,7 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-13T11:46:47.806Z claude: release T-0090 → review (full verify at 3c50abf: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
 - 2026-11-13T13:43:25.785Z claude: T-0120 → verifying
 - 2026-11-13T14:01:15.099Z claude: release T-0120 → review (full verify at 38ccc90: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
+- 2026-11-13T15:45:58.544Z claude: release T-0085 → review (verify at ab32d00: every gate PASS except 12 (card had been set to review before this step was ticked; fixed now); 2c PENDING by measure; 8 awaits Codex)
+- 2026-11-13T15:45:58.733Z claude: release T-0088 → review (verify at ab32d00: every gate PASS except 12 (card had been set to review before this step was ticked; fixed now); 2c PENDING by measure; 8 awaits Codex)
+- 2026-11-13T15:46:05.448Z claude: T-0149 → verifying
+- 2026-11-13T15:46:05.565Z claude: T-0151 → verifying

@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0149",
+  "entries": [
+    {
+      "scenario": "SS-UC08-02",
+      "file": ".agent/evidence/T-0149/20261113-154559-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/bank/bank-rec.db.test.ts › T-0149: bank reconciliation over HTTP › SS-UC08-02 imports the CSV (201, audited); the same file again is duplicate_file (200); refusals",
+      "commit": "a9fdace431a6-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T15:45:59.227Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-05",
+      "file": ".agent/evidence/T-0149/20261113-154559-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/bank/bank-rec.db.test.ts › T-0149: bank reconciliation over HTTP › SS-UC08-05 accepting the rule suggestion creates and posts the transaction (201) and matches the line; replay 200",
+      "commit": "a9fdace431a6-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T15:45:59.227Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-06",
+      "file": ".agent/evidence/T-0149/20261113-154559-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/bank/bank-rec.db.test.ts › T-0149: bank reconciliation over HTTP › SS-UC08-06 the report ties with the deposit listed as unreconciled (decimal strings); 404 for another tenant | apps/api/src/bank/bank-rec.db.test.ts › T-0149: bank reconciliation over HTTP › SS-UC08-06 completing: 422 when it does not tie, 201 when it does, replay 200, 409 for another user; covered lines cannot be unmatched",
+      "commit": "a9fdace431a6-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-13T15:45:59.227Z",
+      "result": "passed"
+    }
+  ]
+}
