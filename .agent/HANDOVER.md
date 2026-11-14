@@ -1,31 +1,25 @@
 # Handover: round 2 fully merged; T-0129 built (2026-11-13 09:50 UTC)
 
 ## Codex continuation prompt
-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0463 to DL-0470. Branch `claude/loving-lovelace-nozqpk`.
+> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0477 (the owner delegated the pending security decisions on best practice), DL-0561, DL-0562 and DL-0560. Branch `claude/loving-lovelace-nozqpk`, tip bed64c8.
 >
-> Built, fully verified and moved to review since the round-2 merges (each VERIFY OK except 2c and 8, which are PENDING by design):
-> - T-0129: per-party reminder pause, migration 0063.
-> - T-0147: daily reminder fan-out per tenant, migration 0064, ADR-0062 accepted, new compose service `scheduler`.
-> - T-0148: close checklist HTTP routes.
-> - T-0090: close checklist screen, plus a contrast fix, DL-0470.
-> - T-0120: approved batches posted and emailed by the worker; job queues installed at deploy, DL-0471.
-> - T-0079 and T-0117 are also in review.
->
-> Rounds 3 (DL-0472) and 4 (DL-0473) are merged, verified and in review: T-0151, T-0085, T-0149, T-0088, T-0145, T-0123 (wizard slice 1, migration 0065), T-0136, T-0153 and T-0087. Follow-ups: T-0150 (bank preview), T-0152 (refunds; blocked on the owner), T-0154 (ABA download), T-0157 (wizard routes; permission question), T-0158 (wizard settings) and T-0159 (done: migration 0066, in review). Round 5 (DL-0476) is merged and validated: T-0154 (ABA download; depends on the blocked T-0057), T-0158 (wizard settings; migration 0067; ADR-0071 Proposed until cross-review) and T-0150 (bank journal preview). New cards: T-0160, T-0161, T-0162, T-0163, T-0164, T-0165. The next migration is 0068.
-> T-0119 (Chromium in the worker image) needs docker image builds, a compose smoke run and the image scan, so it is better done where docker is available. Other ready cards: T-0087, T-0110, T-0119, T-0126, T-0127, T-0130, T-0143 and T-0168. The next migration is 0065.
->
-> Codex cross-review (gate 8) is pending for every card in review. Gate 2c stays PENDING until main's baseline is re-recorded as unit+db; the tree is at 93.63%.
+> - **In review:** everything built since the round-2 merges. That includes the round 3–6 cards: T-0151, T-0085, T-0149, T-0088, T-0145, T-0123, T-0136, T-0153, T-0087, T-0159, T-0150, T-0158, T-0154, T-0169, T-0157, T-0152 and T-0132. Every one is VERIFY OK except gates 2c and 8.
+> - **Migrations:** up to 0070. The next one is 0071.
+> - **Now:** the T-0142 full verify is running; it has never been verified on this branch. Then claim T-0144 (CSRF guard, decided by DL-0477 item 7: fail-safe Fetch-Metadata + Origin). The worktree /tmp/claude-0/csrf (branch feat/T-0144-csrf) was created for it but holds no work yet.
+> - **Other ready cards:** T-0160, T-0161, T-0162 and T-0163 (need T-0057), T-0164, T-0165, T-0172, T-0126, T-0127, T-0130, T-0143 (network allowed now), T-0168, T-0110 (needs a Salesforce scratch org) and T-0119 (needs docker).
+> - **Security CI:** DAST was red at dbd19a5 ("No such image: lf-dast-scheduler"). It is fixed in 4a7950b (DL-0479); confirm the security run is green.
+> - **Cross-provider review:** Codex review (gate 8) is pending for every card in review. Gate 2c stays PENDING until main's baseline is re-recorded as unit+db.
 
 ## Open questions for human
-- **Security CI is red (Gitleaks, DL-0464, owner chose "Ignore + gzip").** The fix is in local stash `DL-0464 gitleaks WIP fix (awaiting owner permission)`. It is not pushed, because committing it was blocked as an oversight change: it edits the human-owned contract test `infra/test/security-workflow.contract.test.ts`, with an exception for commit 3a6bc91 only, .agent/wip T-0086/T-0089 only, and the rule sourcegraph-access-token only. The hits are 254 git object IDs in format-patch headers. To land it, run `git stash pop` and commit, or allow the commit.
+- **(Resolved 2026-11-13, DL-0464/DL-0477; merged dbd19a5)** Security CI is red (Gitleaks, DL-0464, owner chose "Ignore + gzip").** The fix is in local stash `DL-0464 gitleaks WIP fix (awaiting owner permission)`. It is not pushed, because committing it was blocked as an oversight change: it edits the human-owned contract test `infra/test/security-workflow.contract.test.ts`, with an exception for commit 3a6bc91 only, .agent/wip T-0086/T-0089 only, and the rule sourcegraph-access-token only. The hits are 254 git object IDs in format-patch headers. To land it, run `git stash pop` and commit, or allow the commit.
 - **(Resolved 2026-11-13, DL-0466)** ADR-0062: the owner accepted option 1 (fan-out from the lf_migrator maintenance instance). T-0147 is unblocked.
-- **Refund permission (T-0152, blocked).** The catalogue has no permission for customer refunds, so the refund routes and screen, and the refund half of SS-UC11-08, cannot be built without a security ADR. Which permission (for example `ar.refund.create` / `ar.refund.pay`), which role templates get it, and does paying a refund go through the payment-batch SoD rules? (DL-0491)
-- **T-0157 permission.** Should the setup wizard routes reuse `settings.chart.manage`, or get a new permission? A new permission is a security change (DL-0523).
-- **Payment-file routes (DL-0541).** The ABA download and bank-confirmation routes check only `ap.payment_batch.release`: no SoD step and no step-up (DL-0292/DL-0304). Adding either changes the security model. The screen (T-0154) already handles both if they are added.
-- **Statement upload size (T-0161, RQ-0151).** Is a route-scoped 10 MB JSON body limit for statement import a security change under design §6.9? ADR-0054's rate limits still apply.
-- **Network: ato.gov.au** is blocked in this session. RQ-0153's ATO thresholds come from search results and should be re-checked against the pages.
-- **T-0132 needs a security ADR:** a new `ar.invoice.approve` permission and the role templates that get it (ADR-0023). It is the owner's decision; the card stays todo until then.
-- **CSRF policy (T-0144, security ADR to write).** Should cookie-authenticated writes that carry neither Fetch-Metadata nor Origin be rejected (OWASP recommends it)? That changes ~25 session-based DB test files. Owner decision or explicit delegation needed.
+- **(Resolved by owner delegation, DL-0477)** **Refund permission (T-0152, blocked).** The catalogue has no permission for customer refunds, so the refund routes and screen, and the refund half of SS-UC11-08, cannot be built without a security ADR. Which permission (for example `ar.refund.create` / `ar.refund.pay`), which role templates get it, and does paying a refund go through the payment-batch SoD rules? (DL-0491)
+- **(Resolved by owner delegation, DL-0477)** **T-0157 permission.** Should the setup wizard routes reuse `settings.chart.manage`, or get a new permission? A new permission is a security change (DL-0523).
+- **(Resolved by owner delegation, DL-0477)** **Payment-file routes (DL-0541).** The ABA download and bank-confirmation routes check only `ap.payment_batch.release`: no SoD step and no step-up (DL-0292/DL-0304). Adding either changes the security model. The screen (T-0154) already handles both if they are added.
+- **(Resolved by owner delegation, DL-0477)** **Statement upload size (T-0161, RQ-0151).** Is a route-scoped 10 MB JSON body limit for statement import a security change under design §6.9? ADR-0054's rate limits still apply.
+- **(Resolved by owner delegation, DL-0477)** **Network: ato.gov.au** is blocked in this session. RQ-0153's ATO thresholds come from search results and should be re-checked against the pages.
+- **(Resolved by owner delegation, DL-0477)** **T-0132 needs a security ADR:** a new `ar.invoice.approve` permission and the role templates that get it (ADR-0023). It is the owner's decision; the card stays todo until then.
+- **(Resolved by owner delegation, DL-0477)** **CSRF policy (T-0144, security ADR to write).** Should cookie-authenticated writes that carry neither Fetch-Metadata nor Origin be rejected (OWASP recommends it)? That changes ~25 session-based DB test files. Owner decision or explicit delegation needed.
 - **Network:** research for T-0143 (backups) needs postgresql.org, which the session proxy blocks; allowing it in the environment would help.
 - [adr:security] T-0142 Accept ADR-0054 (API security headers, strict CORS, per-address rate limits auth 30 / writes 300 / webhooks 600 per minute, `LF_TRUST_PROXY_HOPS`)?
   Options: A) accept as proposed B) different limits or HSTS policy C) helmet/@nestjs/throttler instead. Recommendation: A (OWASP baseline, no new runtime dependency). See: Docs/adr/0054-api-security-headers-and-rate-limits.md, RQ-0141. Built test-first on `feat/T-0097-pilot-hardening-r2`.
