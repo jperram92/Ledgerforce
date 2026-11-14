@@ -1,0 +1,14 @@
+
+Running 10 tests using 2 workers
+
+[1/10] [chromium] › tests/e2e/web/credit-notes.spec.ts:373:1 › T-0085: a credit beyond the invoice is refused with the reason and nothing is drafted
+[2/10] [chromium] › tests/e2e/web/credit-notes.spec.ts:296:3 › SS-UC11-08: Credit note and refund screens @ 1440 [T-0085]
+[3/10] [chromium] › tests/e2e/web/credit-notes.spec.ts:394:1 › T-0085: a user without ar.read is told so, and no invoice is shown
+[4/10] [chromium] › tests/e2e/web/refunds.spec.ts:292:3 › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 1440 [T-0152]
+[5/10] [chromium] › tests/e2e/web/credit-notes.spec.ts:296:3 › SS-UC11-08: Credit note and refund screens @ 390 [T-0085]
+[6/10] [chromium] › tests/e2e/web/credit-notes.spec.ts:354:1 › SS-UC11-08: an Approver opens the draft, sees the journal and posts it [T-0085]
+[7/10] [chromium] › tests/e2e/web/refunds.spec.ts:292:3 › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 390 [T-0152]
+[8/10] [chromium] › tests/e2e/web/refunds.spec.ts:381:1 › SS-UC11-08 refusal: more than the customer can have back is refused in place [T-0152]
+[9/10] [chromium] › tests/e2e/web/refunds.spec.ts:401:1 › SS-UC11-08 forbidden: a user without the refund permissions sees the credit but can neither request nor approve [T-0152]
+[10/10] [chromium] › tests/e2e/web/refunds.spec.ts:361:1 › SS-UC11-08 refusal: the person who requested a refund cannot approve it (SOD_REFUND_SELF_APPROVAL) [T-0152]
+  10 passed (18.0s)

@@ -3239,3 +3239,19 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: `RefundError` gains `REFUND_NOT_FOUND` (unknown refund, including another tenant's under RLS) and `PARTY_NOT_FOUND` (party not in the company), mapped to 404 `not_found`; they were `INVALID_REFUND` before. Also `NOT_APPROVED`, `NOT_APPROVABLE`, `BANK_ACCOUNT_REQUIRED` (422). No caller matched the old code for these cases (payment-confirmation wraps every `RefundError`).
 - Why: card AC-1 (404 for another tenant's party) and the 404 convention of the other AR routes.
 - ADR: none · Status: accepted
+
+### DL-0584 — Refund screen in the credit-note screen; Stripe-on-approval split to T-0172
+- Date: 2026-11-14 · By: claude · Task: T-0152 · Category: ui + scope
+- Decision:
+  1. The Refund region of `/sales/credit-notes` (shown for a posted invoice) reads the customer's credit from the API ("can have back", "refunds already requested"). With `ar.refund.create` and credit available it offers a request form (amount, pay-from date, optional reason; a client uuid kept for the form's life). After the request the page moves to `?refund=…`, so an Approver can open the same refund. The refund view shows its state in plain words, "Show me the journal" (engine GP-006 preview, P4) and, with `ar.refund.approve`, "Approve refund"; the SoD refusal is shown in place. The browser compares only `available === "0.0000"` as text to choose between the form and "no credit"; it does no arithmetic.
+  2. "Request refund" and "Show me the journal" are secondary buttons so the page keeps at most one primary action (the credit-note form's or "Approve refund").
+  3. Stripe refunds sent by the approve step (ADR-0074) are card T-0172, not this card: the T-0074 Stripe path needs rerouting through the refund document and a step-up decision.
+- Why: card AC-4; P4 (journal before it posts); P12 plain words; brief: split when the card grows.
+- Alternatives: a separate refund page (more navigation; the credit is created on this screen); a disabled approve button for the creator (the SoD rule is the API's, and small-team mode may allow it).
+- ADR: ADR-0074 · Status: accepted
+
+### DL-0585 — T-0085's credit-note e2e adapted to the live Refund region; its evidence re-taken
+- Date: 2026-11-14 · By: claude · Task: T-0152 · Category: process
+- Decision: `tests/e2e/web/credit-notes.spec.ts` (T-0085) asserted that refunds were "not available here yet". The fake API now answers `GET /ar/parties/:id/credit` (no credit before the credit note posts, 220.00 after) and the assertion checks the new text "Acme Pty Ltd has no credit to refund". No assertion was removed or loosened. Running the spec added new T-0085 screenshots and manifest entries at this branch's commit; the earlier entries stay.
+- Why: DL-0491/0492 planned that T-0152 replaces the placeholder; the spec must describe the screen as it is.
+- ADR: none · Status: accepted
