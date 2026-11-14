@@ -16,9 +16,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 7 |
 | done | 3 |
 | in_progress | 1 |
-| review | 120 |
-| todo | 25 |
-| verifying | 4 |
+| review | 125 |
+| todo | 24 |
 | **total** | **160** |
 | **total** | **147** |
 
@@ -175,11 +174,11 @@ graph LR
 | [T-0076](T-0076.md) | Trial balance, profit & loss and balance sheet | MVP | review | T-0027 | UC-10 | 1 |
 | [T-0077](T-0077.md) | GL detail and aged AR/AP reports | MVP | review | T-0076, T-0028, T-0049 | — | 0 |
 | [T-0078](T-0078.md) | Month-end close checklist (UC-10) | MVP | review | T-0023, T-0061, T-0076 | UC-10 | 5 |
-| [T-0079](T-0079.md) | Hard-lock reopen with two approvers and audit reason | MVP | verifying | T-0078, T-0015, T-0013 | UC-10 | 1 |
+| [T-0079](T-0079.md) | Hard-lock reopen with two approvers and audit reason | MVP | review | T-0078, T-0015, T-0013 | UC-10 | 1 |
 | [T-0080](T-0080.md) | Setup wizard backend (10 steps) and opening balances | MVP | review | T-0018, T-0034, T-0058, T-0063, T-0039, T-0046, T-0050 | — | 3 |
-| [T-0123](T-0123.md) | Setup wizard state machine and step validators (steps 1–10) | MVP | verifying | T-0080, T-0018, T-0034, T-0058, T-0063, T-0039 | — | 0 |
-| [T-0157](T-0157.md) | Setup wizard over HTTP: GET /setup/wizard and POST /setup/wizard/steps/:n/complete | MVP | verifying | T-0123 | — | 0 |
-| [T-0158](T-0158.md) | Module-owned settings for wizard steps 3, 8 and 10 (GST basis, BAS frequency, branding, payment terms and methods) and their validators | MVP | verifying | T-0123, T-0034 | — | 1 |
+| [T-0123](T-0123.md) | Setup wizard state machine and step validators (steps 1–10) | MVP | review | T-0080, T-0018, T-0034, T-0058, T-0063, T-0039 | — | 0 |
+| [T-0157](T-0157.md) | Setup wizard over HTTP: GET /setup/wizard and POST /setup/wizard/steps/:n/complete | MVP | review | T-0123 | — | 0 |
+| [T-0158](T-0158.md) | Module-owned settings for wizard steps 3, 8 and 10 (GST basis, BAS frequency, branding, payment terms and methods) and their validators | MVP | review | T-0123, T-0034 | — | 1 |
 | [T-0164](T-0164.md) | AR - new invoices take their due date from the company's default payment terms | MVP | todo | T-0158 | UC-01 | 0 |
 | [T-0165](T-0165.md) | Documents - invoice HTML/PDF shows the company's branding and accepted payment methods | MVP | todo | T-0158, T-0041 | UC-01 | 0 |
 | [T-0124](T-0124.md) | Receipts, refunds and payment batches settle opening AR/AP items | MVP | todo | T-0080, T-0046, T-0054, T-0057 | UC-03, UC-06 | 0 |
@@ -194,22 +193,22 @@ graph LR
 | [T-0083](T-0083.md) | UI: invoices list, detail, approve and post | MVP | review | T-0081, T-0040, T-0041, T-0131 | UC-01 | 1 |
 | [T-0084](T-0084.md) | UI: batch billing preview, approval and exception list | MVP | review | T-0081, T-0044 | UC-02 | 1 |
 | [T-0151](T-0151.md) | AR cash API for the T-0085 screens: receipts list, idempotent allocation, credit-note journal preview | MVP | review | T-0046, T-0045 | UC-03, UC-11 | 2 |
-| [T-0152](T-0152.md) | Customer refund over HTTP and the refund screen: permission decision, routes, UI (split from T-0085) | MVP | verifying | T-0055, T-0151 | UC-11 | 1 |
+| [T-0152](T-0152.md) | Customer refund over HTTP and the refund screen: permission decision, routes, UI (split from T-0085) | MVP | review | T-0055, T-0151 | UC-11 | 1 |
 | [T-0172](T-0172.md) | AR - Stripe refund of customer credit through the refund document, sent only on approval (ADR-0074) | MVP | todo | T-0152, T-0074 | UC-11 | 0 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | review | T-0081, T-0046, T-0045, T-0055, T-0151 | UC-03, UC-11 | 2 |
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | review | T-0081, T-0052, T-0051 | UC-05 | 1 |
-| [T-0153](T-0153.md) | AP release API for the T-0087 screens: batch list, named batch view, bank-detail change list | MVP | verifying | T-0054, T-0053 | UC-06 | 1 |
-| [T-0087](T-0087.md) | UI: supplier bank-detail verification and payment batch release (step-up) | MVP | verifying | T-0081, T-0054, T-0053, T-0056, T-0153 | UC-06 | 1 |
-| [T-0154](T-0154.md) | UI: bank file (ABA) download on the payment batch screen | MVP | verifying | T-0087, T-0056, T-0057 | UC-06 | 1 |
+| [T-0153](T-0153.md) | AP release API for the T-0087 screens: batch list, named batch view, bank-detail change list | MVP | review | T-0054, T-0053 | UC-06 | 1 |
+| [T-0087](T-0087.md) | UI: supplier bank-detail verification and payment batch release (step-up) | MVP | review | T-0081, T-0054, T-0053, T-0056, T-0153 | UC-06 | 1 |
+| [T-0154](T-0154.md) | UI: bank file (ABA) download on the payment batch screen | MVP | review | T-0087, T-0056, T-0057 | UC-06 | 1 |
 | [T-0162](T-0162.md) | AP: preview the GP-009 confirmation journal from the posting engine (API) | MVP | todo | T-0057 | UC-06 | 0 |
 | [T-0163](T-0163.md) | UI: record the bank's confirmation of a payment batch, with the GP-009 preview | MVP | todo | T-0154, T-0162, T-0057 | UC-06 | 0 |
 | [T-0149](T-0149.md) | Bank reconciliation over HTTP (for the reconciliation screens) | MVP | review | T-0058, T-0059, T-0060, T-0061 | UC-08 | 3 |
 | [T-0088](T-0088.md) | UI: statement import and bank reconciliation | MVP | review | T-0081, T-0061, T-0059, T-0149 | UC-08 | 1 |
-| [T-0150](T-0150.md) | Bank: journal preview for a transaction from a line (suggestions → T-0160, large files → T-0161) | MVP | verifying | T-0149, T-0088 | UC-08 | 1 |
+| [T-0150](T-0150.md) | Bank: journal preview for a transaction from a line (suggestions → T-0160, large files → T-0161) | MVP | review | T-0149, T-0088 | UC-08 | 1 |
 | [T-0160](T-0160.md) | Bank: accept a candidate suggestion (module, route, Accept button) — split from T-0150 | MVP | todo | T-0149, T-0088 | UC-08 | 0 |
 | [T-0161](T-0161.md) | Bank: accept large statement files over HTTP (route-scoped body limit) — split from T-0150 | MVP | todo | T-0149 | UC-08 | 0 |
 | [T-0089](T-0089.md) | UI: TB, P&L, balance sheet, GL detail, aged AR/AP | MVP | review | T-0081, T-0077 | — | 4 |
-| [T-0090](T-0090.md) | UI: close checklist and period status | MVP | todo | T-0081, T-0078, T-0079, T-0148 | UC-10 | 1 |
+| [T-0090](T-0090.md) | UI: close checklist and period status | MVP | review | T-0081, T-0078, T-0079, T-0148 | UC-10 | 1 |
 | [T-0091](T-0091.md) | UI: setup wizard | MVP | todo | T-0081, T-0080, T-0123, T-0157 | — | 0 |
 | [T-0092](T-0092.md) | UI: Salesforce sync issues inbox | MVP | review | T-0081, T-0071 | — | 0 |
 | [T-0093](T-0093.md) | UI: users, roles, SoD exceptions report and audit log viewer | MVP | review | T-0081, T-0016, T-0015 | — | 0 |
@@ -217,9 +216,9 @@ graph LR
 | [T-0095](T-0095.md) | CI security gates: SAST, dependency, container and secret scanning, SBOM | MVP | review | T-0001 | — | 1 |
 | [T-0096](T-0096.md) | DAST smoke test against the compose stack | MVP | review | T-0094, T-0095 | — | 0 |
 | [T-0097](T-0097.md) | Pilot hardening: backups, restore drill, security headers, rate limits (superseded by T-0142, T-0143, T-0144) | MVP | blocked | T-0094, T-0096 | — | 0 |
-| [T-0142](T-0142.md) | Platform - API security headers, strict CORS and rate limits on auth and mutating routes | MVP | verifying | T-0094 | — | 1 |
+| [T-0142](T-0142.md) | Platform - API security headers, strict CORS and rate limits on auth and mutating routes | MVP | review | T-0094 | — | 1 |
 | [T-0143](T-0143.md) | Ops - encrypted database backup and restore drill that proves the hash chain | MVP | todo | T-0094 | — | 0 |
-| [T-0144](T-0144.md) | Platform - CSRF guard with Fetch Metadata and Origin checks for cookie-authenticated mutations | MVP | todo | T-0142 | — | 0 |
+| [T-0144](T-0144.md) | Platform - CSRF guard with Fetch Metadata and Origin checks for cookie-authenticated mutations | MVP | review | T-0142 | — | 0 |
 | [T-0098](T-0098.md) | Pilot data migration (opening balances, open AR/AP) and dry run | MVP | todo | T-0080, T-0142, T-0143, T-0144 | — | 0 |
 | [T-0099](T-0099.md) | MVP gate: pilot month and gate evidence pack (human gate) | MVP | todo | T-0098, T-0082, T-0083, T-0084, T-0085, T-0086, T-0087, T-0088, T-0089, T-0090, T-0091, T-0092, T-0093, T-0069, T-0070, T-0072, T-0075, T-0068, T-0048, T-0047, T-0033, T-0031, T-0035 | — | 0 |
 | [T-0100](T-0100.md) | EPIC — Phase 1 backlog (payroll bridge, BAS, collections, Rules Studio, …) | Phase 1 | todo | T-0099 | UC-04, UC-07, UC-09 | 12 |
@@ -245,25 +244,25 @@ graph LR
 | [T-0117](T-0117.md) | Promote period-end accounts to system roles (additive role binding) | Phase 1 | review | T-0116 |
 | [T-0118](T-0118.md) | Tax codes in the database: effective-dated tax_code table, company rounding setting, line wiring | MVP | review | T-0034 |
 | [T-0119](T-0119.md) | Chromium in the worker image and PDF rendering as a worker job | MVP | todo | T-0041 |
-| [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | todo | T-0044, T-0042 |
+| [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | review | T-0044, T-0042 |
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
 | [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | in_progress | — | — | 0 |
-| [T-0129](T-0129.md) | Per-party overdue-reminder pause (audited); daily job split to T-0147 | MVP | claimed | T-0068 | UC-04 | 0 |
+| [T-0129](T-0129.md) | Per-party overdue-reminder pause (audited); daily job split to T-0147 | MVP | review | T-0068 | UC-04 | 0 |
 | [T-0130](T-0130.md) | Stripe payouts: fetch from the API, payout.paid webhook, bank line match | MVP | todo | T-0075, T-0060 | UC-03, UC-08 | 0 |
 | [T-0131](T-0131.md) | AR invoices read and journal-preview API (list, detail, Show me the journal, approve) | MVP | review | T-0040, T-0041 | UC-01 | 0 |
-| [T-0132](T-0132.md) | Approve one invoice over HTTP: permission, SoD and idempotent POST /ar/invoices/:id/approve | MVP | todo | T-0131 | UC-01 | 0 |
-| [T-0136](T-0136.md) | Bills inbox: HTTP routes and screen (list emailed bills, view PDF, code into a draft) | MVP | verifying | T-0051, T-0086 | UC-05 | 1 |
+| [T-0132](T-0132.md) | Approve one invoice over HTTP: permission, SoD and idempotent POST /ar/invoices/:id/approve | MVP | review | T-0131 | UC-01 | 0 |
+| [T-0136](T-0136.md) | Bills inbox: HTTP routes and screen (list emailed bills, view PDF, code into a draft) | MVP | review | T-0051, T-0086 | UC-05 | 1 |
 | [T-0166](T-0166.md) | Gross ECL allowance reconciliation from source lineage | MVP | blocked | T-0031, T-0048 | — | 3 |
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | todo | T-0047, T-0035 | UC-04 | 3 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
-| [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | todo | T-0117 | UC-11 | 0 |
+| [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | review | T-0117 | UC-11 | 0 |
 | [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |
-| [T-0147](T-0147.md) | Worker: daily overdue-reminder run for every company (cross-tenant scheduling) | MVP | todo | T-0129 | — | 0 |
-| [T-0148](T-0148.md) | Close checklist and period list over HTTP (for the close screen) | MVP | todo | T-0078, T-0079 | UC-10 | 0 |
-| [T-0159](T-0159.md) | Mark ar_settings.ecl_allowance_account_id deprecated (column comment) and drop the template suggestion | MVP | todo | T-0145 | UC-03 | 0 |
-| [T-0169](T-0169.md) | RBAC: ar.invoice.approve, ar.refund.create/approve, settings.setup.manage (DL-0477) | MVP | verifying | — | UC-01, UC-11 | 1 |
+| [T-0147](T-0147.md) | Worker: daily overdue-reminder run for every company (cross-tenant scheduling) | MVP | review | T-0129 | — | 0 |
+| [T-0148](T-0148.md) | Close checklist and period list over HTTP (for the close screen) | MVP | review | T-0078, T-0079 | UC-10 | 0 |
+| [T-0159](T-0159.md) | Mark ar_settings.ecl_allowance_account_id deprecated (column comment) and drop the template suggestion | MVP | review | T-0145 | UC-03 | 0 |
+| [T-0169](T-0169.md) | RBAC: ar.invoice.approve, ar.refund.create/approve, settings.setup.manage (DL-0477) | MVP | review | — | UC-01, UC-11 | 1 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:

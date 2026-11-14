@@ -1,14 +1,34 @@
 # Handover: round 2 fully merged; T-0129 built (2026-11-13 09:50 UTC)
 
 ## Codex continuation prompt
-> Resume from the repository. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0477 (the owner delegated the pending security decisions on best practice), DL-0561, DL-0562 and DL-0560. Branch `claude/loving-lovelace-nozqpk`, tip bed64c8.
+> Resume from the repository, not the chat. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0477, DL-0560 to DL-0565. Branch `claude/loving-lovelace-nozqpk` (this commit is the session's final wrap-up).
 >
-> - **In review:** everything built since the round-2 merges. That includes the round 3–6 cards: T-0151, T-0085, T-0149, T-0088, T-0145, T-0123, T-0136, T-0153, T-0087, T-0159, T-0150, T-0158, T-0154, T-0169, T-0157, T-0152 and T-0132. Every one is VERIFY OK except gates 2c and 8.
-> - **Migrations:** up to 0070. The next one is 0071.
-> - **Now:** the T-0142 full verify is running; it has never been verified on this branch. Then claim T-0144 (CSRF guard, decided by DL-0477 item 7: fail-safe Fetch-Metadata + Origin). The worktree /tmp/claude-0/csrf (branch feat/T-0144-csrf) was created for it but holds no work yet.
-> - **Other ready cards:** T-0160, T-0161, T-0162 and T-0163 (need T-0057), T-0164, T-0165, T-0172, T-0126, T-0127, T-0130, T-0143 (network allowed now), T-0168, T-0110 (needs a Salesforce scratch org) and T-0119 (needs docker).
-> - **Security CI:** DAST was red at dbd19a5 ("No such image: lf-dast-scheduler"). It is fixed in 4a7950b (DL-0479); confirm the security run is green.
-> - **Cross-provider review:** Codex review (gate 8) is pending for every card in review. Gate 2c stays PENDING until main's baseline is re-recorded as unit+db.
+> **State**
+> - Every card built this session is in `review`, each VERIFY OK except gates 2c and 8 (both PENDING by design):
+>   - T-0079, T-0117, T-0128, T-0129, T-0147, T-0148, T-0090, T-0120, T-0084, T-0086, T-0089
+>   - T-0151, T-0085, T-0149, T-0088, T-0145, T-0123, T-0136, T-0153, T-0087, T-0159, T-0150, T-0158, T-0154
+>   - T-0169, T-0157, T-0152, T-0132, T-0142, T-0144
+> - Migrations run to 0070. The next is 0071.
+> - CI (ci.yml) and security (security.yml) were green on the latest pushes checked (f50ab18).
+>
+> **Next actions, in order**
+> 1. **T-0146** (todo, lead). Re-bind a system role through the API; the permission is `settings.chart.manage`. The RED test draft is in `.agent/wip/T-0146/`; read the card notes for the exact next steps.
+> 2. **Round 7** (DL-0564) never got going, because the agents hit the usage limit with no commits. Start the cards again from the repository:
+>    - T-0091: setup wizard screens.
+>    - T-0160 and T-0161: bank accept-suggestion, and large statements with a 10 MB route-scoped limit (DL-0477 item 6).
+>    - T-0164 and T-0165: due date from payment terms, and invoice branding. T-0164 has a test draft in `.agent/wip/T-0164/`.
+> 3. **Other ready cards:**
+>    - T-0172: Stripe refunds; step-up is required (DL-0562).
+>    - T-0126, T-0127 (ADR), T-0130, T-0143 (network to postgresql.org is now allowed), T-0168.
+>    - T-0110 needs a Salesforce scratch org. T-0119 needs docker.
+>    - T-0162 and T-0163 wait on the blocked T-0057.
+> 4. **Gate 8:** a Codex cross-review is pending for every card in review (`cross-review` skill). Gate 2c stays PENDING until main's baseline is re-recorded as unit+db, which happens at the next merge to main (an owner gate).
+>
+> **Process reminders**
+> - Check `pnpm typecheck` by its exit code, not by filtered output.
+> - Session-cookie API tests must send `sec-fetch-site: same-origin` (CSRF guard, ADR-0076).
+> - `.log` evidence files are gitignored; use `.txt` or `.json`.
+> - Never commit format-patch output (DL-0464).
 
 ## Open questions for human
 - **(Resolved 2026-11-13, DL-0464/DL-0477; merged dbd19a5)** Security CI is red (Gitleaks, DL-0464, owner chose "Ignore + gzip").** The fix is in local stash `DL-0464 gitleaks WIP fix (awaiting owner permission)`. It is not pushed, because committing it was blocked as an oversight change: it edits the human-owned contract test `infra/test/security-workflow.contract.test.ts`, with an exception for commit 3a6bc91 only, .agent/wip T-0086/T-0089 only, and the rule sourcegraph-access-token only. The hits are 254 git object IDs in format-patch headers. To land it, run `git stash pop` and commit, or allow the commit.
@@ -351,3 +371,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-14T03:20:42.653Z claude: release T-0142 → review (full verify at 8f62a52: VERIFY OK (2c PENDING by measure, 8 Codex); ADR-0054 accepted under DL-0405/DL-0411a)
 - 2026-11-14T03:29:59.736Z claude: T-0144 → verifying
 - 2026-11-14T03:46:16.839Z claude: release T-0144 → review (verify at fd27adb: VERIFY OK (2c PENDING, 8 Codex))
+- 2026-11-14T08:59:56.564Z claude: release T-0146 → todo (stopped for wrap-up: RED test draft saved in .agent/wip/T-0146; permission decided (settings.chart.manage); see card notes)

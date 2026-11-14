@@ -3346,3 +3346,14 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | AR due date from terms; invoice branding | T-0164, T-0165 | 0620–0629 | 0079 | 0159 | T-0180–T-0181 |
 - Why: The owner asked for parallel sub-agents (DL-0408), and these cards touch disjoint areas: setup UI, bank, ar plus documents.
 - ADR: none · Status: accepted
+
+### DL-0565 — Session wrap-up: round 7 stopped at the usage limit; WIP saved as plain files
+- Date: 2026-11-14 · By: claude · Task: sprint · Category: process
+- Decision:
+  - The round-7 agents (T-0091, T-0160/T-0161, T-0164/T-0165) stopped at the 5-hour limit after almost no work. Only the T-0164 agent left a test draft, saved as `.agent/wip/T-0164/payment-terms.db.test.ts.txt`.
+  - The lead's T-0146 RED test draft is saved as `.agent/wip/T-0146/rebind.db.test.ts.txt`, outside the test globs, so the suite stays green.
+  - T-0146 goes back to todo, with notes and its permission decision: `settings.chart.manage`.
+  - WIP is saved as plain files, not format-patch output (DL-0464), so it has no object-id headers.
+  - The local agent branches have no commits beyond d9554f4 and need no saving.
+- Why: the owner asked to wrap up so the work can be continued; the repository is the only memory.
+- ADR: none · Status: accepted

@@ -1,0 +1,126 @@
+/**
+ * Default payment terms set the due date of new invoices (T-0164, design §4.1 step 8, §4.2,
+ * RQ-0153 conclusion 4, ADR-0071), against a real PostgreSQL as lf_app. The due date is the issue
+ * date plus app.ar_settings.default_payment_terms_days; 14 days when the company has saved no
+ * terms; an explicit due date always wins.
+ */
+import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
+import { auServicesSmb } from '@ledgerforce/gl';
+import { seedPostingProfiles, setPartyProfiles, type SeededProfiles } from '@ledgerforce/products';
+import { seedTaxCodes } from '@ledgerforce/tax';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { setInvoiceSettings } from './invoice-settings.ts';
+import { createDraftInvoice, getInvoice, type DocumentOutbox } from './invoices.ts';
+
+const outbox: DocumentOutbox = { publish: async () => {} };
+
+interface Company {
+  f: LedgerFixture;
+  partyId: string;
+  profiles: SeededProfiles;
+}
+
+async function company(tenantId: string): Promise<Company> {
+  const f = await createLedgerFixture(tenantId);
+  const profiles = await f.inTenant(async (trx) => {
+    await seedTaxCodes(trx, f.companyId);
+    return seedPostingProfiles(trx, f.companyId, auServicesSmb, new Map(Object.entries(f.acct)));
+  });
+  const partyId = await f.inTenant(async (trx) => {
+    const p = await trx
+      .insertInto('app.party')
+      .values({ company_id: f.companyId, legal_name: 'Terms Pty Ltd', status: 'active' })
+      .returning('id')
+      .executeTakeFirstOrThrow();
+    await trx
+      .insertInto('app.party_role')
+      .values({ company_id: f.companyId, party_id: p.id, role: 'customer' })
+      .execute();
+    await setPartyProfiles(trx, f.companyId, p.id, {
+      customerProfileId: profiles.partyProfiles.get('DOMESTIC_CUSTOMER') ?? '',
+    });
+    return p.id;
+  });
+  return { f, partyId, profiles };
+}
+
+/** Create a draft (no auto-approve: nothing posts) and read back its stored due date. */
+async function dueDateOf(c: Company, issueDate: string, dueDate?: string): Promise<string> {
+  return c.f.inTenant(async (trx) => {
+    const v = await createDraftInvoice(
+      trx,
+      {
+        companyId: c.f.companyId,
+        partyId: c.partyId,
+        issueDate,
+        ...(dueDate === undefined ? {} : { dueDate }),
+        lines: [
+          {
+            productProfileId: c.profiles.productProfiles.get('PROFESSIONAL_SERVICES') ?? '',
+            description: 'Professional services',
+            quantity: '1',
+            unitPrice: '100.00',
+          },
+        ],
+      },
+      { outbox },
+    );
+    expect(v.status).toBe('draft');
+    return (await getInvoice(trx, { companyId: c.f.companyId, invoiceId: v.invoiceId })).dueDate;
+  });
+}
+
+let withTerms: Company;
+let noTerms: Company;
+
+beforeAll(async () => {
+  withTerms = await company('01900000-0000-7000-8000-000000016401');
+  noTerms = await company('01900000-0000-7000-8000-000000016402');
+  await withTerms.f.inTenant((trx) =>
+    setInvoiceSettings(trx, withTerms.f.companyId, { defaultPaymentTermsDays: 30 }),
+  );
+}, 120_000);
+
+afterAll(async () => {
+  await (withTerms as Company | undefined)?.f.close();
+  await (noTerms as Company | undefined)?.f.close();
+});
+
+describe('T-0164 default payment terms set the due date of new invoices', () => {
+  it('AC-1 with 30 days saved, an invoice issued 2026-11-13 without a due date is due 2026-12-13 [T-0164]', async () => {
+    expect(await dueDateOf(withTerms, '2026-11-13')).toBe('2026-12-13');
+  });
+
+  it('AC-1 the saved terms count calendar days across a month and year end [T-0164]', async () => {
+    expect(await dueDateOf(withTerms, '2026-12-15')).toBe('2027-01-14');
+  });
+
+  it('AC-1 changed terms apply to invoices created afterwards (0 days = due on issue) [T-0164]', async () => {
+    await withTerms.f.inTenant((trx) =>
+      setInvoiceSettings(trx, withTerms.f.companyId, { defaultPaymentTermsDays: 0 }),
+    );
+    expect(await dueDateOf(withTerms, '2026-11-13')).toBe('2026-11-13');
+    await withTerms.f.inTenant((trx) =>
+      setInvoiceSettings(trx, withTerms.f.companyId, { defaultPaymentTermsDays: 30 }),
+    );
+  });
+
+  it('AC-2 with no saved terms the due date is the issue date + 14 days [T-0164]', async () => {
+    expect(await dueDateOf(noTerms, '2026-11-13')).toBe('2026-11-27');
+  });
+
+  it('AC-2 a settings row without terms (branding only) keeps the 14-day default [T-0164]', async () => {
+    const c = await company('01900000-0000-7000-8000-000000016403');
+    try {
+      await c.f.inTenant((trx) => setInvoiceSettings(trx, c.f.companyId, { brandColour: '#123456' }));
+      expect(await dueDateOf(c, '2026-11-13')).toBe('2026-11-27');
+    } finally {
+      await c.f.close();
+    }
+  });
+
+  it('AC-2 an explicit due date wins over the saved terms and over the default [T-0164]', async () => {
+    expect(await dueDateOf(withTerms, '2026-11-13', '2026-11-20')).toBe('2026-11-20');
+    expect(await dueDateOf(noTerms, '2026-11-13', '2026-11-20')).toBe('2026-11-20');
+  });
+});

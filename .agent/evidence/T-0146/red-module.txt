@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:43725
+ ❯ |db| packages/modules/gl/src/rebind.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/gl/src/rebind.db.test.ts [ packages/modules/gl/src/rebind.db.test.ts ]
+Error: Cannot find package '@ledgerforce/ledger/testing' imported from /home/user/Ledgerforce/packages/modules/gl/src/rebind.db.test.ts
+ ❯ packages/modules/gl/src/rebind.db.test.ts:8:1
+      6|  * the database's own message, and the binding is unchanged.
+      7|  */
+      8| import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/…
+       | ^
+      9| import { sql } from 'kysely';
+     10| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  03:47:47
+   Duration  905ms (transform 22ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

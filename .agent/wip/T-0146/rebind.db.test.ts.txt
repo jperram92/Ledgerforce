@@ -1,0 +1,92 @@
+/**
+ * Re-binding a system role (T-0146, design §3.2: roles are re-bound, never unbound; ADR-0061)
+ * against a real PostgreSQL as lf_app. A core role (app.account_system_role) and a period-end role
+ * (app.account_system_role_ext) each move to another account. app.account_role_binding shows the
+ * new account. A disallowed type, an archived account or a non-postable account is refused with
+ * the database's own message, and the binding is unchanged.
+ */
+import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
+import { sql } from 'kysely';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { rebindSystemRole, RebindError } from './rebind.ts';
+
+let f: LedgerFixture;
+let spareExpense = '';
+let archivedExpense = '';
+let headerExpense = '';
+
+const boundTo = (role: string) =>
+  f.inTenant(
+    async (trx) =>
+      (
+        await sql<{ account_id: string }>`
+          SELECT account_id::text FROM app.account_role_binding
+           WHERE company_id = ${f.companyId} AND role = ${role}`.execute(trx)
+      ).rows[0]?.account_id,
+  );
+const rebind = (role: string, accountId: string) =>
+  f.inTenant((trx) => rebindSystemRole(trx, { companyId: f.companyId, role, accountId }));
+
+beforeAll(async () => {
+  f = await createLedgerFixture('01900000-0000-7000-8000-000000014601');
+  const add = async (code: string, extra = '') =>
+    (
+      await f.admin.query<{ id: string }>(
+        `INSERT INTO app.account (tenant_id, company_id, code, name, type${extra ? `, ${extra.split('=')[0]}` : ''})
+         VALUES ($1, $2, $3, $4, 'expense'${extra ? `, ${extra.split('=')[1]}` : ''}) RETURNING id`,
+        [f.tenantId, f.companyId, code, `Spare ${code}`],
+      )
+    ).rows[0]?.id ?? '';
+  spareExpense = await add('6990');
+  archivedExpense = await add('6991', "status='archived'");
+  headerExpense = await add('6992', 'postable=false');
+}, 120_000);
+
+afterAll(async () => {
+  await (f as LedgerFixture | undefined)?.close();
+});
+
+describe('T-0146: re-bind a system role', () => {
+  it('AC-1 a core role (ROUNDING) moves to another account; the view shows it', async () => {
+    const before = await boundTo('ROUNDING');
+    const r = await rebind('ROUNDING', spareExpense);
+    expect(r).toMatchObject({
+      role: 'ROUNDING',
+      previousAccountId: before,
+      accountId: spareExpense,
+    });
+    expect(await boundTo('ROUNDING')).toBe(spareExpense);
+  });
+
+  it('AC-1 a period-end role (DEPRECIATION_EXPENSE) moves too (extended binding table)', async () => {
+    await rebind('DEPRECIATION_EXPENSE', spareExpense);
+    expect(await boundTo('DEPRECIATION_EXPENSE')).toBe(spareExpense);
+  });
+
+  it('re-binding to the account it already has changes nothing and says so', async () => {
+    const r = await rebind('ROUNDING', spareExpense);
+    expect(r.changed).toBe(false);
+  });
+
+  it('AC-2 a disallowed type, an archived or a non-postable account is refused; nothing changes', async () => {
+    const asset = f.acct['1500'] ?? '';
+    for (const [account, msg] of [
+      [asset, /type asset is not allowed/],
+      [archivedExpense, /must stay active/],
+      [headerExpense, /must be/],
+    ] as const) {
+      await expect(rebind('ROUNDING', account)).rejects.toMatchObject({
+        code: 'REBIND_REFUSED',
+        message: expect.stringMatching(msg),
+      });
+      expect(await boundTo('ROUNDING')).toBe(spareExpense);
+    }
+  });
+
+  it('an unknown role, or an account of another company, is refused', async () => {
+    await expect(rebind('NOT_A_ROLE', spareExpense)).rejects.toBeInstanceOf(RebindError);
+    await expect(rebind('ROUNDING', f.otherAcct['6230'] ?? '')).rejects.toMatchObject({
+      code: 'UNKNOWN_ACCOUNT',
+    });
+  });
+});
