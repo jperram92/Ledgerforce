@@ -3334,3 +3334,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - The config test expects `publicOrigin`.
 - Why: OWASP CSRF Prevention Cheat Sheet (RQ-0141 F6–F8): Fetch Metadata is primary, an Origin fallback is mandatory, and missing headers fail safe. Design §6.9.
 - ADR: ADR-0076 · Status: accepted (owner delegation)
+
+### DL-0564 — Parallel round 7: T-0091, T-0160+T-0161, T-0164+T-0165 agents; the lead takes T-0146
+- Date: 2026-11-14 · By: claude · Task: sprint · Category: process
+- Decision: Three sub-agents work in isolated worktrees, and the lead merges and verifies their work. No agent adds a migration; one that needs schema reports it, and the lead adds it as 0071. The lead's own entries use DL-0565 to DL-0569 and cards from T-0182.
+
+  | Agent | Cards | DL | ADR | RQ | New cards |
+  |---|---|---|---|---|---|
+  | Setup wizard screens | T-0091 | 0600–0609 | 0077 | 0157 | T-0176–T-0177 |
+  | Bank: accept suggestion, large statements | T-0160, T-0161 | 0610–0619 | 0078 | 0158 | T-0178–T-0179 |
+  | AR due date from terms; invoice branding | T-0164, T-0165 | 0620–0629 | 0079 | 0159 | T-0180–T-0181 |
+- Why: The owner asked for parallel sub-agents (DL-0408), and these cards touch disjoint areas: setup UI, bank, ar plus documents.
+- ADR: none · Status: accepted
