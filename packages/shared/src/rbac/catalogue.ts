@@ -31,6 +31,7 @@ export const PERMISSIONS = P({
   'settings.sod.manage': 'write', // SoD thresholds and small-team mode; Owner only (T-0015, ADR-0026)
   // Configuration (Finance Admin)
   'settings.chart.manage': 'write',
+  'settings.setup.manage': 'write', // DL-0477 item 4 (T-0157, T-0169)
   'settings.tax.manage': 'write',
   'settings.posting_rules.author': 'write',
   'settings.posting_rules.activate': 'write',
@@ -67,6 +68,10 @@ export const PERMISSIONS = P({
   'ar.dunning.run': 'write',
   'ar.batch.run': 'write', // UC-02, SS-UC02-07
   'ar.batch.approve': 'write',
+  // DL-0477 (T-0169): maker-checker for single invoices and customer refunds.
+  'ar.invoice.approve': 'write',
+  'ar.refund.create': 'write',
+  'ar.refund.approve': 'write',
   // Accounts payable
   'ap.read': 'read',
   'ap.bill.enter': 'write',
@@ -168,6 +173,7 @@ export const ROLE_TEMPLATES: Readonly<Record<RoleId, RoleTemplate>> = Object.fre
       'users.roles.assign',
       'audit_log.read',
       'settings.chart.manage',
+      'settings.setup.manage',
       'settings.tax.manage',
       'settings.posting_rules.author',
       'settings.posting_rules.activate', // SoD: not one they authored (T-0015)
@@ -176,6 +182,9 @@ export const ROLE_TEMPLATES: Readonly<Record<RoleId, RoleTemplate>> = Object.fre
       'period.lock.override',
       'period.reopen', // SoD: two approvers and a reason (T-0015)
       'ar.batch.approve', // UC-02 actors: Approver/Finance Admin approves
+      'ar.invoice.approve', // DL-0477
+      'ar.refund.create',
+      'ar.refund.approve',
     ],
     mfaRequired: true,
     interactiveLogin: true,
@@ -199,6 +208,7 @@ export const ROLE_TEMPLATES: Readonly<Record<RoleId, RoleTemplate>> = Object.fre
       'ar.invoice.send',
       'ar.credit_note.create',
       'ar.receipt.record',
+      'ar.refund.create', // DL-0477: creates, never approves
       'ar.dunning.run',
       'ar.batch.run',
     ],
@@ -235,6 +245,8 @@ export const ROLE_TEMPLATES: Readonly<Record<RoleId, RoleTemplate>> = Object.fre
       'ar.read',
       'ar.credit_note.approve',
       'ar.batch.approve',
+      'ar.invoice.approve', // DL-0477
+      'ar.refund.approve',
       'ap.read',
       'ap.bill.approve',
       'ap.payment_batch.approve',

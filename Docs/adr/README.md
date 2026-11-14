@@ -102,6 +102,7 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0052](0052-owner-authorized-independent-codex-review.md) | Independent Codex review for the current pickup batch | process | owner instruction | Accepted |
 | [0053](0053-mime-parsing-postal-mime.md) | Parse inbound bill email with postal-mime | integration | no | Accepted |
 | [0054](0054-api-security-headers-and-rate-limits.md) | API security headers, strict CORS and rate limits on auth and mutating routes | security | yes | Accepted |
+| [0072](0072-owner-delegated-permissions.md) | New permissions for invoice approval, customer refunds and the setup wizard | security | yes | Accepted |
 | [0068](0068-ecl-allowance-by-role.md) | Resolve the ECL allowance by its system role; deprecate ar_settings.ecl_allowance_account_id | data | no | Accepted |
 | [0062](0062-cross-tenant-daily-job-scheduling.md) | Reach every tenant from a scheduled daily job without widening lf_app | security | yes | Accepted |
 | [0056](0056-period-reopen-http-routes.md) | HTTP routes to reopen a hard-locked period: request, approve, list | architecture | no | Accepted |

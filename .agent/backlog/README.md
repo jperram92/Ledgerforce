@@ -14,12 +14,13 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | Status | Cards |
 |---|---:|
 | blocked | 7 |
+| claimed | 1 |
 | done | 3 |
 | in_progress | 1 |
 | review | 119 |
 | todo | 27 |
 | verifying | 1 |
-| **total** | **158** |
+| **total** | **159** |
 | **total** | **147** |
 
 | Phase | Cards |
@@ -262,6 +263,7 @@ graph LR
 | [T-0147](T-0147.md) | Worker: daily overdue-reminder run for every company (cross-tenant scheduling) | MVP | todo | T-0129 | — | 0 |
 | [T-0148](T-0148.md) | Close checklist and period list over HTTP (for the close screen) | MVP | todo | T-0078, T-0079 | UC-10 | 0 |
 | [T-0159](T-0159.md) | Mark ar_settings.ecl_allowance_account_id deprecated (column comment) and drop the template suggestion | MVP | todo | T-0145 | UC-03 | 0 |
+| [T-0169](T-0169.md) | RBAC: ar.invoice.approve, ar.refund.create/approve, settings.setup.manage (DL-0477) | MVP | claimed | — | UC-01, UC-11 | 1 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:

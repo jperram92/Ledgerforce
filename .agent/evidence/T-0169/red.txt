@@ -1,0 +1,143 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+ ❯ |unit| packages/shared/src/rbac/rbac.matrix.test.ts (71 tests | 5 failed) 25ms
+     × lists the holders of every write permission (no write permission is unlisted) 8ms
+     × settings.setup.manage is held by exactly ["owner","finance_admin"] 1ms
+     × ar.invoice.approve is held by exactly ["owner","finance_admin","approver"] 1ms
+     × ar.refund.create is held by exactly ["owner","finance_admin","ar_clerk"] 1ms
+     × ar.refund.approve is held by exactly ["owner","finance_admin","approver"] 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/shared/src/rbac/rbac.matrix.test.ts > SS-PLAT-48: Role templates grant exactly the design §6.4 matrix > lists the holders of every write permission (no write permission is unlisted)
+AssertionError: expected [ 'ap.bill.approve', …(41) ] to deeply equal [ 'ap.bill.approve', …(37) ]
+
+- Expected
++ Received
+
+@@ -7,13 +7,16 @@
+    "ar.batch.approve",
+    "ar.batch.run",
+    "ar.credit_note.approve",
+    "ar.credit_note.create",
+    "ar.dunning.run",
++   "ar.invoice.approve",
+    "ar.invoice.create",
+    "ar.invoice.send",
+    "ar.receipt.record",
++   "ar.refund.approve",
++   "ar.refund.create",
+    "bank.reconcile",
+    "bank.statement.import",
+    "gl.journal.approve",
+    "gl.journal.post",
+    "parties.bank_account.change_request",
+@@ -27,10 +30,11 @@
+    "period.lock.override",
+    "period.reopen",
+    "settings.chart.manage",
+    "settings.posting_rules.activate",
+    "settings.posting_rules.author",
++   "settings.setup.manage",
+    "settings.sod.manage",
+    "settings.tax.manage",
+    "subscription.manage",
+    "sync.issues.manage",
+    "tax.bas.prepare",
+
+ ❯ packages/shared/src/rbac/rbac.matrix.test.ts:155:47
+    153|
+    154|   it('lists the holders of every write permission (no write permission…
+    155|     expect(Object.keys(WRITE_HOLDERS).sort()).toEqual([...writes].sort…
+       |                                               ^
+    156|   });
+    157|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  |unit| packages/shared/src/rbac/rbac.matrix.test.ts > SS-PLAT-48: Role templates grant exactly the design §6.4 matrix > settings.setup.manage is held by exactly ["owner","finance_admin"]
+AssertionError: expected [] to deeply equal [ 'finance_admin', 'owner' ]
+
+- Expected
++ Received
+
+- [
+-   "finance_admin",
+-   "owner",
+- ]
++ []
+
+ ❯ packages/shared/src/rbac/rbac.matrix.test.ts:162:32
+    160|       ROLE_TEMPLATES[r].permissions.includes(perm as Permission),
+    161|     );
+    162|     expect([...actual].sort()).toEqual([...holders].sort());
+       |                                ^
+    163|   });
+    164|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |unit| packages/shared/src/rbac/rbac.matrix.test.ts > SS-PLAT-48: Role templates grant exactly the design §6.4 matrix > ar.invoice.approve is held by exactly ["owner","finance_admin","approver"]
+ FAIL  |unit| packages/shared/src/rbac/rbac.matrix.test.ts > SS-PLAT-48: Role templates grant exactly the design §6.4 matrix > ar.refund.approve is held by exactly ["owner","finance_admin","approver"]
+AssertionError: expected [] to deeply equal [ Array(3) ]
+
+- Expected
++ Received
+
+- [
+-   "approver",
+-   "finance_admin",
+-   "owner",
+- ]
++ []
+
+ ❯ packages/shared/src/rbac/rbac.matrix.test.ts:162:32
+    160|       ROLE_TEMPLATES[r].permissions.includes(perm as Permission),
+    161|     );
+    162|     expect([...actual].sort()).toEqual([...holders].sort());
+       |                                ^
+    163|   });
+    164|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |unit| packages/shared/src/rbac/rbac.matrix.test.ts > SS-PLAT-48: Role templates grant exactly the design §6.4 matrix > ar.refund.create is held by exactly ["owner","finance_admin","ar_clerk"]
+AssertionError: expected [] to deeply equal [ Array(3) ]
+
+- Expected
++ Received
+
+- [
+-   "ar_clerk",
+-   "finance_admin",
+-   "owner",
+- ]
++ []
+
+ ❯ packages/shared/src/rbac/rbac.matrix.test.ts:162:32
+    160|       ROLE_TEMPLATES[r].permissions.includes(perm as Permission),
+    161|     );
+    162|     expect([...actual].sort()).toEqual([...holders].sort());
+       |                                ^
+    163|   });
+    164|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 66 passed (71)
+   Start at  01:00:05
+   Duration  405ms (transform 56ms, setup 0ms, import 75ms, tests 25ms, environment 0ms)
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:32833
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  01:00:06
+   Duration  7.61s (transform 255ms, setup 0ms, import 440ms, tests 3.38s, environment 0ms)
+

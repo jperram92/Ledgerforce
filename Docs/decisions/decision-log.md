@@ -3175,3 +3175,12 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   7. **CSRF (T-0144):** OWASP's recommended defence-in-depth. Cookie-authenticated state-changing requests are rejected unless Fetch Metadata (`Sec-Fetch-Site: same-origin`/`none`) or a matching `Origin` header proves they are same-origin, failing closed. Test helpers send the headers a browser would.
   8. **Network access** for research (ato.gov.au for RQ-0153 re-check; postgresql.org for T-0143): proposed to the environment through its approval prompt; not assumed.
 - ADR: one per card (security) · Status: accepted (owner delegation)
+
+### DL-0478 — Four permissions added (ADR-0072, migration 0068; T-0169)
+- Date: 2026-11-14 · By: claude under DL-0477 · Task: T-0169 · Category: security
+- Decision:
+  - Added `ar.invoice.approve` (Owner, Finance Admin, Approver), `ar.refund.create` (Owner, Finance Admin, AR Clerk), `ar.refund.approve` (Owner, Finance Admin, Approver) and `settings.setup.manage` (Owner, Finance Admin).
+  - Migration 0068 widens `app.permission_known`. None of them is on the token deny-list.
+  - ADR-0072 is accepted under the owner's delegation.
+- Why: DL-0477 items 2–4: least privilege and maker-checker.
+- ADR: ADR-0072 · Status: accepted

@@ -1,0 +1,37 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:34703
+ ❯ |db| packages/db/src/user-lifecycle.db.test.ts (14 tests | 1 failed) 874ms
+     × the database mirrors the permission catalogue and the token deny-list 13ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/db/src/user-lifecycle.db.test.ts > SS-PLAT-70: API tokens are hashed, scoped, expiring and tenant-bound (database) > the database mirrors the permission catalogue and the token deny-list
+AssertionError: expected [ 'settings.setup.manage', false ] to deeply equal [ 'settings.setup.manage', true ]
+
+- Expected
++ Received
+
+  [
+    "settings.setup.manage",
+-   true,
++   false,
+  ]
+
+ ❯ packages/db/src/user-lifecycle.db.test.ts:382:34
+    380|     for (const row of r.rows) {
+    381|       const known = (ALL_PERMISSIONS as readonly string[]).includes(ro…
+    382|       expect([row.p, row.known]).toEqual([row.p, known]);
+       |                                  ^
+    383|       expect([row.p, row.allowed]).toEqual([
+    384|         row.p,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 passed (14)
+   Start at  01:00:37
+   Duration  1.92s (transform 125ms, setup 0ms, import 244ms, tests 874ms, environment 0ms)
+

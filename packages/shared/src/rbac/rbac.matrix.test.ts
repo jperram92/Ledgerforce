@@ -25,6 +25,8 @@ const WRITE_HOLDERS: Record<string, readonly RoleId[]> = {
   'subscription.manage': ['owner'],
   'settings.sod.manage': ['owner'], // T-0015, ADR-0026
   'settings.chart.manage': ['owner', 'finance_admin'],
+  // DL-0477 item 4: the setup wizard has its own permission (T-0157, T-0169).
+  'settings.setup.manage': ['owner', 'finance_admin'],
   'settings.tax.manage': ['owner', 'finance_admin'],
   'settings.posting_rules.author': ['owner', 'finance_admin'],
   'settings.posting_rules.activate': ['owner', 'finance_admin'],
@@ -48,6 +50,10 @@ const WRITE_HOLDERS: Record<string, readonly RoleId[]> = {
   'ar.dunning.run': ['owner', 'ar_clerk'],
   'ar.batch.run': ['owner', 'ar_clerk'],
   'ar.batch.approve': ['owner', 'finance_admin', 'approver'],
+  // DL-0477 items 2-3 (T-0169): maker-checker for single invoices and customer refunds.
+  'ar.invoice.approve': ['owner', 'finance_admin', 'approver'],
+  'ar.refund.create': ['owner', 'finance_admin', 'ar_clerk'],
+  'ar.refund.approve': ['owner', 'finance_admin', 'approver'],
   'ap.bill.enter': ['owner', 'ap_clerk'],
   'ap.bill.approve': ['owner', 'approver'],
   'ap.payment_batch.create': ['owner', 'ap_clerk'],

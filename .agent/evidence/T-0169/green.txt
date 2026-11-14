@@ -1,0 +1,19 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37429
+
+ Test Files  11 passed (11)
+      Tests  939 passed (939)
+   Start at  01:03:12
+   Duration  19.80s (transform 220ms, setup 0ms, import 1.87s, tests 15.94s, environment 1ms)
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+
+ Test Files  1 passed (1)
+      Tests  71 passed (71)
+   Start at  01:03:33
+   Duration  209ms (transform 48ms, setup 0ms, import 66ms, tests 13ms, environment 0ms)
+
