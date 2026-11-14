@@ -67,6 +67,8 @@ const RULES: Record<SodRuleId, string> = {
   SOD_TAX_CODE_SELF_ACTIVATION: 'Switched on a tax code they had written',
   SOD_PERIOD_REOPEN_SELF_APPROVAL: 'Approved reopening a locked period they had asked to reopen',
   SOD_CREDIT_NOTE_SELF_APPROVAL: 'Approved a credit note they had created, above the limit',
+  SOD_INVOICE_SELF_APPROVAL: 'Approved an invoice they had created',
+  SOD_REFUND_SELF_APPROVAL: 'Approved a customer refund they had created',
 };
 
 export function ruleText(rule: string): string {
