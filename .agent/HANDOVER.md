@@ -349,3 +349,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-14T02:48:07.745Z claude: release T-0152 → review (verify at 15962e3: VERIFY OK (2c PENDING, 8 Codex))
 - 2026-11-14T03:04:13.282Z claude: release T-0132 → review (verify at f50ab18: VERIFY OK (2c PENDING, 8 Codex))
 - 2026-11-14T03:20:42.653Z claude: release T-0142 → review (full verify at 8f62a52: VERIFY OK (2c PENDING by measure, 8 Codex); ADR-0054 accepted under DL-0405/DL-0411a)
+- 2026-11-14T03:29:59.736Z claude: T-0144 → verifying
