@@ -166,7 +166,13 @@ describe('T-0074 Stripe webhook signing secret from the environment (ADR-0049)',
 describe('T-0142 AC-5 security headers and rate limits from the environment (ADR-0054)', () => {
   it('AC-5 production always enables the default limits; no trusted proxy unless configured [T-0142]', () => {
     const o = apiOptionsFromEnv(base, readFile);
-    expect(o.security).toEqual({ hsts: false, trustProxyHops: 0, rateLimits: DEFAULT_RATE_LIMITS });
+    // ADR-0076: the CSRF guard accepts the public origin as Origin when Fetch Metadata is absent.
+    expect(o.security).toEqual({
+      hsts: false,
+      trustProxyHops: 0,
+      rateLimits: DEFAULT_RATE_LIMITS,
+      publicOrigin: LOCAL,
+    });
   });
 
   it('AC-5 an https public URL turns HSTS on [T-0142]', () => {

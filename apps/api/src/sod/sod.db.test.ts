@@ -164,6 +164,7 @@ async function call(method: string, path: string, who?: Who, body?: unknown): Pr
   const headers: Record<string, string> = {};
   const c = who ? cookies.get(who) : undefined;
   if (c) headers.cookie = `lf_session=${c}`;
+  headers['sec-fetch-site'] = 'same-origin';
   if (body !== undefined) headers['content-type'] = 'application/json';
   return fetch(`${api.url}${path}`, {
     method,
@@ -539,7 +540,7 @@ describe('SS-PLAT-63: SoD runs after MFA, permission and step-up, fails closed a
     });
     const res = await fetch(`${api.url}/test/ap/payment-batches/PB-2026-11-01/release`, {
       method: 'POST',
-      headers: { cookie: `lf_session=${stale}` },
+      headers: { cookie: `lf_session=${stale}`, 'sec-fetch-site': 'same-origin' },
     });
     expect(res.status).toBe(401);
     expect(await res.json()).toEqual({ error: 'step_up_required', max_age: 300 });

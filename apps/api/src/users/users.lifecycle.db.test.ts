@@ -44,7 +44,10 @@ async function session(user: string): Promise<string> {
 }
 
 function call(method: string, path: string, cookie: string, body?: unknown): Promise<Response> {
-  const headers: Record<string, string> = { cookie: `lf_session=${cookie}` };
+  const headers: Record<string, string> = {
+    cookie: `lf_session=${cookie}`,
+    'sec-fetch-site': 'same-origin',
+  };
   if (body !== undefined) headers['content-type'] = 'application/json';
   return fetch(`${api.url}${path}`, {
     method,

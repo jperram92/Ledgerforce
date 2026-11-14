@@ -104,6 +104,7 @@ interface Auth {
 function call(method: string, path: string, auth: Auth, body?: unknown): Promise<Response> {
   const headers: Record<string, string> = {};
   if (auth.cookie) headers.cookie = `lf_session=${auth.cookie}`;
+  headers['sec-fetch-site'] = 'same-origin';
   if (auth.bearer) headers.authorization = `Bearer ${auth.bearer}`;
   if (body !== undefined) headers['content-type'] = 'application/json';
   return fetch(`${api.url}${path}`, {

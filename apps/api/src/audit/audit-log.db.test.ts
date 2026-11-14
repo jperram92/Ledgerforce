@@ -47,7 +47,7 @@ function call(path: string, who?: string, method = 'GET'): Promise<Response> {
   const c = who === undefined ? undefined : cookies.get(who);
   return fetch(`${api.url}${path}`, {
     method,
-    headers: c === undefined ? {} : { cookie: `lf_session=${c}` },
+    headers: c === undefined ? {} : { cookie: `lf_session=${c}`, 'sec-fetch-site': 'same-origin' },
   });
 }
 async function page(query: string, who = OWNER): Promise<Page> {

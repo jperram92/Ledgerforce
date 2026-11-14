@@ -26,7 +26,7 @@ const outsider = { id: randomUUID(), roles: ['owner'], name: 'Olive Outsider' };
 const call = (method: string, path: string, who: string) =>
   fetch(`${api.url}${path}`, {
     method,
-    headers: { cookie: `lf_session=${cookies.get(who) ?? ''}` },
+    headers: { cookie: `lf_session=${cookies.get(who) ?? ''}`, 'sec-fetch-site': 'same-origin' },
   });
 
 let batchId: string;
@@ -80,6 +80,7 @@ beforeAll(async () => {
     method: 'PUT',
     headers: {
       cookie: `lf_session=${cookies.get('clerk') ?? ''}`,
+      'sec-fetch-site': 'same-origin',
       'content-type': 'application/json',
     },
     body: JSON.stringify({

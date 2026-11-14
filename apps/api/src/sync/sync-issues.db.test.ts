@@ -62,7 +62,7 @@ function call(path: string, who?: string, method = 'GET', body?: unknown): Promi
   return fetch(`${api.url}${path}`, {
     method,
     headers: {
-      ...(c === undefined ? {} : { cookie: `lf_session=${c}` }),
+      ...(c === undefined ? {} : { cookie: `lf_session=${c}`, 'sec-fetch-site': 'same-origin' }),
       ...(body === undefined ? {} : { 'content-type': 'application/json' }),
     },
     ...(body === undefined ? {} : { body: JSON.stringify(body) }),

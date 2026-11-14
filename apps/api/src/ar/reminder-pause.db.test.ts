@@ -27,7 +27,7 @@ function post(who: string, body: unknown, key?: string) {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
-      ...(c ? { cookie: `lf_session=${c}` } : {}),
+      ...(c ? { cookie: `lf_session=${c}`, 'sec-fetch-site': 'same-origin' } : {}),
       ...(key ? { 'idempotency-key': key } : {}),
     },
     body: JSON.stringify(body),
@@ -36,7 +36,7 @@ function post(who: string, body: unknown, key?: string) {
 function get(who: string) {
   const c = cookies.get(who);
   return fetch(`${api.url}/ar/parties/${party}/reminder-pause?company_id=${f.companyId}`, {
-    headers: c ? { cookie: `lf_session=${c}` } : {},
+    headers: c ? { cookie: `lf_session=${c}`, 'sec-fetch-site': 'same-origin' } : {},
   });
 }
 const audits = async () =>

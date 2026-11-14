@@ -72,6 +72,7 @@ describe('SS-PLAT-30: Every successful API mutation leaves one audit row', () =>
       method: 'POST',
       headers: {
         cookie: `lf_session=${cookie}`,
+        'sec-fetch-site': 'same-origin',
         'user-agent': 'ledgerforce-test/1.0',
         'x-request-id': 'req-123e4567',
       },
@@ -97,7 +98,7 @@ describe('SS-PLAT-30: Every successful API mutation leaves one audit row', () =>
     const sessionId = cookie.split('.')[1];
     await fetch(`${api.url}/auth/logout`, {
       method: 'POST',
-      headers: { cookie: `lf_session=${cookie}` },
+      headers: { cookie: `lf_session=${cookie}`, 'sec-fetch-site': 'same-origin' },
     });
     const row = (await auditRows()).at(-1);
     expect(row).toMatchObject({ entity_type: 'session', entity_id: sessionId });
@@ -109,7 +110,7 @@ describe('SS-PLAT-30: Every successful API mutation leaves one audit row', () =>
     const cookie = await login();
     const res = await fetch(`${api.url}/auth/logout`, {
       method: 'POST',
-      headers: { cookie: `lf_session=${cookie}` },
+      headers: { cookie: `lf_session=${cookie}`, 'sec-fetch-site': 'same-origin' },
     });
     const rid = res.headers.get('x-request-id');
     expect(rid).toMatch(/^[0-9a-f-]{36}$/);
@@ -120,7 +121,11 @@ describe('SS-PLAT-30: Every successful API mutation leaves one audit row', () =>
     const before = (await auditRows()).length;
     const cookie = await login();
     expect(
-      (await fetch(`${api.url}/auth/me`, { headers: { cookie: `lf_session=${cookie}` } })).status,
+      (
+        await fetch(`${api.url}/auth/me`, {
+          headers: { cookie: `lf_session=${cookie}`, 'sec-fetch-site': 'same-origin' },
+        })
+      ).status,
     ).toBe(200);
     expect((await fetch(`${api.url}/auth/logout`, { method: 'POST' })).status).toBe(401);
     expect((await auditRows()).length).toBe(before);

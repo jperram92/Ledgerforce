@@ -47,6 +47,7 @@ async function call(
   const h: Record<string, string> = { ...headers };
   const c = cookies.get(who);
   if (c) h.cookie = `lf_session=${c}`;
+  h['sec-fetch-site'] = 'same-origin';
   if (body !== undefined) h['content-type'] = 'application/json';
   return fetch(`${api.url}${path}`, {
     method,
@@ -173,7 +174,10 @@ describe('SS-PLAT-90: Manual journal routes enforce permission, approval and SoD
     try {
       const response = await fetch(`${unconfigured.url}/manual-journals/${draft}/post`, {
         method: 'POST',
-        headers: { cookie: `lf_session=${cookies.get('accountant')}` },
+        headers: {
+          cookie: `lf_session=${cookies.get('accountant')}`,
+          'sec-fetch-site': 'same-origin',
+        },
       });
       expect(response.status).toBe(503);
       expect(await response.json()).toEqual({ error: 'queue_not_configured' });

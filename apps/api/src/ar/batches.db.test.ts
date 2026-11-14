@@ -42,6 +42,7 @@ async function call(method: string, path: string, who: Who, body?: unknown, key?
   const h: Record<string, string> = {};
   const c = cookies.get(who);
   if (c) h.cookie = `lf_session=${c}`;
+  h['sec-fetch-site'] = 'same-origin';
   if (body !== undefined) h['content-type'] = 'application/json';
   if (key) h['idempotency-key'] = key;
   return fetch(`${api.url}${path}`, {
@@ -240,7 +241,10 @@ describe('T-0120: approval needs the document outbox', () => {
       });
       const r = await fetch(
         `${bare.url}/ar/batches/${uid(0x120f)}/approve?company_id=${companyId}`,
-        { method: 'POST', headers: { cookie: `lf_session=${cookie}` } },
+        {
+          method: 'POST',
+          headers: { cookie: `lf_session=${cookie}`, 'sec-fetch-site': 'same-origin' },
+        },
       );
       expect(r.status).toBe(503);
       expect(await r.json()).toMatchObject({ error: 'outbox_unavailable' });

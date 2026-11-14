@@ -38,7 +38,9 @@ const outsiderId = randomUUID();
 
 async function call(path: string, who: string) {
   const c = cookies.get(who);
-  return fetch(`${api.url}${path}`, { headers: c ? { cookie: `lf_session=${c}` } : {} });
+  return fetch(`${api.url}${path}`, {
+    headers: c ? { cookie: `lf_session=${c}`, 'sec-fetch-site': 'same-origin' } : {},
+  });
 }
 
 /** POST …/approve as `who`; `key` null sends no Idempotency-Key. */
@@ -50,6 +52,7 @@ async function approve(
   const h: Record<string, string> = { 'content-type': 'application/json' };
   const c = cookies.get(who);
   if (c) h.cookie = `lf_session=${c}`;
+  h['sec-fetch-site'] = 'same-origin';
   if (opts.key !== null) h['idempotency-key'] = opts.key ?? randomUUID();
   return fetch(
     `${(opts.on ?? api).url}/ar/invoices/${id}/approve?company_id=${opts.companyId ?? f.companyId}`,
@@ -442,6 +445,7 @@ describe('SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073)', (
       headers: {
         'content-type': 'application/json',
         cookie: `lf_session=${cookies.get('solo') ?? ''}`,
+        'sec-fetch-site': 'same-origin',
       },
       body: JSON.stringify({ small_team_mode: true, reason: 'one-person business' }),
     });

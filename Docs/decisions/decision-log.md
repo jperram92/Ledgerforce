@@ -3324,3 +3324,13 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: When T-0172 sends Stripe refunds from the approve step, `POST /ar/refunds/:id/approve` for a Stripe refund requires step-up (300 s, `@RequireStepUp`), like payment-batch release. SoD stays as is (`SOD_REFUND_SELF_APPROVAL`). T-0172 records this in a security ADR accepted under DL-0477.
 - Why: approving a Stripe refund moves money out at once, with no later release step, so it gets the same fresh-authentication control as other payment-out actions (design §6.2; DL-0477 item 5 applies the same reasoning to payment files).
 - ADR: in T-0172 · Status: accepted (owner delegation)
+
+### DL-0563 — CSRF guard on cookie-authenticated writes, fail-safe (T-0144, ADR-0076)
+- Date: 2026-11-14 · By: claude under DL-0477 item 7 · Task: T-0144 · Category: security
+- Decision:
+  - An unsafe request carrying `lf_session` passes only with `Sec-Fetch-Site: same-origin` or `none`, or, without Fetch Metadata, with an `Origin` exactly equal to the public origin (`LF_PUBLIC_URL`). Anything else gets 403 `csrf_rejected` before routing.
+  - Requests without the session cookie (Bearer tokens, webhooks) and safe methods are not inspected.
+  - The 36 session-based api-db test files send `Sec-Fetch-Site: same-origin` through their request helpers, as a browser does. The edit was scripted and limited to header literals; no assertion changed.
+  - The config test expects `publicOrigin`.
+- Why: OWASP CSRF Prevention Cheat Sheet (RQ-0141 F6–F8): Fetch Metadata is primary, an Origin fallback is mandatory, and missing headers fail safe. Design §6.9.
+- ADR: ADR-0076 · Status: accepted (owner delegation)

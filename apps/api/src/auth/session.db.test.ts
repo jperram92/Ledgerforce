@@ -33,7 +33,7 @@ function parts(cookie: string): SessionCookie {
 async function call(path: string, cookie?: string, method = 'GET'): Promise<Response> {
   return fetch(`${api.url}${path}`, {
     method,
-    headers: cookie ? { cookie: `lf_session=${cookie}` } : {},
+    headers: cookie ? { cookie: `lf_session=${cookie}`, 'sec-fetch-site': 'same-origin' } : {},
   });
 }
 

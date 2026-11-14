@@ -219,7 +219,10 @@ async function login(who: Who, how: IdpLogin = {}): Promise<string> {
 function beginStepUp(session: string | undefined, query = ''): Promise<Response> {
   return fetch(`${api.url}/auth/step-up${query}`, {
     redirect: 'manual',
-    headers: session === undefined ? {} : { cookie: `lf_session=${session}` },
+    headers:
+      session === undefined
+        ? {}
+        : { cookie: `lf_session=${session}`, 'sec-fetch-site': 'same-origin' },
   });
 }
 
@@ -253,7 +256,10 @@ function finishStepUp(s: StepUp, session: string | undefined): Promise<Response>
 function call(method: string, path: string, session?: string): Promise<Response> {
   return fetch(`${api.url}${path}`, {
     method,
-    headers: session === undefined ? {} : { cookie: `lf_session=${session}` },
+    headers:
+      session === undefined
+        ? {}
+        : { cookie: `lf_session=${session}`, 'sec-fetch-site': 'same-origin' },
   });
 }
 

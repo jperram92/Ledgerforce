@@ -5,6 +5,7 @@
  */
 import type { INestApplication } from '@nestjs/common';
 import type { Express, NextFunction, Request, Response } from 'express';
+import { csrfGuard } from './csrf.ts';
 import { FixedWindowLimiter, rateLimitMiddleware, type RateLimitPolicy } from './rate-limit.ts';
 
 export interface SecurityOptions {
@@ -14,6 +15,11 @@ export interface SecurityOptions {
   trustProxyHops?: number;
   /** Rate limits; absent = none (unit/DB test harness). Production always sets them (config.ts). */
   rateLimits?: RateLimitPolicy;
+  /**
+   * The browser-facing public origin (LF_PUBLIC_URL). The CSRF guard (ADR-0076) accepts it as
+   * `Origin` when a request has no Fetch Metadata; without it only Sec-Fetch-Site can pass.
+   */
+  publicOrigin?: string;
   /** Test hook: the limiter's clock (ms). */
   now?: () => number;
 }
@@ -50,4 +56,6 @@ export function applySecurity(app: INestApplication, opts: SecurityOptions = {})
     const limiter = new FixedWindowLimiter(opts.rateLimits, opts.now ?? Date.now);
     app.use(rateLimitMiddleware(limiter));
   }
+  // CSRF (ADR-0076): always on; cookie-authenticated writes must prove they are same-origin.
+  app.use(csrfGuard(opts.publicOrigin));
 }

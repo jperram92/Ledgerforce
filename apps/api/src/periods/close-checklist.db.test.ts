@@ -34,7 +34,7 @@ function call(path: string, who: string, init: { method?: string; key?: string }
     method: init.method ?? 'GET',
     headers: {
       'content-type': 'application/json',
-      ...(c ? { cookie: `lf_session=${c}` } : {}),
+      ...(c ? { cookie: `lf_session=${c}`, 'sec-fetch-site': 'same-origin' } : {}),
       ...(init.key ? { 'idempotency-key': init.key } : {}),
     },
     ...(init.method === 'POST' ? { body: JSON.stringify({ company_id: f.companyId }) } : {}),

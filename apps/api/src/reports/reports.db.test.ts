@@ -21,7 +21,9 @@ const people: Record<string, { id: string; roles: string[] }> = {
 };
 
 const get = (path: string, who: string) =>
-  fetch(`${api.url}${path}`, { headers: { cookie: `lf_session=${cookies.get(who) ?? ''}` } });
+  fetch(`${api.url}${path}`, {
+    headers: { cookie: `lf_session=${cookies.get(who) ?? ''}`, 'sec-fetch-site': 'same-origin' },
+  });
 
 beforeAll(async () => {
   f = await createLedgerFixture('01900000-0000-7000-8000-000000007703');

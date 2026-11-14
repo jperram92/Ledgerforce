@@ -52,6 +52,7 @@ function call(
   const h: Record<string, string> = {};
   const cookie = cookies.get(who);
   if (cookie) h.cookie = `lf_session=${cookie}`;
+  h['sec-fetch-site'] = 'same-origin';
   if (init.body !== undefined) h['content-type'] = 'application/json';
   if (init.key) h['idempotency-key'] = init.key;
   return fetch(`${api.url}${path}`, {

@@ -26,7 +26,9 @@ let cookieA: string;
 let cookieB: string;
 
 const get = (path: string, cookie?: string) =>
-  fetch(`${api.url}${path}`, { headers: cookie ? { cookie: `lf_session=${cookie}` } : {} });
+  fetch(`${api.url}${path}`, {
+    headers: cookie ? { cookie: `lf_session=${cookie}`, 'sec-fetch-site': 'same-origin' } : {},
+  });
 
 beforeAll(async () => {
   tdb = await createTestDatabase({ migrate: true });

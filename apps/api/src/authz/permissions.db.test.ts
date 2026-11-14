@@ -67,6 +67,7 @@ function call(method: string, path: string, user?: string, body?: unknown): Prom
   const headers: Record<string, string> = {};
   const c = user ? cookies.get(user) : undefined;
   if (c) headers.cookie = `lf_session=${c}`;
+  headers['sec-fetch-site'] = 'same-origin';
   if (body !== undefined) headers['content-type'] = 'application/json';
   return fetch(`${api.url}${path}`, {
     method,
@@ -245,7 +246,7 @@ describe('SS-PLAT-49: Every endpoint checks a permission; role changes are audit
     expect(body).toMatchObject({ user_id: TARGET, role: 'ar_clerk' });
     expect(await epochOf(TARGET)).toBe(epoch + 1);
     const me = await fetch(`${api.url}/auth/me`, {
-      headers: { cookie: `lf_session=${targetCookie}` },
+      headers: { cookie: `lf_session=${targetCookie}`, 'sec-fetch-site': 'same-origin' },
     });
     expect(me.status).toBe(401);
     expect(await me.json()).toEqual({ error: 'session_expired' });

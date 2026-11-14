@@ -37,6 +37,7 @@ async function call(method: string, path: string, who?: string, body?: unknown, 
   const headers: Record<string, string> = {};
   const c = who ? cookies.get(who) : undefined;
   if (c) headers.cookie = `lf_session=${c}`;
+  headers['sec-fetch-site'] = 'same-origin';
   if (body !== undefined) headers['content-type'] = 'application/json';
   return fetch(`${on.url}${path}`, {
     method,

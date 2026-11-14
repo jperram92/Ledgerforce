@@ -78,6 +78,7 @@ export function apiOptionsFromEnv(
     // ADR-0054: always on in production; HSTS only when the public origin is https.
     security: {
       hsts: !publicUrl.insecure,
+      publicOrigin: publicUrl.href,
       trustProxyHops: trustProxyHops(env),
       rateLimits: DEFAULT_RATE_LIMITS,
     },

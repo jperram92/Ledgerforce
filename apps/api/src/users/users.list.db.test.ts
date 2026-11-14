@@ -42,7 +42,10 @@ const cookies = new Map<string, string>();
 
 function call(path: string, cookie?: string): Promise<Response> {
   return fetch(`${api.url}${path}`, {
-    headers: cookie === undefined ? {} : { cookie: `lf_session=${cookie}` },
+    headers:
+      cookie === undefined
+        ? {}
+        : { cookie: `lf_session=${cookie}`, 'sec-fetch-site': 'same-origin' },
   });
 }
 
@@ -179,6 +182,7 @@ describe('SS-PLAT-78: GET /auth/me/access tells the browser what the caller may 
       method: 'POST',
       headers: {
         cookie: `lf_session=${cookies.get(AUDITOR) ?? ''}`,
+        'sec-fetch-site': 'same-origin',
         'content-type': 'application/json',
       },
       body: JSON.stringify({ name: 'read audit', scopes: ['audit_log.read', 'users.read'] }),

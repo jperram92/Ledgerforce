@@ -282,7 +282,9 @@ describe('SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, st
     expect(cookieValue(res, 'lf_oidc')).toBe(''); // the pre-auth cookie is cleared
     expect(await sessionCount(A)).toBe(before + 1);
 
-    const me = await fetch(`${api.url}/auth/me`, { headers: { cookie: `lf_session=${session}` } });
+    const me = await fetch(`${api.url}/auth/me`, {
+      headers: { cookie: `lf_session=${session}`, 'sec-fetch-site': 'same-origin' },
+    });
     expect(me.status).toBe(200);
     expect(await me.json()).toEqual({ tenant_id: A, user_id: PRIYA, display_name: 'Priya Shah' });
 
@@ -483,7 +485,9 @@ describe('SS-PLAT-20: MFA and session policy for finance roles — login', () =>
     expect(rows).toEqual([{ amr: ['pwd', 'otp'], acr: MFA, idle: 1800, absolute: 43_200 }]);
 
     now += 31 * MIN;
-    const me = await fetch(`${api.url}/auth/me`, { headers: { cookie: `lf_session=${cookie}` } });
+    const me = await fetch(`${api.url}/auth/me`, {
+      headers: { cookie: `lf_session=${cookie}`, 'sec-fetch-site': 'same-origin' },
+    });
     expect(me.status).toBe(401);
     expect(await me.json()).toMatchObject({ error: 'session_expired' });
   });

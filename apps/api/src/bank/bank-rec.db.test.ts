@@ -79,7 +79,7 @@ function call(method: string, path: string, who: string, o: Opts = {}) {
     method,
     headers: {
       'content-type': 'application/json',
-      ...(c ? { cookie: `lf_session=${c}` } : {}),
+      ...(c ? { cookie: `lf_session=${c}`, 'sec-fetch-site': 'same-origin' } : {}),
       ...(key ? { 'idempotency-key': key } : {}),
     },
     ...(o.body === undefined ? {} : { body: JSON.stringify(o.body) }),

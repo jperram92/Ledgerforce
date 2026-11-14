@@ -36,7 +36,10 @@ let inkChange: string;
 const cookies = new Map<string, string>();
 
 async function call(method: string, path: string, who: string, body?: unknown) {
-  const headers: Record<string, string> = { cookie: `lf_session=${cookies.get(who) ?? ''}` };
+  const headers: Record<string, string> = {
+    cookie: `lf_session=${cookies.get(who) ?? ''}`,
+    'sec-fetch-site': 'same-origin',
+  };
   if (body !== undefined) headers['content-type'] = 'application/json';
   return fetch(`${api.url}${path}`, {
     method,
