@@ -1,0 +1,16 @@
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-1 GET /setup/wizard returns the ten steps (status, locked, valid, missing) and complete [T-0157]
+AssertionError: expected 404 to be 200 // Object.is equality
+ FAIL  |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-3 reading needs settings.read; completing needs settings.setup.manage (403 otherwise) [T-0157]
+AssertionError: expected 404 to be 200 // Object.is equality
+ FAIL  |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-2 a locked step is 409 STEP_LOCKED; an invalid one 422 STEP_INVALID with missing; nothing is written [T-0157]
+AssertionError: expected 404 to be 409 // Object.is equality
+ FAIL  |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-2 bad requests are 400: no Idempotency-Key, a step outside 1–10, a bad body [T-0157]
+AssertionError: expected 404 to be 400 // Object.is equality
+ FAIL  |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-2 completes a valid unlocked step once: 201 audited, then 200 replay; step 2 unlocks [T-0157]
+AssertionError: expected 404 to be 201 // Object.is equality
+ FAIL  |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-2 step 9 accepts { no_history_reason }; another step with a reason is 422 NO_HISTORY_NOT_ALLOWED [T-0157]
+AssertionError: expected 404 to be 422 // Object.is equality
+ FAIL  |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-3 another tenant's company is 404 on both routes and nothing is written [T-0157]
+AssertionError: expected { …(3) } to match object { error: 'UNKNOWN_COMPANY' }
+      Tests  7 failed (7)

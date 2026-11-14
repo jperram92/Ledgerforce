@@ -1,0 +1,14 @@
+ ✓ |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-1 GET /setup/wizard returns the ten steps (status, locked, valid, missing) and complete [T-0157] 150ms
+ ✓ |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-3 reading needs settings.read; completing needs settings.setup.manage (403 otherwise) [T-0157] 63ms
+ ✓ |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-2 a locked step is 409 STEP_LOCKED; an invalid one 422 STEP_INVALID with missing; nothing is written [T-0157] 24ms
+ ✓ |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-2 bad requests are 400: no Idempotency-Key, a step outside 1–10, a bad body [T-0157] 76ms
+ ✓ |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-2 completes a valid unlocked step once: 201 audited, then 200 replay; step 2 unlocks [T-0157] 86ms
+ ✓ |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-2 step 9 accepts { no_history_reason }; another step with a reason is 422 NO_HISTORY_NOT_ALLOWED [T-0157] 38ms
+ ✓ |api-db| apps/api/src/setup/wizard.db.test.ts > SS-PLAT-120: the setup wizard over HTTP > SS-PLAT-120 AC-3 another tenant's company is 404 on both routes and nothing is written [T-0157] 12ms
+ ✓ |api-db| apps/api/src/setup/opening-balances.db.test.ts > SS-PLAT-117: opening balances over HTTP > preview returns the GP-037 journal dated the balance date and writes nothing 71ms
+ ✓ |api-db| apps/api/src/setup/opening-balances.db.test.ts > SS-PLAT-117: opening balances over HTTP > refusals are 422 with the code (and the CSV row), writing nothing 48ms
+ ✓ |api-db| apps/api/src/setup/opening-balances.db.test.ts > SS-PLAT-117: opening balances over HTTP > an Accountant without settings.chart.manage is refused 8ms
+ ✓ |api-db| apps/api/src/setup/opening-balances.db.test.ts > SS-PLAT-117: opening balances over HTTP > posts once: 201 with the opening balance, 200 on replay, readable by GET 102ms
+ ✓ |api-db| apps/api/src/setup/opening-balances.db.test.ts > SS-PLAT-117: opening balances over HTTP > another tenant sees no opening balance and cannot post to this company 20ms
+ Test Files  2 passed (2)
+      Tests  12 passed (12)
