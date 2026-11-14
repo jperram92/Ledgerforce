@@ -1,0 +1,18 @@
+exit 0
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41161
+[Nest] 25560  - 11/14/2026, 1:19:41 AM   ERROR [ExceptionsHandler] Error: SoD: subject type bill has no create step for a reported creator
+    at historyOf (/home/user/Ledgerforce/.claude/worktrees/agent-a81497f99a24b848d/apps/api/src/sod/sod.service.ts:67:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at checkSod (/home/user/Ledgerforce/.claude/worktrees/agent-a81497f99a24b848d/apps/api/src/sod/sod.service.ts:186:19)
+    at /home/user/Ledgerforce/.claude/worktrees/agent-a81497f99a24b848d/apps/api/src/tenancy/tenant.interceptor.ts:127:26
+    at async file:///home/user/Ledgerforce/.claude/worktrees/agent-a81497f99a24b848d/node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection (file:///home/user/Ledgerforce/.claude/worktrees/agent-a81497f99a24b848d/node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20)
+
+ Test Files  1 passed (1)
+      Tests  26 passed (26)
+   Start at  01:19:37
+   Duration  4.28s (transform 1.15s, setup 0ms, import 2.24s, tests 1.25s, environment 0ms)
+
+
+[exited with code 0]

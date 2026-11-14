@@ -1,0 +1,60 @@
++   {
+      "actor_user_id": "01900000-0000-7000-8000-000000001502",
+      "step": "invoice.approve",
+    },
+  ]
+
+ ❯ apps/api/src/sod/sod.db.test.ts:641:35
+    639|     expect(res.status).toBe(200);
+    640|     expect(done.invoices).toContain('INV-D1');
+    641|     expect(await steps('INV-D1')).toEqual([
+       |                                   ^
+    642|       { step: 'invoice.approve', actor_user_id: PEOPLE.approver.id },
+    643|     ]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |api-db| apps/api/src/sod/sod.db.test.ts > T-0132 (ADR-0073): a subject reports its creator; SOD_INVOICE_SELF_APPROVAL > small-team mode with nobody else eligible: the creator needs a recorded exception, which is written
+AssertionError: expected 200 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 200
+
+ ❯ apps/api/src/sod/sod.db.test.ts:655:24
+    653|       created_by: PEOPLE.solo.id,
+    654|     });
+    655|     expect(own.status).toBe(403);
+       |                        ^
+    656|     expect(await own.json()).toEqual({
+    657|       error: 'sod_violation',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |api-db| apps/api/src/sod/sod.db.test.ts > T-0132 (ADR-0073): a subject reports its creator; SOD_INVOICE_SELF_APPROVAL > a creator reported for a subject without a create step fails closed: refused, nothing recorded
+AssertionError: expected 200 to be 500 // Object.is equality
+
+- Expected
++ Received
+
+- 500
++ 200
+
+ ❯ apps/api/src/sod/sod.db.test.ts:682:24
+    680|       created_by: PEOPLE.userA.id,
+    681|     });
+    682|     expect(res.status).toBe(500);
+       |                        ^
+    683|     expect(await steps('BILL-C1')).toEqual([]);
+    684|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed | 21 skipped (26)
+   Start at  01:19:07
+   Duration  4.26s (transform 1.40s, setup 0ms, import 2.44s, tests 970ms, environment 0ms)
+
