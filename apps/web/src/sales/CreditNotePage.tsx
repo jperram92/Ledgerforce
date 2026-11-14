@@ -4,8 +4,9 @@
  * rate) and refuses more than is still creditable. "Show me the journal" is the posting engine's
  * preview of exactly what approval posts (GP-005, T-0151); someone with ar.credit_note.approve
  * posts it, and the separation-of-duties rule for the Clerk's own credit notes is the API's.
- * Refunding the customer's credit is T-0152 (blocked on a permission decision), so this screen
- * says so instead of offering it. No accounting in the browser: every amount is the API's.
+ * The Refund region (T-0152, SS-UC11-08 refund half, ADR-0074) shows the customer's refundable
+ * credit, requests a refund and lets an Approver approve it (RefundRegion.tsx); `?refund=` keeps
+ * the requested refund open. No accounting in the browser: every amount is the API's.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
@@ -26,6 +27,7 @@ import { typeGloss } from '../gl/gl-logic.ts';
 import { CREDIT_REASONS, PAYMENT_WORD } from './cash-logic.ts';
 import type { CreditNote, Invoice } from './client.ts';
 import { quantityText } from './InvoicePage.tsx';
+import { RefundRegion } from './RefundRegion.tsx';
 import { AR_READERS, useCompany } from './InvoicesPage.tsx';
 
 function Region({ heading, children }: { heading: string; children: ReactNode }) {
@@ -48,9 +50,11 @@ const cnKey = (id: string) => ['ar', 'credit-note', id] as const;
 export function CreditNotePage({
   invoiceId,
   creditNoteId,
+  refundId,
 }: {
   invoiceId?: string;
   creditNoteId?: string;
+  refundId?: string;
 }) {
   const access = useAccess();
   const { sales } = useServices();
@@ -137,7 +141,16 @@ export function CreditNotePage({
       {!forInvoice ? (
         <InvoicePicker invoices={invoices.data?.invoices ?? []} />
       ) : doc.data ? (
-        <Body companyId={companyId} invoice={doc.data} note={note.data ?? null} />
+        <Body
+          companyId={companyId}
+          invoice={doc.data}
+          note={note.data ?? null}
+          {...(refundId ? { refundId } : {})}
+          search={{
+            ...(invoiceId ? { invoice: invoiceId } : {}),
+            ...(creditNoteId ? { credit_note: creditNoteId } : {}),
+          }}
+        />
       ) : null}
       <p className="admin-note">
         <Link to="/sales/invoices">All invoices</Link>
@@ -182,10 +195,14 @@ function Body({
   companyId,
   invoice,
   note,
+  refundId,
+  search,
 }: {
   companyId: string;
   invoice: Invoice;
   note: CreditNote | null;
+  refundId?: string;
+  search: { invoice?: string; credit_note?: string };
 }) {
   const { sales } = useServices();
   const access = useAccess();
@@ -253,13 +270,15 @@ function Body({
       ) : (
         <p className="admin-note">AR Clerks, Finance Admins and Owners issue credit notes.</p>
       )}
-      <Region heading="Refund">
-        <p className="admin-note">
-          Refunding a customer&rsquo;s credit is not available here yet. Once the credit note is
-          posted on a paid invoice, the credit stays with the customer until it is refunded or used
-          on another invoice.
-        </p>
-      </Region>
+      {invoice.status === 'posted' ? (
+        <RefundRegion
+          companyId={companyId}
+          partyId={invoice.party_id}
+          partyName={invoice.party_name}
+          {...(refundId ? { refundId } : {})}
+          search={search}
+        />
+      ) : null}
     </>
   );
 }

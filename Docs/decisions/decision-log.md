@@ -3230,3 +3230,46 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: ADR-0067 rule 6 (server derives status); apps/api rules (idempotency, audit); same state-replay pattern as the close checklist and period reopen (DL-0420). Unlike the close checklist, a replay by another user is not a 409: completing a step is a fact about the company, and the repeat changes nothing.
 - Alternatives: 409 for a replay by a different user (no benefit; the wizard screen may be used by two admins); a required `as_of` (pushes date logic into the browser).
 - ADR: ADR-0075 · Status: accepted
+
+### DL-0580 — Customer refund approval and refund routes (ADR-0074 accepted under DL-0477)
+- Date: 2026-11-14 · By: claude under DL-0477 · Task: T-0152 · Category: security
+- Decision: ADR-0074 is accepted under the owner's delegation (DL-0477 item 3). A customer refund is paid only after another person approves it: an append-only `app.customer_refund_approval` row (migration 0070), the SoD rule `SOD_REFUND_SELF_APPROVAL` (lead migration 0069, condition always, small-team exception as `SOD_BATCH_SELF_APPROVAL`) checked in the guard by `@SoD('refund.create')` on `PUT /ar/refunds/:id` and `@SoD('refund.approve')` on `POST /ar/refunds/:id/approve`. `createPaymentBatch` takes only approved bank refunds; `payCustomerRefund` refuses an unapproved one (`NOT_APPROVED`). Stripe stays refused (`METHOD_NOT_AVAILABLE`); when offered, the approve step sends it (T-0172).
+- Why: maker-checker for money leaving the business (COSO; design §6.5; OWASP ASVS V4), the same as supplier payments; no second payment path (card open question 2).
+- Alternatives: a new status `approved` (needs DROP CONSTRAINT on the status CHECK); approval columns on `customer_refund` (needs the 0055 guard replaced and widened); checking the creator in the module (bypasses small-team exceptions and the guard rule of apps/api/AGENTS.md).
+- ADR: ADR-0074 · Status: accepted
+
+### DL-0581 — Migration 0070: approval record append-only (SELECT, INSERT), plus two additive guards
+- Date: 2026-11-14 · By: claude · Task: T-0152 · Category: security
+- Decision: `app.customer_refund_approval` gets SELECT and INSERT for `lf_app`, not UPDATE: an approval is evidence and never changes (precedent `payment_batch_refund`, `sod_action`). New triggers, next to the unchanged 0055 guard: an approval only of a `requested` refund; `paid` only with an approval; a payable `payment_batch_refund` line only with an approval. Each skips another tenant's rows so RLS refuses them (42501). The RLS suite finds the table automatically (871 passed); no seed override was needed.
+- Why: defence in depth (a forgotten code path cannot pay an unapproved refund). The brief's "SELECT/INSERT/UPDATE" is the default for mutable tables; packages/db/AGENTS.md allows SELECT/INSERT for append-only evidence.
+- Alternatives: granting UPDATE and refusing it by trigger (pointless privilege).
+- ADR: ADR-0074 · Status: accepted
+
+### DL-0582 — Which bank account the refund journal preview shows before a batch exists
+- Date: 2026-11-14 · By: claude · Task: T-0152 · Category: accounting
+- Decision: `GET /ar/refunds/:id/journal` previews GP-006 with, in order: the `account_id` query parameter; else the GL account of the live batch that pays the refund; else the GL account of the company's only active `app.bank_account`; with none or several it refuses with 422 `BANK_ACCOUNT_REQUIRED`. The response says which (`bank_account_source`). The preview is dated the refund date; the real entry is dated the bank confirmation (DL-0305). The journal builder is shared with `payCustomerRefund`, so preview and posting cannot drift.
+- Why: GP-006 (Approved) credits "the bank account the batch pays from", chosen at batch creation; guessing among several accounts would show a wrong journal.
+- Alternatives: always the first bank account (silently wrong with several); no preview until a batch exists (the card asks for it at request time).
+- ADR: ADR-0074 · Status: accepted
+
+### DL-0583 — Refund not-found codes for 404
+- Date: 2026-11-14 · By: claude · Task: T-0152 · Category: architecture
+- Decision: `RefundError` gains `REFUND_NOT_FOUND` (unknown refund, including another tenant's under RLS) and `PARTY_NOT_FOUND` (party not in the company), mapped to 404 `not_found`; they were `INVALID_REFUND` before. Also `NOT_APPROVED`, `NOT_APPROVABLE`, `BANK_ACCOUNT_REQUIRED` (422). No caller matched the old code for these cases (payment-confirmation wraps every `RefundError`).
+- Why: card AC-1 (404 for another tenant's party) and the 404 convention of the other AR routes.
+- ADR: none · Status: accepted
+
+### DL-0584 — Refund screen in the credit-note screen; Stripe-on-approval split to T-0172
+- Date: 2026-11-14 · By: claude · Task: T-0152 · Category: ui + scope
+- Decision:
+  1. The Refund region of `/sales/credit-notes` (shown for a posted invoice) reads the customer's credit from the API ("can have back", "refunds already requested"). With `ar.refund.create` and credit available it offers a request form (amount, pay-from date, optional reason; a client uuid kept for the form's life). After the request the page moves to `?refund=…`, so an Approver can open the same refund. The refund view shows its state in plain words, "Show me the journal" (engine GP-006 preview, P4) and, with `ar.refund.approve`, "Approve refund"; the SoD refusal is shown in place. The browser compares only `available === "0.0000"` as text to choose between the form and "no credit"; it does no arithmetic.
+  2. "Request refund" and "Show me the journal" are secondary buttons so the page keeps at most one primary action (the credit-note form's or "Approve refund").
+  3. Stripe refunds sent by the approve step (ADR-0074) are card T-0172, not this card: the T-0074 Stripe path needs rerouting through the refund document and a step-up decision.
+- Why: card AC-4; P4 (journal before it posts); P12 plain words; brief: split when the card grows.
+- Alternatives: a separate refund page (more navigation; the credit is created on this screen); a disabled approve button for the creator (the SoD rule is the API's, and small-team mode may allow it).
+- ADR: ADR-0074 · Status: accepted
+
+### DL-0585 — T-0085's credit-note e2e adapted to the live Refund region; its evidence re-taken
+- Date: 2026-11-14 · By: claude · Task: T-0152 · Category: process
+- Decision: `tests/e2e/web/credit-notes.spec.ts` (T-0085) asserted that refunds were "not available here yet". The fake API now answers `GET /ar/parties/:id/credit` (no credit before the credit note posts, 220.00 after) and the assertion checks the new text "Acme Pty Ltd has no credit to refund". No assertion was removed or loosened. Running the spec added new T-0085 screenshots and manifest entries at this branch's commit; the earlier entries stay.
+- Why: DL-0491/0492 planned that T-0152 replaces the placeholder; the spec must describe the screen as it is.
+- ADR: none · Status: accepted

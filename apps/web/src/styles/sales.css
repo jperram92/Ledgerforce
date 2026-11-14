@@ -43,3 +43,8 @@
 .word[data-status='preview'] {
   border-style: dotted;
 }
+
+/* Refund region (T-0152): one action per row, spaced like the other blocks. */
+.rf-action {
+  margin-block: var(--s3);
+}

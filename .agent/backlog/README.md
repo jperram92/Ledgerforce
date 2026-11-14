@@ -16,10 +16,10 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 7 |
 | done | 3 |
 | in_progress | 1 |
-| review | 119 |
+| review | 120 |
 | todo | 26 |
 | verifying | 3 |
-| **total** | **159** |
+| **total** | **160** |
 | **total** | **147** |
 
 | Phase | Cards |
@@ -194,7 +194,8 @@ graph LR
 | [T-0083](T-0083.md) | UI: invoices list, detail, approve and post | MVP | review | T-0081, T-0040, T-0041, T-0131 | UC-01 | 1 |
 | [T-0084](T-0084.md) | UI: batch billing preview, approval and exception list | MVP | review | T-0081, T-0044 | UC-02 | 1 |
 | [T-0151](T-0151.md) | AR cash API for the T-0085 screens: receipts list, idempotent allocation, credit-note journal preview | MVP | review | T-0046, T-0045 | UC-03, UC-11 | 2 |
-| [T-0152](T-0152.md) | Customer refund over HTTP and the refund screen: permission decision, routes, UI (split from T-0085) | MVP | todo | T-0055, T-0151 | UC-11 | 1 |
+| [T-0152](T-0152.md) | Customer refund over HTTP and the refund screen: permission decision, routes, UI (split from T-0085) | MVP | verifying | T-0055, T-0151 | UC-11 | 1 |
+| [T-0172](T-0172.md) | AR - Stripe refund of customer credit through the refund document, sent only on approval (ADR-0074) | MVP | todo | T-0152, T-0074 | UC-11 | 0 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | review | T-0081, T-0046, T-0045, T-0055, T-0151 | UC-03, UC-11 | 2 |
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | review | T-0081, T-0052, T-0051 | UC-05 | 1 |
 | [T-0153](T-0153.md) | AP release API for the T-0087 screens: batch list, named batch view, bank-detail change list | MVP | verifying | T-0054, T-0053 | UC-06 | 1 |

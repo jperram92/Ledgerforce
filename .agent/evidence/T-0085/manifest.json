@@ -298,6 +298,51 @@
       "provider": "unknown",
       "timestamp": "2026-11-13T15:11:16.793Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0085/20261114-012759-SS-UC11-08-credit-note-form-1440.png",
+      "test": "web/credit-notes.spec.ts › SS-UC11-08: Credit note and refund screens @ 1440 [T-0085]",
+      "commit": "80772c68d341",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T01:27:59.576Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0085/20261114-012800-SS-UC11-08-credit-note-journal-preview-1440.png",
+      "test": "web/credit-notes.spec.ts › SS-UC11-08: Credit note and refund screens @ 1440 [T-0085]",
+      "commit": "80772c68d341",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T01:28:00.646Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0085/20261114-012802-SS-UC11-08-credit-note-form-390.png",
+      "test": "web/credit-notes.spec.ts › SS-UC11-08: Credit note and refund screens @ 390 [T-0085]",
+      "commit": "80772c68d341-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T01:28:02.343Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0085/20261114-012803-SS-UC11-08-credit-note-journal-preview-390.png",
+      "test": "web/credit-notes.spec.ts › SS-UC11-08: Credit note and refund screens @ 390 [T-0085]",
+      "commit": "80772c68d341-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T01:28:03.261Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0085/20261114-012805-SS-UC11-08-credit-note-posted-1440.png",
+      "test": "web/credit-notes.spec.ts › SS-UC11-08: an Approver opens the draft, sees the journal and posts it [T-0085]",
+      "commit": "80772c68d341-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T01:28:05.492Z",
+      "result": "passed"
     }
   ]
 }

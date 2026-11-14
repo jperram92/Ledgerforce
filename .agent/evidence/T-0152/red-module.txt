@@ -1,0 +1,40 @@
+AssertionError: expected undefined to be 'NOT_APPROVED' // Object.is equality
+
+- Expected:
+"NOT_APPROVED"
+
++ Received:
+undefined
+
+ ❯ packages/modules/ar/src/refunds.db.test.ts:364:21
+    362|       ),
+    363|     );
+    364|     expect(e?.code).toBe('NOT_APPROVED');
+       |                     ^
+    365|     // Database guard (migration 0070): the batch-line insert of an un…
+    366|     const batchLine = await sqlCode(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |db| packages/modules/ar/src/refunds.db.test.ts > Customer refund approval (T-0152, ADR-0074) > only a requested refund can be approved (the database refuses an approval of a paid one)
+TypeError: approveCustomerRefund is not a function
+ ❯ packages/modules/ar/src/refunds.db.test.ts:384:7
+    382|     const r = await request(party, '20.00');
+    383|     await f.inTenant((trx) =>
+    384|       approveCustomerRefund(trx, {
+       |       ^
+    385|         companyId: f.companyId,
+    386|         refundId: r.refundId,
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/refunds.db.test.ts:383:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 2 passed (6)
+   Start at  01:13:15
+   Duration  3.56s (transform 589ms, setup 0ms, import 858ms, tests 1.46s, environment 0ms)
+
