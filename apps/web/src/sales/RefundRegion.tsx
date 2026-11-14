@@ -238,9 +238,11 @@ function RefundView({
         {state}
       </p>
       {refund.status !== 'requested' ? null : !wantJournal ? (
-        <button type="button" className="secondary" onClick={() => setWantJournal(true)}>
-          Show me the journal
-        </button>
+        <div className="rf-action">
+          <button type="button" className="secondary" onClick={() => setWantJournal(true)}>
+            Show me the journal
+          </button>
+        </div>
       ) : journal.isPending ? (
         <Loading what="the journal LedgerForce would post" />
       ) : journal.isSuccess ? (
@@ -274,14 +276,16 @@ function RefundView({
       )}
       {refund.status === 'requested' && !approved ? (
         canApprove ? (
-          <button
-            type="button"
-            className="primary"
-            disabled={approve.isPending}
-            onClick={() => approve.mutate()}
-          >
-            Approve refund
-          </button>
+          <div className="rf-action">
+            <button
+              type="button"
+              className="primary"
+              disabled={approve.isPending}
+              onClick={() => approve.mutate()}
+            >
+              Approve refund
+            </button>
+          </div>
         ) : (
           <p className="admin-note">An Approver, Finance Admin or Owner approves refunds.</p>
         )
