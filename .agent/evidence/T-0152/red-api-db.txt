@@ -1,0 +1,97 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-af9f9e8721ee1553d
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37329
+ ❯ |api-db| apps/api/src/ar/refunds.db.test.ts (4 tests | 4 failed) 1983ms
+     × SS-UC11-08 the AR Clerk requests a 220.00 refund (replay 200), sees GP-006, and an Approver approves it; the Clerk may not 32ms
+     × SS-UC11-08 a person who requested a refund is refused its approval (SOD_REFUND_SELF_APPROVAL), even holding both permissions 18ms
+     × 403 without ar.refund.create, ar.refund.approve or ar.read 8ms
+     × another tenant: its party and its refund are 404; more than the credit is REFUND_EXCEEDS_CREDIT 422 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds.db.test.ts > SS-UC11-08: refund of the customer credit, approved by another person, journal shown first > SS-UC11-08 the AR Clerk requests a 220.00 refund (replay 200), sees GP-006, and an Approver approves it; the Clerk may not
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/ar/refunds.db.test.ts:198:27
+    196|   it('SS-UC11-08 the AR Clerk requests a 220.00 refund (replay 200), s…
+    197|     const credit = await call('GET', `/ar/parties/${acme}/credit?${q()…
+    198|     expect(credit.status).toBe(200);
+       |                           ^
+    199|     expect(await credit.json()).toEqual({
+    200|       party_id: acme,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds.db.test.ts > SS-UC11-08: refund of the customer credit, approved by another person, journal shown first > SS-UC11-08 a person who requested a refund is refused its approval (SOD_REFUND_SELF_APPROVAL), even holding both permissions
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ apps/api/src/ar/refunds.db.test.ts:314:98
+    312|     );
+    313|     const id = randomUUID();
+    314|     expect((await call('PUT', `/ar/refunds/${id}`, 'financeAdmin', bod…
+       |                                                                                                  ^
+    315|       201,
+    316|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds.db.test.ts > SS-UC11-08: refund of the customer credit, approved by another person, journal shown first > 403 without ar.refund.create, ar.refund.approve or ar.read
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/ar/refunds.db.test.ts:331:27
+    329|     const id = randomUUID();
+    330|     const create = await call('PUT', `/ar/refunds/${id}`, 'approver', …
+    331|     expect(create.status).toBe(403);
+       |                           ^
+    332|     expect(await create.json()).toEqual({ error: 'forbidden', permissi…
+    333|     const approve = await call('POST', `/ar/refunds/${id}/approve?${q(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds.db.test.ts > SS-UC11-08: refund of the customer credit, approved by another person, journal shown first > another tenant: its party and its refund are 404; more than the credit is REFUND_EXCEEDS_CREDIT 422
+AssertionError: /ar/refunds/8c032a49-6e54-4e34-9125-32b9a8732c5c?company_id=01a1d7a0-d93b-7f9c-9f04-c7518c13d904: expected { …(3) } to match object { error: 'not_found' }
+(2 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "error": "not_found",
++   "error": "Not Found",
+  }
+
+ ❯ apps/api/src/ar/refunds.db.test.ts:360:38
+    358|       const res = await call(method, path, method === 'POST' ? 'approv…
+    359|       expect(res.status, path).toBe(404);
+    360|       expect(await res.json(), path).toMatchObject({ error: 'not_found…
+       |                                      ^
+    361|     }
+    362|     const tooMuch = await call('PUT', `/ar/refunds/${randomUUID()}`, '…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  01:16:40
+   Duration  6.09s (transform 1.76s, setup 0ms, import 3.12s, tests 1.98s, environment 0ms)
+

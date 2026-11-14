@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
   approveCreditNote,
+  approveCustomerRefund,
   approveInvoice,
   createCreditNote,
   createCustomerRefund,
@@ -53,6 +54,7 @@ let p: PayablesFixture;
 let clerk = '';
 let releaser = '';
 let treasurer = '';
+let refundApprover = '';
 const outbox: DocumentOutbox = { publish: async () => {} };
 const codeOf: Record<string, string> = {};
 const OPPORTUNITY = '006000000000001AAA';
@@ -66,6 +68,7 @@ beforeAll(async () => {
   clerk = await f.addUser('ap_clerk');
   releaser = await f.addUser('approver');
   treasurer = await f.addUser('approver');
+  refundApprover = await f.addUser('approver');
   await f.inTenant(async (trx) => {
     const roles = await trx
       .selectFrom('app.account_system_role as r')
@@ -135,7 +138,8 @@ async function paidInvoiceWithCredit(party: string, date: string, paidOn: string
   return { inv, cn };
 }
 
-const requestRefund = (party: string, amount: string, refundDate: string) =>
+/** Requested by the clerk and not yet approved (T-0152: a batch pays only approved refunds). */
+const requestUnapproved = (party: string, amount: string, refundDate: string) =>
   f.inTenant((trx) =>
     createCustomerRefund(trx, {
       companyId: f.companyId,
@@ -147,6 +151,18 @@ const requestRefund = (party: string, amount: string, refundDate: string) =>
       createdBy: clerk,
     }),
   );
+
+const approveRefund = (refundId: string) =>
+  f.inTenant((trx) =>
+    approveCustomerRefund(trx, { companyId: f.companyId, refundId, approvedBy: refundApprover }),
+  );
+
+/** Requested by the clerk, then approved by another person (ADR-0074); returns the request. */
+const requestRefund = async (party: string, amount: string, refundDate: string) => {
+  const r = await requestUnapproved(party, amount, refundDate);
+  await approveRefund(r.refundId);
+  return r;
+};
 
 const releasedBatch = async (paymentDate: string) => {
   const id = randomUUID();
@@ -462,6 +478,42 @@ describe('SS-UC11-03: Refund via payment batch posts GP-006', () => {
     );
     const last = await requestRefund(delta, '100.00', '2026-12-13');
     expect(last.status).toBe('requested');
+  });
+
+  it('ADR-0074: a refund that is not approved stays out of the payment batch; once approved, the next batch pays it', async () => {
+    const supplier = await p.addSupplier('Unapproved Test Supplier Pty Ltd', 72);
+    await p.postBill(supplier, 'UA-1', '110.00', '2026-12-20');
+    const kappa = await p.addSupplier('Kappa Customer Pty Ltd', 72, 'customer');
+    await paidInvoiceWithCredit(kappa, '2026-12-14', '2026-12-15', '2026-12-16');
+    const refund = await requestUnapproved(kappa, '220.00', '2026-12-17');
+    const first = randomUUID();
+    await f.inTenant((trx) =>
+      createPaymentBatch(trx, {
+        companyId: f.companyId,
+        id: first,
+        paymentDate: '2026-12-20',
+        dueBy: '2026-12-20',
+        accountId: f.acct['1010'] ?? '',
+        createdBy: clerk,
+      }),
+    );
+    const b = await f.inTenant((trx) => getPaymentBatch(trx, f.companyId, first));
+    const ids = [...b.refunds, ...b.excludedRefunds].map((r) => r.refundId);
+    expect(ids).not.toContain(refund.refundId);
+    await approveRefund(refund.refundId);
+    const second = randomUUID();
+    await f.inTenant((trx) =>
+      createPaymentBatch(trx, {
+        companyId: f.companyId,
+        id: second,
+        paymentDate: '2026-12-20',
+        dueBy: '2026-12-20',
+        accountId: f.acct['1010'] ?? '',
+        createdBy: clerk,
+      }),
+    );
+    const b2 = await f.inTenant((trx) => getPaymentBatch(trx, f.companyId, second));
+    expect(b2.refunds.map((r) => r.refundId)).toContain(refund.refundId);
   });
 });
 

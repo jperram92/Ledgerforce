@@ -317,13 +317,17 @@ export async function createPaymentBatch(
               AND i.excluded_reason IS NULL AND pb.status <> 'cancelled')
        ORDER BY b.due_date, b.bill_no`.execute(trx)
   ).rows;
-  // Requested bank refunds (T-0055) payable by the due-by date that no live batch pays.
+  // Requested and approved (ADR-0074) bank refunds (T-0055) payable by the due-by date that no
+  // live batch pays.
   const refundsDue = (
     await sql<{ refund_id: string; party_id: string; amount: string }>`
       SELECT r.id::text AS refund_id, r.party_id::text AS party_id, r.amount::text AS amount
         FROM app.customer_refund r
        WHERE r.company_id = ${companyId} AND r.status = 'requested' AND r.method = 'bank_batch'
          AND r.refund_date <= ${c.dueBy}::date
+         AND EXISTS (
+           SELECT 1 FROM app.customer_refund_approval a
+            WHERE a.tenant_id = r.tenant_id AND a.refund_id = r.id)
          AND NOT EXISTS (
            SELECT 1 FROM app.payment_batch_refund i
              JOIN app.payment_batch pb ON pb.tenant_id = i.tenant_id AND pb.id = i.batch_id

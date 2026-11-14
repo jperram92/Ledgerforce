@@ -15,10 +15,12 @@ import { approveCreditNote, createCreditNote } from './credit-notes.ts';
 import { approveInvoice, createDraftInvoice, type DocumentOutbox } from './invoices.ts';
 import { recordReceipt } from './receipts.ts';
 import {
+  approveCustomerRefund,
   createCustomerRefund,
   customerCredit,
   getCustomerRefund,
   payCustomerRefund,
+  previewCustomerRefundJournal,
   type RefundError,
 } from './refunds.ts';
 import { seedBillableCustomers, seedBillingCompany } from './testing/batch-fixture.ts';
@@ -26,16 +28,20 @@ import { seedBillableCustomers, seedBillingCompany } from './testing/batch-fixtu
 let f: LedgerFixture;
 let profiles: SeededProfiles;
 let customers: string[] = [];
+let clerk = '';
+let approver = '';
 const outbox: DocumentOutbox = { publish: async () => {} };
 
 beforeAll(async () => {
   f = await createLedgerFixture('01900000-0000-7000-8000-000000005502');
   profiles = await seedBillingCompany(f);
   customers = await seedBillableCustomers(f, profiles, {
-    count: 3,
+    count: 6,
     prefix: 'Refund',
     billDate: '2026-11-01',
   });
+  clerk = await f.addUser('ar_clerk');
+  approver = await f.addUser('approver');
 }, 180_000);
 
 afterAll(async () => {
@@ -159,6 +165,13 @@ describe('Customer refund document (T-0055)', () => {
         method: 'bank_batch',
       }),
     );
+    await f.inTenant((trx) =>
+      approveCustomerRefund(trx, {
+        companyId: f.companyId,
+        refundId: r.refundId,
+        approvedBy: approver,
+      }),
+    );
     const pay = () =>
       f.inTenant((trx) =>
         payCustomerRefund(trx, {
@@ -254,5 +267,178 @@ describe('Customer refund document (T-0055)', () => {
     expect(code).toBe('23514');
     const still = await f.inTenant((trx) => getCustomerRefund(trx, f.companyId, r.refundId));
     expect(still.status).toBe('requested');
+  });
+});
+
+describe('Customer refund approval (T-0152, ADR-0074)', () => {
+  const request = (party: string, amount: string) =>
+    f.inTenant((trx) =>
+      createCustomerRefund(trx, {
+        companyId: f.companyId,
+        id: randomUUID(),
+        partyId: party,
+        refundDate: '2026-11-24',
+        amount,
+        method: 'bank_batch',
+        createdBy: clerk,
+      }),
+    );
+  const sqlCode = (q: Promise<unknown>) =>
+    q.then(
+      () => null,
+      (e: unknown) => (e as { code?: string }).code ?? 'error',
+    );
+
+  it('a refund starts pending, is approved once (a repeat replays), and records who approved it', async () => {
+    const party = customers[3] ?? '';
+    await creditOf220(party);
+    const r = await request(party, '220.00');
+    expect(r).toMatchObject({
+      status: 'requested',
+      approval: 'pending',
+      approvedBy: null,
+      createdBy: clerk,
+    });
+    const approve = () =>
+      f.inTenant((trx) =>
+        approveCustomerRefund(trx, {
+          companyId: f.companyId,
+          refundId: r.refundId,
+          approvedBy: approver,
+        }),
+      );
+    const a = await approve();
+    expect(a).toMatchObject({
+      refundId: r.refundId,
+      status: 'requested',
+      approval: 'approved',
+      approvedBy: approver,
+      replayed: false,
+    });
+    expect(a.approvedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
+    expect(await approve()).toMatchObject({ approval: 'approved', replayed: true });
+    const unknown = await refusal(
+      f.inTenant((trx) =>
+        approveCustomerRefund(trx, {
+          companyId: f.companyId,
+          refundId: randomUUID(),
+          approvedBy: approver,
+        }),
+      ),
+    );
+    expect(unknown?.code).toBe('REFUND_NOT_FOUND');
+    // The approval record is evidence: lf_app cannot change or remove it.
+    expect(
+      await sqlCode(
+        f.inTenant((trx) =>
+          sql`UPDATE app.customer_refund_approval SET approved_by = ${clerk}::uuid
+               WHERE refund_id = ${r.refundId}::uuid`.execute(trx),
+        ),
+      ),
+    ).toBe('42501');
+    expect(
+      await sqlCode(
+        f.inTenant((trx) =>
+          sql`DELETE FROM app.customer_refund_approval WHERE refund_id = ${r.refundId}::uuid`.execute(
+            trx,
+          ),
+        ),
+      ),
+    ).toBe('42501');
+  });
+
+  it('an unapproved refund cannot be paid: the module refuses NOT_APPROVED and the database refuses too', async () => {
+    const party = customers[4] ?? '';
+    await creditOf220(party);
+    const r = await request(party, '100.00');
+    const e = await refusal(
+      f.inTenant((trx) =>
+        payCustomerRefund(trx, {
+          companyId: f.companyId,
+          refundId: r.refundId,
+          paidOn: '2026-11-25',
+          bankAccountId: f.acct['1010'] ?? '',
+        }),
+      ),
+    );
+    expect(e?.code).toBe('NOT_APPROVED');
+    // Database guard (migration 0070): the batch-line insert of an unapproved refund is refused.
+    const batchLine = await sqlCode(
+      f.inTenant((trx) =>
+        sql`INSERT INTO app.payment_batch_refund (company_id, batch_id, line_no, refund_id, party_id, amount, bank_account_id)
+             VALUES (${f.companyId}::uuid, ${randomUUID()}::uuid, 1, ${r.refundId}::uuid, ${party}::uuid, 100, ${randomUUID()}::uuid)`.execute(
+          trx,
+        ),
+      ),
+    );
+    expect(batchLine).toBe('23514');
+    const still = await f.inTenant((trx) => getCustomerRefund(trx, f.companyId, r.refundId));
+    expect(still).toMatchObject({ status: 'requested', approval: 'pending' });
+  });
+
+  it('only a requested refund can be approved (the database refuses an approval of a paid one)', async () => {
+    const party = customers[5] ?? '';
+    await creditOf220(party);
+    const r = await request(party, '20.00');
+    await f.inTenant((trx) =>
+      approveCustomerRefund(trx, {
+        companyId: f.companyId,
+        refundId: r.refundId,
+        approvedBy: approver,
+      }),
+    );
+    await f.inTenant((trx) =>
+      payCustomerRefund(trx, {
+        companyId: f.companyId,
+        refundId: r.refundId,
+        paidOn: '2026-11-25',
+        bankAccountId: f.acct['1010'] ?? '',
+      }),
+    );
+    const second = await request(party, '20.00');
+    // A second approval of the paid refund, inserted directly: the 0070 trigger refuses it.
+    expect(
+      await sqlCode(
+        f.inTenant((trx) =>
+          sql`INSERT INTO app.customer_refund_approval (company_id, refund_id, approved_by)
+               VALUES (${f.companyId}::uuid, ${r.refundId}::uuid, ${approver}::uuid)`.execute(trx),
+        ),
+      ),
+    ).toBe('23514');
+    // GP-006 preview for the pending refund (writes nothing): Dr AR control / Cr the bank account.
+    const before = await f.inTenant(
+      async (trx) =>
+        (await sql<{ n: string }>`SELECT count(*)::text AS n FROM app.journal_entry`.execute(trx))
+          .rows[0]?.n,
+    );
+    const p = await f.inTenant((trx) =>
+      previewCustomerRefundJournal(trx, {
+        companyId: f.companyId,
+        refundId: second.refundId,
+        accountId: f.acct['1010'] ?? '',
+      }),
+    );
+    expect(p).toMatchObject({
+      entryDate: '2026-11-24',
+      total: '20.0000',
+      bankAccountSource: 'chosen',
+    });
+    expect(p.lines.map((l) => [l.accountCode, l.debit, l.credit, l.partyId])).toEqual([
+      ['1200', '20.0000', '0.0000', party],
+      ['1010', '0.0000', '20.0000', null],
+    ]);
+    const after = await f.inTenant(
+      async (trx) =>
+        (await sql<{ n: string }>`SELECT count(*)::text AS n FROM app.journal_entry`.execute(trx))
+          .rows[0]?.n,
+    );
+    expect(after).toBe(before);
+    // No bank account chosen and none (or several) configured: refused, not guessed.
+    const none = await refusal(
+      f.inTenant((trx) =>
+        previewCustomerRefundJournal(trx, { companyId: f.companyId, refundId: second.refundId }),
+      ),
+    );
+    expect(none?.code).toBe('BANK_ACCOUNT_REQUIRED');
   });
 });

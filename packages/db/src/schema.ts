@@ -1013,6 +1013,15 @@ export interface CustomerRefundTable {
   updated_at: Timestamp;
 }
 
+/** Migration 0070 (T-0152, ADR-0074): the approval of a requested customer refund. Append-only. */
+export interface CustomerRefundApprovalTable {
+  tenant_id: TenantId;
+  company_id: string;
+  refund_id: string;
+  approved_by: string;
+  approved_at: Timestamp;
+}
+
 /** Migration 0055 (T-0055): a customer refund paid (or excluded) in a payment batch. */
 export interface PaymentBatchRefundTable {
   tenant_id: TenantId;
@@ -1334,6 +1343,7 @@ export interface Database {
   'app.payment_batch_release': PaymentBatchReleaseTable;
   'app.payment_batch_confirmation': PaymentBatchConfirmationTable;
   'app.customer_refund': CustomerRefundTable;
+  'app.customer_refund_approval': CustomerRefundApprovalTable;
   'app.opening_balance': OpeningBalanceTable;
   'app.opening_balance_item': OpeningBalanceItemTable;
   'app.payment_batch_refund': PaymentBatchRefundTable;

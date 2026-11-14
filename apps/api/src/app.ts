@@ -2,6 +2,7 @@ import { ApBillCodingController, ApBillsController } from './ap/bills.controller
 import { ApInboxController } from './ap/inbox.controller.ts';
 import { ApPaymentBatchesController } from './ap/payment-batches.controller.ts';
 import { ArReceiptsController } from './ar/receipts.controller.ts';
+import { ArRefundsController } from './ar/refunds.controller.ts';
 import { OpeningBalancesController } from './setup/opening-balances.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArInvoicesController } from './ar/invoices.controller.ts';
@@ -129,6 +130,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ArInvoicesController,
   ArReminderPauseController,
   ArReceiptsController,
+  ArRefundsController,
   ApBillsController,
   ApBillCodingController,
   ApInboxController,
@@ -180,6 +182,7 @@ class AppModule {
         ArInvoicesController,
         ArReminderPauseController,
         ArReceiptsController,
+        ArRefundsController,
         ApBillsController,
         ApBillCodingController,
         ApInboxController,
