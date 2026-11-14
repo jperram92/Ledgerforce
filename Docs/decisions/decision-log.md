@@ -3190,3 +3190,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: `infra/compose/smoke.sh` builds the images itself and then runs `compose up --no-build`. It now tags `${project}-worker` as `${project}-scheduler`. A new contract test requires every compose service with a `build` entry to have an image the smoke script makes.
 - Why: security CI's DAST job failed on dbd19a5 with "No such image: lf-dast-scheduler:latest". The scheduler service added in T-0147 had a build entry that the smoke script did not build, and T-0147 could not run compose locally (no docker). The workflow file (a human-owned gate) is unchanged.
 - ADR: none · Status: accepted
+
+### DL-0560 — Parallel round 6: T-0132, T-0152 and T-0157 agents (built on T-0169's permissions)
+- Date: 2026-11-14 · By: claude · Task: sprint · Category: process
+- Decision: Three sub-agents work in isolated worktrees, and the lead merges and verifies their work. Only T-0152 may add a migration, numbered 0069, for example for refund approval state. The lead's own decision-log entries come from DL-0561 to DL-0569.
+
+  | Agent | Card | DL | ADR | RQ | New cards |
+  |---|---|---|---|---|---|
+  | Single-invoice approval | T-0132 | 0570–0579 | 0073 | 0154 | T-0170–T-0171 |
+  | Customer refunds | T-0152 (+ migration 0069) | 0580–0589 | 0074 | 0155 | T-0172–T-0173 |
+  | Setup wizard routes | T-0157 | 0590–0599 | 0075 | 0156 | T-0174–T-0175 |
+- Why: DL-0477 and ADR-0072 settled the permissions. The cards touch disjoint areas: the AR invoice route, AR refunds, and setup.
+- ADR: none · Status: accepted
