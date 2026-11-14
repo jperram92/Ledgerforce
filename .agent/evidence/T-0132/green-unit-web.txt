@@ -1,0 +1,3 @@
+ Test Files  88 passed (88)
+      Tests  990 passed (990)
+   Duration  21.22s (transform 4.06s, setup 3.10s, import 12.92s, tests 16.84s, environment 14.67s)

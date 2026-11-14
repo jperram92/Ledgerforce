@@ -3212,3 +3212,49 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - For T-0132: the engine takes the invoice's creator from `app.sales_invoice.created_by` (the subject reports its creator), because invoices are created on paths without `@SoD`. ADR-0073 records this extension of the ADR-0026 engine contract.
 - Why: the T-0132 agent found that SoD step and rule ids are CHECK-enforced in SQL (0021), so TypeScript-only additions fail on insert. A single migration avoids two agents rewriting the same functions.
 - ADR: ADR-0072; ADR-0073 to follow in T-0132 · Status: accepted
+
+### DL-0570 — Approving one invoice over HTTP: route contract and the screen action (T-0132)
+- Date: 2026-11-14 · By: claude under DL-0477 · Task: T-0132 · Category: security
+- Decision:
+  - `POST /ar/invoices/:id/approve?company_id=` needs `ar.invoice.approve` and declares `@SoD('invoice.approve')`.
+  - It requires an `Idempotency-Key`, writes an audit row as `sales_invoice`, and posts through `approveInvoice` (GP-001, the same command the T-0131 preview builds).
+  - Without both outboxes it answers 503 `outbox_unavailable`.
+  - `GET /ar/invoices/:id` adds `approval {allowed, rule, small_team_exception_required}` for drafts, so the screen explains the rule before the user clicks.
+  - The invoice screen shows "Approve and post" only after the journal preview and only to holders of the permission. In small-team mode it asks for a reason, which it sends as `sod_exception`.
+  - New scenarios: SS-UC01-12 (api-db) and SS-UC01-13 (e2e).
+- Why: card T-0132, ADR-0072 and ADR-0073. P4 says to show the journal before posting. P6 asks for plain-word refusals.
+- Alternatives:
+  - Approve from the invoice list. Rejected: the journal would not be shown first.
+  - Hide the action from the creator. Rejected: the screen should say why they cannot approve, not just leave the action out.
+- ADR: ADR-0073 · Status: accepted
+
+### DL-0571 — The SoD engine accepts a creator reported by the subject (ADR-0073 accepted)
+- Date: 2026-11-14 · By: claude under DL-0477/DL-0561 · Task: T-0132 · Category: security
+- Decision:
+  - `SodSubject.createdBy` is placed before the recorded history as the step `<subject>.create` by that user, in both `checkSod` and `sodOutlook`.
+  - A subject type without a `create` step throws, so it fails closed.
+  - The invoice route reads `created_by` from `app.sales_invoice` under RLS.
+  - ADR-0073 is accepted under the owner's delegation.
+- Why: invoices are created on paths without `@SoD`, so `app.sod_action` has no `invoice.create` row. The invoice row is the authoritative record, and it also covers drafts that existed before this change.
+- Alternatives:
+  - Record `invoice.create` on every creation path. Rejected: four paths to change, and existing drafts would fail open.
+  - An ad-hoc check in the controller. Rejected: forbidden by apps/api/AGENTS.md, and it would have no exception report.
+- ADR: ADR-0073 · Status: accepted
+
+### DL-0572 — Invoice approval replay: the posted invoice is the replay record
+- Date: 2026-11-14 · By: claude · Task: T-0132 · Category: architecture
+- Decision: if the invoice is already posted and was approved by the caller, the route answers 200 with the posted result and `replayed: true`, and posts nothing more. If it was approved by anyone else, the route answers 409 `already_posted`. A void invoice gets 409 `not_draft`. No key table is added, so no migration is needed.
+- Why:
+  - This is the same pattern as bills and the AP inbox (DL-0420).
+  - The journal entry already has the idempotency key `ar-invoice:<id>`.
+  - The SoD subject lock serialises concurrent approvals.
+  - The screen keeps one key per view, so a retry is the same request.
+- Alternatives: store the header key in a new table. Rejected: DL-0560 forbids migrations here, and the invoice id is the natural key.
+- ADR: ADR-0073 · Status: accepted
+
+### DL-0573 — T-0131's invoice list test names both drafts
+- Date: 2026-11-14 · By: claude · Task: T-0132 · Category: process
+- Decision: `apps/api/src/ar/invoices.db.test.ts` now seeds a second draft, created by a named Finance Admin, for the approval tests. The list test now asserts both drafts exactly (sorted by customer), rather than one. The billing company is seeded once per fixture.
+- Why: the shared fixture gained a row. The assertion stays exact, so it is not weakened.
+- Alternatives: a separate fixture database for the approval tests. Rejected: about 10 s more per run, for no extra coverage.
+- ADR: none · Status: accepted
