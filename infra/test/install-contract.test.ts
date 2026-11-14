@@ -137,6 +137,21 @@ describe('SS-PLAT-86 compose stack', () => {
     );
   });
 
+  it('every service compose would build has an image the smoke script makes (up --no-build)', () => {
+    // CI's DAST and install smoke run infra/compose/smoke.sh, which builds images itself and then
+    // starts compose with --no-build. A service whose <project>-<service> image smoke.sh never makes
+    // fails with "No such image" (the T-0147 scheduler, found by DAST on dbd19a5).
+    const smoke = read('infra/compose/smoke.sh');
+    const loop = /for target in ([a-z ]+); do/.exec(smoke)?.[1]?.split(' ') ?? [];
+    const tagged = [
+      ...smoke.matchAll(/docker tag "\$\{project\}-[a-z]+" "\$\{project\}-([a-z]+)"/g),
+    ].map((m) => m[1]);
+    const made = new Set([...loop, 'keycloak', ...tagged]);
+    for (const [name, s] of Object.entries(compose.services)) {
+      if (s.build) expect(made.has(name), `smoke.sh makes the ${name} image`).toBe(true);
+    }
+  });
+
   it('T-0147 the scheduler is the worker image running the owner-only scheduler CLI (ADR-0062 option 1)', () => {
     expect(svc('scheduler').build).toEqual({
       context: '../..',

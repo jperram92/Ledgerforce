@@ -58,6 +58,8 @@ for target in setup api worker web; do
   docker build "${ca[@]}" -f "$root/infra/docker/Dockerfile" --target "$target" -t "${project}-${target}" "$root"
 done
 docker build -f "$root/infra/docker/keycloak.Dockerfile" -t "${project}-keycloak" "$root"
+# The scheduler (T-0147, ADR-0062) runs the worker image with another command.
+docker tag "${project}-worker" "${project}-scheduler"
 echo "--- starting the stack"
 "${compose[@]}" up -d --no-build
 

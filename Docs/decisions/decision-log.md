@@ -3184,3 +3184,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - ADR-0072 is accepted under the owner's delegation.
 - Why: DL-0477 items 2–4: least privilege and maker-checker.
 - ADR: ADR-0072 · Status: accepted
+
+### DL-0479 — The compose smoke script tags the scheduler image (fix for DAST failure caused by T-0147)
+- Date: 2026-11-14 · By: claude · Task: T-0147 · Category: process (defect fix)
+- Decision: `infra/compose/smoke.sh` builds the images itself and then runs `compose up --no-build`. It now tags `${project}-worker` as `${project}-scheduler`. A new contract test requires every compose service with a `build` entry to have an image the smoke script makes.
+- Why: security CI's DAST job failed on dbd19a5 with "No such image: lf-dast-scheduler:latest". The scheduler service added in T-0147 had a build entry that the smoke script did not build, and T-0147 could not run compose locally (no docker). The workflow file (a human-owned gate) is unchanged.
+- ADR: none · Status: accepted
