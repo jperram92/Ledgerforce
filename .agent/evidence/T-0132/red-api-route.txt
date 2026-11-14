@@ -1,0 +1,278 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a81497f99a24b848d
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:36749
+ ❯ |api-db| apps/api/src/ar/invoices.db.test.ts (13 tests | 10 failed) 2119ms
+     × lists the company invoices for ar.read, newest first, money as decimal strings 51ms
+     × SS-UC01-12 a user without ar.invoice.approve is refused (403) and nothing posts 19ms
+     × SS-UC01-12 the draft's creator is refused by SOD_INVOICE_SELF_APPROVAL, audited, and the screen is told beforehand 15ms
+     × SS-UC01-12 without an Idempotency-Key the approval is refused (400) and nothing posts 6ms
+     × SS-UC01-12 another approver posts it: the journal equals the T-0131 preview and GP-001; audited 29ms
+     × SS-UC01-12 a replay by the approver answers 200 with the posted result and posts nothing more; it is audited 13ms
+     × SS-UC01-12 a different user approving the posted invoice gets 409 already_posted 3ms
+     × SS-UC01-12 another tenant's invoice is not found (404) and nothing posts 6ms
+     × SS-UC01-12 small-team mode: the only user may approve their own draft with a recorded exception 44ms
+     × SS-UC01-12 without the outboxes the approval is refused (503) and nothing posts 4ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > T-0131: invoice read routes > lists the company invoices for ar.read, newest first, money as decimal strings
+AssertionError: expected [ { …(8) }, { …(8) } ] to deeply equal [ ObjectContaining{…} ]
+
+- Expected
++ Received
+
+  [
+    {
+      "due_date": "2026-11-19",
++     "gross_total": null,
++     "id": "01a1d7a6-4318-7e8c-ad57-99d2fef5ddbc",
++     "invoice_no": null,
++     "issue_date": "2026-11-05",
++     "party_id": "01a1d7a6-430c-7abc-ad5e-3f4daf8ad0c4",
++     "party_name": "Maker 01 Pty Ltd",
++     "status": "draft",
++   },
++   {
++     "due_date": "2026-11-19",
++     "gross_total": null,
+      "id": "01a1d7a6-4308-7e44-a00b-3955ff661cc9",
+      "invoice_no": null,
+      "issue_date": "2026-11-05",
++     "party_id": "01a1d7a6-42f3-764e-bf23-2fc7f4e0bedb",
+      "party_name": "Acme 01 Pty Ltd",
+      "status": "draft",
+    },
+  ]
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:183:27
+    181|     expect(r.status).toBe(200);
+    182|     const body = (await r.json()) as { invoices: Record<string, unknow…
+    183|     expect(body.invoices).toEqual([
+       |                           ^
+    184|       expect.objectContaining({
+    185|         id: draftId,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) > SS-UC01-12 a user without ar.invoice.approve is refused (403) and nothing posts
+AssertionError: arClerk: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:290:29
+    288|     for (const who of ['arClerk', 'sales']) {
+    289|       const r = await approve(ownDraftId, who);
+    290|       expect(r.status, who).toBe(403);
+       |                             ^
+    291|       expect(await r.json()).toEqual({ error: 'forbidden', permission:…
+    292|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) > SS-UC01-12 the draft's creator is refused by SOD_INVOICE_SELF_APPROVAL, audited, and the screen is told beforehand
+AssertionError: expected { …(15) } to match object { approval: { allowed: false, …(2) } }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "approval": {
+-     "allowed": false,
+-     "rule": "SOD_INVOICE_SELF_APPROVAL",
+-     "small_team_exception_required": false,
++   "due_date": "2026-11-19",
++   "entry_id": null,
++   "gross_total": null,
++   "id": "01a1d7a6-4318-7e8c-ad57-99d2fef5ddbc",
++   "invoice_no": null,
++   "issue_date": "2026-11-05",
++   "kind": "standard",
++   "lines": [
++     {
++       "description": "Professional services",
++       "gross": null,
++       "line_no": 1,
++       "net": null,
++       "quantity": "1.0000",
++       "tax": null,
++       "tax_code": "GST",
++       "unit_price": "1000.0000",
++     },
++     {
++       "description": "Subscription",
++       "gross": null,
++       "line_no": 2,
++       "net": null,
++       "quantity": "1.0000",
++       "tax": null,
++       "tax_code": "GST",
++       "unit_price": "250.0000",
+      },
++   ],
++   "net_total": null,
++   "party_id": "01a1d7a6-430c-7abc-ad5e-3f4daf8ad0c4",
++   "party_name": "Maker 01 Pty Ltd",
++   "pricing": "exclusive",
++   "status": "draft",
++   "tax_total": null,
++   "warnings": [],
+  }
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:298:33
+    296|   it("SS-UC01-12 the draft's creator is refused by SOD_INVOICE_SELF_AP…
+    297|     const before = await call(`/ar/invoices/${ownDraftId}?company_id=$…
+    298|     expect(await before.json()).toMatchObject({
+       |                                 ^
+    299|       approval: {
+    300|         allowed: false,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) > SS-UC01-12 without an Idempotency-Key the approval is refused (400) and nothing posts
+AssertionError: expected 404 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:324:22
+    322|   it('SS-UC01-12 without an Idempotency-Key the approval is refused (4…
+    323|     const r = await approve(ownDraftId, 'approver', { key: null });
+    324|     expect(r.status).toBe(400);
+       |                      ^
+    325|     expect(await r.json()).toMatchObject({ error: 'idempotency_key_req…
+    326|     expect(await statusOf(f, ownDraftId)).toBe('draft');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) > SS-UC01-12 another approver posts it: the journal equals the T-0131 preview and GP-001; audited
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:342:22
+    340|     };
+    341|     const r = await approve(ownDraftId, 'approver', { key: 'approve-ow…
+    342|     expect(r.status).toBe(200);
+       |                      ^
+    343|     const body = (await r.json()) as Approved;
+    344|     expect(body).toMatchObject({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) > SS-UC01-12 a replay by the approver answers 200 with the posted result and posts nothing more; it is audited
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:401:22
+    399|     const audits = (await auditFor(ownDraftId)).length;
+    400|     const r = await approve(ownDraftId, 'approver', { key: 'approve-ow…
+    401|     expect(r.status).toBe(200);
+       |                      ^
+    402|     expect(await r.json()).toMatchObject({
+    403|       id: ownDraftId,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) > SS-UC01-12 a different user approving the posted invoice gets 409 already_posted
+AssertionError: expected 404 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:415:22
+    413|   it('SS-UC01-12 a different user approving the posted invoice gets 40…
+    414|     const r = await approve(ownDraftId, 'owner');
+    415|     expect(r.status).toBe(409);
+       |                      ^
+    416|     expect(await r.json()).toMatchObject({ error: 'already_posted' });
+    417|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) > SS-UC01-12 another tenant's invoice is not found (404) and nothing posts
+AssertionError: expected { …(3) } to match object { error: 'not_found' }
+(2 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "error": "not_found",
++   "error": "Not Found",
+  }
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:422:28
+    420|     const r = await approve(draftId, 'outsider');
+    421|     expect(r.status).toBe(404);
+    422|     expect(await r.json()).toMatchObject({ error: 'not_found' });
+       |                            ^
+    423|     expect(await statusOf(f, draftId)).toBe('draft');
+    424|     expect((await approve(foreignId, 'approver')).status).toBe(404);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) > SS-UC01-12 small-team mode: the only user may approve their own draft with a recorded exception
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:438:28
+    436|     expect(on.status).toBe(201);
+    437|     const refused = await approve(soloDraftId, 'solo', { on: soloApi, …
+    438|     expect(refused.status).toBe(403);
+       |                            ^
+    439|     expect(await refused.json()).toEqual({
+    440|       error: 'sod_violation',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯
+
+ FAIL  |api-db| apps/api/src/ar/invoices.db.test.ts > SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) > SS-UC01-12 without the outboxes the approval is refused (503) and nothing posts
+AssertionError: expected 404 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 404
+
+ ❯ apps/api/src/ar/invoices.db.test.ts:460:22
+    458|   it('SS-UC01-12 without the outboxes the approval is refused (503) an…
+    459|     const r = await approve(draftId, 'bareApprover', { on: bare });
+    460|     expect(r.status).toBe(503);
+       |                      ^
+    461|     expect(await r.json()).toMatchObject({ error: 'outbox_unavailable'…
+    462|     expect(await statusOf(f, draftId)).toBe('draft');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  10 failed | 3 passed (13)
+   Start at  01:22:34
+   Duration  6.03s (transform 1.66s, setup 0ms, import 2.95s, tests 2.12s, environment 0ms)
+

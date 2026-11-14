@@ -1,5 +1,6 @@
 /**
- * Sales API client (T-0083): companies and the AR invoice read routes (T-0131); batch billing
+ * Sales API client (T-0083): companies and the AR invoice read routes (T-0131) and approval
+ * (T-0132); batch billing
  * preview, read and approve (T-0043/T-0044, T-0084). Same origin, session cookie; failures are
  * AdminApiError (status + error code). Money stays a decimal string.
  */
@@ -43,7 +44,25 @@ export interface Invoice extends InvoiceRow {
   net_total: string | null;
   tax_total: string | null;
   warnings: { line?: number; message?: string }[];
+  /** For a draft: what the separation-of-duties rule says about the caller approving it. */
+  approval: {
+    allowed: boolean;
+    rule: string | null;
+    small_team_exception_required: boolean;
+  } | null;
   lines: InvoiceLine[];
+}
+
+/** POST /ar/invoices/:id/approve (T-0132): the posted invoice; `replayed` on a repeat. */
+export interface ApprovedInvoice {
+  id: string;
+  status: InvoiceStatus;
+  invoice_no: string | null;
+  entry_id: string | null;
+  net_total: string | null;
+  tax_total: string | null;
+  gross_total: string | null;
+  replayed: boolean;
 }
 
 export interface InvoiceJournal {
@@ -179,6 +198,12 @@ export interface SalesClient {
   invoices(companyId: string, status?: InvoiceStatus): Promise<{ invoices: InvoiceRow[] }>;
   invoice(companyId: string, id: string): Promise<Invoice>;
   journal(companyId: string, id: string): Promise<InvoiceJournal>;
+  approveInvoice(
+    companyId: string,
+    id: string,
+    idempotencyKey: string,
+    sodException?: { reason: string },
+  ): Promise<ApprovedInvoice>;
   previewBatch(body: BatchRequest, idempotencyKey: string): Promise<Batch>;
   batch(companyId: string, id: string): Promise<Batch>;
   approveBatch(companyId: string, id: string): Promise<Batch>;
@@ -224,6 +249,13 @@ export function createSalesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Sales
       get(`/ar/invoices?company_id=${seg(companyId)}${status ? `&status=${seg(status)}` : ''}`),
     invoice: (companyId, id) => get(`/ar/invoices/${seg(id)}?company_id=${seg(companyId)}`),
     journal: (companyId, id) => get(`/ar/invoices/${seg(id)}/journal?company_id=${seg(companyId)}`),
+    approveInvoice: (companyId, id, key, sodException) =>
+      send(
+        'POST',
+        `/ar/invoices/${seg(id)}/approve?${co(companyId)}`,
+        sodException ? { sod_exception: sodException } : {},
+        { 'idempotency-key': key },
+      ),
     previewBatch: (body, key) =>
       send('POST', '/ar/batches/preview', body, { 'idempotency-key': key }),
     batch: (companyId, id) => get(`/ar/batches/${seg(id)}?company_id=${seg(companyId)}`),

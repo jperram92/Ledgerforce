@@ -1,0 +1,12 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a81497f99a24b848d
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37073
+[Nest] 30574  - 11/14/2026, 1:24:06 AM   ERROR [ExceptionsHandler] Error: SoD: subject type bill has no create step for a reported creator
+
+ Test Files  7 passed (7)
+      Tests  59 passed (59)
+   Start at  01:23:57
+   Duration  23.38s (transform 1.65s, setup 0ms, import 10.69s, tests 10.55s, environment 1ms)
+
+exit 0
