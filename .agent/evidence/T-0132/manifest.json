@@ -163,6 +163,78 @@
       "provider": "claude",
       "timestamp": "2026-11-14T02:48:01.764Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-030210-SS-UC01-13-invoice-ready-to-approve-1440.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 1440 [T-0132]",
+      "commit": "f50ab182c0c7",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T03:02:10.419Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-030211-SS-UC01-13-invoice-posted-1440.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 1440 [T-0132]",
+      "commit": "f50ab182c0c7",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T03:02:11.141Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-030213-SS-UC01-13-invoice-ready-to-approve-390.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 390 [T-0132]",
+      "commit": "f50ab182c0c7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T03:02:13.158Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-030213-SS-UC01-13-invoice-posted-390.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 390 [T-0132]",
+      "commit": "f50ab182c0c7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T03:02:13.892Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-030216-SS-UC01-13-invoice-no-approve-permission.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: without ar.invoice.approve there is no approve action, and the screen says who approves [T-0132]",
+      "commit": "f50ab182c0c7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T03:02:16.053Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-030218-SS-UC01-13-invoice-creator-cannot-approve.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: the draft's creator is told beforehand that someone else must approve it [T-0132]",
+      "commit": "f50ab182c0c7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T03:02:18.063Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-030220-SS-UC01-13-invoice-approve-refused.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: refusals from the API are explained in plain words [T-0132]",
+      "commit": "f50ab182c0c7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T03:02:20.320Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-030222-SS-UC01-13-invoice-small-team-reason.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: in small-team mode the only user approves their own draft with a recorded reason [T-0132]",
+      "commit": "f50ab182c0c7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T03:02:22.252Z",
+      "result": "passed"
     }
   ]
 }
