@@ -3318,3 +3318,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the shared fixture gained a row. The assertion stays exact, so it is not weakened.
 - Alternatives: a separate fixture database for the approval tests. Rejected: about 10 s more per run, for no extra coverage.
 - ADR: none · Status: accepted
+
+### DL-0562 — Approving a Stripe refund needs step-up (T-0172), decided under the owner's delegation
+- Date: 2026-11-14 · By: claude under DL-0477 · Task: T-0172 · Category: security
+- Decision: When T-0172 sends Stripe refunds from the approve step, `POST /ar/refunds/:id/approve` for a Stripe refund requires step-up (300 s, `@RequireStepUp`), like payment-batch release. SoD stays as is (`SOD_REFUND_SELF_APPROVAL`). T-0172 records this in a security ADR accepted under DL-0477.
+- Why: approving a Stripe refund moves money out at once, with no later release step, so it gets the same fresh-authentication control as other payment-out actions (design §6.2; DL-0477 item 5 applies the same reasoning to payment files).
+- ADR: in T-0172 · Status: accepted (owner delegation)
