@@ -160,6 +160,45 @@ export interface CreditNoteRequest {
   lines: { invoice_line_no: number; amount: string }[];
 }
 
+/** Customer refunds (T-0152, ADR-0074): PUT /ar/refunds/:id, GET …, POST …/approve. */
+export interface CustomerRefund {
+  id: string;
+  replayed: boolean;
+  refund_no: string;
+  party_id: string;
+  refund_date: string;
+  amount: string;
+  method: 'bank_batch' | 'stripe';
+  status: 'requested' | 'paid' | 'cancelled';
+  approval: 'pending' | 'approved';
+  created_by: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  entry_id: string | null;
+  paid_on: string | null;
+}
+
+export interface RefundRequest {
+  company_id: string;
+  party_id: string;
+  refund_date: string;
+  amount: string;
+  method: 'bank_batch';
+  reason?: string;
+}
+
+/** GET /ar/parties/:id/credit: the customer's AR balance, refunds requested, what is refundable. */
+export interface PartyCredit {
+  party_id: string;
+  balance: string;
+  requested: string;
+  available: string;
+}
+
+export interface RefundJournal extends InvoiceJournal {
+  bank_account_source: 'chosen' | 'batch' | 'only_bank_account';
+}
+
 export interface SalesClient {
   receipts(companyId: string): Promise<{ receipts: ReceiptRow[] }>;
   allocate(
@@ -175,6 +214,11 @@ export interface SalesClient {
   creditNote(companyId: string, id: string): Promise<CreditNote>;
   creditNoteJournal(companyId: string, id: string): Promise<InvoiceJournal>;
   approveCreditNote(companyId: string, id: string): Promise<CreditNote>;
+  partyCredit(companyId: string, partyId: string): Promise<PartyCredit>;
+  createRefund(id: string, body: RefundRequest): Promise<CustomerRefund>;
+  refund(companyId: string, id: string): Promise<CustomerRefund>;
+  refundJournal(companyId: string, id: string): Promise<RefundJournal>;
+  approveRefund(companyId: string, id: string): Promise<CustomerRefund>;
   companies(): Promise<Company[]>;
   invoices(companyId: string, status?: InvoiceStatus): Promise<{ invoices: InvoiceRow[] }>;
   invoice(companyId: string, id: string): Promise<Invoice>;
@@ -219,6 +263,12 @@ export function createSalesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Sales
       get(`/ar/credit-notes/${seg(id)}/journal?${co(companyId)}`),
     approveCreditNote: (companyId, id) =>
       send('POST', `/ar/credit-notes/${seg(id)}/approve?${co(companyId)}`, {}),
+    partyCredit: (companyId, partyId) => get(`/ar/parties/${seg(partyId)}/credit?${co(companyId)}`),
+    createRefund: (id, body) => send('PUT', `/ar/refunds/${seg(id)}`, body),
+    refund: (companyId, id) => get(`/ar/refunds/${seg(id)}?${co(companyId)}`),
+    refundJournal: (companyId, id) => get(`/ar/refunds/${seg(id)}/journal?${co(companyId)}`),
+    approveRefund: (companyId, id) =>
+      send('POST', `/ar/refunds/${seg(id)}/approve?${co(companyId)}`, {}),
     companies: () => get('/companies'),
     invoices: (companyId, status) =>
       get(`/ar/invoices?company_id=${seg(companyId)}${status ? `&status=${seg(status)}` : ''}`),

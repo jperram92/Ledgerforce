@@ -306,18 +306,26 @@ const uuidParam = (v: unknown): string | undefined =>
 const creditNotesRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: 'sales/credit-notes',
-  validateSearch: (search: Record<string, unknown>): { invoice?: string; credit_note?: string } => {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { invoice?: string; credit_note?: string; refund?: string } => {
     const invoice = uuidParam(search['invoice']);
     const note = uuidParam(search['credit_note']);
-    return { ...(invoice ? { invoice } : {}), ...(note ? { credit_note: note } : {}) };
+    const refund = uuidParam(search['refund']);
+    return {
+      ...(invoice ? { invoice } : {}),
+      ...(note ? { credit_note: note } : {}),
+      ...(refund ? { refund } : {}),
+    };
   },
   component: function CreditNotesRoute() {
-    const { invoice, credit_note } = creditNotesRoute.useSearch();
+    const { invoice, credit_note, refund } = creditNotesRoute.useSearch();
     return (
       <CreditNotePage
-        key={`${invoice ?? ''}:${credit_note ?? ''}`}
+        key={`${invoice ?? ''}:${credit_note ?? ''}:${refund ?? ''}`}
         {...(invoice ? { invoiceId: invoice } : {})}
         {...(credit_note ? { creditNoteId: credit_note } : {})}
+        {...(refund ? { refundId: refund } : {})}
       />
     );
   },

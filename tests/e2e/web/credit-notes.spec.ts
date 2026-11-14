@@ -2,7 +2,8 @@
  * Credit-note screen (T-0085, UC-11, SS-UC11-08 credit-note half, DL-0492): from paid INV-000123
  * the AR Clerk issues a partial credit note, sees the draft's totals and the posting engine's
  * preview of the GP-005 journal; an Approver posts it. The refund half of SS-UC11-08 is T-0152
- * (blocked: no refund permission), so the screen says refunds are not available here yet.
+ * (tests/e2e/web/refunds.spec.ts); here the Refund region shows the customer's credit (none before
+ * the credit note posts) from GET /ar/parties/:id/credit.
  * The API is faked per test with `page.route` using the response shapes of
  * GET /ar/invoices[/:id], GET /ar/invoices/:id/payment-status, PUT /ar/credit-notes/:id,
  * GET /ar/credit-notes/:id[/journal] and POST /ar/credit-notes/:id/approve (T-0045, T-0131, T-0151).
@@ -231,6 +232,13 @@ async function fakeApi(page: Page, who: keyof typeof ME): Promise<Fake> {
             ? { status: 'posted', credit_note_no: 'CN-000007', entry_id: id(0x8560) }
             : {}),
         });
+      if (path === `/ar/parties/${ACME}/credit`)
+        return send(route, 200, {
+          party_id: ACME,
+          balance: f.approvals > 0 ? '-220.0000' : '0.0000',
+          requested: '0.0000',
+          available: f.approvals > 0 ? '220.0000' : '0.0000',
+        });
       if (path === `/ar/credit-notes/${draftId}/journal`) {
         f.previewCalls += 1;
         return send(route, 200, PREVIEW);
@@ -334,7 +342,7 @@ for (const width of [1440, 390]) {
     await expect(draft).toContainText('An Approver posts it');
     await expect(draft.getByRole('button', { name: 'Approve and post' })).toHaveCount(0);
     const refund = page.getByRole('region', { name: 'Refund' });
-    await expect(refund).toContainText('not available here yet');
+    await expect(refund).toContainText('Acme Pty Ltd has no credit to refund');
     expect(f.previewCalls).toBe(1);
     expect(f.approvals).toBe(0);
     await assertPage(page, width);

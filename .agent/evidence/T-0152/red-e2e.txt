@@ -1,0 +1,144 @@
+
+Running 5 tests using 2 workers
+
+[1/5] [chromium] › tests/e2e/web/refunds.spec.ts:292:3 › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 1440 [T-0152]
+[2/5] [chromium] › tests/e2e/web/refunds.spec.ts:381:1 › SS-UC11-08 refusal: more than the customer can have back is refused in place [T-0152]
+  1) [chromium] › tests/e2e/web/refunds.spec.ts:292:3 › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 1440 [T-0152] 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 4
+    + Received  + 1
+
+    - Array [
+    -   "220.00",
+    -   "0.00",
+    - ]
+    + Array []
+
+      304 |         .locator('dl [data-amount]')
+      305 |         .evaluateAll((els) => els.map((e) => e.getAttribute('data-amount'))),
+    > 306 |     ).toEqual(['220.00', '0.00']);
+          |       ^
+      307 |     const form = refund.getByRole('form', { name: 'Request a refund' });
+      308 |     await form.getByLabel('Amount to refund').fill('220.00');
+      309 |     await form.getByLabel('Pay from').fill('2026-11-24');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-af9f9e8721ee1553d/tests/e2e/web/refunds.spec.ts:306:7
+
+    Error Context: test-results/web-refunds-SS-UC11-08-the-f0e82-er-approves-it-1440-T-0152--chromium/error-context.md
+
+    Error Context: test-results/web-refunds-SS-UC11-08-the-f0e82-er-approves-it-1440-T-0152--chromium/error-context.md
+
+
+[3/5] [chromium] › tests/e2e/web/refunds.spec.ts:292:3 › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 390 [T-0152]
+  2) [chromium] › tests/e2e/web/refunds.spec.ts:292:3 › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 390 [T-0152] 
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 4
+    + Received  + 1
+
+    - Array [
+    -   "220.00",
+    -   "0.00",
+    - ]
+    + Array []
+
+      304 |         .locator('dl [data-amount]')
+      305 |         .evaluateAll((els) => els.map((e) => e.getAttribute('data-amount'))),
+    > 306 |     ).toEqual(['220.00', '0.00']);
+          |       ^
+      307 |     const form = refund.getByRole('form', { name: 'Request a refund' });
+      308 |     await form.getByLabel('Amount to refund').fill('220.00');
+      309 |     await form.getByLabel('Pay from').fill('2026-11-24');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-af9f9e8721ee1553d/tests/e2e/web/refunds.spec.ts:306:7
+
+    Error Context: test-results/web-refunds-SS-UC11-08-the-0b976-ver-approves-it-390-T-0152--chromium/error-context.md
+
+    Error Context: test-results/web-refunds-SS-UC11-08-the-0b976-ver-approves-it-390-T-0152--chromium/error-context.md
+
+
+[4/5] [chromium] › tests/e2e/web/refunds.spec.ts:361:1 › SS-UC11-08 refusal: the person who requested a refund cannot approve it (SOD_REFUND_SELF_APPROVAL) [T-0152]
+  3) [chromium] › tests/e2e/web/refunds.spec.ts:381:1 › SS-UC11-08 refusal: more than the customer can have back is refused in place [T-0152] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('form', { name: 'Request a refund' }).getByLabel('Amount to refund')
+
+
+      392 |   await open(page, CN_PAGE, 1440);
+      393 |   const form = page.getByRole('form', { name: 'Request a refund' });
+    > 394 |   await form.getByLabel('Amount to refund').fill('500.00');
+          |                                             ^
+      395 |   await form.getByRole('button', { name: 'Request refund' }).click();
+      396 |   await expect(form.getByRole('alert')).toContainText('exceeds the customer');
+      397 |   expect(new URL(page.url()).searchParams.get('refund')).toBeNull();
+        at /home/user/Ledgerforce/.claude/worktrees/agent-af9f9e8721ee1553d/tests/e2e/web/refunds.spec.ts:394:45
+
+    Error Context: test-results/web-refunds-SS-UC11-08-ref-69c32-is-refused-in-place-T-0152--chromium/error-context.md
+
+    Error Context: test-results/web-refunds-SS-UC11-08-ref-69c32-is-refused-in-place-T-0152--chromium/error-context.md
+
+
+[5/5] [chromium] › tests/e2e/web/refunds.spec.ts:401:1 › SS-UC11-08 forbidden: a user without the refund permissions sees the credit but can neither request nor approve [T-0152]
+  4) [chromium] › tests/e2e/web/refunds.spec.ts:361:1 › SS-UC11-08 refusal: the person who requested a refund cannot approve it (SOD_REFUND_SELF_APPROVAL) [T-0152] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('form', { name: 'Request a refund' }).getByLabel('Amount to refund')
+
+
+      367 |   const refund = page.getByRole('region', { name: 'Refund' });
+      368 |   const form = refund.getByRole('form', { name: 'Request a refund' });
+    > 369 |   await form.getByLabel('Amount to refund').fill('220.00');
+          |                                             ^
+      370 |   await form.getByLabel('Pay from').fill('2026-11-24');
+      371 |   await form.getByRole('button', { name: 'Request refund' }).click();
+      372 |   await refund.getByRole('button', { name: 'Approve refund' }).click();
+        at /home/user/Ledgerforce/.claude/worktrees/agent-af9f9e8721ee1553d/tests/e2e/web/refunds.spec.ts:369:45
+
+    Error Context: test-results/web-refunds-SS-UC11-08-ref-3c06b-EFUND-SELF-APPROVAL-T-0152--chromium/error-context.md
+
+    Error Context: test-results/web-refunds-SS-UC11-08-ref-3c06b-EFUND-SELF-APPROVAL-T-0152--chromium/error-context.md
+
+
+  5) [chromium] › tests/e2e/web/refunds.spec.ts:401:1 › SS-UC11-08 forbidden: a user without the refund permissions sees the credit but can neither request nor approve [T-0152] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Refund' })
+    Expected substring: "AR Clerks, Finance Admins and Owners request refunds"
+    Received string:    "RefundRefunding a customer’s credit is not available here yet. Once the credit note is posted on a paid invoice, the credit stays with the customer until it is refunded or used on another invoice."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Refund' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Refund' })
+        13 × locator resolved to <section class="admin-block" aria-labelledby="_r_4_">…</section>
+           - unexpected value "RefundRefunding a customer’s credit is not available here yet. Once the credit note is posted on a paid invoice, the credit stays with the customer until it is refunded or used on another invoice."
+
+
+      406 |   await open(page, CN_PAGE, 1440);
+      407 |   const refund = page.getByRole('region', { name: 'Refund' });
+    > 408 |   await expect(refund).toContainText('AR Clerks, Finance Admins and Owners request refunds');
+          |                        ^
+      409 |   await expect(refund.getByRole('form', { name: 'Request a refund' })).toHaveCount(0);
+      410 |   await expect(refund.getByRole('button')).toHaveCount(0);
+      411 |   await assertPage(page, 1440);
+        at /home/user/Ledgerforce/.claude/worktrees/agent-af9f9e8721ee1553d/tests/e2e/web/refunds.spec.ts:408:24
+
+    Error Context: test-results/web-refunds-SS-UC11-08-for-89744-request-nor-approve-T-0152--chromium/error-context.md
+
+    Error Context: test-results/web-refunds-SS-UC11-08-for-89744-request-nor-approve-T-0152--chromium/error-context.md
+
+
+  5 failed
+    [chromium] › tests/e2e/web/refunds.spec.ts:292:3 › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 1440 [T-0152] 
+    [chromium] › tests/e2e/web/refunds.spec.ts:292:3 › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 390 [T-0152] 
+    [chromium] › tests/e2e/web/refunds.spec.ts:361:1 › SS-UC11-08 refusal: the person who requested a refund cannot approve it (SOD_REFUND_SELF_APPROVAL) [T-0152] 
+    [chromium] › tests/e2e/web/refunds.spec.ts:381:1 › SS-UC11-08 refusal: more than the customer can have back is refused in place [T-0152] 
+    [chromium] › tests/e2e/web/refunds.spec.ts:401:1 › SS-UC11-08 forbidden: a user without the refund permissions sees the credit but can neither request nor approve [T-0152] 
