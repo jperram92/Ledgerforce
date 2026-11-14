@@ -1,0 +1,79 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+ ❯ |unit| packages/shared/src/sod/sod.rules.test.ts (37 tests | 1 failed) 92ms
+     × every rule of §6.5 (1–6) and the §6.4 SoD cells is in the table, each with a design reference 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/shared/src/sod/sod.rules.test.ts > SS-PLAT-16: SoD rules 1–6 evaluated as configured > every rule of §6.5 (1–6) and the §6.4 SoD cells is in the table, each with a design reference
+AssertionError: expected [ Array(13) ] to deeply equal [ Array(11) ]
+
+- Expected
++ Received
+
+@@ -3,11 +3,13 @@
+    "SOD_BATCH_SAME_RELEASER",
+    "SOD_BATCH_SELF_APPROVAL",
+    "SOD_BATCH_SELF_RELEASE",
+    "SOD_BILL_SELF_APPROVAL",
+    "SOD_CREDIT_NOTE_SELF_APPROVAL",
++   "SOD_INVOICE_SELF_APPROVAL",
+    "SOD_JOURNAL_SELF_APPROVAL",
+    "SOD_NET_PAY_SELF_RELEASE",
+    "SOD_PERIOD_REOPEN_SELF_APPROVAL",
++   "SOD_REFUND_SELF_APPROVAL",
+    "SOD_RULE_SELF_ACTIVATION",
+    "SOD_TAX_CODE_SELF_ACTIVATION",
+  ]
+
+ ❯ packages/shared/src/sod/sod.rules.test.ts:360:47
+    358|
+    359|   it('every rule of §6.5 (1–6) and the §6.4 SoD cells is in the table,…
+    360|     expect(SOD_RULES.map((r) => r.id).sort()).toEqual(
+       |                                               ^
+    361|       [
+    362|         'SOD_BANK_DETAIL_SELF_VERIFY',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 36 passed (37)
+   Start at  01:09:23
+   Duration  364ms (transform 92ms, setup 0ms, import 135ms, tests 92ms, environment 0ms)
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33873
+ ❯ |db| packages/db/src/sod.db.test.ts (9 tests | 1 failed) 703ms
+     × the step and rule lists in SQL mirror the TypeScript rules; settings.sod.manage mirrors the catalogue 18ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/db/src/sod.db.test.ts > SS-PLAT-62: SoD action ledger, settings, exceptions and acknowledgements are append-only, checked and audited > the step and rule lists in SQL mirror the TypeScript rules; settings.sod.manage mirrors the catalogue
+AssertionError: invoice.create: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/db/src/sod.db.test.ts:137:30
+    135|         [s],
+    136|       );
+    137|       expect(rows[0]?.ok, s).toBe(true);
+       |                              ^
+    138|     }
+    139|     for (const r of SOD_RULES) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  01:09:24
+   Duration  1.85s (transform 158ms, setup 0ms, import 312ms, tests 703ms, environment 0ms)
+

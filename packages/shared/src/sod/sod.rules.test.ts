@@ -90,6 +90,35 @@ const CASES: Case[] = [
     input: { step: 'payment_batch.approve', history: [h('payment_batch.create', A)] },
     expected: deny('SOD_BATCH_SELF_APPROVAL'),
   },
+  // DL-0477 / ADR-0072: maker-checker for invoices and customer refunds (any amount).
+  {
+    name: 'DL-0477: the creator approves their own draft invoice → deny',
+    input: {
+      step: 'invoice.approve',
+      subject: { amount: '50.0000' },
+      history: [h('invoice.create', A)],
+    },
+    expected: deny('SOD_INVOICE_SELF_APPROVAL'),
+  },
+  {
+    name: 'DL-0477: a different approver approves the invoice → allow',
+    input: { step: 'invoice.approve', actorId: B, history: [h('invoice.create', A)] },
+    expected: ALLOW,
+  },
+  {
+    name: 'DL-0477: the creator approves their own refund → deny',
+    input: {
+      step: 'refund.approve',
+      subject: { amount: '10.0000' },
+      history: [h('refund.create', A)],
+    },
+    expected: deny('SOD_REFUND_SELF_APPROVAL'),
+  },
+  {
+    name: 'DL-0477: a different approver approves the refund → allow',
+    input: { step: 'refund.approve', actorId: B, history: [h('refund.create', A)] },
+    expected: ALLOW,
+  },
   {
     name: '§6.4 Payroll Officer: creator releases own net-pay batch → deny',
     input: { step: 'net_pay_batch.release', history: [h('net_pay_batch.create', A)] },
@@ -365,7 +394,9 @@ describe('SS-PLAT-16: SoD rules 1–6 evaluated as configured', () => {
         'SOD_BATCH_SELF_RELEASE',
         'SOD_BILL_SELF_APPROVAL',
         'SOD_CREDIT_NOTE_SELF_APPROVAL',
+        'SOD_INVOICE_SELF_APPROVAL',
         'SOD_JOURNAL_SELF_APPROVAL',
+        'SOD_REFUND_SELF_APPROVAL',
         'SOD_NET_PAY_SELF_RELEASE',
         'SOD_PERIOD_REOPEN_SELF_APPROVAL',
         'SOD_RULE_SELF_ACTIVATION',

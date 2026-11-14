@@ -1,0 +1,22 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:43797
+
+ Test Files  11 passed (11)
+      Tests  939 passed (939)
+   Start at  01:10:36
+   Duration  24.38s (transform 450ms, setup 0ms, import 2.75s, tests 19.10s, environment 1ms)
+
+(node:15110) DeprecationWarning: Client.activeQuery is deprecated and will be removed in pg@9.0
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:15110) DeprecationWarning: Client.queryQueue is deprecated and will be removed in pg@9.0.
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+
+ Test Files  1 passed (1)
+      Tests  41 passed (41)
+   Start at  01:11:02
+   Duration  505ms (transform 102ms, setup 0ms, import 149ms, tests 94ms, environment 0ms)
+

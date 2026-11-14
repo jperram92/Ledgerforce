@@ -3202,3 +3202,13 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | Setup wizard routes | T-0157 | 0590–0599 | 0075 | 0156 | T-0174–T-0175 |
 - Why: DL-0477 and ADR-0072 settled the permissions. The cards touch disjoint areas: the AR invoice route, AR refunds, and setup.
 - ADR: none · Status: accepted
+
+### DL-0561 — SoD steps and rules for invoices and refunds in one lead migration (0069); T-0132 decisions
+- Date: 2026-11-14 · By: claude under DL-0477 · Task: T-0169 (for T-0132, T-0152) · Category: security
+- Decision:
+  - The steps `invoice.create`, `invoice.approve`, `refund.create` and `refund.approve` are added, with the rules `SOD_INVOICE_SELF_APPROVAL` and `SOD_REFUND_SELF_APPROVAL`. Both rules are condition `always`, with a small-team exception, matching `SOD_BATCH_SELF_APPROVAL` and ADR-0072 (no threshold).
+  - The steps live in packages/shared/src/sod/rules.ts. Migration 0069 widens `app.sod_step_known` and `app.sod_rule_known`.
+  - The T-0152 agent moves its own migration, if it needs one, to 0070.
+  - For T-0132: the engine takes the invoice's creator from `app.sales_invoice.created_by` (the subject reports its creator), because invoices are created on paths without `@SoD`. ADR-0073 records this extension of the ADR-0026 engine contract.
+- Why: the T-0132 agent found that SoD step and rule ids are CHECK-enforced in SQL (0021), so TypeScript-only additions fail on insert. A single migration avoids two agents rewriting the same functions.
+- ADR: ADR-0072; ADR-0073 to follow in T-0132 · Status: accepted

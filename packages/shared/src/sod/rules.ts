@@ -21,6 +21,9 @@ export const SOD_SUBJECT_STEPS = {
   posting_rule: ['author', 'activate'],
   tax_code: ['author', 'activate'],
   period_reopen_request: ['request', 'approve'],
+  // DL-0477 / ADR-0072 (T-0132, T-0152; migration 0069): maker-checker for invoices and refunds.
+  invoice: ['create', 'approve'],
+  refund: ['create', 'approve'],
 } as const;
 
 export type SodSubjectType = keyof typeof SOD_SUBJECT_STEPS;
@@ -93,7 +96,9 @@ export type SodRuleId =
   | 'SOD_RULE_SELF_ACTIVATION'
   | 'SOD_TAX_CODE_SELF_ACTIVATION'
   | 'SOD_PERIOD_REOPEN_SELF_APPROVAL'
-  | 'SOD_CREDIT_NOTE_SELF_APPROVAL';
+  | 'SOD_CREDIT_NOTE_SELF_APPROVAL'
+  | 'SOD_INVOICE_SELF_APPROVAL'
+  | 'SOD_REFUND_SELF_APPROVAL';
 
 export interface SodRule {
   /** Also the error code returned to the client and written to the audit log. */
@@ -213,6 +218,24 @@ export const SOD_RULES: readonly SodRule[] = Object.freeze([
     step: 'credit_note.approve',
     conflictsWith: ['credit_note.create'],
     condition: { kind: 'above_threshold', threshold: 'credit_note_self_approval' },
+    smallTeamException: true,
+  }),
+  rule({
+    id: 'SOD_INVOICE_SELF_APPROVAL',
+    designRef: '§6.5; DL-0477 item 2, ADR-0072',
+    description: 'An invoice is not approved by the person who created the draft.',
+    step: 'invoice.approve',
+    conflictsWith: ['invoice.create'],
+    condition: { kind: 'always' },
+    smallTeamException: true,
+  }),
+  rule({
+    id: 'SOD_REFUND_SELF_APPROVAL',
+    designRef: '§6.5; DL-0477 item 3, ADR-0072',
+    description: 'A customer refund is not approved by the person who created it.',
+    step: 'refund.approve',
+    conflictsWith: ['refund.create'],
+    condition: { kind: 'always' },
     smallTeamException: true,
   }),
 ]);
