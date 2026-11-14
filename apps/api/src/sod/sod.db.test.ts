@@ -37,7 +37,12 @@ const PEOPLE = {
 } as const;
 type Who = keyof typeof PEOPLE;
 
-const done = { bills: [] as string[], releases: [] as string[], creditNotes: [] as string[] };
+const done = {
+  bills: [] as string[],
+  releases: [] as string[],
+  creditNotes: [] as string[],
+  invoices: [] as string[],
+};
 
 interface Amounted {
   id?: string;
@@ -102,6 +107,41 @@ class TestCreditNoteController {
   approve(@Param('creditNoteId') id: string): { credit_note_id: string; status: string } {
     done.creditNotes.push(id);
     return { credit_note_id: id, status: 'approved' };
+  }
+}
+
+/**
+ * Invoices (T-0132, ADR-0073): created on paths without @SoD, so the subject reports its creator.
+ * The real route reads `created_by` from app.sales_invoice; this stand-in takes it from the body.
+ */
+@Controller('test/ar/invoices')
+class TestInvoiceController {
+  @Post(':invoiceId/approve')
+  @HttpCode(200)
+  @RequirePermission('ar.invoice.approve')
+  @SoD('invoice.approve', (req) => {
+    const body = (req.body ?? {}) as { created_by?: string };
+    return { id: String(req.params['invoiceId']), createdBy: body.created_by ?? null };
+  })
+  approve(@Param('invoiceId') id: string): { invoice_id: string; status: string } {
+    done.invoices.push(id);
+    return { invoice_id: id, status: 'posted' };
+  }
+}
+
+/** Misdeclared: bills have no `create` step, so a reported creator cannot be placed (fail closed). */
+@Controller('test/ap/bills-with-creator')
+class TestBillWithCreatorController {
+  @Post(':billId/approve')
+  @HttpCode(200)
+  @RequirePermission('ap.bill.approve')
+  @SoD('bill.approve', (req) => ({
+    id: String(req.params['billId']),
+    amount: '5000.0000',
+    createdBy: (req.body as { created_by?: string }).created_by ?? null,
+  }))
+  approve(): { ok: true } {
+    return { ok: true };
   }
 }
 
@@ -196,6 +236,8 @@ beforeAll(async () => {
       TestBillController,
       TestPaymentBatchController,
       TestCreditNoteController,
+      TestInvoiceController,
+      TestBillWithCreatorController,
       TestMisdeclaredController,
     ],
   });
@@ -562,5 +604,82 @@ describe('SS-PLAT-63: SoD runs after MFA, permission and step-up, fails closed a
       week_start: '2026-10-19',
     });
     expect(ack.status).toBe(403);
+  });
+});
+
+describe('T-0132 (ADR-0073): a subject reports its creator; SOD_INVOICE_SELF_APPROVAL', () => {
+  it('the creator reported by the subject may not approve the invoice, with no sod_action history; refusal audited', async () => {
+    const mark = await auditMark();
+    const res = await call('POST', '/test/ar/invoices/INV-D1/approve', 'arClerk', {
+      created_by: PEOPLE.arClerk.id,
+    });
+    expect(res.status).toBe(403);
+    expect(await res.json()).toEqual({
+      error: 'sod_violation',
+      rule: 'SOD_INVOICE_SELF_APPROVAL',
+      small_team_exception_required: false,
+    });
+    expect(done.invoices).not.toContain('INV-D1');
+    expect(await steps('INV-D1')).toEqual([]);
+    expect(await auditSince(mark)).toMatchObject([
+      {
+        actor_user_id: PEOPLE.arClerk.id,
+        action: 'sod_violation',
+        entity_type: 'invoice',
+        entity_id: 'INV-D1',
+        after: { step: 'invoice.approve', rule: 'SOD_INVOICE_SELF_APPROVAL' },
+      },
+    ]);
+  });
+
+  it('another approver may approve it (no threshold); the approval step is recorded', async () => {
+    const res = await call('POST', '/test/ar/invoices/INV-D1/approve', 'approver', {
+      created_by: PEOPLE.arClerk.id,
+    });
+    expect(res.status).toBe(200);
+    expect(done.invoices).toContain('INV-D1');
+    expect(await steps('INV-D1')).toEqual([
+      { step: 'invoice.approve', actor_user_id: PEOPLE.approver.id },
+    ]);
+  });
+
+  it('a draft with no recorded creator (system-created) may be approved by any holder', async () => {
+    const res = await call('POST', '/test/ar/invoices/INV-D2/approve', 'arClerk', {});
+    expect(res.status).toBe(200);
+  });
+
+  it('small-team mode with nobody else eligible: the creator needs a recorded exception, which is written', async () => {
+    const own = await call('POST', '/test/ar/invoices/INV-S1/approve', 'solo', {
+      created_by: PEOPLE.solo.id,
+    });
+    expect(own.status).toBe(403);
+    expect(await own.json()).toEqual({
+      error: 'sod_violation',
+      rule: 'SOD_INVOICE_SELF_APPROVAL',
+      small_team_exception_required: true,
+    });
+    const ok = await call('POST', '/test/ar/invoices/INV-S1/approve', 'solo', {
+      created_by: PEOPLE.solo.id,
+      sod_exception: { reason: 'sole trader; accountant reviews monthly' },
+    });
+    expect(ok.status).toBe(200);
+    expect(await exceptionsFor('INV-S1')).toEqual([
+      {
+        rule: 'SOD_INVOICE_SELF_APPROVAL',
+        step: 'invoice.approve',
+        actor_user_id: PEOPLE.solo.id,
+        kind: 'recorded_exception',
+        reviewer_user_id: null,
+        reason: 'sole trader; accountant reviews monthly',
+      },
+    ]);
+  });
+
+  it('a creator reported for a subject without a create step fails closed: refused, nothing recorded', async () => {
+    const res = await call('POST', '/test/ap/bills-with-creator/BILL-C1/approve', 'approver', {
+      created_by: PEOPLE.userA.id,
+    });
+    expect(res.status).toBe(500);
+    expect(await steps('BILL-C1')).toEqual([]);
   });
 });

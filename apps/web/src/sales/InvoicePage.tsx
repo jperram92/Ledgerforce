@@ -1,10 +1,12 @@
 /**
  * One invoice (T-0083, UC-01, SS-UC01-10): header facts, the lines as entered and, on request,
  * "Show me the journal": the posting engine's preview of exactly what approving the draft would
- * post (P4, design §3.9; T-0131). Nothing is posted from this screen; approving one invoice over
- * HTTP is T-0132. No accounting happens in the browser: amounts are the API's decimal strings.
+ * post (P4, design §3.9; T-0131). Once the journal has been shown, a holder of ar.invoice.approve
+ * can "Approve and post" it (T-0132, ADR-0073); the separation-of-duties rule and every refusal
+ * are explained in plain words. No accounting happens in the browser: amounts are the API's
+ * decimal strings.
  */
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { JournalTable, Money } from '@ledgerforce/ui';
 import { useId, useState, type ReactNode } from 'react';
@@ -19,6 +21,8 @@ import {
 } from '../admin/common.tsx';
 import { useServices } from '../env.tsx';
 import { typeGloss } from '../gl/gl-logic.ts';
+import type { ApprovedInvoice, Invoice } from './client.ts';
+import { approvalNote, approveRefusalText } from './invoice-approve.ts';
 import { AR_READERS, STATUS_WORD, useCompany } from './InvoicesPage.tsx';
 
 function Region({ heading, children }: { heading: string; children: ReactNode }) {
@@ -40,6 +44,88 @@ const refusalText = (e: unknown): string | null =>
     ? e.body['message']
     : null;
 
+/**
+ * "Approve and post" (T-0132), shown under the journal preview. One Idempotency-Key per screen,
+ * so a retry after a lost answer is the same request and can never post twice.
+ */
+function Approve({
+  inv,
+  companyId,
+  canApprove,
+  onApproved,
+}: {
+  inv: Invoice;
+  companyId: string;
+  canApprove: boolean;
+  onApproved: (a: ApprovedInvoice) => void;
+}) {
+  const { sales } = useServices();
+  const queryClient = useQueryClient();
+  const [key] = useState(() => `inv-approve-${crypto.randomUUID()}`);
+  const [reason, setReason] = useState('');
+  const noteId = useId();
+  const reasonId = useId();
+  const approve = useMutation({
+    mutationFn: (sodException?: { reason: string }) =>
+      sales.approveInvoice(companyId, inv.id, key, sodException),
+    onSuccess: async (a) => {
+      onApproved(a);
+      await queryClient.invalidateQueries({ queryKey: ['ar', 'invoice', inv.id] });
+      await queryClient.invalidateQueries({ queryKey: ['ar', 'invoices'] });
+    },
+  });
+  useFailureRouting(approve.error);
+  if (!canApprove)
+    return (
+      <p className="admin-note">
+        An Approver, a Finance Admin or the Owner approves and posts it. The person who created an
+        invoice does not approve it.
+      </p>
+    );
+  const note = approvalNote(inv.approval);
+  const smallTeam = inv.approval?.small_team_exception_required === true;
+  const blocked = inv.approval !== null && !inv.approval.allowed && !smallTeam;
+  const needsReason = smallTeam && reason.trim() === '';
+  const refused = approveRefusalText(approve.error);
+  return (
+    <div className="gl-actions-col">
+      {note ? (
+        <p id={noteId} className="admin-note">
+          {note}
+        </p>
+      ) : null}
+      {smallTeam ? (
+        <div className="admin-form">
+          <label htmlFor={reasonId}>Why you are approving your own invoice</label>
+          <textarea
+            id={reasonId}
+            rows={2}
+            maxLength={2000}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+          />
+        </div>
+      ) : null}
+      <div className="gl-actions">
+        <button
+          type="button"
+          className="primary"
+          disabled={blocked || needsReason || approve.isPending}
+          {...(note ? { 'aria-describedby': noteId } : {})}
+          onClick={() => approve.mutate(smallTeam ? { reason: reason.trim() } : undefined)}
+        >
+          Approve and post
+        </button>
+      </div>
+      {refused ? (
+        <p className="refusal" role="alert">
+          {refused}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 export function InvoicePage({ invoiceId }: { invoiceId: string }) {
   const access = useAccess();
   const { sales } = useServices();
@@ -47,6 +133,7 @@ export function InvoicePage({ invoiceId }: { invoiceId: string }) {
   const company = useCompany();
   const companyId = company.company?.id ?? '';
   const [wantJournal, setWantJournal] = useState(false);
+  const [approved, setApproved] = useState<ApprovedInvoice | null>(null);
   const doc = useQuery({
     queryKey: ['ar', 'invoice', invoiceId],
     queryFn: () => sales.invoice(companyId, invoiceId),
@@ -132,7 +219,12 @@ export function InvoicePage({ invoiceId }: { invoiceId: string }) {
       </Region>
 
       <Region heading="Journal">
-        {inv.status !== 'draft' ? (
+        {inv.status !== 'draft' && approved ? (
+          <p className="admin-state" role="status">
+            Approved and posted as {approved.invoice_no ?? inv.invoice_no}. Its journal is in the
+            general ledger.
+          </p>
+        ) : inv.status !== 'draft' ? (
           <p className="admin-note">
             This invoice is {STATUS_WORD[inv.status].toLowerCase()}; its journal is in the general
             ledger.
@@ -161,6 +253,12 @@ export function InvoicePage({ invoiceId }: { invoiceId: string }) {
                 gloss: typeGloss(l.account_type),
                 ...(l.debit !== '0.0000' ? { debit: l.debit } : { credit: l.credit }),
               }))}
+            />
+            <Approve
+              inv={inv}
+              companyId={companyId}
+              canApprove={access.can('ar.invoice.approve')}
+              onApproved={setApproved}
             />
           </>
         ) : refused ? (

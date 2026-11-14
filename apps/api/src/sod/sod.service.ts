@@ -4,6 +4,7 @@ import { permissionsOf, type Permission } from '@ledgerforce/shared/rbac';
 import {
   DEFAULT_SOD_SETTINGS,
   evaluateSod,
+  isSodStep,
   subjectTypeOf,
   type SodDecision,
   type SodExceptionRequest,
@@ -43,6 +44,29 @@ export class InvalidSodException extends BadRequestException {
   constructor() {
     super({ error: 'invalid_sod_exception' });
   }
+}
+
+/**
+ * The subject's history: a creator the subject reports (ADR-0073) as its `<subject>.create` step,
+ * then the recorded steps. A subject type without a `create` step cannot place a creator: that is
+ * a misdeclared route, so it fails closed.
+ */
+async function historyOf(
+  trx: Trx,
+  step: SodStep,
+  subject: SodSubject,
+): Promise<{ step: string; actorId: string }[]> {
+  const subjectType = subjectTypeOf(step);
+  const recorded = await sql<{ step: string; actorId: string }>`
+    SELECT step, actor_user_id AS "actorId" FROM app.sod_action
+     WHERE subject_type = ${subjectType} AND subject_id = ${subject.id}
+     ORDER BY occurred_at, id`.execute(trx);
+  if (subject.createdBy === undefined || subject.createdBy === null) return recorded.rows;
+  const create = `${subjectType}.create`;
+  if (!isSodStep(create)) {
+    throw new Error(`SoD: subject type ${subjectType} has no create step for a reported creator`);
+  }
+  return [{ step: create, actorId: subject.createdBy }, ...recorded.rows];
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -159,10 +183,7 @@ export async function checkSod(
   if (exception?.reviewerId && !(await reviewerIsActiveUser(trx, exception.reviewerId))) {
     throw new InvalidSodException();
   }
-  const history = await sql<{ step: string; actorId: string }>`
-    SELECT step, actor_user_id AS "actorId" FROM app.sod_action
-     WHERE subject_type = ${subjectType} AND subject_id = ${subject.id}
-     ORDER BY occurred_at, id`.execute(trx);
+  const history = await historyOf(trx, step, subject);
   const { settings } = await loadSodSettings(trx);
   const decision = evaluateSod({
     step,
@@ -173,7 +194,7 @@ export async function checkSod(
         ? {}
         : { controlTaxOrEquity: subject.controlTaxOrEquity }),
     },
-    history: history.rows,
+    history,
     settings,
     otherEligible: await otherEligible(trx, actorId, permission),
     exception,
@@ -193,17 +214,13 @@ export async function sodOutlook(
   trx: Trx,
   opts: { step: SodStep; actorId: string; permission: Permission; subject: SodSubject },
 ): Promise<{ decision: SodDecision; settings: SodSettings }> {
-  const subjectType = subjectTypeOf(opts.step);
-  const history = await sql<{ step: string; actorId: string }>`
-    SELECT step, actor_user_id AS "actorId" FROM app.sod_action
-     WHERE subject_type = ${subjectType} AND subject_id = ${opts.subject.id}
-     ORDER BY occurred_at, id`.execute(trx);
+  const history = await historyOf(trx, opts.step, opts.subject);
   const { settings } = await loadSodSettings(trx);
   const decision = evaluateSod({
     step: opts.step,
     actorId: opts.actorId,
     subject: { amount: opts.subject.amount ?? null },
-    history: history.rows,
+    history,
     settings,
     otherEligible: await otherEligible(trx, opts.actorId, opts.permission),
     exception: null,

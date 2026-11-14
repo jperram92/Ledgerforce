@@ -270,6 +270,7 @@ async function loadInvoice(trx: Trx, companyId: string, invoiceId: string, lock:
     pricing: 'exclusive' | 'inclusive';
     entry_id: string | null;
     created_by: string | null;
+    approved_by: string | null;
     net_total: string | null;
     tax_total: string | null;
     gross_total: string | null;
@@ -278,6 +279,7 @@ async function loadInvoice(trx: Trx, companyId: string, invoiceId: string, lock:
   }>`
     SELECT id::text, party_id::text, status, invoice_no, kind, to_char(issue_date, 'YYYY-MM-DD') AS issue_date,
            to_char(due_date, 'YYYY-MM-DD') AS due_date, pricing, entry_id::text, created_by::text,
+           approved_by::text,
            net_total::text, tax_total::text, gross_total::text, warnings
       FROM app.sales_invoice WHERE company_id = ${companyId} AND id = ${invoiceId}::uuid
       ${lock ? sql`FOR UPDATE` : sql``}`;
@@ -818,6 +820,9 @@ export interface InvoiceDetail extends InvoiceSummary {
   readonly netTotal: string | null;
   readonly taxTotal: string | null;
   readonly warnings: readonly InvoiceWarning[];
+  /** Who created the draft (null when a system path created it) and who approved it (T-0132). */
+  readonly createdBy: string | null;
+  readonly approvedBy: string | null;
   readonly lines: readonly {
     readonly lineNo: number;
     readonly description: string;
@@ -902,6 +907,8 @@ export async function getInvoice(
     netTotal: inv.net_total,
     taxTotal: inv.tax_total,
     warnings: inv.warnings,
+    createdBy: inv.created_by,
+    approvedBy: inv.approved_by,
     lines: lines.map((l) => ({
       lineNo: l.line_no,
       description: l.description,

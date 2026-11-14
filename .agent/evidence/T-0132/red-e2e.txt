@@ -1,0 +1,171 @@
+
+Running 6 tests using 2 workers
+
+  ✘  2 [chromium] › tests/e2e/web/invoice-approve.spec.ts:295:1 › SS-UC01-13: the draft's creator is told beforehand that someone else must approve it [T-0132] (6.7s)
+  ✘  1 [chromium] › tests/e2e/web/invoice-approve.spec.ts:249:3 › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 1440 [T-0132] (8.0s)
+  ✘  4 [chromium] › tests/e2e/web/invoice-approve.spec.ts:249:3 › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 390 [T-0132] (7.5s)
+  ✘  5 [chromium] › tests/e2e/web/invoice-approve.spec.ts:278:1 › SS-UC01-13: without ar.invoice.approve there is no approve action, and the screen says who approves [T-0132] (6.7s)
+  ✘  3 [chromium] › tests/e2e/web/invoice-approve.spec.ts:321:1 › SS-UC01-13: refusals from the API are explained in plain words [T-0132] (30.1s)
+  ✘  6 [chromium] › tests/e2e/web/invoice-approve.spec.ts:370:1 › SS-UC01-13: in small-team mode the only user approves their own draft with a recorded reason [T-0132] (7.4s)
+
+
+  1) [chromium] › tests/e2e/web/invoice-approve.spec.ts:249:3 › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 1440 [T-0132] 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator: getByRole('button', { name: 'Approve and post' })
+    Expected: enabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeEnabled" getByRole('button', { name: 'Approve and post' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Approve and post' })
+
+
+      258 |     await showJournal(page);
+      259 |     const approve = page.getByRole('button', { name: 'Approve and post' });
+    > 260 |     await expect(approve).toBeEnabled();
+          |                           ^
+      261 |     await assertPage(page, width);
+      262 |     await evidence('SS-UC01-13', `invoice-ready-to-approve-${String(width)}`);
+      263 |
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-0edd8-rom-its-screen-1440-T-0132--chromium/error-context.md
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-0edd8-rom-its-screen-1440-T-0132--chromium/error-context.md
+
+  2) [chromium] › tests/e2e/web/invoice-approve.spec.ts:249:3 › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 390 [T-0132] 
+
+    Error: expect(locator).toBeEnabled() failed
+
+    Locator: getByRole('button', { name: 'Approve and post' })
+    Expected: enabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeEnabled" getByRole('button', { name: 'Approve and post' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Approve and post' })
+
+
+      258 |     await showJournal(page);
+      259 |     const approve = page.getByRole('button', { name: 'Approve and post' });
+    > 260 |     await expect(approve).toBeEnabled();
+          |                           ^
+      261 |     await assertPage(page, width);
+      262 |     await evidence('SS-UC01-13', `invoice-ready-to-approve-${String(width)}`);
+      263 |
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-2ea4e-from-its-screen-390-T-0132--chromium/error-context.md
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-2ea4e-from-its-screen-390-T-0132--chromium/error-context.md
+
+  3) [chromium] › tests/e2e/web/invoice-approve.spec.ts:278:1 › SS-UC01-13: without ar.invoice.approve there is no approve action, and the screen says who approves [T-0132] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Journal' })
+    Expected substring: "An Approver, a Finance Admin or the Owner approves and posts it."
+    Received string:    "JournalThis is the journal LedgerForce would post when the invoice is approved, from the posting engine itself. Nothing is posted yet.Journal previewJournal previewDebitCredit1200Trade debtorswhat the business owns1,375.001,375.00 dollars4110Professional servicesmoney earned1,000.001,000.00 dollars4120Subscriptionsmoney earned250.00250.00 dollars2310GST collectedwhat the business owes125.00125.00 dollarsBalanced1,375.001,375.00 dollars1,375.001,375.00 dollars"
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Journal' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Journal' })
+        14 × locator resolved to <section class="admin-block" aria-labelledby="_r_3_">…</section>
+           - unexpected value "JournalThis is the journal LedgerForce would post when the invoice is approved, from the posting engine itself. Nothing is posted yet.Journal previewJournal previewDebitCredit1200Trade debtorswhat the business owns1,375.001,375.00 dollars4110Professional servicesmoney earned1,000.001,000.00 dollars4120Subscriptionsmoney earned250.00250.00 dollars2310GST collectedwhat the business owes125.00125.00 dollarsBalanced1,375.001,375.00 dollars1,375.001,375.00 dollars"
+
+
+      284 |   await showJournal(page);
+      285 |   await expect(page.getByRole('button', { name: 'Approve and post' })).toHaveCount(0);
+    > 286 |   await expect(page.getByRole('region', { name: 'Journal' })).toContainText(
+          |                                                               ^
+      287 |     'An Approver, a Finance Admin or the Owner approves and posts it.',
+      288 |   );
+      289 |   await assertPage(page, 1440);
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-7ec31-n-says-who-approves-T-0132--chromium/error-context.md
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-7ec31-n-says-who-approves-T-0132--chromium/error-context.md
+
+  4) [chromium] › tests/e2e/web/invoice-approve.spec.ts:295:1 › SS-UC01-13: the draft's creator is told beforehand that someone else must approve it [T-0132] 
+
+    Error: expect(locator).toBeDisabled() failed
+
+    Locator: getByRole('button', { name: 'Approve and post' })
+    Expected: disabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeDisabled" getByRole('button', { name: 'Approve and post' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Approve and post' })
+
+
+      309 |   await showJournal(page);
+      310 |   const approve = page.getByRole('button', { name: 'Approve and post' });
+    > 311 |   await expect(approve).toBeDisabled();
+          |                         ^
+      312 |   await expect(approve).toHaveAccessibleDescription(
+      313 |     /You created this invoice\. Someone else who can approve invoices has to approve it/,
+      314 |   );
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-11371-lse-must-approve-it-T-0132--chromium/error-context.md
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-11371-lse-must-approve-it-T-0132--chromium/error-context.md
+
+  5) [chromium] › tests/e2e/web/invoice-approve.spec.ts:321:1 › SS-UC01-13: refusals from the API are explained in plain words [T-0132] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'Approve and post' })
+
+
+      336 |     },
+      337 |   };
+    > 338 |   await approve.click();
+          |                 ^
+      339 |   await expect(page.getByRole('alert')).toHaveText(
+      340 |     'You created this invoice, so you can’t approve it as well. Someone else who can approve invoices has to approve it.',
+      341 |   );
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-8a5b4-ined-in-plain-words-T-0132--chromium/error-context.md
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-8a5b4-ined-in-plain-words-T-0132--chromium/error-context.md
+
+  6) [chromium] › tests/e2e/web/invoice-approve.spec.ts:370:1 › SS-UC01-13: in small-team mode the only user approves their own draft with a recorded reason [T-0132] 
+
+    Error: expect(locator).toBeDisabled() failed
+
+    Locator: getByRole('button', { name: 'Approve and post' })
+    Expected: disabled
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeDisabled" getByRole('button', { name: 'Approve and post' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Approve and post' })
+
+
+      384 |   await showJournal(page);
+      385 |   const approve = page.getByRole('button', { name: 'Approve and post' });
+    > 386 |   await expect(approve).toBeDisabled();
+          |                         ^
+      387 |   const reason = page.getByLabel('Why you are approving your own invoice');
+      388 |   await reason.fill('Sole trader; our accountant reviews each month');
+      389 |   await expect(approve).toBeEnabled();
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-15291-h-a-recorded-reason-T-0132--chromium/error-context.md
+
+    Error Context: test-results/web-invoice-approve-SS-UC0-15291-h-a-recorded-reason-T-0132--chromium/error-context.md
+
+  6 failed
+    [chromium] › tests/e2e/web/invoice-approve.spec.ts:249:3 › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 1440 [T-0132] 
+    [chromium] › tests/e2e/web/invoice-approve.spec.ts:249:3 › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 390 [T-0132] 
+    [chromium] › tests/e2e/web/invoice-approve.spec.ts:278:1 › SS-UC01-13: without ar.invoice.approve there is no approve action, and the screen says who approves [T-0132] 
+    [chromium] › tests/e2e/web/invoice-approve.spec.ts:295:1 › SS-UC01-13: the draft's creator is told beforehand that someone else must approve it [T-0132] 
+    [chromium] › tests/e2e/web/invoice-approve.spec.ts:321:1 › SS-UC01-13: refusals from the API are explained in plain words [T-0132] 
+    [chromium] › tests/e2e/web/invoice-approve.spec.ts:370:1 › SS-UC01-13: in small-team mode the only user approves their own draft with a recorded reason [T-0132] 

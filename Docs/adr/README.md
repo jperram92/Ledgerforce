@@ -104,6 +104,7 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0054](0054-api-security-headers-and-rate-limits.md) | API security headers, strict CORS and rate limits on auth and mutating routes | security | yes | Accepted |
 | [0072](0072-owner-delegated-permissions.md) | New permissions for invoice approval, customer refunds and the setup wizard | security | yes | Accepted |
 | [0074](0074-customer-refund-approval-and-routes.md) | Customer refunds: maker-checker approval before payment, and the refund routes | security | yes (delegated, DL-0477) | Accepted |
+| [0073](0073-invoice-approval-sod-creator-from-subject.md) | Approving one invoice over HTTP: maker-checker through the SoD engine, with the subject reporting its creator | security | yes | Accepted |
 | [0068](0068-ecl-allowance-by-role.md) | Resolve the ECL allowance by its system role; deprecate ar_settings.ecl_allowance_account_id | data | no | Accepted |
 | [0062](0062-cross-tenant-daily-job-scheduling.md) | Reach every tenant from a scheduled daily job without widening lf_app | security | yes | Accepted |
 | [0056](0056-period-reopen-http-routes.md) | HTTP routes to reopen a hard-locked period: request, approve, list | architecture | no | Accepted |

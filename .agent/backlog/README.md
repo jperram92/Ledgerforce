@@ -17,8 +17,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 120 |
-| todo | 26 |
-| verifying | 3 |
+| todo | 25 |
+| verifying | 4 |
 | **total** | **160** |
 | **total** | **147** |
 

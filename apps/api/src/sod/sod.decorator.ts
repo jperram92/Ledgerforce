@@ -12,6 +12,12 @@ export interface SodSubject {
   amount?: string | null;
   /** Manual journals: the journal touches a control, tax or equity account (§6.5 rule 4). */
   controlTaxOrEquity?: boolean;
+  /**
+   * Who created the subject, when the creation happened on a path that records no SoD step
+   * (ADR-0073: invoices). Read from the subject's own row in the request transaction, never from
+   * the request. The engine treats it as `<subject>.create` by that user, before the history.
+   */
+  createdBy?: string | null;
 }
 
 export type SubjectFrom = (
