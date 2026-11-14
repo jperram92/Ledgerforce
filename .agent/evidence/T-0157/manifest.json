@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0157",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-120",
+      "file": ".agent/evidence/T-0157/20261114-tests-api-db-setup.json",
+      "test": "7 test(s): apps/api/src/setup/wizard.db.test.ts › SS-PLAT-120 AC-1 GET /setup/wizard returns the ten steps (status, locked, valid, missing) and complete [T-0157] | SS-PLAT-120 AC-3 reading needs settings.read; completing needs settings.setup.manage (403 otherwise) [T-0157] | SS-PLAT-120 AC-2 a locked step is 409 STEP_LOCKED; an invalid one 422 STEP_INVALID with missing; nothing is written [T-0157] | SS-PLAT-120 AC-2 bad requests are 400: no Idempotency-Key, a step outside 1–10, a bad body [T-0157] | SS-PLAT-120 AC-2 completes a valid unlocked step once: 201 audited, then 200 replay; step 2 unlocks [T-0157] | SS-PLAT-120 AC-2 step 9 accepts { no_history_reason }; another step with a reason is 422 NO_HISTORY_NOT_ALLOWED [T-0157] | SS-PLAT-120 AC-3 another tenant's company is 404 on both routes and nothing is written [T-0157]",
+      "result": "passed",
+      "captured": "2026-11-14"
+    },
+    {
+      "scenario": "SS-PLAT-120",
+      "file": ".agent/evidence/T-0157/20261114-tests-api-db-setup.log",
+      "test": "apps/api/src/setup (wizard SS-PLAT-120 + opening balances SS-PLAT-117), verbose: 12 passed, 0 skipped",
+      "result": "passed",
+      "captured": "2026-11-14"
+    },
+    {
+      "scenario": "RED",
+      "file": ".agent/evidence/T-0157/red-wizard-db.log",
+      "test": "wizard.db.test.ts before the controller: 7 failed (the routes answered 404)",
+      "result": "failed (expected RED)",
+      "captured": "2026-11-14"
+    },
+    {
+      "scenario": "regression",
+      "file": ".agent/evidence/T-0157/20261114-tests-db-setup-module.log",
+      "test": "db packages/modules/setup: 3 files, 40 passed",
+      "result": "passed",
+      "captured": "2026-11-14"
+    },
+    {
+      "scenario": "regression",
+      "file": ".agent/evidence/T-0157/20261114-tests-unit-deploy.log",
+      "test": "api-unit apps/api/src/deploy (nginx route prefixes; setup was already proxied): 5 passed",
+      "result": "passed",
+      "captured": "2026-11-14"
+    }
+  ]
+}

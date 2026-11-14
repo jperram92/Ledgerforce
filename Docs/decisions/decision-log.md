@@ -3212,3 +3212,21 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - For T-0132: the engine takes the invoice's creator from `app.sales_invoice.created_by` (the subject reports its creator), because invoices are created on paths without `@SoD`. ADR-0073 records this extension of the ADR-0026 engine contract.
 - Why: the T-0132 agent found that SoD step and rule ids are CHECK-enforced in SQL (0021), so TypeScript-only additions fail on insert. A single migration avoids two agents rewriting the same functions.
 - ADR: ADR-0072; ADR-0073 to follow in T-0132 · Status: accepted
+
+### DL-0590 — The setup wizard is read with `settings.read` and completed with `settings.setup.manage` (T-0157)
+- Date: 2026-11-14 · By: claude · Task: T-0157 · Category: security (applies ADR-0072; adds no permission)
+- Decision: `GET /setup/wizard` needs `settings.read`; `POST /setup/wizard/steps/:n/complete` needs `settings.setup.manage` (DL-0477 item 4, ADR-0072), not `settings.chart.manage` as the card first said.
+- Why: the permission decorator takes one permission. Every holder of `settings.setup.manage` (Owner, Finance Admin) also holds `settings.read` in the catalogue, so `settings.read` admits every setup manager and also lets the Accountant and Auditor see progress; the view changes nothing. The api-db test proves an AR Clerk (no `settings.read`) is 403 on read and an Accountant is 403 on complete.
+- Alternatives: `settings.setup.manage` for reading too (hides progress from read-only roles); an "any of" decorator (a security-model change for no extra reach).
+- ADR: ADR-0075 · Status: accepted
+
+### DL-0591 — Setup wizard HTTP contract: state replay, as_of default, refusal codes (T-0157)
+- Date: 2026-11-14 · By: claude · Task: T-0157 · Category: architecture
+- Decision:
+  - Completing a step requires an `Idempotency-Key`. The completion record (tenant, company, step) is the replay record: a repeat of a completed step answers 200 with the stored record and `replayed: true`, whoever sends it, and writes nothing (no key column; no migrations this round, DL-0560).
+  - `as_of` is optional on both routes and defaults to today in the tenant's report time zone (`app.sod_report_timezone()`).
+  - `WizardError` maps to HTTP: INVALID_COMMAND 400 `invalid_request`, UNKNOWN_COMPANY 404 (another tenant's company is invisible under RLS), STEP_LOCKED 409, STEP_INVALID 422 with `missing[]`, NO_HISTORY_NOT_ALLOWED 422.
+  - Only a new completion is audited (`setup_wizard_step`, id `<company>:<step>`); a replay is not described.
+- Why: ADR-0067 rule 6 (server derives status); apps/api rules (idempotency, audit); same state-replay pattern as the close checklist and period reopen (DL-0420). Unlike the close checklist, a replay by another user is not a 409: completing a step is a fact about the company, and the repeat changes nothing.
+- Alternatives: 409 for a replay by a different user (no benefit; the wizard screen may be used by two admins); a required `as_of` (pushes date logic into the browser).
+- ADR: ADR-0075 · Status: accepted

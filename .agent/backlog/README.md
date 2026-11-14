@@ -17,8 +17,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 119 |
-| todo | 27 |
-| verifying | 2 |
+| todo | 26 |
+| verifying | 3 |
 | **total** | **159** |
 | **total** | **147** |
 
@@ -178,7 +178,7 @@ graph LR
 | [T-0079](T-0079.md) | Hard-lock reopen with two approvers and audit reason | MVP | verifying | T-0078, T-0015, T-0013 | UC-10 | 1 |
 | [T-0080](T-0080.md) | Setup wizard backend (10 steps) and opening balances | MVP | review | T-0018, T-0034, T-0058, T-0063, T-0039, T-0046, T-0050 | — | 3 |
 | [T-0123](T-0123.md) | Setup wizard state machine and step validators (steps 1–10) | MVP | verifying | T-0080, T-0018, T-0034, T-0058, T-0063, T-0039 | — | 0 |
-| [T-0157](T-0157.md) | Setup wizard over HTTP: GET /setup/wizard and POST /setup/wizard/steps/:n/complete | MVP | todo | T-0123 | — | 0 |
+| [T-0157](T-0157.md) | Setup wizard over HTTP: GET /setup/wizard and POST /setup/wizard/steps/:n/complete | MVP | verifying | T-0123 | — | 0 |
 | [T-0158](T-0158.md) | Module-owned settings for wizard steps 3, 8 and 10 (GST basis, BAS frequency, branding, payment terms and methods) and their validators | MVP | verifying | T-0123, T-0034 | — | 1 |
 | [T-0164](T-0164.md) | AR - new invoices take their due date from the company's default payment terms | MVP | todo | T-0158 | UC-01 | 0 |
 | [T-0165](T-0165.md) | Documents - invoice HTML/PDF shows the company's branding and accepted payment methods | MVP | todo | T-0158, T-0041 | UC-01 | 0 |

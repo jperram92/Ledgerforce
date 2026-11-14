@@ -3,6 +3,7 @@ import { ApInboxController } from './ap/inbox.controller.ts';
 import { ApPaymentBatchesController } from './ap/payment-batches.controller.ts';
 import { ArReceiptsController } from './ar/receipts.controller.ts';
 import { OpeningBalancesController } from './setup/opening-balances.controller.ts';
+import { SetupWizardController } from './setup/wizard.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArInvoicesController } from './ar/invoices.controller.ts';
 import { ArReminderPauseController } from './ar/reminder-pause.controller.ts';
@@ -139,6 +140,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   CloseChecklistController,
   BankRecController,
   OpeningBalancesController,
+  SetupWizardController,
   AuthController,
   LoginController,
 ];
@@ -190,6 +192,7 @@ class AppModule {
         CloseChecklistController,
         BankRecController,
         OpeningBalancesController,
+        SetupWizardController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,
