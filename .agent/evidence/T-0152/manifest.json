@@ -73,6 +73,78 @@
       "provider": "unknown",
       "timestamp": "2026-11-14T01:28:12.002Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0152/20261114-023126-SS-UC11-08-refund-forbidden-1440.png",
+      "test": "web/refunds.spec.ts › SS-UC11-08 forbidden: a user without the refund permissions sees the credit but can neither request nor approve [T-0152]",
+      "commit": "15962e309bb8",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:31:26.361Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0152/20261114-023125-SS-UC11-08-refund-request-1440.png",
+      "test": "web/refunds.spec.ts › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 1440 [T-0152]",
+      "commit": "15962e309bb8",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:31:25.245Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0152/20261114-023126-SS-UC11-08-refund-journal-preview-1440.png",
+      "test": "web/refunds.spec.ts › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 1440 [T-0152]",
+      "commit": "15962e309bb8",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:31:26.232Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0152/20261114-023128-SS-UC11-08-refund-approved-1440.png",
+      "test": "web/refunds.spec.ts › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 1440 [T-0152]",
+      "commit": "15962e309bb8",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:31:28.062Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0152/20261114-023130-SS-UC11-08-refund-request-390.png",
+      "test": "web/refunds.spec.ts › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 390 [T-0152]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:31:30.044Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0152/20261114-023130-SS-UC11-08-refund-journal-preview-390.png",
+      "test": "web/refunds.spec.ts › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 390 [T-0152]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:31:30.988Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0152/20261114-023132-SS-UC11-08-refund-approved-390.png",
+      "test": "web/refunds.spec.ts › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 390 [T-0152]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:31:32.744Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-08",
+      "file": ".agent/evidence/T-0152/20261114-023134-SS-UC11-08-refund-self-approval-refused-1440.png",
+      "test": "web/refunds.spec.ts › SS-UC11-08 refusal: the person who requested a refund cannot approve it (SOD_REFUND_SELF_APPROVAL) [T-0152]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:31:34.956Z",
+      "result": "passed"
     }
   ]
 }

@@ -73,6 +73,96 @@
       "provider": "claude",
       "timestamp": "2026-11-14T01:29:12.989Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-024607-SS-UC01-13-invoice-ready-to-approve-1440.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 1440 [T-0132]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:46:07.411Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-024608-SS-UC01-13-invoice-posted-1440.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 1440 [T-0132]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:46:08.138Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-024609-SS-UC01-13-invoice-ready-to-approve-390.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 390 [T-0132]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:46:09.920Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-024610-SS-UC01-13-invoice-posted-390.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: an Approver approves and posts a draft invoice from its screen @ 390 [T-0132]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:46:10.585Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-024612-SS-UC01-13-invoice-no-approve-permission.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: without ar.invoice.approve there is no approve action, and the screen says who approves [T-0132]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:46:12.535Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-024615-SS-UC01-13-invoice-creator-cannot-approve.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: the draft's creator is told beforehand that someone else must approve it [T-0132]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:46:15.084Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-024617-SS-UC01-13-invoice-approve-refused.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: refusals from the API are explained in plain words [T-0132]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:46:17.182Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-13",
+      "file": ".agent/evidence/T-0132/20261114-024619-SS-UC01-13-invoice-small-team-reason.png",
+      "test": "web/invoice-approve.spec.ts › SS-UC01-13: in small-team mode the only user approves their own draft with a recorded reason [T-0132]",
+      "commit": "15962e309bb8-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-14T02:46:19.158Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-10",
+      "file": ".agent/evidence/T-0132/20261114-024801-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ar/invoices.db.test.ts › T-0131: invoice read routes › SS-UC01-10 \"Show me the journal\" returns the engine preview (GP-001 totals) and writes nothing",
+      "commit": "15962e309bb8-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-14T02:48:01.764Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-12",
+      "file": ".agent/evidence/T-0132/20261114-024801-tests-api-db.json",
+      "test": "9 test(s): apps/api/src/ar/invoices.db.test.ts › SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) › SS-UC01-12 a user without ar.invoice.approve is refused (403) and nothing posts | apps/api/src/ar/invoices.db.test.ts › SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) › SS-UC01-12 the draft's creator is refused by SOD_INVOICE_SELF_APPROVAL, audited, and the screen is told beforehand | apps/api/src/ar/invoices.db.test.ts › SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) › SS-UC01-12 without an Idempotency-Key the approval is refused (400) and nothing posts | apps/api/src/ar/invoices.db.test.ts › SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) › SS-UC01-12 another approver posts it: the journal equals the T-0131 preview and GP-001; audited | apps/api/src/ar/invoices.db.test.ts › SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) › SS-UC01-12 a replay by the approver answers 200 with the posted result and posts nothing more; it is audited | apps/api/src/ar/invoices.db.test.ts › SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) › SS-UC01-12 a different user approving the posted invoice gets 409 already_posted | apps/api/src/ar/invoices.db.test.ts › SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) › SS-UC01-12 another tenant's invoice is not found (404) and nothing posts | apps/api/src/ar/invoices.db.test.ts › SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) › SS-UC01-12 small-team mode: the only user may approve their own draft with a recorded exception | apps/api/src/ar/invoices.db.test.ts › SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073) › SS-UC01-12 without the outboxes the approval is refused (503) and nothing posts",
+      "commit": "15962e309bb8-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-14T02:48:01.764Z",
+      "result": "passed"
     }
   ]
 }
