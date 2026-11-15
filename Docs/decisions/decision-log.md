@@ -3773,3 +3773,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0165 requires all four tests to be green before T-0172 goes to review. The throwing condition uses the same test-only seam as the existing F3 test: `approve` is re-declared with `RequireStepUp(300, cond)`, then restored in `finally`. No production code changed. The behaviour already existed, so the tests could not be seen RED first. Instead, two temporary interceptor mutations were run and reverted: a token counted as stepped up, and a thrown condition swallowed as false. Each made its test fail.
 - Alternatives: an api-unit test of `TenantInterceptor` with a mocked condition (rejected: the api-db test exercises the real route, RLS and Stripe stub with no production seam needed); a test-only controller (rejected: the real approve route is what RQ-0165 is about).
 - ADR: ADR-0083 · Status: accepted
+
+### DL-0700 — Company bank account create: the GL account's active bank account is the replay record (no migration)
+- Date: 2026-11-15 · By: claude · Task: T-0185 · Category: architecture
+- Decision: `POST /setup/bank-accounts` requires an Idempotency-Key but stores none. The database allows one active bank account per GL account (`bank_account_active_gl_uq`), so the request is identified by (company, GL account). Same name, BSB, last 3 of the number, account name, currency, APCA user id, ABA user name and FI mnemonic → 200 `replayed:true`, nothing written; any difference, or a lost race on the unique index → 409 `GL_ACCOUNT_IN_USE`. Migration 0075 is not used.
+- Why: RQ-0166 — the repository's "stored row is the replay record" precedent (fiscal years, close checklist, bank reconciliation); the IETF Idempotency-Key draft allows a resource to define key uniqueness and a fingerprint of selected fields; ERPNext refuses a second bank account on the same GL account. lf_app cannot read the audit log, so it cannot be a key store.
+- Alternatives: key store table (needs a migration); uuid v5 row id from the key (changes the module's id scheme); decrypting to compare the full number (widens ADR-0018).
+- ADR: ADR-0084 · Status: proposed (accepts on cross-review)
+
+### DL-0701 — Adding a company bank account needs step-up (300 s) but no SoD step
+- Date: 2026-11-15 · By: claude · Task: T-0185 · Category: security
+- Decision: `POST /setup/bank-accounts` is `settings.setup.manage` + `@RequireStepUp(300)`, like supplier bank-detail requests and the remittance designation. No SoD step: adding an account moves and redirects no money; the account printed on invoices changes only through the maker-checker remittance routes (ADR-0080), and payments out need a released batch (SoD + step-up).
+- Why: RQ-0166 findings 4–5 — design §6.2 lists "change bank details" for step-up without limiting it to suppliers; OWASP ASVS 4.0.3 V3.7.1; design §6.5 rule 2 names supplier and employee bank details only. ERPNext and Odoo gate by role only, so this is stricter than both.
+- Alternatives: no step-up (rejected: design §6.2); maker-checker on add (rejected: no redirection path; duplicates ADR-0080).
+- ADR: ADR-0084 · Status: accepted (applies ADR-0025 under DL-0691)
+
+### DL-0702 — The replay comparison is a bank module function; database refusals map to fixed messages
+- Date: 2026-11-15 · By: claude · Task: T-0185 · Category: architecture
+- Decision: `sameCompanyBankAccount(existing, input)` in `@ledgerforce/bank` compares a stored masked account with a create request after the module's own normalisation (BSB `NNN-NNN`, number without spaces, trimmed names), so the controller holds no bank rule. The trigger's `check_violation` maps to 422 `GL_ACCOUNT_NOT_BANK` and the unique violation to 409 `GL_ACCOUNT_IN_USE`, each with a fixed message: database error text is never passed to the client.
+- Why: apps/api rules (thin controllers, no domain logic); RQ-0166 finding 6 (database error detail can carry values).
+- Alternatives: compare in the controller (rejected: duplicates normalisation rules).
+- ADR: ADR-0084 · Status: accepted
+
+### DL-0703 — Bank accounts screen: GL accounts offered from the API, the number never kept after sending
+- Date: 2026-11-15 · By: claude · Task: T-0185 · Category: ui
+- Decision: `/settings/bank-accounts` lists accounts with the masked number as the API gives it and offers only GL accounts the API lists (`in_use` ones disabled). The typed account number lives only in the form's state; it is cleared after a successful add and never stored in browser storage, so a step-up round trip means typing it again (the prompt says so). Currency defaults to the GL account's currency or the company's base currency. Wizard step 4 links here (STEP_WHERE).
+- Why: design §6.6 (masked; decrypted only where needed), P12 plain words, P6 step-up.
+- Alternatives: keep the typed number in sessionStorage across the step-up (rejected: puts a clear bank number in browser storage).
+- ADR: ADR-0084 · Status: accepted
+
+### DL-0704 — Follow-up T-0193: change ABA details or archive a company bank account over HTTP
+- Date: 2026-11-15 · By: claude · Task: T-0185 · Category: scope
+- Decision: Add card T-0193. lf_app has no UPDATE grant on `apca_user_id` / `aba_user_name` / `aba_fi_mnemonic`, and archiving has no route, so an account added without ABA details cannot be completed in the app. That needs a grant migration and its own controls (bank-detail change).
+- Why: RQ-0166 finding 7; outside T-0185's no-migration scope.
+- Alternatives: add the grant here (rejected: card says no migration unless truly needed; the step can be met by adding the account with its ABA details).
+- ADR: none · Status: accepted
