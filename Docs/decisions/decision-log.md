@@ -3536,3 +3536,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0161 S8; no migration is allowed for a key store and none is needed: each write converges on the requested state.
 - Alternatives: a key store table (rejected: migration); module-prefixed routes (rejected in ADR-0081).
 - ADR: ADR-0081 · Status: accepted
+
+### DL-0643 — Company details and Tax settings screens: one page per wizard step, client from the env
+- Date: 2026-11-15 · By: claude · Task: T-0176 · Category: ui
+- Decision: Step 1 gets `/settings/company` and step 3 `/settings/tax`, each with one primary action (Save) and secondary actions (Add financial year; Add the standard Australian tax codes), listed on the Settings page and linked from the wizard's "where" line. The screens build their API client from `useServices().env` instead of adding a `settings` entry to `Services`, so parallel cards touching `env.tsx`/`App.tsx` do not conflict. A tax rate is shown as a percentage by moving the decimal point in the API's string (`0.10000000` → `10%`), never through a number. The BAS frequency and GST basis choices carry the ATO conditions as guidance only (RQ-0153: LedgerForce refuses no lawful choice). Users without the manage permission see a read-only view; without `settings.read` the screen is forbidden.
+- Why: genericness probe (≤ 1 primary per page), apps/web rules (no number arithmetic on decimal strings), P12 plain words, minimal shared-file churn during the parallel round (DL-0569).
+- Alternatives: one combined Settings form for all steps (rejected: mixes permissions `settings.setup.manage` and `settings.tax.manage`); a `settings` service in `Services` (deferred: can be added when the parallel round is merged).
+- ADR: ADR-0081 · Status: accepted
+
+### DL-0644 — The wizard's step 1 and 3 assertions follow the new links; evidence committed as text this round
+- Date: 2026-11-15 · By: claude · Task: T-0176 · Category: process
+- Decision: `tests/e2e/web/setup-wizard.spec.ts` and `apps/web/src/setup/wizard-logic.test.ts` asserted that step 3 has "no LedgerForce screen". That behaviour changed by design, so the assertions now require the step 1 "Company details" and step 3 "Tax settings" links and keep the "no LedgerForce screen" check on step 4 (still true until T-0185). No assertion was removed or loosened. Screenshots of SS-PLAT-129 were taken and inspected but, on the lead's instruction for this round, only `.txt`/`.json` evidence (manifest and test output) is committed.
+- Why: the old assertion described the gap this card closes; the lead merges and keeps the binary evidence policy for the round.
+- Alternatives: leave the old assertion (impossible: it would fail on the intended behaviour).
+- ADR: none · Status: accepted
