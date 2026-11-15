@@ -213,9 +213,9 @@ graph LR
 | [T-0090](T-0090.md) | UI: close checklist and period status | MVP | review | T-0081, T-0078, T-0079, T-0148 | UC-10 | 1 |
 | [T-0091](T-0091.md) | UI: setup wizard | MVP | verifying | T-0081, T-0080, T-0123, T-0157 | — | 0 |
 | [T-0176](T-0176.md) | UI: settings forms for setup wizard steps 1, 3, 4, 8 and 10 — split from T-0091 | MVP | todo | T-0091 | — | 0 |
-| [T-0177](T-0177.md) | UI: opening balances import screen (wizard step 9) — split from T-0091; matrix moved to T-0187/T-0188 (DL-0650) | MVP | in_progress | T-0091 | — | 0 |
-| [T-0187](T-0187.md) | API: posting-profile matrix read and override routes (ADR-0082) — split from T-0177 | MVP | in_progress | T-0039 | — | 0 |
-| [T-0188](T-0188.md) | UI: posting-profile matrix screen (wizard step 7) — split from T-0177 | MVP | in_progress | T-0187, T-0091 | — | 0 |
+| [T-0177](T-0177.md) | UI: opening balances import screen (wizard step 9) — split from T-0091; matrix moved to T-0187/T-0188 (DL-0650) | MVP | verifying | T-0091 | — | 0 |
+| [T-0187](T-0187.md) | API: posting-profile matrix read and override routes (ADR-0082) — split from T-0177 | MVP | verifying | T-0039 | — | 0 |
+| [T-0188](T-0188.md) | UI: posting-profile matrix screen (wizard step 7) — split from T-0177 | MVP | verifying | T-0187, T-0091 | — | 0 |
 | [T-0092](T-0092.md) | UI: Salesforce sync issues inbox | MVP | review | T-0081, T-0071 | — | 0 |
 | [T-0093](T-0093.md) | UI: users, roles, SoD exceptions report and audit log viewer | MVP | review | T-0081, T-0016, T-0015 | — | 0 |
 | [T-0094](T-0094.md) | Self-hosted Docker Compose install (api, worker, web, postgres, keycloak) | MVP | review | T-0081, T-0030, T-0011 | — | 1 |
