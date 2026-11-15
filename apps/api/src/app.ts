@@ -7,6 +7,7 @@ import { OpeningBalancesController } from './setup/opening-balances.controller.t
 import { SetupWizardController } from './setup/wizard.controller.ts';
 import { CompanySettingsController } from './settings/company-settings.controller.ts';
 import { TaxSettingsController } from './settings/tax-settings.controller.ts';
+import { PostingProfilesController } from './setup/posting-profiles.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArInvoicesController } from './ar/invoices.controller.ts';
 import { ArReminderPauseController } from './ar/reminder-pause.controller.ts';
@@ -145,6 +146,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   CloseChecklistController,
   BankRecController,
   OpeningBalancesController,
+  PostingProfilesController,
   SetupWizardController,
   CompanySettingsController,
   TaxSettingsController,
@@ -200,6 +202,7 @@ class AppModule {
         CloseChecklistController,
         BankRecController,
         OpeningBalancesController,
+        PostingProfilesController,
         SetupWizardController,
         CompanySettingsController,
         TaxSettingsController,

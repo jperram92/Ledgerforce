@@ -3550,3 +3550,48 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the old assertion described the gap this card closes; the lead merges and keeps the binary evidence policy for the round.
 - Alternatives: leave the old assertion (impossible: it would fail on the intended behaviour).
 - ADR: none · Status: accepted
+
+### DL-0650 — T-0177 split: opening balances stays, the posting-profile matrix becomes T-0187 (API) and T-0188 (screen)
+- Date: 2026-11-15 · By: claude · Task: T-0177, T-0187, T-0188 · Category: scope
+- Decision: T-0177 keeps the step 9 opening-balances screen, which uses the existing T-0080 routes. T-0187 adds the module read `profileMatrix` and the routes `GET /posting-profiles/matrix` and `PUT /posting-profiles/overrides` (ADR-0082). T-0188 builds the matrix screen at `/accounting/posting-profiles` and links it from wizard step 7. T-0182 (setup end to end) now also depends on T-0188. New scenarios: SS-PLAT-132 (opening balances screen), SS-PLAT-133 (matrix over HTTP) and SS-PLAT-134 (matrix screen).
+- Why: RQ-0162 found no posting-profile routes. Together the routes, the ADR and two screens are well over the ~400-line card limit (new-task-card skill). Splitting lets each slice be finished, tested and evidenced on its own.
+- Alternatives: one card for everything (too large); a screen without routes (impossible: the browser may not compute accounting).
+- ADR: ADR-0082 · Status: accepted
+
+### DL-0651 — The opening balances screen lives at /settings/setup/opening-balances and names accounts from the chart
+- Date: 2026-11-15 · By: claude · Task: T-0177 · Category: ui
+- Decision: The step 9 screen is at `/settings/setup/opening-balances`, beside the wizard. The IA has no route for it, and the API owns `/setup/*`. It reads CSV files in the browser as text, and only sends them to the preview and post routes. It shows the preview with `JournalTable`, naming each account code from `GET /accounts`; when the chart cannot be read, it shows the code alone. Item lines carry the engine's memo (document number and date). The Idempotency-Key is kept while the inputs stay the same, so a retry after a network error replays rather than double-posts. Any change of input clears the preview and makes a new key.
+- Why: P4 (journal before posting), "no accounting in the browser" (apps/web AGENTS.md), design §3.9 idempotency.
+- Alternatives: add account names to the preview response (an API change for display only); a new key on every click (a retry after a lost answer would be refused as OPENING_EXISTS instead of replaying).
+- ADR: none · Status: accepted
+
+### DL-0652 — Posting-profile matrix routes: settings.read to read, settings.chart.manage to set an override (ADR-0082)
+- Date: 2026-11-15 · By: claude · Task: T-0187 · Category: architecture
+- Decision: ADR-0082 (Proposed, architecture, no human gate) adds two things:
+  - **Module:** `profileMatrix` and `fillOverride` in `@ledgerforce/products` (new file `matrix-view.ts`; `resolveRows` is exported from `matrix.ts` so the cells use the posting rule). Two new refusal codes, `PROFILE_UNKNOWN` and `PROFILE_TAX_CODE`.
+  - **Routes:** `GET /posting-profiles/matrix` needs `settings.read`, and `PUT /posting-profiles/overrides` needs `settings.chart.manage` plus an Idempotency-Key. The PUT is idempotent by nature, like the T-0146 rebind: a repeat gives `changed:false`, with no write and no audit.
+
+  The matrix answer includes the account `choices` (active, postable, non-control revenue and expense accounts). The screen then needs no `gl.account.read`, and the browser never decides which accounts are allowed.
+- Why: RQ-0162 findings 2–4. These are the catalogue's existing permissions, so nothing changes in security, and no idempotency table is needed, so there is no migration (DL-0569).
+- Alternatives: a new permission (a security ADR, human gate); POST with an idempotency table (a migration, which is not allowed this round); resolving cells in the browser (accounting in the browser).
+- ADR: ADR-0082 · Status: accepted
+
+### DL-0653 — /posting-profiles added to the nginx API prefixes; @ledgerforce/products becomes an API runtime dependency
+- Date: 2026-11-15 · By: claude · Task: T-0187 · Category: tooling
+- Decision: `infra/docker/nginx/default.conf.template` now proxies `posting-profiles` to the API. The test `apps/api/src/deploy/nginx-routes.test.ts` (SS-PLAT-86) requires every API controller prefix to be proxied. `@ledgerforce/products` moves from devDependencies to dependencies of `@ledgerforce/api`. It is an internal workspace package with no third-party code, so no ADR is needed (same as DL-0624). The lockfile changes only in the importer section.
+- Why: the new controller would otherwise be unreachable behind nginx, and the module is now imported by production code.
+- Alternatives: mount the routes under `/setup/posting-profiles` (rejected: the matrix is not only a setup screen; IA S13 lists it under Accounting).
+- ADR: ADR-0082 · Status: accepted
+
+### DL-0654 — The posting-profile matrix screen: words first, one fill panel, choices only from the API
+- Date: 2026-11-15 · By: claude · Task: T-0188 · Category: ui
+- Decision: `/accounting/posting-profiles` is listed with the accounting pages (beside the chart of accounts) and is linked from wizard step 7.
+  - **Layout.** Sales (customer types) and purchases (supplier types) are two tables, each with a "Product default" row.
+  - **Cell states.** Each cell says Default, Override or Gap in words. An override has a solid ink edge and a gap a dashed one. Following the Timeline direction (DL-0070), the mockup's red and teal are not used for state.
+  - **Narrow screens.** The tables scroll sideways inside a focusable region, so the page never scrolls sideways at 390 px.
+  - **Filling a gap.** "Fill the gap" opens one panel below the tables, and focus moves to its heading. The panel offers only the API's `choices` of the purpose's type (income for a sale, expense for a purchase), or a tax code for a tax gap. Gaps an override cannot fix (control account, profile kind) have no button; their message says why.
+  - **Retries.** The Idempotency-Key stays while the choice is unchanged, so a retry cannot apply twice.
+  - **Wording.** The " · " separator of the mockup is replaced by commas (genericness probe).
+- Why: P12 (words first), WCAG 1.4.1 (not colour alone), the ui-screen skill, ADR-0082 (choices come from the API, no accounting in the browser).
+- Alternatives: a side panel as in the mockup (at 1440 the matrix would need sideways scrolling); stacking rows into cards on phones (loses the table semantics that screen readers use to read row and column headers).
+- ADR: ADR-0082 · Status: accepted

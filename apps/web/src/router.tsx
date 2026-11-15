@@ -27,6 +27,8 @@ import { isJournalStatus, JournalsPage } from './gl/JournalsPage.tsx';
 import type { JournalStatus } from './gl/client.ts';
 import { NotFoundPage, SectionPage } from './pages.tsx';
 import { SECTIONS } from './sections.ts';
+import { OpeningBalancesPage } from './setup/OpeningBalancesPage.tsx';
+import { PostingProfilesPage } from './setup/PostingProfilesPage.tsx';
 import { WizardPage } from './setup/WizardPage.tsx';
 import { CompanySettingsPage } from './settings/CompanySettingsPage.tsx';
 import { TaxSettingsPage } from './settings/TaxSettingsPage.tsx';
@@ -165,12 +167,25 @@ const taxSettingsRoute = createRoute({
   path: 'settings/tax',
   component: TaxSettingsPage,
 });
+// Opening balances, wizard step 9 (T-0177, DL-0651); the API owns /setup/opening-balances.
+const openingBalancesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/setup/opening-balances',
+  component: OpeningBalancesPage,
+});
 
 // GL (T-0082, DL-0226): chart of accounts and manual journals under /accounting, listed on Reports.
 const chartRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: 'accounting/chart',
   component: ChartPage,
+});
+
+// Posting-profile matrix (T-0188, IA S13, wizard step 7); the API owns /posting-profiles.
+const postingProfilesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'accounting/posting-profiles',
+  component: PostingProfilesPage,
 });
 
 // Month-end close checklist (T-0090, UC-10).
@@ -513,7 +528,9 @@ const routeTree = rootRoute.addChildren([
     setupRoute,
     companySettingsRoute,
     taxSettingsRoute,
+    openingBalancesRoute,
     chartRoute,
+    postingProfilesRoute,
     closeRoute,
     bankStatementsRoute,
     bankMatchRoute,

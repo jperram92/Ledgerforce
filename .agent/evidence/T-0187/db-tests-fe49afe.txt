@@ -1,0 +1,21 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aef7f54d904d025a7
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:35321
+[db] test PostgreSQL ready (local) on 127.0.0.1:46551
+ ✓ |api-db| apps/api/src/setup/posting-profiles.db.test.ts > SS-PLAT-133: posting-profile matrix over HTTP > SS-PLAT-133 GET returns the profiles, every cell resolved or marked as a gap, and the account choices 154ms
+ ✓ |api-db| apps/api/src/setup/posting-profiles.db.test.ts > SS-PLAT-133: posting-profile matrix over HTTP > SS-PLAT-133 the Accountant reads the matrix; an AR clerk without settings.read is refused 72ms
+ ✓ |api-db| apps/api/src/setup/posting-profiles.db.test.ts > SS-PLAT-133: posting-profile matrix over HTTP > SS-PLAT-133 PUT refuses without an Idempotency-Key, without settings.chart.manage, and with an unusable account, unknown profile or tax code 83ms
+ ✓ |api-db| apps/api/src/setup/posting-profiles.db.test.ts > SS-PLAT-133: posting-profile matrix over HTTP > SS-PLAT-133 PUT fills the gap once (audited), a repeat changes nothing, and step 7 no longer lists it 119ms
+ ✓ |api-db| apps/api/src/setup/posting-profiles.db.test.ts > SS-PLAT-133: posting-profile matrix over HTTP > SS-PLAT-133 another tenant’s company is 404, and malformed requests are 400 21ms
+ ✓ |db| packages/modules/products/src/matrix-view.db.test.ts > SS-PLAT-133: posting-profile matrix read and override (module) > SS-PLAT-133 lists every active party × product cell, resolved with its account and tax code 79ms
+ ✓ |db| packages/modules/products/src/matrix-view.db.test.ts > SS-PLAT-133: posting-profile matrix read and override (module) > SS-PLAT-133 a gap cell carries the gap check reason, and the matrix agrees with profileGaps 118ms
+ ✓ |db| packages/modules/products/src/matrix-view.db.test.ts > SS-PLAT-133: posting-profile matrix read and override (module) > SS-PLAT-133 fillOverride closes the gap once; a repeat changes nothing 132ms
+ ✓ |db| packages/modules/products/src/matrix-view.db.test.ts > SS-PLAT-133: posting-profile matrix read and override (module) > SS-PLAT-133 fillOverride refuses a control account, an unknown profile and an unknown tax code 16ms
+ ✓ |db| packages/modules/products/src/matrix-view.db.test.ts > SS-PLAT-133: posting-profile matrix read and override (module) > SS-PLAT-133 another tenant’s company is not visible 7ms
+
+ Test Files  2 passed (2)
+      Tests  10 passed (10)
+   Start at  08:35:03
+   Duration  9.35s (transform 2.12s, setup 0ms, import 3.78s, tests 3.73s, environment 0ms)
+

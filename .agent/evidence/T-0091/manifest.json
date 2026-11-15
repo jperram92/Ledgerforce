@@ -271,6 +271,87 @@
       "provider": "unknown",
       "timestamp": "2026-11-15T04:14:28.488Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-082559-SS-PLAT-127-wizard-fresh-company-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 1440 [T-0091]",
+      "commit": "7c6693bf026c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T08:25:59.144Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-082600-SS-PLAT-127-wizard-step-7-no-gaps-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 1440 [T-0091]",
+      "commit": "7c6693bf026c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T08:26:00.752Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-082602-SS-PLAT-127-wizard-complete-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 1440 [T-0091]",
+      "commit": "7c6693bf026c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T08:26:02.234Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-082604-SS-PLAT-127-wizard-fresh-company-390.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 390 [T-0091]",
+      "commit": "7c6693bf026c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T08:26:04.190Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-082605-SS-PLAT-127-wizard-step-7-no-gaps-390.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 390 [T-0091]",
+      "commit": "7c6693bf026c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T08:26:05.462Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-082606-SS-PLAT-127-wizard-complete-390.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 390 [T-0091]",
+      "commit": "7c6693bf026c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T08:26:06.625Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-082608-SS-PLAT-127-wizard-missing-plain-words-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: what is missing is listed in plain words, and Complete waits until nothing is [T-0091]",
+      "commit": "7c6693bf026c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T08:26:08.558Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-128",
+      "file": ".agent/evidence/T-0091/20261115-082612-SS-PLAT-128-wizard-step-9-declare-no-history-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-128: step 9 is declared \"no history\" with a reason, which is shown afterwards [T-0091]",
+      "commit": "7c6693bf026c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T08:26:12.193Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-128",
+      "file": ".agent/evidence/T-0091/20261115-082613-SS-PLAT-128-wizard-step-9-no-history-done-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-128: step 9 is declared \"no history\" with a reason, which is shown afterwards [T-0091]",
+      "commit": "7c6693bf026c-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T08:26:13.097Z",
+      "result": "passed"
     }
   ]
 }

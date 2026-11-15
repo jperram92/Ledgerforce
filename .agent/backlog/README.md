@@ -16,11 +16,10 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 7 |
 | done | 3 |
 | in_progress | 1 |
-| review | 126 |
+| review | 131 |
 | todo | 22 |
-| verifying | 5 |
-| **total** | **164** |
-| **total** | **147** |
+| verifying | 4 |
+| **total** | **168** |
 
 | Phase | Cards |
 |---|---:|
@@ -216,6 +215,10 @@ graph LR
 | [T-0185](T-0185.md) | UI: bank accounts settings screen (wizard step 4) — split from T-0176 | MVP | todo | T-0176 | — | 0 |
 | [T-0186](T-0186.md) | UI: numbering and billing (step 8) and approval amounts (step 10) settings screens — split from T-0176 | MVP | todo | T-0176 | — | 0 |
 | [T-0177](T-0177.md) | UI: opening balances import and posting-profile matrix screens (wizard steps 9 and 7) — split from T-0091 | MVP | todo | T-0091 | — | 0 |
+| [T-0176](T-0176.md) | UI: settings forms for setup wizard steps 1, 3, 4, 8 and 10 — split from T-0091 | MVP | todo | T-0091 | — | 0 |
+| [T-0177](T-0177.md) | UI: opening balances import screen (wizard step 9) — split from T-0091; matrix moved to T-0187/T-0188 (DL-0650) | MVP | verifying | T-0091 | — | 0 |
+| [T-0187](T-0187.md) | API: posting-profile matrix read and override routes (ADR-0082) — split from T-0177 | MVP | verifying | T-0039 | — | 0 |
+| [T-0188](T-0188.md) | UI: posting-profile matrix screen (wizard step 7) — split from T-0177 | MVP | verifying | T-0187, T-0091 | — | 0 |
 | [T-0092](T-0092.md) | UI: Salesforce sync issues inbox | MVP | review | T-0081, T-0071 | — | 0 |
 | [T-0093](T-0093.md) | UI: users, roles, SoD exceptions report and audit log viewer | MVP | review | T-0081, T-0016, T-0015 | — | 0 |
 | [T-0094](T-0094.md) | Self-hosted Docker Compose install (api, worker, web, postgres, keycloak) | MVP | review | T-0081, T-0030, T-0011 | — | 1 |
@@ -269,7 +272,7 @@ graph LR
 | [T-0148](T-0148.md) | Close checklist and period list over HTTP (for the close screen) | MVP | review | T-0078, T-0079 | UC-10 | 0 |
 | [T-0159](T-0159.md) | Mark ar_settings.ecl_allowance_account_id deprecated (column comment) and drop the template suggestion | MVP | review | T-0145 | UC-03 | 0 |
 | [T-0169](T-0169.md) | RBAC: ar.invoice.approve, ar.refund.create/approve, settings.setup.manage (DL-0477) | MVP | review | — | UC-01, UC-11 | 1 |
-| [T-0182](T-0182.md) | Setup wizard end to end: a fresh tenant completes setup through the UI (T-0091 AC-1) | MVP | todo | T-0091, T-0176, T-0177 | UC-SETUP | 0 |
+| [T-0182](T-0182.md) | Setup wizard end to end: a fresh tenant completes setup through the UI (T-0091 AC-1) | MVP | todo | T-0091, T-0176, T-0177, T-0188 | UC-SETUP | 0 |
 
 ## Latest update — 2026-11-01
 Existing T-0095 work saved as WIP at user request:

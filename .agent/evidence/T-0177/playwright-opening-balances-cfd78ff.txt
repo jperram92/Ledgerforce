@@ -1,0 +1,9 @@
+
+Running 4 tests using 2 workers
+
+  ✓  1 [chromium] › tests/e2e/web/opening-balances.spec.ts:413:1 › SS-PLAT-132: a refused file is explained with its line, and nothing is posted [T-0177] (3.3s)
+  ✓  3 [chromium] › tests/e2e/web/opening-balances.spec.ts:464:1 › SS-PLAT-132: an Accountant without settings.chart.manage cannot import, and nothing is read [T-0177] (1.6s)
+  ✓  2 [chromium] › tests/e2e/web/opening-balances.spec.ts:347:3 › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 1440 [T-0177] (5.8s)
+  ✓  4 [chromium] › tests/e2e/web/opening-balances.spec.ts:347:3 › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 390 [T-0177] (3.9s)
+
+  4 passed (11.5s)

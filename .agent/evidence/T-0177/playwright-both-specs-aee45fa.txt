@@ -1,0 +1,14 @@
+
+Running 9 tests using 2 workers
+
+  ✓  2 [chromium] › tests/e2e/web/opening-balances.spec.ts:413:1 › SS-PLAT-132: a refused file is explained with its line, and nothing is posted [T-0177] (4.3s)
+  ✓  1 [chromium] › tests/e2e/web/opening-balances.spec.ts:347:3 › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 1440 [T-0177] (7.8s)
+  ✓  3 [chromium] › tests/e2e/web/opening-balances.spec.ts:464:1 › SS-PLAT-132: an Accountant without settings.chart.manage cannot import, and nothing is read [T-0177] (2.7s)
+  ✓  4 [chromium] › tests/e2e/web/opening-balances.spec.ts:347:3 › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 390 [T-0177] (6.1s)
+  ✓  5 [chromium] › tests/e2e/web/posting-profiles.spec.ts:329:3 › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 1440 [T-0188] (8.6s)
+  ✓  6 [chromium] › tests/e2e/web/posting-profiles.spec.ts:427:1 › SS-PLAT-134: an Accountant sees the matrix without actions [T-0188] (3.9s)
+  ✓  8 [chromium] › tests/e2e/web/posting-profiles.spec.ts:439:1 › SS-PLAT-134: a user without settings.read is told so, and the matrix is not read [T-0188] (2.3s)
+  ✓  7 [chromium] › tests/e2e/web/posting-profiles.spec.ts:329:3 › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 390 [T-0188] (6.6s)
+  ✓  9 [chromium] › tests/e2e/web/posting-profiles.spec.ts:388:1 › SS-PLAT-134: a refused account is explained, and the gap stays [T-0188] (3.1s)
+
+  9 passed (28.4s)

@@ -1,0 +1,18 @@
+Validation of T-0177 / T-0187 / T-0188 at aee45fa (branch feat/T-0177-ob-profiles), claude, 2026-11-15
+
+pnpm install --frozen-lockfile                         exit 0
+pnpm typecheck                                          exit 0 (all 50 workspace projects "Done")
+pnpm -s lint                                            exit 0
+pnpm -s format:check                                    exit 0 ("All matched files use Prettier code style!")
+node scripts/agent/conductor.ts lint-backlog            exit 0 ("backlog OK")
+vitest --project web                                    21 files, 195 passed, 0 skipped, 0 failed
+vitest --project api-unit                               6 files, 167 passed, 0 skipped, 0 failed
+VITEST_MAX_WORKERS=1 vitest --project db --project api-db
+  packages/modules/products packages/modules/setup apps/api/src/setup
+                                                        9 files, 77 passed, 0 skipped, 0 failed
+playwright tests/e2e/web/opening-balances.spec.ts tests/e2e/web/posting-profiles.spec.ts --trace off
+                                                        9 passed, 0 skipped, 0 failed (playwright-both-specs-aee45fa.txt)
+
+Not run: bash scripts/agent/verify.sh (full definition of done), the full db/api-db suites,
+and the full e2e suite. The regression runs that were done: setup-wizard.spec.ts (9 passed, at
+cfd78ff) and nginx-routes in api-unit.

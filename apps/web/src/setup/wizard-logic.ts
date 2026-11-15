@@ -30,7 +30,9 @@ type Screen =
   | '/settings/users'
   | '/settings/sync-issues'
   | '/settings/company'
-  | '/settings/tax';
+  | '/settings/tax'
+  | '/settings/setup/opening-balances'
+  | '/accounting/posting-profiles';
 export interface Where {
   /** An existing screen where the setting is entered or checked. */
   to?: Screen;
@@ -70,10 +72,18 @@ export const STEP_WHERE: Record<number, Where> = {
     name: 'Salesforce sync issues',
     text: 'Records arrive from Salesforce once it is connected. Anything that could not be brought across is listed on',
   },
-  7: { text: ELSEWHERE },
+  // T-0188: the posting-profile matrix (IA S13).
+  7: {
+    to: '/accounting/posting-profiles',
+    name: 'Posting profiles',
+    text: 'See every customer and supplier type against every product type, and fill the gaps, on',
+  },
   8: { text: ELSEWHERE },
+  // T-0177: the opening balances screen (DL-0651).
   9: {
-    text: 'There is no LedgerForce screen for this yet: opening balances are imported from a CSV file through the API.',
+    to: '/settings/setup/opening-balances',
+    name: 'Opening balances',
+    text: 'Import the trial balance and the open customer and supplier items from CSV files, see the journal, then post it, on',
   },
   10: {
     to: '/settings/users',

@@ -1,0 +1,10 @@
+
+Running 5 tests using 2 workers
+
+  ✓  2 [chromium] › tests/e2e/web/posting-profiles.spec.ts:427:1 › SS-PLAT-134: an Accountant sees the matrix without actions [T-0188] (3.5s)
+  ✓  3 [chromium] › tests/e2e/web/posting-profiles.spec.ts:439:1 › SS-PLAT-134: a user without settings.read is told so, and the matrix is not read [T-0188] (2.0s)
+  ✓  1 [chromium] › tests/e2e/web/posting-profiles.spec.ts:329:3 › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 1440 [T-0188] (7.1s)
+  ✓  4 [chromium] › tests/e2e/web/posting-profiles.spec.ts:329:3 › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 390 [T-0188] (4.7s)
+  ✓  5 [chromium] › tests/e2e/web/posting-profiles.spec.ts:388:1 › SS-PLAT-134: a refused account is explained, and the gap stays [T-0188] (2.2s)
+
+  5 passed (15.7s)

@@ -116,5 +116,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0078](0078-statement-import-body-limit.md) | Statement import accepts JSON bodies up to 10 MB; every other route keeps the 100 kB default | security | yes (delegated, DL-0477) | Accepted |
 | [0079](0079-invoice-remittance-bank-account.md) | Print one chosen company bank account as the remittance account on customer invoices | security | yes | Accepted |
 | [0081](0081-setup-settings-http-routes.md) | HTTP routes for the setup settings screens (company details, fiscal years, tax settings, tax codes) | architecture | no | Proposed |
+| [0082](0082-posting-profile-matrix-http-routes.md) | HTTP routes for the posting-profile matrix: read the matrix, set an override | architecture | no | Proposed |
 
 Next free number: **0055** (0055–0060 are reserved for the DL-0409 parallel round) (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

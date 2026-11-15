@@ -72,3 +72,74 @@
   flex-basis: 100%;
   margin-top: 0;
 }
+
+/* Posting-profile matrix (T-0188, mockup 08): party rows × product columns. Each cell says its
+   state in a word (Default, Override, Gap); the lines repeat it: an override has a solid ink
+   edge, a gap a dashed one (never colour alone, DL-0070). The table scrolls sideways inside its
+   own focusable region, so the page never does. */
+.mx-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+.mx-wrap:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+.mx {
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 100%;
+}
+.mx th,
+.mx td {
+  border-bottom: 1px solid var(--line);
+  padding: var(--s2);
+  text-align: left;
+  vertical-align: top;
+  min-width: 9rem;
+}
+.mx thead th {
+  border-bottom: 2px solid var(--ink);
+  color: var(--ink-2);
+  font-weight: 600;
+}
+.mx tbody th {
+  font-weight: 600;
+}
+.mx-sec {
+  display: block;
+  font-weight: 400;
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.mx-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--s1) var(--s2);
+  border-left: 2px solid var(--line);
+}
+.mx-cell[data-state='override'] {
+  border-left: 4px solid var(--ink);
+}
+.mx-cell[data-state='gap'] {
+  border: 1px dashed var(--ink);
+  border-left: 4px dashed var(--ink);
+}
+.mx-word {
+  font-weight: 600;
+  font-size: 13px;
+}
+.mx-tax,
+.mx-gap {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.mx-cell button {
+  align-self: start;
+  margin-top: var(--s1);
+}
+.mx-fill {
+  border-top: 2px solid var(--ink);
+  padding-top: var(--s3);
+}

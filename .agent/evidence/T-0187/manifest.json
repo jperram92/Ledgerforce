@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0187",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-133",
+      "file": ".agent/evidence/T-0187/db-tests-fe49afe.txt",
+      "test": "packages/modules/products/src/matrix-view.db.test.ts + apps/api/src/setup/posting-profiles.db.test.ts (10 tests)",
+      "commit": "fe49afe",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:35:27.377Z",
+      "result": "passed"
+    }
+  ]
+}
