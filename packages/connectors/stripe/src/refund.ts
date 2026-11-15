@@ -19,6 +19,16 @@
  * approval is refused (KEY_EXPIRED): Stripe may have pruned the key (RQ-0115 S5), so a resend
  * could refund twice; someone must check Stripe first (T-0189).
  *
+ * Money leaves at most once per refund document (security review r8 F1, RQ-0164, ADR-0083
+ * addendum): before any create, the send lists the refunds of the party's Stripe payments and
+ * adopts one whose metadata `lf_refund_id` is this document (a commit lost after an earlier send,
+ * or a key Stripe pruned, can never cause a second refund). Before money leaves, the journal is
+ * checked by the engine's own preview and the allocation's rules: a refusal is NOT_POSTABLE
+ * ("not sent to Stripe"). Anything that fails after Stripe accepted (or was adopted) is
+ * SENT_NOT_POSTED — permanent, never retried silently — so the Sync issue says the money is out
+ * and the books do not show it yet; its retry adopts and posts once. The entry is the approver's
+ * when the caller names nobody (F5: the worker's retry).
+ *
  * trySendStripeCustomerRefund runs the send in a savepoint for the approve route: a failure rolls
  * back only the send, so the approval and its outbox event `ar.refund.stripe_approved` commit and
  * the outbox handler (stripeRefundSendHandler) retries. Permanent failures (Stripe 4xx, local
@@ -36,10 +46,21 @@ import {
   type StripeRefundCheck,
 } from '@ledgerforce/ar';
 import type { Database } from '@ledgerforce/db';
-import { allocate, post, subledgerEntriesOf, type PostOptions } from '@ledgerforce/ledger';
+import {
+  allocate,
+  AllocationError,
+  openItem,
+  PeriodLockedError,
+  post,
+  PostingError,
+  preview,
+  subledgerEntriesOf,
+  type PostingCommand,
+  type PostOptions,
+} from '@ledgerforce/ledger';
 import { Decimal } from 'decimal.js';
 import { sql, type Transaction } from 'kysely';
-import { StripeApiError, type StripeClient } from './client.ts';
+import { StripeApiError, type ListedRefund, type StripeClient } from './client.ts';
 
 type Trx = Transaction<Database>;
 
@@ -53,18 +74,25 @@ export type StripeRefundErrorCode =
   | 'REFUND_FAILED'
   | 'NOT_APPROVED'
   | 'NOT_PAYABLE'
-  | 'KEY_EXPIRED';
+  | 'KEY_EXPIRED'
+  /** The journal would be refused, so nothing was sent to Stripe (RQ-0164). */
+  | 'NOT_POSTABLE'
+  /** Stripe has the refund (money out) but the journal could not be written (RQ-0164). */
+  | 'SENT_NOT_POSTED';
 
 export class StripeRefundError extends Error {
   readonly code: StripeRefundErrorCode;
   /** The outbox reads it: a local refusal never succeeds by retrying (dead letter → Sync issue). */
   readonly retryable = false;
   readonly errorCode: string;
-  constructor(code: StripeRefundErrorCode, message: string) {
+  /** SENT_NOT_POSTED: the Stripe refund that is out. */
+  readonly stripeRefundId: string | null;
+  constructor(code: StripeRefundErrorCode, message: string, stripeRefundId: string | null = null) {
     super(message);
     this.name = 'StripeRefundError';
     this.code = code;
     this.errorCode = code;
+    this.stripeRefundId = stripeRefundId;
   }
 }
 
@@ -78,6 +106,14 @@ const DEFAULT_ZONE = 'Australia/Sydney';
 const POSTABLE_STATUS = new Set(['pending', 'requires_action', 'succeeded']);
 const AMOUNT_RE = /^\d{1,15}(\.\d{1,2})?$/;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+/** The refusals of the engine and the allocation: a journal that cannot be written. */
+const isLedgerRefusal = (e: unknown) =>
+  e instanceof PostingError || e instanceof PeriodLockedError || e instanceof AllocationError;
+const reasonOf = (e: unknown) =>
+  e instanceof Error
+    ? `${(e as { code?: unknown }).code ? `${String((e as { code?: unknown }).code)}: ` : ''}${e.message}`
+    : String(e);
 
 export const stripeRefundKey = (refundId: string) => `lf-refund-v2-${refundId.toLowerCase()}`;
 
@@ -192,6 +228,89 @@ export async function stripeRefundOf(
   return r ? { stripeRefundId: r.stripe_refund_id, stripeStatus: r.stripe_status } : null;
 }
 
+/** The Stripe payments a refund of this party could have gone to (RQ-0163 Q1), oldest first. */
+async function candidatePaymentIntents(
+  trx: Trx,
+  companyId: string,
+  partyId: string,
+): Promise<string[]> {
+  const rows = (
+    await sql<{ pi: string }>`
+      SELECT DISTINCT w.payment_intent_id AS pi
+        FROM app.credit_note cn
+        JOIN LATERAL (
+          SELECT e.payment_intent_id FROM app.stripe_webhook_event e
+           WHERE e.company_id = cn.company_id AND e.invoice_id = cn.invoice_id
+           ORDER BY e.received_at, e.id LIMIT 1) w ON true
+       WHERE cn.company_id = ${companyId}::uuid AND cn.party_id = ${partyId}::uuid
+         AND cn.status = 'posted'
+       ORDER BY 1`.execute(trx)
+  ).rows;
+  return rows.map((r) => r.pi);
+}
+
+/**
+ * A refund Stripe already holds for this refund document (metadata `lf_refund_id`), or null:
+ * the lookup before every create (RQ-0164). Read-only at Stripe.
+ */
+async function refundAlreadyAtStripe(
+  trx: Trx,
+  client: StripeClient,
+  companyId: string,
+  refund: CustomerRefundView,
+): Promise<ListedRefund | null> {
+  for (const pi of await candidatePaymentIntents(trx, companyId, refund.partyId)) {
+    const found = await client.findRefund(
+      pi,
+      (x) =>
+        x.metadata['lf_refund_id'] === refund.refundId && x.metadata['lf_company_id'] === companyId,
+    );
+    if (found) return found;
+  }
+  return null;
+}
+
+/**
+ * Everything that could refuse the journal, checked before money leaves (RQ-0164): the engine's
+ * own preview of the posting (period, accounts, party, user) and the allocation's rules against
+ * the credit note's open item. Throws the engine's or the allocation's error.
+ */
+async function assertPostable(
+  trx: Trx,
+  command: PostingCommand,
+  creditItemId: string,
+  allocationDate: string,
+): Promise<void> {
+  const built = await preview(trx, command);
+  const mine = built.subledgerItems[0];
+  if (!mine) {
+    throw new AllocationError('UNKNOWN_OPEN_ITEM', 'the refund journal has no open item');
+  }
+  const cn = await openItem(trx, creditItemId);
+  if (cn.accountId !== mine.accountId) {
+    throw new AllocationError('ACCOUNT_MISMATCH', 'the credit note is on another control account');
+  }
+  if (cn.partyId !== mine.partyId) {
+    throw new AllocationError('PARTY_MISMATCH', 'the credit note is of another party');
+  }
+  if (cn.currency !== mine.currency) {
+    throw new AllocationError('CURRENCY_MISMATCH', `the credit note is in ${cn.currency}`);
+  }
+  if (!new Decimal(cn.originalAmount).isNegative() || !new Decimal(mine.originalAmount).gt(0)) {
+    throw new AllocationError('SAME_SIDE', 'the refund and the credit note are on the same side');
+  }
+  const later = [cn.documentDate, mine.documentDate].sort().at(-1) ?? allocationDate;
+  if (allocationDate < later) {
+    throw new AllocationError(
+      'DATE_BEFORE_DOCUMENT',
+      `allocation date ${allocationDate} is before ${later}`,
+    );
+  }
+  if (new Decimal(mine.originalAmount).gt(new Decimal(cn.openAmount).negated())) {
+    throw new AllocationError('OVER_ALLOCATION', `the credit note has ${cn.openAmount} open`);
+  }
+}
+
 /** Send one approved Stripe refund document (see the header). */
 export async function sendStripeCustomerRefund(
   trx: Trx,
@@ -247,18 +366,6 @@ export async function sendStripeCustomerRefund(
       `refund ${r.refundNo} is dated ${r.refundDate} and cannot be sent on ${sentOn}`,
     );
   }
-  const target = await stripeRefundTarget(trx, {
-    companyId,
-    partyId: r.partyId,
-    amount: r.amount,
-    ...(c.creditNoteId ? { creditNoteId: c.creditNoteId } : {}),
-  });
-  if (!target) {
-    throw new StripeRefundError(
-      'NO_STRIPE_PAYMENT',
-      `no card payment through Stripe of this customer covers refund ${r.refundNo} of ${new Decimal(r.amount).toFixed(2)}`,
-    );
-  }
   const settings = await trx
     .selectFrom('app.stripe_settings')
     .select('clearing_account_id')
@@ -273,23 +380,99 @@ export async function sendStripeCustomerRefund(
   const amount = new Decimal(r.amount);
   const cents = amount.times(100).toFixed(0);
   const key = stripeRefundKey(r.refundId);
+  // F5: the journal is the approver's when the caller names nobody (the worker's retry).
+  const createdBy = c.createdBy ?? r.approvedBy ?? undefined;
+  const sentNotPosted = (id: string, reason: string) =>
+    new StripeRefundError(
+      'SENT_NOT_POSTED',
+      `refund ${r.refundNo} was sent to Stripe as ${id} (the money has left), but it was not posted: ${reason}. The books do not show it yet; fix the cause and retry it from Sync issues (the retry records this Stripe refund and never sends another)`,
+      id,
+    );
 
-  const refund = await client.createRefund(
-    {
-      paymentIntentId: target.payment_intent_id,
-      amountCents: cents,
-      reason: 'requested_by_customer',
-      metadata: {
-        lf_tenant_id: tenant ?? '',
-        lf_company_id: companyId,
-        lf_refund_id: r.refundId,
-        lf_refund_no: r.refundNo,
-        lf_credit_note_id: target.credit_note_id,
-        lf_credit_note_no: target.credit_note_no ?? '',
+  // Never a second refund: adopt the one Stripe already holds for this document (RQ-0164).
+  const existing = await refundAlreadyAtStripe(trx, client, companyId, r);
+  const sentFor = existing?.metadata['lf_credit_note_id'];
+  if (existing && (!sentFor || !UUID_RE.test(sentFor))) {
+    throw sentNotPosted(existing.id, 'the Stripe refund names no credit note');
+  }
+  const target = await stripeRefundTarget(trx, {
+    companyId,
+    partyId: r.partyId,
+    amount: r.amount,
+    ...(existing && sentFor
+      ? { creditNoteId: sentFor }
+      : c.creditNoteId
+        ? { creditNoteId: c.creditNoteId }
+        : {}),
+  });
+  if (existing && target?.payment_intent_id !== existing.paymentIntentId) {
+    throw sentNotPosted(
+      existing.id,
+      'the credit note and payment it was sent for no longer cover it',
+    );
+  }
+  if (!target) {
+    throw new StripeRefundError(
+      'NO_STRIPE_PAYMENT',
+      `no card payment through Stripe of this customer covers refund ${r.refundNo} of ${new Decimal(r.amount).toFixed(2)}`,
+    );
+  }
+  const command = (memo: string): PostingCommand => ({
+    companyId,
+    idempotencyKey: `ar-refund:${r.refundId}`,
+    entryDate: sentOn,
+    sourceType: 'ar_refund',
+    sourceId: r.refundId,
+    memo,
+    ...(createdBy ? { createdBy } : {}),
+    lines: [
+      {
+        account: { role: 'AR_CONTROL' },
+        debit: amount.toFixed(2),
+        partyId: r.partyId,
+        memo: r.refundNo,
       },
-    },
-    key,
-  );
+      { account: { id: settings.clearing_account_id }, credit: amount.toFixed(2) },
+    ],
+  });
+  const memoOf = (id: string) =>
+    `Stripe refund ${id} for ${r.refundNo} of ${target.credit_note_no ?? target.credit_note_id}`;
+
+  // Everything that could refuse the journal, before money leaves.
+  try {
+    await assertPostable(
+      trx,
+      command(memoOf(existing?.id ?? 're_pending')),
+      target.item_id,
+      sentOn,
+    );
+  } catch (e) {
+    if (!isLedgerRefusal(e)) throw e;
+    if (existing) throw sentNotPosted(existing.id, reasonOf(e));
+    throw new StripeRefundError(
+      'NOT_POSTABLE',
+      `refund ${r.refundNo} was not sent to Stripe: its journal would be refused (${reasonOf(e)}); fix that, then retry it from Sync issues`,
+    );
+  }
+
+  const refund =
+    existing ??
+    (await client.createRefund(
+      {
+        paymentIntentId: target.payment_intent_id,
+        amountCents: cents,
+        reason: 'requested_by_customer',
+        metadata: {
+          lf_tenant_id: tenant ?? '',
+          lf_company_id: companyId,
+          lf_refund_id: r.refundId,
+          lf_refund_no: r.refundNo,
+          lf_credit_note_id: target.credit_note_id,
+          lf_credit_note_no: target.credit_note_no ?? '',
+        },
+      },
+      key,
+    ));
   if (
     !POSTABLE_STATUS.has(refund.status) ||
     refund.amountCents !== cents ||
@@ -301,62 +484,46 @@ export async function sendStripeCustomerRefund(
     );
   }
 
-  const posted = await post(
-    trx,
-    {
+  // Stripe has the refund: from here on any failure says so and is never retried silently.
+  try {
+    const posted = await post(trx, command(memoOf(refund.id)), opts);
+    const [refundItem] = await subledgerEntriesOf(trx, posted.entryId);
+    if (!refundItem) throw new Error(`refund entry ${posted.entryId} has no open item`);
+    await allocate(trx, {
       companyId,
-      idempotencyKey: `ar-refund:${r.refundId}`,
-      entryDate: sentOn,
-      sourceType: 'ar_refund',
-      sourceId: r.refundId,
-      memo: `Stripe refund ${refund.id} for ${r.refundNo} of ${target.credit_note_no ?? target.credit_note_id}`,
-      ...(c.createdBy ? { createdBy: c.createdBy } : {}),
-      lines: [
-        {
-          account: { role: 'AR_CONTROL' },
-          debit: amount.toFixed(2),
-          partyId: r.partyId,
-          memo: r.refundNo,
-        },
-        { account: { id: settings.clearing_account_id }, credit: amount.toFixed(2) },
-      ],
-    },
-    opts,
-  );
-  const [refundItem] = await subledgerEntriesOf(trx, posted.entryId);
-  if (!refundItem) throw new Error(`refund entry ${posted.entryId} has no open item`);
-  await allocate(trx, {
-    companyId,
-    idempotencyKey: `stripe-refund-alloc:${key}`,
-    fromEntryId: target.item_id,
-    toEntryId: refundItem.id,
-    amount: amount.toFixed(4),
-    allocationDate: sentOn,
-    ...(c.createdBy ? { createdBy: c.createdBy } : {}),
-  });
-  await trx
-    .insertInto('app.stripe_refund')
-    .values({
-      company_id: companyId,
-      credit_note_id: target.credit_note_id,
-      payment_intent_id: target.payment_intent_id,
+      idempotencyKey: `stripe-refund-alloc:${key}`,
+      fromEntryId: target.item_id,
+      toEntryId: refundItem.id,
       amount: amount.toFixed(4),
-      currency: target.currency,
-      refund_date: sentOn,
-      stripe_refund_id: refund.id,
-      stripe_status: refund.status as 'pending' | 'requires_action' | 'succeeded',
-      idempotency_key: key,
-      entry_id: posted.entryId,
-      created_by: c.createdBy ?? null,
-    })
-    .execute();
-  const paid = await markCustomerRefundPaid(trx, {
-    companyId,
-    refundId: r.refundId,
-    entryId: posted.entryId,
-    paidOn: sentOn,
-  });
-  return { refund: paid, stripeRefundId: refund.id, entryId: posted.entryId, replayed: false };
+      allocationDate: sentOn,
+      ...(createdBy ? { createdBy } : {}),
+    });
+    await trx
+      .insertInto('app.stripe_refund')
+      .values({
+        company_id: companyId,
+        credit_note_id: target.credit_note_id,
+        payment_intent_id: target.payment_intent_id,
+        amount: amount.toFixed(4),
+        currency: target.currency,
+        refund_date: sentOn,
+        stripe_refund_id: refund.id,
+        stripe_status: refund.status as 'pending' | 'requires_action' | 'succeeded',
+        idempotency_key: key,
+        entry_id: posted.entryId,
+        created_by: createdBy ?? null,
+      })
+      .execute();
+    const paid = await markCustomerRefundPaid(trx, {
+      companyId,
+      refundId: r.refundId,
+      entryId: posted.entryId,
+      paidOn: sentOn,
+    });
+    return { refund: paid, stripeRefundId: refund.id, entryId: posted.entryId, replayed: false };
+  } catch (e) {
+    throw sentNotPosted(refund.id, reasonOf(e));
+  }
 }
 
 export type StripeSendOutcome =
@@ -368,8 +535,16 @@ export type StripeSendOutcome =
     }
   /** A transient failure: the outbox handler retries. */
   | { readonly status: 'pending'; readonly message: string }
-  /** A permanent failure: reported (Sync issues via the outbox), not retried automatically. */
-  | { readonly status: 'failed'; readonly code: string; readonly message: string };
+  /**
+   * A permanent failure: reported (Sync issues via the outbox), not retried automatically. With
+   * SENT_NOT_POSTED, `stripeRefundId` is the Stripe refund that is out (RQ-0164).
+   */
+  | {
+      readonly status: 'failed';
+      readonly code: string;
+      readonly message: string;
+      readonly stripeRefundId: string | null;
+    };
 
 const isTransient = (e: unknown) =>
   !(e instanceof StripeRefundError || e instanceof RefundError) &&
@@ -398,7 +573,7 @@ export async function trySendStripeCustomerRefund(
   } catch (e) {
     await sql`ROLLBACK TO SAVEPOINT lf_stripe_refund_send`.execute(trx);
     await sql`RELEASE SAVEPOINT lf_stripe_refund_send`.execute(trx);
-    const message = e instanceof Error ? e.message.slice(0, 300) : String(e).slice(0, 300);
+    const message = e instanceof Error ? e.message.slice(0, 600) : String(e).slice(0, 600);
     if (isTransient(e)) return { status: 'pending', message };
     const code =
       e instanceof StripeRefundError || e instanceof RefundError
@@ -406,7 +581,8 @@ export async function trySendStripeCustomerRefund(
         : e instanceof StripeApiError
           ? (e.stripeCode ?? 'stripe_error')
           : 'error';
-    return { status: 'failed', code, message };
+    const stripeRefundId = e instanceof StripeRefundError ? e.stripeRefundId : null;
+    return { status: 'failed', code, message, stripeRefundId };
   }
 }
 
@@ -418,7 +594,8 @@ export interface StripeRefundApprovedEvent {
 
 /**
  * Outbox handler (apps/worker): sends the refund named by an `ar.refund.stripe_approved` event.
- * Its effect and the inbox row commit together (ADR-0008); a paid refund is a no-op.
+ * Its effect and the inbox row commit together (ADR-0008); a paid refund is a no-op. The journal
+ * is the approver's (F5).
  */
 export function stripeRefundSendHandler(deps: {
   client: StripeClient;

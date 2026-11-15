@@ -17,7 +17,13 @@ import {
   isMfa,
   stepUpSatisfied,
 } from './mfa.ts';
-import { RequirePermission, RequireStepUp, routeAccess, stepUpOf } from './permission.decorator.ts';
+import {
+  RequirePermission,
+  RequireStepUp,
+  routeAccess,
+  stepUpOf,
+  stepUpWhenOf,
+} from './permission.decorator.ts';
 
 const NOW = new Date('2026-10-25T10:00:00Z');
 const ago = (s: number) => new Date(NOW.getTime() - s * 1000);
@@ -117,6 +123,26 @@ describe('SS-PLAT-59: Step-up fails closed', () => {
       const h = C.prototype.act;
       expect(stepUpOf(h, C, routeAccess(h, C)), permission).toBe(DEFAULT_STEP_UP_MAX_AGE_SECONDS);
     }
+  });
+
+  it("security review r8 F2: a handler's unconditional @RequireStepUp replaces a class-level conditional one as a whole", () => {
+    const when = () => Promise.resolve(false);
+    @RequireStepUp(120, when)
+    class C {
+      @RequirePermission('ar.refund.approve')
+      @RequireStepUp(60)
+      strict(): void {}
+      @RequirePermission('ar.refund.approve')
+      inherits(): void {}
+    }
+    const strict = C.prototype.strict;
+    const inherits = C.prototype.inherits;
+    // The handler's own declaration: 60 s, always — it never inherits the class's condition.
+    expect(stepUpOf(strict, C, routeAccess(strict, C))).toBe(60);
+    expect(stepUpWhenOf(strict, C)).toBeNull();
+    // A handler without its own declaration takes the class's max age and condition together.
+    expect(stepUpOf(inherits, C, routeAccess(inherits, C))).toBe(120);
+    expect(stepUpWhenOf(inherits, C)).toBe(when);
   });
 
   it('@RequireStepUp refuses a max age that is not a whole number of seconds in 1..3600', () => {

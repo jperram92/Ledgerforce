@@ -6,6 +6,9 @@
  *                                   the approval sends it once and posts GP-006 Stripe variant
  * The approval and its outbox event commit together; a failed send leaves the refund approved
  * for the outbox handler, with nothing posted. Another tenant's refund is 404.
+ * Security review r8 (RQ-0164): a Stripe success that cannot be posted answers `failed` with
+ * code SENT_NOT_POSTED and the Stripe refund id (F1); the handler refuses a Stripe refund whose
+ * step-up the interceptor did not verify, whatever the route's condition saw (F3).
  */
 import 'reflect-metadata';
 import { randomUUID } from 'node:crypto';
@@ -42,6 +45,8 @@ import type { SeededProfiles } from '@ledgerforce/products';
 import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApi, type Api } from '../app.ts';
+import { RequireStepUp } from '../authz/permission.decorator.ts';
+import { ArRefundsController, stripeRefundOnly } from './refunds.controller.ts';
 
 const FILE = resolve(import.meta.dirname, '../../../../Docs/accounting/postings.md');
 const gp006 = approvedTables(parsePostings(readFileSync(FILE, 'utf8'))).find(
@@ -64,6 +69,7 @@ let profiles: SeededProfiles;
 let api: Api;
 let stub: RecordedStripe;
 let stripeDown = false;
+let postingDown = false;
 let foreignRefund = '';
 const cookies = new Map<string, string>();
 const people: Record<string, { id: string; roles: string[] }> = {
@@ -196,7 +202,11 @@ beforeAll(async () => {
                 ${JSON.stringify(e.payload)}::jsonb)`.execute(trx);
     },
   };
-  const postingOutbox: PostingOutbox = { enqueue: async () => {} };
+  const postingOutbox: PostingOutbox = {
+    enqueue: async () => {
+      if (postingDown) throw new Error('posting outbox unavailable');
+    },
+  };
   api = await createApi({
     databaseUrl: f.tdb.url('lf_app'),
     sessions: { clock: { now: () => NOW } },
@@ -261,8 +271,10 @@ describe('SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 
       stripe: { status: 'sent', stripe_refund_id: 're_1SQbT0172ApiAcme220', message: null },
     });
     expect(stub.mismatches).toEqual([]);
-    expect(stub.received.map((x) => [x.idempotencyKey, x.matched])).toEqual([
-      [`lf-refund-v2-${id}`, 'refund-document-220.00'],
+    // RQ-0164: the send first looks for this document's refund at Stripe, then creates it.
+    expect(stub.received.map((x) => [x.method, x.idempotencyKey, x.matched])).toEqual([
+      ['GET', null, 'list-refunds-none'],
+      ['POST', `lf-refund-v2-${id}`, 'refund-document-220.00'],
     ]);
     expect(await eventsFor(id)).toEqual([STRIPE_REFUND_APPROVED]);
 
@@ -294,7 +306,7 @@ describe('SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 
       status: 'paid',
       stripe: { status: 'sent', stripe_refund_id: 're_1SQbT0172ApiAcme220' },
     });
-    expect(stub.received).toHaveLength(1);
+    expect(stub.received).toHaveLength(2);
     expect(await entriesFor(id)).toBe(1);
     const read = await call('GET', `/ar/refunds/${id}?${q()}`, 'arClerk');
     expect(await read.json()).toMatchObject({
@@ -445,5 +457,101 @@ describe('SS-UC11-10 a Stripe refund that cannot be sent at approval is retried,
     const again = await call('POST', `/ar/refunds/${id}/approve?${q()}`, 'approver');
     expect(await again.json()).toMatchObject({ replayed: true, stripe: { status: 'pending' } });
     expect(await entriesFor(id)).toBe(0);
+  });
+});
+
+describe('Security review r8: a Stripe success that cannot be posted, and step-up the handler re-checks', () => {
+  const creates = () => stub.received.filter((x) => x.method === 'POST').length;
+
+  it('SS-UC11-10 F1 the posting fails after Stripe accepted: the answer is failed SENT_NOT_POSTED with the Stripe refund id, nothing is posted', async () => {
+    const credit = await seedCredit(f, 'Theta', profiles);
+    const id = randomUUID();
+    const created = await call('PUT', `/ar/refunds/${id}`, 'arClerk', stripeBody(credit.partyId));
+    expect(created.status).toBe(201);
+    const c = (await created.json()) as { refund_no: string };
+    Object.assign(stub.vars, {
+      tenantId: f.tenantId,
+      companyId: f.companyId,
+      sentRefundId: id,
+      sentRefundNo: c.refund_no,
+      sentCreditNoteId: credit.creditNoteId,
+      sentCreditNoteNo: credit.creditNoteNo,
+      sentPaymentIntentId: credit.paymentIntentId,
+      sentStripeRefundId: 're_1SQbT0172ApiSentNotPosted',
+    });
+    const before = creates();
+    postingDown = true;
+    let body: { stripe?: { status: string; code?: string | null; message: string | null } };
+    try {
+      const ok = await call('POST', `/ar/refunds/${id}/approve?${q()}`, 'approver');
+      expect(ok.status).toBe(200);
+      body = (await ok.json()) as typeof body;
+    } finally {
+      postingDown = false;
+    }
+    expect(stub.mismatches).toEqual([]);
+    expect(body).toMatchObject({
+      id,
+      status: 'requested',
+      approval: 'approved',
+      entry_id: null,
+      stripe: {
+        status: 'failed',
+        code: 'SENT_NOT_POSTED',
+        stripe_refund_id: 're_1SQbT0172ApiSentNotPosted',
+      },
+    });
+    expect(body.stripe?.message).toMatch(
+      /sent to Stripe as re_1SQbT0172ApiSentNotPosted.*not posted/,
+    );
+    expect(creates()).toBe(before + 1);
+    expect(await entriesFor(id)).toBe(0);
+    // The approval and its event stand, so the worker's attempt turns it into a Sync issue.
+    expect(await eventsFor(id)).toEqual([STRIPE_REFUND_APPROVED]);
+  });
+
+  it('SS-UC11-09 F3 the handler refuses a Stripe refund whose step-up was not verified, even when the route condition saw none', async () => {
+    // The race of F3: the condition read the refund before it existed (false), the handler
+    // reads it as a Stripe refund. Forced here by a condition that always answers false.
+    const descriptor = Object.getOwnPropertyDescriptor(ArRefundsController.prototype, 'approve');
+    if (!descriptor) throw new Error('no approve handler');
+    RequireStepUp(300, () => Promise.resolve(false))(
+      ArRefundsController.prototype,
+      'approve',
+      descriptor,
+    );
+    try {
+      const credit = await seedCredit(f, 'Kappa', profiles);
+      const id = randomUUID();
+      const created = await call('PUT', `/ar/refunds/${id}`, 'arClerk', stripeBody(credit.partyId));
+      expect(created.status).toBe(201);
+      const c = (await created.json()) as { refund_no: string };
+      useVars(credit, id, c.refund_no, 're_1SQbT0172ApiKappa220');
+      const before = stub.received.length;
+      const stale = await call('POST', `/ar/refunds/${id}/approve?${q()}`, 'staleApprover');
+      expect(stale.status).toBe(401);
+      expect(await stale.json()).toEqual({ error: 'step_up_required', max_age: 300 });
+      expect(stub.received.length).toBe(before);
+      expect(await eventsFor(id)).toEqual([]);
+      expect(await (await call('GET', `/ar/refunds/${id}?${q()}`, 'arClerk')).json()).toMatchObject(
+        { approval: 'pending', status: 'requested' },
+      );
+      const audited = await f.admin.query<{ n: number }>(
+        `SELECT count(*)::int AS n FROM audit.audit_log
+          WHERE tenant_id = $1 AND action = 'step_up_required' AND after->>'route' LIKE '%approve%'`,
+        [f.tenantId],
+      );
+      expect(audited.rows[0]?.n).toBeGreaterThan(0);
+
+      // A stepped-up approver passes: the interceptor verified the session, whatever the condition.
+      const ok = await call('POST', `/ar/refunds/${id}/approve?${q()}`, 'approver');
+      expect(ok.status).toBe(200);
+      expect(await ok.json()).toMatchObject({
+        status: 'paid',
+        stripe: { status: 'sent', stripe_refund_id: 're_1SQbT0172ApiKappa220' },
+      });
+    } finally {
+      RequireStepUp(300, stripeRefundOnly)(ArRefundsController.prototype, 'approve', descriptor);
+    }
   });
 });

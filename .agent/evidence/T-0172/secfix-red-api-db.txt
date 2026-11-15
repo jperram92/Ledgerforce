@@ -1,0 +1,97 @@
+
+ RUN  v4.1.12 <worktree>
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41243
+ ❯ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts (7 tests | 3 failed) 2765ms
+     × SS-UC11-09 a stepped-up Approver approves a Stripe refund: Stripe is called once, GP-006 (Stripe) posts, a repeat replays 377ms
+     × SS-UC11-10 F1 the posting fails after Stripe accepted: the answer is failed SENT_NOT_POSTED with the Stripe refund id, nothing is posted 124ms
+     × SS-UC11-09 F3 the handler refuses a Stripe refund whose step-up was not verified, even when the route condition saw none 134ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 Stripe variant > SS-UC11-09 a stepped-up Approver approves a Stripe refund: Stripe is called once, GP-006 (Stripe) posts, a repeat replays
+AssertionError: expected [ [ 'POST', …(2) ] ] to deeply equal [ [ 'GET', null, …(1) ], …(1) ]
+
+- Expected
++ Received
+
+  [
+    [
+-     "GET",
+-     null,
+-     "list-refunds-none",
+-   ],
+-   [
+      "POST",
+      "lf-refund-v2-b4470c8b-cfa3-4ccf-9a28-771bd43569d5",
+      "refund-document-220.00",
+    ],
+  ]
+
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:275:79
+    273|     expect(stub.mismatches).toEqual([]);
+    274|     // RQ-0164: the send first looks for this document's refund at Str…
+    275|     expect(stub.received.map((x) => [x.method, x.idempotencyKey, x.mat…
+       |                                                                               ^
+    276|       ['GET', null, 'list-refunds-none'],
+    277|       ['POST', `lf-refund-v2-${id}`, 'refund-document-220.00'],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > Security review r8: a Stripe success that cannot be posted, and step-up the handler re-checks > SS-UC11-10 F1 the posting fails after Stripe accepted: the answer is failed SENT_NOT_POSTED with the Stripe refund id, nothing is posted
+AssertionError: expected { …(15) } to match object { …(5) }
+(11 matching properties omitted from actual)
+
+- Expected
++ Received
+
+@@ -2,10 +2,9 @@
+    "approval": "approved",
+    "entry_id": null,
+    "id": "2ae5c031-554c-4ceb-a4de-a69eb0d526ca",
+    "status": "requested",
+    "stripe": {
+-     "code": "SENT_NOT_POSTED",
+-     "status": "failed",
+-     "stripe_refund_id": "re_1SQbT0172ApiSentNotPosted",
++     "status": "pending",
++     "stripe_refund_id": null,
+    },
+  }
+
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:493:18
+    491|     }
+    492|     expect(stub.mismatches).toEqual([]);
+    493|     expect(body).toMatchObject({
+       |                  ^
+    494|       id,
+    495|       status: 'requested',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > Security review r8: a Stripe success that cannot be posted, and step-up the handler re-checks > SS-UC11-09 F3 the handler refuses a Stripe refund whose step-up was not verified, even when the route condition saw none
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:535:28
+    533|       const before = stub.received.length;
+    534|       const stale = await call('POST', `/ar/refunds/${id}/approve?${q(…
+    535|       expect(stale.status).toBe(401);
+       |                            ^
+    536|       expect(await stale.json()).toEqual({ error: 'step_up_required', …
+    537|       expect(stub.received.length).toBe(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 4 passed (7)
+   Start at  20:06:46
+   Duration  7.10s (transform 2.15s, setup 0ms, import 3.56s, tests 2.77s, environment 0ms)
+
+exit=1

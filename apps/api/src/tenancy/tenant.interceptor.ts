@@ -119,9 +119,14 @@ export class TenantInterceptor implements NestInterceptor {
                 throw new PermissionDenied(access.permission);
               }
             }
+            // Whether this session meets the route's step-up, recorded for the handler (r8 F3).
+            const stepUpMet =
+              stepUp !== null &&
+              principal !== undefined &&
+              stepUpSatisfied(principal, stepUp, this.clock.now(), this.mfa);
             if (
               stepUp !== null &&
-              !(principal && stepUpSatisfied(principal, stepUp, this.clock.now(), this.mfa)) &&
+              !stepUpMet &&
               // A conditional step-up (ADR-0083) asks the route, under RLS, whether it applies.
               (stepUpWhen === null || (await stepUpWhen(req, trx)))
             ) {
@@ -140,32 +145,39 @@ export class TenantInterceptor implements NestInterceptor {
                 body: req.body as unknown,
               });
             }
-            return runInTenantTx(trx, { userId, permissions }, async (scope) => {
-              const result = await lastValueFrom(next.handle(), { defaultValue: undefined });
-              if (sodCheck) await recordSod(trx, sodCheck, requestIdOf(req) ?? null);
-              if (!READ_METHODS.has(req.method)) {
-                const actor = actorOf(req);
-                await trx
-                  .insertInto('audit.audit_log')
-                  .values({
-                    actor_type: actor.userId ? 'user' : 'system',
-                    actor_user_id: actor.userId,
-                    api_token_id: actor.tokenId,
-                    action: `${req.method} ${routeOf(req)}`,
-                    entity_type: scope.audit?.entityType ?? 'request',
-                    entity_id: scope.audit?.entityId ?? null,
-                    before:
-                      scope.audit?.before === undefined ? null : JSON.stringify(scope.audit.before),
-                    after:
-                      scope.audit?.after === undefined ? null : JSON.stringify(scope.audit.after),
-                    ip: ipOf(req),
-                    user_agent: req.headers['user-agent'] ?? null,
-                    request_id: requestIdOf(req) ?? null,
-                  })
-                  .execute();
-              }
-              return result;
-            });
+            return runInTenantTx(
+              trx,
+              { userId, permissions },
+              async (scope) => {
+                const result = await lastValueFrom(next.handle(), { defaultValue: undefined });
+                if (sodCheck) await recordSod(trx, sodCheck, requestIdOf(req) ?? null);
+                if (!READ_METHODS.has(req.method)) {
+                  const actor = actorOf(req);
+                  await trx
+                    .insertInto('audit.audit_log')
+                    .values({
+                      actor_type: actor.userId ? 'user' : 'system',
+                      actor_user_id: actor.userId,
+                      api_token_id: actor.tokenId,
+                      action: `${req.method} ${routeOf(req)}`,
+                      entity_type: scope.audit?.entityType ?? 'request',
+                      entity_id: scope.audit?.entityId ?? null,
+                      before:
+                        scope.audit?.before === undefined
+                          ? null
+                          : JSON.stringify(scope.audit.before),
+                      after:
+                        scope.audit?.after === undefined ? null : JSON.stringify(scope.audit.after),
+                      ip: ipOf(req),
+                      user_agent: req.headers['user-agent'] ?? null,
+                      request_id: requestIdOf(req) ?? null,
+                    })
+                    .execute();
+                }
+                return result;
+              },
+              stepUpMet ? stepUp : null,
+            );
           }),
         ).pipe(
           catchError((e: unknown) => {

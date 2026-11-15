@@ -1,0 +1,188 @@
+
+ RUN  v4.1.12 <worktree>
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:39593
+ ❯ |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts (8 tests | 5 failed) 1665ms
+     × SS-UC11-09 a requested Stripe refund is not sent before approval; approval sends it once and posts GP-006 (Stripe) line for line 226ms
+     × SS-UC11-10 Stripe unreachable at approval: the approval stands, nothing is posted, and the outbox handler sends it once 109ms
+     × SS-UC11-10 F1a a posting the engine would refuse is caught before Stripe: NOT_POSTABLE, nothing sent, not retried 85ms
+     × SS-UC11-10 F1a a posting failure after Stripe accepted is a permanent SENT_NOT_POSTED; the retry adopts the Stripe refund and posts once, as the approver (F5) 107ms
+     × SS-UC11-10 F1b a lost commit after Stripe accepted never leads to a second refund, even on a re-approval a day later 173ms
+ ❯ |db| packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts (8 tests | 2 failed) 1331ms
+     × SS-UC11-04: Refund via Stripe calls the refund API 106ms
+     × SS-UC11-04 a refund beyond the credit or without a Stripe payment is refused before Stripe is called 72ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > SS-UC11-09 a Stripe refund is sent only on approval, once, and posts GP-006 Stripe variant > SS-UC11-09 a requested Stripe refund is not sent before approval; approval sends it once and posts GP-006 (Stripe) line for line
+AssertionError: expected [ [ 'POST', '/v1/refunds', …(2) ] ] to deeply equal [ Array(2) ]
+
+- Expected
++ Received
+
+@@ -1,13 +1,7 @@
+  [
+    [
+-     "GET",
+-     "/v1/refunds",
+-     null,
+-     "list-refunds-none",
+-   ],
+-   [
+      "POST",
+      "/v1/refunds",
+      "lf-refund-v2-32411ec6-d5d4-41ea-9a9f-834d657551af",
+      "refund-document-220.00",
+    ],
+
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:209:87
+    207|     expect(stub.mismatches).toEqual([]);
+    208|     // RQ-0164: first the lookup (no key, read-only), then the one cre…
+    209|     expect(stub.received.map((x) => [x.method, x.path, x.idempotencyKe…
+       |                                                                                       ^
+    210|       ['GET', '/v1/refunds', null, 'list-refunds-none'],
+    211|       ['POST', '/v1/refunds', `lf-refund-v2-${r.refundId}`, 'refund-do…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > SS-UC11-10 a failed Stripe send is retried through the outbox, never refunded or posted twice > SS-UC11-10 Stripe unreachable at approval: the approval stands, nothing is posted, and the outbox handler sends it once
+AssertionError: expected [ 'refund-document-220.00' ] to deeply equal [ 'list-refunds-none', …(1) ]
+
+- Expected
++ Received
+
+  [
+-   "list-refunds-none",
+    "refund-document-220.00",
+  ]
+
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:396:63
+    394|     await f.inTenant((trx) => handler.handle(trx, event));
+    395|     expect(stub.mismatches).toEqual([]);
+    396|     expect(stub.received.slice(before).map((x) => x.matched)).toEqual([
+       |                                                               ^
+    397|       'list-refunds-none',
+    398|       'refund-document-220.00',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > Security review r8 F1: money never leaves twice; a Stripe success that cannot be posted says so > SS-UC11-10 F1a a posting the engine would refuse is caught before Stripe: NOT_POSTABLE, nothing sent, not retried
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "no fixture for POST /v1/refunds key=lf-refund-v2-32e8988f-98b9-4e39-bc7f-85e4eefef06e",
++ ]
+
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:510:29
+    508|       }),
+    509|     );
+    510|     expect(stub.mismatches).toEqual([]);
+       |                             ^
+    511|     expect(out).toMatchObject({ status: 'failed', code: 'NOT_POSTABLE'…
+    512|     expect(out.status === 'failed' ? out.message : '').toMatch(/not se…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > Security review r8 F1: money never leaves twice; a Stripe success that cannot be posted says so > SS-UC11-10 F1a a posting failure after Stripe accepted is a permanent SENT_NOT_POSTED; the retry adopts the Stripe refund and posts once, as the approver (F5)
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "no fixture for POST /v1/refunds key=lf-refund-v2-32e8988f-98b9-4e39-bc7f-85e4eefef06e",
++ ]
+
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:537:29
+    535|       ),
+    536|     );
+    537|     expect(stub.mismatches).toEqual([]);
+       |                             ^
+    538|     expect(out).toMatchObject({
+    539|       status: 'failed',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > Security review r8 F1: money never leaves twice; a Stripe success that cannot be posted says so > SS-UC11-10 F1b a lost commit after Stripe accepted never leads to a second refund, even on a re-approval a day later
+AssertionError: expected [ Array(1) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "no fixture for POST /v1/refunds key=lf-refund-v2-32e8988f-98b9-4e39-bc7f-85e4eefef06e",
++ ]
+
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:628:29
+    626|       }),
+    627|     );
+    628|     expect(stub.mismatches).toEqual([]);
+       |                             ^
+    629|     expect(sent).toMatchObject({ stripeRefundId: 're_1SQbT0172LostComm…
+    630|     expect(creates().length).toBe(posts + 1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts > SS-UC11-04 refund through Stripe > SS-UC11-04: Refund via Stripe calls the refund API
+AssertionError: expected [ [ 'POST', '/v1/refunds', …(2) ] ] to deeply equal [ Array(2) ]
+
+- Expected
++ Received
+
+@@ -1,13 +1,7 @@
+  [
+    [
+-     "GET",
+-     "/v1/refunds",
+-     undefined,
+-     "list-refunds-none",
+-   ],
+-   [
+      "POST",
+      "/v1/refunds",
+      "22000",
+      "refund-document-220.00",
+    ],
+
+ ❯ packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts:514:7
+    512|     expect(
+    513|       refundStub.received.map((x) => [x.method, x.path, x.form['amount…
+    514|     ).toEqual([
+       |       ^
+    515|       ['GET', '/v1/refunds', undefined, 'list-refunds-none'],
+    516|       ['POST', '/v1/refunds', '22000', 'refund-document-220.00'],
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts > SS-UC11-04 refund through Stripe > SS-UC11-04 a refund beyond the credit or without a Stripe payment is refused before Stripe is called
+AssertionError: expected [ { method: 'POST', …(5) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ packages/connectors/stripe/src/stripe-webhook.contract.db.test.ts:616:33
+    614|     expect(await refund('11.00')).toBe('NO_STRIPE_PAYMENT');
+    615|     // Only the first test's lookup and refund: nothing reached Stripe…
+    616|     expect(refundStub.received).toHaveLength(2);
+       |                                 ^
+    617|   });
+    618| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  7 failed | 9 passed (16)
+   Start at  20:05:40
+   Duration  6.34s (transform 1.22s, setup 0ms, import 2.40s, tests 3.00s, environment 0ms)
+
+exit=1

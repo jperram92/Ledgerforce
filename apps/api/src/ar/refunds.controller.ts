@@ -15,7 +15,11 @@
  * no older than 300 s (checked by the interceptor through the route's condition) and sends it:
  * the approval and the outbox event `ar.refund.stripe_approved` commit together, the send runs in
  * a savepoint (GP-006 Stripe variant) and, if it fails, the outbox handler retries. A Stripe
- * refund's view carries `stripe: { status: not_sent | pending | sent | failed, ... }`.
+ * refund's view carries `stripe: { status: not_sent | pending | sent | failed, ... }`; a failed
+ * send also carries `code` — SENT_NOT_POSTED (with `stripe_refund_id`) when Stripe has the money
+ * out but the journal could not be written (security review r8 F1, RQ-0164).
+ * The handler re-checks that the interceptor verified the step-up before it approves a Stripe
+ * refund, so a refund that turned Stripe after the route's condition read it is refused (F3).
  */
 import {
   BadRequestException,
@@ -59,6 +63,7 @@ import type { Request, Response } from 'express';
 import type { Transaction } from 'kysely';
 import type { Clock } from '../auth/session.service.ts';
 import { principalOf, tokenPrincipalOf } from '../auth/session-tenant-resolver.ts';
+import { StepUpRequired } from '../authz/mfa.ts';
 import {
   RequirePermission,
   RequireStepUp,
@@ -127,6 +132,8 @@ interface StripeView {
   status: 'not_sent' | 'pending' | 'sent' | 'failed';
   stripe_refund_id: string | null;
   message: string | null;
+  /** Only when failed: why (e.g. SENT_NOT_POSTED: Stripe has the refund, the books do not). */
+  code?: string;
 }
 
 /** What is known of a Stripe refund's send, from what is stored (no Stripe call). */
@@ -148,7 +155,9 @@ async function storedStripeView(
 const sentView = (o: StripeSendOutcome): StripeView =>
   o.status === 'sent'
     ? { status: 'sent', stripe_refund_id: o.stripeRefundId, message: null }
-    : { status: o.status, stripe_refund_id: null, message: o.message };
+    : o.status === 'failed'
+      ? { status: 'failed', stripe_refund_id: o.stripeRefundId, message: o.message, code: o.code }
+      : { status: 'pending', stripe_refund_id: null, message: o.message };
 
 function viewOf(r: CustomerRefundView, stripe?: StripeView) {
   return {
@@ -262,7 +271,12 @@ export class ArRefundsController {
         });
       return viewOf(r);
     }
-    // A Stripe refund (ADR-0083): approve, record the outbox event, then send in a savepoint.
+    // A Stripe refund (ADR-0083) moves money: refuse unless the interceptor verified the step-up
+    // for this request, whatever the route's condition read before (security review r8 F3).
+    if (!this.tx.stepUpVerified(STRIPE_REFUND_STEP_UP_SECONDS)) {
+      throw new StepUpRequired(STRIPE_REFUND_STEP_UP_SECONDS);
+    }
+    // Approve, record the outbox event, then send in a savepoint.
     const deps = this.stripeDeps();
     if (!deps) throw new ServiceUnavailableException({ error: 'stripe_refunds_unavailable' });
     const now = this.clock.now();

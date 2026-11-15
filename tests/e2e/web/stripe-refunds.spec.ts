@@ -96,8 +96,11 @@ interface Fake {
   who: Who;
   /** Whether the session has a fresh step-up (DL-0562, 300 s). */
   steppedUp: boolean;
-  /** What Stripe does on approval: sent, or the send did not finish (retried by the outbox). */
-  stripe: 'sent' | 'pending';
+  /**
+   * What Stripe does on approval: sent, the send did not finish (retried by the outbox), or
+   * Stripe has the refund but the journal could not be written (security review r8 F1).
+   */
+  stripe: 'sent' | 'pending' | 'sent_not_posted';
   errors: string[];
   created: { id: string; body: Record<string, unknown> }[];
   approvals: number;
@@ -184,23 +187,34 @@ async function fakeApi(page: Page, who: Who): Promise<Fake> {
           approved_at: '2026-11-24T00:00:00.000Z',
         };
         f.refund =
-          f.stripe === 'sent'
+          f.stripe === 'sent_not_posted'
             ? {
                 ...approved,
-                status: 'paid',
-                entry_id: id(0x17299),
-                paid_on: '2026-11-24',
-                stripe: { status: 'sent', stripe_refund_id: 're_1SQbT0172Acme', message: null },
-              }
-            : {
-                ...approved,
                 stripe: {
-                  status: 'pending',
-                  stripe_refund_id: null,
+                  status: 'failed',
+                  code: 'SENT_NOT_POSTED',
+                  stripe_refund_id: 're_1SQbT0172AcmeOut',
                   message:
-                    'stripe request failed (unreachable): the Stripe API could not be reached',
+                    'refund RF-000004 was sent to Stripe as re_1SQbT0172AcmeOut (the money has left), but it was not posted: PERIOD_LOCKED: the period is locked',
                 },
-              };
+              }
+            : f.stripe === 'sent'
+              ? {
+                  ...approved,
+                  status: 'paid',
+                  entry_id: id(0x17299),
+                  paid_on: '2026-11-24',
+                  stripe: { status: 'sent', stripe_refund_id: 're_1SQbT0172Acme', message: null },
+                }
+              : {
+                  ...approved,
+                  stripe: {
+                    status: 'pending',
+                    stripe_refund_id: null,
+                    message:
+                      'stripe request failed (unreachable): the Stripe API could not be reached',
+                  },
+                };
         return send(route, 200, f.refund);
       }
       if (!perms.includes('ar.read'))
@@ -311,6 +325,30 @@ test('SS-UC11-10: a Stripe send that did not finish at approval says it is retri
   // After a reload the stored state says the same (no Stripe call from the browser).
   await page.reload();
   await expect(refund.getByRole('status')).toContainText('tries again automatically');
+  await noAxeViolations(page);
+  expect(f.approvals).toBe(1);
+  expect(f.errors).toEqual([]);
+});
+
+test('SS-UC11-10: a refund Stripe took but the books could not record says the money has left and is not posted [T-0172]', async ({
+  page,
+}) => {
+  const f = await fakeApi(page, 'clerk');
+  await open(page, CN_PAGE, 1440);
+  const refund = await requestStripeRefund(page, f);
+  f.who = 'approver';
+  f.steppedUp = true;
+  f.stripe = 'sent_not_posted';
+  await page.reload();
+  await refund.getByRole('button', { name: 'Approve refund' }).click();
+  const status = refund.getByRole('status');
+  // Security review r8 F1: never "Stripe refused" when Stripe has the money out.
+  await expect(status).toContainText('Sent to Stripe (Stripe refund re_1SQbT0172AcmeOut)');
+  await expect(status).toContainText('not posted');
+  await expect(status).toContainText('PERIOD_LOCKED');
+  await expect(status).toContainText('Sync issues');
+  await expect(status).not.toContainText('Stripe refused');
+  await expect(refund.getByRole('button', { name: 'Approve refund' })).toHaveCount(0);
   await noAxeViolations(page);
   expect(f.approvals).toBe(1);
   expect(f.errors).toEqual([]);

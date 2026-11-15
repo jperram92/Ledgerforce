@@ -508,9 +508,13 @@ describe('SS-UC11-04 refund through Stripe', () => {
       }),
     );
     expect(refundStub.mismatches).toEqual([]);
-    expect(refundStub.received.map((x) => [x.path, x.form['amount'], x.matched])).toEqual([
-      ['/v1/refunds', '22000', 'refund-document-220.00'],
-    ]);
+    // RQ-0164: the send first looks for a refund of this document at Stripe (GET, none yet).
+    expect(refundStub.received.map((x) => [x.method, x.path, x.form['amount'], x.matched])).toEqual(
+      [
+        ['GET', '/v1/refunds', undefined, 'list-refunds-none'],
+        ['POST', '/v1/refunds', '22000', 'refund-document-220.00'],
+      ],
+    );
     expect(r).toMatchObject({ stripeRefundId: 're_1SQbTestRefund000220', amount: '220.0000' });
 
     // GP-006, Stripe variant: line 2 is Stripe clearing instead of the bank.
@@ -543,7 +547,7 @@ describe('SS-UC11-04 refund through Stripe', () => {
       }),
     );
     expect(again).toMatchObject({ entryId: r.entryId, replayed: true });
-    expect(refundStub.received).toHaveLength(1);
+    expect(refundStub.received).toHaveLength(2);
     expect(receiptEntryId).not.toBe('');
   });
 
@@ -608,7 +612,8 @@ describe('SS-UC11-04 refund through Stripe', () => {
         .catch((e: unknown) => (e as { code?: string }).code);
     expect(await refund('11.01')).toBe('REFUND_EXCEEDS_CREDIT');
     expect(await refund('11.00')).toBe('NO_STRIPE_PAYMENT');
-    expect(refundStub.received).toHaveLength(1);
+    // Only the first test's lookup and refund: nothing reached Stripe here.
+    expect(refundStub.received).toHaveLength(2);
   });
 });
 

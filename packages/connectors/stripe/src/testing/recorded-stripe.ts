@@ -5,6 +5,11 @@
  * 400 and is listed in `mismatches`, so a contract test fails if the client's request drifts.
  * Replaying a key returns the same response, as Stripe does for idempotent retries. Test use only;
  * the network is never contacted and the bearer key is never stored.
+ *
+ * GET requests (list endpoints, RQ-0164) carry no Idempotency-Key and no body: their query string
+ * is the "form", and a GET interaction matches only on its exact query. An interaction with
+ * `times` answers at most that many requests, after which the next matching one answers, so a
+ * fixture can say "the list is empty until the refund is created".
  */
 import { readFileSync } from 'node:fs';
 import { createServer, type IncomingMessage, type Server } from 'node:http';
@@ -13,12 +18,15 @@ import type { AddressInfo } from 'node:net';
 export interface RecordedInteraction {
   readonly name: string;
   readonly request: {
-    readonly method: 'POST';
+    readonly method: 'POST' | 'GET';
     readonly path: string;
-    readonly idempotencyKey: string;
+    /** Required for POST; a GET carries none. */
+    readonly idempotencyKey?: string;
     readonly form: Readonly<Record<string, string>>;
   };
   readonly response: { readonly status: number; readonly body: unknown };
+  /** Answer at most this many requests (then the next matching interaction answers). */
+  readonly times?: number;
 }
 
 export interface RecordedCassette {
@@ -73,11 +81,17 @@ export async function startRecordedStripe(cassette: RecordedCassette): Promise<R
   const mismatches: string[] = [];
   const vars: Record<string, string> = {};
 
+  const used = new Map<RecordedInteraction, number>();
+  const sameForm = (want: Record<string, string>, got: Record<string, string>) =>
+    [...new Set([...Object.keys(want), ...Object.keys(got)])].every((k) => want[k] === got[k]);
+
   const server: Server = createServer((req, res) => {
     void (async () => {
       const raw = await body(req);
-      const form = Object.fromEntries(new URLSearchParams(raw));
-      const path = req.url ?? '';
+      const isGet = req.method === 'GET';
+      const url = new URL(req.url ?? '', 'http://stub.invalid');
+      const form = Object.fromEntries(isGet ? url.searchParams : new URLSearchParams(raw));
+      const path = isGet ? url.pathname : (req.url ?? '');
       const key = header(req, 'idempotency-key');
       const version = header(req, 'stripe-version');
       const auth = header(req, 'authorization') ?? '';
@@ -86,15 +100,21 @@ export async function startRecordedStripe(cassette: RecordedCassette): Promise<R
         (i) =>
           i.request.method === req.method &&
           fill(i.request.path, vars) === path &&
-          fill(i.request.idempotencyKey, vars) === key,
+          (i.request.idempotencyKey === undefined
+            ? key === null
+            : fill(i.request.idempotencyKey, vars) === key) &&
+          (!isGet || sameForm(fillDeep(i.request.form, vars) as Record<string, string>, form)) &&
+          (i.times === undefined || (used.get(i) ?? 0) < i.times),
       );
       if (!hit) problems.push(`no fixture for ${String(req.method)} ${path} key=${String(key)}`);
       if (!/^Bearer (sk|rk)_test_\S+$/.test(auth)) problems.push('not a test-mode bearer key');
       if (version !== cassette.apiVersion) problems.push(`Stripe-Version ${String(version)}`);
-      if (header(req, 'content-type') !== 'application/x-www-form-urlencoded') {
+      if (isGet) {
+        if (raw !== '') problems.push('a GET with a body');
+      } else if (header(req, 'content-type') !== 'application/x-www-form-urlencoded') {
         problems.push(`content-type ${String(header(req, 'content-type'))}`);
       }
-      if (hit) {
+      if (hit && !isGet) {
         const want = fillDeep(hit.request.form, vars) as Record<string, string>;
         const keys = new Set([...Object.keys(want), ...Object.keys(form)]);
         for (const k of keys) {
@@ -127,6 +147,7 @@ export async function startRecordedStripe(cassette: RecordedCassette): Promise<R
         );
         return;
       }
+      used.set(hit, (used.get(hit) ?? 0) + 1);
       res.statusCode = hit.response.status;
       res.end(JSON.stringify(fillDeep(hit.response.body, vars)));
     })().catch((e: unknown) => {

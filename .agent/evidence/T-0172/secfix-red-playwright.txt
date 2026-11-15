@@ -1,0 +1,42 @@
+
+Running 4 tests using 2 workers
+
+  ✓  2 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:311:1 › SS-UC11-10: a Stripe send that did not finish at approval says it is retried automatically [T-0172] (4.5s)
+  ✓  1 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:273:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 1440 [T-0172] (4.9s)
+  ✓  4 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:273:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 390 [T-0172] (3.3s)
+  ✘  3 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:333:1 › SS-UC11-10: a refund Stripe took but the books could not record says the money has left and is not posted [T-0172] (7.2s)
+
+
+  1) [chromium] › tests/e2e/web/stripe-refunds.spec.ts:333:1 › SS-UC11-10: a refund Stripe took but the books could not record says the money has left and is not posted [T-0172] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Refund' }).getByRole('status')
+    Expected substring: "Sent to Stripe (Stripe refund re_1SQbT0172AcmeOut)"
+    Received string:    "Approved, but Stripe refused the refund: refund RF-000004 was sent to Stripe as re_1SQbT0172AcmeOut (the money has left), but it was not posted: PERIOD_LOCKED: the period is locked. A Finance Admin sees it in Sync issues."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Refund' }).getByRole('status') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('status')
+        14 × locator resolved to <p role="status" class="admin-state">Approved, but Stripe refused the refund: refund R…</p>
+           - unexpected value "Approved, but Stripe refused the refund: refund RF-000004 was sent to Stripe as re_1SQbT0172AcmeOut (the money has left), but it was not posted: PERIOD_LOCKED: the period is locked. A Finance Admin sees it in Sync issues."
+
+
+      344 |   const status = refund.getByRole('status');
+      345 |   // Security review r8 F1: never "Stripe refused" when Stripe has the money out.
+    > 346 |   await expect(status).toContainText('Sent to Stripe (Stripe refund re_1SQbT0172AcmeOut)');
+          |                        ^
+      347 |   await expect(status).toContainText('not posted');
+      348 |   await expect(status).toContainText('PERIOD_LOCKED');
+      349 |   await expect(status).toContainText('Sync issues');
+        at <worktree>/tests/e2e/web/stripe-refunds.spec.ts:346:24
+
+    Error Context: test-results/web-stripe-refunds-SS-UC11-be3c0-t-and-is-not-posted-T-0172--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refunds-SS-UC11-be3c0-t-and-is-not-posted-T-0172--chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/e2e/web/stripe-refunds.spec.ts:333:1 › SS-UC11-10: a refund Stripe took but the books could not record says the money has left and is not posted [T-0172] 
+  3 passed (13.7s)
+exit=1
