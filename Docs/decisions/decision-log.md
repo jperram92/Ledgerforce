@@ -3515,3 +3515,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | Stripe refunds (step-up, DL-0562) | T-0172 | 0660–0669 | 0083 | 0163 | T-0189–T-0190 | SS-UC11-09..10 |
 - Why: The owner asked for sub-agents ("spawn subagents and continue the build", 2026-11-15). SS id ranges are now allocated too, so agents cannot collide.
 - ADR: none · Status: accepted
+
+### DL-0650 — T-0177 split: opening balances stays, the posting-profile matrix becomes T-0187 (API) and T-0188 (screen)
+- Date: 2026-11-15 · By: claude · Task: T-0177, T-0187, T-0188 · Category: scope
+- Decision: T-0177 keeps the step 9 opening-balances screen, which uses the existing T-0080 routes. T-0187 adds the module read `profileMatrix` and the routes `GET /posting-profiles/matrix` and `PUT /posting-profiles/overrides` (ADR-0082). T-0188 builds the matrix screen at `/accounting/posting-profiles` and links it from wizard step 7. T-0182 (setup end to end) now also depends on T-0188. New scenarios: SS-PLAT-132 (opening balances screen), SS-PLAT-133 (matrix over HTTP) and SS-PLAT-134 (matrix screen).
+- Why: RQ-0162 found no posting-profile routes. Together the routes, the ADR and two screens are well over the ~400-line card limit (new-task-card skill). Splitting lets each slice be finished, tested and evidenced on its own.
+- Alternatives: one card for everything (too large); a screen without routes (impossible: the browser may not compute accounting).
+- ADR: ADR-0082 · Status: accepted
+
+### DL-0651 — The opening balances screen lives at /settings/setup/opening-balances and names accounts from the chart
+- Date: 2026-11-15 · By: claude · Task: T-0177 · Category: ui
+- Decision: The step 9 screen is at `/settings/setup/opening-balances`, beside the wizard. The IA has no route for it, and the API owns `/setup/*`. It reads CSV files in the browser as text, and only sends them to the preview and post routes. It shows the preview with `JournalTable`, naming each account code from `GET /accounts`; when the chart cannot be read, it shows the code alone. Item lines carry the engine's memo (document number and date). The Idempotency-Key is kept while the inputs stay the same, so a retry after a network error replays rather than double-posts. Any change of input clears the preview and makes a new key.
+- Why: P4 (journal before posting), "no accounting in the browser" (apps/web AGENTS.md), design §3.9 idempotency.
+- Alternatives: add account names to the preview response (an API change for display only); a new key on every click (a retry after a lost answer would be refused as OPENING_EXISTS instead of replaying).
+- ADR: none · Status: accepted

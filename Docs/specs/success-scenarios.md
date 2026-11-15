@@ -244,6 +244,9 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-126 | A completed bank reconciliation locks its lines against unmatching; a statement that does not tie cannot be completed | UC-08 | MVP | db-integration | no | packages/modules/bank/src/reconciliation.db.test.ts | T-0061 | green | [.agent/evidence/T-0061/manifest.json](../../.agent/evidence/T-0061/manifest.json) | 31a4eb2 |
 | SS-PLAT-127 | Setup wizard screen: the ten steps with their state and what is missing in plain words, where each setting is entered (existing screen or said plainly), Complete on the open step only when nothing is missing, step 7 shows the gap check (no gaps on the AU template), refusals (STEP_INVALID with the missing list, STEP_LOCKED) in plain words, read-only without settings.setup.manage, forbidden without settings.read; a fresh company walks to "Setup is complete" | — | MVP | e2e-playwright | yes | tests/e2e/web/setup-wizard.spec.ts (route-faked API with the ADR-0075 shapes, 1440 and 390); apps/web/src/setup/wizard-logic.test.ts | T-0091 | green | [.agent/evidence/T-0091/manifest.json](../../.agent/evidence/T-0091/manifest.json) (latest: 20261115-033517-SS-PLAT-127-wizard-complete-1440.png, 20261115-033522-SS-PLAT-127-wizard-complete-390.png, 20261115-033516-SS-PLAT-127-wizard-step-7-no-gaps-1440.png) | 422aa16 |
 | SS-PLAT-128 | Setup wizard screen, step 9: an Owner or Finance Admin declares "no history" with a required reason, the reason is shown on the completed step, and NO_HISTORY_NOT_ALLOWED (an opening balance exists) is explained in plain words | — | MVP | e2e-playwright | yes | tests/e2e/web/setup-wizard.spec.ts | T-0091 | green | [.agent/evidence/T-0091/manifest.json](../../.agent/evidence/T-0091/manifest.json) (latest: 20261115-033527-SS-PLAT-128-wizard-step-9-declare-no-history-1440.png, 20261115-033528-SS-PLAT-128-wizard-step-9-no-history-done-1440.png) | 422aa16 |
+| SS-PLAT-132 | Opening balances screen (wizard step 9): a Finance Admin picks the conversion date and the trial balance, AR and AP CSV files, sees the posting engine's journal preview (nothing posted), posts it once with an Idempotency-Key, and step 9 of the wizard becomes completable; CSV and engine refusals are shown in plain words with the file line; forbidden without settings.chart.manage | — | MVP | e2e-playwright | yes | tests/e2e/web/opening-balances.spec.ts | T-0177 | red | — | — |
+| SS-PLAT-133 | Posting-profile matrix over HTTP (ADR-0082): GET /posting-profiles/matrix lists every active party × product profile cell with its account (default or override), tax code or gap, agreeing with the gap check; PUT /posting-profiles/overrides fills a gap (settings.chart.manage, Idempotency-Key, audited when changed, a repeat changes nothing), refuses an unusable account (422) and another tenant's company (404) | — | MVP | db-integration | no | packages/modules/products/src/matrix.db.test.ts; apps/api/src/setup/posting-profiles.db.test.ts | T-0187 | red | — | — |
+| SS-PLAT-134 | Posting-profile matrix screen (wizard step 7): defaults, overrides and gaps marked in words; a Finance Admin fills a gap by choosing an account, and the gap leaves step 7's missing list; read-only for the Accountant, forbidden without settings.read | — | MVP | e2e-playwright | yes | tests/e2e/web/posting-profiles.spec.ts | T-0188 | red | — | — |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -711,6 +714,18 @@ Additional verified lifecycle (T-0166): GP-039 gross allowance 1,375.00, write-o
 ### SS-PLAT-128 — Setup wizard screen declares "no history" on step 9
 - Phase: MVP · Layer: **e2e-playwright** · Screenshot evidence: yes · Task(s): T-0091 (DL-0600)
 - **Given** steps 1–8 are done and no opening balance is posted · **When** the Finance Admin writes why the company has no history and declares it · **Then** step 9 is done with the reason shown; an empty reason is not sent; with an opening balance the refusal is explained
+
+### SS-PLAT-132 — Opening balances screen previews and posts the conversion journal
+- Phase: MVP · Layer: **e2e-playwright** · Screenshot evidence: yes · Task(s): T-0177 (RQ-0162, DL-0650)
+- **Given** a Finance Admin with no opening balance posted · **When** they choose the conversion date and the GP-037 CSV files and ask for the journal · **Then** the posting engine's preview is shown (Dr/Cr, balanced, nothing posted); posting it shows the entry and step 9 of the wizard can be completed; a refused file names the line; an Accountant is told they cannot import
+
+### SS-PLAT-133 — Posting-profile matrix read and override over HTTP
+- Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0187 (ADR-0082, RQ-0162)
+- **Given** the AU template profiles with one gap · **When** the matrix is read and an override fills the gap · **Then** the cell resolves to the override, the gap check and step 7 no longer list it, the change is audited once, and permissions and tenancy are enforced
+
+### SS-PLAT-134 — Posting-profile matrix screen fills a gap
+- Phase: MVP · Layer: **e2e-playwright** · Screenshot evidence: yes · Task(s): T-0188 (ADR-0082, DL-0650)
+- **Given** a matrix with defaults, an override and a gap · **When** the Finance Admin chooses an account for the gap · **Then** the cell shows the override and step 7's missing list no longer has the gap; an Accountant sees the matrix without actions
 
 ## T-0112 PR integration regression evidence (2026-10-28)
 
