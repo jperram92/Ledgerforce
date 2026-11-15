@@ -3357,3 +3357,13 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - The local agent branches have no commits beyond d9554f4 and need no saving.
 - Why: the owner asked to wrap up so the work can be continued; the repository is the only memory.
 - ADR: none · Status: accepted
+
+### DL-0566 — Re-binding a system role: module function and PUT /accounts/system-roles/:role (T-0146)
+- Date: 2026-11-15 · By: claude · Task: T-0146 · Category: api
+- Decision:
+  - `rebindSystemRole` in @ledgerforce/gl updates `bindingTableFor(role)`: the core table or the period-end table (ADR-0061). The database's role-fit checks remain the authority, and their refusals map to REBIND_REFUSED with the database message.
+  - A role already bound to the requested account returns changed:false and writes nothing.
+  - The route `PUT /accounts/system-roles/:role {company_id, account_id}` needs the existing `settings.chart.manage` (Owner, Finance Admin), so no new permission is added. It needs an Idempotency-Key and is audited as `system_role_binding` with before/after. It answers 422 for a refusal and 404 for an unknown account or role.
+  - An additive route over existing schema needs no ADR (cf. DL-0313).
+- Why: design §3.2 says roles are re-bound, never unbound. The chart UI and the setup wizard need it.
+- ADR: none · Status: accepted

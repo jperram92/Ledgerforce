@@ -1,0 +1,74 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:38045
+ ❯ |api-db| apps/api/src/gl/rebind.db.test.ts (3 tests | 3 failed) 1516ms
+     × needs settings.chart.manage (403) and an Idempotency-Key (400) 45ms
+     × the Finance Admin moves ROUNDING to another account; one audit row; a replay changes nothing 6ms
+     × a binding the database refuses is 422 with its message; an account outside the company is 404 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/gl/rebind.db.test.ts > T-0146 AC-3: re-bind a system role over HTTP > needs settings.chart.manage (403) and an Idempotency-Key (400)
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/gl/rebind.db.test.ts:88:64
+     86|   it('needs settings.chart.manage (403) and an Idempotency-Key (400)',…
+     87|     const body = { company_id: f.companyId, account_id: spare };
+     88|     expect((await put('accountant', 'ROUNDING', body)).status).toBe(40…
+       |                                                                ^
+     89|     expect((await put('fa', 'ROUNDING', body, null)).status).toBe(400);
+     90|     expect(await audits()).toBe(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  |api-db| apps/api/src/gl/rebind.db.test.ts > T-0146 AC-3: re-bind a system role over HTTP > the Finance Admin moves ROUNDING to another account; one audit row; a replay changes nothing
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/gl/rebind.db.test.ts:96:22
+     94|     const body = { company_id: f.companyId, account_id: spare };
+     95|     const r = await put('fa', 'ROUNDING', body);
+     96|     expect(r.status).toBe(200);
+       |                      ^
+     97|     expect(await r.json()).toMatchObject({ role: 'ROUNDING', account_i…
+     98|     expect(await audits()).toBe(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |api-db| apps/api/src/gl/rebind.db.test.ts > T-0146 AC-3: re-bind a system role over HTTP > a binding the database refuses is 422 with its message; an account outside the company is 404
+AssertionError: expected 404 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 404
+
+ ❯ apps/api/src/gl/rebind.db.test.ts:108:28
+    106|     const asset = f.acct['1500'] ?? '';
+    107|     const refused = await put('fa', 'ROUNDING', { company_id: f.compan…
+    108|     expect(refused.status).toBe(422);
+       |                            ^
+    109|     expect(await refused.json()).toMatchObject({
+    110|       error: 'REBIND_REFUSED',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  03:20:11
+   Duration  11.45s (transform 5.79s, setup 0ms, import 9.00s, tests 1.52s, environment 0ms)
+

@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33859
+ ❯ |db| packages/modules/gl/src/rebind.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/gl/src/rebind.db.test.ts [ packages/modules/gl/src/rebind.db.test.ts ]
+Error: Cannot find module './rebind.ts' imported from /home/user/Ledgerforce/packages/modules/gl/src/rebind.db.test.ts
+ ❯ packages/modules/gl/src/rebind.db.test.ts:13:1
+     11| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     12| import { loadChartTemplate } from './chart.ts';
+     13| import { rebindSystemRole, RebindError } from './rebind.ts';
+       | ^
+     14| import { auServicesSmb } from './templates.ts';
+     15|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  03:19:01
+   Duration  2.77s (transform 681ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
