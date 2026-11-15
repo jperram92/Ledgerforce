@@ -1,0 +1,2 @@
+$ pnpm -s lint
+exit=0

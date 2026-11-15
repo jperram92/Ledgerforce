@@ -1,4 +1,4 @@
-import { applyDecorators, ForbiddenException, SetMetadata } from '@nestjs/common';
+import { ForbiddenException, SetMetadata } from '@nestjs/common';
 import type { Database } from '@ledgerforce/db';
 import type { Request } from 'express';
 import type { Transaction } from 'kysely';
@@ -8,8 +8,17 @@ import { DEFAULT_STEP_UP_MAX_AGE_SECONDS, isValidMaxAge } from './mfa.ts';
 
 export const REQUIRED_PERMISSION = 'lf:requiredPermission';
 export const ANY_MEMBER = 'lf:anyMember';
-export const STEP_UP = 'lf:stepUpMaxAge';
-export const STEP_UP_WHEN = 'lf:stepUpWhen';
+/**
+ * One metadata value `{ maxAge, when }` (security review r8 F2): a handler's declaration replaces
+ * its controller's as a whole, so an unconditional handler step-up never inherits a class-level
+ * condition.
+ */
+export const STEP_UP = 'lf:stepUp';
+
+interface StepUpDeclaration {
+  readonly maxAge: number;
+  readonly when: StepUpCondition | null;
+}
 
 /**
  * A condition for a route's step-up (ADR-0083): evaluated by TenantInterceptor inside the tenant
@@ -41,14 +50,13 @@ export const RequireStepUp = (
       `RequireStepUp: max age must be whole seconds in 1..3600, got ${String(maxAgeSeconds)}`,
     );
   }
-  return when
-    ? applyDecorators(SetMetadata(STEP_UP, maxAgeSeconds), SetMetadata(STEP_UP_WHEN, when))
-    : SetMetadata(STEP_UP, maxAgeSeconds);
+  const declaration: StepUpDeclaration = { maxAge: maxAgeSeconds, when: when ?? null };
+  return SetMetadata(STEP_UP, declaration);
 };
 
 /** The route's step-up condition (ADR-0083), or null when the step-up is unconditional. */
 export function stepUpWhenOf(handler: Target, cls: Target): StepUpCondition | null {
-  return meta<StepUpCondition>(STEP_UP_WHEN, handler, cls) ?? null;
+  return meta<StepUpDeclaration>(STEP_UP, handler, cls)?.when ?? null;
 }
 
 export type RouteAccess =
@@ -78,8 +86,8 @@ export function routeAccess(handler: Target, cls: Target): RouteAccess {
 
 /** The step-up max age a route needs, or null. Fail closed for step-up permissions. */
 export function stepUpOf(handler: Target, cls: Target, access: RouteAccess): number | null {
-  const declared = meta<number>(STEP_UP, handler, cls);
-  if (declared !== undefined) return declared;
+  const declared = meta<StepUpDeclaration>(STEP_UP, handler, cls);
+  if (declared !== undefined) return declared.maxAge;
   if (access.kind === 'permission' && STEP_UP_PERMISSIONS.includes(access.permission)) {
     return DEFAULT_STEP_UP_MAX_AGE_SECONDS;
   }

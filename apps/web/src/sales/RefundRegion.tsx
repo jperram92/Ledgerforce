@@ -357,6 +357,13 @@ function stripeState(r: CustomerRefund): string {
       r.stripe?.stripe_refund_id ? ` (Stripe refund ${r.stripe.stripe_refund_id})` : ''
     }. Its journal is in the general ledger.`;
   if (r.status === 'cancelled') return 'Cancelled.';
+  // Security review r8 F1: Stripe has the money out, the journal is missing — never "refused".
+  if (r.approval === 'approved' && r.stripe?.code === 'SENT_NOT_POSTED')
+    return `Sent to Stripe${
+      r.stripe.stripe_refund_id ? ` (Stripe refund ${r.stripe.stripe_refund_id})` : ''
+    }: the money has left, but the refund is not posted in the books: ${
+      r.stripe.message ?? 'no reason given'
+    }. A Finance Admin sees it in Sync issues; retrying it there records this Stripe refund and never sends another.`;
   if (r.approval === 'approved')
     return r.stripe?.status === 'failed'
       ? `Approved, but Stripe refused the refund: ${r.stripe.message ?? 'no reason given'}. A Finance Admin sees it in Sync issues.`

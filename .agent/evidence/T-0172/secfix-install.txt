@@ -1,0 +1,16 @@
+$ pnpm install --frozen-lockfile
+Scope: all 25 workspace projects
+ WARN  There are cyclic workspace dependencies: <worktree>/packages/connectors/salesforce, <worktree>/packages/modules/ar
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: @swc/core@1.16.13, cpu-features@0.0.10,             │
+│   protobufjs@7.6.6, ssh2@1.17.0.                                             │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Done in 939ms using pnpm v10.28.0
+exit=0

@@ -1,0 +1,11 @@
+$ pnpm exec vitest run --project api-unit
+
+ RUN  v4.1.12 <worktree>
+
+
+ Test Files  6 passed (6)
+      Tests  178 passed (178)
+   Start at  20:27:04
+   Duration  5.07s (transform 1.34s, setup 0ms, import 4.19s, tests 169ms, environment 0ms)
+
+exit=0

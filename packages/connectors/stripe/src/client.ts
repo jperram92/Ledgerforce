@@ -1,6 +1,7 @@
 /**
  * Minimal Stripe API client over fetch (RQ-0115, ADR-0048): form-encoded POSTs with a bearer
- * secret key, a pinned Stripe-Version and an Idempotency-Key on every write. No SDK (no new
+ * secret key, a pinned Stripe-Version and an Idempotency-Key on every write, and read-only GETs
+ * with the parameters in the query string (List Refunds, RQ-0164). No SDK (no new
  * runtime dependency). Test mode unless the deployment is explicitly configured live: the key
  * prefix must match the mode, and every returned object's `livemode` must match too.
  * The key comes from the runtime environment (LF_STRIPE_SECRET_KEY) and never appears in errors.
@@ -9,9 +10,10 @@
 export const STRIPE_API_VERSION = '2026-10-28.endive';
 export const STRIPE_API_BASE = 'https://api.stripe.com';
 
+/** The transport (named for its first use): a POST with a form body, or a GET without a body. */
 export type HttpPost = (
   url: string,
-  init: { method: 'POST'; headers: Record<string, string>; body: string },
+  init: { method: 'POST' | 'GET'; headers: Record<string, string>; body?: string },
 ) => Promise<{ status: number; text(): Promise<string> }>;
 
 /** Production transport: global fetch, no redirects. */
@@ -96,6 +98,15 @@ export interface Refund {
   readonly status: string;
 }
 
+/** A refund as List Refunds returns it (RQ-0164): with the metadata it was created with. */
+export interface ListedRefund extends Refund {
+  readonly paymentIntentId: string;
+  readonly metadata: Readonly<Record<string, string>>;
+}
+
+/** List Refunds pages read before giving up (100 refunds a page): a PaymentIntent has far fewer. */
+const MAX_LIST_PAGES = 20;
+
 export interface PaymentLink {
   readonly id: string;
   readonly url: string;
@@ -104,6 +115,39 @@ export interface PaymentLink {
 }
 
 const LOOPBACK = new Set(['127.0.0.1', 'localhost', '[::1]']);
+
+/** A List Refunds item of `paymentIntentId`, or null when it is not one. */
+function listedRefundOf(raw: unknown, paymentIntentId: string): ListedRefund | null {
+  if (typeof raw !== 'object' || raw === null) return null;
+  const o = raw as Record<string, unknown>;
+  const { id, amount, currency, status } = o;
+  const md = o['metadata'];
+  if (
+    typeof id !== 'string' ||
+    !/^re_[A-Za-z0-9]+$/.test(id) ||
+    o['object'] !== 'refund' ||
+    typeof amount !== 'number' ||
+    !Number.isSafeInteger(amount) ||
+    typeof currency !== 'string' ||
+    typeof status !== 'string' ||
+    o['payment_intent'] !== paymentIntentId ||
+    (md !== null && (typeof md !== 'object' || Array.isArray(md)))
+  ) {
+    return null;
+  }
+  const metadata: Record<string, string> = {};
+  for (const [k, v] of Object.entries((md ?? {}) as Record<string, unknown>)) {
+    if (typeof v === 'string') metadata[k] = v;
+  }
+  return {
+    id,
+    amountCents: String(amount),
+    currency: currency.toUpperCase(),
+    status,
+    paymentIntentId,
+    metadata,
+  };
+}
 
 export class StripeClient {
   readonly mode: 'test' | 'live';
@@ -222,6 +266,63 @@ export class StripeClient {
     return { id, amountCents: String(amount), currency: currency.toUpperCase(), status: st };
   }
 
+  /**
+   * The first refund of a PaymentIntent that `match` accepts, or null (RQ-0164): `GET /v1/refunds`
+   * with `payment_intent` and `limit=100`, following `starting_after` while `has_more`. Read-only;
+   * a list longer than MAX_LIST_PAGES pages is refused (the caller must not assume "none").
+   */
+  async findRefund(
+    paymentIntentId: string,
+    match: (r: ListedRefund) => boolean,
+  ): Promise<ListedRefund | null> {
+    if (!/^pi_[A-Za-z0-9]+$/.test(paymentIntentId)) {
+      throw new StripeConfigError('not a PaymentIntent id');
+    }
+    let after: string | undefined;
+    for (let page = 0; page < MAX_LIST_PAGES; page++) {
+      const { status, body } = await this.#get('/v1/refunds', {
+        payment_intent: paymentIntentId,
+        limit: '100',
+        ...(after ? { starting_after: after } : {}),
+      });
+      const data = body['data'];
+      const more = body['has_more'];
+      if (body['object'] !== 'list' || !Array.isArray(data) || typeof more !== 'boolean') {
+        throw new StripeApiError(status, 'malformed_response', 'not a list of refunds');
+      }
+      let last: string | undefined;
+      for (const raw of data as unknown[]) {
+        const r = listedRefundOf(raw, paymentIntentId);
+        if (!r) {
+          throw new StripeApiError(status, 'malformed_response', 'not a Refund of this payment');
+        }
+        if (match(r)) return r;
+        last = r.id;
+      }
+      if (!more) return null;
+      if (!last) throw new StripeApiError(status, 'malformed_response', 'an empty page with more');
+      after = last;
+    }
+    throw new StripeApiError(
+      null,
+      'too_many_refunds',
+      `more than ${String(MAX_LIST_PAGES * 100)} refunds on ${paymentIntentId}; check Stripe by hand`,
+    );
+  }
+
+  async #get(
+    path: string,
+    params: FormObject,
+  ): Promise<{ status: number; body: Record<string, unknown> }> {
+    return this.#send(`${path}?${formEncode(params)}`, {
+      method: 'GET',
+      headers: {
+        authorization: `Bearer ${this.#key}`,
+        'stripe-version': STRIPE_API_VERSION,
+      },
+    });
+  }
+
   async #post(
     path: string,
     params: FormObject,
@@ -230,18 +331,25 @@ export class StripeClient {
     if (idempotencyKey.length < 1 || idempotencyKey.length > 255) {
       throw new StripeConfigError('an idempotency key is 1–255 characters');
     }
+    return this.#send(path, {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${this.#key}`,
+        'content-type': 'application/x-www-form-urlencoded',
+        'stripe-version': STRIPE_API_VERSION,
+        'idempotency-key': idempotencyKey,
+      },
+      body: formEncode(params),
+    });
+  }
+
+  async #send(
+    path: string,
+    init: Parameters<HttpPost>[1],
+  ): Promise<{ status: number; body: Record<string, unknown> }> {
     let res: { status: number; text(): Promise<string> };
     try {
-      res = await this.#http(`${this.#base}${path}`, {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${this.#key}`,
-          'content-type': 'application/x-www-form-urlencoded',
-          'stripe-version': STRIPE_API_VERSION,
-          'idempotency-key': idempotencyKey,
-        },
-        body: formEncode(params),
-      });
+      res = await this.#http(`${this.#base}${path}`, init);
     } catch {
       throw new StripeApiError(null, 'unreachable', 'the Stripe API could not be reached');
     }

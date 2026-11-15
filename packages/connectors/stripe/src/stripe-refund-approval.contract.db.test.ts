@@ -8,6 +8,11 @@
  *  - The direct `refundCreditViaStripe` path needs an approved refund document (AC-3).
  *  - A failed send is retried by the outbox handler: never a second Stripe refund, never a second
  *    journal; permanent failures and sends older than 23 hours are not retried automatically.
+ *  - Security review r8 F1 (RQ-0164, DL-0680..): before every create the send lists the
+ *    PaymentIntent's refunds and adopts one carrying `lf_refund_id`; a posting the engine would
+ *    refuse is caught before Stripe (NOT_POSTABLE); a failure after Stripe accepted is permanent
+ *    SENT_NOT_POSTED and its retry adopts, never sends again. F5: the worker's posting is the
+ *    approver's.
  */
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -19,7 +24,7 @@ import {
   type CustomerRefundView,
 } from '@ledgerforce/ar';
 import { seedBillableCustomers, seedBillingCompany } from '@ledgerforce/ar/testing';
-import { subledgerEntriesOf } from '@ledgerforce/ledger';
+import { subledgerEntriesOf, type PostingOutbox } from '@ledgerforce/ledger';
 import { approvedTables, parsePostings } from '@ledgerforce/ledger/golden';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
 import type { SeededProfiles } from '@ledgerforce/products';
@@ -64,6 +69,8 @@ const clerk = randomUUID();
 const approver = randomUUID();
 
 const stripeCheck = { stripeCheck: assertStripeRefundable };
+/** The Stripe calls that create a refund (POST), as opposed to the read-only lookups (GET). */
+const creates = () => stub.received.filter((x) => x.method === 'POST');
 
 async function requestRefund(credit: StripePaidCredit, amount = '220.00') {
   return f.inTenant((trx) =>
@@ -198,9 +205,15 @@ describe('SS-UC11-09 a Stripe refund is sent only on approval, once, and posts G
       }),
     );
     expect(stub.mismatches).toEqual([]);
-    expect(stub.received.map((x) => [x.path, x.idempotencyKey, x.matched])).toEqual([
-      ['/v1/refunds', `lf-refund-v2-${r.refundId}`, 'refund-document-220.00'],
+    // RQ-0164: first the lookup (no key, read-only), then the one create.
+    expect(stub.received.map((x) => [x.method, x.path, x.idempotencyKey, x.matched])).toEqual([
+      ['GET', '/v1/refunds', null, 'list-refunds-none'],
+      ['POST', '/v1/refunds', `lf-refund-v2-${r.refundId}`, 'refund-document-220.00'],
     ]);
+    expect(stub.received[0]?.form).toEqual({
+      payment_intent: credit.paymentIntentId,
+      limit: '100',
+    });
     expect(sent).toMatchObject({ stripeRefundId: 're_1SQbT0172Acme000220', replayed: false });
     expect(sent.refund).toMatchObject({ status: 'paid', paidOn: '2026-11-24' });
 
@@ -251,7 +264,7 @@ describe('SS-UC11-09 a Stripe refund is sent only on approval, once, and posts G
       }),
     );
     expect(again).toMatchObject({ entryId: sent.entryId, replayed: true });
-    expect(stub.received).toHaveLength(1);
+    expect(stub.received).toHaveLength(2);
     expect(await entriesFor(r.refundId)).toBe(1);
   });
 
@@ -380,11 +393,14 @@ describe('SS-UC11-10 a failed Stripe send is retried through the outbox, never r
     };
     await f.inTenant((trx) => handler.handle(trx, event));
     expect(stub.mismatches).toEqual([]);
-    expect(stub.received.slice(before).map((x) => x.matched)).toEqual(['refund-document-220.00']);
+    expect(stub.received.slice(before).map((x) => x.matched)).toEqual([
+      'list-refunds-none',
+      'refund-document-220.00',
+    ]);
     expect(await entriesFor(r.refundId)).toBe(1);
     // A redelivery finds the refund paid: no Stripe call, no journal.
     await f.inTenant((trx) => handler.handle(trx, event));
-    expect(stub.received.length).toBe(before + 1);
+    expect(stub.received.length).toBe(before + 2);
     expect(await entriesFor(r.refundId)).toBe(1);
     expect(
       await f.inTenant((trx) => getCustomerRefund(trx, f.companyId, r.refundId)),
@@ -446,5 +462,261 @@ describe('SS-UC11-10 a failed Stripe send is retried through the outbox, never r
     expect(expired).toMatchObject({ code: 'KEY_EXPIRED', retryable: false });
     expect(stub.received.length).toBe(before);
     expect(await entriesFor(stale.refundId)).toBe(0);
+  });
+});
+
+describe('Security review r8 F1: money never leaves twice; a Stripe success that cannot be posted says so', () => {
+  const failingOutbox: PostingOutbox = {
+    enqueue: () => Promise.reject(new Error('posting outbox unavailable')),
+  };
+  const eventFor = (refundId: string) => ({
+    id: randomUUID(),
+    tenantId: f.tenantId,
+    companyId: f.companyId,
+    topic: STRIPE_REFUND_APPROVED,
+    aggregateType: 'customer_refund',
+    aggregateId: refundId,
+    payload: { refundId },
+    createdAt: NOW,
+  });
+  const setVars = (prefix: string, credit: StripePaidCredit, r: CustomerRefundView, re: string) =>
+    Object.assign(stub.vars, {
+      tenantId: f.tenantId,
+      companyId: f.companyId,
+      [`${prefix}RefundId`]: r.refundId,
+      [`${prefix}RefundNo`]: r.refundNo,
+      [`${prefix}CreditNoteId`]: credit.creditNoteId,
+      [`${prefix}CreditNoteNo`]: credit.creditNoteNo,
+      [`${prefix}PaymentIntentId`]: credit.paymentIntentId,
+      [`${prefix}StripeRefundId`]: re,
+    });
+
+  it('SS-UC11-10 F1a a posting the engine would refuse is caught before Stripe: NOT_POSTABLE, nothing sent, not retried', async () => {
+    const credit = await seedCredit('Eta');
+    const r = await requestRefund(credit);
+    await approve(r);
+    setVars('unpostable', credit, r, 're_1SQbT0172Unpostable');
+    const posts = creates().length;
+    // Sent on 2027-08-01: no fiscal period covers it (the fixture has FY2027 only), so the
+    // engine would refuse the journal (NO_PERIOD) — Stripe must not be asked for the money.
+    const later = new Date('2027-08-01T00:00:00Z');
+    const out = await f.inTenant((trx) =>
+      trySendStripeCustomerRefund(trx, client, {
+        companyId: f.companyId,
+        refundId: r.refundId,
+        now: later,
+      }),
+    );
+    expect(stub.mismatches).toEqual([]);
+    expect(out).toMatchObject({ status: 'failed', code: 'NOT_POSTABLE' });
+    expect(out.status === 'failed' ? out.message : '').toMatch(/not sent to Stripe/);
+    expect(creates().length).toBe(posts);
+    expect(await entriesFor(r.refundId)).toBe(0);
+    const handler = stripeRefundSendHandler({ client, now: () => later });
+    const permanent = await f
+      .inTenant((trx) => handler.handle(trx, eventFor(r.refundId)))
+      .catch((e: unknown) => e as { errorCode?: string; retryable?: boolean });
+    expect(permanent).toMatchObject({ errorCode: 'NOT_POSTABLE', retryable: false });
+    expect(creates().length).toBe(posts);
+  });
+
+  it('SS-UC11-10 F1a a posting failure after Stripe accepted is a permanent SENT_NOT_POSTED; the retry adopts the Stripe refund and posts once, as the approver (F5)', async () => {
+    const credit = await seedCredit('Theta');
+    const r = await requestRefund(credit);
+    await approve(r);
+    setVars('sent', credit, r, 're_1SQbT0172SentNotPosted');
+    const posts = creates().length;
+    const out = await f.inTenant((trx) =>
+      trySendStripeCustomerRefund(
+        trx,
+        client,
+        { companyId: f.companyId, refundId: r.refundId, now: NOW },
+        { outbox: failingOutbox },
+      ),
+    );
+    expect(stub.mismatches).toEqual([]);
+    expect(out).toMatchObject({
+      status: 'failed',
+      code: 'SENT_NOT_POSTED',
+      stripeRefundId: 're_1SQbT0172SentNotPosted',
+    });
+    expect(out.status === 'failed' ? out.message : '').toMatch(
+      /sent to Stripe as re_1SQbT0172SentNotPosted.*not posted/,
+    );
+    expect(creates().length).toBe(posts + 1);
+    expect(await entriesFor(r.refundId)).toBe(0);
+    expect(
+      await f.inTenant((trx) => getCustomerRefund(trx, f.companyId, r.refundId)),
+    ).toMatchObject({ status: 'requested', approval: 'approved' });
+
+    // The worker's attempt finds the Stripe refund, still cannot post: permanent, said plainly.
+    const failing = stripeRefundSendHandler({
+      client,
+      now: () => NOW,
+      posting: { outbox: failingOutbox },
+    });
+    const err = await f
+      .inTenant((trx) => failing.handle(trx, eventFor(r.refundId)))
+      .catch((e: unknown) => e as { errorCode?: string; retryable?: boolean; message?: string });
+    expect(err).toMatchObject({ errorCode: 'SENT_NOT_POSTED', retryable: false });
+    expect((err as { message?: string }).message).toMatch(
+      /sent to Stripe as re_1SQbT0172SentNotPosted.*not posted/,
+    );
+    expect(creates().length).toBe(posts + 1);
+
+    // Fixed and retried from Sync issues: adopts, posts once, never a second Stripe refund.
+    const handler = stripeRefundSendHandler({ client, now: () => NOW });
+    await f.inTenant((trx) => handler.handle(trx, eventFor(r.refundId)));
+    expect(stub.mismatches).toEqual([]);
+    expect(creates().length).toBe(posts + 1);
+    expect(await entriesFor(r.refundId)).toBe(1);
+    const paid = await f.inTenant((trx) => getCustomerRefund(trx, f.companyId, r.refundId));
+    expect(paid).toMatchObject({ status: 'paid' });
+    const rows = await f.inTenant((trx) =>
+      trx
+        .selectFrom('app.stripe_refund')
+        .select(['stripe_refund_id', 'created_by'])
+        .where('entry_id', '=', paid.entryId ?? '')
+        .execute(),
+    );
+    expect(rows).toEqual([{ stripe_refund_id: 're_1SQbT0172SentNotPosted', created_by: approver }]);
+    // F5: the journal of a worker-retried send is attributed to the approver.
+    const by = await f.inTenant(
+      async (trx) =>
+        (
+          await sql<{ created_by: string | null }>`SELECT created_by::text FROM app.journal_entry
+            WHERE id = ${paid.entryId ?? ''}::uuid`.execute(trx)
+        ).rows[0]?.created_by,
+    );
+    expect(by).toBe(approver);
+  });
+
+  it('SS-UC11-10 F1b a lost commit after Stripe accepted never leads to a second refund, even on a re-approval a day later', async () => {
+    const credit = await seedCredit('Iota');
+    const r = await requestRefund(credit);
+    setVars('lost', credit, r, 're_1SQbT0172LostCommit');
+    stub.vars['lostOtherRefundId'] = randomUUID();
+    const posts = creates().length;
+    // Approve and send, then the request's transaction fails to commit.
+    const lost = await f
+      .inTenant(async (trx) => {
+        await approveCustomerRefund(trx, {
+          companyId: f.companyId,
+          refundId: r.refundId,
+          approvedBy: approver,
+          today: '2026-11-24',
+        });
+        await sendStripeCustomerRefund(trx, client, {
+          companyId: f.companyId,
+          refundId: r.refundId,
+          now: NOW,
+        });
+        throw new Error('connection lost before COMMIT');
+      })
+      .catch((e: unknown) => (e as Error).message);
+    expect(lost).toBe('connection lost before COMMIT');
+    expect(creates().length).toBe(posts + 1);
+    expect(
+      await f.inTenant((trx) => getCustomerRefund(trx, f.companyId, r.refundId)),
+    ).toMatchObject({ status: 'requested', approval: 'pending' });
+    expect(await entriesFor(r.refundId)).toBe(0);
+
+    // Re-approved later (a fresh approval time, as after Stripe pruned the key): the send finds
+    // the refund at Stripe (second page of the list) and adopts it instead of creating another.
+    await approve(r);
+    const sent = await f.inTenant((trx) =>
+      sendStripeCustomerRefund(trx, client, {
+        companyId: f.companyId,
+        refundId: r.refundId,
+        now: NOW,
+      }),
+    );
+    expect(stub.mismatches).toEqual([]);
+    expect(sent).toMatchObject({ stripeRefundId: 're_1SQbT0172LostCommit', replayed: false });
+    expect(creates().length).toBe(posts + 1);
+    expect(stub.received.slice(-2).map((x) => x.matched)).toEqual([
+      'list-refunds-lost-after-page1',
+      'list-refunds-lost-after-page2',
+    ]);
+    expect(await entriesFor(r.refundId)).toBe(1);
+  });
+});
+
+describe('Security re-review R1: the lookup finds a refund whose credit note was voided afterwards', () => {
+  it('SS-UC11-10 R1 a lost commit, then the credit note is voided and the refund re-approved: no second Stripe refund through another credit note', async () => {
+    const credit = await seedCredit('Lambda');
+    const r = await requestRefund(credit);
+    Object.assign(stub.vars, {
+      tenantId: f.tenantId,
+      companyId: f.companyId,
+      voidedRefundId: r.refundId,
+      voidedRefundNo: r.refundNo,
+      voidedCreditNoteId: credit.creditNoteId,
+      voidedCreditNoteNo: credit.creditNoteNo,
+      voidedPaymentIntentId: credit.paymentIntentId,
+      voidedStripeRefundId: 're_1SQbT0172VoidedCn',
+    });
+    const posts = creates().length;
+    // Approve and send, then the request's transaction fails to commit: Stripe has the refund.
+    const lost = await f
+      .inTenant(async (trx) => {
+        await approveCustomerRefund(trx, {
+          companyId: f.companyId,
+          refundId: r.refundId,
+          approvedBy: approver,
+          today: '2026-11-24',
+        });
+        await sendStripeCustomerRefund(trx, client, {
+          companyId: f.companyId,
+          refundId: r.refundId,
+          now: NOW,
+        });
+        throw new Error('connection lost before COMMIT');
+      })
+      .catch((e: unknown) => (e as Error).message);
+    expect(lost).toBe('connection lost before COMMIT');
+    expect(creates().length).toBe(posts + 1);
+
+    // Later the same customer pays another invoice by card and is credited again, and the
+    // credit note the refund was sent for is voided.
+    const second = await seedStripePaidCredit(f, {
+      professionalServicesProfileId: profiles.productProfiles.get('PROFESSIONAL_SERVICES') ?? '',
+      partyId: credit.partyId,
+      clearingAccountId: f.acct['1210'] ?? '',
+    });
+    Object.assign(stub.vars, {
+      voidedSecondPaymentIntentId: second.paymentIntentId,
+      voidedSecondCreditNoteId: second.creditNoteId,
+      voidedSecondCreditNoteNo: second.creditNoteNo,
+    });
+    await f.admin.query(
+      `UPDATE app.credit_note SET status = 'void' WHERE tenant_id = $1 AND id = $2`,
+      [f.tenantId, credit.creditNoteId],
+    );
+
+    // Re-approved (a fresh approval time): the lookup still finds the refund sent for the voided
+    // credit note, so nothing new is created; it cannot be posted, which says the money is out.
+    await approve(r);
+    const out = await f.inTenant((trx) =>
+      trySendStripeCustomerRefund(trx, client, {
+        companyId: f.companyId,
+        refundId: r.refundId,
+        now: NOW,
+      }),
+    );
+    expect(stub.mismatches).toEqual([]);
+    expect(creates().length).toBe(posts + 1);
+    // The only create for this document went to the first payment, never to the second one.
+    expect(
+      creates()
+        .filter((x) => x.idempotencyKey === `lf-refund-v2-${r.refundId}`)
+        .map((x) => x.form['payment_intent']),
+    ).toEqual([credit.paymentIntentId]);
+    expect(out).toMatchObject({
+      status: 'failed',
+      code: 'SENT_NOT_POSTED',
+      stripeRefundId: 're_1SQbT0172VoidedCn',
+    });
+    expect(await entriesFor(r.refundId)).toBe(0);
   });
 });

@@ -76,3 +76,34 @@ even when the network or the worker fails.
   the existing step-up prompt.
 - A refund Stripe refuses permanently stays approved and requested until T-0190 adds a cancel.
 - `stripe_refund.entry_id = customer_refund.entry_id` links the two records without a migration.
+
+## Addendum (2026-11-15, security review r8) — money leaves once; a send that cannot be posted says so
+Added by claude for findings F1, F2, F3 and F5 of security review r8 (research RQ-0164;
+decisions DL-0680–DL-0685). It strengthens the decision above and does not change this ADR's
+status. Review finding F4 (whether DL-0477 covers this security ADR, including the conditional
+step-up mechanism) remains a question for the product owner.
+
+- **Lookup before every create (F1b).** The send lists the refunds of the party's Stripe
+  PaymentIntents (`GET /v1/refunds?payment_intent=…&limit=100`, paged by `starting_after`) and
+  adopts the one whose metadata `lf_refund_id` is the refund document; only if none exists does it
+  call `POST /v1/refunds`. A commit lost after a successful send, or a key Stripe pruned, can no
+  longer cause a second refund. `KEY_EXPIRED` stays as a second guard.
+- **Journal checked before money leaves (F1a).** The engine's `preview()` of the GP-006 Stripe
+  command and the allocation's rules run before Stripe is called; a refusal is `NOT_POSTABLE`
+  ("not sent to Stripe"), permanent.
+- **Post-send failures are permanent (F1a).** After Stripe accepted (or a refund was adopted), any
+  failure is `SENT_NOT_POSTED` (`retryable: false`) with the Stripe refund id: the approve
+  response says `stripe: { status: failed, code: SENT_NOT_POSTED, stripe_refund_id, message }`,
+  the worker dead-letters it to Sync issues at once, and the refund region says the money has left
+  and the refund is not posted. Retrying it adopts the Stripe refund and posts once.
+- The send stays in the approve request (option 3 above); sending only from the worker (option 4)
+  would not fix F1a and would hide the result from the approver (RQ-0164 finding 5).
+- **Step-up metadata (F2).** `@RequireStepUp` stores `{ maxAge, when }` as one value, so a
+  handler's declaration replaces its controller's as a whole.
+- **Handler re-check (F3).** The interceptor records the step-up max age it verified for the
+  request; the approve handler refuses a Stripe refund (401 `step_up_required`, `max_age: 300`)
+  unless it was verified, whatever the route's condition read.
+- **Attribution (F5).** A send with no named actor (the worker's retry) posts as the approver.
+- **Re-review R1 (DL-0686).** The lookup searches every PaymentIntent stored for any of the party's
+  invoices, whatever the invoice or credit-note state: a refund sent for a credit note voided
+  afterwards is still found and adopted, never sent a second time. R2 and R3 are on T-0189.

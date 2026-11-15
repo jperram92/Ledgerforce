@@ -200,6 +200,8 @@ export interface CustomerRefund {
     status: 'not_sent' | 'pending' | 'sent' | 'failed';
     stripe_refund_id: string | null;
     message: string | null;
+    /** Only when failed; SENT_NOT_POSTED: Stripe has the money out, the books do not (r8 F1). */
+    code?: string;
   };
 }
 

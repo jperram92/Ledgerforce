@@ -1,0 +1,4 @@
+$ pnpm -s format:check
+Checking formatting...
+All matched files use Prettier code style!
+exit=0

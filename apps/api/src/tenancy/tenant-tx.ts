@@ -22,6 +22,11 @@ interface RequestScope {
   trx: Transaction<Database>;
   access: RequestAccess;
   audit?: AuditDescription;
+  /**
+   * The step-up max age (seconds) TenantInterceptor verified this request's session against, or
+   * null when it verified none (security review r8 F3).
+   */
+  stepUpVerified: number | null;
 }
 
 const storage = new AsyncLocalStorage<RequestScope>();
@@ -31,8 +36,9 @@ export function runInTenantTx<T>(
   trx: Transaction<Database>,
   access: RequestAccess,
   fn: (scope: RequestScope) => Promise<T>,
+  stepUpVerified: number | null = null,
 ): Promise<T> {
-  const scope: RequestScope = { trx, access };
+  const scope: RequestScope = { trx, access, stepUpVerified };
   return storage.run(scope, () => fn(scope));
 }
 
@@ -47,6 +53,16 @@ export function scope(): RequestScope {
 export class TenantTx {
   get(): Transaction<Database> {
     return scope().trx;
+  }
+
+  /**
+   * True when the interceptor verified, for this request, a step-up at least as fresh as
+   * `maxAgeSeconds` (security review r8 F3): a handler that finds it needs step-up only after
+   * reading its data re-checks here instead of trusting the route's condition.
+   */
+  stepUpVerified(maxAgeSeconds: number): boolean {
+    const v = scope().stepUpVerified;
+    return v !== null && v <= maxAgeSeconds;
   }
 }
 

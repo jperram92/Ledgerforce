@@ -1,0 +1,12 @@
+$ pnpm exec vitest run --project api-db apps/api/src/ar apps/api/src/authz apps/api/src/tenancy
+
+ RUN  v4.1.12 <worktree>
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44729
+
+ Test Files  11 passed (11)
+      Tests  99 passed (99)
+   Start at  20:17:35
+   Duration  25.78s (transform 1.47s, setup 0ms, import 10.42s, tests 13.61s, environment 1ms)
+
+exit=0

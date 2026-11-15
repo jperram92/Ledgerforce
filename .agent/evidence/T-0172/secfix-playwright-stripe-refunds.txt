@@ -1,0 +1,11 @@
+$ pnpm exec playwright test tests/e2e/web/stripe-refunds.spec.ts --trace off
+
+Running 4 tests using 2 workers
+
+  ✓  1 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:273:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 1440 [T-0172] (3.6s)
+  ✓  2 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:311:1 › SS-UC11-10: a Stripe send that did not finish at approval says it is retried automatically [T-0172] (3.9s)
+  ✓  4 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:333:1 › SS-UC11-10: a refund Stripe took but the books could not record says the money has left and is not posted [T-0172] (2.5s)
+  ✓  3 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:273:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 390 [T-0172] (2.8s)
+
+  4 passed (7.8s)
+exit=0
