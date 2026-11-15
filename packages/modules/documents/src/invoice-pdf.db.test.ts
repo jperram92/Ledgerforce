@@ -3,18 +3,24 @@
  * from the HTML template, contains the invoice number, the supplier ABN, GST 125.00 and total
  * 1,375.00 as real, extractable text. Real PostgreSQL as lf_app, real Chromium, real PDF parser.
  */
-import { approveInvoice, createDraftInvoice, type DocumentOutbox } from '@ledgerforce/ar';
+import {
+  approveInvoice,
+  createDraftInvoice,
+  setInvoiceSettings,
+  type DocumentOutbox,
+} from '@ledgerforce/ar';
 import { auServicesSmb } from '@ledgerforce/gl';
 import { entrySeriesFor, SOURCE_TYPES } from '@ledgerforce/ledger';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
 import { seedPostingProfiles, setPartyProfiles } from '@ledgerforce/products';
 import { seedTaxCodes } from '@ledgerforce/tax';
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { getDocument, OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AU_BILLING_FORMATS, seedBillingFormats } from './billing-formats.ts';
 import { renderInvoiceHtml } from './invoice-html.ts';
 import { loadInvoiceDocument } from './invoice-document.ts';
 import { PdfRenderer } from './pdf.ts';
+import { solidPng } from './testing/solid-png.ts';
 
 let f: LedgerFixture;
 let invoiceId = '';
@@ -164,5 +170,83 @@ describe('T-0041: invoice PDF', () => {
     const text = await pdfText(await renderer.render(html, { timeoutMs: 15_000 }));
     expect(text).toContain('static');
     expect(text).not.toContain('scripted');
+  }, 60_000);
+});
+
+// ---------------- T-0165: branding and payment methods on the real PDF ----------------
+
+/**
+ * Pages and number of painted raster images (the logo) in a PDF, read by pdfjs. pdfjs transfers
+ * (detaches) the buffer it is given, so it reads a copy and the caller can still extract text.
+ */
+async function pdfImages(pdf: Uint8Array): Promise<{ pages: number; images: number }> {
+  const d = await getDocument({ data: pdf.slice(), useSystemFonts: true }).promise;
+  const paint = new Set([OPS.paintImageXObject, OPS.paintInlineImageXObject]);
+  let images = 0;
+  for (let n = 1; n <= d.numPages; n++) {
+    const ops = await (await d.getPage(n)).getOperatorList();
+    images += ops.fnArray.filter((fn) => paint.has(fn)).length;
+  }
+  return { pages: d.numPages, images };
+}
+
+describe('T-0165: branded invoice PDF', () => {
+  const logo = solidPng(240, 80, [11, 110, 79]);
+
+  it('SS-UC01-15 AC-3 without saved settings the document has no branding or methods and the PDF no image [T-0165]', async () => {
+    const doc = await f.inTenant((trx) => loadInvoiceDocument(trx, f.companyId, invoiceId));
+    expect(doc.branding ?? null).toBeNull();
+    expect(doc.acceptedPaymentMethods ?? null).toBeNull();
+    const pdf = await renderer.render(renderInvoiceHtml(doc));
+    expect(await pdfImages(pdf)).toEqual({ pages: 1, images: 0 });
+    expect(await pdfText(pdf)).not.toContain('How to pay');
+  }, 60_000);
+
+  it('SS-UC01-15 AC-3 the saved brand colour, PNG logo and both methods reach the document, and the branded PDF renders on one page with the logo and both payment blocks [T-0165]', async () => {
+    await f.inTenant((trx) =>
+      setInvoiceSettings(trx, f.companyId, {
+        brandColour: '#0b6e4f',
+        brandAccentColour: '#F2A541',
+        logo: { contentType: 'image/png', content: logo },
+        acceptedPaymentMethods: ['stripe', 'bank_transfer'],
+      }),
+    );
+    const doc = await f.inTenant((trx) => loadInvoiceDocument(trx, f.companyId, invoiceId));
+    expect(doc.branding?.colour).toBe('#0B6E4F');
+    expect(doc.branding?.accentColour).toBe('#F2A541');
+    expect(doc.branding?.logo?.contentType).toBe('image/png');
+    expect(Buffer.from(doc.branding?.logo?.content ?? new Uint8Array()).equals(logo)).toBe(true);
+    expect(doc.acceptedPaymentMethods).toEqual(['bank_transfer', 'stripe']);
+    // No remittance account can be chosen yet (RQ-0159, ADR-0079 Proposed, T-0180).
+    expect(doc.bankTransfer ?? null).toBeNull();
+
+    const html = renderInvoiceHtml(doc);
+    expect(html).toContain(`data:image/png;base64,${logo.toString('base64')}`);
+    const pdf = await renderer.render(html);
+    expect(await pdfImages(pdf)).toEqual({ pages: 1, images: 1 });
+    const text = await pdfText(pdf);
+    expect(text).toContain('Tax invoice');
+    expect(text).toContain(invoiceNo);
+    expect(text).toMatch(/Total\s*\$1,375\.00/);
+    expect(text).toContain('How to pay');
+    expect(text).toContain('Pay by bank transfer');
+    expect(text).toContain(`Reference: ${invoiceNo}`);
+    expect(text).toContain('Pay online by card (Stripe)');
+  }, 60_000);
+
+  it('SS-UC01-15 AC-3 removing the logo leaves the colour and renders no image; [bank_transfer] alone shows no Stripe block [T-0165]', async () => {
+    await f.inTenant((trx) =>
+      setInvoiceSettings(trx, f.companyId, {
+        logo: null,
+        acceptedPaymentMethods: ['bank_transfer'],
+      }),
+    );
+    const doc = await f.inTenant((trx) => loadInvoiceDocument(trx, f.companyId, invoiceId));
+    expect(doc.branding).toEqual({ colour: '#0B6E4F', accentColour: '#F2A541', logo: null });
+    const pdf = await renderer.render(renderInvoiceHtml(doc));
+    expect(await pdfImages(pdf)).toEqual({ pages: 1, images: 0 });
+    const text = await pdfText(pdf);
+    expect(text).toContain('Pay by bank transfer');
+    expect(text).not.toContain('Pay online');
   }, 60_000);
 });

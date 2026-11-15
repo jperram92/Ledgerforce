@@ -7,10 +7,11 @@ import { randomUUID } from 'node:crypto';
 import {
   approveInvoice,
   createDraftInvoice,
+  setInvoiceSettings,
   type DocumentEvent,
   type DocumentOutbox,
 } from '@ledgerforce/ar';
-import { PdfRenderer } from '@ledgerforce/documents';
+import { PdfRenderer, type InvoicePaymentLinkProvider } from '@ledgerforce/documents';
 import { auServicesSmb } from '@ledgerforce/gl';
 import { entrySeriesFor, SOURCE_TYPES } from '@ledgerforce/ledger';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
@@ -34,6 +35,7 @@ const outbox: DocumentOutbox = {
 };
 let acme = '';
 let supplier = '';
+let servicesProfile = '';
 
 async function contact(
   trx: Parameters<Parameters<LedgerFixture['inTenant']>[0]>[0],
@@ -82,6 +84,7 @@ beforeAll(async () => {
       auServicesSmb,
       new Map(Object.entries(f.acct)),
     );
+    servicesProfile = profiles.productProfiles.get('PROFESSIONAL_SERVICES') ?? '';
     for (const [name, role] of [
       ['Acme', 'customer'],
       ['Supplier', 'supplier'],
@@ -228,4 +231,81 @@ describe('SS-UC06-08: Remittance advices emailed', () => {
     expect(err).toBeInstanceOf(EmailError);
     expect((err as EmailError).code).toBe('NO_RECIPIENT');
   });
+});
+
+describe('SS-UC01-15: the emailed invoice follows the accepted payment methods (T-0165)', () => {
+  /** Post one more invoice for Acme and return its `ar.invoice.posted` outbox event. */
+  async function postInvoice(issueDate: string) {
+    const invoiceId = await f.inTenant(async (trx) => {
+      const draft = await createDraftInvoice(
+        trx,
+        {
+          companyId: f.companyId,
+          partyId: acme,
+          issueDate,
+          lines: [
+            {
+              productProfileId: servicesProfile,
+              description: 'Professional services',
+              quantity: '1',
+              unitPrice: '100.00',
+            },
+          ],
+        },
+        { outbox },
+      );
+      return (
+        await approveInvoice(
+          trx,
+          { companyId: f.companyId, invoiceId: draft.invoiceId },
+          { outbox },
+        )
+      ).invoiceId;
+    });
+    const e = published.find((x) => x.topic === 'ar.invoice.posted' && x.aggregateId === invoiceId);
+    if (!e) throw new Error('no ar.invoice.posted event');
+    return outboxEvent(e);
+  }
+  const calls: string[] = [];
+  const paymentLinks: InvoicePaymentLinkProvider = {
+    ensure: async (_trx, _companyId, invoiceId) => {
+      calls.push(invoiceId);
+      return { url: 'https://buy.stripe.com/test_t0165', amountDue: '110.0000' };
+    },
+  };
+  /** The message with quoted-printable soft line breaks joined, so phrases are searchable. */
+  const unfolded = (raw: string | undefined) => (raw ?? '').replace(/=\r?\n/g, '');
+
+  it('SS-UC01-15 with [bank_transfer] no Stripe link is requested or sent, and the email shows the bank-transfer block [T-0165]', async () => {
+    await f.inTenant((trx) =>
+      setInvoiceSettings(trx, f.companyId, {
+        brandColour: '#0B6E4F',
+        acceptedPaymentMethods: ['bank_transfer'],
+      }),
+    );
+    const event = await postInvoice('2026-11-10');
+    const before = sink.messages.length;
+    const handler = invoiceEmailHandler({ sender, renderer, paymentLinks });
+    await f.inTenant((trx) => handler.handle(trx, event));
+    expect(sink.messages).toHaveLength(before + 1);
+    expect(calls).toEqual([]);
+    const raw = unfolded(sink.messages.at(-1)?.raw);
+    expect(raw).not.toContain('buy.stripe.com');
+    expect(raw).not.toContain('Pay online');
+    expect(raw).toContain('Pay by bank transfer');
+  }, 60_000);
+
+  it('SS-UC01-15 with [bank_transfer, stripe] the link is requested once and sent with both blocks [T-0165]', async () => {
+    await f.inTenant((trx) =>
+      setInvoiceSettings(trx, f.companyId, { acceptedPaymentMethods: ['bank_transfer', 'stripe'] }),
+    );
+    const event = await postInvoice('2026-11-11');
+    const handler = invoiceEmailHandler({ sender, renderer, paymentLinks });
+    await f.inTenant((trx) => handler.handle(trx, event));
+    expect(calls).toEqual([event.aggregateId]);
+    const raw = unfolded(sink.messages.at(-1)?.raw);
+    expect(raw).toContain('Pay online: https://buy.stripe.com/test_t0165');
+    expect(raw).toContain('Pay by bank transfer');
+    expect(raw).toContain('Pay online by card (Stripe)');
+  }, 60_000);
 });

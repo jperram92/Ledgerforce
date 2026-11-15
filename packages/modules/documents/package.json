@@ -11,13 +11,13 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@ledgerforce/ar": "workspace:*",
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
     "kysely": "0.29.7",
     "playwright-core": "1.63.0"
   },
   "devDependencies": {
-    "@ledgerforce/ar": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
     "@ledgerforce/ledger": "workspace:*",
     "@ledgerforce/products": "workspace:*",

@@ -580,6 +580,9 @@ importers:
 
   packages/modules/documents:
     dependencies:
+      '@ledgerforce/ar':
+        specifier: workspace:*
+        version: link:../ar
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../db
@@ -593,9 +596,6 @@ importers:
         specifier: 1.63.0
         version: 1.63.0
     devDependencies:
-      '@ledgerforce/ar':
-        specifier: workspace:*
-        version: link:../ar
       '@ledgerforce/gl':
         specifier: workspace:*
         version: link:../gl

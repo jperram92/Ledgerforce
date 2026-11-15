@@ -1,0 +1,58 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a3894a7ec34b11518
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:35747
+ ❯ |db| packages/modules/documents/src/invoice-pdf.db.test.ts (6 tests | 2 failed) 1427ms
+     × SS-UC01-15 AC-3 the saved brand colour, PNG logo and both methods reach the document, and the branded PDF renders on one page with the logo and both payment blocks [T-0165] 10ms
+     × SS-UC01-15 AC-3 removing the logo leaves the colour and renders no image; [bank_transfer] alone shows no Stripe block [T-0165] 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/documents/src/invoice-pdf.db.test.ts > T-0165: branded invoice PDF > SS-UC01-15 AC-3 the saved brand colour, PNG logo and both methods reach the document, and the branded PDF renders on one page with the logo and both payment blocks [T-0165]
+AssertionError: expected undefined to be '#0B6E4F' // Object.is equality
+
+- Expected:
+"#0B6E4F"
+
++ Received:
+undefined
+
+ ❯ packages/modules/documents/src/invoice-pdf.db.test.ts:215:34
+    213|     );
+    214|     const doc = await f.inTenant((trx) => loadInvoiceDocument(trx, f.c…
+    215|     expect(doc.branding?.colour).toBe('#0B6E4F');
+       |                                  ^
+    216|     expect(doc.branding?.accentColour).toBe('#F2A541');
+    217|     expect(doc.branding?.logo?.contentType).toBe('image/png');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |db| packages/modules/documents/src/invoice-pdf.db.test.ts > T-0165: branded invoice PDF > SS-UC01-15 AC-3 removing the logo leaves the colour and renders no image; [bank_transfer] alone shows no Stripe block [T-0165]
+AssertionError: expected undefined to deeply equal { colour: '#0B6E4F', …(2) }
+
+- Expected:
+{
+  "accentColour": "#F2A541",
+  "colour": "#0B6E4F",
+  "logo": null,
+}
+
++ Received:
+undefined
+
+ ❯ packages/modules/documents/src/invoice-pdf.db.test.ts:245:26
+    243|     );
+    244|     const doc = await f.inTenant((trx) => loadInvoiceDocument(trx, f.c…
+    245|     expect(doc.branding).toEqual({ colour: '#0B6E4F', accentColour: '#…
+       |                          ^
+    246|     const pdf = await renderer.render(renderInvoiceHtml(doc));
+    247|     expect(await pdfImages(pdf)).toEqual({ pages: 1, images: 0 });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  03:35:57
+   Duration  3.60s (transform 573ms, setup 0ms, import 1.36s, tests 1.43s, environment 0ms)
+

@@ -1,9 +1,13 @@
 /**
  * Load a posted sales invoice as the document model the templates render (T-0041). Reads only.
+ * With the company's invoice settings (T-0158) it carries the branding, the logo bytes and the
+ * accepted payment methods (T-0165), read through @ledgerforce/ar. Remittance bank details are not
+ * loaded: choosing the account and printing its number await ADR-0079 (RQ-0159, T-0180).
  */
+import { invoiceLogoOf, invoiceSettingsOf } from '@ledgerforce/ar';
 import type { Database } from '@ledgerforce/db';
 import { sql, type Transaction } from 'kysely';
-import type { InvoiceDocument } from './invoice-html.ts';
+import type { InvoiceBranding, InvoiceDocument } from './invoice-html.ts';
 
 export class DocumentError extends Error {
   readonly code: 'NOT_FOUND' | 'NOT_POSTED';
@@ -59,6 +63,15 @@ export async function loadInvoiceDocument(
     .where('invoice_id', '=', invoiceId)
     .orderBy('line_no')
     .execute();
+  const settings = await invoiceSettingsOf(trx, companyId);
+  const branding: InvoiceBranding | null =
+    settings.brandColour || settings.brandAccentColour || settings.logo
+      ? {
+          colour: settings.brandColour,
+          accentColour: settings.brandAccentColour,
+          logo: settings.logo ? await invoiceLogoOf(trx, companyId) : null,
+        }
+      : null;
   return {
     supplier: { legalName: h.supplier, abn: h.supplier_abn },
     customer: { name: h.customer, abn: h.customer_abn },
@@ -79,5 +92,7 @@ export async function loadInvoiceDocument(
     net: h.net_total ?? '0',
     tax: h.tax_total ?? '0',
     gross: h.gross_total,
+    branding,
+    acceptedPaymentMethods: settings.acceptedPaymentMethods,
   };
 }
