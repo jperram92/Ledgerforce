@@ -29,11 +29,13 @@ import { Money } from '@ledgerforce/shared/money';
 import { computeTax } from '@ledgerforce/tax';
 import { Decimal } from 'decimal.js';
 import { sql, type Transaction } from 'kysely';
+import { invoiceSettingsOf } from './invoice-settings.ts';
 
 type Trx = Transaction<Database>;
 
 export const INVOICE_NUMBER_SERIES = 'ar_invoice_document';
 export const INVOICE_POSTED = 'ar.invoice.posted';
+/** Due-date terms when the company has saved no default payment terms (T-0164). */
 const DEFAULT_TERMS_DAYS = 14;
 
 export type InvoiceErrorCode =
@@ -426,6 +428,13 @@ export async function createDraftInvoice(
     });
   }
 
+  // An explicit due date wins; else the company's default terms (wizard step 8, T-0164); else 14.
+  const dueDate =
+    input.dueDate ??
+    addDays(
+      input.issueDate,
+      (await invoiceSettingsOf(trx, companyId)).defaultPaymentTermsDays ?? DEFAULT_TERMS_DAYS,
+    );
   const pricing = input.pricing ?? 'exclusive';
   const { priced, warnings } = await priceInvoiceLines(
     trx,
@@ -439,7 +448,7 @@ export async function createDraftInvoice(
       company_id: companyId,
       party_id: input.partyId,
       issue_date: input.issueDate,
-      due_date: input.dueDate ?? addDays(input.issueDate, DEFAULT_TERMS_DAYS),
+      due_date: dueDate,
       pricing,
       currency: company.base_currency,
       reference: input.reference ?? null,
