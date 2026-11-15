@@ -75,7 +75,7 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0018](0018-envelope-encryption-local-keyring-kms.md) | Envelope encryption of bank account numbers with a pluggable KMS; local keyring for self-host MVP | security | yes | Accepted |
 | [0023](0023-role-templates-and-permission-checks.md) | Role templates as code, tenant-scoped role assignments, fail-closed permission checks | security | yes | Accepted |
 | [0024](0024-period-control-matrix-and-lock-policy.md) | Period control: §3.5 matrix as data, invariant 3 in the database, personal overrides, two-approver reopen, lock-date policy | accounting | yes | Accepted |
-| [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Accepted |
+| [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Accepted (superseded in part by ADR-0087) |
 | [0026](0026-segregation-of-duties-engine-and-small-team-mode.md) | Segregation-of-duties engine: rules as data, append-only action ledger, tenant thresholds, visible small-team exceptions | security | yes | Accepted |
 | [0027](0027-user-lifecycle-and-scoped-api-tokens.md) | User lifecycle (joiner/mover/leaver) and scoped personal API tokens | security | yes | Accepted |
 | [0029](0029-job-queue-privileges-and-supervision.md) | Job queue (pg-boss) privileges: lf_app DML on the shared pgboss schema, owner-run supervision | security | yes | Accepted |
@@ -119,5 +119,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0081](0081-setup-settings-http-routes.md) | HTTP routes for the setup settings screens (company details, fiscal years, tax settings, tax codes) | architecture | no | Proposed |
 | [0082](0082-posting-profile-matrix-http-routes.md) | HTTP routes for the posting-profile matrix: read the matrix, set an override | architecture | no | Proposed |
 | [0083](0083-stripe-refund-sent-on-approval.md) | A Stripe refund is sent by the approve step, once, with step-up; failures retry through the outbox | security | yes (delegated, DL-0562/DL-0477) | Accepted |
+| [0087](0087-rotate-session-id-on-step-up.md) | A step-up re-authentication rotates the session id and cookie (ASVS 5.0 7.2.4) | security | yes (delegated, DL-0691) | Accepted (supersedes ADR-0025 in part) |
 
 Next free number: **0055** (0055–0060 are reserved for the DL-0409 parallel round) (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).
