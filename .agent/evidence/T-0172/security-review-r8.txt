@@ -1,0 +1,70 @@
+# Security review r8 — T-0180 (remittance account) and T-0172 (Stripe refund on approval)
+
+Reviewer: claude (security-reviewer role), 2026-11-15. Read-only; no product code changed.
+Diffs: `git diff 8664870...HEAD` in worktrees agent-a9e51bd369ad43b03 (T-0180) and
+agent-a1d33617443f758e4 (T-0172); both now merged in claude/loving-lovelace-nozqpk (d887f8d, a21ac5a).
+
+Commands run:
+- `git log --oneline 8664870..HEAD`, `git diff --stat 8664870...HEAD`, targeted `git diff` per file (both worktrees)
+- `grep` over migrations 0012/0013/0035/0055/0070 for grants/guards; `grep` callers of loadInvoiceDocument / revealCompanyBankAccountNumber
+- `pnpm audit --prod` (main checkout): 5 moderate (nodemailer x3 via packages/modules/email, seroval x2 via apps/web) — all pre-existing, neither branch changes third-party deps (lockfile diffs are workspace links only).
+
+## Verdicts
+
+- T-0180: **PASS** (no blocking findings; 3 low).
+- T-0172: **PASS with findings / NEEDS-HUMAN** — one medium money-movement finding (F1), one human-gate question (F4).
+
+## T-0180 checks
+
+| # | Check | Verdict | Evidence |
+|---|---|---|---|
+| 1 | DB guard on app.ar_settings | pass | 0071_ar_remittance_account.sql:155-177 — any insert/update changing remittance_bank_account_id needs an approved change of the same company and value with decided_xact = pg_current_xact_id(); decided_xact set only by trigger (:126), insert refuses non-null (:105). Test remittance-account.db.test.ts:243 |
+| 2 | Commit-time self-approval check | pass | 0071:134-152 DEFERRABLE INITIALLY DEFERRED constraint trigger; decided_by/requested_by come from session principal (controller :165, :186, actorOf :123-127). Tests :162, api :169 |
+| 3 | Small-team exception | pass | 0071:138-144 needs latest sod_settings.small_team_mode AND a sod_exception row for this rule/step/subject/actor. Test :311 |
+| 4 | Change-row immutability | pass | 0071:120-125 only requested -> approved/rejected; jsonb diff of all other columns; no DELETE grant (:184) |
+| 5 | RLS ENABLE+FORCE, policy | pass | 0071:179-183 (USING + WITH CHECK on app.tenant_id); triggers skip foreign-tenant rows so RLS refuses (:101, :159) |
+| 6 | Cross-tenant coverage | pass | packages/db/src/testing/cross-tenant.ts:673-685 prerequisite seeds the table into the generic suite; db suite 1137/1137 (evidence db-suites.txt); module test :352, API test :251 |
+| 7 | SoD mirror SQL <-> TS | pass | 0071:25-55 vs packages/shared/src/sod/rules.ts:27-28, :104, :244-253 (sod.db.test.ts asserts parity per header) |
+| 8 | Step-up 300 s request/approve | pass | remittance-account.controller.ts:50, :148, :180; reject has none (:198) — acceptable, rejection moves nothing. API test :123, :179 |
+| 9 | Decryption scope | pass | bank/src/remittance.ts:33-52 only the account named by ar_settings, status active, same currency; only caller documents/invoice-document.ts:89-94, only with KMS, only from worker email handler (email/invoice-email.ts:106; worker main.ts KMS). No API route calls loadInvoiceDocument with a KMS (grep) |
+| 10 | Bank detail tamper of designated account | pass | lf_app can UPDATE only (name, status, csv_mapping) on app.bank_account (0013:63-64): BSB/number/account_name are immutable, so the approved account cannot be silently re-pointed |
+| 11 | Masking (responses/audit/outbox/email_delivery) | pass | remittance-account.ts:77-99 only account_number_last3; audit uses masked view (controller :116-121); no outbox event; email_delivery stores no body (invoice-email.ts:60-72). API test :232 |
+| 12 | Idempotency | pass | client change id; replay only for same requester+account (remittance-account.ts:197-206); advisory lock + partial unique index (0071:92-93); decision replays only for same actor+status (:248) |
+| 13 | Input validation | pass | UUID checks both layers; reason 1-2000 both layers (0071:79, remittance-account.ts:311-313); bank_account_id must be explicit (controller :158) |
+| 14 | Secrets / logs | pass | worker only logs absence of LF_KMS_PROVIDER; no clear number logged |
+| 15 | Ledger | n/a | no ledger writes |
+| 16 | Deps | pass | workspace deps only |
+
+### T-0180 findings
+- **L1 (low) — re-activation re-prints a designated account.** remittance.ts:43 filters `status = 'active'`, and lf_app may UPDATE bank_account.status. An account archived while designated, then re-activated, prints again without a new approval. Same approved account, so low. Fix: on archive, clear designation via an approved removal, or have the guard refuse re-activation of a designated account without a change record (or document as accepted).
+- **L2 (low) — small-team self-approval has no extra compensating control specific to payment redirection.** Only the generic sod_exception record. Suggest notifying all Owners/Finance Admins (email) on any remittance account change, approved or self-approved (design §1 principle 5, §6.5).
+- **L3 (info) — ADR-0080 is category api, human_gate no**, but it fixes the SoD rule and DB guards. Acceptable because it only implements owner-accepted ADR-0079; noted for the owner.
+
+## T-0172 checks
+
+| # | Check | Verdict | Evidence |
+|---|---|---|---|
+| 1 | Conditional step-up cannot be bypassed by method switch | pass | method immutable: lf_app UPDATE only (status, entry_id, paid_on, updated_at) on customer_refund (0055:181) + guard (0055:88-124) |
+| 2 | Condition and handler read the same input | pass (race noted) | refunds.controller.ts:112-124 uses req.params.id + req.query.company_id; handler uses the same (:243-250), both lower-cased; non-string/array -> false then handler 400. Narrow TOCTOU, see F3 |
+| 3 | Fail-open on errors | pass | tenant.interceptor.ts:122-129 — a throw from the condition propagates inside withTenant, rolls back, request fails (fail-closed). Not-found returns false, handler then 404 |
+| 4 | Conditional cannot weaken mandatory step-up | pass (latent risk) | ar.refund.approve not in STEP_UP_PERMISSIONS (packages/shared/src/rbac/catalogue.ts:328-335). Latent: see F2 |
+| 5 | API tokens | pass | token principal never satisfies step-up (interceptor :113-114, :124) so tokens cannot approve Stripe refunds |
+| 6 | SoD self-approval kept | pass | refunds.controller.ts:239 @SoD('refund.approve'); test refunds-stripe.db.test.ts:339 |
+| 7 | Stripe idempotency key | pass | refund.ts:82 `lf-refund-v2-<refund id>`, passed on createRefund :275-292 |
+| 8 | Exactly-once / replay | pass with finding | paid refund replays without Stripe call (refund.ts:211-220); approve replay returns stored view, no send (controller :276); outbox event commits with approval (:277-283), worker sees paid -> no-op; posting key `ar-refund:<id>` dedupes with bank path (:308). Gaps F1 |
+| 9 | 23 h key expiry | pass | refund.ts:231-242 DB clock from approved_at; missing approval -> KEY_EXPIRED (fail-closed); non-retryable -> dead letter |
+| 10 | Ledger only via posting engine | pass | post()/allocate() from @ledgerforce/ledger (refund.ts:304-336); stripe_refund and customer_refund are not ledger tables |
+| 11 | Secrets | pass | key in private #key (client.ts:131); error messages built from Stripe response message only (client.ts:37, :260); main.ts/worker only test presence of LF_STRIPE_SECRET_KEY |
+| 12 | Stripe refund cannot also go into a bank batch | pass (app layer) | payment-batches.ts:326 `method = 'bank_batch'`; no DB-level method check on payment_batch_refund (pre-existing) |
+| 13 | Deps / audit | pass | workspace link only; pnpm audit: 5 moderate, pre-existing, unrelated |
+
+### T-0172 findings (ranked)
+- **F1 (medium) — Stripe is called inside the API request transaction before the ledger posting; a later failure leaves money refunded with no books, and a lost commit can lead to a second refund after 24 h.**
+  - (a) refund.ts:277-336: createRefund runs, then post()/allocate()/insert. If post() fails (e.g. period locked/closed, account inactive — a PostingError), isTransient (refund.ts:374-376) classifies it as transient: the savepoint rolls back the posting but Stripe has already refunded. The worker retries with the same key (Stripe returns the same refund) and fails again until KEY_EXPIRED / dead letter. Money is out, AR not reduced, and the Sync issue does not say Stripe already refunded.
+  - (b) controller.ts:284-293: after a successful send and RELEASE SAVEPOINT, the outer transaction can still fail to commit (deferred constraint, audit insert, connection loss). Approval, outbox event and posting all roll back; Stripe refund stands; the refund is "requested/unapproved" again. A re-approval within 24 h replays at Stripe (same key, if params same); after 24 h a re-approval gets a fresh approved_at, passes the 23 h check and sends a **second** refund.
+  - Fix: run every check that can refuse the posting (period open, accounts postable — e.g. the engine's preview/validate) *before* calling Stripe; classify PostingError as non-retryable with a code that says "sent to Stripe, not posted"; before createRefund on any send, look up existing Stripe refunds for the payment_intent with metadata lf_refund_id (Stripe List Refunds by payment_intent) and adopt one if found; or move the send out of the request transaction (worker-only after commit, keeping the approve route's response as "pending").
+- **F2 (low, latent) — step-up condition metadata inherits independently of max age.** permission.decorator.ts:44-52, stepUpWhenOf uses meta() falling back to class. A class-level `@RequireStepUp(n, cond)` plus a handler-level unconditional `@RequireStepUp(m)` makes the handler conditional too. No current usage. Fix: store `{maxAge, when}` as one metadata value so handler declarations replace both; add a unit test.
+- **F3 (low) — TOCTOU between condition and handler reads (READ COMMITTED).** stripeRefundOnly returns false when the refund does not exist yet; if the maker's PUT commits between the condition's SELECT and getCustomerRefund (controller :250), the Stripe approval proceeds without step-up. Needs a pre-known client id and precise timing; the approver still needs permission and SoD. Fix: in the handler, when current.method === 'stripe', re-check that the condition was evaluated as true (e.g. interceptor sets a request flag, or the condition SELECTs FOR SHARE and the handler refuses a Stripe refund if the flag says "not required").
+- **F4 (human gate) — ADR-0083 is category security, `human_gate: yes`, Accepted by claude "under DL-0477" via DL-0562.** DL-0477 delegated the listed items; item 3 says only "A Stripe refund is sent only after approval". Adding step-up is a strengthening and consistent with item 5, but the new conditional step-up mechanism in the central interceptor is a change to the authorization framework. AGENTS.md §6 keeps security ADRs with the owner. Ask the owner to confirm ADR-0083 (including the conditional step-up mechanism) is covered by DL-0477.
+- **F5 (info) — worker-path posting has no createdBy** (refund.ts:437-446): the journal entry from a retried send is not attributed to the approver. Pass approvedBy from customer_refund_approval into the handler's send.
+- **F6 (info) — tenant UUID sent to Stripe as metadata** (refund.ts:283). Acceptable (an opaque id), noted for the privacy register.

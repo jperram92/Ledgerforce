@@ -3682,3 +3682,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: The worker registers `stripeRefundSendHandler` when `LF_STRIPE_SECRET_KEY` is set (else a start-up warning), and the API configures `stripeRefunds` the same way. The workspace dependency adds three lockfile lines; no third-party dependency (no ADR needed).
 - Why: the outbox retry must run somewhere (ADR-0008).
 - ADR: none · Status: accepted
+
+### DL-0680 — A Stripe refund send adopts the refund Stripe already holds for the document before it creates one (T-0172, security review r8 F1b)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: security
+- Decision: Before every `POST /v1/refunds`, `sendStripeCustomerRefund` lists the refunds of each Stripe PaymentIntent behind the party's posted credit notes (`GET /v1/refunds?payment_intent=…&limit=100`, paged with `starting_after`, at most 20 pages, then refused) and adopts the refund whose metadata `lf_refund_id` and `lf_company_id` match the document, with the credit note named in its `lf_credit_note_id`. Only when none exists is a refund created. `KEY_EXPIRED` (23 h) stays in front as a second guard, so a send older than that still goes through T-0189.
+- Why: a request transaction that fails to commit after a successful send rolled back the approval; a re-approval after Stripe pruned the key (24 h) could create a second refund (review F1b). The metadata is set on every send, so the lookup makes "money leaves twice for one document" impossible regardless of the key (RQ-0164 findings 2–3).
+- Alternatives: send only from the worker after commit (rejected: does not fix F1a and hides the result from the approver, RQ-0164 finding 5); rely on the idempotency key alone (rejected: pruned after 24 h).
+- ADR: ADR-0083 (addendum, r8) · Status: accepted
+
+### DL-0681 — The journal is checked before money leaves; post-send failures are permanent SENT_NOT_POSTED (T-0172, security review r8 F1a)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: security
+- Decision: Before calling Stripe the send runs the engine's `preview()` of the GP-006 Stripe-variant command and the allocation's rules against the credit note's open item (account, party, currency, sides, date, open amount). A refusal with no refund at Stripe is `NOT_POSTABLE` ("not sent to Stripe"); with an adopted refund it is `SENT_NOT_POSTED`. Any failure after Stripe accepted or was adopted is `SENT_NOT_POSTED` (`retryable: false`, Stripe refund id in the error, the outcome and the API's `stripe.code`/`stripe_refund_id`), so the worker dead-letters it to Sync issues at once with a message saying the money has left and the books do not show it; its retry adopts the Stripe refund and posts once. The refund region says "Sent to Stripe … not posted" instead of "Stripe refused".
+- Why: a posting refusal after the send was classed transient and retried until KEY_EXPIRED with money out and no clear Sync issue (review F1a; RQ-0164 findings 1, 4).
+- Alternatives: keep PostingError transient (rejected: retries cannot fix a closed period and hide the money-out state); post before the Stripe call (rejected: books would show a refund Stripe may refuse, and posted entries are immutable).
+- ADR: ADR-0083 (addendum, r8) · Status: accepted
+
+### DL-0682 — `@RequireStepUp` keeps max age and condition in one metadata value (T-0172, security review r8 F2)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: security
+- Decision: The decorator stores `{ maxAge, when }` under `lf:stepUp`; `stepUpOf` and `stepUpWhenOf` read the same value, so a handler's own declaration replaces the controller's as a whole and an unconditional handler step-up never inherits a class-level condition. The old separate keys are no longer written (no route used a class-level step-up).
+- Why: review F2 (latent weakening of a mandatory step-up). Unit test in `apps/api/src/authz/mfa.test.ts`.
+- Alternatives: forbid class-level conditions (rejected: the single value is simpler and keeps both uses correct).
+- ADR: ADR-0083 (addendum, r8) · Status: accepted
+
+### DL-0683 — The approve handler re-checks the step-up the interceptor verified (T-0172, security review r8 F3)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: security
+- Decision: `TenantInterceptor` records in the request scope the step-up max age the session satisfied (`TenantTx.stepUpVerified(maxAge)`), independent of the route's condition. `POST /ar/refunds/:id/approve` refuses a Stripe refund with 401 `step_up_required` (`max_age: 300`, audited as `step_up_required`) unless that record covers 300 s, so a refund that became readable between the condition's read and the handler's read cannot be approved without step-up.
+- Why: review F3 (TOCTOU under READ COMMITTED). The check stays derived from the interceptor's verification, not an ad-hoc authentication in the controller.
+- Alternatives: `SELECT … FOR SHARE` in the condition (rejected: does not cover a row that did not exist yet); re-evaluating the condition in the handler (rejected: duplicates the policy).
+- ADR: ADR-0083 (addendum, r8) · Status: accepted
+
+### DL-0684 — A worker-retried Stripe refund posting is attributed to the approver (T-0172, security review r8 F5)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: accounting
+- Decision: When the caller names no `createdBy`, the send uses the refund document's `approvedBy` (from `customer_refund_approval`) for the journal entry, the allocation and the `stripe_refund` row. No schema change.
+- Why: review F5; the approver is the person who authorised the money out (design §6.8 audit).
+- Alternatives: pass the approver through the outbox payload (rejected: the approval row already holds it).
+- ADR: none · Status: accepted
+
+### DL-0685 — Test infrastructure and assertion updates for the r8 fixes (T-0172)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: process
+- Decision: The recorded Stripe stub answers GET interactions (query string as the form, no Idempotency-Key, no body) and supports `times` (an interaction answers at most n requests); the documented fixture `stripe-refunds-approved-20261115.json` gains List Refunds interactions (built from the stripe@23.1.0 SDK types, RQ-0164 S1–S4; no live Stripe). Existing assertions on the sequence of Stripe calls now list the read-only lookup before the single create; each still proves exactly one POST per refund document. The `HttpPost` transport type allows `GET` with no body. The API's failed `stripe` view adds `code`.
+- Why: the lookup is a new outbound call that the contract tests must see; nothing was weakened (the counts rose by the GETs, the POST counts are asserted separately).
+- Alternatives: filter GETs out of the assertions (rejected: the lookup is part of the contract and must be proved).
+- ADR: none · Status: accepted

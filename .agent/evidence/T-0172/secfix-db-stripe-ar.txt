@@ -1,0 +1,12 @@
+$ pnpm exec vitest run --project db packages/connectors/stripe packages/modules/ar
+
+ RUN  v4.1.12 <worktree>
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:43541
+
+ Test Files  20 passed (20)
+      Tests  105 passed (105)
+   Start at  20:17:06
+   Duration  27.61s (transform 1.04s, setup 0ms, import 5.07s, tests 19.93s, environment 2ms)
+
+exit=0
