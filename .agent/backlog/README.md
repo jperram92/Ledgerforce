@@ -16,12 +16,10 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 7 |
 | done | 3 |
 | in_progress | 1 |
-| review | 131 |
+| review | 133 |
 | todo | 23 |
-| verifying | 6 |
+| verifying | 4 |
 | **total** | **171** |
-| verifying | 6 |
-| **total** | **165** |
 
 | Phase | Cards |
 |---|---:|
