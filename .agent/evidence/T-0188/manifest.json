@@ -325,6 +325,87 @@
       "provider": "unknown",
       "timestamp": "2026-11-15T21:05:34.276Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-134",
+      "file": ".agent/evidence/T-0188/20261115-212305-SS-PLAT-134-matrix-defaults-overrides-gaps-1440.png",
+      "test": "web/posting-profiles.spec.ts › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 1440 [T-0188]",
+      "commit": "9074c3d24f24",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T21:23:05.738Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-134",
+      "file": ".agent/evidence/T-0188/20261115-212306-SS-PLAT-134-matrix-fill-gap-choose-1440.png",
+      "test": "web/posting-profiles.spec.ts › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 1440 [T-0188]",
+      "commit": "9074c3d24f24",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T21:23:06.497Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-134",
+      "file": ".agent/evidence/T-0188/20261115-212307-SS-PLAT-134-matrix-gap-filled-1440.png",
+      "test": "web/posting-profiles.spec.ts › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 1440 [T-0188]",
+      "commit": "9074c3d24f24",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T21:23:07.252Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-134",
+      "file": ".agent/evidence/T-0188/20261115-212307-SS-PLAT-134-wizard-step-7-one-gap-left-1440.png",
+      "test": "web/posting-profiles.spec.ts › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 1440 [T-0188]",
+      "commit": "9074c3d24f24",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T21:23:07.952Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-134",
+      "file": ".agent/evidence/T-0188/20261115-212310-SS-PLAT-134-matrix-defaults-overrides-gaps-390.png",
+      "test": "web/posting-profiles.spec.ts › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 390 [T-0188]",
+      "commit": "9074c3d24f24-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T21:23:10.240Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-134",
+      "file": ".agent/evidence/T-0188/20261115-212311-SS-PLAT-134-matrix-fill-gap-choose-390.png",
+      "test": "web/posting-profiles.spec.ts › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 390 [T-0188]",
+      "commit": "9074c3d24f24-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T21:23:11.075Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-134",
+      "file": ".agent/evidence/T-0188/20261115-212311-SS-PLAT-134-matrix-gap-filled-390.png",
+      "test": "web/posting-profiles.spec.ts › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 390 [T-0188]",
+      "commit": "9074c3d24f24-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T21:23:11.837Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-134",
+      "file": ".agent/evidence/T-0188/20261115-212312-SS-PLAT-134-wizard-step-7-one-gap-left-390.png",
+      "test": "web/posting-profiles.spec.ts › SS-PLAT-134: Posting-profile matrix marks defaults, overrides and gaps, and a filled gap leaves step 7 @ 390 [T-0188]",
+      "commit": "9074c3d24f24-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T21:23:12.448Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-134",
+      "file": ".agent/evidence/T-0188/20261115-212314-SS-PLAT-134-matrix-fill-refused-1440.png",
+      "test": "web/posting-profiles.spec.ts › SS-PLAT-134: a refused account is explained, and the gap stays [T-0188]",
+      "commit": "9074c3d24f24-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T21:23:14.563Z",
+      "result": "passed"
     }
   ]
 }
