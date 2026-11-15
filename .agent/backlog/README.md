@@ -206,7 +206,7 @@ graph LR
 | [T-0088](T-0088.md) | UI: statement import and bank reconciliation | MVP | review | T-0081, T-0061, T-0059, T-0149 | UC-08 | 1 |
 | [T-0150](T-0150.md) | Bank: journal preview for a transaction from a line (suggestions → T-0160, large files → T-0161) | MVP | review | T-0149, T-0088 | UC-08 | 1 |
 | [T-0160](T-0160.md) | Bank: accept a candidate suggestion (module, route, Accept button) — split from T-0150 | MVP | in_progress | T-0149, T-0088 | UC-08 | 1 |
-| [T-0161](T-0161.md) | Bank: accept large statement files over HTTP (route-scoped body limit) — split from T-0150 | MVP | todo | T-0149 | UC-08 | 0 |
+| [T-0161](T-0161.md) | Bank: accept large statement files over HTTP (route-scoped body limit) — split from T-0150 | MVP | in_progress | T-0149 | UC-08 | 1 |
 | [T-0089](T-0089.md) | UI: TB, P&L, balance sheet, GL detail, aged AR/AP | MVP | review | T-0081, T-0077 | — | 4 |
 | [T-0090](T-0090.md) | UI: close checklist and period status | MVP | review | T-0081, T-0078, T-0079, T-0148 | UC-10 | 1 |
 | [T-0091](T-0091.md) | UI: setup wizard | MVP | todo | T-0081, T-0080, T-0123, T-0157 | — | 0 |

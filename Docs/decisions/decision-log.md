@@ -3385,3 +3385,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: UC-08 step 3 (a person confirms each suggestion), P6 (controls explain themselves), the card's AC-3. One primary action per screen stays "Find matches".
 - Alternatives: a radio group per line plus one "Accept selected" button (rejected: two steps for the common case); an Accept button for rule suggestions that posts at once (rejected: a journal would post without its preview).
 - ADR: none · Status: accepted
+
+### DL-0612 — Large statement files: dependency-free path-scoped JSON reader, 10 MB, ADR-0078 accepted under DL-0477 (T-0161)
+- Date: 2026-11-15 · By: claude under DL-0477 · Task: T-0161 · Category: security
+- Decision: Build RQ-0151 option A. A middleware in `apps/api/src/security/statement-body.ts`, registered in `createApi` after `applySecurity` (headers, rate limits, CSRF) and before Nest's parsers, reads JSON bodies up to 10 MB for `POST /bank-rec/accounts/:id/statements` only; every other route keeps body-parser's 100 kB default. 413 `{error:'payload_too_large'}` above the limit (declared or counted, with `Connection: close`, the rest discarded), 415 for a content encoding or a non-UTF-8 charset, 400 `{error:'invalid_json'}` for malformed or non-object/array JSON. ADR-0078 (security) records it, Accepted under the owner's delegation (DL-0477 item 6). Raising one route's body limit counts as a security change (design §6.9), hence the ADR rather than only a log entry.
+- Why: RQ-0151 and DL-0532; no new runtime dependency (option B would add `express` as a direct dependency); the ADR-0054 rate limits still run before any byte is read.
+- Alternatives: option B, a global limit, multipart (all rejected in ADR-0078).
+- ADR: ADR-0078 · Status: accepted

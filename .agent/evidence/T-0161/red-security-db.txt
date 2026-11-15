@@ -1,0 +1,234 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:40121
+[31m[Nest] 29829  - [39m11/15/2026, 3:39:00 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m3145729[39m,
+  length: [33m3145729[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 29829  - [39m11/15/2026, 3:39:01 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m10486785[39m,
+  length: [33m10486785[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 29829  - [39m11/15/2026, 3:39:01 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at IncomingMessage.onData [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:260:12[90m)[39m
+[90m    at IncomingMessage.emit (node:events:519:28)[39m
+[90m    at addChunk (node:internal/streams/readable:561:12)[39m
+[90m    at readableAddChunkPushByteMode (node:internal/streams/readable:512:3)[39m
+[90m    at Readable.push (node:internal/streams/readable:392:5)[39m
+[90m    at HTTPParser.parserOnBody (node:_http_common:137:24)[39m {
+  limit: [33m102400[39m,
+  received: [33m130859[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 29829  - [39m11/15/2026, 3:39:01 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: incorrect header check
+[90m    at genericNodeError (node:internal/errors:983:15)[39m
+[90m    at wrappedFn (node:internal/errors:537:14)[39m
+[90m    at Zlib.zlibOnError [as onerror] (node:zlib:191:17)[39m {
+  errno: [33m-3[39m,
+  code: [32m'Z_DATA_ERROR'[39m,
+  expose: [33mtrue[39m,
+  statusCode: [33m400[39m,
+  status: [33m400[39m
+}
+[31m[Nest] 29829  - [39m11/15/2026, 3:39:01 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m3145729[39m,
+  length: [33m3145729[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 29829  - [39m11/15/2026, 3:39:01 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204801[39m,
+  length: [33m204801[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 29829  - [39m11/15/2026, 3:39:01 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m3145729[39m,
+  length: [33m3145729[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+ ❯ |api-db| apps/api/src/security/statement-body.db.test.ts (8 tests | 6 failed) 1546ms
+     × T-0161 a body of 3 MB passes the reader and reaches the tenant guard (401) 213ms
+     × T-0161 a declared Content-Length over 10 MB is 413 payload_too_large with the security headers 316ms
+     × T-0161 a chunked body (no Content-Length) over 10 MB is 413 106ms
+     × T-0161 a compressed body is 415 and a non-UTF-8 charset is 415; JSON that is not an object or array is 400 4ms
+     × T-0161 the upper-case spelling of the path is handled the same (Express routes case-insensitively) 24ms
+     × T-0161 the ADR-0054 write rate limit answers 429 before the body is read 25ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/security/statement-body.db.test.ts > T-0161 ADR-0078: the statement import route reads JSON up to 10 MB, no further > T-0161 a body of 3 MB passes the reader and reaches the tenant guard (401)
+AssertionError: expected 413 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 413
+
+ ❯ apps/api/src/security/statement-body.db.test.ts:92:22
+     90|   it('T-0161 a body of 3 MB passes the reader and reaches the tenant g…
+     91|     const r = await raw(api.url, PATH, jsonOf(3 * MB), { 'content-type…
+     92|     expect(r.status).toBe(401);
+       |                      ^
+     93|   });
+     94|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  |api-db| apps/api/src/security/statement-body.db.test.ts > T-0161 ADR-0078: the statement import route reads JSON up to 10 MB, no further > T-0161 a declared Content-Length over 10 MB is 413 payload_too_large with the security headers
+AssertionError: expected { statusCode: 413, …(1) } to deeply equal { error: 'payload_too_large' }
+
+- Expected
++ Received
+
+  {
+-   "error": "payload_too_large",
++   "message": "request entity too large",
++   "statusCode": 413,
+  }
+
+ ❯ apps/api/src/security/statement-body.db.test.ts:100:32
+     98|     });
+     99|     expect(r.status).toBe(413);
+    100|     expect(JSON.parse(r.body)).toEqual({ error: 'payload_too_large' });
+       |                                ^
+    101|     expect(r.headers['x-content-type-options']).toBe('nosniff');
+    102|     expect(r.headers['connection']).toBe('close');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |api-db| apps/api/src/security/statement-body.db.test.ts > T-0161 ADR-0078: the statement import route reads JSON up to 10 MB, no further > T-0161 a chunked body (no Content-Length) over 10 MB is 413
+AssertionError: expected { statusCode: 413, …(1) } to deeply equal { error: 'payload_too_large' }
+
+- Expected
++ Received
+
+  {
+-   "error": "payload_too_large",
++   "message": "request entity too large",
++   "statusCode": 413,
+  }
+
+ ❯ apps/api/src/security/statement-body.db.test.ts:114:32
+    112|     );
+    113|     expect(r.status).toBe(413);
+    114|     expect(JSON.parse(r.body)).toEqual({ error: 'payload_too_large' });
+       |                                ^
+    115|   });
+    116|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  |api-db| apps/api/src/security/statement-body.db.test.ts > T-0161 ADR-0078: the statement import route reads JSON up to 10 MB, no further > T-0161 a compressed body is 415 and a non-UTF-8 charset is 415; JSON that is not an object or array is 400
+AssertionError: expected 400 to be 415 // Object.is equality
+
+- Expected
++ Received
+
+- 415
++ 400
+
+ ❯ apps/api/src/security/statement-body.db.test.ts:122:23
+    120|       'content-encoding': 'gzip',
+    121|     });
+    122|     expect(gz.status).toBe(415);
+       |                       ^
+    123|     expect(JSON.parse(gz.body)).toEqual({ error: 'unsupported_content_…
+    124|     const latin = await raw(api.url, PATH, jsonOf(1024), {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |api-db| apps/api/src/security/statement-body.db.test.ts > T-0161 ADR-0078: the statement import route reads JSON up to 10 MB, no further > T-0161 the upper-case spelling of the path is handled the same (Express routes case-insensitively)
+AssertionError: expected 413 not to be 413 // Object.is equality
+ ❯ apps/api/src/security/statement-body.db.test.ts:140:26
+    138|       'content-type': 'application/json',
+    139|     });
+    140|     expect(r.status).not.toBe(413);
+       |                          ^
+    141|   });
+    142|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |api-db| apps/api/src/security/statement-body.db.test.ts > T-0161 ADR-0078: the statement import route reads JSON up to 10 MB, no further > T-0161 the ADR-0054 write rate limit answers 429 before the body is read
+AssertionError: expected 413 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 413
+
+ ❯ apps/api/src/security/statement-body.db.test.ts:159:26
+    157|       'content-type': 'application/json',
+    158|     });
+    159|     expect(first.status).toBe(401);
+       |                          ^
+    160|     const second = await raw(limited.url, PATH, jsonOf(3 * MB), {
+    161|       'content-type': 'application/json',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 2 passed (8)
+   Start at  03:38:55
+   Duration  5.74s (transform 1.96s, setup 0ms, import 3.31s, tests 1.55s, environment 0ms)
+

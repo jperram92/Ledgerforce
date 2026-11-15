@@ -790,3 +790,122 @@ describe('T-0160: accept a candidate suggestion over HTTP', () => {
     expect(await entries()).toBe(before);
   });
 });
+
+describe('T-0161: large statement files over HTTP (route-scoped 10 MB JSON limit, ADR-0078)', () => {
+  const MB = 1024 * 1024;
+  /** A December CSV of `n` card purchases, each with its own bank transaction id. */
+  const bigCsv = (n: number): Buffer => {
+    const rows = ['Date,Description,Reference,Debit,Credit,Balance,Transaction ID'];
+    for (let i = 1; i <= n; i += 1) {
+      const day = String((i % 28) + 1).padStart(2, '0');
+      const cents = String(i % 100).padStart(2, '0');
+      rows.push(
+        `${day}/12/2026,Card purchase Harbour supplier ${String(i)},T61-${String(i)},${String(1 + (i % 50))}.${cents},,,61${String(i).padStart(10, '0')}`,
+      );
+    }
+    return Buffer.from(`${rows.join('\n')}\n`);
+  };
+  const statementsCount = async () =>
+    (
+      await f.admin.query<{ n: number }>(
+        'SELECT count(*)::int AS n FROM app.bank_statement WHERE tenant_id = $1',
+        [f.tenantId],
+      )
+    ).rows[0]?.n;
+  const importPath = () => `/bank-rec/accounts/${bankAccountId}/statements`;
+
+  it('T-0161 AC-1 a CSV of 30,000 lines (a request of a few MB) imports with 201, audited once; the same file again is duplicate_file', async () => {
+    const csv = bigCsv(30_000);
+    const body = importBody(csv, 'harbour-2026-12-cards.csv');
+    const size = Buffer.byteLength(JSON.stringify(body));
+    expect(size).toBeGreaterThan(2 * MB);
+    expect(size).toBeLessThan(10 * MB);
+    const auditsBefore = await audits('bank_statement');
+
+    const r = await call('POST', importPath(), 'accountant', { body, key: 'big-1' });
+    expect(r.status).toBe(201);
+    const done = await json(r);
+    expect(done).toMatchObject({
+      outcome: 'imported',
+      lines_in_file: 30_000,
+      lines_created: 30_000,
+      lines_duplicate: 0,
+      replayed: false,
+    });
+    expect(await audits('bank_statement')).toBe((auditsBefore ?? 0) + 1);
+
+    const replay = await call('POST', importPath(), 'accountant', { body, key: 'big-1' });
+    expect(replay.status).toBe(200);
+    expect(await json(replay)).toMatchObject({
+      outcome: 'duplicate_file',
+      statement_id: done['statement_id'],
+      lines_created: 0,
+      replayed: true,
+    });
+    expect(await audits('bank_statement')).toBe((auditsBefore ?? 0) + 1);
+  }, 120_000);
+
+  it('T-0161 AC-2 a body over 10 MB to the import route is refused with 413 and nothing is imported', async () => {
+    const before = await statementsCount();
+    const body = importBody(bigCsv(110_000), 'harbour-too-big.csv');
+    expect(Buffer.byteLength(JSON.stringify(body))).toBeGreaterThan(10 * MB);
+    const r = await call('POST', importPath(), 'accountant', { body });
+    expect(r.status).toBe(413);
+    expect(await json(r)).toEqual({ error: 'payload_too_large' });
+    expect(await statementsCount()).toBe(before);
+  }, 120_000);
+
+  it('T-0161 AC-2 other routes keep the 100 kB default: a 200 kB body is 413, also to the transaction preview of a line', async () => {
+    const big = 'x'.repeat(200 * 1024);
+    const run = await call(
+      'POST',
+      `/bank-rec/accounts/${bankAccountId}/matching-runs`,
+      'accountant',
+      {
+        body: { company_id: f.companyId, padding: big },
+      },
+    );
+    expect(run.status).toBe(413);
+    const fee = await lineBy('Account fee');
+    const preview = await call(
+      'POST',
+      `/bank-rec/lines/${fee.id}/transaction/preview`,
+      'accountant',
+      {
+        body: { company_id: f.companyId, memo: big },
+      },
+    );
+    expect(preview.status).toBe(413);
+    // A path that only starts like the import route keeps the default too.
+    const other = await call('POST', `${importPath()}/extra`, 'accountant', {
+      body: { company_id: f.companyId, padding: big },
+    });
+    expect(other.status).toBe(413);
+    // The same 200 kB to the import route passes the size check (and is refused as a statement).
+    const imp = await call('POST', importPath(), 'accountant', {
+      body: { company_id: f.companyId, content_base64: Buffer.from(big).toString('base64') },
+    });
+    expect(imp.status).toBe(422);
+    expect(await json(imp)).toMatchObject({ error: 'STATEMENT_REFUSED' });
+  });
+
+  it('T-0161 AC-2 the import route refuses malformed JSON with 400 and still needs bank.statement.import (403)', async () => {
+    const c = cookies.get('accountant') ?? '';
+    const bad = await fetch(`${api.url}${importPath()}`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        cookie: `lf_session=${c}`,
+        'sec-fetch-site': 'same-origin',
+        'idempotency-key': nextKey(),
+      },
+      body: '{"company_id": ',
+    });
+    expect(bad.status).toBe(400);
+    expect(await json(bad)).toEqual({ error: 'invalid_json' });
+    const clerk = await call('POST', importPath(), 'clerk', {
+      body: importBody(bigCsv(5_000), 'harbour-clerk.csv'),
+    });
+    expect(clerk.status).toBe(403);
+  });
+});
