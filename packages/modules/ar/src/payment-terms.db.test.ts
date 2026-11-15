@@ -87,15 +87,15 @@ afterAll(async () => {
 });
 
 describe('T-0164 default payment terms set the due date of new invoices', () => {
-  it('AC-1 with 30 days saved, an invoice issued 2026-11-13 without a due date is due 2026-12-13 [T-0164]', async () => {
+  it('SS-UC01-14 AC-1 with 30 days saved, an invoice issued 2026-11-13 without a due date is due 2026-12-13 [T-0164]', async () => {
     expect(await dueDateOf(withTerms, '2026-11-13')).toBe('2026-12-13');
   });
 
-  it('AC-1 the saved terms count calendar days across a month and year end [T-0164]', async () => {
+  it('SS-UC01-14 AC-1 the saved terms count calendar days across a month and year end [T-0164]', async () => {
     expect(await dueDateOf(withTerms, '2026-12-15')).toBe('2027-01-14');
   });
 
-  it('AC-1 changed terms apply to invoices created afterwards (0 days = due on issue) [T-0164]', async () => {
+  it('SS-UC01-14 AC-1 changed terms apply to invoices created afterwards (0 days = due on issue) [T-0164]', async () => {
     await withTerms.f.inTenant((trx) =>
       setInvoiceSettings(trx, withTerms.f.companyId, { defaultPaymentTermsDays: 0 }),
     );
@@ -105,11 +105,11 @@ describe('T-0164 default payment terms set the due date of new invoices', () => 
     );
   });
 
-  it('AC-2 with no saved terms the due date is the issue date + 14 days [T-0164]', async () => {
+  it('SS-UC01-14 AC-2 with no saved terms the due date is the issue date + 14 days [T-0164]', async () => {
     expect(await dueDateOf(noTerms, '2026-11-13')).toBe('2026-11-27');
   });
 
-  it('AC-2 a settings row without terms (branding only) keeps the 14-day default [T-0164]', async () => {
+  it('SS-UC01-14 AC-2 a settings row without terms (branding only) keeps the 14-day default [T-0164]', async () => {
     const c = await company('01900000-0000-7000-8000-000000016403');
     try {
       await c.f.inTenant((trx) =>
@@ -121,7 +121,7 @@ describe('T-0164 default payment terms set the due date of new invoices', () => 
     }
   });
 
-  it('AC-2 an explicit due date wins over the saved terms and over the default [T-0164]', async () => {
+  it('SS-UC01-14 AC-2 an explicit due date wins over the saved terms and over the default [T-0164]', async () => {
     expect(await dueDateOf(withTerms, '2026-11-13', '2026-11-20')).toBe('2026-11-20');
     expect(await dueDateOf(noTerms, '2026-11-13', '2026-11-20')).toBe('2026-11-20');
   });
