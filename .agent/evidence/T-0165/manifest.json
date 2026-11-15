@@ -91,6 +91,15 @@
       "provider": "claude",
       "timestamp": "2026-11-15T03:42:28.633Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-15",
+      "file": ".agent/evidence/T-0165/20261115-051814-SS-UC01-15-branded-invoice-pdf-page-1.png",
+      "test": "documents/invoice-branding.spec.ts › SS-UC01-15 the branded invoice PDF shows the logo, brand colour and both payment methods on one A4 page [T-0165]",
+      "commit": "6eeb4fbdbd70",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T05:18:14.144Z",
+      "result": "passed"
     }
   ]
 }
