@@ -3502,3 +3502,16 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0150. Printing the BSB and account number is common Australian practice (bank guidance), though not an ATO requirement. Payment-redirection fraud (BEC) is the main risk; the guidance is to restrict and approve changes to payment details and to have payers verify changes by phone. OWASP: decrypt only where needed.
 - Alternatives: never print (pushes customers to ask by email, which is the very channel BEC exploits); print any bank account (too broad).
 - ADR: ADR-0079 · Status: accepted (owner instruction)
+
+### DL-0569 — Parallel round 8: T-0180, T-0176, T-0177 and T-0172 agents
+- Date: 2026-11-15 · By: claude · Task: sprint · Category: process
+- Decision: Four sub-agents work in isolated worktrees, and the lead merges and verifies their work. Only T-0180 may add a migration, numbered 0071.
+
+  | Agent | Card | DL | ADR | RQ | New cards | SS ids |
+  |---|---|---|---|---|---|---|
+  | Remittance account on invoices | T-0180 (+ migration 0071) | 0630–0639 | 0080 | 0160 | T-0183–T-0184 | SS-UC01-16..17 |
+  | Settings screens for wizard steps 1, 3, 4, 8, 10 | T-0176 | 0640–0649 | 0081 | 0161 | T-0185–T-0186 | SS-PLAT-129..131 |
+  | Opening balances and posting-profile screens | T-0177 | 0650–0659 | 0082 | 0162 | T-0187–T-0188 | SS-PLAT-132..134 |
+  | Stripe refunds (step-up, DL-0562) | T-0172 | 0660–0669 | 0083 | 0163 | T-0189–T-0190 | SS-UC11-09..10 |
+- Why: The owner asked for sub-agents ("spawn subagents and continue the build", 2026-11-15). SS id ranges are now allocated too, so agents cannot collide.
+- ADR: none · Status: accepted
