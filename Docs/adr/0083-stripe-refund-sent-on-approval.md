@@ -104,3 +104,6 @@ step-up mechanism) remains a question for the product owner.
   request; the approve handler refuses a Stripe refund (401 `step_up_required`, `max_age: 300`)
   unless it was verified, whatever the route's condition read.
 - **Attribution (F5).** A send with no named actor (the worker's retry) posts as the approver.
+- **Re-review R1 (DL-0686).** The lookup searches every PaymentIntent stored for any of the party's
+  invoices, whatever the invoice or credit-note state: a refund sent for a credit note voided
+  afterwards is still found and adopted, never sent a second time. R2 and R3 are on T-0189.

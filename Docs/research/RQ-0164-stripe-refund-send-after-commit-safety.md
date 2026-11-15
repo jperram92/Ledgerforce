@@ -105,3 +105,15 @@ proved by tests.
 
 **Affects:** packages/connectors/stripe, apps/api (refunds, authz, tenancy), apps/web (refund
 region), ADR-0083 (addendum).
+
+## Addendum (2026-11-15, security re-review R1)
+
+
+
+The conclusion's "candidate PaymentIntent of the party (its posted credit notes' Stripe payments)" is
+
+widened by DL-0686: the lookup searches every PaymentIntent stored for any of the party's invoices,
+
+whatever the credit-note state, because a credit note voided after a lost commit would otherwise hide
+
+the first refund. Choosing the payment to create against is unchanged.

@@ -1,0 +1,3 @@
+$ node scripts/agent/conductor.ts lint-backlog
+backlog OK
+exit=0

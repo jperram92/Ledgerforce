@@ -1,0 +1,39 @@
+
+ RUN  v4.1.12 <worktree>
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:35775
+ ❯ |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts (9 tests | 1 failed) 2335ms
+     × SS-UC11-10 R1 a lost commit, then the credit note is voided and the refund re-approved: no second Stripe refund through another credit note 256ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > Security re-review R1: the lookup finds a refund whose credit note was voided afterwards > SS-UC11-10 R1 a lost commit, then the credit note is voided and the refund re-approved: no second Stripe refund through another credit note
+AssertionError: expected [ …(3) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "payment_intent: sent \"pi_ac21791f2ba638f98b83\", fixture \"pi_9309f4470a300149a355\"",
++   "metadata[lf_credit_note_id]: sent \"2621f2ad-aaab-433c-abb1-1307f101f657\", fixture \"56d31900-9bff-4ee6-bea3-453c6ed6e9a1\"",
++   "metadata[lf_credit_note_no]: sent \"CN-000011\", fixture \"CN-000010\"",
++ ]
+
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:707:29
+    705|       }),
+    706|     );
+    707|     expect(stub.mismatches).toEqual([]);
+       |                             ^
+    708|     expect(creates().length).toBe(posts + 1);
+    709|     expect(creates().map((x) => x.matched)).not.toContain('refund-docu…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  20:22:41
+   Duration  4.12s (transform 560ms, setup 0ms, import 833ms, tests 2.34s, environment 0ms)
+
+exit=1

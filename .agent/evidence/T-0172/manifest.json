@@ -208,6 +208,42 @@
       "provider": "claude",
       "timestamp": "2026-11-15T13:00:00Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-10",
+      "file": ".agent/evidence/T-0172/secfix-r1-red-stripe-db.txt",
+      "test": "RED: re-review R1 contract test before the fix (a second create via another credit note after the first was voided)",
+      "commit": "41cc1c3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T14:00:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-10",
+      "file": ".agent/evidence/T-0172/secfix-r1-db-stripe-ar.txt",
+      "test": "vitest db packages/connectors/stripe packages/modules/ar after R1 (20 files, 106 passed, 0 skipped)",
+      "commit": "41cc1c3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T14:20:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/secfix-r1-api-db-ar-authz-tenancy.txt",
+      "test": "vitest api-db apps/api/src/ar, authz, tenancy after R1 (11 files, 99 passed, 0 skipped)",
+      "commit": "41cc1c3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T14:25:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/secfix-r1-api-unit.txt",
+      "test": "vitest api-unit after R1 (6 files, 178 passed, 0 skipped)",
+      "commit": "41cc1c3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T14:26:00Z",
+      "result": "passed"
     }
   ]
 }

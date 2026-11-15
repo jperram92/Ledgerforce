@@ -20,8 +20,9 @@
  * could refund twice; someone must check Stripe first (T-0189).
  *
  * Money leaves at most once per refund document (security review r8 F1, RQ-0164, ADR-0083
- * addendum): before any create, the send lists the refunds of the party's Stripe payments and
- * adopts one whose metadata `lf_refund_id` is this document (a commit lost after an earlier send,
+ * addendum): before any create, the send lists the refunds of every Stripe payment of the party
+ * (whatever the state of its invoices and credit notes, re-review R1) and adopts one whose
+ * metadata `lf_refund_id` is this document (a commit lost after an earlier send,
  * or a key Stripe pruned, can never cause a second refund). Before money leaves, the journal is
  * checked by the engine's own preview and the allocation's rules: a refusal is NOT_POSTABLE
  * ("not sent to Stripe"). Anything that fails after Stripe accepted (or was adopted) is
@@ -228,22 +229,24 @@ export async function stripeRefundOf(
   return r ? { stripeRefundId: r.stripe_refund_id, stripeStatus: r.stripe_status } : null;
 }
 
-/** The Stripe payments a refund of this party could have gone to (RQ-0163 Q1), oldest first. */
-async function candidatePaymentIntents(
+/**
+ * Every Stripe payment of the party in this company (security re-review R1): each PaymentIntent
+ * stored for any of the party's invoices, whatever the state of the invoice or of the credit
+ * notes against it. The lookup must search them all — a refund sent for a credit note that was
+ * voided afterwards is still money out. (Choosing the payment to create against keeps RQ-0163's
+ * rules in stripeRefundTarget.)
+ */
+async function partyPaymentIntents(
   trx: Trx,
   companyId: string,
   partyId: string,
 ): Promise<string[]> {
   const rows = (
     await sql<{ pi: string }>`
-      SELECT DISTINCT w.payment_intent_id AS pi
-        FROM app.credit_note cn
-        JOIN LATERAL (
-          SELECT e.payment_intent_id FROM app.stripe_webhook_event e
-           WHERE e.company_id = cn.company_id AND e.invoice_id = cn.invoice_id
-           ORDER BY e.received_at, e.id LIMIT 1) w ON true
-       WHERE cn.company_id = ${companyId}::uuid AND cn.party_id = ${partyId}::uuid
-         AND cn.status = 'posted'
+      SELECT DISTINCT e.payment_intent_id AS pi
+        FROM app.stripe_webhook_event e
+        JOIN app.sales_invoice i ON i.company_id = e.company_id AND i.id = e.invoice_id
+       WHERE e.company_id = ${companyId}::uuid AND i.party_id = ${partyId}::uuid
        ORDER BY 1`.execute(trx)
   ).rows;
   return rows.map((r) => r.pi);
@@ -259,7 +262,7 @@ async function refundAlreadyAtStripe(
   companyId: string,
   refund: CustomerRefundView,
 ): Promise<ListedRefund | null> {
-  for (const pi of await candidatePaymentIntents(trx, companyId, refund.partyId)) {
+  for (const pi of await partyPaymentIntents(trx, companyId, refund.partyId)) {
     const found = await client.findRefund(
       pi,
       (x) =>

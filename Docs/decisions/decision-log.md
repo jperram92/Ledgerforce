@@ -3724,3 +3724,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the lookup is a new outbound call that the contract tests must see; nothing was weakened (the counts rose by the GETs, the POST counts are asserted separately).
 - Alternatives: filter GETs out of the assertions (rejected: the lookup is part of the contract and must be proved).
 - ADR: none · Status: accepted
+
+### DL-0686 — The adoption lookup searches every Stripe payment of the party, whatever the credit-note state (T-0172, security re-review R1)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: security
+- Decision: Before any create, `sendStripeCustomerRefund` lists the refunds of every PaymentIntent stored in `app.stripe_webhook_event` for any of the party's invoices in the company (whatever the invoice or credit-note status), not only those behind posted credit notes. Choosing the payment to create against keeps RQ-0163's rules (`stripeRefundTarget`: posted credit note with open credit and enough left on its payment). Contract test: a lost commit, then the credit note is voided and the customer credited again on another card payment; the re-approval finds the first refund and answers SENT_NOT_POSTED with no second create.
+- Why: re-review R1 — with the old filter a voided credit note hid its PaymentIntent from the lookup, and a re-approval after 24 h could send a second refund through another credit note. A refund sent for a credit note voided later is still money out.
+- Alternatives: also list by the Stripe customer (rejected: payments are stored per invoice, not per Stripe customer); keep the filter and forbid voiding a credit note with an approved Stripe refund (rejected: needs a migration and still misses the lost-commit case where nothing is recorded).
+- ADR: ADR-0083 (addendum, r8) · Status: accepted
+
+### DL-0687 — Re-review residuals R2 and R3 go to T-0189 (T-0172)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: process
+- Decision: T-0189 also takes R2 (find Stripe refunds that carry `lf_refund_id` metadata but have no `app.stripe_refund` row, e.g. after a lost commit that nobody re-approved, and surface or record them) and R3 (an adopted refund that Stripe reports `failed` or `canceled` stops as REFUND_FAILED and needs the manual path: confirm at Stripe, then resend with a new key under a second person, or cancel the document via T-0190).
+- Why: both need reconciliation flows beyond this fix; the r8 fix guarantees no second refund meanwhile.
+- Alternatives: fix them inside T-0172 (rejected: new flows and screens, outside the review fix).
+- ADR: none · Status: accepted

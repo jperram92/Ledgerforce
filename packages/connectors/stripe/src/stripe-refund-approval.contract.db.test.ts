@@ -641,3 +641,82 @@ describe('Security review r8 F1: money never leaves twice; a Stripe success that
     expect(await entriesFor(r.refundId)).toBe(1);
   });
 });
+
+describe('Security re-review R1: the lookup finds a refund whose credit note was voided afterwards', () => {
+  it('SS-UC11-10 R1 a lost commit, then the credit note is voided and the refund re-approved: no second Stripe refund through another credit note', async () => {
+    const credit = await seedCredit('Lambda');
+    const r = await requestRefund(credit);
+    Object.assign(stub.vars, {
+      tenantId: f.tenantId,
+      companyId: f.companyId,
+      voidedRefundId: r.refundId,
+      voidedRefundNo: r.refundNo,
+      voidedCreditNoteId: credit.creditNoteId,
+      voidedCreditNoteNo: credit.creditNoteNo,
+      voidedPaymentIntentId: credit.paymentIntentId,
+      voidedStripeRefundId: 're_1SQbT0172VoidedCn',
+    });
+    const posts = creates().length;
+    // Approve and send, then the request's transaction fails to commit: Stripe has the refund.
+    const lost = await f
+      .inTenant(async (trx) => {
+        await approveCustomerRefund(trx, {
+          companyId: f.companyId,
+          refundId: r.refundId,
+          approvedBy: approver,
+          today: '2026-11-24',
+        });
+        await sendStripeCustomerRefund(trx, client, {
+          companyId: f.companyId,
+          refundId: r.refundId,
+          now: NOW,
+        });
+        throw new Error('connection lost before COMMIT');
+      })
+      .catch((e: unknown) => (e as Error).message);
+    expect(lost).toBe('connection lost before COMMIT');
+    expect(creates().length).toBe(posts + 1);
+
+    // Later the same customer pays another invoice by card and is credited again, and the
+    // credit note the refund was sent for is voided.
+    const second = await seedStripePaidCredit(f, {
+      professionalServicesProfileId: profiles.productProfiles.get('PROFESSIONAL_SERVICES') ?? '',
+      partyId: credit.partyId,
+      clearingAccountId: f.acct['1210'] ?? '',
+    });
+    Object.assign(stub.vars, {
+      voidedSecondPaymentIntentId: second.paymentIntentId,
+      voidedSecondCreditNoteId: second.creditNoteId,
+      voidedSecondCreditNoteNo: second.creditNoteNo,
+    });
+    await f.admin.query(
+      `UPDATE app.credit_note SET status = 'void' WHERE tenant_id = $1 AND id = $2`,
+      [f.tenantId, credit.creditNoteId],
+    );
+
+    // Re-approved (a fresh approval time): the lookup still finds the refund sent for the voided
+    // credit note, so nothing new is created; it cannot be posted, which says the money is out.
+    await approve(r);
+    const out = await f.inTenant((trx) =>
+      trySendStripeCustomerRefund(trx, client, {
+        companyId: f.companyId,
+        refundId: r.refundId,
+        now: NOW,
+      }),
+    );
+    expect(stub.mismatches).toEqual([]);
+    expect(creates().length).toBe(posts + 1);
+    // The only create for this document went to the first payment, never to the second one.
+    expect(
+      creates()
+        .filter((x) => x.idempotencyKey === `lf-refund-v2-${r.refundId}`)
+        .map((x) => x.form['payment_intent']),
+    ).toEqual([credit.paymentIntentId]);
+    expect(out).toMatchObject({
+      status: 'failed',
+      code: 'SENT_NOT_POSTED',
+      stripeRefundId: 're_1SQbT0172VoidedCn',
+    });
+    expect(await entriesFor(r.refundId)).toBe(0);
+  });
+});
