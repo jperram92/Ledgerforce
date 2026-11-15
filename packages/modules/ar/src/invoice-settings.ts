@@ -160,3 +160,22 @@ export async function invoiceSettingsOf(trx: Trx, companyId: string): Promise<In
     acceptedPaymentMethods: r?.accepted_payment_methods ?? null,
   };
 }
+
+/**
+ * The company's logo bytes, for rendering an invoice only (T-0165); null when none is saved.
+ * The database checked the PNG/JPEG magic bytes and size when it was saved.
+ */
+export async function invoiceLogoOf(
+  trx: Trx,
+  companyId: string,
+): Promise<{ readonly contentType: LogoContentType; readonly content: Uint8Array } | null> {
+  if (!UUID.test(companyId)) throw invalid('companyId must be a UUID');
+  const r = await trx
+    .selectFrom('app.ar_settings')
+    .select(['logo', 'logo_content_type'])
+    .where('company_id', '=', companyId)
+    .executeTakeFirst();
+  return r?.logo && r.logo_content_type
+    ? { contentType: r.logo_content_type, content: new Uint8Array(r.logo) }
+    : null;
+}

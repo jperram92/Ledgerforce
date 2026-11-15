@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0165",
+  "entries": [
+    {
+      "scenario": "SS-UC01-15",
+      "file": ".agent/evidence/T-0165/20261115-034117-SS-UC01-15-branded-invoice-pdf-page-1.png",
+      "test": "documents/invoice-branding.spec.ts › SS-UC01-15 the branded invoice PDF shows the logo, brand colour and both payment methods on one A4 page [T-0165]",
+      "commit": "0fa0c1aefc8d",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:41:17.272Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-15",
+      "file": ".agent/evidence/T-0165/20261115-034149-SS-UC01-15-branded-invoice-pdf-page-1.png",
+      "test": "documents/invoice-branding.spec.ts › SS-UC01-15 the branded invoice PDF shows the logo, brand colour and both payment methods on one A4 page [T-0165]",
+      "commit": "46bd2fa13cae",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:41:49.968Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-104",
+      "file": ".agent/evidence/T-0165/20261115-034217-tests-db.json",
+      "test": "2 test(s): packages/modules/documents/src/invoice-pdf.db.test.ts › T-0041: invoice PDF › SS-PLAT-104 the GP-001 invoice PDF contains number, ABN, GST 125.00 and total 1,375.00 | packages/modules/documents/src/invoice-pdf.db.test.ts › T-0041: invoice PDF › SS-PLAT-104 the renderer blocks network requests and scripts",
+      "commit": "3d21df9c7112",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:42:17.864Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-15",
+      "file": ".agent/evidence/T-0165/20261115-034217-tests-db.json",
+      "test": "5 test(s): packages/modules/documents/src/invoice-pdf.db.test.ts › T-0165: branded invoice PDF › SS-UC01-15 AC-3 without saved settings the document has no branding or methods and the PDF no image [T-0165] | packages/modules/documents/src/invoice-pdf.db.test.ts › T-0165: branded invoice PDF › SS-UC01-15 AC-3 the saved brand colour, PNG logo and both methods reach the document, and the branded PDF renders on one page with the logo and both payment blocks [T-0165] | packages/modules/documents/src/invoice-pdf.db.test.ts › T-0165: branded invoice PDF › SS-UC01-15 AC-3 removing the logo leaves the colour and renders no image; [bank_transfer] alone shows no Stripe block [T-0165] | packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-15: the emailed invoice follows the accepted payment methods (T-0165) › SS-UC01-15 with [bank_transfer] no Stripe link is requested or sent, and the email shows the bank-transfer block [T-0165] | packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-15: the emailed invoice follows the accepted payment methods (T-0165) › SS-UC01-15 with [bank_transfer, stripe] the link is requested once and sent with both blocks [T-0165]",
+      "commit": "3d21df9c7112",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:42:17.864Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-03",
+      "file": ".agent/evidence/T-0165/20261115-034217-tests-db.json",
+      "test": "1 test(s): packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-03 / SS-UC02-04: invoice emailed with its PDF to Billing To and CC › SS-UC01-03 SS-UC02-04 the posted invoice event sends one email To the Billing To contact, Cc the Billing CC, with the PDF attached; redelivery sends nothing",
+      "commit": "3d21df9c7112",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:42:17.864Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-04",
+      "file": ".agent/evidence/T-0165/20261115-034217-tests-db.json",
+      "test": "1 test(s): packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-03 / SS-UC02-04: invoice emailed with its PDF to Billing To and CC › SS-UC01-03 SS-UC02-04 the posted invoice event sends one email To the Billing To contact, Cc the Billing CC, with the PDF attached; redelivery sends nothing",
+      "commit": "3d21df9c7112",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:42:17.864Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-08",
+      "file": ".agent/evidence/T-0165/20261115-034217-tests-db.json",
+      "test": "2 test(s): packages/modules/email/src/invoice-email.db.test.ts › SS-UC06-08: Remittance advices emailed › SS-UC06-08 the supplier Remittance contact receives one advice listing the bills paid | packages/modules/email/src/invoice-email.db.test.ts › SS-UC06-08: Remittance advices emailed › a party without the contact role gets no email: NO_RECIPIENT",
+      "commit": "3d21df9c7112",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:42:17.864Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-104",
+      "file": ".agent/evidence/T-0165/20261115-034228-tests-unit.json",
+      "test": "3 test(s): packages/modules/documents/src/invoice-html.test.ts › Invoice HTML (T-0041) › SS-PLAT-104 preserves significant integer quantity zeros [T-0041] | packages/modules/documents/src/invoice-html.test.ts › Invoice HTML (T-0041) › SS-PLAT-104 shows a tax invoice with supplier ABN, number, dates, GST and total | packages/modules/documents/src/invoice-html.test.ts › Invoice HTML (T-0041) › SS-PLAT-104 escapes every value and contains no script",
+      "commit": "3d21df9c7112-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:42:28.633Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-01",
+      "file": ".agent/evidence/T-0165/20261115-034228-tests-unit.json",
+      "test": "1 test(s): packages/modules/documents/src/invoice-html.test.ts › Invoice HTML payment link (T-0073) › SS-UC03-01 shows the Stripe payment link with the amount due, escaped, and nothing without one",
+      "commit": "3d21df9c7112-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:42:28.633Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-15",
+      "file": ".agent/evidence/T-0165/20261115-034228-tests-unit.json",
+      "test": "9 test(s): packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-1 uses the brand colour and embeds the PNG logo as a data URI [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-1 without a logo no image element is rendered; without branding no brand styles [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-1 embeds a JPEG logo; refuses a logo whose bytes are not its type and a colour that is not #RRGGBB [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-2 [bank_transfer] shows the bank-transfer block and no Stripe link, even when one is supplied [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-2 [stripe] shows the Stripe block with the link and no bank-transfer block [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-2 with both methods shows both blocks, bank transfer first [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-2 prints remittance details escaped when the document carries them, and no number otherwise (RQ-0159) [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-2 with no saved methods keeps the T-0073 behaviour: the link if supplied, no bank block [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 the branded template keeps the no-script, no-external-resource rules behind a CSP [T-0165]",
+      "commit": "3d21df9c7112-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:42:28.633Z",
+      "result": "passed"
+    }
+  ]
+}

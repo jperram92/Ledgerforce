@@ -97,7 +97,12 @@ export function invoiceEmailHandler(deps: {
         );
       }
       const loaded = await loadInvoiceDocument(trx, companyId, event.aggregateId);
-      const link = await deps.paymentLinks?.ensure(trx, companyId, event.aggregateId);
+      // A company that has saved its accepted methods without Stripe gets no link (T-0165).
+      const methods = loaded.acceptedPaymentMethods;
+      const link =
+        !methods || methods.includes('stripe')
+          ? await deps.paymentLinks?.ensure(trx, companyId, event.aggregateId)
+          : null;
       const doc = link ? { ...loaded, paymentLink: link } : loaded;
       const html = renderInvoiceHtml(doc);
       const pdf = await deps.renderer.render(html);

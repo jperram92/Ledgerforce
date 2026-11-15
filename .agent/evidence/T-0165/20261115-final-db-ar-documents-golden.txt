@@ -1,0 +1,10 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a3894a7ec34b11518
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:35355
+
+ Test Files  17 passed (17)
+      Tests  78 passed (78)
+   Start at  03:45:53
+   Duration  30.43s (transform 982ms, setup 0ms, import 4.88s, tests 22.50s, environment 1ms)
+

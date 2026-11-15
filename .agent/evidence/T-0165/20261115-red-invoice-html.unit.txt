@@ -1,0 +1,453 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a3894a7ec34b11518
+
+ ❯ |unit| packages/modules/documents/src/invoice-html.test.ts (16 tests | 8 failed) 82ms
+     × SS-UC01-15 AC-1 uses the brand colour and embeds the PNG logo as a data URI [T-0165] 7ms
+     × SS-UC01-15 AC-1 without a logo no image element is rendered; without branding no brand styles [T-0165] 1ms
+     × SS-UC01-15 AC-1 embeds a JPEG logo; refuses a logo whose bytes are not its type and a colour that is not #RRGGBB [T-0165] 23ms
+     × SS-UC01-15 AC-2 [bank_transfer] shows the bank-transfer block and no Stripe link, even when one is supplied [T-0165] 9ms
+     × SS-UC01-15 AC-2 [stripe] shows the Stripe block with the link and no bank-transfer block [T-0165] 5ms
+     × SS-UC01-15 AC-2 with both methods shows both blocks, bank transfer first [T-0165] 1ms
+     × SS-UC01-15 AC-2 prints remittance details escaped when the document carries them, and no number otherwise (RQ-0159) [T-0165] 4ms
+     × SS-UC01-15 the branded template keeps the no-script, no-external-resource rules behind a CSP [T-0165] 23ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/documents/src/invoice-html.test.ts > Invoice branding and payment methods (T-0165) > SS-UC01-15 AC-1 uses the brand colour and embeds the PNG logo as a data URI [T-0165]
+AssertionError: expected '<!doctype html>\n<html lang="en"><hea…' to match /h1 \{[^}]*color: #0B6E4F/
+
+- Expected:
+/h1 \{[^}]*color: #0B6E4F/
+
++ Received:
+"<!doctype html>
+<html lang=\"en\"><head><meta charset=\"utf-8\"><title>INV-000123</title><style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #111; }
+  h1 { font-size: 20pt; margin: 0 0 4mm; }
+  .parties { display: flex; justify-content: space-between; margin-bottom: 8mm; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 2mm 1.5mm; text-align: left; vertical-align: top; }
+  thead th { border-bottom: 1px solid #333; }
+  td.amount, th.amount { text-align: right; white-space: nowrap; }
+  .totals { width: 45%; margin-left: auto; margin-top: 6mm; }
+  .totals th { text-align: left; font-weight: normal; }
+  .totals tr.total th, .totals tr.total td { font-weight: bold; border-top: 1px solid #333; }
+  .meta td { padding: 0.5mm 0; }
+  .meta td:first-child { padding-right: 4mm; }
+  .pay { margin-top: 8mm; padding: 3mm 4mm; border: 1px solid #333; }
+  .pay a { color: #0b3d91; word-break: break-all; }
+</style></head>
+<body>
+<h1>Tax invoice</h1>
+<div class=\"parties\">
+  <div><strong>Harbour Co Pty Ltd</strong><br>ABN 51 824 753 556</div>
+  <table class=\"meta\" style=\"width:auto\"><tbody>
+    <tr><td>Invoice number</td><td><strong>INV-000123</strong></td></tr>
+    <tr><td>Issue date</td><td>5 Nov 2026</td></tr>
+    <tr><td>Due date</td><td>19 Nov 2026</td></tr>
+  </tbody></table>
+</div>
+<p>Bill to: <strong>Acme &lt;Pty&gt; Ltd</strong></p>
+<table class=\"lines\"><thead><tr><th>Description</th><th class=\"amount\">Qty</th><th class=\"amount\">Unit price</th><th>Tax code</th><th class=\"amount\">GST</th><th class=\"amount\">Amount</th></tr></thead>
+<tbody>
+<tr><td>Professional services</td><td class=\"amount\">1</td><td class=\"amount\">$1,000.00</td><td>GST</td><td class=\"amount\">$100.00</td><td class=\"amount\">$1,000.00</td></tr>
+<tr><td>Subscription &lt;script&gt;alert(1)&lt;/script&gt;</td><td class=\"amount\">1</td><td class=\"amount\">$250.00</td><td>GST</td><td class=\"amount\">$25.00</td><td class=\"amount\">$250.00</td></tr>
+</tbody></table>
+<table class=\"totals\"><tbody>
+  <tr><th>Subtotal (excl. GST)</th><td class=\"amount\">$1,250.00</td></tr>
+  <tr><th>GST</th><td class=\"amount\">$125.00</td></tr>
+  <tr class=\"total\"><th>Total</th><td class=\"amount\">$1,375.00</td></tr>
+</tbody></table>
+
+<p>Amounts in AUD.</p>
+</body></html>"
+
+ ❯ packages/modules/documents/src/invoice-html.test.ts:188:18
+    186|   it('SS-UC01-15 AC-1 uses the brand colour and embeds the PNG logo as…
+    187|     const html = renderInvoiceHtml(branded);
+    188|     expect(html).toMatch(/h1 \{[^}]*color: #0B6E4F/);
+       |                  ^
+    189|     expect(html).toMatch(/\.brand-band \{[^}]*background: #0B6E4F/);
+    190|     expect(html).toContain('<div class="brand-band"></div>');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  |unit| packages/modules/documents/src/invoice-html.test.ts > Invoice branding and payment methods (T-0165) > SS-UC01-15 AC-1 without a logo no image element is rendered; without branding no brand styles [T-0165]
+AssertionError: expected '<!doctype html>\n<html lang="en"><hea…' to match /h1 \{[^}]*color: #0B6E4F/
+
+- Expected:
+/h1 \{[^}]*color: #0B6E4F/
+
++ Received:
+"<!doctype html>
+<html lang=\"en\"><head><meta charset=\"utf-8\"><title>INV-000123</title><style>
+  @page { size: A4; margin: 18mm 16mm; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #111; }
+  h1 { font-size: 20pt; margin: 0 0 4mm; }
+  .parties { display: flex; justify-content: space-between; margin-bottom: 8mm; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 2mm 1.5mm; text-align: left; vertical-align: top; }
+  thead th { border-bottom: 1px solid #333; }
+  td.amount, th.amount { text-align: right; white-space: nowrap; }
+  .totals { width: 45%; margin-left: auto; margin-top: 6mm; }
+  .totals th { text-align: left; font-weight: normal; }
+  .totals tr.total th, .totals tr.total td { font-weight: bold; border-top: 1px solid #333; }
+  .meta td { padding: 0.5mm 0; }
+  .meta td:first-child { padding-right: 4mm; }
+  .pay { margin-top: 8mm; padding: 3mm 4mm; border: 1px solid #333; }
+  .pay a { color: #0b3d91; word-break: break-all; }
+</style></head>
+<body>
+<h1>Tax invoice</h1>
+<div class=\"parties\">
+  <div><strong>Harbour Co Pty Ltd</strong><br>ABN 51 824 753 556</div>
+  <table class=\"meta\" style=\"width:auto\"><tbody>
+    <tr><td>Invoice number</td><td><strong>INV-000123</strong></td></tr>
+    <tr><td>Issue date</td><td>5 Nov 2026</td></tr>
+    <tr><td>Due date</td><td>19 Nov 2026</td></tr>
+  </tbody></table>
+</div>
+<p>Bill to: <strong>Acme &lt;Pty&gt; Ltd</strong></p>
+<table class=\"lines\"><thead><tr><th>Description</th><th class=\"amount\">Qty</th><th class=\"amount\">Unit price</th><th>Tax code</th><th class=\"amount\">GST</th><th class=\"amount\">Amount</th></tr></thead>
+<tbody>
+<tr><td>Professional services</td><td class=\"amount\">1</td><td class=\"amount\">$1,000.00</td><td>GST</td><td class=\"amount\">$100.00</td><td class=\"amount\">$1,000.00</td></tr>
+<tr><td>Subscription &lt;script&gt;alert(1)&lt;/script&gt;</td><td class=\"amount\">1</td><td class=\"amount\">$250.00</td><td>GST</td><td class=\"amount\">$25.00</td><td class=\"amount\">$250.00</td></tr>
+</tbody></table>
+<table class=\"totals\"><tbody>
+  <tr><th>Subtotal (excl. GST)</th><td class=\"amount\">$1,250.00</td></tr>
+  <tr><th>GST</th><td class=\"amount\">$125.00</td></tr>
+  <tr class=\"total\"><th>Total</th><td class=\"amount\">$1,375.00</td></tr>
+</tbody></table>
+
+<p>Amounts in AUD.</p>
+</body></html>"
+
+ ❯ packages/modules/documents/src/invoice-html.test.ts:201:18
+    199|     const html = renderInvoiceHtml({ ...doc, branding: { ...brand, log…
+    200|     expect(html).not.toMatch(/<img/i);
+    201|     expect(html).toMatch(/h1 \{[^}]*color: #0B6E4F/);
+       |                  ^
+    202|     const plain = renderInvoiceHtml(doc);
+    203|     expect(plain).not.toMatch(/<img/i);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  |unit| packages/modules/documents/src/invoice-html.test.ts > Invoice branding and payment methods (T-0165) > SS-UC01-15 AC-1 embeds a JPEG logo; refuses a logo whose bytes are not its type and a colour that is not #RRGGBB [T-0165]
+AssertionError: expected '<!doctype html>\n<html lang="en"><hea…' to contain 'src="data:image/jpeg;base64,/9j/4AAQS…'
+
+- Expected
++ Received
+
+- src="data:image/jpeg;base64,/9j/4AAQSkZJRg=="
++ <!doctype html>
++ <html lang="en"><head><meta charset="utf-8"><title>INV-000123</title><style>
++   @page { size: A4; margin: 18mm 16mm; }
++   body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #111; }
++   h1 { font-size: 20pt; margin: 0 0 4mm; }
++   .parties { display: flex; justify-content: space-between; margin-bottom: 8mm; }
++   table { width: 100%; border-collapse: collapse; }
++   th, td { padding: 2mm 1.5mm; text-align: left; vertical-align: top; }
++   thead th { border-bottom: 1px solid #333; }
++   td.amount, th.amount { text-align: right; white-space: nowrap; }
++   .totals { width: 45%; margin-left: auto; margin-top: 6mm; }
++   .totals th { text-align: left; font-weight: normal; }
++   .totals tr.total th, .totals tr.total td { font-weight: bold; border-top: 1px solid #333; }
++   .meta td { padding: 0.5mm 0; }
++   .meta td:first-child { padding-right: 4mm; }
++   .pay { margin-top: 8mm; padding: 3mm 4mm; border: 1px solid #333; }
++   .pay a { color: #0b3d91; word-break: break-all; }
++ </style></head>
++ <body>
++ <h1>Tax invoice</h1>
++ <div class="parties">
++   <div><strong>Harbour Co Pty Ltd</strong><br>ABN 51 824 753 556</div>
++   <table class="meta" style="width:auto"><tbody>
++     <tr><td>Invoice number</td><td><strong>INV-000123</strong></td></tr>
++     <tr><td>Issue date</td><td>5 Nov 2026</td></tr>
++     <tr><td>Due date</td><td>19 Nov 2026</td></tr>
++   </tbody></table>
++ </div>
++ <p>Bill to: <strong>Acme &lt;Pty&gt; Ltd</strong></p>
++ <table class="lines"><thead><tr><th>Description</th><th class="amount">Qty</th><th class="amount">Unit price</th><th>Tax code</th><th class="amount">GST</th><th class="amount">Amount</th></tr></thead>
++ <tbody>
++ <tr><td>Professional services</td><td class="amount">1</td><td class="amount">$1,000.00</td><td>GST</td><td class="amount">$100.00</td><td class="amount">$1,000.00</td></tr>
++ <tr><td>Subscription &lt;script&gt;alert(1)&lt;/script&gt;</td><td class="amount">1</td><td class="amount">$250.00</td><td>GST</td><td class="amount">$25.00</td><td class="amount">$250.00</td></tr>
++ </tbody></table>
++ <table class="totals"><tbody>
++   <tr><th>Subtotal (excl. GST)</th><td class="amount">$1,250.00</td></tr>
++   <tr><th>GST</th><td class="amount">$125.00</td></tr>
++   <tr class="total"><th>Total</th><td class="amount">$1,375.00</td></tr>
++ </tbody></table>
++
++ <p>Amounts in AUD.</p>
++ </body></html>
+
+ ❯ packages/modules/documents/src/invoice-html.test.ts:212:18
+    210|       branding: { ...brand, logo: { contentType: 'image/jpeg', content…
+    211|     });
+    212|     expect(html).toContain(`src="data:image/jpeg;base64,${jpegHead.toS…
+       |                  ^
+    213|     expect(() =>
+    214|       renderInvoiceHtml({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  |unit| packages/modules/documents/src/invoice-html.test.ts > Invoice branding and payment methods (T-0165) > SS-UC01-15 AC-2 [bank_transfer] shows the bank-transfer block and no Stripe link, even when one is supplied [T-0165]
+AssertionError: expected '<!doctype html>\n<html lang="en"><hea…' to contain 'How to pay'
+
+- Expected
++ Received
+
+- How to pay
++ <!doctype html>
++ <html lang="en"><head><meta charset="utf-8"><title>INV-000123</title><style>
++   @page { size: A4; margin: 18mm 16mm; }
++   body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #111; }
++   h1 { font-size: 20pt; margin: 0 0 4mm; }
++   .parties { display: flex; justify-content: space-between; margin-bottom: 8mm; }
++   table { width: 100%; border-collapse: collapse; }
++   th, td { padding: 2mm 1.5mm; text-align: left; vertical-align: top; }
++   thead th { border-bottom: 1px solid #333; }
++   td.amount, th.amount { text-align: right; white-space: nowrap; }
++   .totals { width: 45%; margin-left: auto; margin-top: 6mm; }
++   .totals th { text-align: left; font-weight: normal; }
++   .totals tr.total th, .totals tr.total td { font-weight: bold; border-top: 1px solid #333; }
++   .meta td { padding: 0.5mm 0; }
++   .meta td:first-child { padding-right: 4mm; }
++   .pay { margin-top: 8mm; padding: 3mm 4mm; border: 1px solid #333; }
++   .pay a { color: #0b3d91; word-break: break-all; }
++ </style></head>
++ <body>
++ <h1>Tax invoice</h1>
++ <div class="parties">
++   <div><strong>Harbour Co Pty Ltd</strong><br>ABN 51 824 753 556</div>
++   <table class="meta" style="width:auto"><tbody>
++     <tr><td>Invoice number</td><td><strong>INV-000123</strong></td></tr>
++     <tr><td>Issue date</td><td>5 Nov 2026</td></tr>
++     <tr><td>Due date</td><td>19 Nov 2026</td></tr>
++   </tbody></table>
++ </div>
++ <p>Bill to: <strong>Acme &lt;Pty&gt; Ltd</strong></p>
++ <table class="lines"><thead><tr><th>Description</th><th class="amount">Qty</th><th class="amount">Unit price</th><th>Tax code</th><th class="amount">GST</th><th class="amount">Amount</th></tr></thead>
++ <tbody>
++ <tr><td>Professional services</td><td class="amount">1</td><td class="amount">$1,000.00</td><td>GST</td><td class="amount">$100.00</td><td class="amount">$1,000.00</td></tr>
++ <tr><td>Subscription &lt;script&gt;alert(1)&lt;/script&gt;</td><td class="amount">1</td><td class="amount">$250.00</td><td>GST</td><td class="amount">$25.00</td><td class="amount">$250.00</td></tr>
++ </tbody></table>
++ <table class="totals"><tbody>
++   <tr><th>Subtotal (excl. GST)</th><td class="amount">$1,250.00</td></tr>
++   <tr><th>GST</th><td class="amount">$125.00</td></tr>
++   <tr class="total"><th>Total</th><td class="amount">$1,375.00</td></tr>
++ </tbody></table>
++ <div class="pay"><strong>Pay online</strong> — Amount due $1,375.00<br><a href="https://buy.stripe.com/test_abc">https://buy.stripe.com/test_abc</a></div>
++ <p>Amounts in AUD.</p>
++ </body></html>
+
+ ❯ packages/modules/documents/src/invoice-html.test.ts:245:18
+    243|       paymentLink: stripeLink,
+    244|     });
+    245|     expect(html).toContain('How to pay');
+       |                  ^
+    246|     expect(html).toContain('Pay by bank transfer');
+    247|     expect(html).toContain('Reference: <strong>INV-000123</strong>');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  |unit| packages/modules/documents/src/invoice-html.test.ts > Invoice branding and payment methods (T-0165) > SS-UC01-15 AC-2 [stripe] shows the Stripe block with the link and no bank-transfer block [T-0165]
+AssertionError: expected '<!doctype html>\n<html lang="en"><hea…' to contain 'Pay online by card (Stripe)'
+
+- Expected
++ Received
+
+- Pay online by card (Stripe)
++ <!doctype html>
++ <html lang="en"><head><meta charset="utf-8"><title>INV-000123</title><style>
++   @page { size: A4; margin: 18mm 16mm; }
++   body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #111; }
++   h1 { font-size: 20pt; margin: 0 0 4mm; }
++   .parties { display: flex; justify-content: space-between; margin-bottom: 8mm; }
++   table { width: 100%; border-collapse: collapse; }
++   th, td { padding: 2mm 1.5mm; text-align: left; vertical-align: top; }
++   thead th { border-bottom: 1px solid #333; }
++   td.amount, th.amount { text-align: right; white-space: nowrap; }
++   .totals { width: 45%; margin-left: auto; margin-top: 6mm; }
++   .totals th { text-align: left; font-weight: normal; }
++   .totals tr.total th, .totals tr.total td { font-weight: bold; border-top: 1px solid #333; }
++   .meta td { padding: 0.5mm 0; }
++   .meta td:first-child { padding-right: 4mm; }
++   .pay { margin-top: 8mm; padding: 3mm 4mm; border: 1px solid #333; }
++   .pay a { color: #0b3d91; word-break: break-all; }
++ </style></head>
++ <body>
++ <h1>Tax invoice</h1>
++ <div class="parties">
++   <div><strong>Harbour Co Pty Ltd</strong><br>ABN 51 824 753 556</div>
++   <table class="meta" style="width:auto"><tbody>
++     <tr><td>Invoice number</td><td><strong>INV-000123</strong></td></tr>
++     <tr><td>Issue date</td><td>5 Nov 2026</td></tr>
++     <tr><td>Due date</td><td>19 Nov 2026</td></tr>
++   </tbody></table>
++ </div>
++ <p>Bill to: <strong>Acme &lt;Pty&gt; Ltd</strong></p>
++ <table class="lines"><thead><tr><th>Description</th><th class="amount">Qty</th><th class="amount">Unit price</th><th>Tax code</th><th class="amount">GST</th><th class="amount">Amount</th></tr></thead>
++ <tbody>
++ <tr><td>Professional services</td><td class="amount">1</td><td class="amount">$1,000.00</td><td>GST</td><td class="amount">$100.00</td><td class="amount">$1,000.00</td></tr>
++ <tr><td>Subscription &lt;script&gt;alert(1)&lt;/script&gt;</td><td class="amount">1</td><td class="amount">$250.00</td><td>GST</td><td class="amount">$25.00</td><td class="amount">$250.00</td></tr>
++ </tbody></table>
++ <table class="totals"><tbody>
++   <tr><th>Subtotal (excl. GST)</th><td class="amount">$1,250.00</td></tr>
++   <tr><th>GST</th><td class="amount">$125.00</td></tr>
++   <tr class="total"><th>Total</th><td class="amount">$1,375.00</td></tr>
++ </tbody></table>
++ <div class="pay"><strong>Pay online</strong> — Amount due $1,375.00<br><a href="https://buy.stripe.com/test_abc">https://buy.stripe.com/test_abc</a></div>
++ <p>Amounts in AUD.</p>
++ </body></html>
+
+ ❯ packages/modules/documents/src/invoice-html.test.ts:258:18
+    256|       paymentLink: stripeLink,
+    257|     });
+    258|     expect(html).toContain('Pay online by card (Stripe)');
+       |                  ^
+    259|     expect(html).toContain('href="https://buy.stripe.com/test_abc"');
+    260|     expect(html).toContain('Amount due $1,375.00');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  |unit| packages/modules/documents/src/invoice-html.test.ts > Invoice branding and payment methods (T-0165) > SS-UC01-15 AC-2 with both methods shows both blocks, bank transfer first [T-0165]
+AssertionError: expected -1 to be greater than -1
+ ❯ packages/modules/documents/src/invoice-html.test.ts:276:18
+    274|     const bank = html.indexOf('Pay by bank transfer');
+    275|     const card = html.indexOf('Pay online by card (Stripe)');
+    276|     expect(bank).toBeGreaterThan(-1);
+       |                  ^
+    277|     expect(card).toBeGreaterThan(bank);
+    278|     expect(html).toContain('href="https://buy.stripe.com/test_abc"');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  |unit| packages/modules/documents/src/invoice-html.test.ts > Invoice branding and payment methods (T-0165) > SS-UC01-15 AC-2 prints remittance details escaped when the document carries them, and no number otherwise (RQ-0159) [T-0165]
+AssertionError: expected '<!doctype html>\n<html lang="en"><hea…' to contain 'Harbour Co &lt;Trading&gt;'
+
+- Expected
++ Received
+
+- Harbour Co &lt;Trading&gt;
++ <!doctype html>
++ <html lang="en"><head><meta charset="utf-8"><title>INV-000123</title><style>
++   @page { size: A4; margin: 18mm 16mm; }
++   body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #111; }
++   h1 { font-size: 20pt; margin: 0 0 4mm; }
++   .parties { display: flex; justify-content: space-between; margin-bottom: 8mm; }
++   table { width: 100%; border-collapse: collapse; }
++   th, td { padding: 2mm 1.5mm; text-align: left; vertical-align: top; }
++   thead th { border-bottom: 1px solid #333; }
++   td.amount, th.amount { text-align: right; white-space: nowrap; }
++   .totals { width: 45%; margin-left: auto; margin-top: 6mm; }
++   .totals th { text-align: left; font-weight: normal; }
++   .totals tr.total th, .totals tr.total td { font-weight: bold; border-top: 1px solid #333; }
++   .meta td { padding: 0.5mm 0; }
++   .meta td:first-child { padding-right: 4mm; }
++   .pay { margin-top: 8mm; padding: 3mm 4mm; border: 1px solid #333; }
++   .pay a { color: #0b3d91; word-break: break-all; }
++ </style></head>
++ <body>
++ <h1>Tax invoice</h1>
++ <div class="parties">
++   <div><strong>Harbour Co Pty Ltd</strong><br>ABN 51 824 753 556</div>
++   <table class="meta" style="width:auto"><tbody>
++     <tr><td>Invoice number</td><td><strong>INV-000123</strong></td></tr>
++     <tr><td>Issue date</td><td>5 Nov 2026</td></tr>
++     <tr><td>Due date</td><td>19 Nov 2026</td></tr>
++   </tbody></table>
++ </div>
++ <p>Bill to: <strong>Acme &lt;Pty&gt; Ltd</strong></p>
++ <table class="lines"><thead><tr><th>Description</th><th class="amount">Qty</th><th class="amount">Unit price</th><th>Tax code</th><th class="amount">GST</th><th class="amount">Amount</th></tr></thead>
++ <tbody>
++ <tr><td>Professional services</td><td class="amount">1</td><td class="amount">$1,000.00</td><td>GST</td><td class="amount">$100.00</td><td class="amount">$1,000.00</td></tr>
++ <tr><td>Subscription &lt;script&gt;alert(1)&lt;/script&gt;</td><td class="amount">1</td><td class="amount">$250.00</td><td>GST</td><td class="amount">$25.00</td><td class="amount">$250.00</td></tr>
++ </tbody></table>
++ <table class="totals"><tbody>
++   <tr><th>Subtotal (excl. GST)</th><td class="amount">$1,250.00</td></tr>
++   <tr><th>GST</th><td class="amount">$125.00</td></tr>
++   <tr class="total"><th>Total</th><td class="amount">$1,375.00</td></tr>
++ </tbody></table>
++
++ <p>Amounts in AUD.</p>
++ </body></html>
+
+ ❯ packages/modules/documents/src/invoice-html.test.ts:287:18
+    285|       bankTransfer: remittance,
+    286|     });
+    287|     expect(html).toContain('Harbour Co &lt;Trading&gt;');
+       |                  ^
+    288|     expect(html).toContain('062-000');
+    289|     expect(html).toContain('12345678');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  |unit| packages/modules/documents/src/invoice-html.test.ts > Invoice branding and payment methods (T-0165) > SS-UC01-15 the branded template keeps the no-script, no-external-resource rules behind a CSP [T-0165]
+AssertionError: expected '<!doctype html>\n<html lang="en"><hea…' to contain '<meta http-equiv="Content-Security-Po…'
+
+- Expected
++ Received
+
+- <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'">
++ <!doctype html>
++ <html lang="en"><head><meta charset="utf-8"><title>INV-000123</title><style>
++   @page { size: A4; margin: 18mm 16mm; }
++   body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #111; }
++   h1 { font-size: 20pt; margin: 0 0 4mm; }
++   .parties { display: flex; justify-content: space-between; margin-bottom: 8mm; }
++   table { width: 100%; border-collapse: collapse; }
++   th, td { padding: 2mm 1.5mm; text-align: left; vertical-align: top; }
++   thead th { border-bottom: 1px solid #333; }
++   td.amount, th.amount { text-align: right; white-space: nowrap; }
++   .totals { width: 45%; margin-left: auto; margin-top: 6mm; }
++   .totals th { text-align: left; font-weight: normal; }
++   .totals tr.total th, .totals tr.total td { font-weight: bold; border-top: 1px solid #333; }
++   .meta td { padding: 0.5mm 0; }
++   .meta td:first-child { padding-right: 4mm; }
++   .pay { margin-top: 8mm; padding: 3mm 4mm; border: 1px solid #333; }
++   .pay a { color: #0b3d91; word-break: break-all; }
++ </style></head>
++ <body>
++ <h1>Tax invoice</h1>
++ <div class="parties">
++   <div><strong>Harbour Co Pty Ltd</strong><br>ABN 51 824 753 556</div>
++   <table class="meta" style="width:auto"><tbody>
++     <tr><td>Invoice number</td><td><strong>INV-000123</strong></td></tr>
++     <tr><td>Issue date</td><td>5 Nov 2026</td></tr>
++     <tr><td>Due date</td><td>19 Nov 2026</td></tr>
++   </tbody></table>
++ </div>
++ <p>Bill to: <strong>Acme &lt;Pty&gt; Ltd</strong></p>
++ <table class="lines"><thead><tr><th>Description</th><th class="amount">Qty</th><th class="amount">Unit price</th><th>Tax code</th><th class="amount">GST</th><th class="amount">Amount</th></tr></thead>
++ <tbody>
++ <tr><td>Professional services</td><td class="amount">1</td><td class="amount">$1,000.00</td><td>GST</td><td class="amount">$100.00</td><td class="amount">$1,000.00</td></tr>
++ <tr><td>Subscription &lt;script&gt;alert(1)&lt;/script&gt;</td><td class="amount">1</td><td class="amount">$250.00</td><td>GST</td><td class="amount">$25.00</td><td class="amount">$250.00</td></tr>
++ </tbody></table>
++ <table class="totals"><tbody>
++   <tr><th>Subtotal (excl. GST)</th><td class="amount">$1,250.00</td></tr>
++   <tr><th>GST</th><td class="amount">$125.00</td></tr>
++   <tr class="total"><th>Total</th><td class="amount">$1,375.00</td></tr>
++ </tbody></table>
++ <div class="pay"><strong>Pay online</strong> — Amount due $1,375.00<br><a href="https://buy.stripe.com/test_abc">https://buy.stripe.com/test_abc</a></div>
++ <p>Amounts in AUD.</p>
++ </body></html>
+
+ ❯ packages/modules/documents/src/invoice-html.test.ts:325:18
+    323|       paymentLink: stripeLink,
+    324|     });
+    325|     expect(html).toContain(
+       |                  ^
+    326|       `<meta http-equiv="Content-Security-Policy" content="default-src…
+    327|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 8 passed (16)
+   Start at  03:34:54
+   Duration  480ms (transform 68ms, setup 0ms, import 99ms, tests 82ms, environment 0ms)
+

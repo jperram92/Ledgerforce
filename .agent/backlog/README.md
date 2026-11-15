@@ -13,13 +13,13 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 
 | Status | Cards |
 |---|---:|
-| blocked | 7 |
+| blocked | 8 |
 | done | 3 |
 | in_progress | 1 |
 | review | 126 |
-| todo | 23 |
-| verifying | 3 |
-| **total** | **163** |
+| todo | 21 |
+| verifying | 5 |
+| **total** | **164** |
 | **total** | **147** |
 
 | Phase | Cards |
@@ -180,8 +180,9 @@ graph LR
 | [T-0123](T-0123.md) | Setup wizard state machine and step validators (steps 1–10) | MVP | review | T-0080, T-0018, T-0034, T-0058, T-0063, T-0039 | — | 0 |
 | [T-0157](T-0157.md) | Setup wizard over HTTP: GET /setup/wizard and POST /setup/wizard/steps/:n/complete | MVP | review | T-0123 | — | 0 |
 | [T-0158](T-0158.md) | Module-owned settings for wizard steps 3, 8 and 10 (GST basis, BAS frequency, branding, payment terms and methods) and their validators | MVP | review | T-0123, T-0034 | — | 1 |
-| [T-0164](T-0164.md) | AR - new invoices take their due date from the company's default payment terms | MVP | todo | T-0158 | UC-01 | 0 |
-| [T-0165](T-0165.md) | Documents - invoice HTML/PDF shows the company's branding and accepted payment methods | MVP | todo | T-0158, T-0041 | UC-01 | 0 |
+| [T-0164](T-0164.md) | AR - new invoices take their due date from the company's default payment terms | MVP | verifying | T-0158 | UC-01 | 0 |
+| [T-0165](T-0165.md) | Documents - invoice HTML/PDF shows the company's branding and accepted payment methods | MVP | verifying | T-0158, T-0041 | UC-01 | 0 |
+| [T-0180](T-0180.md) | AR/Documents - print the company's chosen remittance bank account on invoices (ADR-0079) | MVP | blocked | T-0165 | UC-01 | 0 |
 | [T-0124](T-0124.md) | Receipts, refunds and payment batches settle opening AR/AP items | MVP | todo | T-0080, T-0046, T-0054, T-0057 | UC-03, UC-06 | 0 |
 | [T-0125](T-0125.md) | Cash-basis BAS: GST on opening AR/AP items when they are paid | MVP | todo | T-0080, T-0035, T-0124 | — | 0 |
 | [T-0126](T-0126.md) | Opening balances: foreign-currency open items and Xero import | MVP | todo | T-0080 | — | 0 |
