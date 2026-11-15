@@ -1,0 +1,91 @@
+# T-0172 RQ-0165 Q1 step-up tests (tests 2 and 4 added), 2026-11-15, provider claude
+# Branch feat/T-0172-stepup-tests from claude/loving-lovelace-nozqpk (fa78ba3)
+
+## pnpm typecheck -> exit 0
+
+> ledgerforce@0.0.0 typecheck /home/user/Ledgerforce/.claude/worktrees/agent-ac698c79a328f6cb3
+> pnpm -r --if-present typecheck && tsc -p tsconfig.json
+
+Scope: 24 of 25 workspace projects
+packages/connectors/aba typecheck$ tsc -p tsconfig.json
+packages/shared typecheck$ tsc -p tsconfig.json
+packages/testing typecheck$ tsc -p tsconfig.json
+packages/connectors/aba typecheck: Done
+packages/testing typecheck: Done
+packages/shared typecheck: Done
+packages/db typecheck$ tsc -p tsconfig.json
+packages/ui typecheck$ tsc -p tsconfig.json
+packages/ui typecheck: Done
+packages/db typecheck: Done
+apps/web typecheck$ tsc -p tsconfig.json
+packages/modules/parties typecheck$ tsc -p tsconfig.json
+packages/modules/gl typecheck$ tsc -p tsconfig.json
+packages/modules/gl typecheck: Done
+packages/modules/parties typecheck: Done
+apps/web typecheck: Done
+packages/ledger typecheck$ tsc -p tsconfig.json
+packages/ledger typecheck: Done
+packages/modules/journals typecheck$ tsc -p tsconfig.json
+packages/modules/reporting typecheck$ tsc -p tsconfig.json
+packages/modules/tax typecheck$ tsc -p tsconfig.json
+packages/outbox typecheck$ tsc -p tsconfig.json
+packages/modules/journals typecheck: Done
+packages/modules/reporting typecheck: Done
+packages/outbox typecheck: Done
+packages/modules/tax typecheck: Done
+packages/modules/products typecheck$ tsc -p tsconfig.json
+packages/modules/products typecheck: Done
+packages/connectors/salesforce typecheck$ tsc -p tsconfig.json
+packages/modules/ar typecheck$ tsc -p tsconfig.json
+packages/modules/ar typecheck: Done
+packages/connectors/salesforce typecheck: Done
+packages/modules/bank typecheck$ tsc -p tsconfig.json
+packages/modules/bank typecheck: Done
+packages/modules/documents typecheck$ tsc -p tsconfig.json
+packages/modules/documents typecheck: Done
+packages/modules/email typecheck$ tsc -p tsconfig.json
+packages/modules/setup typecheck$ tsc -p tsconfig.json
+packages/modules/email typecheck: Done
+packages/modules/setup typecheck: Done
+packages/connectors/stripe typecheck$ tsc -p tsconfig.json
+packages/modules/ap typecheck$ tsc -p tsconfig.json
+packages/connectors/stripe typecheck: Done
+packages/modules/ap typecheck: Done
+apps/api typecheck$ tsc -p tsconfig.json
+apps/worker typecheck$ tsc -p tsconfig.json
+apps/worker typecheck: Done
+apps/api typecheck: Done
+
+## pnpm -s lint -> exit 0 (no output)
+
+## pnpm -s format:check -> exit 0
+Checking formatting...
+All matched files use Prettier code style!
+
+## VITEST_MAX_WORKERS=1 pnpm vitest run --project api-db apps/api/src/ar/refunds-stripe.db.test.ts --reporter=verbose -> exit 0 (9 passed, 0 skipped)
+ ✓ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 Stripe variant > SS-UC11-09 a stepped-up Approver approves a Stripe refund: Stripe is called once, GP-006 (Stripe) posts, a repeat replays 363ms
+ ✓ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 Stripe variant > SS-UC11-09 approving a Stripe refund without a fresh step-up is 401 step_up_required (300 s); a bank refund needs none 203ms
+ ✓ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 Stripe variant > SS-UC11-09 the person who requested a Stripe refund is refused its approval (SOD_REFUND_SELF_APPROVAL), even stepped up 109ms
+ ✓ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 Stripe variant > SS-UC11-09 another tenant's Stripe refund is 404; a Stripe refund with no Stripe payment behind it is 422 NO_STRIPE_PAYMENT 68ms
+ ✓ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > SS-UC11-10 a Stripe refund that cannot be sent at approval is retried, never posted twice > SS-UC11-10 Stripe unreachable: the approval and its outbox event commit, nothing is posted, the answer says it will be retried 119ms
+ ✓ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > Security review r8: a Stripe success that cannot be posted, and step-up the handler re-checks > SS-UC11-10 F1 the posting fails after Stripe accepted: the answer is failed SENT_NOT_POSTED with the Stripe refund id, nothing is posted 97ms
+ ✓ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > Security review r8: a Stripe success that cannot be posted, and step-up the handler re-checks > SS-UC11-09 F3 the handler refuses a Stripe refund whose step-up was not verified, even when the route condition saw none 131ms
+ ✓ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > RQ-0165 Q1: the step-up condition fails closed, and an API token never approves a Stripe refund > SS-UC11-09 RQ-0165 test 2: an error thrown by the step-up condition fails the request: no approval, no event, no Stripe call, nothing posted 101ms
+ ✓ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > RQ-0165 Q1: the step-up condition fails closed, and an API token never approves a Stripe refund > SS-UC11-09 RQ-0165 test 4: an API token holding ar.refund.approve cannot approve a Stripe refund: 401 step_up_required, no Stripe call 116ms
+ Test Files  1 passed (1)
+      Tests  9 passed (9)
+   Duration  6.33s (transform 1.48s, setup 0ms, import 2.69s, tests 2.78s, environment 0ms)
+
+## Mutation check: temporary edits to apps/api/src/tenancy/tenant.interceptor.ts, reverted, never committed
+### M1: a missing session principal (API token) counts as stepped up -> exit 1, test 4 fails
+     × SS-UC11-09 RQ-0165 test 4: an API token holding ar.refund.approve cannot approve a Stripe refund: 401 step_up_required, no Stripe call 108ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected 200 to be 401 // Object.is equality
+      Tests  1 failed | 8 passed (9)
+### M2: a throwing step-up condition is swallowed as false -> exit 1, test 2 fails
+     × SS-UC11-09 RQ-0165 test 2: an error thrown by the step-up condition fails the request: no approval, no event, no Stripe call, nothing posted 113ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected 401 to be 500 // Object.is equality
+      Tests  1 failed | 8 passed (9)
+
+## api-unit: not run (no api-unit file touched)

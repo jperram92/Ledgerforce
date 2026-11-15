@@ -555,3 +555,129 @@ describe('Security review r8: a Stripe success that cannot be posted, and step-u
     }
   });
 });
+
+describe('RQ-0165 Q1: the step-up condition fails closed, and an API token never approves a Stripe refund', () => {
+  it('SS-UC11-09 RQ-0165 test 2: an error thrown by the step-up condition fails the request: no approval, no event, no Stripe call, nothing posted', async () => {
+    // Test-only seam (as in F3 above): re-declare the route's step-up with a condition that throws.
+    const descriptor = Object.getOwnPropertyDescriptor(ArRefundsController.prototype, 'approve');
+    if (!descriptor) throw new Error('no approve handler');
+    let asked = 0;
+    RequireStepUp(300, () => {
+      asked += 1;
+      return Promise.reject(new Error('step-up condition failed'));
+    })(ArRefundsController.prototype, 'approve', descriptor);
+    try {
+      const credit = await seedCredit(f, 'Lambda', profiles);
+      const stripeId = randomUUID();
+      const created = await call(
+        'PUT',
+        `/ar/refunds/${stripeId}`,
+        'arClerk',
+        stripeBody(credit.partyId, '120.00'),
+      );
+      expect(created.status).toBe(201);
+      const c = (await created.json()) as { refund_no: string };
+      useVars(credit, stripeId, c.refund_no, 're_1SQbT0172ApiLambda120');
+      const before = stub.received.length;
+
+      // A session without a fresh step-up makes the interceptor ask the condition.
+      const failed = await call('POST', `/ar/refunds/${stripeId}/approve?${q()}`, 'staleApprover');
+      expect(asked).toBe(1);
+      expect(failed.status).toBe(500);
+      expect(await failed.text()).not.toContain('step-up condition failed');
+      expect(stub.received.length).toBe(before);
+      expect(await eventsFor(stripeId)).toEqual([]);
+      expect(await entriesFor(stripeId)).toBe(0);
+      expect(
+        await (await call('GET', `/ar/refunds/${stripeId}?${q()}`, 'arClerk')).json(),
+      ).toMatchObject({
+        approval: 'pending',
+        approved_by: null,
+        status: 'requested',
+        stripe: { status: 'not_sent', stripe_refund_id: null },
+      });
+
+      // Fail closed whatever the method: a bank refund is not approved past a failing condition.
+      const bank = randomUUID();
+      expect(
+        (
+          await call('PUT', `/ar/refunds/${bank}`, 'arClerk', {
+            ...stripeBody(credit.partyId, '10.00'),
+            method: 'bank_batch',
+          })
+        ).status,
+      ).toBe(201);
+      const bankFailed = await call('POST', `/ar/refunds/${bank}/approve?${q()}`, 'staleApprover');
+      expect(asked).toBe(2);
+      expect(bankFailed.status).toBe(500);
+      expect(
+        await (await call('GET', `/ar/refunds/${bank}?${q()}`, 'arClerk')).json(),
+      ).toMatchObject({ approval: 'pending', approved_by: null, status: 'requested' });
+    } finally {
+      RequireStepUp(300, stripeRefundOnly)(ArRefundsController.prototype, 'approve', descriptor);
+    }
+  });
+
+  it('SS-UC11-09 RQ-0165 test 4: an API token holding ar.refund.approve cannot approve a Stripe refund: 401 step_up_required, no Stripe call', async () => {
+    // The approver issues a token under a fresh step-up (ADR-0027); ar.refund.approve is a
+    // token-allowed scope, so the refusal comes from the step-up, not from the scope.
+    const issued = await call('POST', '/api-tokens', 'approver', {
+      name: 'refund-bot',
+      scopes: ['ar.refund.approve'],
+    });
+    expect(issued.status).toBe(201);
+    const t = (await issued.json()) as { id: string; scopes: string[]; token: string };
+    expect(t.scopes).toEqual(['ar.refund.approve']);
+    const bearer = (path: string) =>
+      fetch(`${api.url}${path}`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${t.token}` },
+      });
+
+    const credit = await seedCredit(f, 'Mu', profiles);
+    const id = randomUUID();
+    // 200.00 of the 220.00 credit, leaving 20.00 for the bank refund below.
+    const created = await call(
+      'PUT',
+      `/ar/refunds/${id}`,
+      'arClerk',
+      stripeBody(credit.partyId, '200.00'),
+    );
+    expect(created.status).toBe(201);
+    const c = (await created.json()) as { refund_no: string };
+    useVars(credit, id, c.refund_no, 're_1SQbT0172ApiMu200');
+    const before = stub.received.length;
+
+    const refused = await bearer(`/ar/refunds/${id}/approve?${q()}`);
+    expect(refused.status).toBe(401);
+    expect(await refused.json()).toEqual({ error: 'step_up_required', max_age: 300 });
+    expect(stub.received.length).toBe(before);
+    expect(await eventsFor(id)).toEqual([]);
+    expect(await entriesFor(id)).toBe(0);
+    expect(await (await call('GET', `/ar/refunds/${id}?${q()}`, 'arClerk')).json()).toMatchObject({
+      approval: 'pending',
+      approved_by: null,
+      status: 'requested',
+    });
+    const audited = await f.admin.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM audit.audit_log
+        WHERE tenant_id = $1 AND action = 'step_up_required' AND api_token_id = $2`,
+      [f.tenantId, t.id],
+    );
+    expect(audited.rows[0]?.n).toBe(1);
+
+    // The same token approves a bank refund (no step-up there), so the token itself is valid.
+    const bank = randomUUID();
+    expect(
+      (
+        await call('PUT', `/ar/refunds/${bank}`, 'arClerk', {
+          ...stripeBody(credit.partyId, '20.00'),
+          method: 'bank_batch',
+        })
+      ).status,
+    ).toBe(201);
+    const ok = await bearer(`/ar/refunds/${bank}/approve?${q()}`);
+    expect(ok.status).toBe(200);
+    expect(await ok.json()).toMatchObject({ approval: 'approved', status: 'requested' });
+  });
+});
