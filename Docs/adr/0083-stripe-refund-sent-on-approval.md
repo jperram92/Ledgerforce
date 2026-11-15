@@ -81,7 +81,8 @@ even when the network or the worker fails.
 Added by claude for findings F1, F2, F3 and F5 of security review r8 (research RQ-0164;
 decisions DL-0680–DL-0685). It strengthens the decision above and does not change this ADR's
 status. Review finding F4 (whether DL-0477 covers this security ADR, including the conditional
-step-up mechanism) remains a question for the product owner.
+step-up mechanism) is resolved: confirmed under the owner's standing instruction DL-0691 by
+DL-0692, with research RQ-0165; the metadata question F6 by DL-0693.
 
 - **Lookup before every create (F1b).** The send lists the refunds of the party's Stripe
   PaymentIntents (`GET /v1/refunds?payment_intent=…&limit=100`, paged by `starting_after`) and

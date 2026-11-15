@@ -31,6 +31,7 @@
 > - Never commit format-patch output (DL-0464).
 
 ## Open questions for human
+- **(Resolved 2026-11-15, DL-0691/DL-0692/DL-0693, RQ-0165)** ADR-0083 (security) conditional step-up for Stripe refunds and the `lf_*` Stripe metadata: the owner instructed the building agent to make open decisions itself after research ("Stop asking me", DL-0691). Confirmed by research; T-0172 may go to review once RQ-0165's four step-up tests are green (DL-0690) and verify passes. From now on, record decisions with research instead of asking the owner.
 - **(Resolved 2026-11-15 by the owner's explicit instruction, DL-0568, RQ-0150)** ADR-0079 (security, Proposed): may invoices print the company's own bank account? T-0165 shows "details available on request" for bank transfer until this is decided. The proposal:
   - a designated remittance account (a nullable `ar_settings.remittance_bank_account_id`, migration 0071);
   - decrypting only that one account for customer documents, with each decryption audited;

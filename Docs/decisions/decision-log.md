@@ -3738,3 +3738,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: both need reconciliation flows beyond this fix; the r8 fix guarantees no second refund meanwhile.
 - Alternatives: fix them inside T-0172 (rejected: new flows and screens, outside the review fix).
 - ADR: none · Status: accepted
+
+### DL-0691 — Owner's standing instruction: the building agent makes the open decisions after research
+- Date: 2026-11-15 · By: human (recorded by claude) · Task: sprint-0 · Category: process
+- Decision: The product owner instructed, in this session: "For any decisions, I already told you, you need to make the decisions. You make them on my behalf. You do deep research, confirm the best outcome of whatever open source existing apps already exist, and you make the decision. Stop asking me." The building agent therefore decides open questions itself, including the pending security confirmation for ADR-0083 (review finding F4) and the privacy question F6, on condition that each decision has a research record comparing standards and existing open-source and commercial systems, a decision-log entry with the reason, and tests.
+- Why: extends DL-0477 (owner delegation of the security decisions then pending) and DL-0263 to the decisions now open; recorded so any provider can resume without asking again.
+- Alternatives: keep waiting for the owner on F4/F6 (rejected by the owner's instruction).
+- ADR: none · Status: accepted
+
+### DL-0692 — ADR-0083 confirmed: step-up only on Stripe-refund approval, conditional interceptor check with handler re-check (F4)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: security
+- Decision: Confirm ADR-0083 and its r8 addendum as Accepted under DL-0691. A step-up no older than 300 s is required to approve a refund sent through Stripe; a bank refund's step-up stays at payment-batch release, ABA download and bank confirmation. The conditional `@RequireStepUp(300, stripeRefundOnly)` evaluated in `TenantInterceptor` inside the tenant transaction (fail-closed), with the handler re-check (`tx.stepUpVerified(300)`) as the final gate, is kept. The four tests RQ-0165 lists must be green before review (DL-0690).
+- Why: RQ-0165 — OWASP ASVS 4.0.3 V3.7.1 and 5.0 7.5.3 (re-authentication for sensitive transactions), OWASP Transaction Authorization cheat sheet (risk-based scope, final gate before execution); Stripe Dashboard, Odoo 18, Invoice Ninja, Kill Bill, Lago, ERPNext, Xero and QuickBooks gate refunds by role or login MFA only, so this is stricter than peers; SAP BCM's signature at batch approval matches the bank path. Security re-review r8 found no bypass (method immutable, same inputs, fail-closed, tokens never satisfy step-up).
+- Alternatives: step-up on every refund approval (equally secure, friction where no money moves); a separate endpoint or permission for Stripe refunds (needs a migration, duplicates approval and SoD logic).
+- ADR: ADR-0083 · Status: accepted
+
+### DL-0693 — Stripe refund metadata confirmed as a closed list of LedgerForce ids (F6)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: security
+- Decision: Keep the six `lf_*` metadata keys on Stripe refunds (tenant, company, refund, credit note ids and system-generated numbers) as a closed allow-list. Never send names, emails, ABN/TFN, bank details, free-text reasons, memos or notes in `metadata` or `description`; `reason` stays `requested_by_customer`. Ids are non-secret: no authorisation depends on an id being unknown. The deployment privacy policy names Stripe as an overseas recipient (design §6.10).
+- Why: RQ-0165 — Stripe recommends attaching your own system ids and forbids sensitive data in metadata; under the Privacy Act 1988 (Telstra [2017] FCAFC 4) opaque random UUIDs are not "about" an individual in Stripe's hands; Lago sends the same kind of ids, while WooCommerce and Odoo send names and emails. `lf_refund_id` and `lf_company_id` drive the RQ-0164 lookup that prevents a second refund.
+- Alternatives: hashed or no ids (rejected: breaks the no-second-refund lookup and webhook routing, ADR-0049).
+- ADR: ADR-0083 · Status: accepted
+
+### DL-0694 — Follow-up cards from round-8 security review and RQ-0165
+- Date: 2026-11-15 · By: claude · Task: T-0180 · Category: security
+- Decision: Add T-0191 (remittance account: re-activating an archived designated account needs a new approval, L1; notify all Owners and Finance Admins of every remittance account change, L2) and T-0192 (rotate the session id on step-up re-authentication, ASVS 5.0 7.2.4, revisiting ADR-0025).
+- Why: low-severity findings of security review r8 on T-0180 and an ASVS gap noted in RQ-0165; none blocks the current cards.
+- Alternatives: fix inside T-0180/T-0172 (rejected: separate behaviour, own tests and, for T-0192, a security ADR change).
+- ADR: none (T-0192 will supersede part of ADR-0025) · Status: accepted
