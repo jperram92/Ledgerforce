@@ -3738,3 +3738,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: both need reconciliation flows beyond this fix; the r8 fix guarantees no second refund meanwhile.
 - Alternatives: fix them inside T-0172 (rejected: new flows and screens, outside the review fix).
 - ADR: none · Status: accepted
+
+### DL-0690 — RQ-0165 Q1 tests 2 and 4 added to the Stripe refund api-db suite (T-0172)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: security
+- Decision: Add the two missing RQ-0165 Conclusion Q1 tests to `apps/api/src/ar/refunds-stripe.db.test.ts`. Test 2: a step-up condition that throws fails the approval with a 500 and records nothing: no approval, no outbox event, no Stripe call, no journal entry. This holds for a bank refund too, and the error text is not leaked. Test 4: an API token with scope `ar.refund.approve`, issued by the Approver, gets 401 `step_up_required` on a Stripe refund. That refusal is audited with the token id, and Stripe is not called. The same token approves a bank refund, which shows the token itself is valid. Tests 1 and 3 already existed. All four are green; evidence is in `.agent/evidence/T-0172/rq0165-tests.txt`.
+- Why: RQ-0165 requires all four tests to be green before T-0172 goes to review. The throwing condition uses the same test-only seam as the existing F3 test: `approve` is re-declared with `RequireStepUp(300, cond)`, then restored in `finally`. No production code changed. The behaviour already existed, so the tests could not be seen RED first. Instead, two temporary interceptor mutations were run and reverted: a token counted as stepped up, and a thrown condition swallowed as false. Each made its test fail.
+- Alternatives: an api-unit test of `TenantInterceptor` with a mocked condition (rejected: the api-db test exercises the real route, RLS and Stripe stub with no production seam needed); a test-only controller (rejected: the real approve route is what RQ-0165 is about).
+- ADR: ADR-0083 · Status: accepted
