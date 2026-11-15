@@ -14,6 +14,10 @@
  *   then matched to the posted entry (SS-UC08-05). Idempotent per line.
  * - previewTransactionFromLine: the journal createTransactionFromLine would post, from the posting
  *   engine's preview of the same command (one builder for both, T-0150, P4). Writes nothing.
+ * - acceptSuggestion: a person accepts an open candidate suggestion (an ambiguous receipt or
+ *   payment): the line is matched to that entry with method `suggestion` and the line's other
+ *   open suggestions are dismissed (T-0160). Nothing is posted; a rule suggestion needs a
+ *   transaction (createTransactionFromLine with fromSuggestionId).
  *
  * This module never writes ledger tables; the database guard (0050) re-checks every match.
  */
@@ -49,6 +53,7 @@ export type BankMatchErrorCode =
   | 'INVALID_TRANSACTION'
   | 'SUGGESTION_CLOSED'
   | 'NOT_MATCHED'
+  | 'NOT_A_CANDIDATE'
   | 'RECONCILED';
 
 export class BankMatchError extends DomainError {
@@ -585,5 +590,94 @@ export async function createTransactionFromLine(
     entryId: posted.entryId,
     entryNo: posted.entryNo,
     replayed: false,
+  };
+}
+
+export interface AcceptSuggestionInput {
+  statementLineId: string;
+  suggestionId: string;
+  by: string;
+}
+
+export interface AcceptSuggestionResult {
+  matchId: string;
+  journalEntryId: string;
+  sourceKind: 'customer_receipt' | 'supplier_payment';
+  sourceId: string;
+}
+
+/**
+ * Accept an open candidate suggestion of a line (T-0160, UC-08 step 3): match the line to the
+ * suggested receipt or payment with method `suggestion`, close the suggestion as accepted and the
+ * line's other open suggestions as dismissed (recordMatch). No journal is posted: the entry is
+ * already posted. The database guard (0056) re-checks that the entry moves the bank GL account by
+ * the line amount, and its unique index refuses an entry that already has an active match, so a
+ * stale candidate is refused.
+ *
+ * Refusals: NOT_FOUND (no such suggestion for this line), SUGGESTION_CLOSED (already accepted or
+ * dismissed), NOT_A_CANDIDATE (a rule suggestion needs a transaction), ALREADY_MATCHED.
+ */
+export async function acceptSuggestion(
+  trx: Trx,
+  input: AcceptSuggestionInput,
+): Promise<AcceptSuggestionResult> {
+  const line = await statementLine(trx, input.statementLineId, true);
+  const sr = await sql<{
+    id: string;
+    kind: 'candidate' | 'rule';
+    status: string;
+    source_kind: 'customer_receipt' | 'supplier_payment' | null;
+    source_id: string | null;
+    journal_entry_id: string | null;
+  }>`
+    SELECT id::text, kind, status, source_kind, source_id::text, journal_entry_id::text
+      FROM app.bank_match_suggestion
+     WHERE id = ${UUID_RE.test(input.suggestionId) ? input.suggestionId : null}
+       AND statement_line_id = ${line.id}
+       FOR UPDATE`.execute(trx);
+  const s = sr.rows[0];
+  if (!s) {
+    throw new BankMatchError(
+      'NOT_FOUND',
+      `suggestion ${input.suggestionId} not found for this line`,
+    );
+  }
+  if (s.status !== 'open') {
+    throw new BankMatchError('SUGGESTION_CLOSED', `suggestion ${s.id} is ${s.status}`);
+  }
+  if (
+    s.kind !== 'candidate' ||
+    s.source_kind === null ||
+    s.source_id === null ||
+    s.journal_entry_id === null
+  ) {
+    throw new BankMatchError(
+      'NOT_A_CANDIDATE',
+      `suggestion ${s.id} is a rule suggestion; create a transaction from the line to accept it`,
+    );
+  }
+  if (line.status !== 'unmatched') {
+    throw new BankMatchError('ALREADY_MATCHED', `statement line ${line.id} is ${line.status}`);
+  }
+  const bank = await bankAccount(trx, line.bank_account_id);
+  const matchId = await recordMatch(
+    trx,
+    bank,
+    {
+      lineId: line.id,
+      entryId: s.journal_entry_id,
+      sourceKind: s.source_kind,
+      sourceId: s.source_id,
+      method: 'suggestion',
+      ruleId: null,
+      by: input.by,
+    },
+    s.id,
+  );
+  return {
+    matchId,
+    journalEntryId: s.journal_entry_id,
+    sourceKind: s.source_kind,
+    sourceId: s.source_id,
   };
 }

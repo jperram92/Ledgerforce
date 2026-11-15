@@ -1,0 +1,56 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:38183
+(node:13668) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ |api-db| apps/api/src/bank/bank-rec.db.test.ts (11 tests | 2 failed) 2131ms
+     × T-0160 AC-2 lists both candidates; 403 without bank.reconcile, 400 without a key, 404 for another tenant's line 19ms
+     × T-0160 AC-2 accepting a candidate matches the line (200, audited, nothing posted); replay by the same user 200; a closed one 422 SUGGESTION_CLOSED 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/bank/bank-rec.db.test.ts > T-0160: accept a candidate suggestion over HTTP > T-0160 AC-2 lists both candidates; 403 without bank.reconcile, 400 without a key, 404 for another tenant's line
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/bank/bank-rec.db.test.ts:714:68
+    712|     const path = `/bank-rec/lines/${deposit?.id ?? ''}/suggestions/${s…
+    713|     const body = { company_id: f.companyId };
+    714|     expect((await call('POST', path, 'auditor', { body })).status).toB…
+       |                                                                    ^
+    715|     expect((await call('POST', path, 'clerk', { body })).status).toBe(…
+    716|     expect((await call('POST', path, 'accountant', { body, key: null }…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-db| apps/api/src/bank/bank-rec.db.test.ts > T-0160: accept a candidate suggestion over HTTP > T-0160 AC-2 accepting a candidate matches the line (200, audited, nothing posted); replay by the same user 200; a closed one 422 SUGGESTION_CLOSED
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/bank/bank-rec.db.test.ts:757:22
+    755|
+    756|     const r = await call('POST', path(second?.id ?? ''), 'accountant',…
+    757|     expect(r.status).toBe(200);
+       |                      ^
+    758|     const done = await json(r);
+    759|     expect(done).toEqual({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 9 passed (11)
+   Start at  03:28:54
+   Duration  5.55s (transform 1.46s, setup 0ms, import 2.60s, tests 2.13s, environment 0ms)
+

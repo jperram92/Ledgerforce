@@ -10,6 +10,9 @@
  * - SS-UC08-06 over HTTP: the report ties; completing it locks the covered lines against
  *   unmatching.
  * - Every POST needs an Idempotency-Key and is audited; another tenant's rows are 404.
+ * - T-0160 over HTTP: a December statement line with two receipts of the same amount and
+ *   reference gets two candidate suggestions; accepting one matches the line (method
+ *   `suggestion`, nothing posted), a replay by the same user is 200, a closed one is 422.
  *
  * Book: no opening balance, so the statement's closing balance as the books see it is the net of
  * its 10 lines, 8,394.43. The 10,000.00 deposit is above the default journal approval threshold
@@ -19,6 +22,8 @@ import 'reflect-metadata';
 import { randomBytes, randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { recordReceipt } from '@ledgerforce/ar';
+import { seedBillableCustomers, seedBillingCompany } from '@ledgerforce/ar/testing';
 import {
   createCompanyBankAccount,
   createMatchRule,
@@ -642,5 +647,146 @@ describe('T-0149: bank reconciliation over HTTP', () => {
       ),
     );
     expect(statements.statements[0]?.reconciliation_id).toBe(done.reconciliation_id);
+  });
+});
+
+describe('T-0160: accept a candidate suggestion over HTTP', () => {
+  const DECEMBER = Buffer.from(
+    [
+      'Date,Description,Reference,Debit,Credit,Balance,Transaction ID',
+      '03/12/2026,Deposit Acme 01 Pty Ltd,CAP-02,,500.00,"500.00",202612030001',
+      '',
+    ].join('\n'),
+  );
+  let deposit: LineView | undefined;
+  const receipts: { receiptId: string; entryId: string }[] = [];
+
+  beforeAll(async () => {
+    const profiles = await seedBillingCompany(f);
+    const [acme = ''] = await seedBillableCustomers(f, profiles, {
+      count: 1,
+      prefix: 'Acme',
+      billDate: '2026-12-01',
+    });
+    for (const key of ['cap-02-a', 'cap-02-b']) {
+      receipts.push(
+        await f.inTenant((trx) =>
+          recordReceipt(trx, {
+            companyId: f.companyId,
+            partyId: acme,
+            receiptDate: '2026-12-03',
+            amount: '500.00',
+            method: 'eft',
+            depositTo: { accountId: acct('1010') },
+            reference: 'CAP-02',
+            idempotencyKey: key,
+            allocations: [],
+          }),
+        ),
+      );
+    }
+    const imp = await call('POST', `/bank-rec/accounts/${bankAccountId}/statements`, 'accountant', {
+      body: importBody(DECEMBER, 'harbour-2026-12.csv'),
+    });
+    expect(imp.status).toBe(201);
+    const run = await call(
+      'POST',
+      `/bank-rec/accounts/${bankAccountId}/matching-runs`,
+      'accountant',
+      {
+        body: { company_id: f.companyId },
+      },
+    );
+    // Two candidates for the December deposit, plus the rule suggestion of the unmatched fee line again.
+    expect(await json(run)).toMatchObject({ auto_matched: 0, suggested: 3 });
+    deposit = await lineBy('Deposit Acme 01 Pty Ltd');
+  });
+
+  it("T-0160 AC-2 lists both candidates; 403 without bank.reconcile, 400 without a key, 404 for another tenant's line", async () => {
+    expect(deposit?.status).toBe('unmatched');
+    expect(deposit?.suggestions).toEqual([
+      expect.objectContaining({ kind: 'candidate', journal_entry_id: receipts[0]?.entryId }),
+      expect.objectContaining({ kind: 'candidate', journal_entry_id: receipts[1]?.entryId }),
+    ]);
+    const s = deposit?.suggestions[0]?.id ?? '';
+    const path = `/bank-rec/lines/${deposit?.id ?? ''}/suggestions/${s}/accept`;
+    const body = { company_id: f.companyId };
+    expect((await call('POST', path, 'auditor', { body })).status).toBe(403);
+    expect((await call('POST', path, 'clerk', { body })).status).toBe(403);
+    expect((await call('POST', path, 'accountant', { body, key: null })).status).toBe(400);
+    expect(
+      (
+        await call(
+          'POST',
+          `/bank-rec/lines/${foreign.lineId}/suggestions/${s}/accept`,
+          'accountant',
+          {
+            body,
+          },
+        )
+      ).status,
+    ).toBe(404);
+    expect(
+      (
+        await call(
+          'POST',
+          `/bank-rec/lines/${deposit?.id ?? ''}/suggestions/nope/accept`,
+          'accountant',
+          { body },
+        )
+      ).status,
+    ).toBe(400);
+    expect((await lineBy('Deposit Acme 01 Pty Ltd')).status).toBe('unmatched');
+    expect(await audits('bank_suggestion')).toBe(0);
+  });
+
+  it('T-0160 AC-2 accepting a candidate matches the line (200, audited, nothing posted); replay by the same user 200; a closed one 422 SUGGESTION_CLOSED', async () => {
+    const [first, second] = deposit?.suggestions ?? [];
+    const path = (id: string) => `/bank-rec/lines/${deposit?.id ?? ''}/suggestions/${id}/accept`;
+    const body = { company_id: f.companyId };
+    const entries = async () =>
+      (
+        await f.admin.query<{ n: number }>(
+          'SELECT count(*)::int AS n FROM app.journal_entry WHERE tenant_id = $1',
+          [f.tenantId],
+        )
+      ).rows[0]?.n;
+    const before = await entries();
+
+    const r = await call('POST', path(second?.id ?? ''), 'accountant', { body, key: 'acc-1' });
+    expect(r.status).toBe(200);
+    const done = await json(r);
+    expect(done).toEqual({
+      statement_line_id: deposit?.id,
+      suggestion_id: second?.id,
+      match_id: expect.any(String) as unknown,
+      journal_entry_id: receipts[1]?.entryId,
+      source_kind: 'customer_receipt',
+      source_id: receipts[1]?.receiptId,
+      replayed: false,
+    });
+    expect(await entries()).toBe(before);
+    const after = await lineBy('Deposit Acme 01 Pty Ltd');
+    expect(after.status).toBe('matched');
+    expect(after.match).toMatchObject({
+      id: done['match_id'],
+      journal_entry_id: receipts[1]?.entryId,
+      method: 'suggestion',
+    });
+    expect(after.suggestions).toEqual([]);
+    expect(await audits('bank_suggestion')).toBe(1);
+
+    const replay = await call('POST', path(second?.id ?? ''), 'accountant', { body, key: 'acc-1' });
+    expect(replay.status).toBe(200);
+    expect(await json(replay)).toEqual({ ...done, replayed: true });
+
+    const other = await call('POST', path(second?.id ?? ''), 'accountant2', { body });
+    expect(other.status).toBe(422);
+    expect(await json(other)).toMatchObject({ error: 'SUGGESTION_CLOSED' });
+    const dismissed = await call('POST', path(first?.id ?? ''), 'accountant', { body });
+    expect(dismissed.status).toBe(422);
+    expect(await json(dismissed)).toMatchObject({ error: 'SUGGESTION_CLOSED' });
+    expect(await audits('bank_suggestion')).toBe(1);
+    expect(await entries()).toBe(before);
   });
 });

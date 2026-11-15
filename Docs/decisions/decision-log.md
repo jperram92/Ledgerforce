@@ -3367,3 +3367,14 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - An additive route over existing schema needs no ADR (cf. DL-0313).
 - Why: design §3.2 says roles are re-bound, never unbound. The chart UI and the setup wizard need it.
 - ADR: none · Status: accepted
+
+### DL-0610 — Accepting a candidate suggestion: module function, route, replay record and error code (T-0160)
+- Date: 2026-11-15 · By: claude · Task: T-0160 · Category: api
+- Decision:
+  - `acceptSuggestion(trx, {statementLineId, suggestionId, by})` in @ledgerforce/bank locks the line and the suggestion, then records the match with method `suggestion` through the existing `recordMatch`, which closes the suggestion as `accepted` and the line's other open suggestions as `dismissed`. Nothing is posted (the receipt or payment entry is already posted), so no golden posting is involved.
+  - Refusals: NOT_FOUND (no such suggestion for this line), SUGGESTION_CLOSED (accepted or dismissed), ALREADY_MATCHED, and a new code NOT_A_CANDIDATE for a rule suggestion (it needs a transaction, so the person uses "Create transaction" from the rule instead).
+  - Route `POST /bank-rec/lines/:id/suggestions/:suggestionId/accept {company_id}`: bank.reconcile, Idempotency-Key, audited as `bank_suggestion`, 200 with the match. The replay record is the accepted suggestion and its active match: the same user (decided_by and matched_by) gets 200 with `replayed: true`; anyone else 422 SUGGESTION_CLOSED, as for any closed suggestion. Another company's or tenant's line is 404; a malformed id is 400.
+  - An additive route over existing schema (migration 0056 already allows method `suggestion`) needs no ADR (cf. DL-0313, DL-0566).
+- Why: UC-08 step 3 says a person confirms an ambiguous match; the card's AC-1/AC-2. Reusing `recordMatch` keeps one place that closes suggestions; the database guard of 0056 still checks the entry against the line.
+- Alternatives: idempotency in the module (rejected: the module refuses a closed suggestion as AC-1 says, and the controller already finds replays from the kept rows for unmatch and reconciliation); returning 409 for a closed suggestion (rejected: the card asks for 422 SUGGESTION_CLOSED, the module refusal convention of this controller).
+- ADR: none · Status: accepted
