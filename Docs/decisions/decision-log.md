@@ -3515,3 +3515,24 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   | Stripe refunds (step-up, DL-0562) | T-0172 | 0660–0669 | 0083 | 0163 | T-0189–T-0190 | SS-UC11-09..10 |
 - Why: The owner asked for sub-agents ("spawn subagents and continue the build", 2026-11-15). SS id ranges are now allocated too, so agents cannot collide.
 - ADR: none · Status: accepted
+
+### DL-0640 — T-0176 split per wizard step: steps 1 and 3 stay, step 4 → T-0185, steps 8 and 10 → T-0186
+- Date: 2026-11-15 · By: claude · Task: T-0176 · Category: scope
+- Decision: T-0176 keeps the settings screens for wizard steps 1 (company details, fiscal year) and 3 (GST basis, BAS frequency, standard tax codes). Step 4 (company bank accounts) moves to T-0185 (SS-PLAT-130); steps 8 (numbering and billing) and 10 (approval amounts) move to T-0186 (SS-PLAT-131). Each card is finished fully, in wizard-step order.
+- Why: RQ-0161: five steps need about ten new routes plus five screens, well over one session and ~400 lines. Steps 1 and 3 share a shape (thin routes over existing module functions, no key service); step 4 needs the KMS and a create replay; step 8 has four separate settings and step 10 reuses `/sod/settings`.
+- Alternatives: one card per step (rejected: only T-0185–T-0186 were allocated, DL-0569); one card for everything (rejected: too large).
+- ADR: none · Status: accepted
+
+### DL-0641 — The base currency can change only while the company has no journal entry
+- Date: 2026-11-15 · By: claude · Task: T-0176 · Category: accounting
+- Decision: `PUT /settings/company` refuses a different `base_currency` with 409 `BASE_CURRENCY_LOCKED` once any `app.journal_entry` row exists for the company; the GET says so (`base_currency_locked`) and the screen shows the currency read-only with the reason.
+- Why: RQ-0161 finding 3; design §3.1: every journal of a legal entity is kept in its base currency, so changing it afterwards would re-denominate posted history without a single posting. The database does not prevent it (migration 0002). Read-only check of the journal table; nothing is written to ledger tables.
+- Alternatives: allow any change (rejected: corrupts history); a database trigger (rejected: needs a migration, out of this card's rules; can follow later).
+- ADR: ADR-0081 · Status: accepted
+
+### DL-0642 — Setup settings routes under /settings/* (ADR-0081); idempotency by state as for system-role rebinding
+- Date: 2026-11-15 · By: claude · Task: T-0176 · Category: architecture
+- Decision: New routes `GET/PUT /settings/company`, `POST /settings/company/fiscal-years`, `GET/PUT /settings/tax`, `POST /settings/tax/codes/standard` (ADR-0081). Each write requires an Idempotency-Key (400 without) and is replay-safe by state: the same values again answer 200 with `changed:false`/`replayed:true`/`inserted:0` and write nothing, as `PUT /accounts/system-roles/:role` does (T-0146). Successful writes are audited by the interceptor with a handler description.
+- Why: RQ-0161 S8; no migration is allowed for a key store and none is needed: each write converges on the requested state.
+- Alternatives: a key store table (rejected: migration); module-prefixed routes (rejected in ADR-0081).
+- ADR: ADR-0081 · Status: accepted
