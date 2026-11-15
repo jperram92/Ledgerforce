@@ -481,8 +481,11 @@ export interface RefundJournalPreview {
   readonly needsOverride: boolean;
   readonly baseCurrency: string;
   readonly total: string;
-  /** Where the bank line comes from (ADR-0074): chosen, the paying batch, or the only bank account. */
-  readonly bankAccountSource: 'chosen' | 'batch' | 'only_bank_account';
+  /**
+   * Where the credit line comes from (ADR-0074): chosen, the paying batch, or the only bank
+   * account; for a Stripe refund the Stripe clearing account (GP-006 Stripe variant, T-0172).
+   */
+  readonly bankAccountSource: 'chosen' | 'batch' | 'only_bank_account' | 'stripe_clearing';
   readonly lines: readonly {
     readonly lineNo: number;
     readonly accountId: string;
@@ -530,6 +533,22 @@ async function refundBankAccount(
   return { id: only.gl, source: 'only_bank_account' };
 }
 
+/** GP-006 Stripe variant credits the Stripe connector's clearing account (postings Q2). */
+async function stripeClearing(
+  trx: Trx,
+  companyId: string,
+): Promise<{ id: string; source: RefundJournalPreview['bankAccountSource'] }> {
+  const s = await trx
+    .selectFrom('app.stripe_settings')
+    .select('clearing_account_id')
+    .where('company_id', '=', companyId)
+    .executeTakeFirst();
+  if (!s) {
+    throw new RefundError('BANK_ACCOUNT_REQUIRED', 'the company has no Stripe clearing account');
+  }
+  return { id: s.clearing_account_id, source: 'stripe_clearing' };
+}
+
 /**
  * "Show me the journal" for a requested refund (T-0152, SS-UC11-08, design §3.9): the engine's
  * preview of the GP-006 entry the bank confirmation will post, dated the refund date (the real
@@ -544,7 +563,10 @@ export async function previewCustomerRefundJournal(
   if (r.status !== 'requested') {
     throw new RefundError('NOT_PAYABLE', `refund ${r.refundNo} is ${r.status}`);
   }
-  const bank = await refundBankAccount(trx, companyId, r.refundId, q.accountId);
+  const bank =
+    r.method === 'stripe'
+      ? await stripeClearing(trx, companyId)
+      : await refundBankAccount(trx, companyId, r.refundId, q.accountId);
   const built = await preview(trx, {
     companyId,
     idempotencyKey: `ar-refund:${r.refundId}`,

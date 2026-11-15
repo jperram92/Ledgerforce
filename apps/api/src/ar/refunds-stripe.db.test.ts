@@ -234,6 +234,19 @@ describe('SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 
     expect(stub.received).toHaveLength(0);
     useVars(credit, id, c.refund_no, 're_1SQbT0172ApiAcme220');
 
+    // "Show me the journal" for a Stripe refund previews GP-006's Stripe variant (clearing).
+    const preview = await call('GET', `/ar/refunds/${id}/journal?${q()}`, 'arClerk');
+    expect(preview.status).toBe(200);
+    const p = (await preview.json()) as {
+      bank_account_source: string;
+      lines: { account_code: string; debit: string; credit: string }[];
+    };
+    expect(p.bank_account_source).toBe('stripe_clearing');
+    expect(p.lines.map((l) => [l.account_code, l.debit, l.credit])).toEqual([
+      ['1200', '220.0000', '0.0000'],
+      ['1210', '0.0000', '220.0000'],
+    ]);
+
     const ok = await call('POST', `/ar/refunds/${id}/approve?${q()}`, 'approver');
     expect(ok.status).toBe(200);
     const body = (await ok.json()) as { entry_id: string };
