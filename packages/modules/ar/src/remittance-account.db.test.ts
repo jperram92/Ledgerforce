@@ -354,7 +354,7 @@ describe('T-0180 AC-1/AC-4: the remittance account is set only by an approved ch
       'SELECT count(*)::text AS n FROM app.remittance_account_change WHERE company_id = $1',
       [f.companyId],
     );
-    expect(Number(seen.rows[0]?.n)).toBeGreaterThan(0);
+    expect(seen.rows[0]?.n).not.toBe('0');
     await f.admin.query('INSERT INTO app.tenant (id, name) VALUES ($1, $2)', [
       OTHER_TENANT,
       'Other Pty Ltd',

@@ -5,6 +5,7 @@ import { ArReceiptsController } from './ar/receipts.controller.ts';
 import { ArRefundsController } from './ar/refunds.controller.ts';
 import { OpeningBalancesController } from './setup/opening-balances.controller.ts';
 import { SetupWizardController } from './setup/wizard.controller.ts';
+import { RemittanceAccountController } from './setup/remittance-account.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArInvoicesController } from './ar/invoices.controller.ts';
 import { ArReminderPauseController } from './ar/reminder-pause.controller.ts';
@@ -144,6 +145,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   BankRecController,
   OpeningBalancesController,
   SetupWizardController,
+  RemittanceAccountController,
   AuthController,
   LoginController,
 ];
@@ -197,6 +199,7 @@ class AppModule {
         BankRecController,
         OpeningBalancesController,
         SetupWizardController,
+        RemittanceAccountController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,
