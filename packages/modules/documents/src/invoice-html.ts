@@ -156,6 +156,7 @@ const STYLE = `
   .pay a { color: #0b3d91; word-break: break-all; }
   .pay + .pay { margin-top: 3mm; }
   h2.how { font-size: 12pt; margin: 8mm 0 0; }
+  h2.how + .pay { margin-top: 3mm; }
   .remit { margin-top: 1.5mm; }
   .logo { display: block; max-height: 22mm; max-width: 70mm; margin-bottom: 4mm; }
 `;
