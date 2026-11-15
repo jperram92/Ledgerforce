@@ -3367,3 +3367,62 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - An additive route over existing schema needs no ADR (cf. DL-0313).
 - Why: design §3.2 says roles are re-bound, never unbound. The chart UI and the setup wizard need it.
 - ADR: none · Status: accepted
+
+### DL-0620 — New invoices take their due date from the company's default payment terms (T-0164)
+- Date: 2026-11-15 · By: claude · Task: T-0164 · Category: domain
+- Decision:
+  - `createDraftInvoice` resolves the due date in this order: the caller's due date, then the issue date plus `app.ar_settings.default_payment_terms_days` (read with `invoiceSettingsOf`, no second copy), then the issue date plus 14 days. Party terms (design §4.2), when a later card adds them, go between the first two.
+  - Days are calendar days in UTC date arithmetic (the existing `addDays`). 0 days means due on the issue date.
+  - Journal amounts do not depend on the due date. Only the AR line's due-date metadata follows it, so no golden posting changes. AR db suite, golden engine and unit goldens were re-run green.
+- Why: RQ-0153 conclusion 4. Odoo also takes terms from a configured source before falling back (RQ-0159 S5).
+- ADR: none (behaviour over existing schema, ADR-0071) · Status: accepted
+
+### DL-0621 — The Stripe block on invoices follows the company's accepted payment methods (T-0165)
+- Date: 2026-11-15 · By: claude · Task: T-0165 · Category: domain
+- Decision:
+  - The link source stays the `InvoicePaymentLinkProvider` port (connector-stripe, ADR-0048), and billing formats still decide per format whether a link exists.
+  - The invoice shows the Stripe block only when the company accepts `stripe`: the link and amount due when one is supplied, otherwise "Ask us for a secure payment link".
+  - The email handler does not request a link when the company's saved methods exclude `stripe`, so none is created or sent.
+  - With no saved methods, the T-0073 behaviour is unchanged.
+- Why: RQ-0159 conclusion 1. Design §4.1 step 8 makes the accepted methods a company setting.
+- ADR: none · Status: accepted
+
+### DL-0622 — The bank-transfer block prints remittance details only when the document carries them (T-0165)
+- Date: 2026-11-15 · By: claude · Task: T-0165 · Category: domain
+- Decision:
+  - With `bank_transfer` accepted, the invoice shows "Pay by bank transfer" and the invoice number as the reference. It prints account name, BSB and account number only when `InvoiceDocument.bankTransfer` is set; otherwise it says the details are available on request.
+  - `loadInvoiceDocument` does not set `bankTransfer`. No account is chosen as the remittance account (needs schema), and printing the decrypted number is a new use under ADR-0018 (security).
+  - The BSB is re-checked as NNN-NNN, and every value is escaped.
+- Why: RQ-0159 conclusion 2. The agent does not guess which account receives customer money (design §6.1).
+- ADR: ADR-0079 (Proposed) · Status: accepted (interim behaviour)
+
+### DL-0623 — Propose ADR-0079: a chosen remittance account, decrypted only for customer documents; split T-0180
+- Date: 2026-11-15 · By: claude · Task: T-0165 · Category: security
+- Decision:
+  - ADR-0079 (category security, human gate, Proposed) proposes a nullable `app.ar_settings.remittance_bank_account_id`, chosen in wizard step 8. Rendering may decrypt only that account's number, for customer documents.
+  - T-0180 (blocked: owner acceptance of ADR-0079, plus a migration by the lead per DL-0564) implements it.
+  - Rejected options: free-text payment instructions (an unverified second copy of a bank number, a redirection risk), an automatic pick, masked details.
+- Why: RQ-0159 findings 1–3. Security ADRs remain with the product owner (AGENTS.md §6; DL-0263 delegates accounting only).
+- ADR: ADR-0079 · Status: proposed (needs product owner)
+
+### DL-0624 — Invoice branding in the template: CSP meta, validated colours, data-URI logo; documents depends on ar
+- Date: 2026-11-15 · By: claude · Task: T-0165 · Category: architecture
+- Decision:
+  - The invoice HTML gets `<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'">`. That allows no script and no fetch, also when the HTML is shown outside the PDF renderer (ADR-0045).
+  - The renderer checks the brand and accent colours as #RRGGBB again before they reach CSS, and refuses anything else. The logo is embedded only as `data:image/png|jpeg;base64` after a magic-byte check, with the supplier name as alt text. No logo means no `<img>`.
+  - `loadInvoiceDocument` reads settings through `invoiceSettingsOf` and the logo bytes through the new `invoiceLogoOf` (ar), as the card asked.
+  - `@ledgerforce/ar` moves from dev to runtime dependency of `@ledgerforce/documents`. It is an internal workspace package with no new third-party code, so no ADR is needed (AGENTS.md §4 concerns external runtime dependencies). There is no cycle: ar does not depend on documents.
+- Why: T-0165 AC-1 and its card notes; ADR-0045's no-script, no-external-resource rule.
+- ADR: none · Status: accepted
+
+### DL-0625 — Success scenarios SS-UC01-14 and SS-UC01-15
+- Date: 2026-11-15 · By: claude · Task: T-0164, T-0165 · Category: process
+- Decision: SS-UC01-14 (due date from default terms, db-integration) and SS-UC01-15 (branding and payment methods on the invoice, e2e with screenshot) are added to the register and UC-01. They are the next free UC-01 ids at d9554f4/895e443. Test titles start with the ids. Evidence is in `.agent/evidence/T-0164/` and `.agent/evidence/T-0165/`. The lead should check for an id clash when merging the parallel round.
+- Why: every behaviour change needs a scenario with a test and evidence (AGENTS.md §0.8).
+- ADR: none · Status: accepted
+
+### DL-0626 — A shared test-only PNG builder for document tests
+- Date: 2026-11-15 · By: claude · Task: T-0165 · Category: tooling
+- Decision: `packages/modules/documents/src/testing/solid-png.ts` builds a real, decodable solid-colour PNG (zlib from Node, no dependency), so the branding tests and the e2e evidence spec need no binary fixture. Product code never imports it.
+- Why: evidence and tests must show a real image painted in the PDF (pdfjs image operators), not just a data URI string.
+- ADR: none · Status: accepted

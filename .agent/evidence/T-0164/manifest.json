@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0164",
+  "entries": [
+    {
+      "scenario": "SS-UC01-14",
+      "file": ".agent/evidence/T-0164/20261115-034209-tests-db.json",
+      "test": "6 test(s): packages/modules/ar/src/payment-terms.db.test.ts › T-0164 default payment terms set the due date of new invoices › SS-UC01-14 AC-1 with 30 days saved, an invoice issued 2026-11-13 without a due date is due 2026-12-13 [T-0164] | packages/modules/ar/src/payment-terms.db.test.ts › T-0164 default payment terms set the due date of new invoices › SS-UC01-14 AC-1 the saved terms count calendar days across a month and year end [T-0164] | packages/modules/ar/src/payment-terms.db.test.ts › T-0164 default payment terms set the due date of new invoices › SS-UC01-14 AC-1 changed terms apply to invoices created afterwards (0 days = due on issue) [T-0164] | packages/modules/ar/src/payment-terms.db.test.ts › T-0164 default payment terms set the due date of new invoices › SS-UC01-14 AC-2 with no saved terms the due date is the issue date + 14 days [T-0164] | packages/modules/ar/src/payment-terms.db.test.ts › T-0164 default payment terms set the due date of new invoices › SS-UC01-14 AC-2 a settings row without terms (branding only) keeps the 14-day default [T-0164] | packages/modules/ar/src/payment-terms.db.test.ts › T-0164 default payment terms set the due date of new invoices › SS-UC01-14 AC-2 an explicit due date wins over the saved terms and over the default [T-0164]",
+      "commit": "3d21df9c7112",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:42:09.122Z",
+      "result": "passed"
+    }
+  ]
+}
