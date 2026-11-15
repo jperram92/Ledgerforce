@@ -1,0 +1,7 @@
+Scope: all 25 workspace projects
+ WARN  There are cyclic workspace dependencies: /home/user/Ledgerforce/.claude/worktrees/agent-a1d33617443f758e4/packages/connectors/salesforce, /home/user/Ledgerforce/.claude/worktrees/agent-a1d33617443f758e4/packages/modules/ar
+Lockfile is up to date, resolution step is skipped
+Already up to date
+
+Done in 1.6s using pnpm v10.28.0
+exit=0

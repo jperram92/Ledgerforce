@@ -1,0 +1,9 @@
+
+Running 3 tests using 2 workers
+
+  ✓  1 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:259:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 1440 [T-0172] (5.1s)
+  ✓  2 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:297:1 › SS-UC11-10: a Stripe send that did not finish at approval says it is retried automatically [T-0172] (5.6s)
+  ✓  3 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:259:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 390 [T-0172] (3.3s)
+
+  3 passed (10.8s)
+exit=0

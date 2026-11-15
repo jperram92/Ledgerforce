@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0172",
+  "entries": [
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/red-stripe-db.txt",
+      "test": "RED: stripe-refund-approval.contract.db.test.ts before implementation (5 failed)",
+      "commit": "e569dca",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:27:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/red-api-db.txt",
+      "test": "RED: refunds-stripe.db.test.ts before implementation (beforeAll refused METHOD_NOT_AVAILABLE, 5 not run)",
+      "commit": "e569dca",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:28:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/red-playwright.txt",
+      "test": "RED: stripe-refunds.spec.ts before the UI change (3 failed)",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:39:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/db-ar-stripe.txt",
+      "test": "vitest db packages/modules/ar packages/connectors/stripe (19 files, 93 passed, 0 skipped)",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:47:19Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-10",
+      "file": ".agent/evidence/T-0172/db-ar-stripe.txt",
+      "test": "stripe-refund-approval.contract.db.test.ts › SS-UC11-10 (in the db run above)",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:47:19Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/api-db-ar.txt",
+      "test": "vitest api-db apps/api/src/ar (8 files, 42 passed, 0 skipped)",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:48:30Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-10",
+      "file": ".agent/evidence/T-0172/api-db-ar.txt",
+      "test": "refunds-stripe.db.test.ts › SS-UC11-10 (in the api-db run above)",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:48:30Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/api-db-stepup-regression.txt",
+      "test": "vitest api-db apps/api/src/{ap,parties,periods,authz,tenancy} (15 files, 111 passed): step-up regression",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:49:17Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/api-unit.txt",
+      "test": "vitest api-unit (6 files, 165 passed)",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:49:12Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/web.txt",
+      "test": "vitest --project web (19 files, 186 passed)",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:50:19Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/playwright-stripe-refunds.txt",
+      "test": "playwright tests/e2e/web/stripe-refunds.spec.ts --trace off (3 passed)",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:50:40Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-10",
+      "file": ".agent/evidence/T-0172/playwright-stripe-refunds.txt",
+      "test": "stripe-refunds.spec.ts › SS-UC11-10 (in the run above)",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:50:40Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0172/typecheck.txt",
+      "test": "pnpm typecheck (exit 0); pnpm -s lint, format:check, lint-backlog, install --frozen-lockfile all exit 0 (lint.txt, format-check.txt, lint-backlog.txt, install.txt)",
+      "commit": "e84f9a3",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:46:00Z",
+      "result": "passed"
+    }
+  ]
+}
