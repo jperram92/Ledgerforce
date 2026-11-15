@@ -25,7 +25,11 @@ export const GAP_CHECK_STEP = 7;
 /** The one step that may be completed by declaring there is no history (ADR-0067). */
 export const NO_HISTORY_STEP = 9;
 
-type Screen = '/accounting/chart' | '/settings/users' | '/settings/sync-issues';
+type Screen =
+  | '/accounting/chart'
+  | '/settings/users'
+  | '/settings/sync-issues'
+  | '/settings/setup/opening-balances';
 export interface Where {
   /** An existing screen where the setting is entered or checked. */
   to?: Screen;
@@ -58,8 +62,11 @@ export const STEP_WHERE: Record<number, Where> = {
   },
   7: { text: ELSEWHERE },
   8: { text: ELSEWHERE },
+  // T-0177: the opening balances screen (DL-0651).
   9: {
-    text: 'There is no LedgerForce screen for this yet: opening balances are imported from a CSV file through the API.',
+    to: '/settings/setup/opening-balances',
+    name: 'Opening balances',
+    text: 'Import the trial balance and the open customer and supplier items from CSV files, see the journal, then post it, on',
   },
   10: {
     to: '/settings/users',

@@ -56,6 +56,11 @@ describe('T-0091 setup wizard logic', () => {
     expect(STEP_WHERE[2]).toMatchObject({ to: '/accounting/chart', name: 'Chart of accounts' });
     expect(STEP_WHERE[10]).toMatchObject({ to: '/settings/users', name: 'People and roles' });
     expect(STEP_WHERE[3]?.text).toMatch(/no LedgerForce screen/);
+    // T-0177: step 9 links to the opening balances screen.
+    expect(STEP_WHERE[9]).toMatchObject({
+      to: '/settings/setup/opening-balances',
+      name: 'Opening balances',
+    });
     expect(STEP_WHERE[10]?.after).toMatch(/Approval amounts have no LedgerForce screen/);
   });
 

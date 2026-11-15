@@ -27,6 +27,7 @@ import { isJournalStatus, JournalsPage } from './gl/JournalsPage.tsx';
 import type { JournalStatus } from './gl/client.ts';
 import { NotFoundPage, SectionPage } from './pages.tsx';
 import { SECTIONS } from './sections.ts';
+import { OpeningBalancesPage } from './setup/OpeningBalancesPage.tsx';
 import { WizardPage } from './setup/WizardPage.tsx';
 import { Shell } from './Shell.tsx';
 import { SignInPage, type SignInReason } from './SignIn.tsx';
@@ -149,6 +150,13 @@ const setupRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: 'settings/setup',
   component: WizardPage,
+});
+
+// Opening balances, wizard step 9 (T-0177, DL-0651); the API owns /setup/opening-balances.
+const openingBalancesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/setup/opening-balances',
+  component: OpeningBalancesPage,
 });
 
 // GL (T-0082, DL-0226): chart of accounts and manual journals under /accounting, listed on Reports.
@@ -496,6 +504,7 @@ const routeTree = rootRoute.addChildren([
     syncIssuesRoute,
     syncIssueRoute,
     setupRoute,
+    openingBalancesRoute,
     chartRoute,
     closeRoute,
     bankStatementsRoute,
