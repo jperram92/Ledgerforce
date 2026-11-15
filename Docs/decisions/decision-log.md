@@ -3547,3 +3547,16 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the new controller would otherwise be unreachable behind nginx, and the module is now imported by production code.
 - Alternatives: mount the routes under `/setup/posting-profiles` (rejected: the matrix is not only a setup screen; IA S13 lists it under Accounting).
 - ADR: ADR-0082 · Status: accepted
+
+### DL-0654 — The posting-profile matrix screen: words first, one fill panel, choices only from the API
+- Date: 2026-11-15 · By: claude · Task: T-0188 · Category: ui
+- Decision: `/accounting/posting-profiles` is listed with the accounting pages (beside the chart of accounts) and is linked from wizard step 7.
+  - **Layout.** Sales (customer types) and purchases (supplier types) are two tables, each with a "Product default" row.
+  - **Cell states.** Each cell says Default, Override or Gap in words. An override has a solid ink edge and a gap a dashed one. Following the Timeline direction (DL-0070), the mockup's red and teal are not used for state.
+  - **Narrow screens.** The tables scroll sideways inside a focusable region, so the page never scrolls sideways at 390 px.
+  - **Filling a gap.** "Fill the gap" opens one panel below the tables, and focus moves to its heading. The panel offers only the API's `choices` of the purpose's type (income for a sale, expense for a purchase), or a tax code for a tax gap. Gaps an override cannot fix (control account, profile kind) have no button; their message says why.
+  - **Retries.** The Idempotency-Key stays while the choice is unchanged, so a retry cannot apply twice.
+  - **Wording.** The " · " separator of the mockup is replaced by commas (genericness probe).
+- Why: P12 (words first), WCAG 1.4.1 (not colour alone), the ui-screen skill, ADR-0082 (choices come from the API, no accounting in the browser).
+- Alternatives: a side panel as in the mockup (at 1440 the matrix would need sideways scrolling); stacking rows into cards on phones (loses the table semantics that screen readers use to read row and column headers).
+- ADR: ADR-0082 · Status: accepted
