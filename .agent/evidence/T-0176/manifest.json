@@ -82,6 +82,87 @@
       "provider": "unknown",
       "timestamp": "2026-11-15T08:39:33.690Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-129",
+      "file": ".agent/evidence/T-0176/20261115-200636-SS-PLAT-129-company-empty-1440.png",
+      "test": "web/settings-company-tax.spec.ts › SS-PLAT-129: Company details: the Finance Admin follows step 1's link, saves the details and adds the first financial year @ 1440 [T-0176]",
+      "commit": "a21ac5a6b842",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:06:36.173Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-129",
+      "file": ".agent/evidence/T-0176/20261115-200637-SS-PLAT-129-company-saved-1440.png",
+      "test": "web/settings-company-tax.spec.ts › SS-PLAT-129: Company details: the Finance Admin follows step 1's link, saves the details and adds the first financial year @ 1440 [T-0176]",
+      "commit": "a21ac5a6b842",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:06:37.024Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-129",
+      "file": ".agent/evidence/T-0176/20261115-200638-SS-PLAT-129-tax-empty-1440.png",
+      "test": "web/settings-company-tax.spec.ts › SS-PLAT-129: Tax settings: the Finance Admin follows step 3's link, chooses the GST basis and BAS frequency and adds the standard codes @ 1440 [T-0176]",
+      "commit": "a21ac5a6b842-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:06:38.931Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-129",
+      "file": ".agent/evidence/T-0176/20261115-200639-SS-PLAT-129-tax-saved-1440.png",
+      "test": "web/settings-company-tax.spec.ts › SS-PLAT-129: Tax settings: the Finance Admin follows step 3's link, chooses the GST basis and BAS frequency and adds the standard codes @ 1440 [T-0176]",
+      "commit": "a21ac5a6b842-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:06:39.908Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-129",
+      "file": ".agent/evidence/T-0176/20261115-200640-SS-PLAT-129-company-read-only-1440.png",
+      "test": "web/settings-company-tax.spec.ts › SS-PLAT-129: an Accountant sees Company details read-only [T-0176]",
+      "commit": "a21ac5a6b842-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:06:40.827Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-129",
+      "file": ".agent/evidence/T-0176/20261115-200641-SS-PLAT-129-company-empty-390.png",
+      "test": "web/settings-company-tax.spec.ts › SS-PLAT-129: Company details: the Finance Admin follows step 1's link, saves the details and adds the first financial year @ 390 [T-0176]",
+      "commit": "a21ac5a6b842-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:06:41.869Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-129",
+      "file": ".agent/evidence/T-0176/20261115-200642-SS-PLAT-129-company-saved-390.png",
+      "test": "web/settings-company-tax.spec.ts › SS-PLAT-129: Company details: the Finance Admin follows step 1's link, saves the details and adds the first financial year @ 390 [T-0176]",
+      "commit": "a21ac5a6b842-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:06:42.668Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-129",
+      "file": ".agent/evidence/T-0176/20261115-200644-SS-PLAT-129-tax-empty-390.png",
+      "test": "web/settings-company-tax.spec.ts › SS-PLAT-129: Tax settings: the Finance Admin follows step 3's link, chooses the GST basis and BAS frequency and adds the standard codes @ 390 [T-0176]",
+      "commit": "a21ac5a6b842-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:06:44.721Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-129",
+      "file": ".agent/evidence/T-0176/20261115-200645-SS-PLAT-129-tax-saved-390.png",
+      "test": "web/settings-company-tax.spec.ts › SS-PLAT-129: Tax settings: the Finance Admin follows step 3's link, chooses the GST basis and BAS frequency and adds the standard codes @ 390 [T-0176]",
+      "commit": "a21ac5a6b842-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:06:45.781Z",
+      "result": "passed"
     }
   ]
 }
