@@ -1,0 +1,7 @@
+
+Running 3 tests using 2 workers
+
+[1/3] [chromium] › tests/e2e/web/bank-suggestion.spec.ts:216:3 › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 1440 [T-0160]
+[2/3] [chromium] › tests/e2e/web/bank-suggestion.spec.ts:264:1 › SS-UC08-08: an Auditor sees the suggestions but no Accept button [T-0160]
+[3/3] [chromium] › tests/e2e/web/bank-suggestion.spec.ts:216:3 › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 390 [T-0160]
+  3 passed (12.3s)
