@@ -31,6 +31,12 @@
 > - Never commit format-patch output (DL-0464).
 
 ## Open questions for human
+- **ADR-0079 (security, Proposed): may invoices print the company's own bank account?** T-0165 shows "details available on request" for bank transfer until this is decided. The proposal:
+  - a designated remittance account (a nullable `ar_settings.remittance_bank_account_id`, migration 0071);
+  - decrypting only that one account for customer documents, with each decryption audited;
+  - customer and supplier accounts never printed.
+
+  Printing a business's own receiving account is established practice, but this is a new security decision outside the DL-0477 delegation, so it waits for you. It blocks T-0180.
 - **(Resolved 2026-11-13, DL-0464/DL-0477; merged dbd19a5)** Security CI is red (Gitleaks, DL-0464, owner chose "Ignore + gzip").** The fix is in local stash `DL-0464 gitleaks WIP fix (awaiting owner permission)`. It is not pushed, because committing it was blocked as an oversight change: it edits the human-owned contract test `infra/test/security-workflow.contract.test.ts`, with an exception for commit 3a6bc91 only, .agent/wip T-0086/T-0089 only, and the rule sourcegraph-access-token only. The hits are 254 git object IDs in format-patch headers. To land it, run `git stash pop` and commit, or allow the commit.
 - **(Resolved 2026-11-13, DL-0466)** ADR-0062: the owner accepted option 1 (fan-out from the lf_migrator maintenance instance). T-0147 is unblocked.
 - **(Resolved by owner delegation, DL-0477)** **Refund permission (T-0152, blocked).** The catalogue has no permission for customer refunds, so the refund routes and screen, and the refund half of SS-UC11-08, cannot be built without a security ADR. Which permission (for example `ar.refund.create` / `ar.refund.pay`), which role templates get it, and does paying a refund go through the payment-batch SoD rules? (DL-0491)
