@@ -240,6 +240,8 @@ A row may only be `evidenced` if its task's cross-provider review passed.
 | SS-PLAT-120 | Setup wizard over HTTP: `GET /setup/wizard` returns the ten steps; `POST /setup/wizard/steps/:n/complete` completes a valid unlocked step once (idempotency key, 201 then 200, audited), a locked step 409 STEP_LOCKED, an invalid one 422 STEP_INVALID with `missing`; permission and tenant checks | — | MVP | db-integration (API) | no | apps/api/src/setup/wizard.db.test.ts | T-0157 | green | [.agent/evidence/T-0157/manifest.json](../../.agent/evidence/T-0157/manifest.json) | — |
 | SS-PLAT-121 | Wizard steps 3, 8 and 10 require the module-owned settings (GST basis and BAS frequency in tax; branding, payment terms and payment methods in ar) before they complete | — | MVP | db-integration | no | packages/modules/setup/src/wizard-settings.db.test.ts | T-0158 | green | [.agent/evidence/T-0158/manifest.json](../../.agent/evidence/T-0158/manifest.json) | — |
 | SS-PLAT-126 | A completed bank reconciliation locks its lines against unmatching; a statement that does not tie cannot be completed | UC-08 | MVP | db-integration | no | packages/modules/bank/src/reconciliation.db.test.ts | T-0061 | green | [.agent/evidence/T-0061/manifest.json](../../.agent/evidence/T-0061/manifest.json) | 31a4eb2 |
+| SS-PLAT-127 | Setup wizard screen: the ten steps with their state and what is missing in plain words, where each setting is entered (existing screen or said plainly), Complete on the open step only when nothing is missing, step 7 shows the gap check (no gaps on the AU template), refusals (STEP_INVALID with the missing list, STEP_LOCKED) in plain words, read-only without settings.setup.manage, forbidden without settings.read; a fresh company walks to "Setup is complete" | — | MVP | e2e-playwright | yes | tests/e2e/web/setup-wizard.spec.ts (route-faked API with the ADR-0075 shapes, 1440 and 390); apps/web/src/setup/wizard-logic.test.ts | T-0091 | green | [.agent/evidence/T-0091/manifest.json](../../.agent/evidence/T-0091/manifest.json) (latest: 20261115-033517-SS-PLAT-127-wizard-complete-1440.png, 20261115-033522-SS-PLAT-127-wizard-complete-390.png, 20261115-033516-SS-PLAT-127-wizard-step-7-no-gaps-1440.png) | 422aa16 |
+| SS-PLAT-128 | Setup wizard screen, step 9: an Owner or Finance Admin declares "no history" with a required reason, the reason is shown on the completed step, and NO_HISTORY_NOT_ALLOWED (an opening balance exists) is explained in plain words | — | MVP | e2e-playwright | yes | tests/e2e/web/setup-wizard.spec.ts | T-0091 | green | [.agent/evidence/T-0091/manifest.json](../../.agent/evidence/T-0091/manifest.json) (latest: 20261115-033527-SS-PLAT-128-wizard-step-9-declare-no-history-1440.png, 20261115-033528-SS-PLAT-128-wizard-step-9-no-history-done-1440.png) | 422aa16 |
 | SS-PLAT-UI-01 | Static UI pages load cleanly at 1440 and 390 with evidence | — | Sprint 0 | e2e-playwright | yes | tests/e2e/ui-mockups.spec.ts | T-0009 | green | [.agent/evidence/T-0009/manifest.json](../../.agent/evidence/T-0009/manifest.json) | 2e661fa |
 
 ## Platform scenarios (definitions)
@@ -699,6 +701,14 @@ Additional verified lifecycle (T-0166): GP-039 gross allowance 1,375.00, write-o
 ### SS-PLAT-121 — Wizard steps 3, 8 and 10 require module-owned settings
 - Phase: MVP · Layer: **db-integration** · Screenshot evidence: no · Task(s): T-0158 (RQ-0149, DL-0523)
 - **Given** a company without GST basis, BAS frequency, branding, payment terms or payment methods · **When** steps 3 and 8 are read · **Then** each missing setting is listed until its module stores it
+
+### SS-PLAT-127 — Setup wizard screen shows the steps and completes the open one
+- Phase: MVP · Layer: **e2e-playwright** · Screenshot evidence: yes · Task(s): T-0091 (DL-0600, DL-0601, DL-0602)
+- **Given** a Finance Admin of a fresh company on the AU template · **When** they open Settings › Set up your company and complete each open step · **Then** each step shows its state, what is missing in plain words and where it is entered; step 7's gap check shows no gaps; the wizard ends "Setup is complete: all 10 steps are done."; an Accountant sees the same steps with no actions
+
+### SS-PLAT-128 — Setup wizard screen declares "no history" on step 9
+- Phase: MVP · Layer: **e2e-playwright** · Screenshot evidence: yes · Task(s): T-0091 (DL-0600)
+- **Given** steps 1–8 are done and no opening balance is posted · **When** the Finance Admin writes why the company has no history and declares it · **Then** step 9 is done with the reason shown; an empty reason is not sent; with an opening balance the refusal is explained
 
 ## T-0112 PR integration regression evidence (2026-10-28)
 

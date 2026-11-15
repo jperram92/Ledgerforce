@@ -3367,3 +3367,36 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
   - An additive route over existing schema needs no ADR (cf. DL-0313).
 - Why: design §3.2 says roles are re-bound, never unbound. The chart UI and the setup wizard need it.
 - ADR: none · Status: accepted
+
+### DL-0600 — Setup wizard screen: one page at /settings/setup over the T-0157 routes (T-0091)
+- Date: 2026-11-15 · By: claude · Task: T-0091 · Category: ui
+- Decision:
+  - The wizard is one page, `/settings/setup` ("Set up your company"), listed first under Settings. It shows all ten steps as a numbered list. The open step carries its actions. There is no per-step route.
+  - IA S18 names `/setup/:step`, but the API serves `/setup/wizard` on the same origin (RQ-0025), so the web route stays under `/settings` as the other web pages avoid API prefixes (cf. `/bank/*` vs `/bank-rec`).
+  - The screen sends no `as_of`. The API checks against today in the tenant's time zone (ADR-0075). The browser derives no state: status, lock, validity and the missing list are shown as the API returns them.
+  - Complete appears only on the open step and only when the step lists nothing missing. Otherwise the screen says the step can be completed once nothing is missing and offers "Check again", which reads the wizard again. On step 9 with no opening balance, the primary action is "Declare no history and complete step 9" with a required reason (1–500 characters, trimmed; the module's limits). Each attempt uses a new Idempotency-Key. After any refusal the wizard is read again.
+  - Refusals in plain words: STEP_INVALID lists the API's `missing[]`; STEP_LOCKED says an earlier step is not done; NO_HISTORY_NOT_ALLOWED quotes the module's message.
+  - Without `settings.setup.manage` the steps are shown with no actions and a note that the Owner or a Finance Admin completes them. Without `settings.read` the forbidden state is shown and the wizard is not requested.
+- Why: the brief asks for the state, plain-word gaps and completion of the open step, with no setup rule in the browser (apps/web AGENTS.md).
+- Alternatives: a stepper with one route per step, as in mockup 08 (rejected for now: most steps have no form to show, see DL-0601); disabling Complete while something is missing (rejected: a disabled button does not explain itself, P6).
+- ADR: none · Status: accepted
+
+### DL-0601 — Wizard steps without a settings screen say so plainly; the forms are split to T-0176 and T-0177
+- Date: 2026-11-15 · By: claude · Task: T-0091 · Category: scope
+- Decision:
+  - Each step has a "where" line. Step 2 links to Chart of accounts, step 6 to Salesforce sync issues, and step 10 to People and roles, adding that approval amounts have no screen yet.
+  - Steps 1, 3, 4, 7 and 8 say "There is no LedgerForce screen for this yet: these settings are entered when your organisation is set up". Step 5 says Salesforce is connected from the package in the org. Step 9 says opening balances are imported from CSV through the API.
+  - T-0091 builds no settings forms. New cards: T-0176 (forms for steps 1, 3, 4, 8 and the approval amounts of step 10) and T-0177 (opening balances import with preview, and the posting-profile matrix of mockup 08).
+- Why: the brief forbids new settings forms in this card. The card's AC-1 ("wizard completes on a fresh tenant") needs them before a real tenant can finish setup through the UI.
+- ADR: none · Status: accepted
+
+### DL-0602 — T-0091 success scenarios SS-PLAT-127 and SS-PLAT-128; AC-1 proved against a route-faked API
+- Date: 2026-11-15 · By: claude · Task: T-0091 · Category: test
+- Decision:
+  - The card had no SS ids. Two new platform scenarios are added: SS-PLAT-127 (the steps, the missing list, completion to the end, step 7 showing no gaps, refusals, read-only) and SS-PLAT-128 (step 9 "no history").
+  - SS-PLAT-122 to 125 are unused in the register. They were left alone in case another branch holds them, and the next ids after the highest (126) were taken instead.
+  - AC-1 is proved at the screen layer, like every other web screen (close.spec.ts). `page.route` serves the ADR-0075 shapes, with a fake that derives status and lock as `wizardOf` does.
+  - The real-API half is already proved by SS-PLAT-118 to 121 (T-0123, T-0157, T-0158). No browser-to-real-API run exists, because the settings that steps 1–8 need cannot be entered through the UI yet (DL-0601).
+  - The evidence manifest records the honest commit, including `-dirty` while the spec run itself was rewriting the manifest.
+- Why: every SS id needs a test whose title starts with it. The lead's ID ranges (DL-0564) do not cover SS ids, so the next free ids were used.
+- ADR: none · Status: accepted
