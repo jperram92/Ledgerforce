@@ -7,7 +7,7 @@
   "lease_expires_at": null,
   "last_green_commit": null,
   "run_id": "2026-11-12-codex-r01",
-  "updated_at": "2026-11-15T20:23:21.104Z",
+  "updated_at": "2026-11-15T21:08:28.123Z",
   "phase": "sprint-0",
   "attempts": {
     "T-0010": 3,
