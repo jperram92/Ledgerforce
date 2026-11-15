@@ -24,6 +24,8 @@ export const SOD_SUBJECT_STEPS = {
   // DL-0477 / ADR-0072 (T-0132, T-0152; migration 0069): maker-checker for invoices and refunds.
   invoice: ['create', 'approve'],
   refund: ['create', 'approve'],
+  // T-0180 / ADR-0079 (migration 0071): maker-checker for the invoice remittance bank account.
+  remittance_change: ['request', 'approve'],
 } as const;
 
 export type SodSubjectType = keyof typeof SOD_SUBJECT_STEPS;
@@ -98,7 +100,8 @@ export type SodRuleId =
   | 'SOD_PERIOD_REOPEN_SELF_APPROVAL'
   | 'SOD_CREDIT_NOTE_SELF_APPROVAL'
   | 'SOD_INVOICE_SELF_APPROVAL'
-  | 'SOD_REFUND_SELF_APPROVAL';
+  | 'SOD_REFUND_SELF_APPROVAL'
+  | 'SOD_REMITTANCE_SELF_APPROVAL';
 
 export interface SodRule {
   /** Also the error code returned to the client and written to the audit log. */
@@ -235,6 +238,16 @@ export const SOD_RULES: readonly SodRule[] = Object.freeze([
     description: 'A customer refund is not approved by the person who created it.',
     step: 'refund.approve',
     conflictsWith: ['refund.create'],
+    condition: { kind: 'always' },
+    smallTeamException: true,
+  }),
+  rule({
+    id: 'SOD_REMITTANCE_SELF_APPROVAL',
+    designRef: '§6.5 rule 2 by analogy; ADR-0079, RQ-0150',
+    description:
+      'The bank account printed on customer invoices: whoever asks for a change cannot approve it.',
+    step: 'remittance_change.approve',
+    conflictsWith: ['remittance_change.request'],
     condition: { kind: 'always' },
     smallTeamException: true,
   }),

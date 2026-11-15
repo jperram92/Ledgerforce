@@ -10,3 +10,4 @@ export * from './refunds.ts';
 export * from './reminders.ts';
 export * from './reminder-pause.ts';
 export * from './invoice-settings.ts';
+export * from './remittance-account.ts';

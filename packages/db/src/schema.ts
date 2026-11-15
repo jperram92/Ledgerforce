@@ -842,6 +842,29 @@ export interface ArSettingsTable {
   logo_content_type: Generated<'image/png' | 'image/jpeg' | null>;
   default_payment_terms_days: Generated<number | null>;
   accepted_payment_methods: Generated<('bank_transfer' | 'stripe')[] | null>;
+  /**
+   * Migration 0071 (T-0180, ADR-0079): the invoice remittance bank account. Written only by an
+   * approved app.remittance_account_change in the same transaction (database guard).
+   */
+  remittance_bank_account_id: Generated<string | null>;
+}
+
+/** Migration 0071 (T-0180, ADR-0079): maker-checker changes of the remittance bank account. */
+export interface RemittanceAccountChangeTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  /** NULL asks to remove the remittance account. */
+  bank_account_id: string | null;
+  previous_bank_account_id: string | null;
+  status: Generated<'requested' | 'approved' | 'rejected'>;
+  requested_by: string;
+  requested_at: Generated<Date>;
+  decided_by: Generated<string | null>;
+  decided_at: Generated<Date | null>;
+  /** Set by the guard trigger on approval (xid8); never written by the application. */
+  decided_xact: ColumnType<string | null, never, never>;
+  reason: Generated<string | null>;
 }
 
 /** Migration 0067 (T-0158, ADR-0071): GST basis and BAS frequency per company, effective-dated. */
@@ -1344,6 +1367,7 @@ export interface Database {
   'app.payment_batch_confirmation': PaymentBatchConfirmationTable;
   'app.customer_refund': CustomerRefundTable;
   'app.customer_refund_approval': CustomerRefundApprovalTable;
+  'app.remittance_account_change': RemittanceAccountChangeTable;
   'app.opening_balance': OpeningBalanceTable;
   'app.opening_balance_item': OpeningBalanceItemTable;
   'app.payment_batch_refund': PaymentBatchRefundTable;
