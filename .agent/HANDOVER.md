@@ -373,3 +373,4 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-14T03:46:16.839Z claude: release T-0144 → review (verify at fd27adb: VERIFY OK (2c PENDING, 8 Codex))
 - 2026-11-14T08:59:56.564Z claude: release T-0146 → todo (stopped for wrap-up: RED test draft saved in .agent/wip/T-0146; permission decided (settings.chart.manage); see card notes)
 - 2026-11-15T03:26:20.269Z claude: T-0146 → verifying
+- 2026-11-15T03:45:08.955Z claude: release T-0146 → review (verify at 895e443: VERIFY OK (2c PENDING, 8 Codex))
