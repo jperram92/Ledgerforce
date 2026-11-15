@@ -583,6 +583,9 @@ importers:
       '@ledgerforce/ar':
         specifier: workspace:*
         version: link:../ar
+      '@ledgerforce/bank':
+        specifier: workspace:*
+        version: link:../bank
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../db
@@ -639,6 +642,9 @@ importers:
       '@ledgerforce/ar':
         specifier: workspace:*
         version: link:../ar
+      '@ledgerforce/bank':
+        specifier: workspace:*
+        version: link:../bank
       '@ledgerforce/gl':
         specifier: workspace:*
         version: link:../gl
@@ -648,6 +654,9 @@ importers:
       '@ledgerforce/products':
         specifier: workspace:*
         version: link:../products
+      '@ledgerforce/shared':
+        specifier: workspace:*
+        version: link:../../shared
       '@ledgerforce/tax':
         specifier: workspace:*
         version: link:../tax

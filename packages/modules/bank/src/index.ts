@@ -5,3 +5,4 @@ export * from './statements.ts';
 export * from './matcher.ts';
 export * from './matching.ts';
 export * from './reconciliation.ts';
+export * from './remittance.ts';

@@ -12,6 +12,7 @@ import { createDb, databaseUrlFromEnv } from '@ledgerforce/db';
 import { PdfRenderer } from '@ledgerforce/documents';
 import { invoiceEmailHandler, reminderEmailHandler, SmtpSender } from '@ledgerforce/email';
 import { enqueue, HandlerRegistry, runtimeBossOptions } from '@ledgerforce/outbox';
+import { kmsFromEnv } from '@ledgerforce/shared/crypto';
 import { sql } from 'kysely';
 import { PgBoss } from 'pg-boss';
 import { batchApprovedHandler, startBatchWorker } from './batch-jobs.ts';
@@ -59,9 +60,13 @@ registry.register(batchApprovedHandler({ boss }));
 // are delivered to no email handler and recorded as such, and the gap is logged at start.
 // Invoice PDFs are rendered with Chromium (T-0119 adds it to the worker image).
 const renderer = new PdfRenderer();
+// The KMS (ADR-0018) lets invoices print the company's designated remittance account (ADR-0079).
+// Without LF_KMS_PROVIDER they say the bank details are available on request.
+const kms = await kmsFromEnv(process.env);
+if (!kms) console.warn('LF_KMS_PROVIDER not set: invoices print no remittance bank account');
 if (process.env['LF_SMTP_URL'] && process.env['LF_SMTP_FROM']) {
   const sender = SmtpSender.fromEnv(process.env);
-  registry.register(invoiceEmailHandler({ sender, renderer }));
+  registry.register(invoiceEmailHandler({ sender, renderer, kms }));
   registry.register(reminderEmailHandler({ sender }));
 } else {
   console.warn('LF_SMTP_URL / LF_SMTP_FROM not set: invoice and reminder emails are not sent');

@@ -1,13 +1,20 @@
 /**
  * Load a posted sales invoice as the document model the templates render (T-0041). Reads only.
  * With the company's invoice settings (T-0158) it carries the branding, the logo bytes and the
- * accepted payment methods (T-0165), read through @ledgerforce/ar. Remittance bank details are not
- * loaded: choosing the account and printing its number await ADR-0079 (RQ-0159, T-0180).
+ * accepted payment methods (T-0165), read through @ledgerforce/ar.
+ *
+ * Remittance details (T-0180, ADR-0079): when the caller renders a customer document and passes the
+ * KMS, the company accepts bank transfer and it has a designated remittance account in the
+ * invoice's currency, `bankTransfer` carries that account's name, BSB and decrypted number. This is
+ * the render path; the returned document must not be stored, logged or published. Without a KMS
+ * nothing is decrypted and the block says the details are available on request.
  */
 import { invoiceLogoOf, invoiceSettingsOf } from '@ledgerforce/ar';
+import { remittanceDetailsOf } from '@ledgerforce/bank';
 import type { Database } from '@ledgerforce/db';
+import type { Kms } from '@ledgerforce/shared/crypto';
 import { sql, type Transaction } from 'kysely';
-import type { InvoiceBranding, InvoiceDocument } from './invoice-html.ts';
+import type { InvoiceBranding, InvoiceDocument, InvoiceRemittanceView } from './invoice-html.ts';
 
 export class DocumentError extends Error {
   readonly code: 'NOT_FOUND' | 'NOT_POSTED';
@@ -18,10 +25,17 @@ export class DocumentError extends Error {
   }
 }
 
+/** How a document is loaded for rendering. */
+export interface InvoiceDocumentOptions {
+  /** Render path only: decrypt the designated remittance account (ADR-0079). */
+  readonly kms?: Kms | null;
+}
+
 export async function loadInvoiceDocument(
   trx: Transaction<Database>,
   companyId: string,
   invoiceId: string,
+  opts: InvoiceDocumentOptions = {},
 ): Promise<InvoiceDocument> {
   const h = (
     await sql<{
@@ -72,6 +86,12 @@ export async function loadInvoiceDocument(
           logo: settings.logo ? await invoiceLogoOf(trx, companyId) : null,
         }
       : null;
+  let bankTransfer: InvoiceRemittanceView | null = null;
+  if (opts.kms && settings.acceptedPaymentMethods?.includes('bank_transfer')) {
+    const r = await remittanceDetailsOf(trx, opts.kms, companyId, { currency: h.currency });
+    if (r)
+      bankTransfer = { accountName: r.accountName, bsb: r.bsb, accountNumber: r.accountNumber };
+  }
   return {
     supplier: { legalName: h.supplier, abn: h.supplier_abn },
     customer: { name: h.customer, abn: h.customer_abn },
@@ -94,5 +114,6 @@ export async function loadInvoiceDocument(
     gross: h.gross_total,
     branding,
     acceptedPaymentMethods: settings.acceptedPaymentMethods,
+    bankTransfer,
   };
 }

@@ -3,19 +3,27 @@
  * in-process SMTP sink speaking real SMTP to nodemailer. The invoice email is driven by the
  * `ar.invoice.posted` outbox event that T-0040 publishes; the PDF is rendered by T-0041.
  */
-import { randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import {
   approveInvoice,
+  approveRemittanceAccountChange,
   createDraftInvoice,
+  requestRemittanceAccountChange,
   setInvoiceSettings,
   type DocumentEvent,
   type DocumentOutbox,
 } from '@ledgerforce/ar';
-import { PdfRenderer, type InvoicePaymentLinkProvider } from '@ledgerforce/documents';
+import { createCompanyBankAccount } from '@ledgerforce/bank';
+import {
+  PdfRenderer,
+  REMITTANCE_PHONE_CHECK,
+  type InvoicePaymentLinkProvider,
+} from '@ledgerforce/documents';
 import { auServicesSmb } from '@ledgerforce/gl';
 import { entrySeriesFor, SOURCE_TYPES } from '@ledgerforce/ledger';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
 import { seedPostingProfiles, setPartyProfiles } from '@ledgerforce/products';
+import { LocalKeyringKms } from '@ledgerforce/shared/crypto';
 import { seedTaxCodes } from '@ledgerforce/tax';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { EmailError, invoiceEmailHandler, sendRemittanceAdvice } from './invoice-email.ts';
@@ -307,5 +315,49 @@ describe('SS-UC01-15: the emailed invoice follows the accepted payment methods (
     expect(raw).toContain('Pay online: https://buy.stripe.com/test_t0165');
     expect(raw).toContain('Pay by bank transfer');
     expect(raw).toContain('Pay online by card (Stripe)');
+  }, 60_000);
+
+  it('SS-UC01-16 with a KMS the emailed invoice prints the designated remittance account and the phone line; the delivery record holds no number [T-0180]', async () => {
+    const kms = LocalKeyringKms.fromJson(
+      JSON.stringify({ active: 'k1', keys: { k1: randomBytes(32).toString('base64') } }),
+    );
+    const maker = await f.addUser('finance_admin');
+    const checker = await f.addUser('owner');
+    const changeId = randomUUID();
+    await f.inTenant(async (trx) => {
+      const account = await createCompanyBankAccount(trx, kms, f.companyId, {
+        glAccountId: f.acct['1010'] ?? '',
+        name: 'Operating',
+        bsb: '062000',
+        accountNumber: '31415926',
+        accountName: 'Harbour Co Pty Ltd',
+        currency: 'AUD',
+      });
+      await setInvoiceSettings(trx, f.companyId, { acceptedPaymentMethods: ['bank_transfer'] });
+      await requestRemittanceAccountChange(trx, {
+        companyId: f.companyId,
+        changeId,
+        bankAccountId: account,
+        requestedBy: maker,
+      });
+    });
+    await f.inTenant((trx) =>
+      approveRemittanceAccountChange(trx, {
+        companyId: f.companyId,
+        changeId,
+        approvedBy: checker,
+      }),
+    );
+    const event = await postInvoice('2026-11-12');
+    const handler = invoiceEmailHandler({ sender, renderer, kms });
+    await f.inTenant((trx) => handler.handle(trx, event));
+    const raw = unfolded(sink.messages.at(-1)?.raw).replace(/\s+/g, ' ');
+    expect(raw).toContain('31415926');
+    expect(raw).toContain('062-000');
+    expect(raw).toContain(REMITTANCE_PHONE_CHECK);
+    const stored = await f.admin.query<{ n: string }>(
+      `SELECT count(*)::text AS n FROM app.email_delivery t WHERE to_jsonb(t)::text LIKE '%31415926%'`,
+    );
+    expect(stored.rows[0]?.n).toBe('0');
   }, 60_000);
 });
