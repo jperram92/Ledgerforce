@@ -24,7 +24,12 @@ import {
   StepUpRequired,
   type MfaPolicy,
 } from '../authz/mfa.ts';
-import { PermissionDenied, routeAccess, stepUpOf } from '../authz/permission.decorator.ts';
+import {
+  PermissionDenied,
+  routeAccess,
+  stepUpOf,
+  stepUpWhenOf,
+} from '../authz/permission.decorator.ts';
 import type { Clock } from '../auth/session.service.ts';
 import { runInTenantTx } from './tenant-tx.ts';
 import { sodOf } from '../sod/sod.decorator.ts';
@@ -87,6 +92,7 @@ export class TenantInterceptor implements NestInterceptor {
     const access = routeAccess(ctx.getHandler(), ctx.getClass());
     if (access.kind === 'public') return next.handle();
     const stepUp = stepUpOf(ctx.getHandler(), ctx.getClass(), access);
+    const stepUpWhen = stepUpWhenOf(ctx.getHandler(), ctx.getClass());
     const sod = sodOf(ctx.getHandler());
     const req = ctx.switchToHttp().getRequest<Request>();
     return from(this.resolver.resolve(req)).pipe(
@@ -115,7 +121,9 @@ export class TenantInterceptor implements NestInterceptor {
             }
             if (
               stepUp !== null &&
-              !(principal && stepUpSatisfied(principal, stepUp, this.clock.now(), this.mfa))
+              !(principal && stepUpSatisfied(principal, stepUp, this.clock.now(), this.mfa)) &&
+              // A conditional step-up (ADR-0083) asks the route, under RLS, whether it applies.
+              (stepUpWhen === null || (await stepUpWhen(req, trx)))
             ) {
               throw new StepUpRequired(stepUp);
             }

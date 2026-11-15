@@ -14,3 +14,5 @@ export const POSTING_OUTBOX = Symbol('POSTING_OUTBOX');
 export const STRIPE_WEBHOOK = Symbol('STRIPE_WEBHOOK');
 /** Document event outbox (write-back snapshots); null makes routes that publish one answer 503. */
 export const DOCUMENT_OUTBOX = Symbol('DOCUMENT_OUTBOX');
+/** Stripe refunds (ADR-0083): the Stripe client; null makes `method: stripe` unavailable. */
+export const STRIPE_REFUNDS = Symbol('STRIPE_REFUNDS');

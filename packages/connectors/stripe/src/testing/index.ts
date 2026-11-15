@@ -19,3 +19,11 @@ export const REFUNDS_FIXTURE = new URL(
   '../../fixtures/documented/stripe-refunds-20261102.json',
   import.meta.url,
 );
+
+/** The documented fixture of refunds sent by an approved refund document (T-0172, RQ-0163). */
+export const APPROVED_REFUNDS_FIXTURE = new URL(
+  '../../fixtures/documented/stripe-refunds-approved-20261115.json',
+  import.meta.url,
+);
+
+export { seedStripePaidCredit, type StripePaidCredit } from './stripe-paid-credit.ts';

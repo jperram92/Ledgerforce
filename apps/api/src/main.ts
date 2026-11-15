@@ -1,3 +1,4 @@
+import { StripeClient } from '@ledgerforce/connector-stripe';
 import { bossRequeue, enqueue, ledgerOutbox, runtimeBossOptions } from '@ledgerforce/outbox';
 import { PgBoss } from 'pg-boss';
 import { createApi } from './app.ts';
@@ -23,6 +24,10 @@ const api = await createApi({
   ...options,
   syncRequeue: bossRequeue(boss),
   postingOutbox: ledgerOutbox(boss),
+  // Stripe refunds sent on approval (T-0172, ADR-0083); without a key `method: stripe` is refused.
+  ...(process.env['LF_STRIPE_SECRET_KEY']
+    ? { stripeRefunds: { client: StripeClient.fromEnv(process.env) } }
+    : {}),
   // Document events (e.g. the Stripe receipt's `payment.received` write-back, T-0074).
   documentOutbox: {
     publish: async (trx, e) => {

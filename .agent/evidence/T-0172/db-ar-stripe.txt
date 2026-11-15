@@ -1,0 +1,12 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a1d33617443f758e4
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37659
+
+ Test Files  19 passed (19)
+      Tests  93 passed (93)
+   Start at  08:47:19
+   Duration  47.70s (transform 2.12s, setup 0ms, import 9.16s, tests 33.80s, environment 2ms)
+
+[vitest-pool]: Timeout terminating forks worker for test files /home/user/Ledgerforce/.claude/worktrees/agent-a1d33617443f758e4/packages/modules/ar/src/payment-terms.db.test.ts.
+exit=0

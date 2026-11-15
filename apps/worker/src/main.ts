@@ -11,7 +11,8 @@ import { writeFileSync } from 'node:fs';
 import { createDb, databaseUrlFromEnv } from '@ledgerforce/db';
 import { PdfRenderer } from '@ledgerforce/documents';
 import { invoiceEmailHandler, reminderEmailHandler, SmtpSender } from '@ledgerforce/email';
-import { enqueue, HandlerRegistry, runtimeBossOptions } from '@ledgerforce/outbox';
+import { StripeClient, stripeRefundSendHandler } from '@ledgerforce/connector-stripe';
+import { enqueue, HandlerRegistry, ledgerOutbox, runtimeBossOptions } from '@ledgerforce/outbox';
 import { kmsFromEnv } from '@ledgerforce/shared/crypto';
 import { sql } from 'kysely';
 import { PgBoss } from 'pg-boss';
@@ -70,6 +71,18 @@ if (process.env['LF_SMTP_URL'] && process.env['LF_SMTP_FROM']) {
   registry.register(reminderEmailHandler({ sender }));
 } else {
   console.warn('LF_SMTP_URL / LF_SMTP_FROM not set: invoice and reminder emails are not sent');
+}
+// Approved Stripe refunds whose send failed at approval are retried here (T-0172, ADR-0083).
+// Without LF_STRIPE_SECRET_KEY the events wait undelivered to this handler and the gap is logged.
+if (process.env['LF_STRIPE_SECRET_KEY']) {
+  registry.register(
+    stripeRefundSendHandler({
+      client: StripeClient.fromEnv(process.env),
+      posting: { outbox: ledgerOutbox(boss) },
+    }),
+  );
+} else {
+  console.warn('LF_STRIPE_SECRET_KEY not set: approved Stripe refunds are not retried');
 }
 await startOutboxWorker({ boss, db, registry });
 // Approved billing batches, one job per batch (T-0120).

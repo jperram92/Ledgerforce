@@ -1,4 +1,7 @@
-import { ForbiddenException, SetMetadata } from '@nestjs/common';
+import { applyDecorators, ForbiddenException, SetMetadata } from '@nestjs/common';
+import type { Database } from '@ledgerforce/db';
+import type { Request } from 'express';
+import type { Transaction } from 'kysely';
 import { STEP_UP_PERMISSIONS, type Permission } from '@ledgerforce/shared/rbac';
 import { IS_PUBLIC } from '../tenancy/public.decorator.ts';
 import { DEFAULT_STEP_UP_MAX_AGE_SECONDS, isValidMaxAge } from './mfa.ts';
@@ -6,6 +9,13 @@ import { DEFAULT_STEP_UP_MAX_AGE_SECONDS, isValidMaxAge } from './mfa.ts';
 export const REQUIRED_PERMISSION = 'lf:requiredPermission';
 export const ANY_MEMBER = 'lf:anyMember';
 export const STEP_UP = 'lf:stepUpMaxAge';
+export const STEP_UP_WHEN = 'lf:stepUpWhen';
+
+/**
+ * A condition for a route's step-up (ADR-0083): evaluated by TenantInterceptor inside the tenant
+ * transaction, after the permission check. Return true when this request needs the step-up.
+ */
+export type StepUpCondition = (req: Request, trx: Transaction<Database>) => Promise<boolean>;
 
 /**
  * The route needs `permission` (design §6.4, ADR-0023). Checked centrally by TenantInterceptor
@@ -24,14 +34,22 @@ export const AnyMember = (): MethodDecorator & ClassDecorator => SetMetadata(ANY
  */
 export const RequireStepUp = (
   maxAgeSeconds: number = DEFAULT_STEP_UP_MAX_AGE_SECONDS,
+  when?: StepUpCondition,
 ): MethodDecorator & ClassDecorator => {
   if (!isValidMaxAge(maxAgeSeconds)) {
     throw new Error(
       `RequireStepUp: max age must be whole seconds in 1..3600, got ${String(maxAgeSeconds)}`,
     );
   }
-  return SetMetadata(STEP_UP, maxAgeSeconds);
+  return when
+    ? applyDecorators(SetMetadata(STEP_UP, maxAgeSeconds), SetMetadata(STEP_UP_WHEN, when))
+    : SetMetadata(STEP_UP, maxAgeSeconds);
 };
+
+/** The route's step-up condition (ADR-0083), or null when the step-up is unconditional. */
+export function stepUpWhenOf(handler: Target, cls: Target): StepUpCondition | null {
+  return meta<StepUpCondition>(STEP_UP_WHEN, handler, cls) ?? null;
+}
 
 export type RouteAccess =
   | { kind: 'public' }

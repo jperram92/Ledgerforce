@@ -195,6 +195,12 @@ export interface CustomerRefund {
   approved_at: string | null;
   entry_id: string | null;
   paid_on: string | null;
+  /** Stripe refunds only (T-0172, ADR-0083): what happened to the send at Stripe. */
+  stripe?: {
+    status: 'not_sent' | 'pending' | 'sent' | 'failed';
+    stripe_refund_id: string | null;
+    message: string | null;
+  };
 }
 
 export interface RefundRequest {
@@ -202,7 +208,7 @@ export interface RefundRequest {
   party_id: string;
   refund_date: string;
   amount: string;
-  method: 'bank_batch';
+  method: 'bank_batch' | 'stripe';
   reason?: string;
 }
 
@@ -215,7 +221,7 @@ export interface PartyCredit {
 }
 
 export interface RefundJournal extends InvoiceJournal {
-  bank_account_source: 'chosen' | 'batch' | 'only_bank_account';
+  bank_account_source: 'chosen' | 'batch' | 'only_bank_account' | 'stripe_clearing';
 }
 
 export interface SalesClient {

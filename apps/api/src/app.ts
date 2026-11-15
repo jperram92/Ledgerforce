@@ -2,7 +2,7 @@ import { ApBillCodingController, ApBillsController } from './ap/bills.controller
 import { ApInboxController } from './ap/inbox.controller.ts';
 import { ApPaymentBatchesController } from './ap/payment-batches.controller.ts';
 import { ArReceiptsController } from './ar/receipts.controller.ts';
-import { ArRefundsController } from './ar/refunds.controller.ts';
+import { ArRefundsController, type StripeRefundsOptions } from './ar/refunds.controller.ts';
 import { OpeningBalancesController } from './setup/opening-balances.controller.ts';
 import { SetupWizardController } from './setup/wizard.controller.ts';
 import { CompanySettingsController } from './settings/company-settings.controller.ts';
@@ -63,7 +63,7 @@ import { SyncIssuesController } from './sync/sync-issues.controller.ts';
 import { CLOCK, DB, KMS, MFA_POLICY, SYNC_REQUEUE } from './tokens.ts';
 import type { DeliveryRequeue } from '@ledgerforce/outbox';
 import type { PostingOutbox } from '@ledgerforce/ledger';
-import { DOCUMENT_OUTBOX, POSTING_OUTBOX, STRIPE_WEBHOOK } from './tokens.ts';
+import { DOCUMENT_OUTBOX, POSTING_OUTBOX, STRIPE_REFUNDS, STRIPE_WEBHOOK } from './tokens.ts';
 
 export interface ApiOptions {
   /** Connection string for lf_app (never a superuser or the migrator). */
@@ -95,6 +95,11 @@ export interface ApiOptions {
   stripeWebhook?: StripeWebhookOptions;
   /** Document events (write-back snapshots), written in the request's transaction. */
   documentOutbox?: DocumentOutbox;
+  /**
+   * Stripe refunds (ADR-0083, T-0172): the Stripe client the approve step sends refunds with.
+   * Without it (or without `documentOutbox` and `postingOutbox`) `method: stripe` is refused.
+   */
+  stripeRefunds?: StripeRefundsOptions;
   /** Security headers, trusted proxy hops and rate limits (ADR-0054, T-0142). */
   security?: SecurityOptions;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
@@ -171,6 +176,7 @@ class AppModule {
     postingOutbox: PostingOutbox | null,
     stripeWebhook: StripeWebhookOptions | null,
     documentOutbox: DocumentOutbox | null,
+    stripeRefunds: StripeRefundsOptions | null,
   ): DynamicModule {
     return {
       module: AppModule,
@@ -225,6 +231,7 @@ class AppModule {
         { provide: POSTING_OUTBOX, useValue: postingOutbox },
         { provide: STRIPE_WEBHOOK, useValue: stripeWebhook },
         { provide: DOCUMENT_OUTBOX, useValue: documentOutbox },
+        { provide: STRIPE_REFUNDS, useValue: stripeRefunds },
         TenantTx,
         AuditTrail,
         Authz,
@@ -284,6 +291,7 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
       opts.postingOutbox ?? null,
       opts.stripeWebhook ?? null,
       opts.documentOutbox ?? null,
+      opts.stripeRefunds ?? null,
     ),
     {
       logger: ['error', 'warn'],

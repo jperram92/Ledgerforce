@@ -3639,4 +3639,46 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: T-0180 delivers the migration, the maker-checker module, the routes and the render path (about 1,000 changed lines with tests, well over the ~400-line split rule). AC-3 (wizard step 8 lists a missing remittance account) and the request/approve screen move to the new card T-0183, which depends on T-0180 and T-0176. AC-3 changes step-8 fixtures in the setup, wizard-flow and API setup tests, which belong with the wizard work.
 - Why: The brief's split rule. The first slice is complete and verified on its own.
 - Alternatives: one oversized card.
+
+### DL-0660 — ADR-0083: a Stripe refund is sent by the approve step, once, with step-up (T-0172)
+- Date: 2026-11-15 · By: claude under DL-0562 / DL-0477 item 3 · Task: T-0172 · Category: security
+- Decision: Accept ADR-0083. `POST /ar/refunds/:id/approve` for a Stripe refund needs a step-up no older than 300 s (`@RequireStepUp(300, stripeRefundOnly)`); SoD stays `SOD_REFUND_SELF_APPROVAL`. The approval and an outbox event `ar.refund.stripe_approved` commit together; the send runs in a savepoint (Idempotency-Key `lf-refund-v2-<refund id>`, posting key `ar-refund:<refund id>`, GP-006 Stripe variant); a failure leaves the refund approved for the outbox handler `stripe.refund.send`. Bank refunds keep their rules (step-up at batch release).
+- Why: DL-0562 (approving a Stripe refund moves money at once); RQ-0163 (keys, retries, payment choice). Design §6.2, §6.5, §3.9, §5.6.
+- Alternatives: step-up on every refund approval (rejected: bank refunds already step up at release); controller-side check (rejected: authorisation stays in the interceptor); worker-only send (kept as the retry path only).
+- ADR: ADR-0083 · Status: accepted (owner delegation)
+
+### DL-0661 — Conditional step-up: `RequireStepUp(maxAge, when)` evaluated by the interceptor (T-0172)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: security
+- Decision: `RequireStepUp` takes an optional `StepUpCondition (req, trx) => Promise<boolean>`. TenantInterceptor evaluates it inside the tenant transaction, after the permission check and only when the session's step-up is not fresh; the step-up is required when it returns true. The refunds route's condition reads the refund's method under RLS; a refund that is not found (another tenant) needs none and the handler answers 404. Routes without a condition are unchanged.
+- Why: DL-0562 scopes step-up to Stripe refunds; apps/api AGENTS.md keeps authorisation out of controllers. Needs the security-reviewer at cross-review.
+- ADR: ADR-0083 · Status: accepted
+
+### DL-0662 — Which Stripe payment a refund document refunds, without a schema change (T-0172)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: accounting
+- Decision: A Stripe refund document refunds the party's oldest posted credit note whose open credit and whose invoice's stored Stripe payment (less earlier Stripe refunds) both cover the amount; one document refunds one payment. Checked at request time (422 `NO_STRIPE_PAYMENT`) and again at send time. `stripe_refund.entry_id = customer_refund.entry_id` links the records; no migration (DL-0569). The journal is the Approved GP-006 Stripe variant (Dr AR control / Cr `setting:stripe.clearing_account`), dated the send date in the tenant's report time zone; a Stripe refund dated after today is NOT_DUE at approval. The journal preview of a Stripe refund credits Stripe clearing (`bank_account_source: stripe_clearing`).
+- Why: RQ-0163 findings 1–2, 7; a Stripe refund can only go back to the payment it refunds.
+- ADR: ADR-0083 · Status: accepted
+
+### DL-0663 — Retry window and failure classes for Stripe refund sends (T-0172)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: integration
+- Decision: Transient failures (Stripe unreachable, 429, 5xx) return `pending` at approval and are retried by pg-boss backoff through the outbox. Stripe 4xx and local refusals are permanent (`retryable: false` → Sync issue). No automatic send more than 23 hours after the approval (database clock), `KEY_EXPIRED`, because Stripe may prune keys after 24 hours. A repeated approve replays the stored state and does not send from the request.
+- Why: RQ-0163 findings 3–5 (RQ-0115 S5; pg-boss schedule ≤ about 20.5 h).
+- ADR: ADR-0083 · Status: accepted
+
+### DL-0664 — T-0172 follow-up cards T-0189 (expired send reconciliation) and T-0190 (cancel a refused Stripe refund)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: process
+- Decision: Open T-0189 (list the PaymentIntent's refunds at Stripe and match `lf_refund_id` before any resend after KEY_EXPIRED) and T-0190 (cancel an approved Stripe refund Stripe refused, so its amount stops counting as requested).
+- Why: both are outside the card's acceptance criteria and need a GET contract fixture and a new route.
+- ADR: none · Status: accepted
+
+### DL-0665 — `refundCreditViaStripe` routed through the approved refund document; SS-UC11-04 tests adapted (T-0172 AC-3)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: process
+- Decision: `refundCreditViaStripe` now requires the id of an approved Stripe refund document with the same amount and uses `sendStripeCustomerRefund`. The two SS-UC11-04 tests create and approve that document first; Acme first pays the invoice SS-UC03-05 left unpaid, because a refund document refunds only what the customer is owed overall (T-0055). The "beyond the credit / no Stripe payment" test now asserts the refusal at request time (`REFUND_EXCEEDS_CREDIT`, `NO_STRIPE_PAYMENT`) and still that Stripe is not called. The documented fixture `stripe-refunds-20261102.json` is kept unchanged; the tests use the new `stripe-refunds-approved-20261115.json` (key per refund document). No assertion was weakened: the same outcomes are checked through the now mandatory path.
+- Why: AC-3 (no Stripe refund without an approved document).
+- ADR: ADR-0083 · Status: accepted
+
+### DL-0666 — apps/worker depends on @ledgerforce/connector-stripe (workspace package)
+- Date: 2026-11-15 · By: claude · Task: T-0172 · Category: tooling
+- Decision: The worker registers `stripeRefundSendHandler` when `LF_STRIPE_SECRET_KEY` is set (else a start-up warning), and the API configures `stripeRefunds` the same way. The workspace dependency adds three lockfile lines; no third-party dependency (no ADR needed).
+- Why: the outbox retry must run somewhere (ADR-0008).
 - ADR: none · Status: accepted
