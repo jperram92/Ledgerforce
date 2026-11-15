@@ -1,0 +1,66 @@
+
+Running 3 tests using 2 workers
+
+[1/3] [chromium] › tests/e2e/web/bank-suggestion.spec.ts:216:3 › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 1440 [T-0160]
+[2/3] [chromium] › tests/e2e/web/bank-suggestion.spec.ts:264:1 › SS-UC08-08: an Auditor sees the suggestions but no Accept button [T-0160]
+  1) [chromium] › tests/e2e/web/bank-suggestion.spec.ts:216:3 › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 1440 [T-0160] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Accept RCT-000042 for Deposit Acme 01 Pty Ltd, 3 Dec 2026' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Accept RCT-000042 for Deposit Acme 01 Pty Ltd, 3 Dec 2026' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Accept RCT-000042 for Deposit Acme 01 Pty Ltd, 3 Dec 2026' })
+
+
+      228 |       name: 'Accept RCT-000042 for Deposit Acme 01 Pty Ltd, 3 Dec 2026',
+      229 |     });
+    > 230 |     await expect(accept42).toBeVisible();
+          |                            ^
+      231 |     await expect(
+      232 |       page.getByRole('button', {
+      233 |         name: 'Accept RCT-000041 for Deposit Acme 01 Pty Ltd, 3 Dec 2026',
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/tests/e2e/web/bank-suggestion.spec.ts:230:28
+
+    Error Context: test-results/web-bank-suggestion-SS-UC0-7108c-ine-is-matched-1440-T-0160--chromium/error-context.md
+
+    Error Context: test-results/web-bank-suggestion-SS-UC0-7108c-ine-is-matched-1440-T-0160--chromium/error-context.md
+
+
+[3/3] [chromium] › tests/e2e/web/bank-suggestion.spec.ts:216:3 › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 390 [T-0160]
+  2) [chromium] › tests/e2e/web/bank-suggestion.spec.ts:216:3 › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 390 [T-0160] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Accept RCT-000042 for Deposit Acme 01 Pty Ltd, 3 Dec 2026' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Accept RCT-000042 for Deposit Acme 01 Pty Ltd, 3 Dec 2026' }) with timeout 5000ms
+      - waiting for getByRole('button', { name: 'Accept RCT-000042 for Deposit Acme 01 Pty Ltd, 3 Dec 2026' })
+
+
+      228 |       name: 'Accept RCT-000042 for Deposit Acme 01 Pty Ltd, 3 Dec 2026',
+      229 |     });
+    > 230 |     await expect(accept42).toBeVisible();
+          |                            ^
+      231 |     await expect(
+      232 |       page.getByRole('button', {
+      233 |         name: 'Accept RCT-000041 for Deposit Acme 01 Pty Ltd, 3 Dec 2026',
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/tests/e2e/web/bank-suggestion.spec.ts:230:28
+
+    Error Context: test-results/web-bank-suggestion-SS-UC0-4c333-line-is-matched-390-T-0160--chromium/error-context.md
+
+    Error Context: test-results/web-bank-suggestion-SS-UC0-4c333-line-is-matched-390-T-0160--chromium/error-context.md
+
+
+  2 failed
+    [chromium] › tests/e2e/web/bank-suggestion.spec.ts:216:3 › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 1440 [T-0160] 
+    [chromium] › tests/e2e/web/bank-suggestion.spec.ts:216:3 › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 390 [T-0160] 
+  1 passed (15.8s)

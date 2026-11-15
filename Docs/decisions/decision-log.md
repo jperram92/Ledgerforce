@@ -3378,3 +3378,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: UC-08 step 3 says a person confirms an ambiguous match; the card's AC-1/AC-2. Reusing `recordMatch` keeps one place that closes suggestions; the database guard of 0056 still checks the entry against the line.
 - Alternatives: idempotency in the module (rejected: the module refuses a closed suggestion as AC-1 says, and the controller already finds replays from the kept rows for unmatch and reconciliation); returning 409 for a closed suggestion (rejected: the card asks for 422 SUGGESTION_CLOSED, the module refusal convention of this controller).
 - ADR: none · Status: accepted
+
+### DL-0611 — Match screen: "Accept" beside each candidate suggestion; rule suggestions stay on the create-transaction screen (T-0160)
+- Date: 2026-11-15 · By: claude · Task: T-0160 · Category: ui
+- Decision: On the match screen each candidate suggestion ("Suggested: RCT-…") of an unmatched line gets a secondary "Accept" button beside it, only for people with `bank.reconcile`. Its accessible name carries the entry number, the line's description and date ("Accept RCT-000042 for Deposit Acme 01 Pty Ltd, 3 Dec 2026"), so two candidates on one line are told apart by screen readers. Accepting sends a fresh Idempotency-Key, shows "<line> is matched to <entry>." as a status message and reloads the lines; a refusal shows the API's reason (BankRefusal). Rule suggestions get no Accept button here: accepting one posts a journal, so it goes through "Create transaction" where the journal is previewed first (P4, DL-0533). No confirmation dialog: nothing is posted and Unmatch undoes it.
+- Why: UC-08 step 3 (a person confirms each suggestion), P6 (controls explain themselves), the card's AC-3. One primary action per screen stays "Find matches".
+- Alternatives: a radio group per line plus one "Accept selected" button (rejected: two steps for the common case); an Accept button for rule suggestions that posts at once (rejected: a journal would post without its preview).
+- ADR: none · Status: accepted
