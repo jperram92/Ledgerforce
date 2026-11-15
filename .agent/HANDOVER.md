@@ -380,3 +380,8 @@ Do not: edit Approved golden files in Docs/accounting/; delete or rename tracked
 - 2026-11-14T08:59:56.564Z claude: release T-0146 → todo (stopped for wrap-up: RED test draft saved in .agent/wip/T-0146; permission decided (settings.chart.manage); see card notes)
 - 2026-11-15T03:26:20.269Z claude: T-0146 → verifying
 - 2026-11-15T03:45:08.955Z claude: release T-0146 → review (verify at 895e443: VERIFY OK (2c PENDING, 8 Codex))
+- 2026-11-15T08:21:34.017Z claude: release T-0091 → review (full verify at 2448dd5: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
+- 2026-11-15T08:21:34.442Z claude: release T-0160 → review (full verify at 2448dd5: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
+- 2026-11-15T08:21:34.601Z claude: release T-0161 → review (full verify at 2448dd5: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
+- 2026-11-15T08:21:34.767Z claude: release T-0164 → review (full verify at 2448dd5: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
+- 2026-11-15T08:21:34.916Z claude: release T-0165 → review (full verify at 2448dd5: VERIFY OK (2c PENDING by measure, 8 awaits Codex))
