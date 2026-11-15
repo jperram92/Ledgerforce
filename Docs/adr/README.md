@@ -115,5 +115,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0071](0071-wizard-module-settings.md) | Store GST basis and BAS frequency in tax_settings, and invoice branding, terms and methods in ar_settings | data | no | Proposed |
 | [0078](0078-statement-import-body-limit.md) | Statement import accepts JSON bodies up to 10 MB; every other route keeps the 100 kB default | security | yes (delegated, DL-0477) | Accepted |
 | [0079](0079-invoice-remittance-bank-account.md) | Print one chosen company bank account as the remittance account on customer invoices | security | yes | Accepted |
+| [0080](0080-remittance-account-change-routes-and-schema.md) | Remittance account: maker-checker change record, database guards and routes | api | no | Accepted |
 
 Next free number: **0055** (0055–0060 are reserved for the DL-0409 parallel round) (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

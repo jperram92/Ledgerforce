@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0180",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-104",
+      "file": ".agent/evidence/T-0180/20261115-084437-tests-db.json",
+      "test": "2 test(s): packages/modules/documents/src/invoice-pdf.db.test.ts › T-0041: invoice PDF › SS-PLAT-104 the GP-001 invoice PDF contains number, ABN, GST 125.00 and total 1,375.00 | packages/modules/documents/src/invoice-pdf.db.test.ts › T-0041: invoice PDF › SS-PLAT-104 the renderer blocks network requests and scripts",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:44:37.347Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-15",
+      "file": ".agent/evidence/T-0180/20261115-084437-tests-db.json",
+      "test": "6 test(s): packages/modules/documents/src/invoice-pdf.db.test.ts › T-0165: branded invoice PDF › SS-UC01-15 AC-3 without saved settings the document has no branding or methods and the PDF no image [T-0165] | packages/modules/documents/src/invoice-pdf.db.test.ts › T-0165: branded invoice PDF › SS-UC01-15 AC-3 the saved brand colour, PNG logo and both methods reach the document, and the branded PDF renders on one page with the logo and both payment blocks [T-0165] | packages/modules/documents/src/invoice-pdf.db.test.ts › T-0165: branded invoice PDF › SS-UC01-15 AC-3 removing the logo leaves the colour and renders no image; [bank_transfer] alone shows no Stripe block [T-0165] | packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-15: the emailed invoice follows the accepted payment methods (T-0165) › SS-UC01-15 with [bank_transfer] no Stripe link is requested or sent, and the email shows the bank-transfer block [T-0165] | packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-15: the emailed invoice follows the accepted payment methods (T-0165) › SS-UC01-15 with [bank_transfer, stripe] the link is requested once and sent with both blocks [T-0165] | packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-15: the emailed invoice follows the accepted payment methods (T-0165) › SS-UC01-16 with a KMS the emailed invoice prints the designated remittance account and the phone line; the delivery record holds no number [T-0180]",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:44:37.347Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-16",
+      "file": ".agent/evidence/T-0180/20261115-084437-tests-db.json",
+      "test": "5 test(s): packages/modules/documents/src/invoice-pdf.db.test.ts › SS-UC01-16: the invoice prints the designated remittance account (ADR-0079) › SS-UC01-16 AC-2 with a KMS the document carries the decrypted remittance account and the PDF prints it with the phone line [T-0180] | packages/modules/documents/src/invoice-pdf.db.test.ts › SS-UC01-16: the invoice prints the designated remittance account (ADR-0079) › SS-UC01-16 AC-2 without a KMS, or without bank transfer accepted, nothing is decrypted and no number prints [T-0180] | packages/modules/documents/src/invoice-pdf.db.test.ts › SS-UC01-16: the invoice prints the designated remittance account (ADR-0079) › SS-UC01-16 AC-2 an account in another currency than the invoice is not printed [T-0180] | packages/modules/documents/src/invoice-pdf.db.test.ts › SS-UC01-16: the invoice prints the designated remittance account (ADR-0079) › SS-UC01-16 AC-2 the clear number is stored nowhere: not in the outbox, the change records or the settings [T-0180] | packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-15: the emailed invoice follows the accepted payment methods (T-0165) › SS-UC01-16 with a KMS the emailed invoice prints the designated remittance account and the phone line; the delivery record holds no number [T-0180]",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:44:37.347Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-03",
+      "file": ".agent/evidence/T-0180/20261115-084437-tests-db.json",
+      "test": "1 test(s): packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-03 / SS-UC02-04: invoice emailed with its PDF to Billing To and CC › SS-UC01-03 SS-UC02-04 the posted invoice event sends one email To the Billing To contact, Cc the Billing CC, with the PDF attached; redelivery sends nothing",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:44:37.347Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-04",
+      "file": ".agent/evidence/T-0180/20261115-084437-tests-db.json",
+      "test": "1 test(s): packages/modules/email/src/invoice-email.db.test.ts › SS-UC01-03 / SS-UC02-04: invoice emailed with its PDF to Billing To and CC › SS-UC01-03 SS-UC02-04 the posted invoice event sends one email To the Billing To contact, Cc the Billing CC, with the PDF attached; redelivery sends nothing",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:44:37.347Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-08",
+      "file": ".agent/evidence/T-0180/20261115-084437-tests-db.json",
+      "test": "2 test(s): packages/modules/email/src/invoice-email.db.test.ts › SS-UC06-08: Remittance advices emailed › SS-UC06-08 the supplier Remittance contact receives one advice listing the bills paid | packages/modules/email/src/invoice-email.db.test.ts › SS-UC06-08: Remittance advices emailed › a party without the contact role gets no email: NO_RECIPIENT",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:44:37.347Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-17",
+      "file": ".agent/evidence/T-0180/20261115-084450-tests-api-db.json",
+      "test": "8 test(s): apps/api/src/setup/remittance-account.db.test.ts › SS-UC01-17: changing the invoice remittance account needs a second person › SS-UC01-17 without a fresh step-up the request is refused; without the permission it is forbidden [T-0180] | apps/api/src/setup/remittance-account.db.test.ts › SS-UC01-17: changing the invoice remittance account needs a second person › SS-UC01-17 a malformed request is refused; an account of no company is 404 [T-0180] | apps/api/src/setup/remittance-account.db.test.ts › SS-UC01-17: changing the invoice remittance account needs a second person › SS-UC01-17 the maker requests: 201 pending with masked details, nothing set; a replay is 200 [T-0180] | apps/api/src/setup/remittance-account.db.test.ts › SS-UC01-17: changing the invoice remittance account needs a second person › SS-UC01-17 the maker cannot approve their own change (sod_violation); nothing is set [T-0180] | apps/api/src/setup/remittance-account.db.test.ts › SS-UC01-17: changing the invoice remittance account needs a second person › SS-UC01-17 the checker needs a step-up, then approves: the account is in force and GET shows it masked [T-0180] | apps/api/src/setup/remittance-account.db.test.ts › SS-UC01-17: changing the invoice remittance account needs a second person › SS-UC01-17 a removal request can be rejected with a reason; the account stays [T-0180] | apps/api/src/setup/remittance-account.db.test.ts › SS-UC01-17: changing the invoice remittance account needs a second person › SS-UC01-17 every change is audited with the account masked; the clear number is in no audit row [T-0180] | apps/api/src/setup/remittance-account.db.test.ts › SS-UC01-17: changing the invoice remittance account needs a second person › SS-UC01-17 another tenant cannot read this company: 404 [T-0180]",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:44:50.468Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-104",
+      "file": ".agent/evidence/T-0180/20261115-084501-tests-unit.json",
+      "test": "3 test(s): packages/modules/documents/src/invoice-html.test.ts › Invoice HTML (T-0041) › SS-PLAT-104 preserves significant integer quantity zeros [T-0041] | packages/modules/documents/src/invoice-html.test.ts › Invoice HTML (T-0041) › SS-PLAT-104 shows a tax invoice with supplier ABN, number, dates, GST and total | packages/modules/documents/src/invoice-html.test.ts › Invoice HTML (T-0041) › SS-PLAT-104 escapes every value and contains no script",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:45:01.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC03-01",
+      "file": ".agent/evidence/T-0180/20261115-084501-tests-unit.json",
+      "test": "1 test(s): packages/modules/documents/src/invoice-html.test.ts › Invoice HTML payment link (T-0073) › SS-UC03-01 shows the Stripe payment link with the amount due, escaped, and nothing without one",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:45:01.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-15",
+      "file": ".agent/evidence/T-0180/20261115-084501-tests-unit.json",
+      "test": "9 test(s): packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-1 uses the brand colour and embeds the PNG logo as a data URI [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-1 without a logo no image element is rendered; without branding no brand styles [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-1 embeds a JPEG logo; refuses a logo whose bytes are not its type and a colour that is not #RRGGBB [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-2 [bank_transfer] shows the bank-transfer block and no Stripe link, even when one is supplied [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-2 [stripe] shows the Stripe block with the link and no bank-transfer block [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-2 with both methods shows both blocks, bank transfer first [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-2 prints remittance details escaped when the document carries them, and no number otherwise (RQ-0159) [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 AC-2 with no saved methods keeps the T-0073 behaviour: the link if supplied, no bank block [T-0165] | packages/modules/documents/src/invoice-html.test.ts › Invoice branding and payment methods (T-0165) › SS-UC01-15 the branded template keeps the no-script, no-external-resource rules behind a CSP [T-0165]",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:45:01.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-16",
+      "file": ".agent/evidence/T-0180/20261115-084501-tests-unit.json",
+      "test": "1 test(s): packages/modules/documents/src/invoice-html.test.ts › SS-UC01-16: the invoice prints the remittance account with the confirm-by-phone line (ADR-0079) › SS-UC01-16 AC-2 prints account name, BSB, number, the invoice number as reference and the fixed phone line [T-0180]",
+      "commit": "bb1a52b1fbab-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T08:45:01.692Z",
+      "result": "passed"
+    }
+  ]
+}
