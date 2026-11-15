@@ -3490,3 +3490,15 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: `packages/modules/documents/src/testing/solid-png.ts` builds a real, decodable solid-colour PNG (zlib from Node, no dependency), so the branding tests and the e2e evidence spec need no binary fixture. Product code never imports it.
 - Why: evidence and tests must show a real image painted in the PDF (pdfjs image operators), not just a data URI string.
 - ADR: none · Status: accepted
+
+### DL-0568 — ADR-0079 accepted on the owner's explicit instruction, with fraud controls (RQ-0150); T-0180 unblocked
+- Date: 2026-11-15 · By: claude on the product owner's instruction ("Do your own deep research and confirm based off best practices as a decision on my behalf") · Task: T-0165 / T-0180 · Category: security
+- Decision: Invoices may print the company's designated remittance account: account name, BSB and account number, with the invoice number as reference. The controls:
+  - only that one account is ever decrypted for documents, and only in the render path;
+  - setting or changing the account is maker-checker (`settings.setup.manage`, step-up, second-person approval) and audited with masked values;
+  - every invoice carries a line asking customers to confirm any change of bank details by phone.
+
+  ADR-0079 is Accepted. T-0180 moves from blocked to todo.
+- Why: RQ-0150. Printing the BSB and account number is common Australian practice (bank guidance), though not an ATO requirement. Payment-redirection fraud (BEC) is the main risk; the guidance is to restrict and approve changes to payment details and to have payers verify changes by phone. OWASP: decrypt only where needed.
+- Alternatives: never print (pushes customers to ask by email, which is the very channel BEC exploits); print any bank account (too broad).
+- ADR: ADR-0079 · Status: accepted (owner instruction)

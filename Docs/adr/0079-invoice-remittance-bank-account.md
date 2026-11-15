@@ -1,7 +1,7 @@
 ---
 adr: 0079
 title: "Print one chosen company bank account as the remittance account on customer invoices"
-status: Proposed
+status: Accepted
 date: 2026-11-15
 author: claude
 category: security
@@ -132,3 +132,13 @@ Proposed: **Option 1**.
 - Related ADRs: ADR-0018, ADR-0071, ADR-0048
 - External sources: Odoo 18.0 `addons/account/models/account_move.py`; ERPNext `bank_account.json`
   (both retrieved 2026-11-15, see RQ-0159)
+
+
+## Acceptance (2026-11-15)
+Accepted on the product owner's explicit instruction of 2026-11-15: "Do your own deep research and confirm based off best practices as a decision on my behalf" (DL-0568). Research: RQ-0150.
+
+The ADR is accepted with these controls added (RQ-0150 conclusion):
+1. **One account.** Only the designated remittance account (`ar_settings.remittance_bank_account_id`, migration 0071) is ever decrypted for customer documents. Customer and supplier accounts never print.
+2. **Changes are maker-checker.** Setting or changing the remittance account needs `settings.setup.manage` and step-up, plus a second-person approval (design §6.5). Each change is audited, with values masked to the last 3 digits. This is the main defence against payment-redirection fraud.
+3. **What prints.** The invoice shows the account name, BSB, account number and the invoice number as reference. It also carries a fixed line asking customers to confirm any change of bank details by phone before paying.
+4. **Where decryption happens.** Only in the document render path. The clear value is never written to the outbox, logs or stored documents' metadata.
