@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ledgerforce/ar": "workspace:*",
+    "@ledgerforce/connector-stripe": "workspace:*",
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/documents": "workspace:*",
     "@ledgerforce/email": "workspace:*",

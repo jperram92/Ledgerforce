@@ -1,0 +1,29 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a1d33617443f758e4
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:38885
+ ❯ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts (5 tests | 5 skipped) 1851ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts [ apps/api/src/ar/refunds-stripe.db.test.ts ]
+RefundError: refunds through Stripe are not available yet (T-0122); refund by payment batch
+ ❯ createCustomerRefund packages/modules/ar/src/refunds.ts:225:11
+    223|   }
+    224|   if (c.method === 'stripe') {
+    225|     throw new RefundError(
+       |           ^
+    226|       'METHOD_NOT_AVAILABLE',
+    227|       'refunds through Stripe are not available yet (T-0122); refund b…
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:171:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 skipped (5)
+   Start at  08:28:38
+   Duration  5.87s (transform 1.70s, setup 0ms, import 2.84s, tests 1.85s, environment 0ms)
+

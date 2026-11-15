@@ -5,7 +5,7 @@
  * amount may not exceed the party's available credit: its AR credit balance (the sum of its open
  * AR items, when negative) less the refunds already requested. Method `bank_batch` is paid in the
  * next supplier payment batch, to the customer's verified bank account after the same cooling-off
- * as suppliers (Q9; @ledgerforce/ap payment-batches.ts); method `stripe` is T-0122.
+ * as suppliers (Q9; @ledgerforce/ap payment-batches.ts); method `stripe` is sent on approval (T-0172).
  *
  * payCustomerRefund posts GP-006 through the engine when the money has left the bank (the batch
  * confirmation calls it): one entry per refund, source ar_refund, source id = the refund id,
@@ -19,6 +19,12 @@
  * records the append-only approval; the payment batch takes only approved refunds and
  * payCustomerRefund refuses an unapproved one (NOT_APPROVED); the database refuses both too.
  * previewCustomerRefundJournal is the engine's preview of the GP-006 entry, writing nothing.
+ *
+ * Stripe (T-0172, ADR-0083, RQ-0163): method `stripe` is accepted only when the caller supplies the
+ * Stripe connector's check (a Stripe payment of the party covers the refund); without it the
+ * method is refused (METHOD_NOT_AVAILABLE, fail closed). The approve step sends it (the connector's
+ * sendStripeCustomerRefund, which posts GP-006 Stripe variant and calls markCustomerRefundPaid);
+ * a Stripe refund dated after today cannot be approved (NOT_DUE), because approval sends it.
  */
 import type { Database } from '@ledgerforce/db';
 import {
@@ -49,7 +55,9 @@ export type RefundErrorCode =
   | 'NOT_APPROVABLE'
   | 'REFUND_NOT_FOUND'
   | 'PARTY_NOT_FOUND'
-  | 'BANK_ACCOUNT_REQUIRED';
+  | 'BANK_ACCOUNT_REQUIRED'
+  | 'NO_STRIPE_PAYMENT'
+  | 'NOT_DUE';
 
 export class RefundError extends Error {
   readonly code: RefundErrorCode;
@@ -193,10 +201,34 @@ export async function customerCredit(
 const partyLock = (trx: Trx, companyId: string, partyId: string) =>
   sql`SELECT pg_advisory_xact_lock(hashtext(${`ar-refund:${companyId}:${partyId}`}))`.execute(trx);
 
+/** Serialise refund work on one party (request, approve, pay); held to the end of `trx`. */
+export async function lockCustomerRefundParty(
+  trx: Trx,
+  companyId: string,
+  partyId: string,
+): Promise<void> {
+  await partyLock(trx, companyId.toLowerCase(), partyId.toLowerCase());
+}
+
+/**
+ * The Stripe connector's check for `method: stripe` (T-0172): throws RefundError
+ * NO_STRIPE_PAYMENT when no Stripe payment of the party covers `amount`.
+ */
+export type StripeRefundCheck = (
+  trx: Trx,
+  c: { companyId: string; partyId: string; amount: string },
+) => Promise<void>;
+
+export interface CreateRefundOptions {
+  /** Enables `method: stripe` (T-0172); without it a Stripe refund is METHOD_NOT_AVAILABLE. */
+  readonly stripeCheck?: StripeRefundCheck;
+}
+
 /** Request a refund of (part of) a customer's credit balance. */
 export async function createCustomerRefund(
   trx: Trx,
   c: CustomerRefundInput,
+  opts: CreateRefundOptions = {},
 ): Promise<CustomerRefundView> {
   const companyId = c.companyId.toLowerCase();
   if (!UUID_RE.test(c.id)) throw new RefundError('INVALID_REFUND', 'the refund id is a uuid');
@@ -221,13 +253,13 @@ export async function createCustomerRefund(
   if (reason !== undefined && (reason.length < 1 || reason.length > 500)) {
     throw new RefundError('INVALID_REFUND', 'the reason is 1–500 characters');
   }
-  if (c.method === 'stripe') {
+  if (c.method === 'stripe' && !opts.stripeCheck) {
     throw new RefundError(
       'METHOD_NOT_AVAILABLE',
-      'refunds through Stripe are not available yet (T-0122); refund by payment batch',
+      'refunds through Stripe are not configured here; refund by payment batch',
     );
   }
-  if (c.method !== 'bank_batch') {
+  if (c.method !== 'bank_batch' && c.method !== 'stripe') {
     throw new RefundError('INVALID_REFUND', `unknown refund method ${JSON.stringify(c.method)}`);
   }
   const party = await trx
@@ -243,6 +275,9 @@ export async function createCustomerRefund(
       'REFUND_EXCEEDS_CREDIT',
       `refund ${numeric(c.amount)} exceeds the customer's refundable credit ${credit.available}`,
     );
+  }
+  if (c.method === 'stripe' && opts.stripeCheck) {
+    await opts.stripeCheck(trx, { companyId, partyId, amount: c.amount });
   }
   const company = await trx
     .selectFrom('app.company')
@@ -364,6 +399,36 @@ export async function payCustomerRefund(
   return getCustomerRefund(trx, companyId, r.refundId);
 }
 
+/**
+ * Record that a requested, approved Stripe refund was paid by its own posted ar_refund entry
+ * (T-0172; the 0055 guard checks the entry). Only the Stripe connector's send calls this.
+ */
+export async function markCustomerRefundPaid(
+  trx: Trx,
+  c: { companyId: string; refundId: string; entryId: string; paidOn: string },
+): Promise<CustomerRefundView> {
+  const companyId = c.companyId.toLowerCase();
+  const r = await getCustomerRefund(trx, companyId, c.refundId);
+  if (r.status !== 'requested' || r.method !== 'stripe') {
+    throw new RefundError('NOT_PAYABLE', `refund ${r.refundNo} is ${r.status} (${r.method})`);
+  }
+  if (r.approval !== 'approved') {
+    throw new RefundError('NOT_APPROVED', `refund ${r.refundNo} is not approved (ADR-0074)`);
+  }
+  await trx
+    .updateTable('app.customer_refund')
+    .set({
+      status: 'paid',
+      entry_id: c.entryId,
+      paid_on: c.paidOn,
+      updated_at: sql`clock_timestamp()`,
+    })
+    .where('company_id', '=', companyId)
+    .where('id', '=', r.refundId)
+    .execute();
+  return getCustomerRefund(trx, companyId, r.refundId);
+}
+
 /** GP-006: Dr AR control (customer) / Cr the bank account. Shared by payment and preview. */
 function refundJournal(r: CustomerRefundView, bankAccountId: string): PostingLineInput[] {
   return [
@@ -378,7 +443,13 @@ function refundJournal(r: CustomerRefundView, bankAccountId: string): PostingLin
  */
 export async function approveCustomerRefund(
   trx: Trx,
-  c: { companyId: string; refundId: string; approvedBy: string },
+  c: {
+    companyId: string;
+    refundId: string;
+    approvedBy: string;
+    /** YYYY-MM-DD in the tenant's time zone: a Stripe refund dated later is NOT_DUE (T-0172). */
+    today?: string;
+  },
 ): Promise<CustomerRefundView> {
   const companyId = c.companyId.toLowerCase();
   if (!UUID_RE.test(c.approvedBy))
@@ -389,6 +460,12 @@ export async function approveCustomerRefund(
   if (r.approval === 'approved') return { ...r, replayed: true };
   if (r.status !== 'requested') {
     throw new RefundError('NOT_APPROVABLE', `refund ${r.refundNo} is ${r.status}`);
+  }
+  if (r.method === 'stripe' && c.today !== undefined && r.refundDate > c.today) {
+    throw new RefundError(
+      'NOT_DUE',
+      `refund ${r.refundNo} is dated ${r.refundDate}; a Stripe refund is sent when approved, so approve it on or after that date`,
+    );
   }
   await trx
     .insertInto('app.customer_refund_approval')

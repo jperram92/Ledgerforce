@@ -1,0 +1,80 @@
+{
+  "source": "Built from RefundCreateParams, the Refund object and the error object in the official stripe@23.1.0 type definitions (OpenAPI v2596), RQ-0104 S6 and RQ-0163; request encoding as RQ-0115 S6. Not recorded from a live account: no Stripe key or network was available. The key is one per approved refund document (lf-refund-v2-<refund id>, RQ-0163). Replace with a redacted test-mode recording (fixtures/recorded/) when one is (RQ-0104 follow-up).",
+  "apiVersion": "2026-10-28.endive",
+  "accessed": "2026-11-15",
+  "placeholders": "{{name}} is replaced by the test before matching (ids generated at run time).",
+  "interactions": [
+    {
+      "name": "refund-document-220.00",
+      "request": {
+        "method": "POST",
+        "path": "/v1/refunds",
+        "idempotencyKey": "lf-refund-v2-{{refundId}}",
+        "form": {
+          "payment_intent": "{{paymentIntentId}}",
+          "amount": "22000",
+          "reason": "requested_by_customer",
+          "metadata[lf_tenant_id]": "{{tenantId}}",
+          "metadata[lf_company_id]": "{{companyId}}",
+          "metadata[lf_refund_id]": "{{refundId}}",
+          "metadata[lf_refund_no]": "{{refundNo}}",
+          "metadata[lf_credit_note_id]": "{{creditNoteId}}",
+          "metadata[lf_credit_note_no]": "{{creditNoteNo}}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "{{stripeRefundId}}",
+          "object": "refund",
+          "amount": 22000,
+          "balance_transaction": "txn_1SQbTestRefund0172",
+          "charge": "ch_1SQbTestCharge0172",
+          "created": 1795564800,
+          "currency": "aud",
+          "metadata": {
+            "lf_tenant_id": "{{tenantId}}",
+            "lf_company_id": "{{companyId}}",
+            "lf_refund_id": "{{refundId}}",
+            "lf_refund_no": "{{refundNo}}",
+            "lf_credit_note_id": "{{creditNoteId}}",
+            "lf_credit_note_no": "{{creditNoteNo}}"
+          },
+          "payment_intent": "{{paymentIntentId}}",
+          "reason": "requested_by_customer",
+          "receipt_number": null,
+          "status": "succeeded"
+        }
+      }
+    },
+    {
+      "name": "refund-document-charge-disputed",
+      "request": {
+        "method": "POST",
+        "path": "/v1/refunds",
+        "idempotencyKey": "lf-refund-v2-{{disputedRefundId}}",
+        "form": {
+          "payment_intent": "{{disputedPaymentIntentId}}",
+          "amount": "22000",
+          "reason": "requested_by_customer",
+          "metadata[lf_tenant_id]": "{{tenantId}}",
+          "metadata[lf_company_id]": "{{companyId}}",
+          "metadata[lf_refund_id]": "{{disputedRefundId}}",
+          "metadata[lf_refund_no]": "{{disputedRefundNo}}",
+          "metadata[lf_credit_note_id]": "{{disputedCreditNoteId}}",
+          "metadata[lf_credit_note_no]": "{{disputedCreditNoteNo}}"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "type": "invalid_request_error",
+            "code": "charge_disputed",
+            "message": "Charge ch_1SQbTestCharge0172d has been charged back; cannot issue a refund."
+          }
+        }
+      }
+    }
+  ]
+}

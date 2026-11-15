@@ -8,13 +8,15 @@
  * the write-back event is sent to the local fake Salesforce REST API; the refund goes to the
  * Stripe stub replaying the documented refunds fixture. Never the network.
  */
-import { createHmac, randomBytes } from 'node:crypto';
+import { createHmac, randomBytes, randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
   approveCreditNote,
+  approveCustomerRefund,
   approveInvoice,
   createCreditNote,
+  createCustomerRefund,
   createDraftInvoice,
   invoicePaymentStatus,
   recordReceipt,
@@ -36,11 +38,11 @@ import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { StripeClient } from './client.ts';
 import { ensureInvoicePaymentLink } from './payment-link.ts';
-import { refundCreditViaStripe } from './refund.ts';
+import { assertStripeRefundable, refundCreditViaStripe } from './refund.ts';
 import {
+  APPROVED_REFUNDS_FIXTURE,
   loadCassette,
   PAYMENT_LINKS_FIXTURE,
-  REFUNDS_FIXTURE,
   startRecordedStripe,
   type RecordedStripe,
 } from './testing/index.ts';
@@ -75,6 +77,9 @@ const outbox: DocumentOutbox = {
   },
 };
 let invoice = { id: '', no: '' };
+const approverId = randomUUID();
+/** SS-UC03-05's invoice that is never paid through Stripe (Acme owes it until SS-UC11-04). */
+let unpaidSecond = '';
 let cfg: StripeWebhookConfig;
 
 const money = (s: string) =>
@@ -210,12 +215,16 @@ const CODE_OF: Record<string, string> = {
 
 beforeAll(async () => {
   linkStub = await startRecordedStripe(loadCassette(PAYMENT_LINKS_FIXTURE));
-  refundStub = await startRecordedStripe(loadCassette(REFUNDS_FIXTURE));
+  refundStub = await startRecordedStripe(loadCassette(APPROVED_REFUNDS_FIXTURE));
   sf = await startFakeSalesforceRest({
     instanceUrl: SF_INSTANCE,
     acceptToken: (t) => t === SF_TOKEN,
   });
   f = await createLedgerFixture('01900000-0000-7000-8000-000000007401');
+  await f.admin.query(
+    `INSERT INTO app.app_user (id, tenant_id, email, display_name, status) VALUES ($1, $2, 'approver@t0074.test', 'approver', 'active')`,
+    [approverId, f.tenantId],
+  );
   profiles = await seedBillingCompany(f);
   [acme = ''] = await seedBillableCustomers(f, profiles, {
     count: 1,
@@ -373,6 +382,7 @@ describe('SS-UC03-05 duplicate delivery', () => {
   it('SS-UC03-05 a refused delivery stores nothing, so the genuine one still posts later', async () => {
     const pi = `pi_${randomBytes(8).toString('hex')}`;
     const second = await postStripeInvoice(null);
+    unpaidSecond = second.id;
     const body = paymentIntentEvent({
       eventId: 'evt_1T0074Second0001',
       pi,
@@ -442,12 +452,46 @@ describe('SS-UC11-04 refund through Stripe', () => {
       });
       return approveCreditNote(trx, { companyId: f.companyId, creditNoteId: d.creditNoteId });
     });
+    // T-0172 (AC-3): the refund goes through an approved Stripe refund document, which refunds
+    // only what the customer is owed overall (T-0055): Acme first pays the invoice it still owes.
+    const doc = await f.inTenant(async (trx) => {
+      await recordReceipt(trx, {
+        companyId: f.companyId,
+        partyId: acme,
+        receiptDate: '2026-11-21',
+        amount: '1375.00',
+        method: 'eft',
+        depositTo: { accountId: f.acct['1010'] ?? '' },
+        idempotencyKey: ['t0172', 'eft', 'second'].join('-'),
+        allocations: [{ invoiceId: unpaidSecond, amount: '1375.00' }],
+      });
+      const requested = await createCustomerRefund(
+        trx,
+        {
+          companyId: f.companyId,
+          id: randomUUID(),
+          partyId: acme,
+          refundDate: '2026-11-24',
+          amount: '220.00',
+          method: 'stripe',
+        },
+        { stripeCheck: assertStripeRefundable },
+      );
+      return approveCustomerRefund(trx, {
+        companyId: f.companyId,
+        refundId: requested.refundId,
+        approvedBy: approverId,
+      });
+    });
     Object.assign(refundStub.vars, {
       tenantId: f.tenantId,
       companyId: f.companyId,
+      refundId: doc.refundId,
+      refundNo: doc.refundNo,
       creditNoteId: cn.creditNoteId,
       creditNoteNo: cn.creditNoteNo,
       paymentIntentId,
+      stripeRefundId: 're_1SQbTestRefund000220',
     });
     const client = new StripeClient({
       secretKey: 'sk_test_dummy',
@@ -458,13 +502,14 @@ describe('SS-UC11-04 refund through Stripe', () => {
       refundCreditViaStripe(trx, client, {
         companyId: f.companyId,
         creditNoteId: cn.creditNoteId,
+        refundId: doc.refundId,
         amount: '220.00',
         refundDate: '2026-11-24',
       }),
     );
     expect(refundStub.mismatches).toEqual([]);
     expect(refundStub.received.map((x) => [x.path, x.form['amount'], x.matched])).toEqual([
-      ['/v1/refunds', '22000', 'refund-credit-note-220.00'],
+      ['/v1/refunds', '22000', 'refund-document-220.00'],
     ]);
     expect(r).toMatchObject({ stripeRefundId: 're_1SQbTestRefund000220', amount: '220.0000' });
 
@@ -492,6 +537,7 @@ describe('SS-UC11-04 refund through Stripe', () => {
       refundCreditViaStripe(trx, client, {
         companyId: f.companyId,
         creditNoteId: cn.creditNoteId,
+        refundId: doc.refundId,
         amount: '220.00',
         refundDate: '2026-11-24',
       }),
@@ -541,23 +587,26 @@ describe('SS-UC11-04 refund through Stripe', () => {
       });
       return approveCreditNote(trx, { companyId: f.companyId, creditNoteId: c.creditNoteId });
     });
-    const client = new StripeClient({
-      secretKey: 'sk_test_dummy',
-      mode: 'test',
-      baseUrl: refundStub.url,
-    });
+    expect(plain.status).toBe('posted');
+    // T-0172: the request is the refund document; it is refused before any Stripe call.
     const refund = (amount: string) =>
       f
         .inTenant((trx) =>
-          refundCreditViaStripe(trx, client, {
-            companyId: f.companyId,
-            creditNoteId: plain.creditNoteId,
-            amount,
-            refundDate: '2026-11-24',
-          }),
+          createCustomerRefund(
+            trx,
+            {
+              companyId: f.companyId,
+              id: randomUUID(),
+              partyId: acme,
+              refundDate: '2026-11-24',
+              amount,
+              method: 'stripe',
+            },
+            { stripeCheck: assertStripeRefundable },
+          ),
         )
         .catch((e: unknown) => (e as { code?: string }).code);
-    expect(await refund('11.01')).toBe('EXCEEDS_CREDIT');
+    expect(await refund('11.01')).toBe('REFUND_EXCEEDS_CREDIT');
     expect(await refund('11.00')).toBe('NO_STRIPE_PAYMENT');
     expect(refundStub.received).toHaveLength(1);
   });

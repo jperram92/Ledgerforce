@@ -1,0 +1,99 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a1d33617443f758e4
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41997
+ ❯ |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts (5 tests | 5 failed) 1602ms
+     × SS-UC11-09 a requested Stripe refund is not sent before approval; approval sends it once and posts GP-006 (Stripe) line for line 285ms
+     × SS-UC11-09 a Stripe refund is refused when no Stripe payment covers it, and approving one dated after today is NOT_DUE 114ms
+     × SS-UC11-09 AC-3: refundCreditViaStripe is no longer reachable without an approved refund document 162ms
+     × SS-UC11-10 Stripe unreachable at approval: the approval stands, nothing is posted, and the outbox handler sends it once 192ms
+     × SS-UC11-10 a permanent Stripe refusal is reported and not retried; a send older than 23 hours is never automatic 81ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > SS-UC11-09 a Stripe refund is sent only on approval, once, and posts GP-006 Stripe variant > SS-UC11-09 a requested Stripe refund is not sent before approval; approval sends it once and posts GP-006 (Stripe) line for line
+RefundError: refunds through Stripe are not available yet (T-0122); refund by payment batch
+ ❯ createCustomerRefund packages/modules/ar/src/refunds.ts:225:11
+    223|   }
+    224|   if (c.method === 'stripe') {
+    225|     throw new RefundError(
+       |           ^
+    226|       'METHOD_NOT_AVAILABLE',
+    227|       'refunds through Stripe are not available yet (T-0122); refund b…
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:175:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > SS-UC11-09 a Stripe refund is sent only on approval, once, and posts GP-006 Stripe variant > SS-UC11-09 a Stripe refund is refused when no Stripe payment covers it, and approving one dated after today is NOT_DUE
+AssertionError: expected 'METHOD_NOT_AVAILABLE' to be 'REFUND_EXCEEDS_CREDIT' // Object.is equality
+
+Expected: "REFUND_EXCEEDS_CREDIT"
+Received: "METHOD_NOT_AVAILABLE"
+
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:265:21
+    263|       (e: unknown) => (e as { code?: string }).code,
+    264|     );
+    265|     expect(tooMuch).toBe('REFUND_EXCEEDS_CREDIT');
+       |                     ^
+    266|     // Without the Stripe check the ar module refuses the method (fail…
+    267|     const unchecked = await f
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > SS-UC11-09 a Stripe refund is sent only on approval, once, and posts GP-006 Stripe variant > SS-UC11-09 AC-3: refundCreditViaStripe is no longer reachable without an approved refund document
+AssertionError: expected undefined to be 'NOT_APPROVED' // Object.is equality
+
+- Expected:
+"NOT_APPROVED"
+
++ Received:
+undefined
+
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:317:20
+    315|       )
+    316|       .catch((e: unknown) => (e as { code?: string }).code);
+    317|     expect(direct).toBe('NOT_APPROVED');
+       |                    ^
+    318|     const r = await requestRefund(credit);
+    319|     const pending = await f
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > SS-UC11-10 a failed Stripe send is retried through the outbox, never refunded or posted twice > SS-UC11-10 Stripe unreachable at approval: the approval stands, nothing is posted, and the outbox handler sends it once
+RefundError: refunds through Stripe are not available yet (T-0122); refund by payment batch
+ ❯ createCustomerRefund packages/modules/ar/src/refunds.ts:225:11
+    223|   }
+    224|   if (c.method === 'stripe') {
+    225|     throw new RefundError(
+       |           ^
+    226|       'METHOD_NOT_AVAILABLE',
+    227|       'refunds through Stripe are not available yet (T-0122); refund b…
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:339:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts > SS-UC11-10 a failed Stripe send is retried through the outbox, never refunded or posted twice > SS-UC11-10 a permanent Stripe refusal is reported and not retried; a send older than 23 hours is never automatic
+RefundError: refunds through Stripe are not available yet (T-0122); refund by payment batch
+ ❯ createCustomerRefund packages/modules/ar/src/refunds.ts:225:11
+    223|   }
+    224|   if (c.method === 'stripe') {
+    225|     throw new RefundError(
+       |           ^
+    226|       'METHOD_NOT_AVAILABLE',
+    227|       'refunds through Stripe are not available yet (T-0122); refund b…
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/stripe/src/stripe-refund-approval.contract.db.test.ts:396:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  08:27:00
+   Duration  3.55s (transform 622ms, setup 0ms, import 896ms, tests 1.60s, environment 0ms)
+
