@@ -406,6 +406,87 @@
       "provider": "unknown",
       "timestamp": "2026-11-15T08:47:51.618Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-132",
+      "file": ".agent/evidence/T-0177/20261115-202111-SS-PLAT-132-opening-balances-empty-1440.png",
+      "test": "web/opening-balances.spec.ts › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 1440 [T-0177]",
+      "commit": "0712856b7f24",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:21:11.307Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-132",
+      "file": ".agent/evidence/T-0177/20261115-202112-SS-PLAT-132-opening-balances-journal-preview-1440.png",
+      "test": "web/opening-balances.spec.ts › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 1440 [T-0177]",
+      "commit": "0712856b7f24",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:21:12.185Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-132",
+      "file": ".agent/evidence/T-0177/20261115-202112-SS-PLAT-132-opening-balances-posted-1440.png",
+      "test": "web/opening-balances.spec.ts › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 1440 [T-0177]",
+      "commit": "0712856b7f24",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:21:12.891Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-132",
+      "file": ".agent/evidence/T-0177/20261115-202113-SS-PLAT-132-wizard-step-9-ready-1440.png",
+      "test": "web/opening-balances.spec.ts › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 1440 [T-0177]",
+      "commit": "0712856b7f24",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:21:13.535Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-132",
+      "file": ".agent/evidence/T-0177/20261115-202113-SS-PLAT-132-opening-balances-refused-line-1440.png",
+      "test": "web/opening-balances.spec.ts › SS-PLAT-132: a refused file is explained with its line, and nothing is posted [T-0177]",
+      "commit": "0712856b7f24",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:21:13.343Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-132",
+      "file": ".agent/evidence/T-0177/20261115-202115-SS-PLAT-132-opening-balances-empty-390.png",
+      "test": "web/opening-balances.spec.ts › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 390 [T-0177]",
+      "commit": "0712856b7f24-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:21:15.258Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-132",
+      "file": ".agent/evidence/T-0177/20261115-202116-SS-PLAT-132-opening-balances-journal-preview-390.png",
+      "test": "web/opening-balances.spec.ts › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 390 [T-0177]",
+      "commit": "0712856b7f24-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:21:16.215Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-132",
+      "file": ".agent/evidence/T-0177/20261115-202116-SS-PLAT-132-opening-balances-posted-390.png",
+      "test": "web/opening-balances.spec.ts › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 390 [T-0177]",
+      "commit": "0712856b7f24-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:21:16.786Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-132",
+      "file": ".agent/evidence/T-0177/20261115-202117-SS-PLAT-132-wizard-step-9-ready-390.png",
+      "test": "web/opening-balances.spec.ts › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 390 [T-0177]",
+      "commit": "0712856b7f24-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T20:21:17.397Z",
+      "result": "passed"
     }
   ]
 }
