@@ -1,0 +1,25 @@
+
+
+      445 |   await fakeApi(page, 'fa');
+      446 |   await open(page, '/settings', 1440);
+    > 447 |   await page.getByRole('link', { name: 'Set up your company' }).click();
+          |                                                                 ^
+      448 |   await expect(page).toHaveURL(/\/settings\/setup$/);
+      449 |   await expect(page.getByRole('heading', { level: 1, name: 'Set up your company' })).toBeVisible();
+      450 | });
+        at /home/user/Ledgerforce/.claude/worktrees/agent-abbdffcc9e4a82f0a/tests/e2e/web/setup-wizard.spec.ts:447:65
+
+    Error Context: test-results/web-setup-wizard-T-0091-th-f9fae-listed-on-the-Settings-page-chromium/error-context.md
+
+    Error Context: test-results/web-setup-wizard-T-0091-th-f9fae-listed-on-the-Settings-page-chromium/error-context.md
+
+  9 failed
+    [chromium] › tests/e2e/web/setup-wizard.spec.ts:232:3 › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 1440 [T-0091] 
+    [chromium] › tests/e2e/web/setup-wizard.spec.ts:232:3 › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 390 [T-0091] 
+    [chromium] › tests/e2e/web/setup-wizard.spec.ts:291:1 › SS-PLAT-127: what is missing is listed in plain words, and Complete waits until nothing is [T-0091] 
+    [chromium] › tests/e2e/web/setup-wizard.spec.ts:328:1 › T-0091: a refused step explains why: STEP_INVALID lists what is missing, STEP_LOCKED says which step comes first 
+    [chromium] › tests/e2e/web/setup-wizard.spec.ts:359:1 › SS-PLAT-128: step 9 is declared "no history" with a reason, which is shown afterwards [T-0091] 
+    [chromium] › tests/e2e/web/setup-wizard.spec.ts:397:1 › SS-PLAT-128: with an opening balance posted, step 9 refuses "no history" in plain words [T-0091] 
+    [chromium] › tests/e2e/web/setup-wizard.spec.ts:420:1 › T-0091: an Accountant sees the steps but cannot complete them 
+    [chromium] › tests/e2e/web/setup-wizard.spec.ts:433:1 › T-0091: a user without settings.read is told so, and no steps are listed 
+    [chromium] › tests/e2e/web/setup-wizard.spec.ts:444:1 › T-0091: the wizard is listed on the Settings page 

@@ -12,6 +12,7 @@ import { createBankClient } from './bank/client.ts';
 import { createCloseClient } from './close/client.ts';
 import { createReportsClient } from './reports/client.ts';
 import { createSalesClient } from './sales/client.ts';
+import { createSetupClient } from './setup/client.ts';
 import { createAppRouter } from './router.tsx';
 
 export function App({ env, history }: { env: AppEnv; history?: RouterHistory }) {
@@ -27,6 +28,7 @@ export function App({ env, history }: { env: AppEnv; history?: RouterHistory }) 
       reports: createReportsClient(env),
       close: createCloseClient(env),
       bank: createBankClient(env),
+      setup: createSetupClient(env),
     },
     // No automatic retries: a failed session check shows its error and a Retry button at once.
     queryClient: new QueryClient({ defaultOptions: { queries: { retry: false } } }),
