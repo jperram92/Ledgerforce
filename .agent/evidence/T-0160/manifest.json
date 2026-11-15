@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0160",
+  "entries": [
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-033255-SS-UC08-08-suggestion-auditor-read-only-1440.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: an Auditor sees the suggestions but no Accept button [T-0160]",
+      "commit": "52c648d1c64d",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:32:55.668Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-033358-SS-UC08-08-suggestion-auditor-read-only-1440.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: an Auditor sees the suggestions but no Accept button [T-0160]",
+      "commit": "52c648d1c64d-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:58.117Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-033358-SS-UC08-08-suggestion-accept-offered-1440.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 1440 [T-0160]",
+      "commit": "52c648d1c64d-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:58.428Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-033359-SS-UC08-08-suggestion-accepted-matched-1440.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 1440 [T-0160]",
+      "commit": "52c648d1c64d-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:59.081Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-033400-SS-UC08-08-suggestion-accept-offered-390.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 390 [T-0160]",
+      "commit": "52c648d1c64d-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:34:00.755Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-033401-SS-UC08-08-suggestion-accepted-matched-390.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 390 [T-0160]",
+      "commit": "52c648d1c64d-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:34:01.291Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-034405-SS-UC08-08-suggestion-auditor-read-only-1440.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: an Auditor sees the suggestions but no Accept button [T-0160]",
+      "commit": "46de0e49c989",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:44:05.825Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-034405-SS-UC08-08-suggestion-accept-offered-1440.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 1440 [T-0160]",
+      "commit": "46de0e49c989",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:44:05.692Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-034406-SS-UC08-08-suggestion-accepted-matched-1440.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 1440 [T-0160]",
+      "commit": "46de0e49c989",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:44:06.841Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-034409-SS-UC08-08-suggestion-accept-offered-390.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 390 [T-0160]",
+      "commit": "46de0e49c989-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:44:09.644Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC08-08",
+      "file": ".agent/evidence/T-0160/20261115-034410-SS-UC08-08-suggestion-accepted-matched-390.png",
+      "test": "web/bank-suggestion.spec.ts › SS-UC08-08: the Accountant accepts a suggested receipt and the line is matched @ 390 [T-0160]",
+      "commit": "46de0e49c989-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-15T03:44:10.924Z",
+      "result": "passed"
+    }
+  ]
+}

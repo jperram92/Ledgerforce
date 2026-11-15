@@ -18,6 +18,9 @@
  *   posting engine's preview (bank.reconcile, T-0150). Writes nothing: no Idempotency-Key.
  * - `POST /bank-rec/lines/:id/unmatch` undoes a match (bank.reconcile). The replay record is the
  *   kept match row: the same user gets 200, anyone else 409 NOT_MATCHED.
+ * - `POST /bank-rec/lines/:id/suggestions/:suggestionId/accept` accepts a candidate suggestion:
+ *   the line is matched to the suggested receipt or payment, nothing is posted (bank.reconcile,
+ *   T-0160). The accepted suggestion is the replay record: same user 200, anyone else 422.
  * - `GET  /bank-rec/statements/:id/report?company_id=&closing_balance=` returns the
  *   reconciliation report (bank.read).
  * - `POST /bank-rec/statements/:id/reconciliation` completes a statement that ties
@@ -45,6 +48,7 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import {
+  acceptSuggestion,
   BankMatchError,
   BankReconciliationError,
   completeReconciliation,
@@ -524,6 +528,77 @@ export class BankRecController {
           return { statement_line_id: id, match_id: m.id, replayed: true };
         }
         throw new ConflictException({ error: e.code, message: e.message });
+      }
+      return refusal(e);
+    }
+  }
+
+  /**
+   * Accept a candidate suggestion (T-0160): the line is matched to the suggested receipt or
+   * payment, nothing is posted. The replay record is the accepted suggestion and its active
+   * match: the same user gets 200 with the same match, anyone else 422 SUGGESTION_CLOSED.
+   */
+  @Post('lines/:id/suggestions/:suggestionId/accept')
+  @HttpCode(200)
+  @RequirePermission('bank.reconcile')
+  async acceptSuggestion(
+    @Req() req: Request,
+    @Param('id') idParam: string,
+    @Param('suggestionId') suggestionParam: string,
+    @Headers('idempotency-key') key: string | undefined,
+    @Body() body: unknown,
+  ) {
+    requireKey(key);
+    const company = uuid(obj(body)['company_id'], 'company_id');
+    const id = uuid(idParam, 'id');
+    const suggestionId = uuid(suggestionParam, 'suggestionId');
+    const actor = actorOf(req);
+    await this.owned('app.bank_statement_line', id, company, 'statement line');
+    const trx = this.tx.get();
+    const view = (
+      r: { matchId: string; journalEntryId: string; sourceKind: string; sourceId: string },
+      replayed: boolean,
+    ) => ({
+      statement_line_id: id,
+      suggestion_id: suggestionId,
+      match_id: r.matchId,
+      journal_entry_id: r.journalEntryId,
+      source_kind: r.sourceKind,
+      source_id: r.sourceId,
+      replayed,
+    });
+    try {
+      const r = await acceptSuggestion(trx, { statementLineId: id, suggestionId, by: actor });
+      const done = view(r, false);
+      this.audit.describe({ entityType: 'bank_suggestion', entityId: suggestionId, after: done });
+      return done;
+    } catch (e) {
+      if (e instanceof BankMatchError && e.code === 'SUGGESTION_CLOSED') {
+        const kept = await sql<{
+          match_id: string;
+          journal_entry_id: string;
+          source_kind: string;
+          source_id: string;
+        }>`
+          SELECT m.id::text AS match_id, m.journal_entry_id::text, m.source_kind, m.source_id::text
+            FROM app.bank_match_suggestion s
+            JOIN app.bank_match m ON m.tenant_id = s.tenant_id AND m.statement_line_id = s.statement_line_id
+                                 AND m.journal_entry_id = s.journal_entry_id
+           WHERE s.id = ${suggestionId} AND s.statement_line_id = ${id} AND s.status = 'accepted'
+             AND s.decided_by = ${actor} AND m.status = 'matched' AND m.method = 'suggestion'
+             AND m.matched_by = ${actor}`.execute(trx);
+        const m = kept.rows[0];
+        if (m) {
+          return view(
+            {
+              matchId: m.match_id,
+              journalEntryId: m.journal_entry_id,
+              sourceKind: m.source_kind,
+              sourceId: m.source_id,
+            },
+            true,
+          );
+        }
       }
       return refusal(e);
     }

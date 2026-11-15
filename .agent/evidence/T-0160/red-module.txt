@@ -1,0 +1,40 @@
+    471|     const r = await f.inTenant((trx) =>
+    472|       acceptSuggestion(trx, {
+       |       ^
+    473|         statementLineId: deposit.id,
+    474|         suggestionId: second?.id ?? '',
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/bank/src/matching.db.test.ts:471:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |db| packages/modules/bank/src/matching.db.test.ts > SS-UC08-08: Accept a candidate suggestion (T-0160) > SS-UC08-08 a closed suggestion is refused with SUGGESTION_CLOSED; a rule suggestion needs a transaction; unknown ids are NOT_FOUND
+AssertionError: expected TypeError: (0 , __vite_ssr_import_10__.ac… to match object { code: 'SUGGESTION_CLOSED' }
+
+- Expected
++ Received
+
+- {
+-   "code": "SUGGESTION_CLOSED",
++ TypeError {
++   "message": "(0 , __vite_ssr_import_10__.acceptSuggestion) is not a function",
+  }
+
+ ❯ packages/modules/bank/src/matching.db.test.ts:510:8
+    508|           acceptSuggestion(trx, { statementLineId: deposit.id, suggest…
+    509|         ),
+    510|       ).rejects.toMatchObject({ code: 'SUGGESTION_CLOSED' });
+       |        ^
+    511|     }
+    512|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 8 passed (10)
+   Start at  03:27:33
+   Duration  3.97s (transform 1.21s, setup 0ms, import 1.45s, tests 1.72s, environment 0ms)
+

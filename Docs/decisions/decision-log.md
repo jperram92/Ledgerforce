@@ -3406,3 +3406,28 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: T-0091 delivers the wizard screen, proven against a faked API (SS-PLAT-127/128); the API half is proven by SS-PLAT-118 to 121. Completing setup on a fresh tenant through the UI needs the settings screens of T-0176 and T-0177 (DL-0601/0602), so that acceptance criterion moves to the new card T-0182, which depends on both. T-0091 is then judged on what it built. There are no SS-id collisions: SS-PLAT-127/128 are new, and 122–126 are not in the register.
 - Why: a card's acceptance criteria must be met before review. An AC that depends on unbuilt screens belongs to the card that can meet it.
 - ADR: none · Status: accepted
+
+### DL-0610 — Accepting a candidate suggestion: module function, route, replay record and error code (T-0160)
+- Date: 2026-11-15 · By: claude · Task: T-0160 · Category: api
+- Decision:
+  - `acceptSuggestion(trx, {statementLineId, suggestionId, by})` in @ledgerforce/bank locks the line and the suggestion, then records the match with method `suggestion` through the existing `recordMatch`, which closes the suggestion as `accepted` and the line's other open suggestions as `dismissed`. Nothing is posted (the receipt or payment entry is already posted), so no golden posting is involved.
+  - Refusals: NOT_FOUND (no such suggestion for this line), SUGGESTION_CLOSED (accepted or dismissed), ALREADY_MATCHED, and a new code NOT_A_CANDIDATE for a rule suggestion (it needs a transaction, so the person uses "Create transaction" from the rule instead).
+  - Route `POST /bank-rec/lines/:id/suggestions/:suggestionId/accept {company_id}`: bank.reconcile, Idempotency-Key, audited as `bank_suggestion`, 200 with the match. The replay record is the accepted suggestion and its active match: the same user (decided_by and matched_by) gets 200 with `replayed: true`; anyone else 422 SUGGESTION_CLOSED, as for any closed suggestion. Another company's or tenant's line is 404; a malformed id is 400.
+  - An additive route over existing schema (migration 0056 already allows method `suggestion`) needs no ADR (cf. DL-0313, DL-0566).
+- Why: UC-08 step 3 says a person confirms an ambiguous match; the card's AC-1/AC-2. Reusing `recordMatch` keeps one place that closes suggestions; the database guard of 0056 still checks the entry against the line.
+- Alternatives: idempotency in the module (rejected: the module refuses a closed suggestion as AC-1 says, and the controller already finds replays from the kept rows for unmatch and reconciliation); returning 409 for a closed suggestion (rejected: the card asks for 422 SUGGESTION_CLOSED, the module refusal convention of this controller).
+- ADR: none · Status: accepted
+
+### DL-0611 — Match screen: "Accept" beside each candidate suggestion; rule suggestions stay on the create-transaction screen (T-0160)
+- Date: 2026-11-15 · By: claude · Task: T-0160 · Category: ui
+- Decision: On the match screen each candidate suggestion ("Suggested: RCT-…") of an unmatched line gets a secondary "Accept" button beside it, only for people with `bank.reconcile`. Its accessible name carries the entry number, the line's description and date ("Accept RCT-000042 for Deposit Acme 01 Pty Ltd, 3 Dec 2026"), so two candidates on one line are told apart by screen readers. Accepting sends a fresh Idempotency-Key, shows "<line> is matched to <entry>." as a status message and reloads the lines; a refusal shows the API's reason (BankRefusal). Rule suggestions get no Accept button here: accepting one posts a journal, so it goes through "Create transaction" where the journal is previewed first (P4, DL-0533). No confirmation dialog: nothing is posted and Unmatch undoes it.
+- Why: UC-08 step 3 (a person confirms each suggestion), P6 (controls explain themselves), the card's AC-3. One primary action per screen stays "Find matches".
+- Alternatives: a radio group per line plus one "Accept selected" button (rejected: two steps for the common case); an Accept button for rule suggestions that posts at once (rejected: a journal would post without its preview).
+- ADR: none · Status: accepted
+
+### DL-0612 — Large statement files: dependency-free path-scoped JSON reader, 10 MB, ADR-0078 accepted under DL-0477 (T-0161)
+- Date: 2026-11-15 · By: claude under DL-0477 · Task: T-0161 · Category: security
+- Decision: Build RQ-0151 option A. A middleware in `apps/api/src/security/statement-body.ts`, registered in `createApi` after `applySecurity` (headers, rate limits, CSRF) and before Nest's parsers, reads JSON bodies up to 10 MB for `POST /bank-rec/accounts/:id/statements` only; every other route keeps body-parser's 100 kB default. 413 `{error:'payload_too_large'}` above the limit (declared or counted, with `Connection: close`, the rest discarded), 415 for a content encoding or a non-UTF-8 charset, 400 `{error:'invalid_json'}` for malformed or non-object/array JSON. ADR-0078 (security) records it, Accepted under the owner's delegation (DL-0477 item 6). Raising one route's body limit counts as a security change (design §6.9), hence the ADR rather than only a log entry.
+- Why: RQ-0151 and DL-0532; no new runtime dependency (option B would add `express` as a direct dependency); the ADR-0054 rate limits still run before any byte is read.
+- Alternatives: option B, a global limit, multipart (all rejected in ADR-0078).
+- ADR: ADR-0078 · Status: accepted

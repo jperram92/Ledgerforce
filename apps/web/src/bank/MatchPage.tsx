@@ -1,7 +1,8 @@
 /**
  * Match statement lines (T-0088, UC-08 steps 2–4, SS-UC08-08). One statement's lines with what
  * each is matched to, or what is suggested. "Find matches" runs the API's exact matching and
- * bank rules (T-0149): exact matches are recorded, rules only suggest. An unmatched line can
+ * bank rules (T-0149): exact matches are recorded, rules only suggest. A suggested receipt or
+ * payment is accepted with "Accept" beside it (T-0160); nothing is posted. An unmatched line can
  * become a transaction (its own screen); a matched one can be unmatched while no completed
  * reconciliation or hard lock covers it (the API refuses otherwise and says why).
  */
@@ -27,7 +28,20 @@ function suggestionText(s: Suggestion): string {
   return `Suggested: ${s.entry_no ?? 'a posted entry'}`;
 }
 
-function MatchCell({ line }: { line: StatementLine }) {
+/**
+ * What the line is matched to, or its suggestions. A candidate suggestion (a receipt or payment
+ * that agrees with the line) gets an "Accept" button when the person may reconcile (T-0160); a
+ * rule suggestion is accepted on the create-transaction screen, because it posts a journal.
+ */
+function MatchCell({
+  line,
+  onAccept,
+  accepting,
+}: {
+  line: StatementLine;
+  onAccept: ((s: Suggestion) => void) | null;
+  accepting: boolean;
+}) {
   if (line.match)
     return (
       <>
@@ -41,6 +55,24 @@ function MatchCell({ line }: { line: StatementLine }) {
       {line.suggestions.map((s) => (
         <span key={s.id}>
           {suggestionText(s)}
+          {onAccept && s.kind === 'candidate' && line.status === 'unmatched' ? (
+            <>
+              {' '}
+              <button
+                type="button"
+                className="secondary"
+                disabled={accepting}
+                onClick={() => onAccept(s)}
+              >
+                Accept
+                <span className="sr-only">
+                  {' '}
+                  {s.entry_no ?? 'the posted entry'} for {line.description},{' '}
+                  {dateText(line.posted_on)}
+                </span>
+              </button>
+            </>
+          ) : null}
           <br />
         </span>
       ))}
@@ -86,6 +118,20 @@ export function MatchPage({
   const unmatch = useMutation({
     mutationFn: (lineId: string) => bank.unmatch(ctx.companyId, lineId, newKey('unmatch')),
     onSuccess: refresh,
+  });
+  const [acceptedText, setAcceptedText] = useState<string | null>(null);
+  const accept = useMutation({
+    mutationFn: (v: { line: StatementLine; suggestion: Suggestion }) =>
+      bank.acceptSuggestion(ctx.companyId, v.line.id, v.suggestion.id, newKey('accept')),
+    onMutate: () => setAcceptedText(null),
+    onSuccess: async (_r, v) => {
+      setAcceptedText(
+        `${v.line.description || 'The line'} is matched to ${
+          v.suggestion.entry_no ?? 'the posted entry'
+        }.`,
+      );
+      await refresh();
+    },
   });
 
   if (ctx.isPending || (!!statement && lines.isPending))
@@ -158,6 +204,12 @@ export function MatchPage({
 
       <Region heading="Statement lines">
         {unmatch.isError ? <BankRefusal error={unmatch.error} what="unmatch this line" /> : null}
+        {accept.isError ? <BankRefusal error={accept.error} what="accept this suggestion" /> : null}
+        {acceptedText ? (
+          <p className="done" role="status">
+            {acceptedText}
+          </p>
+        ) : null}
         <table className="admin-table" aria-label="Statement lines">
           <thead>
             <tr>
@@ -193,7 +245,13 @@ export function MatchPage({
                   </span>
                 </td>
                 <td data-label="Matched to">
-                  <MatchCell line={l} />
+                  <MatchCell
+                    line={l}
+                    accepting={accept.isPending}
+                    onAccept={
+                      canReconcile ? (s) => accept.mutate({ line: l, suggestion: s }) : null
+                    }
+                  />
                 </td>
                 {canReconcile ? (
                   <td data-label="Action">

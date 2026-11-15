@@ -100,6 +100,16 @@ export interface TransactionResult {
   replayed: boolean;
 }
 
+export interface AcceptedSuggestion {
+  statement_line_id: string;
+  suggestion_id: string;
+  match_id: string;
+  journal_entry_id: string;
+  source_kind: string;
+  source_id: string;
+  replayed: boolean;
+}
+
 /** The posting engine's preview of a transaction from a line: same shape as a journal preview. */
 export type TransactionPreview = Preview;
 
@@ -164,6 +174,13 @@ export interface BankClient {
     input: TransactionInput,
   ): Promise<TransactionPreview>;
   unmatch(companyId: string, lineId: string, key: string): Promise<unknown>;
+  /** Accept a candidate suggestion: the line is matched to that receipt or payment (T-0160). */
+  acceptSuggestion(
+    companyId: string,
+    lineId: string,
+    suggestionId: string,
+    key: string,
+  ): Promise<AcceptedSuggestion>;
   report(companyId: string, statementId: string, closingBalance?: string): Promise<Report>;
   complete(
     companyId: string,
@@ -232,6 +249,13 @@ export function createBankClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): BankCl
       }),
     unmatch: (companyId, lineId, key) =>
       send('POST', `/bank-rec/lines/${seg(lineId)}/unmatch`, { company_id: companyId }, key),
+    acceptSuggestion: (companyId, lineId, suggestionId, key) =>
+      send(
+        'POST',
+        `/bank-rec/lines/${seg(lineId)}/suggestions/${seg(suggestionId)}/accept`,
+        { company_id: companyId },
+        key,
+      ),
     report: (companyId, statementId, closingBalance) =>
       send(
         'GET',

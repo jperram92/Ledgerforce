@@ -7,6 +7,8 @@
  * the posting engine (manual-journal and control-account rules) and the line is matched.
  * T-0150 — the journal preview of a transaction from a line: the posting engine's preview of the
  * command the post uses; it refuses what the post refuses and writes nothing.
+ * T-0160 (SS-UC08-08 screens) — a person accepts one of two ambiguous candidates: the line is matched to
+ * that entry with method `suggestion`, nothing is posted, the other candidate is dismissed.
  *
  * The statement is the November Harbour CSV fixture used by T-0058 (1,375.00 "INV-000123" in,
  * 10.00 account fee out, 550.55 Stripe payout in, …).
@@ -22,6 +24,7 @@ import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createCompanyBankAccount } from './bank-accounts.ts';
 import {
+  acceptSuggestion,
   createMatchRule,
   createTransactionFromLine,
   listLineMatching,
@@ -431,5 +434,134 @@ describe('T-0150: journal preview of a transaction from a line', () => {
       ),
     ).rejects.toMatchObject({ code: 'INVALID_TRANSACTION' });
     expect(await written()).toEqual(before);
+  });
+});
+
+describe('T-0160: accept a candidate suggestion', () => {
+  it('T-0160 AC-1 two receipts of 10,000.00 ref CAP-01 are suggested for the deposit line; accepting one matches it with method suggestion and dismisses the other', async () => {
+    const receipts = [];
+    for (const key of ['cap-1', 'cap-2']) {
+      receipts.push(
+        await f.inTenant((trx) =>
+          recordReceipt(trx, {
+            companyId: f.companyId,
+            partyId: acme,
+            receiptDate: '2026-11-30',
+            amount: '10000.00',
+            method: 'eft',
+            depositTo: { accountId: acct('1010') },
+            reference: 'CAP-01',
+            idempotencyKey: key,
+            allocations: [],
+          }),
+        ),
+      );
+    }
+    const run = await f.inTenant((trx) => runMatching(trx, { bankAccountId, runBy: accountant }));
+    expect(run.autoMatched).toBe(0);
+    const deposit = await lineBy('Deposit Harbour & Co Pty Ltd');
+    expect(deposit.status).toBe('unmatched');
+    const open = (await f.inTenant((trx) => listLineMatching(trx, deposit.id))).suggestions;
+    expect(open.map((s) => [s.kind, s.journalEntryId, s.status])).toEqual(
+      receipts.map((r) => ['candidate', r.entryId, 'open']),
+    );
+    const [first, second] = open;
+    const entriesBefore = await f.countEntries();
+
+    const r = await f.inTenant((trx) =>
+      acceptSuggestion(trx, {
+        statementLineId: deposit.id,
+        suggestionId: second?.id ?? '',
+        by: accountant,
+      }),
+    );
+    expect(await f.countEntries()).toBe(entriesBefore);
+    expect((await lineBy('Deposit Harbour & Co Pty Ltd')).status).toBe('matched');
+    const m = await f.inTenant((trx) => listLineMatching(trx, deposit.id));
+    expect(m.match).toMatchObject({
+      id: r.matchId,
+      journalEntryId: receipts[1]?.entryId,
+      sourceKind: 'customer_receipt',
+      sourceId: receipts[1]?.receiptId,
+      method: 'suggestion',
+      ruleId: null,
+      matchedBy: accountant,
+    });
+    expect(r).toMatchObject({
+      matchId: m.match?.id,
+      journalEntryId: receipts[1]?.entryId,
+      sourceKind: 'customer_receipt',
+      sourceId: receipts[1]?.receiptId,
+    });
+    expect(m.suggestions.map((s) => [s.id, s.status])).toEqual([
+      [first?.id, 'dismissed'],
+      [second?.id, 'accepted'],
+    ]);
+  });
+
+  it('T-0160 AC-1 a closed suggestion is refused with SUGGESTION_CLOSED; a rule suggestion needs a transaction; unknown ids are NOT_FOUND', async () => {
+    const deposit = await lineBy('Deposit Harbour & Co Pty Ltd');
+    const closed = (await f.inTenant((trx) => listLineMatching(trx, deposit.id))).suggestions;
+    for (const s of closed) {
+      await expect(
+        f.inTenant((trx) =>
+          acceptSuggestion(trx, {
+            statementLineId: deposit.id,
+            suggestionId: s.id,
+            by: accountant,
+          }),
+        ),
+      ).rejects.toMatchObject({ code: 'SUGGESTION_CLOSED' });
+    }
+
+    await f.inTenant((trx) =>
+      createMatchRule(trx, {
+        companyId: f.companyId,
+        bankAccountId,
+        name: 'Interest',
+        definition: {
+          match: 'all',
+          conditions: [{ field: 'description', op: 'equals', value: 'Interest' }],
+          direction: 'in',
+        },
+        accountId: acct('4900'),
+        createdBy: accountant,
+      }),
+    );
+    await f.inTenant((trx) => runMatching(trx, { bankAccountId, runBy: accountant }));
+    const interest = await lineBy('Interest');
+    const [rule] = (await f.inTenant((trx) => listLineMatching(trx, interest.id))).suggestions;
+    expect(rule).toMatchObject({ kind: 'rule', status: 'open' });
+    await expect(
+      f.inTenant((trx) =>
+        acceptSuggestion(trx, {
+          statementLineId: interest.id,
+          suggestionId: rule?.id ?? '',
+          by: accountant,
+        }),
+      ),
+    ).rejects.toMatchObject({ code: 'NOT_A_CANDIDATE' });
+    // A suggestion of another line, and a malformed id, are not found for this line.
+    await expect(
+      f.inTenant((trx) =>
+        acceptSuggestion(trx, {
+          statementLineId: deposit.id,
+          suggestionId: rule?.id ?? '',
+          by: accountant,
+        }),
+      ),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+    await expect(
+      f.inTenant((trx) =>
+        acceptSuggestion(trx, {
+          statementLineId: interest.id,
+          suggestionId: 'nope',
+          by: accountant,
+        }),
+      ),
+    ).rejects.toMatchObject({ code: 'NOT_FOUND' });
+    expect((await lineBy('Interest')).status).toBe('unmatched');
+    const after = (await f.inTenant((trx) => listLineMatching(trx, interest.id))).suggestions;
+    expect(after.map((s) => s.status)).toEqual(['open']);
   });
 });
