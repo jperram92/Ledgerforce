@@ -1,0 +1,76 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33397
+(node:5423) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[31m[Nest] 5423  - [39m11/15/2026, 3:43:00 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204866[39m,
+  length: [33m204866[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 5423  - [39m11/15/2026, 3:43:00 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204863[39m,
+  length: [33m204863[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 5423  - [39m11/15/2026, 3:43:00 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204866[39m,
+  length: [33m204866[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 5698  - [39m11/15/2026, 3:43:03 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a2ca7d88ff62658a2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204801[39m,
+  length: [33m204801[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+
+ Test Files  5 passed (5)
+      Tests  45 passed (45)
+   Start at  03:42:47
+   Duration  26.74s (transform 3.35s, setup 0ms, import 11.58s, tests 12.72s, environment 0ms)
+
