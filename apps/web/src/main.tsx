@@ -10,6 +10,7 @@ import './styles/purchases.css';
 import './styles/reports.css';
 import './styles/bank.css';
 import './styles/setup.css';
+import './styles/settings.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App.tsx';

@@ -1,0 +1,16 @@
+
+Running 11 tests using 2 workers
+
+  ✓   2 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:505:1 › SS-PLAT-129: an Accountant sees Company details read-only [T-0176] (3.2s)
+  ✓   1 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:314:3 › SS-PLAT-129: Company details: the Finance Admin follows step 1's link, saves the details and adds the first financial year @ 1440 [T-0176] (4.9s)
+  ✓   3 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:529:1 › SS-PLAT-129: an Accountant sees Tax settings read-only [T-0176] (1.8s)
+  ✓   5 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:546:1 › SS-PLAT-129: without settings.read, Company details is forbidden [T-0176] (1.1s)
+  ✓   6 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:557:1 › SS-PLAT-129: without settings.read, Tax settings is forbidden [T-0176] (970ms)
+  ✓   7 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:566:1 › SS-PLAT-129: both screens are listed on the Settings page [T-0176] (1.3s)
+  ✓   4 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:376:3 › SS-PLAT-129: Tax settings: the Finance Admin follows step 3's link, chooses the GST basis and BAS frequency and adds the standard codes @ 1440 [T-0176] (4.0s)
+  ✓   8 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:314:3 › SS-PLAT-129: Company details: the Finance Admin follows step 1's link, saves the details and adds the first financial year @ 390 [T-0176] (3.1s)
+  ✓   9 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:376:3 › SS-PLAT-129: Tax settings: the Finance Admin follows step 3's link, chooses the GST basis and BAS frequency and adds the standard codes @ 390 [T-0176] (3.0s)
+  ✓  10 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:436:1 › SS-PLAT-129: Company details refusals are said in plain words: ABN check, locked base currency, overlapping year [T-0176] (2.2s)
+  ✓  11 [chromium] › tests/e2e/web/settings-company-tax.spec.ts:474:1 › SS-PLAT-129: Tax settings refusal is said in plain words and nothing is saved [T-0176] (2.1s)
+
+  11 passed (21.1s)

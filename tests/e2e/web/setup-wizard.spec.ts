@@ -254,7 +254,10 @@ for (const width of [1440, 390]) {
     // Where each setting is entered: an existing screen, or said plainly.
     await expect(stepItem(page, 2).getByRole('link', { name: 'Chart of accounts' })).toBeVisible();
     await expect(stepItem(page, 10).getByRole('link', { name: 'People and roles' })).toBeVisible();
-    await expect(stepItem(page, 3)).toContainText('no LedgerForce screen');
+    // T-0176: steps 1 and 3 link to their settings screens; step 4 has none yet (T-0185).
+    await expect(stepItem(page, 1).getByRole('link', { name: 'Company details' })).toBeVisible();
+    await expect(stepItem(page, 3).getByRole('link', { name: 'Tax settings' })).toBeVisible();
+    await expect(stepItem(page, 4)).toContainText('no LedgerForce screen');
     await assertPage(page, width);
     await evidence('SS-PLAT-127', `wizard-fresh-company-${String(width)}`);
 
