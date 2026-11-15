@@ -3530,9 +3530,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: allow any change (rejected: corrupts history); a database trigger (rejected: needs a migration, out of this card's rules; can follow later).
 - ADR: ADR-0081 · Status: accepted
 
-### DL-0642 — Setup settings routes under /settings/* (ADR-0081); idempotency by state as for system-role rebinding
+### DL-0642 — Setup settings routes under /setup/* (ADR-0081); idempotency by state as for system-role rebinding
 - Date: 2026-11-15 · By: claude · Task: T-0176 · Category: architecture
-- Decision: New routes `GET/PUT /settings/company`, `POST /settings/company/fiscal-years`, `GET/PUT /settings/tax`, `POST /settings/tax/codes/standard` (ADR-0081). Each write requires an Idempotency-Key (400 without) and is replay-safe by state: the same values again answer 200 with `changed:false`/`replayed:true`/`inserted:0` and write nothing, as `PUT /accounts/system-roles/:role` does (T-0146). Successful writes are audited by the interceptor with a handler description.
+- Decision: New routes `GET/PUT /setup/company`, `POST /setup/company/fiscal-years`, `GET/PUT /setup/tax`, `POST /setup/tax/codes/standard` (ADR-0081). They live under the API's existing `setup` prefix, not `/settings`: `/settings/*` is the SPA's own path segment, and nginx sends each top-level segment to either the SPA or the API (SS-PLAT-86, `infra/docker/nginx/default.conf.template`). Each write requires an Idempotency-Key (400 without) and is replay-safe by state: the same values again answer 200 with `changed:false`/`replayed:true`/`inserted:0` and write nothing, as `PUT /accounts/system-roles/:role` does (T-0146). Successful writes are audited by the interceptor with a handler description.
 - Why: RQ-0161 S8; no migration is allowed for a key store and none is needed: each write converges on the requested state.
 - Alternatives: a key store table (rejected: migration); module-prefixed routes (rejected in ADR-0081).
 - ADR: ADR-0081 · Status: accepted

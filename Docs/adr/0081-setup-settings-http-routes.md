@@ -33,29 +33,29 @@ functions for everything else and no routes. T-0176 builds the screens; they nee
 - Posted history must never change meaning (design §3.1).
 
 ## Decision
-Routes (JSON, money-free; dates `YYYY-MM-DD`):
+Routes (JSON, money-free; dates `YYYY-MM-DD`), under the API's existing `setup` prefix:
 
-1. `GET /settings/company?company_id=` (settings.read) →
+1. `GET /setup/company?company_id=` (settings.read) →
    `{company_id, name, legal_name, abn, base_currency, base_currency_locked, fiscal_years:[{label, start_date, end_date}]}`.
    `base_currency_locked` is true once the company has a journal entry.
-2. `PUT /settings/company {company_id, legal_name, abn, base_currency}` (settings.setup.manage,
+2. `PUT /setup/company {company_id, legal_name, abn, base_currency}` (settings.setup.manage,
    Idempotency-Key) → the view of 1 plus `changed`. The same values again: 200 `changed:false`,
    nothing written. Refusals: 400 malformed (legal name 1–200 characters, ABN 11 digits after
    removing spaces, ISO 4217 code), 422 `INVALID_ABN` (checksum, from `company_abn_checksum`),
    409 `BASE_CURRENCY_LOCKED` (a different base currency once a journal entry exists, DL-0641).
-3. `POST /settings/company/fiscal-years {company_id, start}` (settings.setup.manage,
+3. `POST /setup/company/fiscal-years {company_id, start}` (settings.setup.manage,
    Idempotency-Key; `start` is the 1st of a month) adds one fiscal year of twelve monthly periods
    through `generateFiscalYear` → 201 `{label, start_date, end_date, periods, replayed:false}`.
    A year with exactly that start already there: 200 with it and `replayed:true`. Any other
    overlap: 409 `FISCAL_YEAR_OVERLAP`. Fiscal years are never changed or removed here.
-4. `GET /settings/tax?company_id=` (settings.read) →
+4. `GET /setup/tax?company_id=` (settings.read) →
    `{company_id, as_of, settings:{effective_from, gst_basis, bas_frequency}|null, codes:[{code, name, kind, rate, effective_from, effective_to, status}]}`;
    `as_of` is today in the tenant's report time zone; `rate` is a decimal string.
-5. `PUT /settings/tax {company_id, effective_from, gst_basis, bas_frequency}`
+5. `PUT /setup/tax {company_id, effective_from, gst_basis, bas_frequency}`
    (settings.tax.manage, Idempotency-Key) through `setTaxSettings` → `{settings, changed}`.
    The same values for the same month again: 200 `changed:false`. 400 for anything the module
    refuses (`INVALID_TAX_SETTINGS`, with its message).
-6. `POST /settings/tax/codes/standard {company_id}` (settings.tax.manage, Idempotency-Key) adds
+6. `POST /setup/tax/codes/standard {company_id}` (settings.tax.manage, Idempotency-Key) adds
    the standard Australian codes the company does not have (`seedTaxCodes`) →
    201 `{inserted}` when some were added, 200 `{inserted:0}` otherwise.
 
@@ -65,7 +65,10 @@ All writes answer 404 `UNKNOWN_COMPANY` for an unknown or other tenant's company
 ## Considered options
 - One generic `PATCH /settings` over every module (rejected: mixes permissions and owners).
 - Module routes under each module's prefix (`/tax/settings`, `/companies/:id`) (rejected for
-  now: the screens are one Settings area; `/settings/*` keeps the permission story in one place).
+  now: the screens are one setup area; `/setup/*` keeps the permission story in one place).
+- Routes under `/settings/*` (rejected: `/settings` is the SPA's path segment; nginx routes each
+  top-level segment to either the SPA or the API, SS-PLAT-86). The API's `setup` prefix is
+  already proxied, so no infrastructure change is needed.
 - Allow the base currency to change at any time (rejected: re-denominates posted history).
 
 ## Consequences

@@ -60,7 +60,7 @@ changed after it has been used could make posted history wrong.
 
 ## Conclusion / decision
 
-1. Add thin settings routes under `/settings/*` (ADR-0081): company details and fiscal years
+1. Add thin settings routes under `/setup/*` (ADR-0081; `/settings` is the SPA's segment, SS-PLAT-86): company details and fiscal years
    (step 1, `settings.setup.manage`), tax settings and the standard tax codes (step 3,
    `settings.tax.manage`), then company bank accounts (step 4) and step 8's settings in
    follow-up cards. Reads need `settings.read`. Step 10 reuses `/sod/settings`.
