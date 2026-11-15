@@ -3773,3 +3773,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0165 requires all four tests to be green before T-0172 goes to review. The throwing condition uses the same test-only seam as the existing F3 test: `approve` is re-declared with `RequireStepUp(300, cond)`, then restored in `finally`. No production code changed. The behaviour already existed, so the tests could not be seen RED first. Instead, two temporary interceptor mutations were run and reverted: a token counted as stepped up, and a thrown condition swallowed as false. Each made its test fail.
 - Alternatives: an api-unit test of `TenantInterceptor` with a mocked condition (rejected: the api-db test exercises the real route, RLS and Stripe stub with no production seam needed); a test-only controller (rejected: the real approve route is what RQ-0165 is about).
 - ADR: ADR-0083 · Status: accepted
+
+### DL-0710 — Numbering and billing routes under /setup/billing (ADR-0085)
+- Date: 2026-11-15 · By: claude · Task: T-0186 · Category: architecture
+- Decision: Wizard step 8 gets `GET /setup/billing` (settings.read) and four writes with settings.setup.manage and an Idempotency-Key: `PUT /setup/billing/series` (invoice and credit-note series), `POST /setup/billing/formats/standard` (AU billing formats), `PUT /setup/billing/invoice` (brand colour, terms, payment methods) and `PUT /setup/billing/stripe` (clearing account only). Each is replay-safe by state (DL-0642) and audited when it changes something. The clearing account must be an active, postable, non-control asset account of the company (422 `INVALID_CLEARING_ACCOUNT`); the read lists those accounts so the screen needs no chart permission.
+- Why: RQ-0167 findings 1, 2; ADR-0081 asks step 8 to extend the `/setup/*` family by its own record.
+- Alternatives: one combined PUT (rejected: four owners and refusal kinds); Stripe under `/payments` (rejected: one setup area); reuse `GET /accounts` for the picker (rejected: needs gl.account.read, which settings readers may lack).
+- ADR: ADR-0085 · Status: proposed (architecture, accepted on cross-review)
+
+### DL-0711 — POST /sod/settings requires an Idempotency-Key
+- Date: 2026-11-15 · By: claude · Task: T-0186 · Category: architecture
+- Decision: The route now answers 400 `idempotency_key_required` before reading the body when the header is missing (nothing written). The key is not stored; the route stays replay-safe by state. The approval-amounts screen sends a fresh key per save; the three api-db test files that call the route send one.
+- Why: apps/api rule "every mutating endpoint requires an idempotency key"; the route had no non-test caller (RQ-0167 finding 3), so the change breaks no client.
+- Alternatives: keep it keyless because it is state-idempotent (rejected: rule; and the screen would be the only settings write without one); send a key from the screen without requiring it (rejected: leaves the rule broken for other clients).
+- ADR: ADR-0085 · Status: proposed (architecture, accepted on cross-review)
+
+### DL-0712 — apps/api depends on the workspace package @ledgerforce/documents
+- Date: 2026-11-15 · By: claude · Task: T-0186 · Category: tooling
+- Decision: Add `"@ledgerforce/documents": "workspace:*"` to `apps/api/package.json` for `seedBillingFormats` and `AU_BILLING_FORMATS`. It is an internal workspace package, not a third-party dependency.
+- Why: the billing-format catalogue and its seeding live in the documents module (RQ-0167 S3); the controller stays thin.
+- Alternatives: copy the catalogue into the API (rejected: two sources of truth).
+- ADR: ADR-0085 · Status: accepted
+
+### DL-0713 — The ledger defines number series: defineNumberSeries and numberSeriesOf
+- Date: 2026-11-15 · By: claude · Task: T-0186 · Category: architecture
+- Decision: `packages/ledger/src/numbering.ts` gains `defineNumberSeries(trx, {companyId, code, prefix, padWidth})` (insert, or change prefix/width — and re-activate — while no number has been issued; same values: `changed:false`; different values after issue: `NUMBER_SERIES_IN_USE`) and `numberSeriesOf` (with the next number formatted as `app.next_document_number` would). The prefix is limited to 0–20 of `A–Z a–z 0–9 - / _ .` (the database allows any non-control text up to 20). The row is locked (`FOR UPDATE`) before comparing, so a concurrent first issue cannot slip past the check; the 0010 guard trigger remains the backstop.
+- Why: RQ-0167 finding 1 (the ledger owns the table; no production code created series). A narrow prefix set keeps invoice numbers safe in file names, e-mail subjects and bank references.
+- Alternatives: insert from the API controller (rejected: ledger ownership); allow any printable prefix (rejected: quoting problems downstream for no user need).
+- ADR: ADR-0085 · Status: accepted
+
+### DL-0714 — T-0186 scope: logo, accent colour, payout accounts and the acknowledge key split out
+- Date: 2026-11-15 · By: claude · Task: T-0186 · Category: scope
+- Decision: T-0186 builds what wizard steps 8 and 10 require. The invoice logo upload, the accent colour on screen and the Stripe payout accounts move to T-0195; the Idempotency-Key on `POST /sod/exceptions/weekly/acknowledge` moves to T-0196. The remittance account (also step 8) stays with T-0183 as instructed.
+- Why: RQ-0167 finding 4: none is needed for step 8; each needs its own transport or picker and tests. Keeps the card near its estimate.
+- Alternatives: build all on T-0186 (rejected: size).
+- ADR: none · Status: accepted
