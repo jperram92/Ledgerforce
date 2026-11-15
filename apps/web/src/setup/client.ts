@@ -73,6 +73,69 @@ export interface OpeningBalance {
   }[];
 }
 
+export interface ProfileAccount {
+  id: string;
+  code: string;
+  name: string;
+}
+
+/** One party × product combination, resolved by the API (null account = a gap). */
+export interface MatrixCell {
+  party_profile_id: string;
+  product_profile_id: string;
+  purpose: 'sale' | 'purchase';
+  account: ProfileAccount | null;
+  account_source: 'override' | 'product' | null;
+  tax_code: string | null;
+  tax_code_source: 'override' | 'party' | 'product' | null;
+  override: boolean;
+  gap: { reason: 'profile' | 'kind' | 'account' | 'control' | 'tax_code'; message: string } | null;
+}
+
+export interface ProfileMatrix {
+  company_id: string;
+  as_of: string;
+  parties: {
+    id: string;
+    code: string;
+    name: string;
+    kind: 'customer' | 'supplier';
+    control_account: ProfileAccount | null;
+    default_tax_code: string;
+  }[];
+  products: {
+    id: string;
+    code: string;
+    name: string;
+    revenue_account: ProfileAccount | null;
+    expense_account: ProfileAccount | null;
+    cogs_account: ProfileAccount | null;
+    default_tax_code: string;
+  }[];
+  cells: MatrixCell[];
+  choices: (ProfileAccount & { type: 'revenue' | 'expense' })[];
+}
+
+export interface OverrideBody {
+  company_id: string;
+  party_profile_id: string;
+  product_profile_id: string;
+  revenue_account_id?: string;
+  expense_account_id?: string;
+  tax_code?: string;
+}
+
+export interface OverrideResult {
+  party_profile_id: string;
+  product_profile_id: string;
+  revenue_account_id: string | null;
+  expense_account_id: string | null;
+  cogs_account_id: string | null;
+  discount_account_id: string | null;
+  tax_code: string | null;
+  changed: boolean;
+}
+
 export interface SetupClient {
   /** The live opening balance, or null when none is posted (404). */
   openingBalance(companyId: string): Promise<OpeningBalance | null>;
@@ -81,6 +144,10 @@ export interface SetupClient {
     files: OpeningBalanceFiles,
     key: string,
   ): Promise<OpeningBalance & { replayed: boolean }>;
+  /** GET /posting-profiles/matrix (T-0187, ADR-0082). */
+  matrix(companyId: string): Promise<ProfileMatrix>;
+  /** PUT /posting-profiles/overrides (T-0187, ADR-0082). */
+  setOverride(body: OverrideBody, key: string): Promise<OverrideResult>;
   wizard(companyId: string): Promise<Wizard>;
   complete(
     companyId: string,
@@ -92,7 +159,7 @@ export interface SetupClient {
 
 export function createSetupClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): SetupClient {
   async function send<T>(
-    method: 'GET' | 'POST',
+    method: 'GET' | 'POST' | 'PUT',
     path: string,
     body?: unknown,
     extra: Record<string, string> = {},
@@ -127,6 +194,9 @@ export function createSetupClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Setup
     previewOpeningBalance: (files) => send('POST', '/setup/opening-balances/preview', files),
     postOpeningBalance: (files, key) =>
       send('POST', '/setup/opening-balances', files, { 'idempotency-key': key }),
+    matrix: (companyId) => send('GET', `/posting-profiles/matrix?company_id=${seg(companyId)}`),
+    setOverride: (body, key) =>
+      send('PUT', '/posting-profiles/overrides', body, { 'idempotency-key': key }),
     wizard: (companyId) => send('GET', `/setup/wizard?company_id=${seg(companyId)}`),
     complete: (companyId, step, key, noHistoryReason) =>
       send(

@@ -29,7 +29,8 @@ type Screen =
   | '/accounting/chart'
   | '/settings/users'
   | '/settings/sync-issues'
-  | '/settings/setup/opening-balances';
+  | '/settings/setup/opening-balances'
+  | '/accounting/posting-profiles';
 export interface Where {
   /** An existing screen where the setting is entered or checked. */
   to?: Screen;
@@ -60,7 +61,12 @@ export const STEP_WHERE: Record<number, Where> = {
     name: 'Salesforce sync issues',
     text: 'Records arrive from Salesforce once it is connected. Anything that could not be brought across is listed on',
   },
-  7: { text: ELSEWHERE },
+  // T-0188: the posting-profile matrix (IA S13).
+  7: {
+    to: '/accounting/posting-profiles',
+    name: 'Posting profiles',
+    text: 'See every customer and supplier type against every product type, and fill the gaps, on',
+  },
   8: { text: ELSEWHERE },
   // T-0177: the opening balances screen (DL-0651).
   9: {

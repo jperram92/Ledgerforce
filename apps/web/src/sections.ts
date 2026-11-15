@@ -13,6 +13,7 @@ export interface SubPage {
     | '/settings/sync-issues'
     | '/accounting/journals'
     | '/accounting/chart'
+    | '/accounting/posting-profiles'
     | '/accounting/close'
     | '/bank/statements'
     | '/bank/match'
@@ -205,6 +206,12 @@ export const SECTIONS: readonly Section[] = [
         to: '/accounting/chart',
         name: 'Chart of accounts',
         text: 'The accounts your books are kept in, by number and type.',
+      },
+      // Posting-profile matrix (T-0188, IA S13).
+      {
+        to: '/accounting/posting-profiles',
+        name: 'Posting profiles',
+        text: 'Which account each kind of customer or supplier posts to for each kind of product, and any gaps.',
       },
       {
         to: '/accounting/close',
