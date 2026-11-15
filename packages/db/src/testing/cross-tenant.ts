@@ -670,6 +670,19 @@ export const PREREQUISITES: Readonly<
     );
   },
   // A company bank account needs its GL account to be an asset of subtype bank (migration 0013).
+  // Migration 0071 (T-0180): a change names a bank account other than the previous one (NULL),
+  // so seed an account of the row's company and name it.
+  'app.remittance_account_change': async (admin, row) => {
+    const account = await seedRow(
+      admin,
+      { schema: 'app', table: 'bank_account', qualified: 'app.bank_account' },
+      row.get('tenant_id') ?? '',
+      DEFAULT_ROW_OVERRIDES,
+      1,
+      new Map([['company_id', row.get('company_id') ?? '']]),
+    );
+    row.set('bank_account_id', String(account['id']));
+  },
   'app.bank_account': async (admin, row) => {
     await admin.query(`UPDATE app.account SET subtype = 'bank' WHERE tenant_id = $1 AND id = $2`, [
       row.get('tenant_id'),
