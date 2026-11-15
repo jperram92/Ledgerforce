@@ -27,6 +27,7 @@ import { isJournalStatus, JournalsPage } from './gl/JournalsPage.tsx';
 import type { JournalStatus } from './gl/client.ts';
 import { NotFoundPage, SectionPage } from './pages.tsx';
 import { SECTIONS } from './sections.ts';
+import { WizardPage } from './setup/WizardPage.tsx';
 import { Shell } from './Shell.tsx';
 import { SignInPage, type SignInReason } from './SignIn.tsx';
 import { inboxSearch } from './sync/logic.ts';
@@ -141,6 +142,13 @@ const syncIssueRoute = createRoute({
     const { issueId } = syncIssueRoute.useParams();
     return <SyncIssuePage key={issueId} issueId={issueId} />;
   },
+});
+
+// Setup wizard (T-0091, DL-0600): under Settings; the API owns /setup/wizard on the same origin.
+const setupRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/setup',
+  component: WizardPage,
 });
 
 // GL (T-0082, DL-0226): chart of accounts and manual journals under /accounting, listed on Reports.
@@ -487,6 +495,7 @@ const routeTree = rootRoute.addChildren([
     auditRoute,
     syncIssuesRoute,
     syncIssueRoute,
+    setupRoute,
     chartRoute,
     closeRoute,
     bankStatementsRoute,

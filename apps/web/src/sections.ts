@@ -6,6 +6,7 @@
 /** A page inside a section, listed on the section's page (T-0093). */
 export interface SubPage {
   to:
+    | '/settings/setup'
     | '/settings/users'
     | '/reports/control-exceptions'
     | '/reports/audit-log'
@@ -221,6 +222,12 @@ export const SECTIONS: readonly Section[] = [
     emptyText:
       'Company details, users and roles, and the Salesforce connection will be set up from here.',
     pages: [
+      // Setup wizard (T-0091).
+      {
+        to: '/settings/setup',
+        name: 'Set up your company',
+        text: 'The ten setup steps: how far you have got and what is still missing.',
+      },
       {
         to: '/settings/users',
         name: 'People and roles',

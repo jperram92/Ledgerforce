@@ -1,0 +1,74 @@
+/* Setup wizard (T-0091) in the Timeline direction (DL-0070): a numbered list of steps drawn with
+   lines, the open step marked with the "your turn" teal edge, no shadows, radius 2px.
+   Requires tokens.css, timeline.css, shell.css and admin.css first. */
+
+.wizard-sum {
+  font-weight: 600;
+}
+.wizard-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+  max-width: 70ch;
+}
+.wizard-steps > li {
+  padding: var(--s3) 0 var(--s3) var(--s3);
+  border-left: 4px solid var(--line-2);
+  border-bottom: 1px solid var(--line);
+}
+.wizard-steps > li[data-state='done'] {
+  border-left-color: var(--ink);
+}
+.wizard-steps > li[data-state='open'] {
+  border-left-color: var(--now);
+  background: var(--now-soft);
+}
+.wizard-steps > li[data-state='locked'] {
+  border-left-style: dashed;
+}
+.wizard-steps h3 {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: var(--s1);
+}
+.wizard-steps .word {
+  white-space: normal;
+}
+.wizard-steps .word[data-status='locked'] {
+  border-style: dashed;
+}
+.wizard-steps .word[data-status='open'] {
+  border-style: solid;
+  border-color: var(--now);
+}
+.wizard-steps .admin-note {
+  margin: var(--s1) 0;
+}
+.wizard-missing {
+  margin: var(--s2) 0;
+}
+.wizard-missing p {
+  font-weight: 600;
+}
+.wizard-missing ul,
+.wizard-actions .refusal ul {
+  margin: var(--s1) 0 0;
+  padding-left: var(--s4);
+}
+.wizard-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s3);
+  align-items: center;
+  margin-top: var(--s3);
+}
+.wizard-actions .admin-form {
+  margin-top: 0;
+  flex-basis: 100%;
+}
+.wizard-actions .refusal {
+  flex-basis: 100%;
+  margin-top: 0;
+}

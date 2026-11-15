@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0091",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-033329-SS-PLAT-127-wizard-missing-plain-words-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: what is missing is listed in plain words, and Complete waits until nothing is [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:29.691Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-128",
+      "file": ".agent/evidence/T-0091/20261115-033332-SS-PLAT-128-wizard-step-9-declare-no-history-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-128: step 9 is declared \"no history\" with a reason, which is shown afterwards [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:32.347Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-128",
+      "file": ".agent/evidence/T-0091/20261115-033333-SS-PLAT-128-wizard-step-9-no-history-done-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-128: step 9 is declared \"no history\" with a reason, which is shown afterwards [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:33.101Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-033347-SS-PLAT-127-wizard-fresh-company-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 1440 [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:47.643Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-033349-SS-PLAT-127-wizard-step-7-no-gaps-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 1440 [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:49.016Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-033350-SS-PLAT-127-wizard-complete-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 1440 [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:50.177Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-033351-SS-PLAT-127-wizard-fresh-company-390.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 390 [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:51.672Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-033352-SS-PLAT-127-wizard-step-7-no-gaps-390.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 390 [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:52.995Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-033353-SS-PLAT-127-wizard-complete-390.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 390 [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:53.960Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-127",
+      "file": ".agent/evidence/T-0091/20261115-033356-SS-PLAT-127-wizard-missing-plain-words-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-127: what is missing is listed in plain words, and Complete waits until nothing is [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:56.007Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-128",
+      "file": ".agent/evidence/T-0091/20261115-033359-SS-PLAT-128-wizard-step-9-declare-no-history-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-128: step 9 is declared \"no history\" with a reason, which is shown afterwards [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:33:59.495Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-128",
+      "file": ".agent/evidence/T-0091/20261115-033400-SS-PLAT-128-wizard-step-9-no-history-done-1440.png",
+      "test": "web/setup-wizard.spec.ts › SS-PLAT-128: step 9 is declared \"no history\" with a reason, which is shown afterwards [T-0091]",
+      "commit": "895e44376518-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-15T03:34:00.295Z",
+      "result": "passed"
+    }
+  ]
+}

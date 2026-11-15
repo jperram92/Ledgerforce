@@ -13,6 +13,7 @@ import type { BankClient } from './bank/client.ts';
 import type { CloseClient } from './close/client.ts';
 import type { ReportsClient } from './reports/client.ts';
 import type { SalesClient } from './sales/client.ts';
+import type { SetupClient } from './setup/client.ts';
 
 export interface AppEnv {
   /** Prefix for API paths; '' means the page's own origin. */
@@ -51,6 +52,8 @@ export interface Services {
   close: CloseClient;
   /** Bank statements and reconciliation (T-0088). */
   bank: BankClient;
+  /** Setup wizard (T-0091). */
+  setup: SetupClient;
 }
 
 export const ServicesContext = createContext<Services | null>(null);
