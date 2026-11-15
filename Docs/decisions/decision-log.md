@@ -3595,3 +3595,48 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: P12 (words first), WCAG 1.4.1 (not colour alone), the ui-screen skill, ADR-0082 (choices come from the API, no accounting in the browser).
 - Alternatives: a side panel as in the mockup (at 1440 the matrix would need sideways scrolling); stacking rows into cards on phones (loses the table semantics that screen readers use to read row and column headers).
 - ADR: ADR-0082 · Status: accepted
+
+### DL-0630 — ADR-0080: remittance account change record, database guards and routes (T-0180)
+- Date: 2026-11-15 · By: claude · Task: T-0180 · Category: architecture
+- Decision: Migration 0071 adds `app.ar_settings.remittance_bank_account_id` (composite FK to the company's bank account) and `app.remittance_account_change` (requested → approved | rejected; RLS ENABLE + FORCE; lf_app SELECT/INSERT/UPDATE). It also adds three triggers:
+  - a guard on `app.ar_settings`: only a change approved in the same transaction (`decided_xact = pg_current_xact_id()`) may write the setting;
+  - a guard on the change table: an insert needs an active account, and decided rows are final;
+  - a deferred requester ≠ approver check, with the small-team exception as in 0025.
+
+  The routes are `GET /setup/remittance-account` and `PUT|POST /setup/remittance-account/changes/:id[/approve|/reject]`, with `settings.setup.manage`, step-up (300 s) and SoD on request and approve. Audit rows hold masked accounts only.
+- Why: ADR-0079 control 2 (RQ-0150). The control must hold in the database as well as in the guard, as supplier bank details do (0025). The client-chosen id makes the PUT idempotent (ADR-0074 pattern).
+- Alternatives: a column guarded by the API only (another code path could bypass it); reusing `app.bank_detail_change` (party accounts with cooling-off and notices, which do not fit the company's own account).
+- ADR: ADR-0080 · Status: accepted
+
+### DL-0631 — The remittance account is stored by an approved change, not by setInvoiceSettings (T-0180 AC-1)
+- Date: 2026-11-15 · By: claude · Task: T-0180 · Category: scope
+- Decision: The card's AC-1 named `setInvoiceSettings` because it predates the acceptance controls. Since ADR-0079 was accepted with maker-checker, `setInvoiceSettings` does not accept the remittance account. `requestRemittanceAccountChange` / `approveRemittanceAccountChange` (packages/modules/ar) store it, and the database refuses any other write. AC-1's checks (same company only; archived and other-company accounts refused) are tested on the request.
+- Why: One path with a second person is the control; a second, single-person setter would defeat it.
+- Alternatives: a `remittanceBankAccountId` field on `setInvoiceSettings` that only creates a request (two APIs for one thing).
+- ADR: ADR-0080 · Status: accepted
+
+### DL-0632 — New SoD subject remittance_change and rule SOD_REMITTANCE_SELF_APPROVAL
+- Date: 2026-11-15 · By: claude · Task: T-0180 · Category: security
+- Decision: Add the steps `remittance_change.request` and `remittance_change.approve`, and the rule `SOD_REMITTANCE_SELF_APPROVAL` (condition always, small-team exception allowed, design §6.5 rule 2 by analogy). They go in `packages/shared/src/sod/rules.ts`, in the SQL mirror (migration 0071, widened as 0069 did) and in the plain-word text in `apps/web/src/admin/messages.ts`.
+- Why: ADR-0079 requires a second person. Small-team mode keeps the same exception route as supplier bank details. The exception is recorded and reported weekly.
+- Alternatives: reuse `bank_detail_change.*` (it would mix the company's own account into the supplier and employee verification report); no small-team exception (a one- or two-person business could never set the account).
+- ADR: ADR-0079, ADR-0080 · Status: accepted
+
+### DL-0633 — Render path: remittanceDetailsOf filters by currency before decrypting; fixed phone line; worker KMS from env
+- Date: 2026-11-15 · By: claude · Task: T-0180 · Category: security
+- Decision: The decrypting reader and the template work as follows:
+  - `remittanceDetailsOf(trx, kms, companyId, {currency})` (packages/modules/bank) decrypts only the designated, active account, and only when it is in the invoice's currency. Otherwise nothing is unwrapped.
+  - `loadInvoiceDocument(…, {kms})` fills `bankTransfer` only when bank transfer is accepted.
+  - The template prints `REMITTANCE_PHONE_CHECK` under printed details: "Our bank details do not change by email. If you are told they have changed, phone us on a number you already know and confirm before you pay."
+  - The worker builds the KMS with `kmsFromEnv`. Without it, invoices keep the "available on request" text.
+  - `documents` depends on the workspace package `@ledgerforce/bank`. `email` gets `@ledgerforce/bank` and `@ledgerforce/shared` as dev dependencies for its test. None of these is a third-party dependency, so no ADR is needed.
+- Why: RQ-0150 F2 (confirm by phone, never trust emailed changes) and F3 / OWASP (decrypt only where needed). ADR-0079 decision 2 (invoice currency).
+- Alternatives: decrypt and then compare the currency (an unneeded decryption); print the line on every invoice (with no details printed there is nothing to confirm).
+- ADR: ADR-0079, ADR-0080 · Status: accepted
+
+### DL-0634 — Split T-0180: wizard step 8 and the settings screen move to T-0183
+- Date: 2026-11-15 · By: claude · Task: T-0180 · Category: process
+- Decision: T-0180 delivers the migration, the maker-checker module, the routes and the render path (about 1,000 changed lines with tests, well over the ~400-line split rule). AC-3 (wizard step 8 lists a missing remittance account) and the request/approve screen move to the new card T-0183, which depends on T-0180 and T-0176. AC-3 changes step-8 fixtures in the setup, wizard-flow and API setup tests, which belong with the wizard work.
+- Why: The brief's split rule. The first slice is complete and verified on its own.
+- Alternatives: one oversized card.
+- ADR: none · Status: accepted

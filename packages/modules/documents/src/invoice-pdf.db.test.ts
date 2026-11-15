@@ -3,21 +3,26 @@
  * from the HTML template, contains the invoice number, the supplier ABN, GST 125.00 and total
  * 1,375.00 as real, extractable text. Real PostgreSQL as lf_app, real Chromium, real PDF parser.
  */
+import { randomBytes, randomUUID } from 'node:crypto';
 import {
   approveInvoice,
+  approveRemittanceAccountChange,
   createDraftInvoice,
+  requestRemittanceAccountChange,
   setInvoiceSettings,
   type DocumentOutbox,
 } from '@ledgerforce/ar';
+import { createCompanyBankAccount } from '@ledgerforce/bank';
 import { auServicesSmb } from '@ledgerforce/gl';
 import { entrySeriesFor, SOURCE_TYPES } from '@ledgerforce/ledger';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
 import { seedPostingProfiles, setPartyProfiles } from '@ledgerforce/products';
 import { seedTaxCodes } from '@ledgerforce/tax';
+import { LocalKeyringKms } from '@ledgerforce/shared/crypto';
 import { getDocument, OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AU_BILLING_FORMATS, seedBillingFormats } from './billing-formats.ts';
-import { renderInvoiceHtml } from './invoice-html.ts';
+import { REMITTANCE_PHONE_CHECK, renderInvoiceHtml } from './invoice-html.ts';
 import { loadInvoiceDocument } from './invoice-document.ts';
 import { PdfRenderer } from './pdf.ts';
 import { solidPng } from './testing/solid-png.ts';
@@ -217,7 +222,7 @@ describe('T-0165: branded invoice PDF', () => {
     expect(doc.branding?.logo?.contentType).toBe('image/png');
     expect(Buffer.from(doc.branding?.logo?.content ?? new Uint8Array()).equals(logo)).toBe(true);
     expect(doc.acceptedPaymentMethods).toEqual(['bank_transfer', 'stripe']);
-    // No remittance account can be chosen yet (RQ-0159, ADR-0079 Proposed, T-0180).
+    // No remittance account is designated here (and no KMS is given), so none prints (T-0180).
     expect(doc.bankTransfer ?? null).toBeNull();
 
     const html = renderInvoiceHtml(doc);
@@ -249,4 +254,119 @@ describe('T-0165: branded invoice PDF', () => {
     expect(text).toContain('Pay by bank transfer');
     expect(text).not.toContain('Pay online');
   }, 60_000);
+});
+
+// ---------------- T-0180: the designated remittance account on the real PDF ----------------
+
+describe('SS-UC01-16: the invoice prints the designated remittance account (ADR-0079)', () => {
+  const kms = LocalKeyringKms.fromJson(
+    JSON.stringify({ active: 'k1', keys: { k1: randomBytes(32).toString('base64') } }),
+  );
+  let aud = '';
+  let usd = '';
+
+  async function designate(bankAccountId: string): Promise<void> {
+    const maker = await f.addUser('finance_admin');
+    const checker = await f.addUser('owner');
+    const changeId = randomUUID();
+    await f.inTenant((trx) =>
+      requestRemittanceAccountChange(trx, {
+        companyId: f.companyId,
+        changeId,
+        bankAccountId,
+        requestedBy: maker,
+      }),
+    );
+    await f.inTenant((trx) =>
+      approveRemittanceAccountChange(trx, {
+        companyId: f.companyId,
+        changeId,
+        approvedBy: checker,
+      }),
+    );
+  }
+
+  beforeAll(async () => {
+    await f.inTenant(async (trx) => {
+      aud = await createCompanyBankAccount(trx, kms, f.companyId, {
+        glAccountId: f.acct['1010'] ?? '',
+        name: 'Operating',
+        bsb: '062000',
+        accountNumber: '10203040',
+        accountName: 'Harbour Co Pty Ltd',
+        currency: 'AUD',
+      });
+      usd = await createCompanyBankAccount(trx, kms, f.companyId, {
+        glAccountId: f.acct['1020'] ?? '',
+        name: 'USD receipts',
+        bsb: '083004',
+        accountNumber: '55667788',
+        accountName: 'Harbour Co USD',
+        currency: 'USD',
+      });
+      await setInvoiceSettings(trx, f.companyId, { acceptedPaymentMethods: ['bank_transfer'] });
+    });
+    await designate(aud);
+  }, 60_000);
+
+  it('SS-UC01-16 AC-2 with a KMS the document carries the decrypted remittance account and the PDF prints it with the phone line [T-0180]', async () => {
+    const doc = await f.inTenant((trx) =>
+      loadInvoiceDocument(trx, f.companyId, invoiceId, { kms }),
+    );
+    expect(doc.bankTransfer).toEqual({
+      accountName: 'Harbour Co Pty Ltd',
+      bsb: '062-000',
+      accountNumber: '10203040',
+    });
+    const text = await pdfText(await renderer.render(renderInvoiceHtml(doc)));
+    expect(text).toContain('Pay by bank transfer');
+    expect(text).toContain('Harbour Co Pty Ltd');
+    expect(text).toContain('062-000');
+    expect(text).toContain('10203040');
+    expect(text).toContain(`Reference: ${invoiceNo}`);
+    expect(text).toContain(REMITTANCE_PHONE_CHECK);
+  }, 60_000);
+
+  it('SS-UC01-16 AC-2 without a KMS, or without bank transfer accepted, nothing is decrypted and no number prints [T-0180]', async () => {
+    const noKms = await f.inTenant((trx) => loadInvoiceDocument(trx, f.companyId, invoiceId));
+    expect(noKms.bankTransfer ?? null).toBeNull();
+    expect(renderInvoiceHtml(noKms)).toContain(
+      'Our bank account details are available from us on request.',
+    );
+    await f.inTenant((trx) =>
+      setInvoiceSettings(trx, f.companyId, { acceptedPaymentMethods: ['stripe'] }),
+    );
+    const stripeOnly = await f.inTenant((trx) =>
+      loadInvoiceDocument(trx, f.companyId, invoiceId, { kms }),
+    );
+    expect(stripeOnly.bankTransfer ?? null).toBeNull();
+    await f.inTenant((trx) =>
+      setInvoiceSettings(trx, f.companyId, { acceptedPaymentMethods: ['bank_transfer'] }),
+    );
+  });
+
+  it('SS-UC01-16 AC-2 an account in another currency than the invoice is not printed [T-0180]', async () => {
+    await designate(usd);
+    const doc = await f.inTenant((trx) =>
+      loadInvoiceDocument(trx, f.companyId, invoiceId, { kms }),
+    );
+    expect(doc.currency).toBe('AUD');
+    expect(doc.bankTransfer ?? null).toBeNull();
+    await designate(aud);
+  });
+
+  it('SS-UC01-16 AC-2 the clear number is stored nowhere: not in the outbox, the change records or the settings [T-0180]', async () => {
+    await f.inTenant((trx) => loadInvoiceDocument(trx, f.companyId, invoiceId, { kms }));
+    for (const table of [
+      'app.outbox_event',
+      'app.remittance_account_change',
+      'app.ar_settings',
+      'audit.audit_log',
+    ]) {
+      const r = await f.admin.query<{ n: string }>(
+        `SELECT count(*)::text AS n FROM ${table} t WHERE to_jsonb(t)::text LIKE '%10203040%'`,
+      );
+      expect(r.rows[0]?.n, table).toBe('0');
+    }
+  });
 });

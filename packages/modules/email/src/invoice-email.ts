@@ -18,6 +18,7 @@ import {
   formatMoney,
   loadInvoiceDocument,
   renderInvoiceHtml,
+  type InvoiceDocumentOptions,
   type InvoicePaymentLinkProvider,
   type PdfRenderer,
 } from '@ledgerforce/documents';
@@ -77,6 +78,12 @@ export function invoiceEmailHandler(deps: {
   renderer: PdfRenderer;
   /** Optional online payment link (T-0073); without it invoices carry no link. */
   paymentLinks?: InvoicePaymentLinkProvider;
+  /**
+   * Optional KMS (T-0180, ADR-0079): with it, an invoice of a company that accepts bank transfer
+   * prints its designated remittance account. The clear number exists only in the rendered email
+   * and PDF; app.email_delivery records no body.
+   */
+  kms?: InvoiceDocumentOptions['kms'];
 }): OutboxHandler {
   return {
     name: 'email.invoice_posted',
@@ -96,7 +103,9 @@ export function invoiceEmailHandler(deps: {
           `invoice ${event.aggregateId}: the customer has no Billing To contact`,
         );
       }
-      const loaded = await loadInvoiceDocument(trx, companyId, event.aggregateId);
+      const loaded = await loadInvoiceDocument(trx, companyId, event.aggregateId, {
+        kms: deps.kms ?? null,
+      });
       // A company that has saved its accepted methods without Stripe gets no link (T-0165).
       const methods = loaded.acceptedPaymentMethods;
       const link =

@@ -115,6 +115,7 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0071](0071-wizard-module-settings.md) | Store GST basis and BAS frequency in tax_settings, and invoice branding, terms and methods in ar_settings | data | no | Proposed |
 | [0078](0078-statement-import-body-limit.md) | Statement import accepts JSON bodies up to 10 MB; every other route keeps the 100 kB default | security | yes (delegated, DL-0477) | Accepted |
 | [0079](0079-invoice-remittance-bank-account.md) | Print one chosen company bank account as the remittance account on customer invoices | security | yes | Accepted |
+| [0080](0080-remittance-account-change-routes-and-schema.md) | Remittance account: maker-checker change record, database guards and routes | api | no | Accepted |
 | [0081](0081-setup-settings-http-routes.md) | HTTP routes for the setup settings screens (company details, fiscal years, tax settings, tax codes) | architecture | no | Proposed |
 | [0082](0082-posting-profile-matrix-http-routes.md) | HTTP routes for the posting-profile matrix: read the matrix, set an override | architecture | no | Proposed |
 

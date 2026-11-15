@@ -119,6 +119,24 @@ const CASES: Case[] = [
     input: { step: 'refund.approve', actorId: B, history: [h('refund.create', A)] },
     expected: ALLOW,
   },
+  // T-0180 / ADR-0079: the invoice remittance account is maker-checker, always.
+  {
+    name: 'T-0180: the requester approves their own remittance account change → deny',
+    input: {
+      step: 'remittance_change.approve',
+      history: [h('remittance_change.request', A)],
+    },
+    expected: deny('SOD_REMITTANCE_SELF_APPROVAL'),
+  },
+  {
+    name: 'T-0180: a different person approves the remittance account change → allow',
+    input: {
+      step: 'remittance_change.approve',
+      actorId: B,
+      history: [h('remittance_change.request', A)],
+    },
+    expected: ALLOW,
+  },
   {
     name: '§6.4 Payroll Officer: creator releases own net-pay batch → deny',
     input: { step: 'net_pay_batch.release', history: [h('net_pay_batch.create', A)] },
@@ -397,6 +415,7 @@ describe('SS-PLAT-16: SoD rules 1–6 evaluated as configured', () => {
         'SOD_INVOICE_SELF_APPROVAL',
         'SOD_JOURNAL_SELF_APPROVAL',
         'SOD_REFUND_SELF_APPROVAL',
+        'SOD_REMITTANCE_SELF_APPROVAL',
         'SOD_NET_PAY_SELF_RELEASE',
         'SOD_PERIOD_REOPEN_SELF_APPROVAL',
         'SOD_RULE_SELF_ACTIVATION',

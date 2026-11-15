@@ -3,7 +3,8 @@
  * account of type asset and subtype bank (the database checks it). The account number is sealed
  * with envelope encryption before it reaches the database, with AAD bound to tenant, company,
  * row and field; reads are masked; revealCompanyBankAccountNumber() is the one decrypting call,
- * reserved for ABA payment files (T-0054: trace account).
+ * reserved for ABA payment files (T-0054: trace account) and the remittance account on customer
+ * documents (remittance.ts, ADR-0079).
  */
 import type { Database } from '@ledgerforce/db';
 import { openField, sealField, type Kms } from '@ledgerforce/shared/crypto';
@@ -193,7 +194,11 @@ export async function setCsvMapping(
   if (r.numUpdatedRows !== 1n) throw new BankAccountValidationError('bank account not found');
 }
 
-/** Decrypt one account number. Only for payment files (ABA, T-0054); never for display. */
+/**
+ * Decrypt one account number. Permitted uses (ADR-0018 as widened by ADR-0079): payment files
+ * (ABA, T-0054), and the company's designated remittance account on its customer documents via
+ * remittanceDetailsOf (T-0180). Never for display in the app or read APIs.
+ */
 export async function revealCompanyBankAccountNumber(
   trx: Transaction<Database>,
   kms: Kms,

@@ -1,0 +1,17 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a9e51bd369ad43b03
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44217
+[31m[Nest] 23979  - [39m11/15/2026, 8:41:20 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: SoD: subject type bill has no create step for a reported creator
+    at historyOf [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a9e51bd369ad43b03/[39mapps/api/src/sod/sod.service.ts:67:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at checkSod [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a9e51bd369ad43b03/[39mapps/api/src/sod/sod.service.ts:186:19[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a9e51bd369ad43b03/[39mapps/api/src/tenancy/tenant.interceptor.ts:127:26
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a9e51bd369ad43b03/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a9e51bd369ad43b03/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+
+ Test Files  14 passed (14)
+      Tests  95 passed (95)
+   Start at  08:41:13
+   Duration  50.22s (transform 2.66s, setup 0ms, import 22.12s, tests 24.74s, environment 1ms)
+

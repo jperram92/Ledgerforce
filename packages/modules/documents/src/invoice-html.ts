@@ -53,8 +53,9 @@ export interface InvoiceDocument {
    */
   readonly acceptedPaymentMethods?: readonly InvoicePaymentMethod[] | null;
   /**
-   * Remittance details of the company's receiving account, printed in the bank-transfer block.
-   * Nothing fills them yet: choosing the account and printing its number await ADR-0079 (T-0180).
+   * Remittance details of the company's receiving account, printed in the bank-transfer block
+   * with the confirm-by-phone line. loadInvoiceDocument fills them from the designated remittance
+   * account when given a KMS (ADR-0079, T-0180).
    */
   readonly bankTransfer?: InvoiceRemittanceView | null;
 }
@@ -70,6 +71,13 @@ export interface InvoiceBranding {
     readonly content: Uint8Array;
   } | null;
 }
+
+/**
+ * The fixed anti-redirection line printed under the remittance details (ADR-0079 control 3,
+ * RQ-0150 F2): customers confirm any change of bank details by phone before paying.
+ */
+export const REMITTANCE_PHONE_CHECK =
+  'Our bank details do not change by email. If you are told they have changed, phone us on a number you already know and confirm before you pay.';
 
 export interface InvoiceRemittanceView {
   readonly accountName: string;
@@ -223,9 +231,10 @@ function bankTransferHtml(d: InvoiceDocument): string {
       `<tr><td>Account number</td><td>${e(r.accountNumber)}</td></tr>` +
       `</tbody></table>`;
   }
+  const check = r ? `<br><em class="remit-check">${e(REMITTANCE_PHONE_CHECK)}</em>` : '';
   return (
     `<div class="pay pay-bank"><strong>Pay by bank transfer</strong>${details}` +
-    `<br>Reference: <strong>${e(d.invoiceNo)}</strong></div>`
+    `<br>Reference: <strong>${e(d.invoiceNo)}</strong>${check}</div>`
   );
 }
 

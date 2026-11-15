@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { AU_BILLING_FORMATS, validateBillingFormat } from './billing-formats.ts';
 import {
   formatAbn,
+  REMITTANCE_PHONE_CHECK,
   renderInvoiceHtml,
   type InvoiceBranding,
   type InvoiceDocument,
@@ -296,5 +297,25 @@ describe('Invoice branding and payment methods (T-0165)', () => {
     // The only URL outside data: is the https payment link itself.
     const urls = [...html.matchAll(/(?:src|href)="([^"]+)"/g)].map((m) => m[1] ?? '');
     expect(urls.filter((u) => !u.startsWith('data:image/'))).toEqual([stripeLink.url]);
+  });
+});
+
+describe('SS-UC01-16: the invoice prints the remittance account with the confirm-by-phone line (ADR-0079)', () => {
+  it('SS-UC01-16 AC-2 prints account name, BSB, number, the invoice number as reference and the fixed phone line [T-0180]', () => {
+    const html = renderInvoiceHtml({
+      ...branded,
+      acceptedPaymentMethods: ['bank_transfer'],
+      bankTransfer: remittance,
+    });
+    const block = html.slice(html.indexOf('Pay by bank transfer'));
+    expect(block).toContain('Account name');
+    expect(block).toContain('062-000');
+    expect(block).toContain('12345678');
+    expect(block).toContain('Reference: <strong>INV-000123</strong>');
+    expect(block).toContain(REMITTANCE_PHONE_CHECK);
+    expect(REMITTANCE_PHONE_CHECK).toMatch(/phone/i);
+    // Without printed details there is nothing to confirm, so no line.
+    const without = renderInvoiceHtml({ ...branded, acceptedPaymentMethods: ['bank_transfer'] });
+    expect(without).not.toContain(REMITTANCE_PHONE_CHECK);
   });
 });

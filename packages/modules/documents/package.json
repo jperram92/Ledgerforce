@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@ledgerforce/ar": "workspace:*",
+    "@ledgerforce/bank": "workspace:*",
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
     "kysely": "0.29.7",

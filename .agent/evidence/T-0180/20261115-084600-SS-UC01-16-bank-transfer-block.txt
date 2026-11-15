@@ -1,0 +1,7 @@
+T-0180 SS-UC01-16 - bank-transfer block rendered by renderInvoiceHtml (test data, not a real account)
+Source: packages/modules/documents/src/invoice-html.ts at commit bb1a52b
+--- HTML ---
+<h2 class="how">How to pay</h2>
+<div class="pay pay-bank"><strong>Pay by bank transfer</strong><table class="meta remit"><tbody><tr><td>Account name</td><td>Harbour Co Pty Ltd</td></tr><tr><td>BSB</td><td>062-000</td></tr><tr><td>Account number</td><td>10203040</td></tr></tbody></table><br>Reference: <strong>INV-000001</strong><br><em class="remit-check">Our bank details do not change by email. If you are told they have changed, phone us on a number you already know and confirm before you pay.</em></div>
+--- as text ---
+How to pay Pay by bank transfer Account name Harbour Co Pty Ltd BSB 062-000 Account number 10203040 Reference: INV-000001 Our bank details do not change by email. If you are told they have changed, phone us on a number you already know and confirm before you pay.
