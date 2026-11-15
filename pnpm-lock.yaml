@@ -98,6 +98,9 @@ importers:
       '@ledgerforce/parties':
         specifier: workspace:*
         version: link:../../packages/modules/parties
+      '@ledgerforce/products':
+        specifier: workspace:*
+        version: link:../../packages/modules/products
       '@ledgerforce/reporting':
         specifier: workspace:*
         version: link:../../packages/modules/reporting
@@ -135,9 +138,6 @@ importers:
         specifier: 7.8.2
         version: 7.8.2
     devDependencies:
-      '@ledgerforce/products':
-        specifier: workspace:*
-        version: link:../../packages/modules/products
       '@ledgerforce/tax':
         specifier: workspace:*
         version: link:../../packages/modules/tax

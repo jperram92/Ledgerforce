@@ -21,6 +21,7 @@
     "@ledgerforce/ledger": "workspace:*",
     "@ledgerforce/outbox": "workspace:*",
     "@ledgerforce/parties": "workspace:*",
+    "@ledgerforce/products": "workspace:*",
     "@ledgerforce/reporting": "workspace:*",
     "@ledgerforce/setup": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
@@ -35,7 +36,6 @@
     "rxjs": "7.8.2"
   },
   "devDependencies": {
-    "@ledgerforce/products": "workspace:*",
     "@ledgerforce/tax": "workspace:*",
     "@nestjs/testing": "12.1.2",
     "@swc/cli": "0.8.1",

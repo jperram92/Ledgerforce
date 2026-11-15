@@ -56,7 +56,7 @@ export interface ResolveQuery {
   readonly date: string;
 }
 
-interface PartyRow {
+export interface PartyRow {
   id: string;
   code: string;
   kind: 'customer' | 'supplier';
@@ -64,7 +64,7 @@ interface PartyRow {
   default_tax_code: string;
   status: string;
 }
-interface ProductRow {
+export interface ProductRow {
   id: string;
   code: string;
   revenue_account_id: string;
@@ -104,7 +104,8 @@ export async function resolvePosting(
   return resolveRows(trx, companyId, partyRow, productRow, q.purpose, q.date);
 }
 
-async function resolveRows(
+/** Resolve one party × product pair from its rows (shared with profileMatrix, matrix-view.ts). */
+export async function resolveRows(
   trx: Trx,
   companyId: string,
   party: PartyRow | undefined,

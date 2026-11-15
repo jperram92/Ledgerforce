@@ -15,7 +15,14 @@ import { sql, type Transaction } from 'kysely';
 
 type Trx = Transaction<Database>;
 
-export type ProfileErrorCode = 'PROFILE_ACCOUNT' | 'PROFILE_KIND' | 'INVALID_PRODUCT';
+export type ProfileErrorCode =
+  | 'PROFILE_ACCOUNT'
+  | 'PROFILE_KIND'
+  | 'INVALID_PRODUCT'
+  /** fillOverride: a profile that is not an active profile of the company (ADR-0082). */
+  | 'PROFILE_UNKNOWN'
+  /** fillOverride: a tax code that is not an active tax code of the company (ADR-0082). */
+  | 'PROFILE_TAX_CODE';
 
 export class ProfileError extends Error {
   readonly code: ProfileErrorCode;

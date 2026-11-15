@@ -3529,3 +3529,21 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: P4 (journal before posting), "no accounting in the browser" (apps/web AGENTS.md), design §3.9 idempotency.
 - Alternatives: add account names to the preview response (an API change for display only); a new key on every click (a retry after a lost answer would be refused as OPENING_EXISTS instead of replaying).
 - ADR: none · Status: accepted
+
+### DL-0652 — Posting-profile matrix routes: settings.read to read, settings.chart.manage to set an override (ADR-0082)
+- Date: 2026-11-15 · By: claude · Task: T-0187 · Category: architecture
+- Decision: ADR-0082 (Proposed, architecture, no human gate) adds two things:
+  - **Module:** `profileMatrix` and `fillOverride` in `@ledgerforce/products` (new file `matrix-view.ts`; `resolveRows` is exported from `matrix.ts` so the cells use the posting rule). Two new refusal codes, `PROFILE_UNKNOWN` and `PROFILE_TAX_CODE`.
+  - **Routes:** `GET /posting-profiles/matrix` needs `settings.read`, and `PUT /posting-profiles/overrides` needs `settings.chart.manage` plus an Idempotency-Key. The PUT is idempotent by nature, like the T-0146 rebind: a repeat gives `changed:false`, with no write and no audit.
+
+  The matrix answer includes the account `choices` (active, postable, non-control revenue and expense accounts). The screen then needs no `gl.account.read`, and the browser never decides which accounts are allowed.
+- Why: RQ-0162 findings 2–4. These are the catalogue's existing permissions, so nothing changes in security, and no idempotency table is needed, so there is no migration (DL-0569).
+- Alternatives: a new permission (a security ADR, human gate); POST with an idempotency table (a migration, which is not allowed this round); resolving cells in the browser (accounting in the browser).
+- ADR: ADR-0082 · Status: accepted
+
+### DL-0653 — /posting-profiles added to the nginx API prefixes; @ledgerforce/products becomes an API runtime dependency
+- Date: 2026-11-15 · By: claude · Task: T-0187 · Category: tooling
+- Decision: `infra/docker/nginx/default.conf.template` now proxies `posting-profiles` to the API. The test `apps/api/src/deploy/nginx-routes.test.ts` (SS-PLAT-86) requires every API controller prefix to be proxied. `@ledgerforce/products` moves from devDependencies to dependencies of `@ledgerforce/api`. It is an internal workspace package with no third-party code, so no ADR is needed (same as DL-0624). The lockfile changes only in the importer section.
+- Why: the new controller would otherwise be unreachable behind nginx, and the module is now imported by production code.
+- Alternatives: mount the routes under `/setup/posting-profiles` (rejected: the matrix is not only a setup screen; IA S13 lists it under Accounting).
+- ADR: ADR-0082 · Status: accepted
