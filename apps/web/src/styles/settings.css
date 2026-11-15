@@ -1,0 +1,30 @@
+/* Setup settings screens (T-0176): company details and tax settings. Plain forms on the admin
+   pattern; no shadows, radius from tokens. Requires tokens.css, shell.css and admin.css first. */
+
+.settings-dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--s1) var(--s3);
+  margin: var(--s2) 0;
+  max-width: 40rem;
+}
+.settings-dl dt {
+  font-weight: 600;
+}
+.settings-dl dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.admin-form fieldset.settings-choices {
+  grid-template-columns: 1fr;
+}
+.settings-choices .check {
+  align-items: flex-start;
+}
+.settings-choices .check input {
+  margin-top: 4px;
+}
+.settings-scroll {
+  overflow-x: auto;
+  max-width: 100%;
+}

@@ -1,0 +1,14 @@
+
+Running 9 tests using 2 workers
+
+  ✓  1 [chromium] › tests/e2e/web/setup-wizard.spec.ts:415:1 › SS-PLAT-128: with an opening balance posted, step 9 refuses "no history" in plain words [T-0091] (2.7s)
+  ✓  3 [chromium] › tests/e2e/web/setup-wizard.spec.ts:438:1 › T-0091: an Accountant sees the steps but cannot complete them (2.5s)
+  ✓  4 [chromium] › tests/e2e/web/setup-wizard.spec.ts:451:1 › T-0091: a user without settings.read is told so, and no steps are listed (1.3s)
+  ✓  2 [chromium] › tests/e2e/web/setup-wizard.spec.ts:240:3 › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 1440 [T-0091] (7.9s)
+  ✓  5 [chromium] › tests/e2e/web/setup-wizard.spec.ts:462:1 › T-0091: the wizard is listed on the Settings page (1.6s)
+  ✓  6 [chromium] › tests/e2e/web/setup-wizard.spec.ts:240:3 › SS-PLAT-127: Setup wizard screen walks a fresh AU company through all ten steps @ 390 [T-0091] (4.5s)
+  ✓  7 [chromium] › tests/e2e/web/setup-wizard.spec.ts:306:1 › SS-PLAT-127: what is missing is listed in plain words, and Complete waits until nothing is [T-0091] (2.0s)
+  ✓  8 [chromium] › tests/e2e/web/setup-wizard.spec.ts:343:1 › T-0091: a refused step explains why: STEP_INVALID lists what is missing, STEP_LOCKED says which step comes first (1.0s)
+  ✓  9 [chromium] › tests/e2e/web/setup-wizard.spec.ts:374:1 › SS-PLAT-128: step 9 is declared "no history" with a reason, which is shown afterwards [T-0091] (2.5s)
+
+  9 passed (19.8s)

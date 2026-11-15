@@ -28,6 +28,8 @@ import type { JournalStatus } from './gl/client.ts';
 import { NotFoundPage, SectionPage } from './pages.tsx';
 import { SECTIONS } from './sections.ts';
 import { WizardPage } from './setup/WizardPage.tsx';
+import { CompanySettingsPage } from './settings/CompanySettingsPage.tsx';
+import { TaxSettingsPage } from './settings/TaxSettingsPage.tsx';
 import { Shell } from './Shell.tsx';
 import { SignInPage, type SignInReason } from './SignIn.tsx';
 import { inboxSearch } from './sync/logic.ts';
@@ -149,6 +151,19 @@ const setupRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: 'settings/setup',
   component: WizardPage,
+});
+
+// Settings screens for wizard steps 1 and 3 (T-0176, ADR-0081); the API owns /setup/company and
+// /setup/tax on the same origin.
+const companySettingsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/company',
+  component: CompanySettingsPage,
+});
+const taxSettingsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/tax',
+  component: TaxSettingsPage,
 });
 
 // GL (T-0082, DL-0226): chart of accounts and manual journals under /accounting, listed on Reports.
@@ -496,6 +511,8 @@ const routeTree = rootRoute.addChildren([
     syncIssuesRoute,
     syncIssueRoute,
     setupRoute,
+    companySettingsRoute,
+    taxSettingsRoute,
     chartRoute,
     closeRoute,
     bankStatementsRoute,

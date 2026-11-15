@@ -7,6 +7,8 @@
 export interface SubPage {
   to:
     | '/settings/setup'
+    | '/settings/company'
+    | '/settings/tax'
     | '/settings/users'
     | '/reports/control-exceptions'
     | '/reports/audit-log'
@@ -227,6 +229,17 @@ export const SECTIONS: readonly Section[] = [
         to: '/settings/setup',
         name: 'Set up your company',
         text: 'The ten setup steps: how far you have got and what is still missing.',
+      },
+      // Settings screens for setup steps 1 and 3 (T-0176).
+      {
+        to: '/settings/company',
+        name: 'Company details',
+        text: 'The legal name, ABN, base currency and financial years.',
+      },
+      {
+        to: '/settings/tax',
+        name: 'Tax settings',
+        text: 'How you account for GST, how often you lodge the BAS, and the tax codes.',
       },
       {
         to: '/settings/users',

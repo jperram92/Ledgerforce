@@ -25,7 +25,12 @@ export const GAP_CHECK_STEP = 7;
 /** The one step that may be completed by declaring there is no history (ADR-0067). */
 export const NO_HISTORY_STEP = 9;
 
-type Screen = '/accounting/chart' | '/settings/users' | '/settings/sync-issues';
+type Screen =
+  | '/accounting/chart'
+  | '/settings/users'
+  | '/settings/sync-issues'
+  | '/settings/company'
+  | '/settings/tax';
 export interface Where {
   /** An existing screen where the setting is entered or checked. */
   to?: Screen;
@@ -40,13 +45,22 @@ const ELSEWHERE =
 
 /** Where each step's settings are entered (DL-0601): an existing screen, or said plainly. */
 export const STEP_WHERE: Record<number, Where> = {
-  1: { text: ELSEWHERE },
+  // T-0176: steps 1 and 3 have their settings screens.
+  1: {
+    to: '/settings/company',
+    name: 'Company details',
+    text: 'Enter the legal name, ABN, base currency and financial year on',
+  },
   2: {
     to: '/accounting/chart',
     name: 'Chart of accounts',
     text: 'See the accounts and their numbers on',
   },
-  3: { text: ELSEWHERE },
+  3: {
+    to: '/settings/tax',
+    name: 'Tax settings',
+    text: 'Choose the GST basis and BAS frequency, and add the tax codes, on',
+  },
   4: { text: ELSEWHERE },
   5: {
     text: 'There is no LedgerForce screen for this yet: Salesforce is connected from the LedgerForce package in your Salesforce org.',
