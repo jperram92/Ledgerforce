@@ -16,9 +16,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 7 |
 | done | 3 |
 | in_progress | 1 |
-| review | 136 |
+| review | 137 |
 | todo | 25 |
-| verifying | 1 |
 | **total** | **173** |
 
 | Phase | Cards |
