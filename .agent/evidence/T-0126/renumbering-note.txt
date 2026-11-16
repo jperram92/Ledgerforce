@@ -1,0 +1,1 @@
+T-0126 evidence note (2026-11-16): the red-*.txt and mutation files were captured before the IDs were renumbered at the lead's request (collision with T-0168). In those files GP-040 means GP-043, SS-PLAT-135 means SS-PLAT-137 and SS-PLAT-136 means SS-PLAT-138. The green-*.txt files are re-captured on the merged tree with the new IDs.

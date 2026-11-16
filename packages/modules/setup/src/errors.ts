@@ -13,7 +13,9 @@ export type OpeningBalanceErrorCode =
   | 'ITEM_AFTER_BALANCE_DATE'
   | 'PERIOD_NOT_OPEN'
   | 'OPENING_EXISTS'
-  | 'PRIOR_ENTRIES';
+  | 'PRIOR_ENTRIES'
+  /** A foreign item's rate does not reproduce its base amount (T-0126, DL-0741). */
+  | 'FX_MISMATCH';
 
 /** An opening balance refused (T-0080, GP-037). Nothing was written. `row` is the CSV line. */
 export class OpeningBalanceError extends DomainError {

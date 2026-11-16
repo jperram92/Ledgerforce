@@ -6,7 +6,8 @@
  * Body: { company_id, conversion_date, trial_balance_csv, ar_items_csv?, ap_items_csv? } — the CSV
  * files are read by @ledgerforce/setup (refusals name the row). All need settings.chart.manage
  * (setting up the books; GET too, since it lists every open document). Refusals are 422 with the
- * module's or the engine's code.
+ * module's or the engine's code. Foreign-currency items (T-0126, GP-043): optional CSV columns
+ * currency, currency_amount, fx_rate; preview lines and items name their currency, amount and rate.
  */
 import {
   BadRequestException,
@@ -84,6 +85,9 @@ const viewOf = (
     line_no: i.lineNo,
     amount: i.amount,
     gst_amount: i.gstAmount,
+    currency: i.currency,
+    currency_amount: i.currencyAmount,
+    fx_rate: i.fxRate,
   })),
 });
 
@@ -137,6 +141,9 @@ export class OpeningBalancesController {
         debit: l.debit,
         credit: l.credit,
         party_id: l.partyId,
+        txn_currency: l.txnCurrency,
+        txn_amount: l.txnAmount,
+        fx_rate: l.fxRate,
         due_date: p.entry.subledgerItems.find((s) => s.lineNo === l.lineNo)?.dueDate ?? null,
         memo: l.memo,
       })),

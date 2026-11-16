@@ -101,6 +101,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 | GP-035 | Prior-period adjustment (AASB 108) | Phase 1 | — | Superseded by GP-036 |
 | GP-036 | Prior-period error: late bill through AP (supersedes GP-035) | Phase 1 | — | Approved |
 | GP-037 | Opening balances at conversion: trial balance plus open AR/AP items (§4.1 step 9) | MVP | — | Approved |
+| GP-043 | Opening balances with foreign-currency open items (variant of GP-037; §4.1 step 9, §3.7) | MVP | — | Approved |
 
 ---
 
@@ -924,6 +925,7 @@ above has been changed.
 | 2026-11-01 | claude (T-0115) | Owner delegated approval (DL-0256): entries Approved, GP-004/007/012/013/018 superseded, Q1–Q15 resolved. |
 | 2026-11-01 | claude (T-0116) | GP-036 supersedes GP-035 (control-account rule); DL-0258. |
 | 2026-11-02 | claude (T-0080) | GP-037 opening balances at conversion added and approved under the standing delegation (DL-0263); basis RQ-0109; DL-0314. No existing entry changed. |
+| 2026-11-15 | claude (T-0126) | GP-043 opening balances with foreign-currency open items added and approved under the standing delegation (DL-0263); basis RQ-0170; DL-0740. No existing entry changed. |
 
 ## GP-038 — Gross expected-credit-loss allowance and subsequent release
 
@@ -1098,3 +1100,43 @@ Allowance zero; net impairment expense 1,250.00. No GST on remeasurement; no aut
 - **Check:** 42a 7,000.00 + 700.00 = 7,700.00 = 7,000.00 + 700.00 ✓ · 42b 3,000.00 + 300.00 = 3,300.00 ✓
 - **Balances after 40a + 42a + 42b:** CUSTOMER_PREPAYMENTS 0.00, GST_ATTRIBUTED_UNBILLED 0.00, GST collected 0.00, bank 0.00.
 - **Tax/BAS (accruals):** 42a G1 −7,700.00, 1A −700.00; 42b G1 −3,300.00, 1A −300.00 (default netted presentation, GP-029); with `credit_note_bas = ato_adjustment` the GST collected lines carry GST-ADJ and the amounts are reported at 1B. The contract's net BAS effect is zero. **Cash basis:** 42a does not arise (no attribution beyond cash); a refund of a GP-020 receipt follows 42b.
+
+## GP-043 — Opening balances with foreign-currency open items (variant of GP-037)
+
+- **Status: Approved (claude under the product owner's standing delegation, DL-0263, 2026-11-15; basis RQ-0170; decision DL-0740)** · Phase: MVP · Source type: `ledger.opening_balance` · Use cases: — · Design: §4.1 step 9, §3.7, §3.2
+- **Relation to GP-037:** same event, same rules (one control line per open document, no plug, balance date = conversion
+  date − 1, one live opening entry). GP-037 stays Approved for base-currency items; this entry adds what a foreign-currency
+  item carries. It does not supersede GP-037.
+- **Scenario:** Demo Co (base AUD) goes live on **2026-11-01**. The old system's trial balance at **2026-10-31** shows AR
+  2,913.46 and AP 615.38. Behind AR: Acme INV-0991 (2026-09-15, due 2026-10-15, AUD 1,375.00 incl. GST 125.00) and Acme
+  INV-2001 (2026-09-20, due 2026-10-20, **USD 1,000.00**, GST-free), carried by the old system at 1,538.46 AUD. Behind AP:
+  Supplier bill B-88 (2026-10-05, due 2026-11-04, **USD 400.00**, no GST), carried at 615.38 AUD. Both USD items are
+  carried at 1.53846154 AUD per USD (the old system's rate at the balance date). 1,000.00 × 1.53846154 = 1,538.46154 →
+  1,538.46, and 400.00 × 1.53846154 = 615.384616 → 615.38, half-up to cents.
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | bank:OPERATING | 1100 | 10,000.00 | | — | — |
+| 2 | system:AR_CONTROL (INV-0991, AUD, due 2026-10-15) | 1200 | 1,375.00 | | — | Acme |
+| 3 | system:AR_CONTROL (INV-2001, USD 1,000.00 @ 1.53846154, due 2026-10-20) | 1200 | 1,538.46 | | — | Acme |
+| 4 | system:AP_CONTROL (B-88, USD 400.00 @ 1.53846154, due 2026-11-04) | 2100 | | 615.38 | — | Supplier |
+| 5 | tax:GST.collected | 2200 | | 125.00 | — | — |
+| 6 | system:RETAINED_EARNINGS | 3200 | | 8,000.00 | — | — |
+| 7 | product:PROFESSIONAL_SERVICES.revenue | 4000 | | 4,173.08 | — | — |
+| | **Total** | | **12,913.46** | **12,913.46** | | |
+
+- **Check:** 10,000.00 + 1,375.00 + 1,538.46 = 12,913.46 = 615.38 + 125.00 + 8,000.00 + 4,173.08 ✓
+- **Rules (beyond GP-037):** the Debit/Credit columns are base currency, and the base amount is the **old system's carrying
+  amount** at the balance date, which must sum to the control row. A foreign item's control line also carries its
+  transaction currency, transaction amount (absolute) and rate (base per one foreign unit). A given rate must reproduce
+  the base amount half-up to cents. Without a rate, the rate is base ÷ transaction amount, half-up to 8 decimals. **No
+  exchange-difference line** is posted: the opening entry reproduces the old trial balance. Re-translation to a closing
+  rate is the old system's period-end revaluation (AASB 121 para 23) or LedgerForce's Phase 1 revaluation job, never a
+  plug here (RQ-0170 findings 1–2).
+- **Subledger:** INV-0991 AUD +1,375.00 (base +1,375.00); INV-2001 **USD +1,000.00, base +1,538.46**, rate 1.53846154;
+  B-88 **USD −400.00, base −615.38**. Ageing is in base: at 2026-11-01, INV-0991 and INV-2001 are 1–30 days overdue
+  (2,913.46 = AR control), B-88 is current.
+- **Later settlement (not part of this journal):** a USD receipt from Acme of USD 1,000.00 at 1.5625 (base 1,562.50) on
+  2026-11-20 allocates to INV-2001 in USD. The allocation records `fx_difference` +24.04 (1,562.50 − 1,538.46), the
+  realised gain since conversion (AASB 121 para 28). The realised-FX journal is a separate golden (design §3.7, DL-0187).
+- **Tax/BAS:** none, as GP-037. The GST content of each item is recorded in AUD (0.00 for the two USD items).

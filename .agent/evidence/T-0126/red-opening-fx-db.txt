@@ -1,0 +1,136 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aebe92c8dcb65979c
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:32795
+ ❯ |db| packages/modules/setup/src/opening-balances.fx.db.test.ts (7 tests | 6 failed) 779ms
+     × SS-PLAT-136 a rate that does not reproduce the base amount half-up to cents 71ms
+     × SS-PLAT-136 a currency amount of the other sign or zero, a bad code, a bad rate 6ms
+     × SS-PLAT-136 a base-currency item with another currency amount or a rate other than 1 4ms
+     × SS-PLAT-136 without a rate the rate is implied from base ÷ currency amount (8 decimals); a base item named AUD stays base 7ms
+     × SS-PLAT-135 posting writes exactly GP-040, the USD lines carrying currency, amount and rate 10ms
+     × SS-PLAT-135 a USD receipt at a later rate settles the opening item in USD; fx_difference is the realised difference since conversion 52ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/setup/src/opening-balances.fx.db.test.ts > T-0126: foreign-currency opening items are refused when inconsistent (SS-PLAT-136) > SS-PLAT-136 a rate that does not reproduce the base amount half-up to cents
+AssertionError: expected undefined to be 'FX_MISMATCH' // Object.is equality
+
+- Expected:
+"FX_MISMATCH"
+
++ Received:
+undefined
+
+ ❯ refused packages/modules/setup/src/opening-balances.fx.db.test.ts:118:35
+    116|     (e: unknown) => e as { code?: string; message?: string },
+    117|   );
+    118|   expect(err?.code, err?.message).toBe(code);
+       |                                   ^
+    119|   if (message) expect(err?.message).toMatch(message);
+    120|   expect(await entryCount()).toBe(before);
+ ❯ packages/modules/setup/src/opening-balances.fx.db.test.ts:136:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  |db| packages/modules/setup/src/opening-balances.fx.db.test.ts > T-0126: foreign-currency opening items are refused when inconsistent (SS-PLAT-136) > SS-PLAT-136 a currency amount of the other sign or zero, a bad code, a bad rate
+AssertionError: expected undefined to be 'INVALID_COMMAND' // Object.is equality
+
+- Expected:
+"INVALID_COMMAND"
+
++ Received:
+undefined
+
+ ❯ refused packages/modules/setup/src/opening-balances.fx.db.test.ts:118:35
+    116|     (e: unknown) => e as { code?: string; message?: string },
+    117|   );
+    118|   expect(err?.code, err?.message).toBe(code);
+       |                                   ^
+    119|   if (message) expect(err?.message).toMatch(message);
+    120|   expect(await entryCount()).toBe(before);
+ ❯ packages/modules/setup/src/opening-balances.fx.db.test.ts:148:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |db| packages/modules/setup/src/opening-balances.fx.db.test.ts > T-0126: foreign-currency opening items are refused when inconsistent (SS-PLAT-136) > SS-PLAT-136 a base-currency item with another currency amount or a rate other than 1
+AssertionError: expected undefined to be 'INVALID_COMMAND' // Object.is equality
+
+- Expected:
+"INVALID_COMMAND"
+
++ Received:
+undefined
+
+ ❯ refused packages/modules/setup/src/opening-balances.fx.db.test.ts:118:35
+    116|     (e: unknown) => e as { code?: string; message?: string },
+    117|   );
+    118|   expect(err?.code, err?.message).toBe(code);
+       |                                   ^
+    119|   if (message) expect(err?.message).toMatch(message);
+    120|   expect(await entryCount()).toBe(before);
+ ❯ packages/modules/setup/src/opening-balances.fx.db.test.ts:175:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  |db| packages/modules/setup/src/opening-balances.fx.db.test.ts > T-0126: foreign-currency opening items are refused when inconsistent (SS-PLAT-136) > SS-PLAT-136 without a rate the rate is implied from base ÷ currency amount (8 decimals); a base item named AUD stays base
+OpeningBalanceError: opening balance X25-000001 is already posted; reverse it first
+ ❯ fail packages/modules/setup/src/errors.ts:29:9
+     27|
+     28| export const fail = (code: OpeningBalanceErrorCode, message: string, r…
+     29|   throw new OpeningBalanceError(
+       |         ^
+     30|     code,
+     31|     row === undefined ? message : `row ${String(row)}: ${message}`,
+ ❯ plan packages/modules/setup/src/opening-balances.ts:338:5
+ ❯ previewOpeningBalance packages/modules/setup/src/opening-balances.ts:418:13
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/setup/src/opening-balances.fx.db.test.ts:188:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |db| packages/modules/setup/src/opening-balances.fx.db.test.ts > T-0126: foreign-currency opening items (GP-040, SS-PLAT-135) > SS-PLAT-135 posting writes exactly GP-040, the USD lines carrying currency, amount and rate
+AssertionError: expected { …(8) } to match object { balanceDate: '2026-10-31', …(1) }
+(6 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "balanceDate": "2026-10-31",
+-   "replayed": false,
++   "replayed": true,
+  }
+
+ ❯ packages/modules/setup/src/opening-balances.fx.db.test.ts:216:15
+    214|   it('SS-PLAT-135 posting writes exactly GP-040, the USD lines carryin…
+    215|     const r = await f.inTenant((trx) => postOpeningBalance(trx, comman…
+    216|     expect(r).toMatchObject({ balanceDate: '2026-10-31', replayed: fal…
+       |               ^
+    217|     const rows = await f.inTenant(
+    218|       async (trx) =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |db| packages/modules/setup/src/opening-balances.fx.db.test.ts > T-0126: foreign-currency opening items (GP-040, SS-PLAT-135) > SS-PLAT-135 a USD receipt at a later rate settles the opening item in USD; fx_difference is the realised difference since conversion
+AllocationError: open items are in USD and AUD
+ ❯ fail packages/ledger/src/subledger.ts:60:9
+     58|
+     59| const fail = (code: AllocationErrorCode, message: string): never => {
+     60|   throw new AllocationError(code, message);
+       |         ^
+     61| };
+     62|
+ ❯ allocate packages/ledger/src/subledger.ts:406:5
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/setup/src/opening-balances.fx.db.test.ts:308:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 1 passed (7)
+   Start at  07:48:06
+   Duration  3.21s (transform 741ms, setup 0ms, import 993ms, tests 779ms, environment 0ms)
+

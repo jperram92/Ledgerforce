@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0126",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-137",
+      "file": ".agent/evidence/T-0126/green-db.txt",
+      "test": "packages/modules/setup/src/opening-balances.fx.db.test.ts › SS-PLAT-137 (3 tests: GP-043 line for line with USD currency/amount/rate; aged AR in base equals AR control; USD receipt allocation fx_difference 24.04); packages/ledger/src/golden/golden-engine.db.test.ts replays GP-043",
+      "commit": "merge-of-8bd4d8f",
+      "provider": "claude",
+      "timestamp": "2026-11-16T00:00:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-137",
+      "file": ".agent/evidence/T-0126/green-api-db.txt",
+      "test": "apps/api/src/setup/opening-balances.db.test.ts › SS-PLAT-137 a USD open item previews with its currency, amount and rate; an inconsistent rate is 422 FX_MISMATCH",
+      "commit": "merge-of-8bd4d8f",
+      "provider": "claude",
+      "timestamp": "2026-11-16T00:00:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-138",
+      "file": ".agent/evidence/T-0126/green-unit.txt",
+      "test": "opening-csv.test.ts › SS-PLAT-138 (2 tests); opening-fx.prop.test.ts › SS-PLAT-138 (3 properties, default runs); golden-postings.golden.test.ts (GP-043 in the inventory)",
+      "commit": "merge-of-8bd4d8f",
+      "provider": "claude",
+      "timestamp": "2026-11-16T00:00:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-138",
+      "file": ".agent/evidence/T-0126/green-db.txt",
+      "test": "packages/modules/setup/src/opening-balances.fx.db.test.ts › SS-PLAT-138 (4 tests: FX_MISMATCH; sign, zero, code and rate refusals; base-currency item; implied rate)",
+      "commit": "merge-of-8bd4d8f",
+      "provider": "claude",
+      "timestamp": "2026-11-16T00:00:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-138",
+      "file": ".agent/evidence/T-0126/mutation-round-down-killed.txt",
+      "test": "opening-fx.prop.test.ts against a ROUND_DOWN mutant of the rate check: the property failed (mutant killed); source restored",
+      "commit": "merge-of-8bd4d8f",
+      "provider": "claude",
+      "timestamp": "2026-11-16T00:00:00Z",
+      "result": "failed"
+    }
+  ]
+}

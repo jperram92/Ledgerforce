@@ -1,0 +1,71 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aebe92c8dcb65979c
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:35947
+ ❯ |api-db| apps/api/src/setup/opening-balances.db.test.ts (6 tests | 2 failed) 2830ms
+     × SS-PLAT-135 a USD open item previews with its currency, amount and rate; an inconsistent rate is 422 FX_MISMATCH (T-0126) 74ms
+     × posts once: 201 with the opening balance, 200 on replay, readable by GET 83ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/setup/opening-balances.db.test.ts > SS-PLAT-117: opening balances over HTTP > SS-PLAT-135 a USD open item previews with its currency, amount and rate; an inconsistent rate is 422 FX_MISMATCH (T-0126)
+AssertionError: expected { line_no: 3, …(6) } to match object { line_no: 3, …(3) }
+(6 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "fx_rate": "1.53846154",
+    "line_no": 3,
+-   "txn_amount": "357.5000",
+-   "txn_currency": "USD",
+  }
+
+ ❯ apps/api/src/setup/opening-balances.db.test.ts:210:24
+    208|       lines: { line_no: number; txn_currency: string; txn_amount: stri…
+    209|     };
+    210|     expect(p.lines[2]).toMatchObject({
+       |                        ^
+    211|       line_no: 3,
+    212|       txn_currency: 'USD',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-db| apps/api/src/setup/opening-balances.db.test.ts > SS-PLAT-117: opening balances over HTTP > posts once: 201 with the opening balance, 200 on replay, readable by GET
+AssertionError: expected { kind: 'ap', …(7) } to match object { currency: 'AUD', …(2) }
+(8 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "currency": "AUD",
+-   "currency_amount": "-660.0000",
+-   "fx_rate": "1.00000000",
++   "amount": "-660.0000",
++   "document_date": "2026-10-08",
++   "document_no": "B-77",
++   "due_date": "2026-11-07",
++   "gst_amount": "-60.0000",
++   "kind": "ap",
++   "line_no": 7,
++   "party_id": "01a1e357-ee44-74de-851b-e08629399ffa",
+  }
+
+ ❯ apps/api/src/setup/opening-balances.db.test.ts:246:24
+    244|     ]);
+    245|     // T-0126: every item names its currency (base items: AUD, rate 1).
+    246|     expect(a.items[2]).toMatchObject({
+       |                        ^
+    247|       currency: 'AUD',
+    248|       currency_amount: '-660.0000',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  07:52:25
+   Duration  7.84s (transform 2.08s, setup 0ms, import 3.59s, tests 2.83s, environment 0ms)
+

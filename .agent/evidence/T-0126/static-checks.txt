@@ -1,0 +1,4 @@
+typecheck exit=0
+lint exit=0
+format:check exit=0
+lint-backlog exit=0
