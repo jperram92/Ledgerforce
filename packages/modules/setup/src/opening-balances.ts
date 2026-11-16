@@ -19,8 +19,11 @@
  * A wrong opening balance is corrected by reversing its entry (refused by the engine once an item
  * is allocated) and posting a new one.
  *
- * Base currency only (foreign-currency items: T-0126). The journal carries no tax codes; each
- * item keeps its GST content as data for the cash-basis BAS (T-0125). Money: decimal.js only.
+ * Foreign-currency items (T-0126, GP-040, RQ-0170, DL-0740): the line stays at the item's base
+ * amount (the old system's carrying amount, no exchange difference posted) and also carries the
+ * transaction currency, amount and rate (opening-fx.ts), so the open item settles in its currency
+ * and allocation measures realised FX against the carried base. The journal carries no tax codes;
+ * each item keeps its GST content (base) as data for the cash-basis BAS (T-0125). Money: decimal.js.
  */
 import type { Database } from '@ledgerforce/db';
 import {
@@ -37,6 +40,7 @@ import { Money } from '@ledgerforce/shared/money';
 import { Decimal } from 'decimal.js';
 import { sql, type Transaction } from 'kysely';
 import { fail, OpeningBalanceError } from './errors.ts';
+import { checkItemFxShape, itemFx } from './opening-fx.ts';
 import {
   decimalText,
   validDate,
@@ -70,6 +74,12 @@ export interface OpeningItemView {
   /** Signed NUMERIC(19,4) text (+ debit, − credit on the control account). */
   readonly amount: string;
   readonly gstAmount: string;
+  /** Transaction currency of the item's line (the base currency for a base item). */
+  readonly currency: string;
+  /** Signed NUMERIC(19,4) text in `currency` (sign of `amount`). */
+  readonly currencyAmount: string;
+  /** NUMERIC(18,8) text, base per one unit of `currency` (1 for a base item). */
+  readonly fxRate: string;
 }
 
 export interface OpeningBalanceView {
@@ -120,6 +130,8 @@ interface PlannedItem {
   readonly partyId: string;
   readonly amount: Decimal;
   readonly gst: Decimal;
+  /** Control-line FX fields of a foreign item; null for a base item (GP-040). */
+  readonly fx: ReturnType<typeof itemFx>;
   lineNo: number;
 }
 
@@ -188,6 +200,7 @@ function checkCommand(c: OpeningBalanceCommand): string {
       fail('INVALID_COMMAND', `${it.documentNo} has a zero amount`, it.row);
     }
     decimalText(it.gstAmount || '0', 'gst_amount', it.row, true);
+    checkItemFxShape(it);
   }
   if (!debit.equals(credit)) {
     fail(
@@ -307,11 +320,18 @@ async function plan(trx: Trx, c: OpeningBalanceCommand): Promise<Plan> {
     }
     return p?.id ?? '';
   };
+  const company = await trx
+    .selectFrom('app.company')
+    .select('base_currency')
+    .where('id', '=', companyId)
+    .executeTakeFirst();
+  const baseCurrency = company?.base_currency ?? '';
   const items: PlannedItem[] = c.items.map((input) => ({
     input,
     partyId: resolve(input),
     amount: new Decimal(input.amount),
     gst: new Decimal(input.gstAmount || '0'),
+    fx: itemFx(input, baseCurrency),
     lineNo: 0,
   }));
 
@@ -382,6 +402,9 @@ async function plan(trx: Trx, c: OpeningBalanceCommand): Promise<Plan> {
       line: {
         account: { id: ctl?.id ?? '' },
         ...(item.amount.isNegative() ? { credit: amount } : { debit: amount }),
+        ...(item.fx
+          ? { txnCurrency: item.fx.currency, txnAmount: item.fx.txnAmount, fxRate: item.fx.fxRate }
+          : {}),
         partyId: item.partyId,
         dueDate: item.input.dueDate,
         memo: `${item.input.documentNo} dated ${item.input.documentDate}`,
@@ -514,13 +537,15 @@ async function findOpening(
   if (!ob) return null;
   const items = (
     await sql<OpeningItemView>`
-      SELECT id::text, kind, party_id::text AS "partyId", document_no AS "documentNo",
-             to_char(document_date, 'YYYY-MM-DD') AS "documentDate",
-             to_char(due_date, 'YYYY-MM-DD') AS "dueDate", line_no AS "lineNo",
-             amount::text, gst_amount::text AS "gstAmount"
-        FROM app.opening_balance_item WHERE opening_balance_id = ${ob.id} ORDER BY line_no`.execute(
-      trx,
-    )
+      SELECT i.id::text, i.kind, i.party_id::text AS "partyId", i.document_no AS "documentNo",
+             to_char(i.document_date, 'YYYY-MM-DD') AS "documentDate",
+             to_char(i.due_date, 'YYYY-MM-DD') AS "dueDate", i.line_no AS "lineNo",
+             i.amount::text, i.gst_amount::text AS "gstAmount", l.txn_currency AS currency,
+             (sign(i.amount) * l.txn_amount)::numeric(19,4)::text AS "currencyAmount", l.fx_rate::text AS "fxRate"
+        FROM app.opening_balance_item i
+        JOIN app.journal_line l
+          ON l.tenant_id = i.tenant_id AND l.entry_id = ${ob.entry_id}::uuid AND l.line_no = i.line_no
+       WHERE i.opening_balance_id = ${ob.id} ORDER BY i.line_no`.execute(trx)
   ).rows;
   return {
     id: ob.id,

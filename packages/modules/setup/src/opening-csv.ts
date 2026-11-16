@@ -9,6 +9,9 @@
  * open invoice is +, a customer credit (unapplied payment, open credit note) −; an unpaid bill is
  * −, a supplier debit balance +. GST, if given, has the amount's sign and is
  * not larger than it. Dates are YYYY-MM-DD; the due date is not before the document date.
+ * Foreign-currency items (T-0126, GP-040, DL-0741) add optional `currency` (three letters),
+ * `currency_amount` (required with a currency, same sign as `amount`) and `fx_rate` (base per one
+ * foreign unit, > 0, at most 8 decimals); `amount` stays the base amount. GST is in base.
  *
  * Records are read with the bank module's RFC 4180 reader (quoted fields keep commas). Every
  * refusal names the CSV line (header = line 1). Amounts stay decimal strings; comparisons use
@@ -39,8 +42,15 @@ export interface OpeningItemInput {
   readonly dueDate: string;
   /** Signed, base currency: + debit on the control account, − credit. */
   readonly amount: string;
-  /** GST content (data only — the opening journal carries no tax codes), '0' when unknown. */
+  /** GST content in base currency (data only — the journal carries no tax codes), '0' when unknown. */
   readonly gstAmount: string;
+  /**
+   * Foreign-currency items (T-0126, GP-040): ISO 4217 code, the signed transaction amount (sign of
+   * `amount`) and optionally the rate, base per one foreign unit (opening-fx.ts). Absent = base.
+   */
+  readonly currency?: string;
+  readonly currencyAmount?: string;
+  readonly fxRate?: string;
 }
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -122,7 +132,7 @@ export function parseOpenItemsCsv(text: string, kind: OpeningItemKind): OpeningI
   const c = columns(
     header,
     ['party', 'document_no', 'document_date', 'due_date', 'amount'],
-    ['gst_amount'],
+    ['gst_amount', 'currency', 'currency_amount', 'fx_rate'],
   );
   const seen = new Map<string, number>();
   return data.map((r, i) => {
@@ -153,6 +163,13 @@ export function parseOpenItemsCsv(text: string, kind: OpeningItemKind): OpeningI
         row,
       );
     }
+    const fx = foreignColumns(
+      cell(r, c.currency),
+      cell(r, c.currency_amount),
+      cell(r, c.fx_rate),
+      a,
+      row,
+    );
     const key = `${party.toLowerCase()}\u0000${documentNo.toLowerCase()}`;
     const first = seen.get(key);
     if (first !== undefined) {
@@ -168,6 +185,41 @@ export function parseOpenItemsCsv(text: string, kind: OpeningItemKind): OpeningI
       dueDate,
       amount,
       gstAmount: g.isZero() ? '0' : gstAmount,
+      ...fx,
     };
   });
+}
+
+/** The optional FX columns of an open-item row (DL-0741); {} for a base item. */
+function foreignColumns(
+  currency: string,
+  currencyAmount: string,
+  fxRate: string,
+  amount: Decimal,
+  row: number,
+): { currency?: string; currencyAmount?: string; fxRate?: string } {
+  if (!currency) {
+    if (currencyAmount || fxRate) {
+      fail('INVALID_CSV', 'currency is empty but currency_amount or fx_rate is given', row);
+    }
+    return {};
+  }
+  if (!/^[A-Za-z]{3}$/.test(currency)) {
+    fail('INVALID_CSV', `currency ${JSON.stringify(currency)} is not a three-letter code`, row);
+  }
+  if (!currencyAmount) fail('INVALID_CSV', `currency_amount is required with ${currency}`, row);
+  const txnText = decimalText(currencyAmount, 'currency_amount', row, true);
+  const txn = new Decimal(txnText);
+  if (txn.isZero()) fail('INVALID_CSV', 'currency_amount must not be zero', row);
+  if (txn.isNegative() !== amount.isNegative()) {
+    fail('INVALID_CSV', `currency_amount ${txnText} must have the sign of amount`, row);
+  }
+  if (!fxRate) return { currency: currency.toUpperCase(), currencyAmount: txnText };
+  const m = /^\d+(?:\.(\d+))?$/.exec(fxRate);
+  if (!m) fail('INVALID_CSV', `fx_rate ${JSON.stringify(fxRate)} is not a positive decimal`, row);
+  if ((m?.[1] ?? '').replace(/0+$/, '').length > 8) {
+    fail('INVALID_CSV', `fx_rate ${fxRate} has more than 8 decimals`, row);
+  }
+  if (new Decimal(fxRate).isZero()) fail('INVALID_CSV', 'fx_rate must be greater than zero', row);
+  return { currency: currency.toUpperCase(), currencyAmount: txnText, fxRate };
 }

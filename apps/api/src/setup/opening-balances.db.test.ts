@@ -191,6 +191,41 @@ describe('SS-PLAT-117: opening balances over HTTP', () => {
     expect(await entries()).toBe(before);
   });
 
+  it('SS-PLAT-135 a USD open item previews with its currency, amount and rate; an inconsistent rate is 422 FX_MISMATCH (T-0126)', async () => {
+    const before = await entries();
+    const usdHead =
+      'party,document_no,document_date,due_date,amount,gst_amount,currency,currency_amount,fx_rate';
+    const usd = (rate: string) =>
+      body({
+        ar_items_csv: [
+          usdHead,
+          'Acme Pty Ltd,INV-0991,2026-09-15,2026-10-15,1375.00,125.00,,,',
+          `Acme Pty Ltd,INV-1004,2026-10-15,2026-11-14,550.00,,USD,357.50,${rate}`,
+        ].join('\n'),
+      });
+    const ok = await call(
+      'POST',
+      '/setup/opening-balances/preview',
+      'financeAdmin',
+      usd('1.53846154'),
+    );
+    expect(ok.status).toBe(200);
+    const p = (await ok.json()) as {
+      lines: { line_no: number; txn_currency: string; txn_amount: string; fx_rate: string }[];
+    };
+    expect(p.lines[2]).toMatchObject({
+      line_no: 3,
+      txn_currency: 'USD',
+      txn_amount: '357.5000',
+      fx_rate: '1.53846154',
+    });
+    expect(p.lines[0]).toMatchObject({ txn_currency: 'AUD', fx_rate: '1' });
+    const bad = await call('POST', '/setup/opening-balances/preview', 'financeAdmin', usd('1.5'));
+    expect(bad.status).toBe(422);
+    expect(await bad.json()).toMatchObject({ error: 'FX_MISMATCH', row: 3 });
+    expect(await entries()).toBe(before);
+  });
+
   it('an Accountant without settings.chart.manage is refused', async () => {
     const r = await call('POST', '/setup/opening-balances', 'accountant', body(), 'k-acct');
     expect(r.status).toBe(403);
@@ -213,6 +248,12 @@ describe('SS-PLAT-117: opening balances over HTTP', () => {
       ['INV-1004', 3, '550.0000', '50.0000'],
       ['B-77', 7, '-660.0000', '-60.0000'],
     ]);
+    // T-0126: every item names its currency (base items: AUD, rate 1).
+    expect(a.items[2]).toMatchObject({
+      currency: 'AUD',
+      currency_amount: '-660.0000',
+      fx_rate: '1.00000000',
+    });
     const count = await entries();
     const again = await call('POST', '/setup/opening-balances', 'financeAdmin', body(), 'k-open-1');
     expect(again.status).toBe(200);

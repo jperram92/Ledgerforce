@@ -3779,14 +3779,14 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: A foreign-currency open item at conversion posts its AR/AP control line at the **old system's base carrying amount** at the balance date (the amount that sums to the trial-balance control row). The line also carries the transaction currency, the absolute transaction amount and the rate (base per one foreign unit). The opening journal gets **no exchange-difference line**. Realised FX after conversion is measured against the carried base at allocation (`fx_difference`, DL-0187). New golden **GP-040** (a variant of GP-037, not a supersession) is added and approved by the building agent under the standing delegation for gate 2 (AGENTS.md §6, DL-0263). It is covered by the golden runner (pure + engine replay) and by `opening-balances.fx.db.test.ts`. No Approved entry was edited.
 - Why: RQ-0170 findings 1–3. AASB 121 para 21 (spot at initial recognition) and para 23 (closing rate only at a reporting date) mean the old books already hold each item at the rate they carry it. Para 28 measures the settlement difference against that carrying amount. The opening entry must reproduce the old trial balance with no plug (RQ-0109 finding 3).
 - Alternatives: re-translate every item at a closing rate given at import and post the difference to FX_UNREALISED (rejected: the posted trial balance would differ from the old one, and revaluation is the Phase 1 job, design §3.7). Keep only the base amount (rejected: a USD receipt could not be allocated and realised FX would be lost). Supersede GP-037 (rejected: its base-currency expectation is unchanged).
-- ADR: none (treatment recorded in GP-040 + RQ-0170 under DL-0263) · Status: accepted
+- ADR: ADR-0088 (accounting, accepted under DL-0263) · Status: accepted
 
 ### DL-0741 — Opening-item FX input contract: optional currency, currency_amount, fx_rate; rate must reproduce the base half-up to cents
 - Date: 2026-11-16 · By: claude · Task: T-0126 · Category: accounting
 - Decision: `OpeningItemInput` and the open-item CSV gain optional `currency`, `currency_amount` (signed like `amount`) and `fx_rate` (base per one foreign unit, > 0, at most 8 decimals). `amount` stays the base amount. For a foreign item, a given rate must satisfy `round_half_up(currency_amount × fx_rate, 2) = amount`. Without a rate, the rate is `amount ÷ currency_amount`, half-up to 8 decimals. An empty currency, or the company's base currency, is a base item: its `currency_amount`, if given, must equal `amount`, and its rate, if given, must be 1. Faults are refused with nothing written: `FX_MISMATCH` for an inconsistent rate, `INVALID_COMMAND` or `INVALID_CSV` (row named) for shape faults.
 - Why: RQ-0170 finding 4. The engine stores the rate as given and never recomputes base (DL-0130). The check stops a wrong rate from silently mis-stating the item, and half-up to cents is design §3.4's default.
 - Alternatives: a tolerance of one cent (rejected: loosens an exact check). Require the rate always (rejected: aged-AR exports often carry only both amounts). Xero's foreign-per-base convention (rejected: the engine convention wins; the Xero reader converts, T-0201).
-- ADR: none · Status: accepted
+- ADR: ADR-0088 · Status: accepted
 
 ### DL-0742 — FX opening items: GST content in base, no party-currency check, no migration
 - Date: 2026-11-16 · By: claude · Task: T-0126 · Category: architecture
@@ -3801,3 +3801,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: design §9 places the "Xero/MYOB importer" in Phase 1, and an MVP module must not depend on a Phase 1 capability (packages/modules/AGENTS.md). The Xero developer docs (rate limits, scopes, rate direction) could not be reached from this session (RQ-0170 S7).
 - Alternatives: build a Xero reader in MVP from the OpenAPI spec alone (rejected: unverified vendor facts and a phase breach).
 - ADR: none · Status: accepted
+
+### DL-0743 — fast-check as a dev dependency of @ledgerforce/setup; FX rule property test
+- Date: 2026-11-16 · By: claude · Task: T-0126 · Category: tooling
+- Decision: Add `fast-check` 4.10.2 (already the repo's pinned version, root and seven packages) to `packages/modules/setup` devDependencies, for `opening-fx.prop.test.ts` (default runs). The test covers four properties: a rate is accepted exactly when it reproduces the base amount half-up to cents; the implied rate is base ÷ amount half-up to 8 decimals; the line amount is absolute; base-currency items are base. A ROUND_DOWN mutant of the check was killed (evidence `mutation-round-down-killed.txt`).
+- Why: ledger-engineer definition of done (property invariants for posting-adjacent rules). This is a dev-only tool, so a decision-log entry is enough (AGENTS.md §4).
+- Alternatives: example-based tests only (rejected: rounding edges are where the rule can fail).
+- ADR: none · Status: accepted
+
+### DL-0744 — Opening-balance HTTP views name the currency of every line and item (additive)
+- Date: 2026-11-16 · By: claude · Task: T-0126 · Category: architecture
+- Decision: `POST /setup/opening-balances/preview` lines add `txn_currency`, `txn_amount` and `fx_rate`. The posted and GET views' items add `currency`, `currency_amount` (signed) and `fx_rate`. Base items show the base currency and rate 1. FX refusals are 422 `FX_MISMATCH` or `INVALID_COMMAND` / `INVALID_CSV` with the row. Showing them on the T-0177 screen is a new card, **T-0202**.
+- Why: a user must see the rate before posting (preview) and what was posted. The change is additive, so no client breaks. ADR-0088 records the public API change.
+- Alternatives: keep FX data server-side only (rejected: preview without the rate cannot be checked by the user).
+- ADR: ADR-0088 · Status: accepted

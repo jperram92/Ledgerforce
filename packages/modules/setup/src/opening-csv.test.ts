@@ -113,3 +113,52 @@ describe('SS-PLAT-116: opening-balance CSV files', () => {
     ).toMatchObject({ row: 3 });
   });
 });
+
+describe('SS-PLAT-136: foreign-currency open items in the CSV (T-0126, GP-040, DL-0741)', () => {
+  const head =
+    'party,document_no,document_date,due_date,amount,gst_amount,currency,currency_amount,fx_rate\n';
+
+  it('SS-PLAT-136 reads currency, currency_amount and fx_rate; an empty currency is a base item without FX fields', () => {
+    const items = parseOpenItemsCsv(
+      head +
+        'Acme Pty Ltd,INV-2001,2026-09-20,2026-10-20,1538.46,,usd,1000.00,1.53846154\n' +
+        'Acme Pty Ltd,INV-2002,2026-09-21,2026-10-21,153.85,,USD,100,\n' +
+        'Acme Pty Ltd,INV-0991,2026-09-15,2026-10-15,1375.00,125.00,,,\n',
+      'ar',
+    );
+    expect(items[0]).toMatchObject({
+      row: 2,
+      amount: '1538.46',
+      gstAmount: '0',
+      currency: 'USD',
+      currencyAmount: '1000.00',
+      fxRate: '1.53846154',
+    });
+    expect(items[1]).toMatchObject({ currency: 'USD', currencyAmount: '100' });
+    expect(items[1]).not.toHaveProperty('fxRate');
+    expect(items[2]).toEqual({
+      row: 4,
+      kind: 'ar',
+      party: 'Acme Pty Ltd',
+      documentNo: 'INV-0991',
+      documentDate: '2026-09-15',
+      dueDate: '2026-10-15',
+      amount: '1375.00',
+      gstAmount: '125.00',
+    });
+  });
+
+  it('SS-PLAT-136 refuses a bad currency code, a missing, zero or opposite-sign currency amount, and a bad rate, naming the row', () => {
+    const row = (r: string) => refusal(() => parseOpenItemsCsv(head + r, 'ap'));
+    const base = 'S,B-88,2026-10-05,2026-11-04,-615.38,,';
+    expect(row(`${base}US,-400.00,\n`)).toMatchObject({ code: 'INVALID_CSV', row: 2 });
+    expect(row(`${base}US,-400.00,\n`).message).toMatch(/currency/);
+    expect(row(`${base}USD,,\n`).message).toMatch(/currency_amount/);
+    expect(row(`${base}USD,0,\n`).message).toMatch(/currency_amount/);
+    expect(row(`${base}USD,400.00,\n`).message).toMatch(/sign/);
+    expect(row(`${base}USD,-400.00,0\n`).message).toMatch(/fx_rate/);
+    expect(row(`${base}USD,-400.00,-1.5\n`).message).toMatch(/fx_rate/);
+    expect(row(`${base}USD,-400.00,1.538461541\n`).message).toMatch(/8 decimals/);
+    expect(row(`${base},-400.00,\n`).message).toMatch(/currency/);
+  });
+});

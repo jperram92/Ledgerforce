@@ -1,0 +1,55 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aebe92c8dcb65979c
+
+ ❯ |unit| packages/modules/setup/src/opening-csv.test.ts (6 tests | 2 failed) 15ms
+     × SS-PLAT-136 reads currency, currency_amount and fx_rate; an empty currency is a base item without FX fields 7ms
+     × SS-PLAT-136 refuses a bad currency code, a missing, zero or opposite-sign currency amount, and a bad rate, naming the row 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/setup/src/opening-csv.test.ts > SS-PLAT-136: foreign-currency open items in the CSV (T-0126, GP-040, DL-0741) > SS-PLAT-136 reads currency, currency_amount and fx_rate; an empty currency is a base item without FX fields
+AssertionError: expected { row: 2, kind: 'ar', …(6) } to match object { row: 2, amount: '1538.46', …(4) }
+(5 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "amount": "1538.46",
+-   "currency": "USD",
+-   "currencyAmount": "1000.00",
+-   "fxRate": "1.53846154",
+    "gstAmount": "0",
+    "row": 2,
+  }
+
+ ❯ packages/modules/setup/src/opening-csv.test.ts:129:22
+    127|       'ar',
+    128|     );
+    129|     expect(items[0]).toMatchObject({
+       |                      ^
+    130|       row: 2,
+    131|       amount: '1538.46',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |unit| packages/modules/setup/src/opening-csv.test.ts > SS-PLAT-136: foreign-currency open items in the CSV (T-0126, GP-040, DL-0741) > SS-PLAT-136 refuses a bad currency code, a missing, zero or opposite-sign currency amount, and a bad rate, naming the row
+Error: expected an OpeningBalanceError
+ ❯ refusal packages/modules/setup/src/opening-csv.test.ts:17:9
+     15|     throw e;
+     16|   }
+     17|   throw new Error('expected an OpeningBalanceError');
+       |         ^
+     18| };
+     19|
+ ❯ row packages/modules/setup/src/opening-csv.test.ts:152:32
+ ❯ packages/modules/setup/src/opening-csv.test.ts:154:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  07:46:50
+   Duration  1.39s (transform 305ms, setup 0ms, import 443ms, tests 15ms, environment 0ms)
+

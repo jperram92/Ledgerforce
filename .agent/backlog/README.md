@@ -185,7 +185,7 @@ graph LR
 | [T-0183](T-0183.md) | Setup/Web - wizard step 8 asks for a remittance account; screen to request and approve it (T-0180 AC-3) | MVP | todo | T-0180, T-0176 | UC-01, UC-SETUP | 0 |
 | [T-0124](T-0124.md) | Receipts, refunds and payment batches settle opening AR/AP items | MVP | todo | T-0080, T-0046, T-0054, T-0057 | UC-03, UC-06 | 0 |
 | [T-0125](T-0125.md) | Cash-basis BAS: GST on opening AR/AP items when they are paid | MVP | todo | T-0080, T-0035, T-0124 | — | 0 |
-| [T-0126](T-0126.md) | Opening balances: foreign-currency open items and Xero import | MVP | in_progress | T-0080 | — | 0 |
+| [T-0126](T-0126.md) | Opening balances: foreign-currency open items and Xero import | MVP | verifying | T-0080 | — | 0 |
 | [T-0106](T-0106.md) | Timeline design system: component fixes and @ledgerforce/ui package | MVP | review | T-0009 | UC-10, UC-12 | 1 |
 | [T-0107](T-0107.md) | Company ABN checksum: validate app.company.abn with app.abn_is_valid; fix test fixtures | MVP | review | T-0036 | — | 0 |
 | [T-0108](T-0108.md) | OpenBao/Vault transit KMS adapter (HTTP, no SDK) for envelope encryption | Phase 1 | review | T-0037 | — | 1 |
@@ -202,6 +202,7 @@ graph LR
 | [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | todo | T-0180 | UC-01 | 0 |
 | [T-0192](T-0192.md) | Security: rotate the session id on step-up re-authentication (ASVS 5.0 7.2.4) | MVP | todo | — | — | 0 |
 | [T-0201](T-0201.md) | Opening balances: Xero reader (trial balance and open invoices/bills at the balance date) | Phase 1 | todo | T-0126 | — | 0 |
+| [T-0202](T-0202.md) | Opening balances screen: show currency, currency amount and rate of foreign-currency items | MVP | todo | T-0126, T-0177 | — | 0 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | review | T-0081, T-0046, T-0045, T-0055, T-0151 | UC-03, UC-11 | 2 |
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | review | T-0081, T-0052, T-0051 | UC-05 | 1 |
 | [T-0153](T-0153.md) | AP release API for the T-0087 screens: batch list, named batch view, bank-detail change list | MVP | review | T-0054, T-0053 | UC-06 | 1 |
