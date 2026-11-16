@@ -47,9 +47,6 @@ export interface Where {
   also?: { to: Screen; name: string; text: string };
 }
 
-const ELSEWHERE =
-  'There is no LedgerForce screen for this yet: these settings are entered when your organisation is set up. Ask whoever set it up if something is missing.';
-
 /** Where each step's settings are entered (DL-0601): an existing screen, or said plainly. */
 export const STEP_WHERE: Record<number, Where> = {
   // T-0176: steps 1 and 3 have their settings screens.
