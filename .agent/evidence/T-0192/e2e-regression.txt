@@ -1,0 +1,27 @@
+
+Running 22 tests using 2 workers
+
+  ✓   1 [chromium] › tests/e2e/web/payment-batch.spec.ts:546:1 › T-0087: an Approver sees the changes but only the Owner verifies them (2.3s)
+  ✓   3 [chromium] › tests/e2e/web/payment-batch.spec.ts:567:5 › bank file [T-0154] › SS-UC06-11 Bank file download from a released batch @ 1440 [T-0154] (2.9s)
+  ✓   2 [chromium] › tests/e2e/web/payment-batch.spec.ts:365:3 › SS-UC06-10 Release screen with step-up prompt @ 1440 [T-0087] (6.5s)
+  ✓   4 [chromium] › tests/e2e/web/payment-batch.spec.ts:567:5 › bank file [T-0154] › SS-UC06-11 Bank file download from a released batch @ 390 [T-0154] (3.1s)
+  ✓   6 [chromium] › tests/e2e/web/payment-batch.spec.ts:595:3 › bank file [T-0154] › T-0154 AC-3: an AP Clerk sees the released batch but no bank-file action (873ms)
+  ✓   7 [chromium] › tests/e2e/web/payment-batch.spec.ts:607:3 › bank file [T-0154] › T-0154: before release there is no bank file to download, and the screen says why (1.2s)
+  ✓   8 [chromium] › tests/e2e/web/payment-batch.spec.ts:648:5 › bank file [T-0154] › T-0154 AC-3: a bank-file refusal (the paying account is not set up for bank files) is explained in plain words (828ms)
+  ✓   5 [chromium] › tests/e2e/web/payment-batch.spec.ts:365:3 › SS-UC06-10 Release screen with step-up prompt @ 390 [T-0087] (4.8s)
+  ✓  10 [chromium] › tests/e2e/web/payment-batch.spec.ts:429:1 › T-0087: the person who built the batch is told before trying that someone else releases it (987ms)
+  ✓   9 [chromium] › tests/e2e/web/payment-batch.spec.ts:648:5 › bank file [T-0154] › T-0154 AC-3: a bank-file refusal (the file cannot be written from the details on file) is explained in plain words (1.1s)
+  ✓  12 [chromium] › tests/e2e/web/payment-batch.spec.ts:648:5 › bank file [T-0154] › T-0154 AC-3: a bank-file refusal (the key service is not available) is explained in plain words (1.1s)
+  ✓  11 [chromium] › tests/e2e/web/payment-batch.spec.ts:440:1 › T-0087: a separation-of-duties refusal from the API is explained in plain words (1.3s)
+  ✓  13 [chromium] › tests/e2e/web/payment-batch.spec.ts:648:5 › bank file [T-0154] › T-0154 AC-3: a bank-file refusal (a separation-of-duties rule) is explained in plain words (1.2s)
+  ✓  14 [chromium] › tests/e2e/web/payment-batch.spec.ts:458:1 › T-0087: an AP Clerk sees the batch but no release button (1.2s)
+  ✓  15 [chromium] › tests/e2e/web/payment-batch.spec.ts:664:3 › bank file [T-0154] › T-0154: if the API asks for a step-up, the bank file waits for a fresh sign-in and a fresh click (1.0s)
+  ✓  16 [chromium] › tests/e2e/web/payment-batch.spec.ts:467:1 › T-0087: someone without access to payables is told so, and nothing is listed (1.1s)
+  ✓  17 [chromium] › tests/e2e/web/step-up-rotation.spec.ts:258:1 › SS-PLAT-137 Step-up rotates the session: the release screen stays put and the retried release succeeds with the new cookie [T-0192] (3.1s)
+  ✓  18 [chromium] › tests/e2e/web/payment-batch.spec.ts:481:3 › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 1440 [T-0087] (4.6s)
+  ✓  19 [chromium] › tests/e2e/web/step-up-rotation.spec.ts:300:1 › SS-PLAT-137 Step-up rotates the session: the typed verification note survives and the retried verify succeeds [T-0192] (2.9s)
+  ✓  20 [chromium] › tests/e2e/web/payment-batch.spec.ts:481:3 › SS-UC06-09 Bank-detail change needs a different verifier: verification screen with step-up @ 390 [T-0087] (4.0s)
+  ✓  21 [chromium] › tests/e2e/web/payment-batch.spec.ts:522:1 › T-0087: the Owner who asked for the change is told someone else verifies it (812ms)
+  ✓  22 [chromium] › tests/e2e/web/payment-batch.spec.ts:534:1 › T-0087: a change can be rejected with a reason, without step-up (905ms)
+
+  22 passed (30.2s)
