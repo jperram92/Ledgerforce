@@ -31,6 +31,7 @@ type Screen =
   | '/settings/sync-issues'
   | '/settings/company'
   | '/settings/tax'
+  | '/settings/bank-accounts'
   | '/settings/setup/opening-balances'
   | '/accounting/posting-profiles';
 export interface Where {
@@ -63,7 +64,12 @@ export const STEP_WHERE: Record<number, Where> = {
     name: 'Tax settings',
     text: 'Choose the GST basis and BAS frequency, and add the tax codes, on',
   },
-  4: { text: ELSEWHERE },
+  // T-0185: the bank accounts screen (ADR-0084).
+  4: {
+    to: '/settings/bank-accounts',
+    name: 'Bank accounts',
+    text: 'Add your bank accounts, with the APCA user id and ABA user name batch payments need, on',
+  },
   5: {
     text: 'There is no LedgerForce screen for this yet: Salesforce is connected from the LedgerForce package in your Salesforce org.',
   },

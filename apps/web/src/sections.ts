@@ -9,6 +9,7 @@ export interface SubPage {
     | '/settings/setup'
     | '/settings/company'
     | '/settings/tax'
+    | '/settings/bank-accounts'
     | '/settings/users'
     | '/reports/control-exceptions'
     | '/reports/audit-log'
@@ -247,6 +248,12 @@ export const SECTIONS: readonly Section[] = [
         to: '/settings/tax',
         name: 'Tax settings',
         text: 'How you account for GST, how often you lodge the BAS, and the tax codes.',
+      },
+      // Bank accounts, setup step 4 (T-0185).
+      {
+        to: '/settings/bank-accounts',
+        name: 'Bank accounts',
+        text: 'Your bank accounts, numbers masked, and the details batch payment files need.',
       },
       {
         to: '/settings/users',

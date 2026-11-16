@@ -1,5 +1,6 @@
 /**
- * Setup settings API client (T-0176): the ADR-0081 routes under /setup/company and /setup/tax.
+ * Setup settings API client (T-0176): the ADR-0081 routes under /setup/company and /setup/tax,
+ * and (T-0185) the ADR-0084 routes under /setup/bank-accounts.
  * Same origin, session cookie; failures are AdminApiError (status + error code + body). Every
  * write carries the Idempotency-Key the screen passes.
  */
@@ -56,6 +57,53 @@ export interface TaxSettingsView {
   codes: TaxCode[];
 }
 
+/** A company bank account as the API lists it: the number is `***` + the last 3 characters. */
+export interface BankAccount {
+  id: string;
+  name: string;
+  gl_account_id: string;
+  gl_account_code: string | null;
+  gl_account_name: string | null;
+  currency: string;
+  bsb: string;
+  account_name: string;
+  account_number: string;
+  apca_user_id: string | null;
+  aba_user_name: string | null;
+  aba_fi_mnemonic: string | null;
+  status: string;
+}
+
+export interface BankGlAccount {
+  id: string;
+  code: string;
+  name: string;
+  currency: string | null;
+  /** Already has an active bank account (one per GL account). */
+  in_use: boolean;
+}
+
+export interface BankAccountsView {
+  company_id: string;
+  base_currency: string;
+  /** False when the server has no key service to seal account numbers (ADR-0030). */
+  kms_configured: boolean;
+  accounts: BankAccount[];
+  gl_accounts: BankGlAccount[];
+}
+
+export interface BankAccountInput {
+  gl_account_id: string;
+  name: string;
+  bsb: string;
+  account_number: string;
+  account_name: string;
+  currency: string;
+  apca_user_id?: string;
+  aba_user_name?: string;
+  aba_fi_mnemonic?: string;
+}
+
 export interface SettingsClient {
   company(companyId: string): Promise<CompanySettings>;
   saveCompany(
@@ -75,6 +123,12 @@ export interface SettingsClient {
     key: string,
   ): Promise<{ settings: TaxSettingsValue; changed: boolean }>;
   addStandardTaxCodes(companyId: string, key: string): Promise<{ inserted: number }>;
+  bankAccounts(companyId: string): Promise<BankAccountsView>;
+  addBankAccount(
+    companyId: string,
+    input: BankAccountInput,
+    key: string,
+  ): Promise<{ account: BankAccount; replayed: boolean }>;
 }
 
 export function createSettingsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): SettingsClient {
@@ -107,5 +161,8 @@ export function createSettingsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Se
     saveTax: (c, value, key) => send('PUT', '/setup/tax', { company_id: c, ...value }, key),
     addStandardTaxCodes: (c, key) =>
       send('POST', '/setup/tax/codes/standard', { company_id: c }, key),
+    bankAccounts: (c) => send('GET', `/setup/bank-accounts${q(c)}`),
+    addBankAccount: (c, input, key) =>
+      send('POST', '/setup/bank-accounts', { company_id: c, ...input }, key),
   };
 }

@@ -32,6 +32,7 @@ import { PostingProfilesPage } from './setup/PostingProfilesPage.tsx';
 import { WizardPage } from './setup/WizardPage.tsx';
 import { CompanySettingsPage } from './settings/CompanySettingsPage.tsx';
 import { TaxSettingsPage } from './settings/TaxSettingsPage.tsx';
+import { BankAccountsPage } from './settings/BankAccountsPage.tsx';
 import { Shell } from './Shell.tsx';
 import { SignInPage, type SignInReason } from './SignIn.tsx';
 import { inboxSearch } from './sync/logic.ts';
@@ -166,6 +167,12 @@ const taxSettingsRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: 'settings/tax',
   component: TaxSettingsPage,
+});
+// Bank accounts, wizard step 4 (T-0185, ADR-0084); the API owns /setup/bank-accounts.
+const bankAccountsSettingsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/bank-accounts',
+  component: BankAccountsPage,
 });
 // Opening balances, wizard step 9 (T-0177, DL-0651); the API owns /setup/opening-balances.
 const openingBalancesRoute = createRoute({
@@ -528,6 +535,7 @@ const routeTree = rootRoute.addChildren([
     setupRoute,
     companySettingsRoute,
     taxSettingsRoute,
+    bankAccountsSettingsRoute,
     openingBalancesRoute,
     chartRoute,
     postingProfilesRoute,
