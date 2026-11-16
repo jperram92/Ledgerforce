@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0191",
+  "entries": [
+    {
+      "scenario": "SS-UC01-18",
+      "file": ".agent/evidence/T-0191/20261116-080443-tests-db.json",
+      "test": "3 test(s): packages/modules/bank/src/remittance.db.test.ts › SS-UC01-18 archiving releases the designation; re-activating prints nothing; a new approval prints again [T-0191] | packages/modules/bank/src/remittance.db.test.ts › SS-UC01-18 a designation left on an archived account by an older schema is released on re-activation [T-0191] | packages/modules/bank/src/remittance.db.test.ts › SS-UC01-18 the database refuses to designate an archived account, even with an approved change [T-0191]",
+      "commit": "d4d686b",
+      "provider": "claude",
+      "timestamp": "2026-11-16T08:05:21.008Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-19",
+      "file": ".agent/evidence/T-0191/20261116-080443-tests-db.json",
+      "test": "6 test(s): packages/modules/ar/src/remittance-account-notice.db.test.ts › SS-UC01-19 with no active Owner or Finance Admin the approval writes one no_recipient notice [T-0191] | packages/modules/ar/src/remittance-account-notice.db.test.ts › SS-UC01-19 an approval notifies each active Owner and Finance Admin once, masked, naming requester and approver [T-0191] | packages/modules/ar/src/remittance-account-notice.db.test.ts › SS-UC01-19 a rejection notifies nobody [T-0191] | packages/modules/ar/src/remittance-account-notice.db.test.ts › SS-UC01-19 a small-team self-approval of a removal notifies everyone and says it was self-approved [T-0191] | packages/modules/ar/src/remittance-account-notice.db.test.ts › SS-UC01-19 an approval that bypasses the module still writes the notices [T-0191] | packages/modules/ar/src/remittance-account-notice.db.test.ts › SS-UC01-19 lf_app cannot write, edit or delete notices; it can only record delivery [T-0191]",
+      "commit": "d4d686b",
+      "provider": "claude",
+      "timestamp": "2026-11-16T08:05:21.008Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC01-19",
+      "file": ".agent/evidence/T-0191/20261116-080443-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/setup/remittance-account-notice.db.test.ts › SS-UC01-19 another tenant's approved change notifies its own Owners and Finance Admins and nobody here [T-0191] | apps/api/src/setup/remittance-account-notice.db.test.ts › SS-UC01-19 this tenant’s approved change notifies only this tenant’s people; the other tenant sees no new notice [T-0191]",
+      "commit": "d4d686b",
+      "provider": "claude",
+      "timestamp": "2026-11-16T08:05:21.008Z",
+      "result": "passed"
+    }
+  ]
+}

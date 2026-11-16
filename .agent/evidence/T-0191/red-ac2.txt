@@ -1,0 +1,103 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a17679ed25a0d45ce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42595
+ ❯ |db| packages/modules/ar/src/remittance-account-notice.db.test.ts (6 tests | 6 failed) 973ms
+     × SS-UC01-19 with no active Owner or Finance Admin the approval writes one no_recipient notice [T-0191] 31ms
+     × SS-UC01-19 an approval notifies each active Owner and Finance Admin once, masked, naming requester and approver [T-0191] 24ms
+     × SS-UC01-19 a rejection notifies nobody [T-0191] 5ms
+     × SS-UC01-19 a small-team self-approval of a removal notifies everyone and says it was self-approved [T-0191] 78ms
+     × SS-UC01-19 an approval that bypasses the module still writes the notices [T-0191] 14ms
+     × SS-UC01-19 lf_app cannot write, edit or delete notices; it can only record delivery [T-0191] 7ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/remittance-account-notice.db.test.ts > SS-UC01-19: every approved remittance account change notifies all Owners and Finance Admins > SS-UC01-19 with no active Owner or Finance Admin the approval writes one no_recipient notice [T-0191]
+error: relation "app.remittance_account_notice" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ noticesOf packages/modules/ar/src/remittance-account-notice.db.test.ts:80:5
+     78| const noticesOf = async (changeId: string): Promise<Notice[]> =>
+     79|   (
+     80|     await f.admin.query<Notice>(
+       |     ^
+     81|       `SELECT recipient_user_id, recipient_name, recipient_email, stat…
+     82|          FROM app.remittance_account_notice WHERE tenant_id = $1 AND c…
+ ❯ packages/modules/ar/src/remittance-account-notice.db.test.ts:145:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  |db| packages/modules/ar/src/remittance-account-notice.db.test.ts > SS-UC01-19: every approved remittance account change notifies all Owners and Finance Admins > SS-UC01-19 an approval notifies each active Owner and Finance Admin once, masked, naming requester and approver [T-0191]
+error: relation "app.remittance_account_notice" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ allNotices packages/modules/ar/src/remittance-account-notice.db.test.ts:91:7
+     89|   Number(
+     90|     (
+     91|       await f.admin.query<{ n: string }>(
+       |       ^
+     92|         'SELECT count(*)::text AS n FROM app.remittance_account_notice…
+     93|         [f.tenantId],
+ ❯ packages/modules/ar/src/remittance-account-notice.db.test.ts:174:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |db| packages/modules/ar/src/remittance-account-notice.db.test.ts > SS-UC01-19: every approved remittance account change notifies all Owners and Finance Admins > SS-UC01-19 a rejection notifies nobody [T-0191]
+error: relation "app.remittance_account_notice" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ allNotices packages/modules/ar/src/remittance-account-notice.db.test.ts:91:7
+     89|   Number(
+     90|     (
+     91|       await f.admin.query<{ n: string }>(
+       |       ^
+     92|         'SELECT count(*)::text AS n FROM app.remittance_account_notice…
+     93|         [f.tenantId],
+ ❯ packages/modules/ar/src/remittance-account-notice.db.test.ts:223:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  |db| packages/modules/ar/src/remittance-account-notice.db.test.ts > SS-UC01-19: every approved remittance account change notifies all Owners and Finance Admins > SS-UC01-19 a small-team self-approval of a removal notifies everyone and says it was self-approved [T-0191]
+error: relation "app.remittance_account_notice" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ noticesOf packages/modules/ar/src/remittance-account-notice.db.test.ts:80:5
+     78| const noticesOf = async (changeId: string): Promise<Notice[]> =>
+     79|   (
+     80|     await f.admin.query<Notice>(
+       |     ^
+     81|       `SELECT recipient_user_id, recipient_name, recipient_email, stat…
+     82|          FROM app.remittance_account_notice WHERE tenant_id = $1 AND c…
+ ❯ packages/modules/ar/src/remittance-account-notice.db.test.ts:268:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |db| packages/modules/ar/src/remittance-account-notice.db.test.ts > SS-UC01-19: every approved remittance account change notifies all Owners and Finance Admins > SS-UC01-19 an approval that bypasses the module still writes the notices [T-0191]
+error: relation "app.remittance_account_notice" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ noticesOf packages/modules/ar/src/remittance-account-notice.db.test.ts:80:5
+     78| const noticesOf = async (changeId: string): Promise<Notice[]> =>
+     79|   (
+     80|     await f.admin.query<Notice>(
+       |     ^
+     81|       `SELECT recipient_user_id, recipient_name, recipient_email, stat…
+     82|          FROM app.remittance_account_notice WHERE tenant_id = $1 AND c…
+ ❯ packages/modules/ar/src/remittance-account-notice.db.test.ts:301:13
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |db| packages/modules/ar/src/remittance-account-notice.db.test.ts > SS-UC01-19: every approved remittance account change notifies all Owners and Finance Admins > SS-UC01-19 lf_app cannot write, edit or delete notices; it can only record delivery [T-0191]
+error: relation "app.remittance_account_notice" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ packages/modules/ar/src/remittance-account-notice.db.test.ts:305:17
+    303|
+    304|   it('SS-UC01-19 lf_app cannot write, edit or delete notices; it can o…
+    305|     const [n] = await f.admin.query<{ id: string; change_id: string }>(
+       |                 ^
+    306|       `SELECT id, change_id FROM app.remittance_account_notice
+    307|         WHERE tenant_id = $1 AND status = 'pending' ORDER BY created_a…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
+   Start at  07:48:05
+   Duration  2.46s (transform 285ms, setup 0ms, import 490ms, tests 973ms, environment 0ms)
+

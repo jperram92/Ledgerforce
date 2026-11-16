@@ -1,0 +1,34 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a17679ed25a0d45ce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33389
+ ❯ |db| packages/modules/bank/src/remittance.db.test.ts (6 tests | 1 failed | 5 skipped) 1038ms
+     × SS-UC01-18 the database refuses to designate an archived account, even with an approved change [T-0191] 35ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/bank/src/remittance.db.test.ts > SS-UC01-18: an archived remittance account needs a new approval to print again > SS-UC01-18 the database refuses to designate an archived account, even with an approved change [T-0191]
+AssertionError: expected undefined to be '23514' // Object.is equality
+
+- Expected:
+"23514"
+
++ Received:
+undefined
+
+ ❯ packages/modules/bank/src/remittance.db.test.ts:223:7
+    221|         }),
+    222|       ),
+    223|     ).toBe('23514');
+       |       ^
+    224|     expect(await designated()).toBeNull();
+    225|     await setStatus(operating, 'active');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 skipped (6)
+   Start at  07:49:45
+   Duration  3.19s (transform 639ms, setup 0ms, import 898ms, tests 1.04s, environment 0ms)
+

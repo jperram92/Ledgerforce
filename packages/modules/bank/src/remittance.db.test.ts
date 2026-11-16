@@ -115,3 +115,113 @@ describe('T-0180 ADR-0079: only the designated remittance account is decrypted',
     expect(unwrapped).toEqual([]);
   });
 });
+
+/**
+ * SS-UC01-18 (T-0191, ADR-0086, RQ-0168, security review r8 L1): archiving the designated account
+ * releases the designation, so re-activating it prints nothing until a new change is approved.
+ */
+describe('SS-UC01-18: an archived remittance account needs a new approval to print again', () => {
+  const designated = async (): Promise<string | null> => {
+    const r = await f.admin.query<{ id: string | null }>(
+      'SELECT remittance_bank_account_id AS id FROM app.ar_settings WHERE tenant_id = $1 AND company_id = $2',
+      [f.tenantId, f.companyId],
+    );
+    return r.rows[0]?.id ?? null;
+  };
+  const setStatus = (id: string, status: 'active' | 'archived') =>
+    f.inTenant((trx) =>
+      trx.updateTable('app.bank_account').set({ status }).where('id', '=', id).execute(),
+    );
+  const sqlState = (p: Promise<unknown>): Promise<string | undefined> =>
+    p.then(
+      () => undefined,
+      (e: unknown) => (e as { code?: string }).code ?? String(e),
+    );
+
+  it('SS-UC01-18 archiving releases the designation; re-activating prints nothing; a new approval prints again [T-0191]', async () => {
+    await designate(operating);
+    expect(await designated()).toBe(operating);
+    await setStatus(operating, 'archived');
+    expect(await designated()).toBeNull();
+    const audit = await f.admin.query<{ after: string; actor_type: string }>(
+      `SELECT after::text AS after, actor_type FROM audit.audit_log
+        WHERE tenant_id = $1 AND action = 'remittance_account.released' AND entity_id = $2
+          AND after -> 'bank_account' ->> 'id' = $3`,
+      [f.tenantId, f.companyId, operating],
+    );
+    expect(audit.rows).toHaveLength(1);
+    expect(audit.rows[0]?.actor_type).toBe('system');
+    expect(audit.rows[0]?.after).toContain('***678');
+    expect(audit.rows[0]?.after).not.toContain('12345678');
+
+    await setStatus(operating, 'active');
+    unwrapped.length = 0;
+    expect(await designated()).toBeNull();
+    expect(await f.inTenant((trx) => remittanceDetailsOf(trx, kms, f.companyId))).toBeNull();
+    expect(unwrapped).toEqual([]);
+
+    await designate(operating);
+    const d = await f.inTenant((trx) => remittanceDetailsOf(trx, kms, f.companyId));
+    expect(d?.bankAccountId).toBe(operating);
+    expect(d?.accountNumber).toBe('12345678');
+  });
+
+  it('SS-UC01-18 a designation left on an archived account by an older schema is released on re-activation [T-0191]', async () => {
+    expect(await designated()).toBe(operating);
+    // Migration 0071 kept the designation while archived: reproduce that state as a superuser
+    // seed step with triggers off (lf_app cannot do this).
+    const client = await f.admin.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query('SET LOCAL session_replication_role = replica');
+      await client.query(`UPDATE app.bank_account SET status = 'archived' WHERE id = $1`, [
+        operating,
+      ]);
+      await client.query('COMMIT');
+    } finally {
+      client.release();
+    }
+    expect(await designated()).toBe(operating);
+    await setStatus(operating, 'active');
+    expect(await designated()).toBeNull();
+    expect(await f.inTenant((trx) => remittanceDetailsOf(trx, kms, f.companyId))).toBeNull();
+  });
+
+  it('SS-UC01-18 the database refuses to designate an archived account, even with an approved change [T-0191]', async () => {
+    const maker = await f.addUser('finance_admin');
+    const checker = await f.addUser('owner');
+    const changeId = randomUUID();
+    await f.inTenant((trx) =>
+      requestRemittanceAccountChange(trx, {
+        companyId: f.companyId,
+        changeId,
+        bankAccountId: operating,
+        requestedBy: maker,
+      }),
+    );
+    await setStatus(operating, 'archived');
+    // Bypass the module: approve and write the setting directly, in one transaction.
+    expect(
+      await sqlState(
+        f.inTenant(async (trx) => {
+          await trx
+            .updateTable('app.remittance_account_change')
+            .set({ status: 'approved', decided_by: checker, decided_at: new Date() })
+            .where('id', '=', changeId)
+            .execute();
+          await trx
+            .insertInto('app.ar_settings')
+            .values({ company_id: f.companyId, remittance_bank_account_id: operating })
+            .onConflict((oc) =>
+              oc
+                .columns(['tenant_id', 'company_id'])
+                .doUpdateSet({ remittance_bank_account_id: operating }),
+            )
+            .execute();
+        }),
+      ),
+    ).toBe('23514');
+    expect(await designated()).toBeNull();
+    await setStatus(operating, 'active');
+  });
+});

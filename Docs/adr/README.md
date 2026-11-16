@@ -119,6 +119,7 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0081](0081-setup-settings-http-routes.md) | HTTP routes for the setup settings screens (company details, fiscal years, tax settings, tax codes) | architecture | no | Proposed |
 | [0082](0082-posting-profile-matrix-http-routes.md) | HTTP routes for the posting-profile matrix: read the matrix, set an override | architecture | no | Proposed |
 | [0083](0083-stripe-refund-sent-on-approval.md) | A Stripe refund is sent by the approve step, once, with step-up; failures retry through the outbox | security | yes (delegated, DL-0562/DL-0477) | Accepted |
+| [0086](0086-remittance-designation-release-and-change-notices.md) | Remittance account: archiving releases the designation; every approved change notifies all Owners and Finance Admins | security | yes (delegated, DL-0691) | Accepted |
 | [0089](0089-single-supply-gst-attribution.md) | Single-supply GST attribution on accruals: whole-supply coded line with contra, GST_ATTRIBUTED_UNBILLED asset, code-driven BAS unchanged | accounting | yes (delegated, DL-0263) | Accepted |
 
 Next free number: **0055** (0055–0060 are reserved for the DL-0409 parallel round) (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

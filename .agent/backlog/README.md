@@ -18,8 +18,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | in_progress | 1 |
 | review | 137 |
 | todo | 27 |
-| verifying | 3 |
-| **total** | **178** |
+| verifying | 4 |
+| **total** | **179** |
 
 | Phase | Cards |
 |---|---:|
@@ -199,8 +199,9 @@ graph LR
 | [T-0172](T-0172.md) | AR - Stripe refund of customer credit through the refund document, sent only on approval (ADR-0074) | MVP | verifying | T-0152, T-0074 | UC-11 | 0 |
 | [T-0189](T-0189.md) | Stripe: reconcile a Stripe refund whose send is older than 23 hours (KEY_EXPIRED) before any resend | MVP | todo | T-0172 | UC-11 | 0 |
 | [T-0190](T-0190.md) | AR: cancel an approved Stripe refund that Stripe refused permanently, so its amount stops counting as requested | MVP | todo | T-0172 | UC-11 | 0 |
-| [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | todo | T-0180 | UC-01 | 0 |
+| [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | verifying | T-0180 | UC-01 | 0 |
 | [T-0192](T-0192.md) | Security: rotate the session id on step-up re-authentication (ASVS 5.0 7.2.4) | MVP | todo | — | — | 0 |
+| [T-0197](T-0197.md) | Platform: send security notices (bank-detail and remittance account changes) by email | MVP | todo | T-0191 | UC-01, UC-06 | 0 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | review | T-0081, T-0046, T-0045, T-0055, T-0151 | UC-03, UC-11 | 2 |
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | review | T-0081, T-0052, T-0051 | UC-05 | 1 |
 | [T-0153](T-0153.md) | AP release API for the T-0087 screens: batch list, named batch view, bank-detail change list | MVP | review | T-0054, T-0053 | UC-06 | 1 |
