@@ -1,0 +1,16 @@
+     × SS-PLAT-130 GET /setup/bank-accounts lists no accounts yet and the bank GL accounts that can take one [T-0185] 25ms
+     × SS-PLAT-130 adding needs settings.setup.manage and a fresh step-up; reading needs settings.read [T-0185] 15ms
+     × SS-PLAT-130 POST adds the account sealed, answers and audits it masked, and step 4 empties [T-0185] 7ms
+     × SS-PLAT-130 the same request again is a replay that writes nothing; a different one on the same GL account is 409 [T-0185] 3ms
+     × SS-PLAT-130 two first requests racing on one GL account: one is added, the other is 409 [T-0185] 7ms
+     × SS-PLAT-130 refusals: no key 400, malformed 400, unknown GL account 404, not a bank account or another currency 422, another tenant 404 [T-0185] 2ms
+     × SS-PLAT-130 without a key service the add is 503 kms_not_configured and nothing is written [T-0185] 3ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected 404 to be 200 // Object.is equality
+AssertionError: expected 404 to be 401 // Object.is equality
+AssertionError: expected 404 to be 201 // Object.is equality
+AssertionError: expected 404 to be 200 // Object.is equality
+AssertionError: expected [ 404, 404 ] to deeply equal [ 201, 409 ]
+AssertionError: expected 404 to be 400 // Object.is equality
+AssertionError: expected 404 to be 503 // Object.is equality
+      Tests  7 failed (7)

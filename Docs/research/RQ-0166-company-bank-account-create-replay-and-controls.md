@@ -78,6 +78,9 @@ re-authentication on a bank-detail change would each break design §6.
    company's own accounts the payment-redirection path is the remittance designation, which is
    already maker-checker (S9). Adding an account moves no money and redirects none: ABA files
    are created from it only through payment batches, whose release is itself SoD + step-up.
+   `packages/modules/AGENTS.md` says "supplier, bank-detail and payment-batch flows go through the
+   SoD engine (design §6.5)"; it points at §6.5, whose bank-detail rule is about supplier and
+   employee details, so it is read the same way (inference).
 6. **What leaves the server (Q3).** Responses use `listCompanyBankAccounts` (masked, S2). The
    audit row's `after` is that masked view. Validation messages of the module never echo the
    account number (only the BSB, which is public routing data). Database errors are mapped to

@@ -1,0 +1,10 @@
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |unit| packages/modules/bank/src/bank-accounts.test.ts > SS-PLAT-130: sameCompanyBankAccount > SS-PLAT-130 the same request after normalisation is a replay [T-0185]
+TypeError: sameCompanyBankAccount is not a function
+ FAIL  |unit| packages/modules/bank/src/bank-accounts.test.ts > SS-PLAT-130: sameCompanyBankAccount > SS-PLAT-130 any differing field is not a replay [T-0185]
+TypeError: sameCompanyBankAccount is not a function
+ FAIL  |unit| packages/modules/bank/src/bank-accounts.test.ts > SS-PLAT-130: sameCompanyBankAccount > SS-PLAT-130 missing optional ABA details equal stored nulls, and differ from stored values [T-0185]
+TypeError: sameCompanyBankAccount is not a function
+ FAIL  |unit| packages/modules/bank/src/bank-accounts.test.ts > SS-PLAT-130: sameCompanyBankAccount > SS-PLAT-130 an archived account is never a replay [T-0185]
+TypeError: sameCompanyBankAccount is not a function
+      Tests  4 failed (4)
