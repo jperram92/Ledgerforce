@@ -3773,3 +3773,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0165 requires all four tests to be green before T-0172 goes to review. The throwing condition uses the same test-only seam as the existing F3 test: `approve` is re-declared with `RequireStepUp(300, cond)`, then restored in `finally`. No production code changed. The behaviour already existed, so the tests could not be seen RED first. Instead, two temporary interceptor mutations were run and reverted: a token counted as stepped up, and a thrown condition swallowed as false. Each made its test fail.
 - Alternatives: an api-unit test of `TenantInterceptor` with a mocked condition (rejected: the api-db test exercises the real route, RLS and Stripe stub with no production seam needed); a test-only controller (rejected: the real approve route is what RQ-0165 is about).
 - ADR: ADR-0083 · Status: accepted
+
+### DL-0740 — Foreign-currency opening items are carried at the old system's base amount; GP-040 approved
+- Date: 2026-11-16 · By: claude · Task: T-0126 · Category: accounting
+- Decision: A foreign-currency open item at conversion posts its AR/AP control line at the **old system's base carrying amount** at the balance date (the amount that sums to the trial-balance control row). The line also carries the transaction currency, the absolute transaction amount and the rate (base per one foreign unit). The opening journal gets **no exchange-difference line**. Realised FX after conversion is measured against the carried base at allocation (`fx_difference`, DL-0187). New golden **GP-040** (a variant of GP-037, not a supersession) is added and approved by the building agent under the standing delegation for gate 2 (AGENTS.md §6, DL-0263). It is covered by the golden runner (pure + engine replay) and by `opening-balances.fx.db.test.ts`. No Approved entry was edited.
+- Why: RQ-0170 findings 1–3. AASB 121 para 21 (spot at initial recognition) and para 23 (closing rate only at a reporting date) mean the old books already hold each item at the rate they carry it. Para 28 measures the settlement difference against that carrying amount. The opening entry must reproduce the old trial balance with no plug (RQ-0109 finding 3).
+- Alternatives: re-translate every item at a closing rate given at import and post the difference to FX_UNREALISED (rejected: the posted trial balance would differ from the old one, and revaluation is the Phase 1 job, design §3.7). Keep only the base amount (rejected: a USD receipt could not be allocated and realised FX would be lost). Supersede GP-037 (rejected: its base-currency expectation is unchanged).
+- ADR: none (treatment recorded in GP-040 + RQ-0170 under DL-0263) · Status: accepted
+
+### DL-0741 — Opening-item FX input contract: optional currency, currency_amount, fx_rate; rate must reproduce the base half-up to cents
+- Date: 2026-11-16 · By: claude · Task: T-0126 · Category: accounting
+- Decision: `OpeningItemInput` and the open-item CSV gain optional `currency`, `currency_amount` (signed like `amount`) and `fx_rate` (base per one foreign unit, > 0, at most 8 decimals). `amount` stays the base amount. For a foreign item, a given rate must satisfy `round_half_up(currency_amount × fx_rate, 2) = amount`. Without a rate, the rate is `amount ÷ currency_amount`, half-up to 8 decimals. An empty currency, or the company's base currency, is a base item: its `currency_amount`, if given, must equal `amount`, and its rate, if given, must be 1. Faults are refused with nothing written: `FX_MISMATCH` for an inconsistent rate, `INVALID_COMMAND` or `INVALID_CSV` (row named) for shape faults.
+- Why: RQ-0170 finding 4. The engine stores the rate as given and never recomputes base (DL-0130). The check stops a wrong rate from silently mis-stating the item, and half-up to cents is design §3.4's default.
+- Alternatives: a tolerance of one cent (rejected: loosens an exact check). Require the rate always (rejected: aged-AR exports often carry only both amounts). Xero's foreign-per-base convention (rejected: the engine convention wins; the Xero reader converts, T-0201).
+- ADR: none · Status: accepted
+
+### DL-0742 — FX opening items: GST content in base, no party-currency check, no migration
+- Date: 2026-11-16 · By: claude · Task: T-0126 · Category: architecture
+- Decision: (1) An item's `gst_amount` is recorded in base currency, because BAS is reported in AUD. (2) The party's `currency` is not checked against the item currency, because no AR/AP document enforces it today. (3) No migration: the item view reads currency, transaction amount and rate from the item's journal line (`opening_balance_item.line_no`). Reserved migration 0074 is unused.
+- Why: keeps the change additive and inside the module. The journal line is the immutable source of the FX data, so no second copy can drift.
+- Alternatives: new columns on `opening_balance_item` (rejected: duplicates ledger data); refusing a party whose currency differs (deferred to a multi-currency document card).
+- ADR: none · Status: accepted
+
+### DL-0745 — T-0126 split: the Xero reader moves to T-0201 (Phase 1)
+- Date: 2026-11-16 · By: claude · Task: T-0126 · Category: scope
+- Decision: T-0126 builds foreign-currency opening items on the CSV path in full. Its part (b), reading the trial balance and open invoices and bills from Xero (old AC-2), becomes **T-0201** (Phase 1, depends on T-0126, adr_required for the connection/token model). RQ-0170 findings 4 and 7 and its follow-ups are T-0201's research input.
+- Why: design §9 places the "Xero/MYOB importer" in Phase 1, and an MVP module must not depend on a Phase 1 capability (packages/modules/AGENTS.md). The Xero developer docs (rate limits, scopes, rate direction) could not be reached from this session (RQ-0170 S7).
+- Alternatives: build a Xero reader in MVP from the OpenAPI spec alone (rejected: unverified vendor facts and a phase breach).
+- ADR: none · Status: accepted
