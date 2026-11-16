@@ -131,3 +131,24 @@ preparation report explains the difference.
 
 RQ-0171 (resolves RQ-0134), RQ-0095/RQ-0096 (Q7, Q13), ADR-0061, ADR-0071; GP-014, GP-020…GP-023,
 GP-029, GP-040…GP-042; DL-0263, DL-0320, DL-0750…DL-0754.
+
+## Addendum A (2026-11-16) — independent accounting review
+
+Status unchanged (Accepted). After the independent accounting review (RQ-0171 addendum A,
+`.agent/evidence/T-0168/accounting-review-20261116.md`, PASS WITH MAJORS):
+
+- **R7 is refined:** when the refund is agreed at cancellation, the whole attributed GST is a
+  decreasing adjustment of the cancellation period (one adjustment note) and the cash received
+  becomes an AR credit (refund owed), refunded with no GST — **GP-044a/b**. The R7 journal
+  (unbilled part only) applies only when the refund is undecided or disputed; the later refund
+  carries its own adjustment note — **GP-044c/d**. GP-042 is superseded by GP-044 (DL-0755).
+- **R6 is refined:** the final tax invoice is posted whole to AR with the cash received as an AR
+  credit allocated to it in the same entry — **GP-045**, superseding GP-041 (DL-0756). A price
+  change in R6 is only for a variation agreed on the invoice date; other variation dates need the
+  T-0204 variation document and are refused until it exists. A final price below the cash
+  received is refused. R6 clears the actual unbilled balance, debit or credit.
+- **R10 is extended:** BAS preparation never presents a negative label (G18/1B instead).
+- **R9 is extended:** a tax invoice requested on an open contract (s 29-70) is issued — before any
+  receipt with the attribution journal, after one with no journal (T-0203 AC-9).
+- Compliance table rows for GP-041/042 now read GP-045/044; primary-law reading is a T-0204 exit
+  criterion.

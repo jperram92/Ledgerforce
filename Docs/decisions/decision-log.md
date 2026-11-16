@@ -3899,3 +3899,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: The card asks for "the existing notification path", which is the durable notice row (RQ-0168 S6), and that path has no sender yet. The email module has no security-notice purpose, so adding one is its own migration and template work, beyond the card's ~200 lines. A release cannot redirect money, and the next designation is approved and notified (RQ-0168 conclusion 4).
 - Alternatives: build the sender inside T-0191 (rejected: scope, and it would leave bank-detail notices with a different sender); notify on release too (rejected: there is no change row to tie the notice to; the audit row records it).
 - ADR: ADR-0086 · Status: accepted
+
+### DL-0755 — GP-044 supersedes GP-042: whole decrease at cancellation when the refund is agreed
+- Date: 2026-11-16 · By: claude · Task: T-0168 · Category: accounting
+- Decision: Approve GP-044 under DL-0263 and supersede GP-042 by its bold successor declaration (GP-042 bytes unchanged). Refund agreed at cancellation: Dr CUSTOMER_PREPAYMENTS coded GST 10,000.00 (tax −1,000.00) / Dr GST collected 1,000.00 / Cr CUSTOMER_PREPAYMENTS uncoded 7,000.00 / Cr GST_ATTRIBUTED_UNBILLED 700.00 / Cr AR_CONTROL 3,300.00 (refund owed), one adjustment note; refund Dr AR / Cr bank, no GST. Undecided or disputed refund keeps the 700.00-then-300.00 variant (44c/44d), each with an adjustment note. GP-043 is left to T-0126.
+- Why: independent accounting review finding 9/10 (MAJOR): adjustments are attributed when the supplier becomes aware (s 29-20(1)); an agreed refund makes the corrected consideration nil at cancellation; decreases above $75 need an adjustment note (s 29-20(3)/s 29-80); the money held becomes a refund obligation (AASB 15 ¶106). Sources are ATO extracts; primary text unread (RQ-0171 addendum A). SS-PLAT-135 RED (goldens missing) then GREEN through the unchanged BAS query.
+- Alternatives: keep GP-042's split for every cancellation (rejected: overstates GST in the cancellation period); drop the split entirely (rejected: when the refund is undecided the received money may still be consideration).
+- ADR: ADR-0089 (addendum A) · Status: accepted (delegated, DL-0263)
+
+### DL-0756 — GP-045 supersedes GP-041: whole tax invoice on AR with receipts allocated
+- Date: 2026-11-16 · By: claude · Task: T-0168 · Category: accounting
+- Decision: Approve GP-045 under DL-0263 and supersede GP-041 (bytes unchanged): one entry Dr AR_CONTROL (tax invoice total) / Dr CUSTOMER_PREPAYMENTS (net received) / Cr revenue / Cr GST_ATTRIBUTED_UNBILLED (balance) / Cr AR_CONTROL (cash received), the credit allocated to the debit at once; price-change lines as before, only for a variation agreed on the invoice date.
+- Why: review finding 17: consistency with canonical GP-022 (prepayment applied to a whole invoice); AR original equals the tax invoice; receipts appear in the invoice's allocation history. Same BAS as GP-041. The engine accepts two AR items in one entry and the allocation between them (SS-PLAT-135 asserts open 4,400.00 / 4,950.00 / 3,850.00).
+- Alternatives: keep GP-041 and document the difference on statements (rejected: invoice register vs AR mismatch); two entries as GP-022a/b (rejected: GST_ATTRIBUTED_UNBILLED would go temporarily negative between them).
+- ADR: ADR-0089 (addendum A) · Status: accepted (delegated, DL-0263)
+
+### DL-0757 — Remaining accounting-review findings become acceptance criteria on T-0203/T-0204
+- Date: 2026-11-16 · By: claude · Task: T-0168 · Category: scope
+- Decision: T-0203 gains AC-7 (contract id on lines; per-contract invariant), AC-8 (last receipt clears the unbilled residue), AC-9 (tax invoice requested on an open contract, s 29-70, with the reviewer's journal as a candidate golden), AC-10 (receipts limited by the varied total), AC-11 (1230 recoverability disclosure). T-0204 gains AC-6 (variation document dated at agreement), AC-7 (no negative BAS label; G18/1B), AC-8 (final price below cash refused), AC-9 (later-period reversal labelled error correction), AC-10 (adjustment-note particulars), AC-11 (read primary law and standards before close).
+- Why: these are new behaviours with their own tests and, where they post, their own goldens to approve with research; they fit the existing implementation cards (≤ 400 lines each, already scoped to the same code).
+- Alternatives: a new card from T-0168's range (rejected: no separate code area; splitting would duplicate fixtures).
+- ADR: ADR-0089 (addendum A) · Status: accepted
+
+### DL-0758 — RQ-0171 and ADR-0089 addenda; primary sources must be read before T-0204 closes
+- Date: 2026-11-16 · By: claude · Task: T-0168 · Category: accounting
+- Decision: Record the review outcome as RQ-0171 addendum A and ADR-0089 addendum A (status unchanged, Accepted). GSTR 2019/1 is not relied on. legislation.gov.au, ato.gov.au and the AASB site were unreachable on 2026-11-16 (403 / proxy refusal / ENOTFOUND); the listed sections, rulings, BAS instructions, Interpretation 1031 and AASB 101 ¶32 are a T-0204 exit criterion.
+- Why: directive 4 (research with sources); the goldens rest on primary s 29-5/99-5/156-5 reads (RQ-0134) plus ATO extracts for Div 19 timing and adjustment notes.
+- Alternatives: block the goldens until the hosts are reachable (rejected: the delegation allows approval on documented research; superseding remains available).
+- ADR: ADR-0089 · Status: accepted
+
+### DL-0759 — Golden runner inventory after the T-0168 review fixes
+- Date: 2026-11-16 · By: claude · Task: T-0168 · Category: tooling
+- Decision: Pure runner: ALL gains GP-044, GP-045; SUPERSEDED gains GP-041→GP-045 and GP-042→GP-044; 35 Approved entries, 49 tables. Engine replay PENDING (unbound GST_ATTRIBUTED_UNBILLED, owner T-0203): GP-040a/b, GP-044a/c, GP-045a–c; GP-044b and GP-044d replay now. `Docs/decisions/golden-approvals.json` is not edited here; the lead re-points it.
+- Why: the runner pins every Approved table and every pending one with its reason; no count is loosened.
+- Alternatives: none.
+- ADR: none · Status: accepted

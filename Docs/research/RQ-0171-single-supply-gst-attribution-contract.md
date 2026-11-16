@@ -155,3 +155,47 @@ load-bearing for a journal line without a second, verified support.
 Confidence: high for findings 1, 3–5 and the engine contract (primary text plus a passing DB
 proof); medium for 2, 6, 8, 10 (extracts); low/unverified for 7 and 9, which only add refusals or
 extra document particulars, never a journal line.
+
+## Addendum A — independent accounting review (2026-11-16)
+
+An independent AI accounting review (same provider, separate instance; not the cross-provider
+gate) returned **PASS WITH MAJORS, no BLOCKER**: `.agent/evidence/T-0168/accounting-review-20261116.md`.
+Its sources are ATO web-search extracts; it could not reach legislation.gov.au or ato.gov.au
+either. Conclusions taken:
+
+1. **Cancellation timing (finding 9/10, MAJOR) — accepted.** On the accruals basis an adjustment
+   is attributed to the period the supplier becomes aware of it (s 29-20(1), ATO "when to make
+   adjustments" extract). When the refund is agreed at cancellation the corrected consideration
+   is nil, so the whole 1,000.00 is a decreasing adjustment of the cancellation period, with one
+   adjustment note (needed before claiming a decrease above $75, s 29-20(3)/s 29-80 extract), and
+   the received 3,300.00 becomes a refund obligation (customer credit), no longer a contract
+   liability (AASB 15 ¶106 extract: no remaining performance obligation). GP-042 split it 700/300
+   across periods and is superseded by **GP-044**. The 700/300 split survives only as a variant
+   for a refund that is undecided or disputed, because until then the money received may still
+   be retained as consideration; its later 300.00 decrease needs its own adjustment note.
+2. **Final invoice shape (finding 17) — changed.** Canonical GP-022 puts the whole invoice on AR
+   and allocates the prepayment; the AR original then equals the tax invoice and the receipts are
+   visible in the invoice's allocation history (customer statements, Salesforce paid amounts).
+   GP-041 posted only the 4,400.00 due. **GP-045** supersedes it with a one-entry shape: AR debit
+   for the tax invoice, AR credit for the cash received, allocated at once (engine accepts both
+   items and the allocation — SS-PLAT-135). GP-015's net shape stays right for deposit
+   *invoices*, whose receipts already sit on AR.
+3. **Variation timing (finding 7, MAJOR)** — the delta belongs to the period the variation is
+   agreed; GP-045b/c are stated for a variation agreed on the invoice date, other dates are a
+   T-0204 variation document, refused until built.
+4. **Negative G1 (finding 11, MAJOR)** — ATO BAS instructions (extract) say not to report negative
+   figures; BAS preparation must present a netted negative as G18/1B (T-0204). The BAS query's
+   raw labels may be negative; SS-PLAT-135 asserts raw query output only.
+5. **Tax invoice requested on an open contract (finding 14, s 29-70)** and **final price below
+   cash received (finding 15)** — new acceptance criteria on T-0203/T-0204 with the reviewer's
+   journal as a candidate golden.
+6. **Minors** — contract id on lines, last-receipt rounding residue, reversal labelling, 1230
+   recoverability disclosure: carried to T-0203/T-0204 (DL-0757).
+7. **Citation** — GSTR 2019/1 concerns supplies connected with the indirect tax zone, not single
+   vs progressive supply; it is not relied on. Mixed/composite: GSTR 2001/8 (unverified text).
+
+**Primary sources still unread.** legislation.gov.au, ato.gov.au (legal database and guidance) and
+the AASB site were unreachable from the build environment on 2026-11-10 (partly) and 2026-11-16.
+GST Act s 29-5, 29-20, 29-70, 29-75, 29-80, 19-10, 19-45, GSTR 2000/29, GSTR 2001/8, the current
+BAS instructions, AASB Interpretation 1031 and AASB 101 ¶32 **must be read directly before T-0204
+closes** (T-0204 AC-11); any difference is handled by superseding goldens, never by editing them.
