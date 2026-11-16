@@ -1,0 +1,9 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a30730efacaa1de6b
+
+
+ Test Files  5 passed (5)
+      Tests  30 passed (30)
+   Start at  08:02:00
+   Duration  1.44s (transform 941ms, setup 0ms, import 1.54s, tests 588ms, environment 1ms)
+

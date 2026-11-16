@@ -1,12 +1,12 @@
 ---
 id: RQ-0134
 title: Integrate single-supply GST attribution with canonical storage and BAS
-status: open
+status: resolved
 opened: 2026-11-10
-resolved:
+resolved: 2026-11-16
 opened_by: codex
 linked_tasks: [T-0168]
-linked_adrs: []
+linked_adrs: [ADR-0089]
 superseded_by:
 ---
 
@@ -75,3 +75,10 @@ do not silently treat unknown totals as qualifying Division 156 supplies.
 
 Confidence: high for the inspected section 29-5 and code differences; incomplete for the complete
 lifecycle and schema integration. Status stays open; this file does not authorize guessed code.
+
+## Resolution (2026-11-16, claude, T-0168)
+
+Resolved by [RQ-0171](RQ-0171-single-supply-gst-attribution-contract.md): items 1–4 and the two
+R6 defects are answered there, with an access log (ATO and legislation hosts unreachable on
+2026-11-16; this record's 2026-11-10 primary reads are relied on). Decision: ADR-0089; goldens
+GP-040…GP-042; implementation T-0203/T-0204. The findings above are unchanged.

@@ -1,0 +1,89 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a30730efacaa1de6b
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37089
+ ❯ |db| packages/modules/tax/src/single-supply-attribution.db.test.ts (5 tests | 5 failed) 770ms
+     × SS-PLAT-135 first part-payment attributes the whole supply (G1 11,000.00, 1A 1,000.00); a second receipt adds nothing; the final invoice repeats no GST 9ms
+     × SS-PLAT-135 a price increase on the final invoice reports only the change (G1 550.00, 1A 50.00) 2ms
+     × SS-PLAT-135 a price decrease on the final invoice reports only the change (G1 −550.00, 1A −50.00) 2ms
+     × SS-PLAT-135 cancellation removes the unbilled attribution (G1 −7,700.00, 1A −700.00); the refund of the part paid removes the rest; the contract nets to zero 2ms
+     × SS-PLAT-135 reversing the first receipt in the same period nets the BAS to zero 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/tax/src/single-supply-attribution.db.test.ts > SS-PLAT-135: single-supply GST attribution goldens through the unchanged BAS query > SS-PLAT-135 first part-payment attributes the whole supply (G1 11,000.00, 1A 1,000.00); a second receipt adds nothing; the final invoice repeats no GST
+Error: golden GP-040a not Approved
+ ❯ table packages/modules/tax/src/single-supply-attribution.db.test.ts:45:17
+     43|     (x) => `${x.entryId}${x.label}` === id,
+     44|   );
+     45|   if (!t) throw new Error(`golden ${id} not Approved`);
+       |                 ^
+     46|   return t;
+     47| };
+ ❯ postGolden packages/modules/tax/src/single-supply-attribution.db.test.ts:51:13
+ ❯ packages/modules/tax/src/single-supply-attribution.db.test.ts:148:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  |db| packages/modules/tax/src/single-supply-attribution.db.test.ts > SS-PLAT-135: single-supply GST attribution goldens through the unchanged BAS query > SS-PLAT-135 a price increase on the final invoice reports only the change (G1 550.00, 1A 50.00)
+Error: golden GP-041b not Approved
+ ❯ table packages/modules/tax/src/single-supply-attribution.db.test.ts:45:17
+     43|     (x) => `${x.entryId}${x.label}` === id,
+     44|   );
+     45|   if (!t) throw new Error(`golden ${id} not Approved`);
+       |                 ^
+     46|   return t;
+     47| };
+ ❯ postGolden packages/modules/tax/src/single-supply-attribution.db.test.ts:51:13
+ ❯ packages/modules/tax/src/single-supply-attribution.db.test.ts:164:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |db| packages/modules/tax/src/single-supply-attribution.db.test.ts > SS-PLAT-135: single-supply GST attribution goldens through the unchanged BAS query > SS-PLAT-135 a price decrease on the final invoice reports only the change (G1 −550.00, 1A −50.00)
+Error: golden GP-041c not Approved
+ ❯ table packages/modules/tax/src/single-supply-attribution.db.test.ts:45:17
+     43|     (x) => `${x.entryId}${x.label}` === id,
+     44|   );
+     45|   if (!t) throw new Error(`golden ${id} not Approved`);
+       |                 ^
+     46|   return t;
+     47| };
+ ❯ postGolden packages/modules/tax/src/single-supply-attribution.db.test.ts:51:13
+ ❯ packages/modules/tax/src/single-supply-attribution.db.test.ts:169:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |db| packages/modules/tax/src/single-supply-attribution.db.test.ts > SS-PLAT-135: single-supply GST attribution goldens through the unchanged BAS query > SS-PLAT-135 cancellation removes the unbilled attribution (G1 −7,700.00, 1A −700.00); the refund of the part paid removes the rest; the contract nets to zero
+Error: golden GP-040a not Approved
+ ❯ table packages/modules/tax/src/single-supply-attribution.db.test.ts:45:17
+     43|     (x) => `${x.entryId}${x.label}` === id,
+     44|   );
+     45|   if (!t) throw new Error(`golden ${id} not Approved`);
+       |                 ^
+     46|   return t;
+     47| };
+ ❯ postGolden packages/modules/tax/src/single-supply-attribution.db.test.ts:51:13
+ ❯ packages/modules/tax/src/single-supply-attribution.db.test.ts:174:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |db| packages/modules/tax/src/single-supply-attribution.db.test.ts > SS-PLAT-135: single-supply GST attribution goldens through the unchanged BAS query > SS-PLAT-135 reversing the first receipt in the same period nets the BAS to zero
+Error: golden GP-040a not Approved
+ ❯ table packages/modules/tax/src/single-supply-attribution.db.test.ts:45:17
+     43|     (x) => `${x.entryId}${x.label}` === id,
+     44|   );
+     45|   if (!t) throw new Error(`golden ${id} not Approved`);
+       |                 ^
+     46|   return t;
+     47| };
+ ❯ postGolden packages/modules/tax/src/single-supply-attribution.db.test.ts:51:13
+ ❯ packages/modules/tax/src/single-supply-attribution.db.test.ts:184:22
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed (5)
+   Start at  07:47:42
+   Duration  2.18s (transform 262ms, setup 0ms, import 409ms, tests 770ms, environment 0ms)
+
