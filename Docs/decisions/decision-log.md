@@ -3773,3 +3773,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0165 requires all four tests to be green before T-0172 goes to review. The throwing condition uses the same test-only seam as the existing F3 test: `approve` is re-declared with `RequireStepUp(300, cond)`, then restored in `finally`. No production code changed. The behaviour already existed, so the tests could not be seen RED first. Instead, two temporary interceptor mutations were run and reverted: a token counted as stepped up, and a thrown condition swallowed as false. Each made its test fail.
 - Alternatives: an api-unit test of `TenantInterceptor` with a mocked condition (rejected: the api-db test exercises the real route, RLS and Stripe stub with no production seam needed); a test-only controller (rejected: the real approve route is what RQ-0165 is about).
 - ADR: ADR-0083 · Status: accepted
+
+### DL-0750 — RQ-0171 resolves RQ-0134: single-supply attribution law, comparable systems and engine contract
+- Date: 2026-11-16 · By: claude · Task: T-0168 · Category: accounting
+- Decision: Resolve RQ-0134 through RQ-0171. On accruals a part payment (or invoice) on a single supply with a known price attributes the whole supply's GST (s 29-5(1), GSTR 2000/29 and EPR extracts); cash basis attributes only what is received (s 29-5(2)); Div 156 needs progressive supply and consideration (s 156-5); Div 99 deposits unchanged. Whole-supply GST is fixed at attribution by the total invoice rule.
+- Why: primary GST Act text read in RQ-0134 (2026-11-10) plus repository-recorded ATO extracts; ERPNext code read 2026-11-16 (document-level rounding, advance tax on the paid amount); Xero/MYOB/QBO extracts show proportional GST only. ATO and legislation hosts were unreachable 2026-11-16 (403 / proxy refusal) — recorded; GSTR 2001/8 and the brief's GSTR 2000/34 rounding attribution could not be verified and carry no journal line.
+- Alternatives: keep RQ-0134 open (rejected: the canonical contract is now proven by SS-PLAT-135 and remaining uncertainty only adds refusals).
+- ADR: ADR-0089 · Status: accepted
+
+### DL-0751 — Accept ADR-0089 and approve GP-040 (single-supply receipts, accruals) under DL-0263
+- Date: 2026-11-16 · By: claude · Task: T-0168 · Category: accounting
+- Decision: Accept accounting ADR-0089 under the standing delegation and approve GP-040: first part-payment posts Dr bank / Dr GST_ATTRIBUTED_UNBILLED / Dr CUSTOMER_PREPAYMENTS (uncoded contra) / Cr CUSTOMER_PREPAYMENTS (coded GST, whole supply) / Cr GST collected; later receipts post no GST. Cash basis keeps GP-020/GP-022. GP-021 remains preferred for non-cancellable contracts.
+- Why: lossless and code-driven: the unchanged BAS query gives G1 11,000.00 / 1A 1,000.00 (SS-PLAT-135); contract liability equals GST-exclusive cash received; GST reported ahead of billing is an asset, not offset (AASB 101; AASB 15 ¶108). Self-review as accountant-reviewer found no BLOCKER (`.agent/evidence/T-0168/accounting-self-review.md`); independent cross-review still to follow.
+- Alternatives: source 872c4fa ADR-0045 GST-UB code with tax_grossed G1 (lossy, new BAS model); journal_line.tax_base_amount (core ledger change); gross-up of unbilled consideration (recognises a cancellable executory contract); GP-021 only (blocks a lawful common case).
+- ADR: ADR-0089 · Status: accepted (delegated, DL-0263)
+
+### DL-0752 — Approve GP-041: final invoice without duplicate GST; price changes as adjustments
+- Date: 2026-11-16 · By: claude · Task: T-0168 · Category: accounting
+- Decision: Final tax invoice after GP-040 clears CUSTOMER_PREPAYMENTS and GST_ATTRIBUTED_UNBILLED with no coded line; a price change adds one coded revenue line with its own GST, presented by the company's `credit_note_bas` setting as GP-029 (default netted G1/1A; strict GST-ADJ). Decrease carries adjustment-note particulars.
+- Why: Div 19 adjustment event for a change in consideration; reuse of the approved GP-029 presentation keeps one BAS policy. Proven: G1 +550/1A +50 and −550/−50 through the unchanged BAS query.
+- Alternatives: re-attribute the whole supply on the final invoice and reverse the earlier attribution (rejected: reports GST twice across periods).
+- ADR: ADR-0089 · Status: accepted (delegated, DL-0263)
+
+### DL-0753 — Approve GP-042: cancellation removes the unbilled attribution; refund of the part paid
+- Date: 2026-11-16 · By: claude · Task: T-0168 · Category: accounting
+- Decision: Cancellation before the final invoice mirrors the attribution for the unbilled part (coded debit on CUSTOMER_PREPAYMENTS with negative GST, uncoded contra credit, Dr GST collected, Cr GST_ATTRIBUTED_UNBILLED); refund of the part paid posts Dr CUSTOMER_PREPAYMENTS (coded, negative GST) / Dr GST collected / Cr bank. Forfeiture refused until researched.
+- Why: decreasing adjustments for an adjustment event; the contract nets to zero on every account and on the BAS (SS-PLAT-135).
+- Alternatives: a single combined cancellation/refund entry (rejected: refunds go through the separate approval path, ADR-0074).
+- ADR: ADR-0089 · Status: accepted (delegated, DL-0263)
+
+### DL-0754 — No migration on the T-0168 branch; implementation split into T-0203 and T-0204
+- Date: 2026-11-16 · By: claude · Task: T-0168 · Category: process
+- Decision: Do not use the reserved migration 0077 here: the base holds 0001–0071 contiguously (DL-0320 map is historical) and 0072–0076 belong to parallel round-9 cards, so a 0077 file would be a gap the migrator refuses. T-0203 (role, contract record, receipt posting, refusals, idempotency/concurrency, RLS) takes the next free number after the merge; T-0204 covers finalisation, cancellation/refund, the BAS basis guard and the aged unbilled report. The golden engine replay pins GP-040a/b, GP-041a–c, GP-042a PENDING on the unbound role with owner T-0203.
+- Why: card scope (≤ 400 lines, no implementation marked done by this card) and the migrator's no-gap rule. The golden-approval registry is content-bound and owner-merged; this branch does not edit it — the lead re-points it to the commit adding GP-040…GP-042.
+- Alternatives: placeholder migrations 0072–0076 (forbidden by DL-0320); test-only role binding in production code (rejected).
+- ADR: ADR-0089 · Status: accepted
