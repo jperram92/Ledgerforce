@@ -47,9 +47,9 @@ export class LoginError extends Error {
   }
 }
 
-/** What the callback did: a login made a new session; a step-up refreshed the existing one. */
+/** What the callback did: a login made a new session; a step-up rotated it (ADR-0087). */
 export type CallbackResult =
-  { kind: 'login'; cookie: string } | { kind: 'step_up'; returnTo: string };
+  { kind: 'login'; cookie: string } | { kind: 'step_up'; returnTo: string; cookie: string };
 
 /** Request facts for the login audit row. */
 export interface LoginContext {
@@ -254,8 +254,15 @@ export class OidcService {
 
     if (stepUp) {
       const auth = { amr, acr, authTime };
-      await this.completeStepUp(tenantId, stepUp.sessionId, sessionCookie, { iss, sub }, auth, ctx);
-      return { kind: 'step_up', returnTo: stepUp.returnTo };
+      const cookie = await this.completeStepUp(
+        tenantId,
+        stepUp.sessionId,
+        sessionCookie,
+        { iss, sub },
+        auth,
+        ctx,
+      );
+      return { kind: 'step_up', returnTo: stepUp.returnTo, cookie };
     }
 
     const outcome = await withTenant(this.db, tenantId, async (trx) => {
@@ -330,8 +337,9 @@ export class OidcService {
   /**
    * The step-up half of the callback. The browser must still present the session the step-up was
    * started for (a valid one); the IdP must have authenticated that same user, with MFA. Only then
-   * the session's authentication facts change. A wrong user or a non-MFA answer is refused and
-   * audited, with the session untouched.
+   * the session is rotated (ADR-0087): the old one is revoked and a new one carries the fresh
+   * authentication; the new cookie value is returned. A wrong user or a non-MFA answer is refused
+   * and audited, with the session untouched.
    */
   private async completeStepUp(
     tenantId: string,
@@ -340,17 +348,17 @@ export class OidcService {
     idp: { iss: string; sub: string },
     auth: { amr: string[]; acr: string | null; authTime: Date | null },
     ctx: LoginContext,
-  ): Promise<void> {
+  ): Promise<string> {
     const cookie = parseSessionCookie(sessionCookie);
     if (!cookie || cookie.tenantId !== tenantId || cookie.sessionId !== sessionId) {
       throw new LoginError('invalid_request');
     }
-    const refused = await withTenant(this.db, tenantId, async (trx) => {
+    const outcome = await withTenant(this.db, tenantId, async (trx) => {
       let principal: Principal;
       try {
         principal = await this.sessions.verify(trx, cookie);
       } catch (e) {
-        if (e instanceof SessionError) return 'invalid_request' as const;
+        if (e instanceof SessionError) return { refused: 'invalid_request' as const };
         throw e;
       }
       const user = await trx
@@ -365,7 +373,7 @@ export class OidcService {
           : !isMfa(auth, this.mfa) || auth.authTime === null
             ? 'mfa_required'
             : null;
-      const audit = (action: string, after: unknown) =>
+      const audit = (action: string, after: unknown, entityId = sessionId) =>
         trx
           .insertInto('audit.audit_log')
           .values({
@@ -373,7 +381,7 @@ export class OidcService {
             actor_user_id: principal.userId,
             action,
             entity_type: 'session',
-            entity_id: sessionId,
+            entity_id: entityId,
             before: null,
             after: JSON.stringify(after),
             ip: ctx.ip,
@@ -383,20 +391,32 @@ export class OidcService {
           .execute();
       if (reason) {
         await audit('step_up_refused', { reason });
-        return reason;
+        return { refused: reason };
       }
-      await this.sessions.reauthenticateInTx(trx, sessionId, {
-        amr: auth.amr,
-        acr: auth.acr,
-        authTime: auth.authTime,
-      });
-      await audit('step_up', {
-        amr: auth.amr,
-        acr: auth.acr,
-        auth_time: auth.authTime?.toISOString() ?? null,
-      });
-      return null;
+      let rotated: { cookie: string; sessionId: string };
+      try {
+        rotated = await this.sessions.rotateInTx(trx, tenantId, sessionId, {
+          amr: auth.amr,
+          acr: auth.acr,
+          authTime: auth.authTime,
+        });
+      } catch (e) {
+        if (e instanceof SessionError) return { refused: 'invalid_request' as const };
+        throw e;
+      }
+      await audit(
+        'step_up',
+        {
+          amr: auth.amr,
+          acr: auth.acr,
+          auth_time: auth.authTime?.toISOString() ?? null,
+          rotated_from: sessionId,
+        },
+        rotated.sessionId,
+      );
+      return { cookie: rotated.cookie };
     });
-    if (refused) throw new LoginError(refused);
+    if ('refused' in outcome) throw new LoginError(outcome.refused);
+    return outcome.cookie;
   }
 }

@@ -67,12 +67,9 @@ export class LoginController {
       )
       .catch(refuse);
     res.clearCookie(OIDC_COOKIE, this.cookie({ path: OIDC_COOKIE_PATH }));
-    if (result.kind === 'step_up') {
-      // ADR-0025: the existing session was re-authenticated; its cookie stays as it is.
-      res.redirect(303, result.returnTo);
-      return;
-    }
+    // Login: a new session. Step-up: the session was rotated (ADR-0087, ASVS 5.0 7.2.4); the old
+    // cookie no longer works, so the browser gets the new one before it goes back to return_to.
     res.cookie(SESSION_COOKIE, result.cookie, this.cookie({ path: '/' }));
-    res.redirect(303, '/');
+    res.redirect(303, result.kind === 'step_up' ? result.returnTo : '/');
   }
 }

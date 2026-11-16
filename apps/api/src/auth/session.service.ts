@@ -173,8 +173,53 @@ export class SessionService {
   }
 
   /**
-   * Step-up (ADR-0025): records a new authentication on an existing session. The session id,
-   * secret, lifetime and epoch stay the same; no new session is created.
+   * Step-up rotation (ADR-0087, ASVS 5.0 7.2.4): ends the session the browser stepped up from and
+   * starts a new one for the same user, with a new id and secret, the step-up's authentication
+   * facts, and the old session's absolute expiry, idle timeout and revoke-all epoch (a step-up
+   * never extends a session). The old row is revoked as `rotated`, kept as history. Runs in the
+   * caller's tenant transaction; fails closed if the old session is no longer live.
+   */
+  async rotateInTx(
+    trx: Transaction<Database>,
+    tenantId: string,
+    oldSessionId: string,
+    a: Required<Authentication>,
+  ): Promise<{ cookie: string; sessionId: string }> {
+    const now = this.clock.now();
+    const old = await trx
+      .updateTable('app.session')
+      .set({ revoked_at: now, revoke_reason: 'rotated' })
+      .where('id', '=', oldSessionId)
+      .where('revoked_at', 'is', null)
+      .returning(['user_id', 'absolute_expires_at', 'idle_timeout_seconds', 'user_session_epoch'])
+      .executeTakeFirst();
+    if (!old || now.getTime() >= new Date(old.absolute_expires_at).getTime()) {
+      throw new SessionError('session_expired');
+    }
+    const secret = randomBytes(32).toString('base64url');
+    const row = await trx
+      .insertInto('app.session')
+      .values({
+        user_id: old.user_id,
+        secret_sha256: sha256(secret),
+        created_at: now,
+        last_seen_at: now,
+        absolute_expires_at: old.absolute_expires_at,
+        idle_timeout_seconds: old.idle_timeout_seconds,
+        user_session_epoch: old.user_session_epoch,
+        amr: a.amr,
+        acr: a.acr,
+        auth_time: a.authTime,
+      })
+      .returning('id')
+      .executeTakeFirstOrThrow();
+    return { cookie: `${tenantId}.${row.id}.${secret}`, sessionId: row.id };
+  }
+
+  /**
+   * Records a new authentication on an existing session without rotating it. Superseded for the
+   * step-up callback by `rotateInTx` (ADR-0087); kept for test fixtures that need a session with a
+   * chosen `auth_time` (no production caller).
    */
   async reauthenticateInTx(
     trx: Transaction<Database>,
