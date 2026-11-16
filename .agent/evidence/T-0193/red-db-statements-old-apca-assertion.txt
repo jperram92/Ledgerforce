@@ -1,0 +1,38 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37533
+ ❯ |db| packages/modules/bank/src/statements.db.test.ts (13 tests | 1 failed) 837ms
+     × validates BSB, APCA user id, ABA user name and FI mnemonic in the service and the database 20ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/bank/src/statements.db.test.ts > SS-PLAT-39: Company bank account bound to a bank GL account, number encrypted > validates BSB, APCA user id, ABA user name and FI mnemonic in the service and the database
+AssertionError: promise resolved "{ numAffectedRows: 1n, rows: [] }" instead of rejecting
+
+- Expected
++ Received
+
+- Error {
+-   "message": "rejected promise",
++ {
++   "numAffectedRows": 1n,
++   "rows": [],
+  }
+
+ ❯ packages/modules/bank/src/statements.db.test.ts:200:6
+    198|     await expect(
+    199|       inTenant((trx) => sql`UPDATE app.bank_account SET apca_user_id =…
+    200|     ).rejects.toMatchObject({ code: '42501' });
+       |      ^
+    201|   });
+    202|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 12 passed (13)
+   Start at  21:37:03
+   Duration  2.18s (transform 262ms, setup 0ms, import 419ms, tests 837ms, environment 0ms)
+
