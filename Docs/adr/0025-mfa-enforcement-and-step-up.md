@@ -7,12 +7,14 @@ author: claude
 category: security
 human_gate: yes
 supersedes: none
-superseded_by: none
+superseded_by: ADR-0087 (in part — session id rotation on step-up)
 ---
 
 # ADR-0025: MFA enforcement for finance roles and step-up re-authentication on the existing session
 
 ## Status
+**Superseded in part by [ADR-0087](0087-rotate-session-id-on-step-up.md) (2026-11-15, DL-0730):** a successful step-up now rotates the session id and cookie (ASVS 5.0 7.2.4); the sentences below that say "no new session row, no new session cookie" and "the session id never changes" no longer apply. Everything else stays in force.
+
 Accepted 2026-11-13 by the product owner\'s instruction to accept all ADRs within risk (DL-0405); previously Proposed:
 
 Proposed — security category, waiting for product-owner acceptance. It extends ADR-0016

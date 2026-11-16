@@ -1,0 +1,5 @@
+2026-11-16 (lead, merge into claude/loving-lovelace-nozqpk): T-0192's success scenarios were renumbered because SS-PLAT-135 (T-0168) and SS-PLAT-137/138 (T-0126) were taken first.
+SS-PLAT-135 -> SS-PLAT-139 (step-up rotates the session)
+SS-PLAT-136 -> SS-PLAT-140 (rotation fails closed under concurrency)
+SS-PLAT-137 -> SS-PLAT-141 (StepUpPrompt across rotation)
+The .txt test outputs in this folder were captured before the renumbering and keep the old ids.

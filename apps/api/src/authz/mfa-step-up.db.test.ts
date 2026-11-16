@@ -1,6 +1,7 @@
 /**
- * SS-PLAT-20 (MFA part), SS-UC06-03, SS-PLAT-58 and SS-PLAT-59 — MFA for finance roles and
- * step-up re-authentication (T-0013, ADR-0025, RQ-0027). Real sessions, real database, lf_app
+ * SS-PLAT-20 (MFA part), SS-UC06-03, SS-PLAT-58, SS-PLAT-59, SS-PLAT-139 and SS-PLAT-140 — MFA
+ * for finance roles and step-up re-authentication (T-0013, ADR-0025, RQ-0027), which rotates the
+ * session id and cookie (T-0192, ADR-0087, RQ-0169). Real sessions, real database, lf_app
  * only, and a real OpenID Provider (`oidc-provider`, in-process on 127.0.0.1) that returns the
  * `amr`, `acr` and `auth_time` the test chooses. Its keys and the client secret are generated at
  * runtime.
@@ -253,6 +254,13 @@ function finishStepUp(s: StepUp, session: string | undefined): Promise<Response>
   return fetch(s.callback, { redirect: 'manual', headers: { cookie: cookies.join('; ') } });
 }
 
+/** ADR-0087: a successful step-up answers with the new (rotated) session cookie. */
+function rotatedCookie(res: Response): string {
+  const fresh = cookieValue(res, 'lf_session');
+  if (!fresh) throw new Error(`no rotated lf_session cookie (status ${String(res.status)})`);
+  return fresh;
+}
+
 function call(method: string, path: string, session?: string): Promise<Response> {
   return fetch(`${api.url}${path}`, {
     method,
@@ -490,12 +498,15 @@ describe('SS-PLAT-20: MFA and session policy for finance roles', () => {
     },
   );
 
-  it('after an MFA step-up the same session may use finance endpoints', async () => {
+  it('after an MFA step-up the rotated session may use finance endpoints (ADR-0087)', async () => {
     const session = await login('acc', { amr: ['pwd'], acr: PWD });
     expect((await call('GET', '/finance/ledger', session)).status).toBe(403);
     const s = await stepUpAtIdp(session, 'acc', { amr: ['pwd', 'otp'] }, '');
-    expect((await finishStepUp(s, session)).status).toBe(303);
-    expect((await call('GET', '/finance/ledger', session)).status).toBe(200);
+    const back = await finishStepUp(s, session);
+    expect(back.status).toBe(303);
+    const fresh = rotatedCookie(back);
+    expect((await call('GET', '/finance/ledger', fresh)).status).toBe(200);
+    expect((await call('GET', '/finance/ledger', session)).status).toBe(401);
   });
 });
 
@@ -523,7 +534,7 @@ describe('SS-UC06-03: Release requires step-up MFA', () => {
     expect(back.status).toBe(303);
     expect(back.headers.get('location')).toBe('/test/ap/payment-batches');
 
-    const ok = await call('POST', '/test/ap/payment-batches/oct-2026/release', session);
+    const ok = await call('POST', '/test/ap/payment-batches/oct-2026/release', rotatedCookie(back));
     expect(ok.status).toBe(200);
     expect(await ok.json()).toEqual({ batch_id: 'oct-2026', status: 'released' });
     expect(done.releases).toContain('oct-2026');
@@ -536,8 +547,10 @@ describe('SS-UC06-03: Release requires step-up MFA', () => {
     expect(res.status).toBe(401);
     expect(await res.json()).toEqual({ error: 'step_up_required', max_age: 300 });
     const s = await stepUpAtIdp(session, 'apr', { amr: ['pwd', 'otp'] });
-    expect((await finishStepUp(s, session)).status).toBe(303);
-    expect((await call('POST', '/test/ap/payment-batches/nov-2026/release', session)).status).toBe(
+    const back = await finishStepUp(s, session);
+    expect(back.status).toBe(303);
+    const fresh = rotatedCookie(back);
+    expect((await call('POST', '/test/ap/payment-batches/nov-2026/release', fresh)).status).toBe(
       200,
     );
   });
@@ -546,19 +559,21 @@ describe('SS-UC06-03: Release requires step-up MFA', () => {
     const session = await login('apr');
     now = Math.floor((now + 10 * MIN) / 1000) * 1000; // auth_time has whole seconds
     const s = await stepUpAtIdp(session, 'apr');
-    expect((await finishStepUp(s, session)).status).toBe(303);
+    const back = await finishStepUp(s, session);
+    expect(back.status).toBe(303);
+    const fresh = rotatedCookie(back);
     now += 300_000;
-    expect((await call('POST', '/test/ap/payment-batches/dec-2026/release', session)).status).toBe(
+    expect((await call('POST', '/test/ap/payment-batches/dec-2026/release', fresh)).status).toBe(
       200,
     );
     now += 1000;
-    const res = await call('POST', '/test/ap/payment-batches/dec-2026/release', session);
+    const res = await call('POST', '/test/ap/payment-batches/dec-2026/release', fresh);
     expect(res.status).toBe(401);
     expect(await res.json()).toEqual({ error: 'step_up_required', max_age: 300 });
   });
 });
 
-describe('SS-PLAT-58: Step-up re-authenticates on the existing session', () => {
+describe('SS-PLAT-58: Step-up re-authenticates the signed-in user (rotated session, ADR-0087)', () => {
   it('step-up redirects to the IdP with prompt=login, max_age and the MFA acr_values, plus PKCE, state and nonce', async () => {
     const session = await login('apr');
     const res = await beginStepUp(session, '?max_age=120&return_to=/periods');
@@ -594,7 +609,8 @@ describe('SS-PLAT-58: Step-up re-authenticates on the existing session', () => {
     expect((await finishStepUp(s, session)).status).toBe(303);
   });
 
-  it('the callback updates auth_time, amr and acr of the same session: no new session, no new cookie, audited', async () => {
+  it('the callback records auth_time, amr and acr on a new rotated session, sets its cookie, and audits the rotation', async () => {
+    // ADR-0087 supersedes ADR-0025's "no new session, no new cookie" (DL-0730, DL-0731).
     const session = await login('apr', { amr: ['pwd'], acr: PWD });
     const count = await sessionCount();
     now += 20 * MIN;
@@ -604,24 +620,29 @@ describe('SS-PLAT-58: Step-up re-authenticates on the existing session', () => {
     const res = await finishStepUp(s, session);
     expect(res.status).toBe(303);
     expect(res.headers.get('location')).toBe('/test/ap/payment-batches');
-    expect(cookieValue(res, 'lf_session')).toBeUndefined();
+    const fresh = rotatedCookie(res);
     expect(cookieValue(res, 'lf_oidc')).toBe(''); // pre-auth cookie cleared
-    expect(await sessionCount()).toBe(count);
-    const row = await sessionRow(session);
-    expect(row).toEqual({
+    expect(await sessionCount()).toBe(count + 1); // the old row is kept (revoked), never deleted
+    expect(await sessionRow(fresh)).toEqual({
       amr: ['pwd', 'hwk'],
       acr: MFA,
       auth_time: new Date(ts * 1000),
       revoked_at: null,
     });
-    expect((await call('GET', '/auth/me', session)).status).toBe(200);
+    expect((await sessionRow(session)).revoked_at).not.toBeNull();
+    expect((await call('GET', '/auth/me', fresh)).status).toBe(200);
     expect(await auditSince(mark)).toEqual([
       expect.objectContaining({
         actor_user_id: PEOPLE.apr.id,
         action: 'step_up',
         entity_type: 'session',
-        entity_id: sessionIdOf(session),
-        after: { amr: ['pwd', 'hwk'], acr: MFA, auth_time: new Date(ts * 1000).toISOString() },
+        entity_id: sessionIdOf(fresh),
+        after: {
+          amr: ['pwd', 'hwk'],
+          acr: MFA,
+          auth_time: new Date(ts * 1000).toISOString(),
+          rotated_from: sessionIdOf(session),
+        },
       }),
     ]);
   });
@@ -778,5 +799,204 @@ describe('SS-PLAT-59: Step-up fails closed', () => {
       error: 'forbidden',
       permission: 'ap.payment_batch.release',
     });
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+// T-0192, ADR-0087, RQ-0169: a step-up rotates the session id (OWASP ASVS 5.0 7.2.4).
+
+interface FullSessionRow {
+  user_id: string;
+  absolute_expires_at: Date;
+  idle_timeout_seconds: number;
+  user_session_epoch: number;
+  revoked_at: Date | null;
+  revoke_reason: string | null;
+}
+async function fullSessionRow(cookie: string): Promise<FullSessionRow> {
+  const { rows } = await tdb.admin.query<FullSessionRow>(
+    `SELECT user_id, absolute_expires_at, idle_timeout_seconds, user_session_epoch, revoked_at,
+            revoke_reason
+       FROM app.session WHERE id = $1`,
+    [sessionIdOf(cookie)],
+  );
+  const row = rows[0];
+  if (!row) throw new Error('no session row');
+  return row;
+}
+
+/** Waits until a backend of this test database waits on a lock (the blocked rotation). */
+async function untilLockWait(): Promise<void> {
+  for (let i = 0; i < 200; i++) {
+    const { rows } = await tdb.admin.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM pg_stat_activity
+        WHERE datname = current_database() AND wait_event_type = 'Lock'`,
+    );
+    if ((rows[0]?.n ?? 0) > 0) return;
+    await new Promise((r) => setTimeout(r, 25));
+  }
+  throw new Error('the step-up callback never waited on the session row');
+}
+
+describe('SS-PLAT-139: Step-up rotates the session id and cookie (ASVS 5.0 7.2.4)', () => {
+  it('SS-PLAT-139 after a step-up the old session cookie is refused and the new one works with the fresh step-up time', async () => {
+    const session = await login('apr');
+    now += 10 * MIN; // the login is too old for a release
+    expect((await call('POST', '/test/ap/payment-batches/r-135a/release', session)).status).toBe(
+      401,
+    );
+    const before = await fullSessionRow(session);
+    const ts = Math.floor(now / 1000);
+    const s = await stepUpAtIdp(session, 'apr', { ts });
+    const res = await finishStepUp(s, session);
+    expect(res.status).toBe(303);
+    expect(res.headers.get('location')).toBe('/test/ap/payment-batches');
+
+    // A new cookie: same tenant, new session id, new secret; the same attributes as at login.
+    const fresh = rotatedCookie(res);
+    expect(fresh).toMatch(/^[0-9a-f-]{36}\.[0-9a-f-]{36}\.[A-Za-z0-9_-]{43}$/);
+    expect(fresh.split('.')[0]).toBe(A);
+    expect(sessionIdOf(fresh)).not.toBe(sessionIdOf(session));
+    expect(fresh.split('.')[2]).not.toBe(session.split('.')[2]);
+    const setCookie = setCookies(res).find((c) => c.startsWith('lf_session=')) ?? '';
+    expect(setCookie).toMatch(/; HttpOnly/i);
+    expect(setCookie).toMatch(/; SameSite=Lax/i);
+    expect(setCookie).toMatch(/; Path=\//i);
+
+    // The old cookie is refused everywhere, also on member routes.
+    const oldMe = await call('GET', '/auth/me', session);
+    expect(oldMe.status).toBe(401);
+    expect(await oldMe.json()).toEqual({ error: 'session_expired' });
+    const oldRelease = await call('POST', '/test/ap/payment-batches/r-135a/release', session);
+    expect(oldRelease.status).toBe(401);
+    expect(done.releases).not.toContain('r-135a');
+
+    // The new cookie carries the fresh step-up.
+    expect((await call('GET', '/auth/me', fresh)).status).toBe(200);
+    expect((await call('POST', '/test/ap/payment-batches/r-135a/release', fresh)).status).toBe(200);
+    expect(done.releases).toContain('r-135a');
+
+    // Nothing deleted: the old row is revoked as 'rotated'; the new row keeps the user, the
+    // absolute expiry (no lifetime extension), the idle timeout and the revoke-all epoch.
+    expect(await fullSessionRow(session)).toEqual({
+      ...before,
+      revoked_at: expect.any(Date) as Date,
+      revoke_reason: 'rotated',
+    });
+    expect(await fullSessionRow(fresh)).toEqual({
+      ...before,
+      revoked_at: null,
+      revoke_reason: null,
+    });
+    expect((await sessionRow(fresh)).auth_time).toEqual(new Date(ts * 1000));
+  });
+
+  it('SS-PLAT-139 the rotated session keeps the 12-hour cap and the revoke-all epoch; logout ends it', async () => {
+    const a = await login('apr');
+    now += 10 * MIN;
+    const s1 = await stepUpAtIdp(a, 'apr');
+    const fa = rotatedCookie(await finishStepUp(s1, a));
+    const cap = (await fullSessionRow(a)).absolute_expires_at.getTime();
+    // Keep the idle timer alive just before the cap, so only the (carried) cap can refuse.
+    now = cap - 1000;
+    await tdb.admin.query('UPDATE app.session SET last_seen_at = $2 WHERE id = $1', [
+      sessionIdOf(fa),
+      new Date(now),
+    ]);
+    expect((await call('GET', '/auth/me', fa)).status).toBe(200);
+    now = cap;
+    const capped = await call('GET', '/auth/me', fa);
+    expect(capped.status).toBe(401);
+    expect(await capped.json()).toEqual({ error: 'session_expired' });
+
+    now = Date.now();
+    const b = await login('apr');
+    now += 10 * MIN;
+    const s2 = await stepUpAtIdp(b, 'apr');
+    const fb = rotatedCookie(await finishStepUp(s2, b));
+    expect((await call('GET', '/auth/me', fb)).status).toBe(200);
+    if (!api.sessions) throw new Error('sessions not configured');
+    await api.sessions.revokeAll(A, PEOPLE.apr.id, 'test');
+    expect((await call('GET', '/auth/me', fb)).status).toBe(401);
+
+    const c = await login('apr');
+    now += 10 * MIN;
+    const s3 = await stepUpAtIdp(c, 'apr');
+    const fc = rotatedCookie(await finishStepUp(s3, c));
+    expect((await call('POST', '/auth/logout', fc)).status).toBe(204);
+    expect((await call('GET', '/auth/me', fc)).status).toBe(401);
+    expect((await call('GET', '/auth/me', c)).status).toBe(401);
+  });
+
+  it('SS-PLAT-139 a refused step-up issues no cookie and the old session keeps working unchanged', async () => {
+    const session = await login('apr');
+    now += 10 * MIN;
+    await call('GET', '/auth/me', session); // the idle touch happens here, not in the checks below
+    const before = await fullSessionRow(session);
+    const refusals: [Who, IdpLogin][] = [
+      ['other', {}],
+      ['apr', { amr: ['pwd'], acr: PWD }],
+    ];
+    for (const [who, how] of refusals) {
+      const s = await stepUpAtIdp(session, who, how);
+      const res = await finishStepUp(s, session);
+      expect(res.status).toBe(403);
+      expect(cookieValue(res, 'lf_session')).toBeUndefined();
+    }
+    expect(await fullSessionRow(session)).toEqual(before);
+    expect((await call('GET', '/auth/me', session)).status).toBe(200);
+  });
+});
+
+describe('SS-PLAT-140: Rotation under concurrency fails closed', () => {
+  it('SS-PLAT-140 a concurrent request with the old cookie during rotation fails closed (401), never with elevated rights', async () => {
+    const session = await login('apr');
+    now += 10 * MIN; // pre-step-up auth_time is stale; beginning the step-up touches last_seen_at
+    const s = await stepUpAtIdp(session, 'apr');
+    // Hold the old session row so the callback's rotation is caught half-way, uncommitted.
+    const blocker = await tdb.admin.connect();
+    let callback: Promise<Response> | undefined;
+    try {
+      await blocker.query('BEGIN');
+      await blocker.query('SELECT 1 FROM app.session WHERE id = $1 FOR UPDATE', [
+        sessionIdOf(session),
+      ]);
+      callback = finishStepUp(s, session);
+      await untilLockWait();
+
+      const during = await call('POST', '/test/ap/payment-batches/r-136a/release', session);
+      expect(during.status).toBe(401);
+      expect(await during.json()).toEqual({ error: 'step_up_required', max_age: 300 });
+      expect(done.releases).not.toContain('r-136a');
+    } finally {
+      await blocker.query('ROLLBACK');
+      blocker.release();
+    }
+    if (!callback) throw new Error('callback not started');
+    const back = await callback;
+    expect(back.status).toBe(303);
+    const fresh = rotatedCookie(back);
+
+    const after = await call('POST', '/test/ap/payment-batches/r-136a/release', session);
+    expect(after.status).toBe(401);
+    expect(await after.json()).toEqual({ error: 'session_expired' });
+    expect(done.releases).not.toContain('r-136a');
+    expect((await call('POST', '/test/ap/payment-batches/r-136a/release', fresh)).status).toBe(200);
+  });
+
+  it('SS-PLAT-140 requests racing the callback with the old cookie never get the fresh step-up', async () => {
+    const session = await login('apr');
+    now += 10 * MIN;
+    const s = await stepUpAtIdp(session, 'apr');
+    const racers = Array.from({ length: 12 }, (_, i) =>
+      call('POST', `/test/ap/payment-batches/r-136b-${String(i)}/release`, session),
+    );
+    const [back, ...answers] = await Promise.all([finishStepUp(s, session), ...racers]);
+    expect(back.status).toBe(303);
+    for (const a of answers) expect(a.status).toBe(401);
+    expect(done.releases.filter((r) => r.startsWith('r-136b-'))).toEqual([]);
+    const late = await call('POST', '/test/ap/payment-batches/r-136b-late/release', session);
+    expect(late.status).toBe(401);
+    expect(done.releases).not.toContain('r-136b-late');
   });
 });

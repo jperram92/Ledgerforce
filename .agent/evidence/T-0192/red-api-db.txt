@@ -1,0 +1,150 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aaed20b6b8c559cfd
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:39883
+stderr | apps/api/src/authz/mfa-step-up.db.test.ts
+oidc-provider WARNING: a quick start development-only in-memory adapter is used, you MUST change it in order to not lose all stateful provider data upon restart and to be able to share these between processes
+oidc-provider WARNING: quick start development-only signing keys are used, you are expected to provide your own in the configuration "jwks" property
+
+ ❯ |api-db| apps/api/src/authz/mfa-step-up.db.test.ts (38 tests | 9 failed) 2855ms
+     × after an MFA step-up the rotated session may use finance endpoints (ADR-0087) 53ms
+     × user B without a fresh step-up gets step_up_required; after step-up the release succeeds 52ms
+     × a fresh login without MFA is not a step-up: the Approver (no MFA needed to sign in) is refused 53ms
+     × the step-up lasts its maximum age: 301 seconds later the release is refused again 36ms
+     × the callback records auth_time, amr and acr on a new rotated session, sets its cookie, and audits the rotation 41ms
+     × SS-PLAT-135 after a step-up the old session cookie is refused and the new one works with the fresh step-up time 36ms
+     × SS-PLAT-135 the rotated session keeps the 12-hour cap and the revoke-all epoch; logout ends it 33ms
+     × SS-PLAT-136 a concurrent request with the old cookie during rotation fails closed (401), never with elevated rights 71ms
+     × SS-PLAT-136 requests racing the callback with the old cookie never get the fresh step-up 110ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-20: MFA and session policy for finance roles > after an MFA step-up the rotated session may use finance endpoints (ADR-0087)
+Error: no rotated lf_session cookie (status 303)
+ ❯ rotatedCookie apps/api/src/authz/mfa-step-up.db.test.ts:260:21
+    258| function rotatedCookie(res: Response): string {
+    259|   const fresh = cookieValue(res, 'lf_session');
+    260|   if (!fresh) throw new Error(`no rotated lf_session cookie (status ${…
+       |                     ^
+    261|   return fresh;
+    262| }
+ ❯ apps/api/src/authz/mfa-step-up.db.test.ts:507:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  |api-db| apps/api/src/authz/mfa-step-up.db.test.ts > SS-UC06-03: Release requires step-up MFA > user B without a fresh step-up gets step_up_required; after step-up the release succeeds
+Error: no rotated lf_session cookie (status 303)
+ ❯ rotatedCookie apps/api/src/authz/mfa-step-up.db.test.ts:260:21
+    258| function rotatedCookie(res: Response): string {
+    259|   const fresh = cookieValue(res, 'lf_session');
+    260|   if (!fresh) throw new Error(`no rotated lf_session cookie (status ${…
+       |                     ^
+    261|   return fresh;
+    262| }
+ ❯ apps/api/src/authz/mfa-step-up.db.test.ts:537:80
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  |api-db| apps/api/src/authz/mfa-step-up.db.test.ts > SS-UC06-03: Release requires step-up MFA > a fresh login without MFA is not a step-up: the Approver (no MFA needed to sign in) is refused
+Error: no rotated lf_session cookie (status 303)
+ ❯ rotatedCookie apps/api/src/authz/mfa-step-up.db.test.ts:260:21
+    258| function rotatedCookie(res: Response): string {
+    259|   const fresh = cookieValue(res, 'lf_session');
+    260|   if (!fresh) throw new Error(`no rotated lf_session cookie (status ${…
+       |                     ^
+    261|   return fresh;
+    262| }
+ ❯ apps/api/src/authz/mfa-step-up.db.test.ts:552:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  |api-db| apps/api/src/authz/mfa-step-up.db.test.ts > SS-UC06-03: Release requires step-up MFA > the step-up lasts its maximum age: 301 seconds later the release is refused again
+Error: no rotated lf_session cookie (status 303)
+ ❯ rotatedCookie apps/api/src/authz/mfa-step-up.db.test.ts:260:21
+    258| function rotatedCookie(res: Response): string {
+    259|   const fresh = cookieValue(res, 'lf_session');
+    260|   if (!fresh) throw new Error(`no rotated lf_session cookie (status ${…
+       |                     ^
+    261|   return fresh;
+    262| }
+ ❯ apps/api/src/authz/mfa-step-up.db.test.ts:564:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  |api-db| apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-58: Step-up re-authenticates the signed-in user (rotated session, ADR-0087) > the callback records auth_time, amr and acr on a new rotated session, sets its cookie, and audits the rotation
+Error: no rotated lf_session cookie (status 303)
+ ❯ rotatedCookie apps/api/src/authz/mfa-step-up.db.test.ts:260:21
+    258| function rotatedCookie(res: Response): string {
+    259|   const fresh = cookieValue(res, 'lf_session');
+    260|   if (!fresh) throw new Error(`no rotated lf_session cookie (status ${…
+       |                     ^
+    261|   return fresh;
+    262| }
+ ❯ apps/api/src/authz/mfa-step-up.db.test.ts:623:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  |api-db| apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-135: Step-up rotates the session id and cookie (ASVS 5.0 7.2.4) > SS-PLAT-135 after a step-up the old session cookie is refused and the new one works with the fresh step-up time
+Error: no rotated lf_session cookie (status 303)
+ ❯ rotatedCookie apps/api/src/authz/mfa-step-up.db.test.ts:260:21
+    258| function rotatedCookie(res: Response): string {
+    259|   const fresh = cookieValue(res, 'lf_session');
+    260|   if (!fresh) throw new Error(`no rotated lf_session cookie (status ${…
+       |                     ^
+    261|   return fresh;
+    262| }
+ ❯ apps/api/src/authz/mfa-step-up.db.test.ts:856:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  |api-db| apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-135: Step-up rotates the session id and cookie (ASVS 5.0 7.2.4) > SS-PLAT-135 the rotated session keeps the 12-hour cap and the revoke-all epoch; logout ends it
+Error: no rotated lf_session cookie (status 303)
+ ❯ rotatedCookie apps/api/src/authz/mfa-step-up.db.test.ts:260:21
+    258| function rotatedCookie(res: Response): string {
+    259|   const fresh = cookieValue(res, 'lf_session');
+    260|   if (!fresh) throw new Error(`no rotated lf_session cookie (status ${…
+       |                     ^
+    261|   return fresh;
+    262| }
+ ❯ apps/api/src/authz/mfa-step-up.db.test.ts:898:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  |api-db| apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-136: Rotation under concurrency fails closed > SS-PLAT-136 a concurrent request with the old cookie during rotation fails closed (401), never with elevated rights
+Error: no rotated lf_session cookie (status 303)
+ ❯ rotatedCookie apps/api/src/authz/mfa-step-up.db.test.ts:260:21
+    258| function rotatedCookie(res: Response): string {
+    259|   const fresh = cookieValue(res, 'lf_session');
+    260|   if (!fresh) throw new Error(`no rotated lf_session cookie (status ${…
+       |                     ^
+    261|   return fresh;
+    262| }
+ ❯ apps/api/src/authz/mfa-step-up.db.test.ts:977:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  |api-db| apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-136: Rotation under concurrency fails closed > SS-PLAT-136 requests racing the callback with the old cookie never get the fresh step-up
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ apps/api/src/authz/mfa-step-up.db.test.ts:998:25
+    996|     expect(done.releases.filter((r) => r.startsWith('r-136b-'))).toEqu…
+    997|     const late = await call('POST', '/test/ap/payment-batches/r-136b-l…
+    998|     expect(late.status).toBe(401);
+       |                         ^
+    999|     expect(done.releases).not.toContain('r-136b-late');
+    1000|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed | 29 passed (38)
+   Start at  07:47:04
+   Duration  10.69s (transform 2.79s, setup 0ms, import 6.44s, tests 2.86s, environment 0ms)
+

@@ -17,8 +17,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 137 |
-| todo | 28 |
-| verifying | 5 |
+| todo | 27 |
+| verifying | 6 |
 | **total** | **181** |
 
 | Phase | Cards |
@@ -204,6 +204,8 @@ graph LR
 | [T-0197](T-0197.md) | Platform: send security notices (bank-detail and remittance account changes) by email | MVP | todo | T-0191 | UC-01, UC-06 | 0 |
 | [T-0201](T-0201.md) | Opening balances: Xero reader (trial balance and open invoices/bills at the balance date) | Phase 1 | todo | T-0126 | — | 0 |
 | [T-0202](T-0202.md) | Opening balances screen: show currency, currency amount and rate of foreign-currency items | MVP | todo | T-0126, T-0177 | — | 0 |
+| [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | todo | T-0180 | UC-01 | 0 |
+| [T-0192](T-0192.md) | Security: rotate the session id on step-up re-authentication (ASVS 5.0 7.2.4) | MVP | verifying | — | — | 0 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | review | T-0081, T-0046, T-0045, T-0055, T-0151 | UC-03, UC-11 | 2 |
 | [T-0086](T-0086.md) | UI: bills, bills inbox and approvals | MVP | review | T-0081, T-0052, T-0051 | UC-05 | 1 |
 | [T-0153](T-0153.md) | AP release API for the T-0087 screens: batch list, named batch view, bank-detail change list | MVP | review | T-0054, T-0053 | UC-06 | 1 |

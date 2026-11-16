@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0192",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-141",
+      "file": ".agent/evidence/T-0192/20261116-080322-SS-PLAT-141-release-step-up-prompt-old-session.png",
+      "test": "web/step-up-rotation.spec.ts \u203a SS-PLAT-141 Step-up rotates the session: the release screen stays put and the retried release succeeds with the new cookie [T-0192]",
+      "commit": "7814ba495fee",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:03:22.248Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-141",
+      "file": ".agent/evidence/T-0192/20261116-080323-SS-PLAT-141-release-succeeds-on-rotated-session.png",
+      "test": "web/step-up-rotation.spec.ts \u203a SS-PLAT-141 Step-up rotates the session: the release screen stays put and the retried release succeeds with the new cookie [T-0192]",
+      "commit": "7814ba495fee",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:03:23.752Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-141",
+      "file": ".agent/evidence/T-0192/20261116-080324-SS-PLAT-141-bank-detail-verified-on-rotated-session-390.png",
+      "test": "web/step-up-rotation.spec.ts \u203a SS-PLAT-141 Step-up rotates the session: the typed verification note survives and the retried verify succeeds [T-0192]",
+      "commit": "7814ba495fee",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:03:24.225Z",
+      "result": "passed"
+    }
+  ]
+}

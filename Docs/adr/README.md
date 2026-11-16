@@ -75,7 +75,7 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0018](0018-envelope-encryption-local-keyring-kms.md) | Envelope encryption of bank account numbers with a pluggable KMS; local keyring for self-host MVP | security | yes | Accepted |
 | [0023](0023-role-templates-and-permission-checks.md) | Role templates as code, tenant-scoped role assignments, fail-closed permission checks | security | yes | Accepted |
 | [0024](0024-period-control-matrix-and-lock-policy.md) | Period control: §3.5 matrix as data, invariant 3 in the database, personal overrides, two-approver reopen, lock-date policy | accounting | yes | Accepted |
-| [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Accepted |
+| [0025](0025-mfa-enforcement-and-step-up.md) | MFA enforcement for finance roles and step-up re-authentication on the existing session | security | yes | Accepted (superseded in part by ADR-0087) |
 | [0026](0026-segregation-of-duties-engine-and-small-team-mode.md) | Segregation-of-duties engine: rules as data, append-only action ledger, tenant thresholds, visible small-team exceptions | security | yes | Accepted |
 | [0027](0027-user-lifecycle-and-scoped-api-tokens.md) | User lifecycle (joiner/mover/leaver) and scoped personal API tokens | security | yes | Accepted |
 | [0029](0029-job-queue-privileges-and-supervision.md) | Job queue (pg-boss) privileges: lf_app DML on the shared pgboss schema, owner-run supervision | security | yes | Accepted |
@@ -122,6 +122,7 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0084](0084-setup-bank-accounts-http-routes.md) | HTTP routes for company bank accounts (setup wizard step 4) | architecture | no | Proposed |
 | [0085](0085-numbering-billing-and-approval-settings-routes.md) | Numbering and billing routes; a key on the approval-amounts route | architecture | no | Proposed |
 | [0086](0086-remittance-designation-release-and-change-notices.md) | Remittance account: archiving releases the designation; every approved change notifies all Owners and Finance Admins | security | yes (delegated, DL-0691) | Accepted |
+| [0087](0087-rotate-session-id-on-step-up.md) | A step-up re-authentication rotates the session id and cookie (ASVS 5.0 7.2.4) | security | yes (delegated, DL-0691) | Accepted (supersedes ADR-0025 in part) |
 | [0088](0088-opening-fx-items-carried-at-old-system-base.md) | Foreign-currency opening items are carried at the old system's base amount, with currency, amount and rate | accounting | yes (delegated, DL-0263) | Accepted |
 | [0089](0089-single-supply-gst-attribution.md) | Single-supply GST attribution on accruals: whole-supply coded line with contra, GST_ATTRIBUTED_UNBILLED asset, code-driven BAS unchanged | accounting | yes (delegated, DL-0263) | Accepted |
 
