@@ -1,11 +1,11 @@
 /**
- * T-0126 foreign-currency open items at conversion (design §4.1 step 9, §3.7, GP-040, RQ-0170,
+ * T-0126 foreign-currency open items at conversion (design §4.1 step 9, §3.7, GP-043, RQ-0170,
  * DL-0740, DL-0741), against a real PostgreSQL as lf_app.
  *
- * SS-PLAT-135: a USD invoice and a USD bill post as GP-040 line for line, with their transaction
+ * SS-PLAT-137: a USD invoice and a USD bill post as GP-043 line for line, with their transaction
  * currency, amount and rate on the control line and the old system's base amount; the open items
  * keep both amounts, age in base and settle in USD with the realised difference as fx_difference.
- * SS-PLAT-136: inconsistent FX input is refused and writes nothing.
+ * SS-PLAT-138: inconsistent FX input is refused and writes nothing.
  */
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -31,8 +31,8 @@ import {
 } from './opening-balances.ts';
 
 const FILE = resolve(import.meta.dirname, '../../../../Docs/accounting/postings.md');
-const gp040 = approvedTables(parsePostings(readFileSync(FILE, 'utf8'))).find(
-  (t) => t.entryId === 'GP-040',
+const gp043 = approvedTables(parsePostings(readFileSync(FILE, 'utf8'))).find(
+  (t) => t.entryId === 'GP-043',
 );
 const roleCode = new Map(
   auServicesSmb.accounts.filter((a) => a.systemRole).map((a) => [a.systemRole, a.code]),
@@ -44,7 +44,7 @@ const codeOf = (binding: string): string => {
 };
 const money = (s: string) => (s === '0' ? '0.0000' : `${s}${s.includes('.') ? '00' : '.0000'}`);
 
-/** The old system's trial balance at 2026-10-31 (GP-040), by template account code. */
+/** The old system's trial balance at 2026-10-31 (GP-043), by template account code. */
 const TB_CSV = [
   'account_code,account_name,debit,credit',
   '1010,Operating account,10000.00,',
@@ -106,7 +106,7 @@ const command = (over: Partial<OpeningBalanceCommand> = {}): OpeningBalanceComma
   idempotencyKey: 'opening-fx-2026-11-01',
   ...over,
 });
-/** GP-040's items with the one at `index` changed. */
+/** GP-043's items with the one at `index` changed. */
 const withItem = (index: number, change: Partial<OpeningItemInput>) =>
   items().map((it, i) => (i === index ? { ...it, ...change } : it));
 
@@ -143,10 +143,10 @@ afterAll(async () => {
   await (f as LedgerFixture | undefined)?.close();
 });
 
-describe('T-0126: foreign-currency opening items are refused when inconsistent (SS-PLAT-136)', () => {
+describe('T-0126: foreign-currency opening items are refused when inconsistent (SS-PLAT-138)', () => {
   const postIt = (c: OpeningBalanceCommand) => f.inTenant((trx) => postOpeningBalance(trx, c));
 
-  it('SS-PLAT-136 a rate that does not reproduce the base amount half-up to cents', async () => {
+  it('SS-PLAT-138 a rate that does not reproduce the base amount half-up to cents', async () => {
     await refused(
       () => postIt(command({ items: withItem(1, { fxRate: '1.5' }) })),
       'FX_MISMATCH',
@@ -158,7 +158,7 @@ describe('T-0126: foreign-currency opening items are refused when inconsistent (
     );
   });
 
-  it('SS-PLAT-136 a currency amount of the other sign or zero, a bad code, a bad rate', async () => {
+  it('SS-PLAT-138 a currency amount of the other sign or zero, a bad code, a bad rate', async () => {
     await refused(
       () => postIt(command({ items: withItem(1, { currencyAmount: '-1000.00' }) })),
       'INVALID_COMMAND',
@@ -190,7 +190,7 @@ describe('T-0126: foreign-currency opening items are refused when inconsistent (
     );
   });
 
-  it('SS-PLAT-136 a base-currency item with another currency amount or a rate other than 1', async () => {
+  it('SS-PLAT-138 a base-currency item with another currency amount or a rate other than 1', async () => {
     await refused(
       () => postIt(command({ items: withItem(0, { currency: 'AUD', currencyAmount: '1300.00' }) })),
       'INVALID_COMMAND',
@@ -203,7 +203,7 @@ describe('T-0126: foreign-currency opening items are refused when inconsistent (
     );
   });
 
-  it('SS-PLAT-136 without a rate the rate is implied from base ÷ currency amount (8 decimals); a base item named AUD stays base', async () => {
+  it('SS-PLAT-138 without a rate the rate is implied from base ÷ currency amount (8 decimals); a base item named AUD stays base', async () => {
     const p = await f.inTenant((trx) =>
       previewOpeningBalance(
         trx,
@@ -229,8 +229,8 @@ describe('T-0126: foreign-currency opening items are refused when inconsistent (
   });
 });
 
-describe('T-0126: foreign-currency opening items (GP-040, SS-PLAT-135)', () => {
-  it('SS-PLAT-135 posting writes exactly GP-040, the USD lines carrying currency, amount and rate', async () => {
+describe('T-0126: foreign-currency opening items (GP-043, SS-PLAT-137)', () => {
+  it('SS-PLAT-137 posting writes exactly GP-043, the USD lines carrying currency, amount and rate', async () => {
     const r = await f.inTenant((trx) => postOpeningBalance(trx, command()));
     expect(r).toMatchObject({ balanceDate: '2026-10-31', replayed: false });
     const rows = await f.inTenant(
@@ -251,9 +251,9 @@ describe('T-0126: foreign-currency opening items (GP-040, SS-PLAT-135)', () => {
            WHERE l.entry_id = ${r.entryId} ORDER BY l.line_no`.execute(trx)
         ).rows,
     );
-    expect(rows).toHaveLength(gp040?.lines.length ?? -1);
-    gp040?.lines.forEach((g, i) => {
-      const at = `GP-040 line ${String(i + 1)} (${g.binding})`;
+    expect(rows).toHaveLength(gp043?.lines.length ?? -1);
+    gp043?.lines.forEach((g, i) => {
+      const at = `GP-043 line ${String(i + 1)} (${g.binding})`;
       expect(rows[i]?.code, at).toBe(codeOf(g.binding));
       expect(rows[i]?.debit, at).toBe(money(g.debit.replaceAll(',', '')));
       expect(rows[i]?.credit, at).toBe(money(g.credit.replaceAll(',', '')));
@@ -298,7 +298,7 @@ describe('T-0126: foreign-currency opening items (GP-040, SS-PLAT-135)', () => {
     expect(view?.items.map((i) => i.currency)).toEqual(['AUD', 'USD', 'USD']);
   });
 
-  it('SS-PLAT-135 aged AR at the conversion date is in base and equals the AR control balance', async () => {
+  it('SS-PLAT-137 aged AR at the conversion date is in base and equals the AR control balance', async () => {
     const aged = await f.inTenant((trx) =>
       agedReceivables(trx, { companyId: f.companyId, asOf: '2026-11-01' }),
     );
@@ -321,7 +321,7 @@ describe('T-0126: foreign-currency opening items (GP-040, SS-PLAT-135)', () => {
     expect(aged.totals.total).toBe(ar);
   });
 
-  it('SS-PLAT-135 a USD receipt at a later rate settles the opening item in USD; fx_difference is the realised difference since conversion', async () => {
+  it('SS-PLAT-137 a USD receipt at a later rate settles the opening item in USD; fx_difference is the realised difference since conversion', async () => {
     const opening = await f.inTenant((trx) => openingBalanceOf(trx, f.companyId));
     const acme = parties.get(`${f.companyId}:Acme`) ?? '';
     const alloc = await f.inTenant(async (trx) => {

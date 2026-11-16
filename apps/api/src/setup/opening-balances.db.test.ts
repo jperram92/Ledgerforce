@@ -191,7 +191,7 @@ describe('SS-PLAT-117: opening balances over HTTP', () => {
     expect(await entries()).toBe(before);
   });
 
-  it('SS-PLAT-135 a USD open item previews with its currency, amount and rate; an inconsistent rate is 422 FX_MISMATCH (T-0126)', async () => {
+  it('SS-PLAT-137 a USD open item previews with its currency, amount and rate; an inconsistent rate is 422 FX_MISMATCH (T-0126)', async () => {
     const before = await entries();
     const usdHead =
       'party,document_no,document_date,due_date,amount,gst_amount,currency,currency_amount,fx_rate';

@@ -101,7 +101,7 @@ W2 amounts withheld. Businesses on Simpler BAS report only G1, 1A and 1B; G10/G1
 | GP-035 | Prior-period adjustment (AASB 108) | Phase 1 | — | Superseded by GP-036 |
 | GP-036 | Prior-period error: late bill through AP (supersedes GP-035) | Phase 1 | — | Approved |
 | GP-037 | Opening balances at conversion: trial balance plus open AR/AP items (§4.1 step 9) | MVP | — | Approved |
-| GP-040 | Opening balances with foreign-currency open items (variant of GP-037; §4.1 step 9, §3.7) | MVP | — | Approved |
+| GP-043 | Opening balances with foreign-currency open items (variant of GP-037; §4.1 step 9, §3.7) | MVP | — | Approved |
 
 ---
 
@@ -925,7 +925,7 @@ above has been changed.
 | 2026-11-01 | claude (T-0115) | Owner delegated approval (DL-0256): entries Approved, GP-004/007/012/013/018 superseded, Q1–Q15 resolved. |
 | 2026-11-01 | claude (T-0116) | GP-036 supersedes GP-035 (control-account rule); DL-0258. |
 | 2026-11-02 | claude (T-0080) | GP-037 opening balances at conversion added and approved under the standing delegation (DL-0263); basis RQ-0109; DL-0314. No existing entry changed. |
-| 2026-11-15 | claude (T-0126) | GP-040 opening balances with foreign-currency open items added and approved under the standing delegation (DL-0263); basis RQ-0170; DL-0740. No existing entry changed. |
+| 2026-11-15 | claude (T-0126) | GP-043 opening balances with foreign-currency open items added and approved under the standing delegation (DL-0263); basis RQ-0170; DL-0740. No existing entry changed. |
 
 ## GP-038 — Gross expected-credit-loss allowance and subsequent release
 
@@ -996,7 +996,7 @@ Allowance remains 125.00 credit. BAS 1B increases 125.00 on accruals, zero on ca
 
 Allowance zero; net impairment expense 1,250.00. No GST on remeasurement; no automatic release of allowances for other customers.
 
-## GP-040 — Opening balances with foreign-currency open items (variant of GP-037)
+## GP-043 — Opening balances with foreign-currency open items (variant of GP-037)
 
 - **Status: Approved (claude under the product owner's standing delegation, DL-0263, 2026-11-15; basis RQ-0170; decision DL-0740)** · Phase: MVP · Source type: `ledger.opening_balance` · Use cases: — · Design: §4.1 step 9, §3.7, §3.2
 - **Relation to GP-037:** same event, same rules (one control line per open document, no plug, balance date = conversion

@@ -19,7 +19,7 @@
  * A wrong opening balance is corrected by reversing its entry (refused by the engine once an item
  * is allocated) and posting a new one.
  *
- * Foreign-currency items (T-0126, GP-040, RQ-0170, DL-0740): the line stays at the item's base
+ * Foreign-currency items (T-0126, GP-043, RQ-0170, DL-0740): the line stays at the item's base
  * amount (the old system's carrying amount, no exchange difference posted) and also carries the
  * transaction currency, amount and rate (opening-fx.ts), so the open item settles in its currency
  * and allocation measures realised FX against the carried base. The journal carries no tax codes;
@@ -130,7 +130,7 @@ interface PlannedItem {
   readonly partyId: string;
   readonly amount: Decimal;
   readonly gst: Decimal;
-  /** Control-line FX fields of a foreign item; null for a base item (GP-040). */
+  /** Control-line FX fields of a foreign item; null for a base item (GP-043). */
   readonly fx: ReturnType<typeof itemFx>;
   lineNo: number;
 }

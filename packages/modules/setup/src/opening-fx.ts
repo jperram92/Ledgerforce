@@ -1,5 +1,5 @@
 /**
- * Foreign-currency opening items (T-0126, GP-040, RQ-0170, DL-0740, DL-0741). Pure.
+ * Foreign-currency opening items (T-0126, GP-043, RQ-0170, DL-0740, DL-0741). Pure.
  *
  * An opening item's `amount` is always the base amount the old system carries at the balance date
  * (it sums to the trial-balance control row; no exchange difference is posted). A foreign item also

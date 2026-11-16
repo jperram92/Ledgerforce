@@ -1,6 +1,6 @@
 /**
- * T-0126 SS-PLAT-136 (property, fast-check default runs): the FX rule of a foreign opening item
- * (GP-040, DL-0741). For any transaction amount and rate, the base amount half-up to cents is
+ * T-0126 SS-PLAT-138 (property, fast-check default runs): the FX rule of a foreign opening item
+ * (GP-043, DL-0741). For any transaction amount and rate, the base amount half-up to cents is
  * accepted with that rate, any other base amount is refused (FX_MISMATCH), the implied rate is
  * base ÷ amount half-up to 8 decimals, and the line always carries the absolute amount.
  */
@@ -34,8 +34,8 @@ const item = (txn: Decimal, base: Decimal, fxRate?: Decimal): OpeningItemInput =
 });
 const cents = (d: Decimal) => d.toDecimalPlaces(2, Decimal.ROUND_HALF_UP);
 
-describe('SS-PLAT-136: foreign opening-item rate rule (property)', () => {
-  it('SS-PLAT-136 a rate is accepted exactly when it reproduces the base amount half-up to cents', () => {
+describe('SS-PLAT-138: foreign opening-item rate rule (property)', () => {
+  it('SS-PLAT-138 a rate is accepted exactly when it reproduces the base amount half-up to cents', () => {
     fc.assert(
       fc.property(txnArb, rateArb, fc.integer({ min: -3, max: 3 }), (txn, rate, cent) => {
         const base = cents(txn.times(rate)).plus(new Decimal(cent).div(100));
@@ -56,7 +56,7 @@ describe('SS-PLAT-136: foreign opening-item rate rule (property)', () => {
     );
   });
 
-  it('SS-PLAT-136 without a rate the rate is base ÷ amount half-up to 8 decimals, printed with 8 decimals', () => {
+  it('SS-PLAT-138 without a rate the rate is base ÷ amount half-up to 8 decimals, printed with 8 decimals', () => {
     fc.assert(
       fc.property(txnArb, rateArb, (txn, rate) => {
         const base = cents(txn.times(rate));
@@ -71,7 +71,7 @@ describe('SS-PLAT-136: foreign opening-item rate rule (property)', () => {
     );
   });
 
-  it('SS-PLAT-136 an item in the base currency is a base item: no FX fields, rate 1 only', () => {
+  it('SS-PLAT-138 an item in the base currency is a base item: no FX fields, rate 1 only', () => {
     fc.assert(
       fc.property(txnArb, (amount) => {
         const it = { ...item(amount, amount), currency: 'AUD' };

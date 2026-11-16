@@ -14,7 +14,7 @@ superseded_by: none
 
 ## Status
 Accepted by the building agent under the product owner's standing delegation for accounting ADRs
-and golden postings (AGENTS.md §6, DL-0263). The basis is research record RQ-0170 and golden GP-040.
+and golden postings (AGENTS.md §6, DL-0263). The basis is research record RQ-0170 and golden GP-043.
 The decision is logged as DL-0740 and DL-0741. Tests cover it: the golden runner (pure and engine
 replay), `packages/modules/setup/src/opening-balances.fx.db.test.ts`, `opening-fx.prop.test.ts`,
 `opening-csv.test.ts` and `apps/api/src/setup/opening-balances.db.test.ts`.

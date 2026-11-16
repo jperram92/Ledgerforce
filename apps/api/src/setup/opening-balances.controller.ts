@@ -6,7 +6,7 @@
  * Body: { company_id, conversion_date, trial_balance_csv, ar_items_csv?, ap_items_csv? } — the CSV
  * files are read by @ledgerforce/setup (refusals name the row). All need settings.chart.manage
  * (setting up the books; GET too, since it lists every open document). Refusals are 422 with the
- * module's or the engine's code. Foreign-currency items (T-0126, GP-040): optional CSV columns
+ * module's or the engine's code. Foreign-currency items (T-0126, GP-043): optional CSV columns
  * currency, currency_amount, fx_rate; preview lines and items name their currency, amount and rate.
  */
 import {

@@ -114,11 +114,11 @@ describe('SS-PLAT-116: opening-balance CSV files', () => {
   });
 });
 
-describe('SS-PLAT-136: foreign-currency open items in the CSV (T-0126, GP-040, DL-0741)', () => {
+describe('SS-PLAT-138: foreign-currency open items in the CSV (T-0126, GP-043, DL-0741)', () => {
   const head =
     'party,document_no,document_date,due_date,amount,gst_amount,currency,currency_amount,fx_rate\n';
 
-  it('SS-PLAT-136 reads currency, currency_amount and fx_rate; an empty currency is a base item without FX fields', () => {
+  it('SS-PLAT-138 reads currency, currency_amount and fx_rate; an empty currency is a base item without FX fields', () => {
     const items = parseOpenItemsCsv(
       head +
         'Acme Pty Ltd,INV-2001,2026-09-20,2026-10-20,1538.46,,usd,1000.00,1.53846154\n' +
@@ -148,7 +148,7 @@ describe('SS-PLAT-136: foreign-currency open items in the CSV (T-0126, GP-040, D
     });
   });
 
-  it('SS-PLAT-136 refuses a bad currency code, a missing, zero or opposite-sign currency amount, and a bad rate, naming the row', () => {
+  it('SS-PLAT-138 refuses a bad currency code, a missing, zero or opposite-sign currency amount, and a bad rate, naming the row', () => {
     const row = (r: string) => refusal(() => parseOpenItemsCsv(head + r, 'ap'));
     const base = 'S,B-88,2026-10-05,2026-11-04,-615.38,,';
     expect(row(`${base}US,-400.00,\n`)).toMatchObject({ code: 'INVALID_CSV', row: 2 });

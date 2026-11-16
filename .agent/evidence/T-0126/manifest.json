@@ -3,43 +3,43 @@
   "taskId": "T-0126",
   "entries": [
     {
-      "scenario": "SS-PLAT-135",
+      "scenario": "SS-PLAT-137",
       "file": ".agent/evidence/T-0126/green-db.txt",
-      "test": "packages/modules/setup/src/opening-balances.fx.db.test.ts › SS-PLAT-135 (3 tests: GP-040 line for line with USD currency/amount/rate; aged AR in base equals AR control; USD receipt allocation fx_difference 24.04); packages/ledger/src/golden/golden-engine.db.test.ts replays GP-040",
+      "test": "packages/modules/setup/src/opening-balances.fx.db.test.ts › SS-PLAT-137 (3 tests: GP-043 line for line with USD currency/amount/rate; aged AR in base equals AR control; USD receipt allocation fx_difference 24.04); packages/ledger/src/golden/golden-engine.db.test.ts replays GP-043",
       "commit": "2c06835-dirty",
       "provider": "claude",
       "timestamp": "2026-11-16T00:00:00Z",
       "result": "passed"
     },
     {
-      "scenario": "SS-PLAT-135",
+      "scenario": "SS-PLAT-137",
       "file": ".agent/evidence/T-0126/green-api-db.txt",
-      "test": "apps/api/src/setup/opening-balances.db.test.ts › SS-PLAT-135 a USD open item previews with its currency, amount and rate; an inconsistent rate is 422 FX_MISMATCH",
+      "test": "apps/api/src/setup/opening-balances.db.test.ts › SS-PLAT-137 a USD open item previews with its currency, amount and rate; an inconsistent rate is 422 FX_MISMATCH",
       "commit": "2c06835-dirty",
       "provider": "claude",
       "timestamp": "2026-11-16T00:00:00Z",
       "result": "passed"
     },
     {
-      "scenario": "SS-PLAT-136",
+      "scenario": "SS-PLAT-138",
       "file": ".agent/evidence/T-0126/green-unit.txt",
-      "test": "opening-csv.test.ts › SS-PLAT-136 (2 tests); opening-fx.prop.test.ts › SS-PLAT-136 (3 properties, default runs); golden-postings.golden.test.ts (GP-040 in the inventory)",
+      "test": "opening-csv.test.ts › SS-PLAT-138 (2 tests); opening-fx.prop.test.ts › SS-PLAT-138 (3 properties, default runs); golden-postings.golden.test.ts (GP-043 in the inventory)",
       "commit": "2c06835-dirty",
       "provider": "claude",
       "timestamp": "2026-11-16T00:00:00Z",
       "result": "passed"
     },
     {
-      "scenario": "SS-PLAT-136",
+      "scenario": "SS-PLAT-138",
       "file": ".agent/evidence/T-0126/green-db.txt",
-      "test": "packages/modules/setup/src/opening-balances.fx.db.test.ts › SS-PLAT-136 (4 tests: FX_MISMATCH; sign, zero, code and rate refusals; base-currency item; implied rate)",
+      "test": "packages/modules/setup/src/opening-balances.fx.db.test.ts › SS-PLAT-138 (4 tests: FX_MISMATCH; sign, zero, code and rate refusals; base-currency item; implied rate)",
       "commit": "2c06835-dirty",
       "provider": "claude",
       "timestamp": "2026-11-16T00:00:00Z",
       "result": "passed"
     },
     {
-      "scenario": "SS-PLAT-136",
+      "scenario": "SS-PLAT-138",
       "file": ".agent/evidence/T-0126/mutation-round-down-killed.txt",
       "test": "opening-fx.prop.test.ts against a ROUND_DOWN mutant of the rate check: the property failed (mutant killed); source restored",
       "commit": "2c06835-dirty",

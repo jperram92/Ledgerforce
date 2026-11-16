@@ -97,7 +97,7 @@ conversion could not be allocated (allocation needs the same currency, `subledge
   command fields). `amount` remains the **base** amount and is what must sum to the control row.
 - A foreign item posts its control line with `txnCurrency`, `txnAmount = |currency_amount|` and the
   rate (given or implied, finding 4). No FX line is posted, and the debits and credits are those of
-  GP-037. The new golden **GP-040** records the expectation (variant, not a supersession of GP-037).
+  GP-037. The new golden **GP-043** records the expectation (variant, not a supersession of GP-037).
 - Refuse: an unknown currency code shape, a currency amount of a different sign or zero, a rate with
   more than 8 decimals or ≤ 0, a rate inconsistent with the base amount, and a base-currency item
   whose `currency_amount` differs from `amount` or whose rate is not 1. Nothing is written.
@@ -123,4 +123,4 @@ session (S7). T-0201 must verify them before any code.
 - Design §3.7 realised-FX journal golden (still not written; DL-0187) and the Phase 1 revaluation job.
 
 **Affects:** packages/modules/setup (opening balances), apps/api setup controller, Docs/accounting
-GP-040, T-0201.
+GP-043, T-0201.

@@ -9,7 +9,7 @@
  * open invoice is +, a customer credit (unapplied payment, open credit note) −; an unpaid bill is
  * −, a supplier debit balance +. GST, if given, has the amount's sign and is
  * not larger than it. Dates are YYYY-MM-DD; the due date is not before the document date.
- * Foreign-currency items (T-0126, GP-040, DL-0741) add optional `currency` (three letters),
+ * Foreign-currency items (T-0126, GP-043, DL-0741) add optional `currency` (three letters),
  * `currency_amount` (required with a currency, same sign as `amount`) and `fx_rate` (base per one
  * foreign unit, > 0, at most 8 decimals); `amount` stays the base amount. GST is in base.
  *
@@ -45,7 +45,7 @@ export interface OpeningItemInput {
   /** GST content in base currency (data only — the journal carries no tax codes), '0' when unknown. */
   readonly gstAmount: string;
   /**
-   * Foreign-currency items (T-0126, GP-040): ISO 4217 code, the signed transaction amount (sign of
+   * Foreign-currency items (T-0126, GP-043): ISO 4217 code, the signed transaction amount (sign of
    * `amount`) and optionally the rate, base per one foreign unit (opening-fx.ts). Absent = base.
    */
   readonly currency?: string;
