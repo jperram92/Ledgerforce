@@ -1,6 +1,7 @@
 /**
  * Setup settings API client (T-0176): the ADR-0081 routes under /setup/company and /setup/tax,
- * and (T-0185) the ADR-0084 routes under /setup/bank-accounts.
+ * (T-0185) the ADR-0084 routes under /setup/bank-accounts, and (T-0186) the ADR-0085 routes
+ * under /setup/billing and the approval amounts (/sod/settings).
  * Same origin, session cookie; failures are AdminApiError (status + error code + body). Every
  * write carries the Idempotency-Key the screen passes.
  */
@@ -104,6 +105,64 @@ export interface BankAccountInput {
   aba_fi_mnemonic?: string;
 }
 
+export type PaymentMethod = 'bank_transfer' | 'stripe';
+export const INVOICE_SERIES = 'ar_invoice_document';
+export const CREDIT_NOTE_SERIES = 'ar_credit_note_document';
+
+export interface NumberSeries {
+  code: string;
+  prefix: string;
+  pad_width: number;
+  /** The number the next document gets, e.g. "INV-000001". */
+  next_number: string;
+  /** Prefix and digits are fixed once true. */
+  issued: boolean;
+  status: string;
+}
+
+export interface InvoiceSettingsValue {
+  brand_colour: string | null;
+  brand_accent_colour: string | null;
+  default_payment_terms_days: number | null;
+  accepted_payment_methods: PaymentMethod[] | null;
+  has_logo: boolean;
+}
+
+export interface BillingSettings {
+  company_id: string;
+  series: NumberSeries[];
+  formats: { code: string; name: string; posted: boolean; status: string }[];
+  invoice: InvoiceSettingsValue;
+  stripe: { clearing_account_id: string } | null;
+  clearing_accounts: { id: string; code: string; name: string }[];
+}
+
+export interface InvoiceInput {
+  brand_colour: string;
+  default_payment_terms_days: number;
+  accepted_payment_methods: PaymentMethod[];
+}
+
+export type ThresholdName =
+  'bill_self_approval' | 'credit_note_self_approval' | 'journal_approval' | 'batch_two_releasers';
+
+export interface ApprovalSettings {
+  small_team_mode: boolean;
+  /** Decimal strings with 4 places, e.g. "1000.0000". */
+  thresholds: Record<ThresholdName, string>;
+  report_timezone: string;
+  set_at: string | null;
+  /** True until the Owner saves them: the values are the design's placeholders. */
+  placeholder_defaults: boolean;
+}
+
+export interface ApprovalInput {
+  small_team_mode: boolean;
+  thresholds: Record<ThresholdName, string>;
+  report_timezone: string;
+  reason: string;
+}
+
 export interface SettingsClient {
   company(companyId: string): Promise<CompanySettings>;
   saveCompany(
@@ -129,15 +188,38 @@ export interface SettingsClient {
     input: BankAccountInput,
     key: string,
   ): Promise<{ account: BankAccount; replayed: boolean }>;
+  billing(companyId: string): Promise<BillingSettings>;
+  saveSeries(
+    companyId: string,
+    input: { code: string; prefix: string; pad_width: number },
+    key: string,
+  ): Promise<{ series: NumberSeries; changed: boolean }>;
+  addStandardFormats(companyId: string, key: string): Promise<{ inserted: number }>;
+  saveInvoice(
+    companyId: string,
+    input: InvoiceInput,
+    key: string,
+  ): Promise<{ invoice: InvoiceSettingsValue; changed: boolean }>;
+  saveStripe(
+    companyId: string,
+    clearingAccountId: string,
+    key: string,
+  ): Promise<{ stripe: { clearing_account_id: string }; changed: boolean }>;
+  approvals(): Promise<ApprovalSettings>;
+  /** 201 when a new settings row was saved, 200 when the values were already in force. */
+  saveApprovals(
+    input: ApprovalInput,
+    key: string,
+  ): Promise<{ settings: ApprovalSettings; changed: boolean }>;
 }
 
 export function createSettingsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): SettingsClient {
-  async function send<T>(
+  async function sendWithStatus<T>(
     method: 'GET' | 'POST' | 'PUT',
     path: string,
     body?: unknown,
     key?: string,
-  ): Promise<T> {
+  ): Promise<{ status: number; data: T }> {
     const headers: Record<string, string> = { accept: 'application/json' };
     if (body !== undefined) headers['content-type'] = 'application/json';
     if (key !== undefined) headers['idempotency-key'] = key;
@@ -149,8 +231,14 @@ export function createSettingsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Se
     });
     const data: unknown = await res.json().catch(() => null);
     if (!res.ok) throw new AdminApiError(res.status, data);
-    return data as T;
+    return { status: res.status, data: data as T };
   }
+  const send = async <T>(
+    method: 'GET' | 'POST' | 'PUT',
+    path: string,
+    body?: unknown,
+    key?: string,
+  ): Promise<T> => (await sendWithStatus<T>(method, path, body, key)).data;
   const q = (companyId: string) => `?company_id=${encodeURIComponent(companyId)}`;
   return {
     company: (c) => send('GET', `/setup/company${q(c)}`),
@@ -164,5 +252,19 @@ export function createSettingsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Se
     bankAccounts: (c) => send('GET', `/setup/bank-accounts${q(c)}`),
     addBankAccount: (c, input, key) =>
       send('POST', '/setup/bank-accounts', { company_id: c, ...input }, key),
+    billing: (c) => send('GET', `/setup/billing${q(c)}`),
+    saveSeries: (c, input, key) =>
+      send('PUT', '/setup/billing/series', { company_id: c, ...input }, key),
+    addStandardFormats: (c, key) =>
+      send('POST', '/setup/billing/formats/standard', { company_id: c }, key),
+    saveInvoice: (c, input, key) =>
+      send('PUT', '/setup/billing/invoice', { company_id: c, ...input }, key),
+    saveStripe: (c, id, key) =>
+      send('PUT', '/setup/billing/stripe', { company_id: c, clearing_account_id: id }, key),
+    approvals: () => send('GET', '/sod/settings'),
+    saveApprovals: async (input, key) => {
+      const r = await sendWithStatus<ApprovalSettings>('POST', '/sod/settings', input, key);
+      return { settings: r.data, changed: r.status === 201 };
+    },
   };
 }

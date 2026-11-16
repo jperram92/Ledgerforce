@@ -83,6 +83,9 @@ importers:
       '@ledgerforce/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@ledgerforce/documents':
+        specifier: workspace:*
+        version: link:../../packages/modules/documents
       '@ledgerforce/gl':
         specifier: workspace:*
         version: link:../../packages/modules/gl

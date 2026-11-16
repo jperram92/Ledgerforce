@@ -446,6 +446,7 @@ describe('SS-UC01-12: approve one draft invoice over HTTP (T-0132, ADR-0073)', (
         'content-type': 'application/json',
         cookie: `lf_session=${cookies.get('solo') ?? ''}`,
         'sec-fetch-site': 'same-origin',
+        'idempotency-key': 'sod-small-team-on', // required since ADR-0085 (T-0186)
       },
       body: JSON.stringify({ small_team_mode: true, reason: 'one-person business' }),
     });

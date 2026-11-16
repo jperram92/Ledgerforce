@@ -28,6 +28,8 @@ async function call(method: string, path: string, who: string, body?: unknown) {
   if (c) h.cookie = `lf_session=${c}`;
   h['sec-fetch-site'] = 'same-origin';
   if (body !== undefined) h['content-type'] = 'application/json';
+  // POST /sod/settings needs an Idempotency-Key (ADR-0085, T-0186).
+  if (method === 'POST' && path === '/sod/settings') h['idempotency-key'] = `sod-${randomUUID()}`;
   return fetch(`${api.url}${path}`, {
     method,
     headers: h,

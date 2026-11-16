@@ -65,7 +65,16 @@ describe('T-0091 setup wizard logic', () => {
       to: '/settings/setup/opening-balances',
       name: 'Opening balances',
     });
-    expect(STEP_WHERE[10]?.after).toMatch(/Approval amounts have no LedgerForce screen/);
+    // T-0186 (SS-PLAT-131): step 8 and step 10's approval amounts have their screens.
+    expect(STEP_WHERE[8]).toMatchObject({
+      to: '/settings/billing',
+      name: 'Numbering and billing',
+    });
+    expect(STEP_WHERE[10]?.also).toMatchObject({
+      to: '/settings/approvals',
+      name: 'Approval amounts',
+    });
+    expect(STEP_WHERE[10]?.after).toBeUndefined();
   });
 
   it('turns the API refusals into plain words, keeping the missing list', () => {

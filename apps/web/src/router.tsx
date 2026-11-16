@@ -33,6 +33,8 @@ import { WizardPage } from './setup/WizardPage.tsx';
 import { CompanySettingsPage } from './settings/CompanySettingsPage.tsx';
 import { TaxSettingsPage } from './settings/TaxSettingsPage.tsx';
 import { BankAccountsPage } from './settings/BankAccountsPage.tsx';
+import { BillingSettingsPage } from './settings/BillingSettingsPage.tsx';
+import { ApprovalSettingsPage } from './settings/ApprovalSettingsPage.tsx';
 import { Shell } from './Shell.tsx';
 import { SignInPage, type SignInReason } from './SignIn.tsx';
 import { inboxSearch } from './sync/logic.ts';
@@ -173,6 +175,17 @@ const bankAccountsSettingsRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: 'settings/bank-accounts',
   component: BankAccountsPage,
+});
+// Wizard steps 8 and 10 (T-0186, ADR-0085); the API owns /setup/billing and /sod/settings.
+const billingSettingsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/billing',
+  component: BillingSettingsPage,
+});
+const approvalSettingsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/approvals',
+  component: ApprovalSettingsPage,
 });
 // Opening balances, wizard step 9 (T-0177, DL-0651); the API owns /setup/opening-balances.
 const openingBalancesRoute = createRoute({
@@ -536,6 +549,8 @@ const routeTree = rootRoute.addChildren([
     companySettingsRoute,
     taxSettingsRoute,
     bankAccountsSettingsRoute,
+    billingSettingsRoute,
+    approvalSettingsRoute,
     openingBalancesRoute,
     chartRoute,
     postingProfilesRoute,

@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aba86349cab0cecec
+
+ ❯ |web| apps/web/src/settings/billing-logic.test.ts (7 tests | 1 failed) 10ms
+     × puts a stored threshold in the input without losing any of its four decimals 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |web| apps/web/src/settings/billing-logic.test.ts > SS-PLAT-131 T-0186 billing and approval logic > puts a stored threshold in the input without losing any of its four decimals
+TypeError: amountEdit is not a function
+ ❯ apps/web/src/settings/billing-logic.test.ts:42:12
+     40|
+     41|   it('puts a stored threshold in the input without losing any of its f…
+     42|     expect(amountEdit('5000.0000')).toBe('5,000.00');
+       |            ^
+     43|     expect(amountEdit('1000.1234')).toBe('1,000.1234');
+     44|     expect(amountEdit('0.5000')).toBe('0.50');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  08:00:10
+   Duration  1.29s (transform 264ms, setup 139ms, import 280ms, tests 10ms, environment 686ms)
+

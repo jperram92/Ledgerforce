@@ -3843,3 +3843,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0166 finding 7; outside T-0185's no-migration scope.
 - Alternatives: add the grant here (rejected: card says no migration unless truly needed; the step can be met by adding the account with its ABA details).
 - ADR: none · Status: accepted
+
+### DL-0710 — Numbering and billing routes under /setup/billing (ADR-0085)
+- Date: 2026-11-15 · By: claude · Task: T-0186 · Category: architecture
+- Decision: Wizard step 8 gets `GET /setup/billing` (settings.read) and four writes with settings.setup.manage and an Idempotency-Key: `PUT /setup/billing/series` (invoice and credit-note series), `POST /setup/billing/formats/standard` (AU billing formats), `PUT /setup/billing/invoice` (brand colour, terms, payment methods) and `PUT /setup/billing/stripe` (clearing account only). Each is replay-safe by state (DL-0642) and audited when it changes something. The clearing account must be an active, postable, non-control asset account of the company (422 `INVALID_CLEARING_ACCOUNT`); the read lists those accounts so the screen needs no chart permission.
+- Why: RQ-0167 findings 1, 2; ADR-0081 asks step 8 to extend the `/setup/*` family by its own record.
+- Alternatives: one combined PUT (rejected: four owners and refusal kinds); Stripe under `/payments` (rejected: one setup area); reuse `GET /accounts` for the picker (rejected: needs gl.account.read, which settings readers may lack).
+- ADR: ADR-0085 · Status: proposed (architecture, accepted on cross-review)
+
+### DL-0711 — POST /sod/settings requires an Idempotency-Key
+- Date: 2026-11-15 · By: claude · Task: T-0186 · Category: architecture
+- Decision: The route now answers 400 `idempotency_key_required` before reading the body when the header is missing (nothing written). The key is not stored; the route stays replay-safe by state. The approval-amounts screen sends a fresh key per save; the three api-db test files that call the route send one.
+- Why: apps/api rule "every mutating endpoint requires an idempotency key"; the route had no non-test caller (RQ-0167 finding 3), so the change breaks no client.
+- Alternatives: keep it keyless because it is state-idempotent (rejected: rule; and the screen would be the only settings write without one); send a key from the screen without requiring it (rejected: leaves the rule broken for other clients).
+- ADR: ADR-0085 · Status: proposed (architecture, accepted on cross-review)
+
+### DL-0712 — apps/api depends on the workspace package @ledgerforce/documents
+- Date: 2026-11-15 · By: claude · Task: T-0186 · Category: tooling
+- Decision: Add `"@ledgerforce/documents": "workspace:*"` to `apps/api/package.json` for `seedBillingFormats` and `AU_BILLING_FORMATS`. It is an internal workspace package, not a third-party dependency.
+- Why: the billing-format catalogue and its seeding live in the documents module (RQ-0167 S3); the controller stays thin.
+- Alternatives: copy the catalogue into the API (rejected: two sources of truth).
+- ADR: ADR-0085 · Status: accepted
+
+### DL-0713 — The ledger defines number series: defineNumberSeries and numberSeriesOf
+- Date: 2026-11-15 · By: claude · Task: T-0186 · Category: architecture
+- Decision: `packages/ledger/src/numbering.ts` gains `defineNumberSeries(trx, {companyId, code, prefix, padWidth})` (insert, or change prefix/width — and re-activate — while no number has been issued; same values: `changed:false`; different values after issue: `NUMBER_SERIES_IN_USE`) and `numberSeriesOf` (with the next number formatted as `app.next_document_number` would). The prefix is limited to 0–20 of `A–Z a–z 0–9 - / _ .` (the database allows any non-control text up to 20). The row is locked (`FOR UPDATE`) before comparing, so a concurrent first issue cannot slip past the check; the 0010 guard trigger remains the backstop.
+- Why: RQ-0167 finding 1 (the ledger owns the table; no production code created series). A narrow prefix set keeps invoice numbers safe in file names, e-mail subjects and bank references.
+- Alternatives: insert from the API controller (rejected: ledger ownership); allow any printable prefix (rejected: quoting problems downstream for no user need).
+- ADR: ADR-0085 · Status: accepted
+
+### DL-0714 — T-0186 scope: logo, accent colour, payout accounts and the acknowledge key split out
+- Date: 2026-11-15 · By: claude · Task: T-0186 · Category: scope
+- Decision: T-0186 builds what wizard steps 8 and 10 require. The invoice logo upload, the accent colour on screen and the Stripe payout accounts move to T-0195; the Idempotency-Key on `POST /sod/exceptions/weekly/acknowledge` moves to T-0196. The remittance account (also step 8) stays with T-0183 as instructed.
+- Why: RQ-0167 finding 4: none is needed for step 8; each needs its own transport or picker and tests. Keeps the card near its estimate.
+- Alternatives: build all on T-0186 (rejected: size).
+- ADR: none · Status: accepted
+
+### DL-0715 — Numbering-and-billing and approval-amount screens: wording, exact amounts, wizard links
+- Date: 2026-11-16 · By: claude · Task: T-0186 · Category: ui
+- Decision: `/settings/billing` (step 8) and `/settings/approvals` (step 10), listed on Settings and linked from the wizard (step 10 keeps its People and roles link and gains a second link through a new optional `also` field of `STEP_WHERE`). An issued series is shown, not offered for change. The Stripe section asks for the clearing account only once card payments are accepted. Approval amounts are put into the inputs exactly (`amountEdit`: only zeros after the cents dropped), so re-saving never rounds a stored 4-decimal value; typed amounts are read as strings (`amountInput`, commas and a leading $ allowed), never as numbers. The suggested amounts are labelled as suggestions until saved (design §11.2 placeholders, DL-0131). One primary button per screen (Save invoice settings; Save approval amounts). The brand colour is a text field (#RRGGBB) rather than a colour picker, which would silently submit black when unset.
+- Why: P12 plain words, apps/web money rule, SS-PLAT-131. TDD note: the unit tests of the helpers and every API/ledger test were seen RED first; the two Playwright specs were written after the screens, so their RED was not captured (the approvals spec did fail first on a real defect — the form remounted on save and lost its status message — fixed before green).
+- Alternatives: format inputs with `formatMoney` (rejected: rounds to cents, would change 4-decimal thresholds on re-save); a single link for step 10 (rejected: users/roles and amounts are two screens).
+- ADR: ADR-0085 · Status: accepted

@@ -17,9 +17,9 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 137 |
-| todo | 26 |
-| verifying | 2 |
-| **total** | **176** |
+| todo | 27 |
+| verifying | 3 |
+| **total** | **178** |
 
 | Phase | Cards |
 |---|---:|
@@ -220,6 +220,10 @@ graph LR
 | [T-0185](T-0185.md) | UI: bank accounts settings screen (wizard step 4) — split from T-0176 | MVP | verifying | T-0176 | — | 0 |
 | [T-0186](T-0186.md) | UI: numbering and billing (step 8) and approval amounts (step 10) settings screens — split from T-0176 | MVP | todo | T-0176 | — | 0 |
 | [T-0193](T-0193.md) | Bank: change ABA details or archive a company bank account over HTTP — found in T-0185 | MVP | todo | T-0185 | — | 0 |
+| [T-0185](T-0185.md) | UI: bank accounts settings screen (wizard step 4) — split from T-0176 | MVP | todo | T-0176 | — | 0 |
+| [T-0186](T-0186.md) | UI: numbering and billing (step 8) and approval amounts (step 10) settings screens — split from T-0176 | MVP | verifying | T-0176 | — | 0 |
+| [T-0195](T-0195.md) | UI: invoice logo, accent colour and Stripe payout accounts on the Numbering and billing screen — split from T-0186 | MVP | todo | T-0186 | — | 0 |
+| [T-0196](T-0196.md) | API: require an Idempotency-Key on POST /sod/exceptions/weekly/acknowledge — from T-0186 | MVP | todo | T-0186 | — | 0 |
 | [T-0177](T-0177.md) | UI: opening balances import and posting-profile matrix screens (wizard steps 9 and 7) — split from T-0091 | MVP | todo | T-0091 | — | 0 |
 | [T-0176](T-0176.md) | UI: settings forms for setup wizard steps 1, 3, 4, 8 and 10 — split from T-0091 | MVP | todo | T-0091 | — | 0 |
 | [T-0177](T-0177.md) | UI: opening balances import screen (wizard step 9) — split from T-0091; matrix moved to T-0187/T-0188 (DL-0650) | MVP | verifying | T-0091 | — | 0 |

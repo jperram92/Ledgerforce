@@ -1,10 +1,20 @@
-import { BadRequestException, Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Post,
+  Query,
+  Res,
+} from '@nestjs/common';
 import { SOD_THRESHOLDS, type SodSettings, type SodThreshold } from '@ledgerforce/shared/sod';
 import type { Response } from 'express';
 import { sql } from 'kysely';
 import { Authz } from '../authz/authz.ts';
 import { RequirePermission } from '../authz/permission.decorator.ts';
 import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
+import { requireKey } from '../settings/settings-common.ts';
 import { loadSodSettings } from './sod.service.ts';
 
 const AMOUNT = /^\d{1,15}(\.\d{1,4})?$/;
@@ -89,8 +99,8 @@ interface ExceptionView {
 
 /**
  * SoD settings and the weekly exception report (design §6.5, ADR-0026). Settings are history:
- * a change inserts a row (Owner only, with a reason; audited by the database). Posting the
- * current values again changes nothing (200). The report lists the small-team exceptions of a
+ * a change inserts a row (Owner only, with a reason, an Idempotency-Key since ADR-0085; audited by
+ * the database). Posting the current values again changes nothing (200). The report lists the small-team exceptions of a
  * Monday-to-Monday week in the tenant's report time zone; the Owner acknowledges a week.
  */
 @Controller('sod')
@@ -111,9 +121,12 @@ export class SodController {
   @Post('settings')
   @RequirePermission('settings.sod.manage')
   async change(
+    @Headers('idempotency-key') key: string | undefined,
     @Body() body: unknown,
     @Res({ passthrough: true }) res: Response,
   ): Promise<SettingsView> {
+    // ADR-0085, DL-0711: required before the body is read; not stored (replay-safe by state).
+    requireKey(key);
     const trx = this.tx.get();
     const current = await loadSodSettings(trx);
     const { next, reason } = changed(body, current.settings);

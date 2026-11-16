@@ -10,6 +10,8 @@ export interface SubPage {
     | '/settings/company'
     | '/settings/tax'
     | '/settings/bank-accounts'
+    | '/settings/billing'
+    | '/settings/approvals'
     | '/settings/users'
     | '/reports/control-exceptions'
     | '/reports/audit-log'
@@ -254,6 +256,17 @@ export const SECTIONS: readonly Section[] = [
         to: '/settings/bank-accounts',
         name: 'Bank accounts',
         text: 'Your bank accounts, numbers masked, and the details batch payment files need.',
+      },
+      // Settings screens for setup steps 8 and 10 (T-0186).
+      {
+        to: '/settings/billing',
+        name: 'Numbering and billing',
+        text: 'Invoice and credit note numbers, billing formats, invoice colour, payment terms and how customers pay.',
+      },
+      {
+        to: '/settings/approvals',
+        name: 'Approval amounts',
+        text: 'The amounts above which a second person must approve, and small-team mode.',
       },
       {
         to: '/settings/users',
