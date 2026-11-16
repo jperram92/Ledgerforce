@@ -27,17 +27,19 @@ const tables = approvedTables(parsePostings(readFileSync(FILE, 'utf8')));
 /**
  * Golden tables the engine cannot replay yet, with the reason and owning task. Shrinks to empty;
  * never grows silently. Empty from T-0032 (reversals replay through reverse()) until T-0168
- * added GP-040…GP-042 (ADR-0089), whose unbound role T-0203 adds; GP-042b replays already.
+ * added GP-040…GP-042 (ADR-0089), whose unbound role T-0203 adds. GP-044/GP-045 supersede
+ * GP-042/GP-041 (accounting review); GP-044b and GP-044d replay already.
  */
 const PENDING: Record<string, string> = {
   // ADR-0089: the GST_ATTRIBUTED_UNBILLED extended role and template account 1230 are bound by
   // T-0203; until then these tables are proven against the BAS query in SS-PLAT-135 only.
   'GP-040a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
   'GP-040b': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-  'GP-041a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-  'GP-041b': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-  'GP-041c': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-  'GP-042a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+  'GP-044a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+  'GP-044c': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+  'GP-045a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+  'GP-045b': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+  'GP-045c': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
 };
 
 /**

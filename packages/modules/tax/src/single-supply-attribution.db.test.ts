@@ -1,12 +1,16 @@
 /**
- * SS-PLAT-135: single-supply GST attribution contract (T-0168, ADR-0089, RQ-0171, GP-040…GP-042),
- * against a real PostgreSQL as lf_app.
+ * SS-PLAT-135: single-supply GST attribution contract (T-0168, ADR-0089, RQ-0171), against a real
+ * PostgreSQL as lf_app. Current goldens: GP-040 (receipts), GP-045 (final invoice, supersedes
+ * GP-041), GP-044 (cancellation and refund, supersedes GP-042) — accounting review of T-0168.
  *
  * Proves that the Approved golden journals for a single (non-Div 156) supply on the accruals basis
  * give the BAS their "Tax/BAS" lines state through the UNCHANGED code-driven BAS query (bas.ts):
  * the first part-payment attributes the whole supply's GST (G1 11,000.00 / 1A 1,000.00), a second
  * receipt and the final invoice add nothing, a price change is reported once as its own
- * adjustment, cancellation removes the unbilled attribution, and a reversal nets to zero.
+ * adjustment, a cancellation with the refund agreed removes the whole 1,000.00 at cancellation
+ * (one adjustment note) and the refund itself has no GST, a cancellation with the refund
+ * undecided removes only the unbilled part until the refund is agreed, and a reversal nets to
+ * zero. The final invoice's AR open item is the whole tax invoice with the receipts allocated.
  *
  * The GST_ATTRIBUTED_UNBILLED role is not bound yet (its additive role binding and template
  * account are T-0203). Here the golden binding resolves to a plain asset account the test adds,
@@ -16,7 +20,14 @@
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { entrySeriesFor, post, reverse, SOURCE_TYPES } from '@ledgerforce/ledger';
+import {
+  allocate,
+  entrySeriesFor,
+  post,
+  reverse,
+  SOURCE_TYPES,
+  subledgerEntriesOf,
+} from '@ledgerforce/ledger';
 import { Money } from '@ledgerforce/shared/money';
 import {
   AU_SERVICES_BINDINGS,
@@ -143,53 +154,115 @@ afterAll(async () => {
   await (f as LedgerFixture | undefined)?.close();
 });
 
+/** The open AR items of an entry: [debit item, credit item] where both exist. */
+const itemsOf = (entryId: string) => f.inTenant((trx) => subledgerEntriesOf(trx, entryId));
+
+/** Allocate the credit open item of `fromEntry` to the debit open item of `toEntry`. */
+async function allocateWithin(fromEntry: string, toEntry: string, amount: string, date: string) {
+  await f.inTenant(async (trx) => {
+    const from = (await subledgerEntriesOf(trx, fromEntry)).find((x) =>
+      x.originalAmount.startsWith('-'),
+    );
+    const to = (await subledgerEntriesOf(trx, toEntry)).find(
+      (x) => !x.originalAmount.startsWith('-'),
+    );
+    await allocate(trx, {
+      companyId: f.companyId,
+      idempotencyKey: randomUUID(),
+      fromEntryId: from?.id ?? 'missing credit item',
+      toEntryId: to?.id ?? 'missing debit item',
+      amount,
+      allocationDate: date,
+    });
+  });
+}
+
+const openOf = async (entryId: string) =>
+  (await itemsOf(entryId)).map((x) => Money.of(x.openAmount, 'AUD').toNumericString());
+
+/** Post GP-040a and GP-040b, then a final invoice table; allocate its receipts credit. */
+async function contractTo(finalId: string, receiptDates: [string, string], finalDate: string) {
+  const r1 = await postGolden('GP-040a', receiptDates[0]);
+  const r2 = await postGolden('GP-040b', receiptDates[1]);
+  const fin = await postGolden(finalId, finalDate);
+  await allocateWithin(fin, fin, '6600.00', finalDate);
+  return { r1, r2, fin };
+}
+
 describe('SS-PLAT-135: single-supply GST attribution goldens through the unchanged BAS query', () => {
-  it('SS-PLAT-135 first part-payment attributes the whole supply (G1 11,000.00, 1A 1,000.00); a second receipt adds nothing; the final invoice repeats no GST', async () => {
+  it('SS-PLAT-135 first part-payment attributes the whole supply (G1 11,000.00, 1A 1,000.00); a second receipt adds nothing; the final tax invoice (GP-045a) repeats no GST and its AR item is the whole 11,000.00 with the 6,600.00 received allocated', async () => {
     const r1 = await postGolden('GP-040a', '2026-11-10');
     const r2 = await postGolden('GP-040b', '2026-11-25');
     expectLabels(await labels('2026-11-01', '2026-11-30'), {
       G1: '11000.0000',
       '1A': '1000.0000',
     });
-    const fin = await postGolden('GP-041a', '2026-12-15');
-    expectLabels(await labels('2026-12-01', '2026-12-31'), {});
-    // The unbilled attribution and the contract liability both clear on the final invoice.
-    expect(await balanceOf(unbilledAccount, [r1, r2, fin])).toBe('0.0000');
-    expect(await balanceOf(await prepayments(), [r1, r2, fin])).toBe('0.0000');
     expect(await balanceOf(unbilledAccount, [r1])).toBe('700.0000');
     expect(await balanceOf(unbilledAccount, [r1, r2])).toBe('400.0000');
+    const fin = await postGolden('GP-045a', '2026-12-15');
+    await allocateWithin(fin, fin, '6600.00', '2026-12-15');
+    expectLabels(await labels('2026-12-01', '2026-12-31'), {});
+    expect(await balanceOf(unbilledAccount, [r1, r2, fin])).toBe('0.0000');
+    expect(await balanceOf(await prepayments(), [r1, r2, fin])).toBe('0.0000');
+    const items = await itemsOf(fin);
+    expect(items.map((x) => Money.of(x.originalAmount, 'AUD').toNumericString())).toEqual([
+      '11000.0000',
+      '-6600.0000',
+    ]);
+    expect(await openOf(fin)).toEqual(['4400.0000', '0.0000']);
   });
 
-  it('SS-PLAT-135 a price increase on the final invoice reports only the change (G1 550.00, 1A 50.00)', async () => {
-    await postGolden('GP-041b', '2027-01-15');
-    expectLabels(await labels('2027-01-01', '2027-01-31'), { G1: '550.0000', '1A': '50.0000' });
+  it('SS-PLAT-135 a price increase agreed on the final invoice date (GP-045b) reports only the change (G1 550.00, 1A 50.00 over the whole supply 11,550.00 / 1,050.00) and clears both contract balances', async () => {
+    const c = await contractTo('GP-045b', ['2027-01-05', '2027-01-12'], '2027-01-20');
+    expectLabels(await labels('2027-01-01', '2027-01-31'), { G1: '11550.0000', '1A': '1050.0000' });
+    expect(await balanceOf(unbilledAccount, [c.r1, c.r2, c.fin])).toBe('0.0000');
+    expect(await balanceOf(await prepayments(), [c.r1, c.r2, c.fin])).toBe('0.0000');
+    expect(await openOf(c.fin)).toEqual(['4950.0000', '0.0000']);
   });
 
-  it('SS-PLAT-135 a price decrease on the final invoice reports only the change (G1 −550.00, 1A −50.00)', async () => {
-    await postGolden('GP-041c', '2027-02-15');
-    expectLabels(await labels('2027-02-01', '2027-02-28'), { G1: '-550.0000', '1A': '-50.0000' });
+  it('SS-PLAT-135 a price decrease agreed on the final invoice date (GP-045c) reports only the change (whole supply 10,450.00 / 950.00) and clears both contract balances', async () => {
+    const c = await contractTo('GP-045c', ['2027-02-03', '2027-02-10'], '2027-02-20');
+    expectLabels(await labels('2027-02-01', '2027-02-28'), { G1: '10450.0000', '1A': '950.0000' });
+    expect(await balanceOf(unbilledAccount, [c.r1, c.r2, c.fin])).toBe('0.0000');
+    expect(await balanceOf(await prepayments(), [c.r1, c.r2, c.fin])).toBe('0.0000');
+    expect(await openOf(c.fin)).toEqual(['3850.0000', '0.0000']);
   });
 
-  it('SS-PLAT-135 cancellation removes the unbilled attribution (G1 −7,700.00, 1A −700.00); the refund of the part paid removes the rest; the contract nets to zero', async () => {
+  it('SS-PLAT-135 cancellation with the refund agreed (GP-044a) removes the whole 1,000.00 in the cancellation period and leaves a 3,300.00 customer credit; the refund (GP-044b) has no GST', async () => {
     const r1 = await postGolden('GP-040a', '2027-03-02');
-    const cancel = await postGolden('GP-042a', '2027-03-20');
-    expectLabels(await labels('2027-03-01', '2027-03-31'), { G1: '3300.0000', '1A': '300.0000' });
+    const cancel = await postGolden('GP-044a', '2027-03-20');
+    expectLabels(await labels('2027-03-01', '2027-03-31'), {});
     expect(await balanceOf(unbilledAccount, [r1, cancel])).toBe('0.0000');
-    const refund = await postGolden('GP-042b', '2027-04-05');
-    expectLabels(await labels('2027-04-01', '2027-04-30'), { G1: '-3300.0000', '1A': '-300.0000' });
+    expect(await balanceOf(await prepayments(), [r1, cancel])).toBe('0.0000');
+    expect(await openOf(cancel)).toEqual(['-3300.0000']);
+    const refund = await postGolden('GP-044b', '2027-04-05');
+    await allocateWithin(cancel, refund, '3300.00', '2027-04-05');
+    expectLabels(await labels('2027-04-01', '2027-04-30'), {});
+    expect(await openOf(cancel)).toEqual(['0.0000']);
+    expect(await openOf(refund)).toEqual(['0.0000']);
+  });
+
+  it('SS-PLAT-135 cancellation with the refund undecided (GP-044c) removes only the unbilled 700.00; the refund agreed later (GP-044d) removes the 300.00 in its own period; the contract nets to zero', async () => {
+    const r1 = await postGolden('GP-040a', '2027-05-04');
+    const cancel = await postGolden('GP-044c', '2027-05-20');
+    expectLabels(await labels('2027-05-01', '2027-05-31'), { G1: '3300.0000', '1A': '300.0000' });
+    expect(await balanceOf(unbilledAccount, [r1, cancel])).toBe('0.0000');
+    expect(await balanceOf(await prepayments(), [r1, cancel])).toBe('-3000.0000');
+    const refund = await postGolden('GP-044d', '2027-06-10');
+    expectLabels(await labels('2027-06-01', '2027-06-30'), { G1: '-3300.0000', '1A': '-300.0000' });
     expect(await balanceOf(await prepayments(), [r1, cancel, refund])).toBe('0.0000');
   });
 
   it('SS-PLAT-135 reversing the first receipt in the same period nets the BAS to zero', async () => {
-    const r1 = await postGolden('GP-040a', '2027-05-03');
+    const r1 = await postGolden('GP-040a', '2026-10-05');
     await f.inTenant((trx) =>
       reverse(trx, {
         companyId: f.companyId,
         entryId: r1,
         idempotencyKey: randomUUID(),
-        entryDate: '2027-05-04',
+        entryDate: '2026-10-06',
       }),
     );
-    expectLabels(await labels('2027-05-01', '2027-05-31'), {});
+    expectLabels(await labels('2026-10-01', '2026-10-31'), {});
   });
 });

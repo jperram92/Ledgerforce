@@ -19,6 +19,24 @@
       "provider": "claude",
       "timestamp": "2026-11-16T08:10:00.000Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-135",
+      "file": ".agent/evidence/T-0168/red-review-fixes.txt",
+      "test": "packages/modules/tax/src/single-supply-attribution.db.test.ts (RED: superseding goldens GP-044/GP-045 not yet Approved)",
+      "commit": "2c56a1d",
+      "provider": "claude",
+      "timestamp": "2026-11-16T12:00:00.000Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-PLAT-135",
+      "file": ".agent/evidence/T-0168/db-tests-review-fixes.txt",
+      "test": "packages/modules/tax/src/single-supply-attribution.db.test.ts + bas.db.test.ts + ledger golden engine replay + ar prepayments (5 files, 25 tests, 0 skipped)",
+      "commit": "2c56a1d",
+      "provider": "claude",
+      "timestamp": "2026-11-16T12:30:00.000Z",
+      "result": "passed"
     }
   ]
 }
