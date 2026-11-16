@@ -1,0 +1,94 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aba86349cab0cecec
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:34275
+ ❯ |db| packages/ledger/src/number-series.db.test.ts (4 tests | 4 failed) 2747ms
+     × SS-PLAT-131 creates the series, then the same values change nothing [T-0186] 5ms
+     × SS-PLAT-131 prefix and width change while unused, and are fixed once a number is issued [T-0186] 2ms
+     × SS-PLAT-131 refuses malformed input before touching the database [T-0186] 6ms
+     × SS-PLAT-131 another tenant's company is unknown [T-0186] 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/ledger/src/number-series.db.test.ts > SS-PLAT-131: defineNumberSeries (ledger) > SS-PLAT-131 creates the series, then the same values change nothing [T-0186]
+TypeError: defineNumberSeries is not a function
+ ❯ packages/ledger/src/number-series.db.test.ts:28:7
+     26|   it('SS-PLAT-131 creates the series, then the same values change noth…
+     27|     const first = await f.inTenant((trx) =>
+     28|       defineNumberSeries(trx, { companyId: f.companyId, code: CODE, pr…
+       |       ^
+     29|     );
+     30|     expect(first).toEqual({
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/ledger/src/number-series.db.test.ts:27:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |db| packages/ledger/src/number-series.db.test.ts > SS-PLAT-131: defineNumberSeries (ledger) > SS-PLAT-131 prefix and width change while unused, and are fixed once a number is issued [T-0186]
+TypeError: defineNumberSeries is not a function
+ ❯ packages/ledger/src/number-series.db.test.ts:52:7
+     50|   it('SS-PLAT-131 prefix and width change while unused, and are fixed …
+     51|     const changed = await f.inTenant((trx) =>
+     52|       defineNumberSeries(trx, { companyId: f.companyId, code: CODE, pr…
+       |       ^
+     53|     );
+     54|     expect(changed).toMatchObject({ changed: true, series: { nextNumbe…
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/ledger/src/number-series.db.test.ts:51:21
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |db| packages/ledger/src/number-series.db.test.ts > SS-PLAT-131: defineNumberSeries (ledger) > SS-PLAT-131 refuses malformed input before touching the database [T-0186]
+AssertionError: {"code":"AR-INV","prefix":"INV-","padWidth":6}: expected TypeError: (0 , __vite_ssr_import_1__.def… to match object { code: 'INVALID_NUMBER_SERIES' }
+
+- Expected
++ Received
+
+- {
+-   "code": "INVALID_NUMBER_SERIES",
++ TypeError {
++   "message": "(0 , __vite_ssr_import_1__.defineNumberSeries) is not a function",
+  }
+
+ ❯ packages/ledger/src/number-series.db.test.ts:84:38
+     82|         .inTenant((trx) => defineNumberSeries(trx, { companyId: f.comp…
+     83|         .catch((x: unknown) => x);
+     84|       expect(e, JSON.stringify(bad)).toMatchObject({ code: 'INVALID_NU…
+       |                                      ^
+     85|     }
+     86|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |db| packages/ledger/src/number-series.db.test.ts > SS-PLAT-131: defineNumberSeries (ledger) > SS-PLAT-131 another tenant's company is unknown [T-0186]
+AssertionError: expected TypeError: (0 , __vite_ssr_import_1__.def… to match object { code: 'UNKNOWN_COMPANY' }
+
+- Expected
++ Received
+
+- {
+-   "code": "UNKNOWN_COMPANY",
++ TypeError {
++   "message": "(0 , __vite_ssr_import_1__.defineNumberSeries) is not a function",
+  }
+
+ ❯ packages/ledger/src/number-series.db.test.ts:94:15
+     92|       )
+     93|       .catch((x: unknown) => x);
+     94|     expect(e).toMatchObject({ code: 'UNKNOWN_COMPANY' });
+       |               ^
+     95|     expect(await other.inTenant((trx) => numberSeriesOf(trx, f.company…
+     96|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  07:45:56
+   Duration  17.23s (transform 1.96s, setup 0ms, import 3.64s, tests 2.75s, environment 0ms)
+

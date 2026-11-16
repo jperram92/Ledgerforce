@@ -1,0 +1,91 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aba86349cab0cecec
+
+ ❯ |web| apps/web/src/settings/billing-logic.test.ts (6 tests | 6 failed) 8ms
+     × shows the first number a new series will issue, padded like the database does 3ms
+     × reads the number of digits and the payment terms as whole numbers in range, else null 1ms
+     × reads an amount as a decimal string without turning it into a number 0ms
+     × shows a threshold as dollars and cents 0ms
+     × says the numbering and billing refusals in plain words 0ms
+     × says the approval-amount refusals in plain words 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |web| apps/web/src/settings/billing-logic.test.ts > SS-PLAT-131 T-0186 billing and approval logic > shows the first number a new series will issue, padded like the database does
+TypeError: firstNumber is not a function
+ ❯ apps/web/src/settings/billing-logic.test.ts:16:12
+     14| describe('SS-PLAT-131 T-0186 billing and approval logic', () => {
+     15|   it('shows the first number a new series will issue, padded like the …
+     16|     expect(firstNumber('INV-', 6)).toBe('INV-000001');
+       |            ^
+     17|     expect(firstNumber('', 1)).toBe('1');
+     18|     expect(firstNumber('TI/', 3)).toBe('TI/001');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  |web| apps/web/src/settings/billing-logic.test.ts > SS-PLAT-131 T-0186 billing and approval logic > reads the number of digits and the payment terms as whole numbers in range, else null
+TypeError: digitsInput is not a function
+ ❯ apps/web/src/settings/billing-logic.test.ts:22:12
+     20|
+     21|   it('reads the number of digits and the payment terms as whole number…
+     22|     expect(digitsInput('6')).toBe(6);
+       |            ^
+     23|     expect(digitsInput(' 18 ')).toBe(18);
+     24|     for (const bad of ['', '0', '19', '2.5', 'six', '-1']) expect(digi…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |web| apps/web/src/settings/billing-logic.test.ts > SS-PLAT-131 T-0186 billing and approval logic > reads an amount as a decimal string without turning it into a number
+TypeError: amountInput is not a function
+ ❯ apps/web/src/settings/billing-logic.test.ts:31:12
+     29|
+     30|   it('reads an amount as a decimal string without turning it into a nu…
+     31|     expect(amountInput('1,000')).toBe('1000');
+       |            ^
+     32|     expect(amountInput(' $7,500.50 ')).toBe('7500.50');
+     33|     expect(amountInput('0.0001')).toBe('0.0001');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  |web| apps/web/src/settings/billing-logic.test.ts > SS-PLAT-131 T-0186 billing and approval logic > shows a threshold as dollars and cents
+TypeError: amountText is not a function
+ ❯ apps/web/src/settings/billing-logic.test.ts:41:12
+     39|
+     40|   it('shows a threshold as dollars and cents', () => {
+     41|     expect(amountText('10000.0000')).toBe('10,000.00');
+       |            ^
+     42|     expect(amountText('1000.5000')).toBe('1,000.50');
+     43|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |web| apps/web/src/settings/billing-logic.test.ts > SS-PLAT-131 T-0186 billing and approval logic > says the numbering and billing refusals in plain words
+TypeError: billingRefusal is not a function
+ ❯ apps/web/src/settings/billing-logic.test.ts:47:7
+     45|   it('says the numbering and billing refusals in plain words', () => {
+     46|     expect(
+     47|       billingRefusal(new AdminApiError(409, { error: 'NUMBER_SERIES_IN…
+       |       ^
+     48|     ).toMatch(/already been given a number/);
+     49|     expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |web| apps/web/src/settings/billing-logic.test.ts > SS-PLAT-131 T-0186 billing and approval logic > says the approval-amount refusals in plain words
+TypeError: approvalRefusal is not a function
+ ❯ apps/web/src/settings/billing-logic.test.ts:74:12
+     72|
+     73|   it('says the approval-amount refusals in plain words', () => {
+     74|     expect(approvalRefusal(new AdminApiError(400, { error: 'invalid_so…
+       |            ^
+     75|       /could not be saved/,
+     76|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
+   Start at  07:54:02
+   Duration  2.64s (transform 111ms, setup 372ms, import 93ms, tests 8ms, environment 1.78s)
+

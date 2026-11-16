@@ -16,6 +16,7 @@
     "@ledgerforce/bank": "workspace:*",
     "@ledgerforce/connector-stripe": "workspace:*",
     "@ledgerforce/db": "workspace:*",
+    "@ledgerforce/documents": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
     "@ledgerforce/journals": "workspace:*",
     "@ledgerforce/ledger": "workspace:*",

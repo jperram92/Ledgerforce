@@ -7,6 +7,7 @@ import { OpeningBalancesController } from './setup/opening-balances.controller.t
 import { SetupWizardController } from './setup/wizard.controller.ts';
 import { CompanySettingsController } from './settings/company-settings.controller.ts';
 import { TaxSettingsController } from './settings/tax-settings.controller.ts';
+import { BillingSettingsController } from './settings/billing-settings.controller.ts';
 import { PostingProfilesController } from './setup/posting-profiles.controller.ts';
 import { RemittanceAccountController } from './setup/remittance-account.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
@@ -156,6 +157,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   SetupWizardController,
   CompanySettingsController,
   TaxSettingsController,
+  BillingSettingsController,
   RemittanceAccountController,
   AuthController,
   LoginController,
@@ -214,6 +216,7 @@ class AppModule {
         SetupWizardController,
         CompanySettingsController,
         TaxSettingsController,
+        BillingSettingsController,
         RemittanceAccountController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),

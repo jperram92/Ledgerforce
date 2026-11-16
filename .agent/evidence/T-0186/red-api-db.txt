@@ -1,0 +1,182 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aba86349cab0cecec
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42213
+[31m[Nest] 3759  - [39m11/16/2026, 7:49:07 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: SoD: subject type bill has no create step for a reported creator
+    at historyOf [90m(/home/user/Ledgerforce/.claude/worktrees/agent-aba86349cab0cecec/[39mapps/api/src/sod/sod.service.ts:67:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at checkSod [90m(/home/user/Ledgerforce/.claude/worktrees/agent-aba86349cab0cecec/[39mapps/api/src/sod/sod.service.ts:186:19[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-aba86349cab0cecec/[39mapps/api/src/tenancy/tenant.interceptor.ts:140:26
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-aba86349cab0cecec/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-aba86349cab0cecec/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+ ❯ |api-db| apps/api/src/sod/sod.db.test.ts (27 tests | 1 failed) 1840ms
+     × SS-PLAT-131 settings: a change needs an Idempotency-Key; without one nothing is written [T-0186] 47ms
+ ❯ |api-db| apps/api/src/settings/billing-settings.db.test.ts (7 tests | 7 failed) 1980ms
+     × SS-PLAT-131 GET /setup/billing shows nothing set up yet and the accounts that may be the Stripe clearing account [T-0186] 31ms
+     × SS-PLAT-131 PUT /setup/billing/series creates the invoice and credit-note series; the same values again change nothing [T-0186] 23ms
+     × SS-PLAT-131 a series is refused in plain words: unknown code, bad prefix, and a change after a number was issued [T-0186] 3ms
+     × SS-PLAT-131 POST /setup/billing/formats/standard adds the standard formats once [T-0186] 8ms
+     × SS-PLAT-131 PUT /setup/billing/invoice saves the brand colour, terms and payment methods; a repeat changes nothing; bad values are refused [T-0186] 14ms
+     × SS-PLAT-131 PUT /setup/billing/stripe sets the clearing account; unsuitable accounts are refused; then step 8 has nothing missing [T-0186] 9ms
+     × SS-PLAT-131 writes need settings.setup.manage and an Idempotency-Key; reads need settings.read; another tenant's company is 404 [T-0186] 24ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-settings.db.test.ts > SS-PLAT-131: numbering and billing over HTTP (wizard step 8) > SS-PLAT-131 GET /setup/billing shows nothing set up yet and the accounts that may be the Stripe clearing account [T-0186]
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/settings/billing-settings.db.test.ts:104:22
+    102|   it('SS-PLAT-131 GET /setup/billing shows nothing set up yet and the …
+    103|     const r = await call('GET', `/setup/billing?company_id=${co}`, 'ac…
+    104|     expect(r.status).toBe(200);
+       |                      ^
+    105|     const b = await json(r);
+    106|     expect(b).toMatchObject({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-settings.db.test.ts > SS-PLAT-131: numbering and billing over HTTP (wizard step 8) > SS-PLAT-131 PUT /setup/billing/series creates the invoice and credit-note series; the same values again change nothing [T-0186]
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/settings/billing-settings.db.test.ts:139:22
+    137|     const body = { company_id: co, code: 'ar_invoice_document', prefix…
+    138|     const r = await call('PUT', '/setup/billing/series', 'fa', { body …
+    139|     expect(r.status).toBe(200);
+       |                      ^
+    140|     expect(await json(r)).toEqual({
+    141|       series: {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-settings.db.test.ts > SS-PLAT-131: numbering and billing over HTTP (wizard step 8) > SS-PLAT-131 a series is refused in plain words: unknown code, bad prefix, and a change after a number was issued [T-0186]
+AssertionError: expected 404 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 404
+
+ ❯ apps/api/src/settings/billing-settings.db.test.ts:171:24
+    169|       body: { company_id: co, code: 'journal', prefix: 'J-', pad_width…
+    170|     });
+    171|     expect(bad.status).toBe(400);
+       |                        ^
+    172|     expect(await json(bad)).toMatchObject({ error: 'invalid_request' }…
+    173|     const prefix = await call('PUT', '/setup/billing/series', 'fa', {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-settings.db.test.ts > SS-PLAT-131: numbering and billing over HTTP (wizard step 8) > SS-PLAT-131 POST /setup/billing/formats/standard adds the standard formats once [T-0186]
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ apps/api/src/settings/billing-settings.db.test.ts:199:22
+    197|       body: { company_id: co },
+    198|     });
+    199|     expect(r.status).toBe(201);
+       |                      ^
+    200|     const { inserted } = await json(r);
+    201|     expect(inserted).toBeGreaterThan(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-settings.db.test.ts > SS-PLAT-131: numbering and billing over HTTP (wizard step 8) > SS-PLAT-131 PUT /setup/billing/invoice saves the brand colour, terms and payment methods; a repeat changes nothing; bad values are refused [T-0186]
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/settings/billing-settings.db.test.ts:227:22
+    225|     };
+    226|     const r = await call('PUT', '/setup/billing/invoice', 'fa', { body…
+    227|     expect(r.status).toBe(200);
+       |                      ^
+    228|     expect(await json(r)).toEqual({
+    229|       invoice: {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-settings.db.test.ts > SS-PLAT-131: numbering and billing over HTTP (wizard step 8) > SS-PLAT-131 PUT /setup/billing/stripe sets the clearing account; unsuitable accounts are refused; then step 8 has nothing missing [T-0186]
+AssertionError: 01a1e354-d4a2-7dd2-8422-e8e0ae342e55: expected 404 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 404
+
+ ❯ apps/api/src/settings/billing-settings.db.test.ts:273:29
+    271|         body: { company_id: co, clearing_account_id: bad },
+    272|       });
+    273|       expect(r.status, bad).toBe(422);
+       |                             ^
+    274|       expect(await json(r)).toMatchObject({ error: 'INVALID_CLEARING_A…
+    275|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-settings.db.test.ts > SS-PLAT-131: numbering and billing over HTTP (wizard step 8) > SS-PLAT-131 writes need settings.setup.manage and an Idempotency-Key; reads need settings.read; another tenant's company is 404 [T-0186]
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/settings/billing-settings.db.test.ts:290:24
+    288|     const body = { company_id: co, code: 'ar_invoice_document', prefix…
+    289|     const acc = await call('PUT', '/setup/billing/series', 'accountant…
+    290|     expect(acc.status).toBe(403);
+       |                        ^
+    291|     expect(await json(acc)).toMatchObject({ permission: 'settings.setu…
+    292|     const clerk = await call('GET', `/setup/billing?company_id=${co}`,…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  |api-db| apps/api/src/sod/sod.db.test.ts > SS-PLAT-63: SoD runs after MFA, permission and step-up, fails closed and is managed by the Owner > SS-PLAT-131 settings: a change needs an Idempotency-Key; without one nothing is written [T-0186]
+AssertionError: expected 201 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 201
+
+ ❯ apps/api/src/sod/sod.db.test.ts:621:24
+    619|       null,
+    620|     );
+    621|     expect(res.status).toBe(400);
+       |                        ^
+    622|     expect(await res.json()).toEqual({ error: 'idempotency_key_require…
+    623|     expect(await rows()).toBe(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  8 failed | 26 passed (34)
+   Start at  07:48:59
+   Duration  11.77s (transform 3.34s, setup 0ms, import 6.52s, tests 3.82s, environment 0ms)
+

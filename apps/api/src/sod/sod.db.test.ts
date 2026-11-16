@@ -12,6 +12,7 @@
  * own tables.
  */
 import 'reflect-metadata';
+import { randomUUID } from 'node:crypto';
 import { Body, Controller, HttpCode, Param, Post } from '@nestjs/common';
 import { createTestDatabase, type TestDatabase } from '@ledgerforce/db/testing';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -160,12 +161,21 @@ let tdb: TestDatabase;
 let api: Api;
 const cookies = new Map<Who, string>();
 
-async function call(method: string, path: string, who?: Who, body?: unknown): Promise<Response> {
+async function call(
+  method: string,
+  path: string,
+  who?: Who,
+  body?: unknown,
+  /** POST /sod/settings needs an Idempotency-Key (ADR-0085): a fresh one unless null. */
+  key?: string | null,
+): Promise<Response> {
   const headers: Record<string, string> = {};
   const c = who ? cookies.get(who) : undefined;
   if (c) headers.cookie = `lf_session=${c}`;
   headers['sec-fetch-site'] = 'same-origin';
   if (body !== undefined) headers['content-type'] = 'application/json';
+  const k = key === undefined ? `sod-${randomUUID()}` : key;
+  if (method === 'POST' && path === '/sod/settings' && k !== null) headers['idempotency-key'] = k;
   return fetch(`${api.url}${path}`, {
     method,
     headers,
@@ -594,6 +604,26 @@ describe('SS-PLAT-63: SoD runs after MFA, permission and step-up, fails closed a
       reason: 'no change',
     });
     expect(same.status).toBe(200);
+  });
+
+  it('SS-PLAT-131 settings: a change needs an Idempotency-Key; without one nothing is written [T-0186]', async () => {
+    const rows = async () =>
+      (await tdb.admin.query<{ n: number }>('SELECT count(*)::int AS n FROM app.sod_settings'))
+        .rows[0]?.n ?? 0;
+    const before = await rows();
+    const res = await call(
+      'POST',
+      '/sod/settings',
+      'ownerA',
+      { thresholds: { journal_approval: '7500' }, reason: 'raise the journal limit' },
+      null,
+    );
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: 'idempotency_key_required' });
+    expect(await rows()).toBe(before);
+    // A body that is also invalid still answers the key error first: nothing is read.
+    const both = await call('POST', '/sod/settings', 'ownerA', { reason: '' }, null);
+    expect(await both.json()).toEqual({ error: 'idempotency_key_required' });
   });
 
   it('the weekly report needs audit_log.read and a Monday; acknowledging needs settings.sod.manage', async () => {
