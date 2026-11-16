@@ -31,6 +31,8 @@ type Screen =
   | '/settings/sync-issues'
   | '/settings/company'
   | '/settings/tax'
+  | '/settings/billing'
+  | '/settings/approvals'
   | '/settings/setup/opening-balances'
   | '/accounting/posting-profiles';
 export interface Where {
@@ -40,6 +42,8 @@ export interface Where {
   text: string;
   /** Said after the link. */
   after?: string;
+  /** A second screen for the same step (T-0186: step 10's approval amounts). */
+  also?: { to: Screen; name: string; text: string };
 }
 
 const ELSEWHERE =
@@ -78,7 +82,12 @@ export const STEP_WHERE: Record<number, Where> = {
     name: 'Posting profiles',
     text: 'See every customer and supplier type against every product type, and fill the gaps, on',
   },
-  8: { text: ELSEWHERE },
+  // T-0186: numbering and billing (the remittance account has its own screen, T-0183).
+  8: {
+    to: '/settings/billing',
+    name: 'Numbering and billing',
+    text: 'Set up invoice numbers, billing formats, the invoice colour, payment terms and how customers pay, on',
+  },
   // T-0177: the opening balances screen (DL-0651).
   9: {
     to: '/settings/setup/opening-balances',
@@ -89,8 +98,12 @@ export const STEP_WHERE: Record<number, Where> = {
     to: '/settings/users',
     name: 'People and roles',
     text: 'Give someone the Owner or Finance Admin role on',
-    after:
-      'Approval amounts have no LedgerForce screen yet: they are entered when your organisation is set up.',
+    // T-0186: the approval amounts screen.
+    also: {
+      to: '/settings/approvals',
+      name: 'Approval amounts',
+      text: 'The Owner saves the approval amounts on',
+    },
   },
 };
 

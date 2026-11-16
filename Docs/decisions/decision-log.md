@@ -3808,3 +3808,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0167 finding 4: none is needed for step 8; each needs its own transport or picker and tests. Keeps the card near its estimate.
 - Alternatives: build all on T-0186 (rejected: size).
 - ADR: none · Status: accepted
+
+### DL-0715 — Numbering-and-billing and approval-amount screens: wording, exact amounts, wizard links
+- Date: 2026-11-16 · By: claude · Task: T-0186 · Category: ui
+- Decision: `/settings/billing` (step 8) and `/settings/approvals` (step 10), listed on Settings and linked from the wizard (step 10 keeps its People and roles link and gains a second link through a new optional `also` field of `STEP_WHERE`). An issued series is shown, not offered for change. The Stripe section asks for the clearing account only once card payments are accepted. Approval amounts are put into the inputs exactly (`amountEdit`: only zeros after the cents dropped), so re-saving never rounds a stored 4-decimal value; typed amounts are read as strings (`amountInput`, commas and a leading $ allowed), never as numbers. The suggested amounts are labelled as suggestions until saved (design §11.2 placeholders, DL-0131). One primary button per screen (Save invoice settings; Save approval amounts). The brand colour is a text field (#RRGGBB) rather than a colour picker, which would silently submit black when unset.
+- Why: P12 plain words, apps/web money rule, SS-PLAT-131. TDD note: the unit tests of the helpers and every API/ledger test were seen RED first; the two Playwright specs were written after the screens, so their RED was not captured (the approvals spec did fail first on a real defect — the form remounted on save and lost its status message — fixed before green).
+- Alternatives: format inputs with `formatMoney` (rejected: rounds to cents, would change 4-decimal thresholds on re-save); a single link for step 10 (rejected: users/roles and amounts are two screens).
+- ADR: ADR-0085 · Status: accepted

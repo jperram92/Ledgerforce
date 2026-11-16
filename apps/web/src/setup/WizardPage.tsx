@@ -91,6 +91,12 @@ function Where({ step }: { step: number }) {
         </>
       ) : null}
       {w.after ? ` ${w.after}` : null}
+      {w.also ? (
+        <>
+          {' '}
+          {w.also.text} <Link to={w.also.to}>{w.also.name}</Link>.
+        </>
+      ) : null}
     </p>
   );
 }

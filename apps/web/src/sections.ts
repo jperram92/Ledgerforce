@@ -9,6 +9,8 @@ export interface SubPage {
     | '/settings/setup'
     | '/settings/company'
     | '/settings/tax'
+    | '/settings/billing'
+    | '/settings/approvals'
     | '/settings/users'
     | '/reports/control-exceptions'
     | '/reports/audit-log'
@@ -247,6 +249,17 @@ export const SECTIONS: readonly Section[] = [
         to: '/settings/tax',
         name: 'Tax settings',
         text: 'How you account for GST, how often you lodge the BAS, and the tax codes.',
+      },
+      // Settings screens for setup steps 8 and 10 (T-0186).
+      {
+        to: '/settings/billing',
+        name: 'Numbering and billing',
+        text: 'Invoice and credit note numbers, billing formats, invoice colour, payment terms and how customers pay.',
+      },
+      {
+        to: '/settings/approvals',
+        name: 'Approval amounts',
+        text: 'The amounts above which a second person must approve, and small-team mode.',
       },
       {
         to: '/settings/users',
