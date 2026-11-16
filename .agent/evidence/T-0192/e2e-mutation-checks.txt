@@ -1,0 +1,13 @@
+# T-0192 AC-3 mutation checks (temporary edits, reverted; restored files verified with cmp)
+## M1: apps/web/src/admin/stepUp.ts return_to forced to '/' -> exit 1
+    Error: expect(locator).toBeVisible() failed
+    Error: element(s) not found
+    Error: expect(locator).toHaveValue(expected) failed
+    Error: element(s) not found
+  2 failed
+## M2: fake callback without Set-Cookie (old cookie refused after rotation) -> exit 1
+    Error: expect(locator).toBeVisible() failed
+    Error: element(s) not found
+    Error: expect(locator).toHaveValue(expected) failed
+    Error: element(s) not found
+  2 failed
