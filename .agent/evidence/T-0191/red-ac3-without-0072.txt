@@ -1,0 +1,59 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a17679ed25a0d45ce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37183
+ ❯ |api-db| apps/api/src/setup/remittance-account-notice.db.test.ts (2 tests | 2 failed) 1023ms
+     × SS-UC01-19 another tenant's approved change notifies its own Owners and Finance Admins and nobody here [T-0191] 85ms
+     × SS-UC01-19 this tenant’s approved change notifies only this tenant’s people; the other tenant sees no new notice [T-0191] 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/setup/remittance-account-notice.db.test.ts > SS-UC01-19: remittance change notices stay inside their tenant (HTTP) > SS-UC01-19 another tenant's approved change notifies its own Owners and Finance Admins and nobody here [T-0191]
+error: relation "app.remittance_account_notice" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ noticesOf apps/api/src/setup/remittance-account-notice.db.test.ts:85:5
+     83| const noticesOf = async (tenant: string) =>
+     84|   (
+     85|     await f.admin.query<{ recipient_user_id: string | null; change_id:…
+       |     ^
+     86|       `SELECT recipient_user_id, change_id FROM app.remittance_account…
+     87|         ORDER BY recipient_user_id`,
+ ❯ apps/api/src/setup/remittance-account-notice.db.test.ts:168:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-db| apps/api/src/setup/remittance-account-notice.db.test.ts > SS-UC01-19: remittance change notices stay inside their tenant (HTTP) > SS-UC01-19 this tenant’s approved change notifies only this tenant’s people; the other tenant sees no new notice [T-0191]
+error: relation "app.remittance_account_notice" does not exist
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ apps/api/src/setup/remittance-account-notice.db.test.ts:95:15
+     93| const visibleIn = (tenant: string) =>
+     94|   withTenant(f.db, tenant, async (trx) => {
+     95|     const r = await sql<{
+       |               ^
+     96|       change_id: string;
+     97|     }>`SELECT change_id FROM app.remittance_account_notice`.execute(tr…
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ apps/api/src/setup/remittance-account-notice.db.test.ts:95:15
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ apps/api/src/setup/remittance-account-notice.db.test.ts:178:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  08:00:48
+   Duration  5.13s (transform 1.55s, setup 0ms, import 2.86s, tests 1.02s, environment 0ms)
+

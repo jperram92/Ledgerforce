@@ -1,0 +1,71 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a17679ed25a0d45ce
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33979
+ ❯ |db| packages/modules/bank/src/remittance.db.test.ts (6 tests | 3 failed) 716ms
+     × SS-UC01-18 archiving releases the designation; re-activating prints nothing; a new approval prints again [T-0191] 20ms
+     × SS-UC01-18 a designation left on an archived account by an older schema is released on re-activation [T-0191] 5ms
+     × SS-UC01-18 the database refuses to designate an archived account, even with an approved change [T-0191] 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/bank/src/remittance.db.test.ts > SS-UC01-18: an archived remittance account needs a new approval to print again > SS-UC01-18 archiving releases the designation; re-activating prints nothing; a new approval prints again [T-0191]
+AssertionError: expected '01a1e352-dbbc-7181-a3bd-0a6262627ef2' to be null
+
+- Expected:
+null
+
++ Received:
+"01a1e352-dbbc-7181-a3bd-0a6262627ef2"
+
+ ❯ packages/modules/bank/src/remittance.db.test.ts:145:32
+    143|     expect(await designated()).toBe(operating);
+    144|     await setStatus(operating, 'archived');
+    145|     expect(await designated()).toBeNull();
+       |                                ^
+    146|     const audit = await f.admin.query<{ after: string; actor_type: str…
+    147|       `SELECT after::text AS after, actor_type FROM audit.audit_log
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  |db| packages/modules/bank/src/remittance.db.test.ts > SS-UC01-18: an archived remittance account needs a new approval to print again > SS-UC01-18 a designation left on an archived account by an older schema is released on re-activation [T-0191]
+AssertionError: expected '01a1e352-dbbc-7181-a3bd-0a6262627ef2' to be null
+
+- Expected:
+null
+
++ Received:
+"01a1e352-dbbc-7181-a3bd-0a6262627ef2"
+
+ ❯ packages/modules/bank/src/remittance.db.test.ts:185:32
+    183|     expect(await designated()).toBe(operating);
+    184|     await setStatus(operating, 'active');
+    185|     expect(await designated()).toBeNull();
+       |                                ^
+    186|     expect(await f.inTenant((trx) => remittanceDetailsOf(trx, kms, f.c…
+    187|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |db| packages/modules/bank/src/remittance.db.test.ts > SS-UC01-18: an archived remittance account needs a new approval to print again > SS-UC01-18 the database refuses to designate an archived account, even with an approved change [T-0191]
+RemittanceAccountError: that is already the remittance account
+ ❯ fail packages/modules/ar/src/remittance-account.ts:70:9
+     68| const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f…
+     69| const fail = (code: RemittanceAccountErrorCode, message: string): neve…
+     70|   throw new RemittanceAccountError(code, message);
+       |         ^
+     71| };
+     72| const uuid = (v: unknown, name: string): string =>
+ ❯ requestRemittanceAccountChange packages/modules/ar/src/remittance-account.ts:214:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/bank/src/remittance.db.test.ts:193:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 3 passed (6)
+   Start at  07:46:57
+   Duration  4.05s (transform 995ms, setup 0ms, import 1.18s, tests 716ms, environment 0ms)
+

@@ -867,6 +867,27 @@ export interface RemittanceAccountChangeTable {
   reason: Generated<string | null>;
 }
 
+/**
+ * Migration 0072 (T-0191, ADR-0086): notice of an approved remittance account change to each
+ * active Owner and Finance Admin, written by the database. lf_app reads it and records delivery
+ * only (status, sent_at); it never inserts.
+ */
+export interface RemittanceAccountNoticeTable {
+  id: ColumnType<string, never, never>;
+  tenant_id: ColumnType<string, never, never>;
+  company_id: ColumnType<string, never, never>;
+  change_id: ColumnType<string, never, never>;
+  kind: ColumnType<'remittance_account_changed', never, never>;
+  recipient_user_id: ColumnType<string | null, never, never>;
+  recipient_name: ColumnType<string | null, never, never>;
+  recipient_email: ColumnType<string | null, never, never>;
+  status: ColumnType<'pending' | 'sent' | 'failed' | 'no_recipient', never, 'sent' | 'failed'>;
+  /** Masked to the last 3 digits (ADR-0018). */
+  payload: ColumnType<Record<string, unknown>, never, never>;
+  created_at: ColumnType<Date, never, never>;
+  sent_at: ColumnType<Date | null, never, Date | null>;
+}
+
 /** Migration 0067 (T-0158, ADR-0071): GST basis and BAS frequency per company, effective-dated. */
 export interface TaxSettingsTable {
   id: Generated<string>;
@@ -1368,6 +1389,7 @@ export interface Database {
   'app.customer_refund': CustomerRefundTable;
   'app.customer_refund_approval': CustomerRefundApprovalTable;
   'app.remittance_account_change': RemittanceAccountChangeTable;
+  'app.remittance_account_notice': RemittanceAccountNoticeTable;
   'app.opening_balance': OpeningBalanceTable;
   'app.opening_balance_item': OpeningBalanceItemTable;
   'app.payment_batch_refund': PaymentBatchRefundTable;
