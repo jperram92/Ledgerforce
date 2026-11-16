@@ -4,7 +4,7 @@
  * the settings are entered. Someone with settings.setup.manage completes the open step, or declares
  * "no history" on step 9 with a reason. The API (T-0157, ADR-0075) derives every state and enforces
  * order, validation, permission and audit; this screen only reads and explains it. It builds no
- * settings forms: steps 1 and 3 link to theirs (T-0176); the others say plainly where (DL-0601).
+ * settings forms: steps 1 and 3 link to theirs (T-0176), step 4 to Bank accounts (T-0185); the others say plainly where (DL-0601).
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';

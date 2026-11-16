@@ -55,10 +55,11 @@ describe('T-0091 setup wizard logic', () => {
     expect(Object.keys(STEP_WHERE).map(Number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
     expect(STEP_WHERE[2]).toMatchObject({ to: '/accounting/chart', name: 'Chart of accounts' });
     expect(STEP_WHERE[10]).toMatchObject({ to: '/settings/users', name: 'People and roles' });
-    // T-0176: steps 1 and 3 link to their settings screens; step 4 still has none (T-0185).
+    // T-0176: steps 1 and 3 link to their settings screens; T-0185: step 4 to Bank accounts.
     expect(STEP_WHERE[1]).toMatchObject({ to: '/settings/company', name: 'Company details' });
     expect(STEP_WHERE[3]).toMatchObject({ to: '/settings/tax', name: 'Tax settings' });
-    expect(STEP_WHERE[4]?.text).toMatch(/no LedgerForce screen/);
+    expect(STEP_WHERE[4]).toMatchObject({ to: '/settings/bank-accounts', name: 'Bank accounts' });
+    expect(STEP_WHERE[4]?.text).not.toMatch(/no LedgerForce screen/);
     // T-0177: step 9 links to the opening balances screen.
     expect(STEP_WHERE[9]).toMatchObject({
       to: '/settings/setup/opening-balances',

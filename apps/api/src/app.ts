@@ -9,6 +9,7 @@ import { CompanySettingsController } from './settings/company-settings.controlle
 import { TaxSettingsController } from './settings/tax-settings.controller.ts';
 import { PostingProfilesController } from './setup/posting-profiles.controller.ts';
 import { RemittanceAccountController } from './setup/remittance-account.controller.ts';
+import { BankAccountsSettingsController } from './setup/bank-accounts-settings.controller.ts';
 import { ArCreditNotesController } from './ar/credit-notes.controller.ts';
 import { ArInvoicesController } from './ar/invoices.controller.ts';
 import { ArReminderPauseController } from './ar/reminder-pause.controller.ts';
@@ -157,6 +158,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   CompanySettingsController,
   TaxSettingsController,
   RemittanceAccountController,
+  BankAccountsSettingsController,
   AuthController,
   LoginController,
 ];
@@ -215,6 +217,7 @@ class AppModule {
         CompanySettingsController,
         TaxSettingsController,
         RemittanceAccountController,
+        BankAccountsSettingsController,
         ...(sessions ? [AuthController] : []),
         ...(oidc ? [LoginController] : []),
         ...testControllers,

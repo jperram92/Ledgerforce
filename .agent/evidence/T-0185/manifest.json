@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0185",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080425-SS-PLAT-130-bank-accounts-empty-1440.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 1440 [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:04:25.213Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080427-SS-PLAT-130-bank-accounts-added-1440.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 1440 [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:04:27.151Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080429-SS-PLAT-130-bank-accounts-read-only-1440.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: an Accountant sees the bank accounts read-only, masked [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:04:29.459Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080431-SS-PLAT-130-bank-accounts-empty-390.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 390 [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:04:31.693Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080433-SS-PLAT-130-bank-accounts-added-390.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 390 [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:04:33.002Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080435-SS-PLAT-130-bank-accounts-step-up-1440.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: adding asks for a fresh sign-in first, and keeps nothing typed while away [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:04:35.425Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080614-SS-PLAT-130-bank-accounts-empty-1440.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 1440 [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:06:14.183Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080616-SS-PLAT-130-bank-accounts-added-1440.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 1440 [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:06:16.311Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080617-SS-PLAT-130-bank-accounts-read-only-1440.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: an Accountant sees the bank accounts read-only, masked [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:06:17.941Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080620-SS-PLAT-130-bank-accounts-empty-390.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 390 [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:06:20.066Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080621-SS-PLAT-130-bank-accounts-added-390.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 390 [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:06:21.473Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0185/20261116-080626-SS-PLAT-130-bank-accounts-step-up-1440.png",
+      "test": "web/settings-bank-accounts.spec.ts › SS-PLAT-130: adding asks for a fresh sign-in first, and keeps nothing typed while away [T-0185]",
+      "commit": "282ec0e6d2f2-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T08:06:26.412Z",
+      "result": "passed"
+    }
+  ]
+}

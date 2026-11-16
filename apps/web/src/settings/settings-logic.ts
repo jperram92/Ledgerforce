@@ -82,3 +82,37 @@ export function taxRefusal(error: unknown): string | null {
   if (error.code === 'invalid_request') return sentence(messageOf(error));
   return null;
 }
+
+/**
+ * A bank account number as the screen says it (T-0185, design §6.6): only the last 3 characters
+ * of what the API gave (already `***` + last 3), never more.
+ */
+export function bankNumberText(masked: string): string {
+  const tail = masked.replace(/^\*+/, '').slice(-3);
+  return tail ? `ending ${tail}` : 'not shown';
+}
+
+/** The currency a new bank account starts with: its GL account's, else the base currency. */
+export const bankCurrencyFor = (
+  gl: { currency: string | null } | undefined,
+  baseCurrency: string,
+): string => gl?.currency ?? baseCurrency;
+
+/** A bank-account refusal in plain words (ADR-0084); null for anything else. */
+export function bankRefusal(error: unknown): string | null {
+  if (!(error instanceof AdminApiError)) return null;
+  switch (error.code) {
+    case 'GL_ACCOUNT_IN_USE':
+      return 'This GL account already has a bank account. Choose another GL account, or add a bank GL account on Chart of accounts first.';
+    case 'GL_ACCOUNT_NOT_BANK':
+      return 'That GL account cannot take a bank account: choose an active bank account in the chart (an asset of subtype bank) in the same currency.';
+    case 'UNKNOWN_GL_ACCOUNT':
+      return 'That GL account is no longer in the chart. Reload the page and choose again.';
+    case 'kms_not_configured':
+      return 'LedgerForce cannot store bank account numbers yet: the key service that encrypts them is not set up. Ask whoever runs your LedgerForce.';
+    case 'invalid_request':
+      return sentence(messageOf(error));
+    default:
+      return null;
+  }
+}

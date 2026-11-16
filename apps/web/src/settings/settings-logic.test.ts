@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { AdminApiError } from '../admin/client.ts';
 import {
   abnText,
+  bankCurrencyFor,
+  bankNumberText,
+  bankRefusal,
   companyRefusal,
   dayText,
   fiscalStart,
@@ -67,5 +70,35 @@ describe('T-0176 settings logic', () => {
       ),
     ).toMatch(/Choose the month the settings apply from/);
     expect(taxRefusal(new Error('boom'))).toBeNull();
+  });
+});
+
+describe('T-0185 bank accounts logic (SS-PLAT-130)', () => {
+  it('SS-PLAT-130 says a masked number in words and never shows more than the API gave', () => {
+    expect(bankNumberText('***678')).toBe('ending 678');
+    expect(bankNumberText('12345678')).toBe('ending 678');
+    expect(bankNumberText('')).toBe('not shown');
+  });
+
+  it('SS-PLAT-130 defaults the currency to the GL account’s, else the base currency', () => {
+    expect(bankCurrencyFor({ currency: 'USD' }, 'AUD')).toBe('USD');
+    expect(bankCurrencyFor({ currency: null }, 'AUD')).toBe('AUD');
+    expect(bankCurrencyFor(undefined, 'AUD')).toBe('AUD');
+  });
+
+  it('SS-PLAT-130 turns the bank account refusals into plain words', () => {
+    const e = (status: number, error: string, message = '') =>
+      new AdminApiError(status, { error, message });
+    expect(bankRefusal(e(409, 'GL_ACCOUNT_IN_USE', 'x'))).toMatch(
+      /already has a bank account.*Choose another GL account/,
+    );
+    expect(bankRefusal(e(422, 'GL_ACCOUNT_NOT_BANK'))).toMatch(/bank account in the chart/);
+    expect(bankRefusal(e(503, 'kms_not_configured'))).toMatch(/cannot store bank account numbers/);
+    expect(bankRefusal(e(404, 'UNKNOWN_GL_ACCOUNT'))).toMatch(/no longer in the chart/);
+    expect(bankRefusal(e(400, 'invalid_request', 'BSB must be 6 digits, got "06200"'))).toBe(
+      'BSB must be 6 digits, got "06200".',
+    );
+    expect(bankRefusal(new Error('x'))).toBeNull();
+    expect(bankRefusal(e(500, 'boom'))).toBeNull();
   });
 });

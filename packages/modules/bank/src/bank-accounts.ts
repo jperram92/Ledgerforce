@@ -69,12 +69,15 @@ function normaliseBsb(bsb: string): string {
   return `${digits.slice(0, 3)}-${digits.slice(3)}`;
 }
 
-export async function createCompanyBankAccount(
-  trx: Transaction<Database>,
-  kms: Kms,
-  companyId: string,
-  input: CompanyBankAccountInput,
-): Promise<string> {
+interface NormalisedInput {
+  bsb: string;
+  accountNumber: string;
+  name: string;
+  accountName: string;
+  mapping: CsvMapping | undefined;
+}
+
+function normaliseInput(input: CompanyBankAccountInput): NormalisedInput {
   const bsb = normaliseBsb(input.bsb);
   const accountNumber = input.accountNumber.replace(/\s+/g, '');
   check(
@@ -106,6 +109,25 @@ export async function createCompanyBankAccount(
       throw error;
     }
   }
+  return { bsb, accountNumber, name, accountName: input.accountName.trim(), mapping };
+}
+
+/**
+ * The checks createCompanyBankAccount applies, without writing: throws
+ * BankAccountValidationError with a message that never contains the account number (T-0185:
+ * a malformed request is refused before the replay test, RQ-0166).
+ */
+export function validateCompanyBankAccountInput(input: CompanyBankAccountInput): void {
+  normaliseInput(input);
+}
+
+export async function createCompanyBankAccount(
+  trx: Transaction<Database>,
+  kms: Kms,
+  companyId: string,
+  input: CompanyBankAccountInput,
+): Promise<string> {
+  const { bsb, accountNumber, name, accountName, mapping } = normaliseInput(input);
   const ids = await sql<{ id: string; tenant_id: string }>`
     SELECT app.uuid_generate_v7() AS id, current_setting('app.tenant_id', true) AS tenant_id`.execute(
     trx,
@@ -123,7 +145,7 @@ export async function createCompanyBankAccount(
       name,
       currency: input.currency,
       bsb,
-      account_name: input.accountName.trim(),
+      account_name: accountName,
       account_number_last3: accountNumber.slice(-3),
       account_number_ct: sealed.ciphertext,
       account_number_iv: sealed.iv,
@@ -139,6 +161,37 @@ export async function createCompanyBankAccount(
     })
     .execute();
   return row.id;
+}
+
+/**
+ * Whether a stored (masked) bank account is what a create request would have written: the replay
+ * test of `POST /setup/bank-accounts` (T-0185, RQ-0166, DL-0700). Compares, after this module's
+ * normalisation, the GL account, name, BSB, last 3 characters of the number, account name,
+ * currency and ABA details. Never decrypts: the full number is not compared (RQ-0166 finding 2).
+ * An archived account is never a replay. An input this module would refuse is never equal.
+ */
+export function sameCompanyBankAccount(
+  existing: MaskedCompanyBankAccount,
+  input: Omit<CompanyBankAccountInput, 'csvMapping' | 'createdBy'>,
+): boolean {
+  let n: NormalisedInput;
+  try {
+    n = normaliseInput(input);
+  } catch {
+    return false;
+  }
+  return (
+    existing.status === 'active' &&
+    existing.glAccountId === input.glAccountId &&
+    existing.name === n.name &&
+    existing.bsb === n.bsb &&
+    existing.accountNumber === `***${n.accountNumber.slice(-3)}` &&
+    existing.accountName === n.accountName &&
+    existing.currency === input.currency &&
+    existing.apcaUserId === (input.apcaUserId ?? null) &&
+    existing.abaUserName === (input.abaUserName ?? null) &&
+    existing.abaFiMnemonic === (input.abaFiMnemonic ?? null)
+  );
 }
 
 /** Masked bank accounts of a company (never decrypts). */

@@ -17,8 +17,9 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 137 |
-| todo | 25 |
-| **total** | **173** |
+| todo | 26 |
+| verifying | 2 |
+| **total** | **176** |
 
 | Phase | Cards |
 |---|---:|
@@ -216,8 +217,9 @@ graph LR
 | [T-0090](T-0090.md) | UI: close checklist and period status | MVP | review | T-0081, T-0078, T-0079, T-0148 | UC-10 | 1 |
 | [T-0091](T-0091.md) | UI: setup wizard | MVP | verifying | T-0081, T-0080, T-0123, T-0157 | — | 0 |
 | [T-0176](T-0176.md) | UI: settings forms for setup wizard steps 1 and 3 (steps 4, 8, 10 → T-0185, T-0186) — split from T-0091 | MVP | verifying | T-0091 | — | 0 |
-| [T-0185](T-0185.md) | UI: bank accounts settings screen (wizard step 4) — split from T-0176 | MVP | todo | T-0176 | — | 0 |
+| [T-0185](T-0185.md) | UI: bank accounts settings screen (wizard step 4) — split from T-0176 | MVP | verifying | T-0176 | — | 0 |
 | [T-0186](T-0186.md) | UI: numbering and billing (step 8) and approval amounts (step 10) settings screens — split from T-0176 | MVP | todo | T-0176 | — | 0 |
+| [T-0193](T-0193.md) | Bank: change ABA details or archive a company bank account over HTTP — found in T-0185 | MVP | todo | T-0185 | — | 0 |
 | [T-0177](T-0177.md) | UI: opening balances import and posting-profile matrix screens (wizard steps 9 and 7) — split from T-0091 | MVP | todo | T-0091 | — | 0 |
 | [T-0176](T-0176.md) | UI: settings forms for setup wizard steps 1, 3, 4, 8 and 10 — split from T-0091 | MVP | todo | T-0091 | — | 0 |
 | [T-0177](T-0177.md) | UI: opening balances import screen (wizard step 9) — split from T-0091; matrix moved to T-0187/T-0188 (DL-0650) | MVP | verifying | T-0091 | — | 0 |

@@ -1,0 +1,9 @@
+ ✓ |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-130: company bank accounts over HTTP (wizard step 4) > SS-PLAT-130 GET /setup/bank-accounts lists no accounts yet and the bank GL accounts that can take one [T-0185] 173ms
+ ✓ |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-130: company bank accounts over HTTP (wizard step 4) > SS-PLAT-130 adding needs settings.setup.manage and a fresh step-up; reading needs settings.read [T-0185] 207ms
+ ✓ |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-130: company bank accounts over HTTP (wizard step 4) > SS-PLAT-130 POST adds the account sealed, answers and audits it masked, and step 4 empties [T-0185] 77ms
+ ✓ |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-130: company bank accounts over HTTP (wizard step 4) > SS-PLAT-130 the same request again is a replay that writes nothing; a different one on the same GL account is 409 [T-0185] 25ms
+ ✓ |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-130: company bank accounts over HTTP (wizard step 4) > SS-PLAT-130 two first requests racing on one GL account: one is added, the other is 409 [T-0185] 33ms
+ ✓ |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-130: company bank accounts over HTTP (wizard step 4) > SS-PLAT-130 refusals: no key 400, malformed 400, unknown GL account 404, not a bank account or another currency 422, another tenant 404 [T-0185] 77ms
+ ✓ |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-130: company bank accounts over HTTP (wizard step 4) > SS-PLAT-130 without a key service the add is 503 kms_not_configured and nothing is written [T-0185] 9ms
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
