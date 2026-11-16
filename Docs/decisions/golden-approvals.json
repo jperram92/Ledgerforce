@@ -3,12 +3,14 @@
   "approvals": [
     {
       "path": "Docs/accounting/postings.md",
-      "commit": "983cc919f4911c5dd55e6e8bf9ff1e1f6a2ff404",
+      "commit": "e6f2af793fd163d06a6eef111a1fb4fb3c5711ad",
       "decisions": [
-        "DL-0405",
-        "DL-0263",
-        "DL-0256",
-        "DL-0258"
+        "DL-0755",
+        "DL-0756",
+        "DL-0751",
+        "DL-0752",
+        "DL-0753",
+        "DL-0740"
       ]
     }
   ]
