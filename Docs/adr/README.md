@@ -125,5 +125,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0087](0087-rotate-session-id-on-step-up.md) | A step-up re-authentication rotates the session id and cookie (ASVS 5.0 7.2.4) | security | yes (delegated, DL-0691) | Accepted (supersedes ADR-0025 in part) |
 | [0088](0088-opening-fx-items-carried-at-old-system-base.md) | Foreign-currency opening items are carried at the old system's base amount, with currency, amount and rate | accounting | yes (delegated, DL-0263) | Accepted |
 | [0089](0089-single-supply-gst-attribution.md) | Single-supply GST attribution on accruals: whole-supply coded line with contra, GST_ATTRIBUTED_UNBILLED asset, code-driven BAS unchanged | accounting | yes (delegated, DL-0263) | Accepted |
+| [0094](0094-company-bank-account-aba-details-and-archive.md) | Company bank account: change the ABA details in place, or archive it, over HTTP (grant + step-up + audit, no SoD) | security | yes (delegated, DL-0691) | Accepted (supersedes ADR-0084 in part) |
 
 Next free number: **0055** (0055–0060 are reserved for the DL-0409 parallel round) (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

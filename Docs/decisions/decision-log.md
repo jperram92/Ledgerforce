@@ -3997,3 +3997,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0169 finding 7. The cookie is HttpOnly and the SPA never reads or caches it. StepUpPrompt already returns to the same path and keeps a typed note in sessionStorage. The real rotation is proven against the real API, database and OpenID Provider in SS-PLAT-139/136. The e2e spec proves the browser side of the contract. That follows the existing practice in the web e2e suites, which use route-faked APIs.
 - Alternatives: a web change to re-fetch `/auth/me` after a step-up (rejected: nothing reads session state, so it would add code with no behaviour behind it); an e2e test against the real API plus an IdP (rejected: no such harness exists for the web suites; that would be a separate card).
 - ADR: ADR-0087 · Status: accepted
+
+### DL-0800 — Company bank account ABA details editable in place; archive over HTTP; no SoD (ADR-0094 accepted under DL-0691)
+- Date: 2026-11-16 · By: claude · Task: T-0193 · Category: security
+- Decision: Accept ADR-0094. Migration 0074 grants `lf_app` UPDATE on `apca_user_id`, `aba_user_name`, `aba_fi_mnemonic` of `app.bank_account` only, with a trigger refusing a change of those columns on an archived row. `PUT /setup/bank-accounts/:id/aba` and `POST /setup/bank-accounts/:id/archive` need `settings.setup.manage` + step-up 300 s + Idempotency-Key, audit a masked before/after, and answer the same state again 200 `changed:false`. No SoD step.
+- Why: RQ-0176 — the ABA header (type 0) identifies the company to its own bank; payees come from supplier bank details (SoD, T-0055) and the trace account from the immutable BSB and sealed number, so the change cannot redirect a payment; files come only from released batches (SoD + step-up). Design §6.5 rule 2 names supplier and employee details. ERPNext and Odoo allow both edits with a manager role only; LedgerForce adds step-up and audit (§6.2, §6.8).
+- Alternatives: maker-checker on ABA changes (no money redirected; batch release already SoD); grant on BSB/number too (changes where returns go in place); DB-trigger audit (a second row beside the interceptor's).
+- ADR: ADR-0094 · Status: accepted
+
+### DL-0801 — SS-PLAT-39 immutability assertion follows ADR-0094 (not weakened)
+- Date: 2026-11-16 · By: claude · Task: T-0193 · Category: security
+- Decision: In `packages/modules/bank/src/statements.db.test.ts`, the assertion that `lf_app` cannot `UPDATE … SET apca_user_id` is replaced by assertions that `lf_app` cannot update `bsb`, `account_name`, `account_number_last3`, `account_number_ct`, `currency` or `gl_account_id` (each 42501). The new grant is proven in `packages/db/src/bank-account-aba.db.test.ts`.
+- Why: ADR-0094 supersedes the 0013 rule for the three ABA columns only; the test now checks every payment-identity column instead of one column that is no longer immutable by decision. RED evidence of the old assertion failing after the migration is in `.agent/evidence/T-0193/`.
+- Alternatives: keep the old assertion (impossible with the accepted grant).
+- ADR: ADR-0094 · Status: accepted
+
+### DL-0802 — Archiving the designated remittance account is allowed and reported
+- Date: 2026-11-16 · By: claude · Task: T-0193 · Category: security
+- Decision: The archive route does not refuse the designated remittance account. The 0072 trigger releases the designation and audits it; the route reads the designation before and after and answers `remittance_released: true`, and the screen tells the user that invoices print no account until a new change is approved.
+- Why: RQ-0176 finding 2 / RQ-0168 Q1: release is fail-safe and audited; refusing would make retiring a closed account depend on a second approver first designating another.
+- Alternatives: refuse with 409 (blocks retirement); force a new designation in the same request (needs the maker-checker of ADR-0080 inside an archive).
+- ADR: ADR-0094, ADR-0086 · Status: accepted
+
+### DL-0803 — ABA PUT replaces all three fields; archived accounts are not edited or re-activated over HTTP
+- Date: 2026-11-16 · By: claude · Task: T-0193 · Category: architecture
+- Decision: `PUT …/aba` requires all three fields (validated by the bank module's create rules); clearing is not offered. An ABA change on an archived account is 409 `BANK_ACCOUNT_ARCHIVED`; archiving again is 200 `changed:false`; no re-activation route.
+- Why: an ABA file needs all three (aba-export.ts); archiving retires an account; RFC 9110 §9.2.2 PUT idempotence.
+- Alternatives: PATCH with optional/clearable fields (no use case; more states).
+- ADR: ADR-0094 · Status: accepted
