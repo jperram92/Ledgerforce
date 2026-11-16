@@ -996,6 +996,111 @@ Allowance remains 125.00 credit. BAS 1B increases 125.00 on accruals, zero on ca
 
 Allowance zero; net impairment expense 1,250.00. No GST on remeasurement; no automatic release of allowances for other customers.
 
+## GP-040 — Single supply on the accruals basis: part-payments before any invoice attribute the whole supply's GST
+
+- **Status: Approved (claude under the owner's standing accounting delegation, DL-0263, DL-0751, 2026-11-16; RQ-0171, ADR-0089)** · Phase: MVP · Source type: `ar.prepayment` · Use cases: UC-04 · Design: §3.8 row 10, §4.3
+- **Scenario:** Acme agrees a single (non-progressive) supply — one project, one completion, price $10,000.00 ex GST ($11,000.00 incl.), contract cancellable — and pays two part-payments of $3,300.00 by EFT on 2026-11-10 and 2026-11-25 before any invoice. The company is on the **accruals** basis. No whole-supply tax invoice is issued (GP-021 is the alternative for non-cancellable contracts). Whole-supply GST, fixed at the first receipt by the total invoice rule: 10,000.00 × 10% = 1,000.00. GST in the receipt: 3,300.00 / 11 = 300.00.
+- **Provenance:** canonical successor of source 872c4fa GP-012-B (not on this line). The source's `GST-UB` code and `tax_grossed` G1 are replaced by a whole-supply coded line with an uncoded contra on the same account (RQ-0171), so the unchanged code-driven BAS query reports it exactly.
+
+### 40a — First part-payment: whole GST attributed
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | bank:OPERATING | 1100 | 3,300.00 | | — | — |
+| 2 | system:GST_ATTRIBUTED_UNBILLED | 1230 | 700.00 | | — | Acme |
+| 3 | system:CUSTOMER_PREPAYMENTS (whole supply attributed) | 2400 | | 10,000.00 | GST (tax 1,000.00) | Acme |
+| 4 | system:CUSTOMER_PREPAYMENTS (consideration not yet received) | 2400 | 7,000.00 | | — | Acme |
+| 5 | tax:GST.collected | 2200 | | 1,000.00 | GST | — |
+| | **Total** | | **11,000.00** | **11,000.00** | | |
+
+### 40b — Second part-payment: no further GST
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | bank:OPERATING | 1100 | 3,300.00 | | — | — |
+| 2 | system:CUSTOMER_PREPAYMENTS | 2400 | | 3,000.00 | — | Acme |
+| 3 | system:GST_ATTRIBUTED_UNBILLED | 1230 | | 300.00 | — | Acme |
+| | **Total** | | **3,300.00** | **3,300.00** | | |
+
+- **Check:** 40a 3,300.00 + 700.00 + 7,000.00 = 11,000.00 = 10,000.00 + 1,000.00 ✓ · 40b 3,300.00 = 3,000.00 + 300.00 ✓
+- **Balances after 40a/40b:** CUSTOMER_PREPAYMENTS Cr 3,000.00 then Cr 6,000.00 (= GST-exclusive cash received); GST_ATTRIBUTED_UNBILLED Dr 700.00 then Dr 400.00 (= GST reported but not yet received from Acme); GST collected Cr 1,000.00.
+- **Subledger:** none on AR_CONTROL (no invoice); the contract record holds known total 10,000.00, attributed GST 1,000.00, received 6,600.00.
+- **Tax/BAS (accruals):** 2026-11: G1 +11,000.00, 1A +1,000.00 (40a); 40b none. **Cash basis:** this shape is not used — each receipt posts the GP-020 journal (GST on the amount received) and the final invoice applies it by GP-022 (s 29-5(2)).
+- **Refused until researched:** deposit invoice for a single supply on accruals (use GP-021), unknown or mixed totals, receipts above the contract total, a GST-basis change while the contract is open.
+
+## GP-041 — Final tax invoice for a GP-040 single supply (no GST repeated; price changes as adjustments)
+
+- **Status: Approved (claude under the owner's standing accounting delegation, DL-0263, DL-0752, 2026-11-16; RQ-0171, ADR-0089)** · Phase: MVP · Source type: `ar.invoice` · Use cases: UC-04 · Design: §4.3
+- **Scenario:** after GP-040a/b (6,600.00 received, GST 1,000.00 attributed, 400.00 unbilled), the work is completed and final tax invoice INV-000171 is issued. It shows the whole supply, the GST fixed at attribution, less 6,600.00 received. 41a: price unchanged (10,000.00 + GST 1,000.00 = 11,000.00; due 4,400.00). 41b: price increased by agreement to 10,500.00 (GST 1,050.00; total 11,550.00; due 4,950.00) — Div 19 increasing adjustment of 50.00. 41c: price reduced to 9,500.00 (GST 950.00; total 10,450.00; due 3,850.00) — decreasing adjustment of 50.00; the invoice carries adjustment-note particulars.
+
+### 41a — Price unchanged
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_CONTROL | 1200 | 4,400.00 | | — | Acme |
+| 2 | system:CUSTOMER_PREPAYMENTS | 2400 | 6,000.00 | | — | Acme |
+| 3 | product:PROFESSIONAL_SERVICES.revenue | 4000 | | 10,000.00 | — | Acme |
+| 4 | system:GST_ATTRIBUTED_UNBILLED | 1230 | | 400.00 | — | Acme |
+| | **Total** | | **10,400.00** | **10,400.00** | | |
+
+### 41b — Price increased by 500.00
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_CONTROL | 1200 | 4,950.00 | | — | Acme |
+| 2 | system:CUSTOMER_PREPAYMENTS | 2400 | 6,000.00 | | — | Acme |
+| 3 | product:PROFESSIONAL_SERVICES.revenue | 4000 | | 10,000.00 | — | Acme |
+| 4 | product:PROFESSIONAL_SERVICES.revenue (price increase) | 4000 | | 500.00 | GST (tax 50.00) | Acme |
+| 5 | system:GST_ATTRIBUTED_UNBILLED | 1230 | | 400.00 | — | Acme |
+| 6 | tax:GST.collected | 2200 | | 50.00 | GST | — |
+| | **Total** | | **10,950.00** | **10,950.00** | | |
+
+### 41c — Price reduced by 500.00
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:AR_CONTROL | 1200 | 3,850.00 | | — | Acme |
+| 2 | system:CUSTOMER_PREPAYMENTS | 2400 | 6,000.00 | | — | Acme |
+| 3 | product:PROFESSIONAL_SERVICES.revenue (price reduction) | 4000 | 500.00 | | GST (tax −50.00) | Acme |
+| 4 | tax:GST.collected | 2200 | 50.00 | | GST | — |
+| 5 | product:PROFESSIONAL_SERVICES.revenue | 4000 | | 10,000.00 | — | Acme |
+| 6 | system:GST_ATTRIBUTED_UNBILLED | 1230 | | 400.00 | — | Acme |
+| | **Total** | | **10,400.00** | **10,400.00** | | |
+
+- **Check:** 41a 4,400.00 + 6,000.00 = 10,400.00 = 10,000.00 + 400.00 ✓ · 41b 4,950.00 + 6,000.00 = 10,950.00 = 10,000.00 + 500.00 + 400.00 + 50.00 ✓ · 41c 3,850.00 + 6,000.00 + 500.00 + 50.00 = 10,400.00 = 10,000.00 + 400.00 ✓
+- **Balances after the final invoice:** CUSTOMER_PREPAYMENTS 0.00; GST_ATTRIBUTED_UNBILLED 0.00; revenue 10,000.00 / 10,500.00 / 9,500.00; GST collected for the contract 1,000.00 / 1,050.00 / 950.00 = GST on the final price ✓.
+- **Subledger:** INV-000171 open 4,400.00 / 4,950.00 / 3,850.00 (the 6,600.00 received is shown as paid on the invoice, not allocated through AR).
+- **Tax/BAS (accruals):** 41a none (no duplicate GST). 41b G1 +550.00, 1A +50.00. 41c G1 −550.00, 1A −50.00 — the company default `credit_note_bas` nets adjustments into G1/1A of their own period (GP-029); with `credit_note_bas = ato_adjustment` line 4 of 41c carries GST-ADJ instead and the 50.00 is reported at 1B (41b: line 6 at 1A), as GP-029.
+- **Rounding:** the invoice shows the GST fixed at attribution (distributed to lines by the GP-023a residual method), so no rounding-only residual arises; only a genuine price change produces 41b/41c lines, whose GST is computed by the company rule on the change.
+
+## GP-042 — Cancellation of a GP-040 single supply before the final invoice, and refund of the part paid
+
+- **Status: Approved (claude under the owner's standing accounting delegation, DL-0263, DL-0753, 2026-11-16; RQ-0171, ADR-0089)** · Phase: MVP · Source type: `ar.credit_note`, `ar.refund` · Use cases: UC-04, UC-11 · Design: §4.3
+- **Scenario:** after GP-040a only (3,300.00 received, GST 1,000.00 attributed, 700.00 unbilled), Acme and Demo Co cancel the contract on 2026-12-05 (adjustment event, Div 19) and agree to refund the 3,300.00, paid on 2026-12-12. 42a removes the attribution on the consideration that will never be received and carries adjustment-note particulars; 42b refunds the part paid, a further decreasing adjustment of 300.00. Forfeiture of a part payment is refused until researched.
+
+### 42a — Cancellation: unbilled attribution removed
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:CUSTOMER_PREPAYMENTS (attribution cancelled) | 2400 | 7,000.00 | | GST (tax −700.00) | Acme |
+| 2 | tax:GST.collected | 2200 | 700.00 | | GST | — |
+| 3 | system:CUSTOMER_PREPAYMENTS (consideration not to be received) | 2400 | | 7,000.00 | — | Acme |
+| 4 | system:GST_ATTRIBUTED_UNBILLED | 1230 | | 700.00 | — | Acme |
+| | **Total** | | **7,700.00** | **7,700.00** | | |
+
+### 42b — Refund of the part paid
+
+| # | Account | Ref | Debit | Credit | Tax code | Party |
+|---|---|---|---:|---:|---|---|
+| 1 | system:CUSTOMER_PREPAYMENTS | 2400 | 3,000.00 | | GST (tax −300.00) | Acme |
+| 2 | tax:GST.collected | 2200 | 300.00 | | GST | — |
+| 3 | bank:OPERATING | 1100 | | 3,300.00 | — | — |
+| | **Total** | | **3,300.00** | **3,300.00** | | |
+
+- **Check:** 42a 7,000.00 + 700.00 = 7,700.00 = 7,000.00 + 700.00 ✓ · 42b 3,000.00 + 300.00 = 3,300.00 ✓
+- **Balances after 40a + 42a + 42b:** CUSTOMER_PREPAYMENTS 0.00, GST_ATTRIBUTED_UNBILLED 0.00, GST collected 0.00, bank 0.00.
+- **Tax/BAS (accruals):** 42a G1 −7,700.00, 1A −700.00; 42b G1 −3,300.00, 1A −300.00 (default netted presentation, GP-029); with `credit_note_bas = ato_adjustment` the GST collected lines carry GST-ADJ and the amounts are reported at 1B. The contract's net BAS effect is zero. **Cash basis:** 42a does not arise (no attribution beyond cash); a refund of a GP-020 receipt follows 42b.
+
 ## GP-043 — Opening balances with foreign-currency open items (variant of GP-037)
 
 - **Status: Approved (claude under the product owner's standing delegation, DL-0263, 2026-11-15; basis RQ-0170; decision DL-0740)** · Phase: MVP · Source type: `ledger.opening_balance` · Use cases: — · Design: §4.1 step 9, §3.7, §3.2

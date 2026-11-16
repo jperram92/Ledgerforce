@@ -26,9 +26,19 @@ const tables = approvedTables(parsePostings(readFileSync(FILE, 'utf8')));
 
 /**
  * Golden tables the engine cannot replay yet, with the reason and owning task. Shrinks to empty;
- * never grows silently. Empty since T-0032 (reversals replay through reverse()).
+ * never grows silently. Empty from T-0032 (reversals replay through reverse()) until T-0168
+ * added GP-040…GP-042 (ADR-0089), whose unbound role T-0203 adds; GP-042b replays already.
  */
-const PENDING: Record<string, string> = {};
+const PENDING: Record<string, string> = {
+  // ADR-0089: the GST_ATTRIBUTED_UNBILLED extended role and template account 1230 are bound by
+  // T-0203; until then these tables are proven against the BAS query in SS-PLAT-135 only.
+  'GP-040a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+  'GP-040b': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+  'GP-041a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+  'GP-041b': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+  'GP-041c': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+  'GP-042a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
+};
 
 /**
  * What each golden binding means on the AU services template, by account name — an expectation

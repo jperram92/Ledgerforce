@@ -16,9 +16,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 7 |
 | done | 3 |
 | in_progress | 1 |
-| review | 136 |
+| review | 137 |
 | todo | 25 |
-| verifying | 1 |
 | **total** | **173** |
 
 | Phase | Cards |
@@ -271,7 +270,9 @@ graph LR
 | [T-0136](T-0136.md) | Bills inbox: HTTP routes and screen (list emailed bills, view PDF, code into a draft) | MVP | review | T-0051, T-0086 | UC-05 | 1 |
 | [T-0166](T-0166.md) | Gross ECL allowance reconciliation from source lineage | MVP | blocked | T-0031, T-0048 | — | 3 |
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
-| [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | todo | T-0047, T-0035 | UC-04 | 3 |
+| [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | verifying | T-0047, T-0035 | UC-04 | 3 |
+| [T-0203](T-0203.md) | Single-supply GST attribution: role binding, contract record and accruals receipt posting (GP-040) | MVP | todo | T-0168 | UC-04 | 0 |
+| [T-0204](T-0204.md) | Single-supply GST attribution: final invoice, price change, cancellation/refund and BAS-preparation reports (GP-041, GP-042) | MVP | todo | T-0203 | UC-04, UC-11 | 0 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
 | [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | review | T-0117 | UC-11 | 0 |
 | [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |
