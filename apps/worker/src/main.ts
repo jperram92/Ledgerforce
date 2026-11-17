@@ -18,6 +18,7 @@ import { sql } from 'kysely';
 import { PgBoss } from 'pg-boss';
 import { batchApprovedHandler, startBatchWorker } from './batch-jobs.ts';
 import { startReminderWorker } from './daily-jobs.ts';
+import { startInboxPollWorker } from './inbox-poll-jobs.ts';
 import { startOutboxWorker } from './outbox-worker.ts';
 import { startSyncIssueWorker } from './sync-issue-worker.ts';
 
@@ -89,6 +90,10 @@ await startOutboxWorker({ boss, db, registry });
 await startBatchWorker({ boss, db, outbox: documentOutbox });
 // The daily overdue-reminder run, one job per tenant fanned out by the scheduler (ADR-0062).
 await startReminderWorker({ boss, db, outbox: documentOutbox });
+// Bills inbox IMAP polling, one job per tenant every 5 minutes (T-0127, ADR-0095). Mailbox
+// passwords are sealed, so polling needs the KMS; without it no mailbox is read.
+if (kms) await startInboxPollWorker({ boss, db, deps: { kms } });
+else console.warn('LF_KMS_PROVIDER not set: bills mailboxes are not polled');
 // Dead-lettered deliveries become Sync issues (design §5.6 rule 2, T-0071).
 await startSyncIssueWorker({ boss, db });
 

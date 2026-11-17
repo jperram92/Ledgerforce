@@ -54,8 +54,8 @@ export function parseTenantJob(data: unknown): TenantJob {
   return { tenantId: t.toLowerCase() };
 }
 
-/** A UUID derived from the queue, tenant and day: the same inputs give the same job id. */
-function jobId(queue: string, tenantId: string, day: string): string {
+/** A UUID derived from the queue, tenant and day (or slot): the same inputs give the same job id. */
+export function jobId(queue: string, tenantId: string, day: string): string {
   const h = createHash('sha256').update(`${queue}|${tenantId}|${day}`).digest('hex');
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-5${h.slice(13, 16)}-a${h.slice(17, 20)}-${h.slice(20, 32)}`;
 }
@@ -70,6 +70,20 @@ export async function installDailySchedules(owner: PgBoss): Promise<void> {
   await owner.schedule(DAILY_FANOUT_QUEUE, DAILY_FANOUT_CRON, {}, { tz: 'UTC' });
 }
 
+/** Owner only (lf_migrator): the ids of active tenants, via app.active_tenant_ids() (ADR-0062). */
+export async function activeTenantIds(ownerUrl: string): Promise<string[]> {
+  const client = new pg.Client({ connectionString: ownerUrl });
+  await client.connect();
+  try {
+    const { rows } = await client.query<{ tenant_id: string }>(
+      'SELECT tenant_id FROM app.active_tenant_ids()',
+    );
+    return rows.map((r) => r.tenant_id);
+  } finally {
+    await client.end();
+  }
+}
+
 /**
  * Owner instance only: one `ar.reminders.run` job per active tenant for the UTC day of `now`.
  * `ownerUrl` must connect as lf_migrator, the only role that may call app.active_tenant_ids().
@@ -79,17 +93,7 @@ export async function fanOutDailyJobs(
   ownerUrl: string,
   now: Date,
 ): Promise<{ tenants: string[]; sent: number }> {
-  const client = new pg.Client({ connectionString: ownerUrl });
-  await client.connect();
-  let tenants: string[];
-  try {
-    const { rows } = await client.query<{ tenant_id: string }>(
-      'SELECT tenant_id FROM app.active_tenant_ids()',
-    );
-    tenants = rows.map((r) => r.tenant_id);
-  } finally {
-    await client.end();
-  }
+  const tenants = await activeTenantIds(ownerUrl);
   const day = now.toISOString().slice(0, 10);
   let sent = 0;
   for (const tenantId of tenants) {

@@ -3,7 +3,8 @@
  * lf_migrator (startMaintenance refuses any other role) and does three things:
  * - pg-boss supervision;
  * - the cron timekeeper for the daily schedule (installed idempotently on start);
- * - the `daily.fanout` consumer, which sends one `ar.reminders.run` job per active tenant.
+ * - the `daily.fanout` consumer, which sends one `ar.reminders.run` job per active tenant;
+ * - the `ap.inbox.fanout` consumer (every 5 minutes), one `ap.inbox.poll` job per active tenant.
  * Tenant data is never read here; the worker does that per tenant, as lf_app.
  *
  * Health: every 10 s it runs `SELECT 1` and touches LF_SCHEDULER_HEARTBEAT_FILE
@@ -13,6 +14,7 @@ import { writeFileSync } from 'node:fs';
 import { databaseUrlFromEnv } from '@ledgerforce/db';
 import pg from 'pg';
 import { installDailySchedules, startFanOutWorker } from '../daily-jobs.ts';
+import { installInboxPollSchedule, startInboxFanOutWorker } from '../inbox-poll-jobs.ts';
 import { startMaintenance } from '../queue-admin.ts';
 
 let url: string;
@@ -28,6 +30,9 @@ const owner = await startMaintenance(url, { schedule: true });
 owner.on('error', (error: Error) => console.error(`pg-boss: ${error.message}`));
 await installDailySchedules(owner);
 await startFanOutWorker(owner, url);
+// Bills inbox polling: one ap.inbox.poll job per active tenant every 5 minutes (T-0127, DL-0814).
+await installInboxPollSchedule(owner);
+await startInboxFanOutWorker(owner, url);
 
 const pool = new pg.Pool({ connectionString: url, max: 1 });
 async function beat(): Promise<void> {
@@ -40,7 +45,7 @@ async function beat(): Promise<void> {
 }
 await beat();
 const timer = setInterval(() => void beat(), 10_000);
-console.log('LedgerForce scheduler started (daily fan-out, lf_migrator)');
+console.log('LedgerForce scheduler started (daily and inbox fan-out, lf_migrator)');
 
 for (const signal of ['SIGTERM', 'SIGINT'] as const) {
   process.once(signal, () => {
