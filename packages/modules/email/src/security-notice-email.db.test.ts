@@ -8,10 +8,7 @@
  * superuser only seeds sessions and inspects.
  */
 import { randomBytes, randomUUID } from 'node:crypto';
-import {
-  approveRemittanceAccountChange,
-  requestRemittanceAccountChange,
-} from '@ledgerforce/ar';
+import { approveRemittanceAccountChange, requestRemittanceAccountChange } from '@ledgerforce/ar';
 import { withTenant, type Database } from '@ledgerforce/db';
 import { auServicesSmb, loadChartTemplate } from '@ledgerforce/gl';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
@@ -484,8 +481,7 @@ describe('SS-PLAT-147: SMTP failures are recorded and retried with backoff; tena
         () => 'no error',
         (e: unknown) => (e as { code?: string }).code ?? String(e),
       );
-    const run = (q: string) =>
-      code(f.inTenant((trx) => sql.raw(q).execute(trx)));
+    const run = (q: string) => code(f.inTenant((trx) => sql.raw(q).execute(trx)));
     expect(await run(`UPDATE app.security_notice_delivery SET outcome = 'failed'`)).toBe('42501');
     expect(await run(`DELETE FROM app.security_notice_delivery`)).toBe('42501');
     expect(

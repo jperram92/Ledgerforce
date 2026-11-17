@@ -367,6 +367,13 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   // Remittance account notices (migration 0072, T-0191): same shape; a generated notice has no
   // recipient, which the table allows only as 'no_recipient'.
   'app.remittance_account_notice': { status: () => 'no_recipient' },
+  // Security notice deliveries (T-0197, ADR-0092): a sent attempt to a valid address; the notice
+  // it belongs to is seeded by the prerequisite below.
+  'app.security_notice_delivery': {
+    notice_kind: () => 'bank_details_changed',
+    outcome: () => 'sent',
+    to_addr: () => 'to@example.test',
+  },
   // Salesforce Pub/Sub subscriber state (migration 0026): a CDC channel name, a cdc:/event: key,
   // an opaque replay id; a resync request for a rejected replay id has no entity or records.
   'app.salesforce_replay_cursor': { channel: () => '/data/AccountChangeEvent' },
@@ -685,6 +692,22 @@ export const PREREQUISITES: Readonly<
       new Map([['company_id', row.get('company_id') ?? '']]),
     );
     row.set('bank_account_id', String(account['id']));
+  },
+  // A delivery names exactly one notice (T-0197, migration 0075): seed a bank-detail notice of
+  // the same tenant and point the row at it.
+  'app.security_notice_delivery': async (admin, row) => {
+    const notice = await seedRow(
+      admin,
+      {
+        schema: 'app',
+        table: 'bank_detail_change_notice',
+        qualified: 'app.bank_detail_change_notice',
+      },
+      row.get('tenant_id') ?? '',
+      DEFAULT_ROW_OVERRIDES,
+      1,
+    );
+    row.set('bank_detail_notice_id', String(notice['id']));
   },
   'app.bank_account': async (admin, row) => {
     await admin.query(`UPDATE app.account SET subtype = 'bank' WHERE tenant_id = $1 AND id = $2`, [

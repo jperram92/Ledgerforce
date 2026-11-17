@@ -19,6 +19,7 @@ import { PgBoss } from 'pg-boss';
 import { batchApprovedHandler, startBatchWorker } from './batch-jobs.ts';
 import { startReminderWorker } from './daily-jobs.ts';
 import { startOutboxWorker } from './outbox-worker.ts';
+import { startSecurityNoticeWorker } from './security-notices.ts';
 import { startSyncIssueWorker } from './sync-issue-worker.ts';
 
 let url: string;
@@ -65,12 +66,16 @@ const renderer = new PdfRenderer();
 // Without LF_KMS_PROVIDER they say the bank details are available on request.
 const kms = await kmsFromEnv(process.env);
 if (!kms) console.warn('LF_KMS_PROVIDER not set: invoices print no remittance bank account');
+// Security notices (T-0197, ADR-0092) use the same sender; without it they stay pending.
+let sender: SmtpSender | null = null;
 if (process.env['LF_SMTP_URL'] && process.env['LF_SMTP_FROM']) {
-  const sender = SmtpSender.fromEnv(process.env);
+  sender = SmtpSender.fromEnv(process.env);
   registry.register(invoiceEmailHandler({ sender, renderer, kms }));
   registry.register(reminderEmailHandler({ sender }));
 } else {
-  console.warn('LF_SMTP_URL / LF_SMTP_FROM not set: invoice and reminder emails are not sent');
+  console.warn(
+    'LF_SMTP_URL / LF_SMTP_FROM not set: invoice, reminder and security notice emails are not sent',
+  );
 }
 // Approved Stripe refunds whose send failed at approval are retried here (T-0172, ADR-0083).
 // Without LF_STRIPE_SECRET_KEY the events wait undelivered to this handler and the gap is logged.
@@ -89,6 +94,8 @@ await startOutboxWorker({ boss, db, registry });
 await startBatchWorker({ boss, db, outbox: documentOutbox });
 // The daily overdue-reminder run, one job per tenant fanned out by the scheduler (ADR-0062).
 await startReminderWorker({ boss, db, outbox: documentOutbox });
+// Security notices of bank-detail and remittance account changes, one job per tenant a minute.
+await startSecurityNoticeWorker({ boss, db, sender });
 // Dead-lettered deliveries become Sync issues (design §5.6 rule 2, T-0071).
 await startSyncIssueWorker({ boss, db });
 

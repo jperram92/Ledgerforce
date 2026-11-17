@@ -3997,3 +3997,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0169 finding 7. The cookie is HttpOnly and the SPA never reads or caches it. StepUpPrompt already returns to the same path and keeps a typed note in sessionStorage. The real rotation is proven against the real API, database and OpenID Provider in SS-PLAT-139/136. The e2e spec proves the browser side of the contract. That follows the existing practice in the web e2e suites, which use route-faked APIs.
 - Alternatives: a web change to re-fetch `/auth/me` after a step-up (rejected: nothing reads session state, so it would add code with no behaviour behind it); an e2e test against the real API plus an IdP (rejected: no such harness exists for the web suites; that would be a separate card).
 - ADR: ADR-0087 · Status: accepted
+
+### DL-0780 — Security notices are delivered by polling, fanned out per tenant every minute (ADR-0092 accepted under DL-0691)
+- Date: 2026-11-17 · By: claude · Task: T-0197 · Category: security
+- Decision: Accept ADR-0092. The scheduler (lf_migrator) installs the pg-boss schedule `security.notices.fanout` (`* * * * *`, UTC). Its consumer sends one `security.notices.dispatch` job per active tenant, with a job id from queue, tenant and UTC minute. The worker (lf_app) dispatches that tenant's due notices under RLS. Neither new queue has pg-boss retries (`retryLimit 0`), because the next minute is the retry. Without SMTP the worker still consumes the jobs and the notices stay `pending`.
+- Why: RQ-0174 findings 5–6. The notices are written by SECURITY DEFINER SQL, including approvals that bypass the module (0072). SQL cannot create a pg-boss job, so an outbox event would miss exactly that case. Tenant enumeration stays owner-only (ADR-0062). Third-party Xero bank-change monitors also deliver by polling.
+- Alternatives: an outbox event per notice (rejected: a bypassing approval would never be sent); an owner function listing tenants with due notices (rejected: widens the owner's view of tenant data); a 5-minute cadence (rejected: the first retry would not be 1 min, design §5.6).
+- ADR: ADR-0092 · Status: accepted
+
+### DL-0781 — app.security_notice_delivery records every attempt; one sent row per notice (migration 0075)
+- Date: 2026-11-17 · By: claude · Task: T-0197 · Category: architecture
+- Decision: The new table holds one row per attempt, tenant-owned and append-only (lf_app SELECT, INSERT; `sod_never_changed`). Exactly one composite foreign key is set: to `remittance_account_notice` or to `bank_detail_change_notice`. Each notice table gains `UNIQUE (tenant_id, id)`, which is additive. A partial unique index allows one `sent` row per notice. Each notice is handled in its own tenant transaction, locked `FOR UPDATE OF n SKIP LOCKED`. The migration is reserved as 0075. On the task branch the file is numbered 0073, because the runner refuses gaps and 0073/0074 are on sibling branches. The integrator renames it.
+- Why: `app.email_delivery.purpose` cannot be widened (DROP CONSTRAINT refused; precedents 0054, 0062), and it has no place for failed attempts or backoff (RQ-0174 finding 7). The lock and the unique index make two concurrent dispatchers send each notice once (proven in SS-PLAT-145).
+- Alternatives: reuse app.email_delivery (impossible without dropping its CHECK); a status column with an attempt counter on the notice tables (rejected: lf_app may update only status and sent_at, and history would be lost).
+- ADR: ADR-0092 · Status: accepted
+
+### DL-0782 — Security notice content: plain text, masked, no links, "use a contact you already know"
+- Date: 2026-11-17 · By: claude · Task: T-0197 · Category: security
+- Decision: Text-only email with no HTML and no links. The subject starts `Security notice:` and carries no numbers. Accounts appear as "BSB …, account ending in NNN". The body states the event and when it happened (tenant report time zone), and for staff notices the requester, the approver and any self-approval. It says only the last 3 digits are shown and that there are no links. The "If you did not expect this" guidance says: do not reply; do not use links or phone numbers sent about the change; call a contact you already know (the company, or the requester or approver); sign in the usual way; contact your bank if money may have moved. Bank account labels and display names are made inert (one line, at most 80 characters, `://` and `www.` broken). `account_name` is not printed.
+- Why: RQ-0174. OWASP ASVS 4.0.3 2.2.3 says to notify without disclosing sensitive information, and ASVS 5.0 6.3.7 requires notification. NIST SP 800-63B-4 §4.6 requires clear instructions and contact information if the recipient repudiates the event. ASD and NCSC tell people to use known phone numbers, not details from an email. A link-free notice cannot be cloned into a working lure, and requester-typed text cannot plant one.
+- Alternatives: HTML with a "review the change" button (rejected: trains clicking links in security email); printing a company phone number (rejected: there is no verified number, and S4 says not to trust a number from an email).
+- ADR: ADR-0092 · Status: accepted
+
+### DL-0783 — Failed security notices retry from 1 min to 6 h and never give up; Sync-issue surfacing is T-0209
+- Date: 2026-11-17 · By: claude · Task: T-0197 · Category: security
+- Decision: A failed attempt n is due again after min(6 h, 1 min · 2^(n−1)), computed from the injected `now`. The notice stays `failed` and is retried every 6 h until it is sent. This deviates from the apps/worker rule "then a Sync issues inbox entry": app.sync_issue rows need an outbox event and a dead-letter job (migration 0030), and a polled notice has neither. Follow-up T-0209 surfaces failed security notices to administrators with a retry-now action.
+- Why: RQ-0174 finding 8. Abandoning a fraud notice silently is worse than a 6-hourly retry. The failure is visible in the notice status and in each attempt row (error name, nodemailer code, SMTP reply code, message ≤ 500).
+- Alternatives: stop after 10 attempts like the outbox (rejected: no inbox to show it, so it would be silent); fake an outbox event so that a Sync issue can be raised (rejected: misuses the outbox contract).
+- ADR: ADR-0092 · Status: accepted
+
+### DL-0784 — @ledgerforce/parties as a devDependency of @ledgerforce/email; SmtpSink can refuse recipients
+- Date: 2026-11-17 · By: claude · Task: T-0197 · Category: tooling
+- Decision: The email package's db tests create bank-detail notices through the real parties workflow (request and verify with step-up), so `@ledgerforce/parties` is a workspace devDependency. The test SMTP sink gains `rcptReply`, which answers every RCPT with a chosen reply (e.g. `451 4.3.0 …`) so the sender sees a real SMTP failure. The worker job test was written after its module. Its RED is a mutation check (schedule, fan-out and job disabled → 3 of 4 tests fail; `.agent/evidence/T-0197/red-worker-mutation.txt`). The dispatcher itself has a true RED.
+- Why: no mocks of the database or SMTP (Docs/process/tdd.md). A workspace package adds no third-party code.
+- Alternatives: insert notice rows as superuser (rejected: bypasses the guards being relied on); a throwing EmailSender double (rejected: a real SMTP refusal also exercises nodemailer's error fields).
+- ADR: none · Status: accepted
