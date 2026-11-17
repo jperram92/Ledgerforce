@@ -1,0 +1,5 @@
+Mutation check (rejectUnauthorized temporarily false; reverted):
+     × SS-PLAT-156 a self-signed certificate is refused as tls_failed and nothing is sent 12ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected null to be an instance of ImapError
+      Tests  1 failed | 1 passed (2)
