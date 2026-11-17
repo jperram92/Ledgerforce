@@ -110,20 +110,6 @@ export async function fanOutDailyJobs(
   return { tenants, sent };
 }
 
-/** Owner only: the ids of active tenants. `ownerUrl` must connect as lf_migrator. */
-export async function activeTenantIds(ownerUrl: string): Promise<string[]> {
-  const client = new pg.Client({ connectionString: ownerUrl });
-  await client.connect();
-  try {
-    const { rows } = await client.query<{ tenant_id: string }>(
-      'SELECT tenant_id FROM app.active_tenant_ids()',
-    );
-    return rows.map((r) => r.tenant_id);
-  } finally {
-    await client.end();
-  }
-}
-
 export interface TenantReminderRun {
   readonly runDate: string;
   readonly companies: { companyId: string; queued: number }[];

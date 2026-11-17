@@ -53,7 +53,9 @@ async function beat(): Promise<void> {
 }
 await beat();
 const timer = setInterval(() => void beat(), 10_000);
-console.log('LedgerForce scheduler started (daily, security-notice and inbox fan-out, lf_migrator)');
+console.log(
+  'LedgerForce scheduler started (daily, security-notice and inbox fan-out, lf_migrator)',
+);
 
 for (const signal of ['SIGTERM', 'SIGINT'] as const) {
   process.once(signal, () => {
