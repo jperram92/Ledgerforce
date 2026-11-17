@@ -939,6 +939,33 @@ export interface BillInboxItemTable {
   received_at: Timestamp;
 }
 
+/** Migration 0073 (T-0127, ADR-0095): bills inbox IMAP mailbox — sealed password, poll cursor. */
+export interface BillInboxMailboxTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: string;
+  host: string;
+  port: Generated<number>;
+  username: string;
+  folder: Generated<string>;
+  password_ct: Buffer;
+  password_iv: Buffer;
+  password_tag: Buffer;
+  password_dek_wrapped: Buffer;
+  password_kek_id: string;
+  password_enc_version: number;
+  status: Generated<'active' | 'superseded' | 'disabled'>;
+  /** bigint as a decimal string. */
+  uidvalidity: string | null;
+  /** bigint as a decimal string. */
+  last_uid: Generated<string>;
+  refused_count: Generated<number>;
+  last_polled_at: Timestamp | null;
+  last_error: string | null;
+  created_by: string | null;
+  created_at: ColumnType<Date, Date | string | undefined, never>;
+}
+
 export interface DocumentAttachmentTable {
   id: Generated<string>;
   tenant_id: TenantId;
@@ -1418,6 +1445,7 @@ export interface Database {
   'app.payment_batch_refund': PaymentBatchRefundTable;
   'app.supplier_bill_line': SupplierBillLineTable;
   'app.bill_inbox_item': BillInboxItemTable;
+  'app.bill_inbox_mailbox': BillInboxMailboxTable;
   'app.document_attachment': DocumentAttachmentTable;
   'app.customer_prepayment': CustomerPrepaymentTable;
   'app.prepayment_application': PrepaymentApplicationTable;

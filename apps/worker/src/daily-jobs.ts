@@ -55,8 +55,8 @@ export function parseTenantJob(data: unknown): TenantJob {
 }
 
 /**
- * A UUID derived from the queue, tenant and period (a day, or a minute for T-0197): the same inputs
- * give the same job id.
+ * A UUID derived from the queue, tenant and period (a day, a minute for T-0197, or a 5-minute slot
+ * for T-0127): the same inputs give the same job id.
  */
 export function jobId(queue: string, tenantId: string, day: string): string {
   const h = createHash('sha256').update(`${queue}|${tenantId}|${day}`).digest('hex');
@@ -71,6 +71,20 @@ export async function installDailySchedules(owner: PgBoss): Promise<void> {
     }
   }
   await owner.schedule(DAILY_FANOUT_QUEUE, DAILY_FANOUT_CRON, {}, { tz: 'UTC' });
+}
+
+/** Owner only (lf_migrator): the ids of active tenants, via app.active_tenant_ids() (ADR-0062). */
+export async function activeTenantIds(ownerUrl: string): Promise<string[]> {
+  const client = new pg.Client({ connectionString: ownerUrl });
+  await client.connect();
+  try {
+    const { rows } = await client.query<{ tenant_id: string }>(
+      'SELECT tenant_id FROM app.active_tenant_ids()',
+    );
+    return rows.map((r) => r.tenant_id);
+  } finally {
+    await client.end();
+  }
 }
 
 /**

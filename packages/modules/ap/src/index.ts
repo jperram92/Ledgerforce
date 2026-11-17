@@ -1,6 +1,14 @@
 export * from './bills.ts';
 export * from './bills-read.ts';
 export * from './inbox.ts';
+export * from './inbox-mailbox.ts';
+export {
+  ImapClient,
+  ImapError,
+  tlsConnector,
+  type ImapConnector,
+  type ImapErrorKind,
+} from './imap-client.ts';
 export * from './payment-batches.ts';
 export * from './aba-export.ts';
 export * from './payment-confirmation.ts';

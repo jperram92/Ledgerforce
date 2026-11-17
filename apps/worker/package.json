@@ -2,13 +2,14 @@
   "name": "@ledgerforce/worker",
   "version": "0.0.0",
   "private": true,
-  "description": "pg-boss workers (design \u00a77.1, ADR-0008): outbox consumer; queue install and maintenance as the schema owner",
+  "description": "pg-boss workers (design §7.1, ADR-0008): outbox consumer; queue install and maintenance as the schema owner",
   "type": "module",
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
     "install-queue": "node src/cli/install-queue.ts"
   },
   "dependencies": {
+    "@ledgerforce/ap": "workspace:*",
     "@ledgerforce/ar": "workspace:*",
     "@ledgerforce/connector-stripe": "workspace:*",
     "@ledgerforce/db": "workspace:*",

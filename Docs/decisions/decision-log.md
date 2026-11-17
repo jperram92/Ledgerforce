@@ -4032,3 +4032,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: no mocks of the database or SMTP (Docs/process/tdd.md). A workspace package adds no third-party code.
 - Alternatives: insert notice rows as superuser (rejected: bypasses the guards being relied on); a throwing EmailSender double (rejected: a real SMTP refusal also exercises nodemailer's error fields).
 - ADR: none · Status: accepted
+
+### DL-0810 — T-0127 split by transport: IMAP polling here, inbound webhooks to T-0215, XOAUTH2 and settings to T-0216
+- Date: 2026-11-16 · By: claude · Task: T-0127 · Category: scope
+- Decision: T-0127 builds the IMAP polling transport completely (AC-1: poller, mailbox store, migration 0077, worker job and scheduler fan-out). AC-2 (signed provider inbound webhooks for the SaaS) moves to new card T-0215; OAuth2 XOAUTH2 (needed for Microsoft 365, RQ-0177 F3) and the mailbox settings API/UI move to new card T-0216.
+- Why: Each transport is a full slice of its own (protocol client or per-provider signature schemes, storage, routing, tests); together they are well above the ~400-line card limit. IMAP is the self-host default (RQ-0111), so it goes first. RQ-0177.
+- Alternatives: both transports in one branch (rejected: oversize, half-built risk); webhooks first (rejected: SaaS path, self-host is the primary distribution).
+- ADR: ADR-0095 · Status: accepted
+
+### DL-0811 — In-house minimal IMAP client; no imapflow dependency (ADR-0095 accepted under DL-0691)
+- Date: 2026-11-16 · By: claude · Task: T-0127 · Category: security
+- Decision: Accept ADR-0095 under DL-0691. The poller uses an in-house IMAP4rev1 subset client over `node:tls` (`packages/modules/ap/src/imap-client.ts`): implicit TLS with certificate verification, greeting, LOGIN, EXAMINE, UID SEARCH, UID FETCH (RFC822.SIZE / BODY.PEEK[]), LOGOUT; bounded lines (64 KiB) and literals (message ceiling), command timeouts; no command that changes the mailbox.
+- Why: RQ-0177 F1/F2: imapflow (the only maintained library) adds 8 direct runtime dependencies for features not used; the needed subset is small and fully testable against an in-process fake server. AGENTS.md §4 "prefer none", directive 5.
+- Alternatives: imapflow (rejected: dependency weight); node-imap / emailjs-imap-client (rejected: unmaintained/archived); STARTTLS support (rejected: RFC 8314 prefers implicit TLS; fewer downgrade paths).
+- ADR: ADR-0095 · Status: accepted
+
+### DL-0812 — Bills mailbox credentials sealed per row; write-once identity; fixed error texts
+- Date: 2026-11-16 · By: claude · Task: T-0127 · Category: security
+- Decision: `app.bill_inbox_mailbox` (migration 0077) keeps host, port, username, folder and the password envelope-encrypted (ADR-0018, AAD bound to tenant/company/table/row/field). lf_app may only update status, the cursor and the last-poll outcome; a credential change is a new row and the previous one becomes `superseded` (one active per company). Poll failures are recorded as a fixed error class (`connect_failed`, `tls_failed`, `auth_failed`, `folder_missing`, `protocol_error`, `timeout`), never server text.
+- Why: Design §6.6; same pattern as the Salesforce connection (migration 0017); server text may echo the username or worse, and error columns are readable by every lf_app read path.
+- Alternatives: environment-variable credentials (rejected: per install, not per company, no rotation path); storing server error text (rejected: leak risk).
+- ADR: ADR-0095 · Status: accepted
+
+### DL-0813 — Exactly-once polling: per-message transaction with row lock, (uidvalidity, last_uid) cursor, refuse-and-advance
+- Date: 2026-11-16 · By: claude · Task: T-0127 · Category: architecture
+- Decision: Each fetched message is ingested in its own `withTenant` transaction that locks the mailbox row, skips UIDs at or below the cursor, calls `ingestBillEmail` and advances the cursor. A changed UIDVALIDITY restarts the cursor at 0 (Message-ID idempotency absorbs the re-reads). Messages over 25 MiB (RFC822.SIZE, checked before download) and messages `ingestBillEmail` refuses (`InboxError`) advance the cursor and are counted as refused; other errors stop the poll with the cursor unchanged. At most 50 messages per poll; network I/O never runs inside a database transaction.
+- Why: RQ-0177 F2/F5/F6: a crash loses or duplicates nothing; one bad email never blocks the inbox; concurrent pollers serialise on the row lock.
+- Alternatives: marking messages \Seen or moving them (rejected: modifies the business's mailbox and is not transactional with the DB); one transaction per poll (rejected: one bad message rolls back the batch; holds a transaction across network I/O).
+- ADR: ADR-0095 · Status: accepted
+
+### DL-0814 — Poll schedule: owner fan-out every 5 minutes, one job per tenant and slot
+- Date: 2026-11-16 · By: claude · Task: T-0127 · Category: architecture
+- Decision: The owner-role scheduler installs a `*/5 * * * *` (UTC) schedule on queue `ap.inbox.fanout`; its consumer sends one `ap.inbox.poll` job per active tenant with a job id derived from queue, tenant and 5-minute slot. The lf_app worker polls that tenant's active mailboxes in RLS. IDLE is not used.
+- Why: ADR-0062 pattern (lf_app cannot enumerate tenants); a 5-minute delay is acceptable for supplier bills; deterministic ids make a duplicate fan-out a no-op.
+- Alternatives: IMAP IDLE long-lived connections per mailbox (rejected for MVP: one socket per tenant, reconnect logic, little AP value); worker-local timers (rejected: worker cannot list tenants).
+- ADR: ADR-0095 · Status: accepted
