@@ -11,6 +11,7 @@ export interface SubPage {
     | '/settings/tax'
     | '/settings/bank-accounts'
     | '/settings/billing'
+    | '/settings/remittance-account'
     | '/settings/approvals'
     | '/settings/users'
     | '/reports/control-exceptions'
@@ -262,6 +263,12 @@ export const SECTIONS: readonly Section[] = [
         to: '/settings/billing',
         name: 'Numbering and billing',
         text: 'Invoice and credit note numbers, billing formats, invoice colour, payment terms and how customers pay.',
+      },
+      // The bank account printed on invoices, part of setup step 8 (T-0183).
+      {
+        to: '/settings/remittance-account',
+        name: 'Remittance account',
+        text: 'The bank account printed on invoices for bank transfer. A second person approves every change.',
       },
       {
         to: '/settings/approvals',

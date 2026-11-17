@@ -44,7 +44,9 @@ export function ControlExceptionsPage({ week }: { week: string | undefined }) {
   });
   const [note, setNote] = useState('');
   const ack = useMutation({
-    mutationFn: (weekStart: string) => admin.acknowledgeWeek(weekStart, note.trim() || undefined),
+    // A fresh Idempotency-Key per press (ADR-0093); the route is replay-safe by state.
+    mutationFn: (weekStart: string) =>
+      admin.acknowledgeWeek(weekStart, `sod-ack-${crypto.randomUUID()}`, note.trim() || undefined),
     onSuccess: async () => {
       setNote('');
       await queryClient.invalidateQueries({ queryKey: ['admin', 'sod-week'] });

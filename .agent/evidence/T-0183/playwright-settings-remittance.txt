@@ -1,0 +1,18 @@
+
+Running 14 tests using 2 workers
+
+[1/14] [chromium] › tests/e2e/web/settings-billing.spec.ts:461:1 › SS-PLAT-131: an Accountant sees Numbering and billing read-only [T-0186]
+[2/14] [chromium] › tests/e2e/web/settings-billing.spec.ts:319:3 › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 1440 [T-0186]
+[3/14] [chromium] › tests/e2e/web/settings-billing.spec.ts:496:1 › SS-PLAT-131: without settings.read, Numbering and billing is forbidden [T-0186]
+[4/14] [chromium] › tests/e2e/web/settings-billing.spec.ts:507:1 › SS-PLAT-131: Numbering and billing and Approval amounts are listed on the Settings page [T-0186]
+[5/14] [chromium] › tests/e2e/web/settings-billing.spec.ts:319:3 › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 390 [T-0186]
+[6/14] [chromium] › tests/e2e/web/settings-remittance.spec.ts:394:3 › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]
+[7/14] [chromium] › tests/e2e/web/settings-billing.spec.ts:414:1 › SS-PLAT-131: Numbering and billing refusals are said in plain words, and incomplete forms send nothing [T-0186]
+[8/14] [chromium] › tests/e2e/web/settings-remittance.spec.ts:606:1 › SS-PLAT-149: when the API does not allow the self-approval, the requester is told why in plain words [T-0183]
+[9/14] [chromium] › tests/e2e/web/settings-remittance.spec.ts:394:3 › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]
+[10/14] [chromium] › tests/e2e/web/settings-remittance.spec.ts:635:1 › SS-PLAT-149: an Accountant sees the remittance account and a pending change read-only, masked [T-0183]
+[11/14] [chromium] › tests/e2e/web/settings-remittance.spec.ts:664:1 › SS-PLAT-149: without settings.read, the remittance account is forbidden [T-0183]
+[12/14] [chromium] › tests/e2e/web/settings-remittance.spec.ts:675:1 › SS-PLAT-149: the remittance account is listed on the Settings page [T-0183]
+[13/14] [chromium] › tests/e2e/web/settings-remittance.spec.ts:506:1 › SS-PLAT-149: a rejection needs a reason; the account in force stays [T-0183]
+[14/14] [chromium] › tests/e2e/web/settings-remittance.spec.ts:550:1 › SS-PLAT-149: in small-team mode the requester may approve their own change with a reason; refusals are in plain words [T-0183]
+  14 passed (34.8s)

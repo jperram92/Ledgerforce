@@ -9,12 +9,16 @@
  * - A series' prefix and width are fixed once a number is issued (409); the clearing account must
  *   be an active, postable, non-control asset account of the company (422); another tenant's
  *   company is 404.
- * - After saving, the wizard's step 8 has nothing missing.
+ * - After saving, the wizard's step 8 has nothing missing (T-0183: bank transfer is accepted, so
+ *   it also needs an approved remittance bank account in force, ADR-0079 decision 2).
  */
 import 'reflect-metadata';
-import { randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
+import { approveRemittanceAccountChange, requestRemittanceAccountChange } from '@ledgerforce/ar';
+import { createCompanyBankAccount } from '@ledgerforce/bank';
 import { nextNumber } from '@ledgerforce/ledger';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
+import { LocalKeyringKms } from '@ledgerforce/shared/crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApi, type Api } from '../app.ts';
 
@@ -251,9 +255,11 @@ describe('SS-PLAT-131: numbering and billing over HTTP (wizard step 8)', () => {
     });
     expect(missing.status).toBe(400);
     expect(await json(missing)).toMatchObject({ error: 'invalid_request' });
-    // Stripe is accepted but not set up yet: the wizard says so.
+    // Stripe is accepted but not set up yet, and (T-0183) bank transfer has no remittance account
+    // in force yet: the wizard says both.
     expect(await wizardMissing(8)).toEqual([
       'Stripe is an accepted payment method but Stripe is not set up (no clearing account)',
+      'No remittance bank account has been chosen for bank transfer',
     ]);
   });
 
@@ -281,6 +287,40 @@ describe('SS-PLAT-131: numbering and billing over HTTP (wizard step 8)', () => {
     const again = await call('PUT', '/setup/billing/stripe', 'fa', { body });
     expect(await json(again)).toMatchObject({ changed: false });
     expect(await audits('stripe_settings')).toBe(before + 1);
+    // T-0183: bank transfer is accepted too, so step 8 asks for the remittance account until a
+    // second person approves one (maker-checker, ADR-0080; its routes are T-0180's tests).
+    expect(await wizardMissing(8)).toEqual([
+      'No remittance bank account has been chosen for bank transfer',
+    ]);
+    const kms = LocalKeyringKms.fromJson(
+      JSON.stringify({ active: 'k1', keys: { k1: randomBytes(32).toString('base64') } }),
+    );
+    const operating = await f.inTenant((trx) =>
+      createCompanyBankAccount(trx, kms, co, {
+        glAccountId: acct('1010'),
+        name: 'Operating',
+        bsb: '062-000',
+        accountName: 'Billing Test Pty Ltd',
+        accountNumber: '12345678',
+        currency: 'AUD',
+      }),
+    );
+    const changeId = randomUUID();
+    await f.inTenant((trx) =>
+      requestRemittanceAccountChange(trx, {
+        companyId: co,
+        changeId,
+        bankAccountId: operating,
+        requestedBy: people['fa']?.id ?? '',
+      }),
+    );
+    await f.inTenant((trx) =>
+      approveRemittanceAccountChange(trx, {
+        companyId: co,
+        changeId,
+        approvedBy: people['accountant']?.id ?? '',
+      }),
+    );
     expect(await wizardMissing(8)).toEqual([]);
   });
 

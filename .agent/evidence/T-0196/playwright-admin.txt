@@ -1,0 +1,24 @@
+
+Running 20 tests using 2 workers
+
+[1/20] [chromium] › tests/e2e/web/admin.spec.ts:634:3 › SS-PLAT-78 people and roles › SS-PLAT-78: a disabled person shows when, why and who took over [T-0093]
+[2/20] [chromium] › tests/e2e/web/admin.spec.ts:423:5 › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner sees people with roles and status @ 1440 [T-0093]
+[3/20] [chromium] › tests/e2e/web/admin.spec.ts:649:3 › SS-PLAT-78 people and roles › SS-PLAT-78: a step-up challenge goes to /auth/step-up and returns here [T-0093]
+[4/20] [chromium] › tests/e2e/web/admin.spec.ts:423:5 › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner sees people with roles and status @ 390 [T-0093]
+[5/20] [chromium] › tests/e2e/web/admin.spec.ts:675:5 › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 1440 [T-0093]
+[6/20] [chromium] › tests/e2e/web/admin.spec.ts:448:3 › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner invites someone by keyboard [T-0093]
+[7/20] [chromium] › tests/e2e/web/admin.spec.ts:675:5 › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 390 [T-0093]
+[8/20] [chromium] › tests/e2e/web/admin.spec.ts:491:3 › SS-PLAT-78 people and roles › SS-PLAT-78: an Auditor reads the list but is told who can change it [T-0093]
+[9/20] [chromium] › tests/e2e/web/admin.spec.ts:504:3 › SS-PLAT-78 people and roles › SS-PLAT-78: a clerk without users.read sees the forbidden state [T-0093]
+[10/20] [chromium] › tests/e2e/web/admin.spec.ts:714:3 › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: an Auditor sees whose turn it is, with no button [T-0093]
+[11/20] [chromium] › tests/e2e/web/admin.spec.ts:728:3 › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: an empty week, an error and the forbidden state [T-0093]
+[12/20] [chromium] › tests/e2e/web/admin.spec.ts:522:3 › SS-PLAT-78 people and roles › SS-PLAT-78: loading and error states, with Try again [T-0093]
+[13/20] [chromium] › tests/e2e/web/admin.spec.ts:542:3 › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner tries to give themselves a role and sees the refusal [T-0093]
+[14/20] [chromium] › tests/e2e/web/admin.spec.ts:760:5 › SS-PLAT-80 audit log viewer › SS-PLAT-80: newest entries first, with details @ 1440 [T-0093]
+[15/20] [chromium] › tests/e2e/web/admin.spec.ts:568:3 › SS-PLAT-78 people and roles › SS-PLAT-78: a Finance Admin gives and removes a role, but not the Owner role [T-0093]
+[16/20] [chromium] › tests/e2e/web/admin.spec.ts:760:5 › SS-PLAT-80 audit log viewer › SS-PLAT-80: newest entries first, with details @ 390 [T-0093]
+[17/20] [chromium] › tests/e2e/web/admin.spec.ts:599:5 › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner offboards a leaver with a successor @ 1440 [T-0093]
+[18/20] [chromium] › tests/e2e/web/admin.spec.ts:784:3 › SS-PLAT-80 audit log viewer › SS-PLAT-80: filters live in the address; older entries page by keyset [T-0093]
+[19/20] [chromium] › tests/e2e/web/admin.spec.ts:599:5 › SS-PLAT-78 people and roles › SS-PLAT-78: the Owner offboards a leaver with a successor @ 390 [T-0093]
+[20/20] [chromium] › tests/e2e/web/admin.spec.ts:810:3 › SS-PLAT-80 audit log viewer › SS-PLAT-80: no match, an invalid filter and the forbidden state [T-0093]
+  20 passed (51.1s)

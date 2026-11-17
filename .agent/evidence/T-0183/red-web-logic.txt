@@ -1,0 +1,52 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8
+
+ ❯ |web| apps/web/src/settings/settings-logic.test.ts (12 tests | 3 failed) 17ms
+     × SS-PLAT-149 names a remittance account by its BSB and last 3 digits only 9ms
+     × SS-PLAT-149 offers active accounts other than the one in force, and removal when one is 1ms
+     × SS-PLAT-149 turns the remittance refusals into plain words 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |web| apps/web/src/settings/settings-logic.test.ts > T-0183 remittance account logic (SS-PLAT-149) > SS-PLAT-149 names a remittance account by its BSB and last 3 digits only
+TypeError: remittanceText is not a function
+ ❯ apps/web/src/settings/settings-logic.test.ts:122:12
+    120|
+    121|   it('SS-PLAT-149 names a remittance account by its BSB and last 3 dig…
+    122|     expect(remittanceText(operating)).toBe('Operating: BSB 062-000, ac…
+       |            ^
+    123|     expect(remittanceText({ ...operating, account_number: '12345678' }…
+    124|       'Operating: BSB 062-000, account ending 678',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  |web| apps/web/src/settings/settings-logic.test.ts > T-0183 remittance account logic (SS-PLAT-149) > SS-PLAT-149 offers active accounts other than the one in force, and removal when one is
+TypeError: remittanceChoices is not a function
+ ❯ apps/web/src/settings/settings-logic.test.ts:132:12
+    130|     const reserve = { ...operating, id: 'a2', name: 'Reserve', account…
+    131|     const old = { ...operating, id: 'a3', name: 'Old', status: 'archiv…
+    132|     expect(remittanceChoices([operating, reserve, old], null)).toEqual…
+       |            ^
+    133|       { value: 'a1', label: 'Operating: BSB 062-000, account ending 67…
+    134|       { value: 'a2', label: 'Reserve: BSB 062-000, account ending 321'…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |web| apps/web/src/settings/settings-logic.test.ts > T-0183 remittance account logic (SS-PLAT-149) > SS-PLAT-149 turns the remittance refusals into plain words
+TypeError: remittanceRefusal is not a function
+ ❯ apps/web/src/settings/settings-logic.test.ts:145:12
+    143|     const e = (status: number, body: Record<string, unknown>) => new A…
+    144|     const sod = { error: 'sod_violation', rule: 'SOD_REMITTANCE_SELF_A…
+    145|     expect(remittanceRefusal(e(403, { ...sod, small_team_exception_req…
+       |            ^
+    146|       /You asked for this change, so you can’t approve it as well/,
+    147|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 9 passed (12)
+   Start at  04:43:18
+   Duration  10.30s (transform 524ms, setup 2.47s, import 79ms, tests 17ms, environment 6.70s)
+

@@ -7,14 +7,23 @@
  * default payment terms and accepted payment methods until the ar module stores them, and Stripe
  * as a method needs Stripe set up. The modules and the database refuse malformed settings; another
  * tenant cannot read them. Step 10 needs nothing new (RQ-0153 Q4).
+ *
+ * SS-PLAT-148 (T-0183, ADR-0079 decision 2): when bank transfer is accepted, step 8 also lists the
+ * remittance bank account until an approved one is in force. The company walked by SS-PLAT-121
+ * has one approved in its fixture (maker-checker, ADR-0080).
  */
+import { randomBytes, randomUUID } from 'node:crypto';
+import { createCompanyBankAccount } from '@ledgerforce/bank';
 import { seedBillingFormats } from '@ledgerforce/documents';
 import { auServicesSmb, loadChartTemplate } from '@ledgerforce/gl';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
 import { withTenant } from '@ledgerforce/db';
 import {
+  approveRemittanceAccountChange,
   invoiceSettingsOf,
   InvoiceSettingsError,
+  rejectRemittanceAccountChange,
+  requestRemittanceAccountChange,
   setInvoiceSettings,
   type InvoiceSettingsPatch,
 } from '@ledgerforce/ar';
@@ -25,7 +34,9 @@ import {
   TaxSettingsError,
   type SetTaxSettings,
 } from '@ledgerforce/tax';
-import { sql } from 'kysely';
+import { LocalKeyringKms } from '@ledgerforce/shared/crypto';
+import { sql, type Transaction } from 'kysely';
+import type { Database } from '@ledgerforce/db';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { wizardOf } from './wizard.ts';
 
@@ -42,10 +53,15 @@ const TERMS = 'Default payment terms have not been set';
 const METHODS = 'No accepted payment method (bank transfer or Stripe) has been chosen';
 const STRIPE =
   'Stripe is an accepted payment method but Stripe is not set up (no clearing account)';
+const REMITTANCE = 'No remittance bank account has been chosen for bank transfer';
+const kms = LocalKeyringKms.fromJson(
+  JSON.stringify({ active: 'k1', keys: { k1: randomBytes(32).toString('base64') } }),
+);
 
 let f: LedgerFixture;
 let c: string;
 let user: string;
+let checker: string;
 let acct: Record<string, string> = {};
 
 const missing = async (step: number, asOf = AS_OF) =>
@@ -61,6 +77,31 @@ const setTax = (s: Partial<SetTaxSettings>) =>
     }),
   );
 const setAr = (p: InvoiceSettingsPatch) => f.inTenant((trx) => setInvoiceSettings(trx, c, p));
+/** An active company bank account on the chart's operating account (sealed by the bank module). */
+const operatingAccount = (trx: Transaction<Database>, company: string, glAccountId: string) =>
+  createCompanyBankAccount(trx, kms, company, {
+    glAccountId,
+    name: 'Operating',
+    bsb: '062-000',
+    accountName: 'Harbour Lane Design Pty Ltd',
+    accountNumber: '12345678',
+    currency: 'AUD',
+  });
+/** Maker-checker (ADR-0080): `user` requests, `checker` approves, in separate transactions. */
+const approveRemittance = async (company: string, bankAccountId: string) => {
+  const changeId = randomUUID();
+  await f.inTenant((trx) =>
+    requestRemittanceAccountChange(trx, {
+      companyId: company,
+      changeId,
+      bankAccountId,
+      requestedBy: user,
+    }),
+  );
+  await f.inTenant((trx) =>
+    approveRemittanceAccountChange(trx, { companyId: company, changeId, approvedBy: checker }),
+  );
+};
 const refused = async (p: Promise<unknown>): Promise<{ code: string; message: string }> => {
   const e: unknown = await p.then(
     () => undefined,
@@ -73,6 +114,7 @@ const refused = async (p: Promise<unknown>): Promise<{ code: string; message: st
 beforeAll(async () => {
   f = await createLedgerFixture(T);
   user = await f.addUser('finance_admin');
+  checker = await f.addUser('finance_admin');
   c = await f.inTenant(async (trx) => {
     const row = await trx
       .insertInto('app.company')
@@ -90,6 +132,9 @@ beforeAll(async () => {
   acct = await f.inTenant(async (trx) =>
     Object.fromEntries((await loadChartTemplate(trx, c, auServicesSmb)).accounts),
   );
+  // T-0183: bank transfer needs a remittance account in force; approve one up front.
+  const operating = await f.inTenant((trx) => operatingAccount(trx, c, acct['1010'] ?? ''));
+  await approveRemittance(c, operating);
 }, 120_000);
 
 afterAll(async () => {
@@ -261,6 +306,84 @@ describe('SS-PLAT-121: step 8 requires branding, payment terms and payment metho
     );
     await expect(update(sql`logo = '\\x00'::bytea`)).rejects.toThrow(/check constraint/);
     // Nothing changed.
+    expect(await missing(8)).toEqual([]);
+  });
+});
+
+describe('SS-PLAT-148: step 8 asks for a remittance bank account when bank transfer is accepted', () => {
+  it('SS-PLAT-148 step 8 lists the remittance account with bank transfer and none in force; not with Stripe only, nor once an approved account is in force [T-0183]', async () => {
+    const { c2, gl } = await f.inTenant(async (trx) => {
+      const row = await trx
+        .insertInto('app.company')
+        .values({ name: 'Bay Street Studio', base_currency: 'AUD' })
+        .returning('id')
+        .executeTakeFirstOrThrow();
+      await trx
+        .insertInto('app.number_series')
+        .values({ company_id: row.id, code: 'ar_invoice_document', prefix: 'INV-' })
+        .execute();
+      await seedBillingFormats(trx, row.id);
+      const chart = Object.fromEntries(
+        (await loadChartTemplate(trx, row.id, auServicesSmb)).accounts,
+      );
+      await setInvoiceSettings(trx, row.id, {
+        brandColour: '#0B3D2E',
+        defaultPaymentTermsDays: 30,
+      });
+      await sql`INSERT INTO app.stripe_settings (company_id, clearing_account_id)
+                VALUES (${row.id}, ${chart['1210'] ?? ''})`.execute(trx);
+      return { c2: row.id, gl: chart };
+    });
+    const missing2 = async () =>
+      (await f.inTenant((trx) => wizardOf(trx, c2, { asOf: AS_OF }))).steps[7]?.missing;
+    const set2 = (p: InvoiceSettingsPatch) => f.inTenant((trx) => setInvoiceSettings(trx, c2, p));
+
+    // Stripe only: no remittance account is needed.
+    await set2({ acceptedPaymentMethods: ['stripe'] });
+    expect(await missing2()).toEqual([]);
+
+    // Bank transfer accepted and no account at all.
+    await set2({ acceptedPaymentMethods: ['bank_transfer'] });
+    expect(await missing2()).toEqual([REMITTANCE]);
+    await set2({ acceptedPaymentMethods: ['bank_transfer', 'stripe'] });
+    expect(await missing2()).toEqual([REMITTANCE]);
+
+    // A bank account exists, and a change is requested but not approved, then rejected.
+    const operating = await f.inTenant((trx) => operatingAccount(trx, c2, gl['1010'] ?? ''));
+    const asked = randomUUID();
+    await f.inTenant((trx) =>
+      requestRemittanceAccountChange(trx, {
+        companyId: c2,
+        changeId: asked,
+        bankAccountId: operating,
+        requestedBy: user,
+      }),
+    );
+    expect(await missing2()).toEqual([REMITTANCE]);
+    await f.inTenant((trx) =>
+      rejectRemittanceAccountChange(trx, {
+        companyId: c2,
+        changeId: asked,
+        rejectedBy: checker,
+        reason: 'Wrong account',
+      }),
+    );
+    expect(await missing2()).toEqual([REMITTANCE]);
+
+    // Approved by a second person: in force, nothing is missing.
+    await approveRemittance(c2, operating);
+    expect(await missing2()).toEqual([]);
+
+    // Archiving the account releases the designation (ADR-0086): step 8 asks again.
+    await f.inTenant((trx) =>
+      trx
+        .updateTable('app.bank_account')
+        .set({ status: 'archived' })
+        .where('id', '=', operating)
+        .execute(),
+    );
+    expect(await missing2()).toEqual([REMITTANCE]);
+    // The other company's account in force is untouched.
     expect(await missing(8)).toEqual([]);
   });
 });

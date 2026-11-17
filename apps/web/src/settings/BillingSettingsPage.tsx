@@ -526,6 +526,11 @@ export function BillingSettingsPage() {
       <p className="admin-note">
         <Link to="/settings/setup">Back to Set up your company</Link>
       </p>
+      <p className="admin-note">
+        The bank account printed on invoices for bank transfer is chosen on{' '}
+        <Link to="/settings/remittance-account">Remittance account</Link>; a second person approves
+        every change.
+      </p>
       {body}
     </>
   );

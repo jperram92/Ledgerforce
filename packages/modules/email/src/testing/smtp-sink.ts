@@ -2,6 +2,8 @@
  * In-process SMTP sink for tests (T-0042, ADR-0046 rule 5): a real SMTP conversation over TCP on
  * 127.0.0.1 (EHLO/HELO, MAIL, RCPT, DATA with dot-unstuffing, RSET, NOOP, QUIT), collecting each
  * message's envelope and raw RFC 5322 text. No TLS, no auth, no relaying — test use only.
+ * `rcptReply` makes the sink refuse every recipient with a chosen SMTP reply (e.g. a transient
+ * `451 4.3.0 …`), so a sender sees a real SMTP failure (T-0197).
  */
 import { createServer, type AddressInfo, type Server, type Socket } from 'node:net';
 
@@ -13,6 +15,8 @@ export interface SunkMessage {
 
 export class SmtpSink {
   readonly messages: SunkMessage[] = [];
+  /** When set, every RCPT TO is answered with this reply instead of `250 OK`. */
+  rcptReply: string | null = null;
   #server: Server | null = null;
   #port = 0;
 
@@ -67,8 +71,12 @@ export class SmtpSink {
           from = /<([^>]*)>/.exec(line)?.[1] ?? '';
           reply('250 OK');
         } else if (verb === 'RCPT') {
-          to.push(/<([^>]*)>/.exec(line)?.[1] ?? '');
-          reply('250 OK');
+          if (this.rcptReply) {
+            reply(this.rcptReply);
+          } else {
+            to.push(/<([^>]*)>/.exec(line)?.[1] ?? '');
+            reply('250 OK');
+          }
         } else if (verb === 'DATA') {
           data = [];
           reply('354 End data with <CR><LF>.<CR><LF>');

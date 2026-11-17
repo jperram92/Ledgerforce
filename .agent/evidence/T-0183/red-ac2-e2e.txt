@@ -1,0 +1,224 @@
+
+Running 8 tests using 2 workers
+
+[1/8] [chromium] › tests/e2e/web/settings-remittance.spec.ts:394:3 › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]
+[2/8] [chromium] › tests/e2e/web/settings-remittance.spec.ts:606:1 › SS-PLAT-149: when the API does not allow the self-approval, the requester is told why in plain words [T-0183]
+  1) [chromium] › tests/e2e/web/settings-remittance.spec.ts:606:1 › SS-PLAT-149: when the API does not allow the self-approval, the requester is told why in plain words [T-0183] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.fill: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Waiting for approval' }).getByLabel('Why you are approving your own change')
+
+
+      624 |   f.smallTeam = false;
+      625 |   const waiting = region(page, 'Waiting for approval');
+    > 626 |   await waiting.getByLabel('Why you are approving your own change').fill('Only one of us');
+          |                                                                     ^
+      627 |   await waiting.getByRole('button', { name: 'Approve my own change' }).click();
+      628 |   await expect(page.getByRole('alert')).toContainText(
+      629 |     'You asked for this change, so you can’t approve it as well',
+        at /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/tests/e2e/web/settings-remittance.spec.ts:626:69
+
+    Error Context: test-results/web-settings-remittance-SS-b8db2--why-in-plain-words-T-0183--chromium/error-context.md
+
+    Error Context: test-results/web-settings-remittance-SS-b8db2--why-in-plain-words-T-0183--chromium/error-context.md
+
+
+  2) [chromium] › tests/e2e/web/settings-remittance.spec.ts:394:3 › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('link', { name: 'Remittance account' })
+
+
+      401 |     await expect(stepItem(page, 8)).toContainText(REMITTANCE_MISSING);
+      402 |     await stepItem(page, 8).getByRole('link', { name: 'Numbering and billing' }).click();
+    > 403 |     await page.getByRole('link', { name: 'Remittance account' }).click();
+          |                                                                  ^
+      404 |     await expect(page).toHaveURL(/\/settings\/remittance-account$/);
+      405 |     await expect(page.getByRole('heading', { level: 1, name: 'Remittance account' })).toBeVisible();
+      406 |     await expect(region(page, 'On your invoices')).toContainText('No remittance account yet');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/tests/e2e/web/settings-remittance.spec.ts:403:66
+
+    Error Context: test-results/web-settings-remittance-SS-7ad60--fresh-sign-in-1440-T-0183--chromium/error-context.md
+
+    Error Context: test-results/web-settings-remittance-SS-7ad60--fresh-sign-in-1440-T-0183--chromium/error-context.md
+
+
+[3/8] [chromium] › tests/e2e/web/settings-remittance.spec.ts:635:1 › SS-PLAT-149: an Accountant sees the remittance account and a pending change read-only, masked [T-0183]
+[4/8] [chromium] › tests/e2e/web/settings-remittance.spec.ts:394:3 › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]
+  3) [chromium] › tests/e2e/web/settings-remittance.spec.ts:635:1 › SS-PLAT-149: an Accountant sees the remittance account and a pending change read-only, masked [T-0183] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'On your invoices' })
+    Expected substring: "account ending 678"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'On your invoices' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'On your invoices' })
+
+
+      651 |   });
+      652 |   await open(page, '/settings/remittance-account', 1440);
+    > 653 |   await expect(region(page, 'On your invoices')).toContainText('account ending 678');
+          |                                                  ^
+      654 |   await expect(region(page, 'Waiting for approval')).toContainText('Remove the remittance account');
+      655 |   await expect(page.locator('main').getByRole('button')).toHaveCount(0);
+      656 |   await expect(page.getByRole('combobox')).toHaveCount(0);
+        at /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/tests/e2e/web/settings-remittance.spec.ts:653:50
+
+    Error Context: test-results/web-settings-remittance-SS-a6c54-ge-read-only-masked-T-0183--chromium/error-context.md
+
+    Error Context: test-results/web-settings-remittance-SS-a6c54-ge-read-only-masked-T-0183--chromium/error-context.md
+
+
+[5/8] [chromium] › tests/e2e/web/settings-remittance.spec.ts:664:1 › SS-PLAT-149: without settings.read, the remittance account is forbidden [T-0183]
+  4) [chromium] › tests/e2e/web/settings-remittance.spec.ts:664:1 › SS-PLAT-149: without settings.read, the remittance account is forbidden [T-0183] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/do not have access/i)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/do not have access/i) with timeout 5000ms
+      - waiting for getByText(/do not have access/i)
+
+
+      667 |   const f = await fakeApi(page, 'clerk');
+      668 |   await open(page, '/settings/remittance-account', 1440);
+    > 669 |   await expect(page.getByText(/do not have access/i)).toBeVisible();
+          |                                                       ^
+      670 |   await expect(page.getByRole('region', { name: 'On your invoices' })).toHaveCount(0);
+      671 |   expect(f.reads).toBe(0);
+      672 |   expect(f.errors).toEqual([]);
+        at /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/tests/e2e/web/settings-remittance.spec.ts:669:55
+
+    Error Context: test-results/web-settings-remittance-SS-c5148-ccount-is-forbidden-T-0183--chromium/error-context.md
+
+    Error Context: test-results/web-settings-remittance-SS-c5148-ccount-is-forbidden-T-0183--chromium/error-context.md
+
+
+[6/8] [chromium] › tests/e2e/web/settings-remittance.spec.ts:675:1 › SS-PLAT-149: the remittance account is listed on the Settings page [T-0183]
+  5) [chromium] › tests/e2e/web/settings-remittance.spec.ts:394:3 › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('link', { name: 'Remittance account' })
+
+
+      401 |     await expect(stepItem(page, 8)).toContainText(REMITTANCE_MISSING);
+      402 |     await stepItem(page, 8).getByRole('link', { name: 'Numbering and billing' }).click();
+    > 403 |     await page.getByRole('link', { name: 'Remittance account' }).click();
+          |                                                                  ^
+      404 |     await expect(page).toHaveURL(/\/settings\/remittance-account$/);
+      405 |     await expect(page.getByRole('heading', { level: 1, name: 'Remittance account' })).toBeVisible();
+      406 |     await expect(region(page, 'On your invoices')).toContainText('No remittance account yet');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/tests/e2e/web/settings-remittance.spec.ts:403:66
+
+    Error Context: test-results/web-settings-remittance-SS-e467c-a-fresh-sign-in-390-T-0183--chromium/error-context.md
+
+    Error Context: test-results/web-settings-remittance-SS-e467c-a-fresh-sign-in-390-T-0183--chromium/error-context.md
+
+
+[7/8] [chromium] › tests/e2e/web/settings-remittance.spec.ts:506:1 › SS-PLAT-149: a rejection needs a reason; the account in force stays [T-0183]
+  6) [chromium] › tests/e2e/web/settings-remittance.spec.ts:506:1 › SS-PLAT-149: a rejection needs a reason; the account in force stays [T-0183] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Waiting for approval' })
+    Expected substring: "Reserve: BSB 062-000, account ending 321"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Waiting for approval' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Waiting for approval' })
+
+
+      523 |   await open(page, '/settings/remittance-account', 1440);
+      524 |   const waiting = region(page, 'Waiting for approval');
+    > 525 |   await expect(waiting).toContainText('Reserve: BSB 062-000, account ending 321');
+          |                         ^
+      526 |   await expect(waiting).toContainText('Instead of Operating: BSB 062-000, account ending 678');
+      527 |   await waiting.getByRole('button', { name: 'Reject this change' }).click();
+      528 |   await expect(waiting.getByText('Write why you are rejecting this change.')).toBeVisible();
+        at /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/tests/e2e/web/settings-remittance.spec.ts:525:25
+
+    Error Context: test-results/web-settings-remittance-SS-433c0-ount-in-force-stays-T-0183--chromium/error-context.md
+
+    Error Context: test-results/web-settings-remittance-SS-433c0-ount-in-force-stays-T-0183--chromium/error-context.md
+
+
+[8/8] [chromium] › tests/e2e/web/settings-remittance.spec.ts:550:1 › SS-PLAT-149: in small-team mode the requester may approve their own change with a reason; refusals are in plain words [T-0183]
+  7) [chromium] › tests/e2e/web/settings-remittance.spec.ts:675:1 › SS-PLAT-149: the remittance account is listed on the Settings page [T-0183] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('link', { name: 'Remittance account' })
+
+
+      678 |   await fakeApi(page, 'fa');
+      679 |   await open(page, '/settings', 1440);
+    > 680 |   await page.getByRole('link', { name: 'Remittance account' }).click();
+          |                                                                ^
+      681 |   await expect(page).toHaveURL(/\/settings\/remittance-account$/);
+      682 | });
+      683 |
+        at /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/tests/e2e/web/settings-remittance.spec.ts:680:64
+
+    Error Context: test-results/web-settings-remittance-SS-eda45-n-the-Settings-page-T-0183--chromium/error-context.md
+
+    Error Context: test-results/web-settings-remittance-SS-eda45-n-the-Settings-page-T-0183--chromium/error-context.md
+
+
+  8) [chromium] › tests/e2e/web/settings-remittance.spec.ts:550:1 › SS-PLAT-149: in small-team mode the requester may approve their own change with a reason; refusals are in plain words [T-0183] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Waiting for approval' })
+    Expected substring: "small-team mode"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Waiting for approval' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Waiting for approval' })
+
+
+      567 |   await open(page, '/settings/remittance-account', 1440);
+      568 |   const waiting = region(page, 'Waiting for approval');
+    > 569 |   await expect(waiting).toContainText('small-team mode');
+          |                         ^
+      570 |   await expect(waiting).toContainText('every Owner and Finance Admin is told');
+      571 |   const approve = waiting.getByRole('button', { name: 'Approve my own change' });
+      572 |   await expect(approve).toBeDisabled();
+        at /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/tests/e2e/web/settings-remittance.spec.ts:569:25
+
+    Error Context: test-results/web-settings-remittance-SS-40733--are-in-plain-words-T-0183--chromium/error-context.md
+
+    Error Context: test-results/web-settings-remittance-SS-40733--are-in-plain-words-T-0183--chromium/error-context.md
+
+
+  8 failed
+    [chromium] › tests/e2e/web/settings-remittance.spec.ts:394:3 › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183] 
+    [chromium] › tests/e2e/web/settings-remittance.spec.ts:394:3 › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183] 
+    [chromium] › tests/e2e/web/settings-remittance.spec.ts:506:1 › SS-PLAT-149: a rejection needs a reason; the account in force stays [T-0183] 
+    [chromium] › tests/e2e/web/settings-remittance.spec.ts:550:1 › SS-PLAT-149: in small-team mode the requester may approve their own change with a reason; refusals are in plain words [T-0183] 
+    [chromium] › tests/e2e/web/settings-remittance.spec.ts:606:1 › SS-PLAT-149: when the API does not allow the self-approval, the requester is told why in plain words [T-0183] 
+    [chromium] › tests/e2e/web/settings-remittance.spec.ts:635:1 › SS-PLAT-149: an Accountant sees the remittance account and a pending change read-only, masked [T-0183] 
+    [chromium] › tests/e2e/web/settings-remittance.spec.ts:664:1 › SS-PLAT-149: without settings.read, the remittance account is forbidden [T-0183] 
+    [chromium] › tests/e2e/web/settings-remittance.spec.ts:675:1 › SS-PLAT-149: the remittance account is listed on the Settings page [T-0183] 

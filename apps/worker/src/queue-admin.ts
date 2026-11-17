@@ -13,6 +13,7 @@ import pg from 'pg';
 import { PgBoss } from 'pg-boss';
 import { BATCH_RUN_QUEUE } from './batch-jobs.ts';
 import { AR_REMINDERS_QUEUE, DAILY_FANOUT_QUEUE } from './daily-jobs.ts';
+import { installSecurityNoticeQueues } from './security-notices.ts';
 
 async function assertOwnerRole(url: string): Promise<void> {
   const client = new pg.Client({ connectionString: url });
@@ -38,6 +39,8 @@ export async function installJobQueues(owner: PgBoss): Promise<void> {
       await owner.createQueue(name, { retryLimit: 3, retryDelay: 300, retryBackoff: true });
     }
   }
+  // Security notice delivery (T-0197, ADR-0092): no pg-boss retries, the next minute retries.
+  await installSecurityNoticeQueues(owner);
 }
 
 export async function installQueue(ownerUrl: string): Promise<void> {

@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0127",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-154",
+      "file": ".agent/evidence/T-0127/red-imap-client.txt",
+      "test": "packages/modules/ap/src/imap-client.test.ts (RED: module missing)",
+      "commit": "08ce0efd2d14",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:00:00.000Z",
+      "result": "failed-as-expected"
+    },
+    {
+      "scenario": "SS-PLAT-154",
+      "file": ".agent/evidence/T-0127/green-imap-client.txt",
+      "test": "packages/modules/ap/src/imap-client.test.ts + imap-client.tls.db.test.ts",
+      "commit": "08ce0efd2d14",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:00:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-154",
+      "file": ".agent/evidence/T-0127/red-inbox-mailbox.txt",
+      "test": "packages/modules/ap/src/inbox-mailbox.db.test.ts (RED: module missing)",
+      "commit": "08ce0efd2d14",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:00:00.000Z",
+      "result": "failed-as-expected"
+    },
+    {
+      "scenario": "SS-PLAT-154",
+      "file": ".agent/evidence/T-0127/green-inbox-mailbox.txt",
+      "test": "packages/modules/ap/src/inbox-mailbox.db.test.ts",
+      "commit": "08ce0efd2d14",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:00:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-155",
+      "file": ".agent/evidence/T-0127/green-inbox-mailbox.txt",
+      "test": "packages/modules/ap/src/inbox-mailbox.db.test.ts",
+      "commit": "08ce0efd2d14",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:00:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-156",
+      "file": ".agent/evidence/T-0127/green-inbox-mailbox.txt",
+      "test": "packages/modules/ap/src/inbox-mailbox.db.test.ts",
+      "commit": "08ce0efd2d14",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:00:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-154",
+      "file": ".agent/evidence/T-0127/red-inbox-poll-jobs.txt",
+      "test": "apps/worker/src/inbox-poll-jobs.db.test.ts (RED: module missing)",
+      "commit": "08ce0efd2d14",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:00:00.000Z",
+      "result": "failed-as-expected"
+    },
+    {
+      "scenario": "SS-PLAT-154",
+      "file": ".agent/evidence/T-0127/green-db.txt",
+      "test": "vitest --project db packages/modules/ap apps/worker packages/db (incl. inbox-poll-jobs, cross-tenant suite)",
+      "commit": "08ce0efd2d14",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:00:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-156",
+      "file": ".agent/evidence/T-0127/red-tls-mutation.txt",
+      "test": "imap-client.tls.db.test.ts with rejectUnauthorized temporarily false (mutation, reverted)",
+      "commit": "08ce0efd2d14",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:00:00.000Z",
+      "result": "failed-as-expected"
+    },
+    {
+      "scenario": "SS-PLAT-156",
+      "file": ".agent/evidence/T-0127/green-unit.txt",
+      "test": "vitest --project unit (full)",
+      "commit": "08ce0efd2d14",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:00:00.000Z",
+      "result": "passed"
+    }
+  ]
+}

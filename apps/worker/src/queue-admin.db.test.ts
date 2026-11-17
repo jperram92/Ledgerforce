@@ -10,6 +10,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { BATCH_RUN_QUEUE } from './batch-jobs.ts';
 import { AR_REMINDERS_QUEUE, DAILY_FANOUT_QUEUE } from './daily-jobs.ts';
 import { installQueue } from './queue-admin.ts';
+import { SECURITY_NOTICES_FANOUT_QUEUE, SECURITY_NOTICES_QUEUE } from './security-notices.ts';
 
 let tdb: TestDatabase;
 
@@ -36,7 +37,7 @@ describe('SS-PLAT-69 queue install', () => {
     expect(rows[0]).toEqual({ n: 0 });
   });
 
-  it('SS-PLAT-69 installs pg-boss, the outbox queues and the job queues (T-0120) as lf_migrator, idempotently', async () => {
+  it('SS-PLAT-69 installs pg-boss, the outbox queues and the job queues (T-0120, T-0197) as lf_migrator, idempotently', async () => {
     await installQueue(tdb.url('lf_migrator'));
     await installQueue(tdb.url('lf_migrator'));
     expect(await queues()).toEqual([
@@ -49,6 +50,9 @@ describe('SS-PLAT-69 queue install', () => {
         dead_letter: OUTBOX_DEAD_LETTER_QUEUE,
       },
       { name: OUTBOX_DEAD_LETTER_QUEUE, retry_limit: 2, dead_letter: null },
+      // T-0197 (ADR-0092): no pg-boss retries; the next minute's job is the retry.
+      { name: SECURITY_NOTICES_QUEUE, retry_limit: 0, dead_letter: null },
+      { name: SECURITY_NOTICES_FANOUT_QUEUE, retry_limit: 0, dead_letter: null },
     ]);
   });
 });

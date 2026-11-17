@@ -140,19 +140,25 @@ export interface AdminClient {
   grantRole(id: string, role: string): Promise<unknown>;
   revokeRole(id: string, role: string, reason: string): Promise<unknown>;
   sodWeek(weekStart?: string): Promise<SodWeek>;
-  acknowledgeWeek(weekStart: string, note?: string): Promise<unknown>;
+  /** `key` is the Idempotency-Key the route requires (ADR-0093): one per press. */
+  acknowledgeWeek(weekStart: string, key: string, note?: string): Promise<unknown>;
   auditLog(q: AuditQuery): Promise<AuditPage>;
 }
 
 export function createAdminClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): AdminClient {
-  async function send<T>(method: 'GET' | 'POST', path: string, body?: unknown): Promise<T> {
+  async function send<T>(
+    method: 'GET' | 'POST',
+    path: string,
+    body?: unknown,
+    key?: string,
+  ): Promise<T> {
+    const headers: Record<string, string> = { accept: 'application/json' };
+    if (body !== undefined) headers['content-type'] = 'application/json';
+    if (key !== undefined) headers['idempotency-key'] = key;
     const res = await env.fetch(`${env.apiBase}${path}`, {
       method,
       credentials: 'same-origin',
-      headers:
-        body === undefined
-          ? { accept: 'application/json' }
-          : { accept: 'application/json', 'content-type': 'application/json' },
+      headers,
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
     // A body that is not JSON (e.g. a proxy's error page) is treated as no body.
@@ -177,11 +183,13 @@ export function createAdminClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Admin
           ? `/sod/exceptions/weekly?week_start=${seg(weekStart)}`
           : '/sod/exceptions/weekly',
       ),
-    acknowledgeWeek: (weekStart, note) =>
-      send('POST', '/sod/exceptions/weekly/acknowledge', {
-        week_start: weekStart,
-        ...(note ? { note } : {}),
-      }),
+    acknowledgeWeek: (weekStart, key, note) =>
+      send(
+        'POST',
+        '/sod/exceptions/weekly/acknowledge',
+        { week_start: weekStart, ...(note ? { note } : {}) },
+        key,
+      ),
     auditLog: (q) => send('GET', `/audit-log${auditQueryString(q)}`),
   };
 }

@@ -98,6 +98,8 @@ interface Fake {
     has_logo: boolean;
   };
   stripe: { clearing_account_id: string } | null;
+  /** T-0183: an approved remittance account is in force (it is set on its own screen). */
+  remittance: boolean;
   refuse: Map<string, { status: number; body: unknown }>;
   reads: number;
 }
@@ -114,6 +116,8 @@ function missing8(f: Fake): string[] {
     out.push('No accepted payment method (bank transfer or Stripe) has been chosen');
   if (f.invoice.accepted_payment_methods?.includes('stripe') && !f.stripe)
     out.push('Stripe is an accepted payment method but Stripe is not set up (no clearing account)');
+  if (f.invoice.accepted_payment_methods?.includes('bank_transfer') && !f.remittance)
+    out.push('No remittance bank account has been chosen for bank transfer');
   return out;
 }
 
@@ -134,6 +138,8 @@ async function fakeApi(page: Page, who: keyof typeof ME): Promise<Fake> {
       has_logo: false,
     },
     stripe: null,
+    // Approved beforehand on the remittance account screen (T-0183, maker-checker).
+    remittance: true,
     refuse: new Map(),
     reads: 0,
   };

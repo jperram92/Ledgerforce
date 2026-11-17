@@ -1,0 +1,36 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:36671
+ ❯ |db| packages/modules/setup/src/wizard-settings.db.test.ts (9 tests | 1 failed) 927ms
+     × SS-PLAT-148 step 8 lists the remittance account with bank transfer and none in force; not with Stripe only, nor once an approved account is in force [T-0183] 36ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/setup/src/wizard-settings.db.test.ts > SS-PLAT-148: step 8 asks for a remittance bank account when bank transfer is accepted > SS-PLAT-148 step 8 lists the remittance account with bank transfer and none in force; not with Stripe only, nor once an approved account is in force [T-0183]
+AssertionError: expected [] to deeply equal [ Array(1) ]
+
+- Expected
++ Received
+
+- [
+-   "No remittance bank account has been chosen for bank transfer",
+- ]
++ []
+
+ ❯ packages/modules/setup/src/wizard-settings.db.test.ts:345:30
+    343|     // Bank transfer accepted and no account at all.
+    344|     await set2({ acceptedPaymentMethods: ['bank_transfer'] });
+    345|     expect(await missing2()).toEqual([REMITTANCE]);
+       |                              ^
+    346|     await set2({ acceptedPaymentMethods: ['bank_transfer', 'stripe'] }…
+    347|     expect(await missing2()).toEqual([REMITTANCE]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 8 passed (9)
+   Start at  21:33:59
+   Duration  3.64s (transform 848ms, setup 0ms, import 1.87s, tests 927ms, environment 0ms)
+

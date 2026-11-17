@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0183",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044843-SS-PLAT-149-remittance-empty-1440.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:48:43.842Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044844-SS-PLAT-149-remittance-request-step-up-1440.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:48:44.596Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044846-SS-PLAT-149-remittance-requested-1440.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:48:46.300Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044849-SS-PLAT-149-remittance-to-approve-1440.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:48:49.412Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044850-SS-PLAT-149-remittance-approved-1440.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:48:50.399Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044855-SS-PLAT-149-remittance-read-only-1440.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: an Accountant sees the remittance account and a pending change read-only, masked [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:48:55.792Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044854-SS-PLAT-149-remittance-empty-390.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:48:54.493Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044855-SS-PLAT-149-remittance-requested-390.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:48:55.391Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044858-SS-PLAT-149-remittance-to-approve-390.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:48:58.271Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044859-SS-PLAT-149-remittance-approved-390.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:48:59.054Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044902-SS-PLAT-149-remittance-reject-reason-1440.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: a rejection needs a reason; the account in force stays [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:49:02.109Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-149",
+      "file": ".agent/evidence/T-0183/20261117-044904-SS-PLAT-149-remittance-small-team-1440.png",
+      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: in small-team mode the requester may approve their own change with a reason; refusals are in plain words [T-0183]",
+      "commit": "5729f01cb382-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:49:04.407Z",
+      "result": "passed"
+    }
+  ]
+}
