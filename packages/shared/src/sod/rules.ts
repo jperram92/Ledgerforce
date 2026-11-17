@@ -26,6 +26,8 @@ export const SOD_SUBJECT_STEPS = {
   refund: ['create', 'approve'],
   // T-0180 / ADR-0079 (migration 0071): maker-checker for the invoice remittance bank account.
   remittance_change: ['request', 'approve'],
+  // T-0189 / ADR-0091 (migration 0077): resend of a Stripe refund, two people.
+  refund_resend: ['request', 'confirm'],
 } as const;
 
 export type SodSubjectType = keyof typeof SOD_SUBJECT_STEPS;
@@ -101,7 +103,8 @@ export type SodRuleId =
   | 'SOD_CREDIT_NOTE_SELF_APPROVAL'
   | 'SOD_INVOICE_SELF_APPROVAL'
   | 'SOD_REFUND_SELF_APPROVAL'
-  | 'SOD_REMITTANCE_SELF_APPROVAL';
+  | 'SOD_REMITTANCE_SELF_APPROVAL'
+  | 'SOD_REFUND_RESEND_SELF_CONFIRM';
 
 export interface SodRule {
   /** Also the error code returned to the client and written to the audit log. */
@@ -250,6 +253,16 @@ export const SOD_RULES: readonly SodRule[] = Object.freeze([
     conflictsWith: ['remittance_change.request'],
     condition: { kind: 'always' },
     smallTeamException: true,
+  }),
+  rule({
+    id: 'SOD_REFUND_RESEND_SELF_CONFIRM',
+    designRef: '§6.5; ADR-0091, RQ-0173',
+    description:
+      'A Stripe refund sent again with a new key: whoever asks for the resend cannot confirm it, never (no small-team exception).',
+    step: 'refund_resend.confirm',
+    conflictsWith: ['refund_resend.request'],
+    condition: { kind: 'always' },
+    smallTeamException: false,
   }),
 ]);
 

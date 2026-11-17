@@ -930,6 +930,25 @@ export interface ArSettingsTable {
   remittance_bank_account_id: Generated<string | null>;
 }
 
+/**
+ * Migration 0077 (T-0189, ADR-0091): a resend of a Stripe refund document with its
+ * own recorded Idempotency-Key `lf-refund-v3-<id>`, asked by one person, confirmed by another.
+ */
+export interface CustomerRefundStripeResendTable {
+  tenant_id: TenantId;
+  company_id: string;
+  id: string;
+  refund_id: string;
+  requested_by: string;
+  requested_at: Generated<Date>;
+  reason: string;
+  idempotency_key: string;
+  /** The only update: set once, by someone other than requested_by (guard and CHECK). */
+  confirmed_by: Generated<string | null>;
+  /** Stamped by the guard trigger on confirmation; never written by the application. */
+  confirmed_at: ColumnType<Date | null, never, never>;
+}
+
 /** Migration 0071 (T-0180, ADR-0079): maker-checker changes of the remittance bank account. */
 export interface RemittanceAccountChangeTable {
   id: Generated<string>;
@@ -1498,6 +1517,7 @@ export interface Database {
   'app.customer_refund': CustomerRefundTable;
   'app.customer_refund_approval': CustomerRefundApprovalTable;
   'app.remittance_account_change': RemittanceAccountChangeTable;
+  'app.customer_refund_stripe_resend': CustomerRefundStripeResendTable;
   'app.remittance_account_notice': RemittanceAccountNoticeTable;
   'app.opening_balance': OpeningBalanceTable;
   'app.opening_balance_item': OpeningBalanceItemTable;

@@ -102,6 +102,8 @@ export interface Refund {
 export interface ListedRefund extends Refund {
   readonly paymentIntentId: string;
   readonly metadata: Readonly<Record<string, string>>;
+  /** When Stripe created it, seconds since the Unix epoch (RQ-0173 S4): the date money left. */
+  readonly created: number;
 }
 
 /** List Refunds pages read before giving up (100 refunds a page): a PaymentIntent has far fewer. */
@@ -120,9 +122,12 @@ const LOOPBACK = new Set(['127.0.0.1', 'localhost', '[::1]']);
 function listedRefundOf(raw: unknown, paymentIntentId: string): ListedRefund | null {
   if (typeof raw !== 'object' || raw === null) return null;
   const o = raw as Record<string, unknown>;
-  const { id, amount, currency, status } = o;
+  const { id, amount, currency, status, created } = o;
   const md = o['metadata'];
   if (
+    typeof created !== 'number' ||
+    !Number.isSafeInteger(created) ||
+    created <= 0 ||
     typeof id !== 'string' ||
     !/^re_[A-Za-z0-9]+$/.test(id) ||
     o['object'] !== 'refund' ||
@@ -146,6 +151,7 @@ function listedRefundOf(raw: unknown, paymentIntentId: string): ListedRefund | n
     status,
     paymentIntentId,
     metadata,
+    created,
   };
 }
 
@@ -275,6 +281,26 @@ export class StripeClient {
     paymentIntentId: string,
     match: (r: ListedRefund) => boolean,
   ): Promise<ListedRefund | null> {
+    return (await this.#listRefunds(paymentIntentId, match, true))[0] ?? null;
+  }
+
+  /**
+   * Every refund of a PaymentIntent that `match` accepts, in Stripe's order (newest first), reading
+   * every page (RQ-0173: a failed refund and a live one may both carry the same document id).
+   */
+  async findRefunds(
+    paymentIntentId: string,
+    match: (r: ListedRefund) => boolean,
+  ): Promise<ListedRefund[]> {
+    return this.#listRefunds(paymentIntentId, match, false);
+  }
+
+  async #listRefunds(
+    paymentIntentId: string,
+    match: (r: ListedRefund) => boolean,
+    firstOnly: boolean,
+  ): Promise<ListedRefund[]> {
+    const found: ListedRefund[] = [];
     if (!/^pi_[A-Za-z0-9]+$/.test(paymentIntentId)) {
       throw new StripeConfigError('not a PaymentIntent id');
     }
@@ -296,10 +322,13 @@ export class StripeClient {
         if (!r) {
           throw new StripeApiError(status, 'malformed_response', 'not a Refund of this payment');
         }
-        if (match(r)) return r;
+        if (match(r)) {
+          found.push(r);
+          if (firstOnly) return found;
+        }
         last = r.id;
       }
-      if (!more) return null;
+      if (!more) return found;
       if (!last) throw new StripeApiError(status, 'malformed_response', 'an empty page with more');
       after = last;
     }

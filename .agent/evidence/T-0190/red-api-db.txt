@@ -1,0 +1,75 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:46321
+[31m[Nest] 2250  - [39m11/17/2026, 4:44:07 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/ar/refunds-stripe.db.test.ts:569:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+[31m[Nest] 2250  - [39m11/17/2026, 4:44:07 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/ar/refunds-stripe.db.test.ts:569:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+ ❯ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts (11 tests | 2 failed) 3260ms
+     × SS-UC11-11 a refused Stripe refund shows failed after a reload, the clerk cancels it (a repeat replays) and its credit is freed 82ms
+     × SS-UC11-11 a sent (paid) Stripe refund is 422 NOT_CANCELLABLE; another tenant's is 404; a malformed id is 400 88ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanently > SS-UC11-11 a refused Stripe refund shows failed after a reload, the clerk cancels it (a repeat replays) and its credit is freed
+AssertionError: expected { …(15) } to match object { status: 'requested', …(1) }
+(14 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "status": "requested",
+    "stripe": {
+-     "code": "StripeApiError",
+-     "message": StringMatching /charged back/,
+-     "status": "failed",
++     "message": null,
++     "status": "pending",
+    },
+  }
+
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:738:31
+    736|     );
+    737|     const read = await call('GET', `/ar/refunds/${id}?${q()}`, 'arCler…
+    738|     expect(await read.json()).toMatchObject({
+       |                               ^
+    739|       status: 'requested',
+    740|       stripe: {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanently > SS-UC11-11 a sent (paid) Stripe refund is 422 NOT_CANCELLABLE; another tenant's is 404; a malformed id is 400
+AssertionError: expected 404 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 404
+
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:787:25
+    785|     expect(await paid.json()).toMatchObject({ status: 'paid' });
+    786|     const sent = await call('POST', `/ar/refunds/${id}/cancel?${q()}`,…
+    787|     expect(sent.status).toBe(422);
+       |                         ^
+    788|     expect(await sent.json()).toMatchObject({ error: 'NOT_CANCELLABLE'…
+    789|     expect(await entriesFor(id)).toBe(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 9 passed (11)
+   Start at  04:43:56
+   Duration  10.86s (transform 2.19s, setup 0ms, import 4.23s, tests 3.26s, environment 0ms)
+

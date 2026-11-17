@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0189",
+  "entries": [
+    {
+      "scenario": "SS-UC11-12",
+      "file": ".agent/evidence/T-0189/red-connector-db.txt",
+      "test": "RED: stripe-refund-followups.contract.db.test.ts T-0189 blocks before implementation (5 failed: checkStripeCustomerRefund / requestStripeRefundResend not a function)",
+      "commit": "8c4c0a8",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:05:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-13",
+      "file": ".agent/evidence/T-0189/red-api-db.txt",
+      "test": "RED: refunds-stripe.db.test.ts T-0189 block before implementation (2 failed: stripe-check and resend routes 404)",
+      "commit": "8c4c0a8",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:06:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-12",
+      "file": ".agent/evidence/T-0189/green-db-full.txt",
+      "test": "GREEN: vitest db project, full (111 files, 1620 tests, 0 skipped), migration run as 0073 before the merge of the base branch",
+      "commit": "8c4c0a8",
+      "provider": "claude",
+      "timestamp": "2026-11-17T11:10:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-13",
+      "file": ".agent/evidence/T-0189/green-api-db.txt",
+      "test": "GREEN: vitest api-db project, full (51 files, 379 tests, 0 skipped)",
+      "commit": "8c4c0a8",
+      "provider": "claude",
+      "timestamp": "2026-11-17T10:55:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-12",
+      "file": ".agent/evidence/T-0189/green-db-packages-db.txt",
+      "test": "GREEN: vitest db packages/db incl. rls.db.test.ts cross-tenant suite on app.customer_refund_stripe_resend and sod.db.test.ts SQL/TS parity (11 files, 971 tests)",
+      "commit": "8c4c0a8",
+      "provider": "claude",
+      "timestamp": "2026-11-17T10:40:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-12",
+      "file": ".agent/evidence/T-0189/green-db-modules.txt",
+      "test": "GREEN: vitest db packages/connectors, modules/ar, modules/ap, outbox, apps/worker (48 files, 255 tests)",
+      "commit": "8c4c0a8",
+      "provider": "claude",
+      "timestamp": "2026-11-17T10:45:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-13",
+      "file": ".agent/evidence/T-0189/green-unit-web.txt",
+      "test": "GREEN: vitest unit, api-unit, web projects (101 files, 1233 tests), incl. sod.rules.test.ts SOD_REFUND_RESEND_SELF_CONFIRM cases",
+      "commit": "8c4c0a8",
+      "provider": "claude",
+      "timestamp": "2026-11-17T05:20:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-13",
+      "file": ".agent/evidence/T-0189/post-merge-db.txt",
+      "test": "GREEN after merging claude/loving-lovelace-nozqpk: vitest db full (117 files, 1663 tests, 0 skipped); migration run locally as 0076 (0076 is reserved for T-0203, not yet merged; the committed file is 0077)",
+      "commit": "7647a0c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T19:30:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-13",
+      "file": ".agent/evidence/T-0189/post-merge-api-db.txt",
+      "test": "GREEN after merge: vitest api-db full (51 files, 385 tests)",
+      "commit": "7647a0c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T19:30:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-13",
+      "file": ".agent/evidence/T-0189/post-merge-unit-web.txt",
+      "test": "GREEN after merge: vitest unit, api-unit, web (102 files, 1246 tests)",
+      "commit": "7647a0c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T19:30:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-13",
+      "file": ".agent/evidence/T-0189/post-merge-e2e.txt",
+      "test": "GREEN after merge: playwright stripe-refunds.spec.ts and refunds.spec.ts (12 passed)",
+      "commit": "7647a0c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T19:30:00Z",
+      "result": "passed"
+    }
+  ]
+}

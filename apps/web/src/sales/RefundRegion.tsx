@@ -7,7 +7,9 @@
  * money then leaves in the next supplier payment batch, under that batch's own release rules.
  * A refund back to the card through Stripe (T-0172, ADR-0083) is sent the moment it is approved,
  * so approving it needs a fresh sign-in step (DL-0562: the step-up prompt); the region then shows
- * what Stripe did, or that LedgerForce is retrying the send.
+ * what Stripe did, or that LedgerForce is retrying the send. A Stripe refund that Stripe refused can
+ * be cancelled by someone who requests refunds (T-0190), after a confirmation step; the API asks
+ * Stripe first and refuses if Stripe has a refund for it.
  * No accounting in the browser: every amount and journal line is the API's.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -93,6 +95,7 @@ export function RefundRegion({
             companyId={companyId}
             refund={refund.data}
             canApprove={access.can('ar.refund.approve')}
+            canCancel={access.can('ar.refund.create')}
           />
         ) : c.available === NONE ? (
           <p className="admin-note">
@@ -228,10 +231,12 @@ function RefundView({
   companyId,
   refund,
   canApprove,
+  canCancel,
 }: {
   companyId: string;
   refund: CustomerRefund;
   canApprove: boolean;
+  canCancel: boolean;
 }) {
   const { sales } = useServices();
   const queryClient = useQueryClient();
@@ -343,6 +348,89 @@ function RefundView({
       ) : isStepUp(approve.error) ? null : (
         <Refusal error={approve.error} />
       )}
+      {canCancel && cancellable(refund) ? (
+        <CancelRefund companyId={companyId} refund={refund} />
+      ) : null}
+    </>
+  );
+}
+
+/**
+ * T-0190: a requested Stripe refund that Stripe refused (its send failed, and Stripe does not have
+ * the money: not SENT_NOT_POSTED) can be cancelled, so its credit can be refunded another way.
+ */
+const cancellable = (r: CustomerRefund) =>
+  r.method === 'stripe' &&
+  r.status === 'requested' &&
+  r.stripe?.status === 'failed' &&
+  r.stripe.code !== 'SENT_NOT_POSTED';
+
+/** Cancel with a confirmation step (T-0190); the API asks Stripe first and may refuse. */
+function CancelRefund({ companyId, refund }: { companyId: string; refund: CustomerRefund }) {
+  const { sales } = useServices();
+  const queryClient = useQueryClient();
+  const [asking, setAsking] = useState(false);
+  const legendId = useId();
+  const cancel = useMutation({
+    mutationFn: () => sales.cancelRefund(companyId, refund.id),
+    onSuccess: async (r) => {
+      setAsking(false);
+      queryClient.setQueryData(refundKey(r.id), r);
+      await queryClient.invalidateQueries({ queryKey: creditKey(r.party_id) });
+    },
+  });
+  useMutationFailureRouting(cancel.error);
+  const why =
+    cancel.error instanceof AdminApiError &&
+    (cancel.error.status === 409 || cancel.error.status === 422) &&
+    typeof cancel.error.body['message'] === 'string'
+      ? cancel.error.body['message']
+      : null;
+  return (
+    <>
+      {asking ? (
+        <div className="rf-action" role="group" aria-labelledby={legendId}>
+          <p id={legendId}>
+            <strong>Cancel this refund?</strong>
+          </p>
+          <p>
+            Cancelling frees {money2(refund.amount)} of the customer’s credit, so it can be refunded
+            another way. LedgerForce checks with Stripe first and refuses if Stripe has a refund for
+            it.
+          </p>
+          <button
+            type="button"
+            className="primary"
+            disabled={cancel.isPending}
+            onClick={() => cancel.mutate()}
+          >
+            Yes, cancel it
+          </button>{' '}
+          <button
+            type="button"
+            className="secondary"
+            onClick={() => {
+              setAsking(false);
+              cancel.reset();
+            }}
+          >
+            Keep it
+          </button>
+        </div>
+      ) : (
+        <div className="rf-action">
+          <button type="button" className="secondary" onClick={() => setAsking(true)}>
+            Cancel refund
+          </button>
+        </div>
+      )}
+      {why ? (
+        <p className="refusal" role="alert">
+          We could not cancel this refund: {why}
+        </p>
+      ) : (
+        <Refusal error={cancel.error} />
+      )}
     </>
   );
 }
@@ -366,7 +454,7 @@ function stripeState(r: CustomerRefund): string {
     }. A Finance Admin sees it in Sync issues; retrying it there records this Stripe refund and never sends another.`;
   if (r.approval === 'approved')
     return r.stripe?.status === 'failed'
-      ? `Approved, but Stripe refused the refund: ${r.stripe.message ?? 'no reason given'}. A Finance Admin sees it in Sync issues.`
+      ? `Approved, but Stripe refused the refund: ${(r.stripe.message ?? 'no reason given').replace(/\.$/, '')}. A Finance Admin sees it in Sync issues; whoever requests refunds can cancel it, so the credit can be refunded another way.`
       : 'Approved. Sending it to Stripe did not finish; LedgerForce tries again automatically, and a refund that keeps failing appears in Sync issues.';
   return 'Waiting for approval. An Approver, not the person who requested it, approves it; it then goes back to the card at once.';
 }

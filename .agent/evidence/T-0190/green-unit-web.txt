@@ -1,0 +1,74 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2
+
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+Not implemented: Window's scrollTo() method
+
+ Test Files  101 passed (101)
+      Tests  1227 passed (1227)
+   Start at  04:58:19
+   Duration  62.15s (transform 10.65s, setup 8.70s, import 39.35s, tests 47.00s, environment 45.95s)
+

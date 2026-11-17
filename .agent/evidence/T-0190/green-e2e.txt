@@ -1,0 +1,12 @@
+
+Running 7 tests using 2 workers
+
+  ✓  1 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:299:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 1440 [T-0172] (9.7s)
+  ✓  2 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:387:5 › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190] (10.3s)
+  ✓  3 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:299:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 390 [T-0172] (5.7s)
+  ✓  4 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:387:5 › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190] (7.4s)
+  ✓  5 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:337:1 › SS-UC11-10: a Stripe send that did not finish at approval says it is retried automatically [T-0172] (5.9s)
+  ✓  6 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:425:3 › T-0190 cancel › SS-UC11-11: a refund Stripe took (sent, not posted) offers no Cancel, even to the clerk [T-0190] (4.4s)
+  ✓  7 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:359:1 › SS-UC11-10: a refund Stripe took but the books could not record says the money has left and is not posted [T-0172] (3.0s)
+
+  7 passed (27.5s)

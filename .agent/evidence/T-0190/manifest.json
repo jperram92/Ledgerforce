@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0190",
+  "entries": [
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261117-044854-SS-UC11-11-stripe-refund-cancel-confirm-1440.png",
+      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:48:54.099Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261117-044855-SS-UC11-11-stripe-refund-cancelled-1440.png",
+      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:48:55.267Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261117-044901-SS-UC11-11-stripe-refund-cancel-confirm-390.png",
+      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:49:01.768Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261117-044902-SS-UC11-11-stripe-refund-cancelled-390.png",
+      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:49:02.629Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/red-connector-db.txt",
+      "test": "RED: stripe-refund-followups.contract.db.test.ts before implementation (3 failed: cancelStripeCustomerRefund is not a function)",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-16T21:40:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/red-api-db.txt",
+      "test": "RED: refunds-stripe.db.test.ts T-0190 block before implementation (2 failed: stored view pending, cancel route 404)",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:44:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/red-e2e.txt",
+      "test": "RED: stripe-refunds.spec.ts before the UI change (2 failed: no Cancel refund button)",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:46:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/green-db.txt",
+      "test": "GREEN: vitest db project packages/connectors/stripe, packages/modules/ar, packages/modules/ap (32 files, 155 tests, 0 skipped)",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:52:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/green-api-db.txt",
+      "test": "GREEN: vitest api-db apps/api/src/ar, apps/api/src/sod (9 files, 75 tests, 0 skipped)",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:53:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/green-unit-web.txt",
+      "test": "GREEN: vitest unit, api-unit, web projects (101 files, 1227 tests)",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:54:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/green-e2e.txt",
+      "test": "GREEN: stripe-refunds.spec.ts (7 passed, incl. 3 T-0190)",
+      "commit": "f7add7c",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:49:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261117-192647-SS-UC11-11-stripe-refund-cancel-confirm-1440.png",
+      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "commit": "7647a0c (post-merge regression run)",
+      "provider": "claude",
+      "timestamp": "2026-11-17T19:26:47.566Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261117-192648-SS-UC11-11-stripe-refund-cancelled-1440.png",
+      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "commit": "7647a0c (post-merge regression run)",
+      "provider": "claude",
+      "timestamp": "2026-11-17T19:26:48.310Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261117-192651-SS-UC11-11-stripe-refund-cancel-confirm-390.png",
+      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "commit": "7647a0c (post-merge regression run)",
+      "provider": "claude",
+      "timestamp": "2026-11-17T19:26:51.935Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261117-192652-SS-UC11-11-stripe-refund-cancelled-390.png",
+      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "commit": "7647a0c (post-merge regression run)",
+      "provider": "claude",
+      "timestamp": "2026-11-17T19:26:52.554Z",
+      "result": "passed"
+    }
+  ]
+}

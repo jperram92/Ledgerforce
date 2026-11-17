@@ -71,6 +71,7 @@ const RULES: Record<SodRuleId, string> = {
   SOD_REFUND_SELF_APPROVAL: 'Approved a customer refund they had created',
   SOD_REMITTANCE_SELF_APPROVAL:
     'Approved a change to the bank account on invoices that they had asked for',
+  SOD_REFUND_RESEND_SELF_CONFIRM: 'Confirmed sending a card refund again that they had asked for',
 };
 
 export function ruleText(rule: string): string {

@@ -6,13 +6,14 @@
  * shows the result; a send that did not finish says it is retried automatically.
  * The API is faked with `page.route` using the shapes of the real routes
  * (apps/api/src/ar/refunds.controller.ts, proven by refunds-stripe.db.test.ts). No screenshots:
- * this round's evidence is text only.
+ * T-0172's evidence is text only; T-0190's cancel tests capture screenshots (evidence fixture).
  */
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { AxeBuilder } from '@axe-core/playwright';
-import { expect, test, type Page, type Route } from '@playwright/test';
+import type { Page, Route } from '@playwright/test';
+import { expect, test } from '@ledgerforce/testing/evidence';
 import { createViteServer } from 'vitest/node';
 import { ROLE_TEMPLATES } from '../../../packages/shared/src/rbac/index.ts';
 
@@ -104,11 +105,12 @@ interface Fake {
    * What Stripe does on approval: sent, the send did not finish (retried by the outbox), or
    * Stripe has the refund but the journal could not be written (security review r8 F1).
    */
-  stripe: 'sent' | 'pending' | 'sent_not_posted';
+  stripe: 'sent' | 'pending' | 'sent_not_posted' | 'refused';
   errors: string[];
   created: { id: string; body: Record<string, unknown> }[];
   approvals: number;
   stepUps: number;
+  cancels: number;
   refund: Record<string, unknown> | null;
 }
 
@@ -121,6 +123,7 @@ async function fakeApi(page: Page, who: Who): Promise<Fake> {
     created: [],
     approvals: 0,
     stepUps: 0,
+    cancels: 0,
     refund: null,
   };
   page.on('console', (m) => {
@@ -191,34 +194,57 @@ async function fakeApi(page: Page, who: Who): Promise<Fake> {
           approved_at: '2026-11-24T00:00:00.000Z',
         };
         f.refund =
-          f.stripe === 'sent_not_posted'
+          f.stripe === 'refused'
             ? {
                 ...approved,
                 stripe: {
                   status: 'failed',
-                  code: 'SENT_NOT_POSTED',
-                  stripe_refund_id: 're_1SQbT0172AcmeOut',
+                  code: 'StripeApiError',
+                  stripe_refund_id: null,
                   message:
-                    'refund RF-000004 was sent to Stripe as re_1SQbT0172AcmeOut (the money has left), but it was not posted: PERIOD_LOCKED: the period is locked',
+                    'stripe request failed (400): Charge ch_1SQbT0190Disputed has been charged back; cannot issue a refund.',
                 },
               }
-            : f.stripe === 'sent'
+            : f.stripe === 'sent_not_posted'
               ? {
                   ...approved,
-                  status: 'paid',
-                  entry_id: id(0x17299),
-                  paid_on: '2026-11-24',
-                  stripe: { status: 'sent', stripe_refund_id: 're_1SQbT0172Acme', message: null },
-                }
-              : {
-                  ...approved,
                   stripe: {
-                    status: 'pending',
-                    stripe_refund_id: null,
+                    status: 'failed',
+                    code: 'SENT_NOT_POSTED',
+                    stripe_refund_id: 're_1SQbT0172AcmeOut',
                     message:
-                      'stripe request failed (unreachable): the Stripe API could not be reached',
+                      'refund RF-000004 was sent to Stripe as re_1SQbT0172AcmeOut (the money has left), but it was not posted: PERIOD_LOCKED: the period is locked',
                   },
-                };
+                }
+              : f.stripe === 'sent'
+                ? {
+                    ...approved,
+                    status: 'paid',
+                    entry_id: id(0x17299),
+                    paid_on: '2026-11-24',
+                    stripe: { status: 'sent', stripe_refund_id: 're_1SQbT0172Acme', message: null },
+                  }
+                : {
+                    ...approved,
+                    stripe: {
+                      status: 'pending',
+                      stripe_refund_id: null,
+                      message:
+                        'stripe request failed (unreachable): the Stripe API could not be reached',
+                    },
+                  };
+        return send(route, 200, f.refund);
+      }
+      if (req.method() === 'POST' && /^\/ar\/refunds\/[0-9a-f-]{36}\/cancel$/.test(path)) {
+        if (!perms.includes('ar.refund.create'))
+          return send(route, 403, { error: 'forbidden', permission: 'ar.refund.create' });
+        expect(url.searchParams.get('company_id')).toBe(CO);
+        f.cancels += 1;
+        f.refund = {
+          ...f.refund,
+          status: 'cancelled',
+          stripe: { status: 'not_sent', stripe_refund_id: null, message: null },
+        };
         return send(route, 200, f.refund);
       }
       if (!perms.includes('ar.read'))
@@ -232,7 +258,7 @@ async function fakeApi(page: Page, who: Who): Promise<Fake> {
           party_id: ACME,
           balance: f.refund?.['status'] === 'paid' ? '0.0000' : '-220.0000',
           requested: f.refund && f.refund['status'] === 'requested' ? '220.0000' : '0.0000',
-          available: f.refund ? '0.0000' : '220.0000',
+          available: f.refund && f.refund['status'] !== 'cancelled' ? '0.0000' : '220.0000',
         });
       if (f.refund && path === `/ar/refunds/${String(f.refund['id'])}`)
         return send(route, 200, { ...f.refund, replayed: false });
@@ -356,4 +382,67 @@ test('SS-UC11-10: a refund Stripe took but the books could not record says the m
   await noAxeViolations(page);
   expect(f.approvals).toBe(1);
   expect(f.errors).toEqual([]);
+});
+
+test.describe('T-0190 cancel', () => {
+  test.use({ evidenceTaskId: 'T-0190' });
+
+  for (const width of [1440, 390]) {
+    test(`SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ ${String(width)} [T-0190]`, async ({
+      page,
+      evidence,
+    }) => {
+      const f = await fakeApi(page, 'clerk');
+      await open(page, CN_PAGE, width);
+      const refund = await requestStripeRefund(page, f);
+      f.who = 'approver';
+      f.steppedUp = true;
+      f.stripe = 'refused';
+      await page.reload();
+      await refund.getByRole('button', { name: 'Approve refund' }).click();
+      await expect(refund.getByRole('status')).toContainText('Stripe refused the refund');
+      await expect(refund.getByRole('status')).toContainText('charged back');
+      // An Approver checks; the people who request refunds withdraw them.
+      await expect(refund.getByRole('button', { name: 'Cancel refund' })).toHaveCount(0);
+
+      f.who = 'clerk';
+      await page.reload();
+      await expect(refund.getByRole('status')).toContainText('Stripe refused the refund');
+      await refund.getByRole('button', { name: 'Cancel refund' }).click();
+      const confirm = refund.getByRole('group', { name: 'Cancel this refund?' });
+      await expect(confirm).toContainText('220.00');
+      await expect(confirm).toContainText('checks with Stripe first');
+      await noAxeViolations(page);
+      await evidence('SS-UC11-11', `stripe-refund-cancel-confirm-${String(width)}`);
+      expect(f.cancels).toBe(0);
+      await confirm.getByRole('button', { name: 'Yes, cancel it' }).click();
+      await expect(refund.getByRole('status')).toHaveText('Cancelled.');
+      await expect(refund).toContainText(/can have back\s*220\.00/);
+      await expect(refund.getByRole('button', { name: 'Cancel refund' })).toHaveCount(0);
+      expect(f.cancels).toBe(1);
+      await noAxeViolations(page);
+      await evidence('SS-UC11-11', `stripe-refund-cancelled-${String(width)}`);
+      expect(f.errors).toEqual([]);
+    });
+  }
+
+  test('SS-UC11-11: a refund Stripe took (sent, not posted) offers no Cancel, even to the clerk [T-0190]', async ({
+    page,
+  }) => {
+    const f = await fakeApi(page, 'clerk');
+    await open(page, CN_PAGE, 1440);
+    const refund = await requestStripeRefund(page, f);
+    f.who = 'approver';
+    f.steppedUp = true;
+    f.stripe = 'sent_not_posted';
+    await page.reload();
+    await refund.getByRole('button', { name: 'Approve refund' }).click();
+    await expect(refund.getByRole('status')).toContainText('the money has left');
+    f.who = 'clerk';
+    await page.reload();
+    await expect(refund.getByRole('status')).toContainText('the money has left');
+    await expect(refund.getByRole('button', { name: 'Cancel refund' })).toHaveCount(0);
+    expect(f.cancels).toBe(0);
+    expect(f.errors).toEqual([]);
+  });
 });

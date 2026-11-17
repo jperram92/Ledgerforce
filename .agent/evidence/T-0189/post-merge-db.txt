@@ -1,0 +1,33 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:34971
+········stdout | packages/ledger/src/ledger.invariants.db.test.ts > SS-PLAT-11: Invariants hold over 10,000 random documents > SS-PLAT-11 INV-balance INV-tb-zero INV-ar-control INV-ap-control INV-reversal over 10,000 seeded documents
+[SS-PLAT-11] fast-check seed 20261101 (reproduce with LF_FC_SEED=20261101)
+
+stdout | packages/ledger/src/ledger.invariants.db.test.ts > SS-PLAT-11: Invariants hold over 10,000 random documents > SS-PLAT-11 INV-balance INV-tb-zero INV-ar-control INV-ap-control INV-reversal over 10,000 seeded documents
+[SS-PLAT-11] 10000 documents, 3980 allocations, 313 voids, 660 voids refused (ALLOCATED)
+
+···················································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································································(node:16278) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+·········(node:16338) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+···················································(node:16636) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+··························································································(node:16868) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+·································································································(node:17135) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+··(node:17162) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+·············································································································································(node:17567) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+······························································································································································································
+
+ Test Files  117 passed (117)
+      Tests  1663 passed (1663)
+   Start at  19:15:11
+   Duration  442.80s (transform 4.00s, setup 0ms, import 40.99s, tests 383.79s, environment 11ms)
+
+[vitest-pool]: Timeout terminating forks worker for test files /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/packages/db/src/migrate.db.test.ts.
+exit=0

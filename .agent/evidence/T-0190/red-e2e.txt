@@ -1,0 +1,60 @@
+
+Running 7 tests using 2 workers
+
+  ✓  1 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:298:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 1440 [T-0172] (6.6s)
+  ✓  3 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:298:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 390 [T-0172] (5.1s)
+  ✓  4 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:336:1 › SS-UC11-10: a Stripe send that did not finish at approval says it is retried automatically [T-0172] (4.5s)
+  ✓  5 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:358:1 › SS-UC11-10: a refund Stripe took but the books could not record says the money has left and is not posted [T-0172] (2.9s)
+  ✘  2 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:383:3 › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190] (30.0s)
+  ✘  6 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:383:3 › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190] (30.1s)
+  ✓  7 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:419:1 › SS-UC11-11: a refund Stripe took (sent, not posted) offers no Cancel, even to the clerk [T-0190] (3.2s)
+
+
+  1) [chromium] › tests/e2e/web/stripe-refunds.spec.ts:383:3 › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('button', { name: 'Cancel refund' })
+
+
+      400 |     await page.reload();
+      401 |     await expect(refund.getByRole('status')).toContainText('Stripe refused the refund');
+    > 402 |     await refund.getByRole('button', { name: 'Cancel refund' }).click();
+          |                                                                 ^
+      403 |     const confirm = refund.getByRole('group', { name: 'Cancel this refund?' });
+      404 |     await expect(confirm).toContainText('220.00');
+      405 |     await expect(confirm).toContainText('checks with Stripe first');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/tests/e2e/web/stripe-refunds.spec.ts:402:65
+
+    Error Context: test-results/web-stripe-refunds-SS-UC11-ad02d--is-free-again-1440-T-0190--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refunds-SS-UC11-ad02d--is-free-again-1440-T-0190--chromium/error-context.md
+
+  2) [chromium] › tests/e2e/web/stripe-refunds.spec.ts:383:3 › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('button', { name: 'Cancel refund' })
+
+
+      400 |     await page.reload();
+      401 |     await expect(refund.getByRole('status')).toContainText('Stripe refused the refund');
+    > 402 |     await refund.getByRole('button', { name: 'Cancel refund' }).click();
+          |                                                                 ^
+      403 |     const confirm = refund.getByRole('group', { name: 'Cancel this refund?' });
+      404 |     await expect(confirm).toContainText('220.00');
+      405 |     await expect(confirm).toContainText('checks with Stripe first');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/tests/e2e/web/stripe-refunds.spec.ts:402:65
+
+    Error Context: test-results/web-stripe-refunds-SS-UC11-38953-t-is-free-again-390-T-0190--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refunds-SS-UC11-38953-t-is-free-again-390-T-0190--chromium/error-context.md
+
+  2 failed
+    [chromium] › tests/e2e/web/stripe-refunds.spec.ts:383:3 › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190] 
+    [chromium] › tests/e2e/web/stripe-refunds.spec.ts:383:3 › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190] 
+  5 passed (1.2m)
