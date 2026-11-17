@@ -1,7 +1,8 @@
 /**
  * Setup settings API client (T-0176): the ADR-0081 routes under /setup/company and /setup/tax,
  * (T-0185) the ADR-0084 routes under /setup/bank-accounts, and (T-0186) the ADR-0085 routes
- * under /setup/billing and the approval amounts (/sod/settings).
+ * under /setup/billing and the approval amounts (/sod/settings); (T-0183) the ADR-0080 remittance
+ * account routes under /setup/remittance-account.
  * Same origin, session cookie; failures are AdminApiError (status + error code + body). Every
  * write carries the Idempotency-Key the screen passes.
  */
@@ -163,6 +164,39 @@ export interface ApprovalInput {
   reason: string;
 }
 
+/** A company bank account as the remittance routes show it: masked to `***` + the last 3. */
+export interface RemittanceAccount {
+  id: string;
+  name: string;
+  bsb: string;
+  account_name: string;
+  account_number: string;
+  currency: string;
+  status: string;
+}
+
+/** A remittance account change (ADR-0080): requested, then approved or rejected by another person. */
+export interface RemittanceChange {
+  id: string;
+  company_id: string;
+  status: 'requested' | 'approved' | 'rejected';
+  replayed: boolean;
+  /** The account asked for; null asks to remove the remittance account. */
+  bank_account: RemittanceAccount | null;
+  /** The account in force when the change was asked for. */
+  previous_bank_account: RemittanceAccount | null;
+  requested_by: string;
+  requested_at: string;
+  decided_by: string | null;
+  decided_at: string | null;
+  reason: string | null;
+}
+
+export interface RemittanceView {
+  account: RemittanceAccount | null;
+  pending: RemittanceChange | null;
+}
+
 export interface SettingsClient {
   company(companyId: string): Promise<CompanySettings>;
   saveCompany(
@@ -211,6 +245,27 @@ export interface SettingsClient {
     input: ApprovalInput,
     key: string,
   ): Promise<{ settings: ApprovalSettings; changed: boolean }>;
+  remittance(companyId: string): Promise<RemittanceView>;
+  /** The change id is the client's (ADR-0080): a new one for each new request. */
+  requestRemittance(
+    companyId: string,
+    changeId: string,
+    bankAccountId: string | null,
+    key: string,
+  ): Promise<RemittanceChange>;
+  /** `sodException` only for a small-team self-approval (ADR-0026). */
+  approveRemittance(
+    companyId: string,
+    changeId: string,
+    key: string,
+    sodException?: { reason: string },
+  ): Promise<RemittanceChange>;
+  rejectRemittance(
+    companyId: string,
+    changeId: string,
+    reason: string,
+    key: string,
+  ): Promise<RemittanceChange>;
 }
 
 export function createSettingsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): SettingsClient {
@@ -266,5 +321,27 @@ export function createSettingsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Se
       const r = await sendWithStatus<ApprovalSettings>('POST', '/sod/settings', input, key);
       return { settings: r.data, changed: r.status === 201 };
     },
+    remittance: (c) => send('GET', `/setup/remittance-account${q(c)}`),
+    requestRemittance: (c, changeId, bankAccountId, key) =>
+      send(
+        'PUT',
+        `/setup/remittance-account/changes/${encodeURIComponent(changeId)}`,
+        { company_id: c, bank_account_id: bankAccountId },
+        key,
+      ),
+    approveRemittance: (c, changeId, key, sodException) =>
+      send(
+        'POST',
+        `/setup/remittance-account/changes/${encodeURIComponent(changeId)}/approve`,
+        sodException ? { company_id: c, sod_exception: sodException } : { company_id: c },
+        key,
+      ),
+    rejectRemittance: (c, changeId, reason, key) =>
+      send(
+        'POST',
+        `/setup/remittance-account/changes/${encodeURIComponent(changeId)}/reject`,
+        { company_id: c, reason },
+        key,
+      ),
   };
 }
