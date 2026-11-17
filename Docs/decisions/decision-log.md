@@ -4018,3 +4018,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: The evidence manifest must point at real files. The removed files were scratch output of this session, not committed evidence (directive 6 covers tracked items).
 - Alternatives: commit the stale screenshots of a failing run (rejected: misleading evidence).
 - ADR: none · Status: accepted
+
+### DL-0793 — POST /sod/exceptions/weekly/acknowledge requires an Idempotency-Key; the control-exceptions screen sends one (T-0196)
+- Date: 2026-11-17 · By: claude · Task: T-0196 · Category: architecture
+- Decision: As DL-0711 did for `POST /sod/settings`: the route answers 400 `idempotency_key_required` before reading the body when the header is missing, empty or over 200 characters (nothing written or audited); the key is not stored and the route stays replay-safe by state (201 new, 200 already acknowledged). `acknowledgeWeek(weekStart, key, note?)` in the web admin client sends the header; the screen sends a fresh key per press. The sod api-db helper sends a key on this route by default. The admin e2e fake now refuses an acknowledgement without a key, as the API does, and SS-PLAT-79 asserts the key was sent. Recorded as ADR-0093, an amendment of ADR-0085.
+- Why: apps/api rule "every mutating endpoint requires an idempotency key"; RQ-0167 S8; T-0196 AC-1/AC-2. RED: the api-db test got 201 without a key; the e2e with the old client got the fake's 400 and no acknowledgement.
+- Alternatives: store keys and replay responses (rejected: no other settings route does, and the route is already state-idempotent); accept but not require the key (rejected: the rule stays broken).
+- ADR: ADR-0093 · Status: proposed (architecture, accepted on cross-review)
