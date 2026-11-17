@@ -69,7 +69,7 @@ Under the API's `setup` prefix:
 ## Consequences
 - Wizard step 4 can be completed in the app.
 - APCA user id and ABA user name cannot be added to an existing account (no UPDATE grant): T-0193.
-  *Superseded by ADR-0094 (T-0193): migration 0074 grants UPDATE on the three ABA columns and
+  *Superseded by ADR-0094 (T-0193): migration 0076 grants UPDATE on the three ABA columns and
   routes change them or archive an account.*
 - New public routes enter the route inventory (`routes.test.ts`).
 

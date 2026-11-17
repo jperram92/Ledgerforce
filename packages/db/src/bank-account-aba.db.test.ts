@@ -1,6 +1,6 @@
 /**
  * SS-PLAT-151 — lf_app may change only the ABA header of a company bank account in place
- * (T-0193, migration 0074, RQ-0176, ADR-0094): the APCA user id, ABA user name and FI mnemonic,
+ * (T-0193, migration 0076, RQ-0176, ADR-0094): the APCA user id, ABA user name and FI mnemonic,
  * and not on an archived account. The BSB, account name, number columns, currency, GL account and
  * company stay immutable (a different number is a new account, migration 0013). Real PostgreSQL,
  * as lf_app inside a tenant transaction.

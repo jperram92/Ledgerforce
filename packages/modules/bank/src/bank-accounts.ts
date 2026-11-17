@@ -201,7 +201,7 @@ export interface CompanyBankAccountAba {
   abaFiMnemonic: string;
 }
 
-/** The account is archived: its ABA details no longer change (ADR-0094, migration 0074). */
+/** The account is archived: its ABA details no longer change (ADR-0094, migration 0076). */
 export class BankAccountArchivedError extends Error {
   constructor(message = 'the bank account is archived; its ABA details cannot change') {
     super(message);
@@ -286,7 +286,7 @@ async function lockedAccount(
  * (T-0193, ADR-0094). The BSB and number never change in place. Returns undefined when the
  * company has no such account; `changed: false` when the values are already stored. Throws
  * BankAccountValidationError for a malformed value and BankAccountArchivedError for an archived
- * account (the database refuses it too, migration 0074).
+ * account (the database refuses it too, migration 0076).
  */
 export async function setCompanyBankAccountAba(
   trx: Transaction<Database>,

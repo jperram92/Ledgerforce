@@ -38,7 +38,7 @@ be retired.
 
 ## Decision
 
-1. **Migration 0074** (additive): `GRANT UPDATE (apca_user_id, aba_user_name, aba_fi_mnemonic) ON
+1. **Migration 0076** (additive): `GRANT UPDATE (apca_user_id, aba_user_name, aba_fi_mnemonic) ON
    app.bank_account TO lf_app`, and a BEFORE UPDATE trigger `bank_account_aba_archived_guard`
    refusing (`check_violation`) a change of those columns on a row whose status is `archived`
    (old or new). `bsb`, `account_name`, the number columns, `currency`, `gl_account_id`,

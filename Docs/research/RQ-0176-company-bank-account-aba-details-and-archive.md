@@ -83,7 +83,7 @@ retired account printed, would break design §6.
 
 ## Conclusion / decision
 
-1. Migration 0074: `GRANT UPDATE (apca_user_id, aba_user_name, aba_fi_mnemonic) ON
+1. Migration 0076: `GRANT UPDATE (apca_user_id, aba_user_name, aba_fi_mnemonic) ON
    app.bank_account TO lf_app` (additive) and a trigger refusing a change of those columns on an
    archived row. All other columns stay immutable for `lf_app` (DB test).
 2. `PUT /setup/bank-accounts/:id/aba {company_id, apca_user_id, aba_user_name, aba_fi_mnemonic}`

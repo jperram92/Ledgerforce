@@ -1,4 +1,4 @@
--- 0074 — company bank account: the ABA header is editable in place (T-0193, ADR-0094, RQ-0176,
+-- 0076 — company bank account: the ABA header is editable in place (T-0193, ADR-0094, RQ-0176,
 -- DL-0800). Owner: packages/modules/bank.
 --
 -- * lf_app may now UPDATE apca_user_id, aba_user_name and aba_fi_mnemonic of app.bank_account
@@ -36,4 +36,4 @@ CREATE TRIGGER bank_account_aba_archived_guard
   FOR EACH ROW EXECUTE FUNCTION app.bank_account_aba_archived_guard();
 
 COMMENT ON COLUMN app.bank_account.apca_user_id IS
-  'APCA / Direct Entry user id, 6 digits (ABA type 0, pos 57-62; RQ-0006). Editable by lf_app while active (0074, ADR-0094).';
+  'APCA / Direct Entry user id, 6 digits (ABA type 0, pos 57-62; RQ-0006). Editable by lf_app while active (0076, ADR-0094).';

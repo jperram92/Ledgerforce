@@ -1232,7 +1232,7 @@ export interface BankAccountTable {
   dek_wrapped: ColumnType<Buffer, Buffer, never>;
   kek_id: ColumnType<string, string, never>;
   enc_version: ColumnType<number, number, never>;
-  /** ABA header: updatable by lf_app while active (migration 0074, ADR-0094). */
+  /** ABA header: updatable by lf_app while active (migration 0076, ADR-0094). */
   apca_user_id: ColumnType<string | null, string | null | undefined, string>;
   aba_user_name: ColumnType<string | null, string | null | undefined, string>;
   aba_fi_mnemonic: ColumnType<string | null, string | null | undefined, string>;
