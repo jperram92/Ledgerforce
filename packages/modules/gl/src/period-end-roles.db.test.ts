@@ -27,6 +27,11 @@ const PERIOD_END: Record<string, { code: string; type: (typeof TYPES)[number] }>
   PRIOR_PERIOD_ADJUSTMENTS: { code: '3400', type: 'equity' },
 };
 const CORE_COUNT = 17;
+/** Extended roles added later by an accounting ADR, bound by the same template (T-0203). */
+const LATER_EXTENDED: Record<string, { code: string; type: (typeof TYPES)[number] }> = {
+  GST_ATTRIBUTED_UNBILLED: { code: '1230', type: 'asset' }, // ADR-0089 R3
+};
+const EXTENDED = { ...PERIOD_END, ...LATER_EXTENDED };
 
 let tdb: TestDatabase;
 let db: Kysely<Database>;
@@ -77,7 +82,7 @@ describe('ADR-0061: period-end system roles are bound and guarded by the databas
          WHERE b.company_id = ${companyId} ORDER BY b.role`.execute(trx),
     );
     expect(Object.fromEntries(r.rows.map((x) => [x.role, x.code]))).toEqual(
-      Object.fromEntries(Object.entries(PERIOD_END).map(([role, v]) => [role, v.code])),
+      Object.fromEntries(Object.entries(EXTENDED).map(([role, v]) => [role, v.code])),
     );
     const core = await inTenant((trx) =>
       sql<{ n: number }>`SELECT count(*)::int AS n FROM app.account_system_role`.execute(trx),
@@ -91,7 +96,7 @@ describe('ADR-0061: period-end system roles are bound and guarded by the databas
         SELECT role, count(*)::int AS n FROM app.account_role_binding
          WHERE company_id = ${companyId} GROUP BY role`.execute(trx),
     );
-    expect(r.rows).toHaveLength(CORE_COUNT + Object.keys(PERIOD_END).length);
+    expect(r.rows).toHaveLength(CORE_COUNT + Object.keys(EXTENDED).length);
     expect(r.rows.every((x) => x.n === 1)).toBe(true);
     for (const role of Object.keys(PERIOD_END)) {
       expect(
@@ -233,6 +238,6 @@ describe('ADR-0061: period-end system roles are bound and guarded by the databas
     const own = await inTenant((trx) =>
       sql<{ n: number }>`SELECT count(*)::int AS n FROM app.account_role_binding`.execute(trx),
     );
-    expect(own.rows[0]?.n).toBe(CORE_COUNT + Object.keys(PERIOD_END).length);
+    expect(own.rows[0]?.n).toBe(CORE_COUNT + Object.keys(EXTENDED).length);
   });
 });

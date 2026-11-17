@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0203",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-142",
+      "file": ".agent/evidence/T-0203/red-step1-unit.txt",
+      "test": "gl system-roles and templates tests before the role existed",
+      "commit": "89b7fbf",
+      "provider": "claude",
+      "timestamp": "2026-11-16T21:30:00.000Z",
+      "result": "failed (RED, expected)"
+    },
+    {
+      "scenario": "SS-PLAT-142",
+      "file": ".agent/evidence/T-0203/red-step1-db.txt",
+      "test": "gl role DB tests, period-end roles, golden-engine PENDING and SS-PLAT-135 before the migration",
+      "commit": "89b7fbf",
+      "provider": "claude",
+      "timestamp": "2026-11-16T21:32:00.000Z",
+      "result": "failed (RED, expected)"
+    },
+    {
+      "scenario": "SS-PLAT-142",
+      "file": ".agent/evidence/T-0203/green-step1-db.txt",
+      "test": "gl role DB, golden-engine replay with PENDING empty (GP-040a/b, GP-044a/c, GP-045a-c), SS-PLAT-135",
+      "commit": "89b7fbf",
+      "provider": "claude",
+      "timestamp": "2026-11-16T21:36:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-142",
+      "file": ".agent/evidence/T-0203/green-step1-db-crosstenant.txt",
+      "test": "packages/db/src including the cross-tenant RLS suite over the four new tables",
+      "commit": "89b7fbf",
+      "provider": "claude",
+      "timestamp": "2026-11-16T21:39:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-143",
+      "file": ".agent/evidence/T-0203/red-step2-db.txt",
+      "test": "single-supply.db.test.ts against a stub that throws",
+      "commit": "7849415",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:40:00.000Z",
+      "result": "failed (RED, expected)"
+    },
+    {
+      "scenario": "SS-PLAT-143",
+      "file": ".agent/evidence/T-0203/green-step2-db.txt",
+      "test": "single-supply.db.test.ts: GP-040a/b and GP-020 line for line, refusals, AC-6/7/8, idempotency, concurrency",
+      "commit": "7849415",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:42:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-144",
+      "file": ".agent/evidence/T-0203/red-step3-prop-db-zero-gst.txt",
+      "test": "property counterexample [1n,[1],false]: a 0.01 total carries 0.00 GST",
+      "commit": "7849415",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:46:00.000Z",
+      "result": "failed (RED, expected)"
+    },
+    {
+      "scenario": "SS-PLAT-144",
+      "file": ".agent/evidence/T-0203/green-step3-prop-db.txt",
+      "test": "single-supply.prop.db.test.ts, default numRuns",
+      "commit": "7849415",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:48:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-144",
+      "file": ".agent/evidence/T-0203/mutation-step3-no-residual-rule.txt",
+      "test": "mutation with the last-receipt residual rule disabled: AC-8 test and property fail",
+      "commit": "7849415",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:50:00.000Z",
+      "result": "failed (mutation, expected)"
+    },
+    {
+      "scenario": "SS-PLAT-143",
+      "file": ".agent/evidence/T-0203/final-db.txt",
+      "test": "full db project after merging claude/loving-lovelace-nozqpk: 119 files, 1692 tests",
+      "commit": "pending (T-0203 branch)",
+      "provider": "claude",
+      "timestamp": "2026-11-17T12:00:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-143",
+      "file": ".agent/evidence/T-0203/final-api-db.txt",
+      "test": "full api-db project after the merge: 51 files, 381 tests",
+      "commit": "pending (T-0203 branch)",
+      "provider": "claude",
+      "timestamp": "2026-11-17T12:10:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-142",
+      "file": ".agent/evidence/T-0203/final-unit-api-unit-web.txt",
+      "test": "unit + api-unit + web after the final merge: 102 files, 1243 tests",
+      "commit": "pending (T-0203 branch)",
+      "provider": "claude",
+      "timestamp": "2026-11-17T12:20:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-142",
+      "file": ".agent/evidence/T-0203/final-web-admin-rerun.txt",
+      "test": "apps/web admin.test.tsx re-run alone, 13/13",
+      "commit": "pending (T-0203 branch)",
+      "provider": "claude",
+      "timestamp": "2026-11-17T10:05:00.000Z",
+      "result": "passed"
+    }
+  ]
+}

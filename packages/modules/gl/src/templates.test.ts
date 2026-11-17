@@ -21,7 +21,7 @@ const find = (t: ChartTemplate, pred: (a: TemplateAccount) => boolean, what: str
   must(t.accounts.find(pred), what);
 
 describe('SS-PLAT-32: AU services SMB chart template is valid', () => {
-  it('knows exactly the 17 core roles of design §3.2 plus the 7 period-end roles of §3.2/§3.10 [T-0117]', () => {
+  it('knows exactly the 17 core roles of design §3.2, the 7 period-end roles of §3.2/§3.10 and the ADR-0089 role [T-0117][T-0203]', () => {
     expect([...SYSTEM_ROLES].sort()).toEqual(
       [
         'AR_CONTROL',
@@ -49,6 +49,8 @@ describe('SS-PLAT-32: AU services SMB chart template is valid', () => {
         'ACCRUED_EXPENSES',
         'SGC_PAYABLE',
         'PRIOR_PERIOD_ADJUSTMENTS',
+        // Single-supply GST attribution (ADR-0089 R3, T-0203).
+        'GST_ATTRIBUTED_UNBILLED',
       ].sort(),
     );
     expect([...CONTROL_ROLES].sort()).toEqual(['AP_CONTROL', 'AR_CONTROL', 'PAYROLL_CLEARING']);
@@ -111,5 +113,41 @@ describe('T-0159: the ECL allowance comes from its system role, not a suggested 
     expect(
       auServicesSmb.accounts.filter((a) => a.systemRole === 'AR_ECL_ALLOWANCE').map((a) => a.code),
     ).toEqual(['1220']);
+  });
+});
+
+describe('SS-PLAT-142: account 1230 GST attributed on unbilled supplies (ADR-0089 R3, review finding 4)', () => {
+  const a = () => find(auServicesSmb, (x) => x.code === '1230', '1230');
+
+  it('SS-PLAT-142 AC-2 binds GST_ATTRIBUTED_UNBILLED to 1230, an other current asset with a debit balance, not control [T-0203]', () => {
+    expect(
+      auServicesSmb.accounts
+        .filter((x) => x.systemRole === 'GST_ATTRIBUTED_UNBILLED')
+        .map((x) => x.code),
+    ).toEqual(['1230']);
+    expect(a()).toMatchObject({
+      name: 'GST attributed on unbilled supplies',
+      type: 'asset',
+      subtype: 'current_asset',
+      normalBalance: 'debit',
+      postable: true,
+      control: false,
+    });
+    expect(auServicesSmb.version).toBe(2);
+  });
+
+  it('SS-PLAT-142 AC-11 its description is the disclosure policy: other current asset, recoverability like a prepayment, outside trade receivables and the ECL base [T-0203]', () => {
+    const d = a().description ?? '';
+    expect(d).toMatch(/other current asset/i);
+    expect(d).toMatch(/recoverability .*like a prepayment/i);
+    expect(d).toMatch(/not a trade receivable/i);
+    expect(d).toMatch(/outside the expected credit loss \(ECL\) base/i);
+    expect(d).toMatch(/ADR-0089/);
+  });
+
+  it('SS-PLAT-142 AC-11 a description must not be blank when given [T-0203]', () => {
+    const t = clone(auServicesSmb);
+    find(t, (x) => x.code === '1230', '1230').description = '  ';
+    expect(validateTemplate(t).join('\n')).toMatch(/1230: description is empty/);
   });
 });

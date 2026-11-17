@@ -1,8 +1,8 @@
 /**
  * System roles (design §3.2): the posting engine finds accounts by role, never by code.
- * ROLE_ACCOUNT_TYPES mirrors app.system_role_allows() (migrations 0005 and 0062);
+ * ROLE_ACCOUNT_TYPES mirrors app.system_role_allows() (migrations 0005, 0062 and 0076);
  * chart.db.test.ts proves the two agree for every role × type. EXTENDED_SYSTEM_ROLES mirrors
- * app.system_role_is_extended() (0062, ADR-0061): those roles are bound in
+ * app.system_role_is_extended() (0062 and 0076, ADR-0061): those roles are bound in
  * app.account_system_role_ext, the others in app.account_system_role; readers use the view
  * app.account_role_binding.
  */
@@ -29,7 +29,10 @@ export const CORE_SYSTEM_ROLES = [
   'CUSTOMER_PREPAYMENTS',
 ] as const;
 
-/** Period-end roles (design §3.2 AASB note, §3.10; migration 0062, ADR-0061, RQ-0143). */
+/**
+ * Roles bound in app.account_system_role_ext: the period-end roles (design §3.2 AASB note, §3.10;
+ * migration 0062, ADR-0061, RQ-0143) and GST_ATTRIBUTED_UNBILLED (0076, ADR-0089).
+ */
 export const EXTENDED_SYSTEM_ROLES = [
   'AR_ECL_ALLOWANCE',
   'PREPAYMENTS',
@@ -38,6 +41,8 @@ export const EXTENDED_SYSTEM_ROLES = [
   'ACCRUED_EXPENSES',
   'SGC_PAYABLE',
   'PRIOR_PERIOD_ADJUSTMENTS',
+  // Single-supply GST attribution (migration 0076, ADR-0089 R3, RQ-0171).
+  'GST_ATTRIBUTED_UNBILLED',
 ] as const;
 
 export const SYSTEM_ROLES = [...CORE_SYSTEM_ROLES, ...EXTENDED_SYSTEM_ROLES] as const;
@@ -78,6 +83,8 @@ export const ROLE_ACCOUNT_TYPES: Readonly<Record<SystemRole, readonly AccountTyp
   ACCRUED_EXPENSES: ['liability'],
   SGC_PAYABLE: ['liability'],
   PRIOR_PERIOD_ADJUSTMENTS: ['equity'],
+  // GST attributed on a single supply but not yet received from the customer (0076, ADR-0089 R3).
+  GST_ATTRIBUTED_UNBILLED: ['asset'],
 };
 
 /** Control accounts: posted only by their subledger. */

@@ -1,0 +1,49 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aa59e42fb7e9a8b47
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:39485
+ ❯ |db| packages/modules/ar/src/single-supply.prop.db.test.ts (1 test | 1 failed) 2392ms
+     × SS-PLAT-144 AC-5 every entry balances, GST reported = GST on the known total, unbilled = attributed − received GST, liability = net received, per contract [T-0203] 1297ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.prop.db.test.ts > SS-PLAT-144: single-supply contract invariants (ADR-0089 R11) > SS-PLAT-144 AC-5 every entry balances, GST reported = GST on the known total, unbilled = attributed − received GST, liability = net received, per contract [T-0203]
+Error: Property failed after 25 tests
+{ seed: -340227933, path: "24:0:0", endOnFailure: true }
+Counterexample: [1n,[1],false]
+Shrunk 2 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ asyncThrowIfFailed node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2481:8
+
+Caused by: error: new row for relation "single_supply_attribution" violates check constraint "single_supply_attribution_attributed_tax_check"
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ InsertQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/insert-query-builder.js:1101:24
+ ❯ recordSingleSupplyReceipt packages/modules/ar/src/single-supply.ts:419:5
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ InsertQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/insert-query-builder.js:1101:24
+ ❯ recordSingleSupplyReceipt packages/modules/ar/src/single-supply.ts:419:5
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { length: 266, severity: 'ERROR', code: '23514', detail: undefined, hint: undefined, position: undefined, internalPosition: undefined, internalQuery: undefined, where: undefined, schema: 'app', table: 'single_supply_attribution', dataType: undefined, constraint: 'single_supply_attribution_attributed_tax_check', file: 'execMain.c', routine: 'ExecConstraints' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  04:50:32
+   Duration  3.73s (transform 343ms, setup 0ms, import 538ms, tests 2.39s, environment 0ms)
+

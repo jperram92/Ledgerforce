@@ -1,0 +1,56 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aa59e42fb7e9a8b47
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37875
+ ❯ |db| packages/modules/ar/src/single-supply.prop.db.test.ts (1 test | 1 failed) 8988ms
+     × SS-PLAT-144 AC-5 every entry balances, GST reported = GST on the known total, unbilled = attributed − received GST, liability = net received, per contract [T-0203] 7735ms
+ ❯ |db| packages/modules/ar/src/single-supply.db.test.ts (9 tests | 1 failed) 2312ms
+     × SS-PLAT-143 AC-8 the receipt that completes the contract takes the remaining unbilled GST, so per-receipt rounding leaves no residue [T-0203] 322ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.db.test.ts > SS-PLAT-143: single-supply receipts post the whole supply GST once (GP-040) > SS-PLAT-143 AC-8 the receipt that completes the contract takes the remaining unbilled GST, so per-receipt rounding leaves no residue [T-0203]
+AssertionError: expected '90.9100' to be '90.9000' // Object.is equality
+
+Expected: "90.9000"
+Received: "90.9100"
+
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:247:22
+    245|     expect(parts.every((t) => t === '90.9100')).toBe(true);
+    246|     const last = await receive(c.contractId, '2026-11-20', '999.99', '…
+    247|     expect(last.tax).toBe('90.9000');
+       |                      ^
+    248|     const view = await f.inTenant((trx) => singleSupplyContract(trx, f…
+    249|     expect(view).toMatchObject({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.prop.db.test.ts > SS-PLAT-144: single-supply contract invariants (ADR-0089 R11) > SS-PLAT-144 AC-5 every entry balances, GST reported = GST on the known total, unbilled = attributed − received GST, liability = net received, per contract [T-0203]
+Error: Property failed after 7 tests
+{ seed: -2016913620, path: "6:1:2:1:2:0:0:3:3:2:2:0:1:0:2:1:2:3:7:2:2", endOnFailure: true }
+Counterexample: [177736535n,[1,212],true]
+Shrunk 20 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ asyncThrowIfFailed node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2481:8
+
+Caused by: AssertionError: expected '0.0100' to be '0.0000' // Object.is equality
+
+Expected: "0.0000"
+Received: "0.0100"
+
+ ❯ packages/modules/ar/src/single-supply.prop.db.test.ts:155:37
+ ❯ AsyncProperty.run node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:1217:19
+ ❯ asyncPropertyExecution node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2564:14
+ ❯ asyncRunIt node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2557:15
+ ❯ packages/modules/ar/src/single-supply.prop.db.test.ts:75:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  2 failed | 8 passed (10)
+   Start at  04:51:09
+   Duration  14.88s (transform 841ms, setup 0ms, import 1.38s, tests 11.30s, environment 0ms)
+

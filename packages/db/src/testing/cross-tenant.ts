@@ -247,6 +247,15 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     tax: () => '0',
   },
   'app.prepayment_application': { net: () => '1', tax: () => '0' },
+  // T-0203: single-supply contracts (basis CHECK, whole cents, gross = net + tax, status CHECK).
+  'app.single_supply_contract': {
+    gst_basis: () => 'accrual',
+    known_net: () => '1',
+    reference: () => 'C-1',
+  },
+  'app.single_supply_attribution': { attributed_tax: () => '1' },
+  'app.single_supply_receipt': { gross: () => '1', net: () => '1', tax: () => '0' },
+  'app.single_supply_contract_status': { status: () => 'finalised' },
   'app.sales_invoice_deposit': { net: () => '1', tax: () => '0' },
   // T-0046: customer receipts (method CHECK, amount > 0).
   'app.customer_receipt': { method: () => 'eft', amount: () => '1' },

@@ -12,10 +12,10 @@
  * undecided removes only the unbilled part until the refund is agreed, and a reversal nets to
  * zero. The final invoice's AR open item is the whole tax invoice with the receipts allocated.
  *
- * The GST_ATTRIBUTED_UNBILLED role is not bound yet (its additive role binding and template
- * account are T-0203). Here the golden binding resolves to a plain asset account the test adds,
- * so this file proves the journal/BAS contract, not the production posting path; that path is
- * T-0203/T-0204 (their failing tests are named on those cards).
+ * The golden binding system:GST_ATTRIBUTED_UNBILLED resolves through its role, bound by the
+ * template to account 1230 since T-0203 (migration 0076; until then this file added a plain
+ * asset account). This file proves the journal/BAS contract, not the production posting path;
+ * that path is T-0203 (single-supply.db.test.ts in modules/ar) and T-0204.
  */
 import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -43,7 +43,6 @@ import { basLabels, BAS_LABELS } from './bas.ts';
 import { seedTaxCodes, taxCodeIdOn } from './tax-codes.ts';
 
 const FILE = resolve(import.meta.dirname, '../../../../Docs/accounting/postings.md');
-const UNBILLED = 'system:GST_ATTRIBUTED_UNBILLED';
 
 let f: LedgerFixture;
 let unbilledAccount = '';
@@ -66,7 +65,6 @@ async function postGolden(id: string, date: string): Promise<string> {
       entryDate: date,
       idempotencyKey: randomUUID(),
       account: (binding) => {
-        if (binding === UNBILLED) return { id: unbilledAccount };
         const b = AU_SERVICES_BINDINGS[binding];
         if (!b) throw new Error(`${id}: unresolved ${binding}`);
         return 'role' in b ? { role: b.role } : { id: f.acct[b.code] ?? `missing ${b.code}` };
@@ -111,8 +109,10 @@ async function balanceOf(account: string, entries: readonly string[]): Promise<s
 const prepayments = async () =>
   (
     await f.inTenant((trx) =>
+      // The fixture has two companies on the same chart: pick the main company's binding.
       sql<{ id: string }>`SELECT account_id::text AS id FROM app.account_role_binding
-                           WHERE role = 'CUSTOMER_PREPAYMENTS'`.execute(trx),
+                           WHERE role = 'CUSTOMER_PREPAYMENTS'
+                             AND company_id = ${f.companyId}::uuid`.execute(trx),
     )
   ).rows[0]?.id ?? '';
 
@@ -134,19 +134,14 @@ beforeAll(async () => {
       .executeTakeFirstOrThrow();
     parties.set('Acme', p.id);
     await seedTaxCodes(trx, f.companyId);
-    const a = await trx
-      .insertInto('app.account')
-      .values({
-        company_id: f.companyId,
-        code: '1230',
-        name: 'GST attributed on unbilled supplies',
-        type: 'asset',
-        subtype: 'current_asset',
-        normal_balance: 'debit',
-      })
-      .returning('id')
-      .executeTakeFirstOrThrow();
-    unbilledAccount = a.id;
+    const a = await sql<{ id: string; code: string }>`
+      SELECT b.account_id::text AS id, a.code FROM app.account_role_binding b
+        JOIN app.account a ON a.tenant_id = b.tenant_id AND a.id = b.account_id
+       WHERE b.company_id = ${f.companyId}::uuid AND b.role = 'GST_ATTRIBUTED_UNBILLED'`.execute(
+      trx,
+    );
+    expect(a.rows.map((x) => x.code)).toEqual(['1230']);
+    unbilledAccount = a.rows[0]?.id ?? '';
   });
 }, 120_000);
 

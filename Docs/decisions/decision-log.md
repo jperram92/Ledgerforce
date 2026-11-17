@@ -3998,6 +3998,69 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: a web change to re-fetch `/auth/me` after a step-up (rejected: nothing reads session state, so it would add code with no behaviour behind it); an e2e test against the real API plus an IdP (rejected: no such harness exists for the web suites; that would be a separate card).
 - ADR: ADR-0087 · Status: accepted
 
+### DL-0760 — GST_ATTRIBUTED_UNBILLED bound by widening the ADR-0061 functions; template v2 adds 1230 (T-0203)
+- Date: 2026-11-17 · By: claude · Task: T-0203 · Category: architecture
+- Decision: Migration 0076 (renumbered from 0073 at merge, lead instruction) widens `app.system_role_is_extended` and `app.system_role_allows` by CREATE OR REPLACE (every earlier rule repeated unchanged) so `GST_ATTRIBUTED_UNBILLED` is an extended role, asset only, not control, postable. `system-roles.ts` mirrors it. The AU services SMB template becomes version 2 and binds account 1230 "GST attributed on unbilled supplies" (other current asset, debit). The golden binding `system:GST_ATTRIBUTED_UNBILLED` resolves through the role, so `PENDING` in `golden-engine.db.test.ts` is `{}` again and GP-040a/b, GP-044a/c and GP-045a–c replay. SS-PLAT-135 now resolves the account through the role instead of adding a plain asset account 1230, which would collide with the template account. The T-0117 tests that enumerate the extended roles (`system-roles.test.ts`, `period-end-roles.db.test.ts`) now expect the period-end roles plus the ADR-0089 role. That makes them stricter, not weaker.
+- Why: ADR-0089 R3 and RQ-0171 name this exact mechanism. The 0005 CHECK cannot be widened without a DROP, which is forbidden.
+- Alternatives: a new tax code (rejected in ADR-0089); binding the account by code without a role (rejected: the engine resolves accounts by role, design §3.2).
+- ADR: ADR-0089, ADR-0061 · Status: accepted
+
+### DL-0761 — Single-supply contract stored in four immutable tables; attribution is its own one-per-contract row (T-0203)
+- Date: 2026-11-17 · By: claude · Task: T-0203 · Category: architecture
+- Decision: Migration 0076 adds four tables, each with RLS ENABLE + FORCE, the tenant_isolation policy, lf_app SELECT/INSERT only, and an UPDATE/DELETE trigger (`sod_never_changed`). They are:
+  - `app.single_supply_contract`: party, reference, contract date, known net in whole cents and > 0, one tax code, GST basis in force on the contract date, the `supply_contract` dimension value, who confirmed and when, idempotency key.
+  - `app.single_supply_attribution`: primary key (tenant, contract). It holds the attributed GST and attribution date, written by the attributing receipt.
+  - `app.single_supply_receipt`: gross = net + tax, whole cents.
+  - `app.single_supply_contract_status`: a successor row, finalised or cancelled, one per contract. No row means open. T-0204 writes it.
+
+  `attributed_tax`/`attribution_date` live on the attribution row, not on the contract row. The 0042 `supply_type` CHECK is untouched.
+- Why: Card AC-1 asks for immutable rows with status held in successor rows. The GST is fixed when the first attributing document is posted, not when the contract is recorded, so it cannot sit on an immutable contract row that already exists. A one-per-contract attribution row is also the database backstop for "exactly one first receipt" under concurrency (AC-4). The T-0206 s 29-70 tax invoice can write the same row.
+- Alternatives: an `is_first` flag on the receipt (rejected: a tax invoice could not attribute); mutable status/attribution columns (rejected: immutability rule); widening `customer_prepayment.supply_type` (rejected: needs DROP CONSTRAINT).
+- ADR: ADR-0089 · Status: accepted
+
+### DL-0762 — Contract id on the lines through a `supply_contract` dimension value (T-0203 AC-7)
+- Date: 2026-11-17 · By: claude · Task: T-0203 · Category: accounting
+- Decision: `createSingleSupplyContract` creates the company dimension `supply_contract` if it is missing, then adds one value per contract (code = contract id, name = the customer's reference). Every receipt line on CUSTOMER_PREPAYMENTS and GST_ATTRIBUTED_UNBILLED carries that value. Bank and GST collected lines do not. Per-contract balances therefore come from the ordinary dimension sets that the journal and `account_balance` already store.
+- Why: Review MINOR-1 and MINOR-3: R11 must hold per contract, and a party key alone fails when one customer has two contracts. Dimensions are the engine's existing line analysis (design §2, §3.3). No ledger-table change is needed, and the hash chain and immutability rules are untouched. The test shows two contracts of one customer keeping separate balances.
+- Alternatives: a line memo (rejected: free text, not queryable reliably); a new `journal_line` column (rejected: changes the core ledger row and hash for one use case, as ADR-0089 option 2); relying on `journal_entry.source_id` (rejected: T-0204's final invoice and cancellation entries have other sources, and an entry-level key does not tag lines).
+- ADR: ADR-0089 · Status: accepted
+
+### DL-0763 — T-0203 split: AC-9 and the deposit-invoice refusal to T-0206, AC-10 to T-0205
+- Date: 2026-11-17 · By: claude · Task: T-0203 · Category: scope
+- Decision: T-0203 delivers AC-1–AC-8 and AC-11. Two pieces move out:
+  - **T-0206 (new)**: AC-9, the s 29-70 tax invoice on an open contract, which needs a new golden GP-046 approved with research. The R9 refusal of a `single_supply` deposit invoice also moves here, because both are invoice documents on an open contract.
+  - **T-0205 (new, depends on T-0204)**: AC-10, the receipt limit by the varied total. The variation document that defines that total is T-0204 AC-6. Until then, receipts are limited by the known total.
+- Why: The lead's instruction is to split by AC when a card is too big. The card had grown from 6 to 11 ACs after the review. Both moved parts depend on something not built yet: a new golden, and the variation document. Building them now would mean guessing a golden or creating a variation table that T-0204 would have to design around.
+- Alternatives: build AC-9 now with a self-approved GP-046 (rejected for this slice: needs primary-law research that the environment could not reach on 2026-11-16, and deserves its own review); add a provisional variation table (rejected: pre-empts T-0204's design).
+- ADR: none · Status: accepted
+
+### DL-0764 — Single-supply receipt rules: whole GST fixed by the total invoice rule, last receipt takes the residual, zero-GST contracts allowed
+- Date: 2026-11-17 · By: claude · Task: T-0203 · Category: accounting
+- Decision: How receipts are computed:
+  - **Whole GST.** It is computed at the first accruals receipt by `computeTax` (exclusive, company rounding rule) on the known total, and stored on the one attribution row.
+  - **Each receipt's GST part.** It is receipt × rate/(1+rate) under the company rule (as `recordPrepayment`). The receipt that brings receipts to the total takes the whole GST less the GST already received (AC-8).
+  - **Cash basis.** Receipts are stored in `single_supply_receipt` too, with the same GST-part rule, and post GP-020 with no attribution row.
+  - **Contract basis.** It is the basis in force on the contract date. A receipt dated under another basis is refused (`BASIS_CHANGED`, R8).
+  - **Very small totals.** A known total small enough to carry 0.00 GST (e.g. 0.01) attributes 0.00. The attribution CHECK is `>= 0`; the property test found the case.
+  - **Tax code.** The contract's tax code must be `taxable` with rate > 0. A receipt naming another code is refused (`SECOND_TAX_CODE`).
+- Why: ADR-0089 R4/R5/R8 and review MINOR-2. A mutation run that disabled the residual rule failed both the AC-8 test and the property (`.agent/evidence/T-0203/mutation-step3-no-residual-rule.txt`).
+- Alternatives: cumulative rounding (GST part = round(Σreceived/11) − GST already counted). It is also exact, but differs from R4's per-receipt wording. Rejected so as to follow the ADR literally; the residual rule gives the same end state.
+- ADR: ADR-0089 · Status: accepted
+
+### DL-0765 — fast-check added as a dev dependency of @ledgerforce/ar
+- Date: 2026-11-17 · By: claude · Task: T-0203 · Category: tooling
+- Decision: `packages/modules/ar` gets `fast-check` 4.10.2 in devDependencies, the version already used by ap, bank and parties. The lockfile change only adds the importer entry.
+- Why: AC-5 needs property tests (`single-supply.prop.db.test.ts`, default numRuns).
+- Alternatives: putting the property test in a package that already has fast-check (rejected: the test belongs beside the code under test, `Docs/process/tdd.md`).
+- ADR: none · Status: accepted
+
+### DL-0766 — SS-PLAT-135 helper picks the main company's CUSTOMER_PREPAYMENTS binding
+- Date: 2026-11-17 · By: claude · Task: T-0203 · Category: process
+- Decision: `prepayments()` in `packages/modules/tax/src/single-supply-attribution.db.test.ts` now filters `account_role_binding` by the fixture's main company.
+- Why: The ledger fixture has two companies on the same chart. The unfiltered `rows[0]` could return the other company's account, so the GP-044c balance assertion failed once in this session (0.00 instead of −3,000.00) and passed on reruns. The filter makes the assertion deterministic and does not weaken it.
+- Alternatives: none.
+- ADR: none · Status: accepted
+
 ### DL-0780 — Security notices are delivered by polling, fanned out per tenant every minute (ADR-0092 accepted under DL-0691)
 - Date: 2026-11-17 · By: claude · Task: T-0197 · Category: security
 - Decision: Accept ADR-0092. The scheduler (lf_migrator) installs the pg-boss schedule `security.notices.fanout` (`* * * * *`, UTC). Its consumer sends one `security.notices.dispatch` job per active tenant, with a job id from queue, tenant and UTC minute. The worker (lf_app) dispatches that tenant's due notices under RLS. Neither new queue has pg-boss retries (`retryLimit 0`), because the next minute is the retry. Without SMTP the worker still consumes the jobs and the notices stay `pending`.
