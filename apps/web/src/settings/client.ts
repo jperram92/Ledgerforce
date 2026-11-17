@@ -105,6 +105,13 @@ export interface BankAccountInput {
   aba_fi_mnemonic?: string;
 }
 
+/** The ABA header of a bank account (ADR-0094): all three are set together. */
+export interface BankAccountAba {
+  apca_user_id: string;
+  aba_user_name: string;
+  aba_fi_mnemonic: string;
+}
+
 export type PaymentMethod = 'bank_transfer' | 'stripe';
 export const INVOICE_SERIES = 'ar_invoice_document';
 export const CREDIT_NOTE_SERIES = 'ar_credit_note_document';
@@ -188,6 +195,17 @@ export interface SettingsClient {
     input: BankAccountInput,
     key: string,
   ): Promise<{ account: BankAccount; replayed: boolean }>;
+  setBankAccountAba(
+    companyId: string,
+    bankAccountId: string,
+    input: BankAccountAba,
+    key: string,
+  ): Promise<{ account: BankAccount; changed: boolean }>;
+  archiveBankAccount(
+    companyId: string,
+    bankAccountId: string,
+    key: string,
+  ): Promise<{ account: BankAccount; changed: boolean; remittance_released: boolean }>;
   billing(companyId: string): Promise<BillingSettings>;
   saveSeries(
     companyId: string,
@@ -252,6 +270,20 @@ export function createSettingsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Se
     bankAccounts: (c) => send('GET', `/setup/bank-accounts${q(c)}`),
     addBankAccount: (c, input, key) =>
       send('POST', '/setup/bank-accounts', { company_id: c, ...input }, key),
+    setBankAccountAba: (c, id, input, key) =>
+      send(
+        'PUT',
+        `/setup/bank-accounts/${encodeURIComponent(id)}/aba`,
+        { company_id: c, ...input },
+        key,
+      ),
+    archiveBankAccount: (c, id, key) =>
+      send(
+        'POST',
+        `/setup/bank-accounts/${encodeURIComponent(id)}/archive`,
+        { company_id: c },
+        key,
+      ),
     billing: (c) => send('GET', `/setup/billing${q(c)}`),
     saveSeries: (c, input, key) =>
       send('PUT', '/setup/billing/series', { company_id: c, ...input }, key),

@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0193",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045655-SS-PLAT-153-bank-accounts-aba-form-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:56:55.674Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045657-SS-PLAT-153-bank-accounts-aba-saved-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:56:57.076Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045658-SS-PLAT-153-bank-accounts-archive-confirm-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:56:58.766Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045700-SS-PLAT-153-bank-accounts-archived-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:57:00.489Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045703-SS-PLAT-153-bank-accounts-aba-form-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:57:03.496Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045704-SS-PLAT-153-bank-accounts-aba-saved-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:57:04.846Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045706-SS-PLAT-153-bank-accounts-archive-confirm-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:57:06.048Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045707-SS-PLAT-153-bank-accounts-archived-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:57:07.193Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045709-SS-PLAT-153-bank-accounts-change-step-up-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; \"Keep it\" archives nothing [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:57:09.413Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045756-SS-PLAT-153-bank-accounts-aba-form-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:57:56.673Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045758-SS-PLAT-153-bank-accounts-aba-saved-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:57:58.123Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045759-SS-PLAT-153-bank-accounts-archive-confirm-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:57:59.290Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045800-SS-PLAT-153-bank-accounts-archived-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:58:00.039Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045801-SS-PLAT-153-bank-accounts-aba-form-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:58:01.774Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045802-SS-PLAT-153-bank-accounts-aba-saved-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:58:02.649Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045803-SS-PLAT-153-bank-accounts-archive-confirm-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:58:03.586Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045804-SS-PLAT-153-bank-accounts-archived-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:58:04.473Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-045806-SS-PLAT-153-bank-accounts-change-step-up-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; \"Keep it\" archives nothing [T-0193]",
+      "commit": "dc997bc53c17-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T04:58:06.325Z",
+      "result": "passed"
+    }
+  ]
+}

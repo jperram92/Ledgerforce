@@ -101,4 +101,14 @@ describe('T-0185 bank accounts logic (SS-PLAT-130)', () => {
     expect(bankRefusal(new Error('x'))).toBeNull();
     expect(bankRefusal(e(500, 'boom'))).toBeNull();
   });
+
+  it('SS-PLAT-153 turns the ABA change and archive refusals into plain words [T-0193]', () => {
+    const e = (status: number, error: string) => new AdminApiError(status, { error, message: 'x' });
+    expect(bankRefusal(e(409, 'BANK_ACCOUNT_ARCHIVED'))).toMatch(
+      /archived, so its ABA details cannot change.*new bank account/,
+    );
+    expect(bankRefusal(e(404, 'UNKNOWN_BANK_ACCOUNT'))).toMatch(
+      /no longer one of this company’s accounts/,
+    );
+  });
 });
