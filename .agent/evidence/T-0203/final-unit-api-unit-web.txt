@@ -54,8 +54,6 @@ Not implemented: Window's scrollTo() method
 Not implemented: Window's scrollTo() method
 Not implemented: Window's scrollTo() method
 Not implemented: Window's scrollTo() method
- ❯ |web| apps/web/src/admin/admin.test.tsx (13 tests | 1 failed) 15602ms
-     × lists people with roles and status, and the Owner can invite someone 5484ms
 Not implemented: Window's scrollTo() method
 Not implemented: Window's scrollTo() method
 Not implemented: Window's scrollTo() method
@@ -69,24 +67,8 @@ Not implemented: Window's scrollTo() method
 Not implemented: Window's scrollTo() method
 Not implemented: Window's scrollTo() method
 
-⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
-
- FAIL  |web| apps/web/src/admin/admin.test.tsx > SS-PLAT-78: people and roles > lists people with roles and status, and the Owner can invite someone
-Error: Test timed out in 5000ms.
-If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
- ❯ apps/web/src/admin/admin.test.tsx:67:3
-     65|
-     66| describe('SS-PLAT-78: people and roles', () => {
-     67|   it('lists people with roles and status, and the Owner can invite som…
-       |   ^
-     68|     const u = userEvent.setup();
-     69|     const { calls } = start('/settings/users', OWNER, {
-
-⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
-
-
- Test Files  1 failed | 101 passed (102)
-      Tests  1 failed | 1239 passed (1240)
-   Start at  10:12:39
-   Duration  122.79s (transform 13.59s, setup 20.91s, import 67.58s, tests 80.24s, environment 117.30s)
+ Test Files  102 passed (102)
+      Tests  1243 passed (1243)
+   Start at  19:09:37
+   Duration  56.99s (transform 32.44s, setup 6.41s, import 65.35s, tests 34.13s, environment 30.17s)
 
