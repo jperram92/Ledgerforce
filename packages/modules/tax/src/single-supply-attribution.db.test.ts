@@ -109,8 +109,10 @@ async function balanceOf(account: string, entries: readonly string[]): Promise<s
 const prepayments = async () =>
   (
     await f.inTenant((trx) =>
+      // The fixture has two companies on the same chart: pick the main company's binding.
       sql<{ id: string }>`SELECT account_id::text AS id FROM app.account_role_binding
-                           WHERE role = 'CUSTOMER_PREPAYMENTS'`.execute(trx),
+                           WHERE role = 'CUSTOMER_PREPAYMENTS'
+                             AND company_id = ${f.companyId}::uuid`.execute(trx),
     )
   ).rows[0]?.id ?? '';
 

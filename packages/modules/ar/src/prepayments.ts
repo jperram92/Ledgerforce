@@ -6,8 +6,8 @@
  *   Dr bank (gross) / Cr CUSTOMER_PREPAYMENTS (net, GST code + tax, party) / Cr GST collected (tax).
  * GST-free supplies and genuine Div 99 security deposits are untaxed (GP-012 shape):
  *   Dr bank / Cr CUSTOMER_PREPAYMENTS (gross, party).
- * A single supply with a known total needs a full (deposit) tax invoice at receipt instead
- * (GP-021, GP-014) — refused here with that advice.
+ * A single supply with a known total is refused here: it is received on a single-supply contract
+ * (single-supply.ts, GP-040 on accruals, GP-020 on cash; ADR-0089) or invoiced whole (GP-021).
  *
  * applyPrepayment — applies what is left of a prepayment to the customer's final invoice: GP-022b
  *   Dr CUSTOMER_PREPAYMENTS (net, GST code + tax) / Dr GST collected (tax) / Cr AR (gross, party),
@@ -120,10 +120,10 @@ export async function recordPrepayment(
     .where('idempotency_key', '=', c.idempotencyKey)
     .executeTakeFirst();
   if (existing) return viewOf(trx, companyId, existing.id, true);
-  if (c.supplyType === 'single') {
+  if (c.supplyType === 'single' || c.supplyType === 'single_supply') {
     throw new PrepaymentError(
       'INVALID_PREPAYMENT',
-      'a single supply with a known total needs a deposit tax invoice for the whole supply at receipt (GP-021, GP-014)',
+      'a single supply with a known total is received on a single-supply contract (recordSingleSupplyReceipt, GP-040 / GP-020, ADR-0089) or invoiced whole at receipt (GP-021)',
     );
   }
   if (!(SUPPLY_TYPES as readonly string[]).includes(c.supplyType)) {

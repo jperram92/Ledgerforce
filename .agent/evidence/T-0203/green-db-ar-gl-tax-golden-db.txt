@@ -1,0 +1,11 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aa59e42fb7e9a8b47
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41273
+
+ Test Files  38 passed (38)
+      Tests  1136 passed (1136)
+   Start at  04:58:49
+   Duration  81.21s (transform 1.41s, setup 0ms, import 8.66s, tests 64.94s, environment 3ms)
+
+[vitest-pool]: Timeout terminating forks worker for test files /home/user/Ledgerforce/.claude/worktrees/agent-aa59e42fb7e9a8b47/packages/db/src/migrate.db.test.ts.

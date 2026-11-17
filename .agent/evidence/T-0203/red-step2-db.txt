@@ -1,0 +1,187 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aa59e42fb7e9a8b47
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33017
+ ❯ |db| packages/modules/ar/src/single-supply.db.test.ts (9 tests | 9 failed) 729ms
+     × SS-PLAT-143 AC-3 the first receipt posts GP-040a and the second GP-040b line for line, with the contract on its lines; BAS G1 11,000.00 / 1A 1,000.00 once [T-0203] 7ms
+     × SS-PLAT-143 AC-8 the receipt that completes the contract takes the remaining unbilled GST, so per-receipt rounding leaves no residue [T-0203] 1ms
+     × SS-PLAT-143 AC-7 two contracts of one customer keep separate per-contract balances [T-0203] 1ms
+     × SS-PLAT-143 AC-3 on the cash basis in force a receipt posts GP-020 (GST on the amount received), with no attribution [T-0203] 1ms
+     × SS-PLAT-143 AC-3 refuses a contract with no known total, a non-taxable code, or an unknown basis [T-0203] 5ms
+     × SS-PLAT-143 AC-3 refuses a second tax code, receipts above the total, a different basis and a contract that is not open [T-0203] 1ms
+     × SS-PLAT-143 AC-6 recordPrepayment still refuses a single supply and points to the contract path, writing nothing [T-0203] 3ms
+     × SS-PLAT-144 AC-4 the same key posts once and returns the same view; a contract key creates once [T-0203] 1ms
+     × SS-PLAT-144 AC-4 two receipts in parallel on one contract: exactly one attributes and the GST is attributed once [T-0203] 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.db.test.ts > SS-PLAT-143: single-supply receipts post the whole supply GST once (GP-040) > SS-PLAT-143 AC-3 the first receipt posts GP-040a and the second GP-040b line for line, with the contract on its lines; BAS G1 11,000.00 / 1A 1,000.00 once [T-0203]
+Error: single-supply path not implemented
+ ❯ missing packages/modules/ar/src/single-supply.ts:4:9
+      2| export type SingleSupplyContractView = { contractId: string; [k: strin…
+      3| const missing = (): never => {
+      4|   throw new Error('single-supply path not implemented');
+       |         ^
+      5| };
+      6| export const createSingleSupplyContract = async (..._a: unknown[]) => …
+ ❯ createSingleSupplyContract packages/modules/ar/src/single-supply.ts:6:71
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:117:5
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:194:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.db.test.ts > SS-PLAT-143: single-supply receipts post the whole supply GST once (GP-040) > SS-PLAT-143 AC-8 the receipt that completes the contract takes the remaining unbilled GST, so per-receipt rounding leaves no residue [T-0203]
+Error: single-supply path not implemented
+ ❯ missing packages/modules/ar/src/single-supply.ts:4:9
+      2| export type SingleSupplyContractView = { contractId: string; [k: strin…
+      3| const missing = (): never => {
+      4|   throw new Error('single-supply path not implemented');
+       |         ^
+      5| };
+      6| export const createSingleSupplyContract = async (..._a: unknown[]) => …
+ ❯ createSingleSupplyContract packages/modules/ar/src/single-supply.ts:6:71
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:117:5
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:239:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.db.test.ts > SS-PLAT-143: single-supply receipts post the whole supply GST once (GP-040) > SS-PLAT-143 AC-7 two contracts of one customer keep separate per-contract balances [T-0203]
+Error: single-supply path not implemented
+ ❯ missing packages/modules/ar/src/single-supply.ts:4:9
+      2| export type SingleSupplyContractView = { contractId: string; [k: strin…
+      3| const missing = (): never => {
+      4|   throw new Error('single-supply path not implemented');
+       |         ^
+      5| };
+      6| export const createSingleSupplyContract = async (..._a: unknown[]) => …
+ ❯ createSingleSupplyContract packages/modules/ar/src/single-supply.ts:6:71
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:117:5
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:262:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.db.test.ts > SS-PLAT-143: single-supply receipts post the whole supply GST once (GP-040) > SS-PLAT-143 AC-3 on the cash basis in force a receipt posts GP-020 (GST on the amount received), with no attribution [T-0203]
+Error: single-supply path not implemented
+ ❯ missing packages/modules/ar/src/single-supply.ts:4:9
+      2| export type SingleSupplyContractView = { contractId: string; [k: strin…
+      3| const missing = (): never => {
+      4|   throw new Error('single-supply path not implemented');
+       |         ^
+      5| };
+      6| export const createSingleSupplyContract = async (..._a: unknown[]) => …
+ ❯ createSingleSupplyContract packages/modules/ar/src/single-supply.ts:6:71
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:117:5
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:278:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.db.test.ts > SS-PLAT-143: refusals write nothing > SS-PLAT-143 AC-3 refuses a contract with no known total, a non-taxable code, or an unknown basis [T-0203]
+AssertionError: expected undefined to be 'NO_CONTRACT_TOTAL' // Object.is equality
+
+- Expected:
+"NO_CONTRACT_TOTAL"
+
++ Received:
+undefined
+
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:291:63
+    289|   it('SS-PLAT-143 AC-3 refuses a contract with no known total, a non-t…
+    290|     const before = await counts();
+    291|     expect((await refusal(contract({ knownNet: '0' }))).code).toBe('NO…
+       |                                                               ^
+    292|     expect((await refusal(contract({ knownNet: '' }))).code).toBe('NO_…
+    293|     expect((await refusal(contract({ taxCode: 'GST-FREE' }))).code).to…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.db.test.ts > SS-PLAT-143: refusals write nothing > SS-PLAT-143 AC-3 refuses a second tax code, receipts above the total, a different basis and a contract that is not open [T-0203]
+Error: single-supply path not implemented
+ ❯ missing packages/modules/ar/src/single-supply.ts:4:9
+      2| export type SingleSupplyContractView = { contractId: string; [k: strin…
+      3| const missing = (): never => {
+      4|   throw new Error('single-supply path not implemented');
+       |         ^
+      5| };
+      6| export const createSingleSupplyContract = async (..._a: unknown[]) => …
+ ❯ createSingleSupplyContract packages/modules/ar/src/single-supply.ts:6:71
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:117:5
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:299:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.db.test.ts > SS-PLAT-143: refusals write nothing > SS-PLAT-143 AC-6 recordPrepayment still refuses a single supply and points to the contract path, writing nothing [T-0203]
+AssertionError: single: expected 'a single supply with a known total ne…' to match /recordSingleSupplyReceipt|single-supp…/
+
+- Expected:
+/recordSingleSupplyReceipt|single-supply contract/
+
++ Received:
+"a single supply with a known total needs a deposit tax invoice for the whole supply at receipt (GP-021, GP-014)"
+
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:353:37
+    351|       );
+    352|       expect(e.code, supplyType).toBe('INVALID_PREPAYMENT');
+    353|       expect(e.message, supplyType).toMatch(/recordSingleSupplyReceipt…
+       |                                     ^
+    354|     }
+    355|     expect(await counts()).toEqual(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.db.test.ts > SS-PLAT-144: idempotency and concurrency > SS-PLAT-144 AC-4 the same key posts once and returns the same view; a contract key creates once [T-0203]
+Error: single-supply path not implemented
+ ❯ missing packages/modules/ar/src/single-supply.ts:4:9
+      2| export type SingleSupplyContractView = { contractId: string; [k: strin…
+      3| const missing = (): never => {
+      4|   throw new Error('single-supply path not implemented');
+       |         ^
+      5| };
+      6| export const createSingleSupplyContract = async (..._a: unknown[]) => …
+ ❯ createSingleSupplyContract packages/modules/ar/src/single-supply.ts:6:71
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:117:5
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:361:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply.db.test.ts > SS-PLAT-144: idempotency and concurrency > SS-PLAT-144 AC-4 two receipts in parallel on one contract: exactly one attributes and the GST is attributed once [T-0203]
+Error: single-supply path not implemented
+ ❯ missing packages/modules/ar/src/single-supply.ts:4:9
+      2| export type SingleSupplyContractView = { contractId: string; [k: strin…
+      3| const missing = (): never => {
+      4|   throw new Error('single-supply path not implemented');
+       |         ^
+      5| };
+      6| export const createSingleSupplyContract = async (..._a: unknown[]) => …
+ ❯ createSingleSupplyContract packages/modules/ar/src/single-supply.ts:6:71
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:117:5
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ar/src/single-supply.db.test.ts:373:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  9 failed (9)
+   Start at  04:49:05
+   Duration  3.02s (transform 808ms, setup 0ms, import 1.11s, tests 729ms, environment 0ms)
+

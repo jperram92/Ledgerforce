@@ -101,7 +101,7 @@ CREATE TABLE app.single_supply_attribution (
   company_id        uuid          NOT NULL,
   contract_id       uuid          NOT NULL,
   attribution_date  date          NOT NULL,
-  attributed_tax    numeric(19,4) NOT NULL CHECK (attributed_tax > 0 AND attributed_tax = round(attributed_tax, 2)),
+  attributed_tax    numeric(19,4) NOT NULL CHECK (attributed_tax >= 0 AND attributed_tax = round(attributed_tax, 2)),
   entry_id          uuid          NOT NULL,
   created_at        timestamptz   NOT NULL DEFAULT clock_timestamp(),
   PRIMARY KEY (tenant_id, contract_id),
