@@ -15,10 +15,10 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 |---|---:|
 | blocked | 7 |
 | done | 3 |
-| in_progress | 2 |
+| in_progress | 1 |
 | review | 140 |
 | todo | 27 |
-| verifying | 7 |
+| verifying | 8 |
 | **total** | **186** |
 
 | Phase | Cards |
@@ -283,7 +283,7 @@ graph LR
 | [T-0166](T-0166.md) | Gross ECL allowance reconciliation from source lineage | MVP | blocked | T-0031, T-0048 | — | 3 |
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | verifying | T-0047, T-0035 | UC-04 | 3 |
-| [T-0203](T-0203.md) | Single-supply GST attribution: role binding, contract record and accruals receipt posting (GP-040) | MVP | in_progress | T-0168 | UC-04 | 0 |
+| [T-0203](T-0203.md) | Single-supply GST attribution: role binding, contract record and accruals receipt posting (GP-040) | MVP | verifying | T-0168 | UC-04 | 0 |
 | [T-0204](T-0204.md) | Single-supply GST attribution: final invoice, price change, cancellation/refund and BAS-preparation reports (GP-041, GP-042) | MVP | todo | T-0203 | UC-04, UC-11 | 0 |
 | [T-0205](T-0205.md) | Single-supply receipts limited by the contract total as varied (review finding 7) | MVP | todo | T-0203, T-0204 | UC-04 | 0 |
 | [T-0206](T-0206.md) | Single-supply documents on an open contract: s 29-70 tax invoice (candidate GP-046) and deposit-invoice refusal (ADR-0089 R9) | MVP | todo | T-0203 | UC-04 | 0 |

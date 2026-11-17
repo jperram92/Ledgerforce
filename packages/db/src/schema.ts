@@ -565,7 +565,7 @@ export interface PrepaymentApplicationTable {
   created_at: Timestamp;
 }
 
-/** Migration 0075 (T-0203, ADR-0089): a single supply with a known total. Immutable. */
+/** Migration 0076 (T-0203, ADR-0089): a single supply with a known total. Immutable. */
 export interface SingleSupplyContractTable {
   id: ColumnType<string, string | undefined, never>;
   tenant_id: TenantId;
@@ -583,7 +583,7 @@ export interface SingleSupplyContractTable {
   idempotency_key: string;
 }
 
-/** Migration 0075: the one accruals attribution of a contract's whole GST (GP-040a). */
+/** Migration 0076: the one accruals attribution of a contract's whole GST (GP-040a). */
 export interface SingleSupplyAttributionTable {
   tenant_id: TenantId;
   company_id: string;
@@ -594,7 +594,7 @@ export interface SingleSupplyAttributionTable {
   created_at: Timestamp;
 }
 
-/** Migration 0075: a receipt on a single-supply contract (GP-040a/b, GP-020 on cash). */
+/** Migration 0076: a receipt on a single-supply contract (GP-040a/b, GP-020 on cash). */
 export interface SingleSupplyReceiptTable {
   id: Generated<string>;
   tenant_id: TenantId;
@@ -611,7 +611,7 @@ export interface SingleSupplyReceiptTable {
   created_at: Timestamp;
 }
 
-/** Migration 0075: finalised / cancelled successor row of a contract; none = open. */
+/** Migration 0076: finalised / cancelled successor row of a contract; none = open. */
 export interface SingleSupplyContractStatusTable {
   tenant_id: TenantId;
   company_id: string;

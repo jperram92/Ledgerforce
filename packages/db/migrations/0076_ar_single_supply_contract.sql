@@ -1,4 +1,4 @@
--- 0075 — Single-supply GST attribution: the GST_ATTRIBUTED_UNBILLED role and the contract,
+-- 0076 — Single-supply GST attribution: the GST_ATTRIBUTED_UNBILLED role and the contract,
 -- attribution, receipt and status records (T-0203, ADR-0089 R1–R5, R8, R11, RQ-0171, DL-0760..).
 -- Owners: packages/modules/gl (the role) and packages/modules/ar (the contract tables).
 --
@@ -60,13 +60,13 @@ AS $$
     WHEN 'ACCRUED_EXPENSES'         THEN account_type = 'liability'
     WHEN 'SGC_PAYABLE'              THEN account_type = 'liability'
     WHEN 'PRIOR_PERIOD_ADJUSTMENTS' THEN account_type = 'equity'
-    -- Single-supply GST attribution (0075, ADR-0089 R3, RQ-0171).
+    -- Single-supply GST attribution (0076, ADR-0089 R3, RQ-0171).
     WHEN 'GST_ATTRIBUTED_UNBILLED'  THEN account_type = 'asset'
     ELSE false
   END
 $$;
 COMMENT ON FUNCTION app.system_role_allows(text, text) IS
-  'Which account types a system role may bind to (design 3.2; 0062 period-end roles; 0075 GST_ATTRIBUTED_UNBILLED). Mirrored in modules/gl system-roles.ts.';
+  'Which account types a system role may bind to (design 3.2; 0062 period-end roles; 0076 GST_ATTRIBUTED_UNBILLED). Mirrored in modules/gl system-roles.ts.';
 
 CREATE TABLE app.single_supply_contract (
   id                  uuid          PRIMARY KEY DEFAULT app.uuid_generate_v7(),
