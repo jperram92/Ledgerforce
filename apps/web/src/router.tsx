@@ -33,6 +33,7 @@ import { WizardPage } from './setup/WizardPage.tsx';
 import { CompanySettingsPage } from './settings/CompanySettingsPage.tsx';
 import { TaxSettingsPage } from './settings/TaxSettingsPage.tsx';
 import { BankAccountsPage } from './settings/BankAccountsPage.tsx';
+import { RemittanceAccountPage } from './settings/RemittanceAccountPage.tsx';
 import { BillingSettingsPage } from './settings/BillingSettingsPage.tsx';
 import { ApprovalSettingsPage } from './settings/ApprovalSettingsPage.tsx';
 import { Shell } from './Shell.tsx';
@@ -181,6 +182,13 @@ const billingSettingsRoute = createRoute({
   getParentRoute: () => shellRoute,
   path: 'settings/billing',
   component: BillingSettingsPage,
+});
+// The remittance account, part of wizard step 8 (T-0183, ADR-0080); the API owns
+// /setup/remittance-account.
+const remittanceSettingsRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/remittance-account',
+  component: RemittanceAccountPage,
 });
 const approvalSettingsRoute = createRoute({
   getParentRoute: () => shellRoute,
@@ -549,6 +557,7 @@ const routeTree = rootRoute.addChildren([
     companySettingsRoute,
     taxSettingsRoute,
     bankAccountsSettingsRoute,
+    remittanceSettingsRoute,
     billingSettingsRoute,
     approvalSettingsRoute,
     openingBalancesRoute,

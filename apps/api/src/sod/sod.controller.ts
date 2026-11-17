@@ -101,7 +101,8 @@ interface ExceptionView {
  * SoD settings and the weekly exception report (design §6.5, ADR-0026). Settings are history:
  * a change inserts a row (Owner only, with a reason, an Idempotency-Key since ADR-0085; audited by
  * the database). Posting the current values again changes nothing (200). The report lists the small-team exceptions of a
- * Monday-to-Monday week in the tenant's report time zone; the Owner acknowledges a week.
+ * Monday-to-Monday week in the tenant's report time zone; the Owner acknowledges a week (with an
+ * Idempotency-Key since ADR-0093).
  */
 @Controller('sod')
 export class SodController {
@@ -189,9 +190,13 @@ export class SodController {
   @Post('exceptions/weekly/acknowledge')
   @RequirePermission('settings.sod.manage')
   async acknowledge(
+    @Headers('idempotency-key') key: string | undefined,
     @Body() body: unknown,
     @Res({ passthrough: true }) res: Response,
   ): Promise<{ week_start: string; exceptions: number }> {
+    // ADR-0093 (amends ADR-0085, DL-0711's pattern): required before the body is read; not
+    // stored, the route stays replay-safe by state.
+    requireKey(key);
     const b = (body ?? {}) as { week_start?: unknown; note?: unknown };
     if (typeof b.week_start !== 'string') {
       throw new BadRequestException({ error: 'invalid_week_start' });

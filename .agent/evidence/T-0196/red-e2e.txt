@@ -1,0 +1,72 @@
+
+Running 2 tests using 2 workers
+
+[1/2] [chromium] › tests/e2e/web/admin.spec.ts:675:5 › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 390 [T-0093]
+[2/2] [chromium] › tests/e2e/web/admin.spec.ts:675:5 › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 1440 [T-0093]
+  1) [chromium] › tests/e2e/web/admin.spec.ts:675:5 › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 390 [T-0093] 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByRole('status')
+    Expected: "Acknowledged on 25 Oct 2026, 11:20 am."
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+      696 |         .fill('Both reviewed with Mei on Friday.');
+      697 |       await page.getByRole('button', { name: 'Acknowledge this week' }).click();
+    > 698 |       await expect(page.getByRole('status')).toHaveText('Acknowledged on 25 Oct 2026, 11:20 am.');
+          |                                              ^
+      699 |       await expect(table.getByRole('row').nth(1)).toContainText('Yes');
+      700 |       expect(f.posts).toEqual([
+      701 |         {
+        at /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/tests/e2e/web/admin.spec.ts:698:46
+
+    attachment #1: SS-PLAT-79-exceptions-week-owner-390 (image/png) ────────────────────────────────
+    test-results/web-admin-SS-PLAT-79-weekl-5962b-ledges-the-week-390-T-0093--chromium/attachments/SS-PLAT-79-exceptions-week-owner-390-d8ff27e88f58abdb0696628df356d35081385f59.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/web-admin-SS-PLAT-79-weekl-5962b-ledges-the-week-390-T-0093--chromium/error-context.md
+
+    Error Context: test-results/web-admin-SS-PLAT-79-weekl-5962b-ledges-the-week-390-T-0093--chromium/error-context.md
+
+
+  2) [chromium] › tests/e2e/web/admin.spec.ts:675:5 › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 1440 [T-0093] 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: getByRole('status')
+    Expected: "Acknowledged on 25 Oct 2026, 11:20 am."
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" getByRole('status') with timeout 5000ms
+      - waiting for getByRole('status')
+
+
+      696 |         .fill('Both reviewed with Mei on Friday.');
+      697 |       await page.getByRole('button', { name: 'Acknowledge this week' }).click();
+    > 698 |       await expect(page.getByRole('status')).toHaveText('Acknowledged on 25 Oct 2026, 11:20 am.');
+          |                                              ^
+      699 |       await expect(table.getByRole('row').nth(1)).toContainText('Yes');
+      700 |       expect(f.posts).toEqual([
+      701 |         {
+        at /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/tests/e2e/web/admin.spec.ts:698:46
+
+    attachment #1: SS-PLAT-79-exceptions-week-owner-1440 (image/png) ───────────────────────────────
+    test-results/web-admin-SS-PLAT-79-weekl-4c3b6-edges-the-week-1440-T-0093--chromium/attachments/SS-PLAT-79-exceptions-week-owner-1440-87a518df722cf6276138aa3ba603c56c527eb46a.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/web-admin-SS-PLAT-79-weekl-4c3b6-edges-the-week-1440-T-0093--chromium/error-context.md
+
+    Error Context: test-results/web-admin-SS-PLAT-79-weekl-4c3b6-edges-the-week-1440-T-0093--chromium/error-context.md
+
+
+  2 failed
+    [chromium] › tests/e2e/web/admin.spec.ts:675:5 › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 1440 [T-0093] 
+    [chromium] › tests/e2e/web/admin.spec.ts:675:5 › SS-PLAT-79 weekly control exceptions › SS-PLAT-79: the Owner reviews and acknowledges the week @ 390 [T-0093] 

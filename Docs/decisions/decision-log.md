@@ -4067,3 +4067,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: ADR-0062 pattern (lf_app cannot enumerate tenants); a 5-minute delay is acceptable for supplier bills; deterministic ids make a duplicate fan-out a no-op.
 - Alternatives: IMAP IDLE long-lived connections per mailbox (rejected for MVP: one socket per tenant, reconnect logic, little AP value); worker-local timers (rejected: worker cannot list tenants).
 - ADR: ADR-0095 · Status: accepted
+
+### DL-0790 — Wizard step 8 asks for an approved, active remittance account when bank transfer is accepted (T-0183)
+- Date: 2026-11-17 · By: claude · Task: T-0183 · Category: architecture
+- Decision: Step 8's validator calls `remittanceAccountOf` (@ledgerforce/ar) and lists "No remittance bank account has been chosen for bank transfer" when `bank_transfer` is accepted and the account in force is missing or not `active`. A pending or rejected change does not count. Fixtures that accept bank transfer (setup wizard-settings and wizard-flow db tests, apps/api billing-settings db test) now approve one by maker-checker through the module first, with the new line asserted before the approval; no assertion was removed or loosened. The billing e2e fake mirrors the wording and starts with an approved account.
+- Why: ADR-0079 decision 2 and T-0183 AC-1: an invoice offering bank transfer without a printed account cannot be paid. The status check is defensive: ADR-0086 already releases the designation on archive.
+- Alternatives: read `app.ar_settings` directly in the validator (rejected: the module exports a function, rule of wizard-validators.ts); count a pending change (rejected: nothing prints until a second person approves).
+- ADR: ADR-0079, ADR-0080, ADR-0086 · Status: accepted
+
+### DL-0791 — Remittance account screen: own page beside Numbering and billing; requester never offered approval except small-team with a reason (T-0183)
+- Date: 2026-11-17 · By: claude · Task: T-0183 · Category: ui
+- Decision: `/settings/remittance-account` (RemittanceAccountPage) shows the account in force, the pending change and, with settings.setup.manage and nothing pending, a form to ask for a change. It is linked from Numbering and billing (wizard step 8 keeps its single link, as wizard-logic has one per step) and from the Settings list. The choices are the company's active bank accounts from `GET /setup/bank-accounts` other than the one in force, plus removal when one is in force. Each attempt uses a new client change id and Idempotency-Key, so a refused or step-up attempt never collides (ADR-0080 replay is by id). The requester is told before asking, and on the pending change, that someone else approves; they get no approve button unless `GET /sod/settings` says small-team mode is on, and then only with a written reason sent as `sod_exception` (ADR-0026), the API still deciding. The requester is shown as "you" or "someone else": the GET returns user ids only and the users list needs a permission Accountants do not have. Approvers are asked to check the details with the requester out of band before approving (RQ-0150 F2). Step-up 401s use the existing StepUpPrompt; reject has no step-up (ADR-0080). A request refusal stays on screen instead of refreshing it away.
+- Why: T-0183 AC-2; P6/P12 plain words; design §6.6 masking; reuse of the T-0185/T-0186 settings patterns.
+- Alternatives: put the form inside Numbering and billing (rejected: that page already has five forms and only one primary action is allowed per screen); show the approve button to the requester and let the API refuse (rejected: the card asks for the requester to be told beforehand); fetch user names (rejected: needs users.read).
+- ADR: ADR-0080 · Status: accepted
+
+### DL-0792 — Dangling manifest entries of a failed intermediate e2e run removed before the first commit (T-0183)
+- Date: 2026-11-17 · By: claude · Task: T-0183 · Category: process
+- Decision: The first green-attempt run of `settings-remittance.spec.ts` (one test failing) wrote 12 screenshots to `.agent/evidence/T-0183/`. They were removed, untracked and never committed, before the passing re-run, and their 12 manifest entries (which pointed at the removed files) were dropped so every manifest entry names a file that exists. The failing run's output is not kept; the RED run and the final green run are (`red-ac2-e2e.txt`, `playwright-settings-remittance.txt`). Screenshots and manifest changes that regression runs wrote into other tasks' evidence folders (T-0081, T-0091, T-0176, T-0185, T-0186) were not committed.
+- Why: The evidence manifest must point at real files. The removed files were scratch output of this session, not committed evidence (directive 6 covers tracked items).
+- Alternatives: commit the stale screenshots of a failing run (rejected: misleading evidence).
+- ADR: none · Status: accepted
+
+### DL-0793 — POST /sod/exceptions/weekly/acknowledge requires an Idempotency-Key; the control-exceptions screen sends one (T-0196)
+- Date: 2026-11-17 · By: claude · Task: T-0196 · Category: architecture
+- Decision: As DL-0711 did for `POST /sod/settings`: the route answers 400 `idempotency_key_required` before reading the body when the header is missing, empty or over 200 characters (nothing written or audited); the key is not stored and the route stays replay-safe by state (201 new, 200 already acknowledged). `acknowledgeWeek(weekStart, key, note?)` in the web admin client sends the header; the screen sends a fresh key per press. The sod api-db helper sends a key on this route by default. The admin e2e fake now refuses an acknowledgement without a key, as the API does, and SS-PLAT-79 asserts the key was sent. Recorded as ADR-0093, an amendment of ADR-0085.
+- Why: apps/api rule "every mutating endpoint requires an idempotency key"; RQ-0167 S8; T-0196 AC-1/AC-2. RED: the api-db test got 201 without a key; the e2e with the old client got the fake's 400 and no acknowledgement.
+- Alternatives: store keys and replay responses (rejected: no other settings route does, and the route is already state-idempotent); accept but not require the key (rejected: the rule stays broken).
+- ADR: ADR-0093 · Status: proposed (architecture, accepted on cross-review)
