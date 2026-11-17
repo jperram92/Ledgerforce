@@ -649,6 +649,29 @@ export interface EmailDeliveryTable {
   sent_at: Timestamp;
 }
 
+/**
+ * Migration 0075 (T-0197, ADR-0092): one row per attempt to email a security notice. Append-only;
+ * exactly one notice id is set, matching notice_kind; at most one 'sent' row per notice.
+ */
+export interface SecurityNoticeDeliveryTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  notice_kind: 'remittance_account_changed' | 'bank_details_changed';
+  remittance_notice_id: string | null;
+  bank_detail_notice_id: string | null;
+  attempt: number;
+  outcome: 'sent' | 'failed';
+  to_addr: string;
+  subject: string;
+  message_id: string | null;
+  error_name: string | null;
+  error_code: string | null;
+  smtp_code: number | null;
+  error_message: string | null;
+  next_attempt_at: Date | null;
+  attempted_at: Timestamp;
+}
+
 /** Migration 0049 (T-0073, RQ-0115): Stripe Payment Link per invoice and amount due. */
 export interface StripePaymentLinkTable {
   id: Generated<string>;
@@ -1402,6 +1425,7 @@ export interface Database {
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;
+  'app.security_notice_delivery': SecurityNoticeDeliveryTable;
   'app.stripe_payment_link': StripePaymentLinkTable;
   'app.stripe_settings': StripeSettingsTable;
   'app.stripe_payout': StripePayoutTable;

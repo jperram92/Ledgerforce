@@ -18,13 +18,13 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | in_progress | 1 |
 | review | 140 |
 | todo | 27 |
-| verifying | 3 |
-| **total** | **181** |
+| verifying | 4 |
+| **total** | **182** |
 
 | Phase | Cards |
 |---|---:|
 | Sprint 0 | 9 |
-| MVP | 96 |
+| MVP | 97 |
 | Phase 1 | 1 |
 | Phase 2 | 1 |
 | Phase 3 | 1 |
@@ -201,7 +201,8 @@ graph LR
 | [T-0190](T-0190.md) | AR: cancel an approved Stripe refund that Stripe refused permanently, so its amount stops counting as requested | MVP | todo | T-0172 | UC-11 | 0 |
 | [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | verifying | T-0180 | UC-01 | 0 |
 | [T-0192](T-0192.md) | Security: rotate the session id on step-up re-authentication (ASVS 5.0 7.2.4) | MVP | todo | — | — | 0 |
-| [T-0197](T-0197.md) | Platform: send security notices (bank-detail and remittance account changes) by email | MVP | todo | T-0191 | UC-01, UC-06 | 0 |
+| [T-0197](T-0197.md) | Platform: send security notices (bank-detail and remittance account changes) by email | MVP | verifying | T-0191 | UC-01, UC-06 | 0 |
+| [T-0209](T-0209.md) | Platform: surface failed security notices to administrators with a retry-now action | MVP | todo | T-0197 | UC-01, UC-06 | 0 |
 | [T-0201](T-0201.md) | Opening balances: Xero reader (trial balance and open invoices/bills at the balance date) | Phase 1 | todo | T-0126 | — | 0 |
 | [T-0202](T-0202.md) | Opening balances screen: show currency, currency amount and rate of foreign-currency items | MVP | todo | T-0126, T-0177 | — | 0 |
 | [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | todo | T-0180 | UC-01 | 0 |

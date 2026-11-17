@@ -23,6 +23,7 @@
     "@ledgerforce/bank": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
     "@ledgerforce/ledger": "workspace:*",
+    "@ledgerforce/parties": "workspace:*",
     "@ledgerforce/products": "workspace:*",
     "@ledgerforce/shared": "workspace:*",
     "@ledgerforce/tax": "workspace:*",
