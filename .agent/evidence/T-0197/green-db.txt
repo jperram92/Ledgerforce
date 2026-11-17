@@ -1,0 +1,30 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a445ddbe879b5e963
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41667
+ ✓ |db| packages/modules/parties/src/bank-change.workflow.db.test.ts (11 tests) 985ms
+ ✓ |db| packages/modules/ar/src/remittance-account-notice.db.test.ts (6 tests) 1141ms
+ ✓ |db| packages/modules/email/src/batch-email.db.test.ts (1 test) 8372ms
+     ✓ SS-UC02-04 a batch of 40 with one inactive party sends 39 emails, each To its Billing To, Cc its CC, PDF attached  6840ms
+ ✓ |db| packages/db/src/rls.db.test.ts (895 tests) 14998ms
+     ✓ reports no violations on the migrated schema  1348ms
+     ✓ FAILS for a tenant table without RLS, without FORCE, or without a policy  1566ms
+     ✓ FAILS for a view over tenant tables that is not security_invoker (ADR-0061) [T-0117]  1459ms
+ ✓ |db| packages/modules/email/src/invoice-email.db.test.ts (6 tests) 2964ms
+     ✓ SS-UC01-03 SS-UC02-04 the posted invoice event sends one email To the Billing To contact, Cc the Billing CC, with the PDF attached; redelivery sends nothing  488ms
+ ✓ |db| apps/worker/src/daily-jobs.db.test.ts (8 tests) 946ms
+ ✓ |db| packages/modules/email/src/security-notice-email.db.test.ts (8 tests) 1310ms
+ ✓ |db| apps/worker/src/queue-admin.db.test.ts (2 tests) 884ms
+ ✓ |db| apps/worker/src/security-notices.db.test.ts (4 tests) 1204ms
+ ✓ |db| packages/db/src/migrate.db.test.ts (7 tests) 1006ms
+     ✓ refuses to run when an applied migration was edited (checksum changed)  339ms
+ ✓ |db| packages/modules/email/src/reminder-email.db.test.ts (2 tests) 1201ms
+
+ Test Files  11 passed (11)
+      Tests  950 passed (950)
+   Start at  04:58:18
+   Duration  47.60s (transform 1.22s, setup 0ms, import 9.62s, tests 35.01s, environment 1ms)
+
+JSON report written to /home/user/Ledgerforce/.claude/worktrees/agent-a445ddbe879b5e963/.agent/evidence/T-0197/tests-db.json
+[vitest-pool]: Timeout terminating forks worker for test files /home/user/Ledgerforce/.claude/worktrees/agent-a445ddbe879b5e963/packages/modules/email/src/reminder-email.db.test.ts.
+exit 0

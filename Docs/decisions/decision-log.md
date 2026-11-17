@@ -3998,6 +3998,76 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: a web change to re-fetch `/auth/me` after a step-up (rejected: nothing reads session state, so it would add code with no behaviour behind it); an e2e test against the real API plus an IdP (rejected: no such harness exists for the web suites; that would be a separate card).
 - ADR: ADR-0087 · Status: accepted
 
+### DL-0780 — Security notices are delivered by polling, fanned out per tenant every minute (ADR-0092 accepted under DL-0691)
+- Date: 2026-11-17 · By: claude · Task: T-0197 · Category: security
+- Decision: Accept ADR-0092. The scheduler (lf_migrator) installs the pg-boss schedule `security.notices.fanout` (`* * * * *`, UTC). Its consumer sends one `security.notices.dispatch` job per active tenant, with a job id from queue, tenant and UTC minute. The worker (lf_app) dispatches that tenant's due notices under RLS. Neither new queue has pg-boss retries (`retryLimit 0`), because the next minute is the retry. Without SMTP the worker still consumes the jobs and the notices stay `pending`.
+- Why: RQ-0174 findings 5–6. The notices are written by SECURITY DEFINER SQL, including approvals that bypass the module (0072). SQL cannot create a pg-boss job, so an outbox event would miss exactly that case. Tenant enumeration stays owner-only (ADR-0062). Third-party Xero bank-change monitors also deliver by polling.
+- Alternatives: an outbox event per notice (rejected: a bypassing approval would never be sent); an owner function listing tenants with due notices (rejected: widens the owner's view of tenant data); a 5-minute cadence (rejected: the first retry would not be 1 min, design §5.6).
+- ADR: ADR-0092 · Status: accepted
+
+### DL-0781 — app.security_notice_delivery records every attempt; one sent row per notice (migration 0075)
+- Date: 2026-11-17 · By: claude · Task: T-0197 · Category: architecture
+- Decision: The new table holds one row per attempt, tenant-owned and append-only (lf_app SELECT, INSERT; `sod_never_changed`). Exactly one composite foreign key is set: to `remittance_account_notice` or to `bank_detail_change_notice`. Each notice table gains `UNIQUE (tenant_id, id)`, which is additive. A partial unique index allows one `sent` row per notice. Each notice is handled in its own tenant transaction, locked `FOR UPDATE OF n SKIP LOCKED`. The migration is reserved as 0075. On the task branch the file is numbered 0073, because the runner refuses gaps and 0073/0074 are on sibling branches. The integrator renames it.
+- Why: `app.email_delivery.purpose` cannot be widened (DROP CONSTRAINT refused; precedents 0054, 0062), and it has no place for failed attempts or backoff (RQ-0174 finding 7). The lock and the unique index make two concurrent dispatchers send each notice once (proven in SS-PLAT-145).
+- Alternatives: reuse app.email_delivery (impossible without dropping its CHECK); a status column with an attempt counter on the notice tables (rejected: lf_app may update only status and sent_at, and history would be lost).
+- ADR: ADR-0092 · Status: accepted
+
+### DL-0782 — Security notice content: plain text, masked, no links, "use a contact you already know"
+- Date: 2026-11-17 · By: claude · Task: T-0197 · Category: security
+- Decision: Text-only email with no HTML and no links. The subject starts `Security notice:` and carries no numbers. Accounts appear as "BSB …, account ending in NNN". The body states the event and when it happened (tenant report time zone), and for staff notices the requester, the approver and any self-approval. It says only the last 3 digits are shown and that there are no links. The "If you did not expect this" guidance says: do not reply; do not use links or phone numbers sent about the change; call a contact you already know (the company, or the requester or approver); sign in the usual way; contact your bank if money may have moved. Bank account labels and display names are made inert (one line, at most 80 characters, `://` and `www.` broken). `account_name` is not printed.
+- Why: RQ-0174. OWASP ASVS 4.0.3 2.2.3 says to notify without disclosing sensitive information, and ASVS 5.0 6.3.7 requires notification. NIST SP 800-63B-4 §4.6 requires clear instructions and contact information if the recipient repudiates the event. ASD and NCSC tell people to use known phone numbers, not details from an email. A link-free notice cannot be cloned into a working lure, and requester-typed text cannot plant one.
+- Alternatives: HTML with a "review the change" button (rejected: trains clicking links in security email); printing a company phone number (rejected: there is no verified number, and S4 says not to trust a number from an email).
+- ADR: ADR-0092 · Status: accepted
+
+### DL-0783 — Failed security notices retry from 1 min to 6 h and never give up; Sync-issue surfacing is T-0209
+- Date: 2026-11-17 · By: claude · Task: T-0197 · Category: security
+- Decision: A failed attempt n is due again after min(6 h, 1 min · 2^(n−1)), computed from the injected `now`. The notice stays `failed` and is retried every 6 h until it is sent. This deviates from the apps/worker rule "then a Sync issues inbox entry": app.sync_issue rows need an outbox event and a dead-letter job (migration 0030), and a polled notice has neither. Follow-up T-0209 surfaces failed security notices to administrators with a retry-now action.
+- Why: RQ-0174 finding 8. Abandoning a fraud notice silently is worse than a 6-hourly retry. The failure is visible in the notice status and in each attempt row (error name, nodemailer code, SMTP reply code, message ≤ 500).
+- Alternatives: stop after 10 attempts like the outbox (rejected: no inbox to show it, so it would be silent); fake an outbox event so that a Sync issue can be raised (rejected: misuses the outbox contract).
+- ADR: ADR-0092 · Status: accepted
+
+### DL-0784 — @ledgerforce/parties as a devDependency of @ledgerforce/email; SmtpSink can refuse recipients
+- Date: 2026-11-17 · By: claude · Task: T-0197 · Category: tooling
+- Decision: The email package's db tests create bank-detail notices through the real parties workflow (request and verify with step-up), so `@ledgerforce/parties` is a workspace devDependency. The test SMTP sink gains `rcptReply`, which answers every RCPT with a chosen reply (e.g. `451 4.3.0 …`) so the sender sees a real SMTP failure. The worker job test was written after its module. Its RED is a mutation check (schedule, fan-out and job disabled → 3 of 4 tests fail; `.agent/evidence/T-0197/red-worker-mutation.txt`). The dispatcher itself has a true RED.
+- Why: no mocks of the database or SMTP (Docs/process/tdd.md). A workspace package adds no third-party code.
+- Alternatives: insert notice rows as superuser (rejected: bypasses the guards being relied on); a throwing EmailSender double (rejected: a real SMTP refusal also exercises nodemailer's error fields).
+- ADR: none · Status: accepted
+
+### DL-0810 — T-0127 split by transport: IMAP polling here, inbound webhooks to T-0215, XOAUTH2 and settings to T-0216
+- Date: 2026-11-16 · By: claude · Task: T-0127 · Category: scope
+- Decision: T-0127 builds the IMAP polling transport completely (AC-1: poller, mailbox store, migration 0077, worker job and scheduler fan-out). AC-2 (signed provider inbound webhooks for the SaaS) moves to new card T-0215; OAuth2 XOAUTH2 (needed for Microsoft 365, RQ-0177 F3) and the mailbox settings API/UI move to new card T-0216.
+- Why: Each transport is a full slice of its own (protocol client or per-provider signature schemes, storage, routing, tests); together they are well above the ~400-line card limit. IMAP is the self-host default (RQ-0111), so it goes first. RQ-0177.
+- Alternatives: both transports in one branch (rejected: oversize, half-built risk); webhooks first (rejected: SaaS path, self-host is the primary distribution).
+- ADR: ADR-0095 · Status: accepted
+
+### DL-0811 — In-house minimal IMAP client; no imapflow dependency (ADR-0095 accepted under DL-0691)
+- Date: 2026-11-16 · By: claude · Task: T-0127 · Category: security
+- Decision: Accept ADR-0095 under DL-0691. The poller uses an in-house IMAP4rev1 subset client over `node:tls` (`packages/modules/ap/src/imap-client.ts`): implicit TLS with certificate verification, greeting, LOGIN, EXAMINE, UID SEARCH, UID FETCH (RFC822.SIZE / BODY.PEEK[]), LOGOUT; bounded lines (64 KiB) and literals (message ceiling), command timeouts; no command that changes the mailbox.
+- Why: RQ-0177 F1/F2: imapflow (the only maintained library) adds 8 direct runtime dependencies for features not used; the needed subset is small and fully testable against an in-process fake server. AGENTS.md §4 "prefer none", directive 5.
+- Alternatives: imapflow (rejected: dependency weight); node-imap / emailjs-imap-client (rejected: unmaintained/archived); STARTTLS support (rejected: RFC 8314 prefers implicit TLS; fewer downgrade paths).
+- ADR: ADR-0095 · Status: accepted
+
+### DL-0812 — Bills mailbox credentials sealed per row; write-once identity; fixed error texts
+- Date: 2026-11-16 · By: claude · Task: T-0127 · Category: security
+- Decision: `app.bill_inbox_mailbox` (migration 0077) keeps host, port, username, folder and the password envelope-encrypted (ADR-0018, AAD bound to tenant/company/table/row/field). lf_app may only update status, the cursor and the last-poll outcome; a credential change is a new row and the previous one becomes `superseded` (one active per company). Poll failures are recorded as a fixed error class (`connect_failed`, `tls_failed`, `auth_failed`, `folder_missing`, `protocol_error`, `timeout`), never server text.
+- Why: Design §6.6; same pattern as the Salesforce connection (migration 0017); server text may echo the username or worse, and error columns are readable by every lf_app read path.
+- Alternatives: environment-variable credentials (rejected: per install, not per company, no rotation path); storing server error text (rejected: leak risk).
+- ADR: ADR-0095 · Status: accepted
+
+### DL-0813 — Exactly-once polling: per-message transaction with row lock, (uidvalidity, last_uid) cursor, refuse-and-advance
+- Date: 2026-11-16 · By: claude · Task: T-0127 · Category: architecture
+- Decision: Each fetched message is ingested in its own `withTenant` transaction that locks the mailbox row, skips UIDs at or below the cursor, calls `ingestBillEmail` and advances the cursor. A changed UIDVALIDITY restarts the cursor at 0 (Message-ID idempotency absorbs the re-reads). Messages over 25 MiB (RFC822.SIZE, checked before download) and messages `ingestBillEmail` refuses (`InboxError`) advance the cursor and are counted as refused; other errors stop the poll with the cursor unchanged. At most 50 messages per poll; network I/O never runs inside a database transaction.
+- Why: RQ-0177 F2/F5/F6: a crash loses or duplicates nothing; one bad email never blocks the inbox; concurrent pollers serialise on the row lock.
+- Alternatives: marking messages \Seen or moving them (rejected: modifies the business's mailbox and is not transactional with the DB); one transaction per poll (rejected: one bad message rolls back the batch; holds a transaction across network I/O).
+- ADR: ADR-0095 · Status: accepted
+
+### DL-0814 — Poll schedule: owner fan-out every 5 minutes, one job per tenant and slot
+- Date: 2026-11-16 · By: claude · Task: T-0127 · Category: architecture
+- Decision: The owner-role scheduler installs a `*/5 * * * *` (UTC) schedule on queue `ap.inbox.fanout`; its consumer sends one `ap.inbox.poll` job per active tenant with a job id derived from queue, tenant and 5-minute slot. The lf_app worker polls that tenant's active mailboxes in RLS. IDLE is not used.
+- Why: ADR-0062 pattern (lf_app cannot enumerate tenants); a 5-minute delay is acceptable for supplier bills; deterministic ids make a duplicate fan-out a no-op.
+- Alternatives: IMAP IDLE long-lived connections per mailbox (rejected for MVP: one socket per tenant, reconnect logic, little AP value); worker-local timers (rejected: worker cannot list tenants).
+- ADR: ADR-0095 · Status: accepted
+
 ### DL-0800 — Company bank account ABA details editable in place; archive over HTTP; no SoD (ADR-0094 accepted under DL-0691)
 - Date: 2026-11-16 · By: claude · Task: T-0193 · Category: security
 - Decision: Accept ADR-0094. Migration 0076 grants `lf_app` UPDATE on `apca_user_id`, `aba_user_name`, `aba_fi_mnemonic` of `app.bank_account` only, with a trigger refusing a change of those columns on an archived row. `PUT /setup/bank-accounts/:id/aba` and `POST /setup/bank-accounts/:id/archive` need `settings.setup.manage` + step-up 300 s + Idempotency-Key, audit a masked before/after, and answer the same state again 200 `changed:false`. No SoD step.

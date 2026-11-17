@@ -1,0 +1,201 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a445ddbe879b5e963
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:38565
+ ❯ |db| packages/modules/email/src/security-notice-email.db.test.ts (8 tests | 8 failed) 1008ms
+     × SS-PLAT-145 each Owner and Finance Admin gets one plain-text notice; the notice becomes sent [T-0197] 41ms
+     × SS-PLAT-145 a redelivery sends nothing again [T-0197] 3ms
+     × SS-PLAT-145 two dispatchers running at once send each notice exactly once [T-0197] 14ms
+     × SS-PLAT-146 the supplier contact gets one masked notice; a no_recipient notice is never sent [T-0197] 50ms
+     × SS-PLAT-147 the retry delay doubles from 1 minute and stops growing at 6 hours [T-0197] 1ms
+     × SS-PLAT-147 a refused send marks the notice failed, waits out the backoff, then sends it [T-0197] 12ms
+     × SS-PLAT-147 a tenant's dispatch never reads or sends another tenant's notices [T-0197] 35ms
+     × SS-PLAT-147 lf_app can only append delivery records, and only one sent record per notice [T-0197] 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/email/src/security-notice-email.db.test.ts > SS-PLAT-145: a remittance account notice is emailed once, masked, with no links > SS-PLAT-145 each Owner and Finance Admin gets one plain-text notice; the notice becomes sent [T-0197]
+AssertionError: expected { sent: +0, failed: +0 } to deeply equal { sent: 4, failed: +0 }
+
+- Expected
++ Received
+
+  {
+    "failed": 0,
+-   "sent": 4,
++   "sent": 0,
+  }
+
+ ❯ packages/modules/email/src/security-notice-email.db.test.ts:261:15
+    259|     const r = await dispatchSecurityNotices(f.db, f.tenantId, { sender…
+    260|
+    261|     expect(r).toEqual({ sent: 4, failed: 0 });
+       |               ^
+    262|     expect(to('oscar.owner@notice.test')).toHaveLength(2);
+    263|     expect(to('fiona.admin@notice.test')).toHaveLength(2);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  |db| packages/modules/email/src/security-notice-email.db.test.ts > SS-PLAT-145: a remittance account notice is emailed once, masked, with no links > SS-PLAT-145 a redelivery sends nothing again [T-0197]
+error: relation "app.security_notice_delivery" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ deliveriesOf packages/modules/email/src/security-notice-email.db.test.ts:205:5
+    203| const deliveriesOf = async (noticeId: string): Promise<DeliveryRow[]> …
+    204|   (
+    205|     await f.admin.query<DeliveryRow>(
+       |     ^
+    206|       `SELECT notice_kind, attempt, outcome, to_addr, subject, smtp_co…
+    207|               next_attempt_at
+ ❯ packages/modules/email/src/security-notice-email.db.test.ts:307:57
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  |db| packages/modules/email/src/security-notice-email.db.test.ts > SS-PLAT-145: a remittance account notice is emailed once, masked, with no links > SS-PLAT-145 two dispatchers running at once send each notice exactly once [T-0197]
+AssertionError: expected +0 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 0
+
+ ❯ packages/modules/email/src/security-notice-email.db.test.ts:318:45
+    316|       dispatchSecurityNotices(f.db, f.tenantId, { sender, now }),
+    317|     ]);
+    318|     expect((a?.sent ?? 0) + (b?.sent ?? 0)).toBe(2);
+       |                                             ^
+    319|     expect(sink.messages).toHaveLength(before + 2);
+    320|     for (const n of await remittanceNotices(c3)) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  |db| packages/modules/email/src/security-notice-email.db.test.ts > SS-PLAT-146: a bank-detail change notice is emailed to the previous remittance contact > SS-PLAT-146 the supplier contact gets one masked notice; a no_recipient notice is never sent [T-0197]
+AssertionError: expected { sent: +0, failed: +0 } to deeply equal { sent: 2, failed: +0 }
+
+- Expected
++ Received
+
+  {
+    "failed": 0,
+-   "sent": 2,
++   "sent": 0,
+  }
+
+ ❯ packages/modules/email/src/security-notice-email.db.test.ts:338:15
+    336|     const r = await dispatchSecurityNotices(f.db, f.tenantId, { sender…
+    337|
+    338|     expect(r).toEqual({ sent: 2, failed: 0 });
+       |               ^
+    339|     expect(sink.messages).toHaveLength(before + 2);
+    340|     const mails = to('accounts@office-supplies.test');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  |db| packages/modules/email/src/security-notice-email.db.test.ts > SS-PLAT-147: SMTP failures are recorded and retried with backoff; tenants stay apart > SS-PLAT-147 the retry delay doubles from 1 minute and stops growing at 6 hours [T-0197]
+AssertionError: expected [ Array(12) ] to deeply equal [ 60, 120, 240, 480, 960, 1920, …(6) ]
+
+- Expected
++ Received
+
+  [
+-   60,
+-   120,
+-   240,
+-   480,
+-   960,
+-   1920,
+-   3840,
+-   7680,
+-   15360,
+-   21600,
+-   21600,
+-   21600,
++   0,
++   0,
++   0,
++   0,
++   0,
++   0,
++   0,
++   0,
++   0,
++   0,
++   0,
++   0,
+  ]
+
+ ❯ packages/modules/email/src/security-notice-email.db.test.ts:372:90
+    370| describe('SS-PLAT-147: SMTP failures are recorded and retried with bac…
+    371|   it('SS-PLAT-147 the retry delay doubles from 1 minute and stops grow…
+    372|     expect([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 50].map(securityNoticeR…
+       |                                                                                          ^
+    373|       60, 120, 240, 480, 960, 1920, 3840, 7680, 15360, 21600, 21600, 2…
+    374|     ]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  |db| packages/modules/email/src/security-notice-email.db.test.ts > SS-PLAT-147: SMTP failures are recorded and retried with backoff; tenants stay apart > SS-PLAT-147 a refused send marks the notice failed, waits out the backoff, then sends it [T-0197]
+AssertionError: expected { sent: +0, failed: +0 } to deeply equal { sent: +0, failed: 2 }
+
+- Expected
++ Received
+
+  {
+-   "failed": 2,
++   "failed": 0,
+    "sent": 0,
+  }
+
+ ❯ packages/modules/email/src/security-notice-email.db.test.ts:384:84
+    382|     sink.rcptReply = '451 4.3.0 Mailbox temporarily unavailable';
+    383|     try {
+    384|       expect(await dispatchSecurityNotices(f.db, f.tenantId, { sender,…
+       |                                                                                    ^
+    385|         sent: 0,
+    386|         failed: 2,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  |db| packages/modules/email/src/security-notice-email.db.test.ts > SS-PLAT-147: SMTP failures are recorded and retried with backoff; tenants stay apart > SS-PLAT-147 a tenant's dispatch never reads or sends another tenant's notices [T-0197]
+AssertionError: expected { sent: +0, failed: +0 } to deeply equal { sent: 2, failed: +0 }
+
+- Expected
++ Received
+
+  {
+    "failed": 0,
+-   "sent": 2,
++   "sent": 0,
+  }
+
+ ❯ packages/modules/email/src/security-notice-email.db.test.ts:459:85
+    457|     expect((await remittanceNotices(change)).map((n) => n.status)).toE…
+    458|
+    459|     expect(await dispatchSecurityNotices(f.db, OTHER, { sender, now: n…
+       |                                                                                     ^
+    460|       sent: 2,
+    461|       failed: 0,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  |db| packages/modules/email/src/security-notice-email.db.test.ts > SS-PLAT-147: SMTP failures are recorded and retried with backoff; tenants stay apart > SS-PLAT-147 lf_app can only append delivery records, and only one sent record per notice [T-0197]
+error: invalid input syntax for type uuid: ""
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ remittanceNotices packages/modules/email/src/security-notice-email.db.test.ts:176:5
+    174| const remittanceNotices = async (changeId: string): Promise<NoticeRow[…
+    175|   (
+    176|     await f.admin.query<NoticeRow>(
+       |     ^
+    177|       `SELECT id, recipient_email, status, sent_at FROM app.remittance…
+    178|         WHERE change_id = $1 ORDER BY recipient_email NULLS FIRST`,
+ ❯ packages/modules/email/src/security-notice-email.db.test.ts:472:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed (8)
+   Start at  21:39:34
+   Duration  2.83s (transform 599ms, setup 0ms, import 902ms, tests 1.01s, environment 0ms)
+
+exit 1
