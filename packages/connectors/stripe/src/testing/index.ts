@@ -26,4 +26,10 @@ export const APPROVED_REFUNDS_FIXTURE = new URL(
   import.meta.url,
 );
 
+/** The documented fixture of the refund follow-ups: cancel, reconcile, resend (T-0190, T-0189, RQ-0173). */
+export const REFUND_FOLLOWUPS_FIXTURE = new URL(
+  '../../fixtures/documented/stripe-refunds-followups-20261116.json',
+  import.meta.url,
+);
+
 export { seedStripePaidCredit, type StripePaidCredit } from './stripe-paid-credit.ts';

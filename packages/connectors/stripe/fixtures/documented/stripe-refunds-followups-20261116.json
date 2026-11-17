@@ -1,0 +1,269 @@
+{
+  "source": "Built for T-0190 and T-0189 (RQ-0173) from the Refund object, RefundListParams and the error object in the official stripe@23.1.0 type definitions (OpenAPI v2596; Refund.status pending | requires_action | succeeded | failed | canceled, Refund.created, failure_reason, failure_balance_transaction), in the shape of the T-0172 fixture (RQ-0163, RQ-0164). Not recorded from a live account: no Stripe key or network was available. lf-refund-v2-<refund id> is the document's first key; lf-refund-v3-<resend id> is a resend's recorded key (ADR-0091). No interaction answers a v2 create for a document Stripe already holds or for the 'vanished' document, and none answers a second create for the 'refused' one: they must never be requested.",
+  "apiVersion": "2026-10-28.endive",
+  "accessed": "2026-11-16",
+  "placeholders": "{{name}} is replaced by the test before matching (ids generated at run time). `times` limits how often an interaction answers (then the next matching one answers).",
+  "interactions": [
+    {
+      "name": "list-refunds-refused",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{refusedPaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      }
+    },
+    {
+      "name": "refund-document-refused-charge-disputed",
+      "request": {
+        "method": "POST",
+        "path": "/v1/refunds",
+        "idempotencyKey": "lf-refund-v2-{{refusedRefundId}}",
+        "form": {
+          "payment_intent": "{{refusedPaymentIntentId}}",
+          "amount": "22000",
+          "reason": "requested_by_customer",
+          "metadata[lf_tenant_id]": "{{tenantId}}",
+          "metadata[lf_company_id]": "{{companyId}}",
+          "metadata[lf_refund_id]": "{{refusedRefundId}}",
+          "metadata[lf_refund_no]": "{{refusedRefundNo}}",
+          "metadata[lf_credit_note_id]": "{{refusedCreditNoteId}}",
+          "metadata[lf_credit_note_no]": "{{refusedCreditNoteNo}}"
+        }
+      },
+      "response": {
+        "status": 400,
+        "body": {
+          "error": {
+            "type": "invalid_request_error",
+            "code": "charge_disputed",
+            "message": "Charge ch_1SQbT0190Disputed has been charged back; cannot issue a refund."
+          }
+        }
+      }
+    },
+    {
+      "name": "list-refunds-held-before",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{heldPaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      },
+      "times": 1
+    },
+    {
+      "name": "refund-document-held",
+      "request": {
+        "method": "POST",
+        "path": "/v1/refunds",
+        "idempotencyKey": "lf-refund-v2-{{heldRefundId}}",
+        "form": {
+          "payment_intent": "{{heldPaymentIntentId}}",
+          "amount": "22000",
+          "reason": "requested_by_customer",
+          "metadata[lf_tenant_id]": "{{tenantId}}",
+          "metadata[lf_company_id]": "{{companyId}}",
+          "metadata[lf_refund_id]": "{{heldRefundId}}",
+          "metadata[lf_refund_no]": "{{heldRefundNo}}",
+          "metadata[lf_credit_note_id]": "{{heldCreditNoteId}}",
+          "metadata[lf_credit_note_no]": "{{heldCreditNoteNo}}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "{{heldStripeRefundId}}",
+          "object": "refund",
+          "amount": 22000,
+          "balance_transaction": "txn_1SQbT0189Held",
+          "charge": "ch_1SQbT0189Held",
+          "created": 1795564800,
+          "currency": "aud",
+          "metadata": {
+            "lf_tenant_id": "{{tenantId}}",
+            "lf_company_id": "{{companyId}}",
+            "lf_refund_id": "{{heldRefundId}}",
+            "lf_refund_no": "{{heldRefundNo}}",
+            "lf_credit_note_id": "{{heldCreditNoteId}}",
+            "lf_credit_note_no": "{{heldCreditNoteNo}}"
+          },
+          "payment_intent": "{{heldPaymentIntentId}}",
+          "reason": "requested_by_customer",
+          "receipt_number": null,
+          "status": "succeeded"
+        }
+      }
+    },
+    {
+      "name": "list-refunds-held-after",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{heldPaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [
+            {
+              "id": "{{heldStripeRefundId}}",
+              "object": "refund",
+              "amount": 22000,
+              "balance_transaction": "txn_1SQbT0189Held",
+              "charge": "ch_1SQbT0189Held",
+              "created": 1795564800,
+              "currency": "aud",
+              "metadata": {
+                "lf_tenant_id": "{{tenantId}}",
+                "lf_company_id": "{{companyId}}",
+                "lf_refund_id": "{{heldRefundId}}",
+                "lf_refund_no": "{{heldRefundNo}}",
+                "lf_credit_note_id": "{{heldCreditNoteId}}",
+                "lf_credit_note_no": "{{heldCreditNoteNo}}"
+              },
+              "payment_intent": "{{heldPaymentIntentId}}",
+              "reason": "requested_by_customer",
+              "receipt_number": null,
+              "status": "succeeded"
+            }
+          ],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      }
+    },
+    {
+      "name": "list-refunds-paid-before",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{paidPaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      },
+      "times": 1
+    },
+    {
+      "name": "refund-document-paid",
+      "request": {
+        "method": "POST",
+        "path": "/v1/refunds",
+        "idempotencyKey": "lf-refund-v2-{{paidRefundId}}",
+        "form": {
+          "payment_intent": "{{paidPaymentIntentId}}",
+          "amount": "22000",
+          "reason": "requested_by_customer",
+          "metadata[lf_tenant_id]": "{{tenantId}}",
+          "metadata[lf_company_id]": "{{companyId}}",
+          "metadata[lf_refund_id]": "{{paidRefundId}}",
+          "metadata[lf_refund_no]": "{{paidRefundNo}}",
+          "metadata[lf_credit_note_id]": "{{paidCreditNoteId}}",
+          "metadata[lf_credit_note_no]": "{{paidCreditNoteNo}}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "{{paidStripeRefundId}}",
+          "object": "refund",
+          "amount": 22000,
+          "balance_transaction": "txn_1SQbT0189Paid",
+          "charge": "ch_1SQbT0189Paid",
+          "created": 1795564800,
+          "currency": "aud",
+          "metadata": {
+            "lf_tenant_id": "{{tenantId}}",
+            "lf_company_id": "{{companyId}}",
+            "lf_refund_id": "{{paidRefundId}}",
+            "lf_refund_no": "{{paidRefundNo}}",
+            "lf_credit_note_id": "{{paidCreditNoteId}}",
+            "lf_credit_note_no": "{{paidCreditNoteNo}}"
+          },
+          "payment_intent": "{{paidPaymentIntentId}}",
+          "reason": "requested_by_customer",
+          "receipt_number": null,
+          "status": "succeeded"
+        }
+      }
+    },
+    {
+      "name": "list-refunds-paid-after",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{paidPaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [
+            {
+              "id": "{{paidStripeRefundId}}",
+              "object": "refund",
+              "amount": 22000,
+              "balance_transaction": "txn_1SQbT0189Paid",
+              "charge": "ch_1SQbT0189Paid",
+              "created": 1795564800,
+              "currency": "aud",
+              "metadata": {
+                "lf_tenant_id": "{{tenantId}}",
+                "lf_company_id": "{{companyId}}",
+                "lf_refund_id": "{{paidRefundId}}",
+                "lf_refund_no": "{{paidRefundNo}}",
+                "lf_credit_note_id": "{{paidCreditNoteId}}",
+                "lf_credit_note_no": "{{paidCreditNoteNo}}"
+              },
+              "payment_intent": "{{paidPaymentIntentId}}",
+              "reason": "requested_by_customer",
+              "receipt_number": null,
+              "status": "succeeded"
+            }
+          ],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      }
+    }
+  ]
+}

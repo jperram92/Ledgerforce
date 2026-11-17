@@ -3997,3 +3997,24 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0169 finding 7. The cookie is HttpOnly and the SPA never reads or caches it. StepUpPrompt already returns to the same path and keeps a typed note in sessionStorage. The real rotation is proven against the real API, database and OpenID Provider in SS-PLAT-139/136. The e2e spec proves the browser side of the contract. That follows the existing practice in the web e2e suites, which use route-faked APIs.
 - Alternatives: a web change to re-fetch `/auth/me` after a step-up (rejected: nothing reads session state, so it would add code with no behaviour behind it); an e2e test against the real API plus an IdP (rejected: no such harness exists for the web suites; that would be a separate card).
 - ADR: ADR-0087 · Status: accepted
+
+### DL-0770 — Cancel a refused Stripe refund document only after a lookup at Stripe (T-0190)
+- Date: 2026-11-17 · By: claude · Task: T-0190 · Category: security
+- Decision: Add `POST /ar/refunds/:id/cancel?company_id=` (permission `ar.refund.create`). It holds the party's advisory lock, then lists the party's PaymentIntents' refunds at Stripe (read-only). It moves a requested Stripe refund document, approved or not, to `cancelled` only when Stripe holds no live refund (`pending`, `requires_action`, `succeeded`) carrying its `lf_refund_id`. Otherwise it answers 409 `AT_STRIPE` with the Stripe refund id. A paid or bank refund gets 422 `NOT_CANCELLABLE` (bank refunds: new card T-0207). With no Stripe client the answer is 503, and when Stripe cannot be asked the request fails closed. A repeat replays. The cancel is audited, has no SoD step and needs no step-up. The card's "create or approve" is narrowed to `ar.refund.create`.
+- Why: RQ-0173 findings 1–3. A commit lost after a send can leave the document requested and unapproved while Stripe has the money (review r8 R2), so "nothing recorded" is not enough. The party lock excludes a concurrent send. Cancelling is the maker withdrawing a request and moves no money; spending the freed credit needs a new approved document. `RequirePermission` takes one permission, and an any-of check would change the authorisation framework (a security change outside this card). Owner and Finance Admin hold both permissions; the Approver role only checks. Comparable systems cancel unpaid documents and keep them as history (Odoo `payment.transaction` `cancel`, ERPNext Payment Request `Cancelled`).
+- Alternatives: cancel whenever nothing is recorded locally (rejected: misses R2); allow `ar.refund.approve` too through a new any-of decorator (rejected: authz framework change); a new permission `ar.refund.cancel` (rejected: a migration of role grants for no control gain); a SoD rule "creator cannot cancel" (rejected: withdrawing one's own request is the expected maker action).
+- ADR: none (within ADR-0074/ADR-0083, whose consequences name this cancel) · Status: accepted
+
+### DL-0771 — The Stripe send handler treats a cancelled refund as done (T-0190)
+- Date: 2026-11-17 · By: claude · Task: T-0190 · Category: architecture
+- Decision: `stripe.refund.send` reads the refund, takes the party lock, and returns without a Stripe call when the document is `cancelled`. `sendStripeCustomerRefund` itself still refuses a cancelled document with `NOT_PAYABLE`, for the approve route and the direct path.
+- Why: a retry from Sync issues of a refused send must not reopen the issue after the cancel. The inbox row records the delivery as done (ADR-0008). Taking the lock first means a cancel committed between the read and the send is still seen.
+- Alternatives: make the send return a no-op for cancelled (rejected: the approve route and the direct path must keep refusing loudly).
+- ADR: none · Status: accepted
+
+### DL-0772 — A refund's stored Stripe view shows a failed send from its open Sync issue (T-0190)
+- Date: 2026-11-17 · By: claude · Task: T-0190 · Category: ui
+- Decision: For an approved, requested Stripe refund, `GET /ar/refunds/:id` (and the cancel response) answers `stripe: { status: 'failed', code, message }` when the `stripe.refund.send` delivery of its `ar.refund.stripe_approved` event has an open or ignored Sync issue. `code` is the issue's `error_code`, else its `error_name`. Otherwise the answer stays `pending`. The refund region offers Cancel to people with `ar.refund.create` when the send failed and the code is not `SENT_NOT_POSTED`; a confirmation step comes first.
+- Why: the approve response alone held the refusal, so after a reload the region could not offer Cancel. The Sync issue is the stored record of a permanent failure (ADR-0040). `SENT_NOT_POSTED` means Stripe has the money, so a Cancel there would always be refused.
+- Alternatives: store the last send outcome on the refund (rejected: a migration, and it would duplicate the Sync issue).
+- ADR: none · Status: accepted

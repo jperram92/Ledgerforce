@@ -198,7 +198,7 @@ graph LR
 | [T-0152](T-0152.md) | Customer refund over HTTP and the refund screen: permission decision, routes, UI (split from T-0085) | MVP | review | T-0055, T-0151 | UC-11 | 1 |
 | [T-0172](T-0172.md) | AR - Stripe refund of customer credit through the refund document, sent only on approval (ADR-0074) | MVP | verifying | T-0152, T-0074 | UC-11 | 0 |
 | [T-0189](T-0189.md) | Stripe: reconcile a Stripe refund whose send is older than 23 hours (KEY_EXPIRED) before any resend | MVP | todo | T-0172 | UC-11 | 0 |
-| [T-0190](T-0190.md) | AR: cancel an approved Stripe refund that Stripe refused permanently, so its amount stops counting as requested | MVP | todo | T-0172 | UC-11 | 0 |
+| [T-0190](T-0190.md) | AR: cancel an approved Stripe refund that Stripe refused permanently, so its amount stops counting as requested | MVP | verifying | T-0172 | UC-11 | 0 |
 | [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | verifying | T-0180 | UC-01 | 0 |
 | [T-0192](T-0192.md) | Security: rotate the session id on step-up re-authentication (ASVS 5.0 7.2.4) | MVP | todo | — | — | 0 |
 | [T-0197](T-0197.md) | Platform: send security notices (bank-detail and remittance account changes) by email | MVP | todo | T-0191 | UC-01, UC-06 | 0 |
@@ -282,6 +282,7 @@ graph LR
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | verifying | T-0047, T-0035 | UC-04 | 3 |
 | [T-0203](T-0203.md) | Single-supply GST attribution: role binding, contract record and accruals receipt posting (GP-040) | MVP | todo | T-0168 | UC-04 | 0 |
 | [T-0204](T-0204.md) | Single-supply GST attribution: final invoice, price change, cancellation/refund and BAS-preparation reports (GP-041, GP-042) | MVP | todo | T-0203 | UC-04, UC-11 | 0 |
+| [T-0207](T-0207.md) | AR: cancel a requested bank refund that no live payment batch pays | MVP | todo | T-0190 | UC-11 | 0 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
 | [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | review | T-0117 | UC-11 | 0 |
 | [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |

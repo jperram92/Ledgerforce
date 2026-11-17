@@ -4,6 +4,8 @@
  *   PUT  /ar/refunds/:id                   ar.refund.create, SoD refund.create (client id; replay 200)
  *   POST /ar/refunds/:id/approve           ar.refund.approve, SoD refund.approve (the creator is
  *                                          refused, SOD_REFUND_SELF_APPROVAL); a repeat replays
+ *   POST /ar/refunds/:id/cancel            ar.refund.create: a requested Stripe refund with no live
+ *                                          refund at Stripe (T-0190); a repeat replays
  *   GET  /ar/refunds/:id                   ar.read
  *   GET  /ar/refunds/:id/journal           ar.read: the engine's GP-006 preview, writes nothing
  *   GET  /ar/parties/:id/credit            ar.read: balance / requested / available
@@ -24,6 +26,7 @@
 import {
   BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Get,
   HttpCode,
@@ -40,6 +43,7 @@ import {
 } from '@nestjs/common';
 import {
   approveCustomerRefund,
+  cancelCustomerRefund,
   createCustomerRefund,
   customerCredit,
   getCustomerRefund,
@@ -50,7 +54,9 @@ import {
 } from '@ledgerforce/ar';
 import {
   assertStripeRefundable,
+  cancelStripeCustomerRefund,
   STRIPE_REFUND_APPROVED,
+  STRIPE_REFUND_SEND_HANDLER,
   stripeRefundOf,
   stripeRefundToday,
   trySendStripeCustomerRefund,
@@ -60,7 +66,7 @@ import {
 import type { Database } from '@ledgerforce/db';
 import { PostingError, type PostingOutbox } from '@ledgerforce/ledger';
 import type { Request, Response } from 'express';
-import type { Transaction } from 'kysely';
+import { sql, type Transaction } from 'kysely';
 import type { Clock } from '../auth/session.service.ts';
 import { principalOf, tokenPrincipalOf } from '../auth/session-tenant-resolver.ts';
 import { StepUpRequired } from '../authz/mfa.ts';
@@ -92,6 +98,9 @@ const notFound = (what: string): never => {
 };
 const refusal = (e: unknown): never => {
   if (e instanceof RefundError && e.code === 'REFUND_NOT_FOUND') notFound('refund');
+  if (e instanceof RefundError && e.code === 'AT_STRIPE') {
+    throw new ConflictException({ error: e.code, message: e.message });
+  }
   if (e instanceof RefundError && e.code === 'PARTY_NOT_FOUND') notFound('party');
   if (e instanceof RefundError || e instanceof PostingError) {
     throw new UnprocessableEntityException({ error: e.code, message: e.message });
@@ -136,7 +145,11 @@ interface StripeView {
   code?: string;
 }
 
-/** What is known of a Stripe refund's send, from what is stored (no Stripe call). */
+/**
+ * What is known of a Stripe refund's send, from what is stored (no Stripe call). An approved,
+ * requested refund whose send is an open (or ignored) Sync issue is `failed` with that issue's
+ * code and message (T-0190), so the refund region can offer Cancel after a reload.
+ */
 async function storedStripeView(
   trx: Transaction<Database>,
   companyId: string,
@@ -147,8 +160,21 @@ async function storedStripeView(
     const s = await stripeRefundOf(trx, companyId, r.entryId);
     return { status: 'sent', stripe_refund_id: s?.stripeRefundId ?? null, message: null };
   }
-  if (r.status === 'requested' && r.approval === 'approved')
-    return { status: 'pending', stripe_refund_id: null, message: null };
+  if (r.status === 'requested' && r.approval === 'approved') {
+    const issue = (
+      await sql<{ code: string; message: string }>`
+        SELECT coalesce(i.error_code, i.error_name) AS code, i.error_message AS message
+          FROM app.sync_issue i JOIN app.outbox_event e ON e.id = i.event_id
+         WHERE e.company_id = ${companyId}::uuid AND e.topic = ${STRIPE_REFUND_APPROVED}
+           AND e.aggregate_id = ${r.refundId} AND i.handler = ${STRIPE_REFUND_SEND_HANDLER}
+           AND i.status IN ('open', 'ignored')
+         ORDER BY i.last_failed_at DESC, i.id DESC
+         LIMIT 1`.execute(trx)
+    ).rows[0];
+    return issue
+      ? { status: 'failed', stripe_refund_id: null, message: issue.message, code: issue.code }
+      : { status: 'pending', stripe_refund_id: null, message: null };
+  }
   return { status: 'not_sent', stripe_refund_id: null, message: null };
 }
 
@@ -304,6 +330,40 @@ export class ArRefundsController {
     const r = await getCustomerRefund(trx, cid, approved.refundId);
     const view = viewOf(r, sentView(outcome));
     this.audit.describe({ entityType: 'customer_refund', entityId: r.refundId, after: view });
+    return view;
+  }
+
+  /**
+   * Cancel a requested Stripe refund that no live Stripe refund pays (T-0190, RQ-0173): asks
+   * Stripe first under the party lock (409 AT_STRIPE when Stripe holds one); 422 NOT_CANCELLABLE
+   * when paid or a bank refund; a repeat replays. The maker withdraws a request: no SoD step and
+   * no step-up (no money moves). Audited.
+   */
+  @Post('refunds/:id/cancel')
+  @HttpCode(200)
+  @RequirePermission('ar.refund.create')
+  async cancel(@Param('id') id: string, @Query('company_id') companyId: string | undefined) {
+    const cid = uuid(companyId, 'company_id');
+    const refundId = uuid(id, 'id');
+    const trx = this.tx.get();
+    const current = await getCustomerRefund(trx, cid, refundId).catch(refusal);
+    const deps = this.stripeDeps();
+    if (current.method === 'stripe' && current.status === 'requested' && !deps) {
+      throw new ServiceUnavailableException({ error: 'stripe_refunds_unavailable' });
+    }
+    const r = await (
+      deps
+        ? cancelStripeCustomerRefund(trx, deps.client, { companyId: cid, refundId })
+        : cancelCustomerRefund(trx, { companyId: cid, refundId })
+    ).catch(refusal);
+    const view = viewOf(r, await storedStripeView(trx, cid, r));
+    if (!r.replayed)
+      this.audit.describe({
+        entityType: 'customer_refund',
+        entityId: r.refundId,
+        before: viewOf(current),
+        after: view,
+      });
     return view;
   }
 

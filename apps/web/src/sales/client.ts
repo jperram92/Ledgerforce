@@ -246,6 +246,8 @@ export interface SalesClient {
   refund(companyId: string, id: string): Promise<CustomerRefund>;
   refundJournal(companyId: string, id: string): Promise<RefundJournal>;
   approveRefund(companyId: string, id: string): Promise<CustomerRefund>;
+  /** T-0190: cancel a requested Stripe refund Stripe did not take (POST …/cancel). */
+  cancelRefund(companyId: string, id: string): Promise<CustomerRefund>;
   companies(): Promise<Company[]>;
   invoices(companyId: string, status?: InvoiceStatus): Promise<{ invoices: InvoiceRow[] }>;
   invoice(companyId: string, id: string): Promise<Invoice>;
@@ -302,6 +304,8 @@ export function createSalesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Sales
     refundJournal: (companyId, id) => get(`/ar/refunds/${seg(id)}/journal?${co(companyId)}`),
     approveRefund: (companyId, id) =>
       send('POST', `/ar/refunds/${seg(id)}/approve?${co(companyId)}`, {}),
+    cancelRefund: (companyId, id) =>
+      send('POST', `/ar/refunds/${seg(id)}/cancel?${co(companyId)}`, {}),
     companies: () => get('/companies'),
     invoices: (companyId, status) =>
       get(`/ar/invoices?company_id=${seg(companyId)}${status ? `&status=${seg(status)}` : ''}`),

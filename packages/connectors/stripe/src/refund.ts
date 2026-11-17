@@ -39,6 +39,7 @@
  * goes through the same send (AC-3). Money via decimal.js; amounts are decimal strings.
  */
 import {
+  cancelCustomerRefund,
   getCustomerRefund,
   lockCustomerRefundParty,
   markCustomerRefundPaid,
@@ -271,6 +272,44 @@ async function refundAlreadyAtStripe(
     if (found) return found;
   }
   return null;
+}
+
+/**
+ * A refund Stripe holds for this document that has moved or may still move money (RQ-0173):
+ * `failed` gives the money back to the balance and `canceled` moved none, so those are not.
+ */
+const isLive = (x: ListedRefund) => POSTABLE_STATUS.has(x.status);
+
+/**
+ * Cancel a requested Stripe refund document (T-0190, RQ-0173) once Stripe, asked under the party
+ * lock, holds no live refund for it (else AT_STRIPE). Read-only at Stripe; fails closed when
+ * Stripe cannot be asked.
+ */
+export async function cancelStripeCustomerRefund(
+  trx: Trx,
+  client: StripeClient,
+  c: { companyId: string; refundId: string },
+): Promise<CustomerRefundView> {
+  const companyId = c.companyId.toLowerCase();
+  return cancelCustomerRefund(
+    trx,
+    { companyId, refundId: c.refundId },
+    {
+      heldAtStripe: async (t, r) => {
+        for (const pi of await partyPaymentIntents(t, companyId, r.partyId)) {
+          const found = await client.findRefund(
+            pi,
+            (x) =>
+              isLive(x) &&
+              x.metadata['lf_refund_id'] === r.refundId &&
+              x.metadata['lf_company_id'] === companyId,
+          );
+          if (found) return found.id;
+        }
+        return null;
+      },
+    },
+  );
 }
 
 /**
@@ -614,6 +653,13 @@ export function stripeRefundSendHandler(deps: {
     topics: [STRIPE_REFUND_APPROVED],
     async handle(trx, event) {
       if (!event.companyId) throw new StripeRefundError('INVALID_REFUND', 'event has no company');
+      // T-0190: a cancelled refund is done; nothing is sent (checked under the party lock).
+      const r = await getCustomerRefund(trx, event.companyId, event.aggregateId).catch(() => null);
+      if (r) {
+        await lockCustomerRefundParty(trx, event.companyId, r.partyId);
+        const now = await getCustomerRefund(trx, event.companyId, r.refundId);
+        if (now.status === 'cancelled') return;
+      }
       await sendStripeCustomerRefund(
         trx,
         deps.client,

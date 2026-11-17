@@ -57,7 +57,11 @@ export type RefundErrorCode =
   | 'PARTY_NOT_FOUND'
   | 'BANK_ACCOUNT_REQUIRED'
   | 'NO_STRIPE_PAYMENT'
-  | 'NOT_DUE';
+  | 'NOT_DUE'
+  /** T-0190: only a requested Stripe refund with no live refund at Stripe is cancelled. */
+  | 'NOT_CANCELLABLE'
+  /** T-0190 (RQ-0173): Stripe holds a live refund for this document; it is never cancelled. */
+  | 'AT_STRIPE';
 
 export class RefundError extends Error {
   readonly code: RefundErrorCode;
@@ -423,6 +427,58 @@ export async function markCustomerRefundPaid(
       paid_on: c.paidOn,
       updated_at: sql`clock_timestamp()`,
     })
+    .where('company_id', '=', companyId)
+    .where('id', '=', r.refundId)
+    .execute();
+  return getCustomerRefund(trx, companyId, r.refundId);
+}
+
+/**
+ * The Stripe connector's lookup for a cancel (T-0190, RQ-0173): the id of a live refund Stripe
+ * holds for this refund document, or null. Throws when Stripe cannot be asked (fail closed).
+ */
+export type StripeRefundHeldCheck = (trx: Trx, r: CustomerRefundView) => Promise<string | null>;
+
+/**
+ * Cancel a requested Stripe refund that no live Stripe refund pays (T-0190, RQ-0173): its amount
+ * stops counting as requested, so the credit can be refunded another way. Under the party lock
+ * (no send of the party runs meanwhile) the caller's `heldAtStripe` asks Stripe; a live refund
+ * there is AT_STRIPE and the document stays requested. A paid or bank refund is NOT_CANCELLABLE
+ * (bank: T-0207). A repeat returns the cancelled refund (`replayed`). The 0055 guard keeps it
+ * cancelled for good. No money moves, so neither a checker nor a step-up is needed.
+ */
+export async function cancelCustomerRefund(
+  trx: Trx,
+  c: { companyId: string; refundId: string },
+  opts: { heldAtStripe?: StripeRefundHeldCheck } = {},
+): Promise<CustomerRefundView> {
+  const companyId = c.companyId.toLowerCase();
+  const before = await getCustomerRefund(trx, companyId, c.refundId);
+  await partyLock(trx, companyId, before.partyId);
+  const r = await getCustomerRefund(trx, companyId, before.refundId);
+  if (r.status === 'cancelled') return { ...r, replayed: true };
+  if (r.status !== 'requested' || r.method !== 'stripe') {
+    throw new RefundError(
+      'NOT_CANCELLABLE',
+      `refund ${r.refundNo} is ${r.status} (${r.method}); only a requested Stripe refund is cancelled here`,
+    );
+  }
+  if (!opts.heldAtStripe) {
+    throw new RefundError(
+      'METHOD_NOT_AVAILABLE',
+      'refunds through Stripe are not configured here, so Stripe cannot be asked first',
+    );
+  }
+  const held = await opts.heldAtStripe(trx, r);
+  if (held) {
+    throw new RefundError(
+      'AT_STRIPE',
+      `refund ${r.refundNo} cannot be cancelled: Stripe holds refund ${held} for it (the money has left or is leaving); record it instead`,
+    );
+  }
+  await trx
+    .updateTable('app.customer_refund')
+    .set({ status: 'cancelled', updated_at: sql`clock_timestamp()` })
     .where('company_id', '=', companyId)
     .where('id', '=', r.refundId)
     .execute();
