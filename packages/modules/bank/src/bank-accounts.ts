@@ -194,6 +194,155 @@ export function sameCompanyBankAccount(
   );
 }
 
+/** The ABA header of a company bank account (ABA type 0 record, RQ-0006); all three together. */
+export interface CompanyBankAccountAba {
+  apcaUserId: string;
+  abaUserName: string;
+  abaFiMnemonic: string;
+}
+
+/** The account is archived: its ABA details no longer change (ADR-0094, migration 0076). */
+export class BankAccountArchivedError extends Error {
+  constructor(message = 'the bank account is archived; its ABA details cannot change') {
+    super(message);
+    this.name = 'BankAccountArchivedError';
+  }
+}
+
+/** Throws BankAccountValidationError unless all three ABA fields pass the create rules. */
+export function validateCompanyBankAccountAba(input: CompanyBankAccountAba): void {
+  check(/^[0-9]{6}$/.test(input.apcaUserId), 'APCA user id must be 6 digits');
+  check(BECS.test(input.abaUserName), 'ABA user name: up to 26 BECS characters');
+  check(/^[A-Z]{3}$/.test(input.abaFiMnemonic), 'FI mnemonic must be 3 capital letters, e.g. CBA');
+}
+
+export interface CompanyBankAccountChange {
+  before: MaskedCompanyBankAccount;
+  after: MaskedCompanyBankAccount;
+  /** false when the account was already in the requested state (nothing written). */
+  changed: boolean;
+}
+
+const MASKED_COLUMNS = [
+  'id',
+  'name',
+  'gl_account_id',
+  'currency',
+  'bsb',
+  'account_name',
+  'account_number_last3',
+  'apca_user_id',
+  'aba_user_name',
+  'aba_fi_mnemonic',
+  'status',
+] as const;
+
+interface MaskedRow {
+  id: string;
+  name: string;
+  gl_account_id: string;
+  currency: string;
+  bsb: string;
+  account_name: string;
+  account_number_last3: string;
+  apca_user_id: string | null;
+  aba_user_name: string | null;
+  aba_fi_mnemonic: string | null;
+  status: string;
+}
+
+const masked = (r: MaskedRow): MaskedCompanyBankAccount => ({
+  id: r.id,
+  name: r.name,
+  glAccountId: r.gl_account_id,
+  currency: r.currency,
+  bsb: r.bsb,
+  accountName: r.account_name,
+  accountNumber: `***${r.account_number_last3}`,
+  apcaUserId: r.apca_user_id,
+  abaUserName: r.aba_user_name,
+  abaFiMnemonic: r.aba_fi_mnemonic,
+  status: r.status,
+});
+
+/** One account of the company, locked for this transaction; undefined when not visible. */
+async function lockedAccount(
+  trx: Transaction<Database>,
+  companyId: string,
+  bankAccountId: string,
+): Promise<MaskedCompanyBankAccount | undefined> {
+  const r = await trx
+    .selectFrom('app.bank_account')
+    .select(MASKED_COLUMNS)
+    .where('company_id', '=', companyId)
+    .where('id', '=', bankAccountId)
+    .forUpdate()
+    .executeTakeFirst();
+  return r ? masked(r) : undefined;
+}
+
+/**
+ * Set the APCA user id, ABA user name and FI mnemonic of an active company bank account
+ * (T-0193, ADR-0094). The BSB and number never change in place. Returns undefined when the
+ * company has no such account; `changed: false` when the values are already stored. Throws
+ * BankAccountValidationError for a malformed value and BankAccountArchivedError for an archived
+ * account (the database refuses it too, migration 0076).
+ */
+export async function setCompanyBankAccountAba(
+  trx: Transaction<Database>,
+  companyId: string,
+  bankAccountId: string,
+  input: CompanyBankAccountAba,
+): Promise<CompanyBankAccountChange | undefined> {
+  validateCompanyBankAccountAba(input);
+  const before = await lockedAccount(trx, companyId, bankAccountId);
+  if (!before) return undefined;
+  if (
+    before.apcaUserId === input.apcaUserId &&
+    before.abaUserName === input.abaUserName &&
+    before.abaFiMnemonic === input.abaFiMnemonic
+  )
+    return { before, after: before, changed: false };
+  if (before.status !== 'active') throw new BankAccountArchivedError();
+  const r = await trx
+    .updateTable('app.bank_account')
+    .set({
+      apca_user_id: input.apcaUserId,
+      aba_user_name: input.abaUserName,
+      aba_fi_mnemonic: input.abaFiMnemonic,
+    })
+    .where('company_id', '=', companyId)
+    .where('id', '=', bankAccountId)
+    .returning(MASKED_COLUMNS)
+    .executeTakeFirstOrThrow();
+  return { before, after: masked(r), changed: true };
+}
+
+/**
+ * Archive a company bank account (T-0193, ADR-0094). Its history stays; statements can no longer
+ * be imported to it and payment files no longer use it; its GL account can take a new account.
+ * If it is the designated remittance account, the database releases that designation in the
+ * same statement (migration 0072, ADR-0086). Returns undefined when the company has no such
+ * account; `changed: false` when it is already archived.
+ */
+export async function archiveCompanyBankAccount(
+  trx: Transaction<Database>,
+  companyId: string,
+  bankAccountId: string,
+): Promise<CompanyBankAccountChange | undefined> {
+  const before = await lockedAccount(trx, companyId, bankAccountId);
+  if (!before) return undefined;
+  if (before.status === 'archived') return { before, after: before, changed: false };
+  const r = await trx
+    .updateTable('app.bank_account')
+    .set({ status: 'archived' })
+    .where('company_id', '=', companyId)
+    .where('id', '=', bankAccountId)
+    .returning(MASKED_COLUMNS)
+    .executeTakeFirstOrThrow();
+  return { before, after: masked(r), changed: true };
+}
+
 /** Masked bank accounts of a company (never decrypts). */
 export async function listCompanyBankAccounts(
   trx: Transaction<Database>,

@@ -7,7 +7,7 @@ author: claude
 category: architecture
 human_gate: no
 supersedes: none
-superseded_by: none
+superseded_by: ADR-0094 (in part — ABA details of an existing account and archiving, T-0193)
 ---
 
 # ADR-0084: HTTP routes for company bank accounts (setup wizard step 4)
@@ -69,6 +69,8 @@ Under the API's `setup` prefix:
 ## Consequences
 - Wizard step 4 can be completed in the app.
 - APCA user id and ABA user name cannot be added to an existing account (no UPDATE grant): T-0193.
+  *Superseded by ADR-0094 (T-0193): migration 0076 grants UPDATE on the three ABA columns and
+  routes change them or archive an account.*
 - New public routes enter the route inventory (`routes.test.ts`).
 
 ## Links

@@ -1,0 +1,17 @@
+
+Running 13 tests using 2 workers
+
+[1/13] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:384:1 › SS-PLAT-153: refusals are said in plain words and nothing changes [T-0193]
+[2/13] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]
+[3/13] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:422:1 › SS-PLAT-153: an Accountant sees no way to change or archive an account [T-0193]
+[4/13] [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:292:3 › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 1440 [T-0185]
+[5/13] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]
+[6/13] [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:292:3 › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 390 [T-0185]
+[7/13] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:348:1 › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; "Keep it" archives nothing [T-0193]
+[8/13] [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:354:1 › SS-PLAT-130: adding asks for a fresh sign-in first, and keeps nothing typed while away [T-0185]
+[9/13] [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:413:1 › SS-PLAT-130: without a key service the screen says numbers cannot be stored and offers no form [T-0185]
+[10/13] [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:380:1 › SS-PLAT-130: refusals are said in plain words and nothing is added [T-0185]
+[11/13] [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:426:1 › SS-PLAT-130: an Accountant sees the bank accounts read-only, masked [T-0185]
+[12/13] [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:446:1 › SS-PLAT-130: without settings.read, Bank accounts is forbidden [T-0185]
+[13/13] [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:457:1 › SS-PLAT-130: Bank accounts is listed on the Settings page [T-0185]
+  13 passed (28.4s)
