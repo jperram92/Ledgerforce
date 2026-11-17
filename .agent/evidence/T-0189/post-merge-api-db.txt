@@ -1,0 +1,182 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33439
+·······[31m[Nest] 18311  - [39m11/17/2026, 7:22:57 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/ar/refunds-stripe.db.test.ts:579:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+[31m[Nest] 18311  - [39m11/17/2026, 7:22:57 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/ar/refunds-stripe.db.test.ts:579:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+······(node:18448) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+············[31m[Nest] 18448  - [39m11/17/2026, 7:23:05 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204866[39m,
+  length: [33m204866[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+·[31m[Nest] 18448  - [39m11/17/2026, 7:23:05 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204863[39m,
+  length: [33m204863[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 18448  - [39m11/17/2026, 7:23:05 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204866[39m,
+  length: [33m204866[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+··stderr | apps/api/src/authz/mfa-step-up.db.test.ts
+oidc-provider WARNING: a quick start development-only in-memory adapter is used, you MUST change it in order to not lose all stateful provider data upon restart and to be able to share these between processes
+oidc-provider WARNING: quick start development-only signing keys are used, you are expected to provide your own in the configuration "jwks" property
+
+stdout | apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-20: MFA and session policy for finance roles > an Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited
+oidc-provider NOTICE: default ttl.Interaction function called, you SHOULD change it in order to define the expiration for Interaction artifacts.
+
+stdout | apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-20: MFA and session policy for finance roles > an Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited
+oidc-provider NOTICE: default ttl.Grant function called, you SHOULD change it in order to define the expiration for Grant artifacts.
+
+stdout | apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-20: MFA and session policy for finance roles > an Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited
+oidc-provider NOTICE: default ttl.Session function called, you SHOULD change it in order to define the expiration for Session artifacts.
+
+stdout | apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-20: MFA and session policy for finance roles > an Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited
+oidc-provider NOTICE: default ttl.AccessToken function called, you SHOULD change it in order to define the expiration for AccessToken artifacts.
+
+stdout | apps/api/src/authz/mfa-step-up.db.test.ts > SS-PLAT-20: MFA and session policy for finance roles > an Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited
+oidc-provider NOTICE: default ttl.IdToken function called, you SHOULD change it in order to define the expiration for IdToken artifacts.
+
+·····················································································(node:19111) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+···················································[31m[Nest] 19268  - [39m11/17/2026, 7:23:52 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: SoD: subject type bill has no create step for a reported creator
+    at historyOf [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/sod/sod.service.ts:67:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at checkSod [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/sod/sod.service.ts:186:19[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/tenancy/tenant.interceptor.ts:140:26
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+·········stderr | apps/api/src/auth/oidc.db.test.ts
+oidc-provider WARNING: a quick start development-only in-memory adapter is used, you MUST change it in order to not lose all stateful provider data upon restart and to be able to share these between processes
+oidc-provider WARNING: quick start development-only signing keys are used, you are expected to provide your own in the configuration "jwks" property
+
+stdout | apps/api/src/auth/oidc.db.test.ts > SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) > the callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works
+oidc-provider NOTICE: default ttl.Interaction function called, you SHOULD change it in order to define the expiration for Interaction artifacts.
+
+stdout | apps/api/src/auth/oidc.db.test.ts > SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) > the callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works
+oidc-provider NOTICE: default ttl.Grant function called, you SHOULD change it in order to define the expiration for Grant artifacts.
+
+stdout | apps/api/src/auth/oidc.db.test.ts > SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) > the callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works
+oidc-provider NOTICE: default ttl.Session function called, you SHOULD change it in order to define the expiration for Session artifacts.
+
+stdout | apps/api/src/auth/oidc.db.test.ts > SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) > the callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works
+oidc-provider NOTICE: default ttl.AccessToken function called, you SHOULD change it in order to define the expiration for AccessToken artifacts.
+
+stdout | apps/api/src/auth/oidc.db.test.ts > SS-PLAT-41: OIDC login creates a session for an invited user (PKCE, state, nonce) > the callback for an invited user creates a session cookie (HttpOnly, SameSite=Lax, Path=/) and /auth/me works
+oidc-provider NOTICE: default ttl.IdToken function called, you SHOULD change it in order to define the expiration for IdToken artifacts.
+
+················(node:19370) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+·········(node:19460) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[31m[Nest] 19460  - [39m11/17/2026, 7:24:06 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39merror: permission denied for table job_common
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/pg@8.23.1/node_modules/[4mpg[24m/lib/client.js:694:17
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:118:28[90m)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
+    at async #run [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
+    at async DefaultQueryExecutor.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
+    at async Transaction.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:545:16[90m)[39m
+    at async Object.executeSql [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/adapters/kysely.js:4:28[90m)[39m
+    at async #createJob [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/manager.js:1372:32[90m)[39m
+    at PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:131:41[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
+    at async #run [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
+    at async DefaultQueryExecutor.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
+    at async Transaction.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:545:16[90m)[39m
+    at async Object.executeSql [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/adapters/kysely.js:4:28[90m)[39m
+    at async #createJob [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/manager.js:1372:32[90m)[39m
+    at async Telemetry.send [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/telemetry.js:189:28[90m)[39m {
+  length: [33m98[39m,
+  severity: [32m'ERROR'[39m,
+  code: [32m'42501'[39m,
+  detail: [90mundefined[39m,
+  hint: [90mundefined[39m,
+  position: [90mundefined[39m,
+  internalPosition: [90mundefined[39m,
+  internalQuery: [90mundefined[39m,
+  where: [90mundefined[39m,
+  schema: [90mundefined[39m,
+  table: [90mundefined[39m,
+  column: [90mundefined[39m,
+  dataType: [90mundefined[39m,
+  constraint: [90mundefined[39m,
+  file: [32m'aclchk.c'[39m,
+  line: [32m'2812'[39m,
+  routine: [32m'aclcheck_error'[39m
+}
+·····································································································(node:20073) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+·············································[31m[Nest] 20679  - [39m11/17/2026, 7:25:18 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204801[39m,
+  length: [33m204801[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+·········································
+
+ Test Files  51 passed (51)
+      Tests  385 passed (385)
+   Start at  19:22:49
+   Duration  166.52s (transform 3.57s, setup 0ms, import 64.90s, tests 93.15s, environment 5ms)
+
+exit=0
