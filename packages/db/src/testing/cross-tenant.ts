@@ -686,6 +686,28 @@ export const PREREQUISITES: Readonly<
     );
     row.set('bank_account_id', String(account['id']));
   },
+  // Migration 0077 (T-0189, ADR-0091): a resend's key is fixed by its id; seeded unconfirmed. Its
+  // refund must be an approved, requested Stripe refund (insert guard): make the generated parent
+  // one (method is immutable for lf_app, so as a seed step with triggers off) and approve it.
+  'app.customer_refund_stripe_resend': async (admin, row) => {
+    row.set('idempotency_key', `lf-refund-v3-${row.get('id') ?? ''}`);
+    row.delete('confirmed_by');
+    row.delete('confirmed_at');
+    const tenant = row.get('tenant_id') ?? '';
+    const refund = row.get('refund_id') ?? '';
+    await asReplica(admin, (q) =>
+      q.query(
+        `UPDATE app.customer_refund SET method = 'stripe', status = 'requested'
+          WHERE tenant_id = $1 AND id = $2`,
+        [tenant, refund],
+      ),
+    );
+    await admin.query(
+      `INSERT INTO app.customer_refund_approval (tenant_id, company_id, refund_id, approved_by)
+       VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING`,
+      [tenant, row.get('company_id'), refund, row.get('requested_by')],
+    );
+  },
   'app.bank_account': async (admin, row) => {
     await admin.query(`UPDATE app.account SET subtype = 'bank' WHERE tenant_id = $1 AND id = $2`, [
       row.get('tenant_id'),

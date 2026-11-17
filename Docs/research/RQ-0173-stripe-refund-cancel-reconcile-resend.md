@@ -121,7 +121,7 @@ refund document that can be neither paid nor cancelled locks the customer's cred
   `PUT /ar/refunds/:id/stripe-resends/:resendId` (ask, `ar.refund.approve`), then
   `POST …/:resendId/confirm` (`ar.refund.approve`, step-up 300 s, SoD
   `SOD_REFUND_RESEND_SELF_CONFIRM` with no small-team exception, database-enforced). Each resend
-  gets a recorded key `lf-refund-v3-<resend id>`. Recorded in ADR-0091 (migration 0076).
+  gets a recorded key `lf-refund-v3-<resend id>`. Recorded in ADR-0091 (migration reserved as 0077).
 
 ## Confidence
 
@@ -138,5 +138,5 @@ and are proved by tests.
 - Replace the documented fixtures with a redacted test-mode recording when a key is available
   (RQ-0104 follow-up).
 
-**Affects:** packages/connectors/stripe, packages/modules/ar, packages/db (migration 0076),
+**Affects:** packages/connectors/stripe, packages/modules/ar, packages/db (migration reserved as 0077),
 packages/shared (SoD rule), apps/api (refund routes), apps/web (refund region).

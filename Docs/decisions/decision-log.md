@@ -4018,3 +4018,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the approve response alone held the refusal, so after a reload the region could not offer Cancel. The Sync issue is the stored record of a permanent failure (ADR-0040). `SENT_NOT_POSTED` means Stripe has the money, so a Cancel there would always be refused.
 - Alternatives: store the last send outcome on the refund (rejected: a migration, and it would duplicate the Sync issue).
 - ADR: none · Status: accepted
+
+### DL-0773 — ADR-0091 accepted: reconcile a stale or failed Stripe refund first; resend only by two people with a new recorded key (T-0189)
+- Date: 2026-11-17 · By: claude · Task: T-0189 · Category: security
+- Decision: Accept ADR-0091 under the owner's standing instruction DL-0691. Every lookup collects all Stripe refunds that carry the document's `lf_refund_id`. Only a live one (`pending`, `requires_action`, `succeeded`) is adopted, and two live ones stop with `SENT_NOT_POSTED`. Past the 23-hour window (counted from the approval or the latest confirmed resend) the send adopts and posts a live refund, or refuses `KEY_EXPIRED`. A resend is asked (`refund_resend.request`) and confirmed (`refund_resend.confirm`, step-up 300 s) by two different people. It is allowed only when the normal send is blocked and Stripe holds nothing live, and it uses the recorded key `lf-refund-v3-<resend id>`.
+- Why: RQ-0173. Stripe says a failed refund returns the money to the balance and a canceled one moved none (stripe@23.1.0 `Refund.status`, `failure_balance_transaction`, `cancel`). Reusing `lf-refund-v2-<id>` would replay the failed refund, or after pruning could not be told apart from a new refund (RQ-0164 S5). Design §6.5 and §6.2 require maker-checker and step-up for money out. Odoo retries a failed gateway refund as a new transaction with a new reference; LedgerForce is stricter, with a lookup, a recorded key and a second person.
+- Alternatives: lift the 23-hour rule and rely on the lookup (rejected: a days-later automatic send is a new money-out decision); resend under the old key (rejected, see above); send resends from the worker only (rejected: the person confirming would not see the result).
+- ADR: ADR-0091 · Status: accepted
+
+### DL-0774 — SOD_REFUND_RESEND_SELF_CONFIRM with no small-team exception, enforced in the database too (T-0189)
+- Date: 2026-11-17 · By: claude · Task: T-0189 · Category: security
+- Decision: New SoD subject `refund_resend` (steps `request`, `confirm`) and rule `SOD_REFUND_RESEND_SELF_CONFIRM` (`always`, `smallTeamException: false`). The migration mirrors them in `app.sod_step_known` / `app.sod_rule_known`. The table `app.customer_refund_stripe_resend` holds a CHECK of the same name (`confirmed_by IS DISTINCT FROM requested_by`) and a guard that allows only the one-time confirmation update. The web's plain-word message list gains the rule.
+- Why: a resend after an uncertain state is the riskiest money-out step. A sole user can still cancel the document (T-0190) and refund by bank under the batch release controls. The database check stops any path that skips the API guard, as 0071 does for the remittance account.
+- Alternatives: allow the small-team exception as the other refund rules do (rejected for the reason above); enforce it only in the API (rejected: defence in depth, as 0071).
+- ADR: ADR-0091 · Status: accepted
+
+### DL-0775 — An adopted Stripe refund is dated its Stripe creation date (T-0189)
+- Date: 2026-11-17 · By: claude · Task: T-0189 · Category: accounting
+- Decision: When the send or the check adopts a refund Stripe already holds, the GP-006 Stripe-variant entry, the allocation, `stripe_refund.refund_date` and `paid_on` are all dated the Stripe refund's `created` time. The date is taken in the tenant's report time zone and is never earlier than the refund document's date. A refund LedgerForce creates is still dated the send date. The `stripe_refund.idempotency_key` is the key used: v2, or the resend's v3.
+- Why: the card asks for "dated the Stripe refund date". GP-006 is dated when the money left. On the inline path the two dates only differ after a lost commit, so the change is a correction, not a new treatment. The golden lines are unchanged and no golden edit is needed.
+- Alternatives: date the adoption day (rejected: it misstates when the money left, possibly across a period end).
+- ADR: ADR-0091 · Status: accepted
+
+### DL-0776 — The T-0172 KEY_EXPIRED test follows ADR-0091: one read-only lookup, then the refusal (T-0189)
+- Date: 2026-11-17 · By: claude · Task: T-0189 · Category: process
+- Decision: In `stripe-refund-approval.contract.db.test.ts`, the stale ("Zeta") case asserted "Stripe not called". It now asserts that exactly one read-only `GET /v1/refunds` was made (fixture interaction `list-refunds-none-stale`, added to the T-0172 fixture), that no POST was made, and that the result is still `KEY_EXPIRED`, `retryable: false`.
+- Why: ADR-0091 makes the expired send look at Stripe before refusing, so that it can record a refund Stripe holds. The test now pins the exact call made, which is stronger than a count; the money-out assertion (no create) is unchanged. Precedent: DL-0731.
+- Alternatives: keep a no-lookup path for the approve route (rejected: two behaviours, and the approve route never sends past the window anyway).
+- ADR: ADR-0091 · Status: accepted
+
+### DL-0777 — T-0189 scope: API and module only; refund region and nightly sweep split to T-0208; migration number 0077 (T-0189)
+- Date: 2026-11-17 · By: claude · Task: T-0189 · Category: scope
+- Decision: T-0189 delivers the module functions (`checkStripeCustomerRefund`, `requestStripeRefundResend`, `confirmStripeRefundResend`), the three API routes and the migration. The refund-region UI for check and resend, and a nightly sweep that surfaces R2 strays company-wide, are new card T-0208. The migration file is committed as `0077_ar_stripe_refund_resend.sql`, the number the lead assigned (0073–0076 are taken). Because the runner refuses gaps, its tests ran with the same file numbered 0073 on this branch; the lead keeps the sequence gapless at merge.
+- Why: the card's ACs are contract and db; the UI and the sweep are each a screen or job of their own (about 300 lines).
+- Alternatives: build everything here (rejected: oversized).
+- ADR: ADR-0091 · Status: accepted

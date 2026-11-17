@@ -9,6 +9,8 @@
  * Security review r8 (RQ-0164): a Stripe success that cannot be posted answers `failed` with
  * code SENT_NOT_POSTED and the Stripe refund id (F1); the handler refuses a Stripe refund whose
  * step-up the interceptor did not verify, whatever the route's condition saw (F3).
+ * T-0190 (SS-UC11-11): cancel a refused Stripe refund. T-0189 (SS-UC11-12, SS-UC11-13, ADR-0091):
+ * stripe-check records a refund Stripe holds; a resend is asked and confirmed by two people.
  */
 import 'reflect-metadata';
 import { randomUUID } from 'node:crypto';
@@ -34,6 +36,7 @@ import {
 import {
   APPROVED_REFUNDS_FIXTURE,
   loadCassette,
+  REFUND_FOLLOWUPS_FIXTURE,
   seedStripePaidCredit,
   startRecordedStripe,
   type RecordedStripe,
@@ -158,7 +161,13 @@ async function session(who: string, authTime: Date, fx: LedgerFixture = f) {
 }
 
 beforeAll(async () => {
-  stub = await startRecordedStripe(loadCassette(APPROVED_REFUNDS_FIXTURE));
+  // T-0189: the follow-ups fixture's interactions (expired, vanished) next to T-0172's.
+  const approved = loadCassette(APPROVED_REFUNDS_FIXTURE);
+  const followups = loadCassette(REFUND_FOLLOWUPS_FIXTURE);
+  stub = await startRecordedStripe({
+    ...approved,
+    interactions: [...approved.interactions, ...followups.interactions],
+  });
   f = await createLedgerFixture('01900000-0000-7000-8000-000000017211');
   other = await createLedgerFixture('01900000-0000-7000-8000-000000017212');
   for (const [who, p] of Object.entries(people)) {
@@ -225,6 +234,7 @@ beforeAll(async () => {
   });
   for (const who of Object.keys(people)) cookies.set(who, await session(who, FRESH));
   cookies.set('staleApprover', await session('approver', STALE));
+  cookies.set('staleFinanceAdmin', await session('financeAdmin', STALE));
 }, 240_000);
 
 afterAll(async () => {
@@ -792,5 +802,157 @@ describe('SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanen
     expect(foreign.status).toBe(404);
     const malformed = await call('POST', `/ar/refunds/not-a-uuid/cancel?${q()}`, 'arClerk');
     expect(malformed.status).toBe(400);
+  });
+});
+
+describe('T-0189 a Stripe refund older than 23 hours: check at Stripe, record once, or resend after a second person (ADR-0091)', () => {
+  const approvedHoursAgo = (refundId: string, hours: number) =>
+    f.admin.query(
+      `INSERT INTO app.customer_refund_approval (tenant_id, company_id, refund_id, approved_by, approved_at)
+       VALUES ($1, $2, $3, $4, clock_timestamp() - make_interval(hours => $5))`,
+      [f.tenantId, f.companyId, refundId, people.approver?.id, hours],
+    );
+  const setVars = (prefix: string, credit: StripePaidCredit, id: string, no: string, re: string) =>
+    Object.assign(stub.vars, {
+      tenantId: f.tenantId,
+      companyId: f.companyId,
+      [`${prefix}RefundId`]: id,
+      [`${prefix}RefundNo`]: no,
+      [`${prefix}CreditNoteId`]: credit.creditNoteId,
+      [`${prefix}CreditNoteNo`]: credit.creditNoteNo,
+      [`${prefix}PaymentIntentId`]: credit.paymentIntentId,
+      [`${prefix}StripeRefundId`]: re,
+    });
+  const requested = async (prefix: string) => {
+    const credit = await seedCredit(f, prefix, profiles);
+    const id = randomUUID();
+    const created = await call('PUT', `/ar/refunds/${id}`, 'arClerk', stripeBody(credit.partyId));
+    expect(created.status).toBe(201);
+    const c = (await created.json()) as { refund_no: string };
+    return { credit, id, no: c.refund_no };
+  };
+
+  it('SS-UC11-12 stripe-check records a refund Stripe holds for an expired send once, dated the Stripe refund date; an AR Clerk cannot check', async () => {
+    const { credit, id, no } = await requested('ApiExpired');
+    await approvedHoursAgo(id, 30);
+    setVars('expired', credit, id, no, 're_1SQbT0189ApiExpired');
+    const clerk = await call('POST', `/ar/refunds/${id}/stripe-check?${q()}`, 'arClerk');
+    expect(clerk.status).toBe(403);
+    const posts = stub.received.filter((x) => x.method === 'POST').length;
+    const ok = await call('POST', `/ar/refunds/${id}/stripe-check?${q()}`, 'approver');
+    expect(ok.status).toBe(200);
+    expect(await ok.json()).toMatchObject({
+      outcome: 'recorded',
+      stripe_refund_id: 're_1SQbT0189ApiExpired',
+      failed_at_stripe: [],
+      resendable: false,
+      refund: { id, status: 'paid', paid_on: '2026-11-25', stripe: { status: 'sent' } },
+    });
+    expect(stub.received.filter((x) => x.method === 'POST').length).toBe(posts);
+    expect(await entriesFor(id)).toBe(1);
+  });
+
+  it('SS-UC11-13 nothing at Stripe: one person asks a resend, the same person cannot confirm, a stale step-up is refused, a second person confirms and it is sent once with a new key', async () => {
+    const { credit, id, no } = await requested('ApiVanished');
+    await approvedHoursAgo(id, 30);
+    setVars('vanished', credit, id, no, 're_1SQbT0189ApiResent');
+    // Twice: a repeated check changes nothing.
+    for (let i = 0; i < 2; i++) {
+      const check = await call('POST', `/ar/refunds/${id}/stripe-check?${q()}`, 'approver');
+      expect(await check.json()).toMatchObject({
+        outcome: 'not_at_stripe',
+        stripe_refund_id: null,
+        resendable: true,
+        refund: { status: 'requested', approval: 'approved' },
+      });
+    }
+    const resendId = randomUUID();
+    stub.vars['vanishedResendId'] = resendId;
+    const body = { reason: 'Checked the payment in Stripe: no refund was made' };
+    const byClerk = await call(
+      'PUT',
+      `/ar/refunds/${id}/stripe-resends/${resendId}?${q()}`,
+      'arClerk',
+      body,
+    );
+    expect(byClerk.status).toBe(403);
+    const asked = await call(
+      'PUT',
+      `/ar/refunds/${id}/stripe-resends/${resendId}?${q()}`,
+      'approver',
+      body,
+    );
+    expect(asked.status).toBe(201);
+    expect(await asked.json()).toMatchObject({
+      id: resendId,
+      refund_id: id,
+      status: 'requested',
+      requested_by: people.approver?.id,
+      idempotency_key: `lf-refund-v3-${resendId}`,
+    });
+    const replay = await call(
+      'PUT',
+      `/ar/refunds/${id}/stripe-resends/${resendId}?${q()}`,
+      'approver',
+      body,
+    );
+    expect(replay.status).toBe(200);
+
+    const posts = stub.received.filter((x) => x.method === 'POST').length;
+    const self = await call(
+      'POST',
+      `/ar/refunds/${id}/stripe-resends/${resendId}/confirm?${q()}`,
+      'approver',
+    );
+    expect(self.status).toBe(403);
+    expect(await self.json()).toMatchObject({
+      error: 'sod_violation',
+      rule: 'SOD_REFUND_RESEND_SELF_CONFIRM',
+    });
+    const stale = await call(
+      'POST',
+      `/ar/refunds/${id}/stripe-resends/${resendId}/confirm?${q()}`,
+      'staleFinanceAdmin',
+    );
+    expect(stale.status).toBe(401);
+    expect(await stale.json()).toEqual({ error: 'step_up_required', max_age: 300 });
+    expect(stub.received.filter((x) => x.method === 'POST').length).toBe(posts);
+
+    const ok = await call(
+      'POST',
+      `/ar/refunds/${id}/stripe-resends/${resendId}/confirm?${q()}`,
+      'financeAdmin',
+    );
+    expect(ok.status).toBe(200);
+    expect(stub.mismatches).toEqual([]);
+    expect(await ok.json()).toMatchObject({
+      resend: { id: resendId, status: 'confirmed', confirmed_by: people.financeAdmin?.id },
+      refund: {
+        id,
+        status: 'paid',
+        stripe: { status: 'sent', stripe_refund_id: 're_1SQbT0189ApiResent' },
+      },
+    });
+    const creates = stub.received.filter((x) => x.method === 'POST');
+    expect(creates.slice(posts).map((x) => x.idempotencyKey)).toEqual([`lf-refund-v3-${resendId}`]);
+    expect(await eventsFor(id)).toEqual([STRIPE_REFUND_APPROVED]);
+    const again = await call(
+      'POST',
+      `/ar/refunds/${id}/stripe-resends/${resendId}/confirm?${q()}`,
+      'financeAdmin',
+    );
+    expect(again.status).toBe(200);
+    expect(await again.json()).toMatchObject({
+      resend: { replayed: true },
+      refund: { status: 'paid' },
+    });
+    expect(stub.received.filter((x) => x.method === 'POST').length).toBe(posts + 1);
+    expect(await entriesFor(id)).toBe(1);
+    const foreign = await call(
+      'POST',
+      `/ar/refunds/${foreignRefund}/stripe-check?${q()}`,
+      'approver',
+    );
+    expect(foreign.status).toBe(404);
   });
 });

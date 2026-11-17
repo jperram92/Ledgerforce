@@ -1,5 +1,5 @@
 {
-  "source": "Built from RefundCreateParams, the Refund object and the error object in the official stripe@23.1.0 type definitions (OpenAPI v2596), RQ-0104 S6 and RQ-0163; request encoding as RQ-0115 S6. Not recorded from a live account: no Stripe key or network was available. The key is one per approved refund document (lf-refund-v2-<refund id>, RQ-0163). Replace with a redacted test-mode recording (fixtures/recorded/) when one is (RQ-0104 follow-up). List Refunds (GET /v1/refunds?payment_intent=…&limit=100, paged by starting_after; RQ-0164 S1–S4) added 2026-11-15 from RefundListParams, PaginationParams and ApiList in the same SDK: before every create the send looks for a refund with metadata lf_refund_id. Security re-review R1 (2026-11-15): 'voided' interactions — the lookup must find a refund sent for a credit note voided afterwards; No interaction answers a second create for that document: it must never be requested.",
+  "source": "Built from RefundCreateParams, the Refund object and the error object in the official stripe@23.1.0 type definitions (OpenAPI v2596), RQ-0104 S6 and RQ-0163; request encoding as RQ-0115 S6. Not recorded from a live account: no Stripe key or network was available. The key is one per approved refund document (lf-refund-v2-<refund id>, RQ-0163). Replace with a redacted test-mode recording (fixtures/recorded/) when one is (RQ-0104 follow-up). List Refunds (GET /v1/refunds?payment_intent=…&limit=100, paged by starting_after; RQ-0164 S1–S4) added 2026-11-15 from RefundListParams, PaginationParams and ApiList in the same SDK: before every create the send looks for a refund with metadata lf_refund_id. Security re-review R1 (2026-11-15): 'voided' interactions — the lookup must find a refund sent for a credit note voided afterwards; No interaction answers a second create for that document: it must never be requested. T-0189 (2026-11-17, ADR-0091): 'list-refunds-none-stale' — a send older than 23 hours now looks at Stripe (read-only) before refusing KEY_EXPIRED.",
   "apiVersion": "2026-10-28.endive",
   "accessed": "2026-11-15",
   "placeholders": "{{name}} is replaced by the test before matching (ids generated at run time). `times` limits how often an interaction answers (the list is empty until the refund exists).",
@@ -123,6 +123,26 @@
         "path": "/v1/refunds",
         "form": {
           "payment_intent": "{{unpostablePaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      }
+    },
+    {
+      "name": "list-refunds-none-stale",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{stalePaymentIntentId}}",
           "limit": "100"
         }
       },

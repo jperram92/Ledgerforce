@@ -137,6 +137,33 @@ const CASES: Case[] = [
     },
     expected: ALLOW,
   },
+  // T-0189 / ADR-0091: a Stripe refund resend is asked by one person and confirmed by another,
+  // with no small-team exception (the riskiest money-out step).
+  {
+    name: 'T-0189: the person who asked for a Stripe refund resend confirms it → deny',
+    input: { step: 'refund_resend.confirm', history: [h('refund_resend.request', A)] },
+    expected: deny('SOD_REFUND_RESEND_SELF_CONFIRM'),
+  },
+  {
+    name: 'T-0189: small team on, nobody else eligible, recorded exception → still deny (no exception)',
+    input: {
+      step: 'refund_resend.confirm',
+      history: [h('refund_resend.request', A)],
+      settings: smallTeam,
+      otherEligible: 0,
+      exception: { reason: 'sole trader' },
+    },
+    expected: deny('SOD_REFUND_RESEND_SELF_CONFIRM'),
+  },
+  {
+    name: 'T-0189: a different person confirms the resend → allow',
+    input: {
+      step: 'refund_resend.confirm',
+      actorId: B,
+      history: [h('refund_resend.request', A)],
+    },
+    expected: ALLOW,
+  },
   {
     name: '§6.4 Payroll Officer: creator releases own net-pay batch → deny',
     input: { step: 'net_pay_batch.release', history: [h('net_pay_batch.create', A)] },
@@ -415,6 +442,7 @@ describe('SS-PLAT-16: SoD rules 1–6 evaluated as configured', () => {
         'SOD_INVOICE_SELF_APPROVAL',
         'SOD_JOURNAL_SELF_APPROVAL',
         'SOD_REFUND_SELF_APPROVAL',
+        'SOD_REFUND_RESEND_SELF_CONFIRM',
         'SOD_REMITTANCE_SELF_APPROVAL',
         'SOD_NET_PAY_SELF_RELEASE',
         'SOD_PERIOD_REOPEN_SELF_APPROVAL',

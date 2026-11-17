@@ -1,0 +1,77 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42071
+[31m[Nest] 18759  - [39m11/17/2026, 5:04:29 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/ar/refunds-stripe.db.test.ts:577:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+[31m[Nest] 18759  - [39m11/17/2026, 5:04:29 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/ar/refunds-stripe.db.test.ts:577:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+ ❯ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts (13 tests | 2 failed) 7971ms
+     × SS-UC11-12 stripe-check records a refund Stripe holds for an expired send once, dated the Stripe refund date; an AR Clerk cannot check 283ms
+     × SS-UC11-13 nothing at Stripe: one person asks a resend, the same person cannot confirm, a stale step-up is refused, a second person confirms and it is sent once with a new key 177ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > T-0189 a Stripe refund older than 23 hours: check at Stripe, record once, or resend after a second person (ADR-0091) > SS-UC11-12 stripe-check records a refund Stripe holds for an expired send once, dated the Stripe refund date; an AR Clerk cannot check
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:838:26
+    836|     setVars('expired', credit, id, no, 're_1SQbT0189ApiExpired');
+    837|     const clerk = await call('POST', `/ar/refunds/${id}/stripe-check?$…
+    838|     expect(clerk.status).toBe(403);
+       |                          ^
+    839|     const posts = stub.received.filter((x) => x.method === 'POST').len…
+    840|     const ok = await call('POST', `/ar/refunds/${id}/stripe-check?${q(…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > T-0189 a Stripe refund older than 23 hours: check at Stripe, record once, or resend after a second person (ADR-0091) > SS-UC11-13 nothing at Stripe: one person asks a resend, the same person cannot confirm, a stale step-up is refused, a second person confirms and it is sent once with a new key
+AssertionError: expected { …(3) } to match object { outcome: 'not_at_stripe', …(3) }
+(3 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "outcome": "not_at_stripe",
+-   "refund": {
+-     "approval": "approved",
+-     "status": "requested",
+-   },
+-   "resendable": true,
+-   "stripe_refund_id": null,
++   "error": "Not Found",
++   "message": "Cannot POST /ar/refunds/bd9ff5b2-1328-49ac-a7aa-2f3c6b4b30f4/stripe-check?company_id=01a1e7e4-5a1d-7166-a98b-3f3148b47abf",
++   "statusCode": 404,
+  }
+
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:860:34
+    858|     for (let i = 0; i < 2; i++) {
+    859|       const check = await call('POST', `/ar/refunds/${id}/stripe-check…
+    860|       expect(await check.json()).toMatchObject({
+       |                                  ^
+    861|         outcome: 'not_at_stripe',
+    862|         stripe_refund_id: null,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 11 passed (13)
+   Start at  05:04:16
+   Duration  14.19s (transform 2.75s, setup 0ms, import 4.68s, tests 7.97s, environment 0ms)
+

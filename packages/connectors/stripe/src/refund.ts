@@ -16,8 +16,12 @@
  *  4. the refund's open item is allocated against the credit note's, a `stripe_refund` row records
  *     the Stripe refund with the same entry, and the refund document is marked paid.
  * A paid refund is a replay: no Stripe call, no posting. A send later than 23 hours after the
- * approval is refused (KEY_EXPIRED): Stripe may have pruned the key (RQ-0115 S5), so a resend
- * could refund twice; someone must check Stripe first (T-0189).
+ * approval (or its latest confirmed resend) creates nothing: Stripe may have pruned the key
+ * (RQ-0115 S5). It still looks at Stripe and records a live refund it holds (dated its Stripe
+ * date); with none it is refused (KEY_EXPIRED). T-0189 / ADR-0091: checkStripeCustomerRefund
+ * reconciles without ever creating; a resend is asked by one person and confirmed by another
+ * (requestStripeRefundResend, confirmStripeRefundResend) and uses its own recorded key
+ * `lf-refund-v3-<resend id>`. A failed or canceled Stripe refund is never adopted (RQ-0173).
  *
  * Money leaves at most once per refund document (security review r8 F1, RQ-0164, ADR-0083
  * addendum): before any create, the send lists the refunds of every Stripe payment of the party
@@ -80,7 +84,16 @@ export type StripeRefundErrorCode =
   /** The journal would be refused, so nothing was sent to Stripe (RQ-0164). */
   | 'NOT_POSTABLE'
   /** Stripe has the refund (money out) but the journal could not be written (RQ-0164). */
-  | 'SENT_NOT_POSTED';
+  | 'SENT_NOT_POSTED'
+  /** ADR-0091: a resend is refused while Stripe holds a live refund for the document. */
+  | 'AT_STRIPE'
+  /** ADR-0091: a resend is only for a send that is blocked (expired, or failed at Stripe). */
+  | 'NOT_BLOCKED'
+  | 'RESEND_NOT_FOUND'
+  | 'INVALID_RESEND'
+  /** ADR-0091 (SOD_REFUND_RESEND_SELF_CONFIRM): whoever asked cannot confirm. */
+  | 'SELF_CONFIRM'
+  | 'ALREADY_CONFIRMED';
 
 export class StripeRefundError extends Error {
   readonly code: StripeRefundErrorCode;
@@ -254,31 +267,51 @@ async function partyPaymentIntents(
 }
 
 /**
- * A refund Stripe already holds for this refund document (metadata `lf_refund_id`), or null:
- * the lookup before every create (RQ-0164). Read-only at Stripe.
- */
-async function refundAlreadyAtStripe(
-  trx: Trx,
-  client: StripeClient,
-  companyId: string,
-  refund: CustomerRefundView,
-): Promise<ListedRefund | null> {
-  for (const pi of await partyPaymentIntents(trx, companyId, refund.partyId)) {
-    const found = await client.findRefund(
-      pi,
-      (x) =>
-        x.metadata['lf_refund_id'] === refund.refundId && x.metadata['lf_company_id'] === companyId,
-    );
-    if (found) return found;
-  }
-  return null;
-}
-
-/**
  * A refund Stripe holds for this document that has moved or may still move money (RQ-0173):
  * `failed` gives the money back to the balance and `canceled` moved none, so those are not.
  */
 const isLive = (x: ListedRefund) => POSTABLE_STATUS.has(x.status);
+
+interface AtStripe {
+  /** The one live refund Stripe holds for this document, or null. */
+  readonly live: ListedRefund | null;
+  /** Its failed or canceled refunds (no money out under them; never adopted). */
+  readonly dead: readonly ListedRefund[];
+}
+
+/**
+ * What Stripe holds for this refund document (metadata `lf_refund_id`, `lf_company_id`) across
+ * every Stripe payment of the party: the lookup before every create (RQ-0164) and every cancel,
+ * check or resend (RQ-0173). Read-only at Stripe. Two live refunds for one document should never
+ * exist; if they do, nothing is adopted or sent and the caller is told (SENT_NOT_POSTED).
+ */
+async function refundsAtStripe(
+  trx: Trx,
+  client: StripeClient,
+  companyId: string,
+  refund: CustomerRefundView,
+): Promise<AtStripe> {
+  const all: ListedRefund[] = [];
+  for (const pi of await partyPaymentIntents(trx, companyId, refund.partyId)) {
+    all.push(
+      ...(await client.findRefunds(
+        pi,
+        (x) =>
+          x.metadata['lf_refund_id'] === refund.refundId &&
+          x.metadata['lf_company_id'] === companyId,
+      )),
+    );
+  }
+  const live = all.filter(isLive);
+  if (live.length > 1) {
+    throw new StripeRefundError(
+      'SENT_NOT_POSTED',
+      `Stripe holds ${String(live.length)} live refunds for refund ${refund.refundNo} (${live.map((x) => x.id).join(', ')}); nothing was recorded or sent. Check them in Stripe by hand`,
+      live[0]?.id ?? null,
+    );
+  }
+  return { live: live[0] ?? null, dead: all.filter((x) => !isLive(x)) };
+}
 
 /**
  * Cancel a requested Stripe refund document (T-0190, RQ-0173) once Stripe, asked under the party
@@ -295,19 +328,8 @@ export async function cancelStripeCustomerRefund(
     trx,
     { companyId, refundId: c.refundId },
     {
-      heldAtStripe: async (t, r) => {
-        for (const pi of await partyPaymentIntents(t, companyId, r.partyId)) {
-          const found = await client.findRefund(
-            pi,
-            (x) =>
-              isLive(x) &&
-              x.metadata['lf_refund_id'] === r.refundId &&
-              x.metadata['lf_company_id'] === companyId,
-          );
-          if (found) return found.id;
-        }
-        return null;
-      },
+      heldAtStripe: async (t, r) =>
+        (await refundsAtStripe(t, client, companyId, r)).live?.id ?? null,
     },
   );
 }
@@ -353,6 +375,26 @@ async function assertPostable(
   }
 }
 
+/** The latest confirmed resend of a refund document (ADR-0091), or null. */
+async function confirmedResend(
+  trx: Trx,
+  companyId: string,
+  refundId: string,
+): Promise<{ id: string; key: string; ageMs: string } | null> {
+  return (
+    (
+      await sql<{ id: string; key: string; ageMs: string }>`
+        SELECT id::text, idempotency_key AS key,
+               (extract(epoch FROM clock_timestamp() - confirmed_at) * 1000)::bigint::text AS "ageMs"
+          FROM app.customer_refund_stripe_resend
+         WHERE company_id = ${companyId}::uuid AND refund_id = ${refundId}::uuid
+           AND confirmed_by IS NOT NULL
+         ORDER BY confirmed_at DESC, id DESC
+         LIMIT 1`.execute(trx)
+    ).rows[0] ?? null
+  );
+}
+
 /** Send one approved Stripe refund document (see the header). */
 export async function sendStripeCustomerRefund(
   trx: Trx,
@@ -360,6 +402,22 @@ export async function sendStripeCustomerRefund(
   c: StripeSendInput,
   opts: PostOptions = {},
 ): Promise<StripeCustomerRefundSent> {
+  const sent = await sendOrRecord(trx, client, c, opts, false);
+  if (!sent) throw new Error('unreachable: a send never stops at the lookup');
+  return sent;
+}
+
+/**
+ * The send (`recordOnly` false) or the check's recording (`recordOnly` true: adopt a live refund
+ * Stripe holds, else return null; never create). See the header.
+ */
+async function sendOrRecord(
+  trx: Trx,
+  client: StripeClient,
+  c: StripeSendInput,
+  opts: PostOptions,
+  recordOnly: boolean,
+): Promise<StripeCustomerRefundSent | null> {
   const companyId = c.companyId.toLowerCase();
   const before = await getCustomerRefund(trx, companyId, c.refundId).catch((e: unknown) => {
     if (e instanceof RefundError && e.code === 'REFUND_NOT_FOUND') {
@@ -388,24 +446,23 @@ export async function sendStripeCustomerRefund(
       `refund ${r.refundNo} is not approved; a Stripe refund is sent only after approval (ADR-0074)`,
     );
   }
-  // The database's clock, the one that stamped the approval.
-  const age = (
-    await sql<{ ms: string }>`
-      SELECT (extract(epoch FROM clock_timestamp() - approved_at) * 1000)::bigint::text AS ms
-        FROM app.customer_refund_approval
-       WHERE company_id = ${companyId}::uuid AND refund_id = ${r.refundId}::uuid`.execute(trx)
-  ).rows[0]?.ms;
-  if (age === undefined || Number(age) > STRIPE_REFUND_SEND_WINDOW_MS) {
-    throw new StripeRefundError(
-      'KEY_EXPIRED',
-      `refund ${r.refundNo} was approved more than 23 hours ago; check the payment in Stripe before sending it again (T-0189)`,
-    );
-  }
-  const sentOn = c.sentOn ?? (await stripeRefundToday(trx, c.now));
-  if (!DATE_RE.test(sentOn) || sentOn < r.refundDate) {
+  // The window runs from the approval, or from the latest confirmed resend (ADR-0091), on the
+  // database's clock, the one that stamped them. Past it only an adoption may happen (T-0189).
+  const resend = await confirmedResend(trx, companyId, r.refundId);
+  const age =
+    resend?.ageMs ??
+    (
+      await sql<{ ms: string }>`
+        SELECT (extract(epoch FROM clock_timestamp() - approved_at) * 1000)::bigint::text AS ms
+          FROM app.customer_refund_approval
+         WHERE company_id = ${companyId}::uuid AND refund_id = ${r.refundId}::uuid`.execute(trx)
+    ).rows[0]?.ms;
+  const expired = age === undefined || Number(age) > STRIPE_REFUND_SEND_WINDOW_MS;
+  const sendOn = c.sentOn ?? (await stripeRefundToday(trx, c.now));
+  if (!DATE_RE.test(sendOn) || sendOn < r.refundDate) {
     throw new StripeRefundError(
       'INVALID_REFUND',
-      `refund ${r.refundNo} is dated ${r.refundDate} and cannot be sent on ${sentOn}`,
+      `refund ${r.refundNo} is dated ${r.refundDate} and cannot be sent on ${sendOn}`,
     );
   }
   const settings = await trx
@@ -421,7 +478,7 @@ export async function sendStripeCustomerRefund(
   ).rows[0]?.t;
   const amount = new Decimal(r.amount);
   const cents = amount.times(100).toFixed(0);
-  const key = stripeRefundKey(r.refundId);
+  const key = resend?.key ?? stripeRefundKey(r.refundId);
   // F5: the journal is the approver's when the caller names nobody (the worker's retry).
   const createdBy = c.createdBy ?? r.approvedBy ?? undefined;
   const sentNotPosted = (id: string, reason: string) =>
@@ -431,8 +488,20 @@ export async function sendStripeCustomerRefund(
       id,
     );
 
-  // Never a second refund: adopt the one Stripe already holds for this document (RQ-0164).
-  const existing = await refundAlreadyAtStripe(trx, client, companyId, r);
+  // Never a second refund: adopt the live one Stripe already holds for this document (RQ-0164);
+  // a failed or canceled one moved no money and is never adopted (RQ-0173, review r8 R3).
+  const existing = (await refundsAtStripe(trx, client, companyId, r)).live;
+  if (!existing && recordOnly) return null;
+  if (!existing && expired) {
+    throw new StripeRefundError(
+      'KEY_EXPIRED',
+      `refund ${r.refundNo} was approved${resend ? ' (or its resend confirmed)' : ''} more than 23 hours ago and Stripe holds no refund for it; it is not sent automatically. Someone who approves refunds asks for a resend and another person confirms it (ADR-0091), or the refund is cancelled (T-0190)`,
+    );
+  }
+  // An adopted refund is dated the day Stripe made it (the money left then), in the tenant's
+  // report time zone, never before the refund document's date.
+  const madeOn = existing ? await stripeRefundToday(trx, new Date(existing.created * 1000)) : null;
+  const sentOn = madeOn === null ? sendOn : madeOn < r.refundDate ? r.refundDate : madeOn;
   const sentFor = existing?.metadata['lf_credit_note_id'];
   if (existing && (!sentFor || !UUID_RE.test(sentFor))) {
     throw sentNotPosted(existing.id, 'the Stripe refund names no credit note');
@@ -626,6 +695,338 @@ export async function trySendStripeCustomerRefund(
     const stripeRefundId = e instanceof StripeRefundError ? e.stripeRefundId : null;
     return { status: 'failed', code, message, stripeRefundId };
   }
+}
+
+export interface StripeRefundReconciliation {
+  /**
+   * recorded: the document is paid by a Stripe refund (now or before; `replayed` when before);
+   * held_unapproved: Stripe holds a live refund for a document that is not approved (review r8
+   * R2: approving it records that refund and sends nothing); not_at_stripe: no live refund.
+   */
+  readonly outcome: 'recorded' | 'held_unapproved' | 'not_at_stripe';
+  readonly stripeRefundId: string | null;
+  readonly entryId: string | null;
+  readonly replayed: boolean;
+  /** Failed or canceled refunds Stripe holds for the document (no money out under them). */
+  readonly failedAtStripe: readonly string[];
+  /** A resend may be asked (ADR-0091): approved, nothing live at Stripe, and the send blocked. */
+  readonly resendable: boolean;
+  readonly refund: CustomerRefundView;
+}
+
+/**
+ * Reconcile a Stripe refund document with Stripe (T-0189, RQ-0173): read-only at Stripe, never a
+ * create. A live refund carrying the document's `lf_refund_id` is recorded once (GP-006 Stripe
+ * variant, dated the Stripe refund date) when the document is approved, or reported when it is
+ * not; otherwise it says whether a resend may be asked.
+ */
+export async function checkStripeCustomerRefund(
+  trx: Trx,
+  client: StripeClient,
+  c: { companyId: string; refundId: string; now: Date; createdBy?: string },
+  opts: PostOptions = {},
+): Promise<StripeRefundReconciliation> {
+  const companyId = c.companyId.toLowerCase();
+  const before = await getCustomerRefund(trx, companyId, c.refundId);
+  await lockCustomerRefundParty(trx, companyId, before.partyId);
+  const r = await getCustomerRefund(trx, companyId, before.refundId);
+  if (r.method !== 'stripe') {
+    throw new StripeRefundError('NOT_PAYABLE', `refund ${r.refundNo} is not a Stripe refund`);
+  }
+  if (r.status === 'paid') {
+    const done = await stripeRefundOf(trx, companyId, r.entryId);
+    return {
+      outcome: 'recorded',
+      stripeRefundId: done?.stripeRefundId ?? null,
+      entryId: r.entryId,
+      replayed: true,
+      failedAtStripe: [],
+      resendable: false,
+      refund: r,
+    };
+  }
+  if (r.status !== 'requested') {
+    throw new StripeRefundError('NOT_PAYABLE', `refund ${r.refundNo} is ${r.status}`);
+  }
+  const at = await refundsAtStripe(trx, client, companyId, r);
+  const failedAtStripe = at.dead.map((x) => x.id);
+  if (at.live && r.approval !== 'approved') {
+    return {
+      outcome: 'held_unapproved',
+      stripeRefundId: at.live.id,
+      entryId: null,
+      replayed: false,
+      failedAtStripe,
+      resendable: false,
+      refund: r,
+    };
+  }
+  if (at.live) {
+    const sent = await sendOrRecord(
+      trx,
+      client,
+      {
+        companyId,
+        refundId: r.refundId,
+        now: c.now,
+        ...(c.createdBy ? { createdBy: c.createdBy } : {}),
+      },
+      opts,
+      true,
+    );
+    if (!sent) throw new Error('unreachable: Stripe holds a live refund');
+    return {
+      outcome: 'recorded',
+      stripeRefundId: sent.stripeRefundId,
+      entryId: sent.entryId,
+      replayed: false,
+      failedAtStripe,
+      resendable: false,
+      refund: sent.refund,
+    };
+  }
+  return {
+    outcome: 'not_at_stripe',
+    stripeRefundId: null,
+    entryId: null,
+    replayed: false,
+    failedAtStripe,
+    resendable:
+      r.approval === 'approved' && (await sendBlocked(trx, companyId, r.refundId, failedAtStripe)),
+    refund: r,
+  };
+}
+
+/** The normal send cannot go on (ADR-0091): its window passed, or Stripe failed its refund. */
+async function sendBlocked(
+  trx: Trx,
+  companyId: string,
+  refundId: string,
+  failedAtStripe: readonly string[],
+): Promise<boolean> {
+  if (failedAtStripe.length > 0) return true;
+  const resend = await confirmedResend(trx, companyId, refundId);
+  const age =
+    resend?.ageMs ??
+    (
+      await sql<{ ms: string }>`
+        SELECT (extract(epoch FROM clock_timestamp() - approved_at) * 1000)::bigint::text AS ms
+          FROM app.customer_refund_approval
+         WHERE company_id = ${companyId}::uuid AND refund_id = ${refundId}::uuid`.execute(trx)
+    ).rows[0]?.ms;
+  return age === undefined || Number(age) > STRIPE_REFUND_SEND_WINDOW_MS;
+}
+
+export interface StripeRefundResendView {
+  readonly resendId: string;
+  readonly refundId: string;
+  readonly status: 'requested' | 'confirmed';
+  readonly requestedBy: string;
+  readonly requestedAt: string;
+  readonly reason: string;
+  readonly confirmedBy: string | null;
+  readonly confirmedAt: string | null;
+  /** The resend's own Stripe Idempotency-Key, recorded before any call. */
+  readonly idempotencyKey: string;
+  readonly replayed: boolean;
+}
+
+async function resendOf(
+  trx: Trx,
+  companyId: string,
+  resendId: string,
+  replayed = false,
+): Promise<StripeRefundResendView | null> {
+  const row = (
+    await sql<{
+      id: string;
+      refund_id: string;
+      requested_by: string;
+      requested_at: string;
+      reason: string;
+      confirmed_by: string | null;
+      confirmed_at: string | null;
+      idempotency_key: string;
+    }>`
+      SELECT id::text, refund_id::text, requested_by::text, reason, confirmed_by::text,
+             idempotency_key,
+             to_char(requested_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS requested_at,
+             to_char(confirmed_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS confirmed_at
+        FROM app.customer_refund_stripe_resend
+       WHERE company_id = ${companyId}::uuid AND id = ${resendId}::uuid`.execute(trx)
+  ).rows[0];
+  return row
+    ? {
+        resendId: row.id,
+        refundId: row.refund_id,
+        status: row.confirmed_by ? 'confirmed' : 'requested',
+        requestedBy: row.requested_by,
+        requestedAt: row.requested_at,
+        reason: row.reason,
+        confirmedBy: row.confirmed_by,
+        confirmedAt: row.confirmed_at,
+        idempotencyKey: row.idempotency_key,
+        replayed,
+      }
+    : null;
+}
+
+/** The resend of a refund document, or RESEND_NOT_FOUND (another company's is not there). */
+export async function getStripeRefundResend(
+  trx: Trx,
+  c: { companyId: string; refundId: string; resendId: string },
+): Promise<StripeRefundResendView> {
+  const companyId = c.companyId.toLowerCase();
+  const v = UUID_RE.test(c.resendId)
+    ? await resendOf(trx, companyId, c.resendId.toLowerCase())
+    : null;
+  if (!v || v.refundId !== c.refundId.toLowerCase()) {
+    throw new StripeRefundError(
+      'RESEND_NOT_FOUND',
+      `there is no resend ${c.resendId} of this refund`,
+    );
+  }
+  return v;
+}
+
+/**
+ * Ask for a resend of an approved, requested Stripe refund document (T-0189, ADR-0091): only when
+ * its normal send is blocked (past the 23-hour window, or Stripe failed its refund) and Stripe,
+ * asked now under the party lock, holds no live refund for it (else AT_STRIPE: record it with the
+ * check). Records the resend's own key `lf-refund-v3-<resend id>`. Nothing is sent until another
+ * person confirms. A repeat by the same person for the same refund replays.
+ */
+export async function requestStripeRefundResend(
+  trx: Trx,
+  client: StripeClient,
+  c: {
+    companyId: string;
+    refundId: string;
+    resendId: string;
+    requestedBy: string;
+    reason: string;
+    now: Date;
+  },
+): Promise<StripeRefundResendView> {
+  const companyId = c.companyId.toLowerCase();
+  if (!UUID_RE.test(c.resendId) || !UUID_RE.test(c.requestedBy)) {
+    throw new StripeRefundError('INVALID_RESEND', 'the resend id and the person are uuids');
+  }
+  const reason = c.reason.trim();
+  if (reason.length < 1 || reason.length > 500) {
+    throw new StripeRefundError('INVALID_RESEND', 'the reason is 1–500 characters');
+  }
+  const resendId = c.resendId.toLowerCase();
+  const before = await getCustomerRefund(trx, companyId, c.refundId);
+  await lockCustomerRefundParty(trx, companyId, before.partyId);
+  const prior = await resendOf(trx, companyId, resendId, true);
+  if (prior) {
+    if (prior.refundId !== before.refundId || prior.requestedBy !== c.requestedBy.toLowerCase()) {
+      throw new StripeRefundError('INVALID_RESEND', `resend ${resendId} is another request`);
+    }
+    return prior;
+  }
+  const r = await getCustomerRefund(trx, companyId, before.refundId);
+  if (r.method !== 'stripe' || r.status !== 'requested') {
+    throw new StripeRefundError('NOT_PAYABLE', `refund ${r.refundNo} is ${r.status} (${r.method})`);
+  }
+  if (r.approval !== 'approved') {
+    throw new StripeRefundError(
+      'NOT_APPROVED',
+      `refund ${r.refundNo} is not approved; approve it, which sends it`,
+    );
+  }
+  const open = (
+    await sql<{ id: string }>`
+      SELECT id::text FROM app.customer_refund_stripe_resend
+       WHERE company_id = ${companyId}::uuid AND refund_id = ${r.refundId}::uuid
+         AND confirmed_by IS NULL`.execute(trx)
+  ).rows[0];
+  if (open) {
+    throw new StripeRefundError(
+      'INVALID_RESEND',
+      `refund ${r.refundNo} already has resend ${open.id} waiting for confirmation`,
+    );
+  }
+  const at = await refundsAtStripe(trx, client, companyId, r);
+  if (at.live) {
+    throw new StripeRefundError(
+      'AT_STRIPE',
+      `Stripe holds refund ${at.live.id} for refund ${r.refundNo}; it is recorded by checking with Stripe, never sent again`,
+      at.live.id,
+    );
+  }
+  if (
+    !(await sendBlocked(
+      trx,
+      companyId,
+      r.refundId,
+      at.dead.map((x) => x.id),
+    ))
+  ) {
+    throw new StripeRefundError(
+      'NOT_BLOCKED',
+      `refund ${r.refundNo} can still be sent normally (LedgerForce retries it); a resend is only for a send past 23 hours or one Stripe failed`,
+    );
+  }
+  await trx
+    .insertInto('app.customer_refund_stripe_resend')
+    .values({
+      company_id: companyId,
+      id: resendId,
+      refund_id: r.refundId,
+      requested_by: c.requestedBy.toLowerCase(),
+      reason,
+      idempotency_key: `lf-refund-v3-${resendId}`,
+    })
+    .execute();
+  const view = await resendOf(trx, companyId, resendId);
+  if (!view) throw new Error('resend not readable');
+  return view;
+}
+
+/**
+ * Confirm a resend (T-0189, ADR-0091): another person than the one who asked (SELF_CONFIRM; the
+ * database refuses it too). The caller then sends in the same transaction (the approve route's
+ * pattern: outbox event, then a savepointed send that uses the resend's key). A repeat by the
+ * same person replays; anyone else gets ALREADY_CONFIRMED.
+ */
+export async function confirmStripeRefundResend(
+  trx: Trx,
+  c: { companyId: string; refundId: string; resendId: string; confirmedBy: string },
+): Promise<StripeRefundResendView> {
+  const companyId = c.companyId.toLowerCase();
+  const confirmedBy = c.confirmedBy.toLowerCase();
+  const before = await getCustomerRefund(trx, companyId, c.refundId);
+  await lockCustomerRefundParty(trx, companyId, before.partyId);
+  const v = await getStripeRefundResend(trx, {
+    companyId,
+    refundId: before.refundId,
+    resendId: c.resendId,
+  });
+  if (v.status === 'confirmed') {
+    if (v.confirmedBy === confirmedBy) return { ...v, replayed: true };
+    throw new StripeRefundError('ALREADY_CONFIRMED', `resend ${v.resendId} is already confirmed`);
+  }
+  if (v.requestedBy === confirmedBy) {
+    throw new StripeRefundError(
+      'SELF_CONFIRM',
+      `the person who asked for resend ${v.resendId} cannot confirm it (SOD_REFUND_RESEND_SELF_CONFIRM)`,
+    );
+  }
+  const r = await getCustomerRefund(trx, companyId, before.refundId);
+  if (r.status !== 'requested') {
+    throw new StripeRefundError('NOT_PAYABLE', `refund ${r.refundNo} is ${r.status}`);
+  }
+  await trx
+    .updateTable('app.customer_refund_stripe_resend')
+    .set({ confirmed_by: confirmedBy })
+    .where('company_id', '=', companyId)
+    .where('id', '=', v.resendId)
+    .execute();
+  const after = await resendOf(trx, companyId, v.resendId);
+  if (!after) throw new Error('resend not readable');
+  return after;
 }
 
 /** The outbox event shape the handler reads (structurally @ledgerforce/outbox's OutboxEvent). */

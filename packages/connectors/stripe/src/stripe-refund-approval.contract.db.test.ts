@@ -448,8 +448,11 @@ describe('SS-UC11-10 a failed Stripe send is retried through the outbox, never r
 
     expect(await entriesFor(r.refundId)).toBe(0);
 
-    // Approved a day ago (the key may be pruned at Stripe): refused, Stripe not called.
-    const stale = await requestRefund(await seedCredit('Zeta'));
+    // Approved a day ago (the key may be pruned at Stripe): refused, nothing created. Since T-0189
+    // (ADR-0091) the send first looks at Stripe (read-only) to record a refund it may hold.
+    const zeta = await seedCredit('Zeta');
+    const stale = await requestRefund(zeta);
+    stub.vars['stalePaymentIntentId'] = zeta.paymentIntentId;
     await f.admin.query(
       `INSERT INTO app.customer_refund_approval (tenant_id, company_id, refund_id, approved_by, approved_at)
        VALUES ($1, $2, $3, $4, clock_timestamp() - interval '24 hours')`,
@@ -460,7 +463,9 @@ describe('SS-UC11-10 a failed Stripe send is retried through the outbox, never r
       .inTenant((trx) => handler.handle(trx, { ...event, aggregateId: stale.refundId }))
       .catch((e: unknown) => e as { code?: string; retryable?: boolean });
     expect(expired).toMatchObject({ code: 'KEY_EXPIRED', retryable: false });
-    expect(stub.received.length).toBe(before);
+    expect(stub.received.slice(before).map((x) => [x.method, x.matched])).toEqual([
+      ['GET', 'list-refunds-none-stale'],
+    ]);
     expect(await entriesFor(stale.refundId)).toBe(0);
   });
 });

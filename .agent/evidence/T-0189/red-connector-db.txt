@@ -1,0 +1,102 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:46829
+ ❯ |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts (8 tests | 5 failed) 2746ms
+     × SS-UC11-12 approved more than 23 h ago and found at Stripe by lf_refund_id: the retry records it once, dated the Stripe refund date; no create 131ms
+     × SS-UC11-12 R2 an unapproved document whose refund Stripe holds is reported (never recorded unapproved, never cancelled); approving it adopts, no create 125ms
+     × SS-UC11-13 approved more than 23 h ago and nothing at Stripe: KEY_EXPIRED; a resend asked by one person and confirmed by another sends once with lf-refund-v3-<resend id> 87ms
+     × SS-UC11-13 R3 Stripe reports the refund failed: never adopted (REFUND_FAILED); a confirmed resend creates a new refund with a new key, recorded once 89ms
+     × SS-UC11-13 a resend is refused while the normal send is not blocked (NOT_BLOCKED) or Stripe holds a live refund (AT_STRIPE); the database refuses a self-confirm and an unapproved document 63ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-12 T-0189 AC-1 / review r8 R2: a refund Stripe already holds is recorded once and never sent again > SS-UC11-12 approved more than 23 h ago and found at Stripe by lf_refund_id: the retry records it once, dated the Stripe refund date; no create
+StripeRefundError: refund RF-000006 was approved more than 23 hours ago; check the payment in Stripe before sending it again (T-0189)
+ ❯ sendStripeCustomerRefund packages/connectors/stripe/src/refund.ts:399:11
+    397|   ).rows[0]?.ms;
+    398|   if (age === undefined || Number(age) > STRIPE_REFUND_SEND_WINDOW_MS)…
+    399|     throw new StripeRefundError(
+       |           ^
+    400|       'KEY_EXPIRED',
+    401|       `refund ${r.refundNo} was approved more than 23 hours ago; check…
+ ❯ Object.handle packages/connectors/stripe/src/refund.ts:663:7
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:356:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-12 T-0189 AC-1 / review r8 R2: a refund Stripe already holds is recorded once and never sent again > SS-UC11-12 R2 an unapproved document whose refund Stripe holds is reported (never recorded unapproved, never cancelled); approving it adopts, no create
+TypeError: checkStripeCustomerRefund is not a function
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:397:7
+    395|     const posts = creates().length;
+    396|     const check = await f.inTenant((trx) =>
+    397|       checkStripeCustomerRefund(trx, client, {
+       |       ^
+    398|         companyId: f.companyId,
+    399|         refundId: r.refundId,
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:396:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-13 T-0189 AC-2 / review r8 R3: with no live refund at Stripe, a resend needs a second person and a new recorded key > SS-UC11-13 approved more than 23 h ago and nothing at Stripe: KEY_EXPIRED; a resend asked by one person and confirmed by another sends once with lf-refund-v3-<resend id>
+AssertionError: expected 'refund RF-000008 was approved more th…' to match /Stripe holds no refund for it/
+
+- Expected:
+/Stripe holds no refund for it/
+
++ Received:
+"refund RF-000008 was approved more than 23 hours ago; check the payment in Stripe before sending it again (T-0189)"
+
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:439:55
+    437|       .catch((e: unknown) => e as { code?: string; retryable?: boolean…
+    438|     expect(expired).toMatchObject({ code: 'KEY_EXPIRED', retryable: fa…
+    439|     expect((expired as { message?: string }).message).toMatch(/Stripe …
+       |                                                       ^
+    440|     expect(creates().length).toBe(posts);
+    441|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-13 T-0189 AC-2 / review r8 R3: with no live refund at Stripe, a resend needs a second person and a new recorded key > SS-UC11-13 R3 Stripe reports the refund failed: never adopted (REFUND_FAILED); a confirmed resend creates a new refund with a new key, recorded once
+TypeError: checkStripeCustomerRefund is not a function
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:557:7
+    555|
+    556|     const check = await f.inTenant((trx) =>
+    557|       checkStripeCustomerRefund(trx, client, {
+       |       ^
+    558|         companyId: f.companyId,
+    559|         refundId: r.refundId,
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:556:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-13 T-0189 AC-2 / review r8 R3: with no live refund at Stripe, a resend needs a second person and a new recorded key > SS-UC11-13 a resend is refused while the normal send is not blocked (NOT_BLOCKED) or Stripe holds a live refund (AT_STRIPE); the database refuses a self-confirm and an unapproved document
+AssertionError: expected 'TypeError: (0 , __vite_ssr_import_7__…' to be 'NOT_BLOCKED' // Object.is equality
+
+Expected: "NOT_BLOCKED"
+Received: "TypeError: (0 , __vite_ssr_import_7__.requestStripeRefundResend) is not a function"
+
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:636:7
+    634|         ),
+    635|       ),
+    636|     ).toBe('NOT_BLOCKED');
+       |       ^
+    637|
+    638|     // Stripe holds a live refund: record it instead.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 3 passed (8)
+   Start at  05:04:10
+   Duration  4.62s (transform 449ms, setup 0ms, import 647ms, tests 2.75s, environment 0ms)
+
