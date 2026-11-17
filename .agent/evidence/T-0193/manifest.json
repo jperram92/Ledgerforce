@@ -163,6 +163,87 @@
       "provider": "unknown",
       "timestamp": "2026-11-17T04:58:06.325Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-101850-SS-PLAT-153-bank-accounts-aba-form-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "ce7efaecf956",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T10:18:50.740Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-101851-SS-PLAT-153-bank-accounts-aba-saved-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "ce7efaecf956",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T10:18:51.885Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-101853-SS-PLAT-153-bank-accounts-archive-confirm-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "ce7efaecf956",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T10:18:53.513Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-101854-SS-PLAT-153-bank-accounts-archived-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]",
+      "commit": "ce7efaecf956",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T10:18:54.781Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-101857-SS-PLAT-153-bank-accounts-aba-form-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "ce7efaecf956-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T10:18:57.641Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-101858-SS-PLAT-153-bank-accounts-aba-saved-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "ce7efaecf956-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T10:18:58.668Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-101859-SS-PLAT-153-bank-accounts-archive-confirm-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "ce7efaecf956-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T10:18:59.838Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-101900-SS-PLAT-153-bank-accounts-archived-390.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]",
+      "commit": "ce7efaecf956-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T10:19:00.930Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-153",
+      "file": ".agent/evidence/T-0193/20261117-101904-SS-PLAT-153-bank-accounts-change-step-up-1440.png",
+      "test": "web/settings-bank-accounts-edit.spec.ts › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; \"Keep it\" archives nothing [T-0193]",
+      "commit": "ce7efaecf956-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-17T10:19:04.092Z",
+      "result": "passed"
     }
   ]
 }
