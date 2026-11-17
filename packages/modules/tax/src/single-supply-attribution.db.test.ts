@@ -13,7 +13,7 @@
  * zero. The final invoice's AR open item is the whole tax invoice with the receipts allocated.
  *
  * The golden binding system:GST_ATTRIBUTED_UNBILLED resolves through its role, bound by the
- * template to account 1230 since T-0203 (migration 0073; until then this file added a plain
+ * template to account 1230 since T-0203 (migration 0075; until then this file added a plain
  * asset account). This file proves the journal/BAS contract, not the production posting path;
  * that path is T-0203 (single-supply.db.test.ts in modules/ar) and T-0204.
  */

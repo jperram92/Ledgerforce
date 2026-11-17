@@ -28,7 +28,7 @@ const tables = approvedTables(parsePostings(readFileSync(FILE, 'utf8')));
  * Golden tables the engine cannot replay yet, with the reason and owning task. Shrinks to empty;
  * never grows silently. Empty from T-0032 (reversals replay through reverse()); T-0168 pinned
  * GP-040, GP-044a/c and GP-045 on the unbound GST_ATTRIBUTED_UNBILLED role until T-0203 bound it
- * (migration 0073, template account 1230), so it is empty again.
+ * (migration 0075, template account 1230), so it is empty again.
  */
 const PENDING: Record<string, string> = {};
 

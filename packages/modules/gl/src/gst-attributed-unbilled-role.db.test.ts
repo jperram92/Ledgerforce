@@ -1,6 +1,6 @@
 /**
  * SS-PLAT-142 / T-0203 AC-1, AC-2 — the GST_ATTRIBUTED_UNBILLED role (ADR-0089 R3, RQ-0171) is an
- * extended role (migration 0073, ADR-0061 pattern): allowed on an asset account only, bound by the
+ * extended role (migration 0075, ADR-0061 pattern): allowed on an asset account only, bound by the
  * AU services template to 1230 in app.account_system_role_ext, guarded like every bound account.
  * Runs as lf_app inside tenant transactions. Expected values come from ADR-0089, not the code.
  */

@@ -1,6 +1,6 @@
 /**
  * Single-supply contracts and their receipts (T-0203; ADR-0089 R1–R5, R8, R11; RQ-0171;
- * goldens GP-040 and GP-020; migration 0073).
+ * goldens GP-040 and GP-020; migration 0075).
  *
  * createSingleSupplyContract — records a single (non-Div 156) supply with a known GST-exclusive
  * total, one taxable tax code and the GST basis in force on the contract date, with the person
