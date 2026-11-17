@@ -1,0 +1,144 @@
+
+Running 5 tests using 2 workers
+
+[1/5] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]
+[2/5] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:382:1 › SS-PLAT-153: refusals are said in plain words and nothing changes [T-0193]
+  1) [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Change ABA details or archive an account' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'Change ABA details or archive an account' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Change ABA details or archive an account' })
+
+
+      256 |     await open(page, width);
+      257 |     const section = change(page);
+    > 258 |     await expect(section).toBeVisible();
+          |                           ^
+      259 |
+      260 |     await section
+      261 |       .getByLabel('Bank account to change')
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/tests/e2e/web/settings-bank-accounts-edit.spec.ts:258:27
+
+    Error Context: test-results/web-settings-bank-accounts-39d6f-a-confirmation-1440-T-0193--chromium/error-context.md
+
+    Error Context: test-results/web-settings-bank-accounts-39d6f-a-confirmation-1440-T-0193--chromium/error-context.md
+
+
+[3/5] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]
+  2) [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Change ABA details or archive an account' })
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'Change ABA details or archive an account' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Change ABA details or archive an account' })
+
+
+      256 |     await open(page, width);
+      257 |     const section = change(page);
+    > 258 |     await expect(section).toBeVisible();
+          |                           ^
+      259 |
+      260 |     await section
+      261 |       .getByLabel('Bank account to change')
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/tests/e2e/web/settings-bank-accounts-edit.spec.ts:258:27
+
+    Error Context: test-results/web-settings-bank-accounts-1f51b--a-confirmation-390-T-0193--chromium/error-context.md
+
+    Error Context: test-results/web-settings-bank-accounts-1f51b--a-confirmation-390-T-0193--chromium/error-context.md
+
+
+[4/5] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:346:1 › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; "Keep it" archives nothing [T-0193]
+  3) [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:382:1 › SS-PLAT-153: refusals are said in plain words and nothing changes [T-0193] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Change ABA details or archive an account' }).getByRole('button', { name: 'Save ABA details' })
+
+
+      387 |   const section = change(page);
+      388 |   // Nothing chosen or filled: the form says what is needed and sends nothing.
+    > 389 |   await section.getByRole('button', { name: 'Save ABA details' }).click();
+          |                                                                   ^
+      390 |   await expect(
+      391 |     section.getByText(
+      392 |       'Choose the bank account and fill in the APCA user id, ABA user name and bank mnemonic.',
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/tests/e2e/web/settings-bank-accounts-edit.spec.ts:389:67
+
+    Error Context: test-results/web-settings-bank-accounts-1fb98-and-nothing-changes-T-0193--chromium/error-context.md
+
+    Error Context: test-results/web-settings-bank-accounts-1fb98-and-nothing-changes-T-0193--chromium/error-context.md
+
+
+[5/5] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:420:1 › SS-PLAT-153: an Accountant sees no way to change or archive an account [T-0193]
+  4) [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:420:1 › SS-PLAT-153: an Accountant sees no way to change or archive an account [T-0193] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/Only the Owner or a Finance Admin can add bank accounts, change their ABA details or archive them/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/Only the Owner or a Finance Admin can add bank accounts, change their ABA details or archive them/) with timeout 5000ms
+      - waiting for getByText(/Only the Owner or a Finance Admin can add bank accounts, change their ABA details or archive them/)
+
+
+      430 |       /Only the Owner or a Finance Admin can add bank accounts, change their ABA details or archive them/,
+      431 |     ),
+    > 432 |   ).toBeVisible();
+          |     ^
+      433 |   expect(f.writes).toEqual([]);
+      434 |   expect(f.errors).toEqual([]);
+      435 | });
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/tests/e2e/web/settings-bank-accounts-edit.spec.ts:432:5
+
+    Error Context: test-results/web-settings-bank-accounts-9f1e3--archive-an-account-T-0193--chromium/error-context.md
+
+    Error Context: test-results/web-settings-bank-accounts-9f1e3--archive-an-account-T-0193--chromium/error-context.md
+
+
+  5) [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:346:1 › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; "Keep it" archives nothing [T-0193] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.selectOption: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Change ABA details or archive an account' }).getByLabel('Bank account to change')
+
+
+      353 |   await section
+      354 |     .getByLabel('Bank account to change')
+    > 355 |     .selectOption({ label: 'Payroll (ending 432)' });
+          |      ^
+      356 |   await section.getByLabel('APCA user id', { exact: true }).fill('654321');
+      357 |   await section.getByLabel('ABA user name', { exact: true }).fill('HARBOUR PAYROLL');
+      358 |   await section.getByLabel('Bank mnemonic', { exact: true }).fill('WBC');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/tests/e2e/web/settings-bank-accounts-edit.spec.ts:355:6
+
+    Error Context: test-results/web-settings-bank-accounts-9efb3-it-archives-nothing-T-0193--chromium/error-context.md
+
+    Error Context: test-results/web-settings-bank-accounts-9efb3-it-archives-nothing-T-0193--chromium/error-context.md
+
+
+  5 failed
+    [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193] 
+    [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193] 
+    [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:346:1 › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; "Keep it" archives nothing [T-0193] 
+    [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:382:1 › SS-PLAT-153: refusals are said in plain words and nothing changes [T-0193] 
+    [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:420:1 › SS-PLAT-153: an Accountant sees no way to change or archive an account [T-0193] 

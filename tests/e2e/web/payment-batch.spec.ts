@@ -7,7 +7,7 @@
  * step_up_required until the session has stepped up through /auth/step-up, and 403
  * sod_violation with the rule. Account numbers only ever arrive masked.
  */
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { AxeBuilder } from '@axe-core/playwright';
@@ -37,11 +37,14 @@ let origin = '';
 
 test.use({ evidenceTaskId: 'T-0087', timezoneId: 'Australia/Sydney', locale: 'en-AU' });
 
+// The worker's Vite cache is removed after its tests; left behind it fills the disk (DL-0820).
+let cacheDir = '';
+
 test.beforeAll(async () => {
   server = await createViteServer({
     root: WEB,
     configFile: false,
-    cacheDir: mkdtempSync(join(tmpdir(), 'lf-web-')),
+    cacheDir: (cacheDir = mkdtempSync(join(tmpdir(), 'lf-web-'))),
     logLevel: 'error',
     server: { host: '127.0.0.1', port: 0, strictPort: false, hmr: false },
   });
@@ -53,6 +56,7 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
   await server?.close();
+  if (cacheDir) rmSync(cacheDir, { recursive: true, force: true });
 });
 
 interface Fake {

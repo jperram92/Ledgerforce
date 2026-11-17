@@ -194,10 +194,24 @@ describe('SS-PLAT-39: Company bank account bound to a bank GL account, number en
         `${column}=${value}`,
       ).rejects.toMatchObject({ code: '23514' });
     }
-    // ...and lf_app may not change the payment identity of an account in place at all.
-    await expect(
-      inTenant((trx) => sql`UPDATE app.bank_account SET apca_user_id = '999999'`.execute(trx)),
-    ).rejects.toMatchObject({ code: '42501' });
+    // ...and lf_app may not change the payment identity of an account in place at all. Since
+    // ADR-0094 (T-0193, DL-0801) the ABA header (APCA user id, user name, FI mnemonic) is
+    // editable; every column that says where money comes from or returns to is not.
+    for (const [column, value] of [
+      ['bsb', sql`'063-000'`],
+      ['account_name', sql`'Someone Else'`],
+      ['account_number_last3', sql`'999'`],
+      ['account_number_ct', sql`'\\x00'::bytea`],
+      ['currency', sql`'USD'`],
+      ['gl_account_id', sql`gl_account_id`],
+    ] as const) {
+      await expect(
+        inTenant((trx) =>
+          sql`UPDATE app.bank_account SET ${sql.ref(column)} = ${value}`.execute(trx),
+        ),
+        column,
+      ).rejects.toMatchObject({ code: '42501' });
+    }
   });
 
   it('lf_app cannot delete a bank account, statement or line', async () => {

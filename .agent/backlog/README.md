@@ -17,8 +17,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 140 |
-| todo | 27 |
-| verifying | 8 |
+| todo | 26 |
+| verifying | 9 |
 | **total** | **186** |
 
 | Phase | Cards |
@@ -225,7 +225,7 @@ graph LR
 | [T-0176](T-0176.md) | UI: settings forms for setup wizard steps 1 and 3 (steps 4, 8, 10 → T-0185, T-0186) — split from T-0091 | MVP | verifying | T-0091 | — | 0 |
 | [T-0185](T-0185.md) | UI: bank accounts settings screen (wizard step 4) — split from T-0176 | MVP | verifying | T-0176 | — | 0 |
 | [T-0186](T-0186.md) | UI: numbering and billing (step 8) and approval amounts (step 10) settings screens — split from T-0176 | MVP | todo | T-0176 | — | 0 |
-| [T-0193](T-0193.md) | Bank: change ABA details or archive a company bank account over HTTP — found in T-0185 | MVP | todo | T-0185 | — | 0 |
+| [T-0193](T-0193.md) | Bank: change ABA details or archive a company bank account over HTTP — found in T-0185 | MVP | verifying | T-0185 | — | 0 |
 | [T-0185](T-0185.md) | UI: bank accounts settings screen (wizard step 4) — split from T-0176 | MVP | todo | T-0176 | — | 0 |
 | [T-0186](T-0186.md) | UI: numbering and billing (step 8) and approval amounts (step 10) settings screens — split from T-0176 | MVP | verifying | T-0176 | — | 0 |
 | [T-0195](T-0195.md) | UI: invoice logo, accent colour and Stripe payout accounts on the Numbering and billing screen — split from T-0186 | MVP | todo | T-0186 | — | 0 |

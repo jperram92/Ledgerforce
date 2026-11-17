@@ -1,0 +1,890 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41479
+[db] test PostgreSQL ready (local) on 127.0.0.1:41393
+(node:32281) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[31m[Nest] 32281  - [39m11/17/2026, 10:19:33 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204866[39m,
+  length: [33m204866[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 32281  - [39m11/17/2026, 10:19:34 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204863[39m,
+  length: [33m204863[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 32281  - [39m11/17/2026, 10:19:34 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204866[39m,
+  length: [33m204866[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+[31m[Nest] 32329  - [39m11/17/2026, 10:19:37 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: SoD: subject type bill has no create step for a reported creator
+    at historyOf [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/sod/sod.service.ts:67:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at checkSod [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/sod/sod.service.ts:186:19[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/tenancy/tenant.interceptor.ts:140:26
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+[31m[Nest] 32347  - [39m11/17/2026, 10:19:42 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/ar/refunds-stripe.db.test.ts:567:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+[31m[Nest] 32347  - [39m11/17/2026, 10:19:43 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/ar/refunds-stripe.db.test.ts:567:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+(node:32469) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[31m[Nest] 32469  - [39m11/17/2026, 10:19:56 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39merror: permission denied for table job_common
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/pg@8.23.1/node_modules/[4mpg[24m/lib/client.js:694:17
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:118:28[90m)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
+    at async #run [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
+    at async DefaultQueryExecutor.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
+    at async Transaction.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:545:16[90m)[39m
+    at async Object.executeSql [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/adapters/kysely.js:4:28[90m)[39m
+    at async #createJob [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/manager.js:1372:32[90m)[39m
+    at PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:131:41[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
+    at async #run [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
+    at async DefaultQueryExecutor.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
+    at async Transaction.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:545:16[90m)[39m
+    at async Object.executeSql [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/adapters/kysely.js:4:28[90m)[39m
+    at async #createJob [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/manager.js:1372:32[90m)[39m
+    at async Telemetry.send [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/pg-boss@12.37.1_@opentelemetry+api@1.9.1/node_modules/[4mpg-boss[24m/dist/telemetry.js:189:28[90m)[39m {
+  length: [33m98[39m,
+  severity: [32m'ERROR'[39m,
+  code: [32m'42501'[39m,
+  detail: [90mundefined[39m,
+  hint: [90mundefined[39m,
+  position: [90mundefined[39m,
+  internalPosition: [90mundefined[39m,
+  internalQuery: [90mundefined[39m,
+  where: [90mundefined[39m,
+  schema: [90mundefined[39m,
+  table: [90mundefined[39m,
+  column: [90mundefined[39m,
+  dataType: [90mundefined[39m,
+  constraint: [90mundefined[39m,
+  file: [32m'aclchk.c'[39m,
+  line: [32m'2812'[39m,
+  routine: [32m'aclcheck_error'[39m
+}
+(node:703) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:753) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:1163) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[31m[Nest] 2332  - [39m11/17/2026, 10:21:53 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204801[39m,
+  length: [33m204801[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+(node:5048) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ ❯ |db| packages/db/src/user-lifecycle.db.test.ts (0 test)
+ ❯ |db| packages/connectors/salesforce/src/reconcile/sf-nightly-recon.db.test.ts (3 tests | 3 skipped) 33ms
+ ❯ |db| packages/modules/setup/src/opening-balances.db.test.ts (14 tests | 14 skipped) 480ms
+ ❯ |db| packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts (7 tests | 7 skipped) 90ms
+ ❯ |db| packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts (0 test)
+ ❯ |db| packages/modules/bank/src/reconciliation.db.test.ts (9 tests | 9 skipped) 50ms
+ ❯ |db| packages/ledger/src/account-balance.db.test.ts (9 tests | 9 skipped) 90ms
+ ❯ |db| packages/modules/ar/src/invoice.lifecycle.db.test.ts (9 tests | 9 skipped) 9ms
+ ❯ |db| packages/ledger/src/ledger.invariants.db.test.ts (1 test | 1 skipped) 7ms
+ ❯ |db| packages/modules/bank/src/statements.db.test.ts (13 tests | 13 skipped) 14ms
+ ❯ |db| packages/ledger/src/period-control.db.test.ts (10 tests | 10 skipped) 20ms
+ ❯ |db| packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts (10 tests | 10 skipped) 10ms
+ ❯ |db| packages/connectors/salesforce/src/connection-store.db.test.ts (12 tests | 12 skipped) 12ms
+ ❯ |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts (8 tests | 8 skipped) 10ms
+ ❯ |db| packages/modules/ar/src/refunds.db.test.ts (6 tests | 6 skipped) 7ms
+ ❯ |db| packages/modules/ap/src/payment-confirmation.db.test.ts (12 tests | 12 skipped) 10ms
+ ❯ |db| packages/modules/documents/src/invoice-pdf.db.test.ts (10 tests | 10 skipped) 10ms
+ ❯ |db| packages/db/src/sod.db.test.ts (9 tests | 9 skipped) 14ms
+ ❯ |db| packages/modules/journals/src/manual-journal.approval.db.test.ts (10 tests | 10 skipped) 11ms
+ ❯ |db| apps/worker/src/salesforce-writeback.outage.db.test.ts (4 tests | 4 skipped) 9ms
+ ❯ |db| packages/modules/email/src/invoice-email.db.test.ts (6 tests | 6 skipped) 13ms
+ ❯ |db| packages/connectors/stripe/src/stripe-link.contract.db.test.ts (5 tests | 5 skipped) 20ms
+ ❯ |db| packages/modules/setup/src/opening-balances.fx.db.test.ts (7 tests | 7 skipped) 10ms
+ ❯ |db| packages/ledger/src/engine.preview.prop.db.test.ts (2 tests | 2 skipped) 17ms
+ ❯ |db| packages/ledger/src/hash-chain.db.test.ts (11 tests | 11 skipped) 11ms
+ ❯ |db| packages/ledger/src/dimension-set.db.test.ts (14 tests | 14 skipped) 16ms
+ ❯ |db| packages/modules/setup/src/wizard-settings.db.test.ts (8 tests | 8 skipped) 7ms
+ ❯ |db| packages/ledger/src/engine.preview.db.test.ts (5 tests | 5 skipped) 10ms
+ ❯ |db| packages/modules/ar/src/remittance-account.db.test.ts (9 tests | 9 skipped) 7ms
+ ❯ |db| packages/modules/ar/src/remittance-account-notice.db.test.ts (6 tests | 6 skipped) 7ms
+ ❯ |db| packages/modules/tax/src/single-supply-attribution.db.test.ts (6 tests | 6 skipped) 7ms
+ ❯ |db| packages/db/src/audit-read.db.test.ts (9 tests | 9 skipped) 11ms
+ ❯ |db| packages/modules/parties/src/parties.db.test.ts (12 tests | 12 skipped) 12ms
+ ❯ |db| packages/modules/ap/src/inbox-mailbox.db.test.ts (6 tests | 6 skipped) 8ms
+ ❯ |db| packages/modules/reporting/src/reports.gl-detail.db.test.ts (5 tests | 5 skipped) 8ms
+ ❯ |db| packages/ledger/src/journal-immutability.db.test.ts (17 tests | 17 skipped) 25ms
+ ❯ |db| packages/ledger/src/golden/golden-engine.db.test.ts (2 tests | 2 skipped) 7ms
+ ❯ |db| packages/modules/gl/src/period-end-roles.db.test.ts (8 tests | 8 skipped) 14ms
+ ❯ |db| packages/modules/bank/src/camt-extensions.db.test.ts (9 tests | 9 skipped) 12ms
+ ❯ |db| packages/modules/ar/src/prepayments.db.test.ts (5 tests | 5 skipped) 10ms
+ ❯ |db| apps/worker/src/salesforce-inbound.issues.db.test.ts (2 tests | 2 skipped) 8ms
+ ❯ |db| packages/ledger/src/reversal.db.test.ts (4 tests | 4 skipped) 11ms
+ ❯ |db| packages/modules/bank/src/remittance.db.test.ts (6 tests | 6 skipped) 11ms
+ ❯ |db| packages/ledger/src/control-accounts.db.test.ts (5 tests | 5 skipped) 10ms
+ ❯ |db| apps/worker/src/setup/setup.db.test.ts (8 tests | 8 skipped) 9ms
+ ❯ |db| packages/modules/ar/src/credit-note.db.test.ts (5 tests | 5 skipped) 10ms
+ ❯ |db| packages/ledger/src/subledger.prop.db.test.ts (1 test | 1 skipped) 12ms
+ ❯ |db| packages/modules/ar/src/receipts.db.test.ts (4 tests | 4 skipped) 11ms
+ ❯ |db| packages/db/src/platform.db.test.ts (17 tests | 17 skipped) 11ms
+ ❯ |db| packages/modules/tax/src/bas.db.test.ts (5 tests | 5 skipped) 11ms
+ ❯ |db| packages/modules/tax/src/tax-codes.db.test.ts (7 tests | 7 skipped) 8ms
+ ❯ |db| packages/modules/ap/src/remittance.db.test.ts (2 tests | 2 skipped) 12ms
+ ❯ |db| packages/ledger/src/numbering.db.test.ts (8 tests | 8 skipped) 11ms
+ ❯ |db| packages/ledger/src/engine.idempotency.db.test.ts (7 tests | 7 skipped) 14ms
+ ❯ |db| packages/modules/ap/src/aged.db.test.ts (3 tests | 3 skipped) 11ms
+ ❯ |db| apps/worker/src/outbox.delivery.db.test.ts (4 tests | 4 skipped) 12ms
+ ❯ |db| packages/connectors/stripe/src/payout.db.test.ts (5 tests | 5 skipped) 17ms
+ ❯ |db| packages/modules/ar/src/ar-cash.db.test.ts (3 tests | 3 skipped) 7ms
+ ❯ |db| packages/outbox/src/outbox.db.test.ts (7 tests | 7 skipped) 9ms
+ ❯ |db| packages/ledger/src/journal-balance.db.test.ts (9 tests | 9 skipped) 9ms
+ ❯ |db| packages/modules/ar/src/batch.post.db.test.ts (5 tests | 5 skipped) 7ms
+ ❯ |db| packages/db/src/user-role.db.test.ts (10 tests | 10 skipped) 9ms
+ ❯ |db| packages/modules/ar/src/write-off.db.test.ts (4 tests | 4 skipped) 12ms
+ ❯ |db| apps/worker/src/daily-jobs.db.test.ts (8 tests | 8 skipped) 9ms
+ ❯ |db| packages/modules/parties/src/bank-accounts.db.test.ts (6 tests | 6 skipped) 9ms
+ ❯ |db| packages/ledger/src/account-balance.prop.db.test.ts (2 tests | 2 skipped) 10ms
+ ❯ |db| packages/modules/products/src/products.db.test.ts (7 tests | 7 skipped) 7ms
+ ❯ |db| packages/modules/ap/src/payment-batches.db.test.ts (5 tests | 5 skipped) 8ms
+ ❯ |db| packages/modules/ar/src/batch.preview.db.test.ts (3 tests | 3 skipped) 8ms
+ ❯ |db| apps/worker/src/batch-jobs.db.test.ts (6 tests | 6 skipped) 7ms
+ ❯ |db| packages/modules/products/src/matrix-view.db.test.ts (5 tests | 5 skipped) 7ms
+ ❯ |db| packages/modules/reporting/src/reports.prop.db.test.ts (1 test | 1 skipped) 11ms
+ ❯ |db| packages/modules/ap/src/bills.db.test.ts (4 tests | 4 skipped) 11ms
+ ❯ |db| packages/modules/ap/src/inbox.db.test.ts (3 tests | 3 skipped) 8ms
+ ❯ |db| packages/modules/ar/src/gross-allowance.db.test.ts (1 test | 1 failed) 17ms
+   × SS-PLAT-106 GP-039 preserves the residual until reassessment and reports relief only on accruals 15ms
+ ❯ |db| packages/modules/ar/src/aged.db.test.ts (3 tests | 3 skipped) 8ms
+ ❯ |db| packages/modules/products/src/matrix.db.test.ts (8 tests | 8 skipped) 14ms
+ ❯ |db| apps/worker/src/security-notices.db.test.ts (4 tests | 4 skipped) 20ms
+ ❯ |db| packages/modules/ar/src/reminder-pause.db.test.ts (8 tests | 8 skipped) 11ms
+ ❯ |db| packages/modules/gl/src/chart.db.test.ts (10 tests | 10 skipped) 10ms
+ ❯ |db| apps/worker/src/inbox-poll-jobs.db.test.ts (3 tests | 3 skipped) 9ms
+ ❯ |db| packages/modules/ar/src/reminders.db.test.ts (5 tests | 5 skipped) 12ms
+ ❯ |db| packages/modules/gl/src/rebind.db.test.ts (5 tests | 5 skipped) 10ms
+ ❯ |db| packages/modules/ar/src/write-off-role.db.test.ts (3 tests | 3 skipped) 11ms
+ ❯ |db| packages/modules/ap/src/payment-confirmation.prop.db.test.ts (1 test | 1 skipped) 21ms
+ ❯ |db| packages/modules/ar/src/payment-terms.db.test.ts (6 tests | 6 skipped) 11ms
+ ❯ |db| packages/modules/reporting/src/close-checklist.db.test.ts (6 tests | 6 skipped) 8ms
+ ❯ |db| packages/modules/email/src/reminder-email.db.test.ts (2 tests | 2 skipped) 13ms
+ ❯ |db| packages/db/src/rls.db.test.ts (0 test)
+ ❯ |db| packages/db/src/bank-account-aba.db.test.ts (3 tests | 3 skipped) 13ms
+ ❯ |db| packages/ledger/src/account-movements.db.test.ts (4 tests | 4 skipped) 11ms
+ ❯ |db| packages/ledger/src/posting-invariants.prop.db.test.ts (2 tests | 2 skipped) 14ms
+ ❯ |db| packages/modules/ap/src/bank-match.db.test.ts (1 test | 1 skipped) 11ms
+ ❯ |db| packages/db/src/migrate.db.test.ts (7 tests | 7 failed) 67ms
+     × applies pending migrations in order and records version, checksum and role 50ms
+     × is idempotent: a second run applies nothing 3ms
+     × applies only the new migration when one is added 2ms
+     × refuses to run when an applied migration was edited (checksum changed) 2ms
+     × refuses to run when an applied migration file has disappeared 2ms
+     × rolls back a failing migration completely and does not record it 1ms
+     × refuses policy-violating migrations before touching the database 1ms
+ ❯ |db| packages/ledger/src/number-series.db.test.ts (4 tests | 4 skipped) 10ms
+ ❯ |db| packages/modules/email/src/batch-email.db.test.ts (1 test | 1 skipped) 40ms
+ ❯ |db| packages/db/src/tenant-context.db.test.ts (6 tests | 6 skipped) 9ms
+ ❯ |db| packages/modules/ap/src/aba-export.db.test.ts (2 tests | 2 skipped) 14ms
+ ❯ |db| packages/outbox/src/preview.db.test.ts (1 test | 1 skipped) 7ms
+ ❯ |db| apps/worker/src/queue-admin.db.test.ts (2 tests | 2 skipped) 8ms
+ ❯ |db| packages/db/src/company-abn.db.test.ts (2 tests | 2 skipped) 9ms
+ ❯ |db| packages/db/src/ecl-setting-deprecated.db.test.ts (1 test | 1 skipped) 25ms
+
+⎯⎯⎯⎯⎯ Failed Suites 101 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/db/src/audit-read.db.test.ts [ packages/db/src/audit-read.db.test.ts ]
+ FAIL  |db| packages/db/src/bank-account-aba.db.test.ts [ packages/db/src/bank-account-aba.db.test.ts ]
+ FAIL  |db| packages/db/src/company-abn.db.test.ts [ packages/db/src/company-abn.db.test.ts ]
+ FAIL  |db| packages/db/src/ecl-setting-deprecated.db.test.ts [ packages/db/src/ecl-setting-deprecated.db.test.ts ]
+ FAIL  |db| packages/db/src/platform.db.test.ts [ packages/db/src/platform.db.test.ts ]
+ FAIL  |db| packages/db/src/rls.db.test.ts [ packages/db/src/rls.db.test.ts ]
+ FAIL  |db| packages/db/src/sod.db.test.ts [ packages/db/src/sod.db.test.ts ]
+ FAIL  |db| packages/db/src/tenant-context.db.test.ts [ packages/db/src/tenant-context.db.test.ts ]
+ FAIL  |db| packages/db/src/user-role.db.test.ts [ packages/db/src/user-role.db.test.ts ]
+ FAIL  |db| packages/ledger/src/account-balance.prop.db.test.ts [ packages/ledger/src/account-balance.prop.db.test.ts ]
+ FAIL  |db| packages/ledger/src/account-movements.db.test.ts [ packages/ledger/src/account-movements.db.test.ts ]
+ FAIL  |db| packages/ledger/src/control-accounts.db.test.ts [ packages/ledger/src/control-accounts.db.test.ts ]
+ FAIL  |db| packages/ledger/src/dimension-set.db.test.ts [ packages/ledger/src/dimension-set.db.test.ts ]
+ FAIL  |db| packages/ledger/src/engine.idempotency.db.test.ts [ packages/ledger/src/engine.idempotency.db.test.ts ]
+ FAIL  |db| packages/ledger/src/engine.preview.db.test.ts [ packages/ledger/src/engine.preview.db.test.ts ]
+ FAIL  |db| packages/ledger/src/engine.preview.prop.db.test.ts [ packages/ledger/src/engine.preview.prop.db.test.ts ]
+ FAIL  |db| packages/ledger/src/hash-chain.db.test.ts [ packages/ledger/src/hash-chain.db.test.ts ]
+ FAIL  |db| packages/ledger/src/journal-balance.db.test.ts [ packages/ledger/src/journal-balance.db.test.ts ]
+ FAIL  |db| packages/ledger/src/journal-immutability.db.test.ts [ packages/ledger/src/journal-immutability.db.test.ts ]
+ FAIL  |db| packages/ledger/src/ledger.invariants.db.test.ts [ packages/ledger/src/ledger.invariants.db.test.ts ]
+ FAIL  |db| packages/ledger/src/number-series.db.test.ts [ packages/ledger/src/number-series.db.test.ts ]
+ FAIL  |db| packages/ledger/src/numbering.db.test.ts [ packages/ledger/src/numbering.db.test.ts ]
+ FAIL  |db| packages/ledger/src/period-control.db.test.ts [ packages/ledger/src/period-control.db.test.ts ]
+ FAIL  |db| packages/ledger/src/posting-invariants.prop.db.test.ts [ packages/ledger/src/posting-invariants.prop.db.test.ts ]
+ FAIL  |db| packages/ledger/src/reversal.db.test.ts [ packages/ledger/src/reversal.db.test.ts ]
+ FAIL  |db| packages/ledger/src/subledger.prop.db.test.ts [ packages/ledger/src/subledger.prop.db.test.ts ]
+ FAIL  |db| packages/outbox/src/outbox.db.test.ts [ packages/outbox/src/outbox.db.test.ts ]
+ FAIL  |db| packages/outbox/src/preview.db.test.ts [ packages/outbox/src/preview.db.test.ts ]
+ FAIL  |db| apps/worker/src/batch-jobs.db.test.ts [ apps/worker/src/batch-jobs.db.test.ts ]
+ FAIL  |db| apps/worker/src/daily-jobs.db.test.ts [ apps/worker/src/daily-jobs.db.test.ts ]
+ FAIL  |db| apps/worker/src/inbox-poll-jobs.db.test.ts [ apps/worker/src/inbox-poll-jobs.db.test.ts ]
+ FAIL  |db| apps/worker/src/outbox.delivery.db.test.ts [ apps/worker/src/outbox.delivery.db.test.ts ]
+ FAIL  |db| apps/worker/src/queue-admin.db.test.ts [ apps/worker/src/queue-admin.db.test.ts ]
+ FAIL  |db| apps/worker/src/salesforce-inbound.issues.db.test.ts [ apps/worker/src/salesforce-inbound.issues.db.test.ts ]
+ FAIL  |db| apps/worker/src/salesforce-writeback.outage.db.test.ts [ apps/worker/src/salesforce-writeback.outage.db.test.ts ]
+ FAIL  |db| apps/worker/src/security-notices.db.test.ts [ apps/worker/src/security-notices.db.test.ts ]
+ FAIL  |db| packages/connectors/salesforce/src/connection-store.db.test.ts [ packages/connectors/salesforce/src/connection-store.db.test.ts ]
+ FAIL  |db| packages/connectors/stripe/src/payout.db.test.ts [ packages/connectors/stripe/src/payout.db.test.ts ]
+ FAIL  |db| packages/connectors/stripe/src/stripe-link.contract.db.test.ts [ packages/connectors/stripe/src/stripe-link.contract.db.test.ts ]
+ FAIL  |db| packages/ledger/src/golden/golden-engine.db.test.ts [ packages/ledger/src/golden/golden-engine.db.test.ts ]
+ FAIL  |db| packages/modules/ap/src/aba-export.db.test.ts [ packages/modules/ap/src/aba-export.db.test.ts ]
+ FAIL  |db| packages/modules/ap/src/aged.db.test.ts [ packages/modules/ap/src/aged.db.test.ts ]
+ FAIL  |db| packages/modules/ap/src/bank-match.db.test.ts [ packages/modules/ap/src/bank-match.db.test.ts ]
+ FAIL  |db| packages/modules/ap/src/bills.db.test.ts [ packages/modules/ap/src/bills.db.test.ts ]
+ FAIL  |db| packages/modules/ap/src/inbox-mailbox.db.test.ts [ packages/modules/ap/src/inbox-mailbox.db.test.ts ]
+ FAIL  |db| packages/modules/ap/src/inbox.db.test.ts [ packages/modules/ap/src/inbox.db.test.ts ]
+ FAIL  |db| packages/modules/ap/src/payment-batches.db.test.ts [ packages/modules/ap/src/payment-batches.db.test.ts ]
+ FAIL  |db| packages/modules/ap/src/payment-confirmation.db.test.ts [ packages/modules/ap/src/payment-confirmation.db.test.ts ]
+ FAIL  |db| packages/modules/ap/src/payment-confirmation.prop.db.test.ts [ packages/modules/ap/src/payment-confirmation.prop.db.test.ts ]
+ FAIL  |db| packages/modules/ap/src/remittance.db.test.ts [ packages/modules/ap/src/remittance.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/aged.db.test.ts [ packages/modules/ar/src/aged.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/ar-cash.db.test.ts [ packages/modules/ar/src/ar-cash.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/batch.post.db.test.ts [ packages/modules/ar/src/batch.post.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/batch.preview.db.test.ts [ packages/modules/ar/src/batch.preview.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/credit-note.db.test.ts [ packages/modules/ar/src/credit-note.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/payment-terms.db.test.ts [ packages/modules/ar/src/payment-terms.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/prepayments.db.test.ts [ packages/modules/ar/src/prepayments.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/receipts.db.test.ts [ packages/modules/ar/src/receipts.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/refunds.db.test.ts [ packages/modules/ar/src/refunds.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/reminder-pause.db.test.ts [ packages/modules/ar/src/reminder-pause.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/reminders.db.test.ts [ packages/modules/ar/src/reminders.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/remittance-account-notice.db.test.ts [ packages/modules/ar/src/remittance-account-notice.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/remittance-account.db.test.ts [ packages/modules/ar/src/remittance-account.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/write-off-role.db.test.ts [ packages/modules/ar/src/write-off-role.db.test.ts ]
+ FAIL  |db| packages/modules/ar/src/write-off.db.test.ts [ packages/modules/ar/src/write-off.db.test.ts ]
+ FAIL  |db| packages/modules/bank/src/camt-extensions.db.test.ts [ packages/modules/bank/src/camt-extensions.db.test.ts ]
+ FAIL  |db| packages/modules/bank/src/remittance.db.test.ts [ packages/modules/bank/src/remittance.db.test.ts ]
+ FAIL  |db| packages/modules/bank/src/statements.db.test.ts [ packages/modules/bank/src/statements.db.test.ts ]
+ FAIL  |db| packages/modules/documents/src/invoice-pdf.db.test.ts [ packages/modules/documents/src/invoice-pdf.db.test.ts ]
+ FAIL  |db| packages/modules/email/src/batch-email.db.test.ts [ packages/modules/email/src/batch-email.db.test.ts ]
+ FAIL  |db| packages/modules/email/src/invoice-email.db.test.ts [ packages/modules/email/src/invoice-email.db.test.ts ]
+ FAIL  |db| packages/modules/email/src/reminder-email.db.test.ts [ packages/modules/email/src/reminder-email.db.test.ts ]
+ FAIL  |db| packages/modules/gl/src/chart.db.test.ts [ packages/modules/gl/src/chart.db.test.ts ]
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts [ packages/modules/gl/src/period-end-roles.db.test.ts ]
+ FAIL  |db| packages/modules/gl/src/rebind.db.test.ts [ packages/modules/gl/src/rebind.db.test.ts ]
+ FAIL  |db| packages/modules/journals/src/manual-journal.approval.db.test.ts [ packages/modules/journals/src/manual-journal.approval.db.test.ts ]
+ FAIL  |db| packages/modules/parties/src/bank-accounts.db.test.ts [ packages/modules/parties/src/bank-accounts.db.test.ts ]
+ FAIL  |db| packages/modules/parties/src/parties.db.test.ts [ packages/modules/parties/src/parties.db.test.ts ]
+ FAIL  |db| packages/modules/products/src/matrix-view.db.test.ts [ packages/modules/products/src/matrix-view.db.test.ts ]
+ FAIL  |db| packages/modules/products/src/matrix.db.test.ts [ packages/modules/products/src/matrix.db.test.ts ]
+ FAIL  |db| packages/modules/products/src/products.db.test.ts [ packages/modules/products/src/products.db.test.ts ]
+ FAIL  |db| packages/modules/reporting/src/close-checklist.db.test.ts [ packages/modules/reporting/src/close-checklist.db.test.ts ]
+ FAIL  |db| packages/modules/reporting/src/reports.gl-detail.db.test.ts [ packages/modules/reporting/src/reports.gl-detail.db.test.ts ]
+ FAIL  |db| packages/modules/reporting/src/reports.prop.db.test.ts [ packages/modules/reporting/src/reports.prop.db.test.ts ]
+ FAIL  |db| packages/modules/setup/src/opening-balances.fx.db.test.ts [ packages/modules/setup/src/opening-balances.fx.db.test.ts ]
+ FAIL  |db| packages/modules/setup/src/wizard-settings.db.test.ts [ packages/modules/setup/src/wizard-settings.db.test.ts ]
+ FAIL  |db| packages/modules/tax/src/bas.db.test.ts [ packages/modules/tax/src/bas.db.test.ts ]
+ FAIL  |db| packages/modules/tax/src/single-supply-attribution.db.test.ts [ packages/modules/tax/src/single-supply-attribution.db.test.ts ]
+ FAIL  |db| packages/modules/tax/src/tax-codes.db.test.ts [ packages/modules/tax/src/tax-codes.db.test.ts ]
+ FAIL  |db| apps/worker/src/setup/setup.db.test.ts [ apps/worker/src/setup/setup.db.test.ts ]
+ FAIL  |db| packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts [ packages/connectors/salesforce/src/inbound/sf-inbound.idempotency.db.test.ts ]
+ FAIL  |db| packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts [ packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts ]
+Error: connect ECONNREFUSED 127.0.0.1:41393
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/142]⎯
+
+ FAIL  |db| packages/db/src/audit-read.db.test.ts [ packages/db/src/audit-read.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/db/src/audit-read.db.test.ts:147:12
+    145|
+    146| afterAll(async () => {
+    147|   await db.destroy();
+       |            ^
+    148|   await tdb.close();
+    149| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/142]⎯
+
+ FAIL  |db| packages/db/src/bank-account-aba.db.test.ts [ packages/db/src/bank-account-aba.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/db/src/bank-account-aba.db.test.ts:95:12
+     93|
+     94| afterAll(async () => {
+     95|   await db.destroy();
+       |            ^
+     96|   await tdb.close();
+     97| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/142]⎯
+
+ FAIL  |db| packages/db/src/company-abn.db.test.ts [ packages/db/src/company-abn.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/db/src/company-abn.db.test.ts:26:12
+     24|
+     25| afterAll(async () => {
+     26|   await db.destroy();
+       |            ^
+     27|   await tdb.close();
+     28| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/142]⎯
+
+ FAIL  |db| packages/db/src/migrate.db.test.ts [ packages/db/src/migrate.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'end')
+ ❯ packages/db/src/migrate.db.test.ts:21:16
+     19|
+     20| afterAll(async () => {
+     21|   await client.end().catch(() => undefined);
+       |                ^
+     22|   await tdb.close();
+     23| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/142]⎯
+
+ FAIL  |db| packages/db/src/platform.db.test.ts [ packages/db/src/platform.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/db/src/platform.db.test.ts:24:13
+     22| });
+     23| afterAll(async () => {
+     24|   await tdb.close();
+       |             ^
+     25| });
+     26|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/142]⎯
+
+ FAIL  |db| packages/db/src/sod.db.test.ts [ packages/db/src/sod.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/db/src/sod.db.test.ts:118:12
+    116|
+    117| afterAll(async () => {
+    118|   await db.destroy();
+       |            ^
+    119|   await tdb.close();
+    120| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/142]⎯
+
+ FAIL  |db| packages/db/src/tenant-context.db.test.ts [ packages/db/src/tenant-context.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/db/src/tenant-context.db.test.ts:42:12
+     40|
+     41| afterAll(async () => {
+     42|   await db.destroy();
+       |            ^
+     43|   await tdb.close();
+     44| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/142]⎯
+
+ FAIL  |db| packages/db/src/user-lifecycle.db.test.ts [ packages/db/src/user-lifecycle.db.test.ts ]
+Error: ENOSPC: no space left on device, write
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/142]⎯
+
+ FAIL  |db| packages/db/src/user-role.db.test.ts [ packages/db/src/user-role.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/db/src/user-role.db.test.ts:65:12
+     63|
+     64| afterAll(async () => {
+     65|   await db.destroy();
+       |            ^
+     66|   await tdb.close();
+     67| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/142]⎯
+
+ FAIL  |db| packages/ledger/src/account-balance.db.test.ts [ packages/ledger/src/account-balance.db.test.ts ]
+error: could not write to file "pg_wal/xlogtemp.5437": No space left on device
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ createTestDatabase packages/db/src/testing/test-db.ts:48:5
+     46|   await root.connect();
+     47|   try {
+     48|     await root.query(`CREATE DATABASE ${name}`);
+       |     ^
+     49|   } finally {
+     50|     await root.end();
+ ❯ createLedgerFixture packages/ledger/src/testing/journal-fixture.ts:70:15
+ ❯ packages/ledger/src/account-balance.db.test.ts:81:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/142]⎯
+
+ FAIL  |db| packages/ledger/src/account-balance.db.test.ts [ packages/ledger/src/account-balance.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/ledger/src/account-balance.db.test.ts:105:15
+    103|
+    104| afterAll(async () => {
+    105|   await owner.destroy();
+       |               ^
+    106|   await f.close();
+    107| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/142]⎯
+
+ FAIL  |db| packages/ledger/src/account-balance.prop.db.test.ts [ packages/ledger/src/account-balance.prop.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/ledger/src/account-balance.prop.db.test.ts:136:11
+    134|
+    135| afterAll(async () => {
+    136|   await f.close();
+       |           ^
+    137| });
+    138|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/142]⎯
+
+ FAIL  |db| packages/ledger/src/account-movements.db.test.ts [ packages/ledger/src/account-movements.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/ledger/src/account-movements.db.test.ts:116:11
+    114|
+    115| afterAll(async () => {
+    116|   await f.close();
+       |           ^
+    117| });
+    118|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/142]⎯
+
+ FAIL  |db| packages/ledger/src/control-accounts.db.test.ts [ packages/ledger/src/control-accounts.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/ledger/src/control-accounts.db.test.ts:91:11
+     89|
+     90| afterAll(async () => {
+     91|   await f.close();
+       |           ^
+     92| });
+     93|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/142]⎯
+
+ FAIL  |db| packages/ledger/src/dimension-set.db.test.ts [ packages/ledger/src/dimension-set.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/ledger/src/dimension-set.db.test.ts:90:12
+     88|
+     89| afterAll(async () => {
+     90|   await db.destroy();
+       |            ^
+     91|   await tdb.close();
+     92| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/142]⎯
+
+ FAIL  |db| packages/ledger/src/engine.idempotency.db.test.ts [ packages/ledger/src/engine.idempotency.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/ledger/src/engine.idempotency.db.test.ts:68:14
+     66|
+     67| afterAll(async () => {
+     68|   await wide.destroy();
+       |              ^
+     69|   await f.close();
+     70| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/142]⎯
+
+ FAIL  |db| packages/ledger/src/engine.preview.db.test.ts [ packages/ledger/src/engine.preview.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/ledger/src/engine.preview.db.test.ts:141:11
+    139|
+    140| afterAll(async () => {
+    141|   await f.close();
+       |           ^
+    142| });
+    143|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/142]⎯
+
+ FAIL  |db| packages/ledger/src/engine.preview.prop.db.test.ts [ packages/ledger/src/engine.preview.prop.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/ledger/src/engine.preview.prop.db.test.ts:313:11
+    311|
+    312| afterAll(async () => {
+    313|   await f.close();
+       |           ^
+    314| });
+    315|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/142]⎯
+
+ FAIL  |db| packages/ledger/src/hash-chain.db.test.ts [ packages/ledger/src/hash-chain.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/ledger/src/hash-chain.db.test.ts:68:12
+     66|
+     67| afterAll(async () => {
+     68|   await su.destroy();
+       |            ^
+     69|   await f.close();
+     70| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/142]⎯
+
+ FAIL  |db| packages/ledger/src/journal-balance.db.test.ts [ packages/ledger/src/journal-balance.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/ledger/src/journal-balance.db.test.ts:36:11
+     34|
+     35| afterAll(async () => {
+     36|   await f.close();
+       |           ^
+     37| });
+     38|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/142]⎯
+
+ FAIL  |db| packages/ledger/src/journal-immutability.db.test.ts [ packages/ledger/src/journal-immutability.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/ledger/src/journal-immutability.db.test.ts:51:15
+     49|
+     50| afterAll(async () => {
+     51|   await owner.destroy();
+       |               ^
+     52|   await f.close();
+     53| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/142]⎯
+
+ FAIL  |db| packages/ledger/src/numbering.db.test.ts [ packages/ledger/src/numbering.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/ledger/src/numbering.db.test.ts:84:14
+     82|
+     83| afterAll(async () => {
+     84|   await wide.destroy();
+       |              ^
+     85|   await f.close();
+     86| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/142]⎯
+
+ FAIL  |db| packages/ledger/src/period-control.db.test.ts [ packages/ledger/src/period-control.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/ledger/src/period-control.db.test.ts:59:11
+     57|
+     58| afterAll(async () => {
+     59|   await f.close();
+       |           ^
+     60| });
+     61|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/142]⎯
+
+ FAIL  |db| packages/ledger/src/posting-invariants.prop.db.test.ts [ packages/ledger/src/posting-invariants.prop.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/ledger/src/posting-invariants.prop.db.test.ts:87:11
+     85|
+     86| afterAll(async () => {
+     87|   await f.close();
+       |           ^
+     88| });
+     89|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/142]⎯
+
+ FAIL  |db| packages/ledger/src/subledger.prop.db.test.ts [ packages/ledger/src/subledger.prop.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/ledger/src/subledger.prop.db.test.ts:99:11
+     97|
+     98| afterAll(async () => {
+     99|   await f.close();
+       |           ^
+    100| });
+    101|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/142]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/connection-store.db.test.ts [ packages/connectors/salesforce/src/connection-store.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/connectors/salesforce/src/connection-store.db.test.ts:104:14
+    102|
+    103| afterAll(async () => {
+    104|   await fake.close();
+       |              ^
+    105|   await su.destroy();
+    106|   await db.destroy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/142]⎯
+
+ FAIL  |db| packages/modules/ar/src/invoice.lifecycle.db.test.ts [ packages/modules/ar/src/invoice.lifecycle.db.test.ts ]
+error: the database system is not yet accepting connections
+ ❯ parseErrorMessage node_modules/.pnpm/pg-protocol@1.16.1/node_modules/pg-protocol/src/parser.ts:395:8
+ ❯ Parser.handlePacket node_modules/.pnpm/pg-protocol@1.16.1/node_modules/pg-protocol/src/parser.ts:212:18
+ ❯ Parser.parse node_modules/.pnpm/pg-protocol@1.16.1/node_modules/pg-protocol/src/parser.ts:105:29
+ ❯ Socket.<anonymous> node_modules/.pnpm/pg-protocol@1.16.1/node_modules/pg-protocol/src/index.ts:7:47
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/142]⎯
+
+ FAIL  |db| packages/modules/bank/src/camt-extensions.db.test.ts [ packages/modules/bank/src/camt-extensions.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/modules/bank/src/camt-extensions.db.test.ts:98:12
+     96|
+     97| afterAll(async () => {
+     98|   await su.destroy();
+       |            ^
+     99|   await db.destroy();
+    100|   await tdb.close();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/142]⎯
+
+ FAIL  |db| packages/modules/bank/src/reconciliation.db.test.ts [ packages/modules/bank/src/reconciliation.db.test.ts ]
+error: could not extend file "base/72991/6113": No space left on device
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ createTestDatabase packages/db/src/testing/test-db.ts:48:5
+     46|   await root.connect();
+     47|   try {
+     48|     await root.query(`CREATE DATABASE ${name}`);
+       |     ^
+     49|   } finally {
+     50|     await root.end();
+ ❯ createLedgerFixture packages/ledger/src/testing/journal-fixture.ts:70:15
+ ❯ packages/modules/bank/src/reconciliation.db.test.ts:192:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/142]⎯
+
+ FAIL  |db| packages/modules/bank/src/statements.db.test.ts [ packages/modules/bank/src/statements.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/modules/bank/src/statements.db.test.ts:82:12
+     80|
+     81| afterAll(async () => {
+     82|   await su.destroy();
+       |            ^
+     83|   await db.destroy();
+     84|   await tdb.close();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[31/142]⎯
+
+ FAIL  |db| packages/modules/gl/src/chart.db.test.ts [ packages/modules/gl/src/chart.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/modules/gl/src/chart.db.test.ts:40:12
+     38|
+     39| afterAll(async () => {
+     40|   await db.destroy();
+       |            ^
+     41|   await tdb.close();
+     42| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[32/142]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts [ packages/modules/gl/src/period-end-roles.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:67:12
+     65|
+     66| afterAll(async () => {
+     67|   await db.destroy();
+       |            ^
+     68|   await tdb.close();
+     69| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[33/142]⎯
+
+ FAIL  |db| packages/modules/gl/src/rebind.db.test.ts [ packages/modules/gl/src/rebind.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/modules/gl/src/rebind.db.test.ts:79:12
+     77|
+     78| afterAll(async () => {
+     79|   await db.destroy();
+       |            ^
+     80|   await tdb.close();
+     81| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[34/142]⎯
+
+ FAIL  |db| packages/modules/journals/src/manual-journal.approval.db.test.ts [ packages/modules/journals/src/manual-journal.approval.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/modules/journals/src/manual-journal.approval.db.test.ts:95:11
+     93|
+     94| afterAll(async () => {
+     95|   await f.close();
+       |           ^
+     96| });
+     97|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[35/142]⎯
+
+ FAIL  |db| packages/modules/parties/src/bank-accounts.db.test.ts [ packages/modules/parties/src/bank-accounts.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/modules/parties/src/bank-accounts.db.test.ts:52:12
+     50|
+     51| afterAll(async () => {
+     52|   await su.destroy();
+       |            ^
+     53|   await db.destroy();
+     54|   await tdb.close();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[36/142]⎯
+
+ FAIL  |db| packages/modules/parties/src/parties.db.test.ts [ packages/modules/parties/src/parties.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'destroy')
+ ❯ packages/modules/parties/src/parties.db.test.ts:43:12
+     41|
+     42| afterAll(async () => {
+     43|   await db.destroy();
+       |            ^
+     44|   await tdb.close();
+     45| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[37/142]⎯
+
+ FAIL  |db| packages/modules/reporting/src/reports.prop.db.test.ts [ packages/modules/reporting/src/reports.prop.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/modules/reporting/src/reports.prop.db.test.ts:108:11
+    106|
+    107| afterAll(async () => {
+    108|   await f.close();
+       |           ^
+    109| });
+    110|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[38/142]⎯
+
+ FAIL  |db| packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts [ packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts ]
+Error: ENOSPC: no space left on device, write
+ ❯ packages/modules/reporting/src/reports.tb-pl-bs.db.test.ts:20:1
+     18| import { randomUUID } from 'node:crypto';
+     19| import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+     20| import {
+       | ^
+     21|   balanceSheetReport,
+     22|   profitAndLossReport,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39/142]⎯
+
+ FAIL  |db| packages/modules/setup/src/opening-balances.db.test.ts [ packages/modules/setup/src/opening-balances.db.test.ts ]
+error: could not extend file "base/71152/2608": No space left on device
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ migrate packages/db/src/migrate.ts:234:9
+    232|       await client.query('BEGIN');
+    233|       try {
+    234|         await client.query(f.sql);
+       |         ^
+    235|         await client.query(
+    236|           'INSERT INTO public.schema_migrations (version, name, checks…
+ ❯ createTestDatabase packages/db/src/testing/test-db.ts:60:7
+ ❯ createLedgerFixture packages/ledger/src/testing/journal-fixture.ts:70:15
+ ❯ packages/modules/setup/src/opening-balances.db.test.ts:133:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[40/142]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts [ packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts ]
+error: could not write block 59 in file "base/39106/1255": No space left on device
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ createTestDatabase packages/db/src/testing/test-db.ts:48:5
+     46|   await root.connect();
+     47|   try {
+     48|     await root.query(`CREATE DATABASE ${name}`);
+       |     ^
+     49|   } finally {
+     50|     await root.end();
+ ❯ createLedgerFixture packages/ledger/src/testing/journal-fixture.ts:70:15
+ ❯ packages/connectors/salesforce/src/polling/sf-polling.recovery.db.test.ts:149:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[41/142]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts [ packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts ]
+TypeError: Cannot read properties of undefined (reading 'close')
+ ❯ packages/connectors/salesforce/src/pubsub/replay-resume.db.test.ts:181:10
+    179|
+    180| afterAll(async () => {
+    181|   client.close();
+       |          ^
+    182|   await fake.close();
+    183|   await db.destroy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[42/142]⎯
+
+ FAIL  |db| packages/connectors/salesforce/src/reconcile/sf-nightly-recon.db.test.ts [ packages/connectors/salesforce/src/reconcile/sf-nightly-recon.db.test.ts ]
+error: could not extend file "base/71151/2651": No space left on device
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ createTestDatabase packages/db/src/testing/test-db.ts:48:5
+     46|   await root.connect();
+     47|   try {
+     48|     await root.query(`CREATE DATABASE ${name}`);
+       |     ^
+     49|   } finally {
+     50|     await root.end();
+ ❯ createLedgerFixture packages/ledger/src/testing/journal-fixture.ts:70:15
+ ❯ packages/connectors/salesforce/src/reconcile/sf-nightly-recon.db.test.ts:153:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[43/142]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/db/src/migrate.db.test.ts > migrate() > applies pending migrations in order and records version, checksum and role
+ FAIL  |db| packages/db/src/migrate.db.test.ts > migrate() > is idempotent: a second run applies nothing
+ FAIL  |db| packages/db/src/migrate.db.test.ts > migrate() > applies only the new migration when one is added
+ FAIL  |db| packages/db/src/migrate.db.test.ts > migrate() > refuses to run when an applied migration was edited (checksum changed)
+ FAIL  |db| packages/db/src/migrate.db.test.ts > migrate() > refuses to run when an applied migration file has disappeared
+ FAIL  |db| packages/db/src/migrate.db.test.ts > migrate() > rolls back a failing migration completely and does not record it
+ FAIL  |db| packages/db/src/migrate.db.test.ts > migrate() > refuses policy-violating migrations before touching the database
+ FAIL  |db| packages/modules/ar/src/gross-allowance.db.test.ts > SS-PLAT-106 GP-039 preserves the residual until reassessment and reports relief only on accruals
+Error: connect ECONNREFUSED 127.0.0.1:41393
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[44/142]⎯
+
+
+ Test Files  102 failed | 65 passed (167)
+      Tests  8 failed | 509 passed | 582 skipped (1099)
+   Start at  10:19:17
+   Duration  306.54s (transform 6.93s, setup 0ms, import 141.94s, tests 127.94s, environment 21ms)
+
+error during close Error: /usr/lib/postgresql/16/bin/pg_ctl stop -D /tmp/lf-pg-cpaNMh/data -m fast -w failed (1):
+
+pg_ctl: PID file "/tmp/lf-pg-cpaNMh/data/postmaster.pid" does not exist
+Is server running?
+
+    at run (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/packages/db/src/testing/start-test-database.ts:147:9)
+    at Object.stop (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/packages/db/src/testing/start-test-database.ts:244:5)
+    at Object.teardown (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/packages/db/src/testing/global-setup.ts:37:16)
+    at TestProject._teardownGlobalSetup (file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/vitest@4.1.12_@opentelemetry+api@1.9.1_@types+node@22.20.5_@vitest+coverage-v8@4.1.12_j_fb65c21c8e71efd1e33d79ed77baf9a3/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:10825:100)
+    at file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/vitest@4.1.12_@opentelemetry+api@1.9.1_@types+node@22.20.5_@vitest+coverage-v8@4.1.12_j_fb65c21c8e71efd1e33d79ed77baf9a3/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:14004:68
+    at async startVitest (file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/vitest@4.1.12_@opentelemetry+api@1.9.1_@types+node@22.20.5_@vitest+coverage-v8@4.1.12_j_fb65c21c8e71efd1e33d79ed77baf9a3/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:14643:4)
+    at async start (file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/vitest@4.1.12_@opentelemetry+api@1.9.1_@types+node@22.20.5_@vitest+coverage-v8@4.1.12_j_fb65c21c8e71efd1e33d79ed77baf9a3/node_modules/vitest/dist/chunks/cac.DzDtg8hz.js:2340:15)
+    at async CAC.run (file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/vitest@4.1.12_@opentelemetry+api@1.9.1_@types+node@22.20.5_@vitest+coverage-v8@4.1.12_j_fb65c21c8e71efd1e33d79ed77baf9a3/node_modules/vitest/dist/chunks/cac.DzDtg8hz.js:2318:2)
+exit 1

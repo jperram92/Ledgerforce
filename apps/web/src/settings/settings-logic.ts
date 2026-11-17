@@ -157,7 +157,7 @@ export const bankCurrencyFor = (
   baseCurrency: string,
 ): string => gl?.currency ?? baseCurrency;
 
-/** A bank-account refusal in plain words (ADR-0084); null for anything else. */
+/** A bank-account refusal in plain words (ADR-0084, ADR-0094); null for anything else. */
 export function bankRefusal(error: unknown): string | null {
   if (!(error instanceof AdminApiError)) return null;
   switch (error.code) {
@@ -167,6 +167,10 @@ export function bankRefusal(error: unknown): string | null {
       return 'That GL account cannot take a bank account: choose an active bank account in the chart (an asset of subtype bank) in the same currency.';
     case 'UNKNOWN_GL_ACCOUNT':
       return 'That GL account is no longer in the chart. Reload the page and choose again.';
+    case 'BANK_ACCOUNT_ARCHIVED':
+      return 'This bank account has been archived, so its ABA details cannot change. Add the account again as a new bank account if you still use it.';
+    case 'UNKNOWN_BANK_ACCOUNT':
+      return 'That bank account is no longer one of this company’s accounts. Reload the page and choose again.';
     case 'kms_not_configured':
       return 'LedgerForce cannot store bank account numbers yet: the key service that encrypts them is not set up. Ask whoever runs your LedgerForce.';
     case 'invalid_request':
