@@ -1,0 +1,223 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-aa59e42fb7e9a8b47
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:35963
+ ❯ |db| packages/modules/tax/src/single-supply-attribution.db.test.ts (6 tests | 6 skipped) 800ms
+ ❯ |db| packages/modules/gl/src/period-end-roles.db.test.ts (8 tests | 3 failed) 872ms
+     × AC-2 loading the template binds the seven period-end roles in the additive table [T-0117] 11ms
+     × AC-2 the account_role_binding view returns every core and period-end binding once [T-0117] 5ms
+     × AC-2 the additive table forces RLS and the view is security_invoker, so another tenant sees nothing [T-0117] 4ms
+ ❯ |db| packages/ledger/src/golden/golden-engine.db.test.ts (2 tests | 2 failed) 1090ms
+     × the tables that cannot be replayed yet are exactly the pinned PENDING list 10ms
+     × preview() reproduces every other Approved table line for line 272ms
+ ❯ |db| packages/modules/gl/src/gst-attributed-unbilled-role.db.test.ts (3 tests | 3 failed) 779ms
+     × SS-PLAT-142 AC-1 app.system_role_allows accepts an asset account only and the role is extended [T-0203] 7ms
+     × SS-PLAT-142 AC-2 loading the template binds the role to 1230 in the additive table [T-0203] 4ms
+     × SS-PLAT-142 AC-1 the bound account cannot be re-typed to a liability or archived, and the role cannot go to the core table [T-0203] 3ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/tax/src/single-supply-attribution.db.test.ts [ packages/modules/tax/src/single-supply-attribution.db.test.ts ]
+AssertionError: expected [] to deeply equal [ '1230' ]
+
+- Expected
++ Received
+
+- [
+-   "1230",
+- ]
++ []
+
+ ❯ packages/modules/tax/src/single-supply-attribution.db.test.ts:141:39
+    139|       trx,
+    140|     );
+    141|     expect(a.rows.map((x) => x.code)).toEqual(['1230']);
+       |                                       ^
+    142|     unbilledAccount = a.rows[0]?.id ?? '';
+    143|   });
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/tax/src/single-supply-attribution.db.test.ts:119:3
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/9]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/ledger/src/golden/golden-engine.db.test.ts > SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay > the tables that cannot be replayed yet are exactly the pinned PENDING list
+AssertionError: expected [ 'GP-040a', 'GP-040b', …(5) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "GP-040a",
++   "GP-040b",
++   "GP-044a",
++   "GP-044c",
++   "GP-045a",
++   "GP-045b",
++   "GP-045c",
++ ]
+
+ ❯ packages/ledger/src/golden/golden-engine.db.test.ts:177:40
+    175|       if (why) actual[`${t.entryId}${t.label}`] = why;
+    176|     }
+    177|     expect(Object.keys(actual).sort()).toEqual(Object.keys(PENDING).so…
+       |                                        ^
+    178|     for (const [k, why] of Object.entries(actual)) expect(why, k).toBe…
+    179|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/9]⎯
+
+ FAIL  |db| packages/ledger/src/golden/golden-engine.db.test.ts > SS-PLAT-12: Every Approved golden posting is reproduced exactly — engine replay > preview() reproduces every other Approved table line for line
+AssertionError: expected 43 to be 50 // Object.is equality
+
+- Expected
++ Received
+
+- 50
++ 43
+
+ ❯ packages/ledger/src/golden/golden-engine.db.test.ts:216:22
+    214|       replayed += 1;
+    215|     }
+    216|     expect(replayed).toBe(tables.length - Object.keys(PENDING).length);
+       |                      ^
+    217|   }, 120_000);
+    218| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/gst-attributed-unbilled-role.db.test.ts > SS-PLAT-142: GST_ATTRIBUTED_UNBILLED is an extended asset role bound to 1230 > SS-PLAT-142 AC-1 app.system_role_allows accepts an asset account only and the role is extended [T-0203]
+AssertionError: asset: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/modules/gl/src/gst-attributed-unbilled-role.db.test.ts:55:35
+     53|         ok: boolean;
+     54|       }>`SELECT app.system_role_allows(${ROLE}, ${type}) AS ok`.execut…
+     55|       expect(r.rows[0]?.ok, type).toBe(type === 'asset');
+       |                                   ^
+     56|     }
+     57|     const ext = await sql<{
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/gst-attributed-unbilled-role.db.test.ts > SS-PLAT-142: GST_ATTRIBUTED_UNBILLED is an extended asset role bound to 1230 > SS-PLAT-142 AC-2 loading the template binds the role to 1230 in the additive table [T-0203]
+AssertionError: expected [] to deeply equal [ { code: '1230', …(3) } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "code": "1230",
+-     "is_control": false,
+-     "name": "GST attributed on unbilled supplies",
+-     "postable": true,
+-   },
+- ]
++ []
+
+ ❯ packages/modules/gl/src/gst-attributed-unbilled-role.db.test.ts:70:20
+     68|          WHERE b.company_id = ${companyId}::uuid AND b.role = ${ROLE}`…
+     69|     );
+     70|     expect(r.rows).toEqual([
+       |                    ^
+     71|       {
+     72|         code: '1230',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/gst-attributed-unbilled-role.db.test.ts > SS-PLAT-142: GST_ATTRIBUTED_UNBILLED is an extended asset role bound to 1230 > SS-PLAT-142 AC-1 the bound account cannot be re-typed to a liability or archived, and the role cannot go to the core table [T-0203]
+Error: no result
+ ❯ SelectQueryBuilderImpl.executeTakeFirstOrThrow node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/select-query-builder.js:335:19
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/gl/src/gst-attributed-unbilled-role.db.test.ts:82:7
+     80|   it('SS-PLAT-142 AC-1 the bound account cannot be re-typed to a liabi…
+     81|     const id = (
+     82|       await inTenant((trx) =>
+       |       ^
+     83|         trx
+     84|           .selectFrom('app.account')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 loading the template binds the seven period-end roles in the additive table [T-0117]
+AssertionError: expected { ACCRUED_EXPENSES: '2360', …(6) } to deeply equal { AR_ECL_ALLOWANCE: '1220', …(7) }
+
+- Expected
++ Received
+
+  {
+    "ACCRUED_EXPENSES": "2360",
+    "ACCUM_DEPRECIATION": "1510",
+    "AR_ECL_ALLOWANCE": "1220",
+    "DEPRECIATION_EXPENSE": "6600",
+-   "GST_ATTRIBUTED_UNBILLED": "1230",
+    "PREPAYMENTS": "1300",
+    "PRIOR_PERIOD_ADJUSTMENTS": "3400",
+    "SGC_PAYABLE": "2370",
+  }
+
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:84:69
+     82|          WHERE b.company_id = ${companyId} ORDER BY b.role`.execute(tr…
+     83|     );
+     84|     expect(Object.fromEntries(r.rows.map((x) => [x.role, x.code]))).to…
+       |                                                                     ^
+     85|       Object.fromEntries(Object.entries(EXTENDED).map(([role, v]) => […
+     86|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 the account_role_binding view returns every core and period-end binding once [T-0117]
+AssertionError: expected [ …(24) ] to have a length of 25 but got 24
+
+- Expected
++ Received
+
+- 25
++ 24
+
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:99:20
+     97|          WHERE company_id = ${companyId} GROUP BY role`.execute(trx),
+     98|     );
+     99|     expect(r.rows).toHaveLength(CORE_COUNT + Object.keys(EXTENDED).len…
+       |                    ^
+    100|     expect(r.rows.every((x) => x.n === 1)).toBe(true);
+    101|     for (const role of Object.keys(PERIOD_END)) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/9]⎯
+
+ FAIL  |db| packages/modules/gl/src/period-end-roles.db.test.ts > ADR-0061: period-end system roles are bound and guarded by the database > AC-2 the additive table forces RLS and the view is security_invoker, so another tenant sees nothing [T-0117]
+AssertionError: expected 24 to be 25 // Object.is equality
+
+- Expected
++ Received
+
+- 25
++ 24
+
+ ❯ packages/modules/gl/src/period-end-roles.db.test.ts:241:28
+    239|       sql<{ n: number }>`SELECT count(*)::int AS n FROM app.account_ro…
+    240|     );
+    241|     expect(own.rows[0]?.n).toBe(CORE_COUNT + Object.keys(EXTENDED).len…
+       |                            ^
+    242|   });
+    243| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/9]⎯
+
+
+ Test Files  4 failed (4)
+      Tests  8 failed | 5 passed | 6 skipped (19)
+   Start at  21:37:28
+   Duration  5.79s (transform 348ms, setup 0ms, import 994ms, tests 3.54s, environment 0ms)
+

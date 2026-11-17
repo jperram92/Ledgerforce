@@ -3,7 +3,7 @@
   "id": "au-services-smb",
   "name": "Australia — services small business",
   "country": "AU",
-  "version": 1,
+  "version": 2,
   "accounts": [
     {
       "code": "1010",
@@ -61,6 +61,17 @@
       "postable": true,
       "control": false,
       "systemRole": "AR_ECL_ALLOWANCE"
+    },
+    {
+      "code": "1230",
+      "name": "GST attributed on unbilled supplies",
+      "type": "asset",
+      "subtype": "current_asset",
+      "normalBalance": "debit",
+      "postable": true,
+      "control": false,
+      "systemRole": "GST_ATTRIBUTED_UNBILLED",
+      "description": "GST already reported to the ATO on a single supply (whole supply attributed at the first part-payment, GST Act s 29-5(1)) but not yet received or billed to the customer (ADR-0089). Disclosure policy: an other current asset, assessed for recoverability like a prepayment (written down when the contract is cancelled or the GST will not be recovered); not a trade receivable, so it is outside trade receivables and outside the expected credit loss (ECL) base (AASB 9); never offset against GST payable (AASB 101 para 32). Kept per contract by the supply_contract dimension."
     },
     {
       "code": "1300",

@@ -3997,3 +3997,23 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0169 finding 7. The cookie is HttpOnly and the SPA never reads or caches it. StepUpPrompt already returns to the same path and keeps a typed note in sessionStorage. The real rotation is proven against the real API, database and OpenID Provider in SS-PLAT-139/136. The e2e spec proves the browser side of the contract. That follows the existing practice in the web e2e suites, which use route-faked APIs.
 - Alternatives: a web change to re-fetch `/auth/me` after a step-up (rejected: nothing reads session state, so it would add code with no behaviour behind it); an e2e test against the real API plus an IdP (rejected: no such harness exists for the web suites; that would be a separate card).
 - ADR: ADR-0087 · Status: accepted
+
+### DL-0760 — GST_ATTRIBUTED_UNBILLED bound by widening the ADR-0061 functions; template v2 adds 1230 (T-0203)
+- Date: 2026-11-17 · By: claude · Task: T-0203 · Category: architecture
+- Decision: Migration 0073 widens `app.system_role_is_extended` and `app.system_role_allows` by CREATE OR REPLACE (every earlier rule repeated unchanged) so `GST_ATTRIBUTED_UNBILLED` is an extended role, asset only, not control, postable. `system-roles.ts` mirrors it. The AU services SMB template becomes version 2 and binds account 1230 "GST attributed on unbilled supplies" (other current asset, debit). The golden binding `system:GST_ATTRIBUTED_UNBILLED` resolves through the role, so `PENDING` in `golden-engine.db.test.ts` is `{}` again and GP-040a/b, GP-044a/c and GP-045a–c replay. SS-PLAT-135 now resolves the account through the role instead of adding a plain asset account 1230, which would collide with the template account. The T-0117 tests that enumerate the extended roles (`system-roles.test.ts`, `period-end-roles.db.test.ts`) now expect the period-end roles plus the ADR-0089 role. That makes them stricter, not weaker.
+- Why: ADR-0089 R3 and RQ-0171 name this exact mechanism. The 0005 CHECK cannot be widened without a DROP, which is forbidden.
+- Alternatives: a new tax code (rejected in ADR-0089); binding the account by code without a role (rejected: the engine resolves accounts by role, design §3.2).
+- ADR: ADR-0089, ADR-0061 · Status: accepted
+
+### DL-0761 — Single-supply contract stored in four immutable tables; attribution is its own one-per-contract row (T-0203)
+- Date: 2026-11-17 · By: claude · Task: T-0203 · Category: architecture
+- Decision: Migration 0073 adds four tables, each with RLS ENABLE + FORCE, the tenant_isolation policy, lf_app SELECT/INSERT only, and an UPDATE/DELETE trigger (`sod_never_changed`). They are:
+  - `app.single_supply_contract`: party, reference, contract date, known net in whole cents and > 0, one tax code, GST basis in force on the contract date, the `supply_contract` dimension value, who confirmed and when, idempotency key.
+  - `app.single_supply_attribution`: primary key (tenant, contract). It holds the attributed GST and attribution date, written by the attributing receipt.
+  - `app.single_supply_receipt`: gross = net + tax, whole cents.
+  - `app.single_supply_contract_status`: a successor row, finalised or cancelled, one per contract. No row means open. T-0204 writes it.
+
+  `attributed_tax`/`attribution_date` live on the attribution row, not on the contract row. The 0042 `supply_type` CHECK is untouched.
+- Why: Card AC-1 asks for immutable rows with status held in successor rows. The GST is fixed when the first attributing document is posted, not when the contract is recorded, so it cannot sit on an immutable contract row that already exists. A one-per-contract attribution row is also the database backstop for "exactly one first receipt" under concurrency (AC-4). The T-0206 s 29-70 tax invoice can write the same row.
+- Alternatives: an `is_first` flag on the receipt (rejected: a tax invoice could not attribute); mutable status/attribution columns (rejected: immutability rule); widening `customer_prepayment.supply_type` (rejected: needs DROP CONSTRAINT).
+- ADR: ADR-0089 · Status: accepted

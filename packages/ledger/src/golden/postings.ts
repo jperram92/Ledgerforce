@@ -247,6 +247,7 @@ export const AU_SERVICES_BINDINGS: Readonly<
   'system:AP_CONTROL': { role: 'AP_CONTROL' },
   'system:UNDEPOSITED_FUNDS': { role: 'UNDEPOSITED_FUNDS' },
   'system:CUSTOMER_PREPAYMENTS': { role: 'CUSTOMER_PREPAYMENTS' },
+  'system:GST_ATTRIBUTED_UNBILLED': { role: 'GST_ATTRIBUTED_UNBILLED' },
   'system:DEFERRED_REVENUE': { role: 'DEFERRED_REVENUE' },
   'system:ROUNDING': { role: 'ROUNDING' },
   'system:WAGES_PAYABLE': { role: 'WAGES_PAYABLE' },

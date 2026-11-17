@@ -565,6 +565,64 @@ export interface PrepaymentApplicationTable {
   created_at: Timestamp;
 }
 
+/** Migration 0073 (T-0203, ADR-0089): a single supply with a known total. Immutable. */
+export interface SingleSupplyContractTable {
+  id: ColumnType<string, string | undefined, never>;
+  tenant_id: TenantId;
+  company_id: string;
+  party_id: string;
+  reference: string;
+  contract_date: ColumnType<Date, string, never>;
+  /** NUMERIC(19,4) text, whole cents, > 0. */
+  known_net: string;
+  tax_code_id: string;
+  gst_basis: 'cash' | 'accrual';
+  dimension_value_id: string;
+  confirmed_by: string;
+  confirmed_at: Timestamp;
+  idempotency_key: string;
+}
+
+/** Migration 0073: the one accruals attribution of a contract's whole GST (GP-040a). */
+export interface SingleSupplyAttributionTable {
+  tenant_id: TenantId;
+  company_id: string;
+  contract_id: string;
+  attribution_date: ColumnType<Date, string, never>;
+  attributed_tax: string;
+  entry_id: string;
+  created_at: Timestamp;
+}
+
+/** Migration 0073: a receipt on a single-supply contract (GP-040a/b, GP-020 on cash). */
+export interface SingleSupplyReceiptTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  contract_id: string;
+  receipt_date: ColumnType<Date, string, never>;
+  gross: string;
+  net: string;
+  tax: string;
+  account_id: string;
+  entry_id: string;
+  idempotency_key: string;
+  created_by: string | null;
+  created_at: Timestamp;
+}
+
+/** Migration 0073: finalised / cancelled successor row of a contract; none = open. */
+export interface SingleSupplyContractStatusTable {
+  tenant_id: TenantId;
+  company_id: string;
+  contract_id: string;
+  status: 'finalised' | 'cancelled';
+  status_date: ColumnType<Date, string, never>;
+  entry_id: string | null;
+  set_by: string | null;
+  set_at: Timestamp;
+}
+
 export interface SalesInvoiceDepositTable {
   tenant_id: TenantId;
   company_id: string;
@@ -1399,6 +1457,10 @@ export interface Database {
   'app.customer_prepayment': CustomerPrepaymentTable;
   'app.prepayment_application': PrepaymentApplicationTable;
   'app.sales_invoice_deposit': SalesInvoiceDepositTable;
+  'app.single_supply_contract': SingleSupplyContractTable;
+  'app.single_supply_attribution': SingleSupplyAttributionTable;
+  'app.single_supply_receipt': SingleSupplyReceiptTable;
+  'app.single_supply_contract_status': SingleSupplyContractStatusTable;
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;

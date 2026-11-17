@@ -25,6 +25,8 @@ export interface TemplateAccount {
   control: boolean;
   systemRole?: SystemRole | undefined;
   defaultTaxCode?: string | undefined;
+  /** What the account holds and its disclosure policy (e.g. 1230, ADR-0089 R3). */
+  description?: string | undefined;
 }
 
 /** Who (design §4.4): decides the control account and the default tax code. */
@@ -77,6 +79,9 @@ export function validateTemplate(t: ChartTemplate): string[] {
     if (seen.has(a.code)) errors.push(`duplicate code ${a.code}`);
     seen.add(a.code);
     if (!a.name.trim()) errors.push(`${a.code}: name is empty`);
+    if (a.description !== undefined && !a.description.trim()) {
+      errors.push(`${a.code}: description is empty`);
+    }
     if (!ACCOUNT_TYPES.includes(a.type)) errors.push(`${a.code}: unknown type ${String(a.type)}`);
     if (!SUBTYPE_RE.test(a.subtype))
       errors.push(`${a.code}: subtype ${a.subtype} must be snake_case`);

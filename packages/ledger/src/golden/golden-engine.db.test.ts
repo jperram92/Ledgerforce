@@ -26,21 +26,11 @@ const tables = approvedTables(parsePostings(readFileSync(FILE, 'utf8')));
 
 /**
  * Golden tables the engine cannot replay yet, with the reason and owning task. Shrinks to empty;
- * never grows silently. Empty from T-0032 (reversals replay through reverse()) until T-0168
- * added GP-040…GP-042 (ADR-0089), whose unbound role T-0203 adds. GP-044/GP-045 supersede
- * GP-042/GP-041 (accounting review); GP-044b and GP-044d replay already.
+ * never grows silently. Empty from T-0032 (reversals replay through reverse()); T-0168 pinned
+ * GP-040, GP-044a/c and GP-045 on the unbound GST_ATTRIBUTED_UNBILLED role until T-0203 bound it
+ * (migration 0073, template account 1230), so it is empty again.
  */
-const PENDING: Record<string, string> = {
-  // ADR-0089: the GST_ATTRIBUTED_UNBILLED extended role and template account 1230 are bound by
-  // T-0203; until then these tables are proven against the BAS query in SS-PLAT-135 only.
-  'GP-040a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-  'GP-040b': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-  'GP-044a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-  'GP-044c': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-  'GP-045a': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-  'GP-045b': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-  'GP-045c': 'binding system:GST_ATTRIBUTED_UNBILLED (T-0203)',
-};
+const PENDING: Record<string, string> = {};
 
 /**
  * What each golden binding means on the AU services template, by account name — an expectation
@@ -51,6 +41,7 @@ const MEANS: Record<string, string> = {
   'system:AP_CONTROL': 'Trade creditors',
   'system:UNDEPOSITED_FUNDS': 'Undeposited funds',
   'system:CUSTOMER_PREPAYMENTS': 'Customer prepayments',
+  'system:GST_ATTRIBUTED_UNBILLED': 'GST attributed on unbilled supplies',
   'system:DEFERRED_REVENUE': 'Deferred revenue',
   'system:ROUNDING': 'Rounding',
   'system:WAGES_PAYABLE': 'Wages payable',
