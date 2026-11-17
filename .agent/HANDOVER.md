@@ -1,4 +1,31 @@
-# Handover: round 2 fully merged; T-0129 built (2026-11-13 09:50 UTC)
+# Handover: rounds 8-10 integrated; golden-dependent cards await main merge (2026-11-17 19:30 UTC)
+
+## Codex continuation prompt
+> Resume from the repository, not the chat. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0691 (owner: the building agent makes open decisions itself after research; do not ask), DL-0820. Branch `claude/loving-lovelace-nozqpk`.
+>
+> **State**
+> - In `review` (VERIFY OK except 2c/8 PENDING by design): rounds 3-8 cards listed below, plus T-0176, T-0177, T-0180, T-0187, T-0188, T-0172, T-0185, T-0186, T-0191, T-0197, T-0127.
+> - At `verifying`, verify running or queued on local branch `verify/r9-no-golden` (worktree `.claude/worktrees/verify-r9`, the combined tree minus the golden merges): T-0192, T-0183, T-0196, T-0193. Copy their evidence/manifest from that worktree when they pass, then release.
+> - At `verifying`, **blocked on the owner's merge to main**: T-0168, T-0126, T-0203. They change `Docs/accounting/postings.md` (goldens GP-040, GP-043, GP-044, GP-045, approved under DL-0263 with research and an independent accounting review). ADR-0047's golden guard trusts `Docs/decisions/golden-approvals.json` only once it is on main, so verify gate 4 fails on this branch until then. Do not edit the guard.
+> - Building: T-0190 then T-0189 (Stripe refund follow-ups; migration 0077 if needed).
+> - Migrations run to 0076. The next is 0077.
+>
+> **Next actions, in order**
+> 1. Finish verify/release of T-0192, T-0183, T-0196, T-0193; merge and verify T-0190/T-0189 when the agent reports.
+> 2. Next ready cards: T-0204 (GST final invoice/variation/cancellation, after T-0203), T-0205, T-0206, T-0201/T-0202, T-0209, T-0215/T-0216, T-0130, T-0143, T-0182, T-0195. T-0110/T-0111 need a scratch org; T-0119 needs docker; T-0162/T-0163 wait on T-0057.
+> 3. Gate 8: Codex cross-review is pending for every card in review. Gate 2c stays PENDING until main's baseline is re-recorded as unit+db (next merge to main, an owner gate).
+>
+> **Process reminders**
+> - Reserve migration numbers per agent but renumber at merge so the sequence stays gapless; reserve GP and SS ids per agent too (collisions happened in round 9).
+> - Clean stale `/tmp/lf-web-*` and `/tmp/lf-pg-*` if the disk fills (DL-0820 fixes the web cache leak going forward).
+> - Check `pnpm typecheck` by its exit code, not by filtered output.
+> - Session-cookie API tests must send `sec-fetch-site: same-origin` (CSRF guard, ADR-0076).
+> - `.log` evidence files are gitignored; use `.txt` or `.json`.
+> - Never commit format-patch output (DL-0464).
+
+---
+
+# Previous handover — Handover: round 2 fully merged; T-0129 built (2026-11-13 09:50 UTC)
 
 ## Codex continuation prompt
 > Resume from the repository, not the chat. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0477, DL-0560 to DL-0565. Branch `claude/loving-lovelace-nozqpk` (this commit is the session's final wrap-up).
