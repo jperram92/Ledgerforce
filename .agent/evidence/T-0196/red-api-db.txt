@@ -1,0 +1,41 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:38327
+[31m[Nest] 5538  - [39m11/17/2026, 4:58:43 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: SoD: subject type bill has no create step for a reported creator
+    at historyOf [90m(/home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/[39mapps/api/src/sod/sod.service.ts:67:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at checkSod [90m(/home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/[39mapps/api/src/sod/sod.service.ts:186:19[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/[39mapps/api/src/tenancy/tenant.interceptor.ts:140:26
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-ae9531fc9455891d8/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+ ❯ |api-db| apps/api/src/sod/sod.db.test.ts (28 tests | 1 failed) 2880ms
+     × SS-PLAT-150 acknowledging a week needs an Idempotency-Key; without one nothing is written; with one 201 new, 200 already acknowledged [T-0196] 23ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/sod/sod.db.test.ts > SS-UC05-06: Small-team mode records a visible exception > SS-PLAT-150 acknowledging a week needs an Idempotency-Key; without one nothing is written; with one 201 new, 200 already acknowledged [T-0196]
+AssertionError: expected 201 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 201
+
+ ❯ apps/api/src/sod/sod.db.test.ts:528:25
+    526|     const path = '/sod/exceptions/weekly/acknowledge';
+    527|     const none = await call('POST', path, 'solo', { week_start: week, …
+    528|     expect(none.status).toBe(400);
+       |                         ^
+    529|     expect(await none.json()).toEqual({ error: 'idempotency_key_requir…
+    530|     // A body that is also invalid answers the key error first: nothin…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 27 passed (28)
+   Start at  04:58:35
+   Duration  8.27s (transform 1.89s, setup 0ms, import 3.55s, tests 2.88s, environment 0ms)
+

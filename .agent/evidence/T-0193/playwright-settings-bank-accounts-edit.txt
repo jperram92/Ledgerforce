@@ -1,0 +1,9 @@
+
+Running 5 tests using 2 workers
+
+[1/5] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:384:1 › SS-PLAT-153: refusals are said in plain words and nothing changes [T-0193]
+[2/5] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]
+[3/5] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:422:1 › SS-PLAT-153: an Accountant sees no way to change or archive an account [T-0193]
+[4/5] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]
+[5/5] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:348:1 › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; "Keep it" archives nothing [T-0193]
+  5 passed (16.7s)

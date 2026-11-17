@@ -16,15 +16,16 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 7 |
 | done | 3 |
 | in_progress | 1 |
-| review | 137 |
-| todo | 27 |
+| review | 142 |
+| todo | 25 |
 | verifying | 6 |
-| **total** | **181** |
+| **total** | **184** |
 
 | Phase | Cards |
 |---|---:|
 | Sprint 0 | 9 |
-| MVP | 96 |
+| MVP | 97 |
+| MVP | 98 |
 | Phase 1 | 1 |
 | Phase 2 | 1 |
 | Phase 3 | 1 |
@@ -182,7 +183,7 @@ graph LR
 | [T-0164](T-0164.md) | AR - new invoices take their due date from the company's default payment terms | MVP | verifying | T-0158 | UC-01 | 0 |
 | [T-0165](T-0165.md) | Documents - invoice HTML/PDF shows the company's branding and accepted payment methods | MVP | verifying | T-0158, T-0041 | UC-01 | 0 |
 | [T-0180](T-0180.md) | AR/Documents - print the company's chosen remittance bank account on invoices (ADR-0079) | MVP | verifying | T-0165 | UC-01 | 1 |
-| [T-0183](T-0183.md) | Setup/Web - wizard step 8 asks for a remittance account; screen to request and approve it (T-0180 AC-3) | MVP | todo | T-0180, T-0176 | UC-01, UC-SETUP | 0 |
+| [T-0183](T-0183.md) | Setup/Web - wizard step 8 asks for a remittance account; screen to request and approve it (T-0180 AC-3) | MVP | verifying | T-0180, T-0176 | UC-01, UC-SETUP | 0 |
 | [T-0124](T-0124.md) | Receipts, refunds and payment batches settle opening AR/AP items | MVP | todo | T-0080, T-0046, T-0054, T-0057 | UC-03, UC-06 | 0 |
 | [T-0125](T-0125.md) | Cash-basis BAS: GST on opening AR/AP items when they are paid | MVP | todo | T-0080, T-0035, T-0124 | — | 0 |
 | [T-0126](T-0126.md) | Opening balances: foreign-currency open items and Xero import | MVP | verifying | T-0080 | — | 0 |
@@ -201,7 +202,8 @@ graph LR
 | [T-0190](T-0190.md) | AR: cancel an approved Stripe refund that Stripe refused permanently, so its amount stops counting as requested | MVP | verifying | T-0172 | UC-11 | 0 |
 | [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | verifying | T-0180 | UC-01 | 0 |
 | [T-0192](T-0192.md) | Security: rotate the session id on step-up re-authentication (ASVS 5.0 7.2.4) | MVP | todo | — | — | 0 |
-| [T-0197](T-0197.md) | Platform: send security notices (bank-detail and remittance account changes) by email | MVP | todo | T-0191 | UC-01, UC-06 | 0 |
+| [T-0197](T-0197.md) | Platform: send security notices (bank-detail and remittance account changes) by email | MVP | verifying | T-0191 | UC-01, UC-06 | 0 |
+| [T-0209](T-0209.md) | Platform: surface failed security notices to administrators with a retry-now action | MVP | todo | T-0197 | UC-01, UC-06 | 0 |
 | [T-0201](T-0201.md) | Opening balances: Xero reader (trial balance and open invoices/bills at the balance date) | Phase 1 | todo | T-0126 | — | 0 |
 | [T-0202](T-0202.md) | Opening balances screen: show currency, currency amount and rate of foreign-currency items | MVP | todo | T-0126, T-0177 | — | 0 |
 | [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | todo | T-0180 | UC-01 | 0 |
@@ -224,11 +226,11 @@ graph LR
 | [T-0176](T-0176.md) | UI: settings forms for setup wizard steps 1 and 3 (steps 4, 8, 10 → T-0185, T-0186) — split from T-0091 | MVP | verifying | T-0091 | — | 0 |
 | [T-0185](T-0185.md) | UI: bank accounts settings screen (wizard step 4) — split from T-0176 | MVP | verifying | T-0176 | — | 0 |
 | [T-0186](T-0186.md) | UI: numbering and billing (step 8) and approval amounts (step 10) settings screens — split from T-0176 | MVP | todo | T-0176 | — | 0 |
-| [T-0193](T-0193.md) | Bank: change ABA details or archive a company bank account over HTTP — found in T-0185 | MVP | todo | T-0185 | — | 0 |
+| [T-0193](T-0193.md) | Bank: change ABA details or archive a company bank account over HTTP — found in T-0185 | MVP | verifying | T-0185 | — | 0 |
 | [T-0185](T-0185.md) | UI: bank accounts settings screen (wizard step 4) — split from T-0176 | MVP | todo | T-0176 | — | 0 |
 | [T-0186](T-0186.md) | UI: numbering and billing (step 8) and approval amounts (step 10) settings screens — split from T-0176 | MVP | verifying | T-0176 | — | 0 |
 | [T-0195](T-0195.md) | UI: invoice logo, accent colour and Stripe payout accounts on the Numbering and billing screen — split from T-0186 | MVP | todo | T-0186 | — | 0 |
-| [T-0196](T-0196.md) | API: require an Idempotency-Key on POST /sod/exceptions/weekly/acknowledge — from T-0186 | MVP | todo | T-0186 | — | 0 |
+| [T-0196](T-0196.md) | API: require an Idempotency-Key on POST /sod/exceptions/weekly/acknowledge — from T-0186 | MVP | verifying | T-0186 | — | 0 |
 | [T-0177](T-0177.md) | UI: opening balances import and posting-profile matrix screens (wizard steps 9 and 7) — split from T-0091 | MVP | todo | T-0091 | — | 0 |
 | [T-0176](T-0176.md) | UI: settings forms for setup wizard steps 1, 3, 4, 8 and 10 — split from T-0091 | MVP | todo | T-0091 | — | 0 |
 | [T-0177](T-0177.md) | UI: opening balances import screen (wizard step 9) — split from T-0091; matrix moved to T-0187/T-0188 (DL-0650) | MVP | verifying | T-0091 | — | 0 |
@@ -270,7 +272,9 @@ graph LR
 | [T-0119](T-0119.md) | Chromium in the worker image and PDF rendering as a worker job | MVP | todo | T-0041 |
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | review | T-0044, T-0042 |
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
-| [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | todo | T-0051 |
+| [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | verifying | T-0051 |
+| [T-0215](T-0215.md) | Bills inbox transport: signed provider inbound webhooks (SaaS) | MVP | todo | T-0127 |
+| [T-0216](T-0216.md) | Bills mailbox: settings API/UI and OAuth2 XOAUTH2 (Microsoft 365, Google Workspace) | MVP | todo | T-0127 |
 | [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | in_progress | — | — | 0 |
 | [T-0129](T-0129.md) | Per-party overdue-reminder pause (audited); daily job split to T-0147 | MVP | review | T-0068 | UC-04 | 0 |
 | [T-0130](T-0130.md) | Stripe payouts: fetch from the API, payout.paid webhook, bank line match | MVP | todo | T-0075, T-0060 | UC-03, UC-08 | 0 |

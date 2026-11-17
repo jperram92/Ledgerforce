@@ -1,0 +1,114 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33593
+ ❯ |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts (12 tests | 5 failed) 1813ms
+     × SS-PLAT-152 both routes need settings.setup.manage and a fresh step-up; nothing changes [T-0193] 23ms
+     × SS-PLAT-152 refusals: no key 400, malformed 400, unknown or another company’s or tenant’s account 404 [T-0193] 9ms
+     × SS-PLAT-152 archiving the designated remittance account releases it, audits masked, and step 4 asks for ABA details again [T-0193] 22ms
+     × SS-PLAT-152 PUT sets the ABA details, audits before/after masked, empties step 4; the same values again change nothing [T-0193] 16ms
+     × SS-PLAT-152 an archived account’s ABA details cannot change: 409 BANK_ACCOUNT_ARCHIVED [T-0193] 21ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193) > SS-PLAT-152 both routes need settings.setup.manage and a fresh step-up; nothing changes [T-0193]
+AssertionError: expected 404 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 404
+
+ ❯ apps/api/src/setup/bank-accounts-settings.db.test.ts:398:24
+    396|       await archive(operating, { company_id: c }, 'stale'),
+    397|     ]) {
+    398|       expect(r.status).toBe(401);
+       |                        ^
+    399|       expect(await json(r)).toEqual({ error: 'step_up_required', max_a…
+    400|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193) > SS-PLAT-152 refusals: no key 400, malformed 400, unknown or another company’s or tenant’s account 404 [T-0193]
+AssertionError: expected 404 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 404
+
+ ❯ apps/api/src/setup/bank-accounts-settings.db.test.ts:421:26
+    419|     const payroll = await idOf(/^Payroll/);
+    420|     const noKey = await put(payroll, abaBody(), 'fa', { key: null });
+    421|     expect(noKey.status).toBe(400);
+       |                          ^
+    422|     expect((await json(noKey))['error']).toBe('idempotency_key_require…
+    423|     const noKeyArchive = await archive(payroll, { company_id: c }, 'fa…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193) > SS-PLAT-152 archiving the designated remittance account releases it, audits masked, and step 4 asks for ABA details again [T-0193]
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/setup/bank-accounts-settings.db.test.ts:496:22
+    494|
+    495|     const r = await archive(operating, { company_id: c });
+    496|     expect(r.status).toBe(200);
+       |                      ^
+    497|     const text = await r.text();
+    498|     expect(text).not.toContain(NUMBER);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193) > SS-PLAT-152 PUT sets the ABA details, audits before/after masked, empties step 4; the same values again change nothing [T-0193]
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/setup/bank-accounts-settings.db.test.ts:554:22
+    552|     const audits = (await bankAuditRows()).length;
+    553|     const r = await put(payroll, abaBody());
+    554|     expect(r.status).toBe(200);
+       |                      ^
+    555|     const text = await r.text();
+    556|     const body = JSON.parse(text) as { account: Record<string, unknown…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |api-db| apps/api/src/setup/bank-accounts-settings.db.test.ts > SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193) > SS-PLAT-152 an archived account’s ABA details cannot change: 409 BANK_ACCOUNT_ARCHIVED [T-0193]
+AssertionError: expected 404 to be 409 // Object.is equality
+
+- Expected
++ Received
+
+- 409
++ 404
+
+ ❯ apps/api/src/setup/bank-accounts-settings.db.test.ts:609:22
+    607|     const audits = (await bankAuditRows()).length;
+    608|     const r = await put(id, abaBody());
+    609|     expect(r.status).toBe(409);
+       |                      ^
+    610|     expect((await json(r))['error']).toBe('BANK_ACCOUNT_ARCHIVED');
+    611|     expect((await listed()).find((x) => x['id'] === id)).toMatchObject…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 7 passed (12)
+   Start at  21:39:39
+   Duration  5.14s (transform 1.44s, setup 0ms, import 2.50s, tests 1.81s, environment 0ms)
+

@@ -9,7 +9,11 @@
  * what is missing — walked step by step from an empty company to a complete wizard.
  */
 import { randomBytes, randomUUID } from 'node:crypto';
-import { setInvoiceSettings } from '@ledgerforce/ar';
+import {
+  approveRemittanceAccountChange,
+  requestRemittanceAccountChange,
+  setInvoiceSettings,
+} from '@ledgerforce/ar';
 import { createCompanyBankAccount } from '@ledgerforce/bank';
 import { createJwtConnection } from '@ledgerforce/connector-salesforce';
 import {
@@ -412,6 +416,36 @@ describe('SS-PLAT-119: each step validator reads its module and lists what is mi
         defaultPaymentTermsDays: 30,
         acceptedPaymentMethods: ['bank_transfer'],
       }),
+    );
+    // T-0183: bank transfer needs a remittance account in force, set by maker-checker (ADR-0080).
+    expect(await missing(8)).toEqual([
+      'No remittance bank account has been chosen for bank transfer',
+    ]);
+    const operating = await f.inTenant(
+      async (trx) =>
+        (
+          await trx
+            .selectFrom('app.bank_account')
+            .select('id')
+            .where('company_id', '=', c)
+            .where('name', '=', 'Operating')
+            .executeTakeFirstOrThrow()
+        ).id,
+    );
+    // A second person (the module checks only that it is not the requester; the API adds the
+    // permission). Not an Owner or Finance Admin, so step 10's first check below still applies.
+    const approver = await f.addUser('approver');
+    const changeId = randomUUID();
+    await f.inTenant((trx) =>
+      requestRemittanceAccountChange(trx, {
+        companyId: c,
+        changeId,
+        bankAccountId: operating,
+        requestedBy: clerk,
+      }),
+    );
+    await f.inTenant((trx) =>
+      approveRemittanceAccountChange(trx, { companyId: c, changeId, approvedBy: approver }),
     );
     expect(await missing(8)).toEqual([]);
     await complete(8);

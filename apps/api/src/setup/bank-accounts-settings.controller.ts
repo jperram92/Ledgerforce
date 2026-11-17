@@ -8,6 +8,13 @@
  *   account is the replay record (DL-0700): the same request again is 200 `replayed:true`; a
  *   different one, or a lost race on the one-per-GL-account index, is 409 GL_ACCOUNT_IN_USE.
  *   Without a key service: 503 kms_not_configured (ADR-0030). No SoD step (DL-0701).
+ * - `PUT /setup/bank-accounts/:id/aba` and `POST /setup/bank-accounts/:id/archive` (T-0193,
+ *   ADR-0094, RQ-0176; settings.setup.manage + step-up 300 s, Idempotency-Key, audited with the
+ *   masked before/after): set the APCA user id, ABA user name and FI mnemonic (all three), or
+ *   archive. The same state again is 200 `changed:false` and describes no audit entity. An
+ *   archived account's ABA details are 409 BANK_ACCOUNT_ARCHIVED. Archiving the designated
+ *   remittance account releases it in the database (0072) and answers `remittance_released`.
+ *   The BSB and number never change in place. No SoD step (DL-0800).
  * No response, message or audit row carries a clear account number; database errors are mapped
  * to fixed messages (DL-0702). Another tenant's company is 404 (RLS).
  */
@@ -20,17 +27,22 @@ import {
   HttpCode,
   Inject,
   NotFoundException,
+  Param,
   Post,
+  Put,
   Query,
   Res,
   ServiceUnavailableException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import {
+  archiveCompanyBankAccount,
+  BankAccountArchivedError,
   BankAccountValidationError,
   createCompanyBankAccount,
   listCompanyBankAccounts,
   sameCompanyBankAccount,
+  setCompanyBankAccountAba,
   type CompanyBankAccountInput,
   type MaskedCompanyBankAccount,
   validateCompanyBankAccountInput,
@@ -101,6 +113,28 @@ const optional = (b: Record<string, unknown>, name: string): string | undefined 
   if (v === undefined || v === null || v === '') return undefined;
   return typeof v === 'string' ? v : bad(`${name} must be text`);
 };
+const UNKNOWN_ACCOUNT = () =>
+  new NotFoundException({
+    error: 'UNKNOWN_BANK_ACCOUNT',
+    message: 'the bank account is not one of this company’s accounts',
+  });
+const ARCHIVED = () =>
+  new ConflictException({
+    error: 'BANK_ACCOUNT_ARCHIVED',
+    message:
+      'this bank account is archived, so its ABA details cannot change; add a new bank account instead',
+  });
+
+/** The company's designated remittance account (ADR-0079), or null. */
+async function remittanceAccountOf(trx: Transaction<Database>, companyId: string) {
+  const r = await trx
+    .selectFrom('app.ar_settings')
+    .select('remittance_bank_account_id')
+    .where('company_id', '=', companyId)
+    .executeTakeFirst();
+  return r?.remittance_bank_account_id ?? null;
+}
+
 const pgCode = (e: unknown): string | undefined =>
   typeof e === 'object' && e !== null ? (e as { code?: string }).code : undefined;
 
@@ -219,5 +253,75 @@ export class BankAccountsSettingsController {
     const view = viewOf(added, names);
     this.audit.describe({ entityType: 'bank_account', entityId: id, after: view });
     return { account: view, replayed: false };
+  }
+  @Put(':id/aba')
+  @RequirePermission('settings.setup.manage')
+  @RequireStepUp(STEP_UP_SECONDS)
+  async setAba(
+    @Param('id') idParam: string,
+    @Headers('idempotency-key') key: string | undefined,
+    @Body() body: unknown,
+  ) {
+    requireKey(key);
+    const id = uuid(idParam, 'id');
+    const b = bodyOf(body);
+    const companyId = uuid(b['company_id'], 'company_id');
+    const input = {
+      apcaUserId: text(b, 'apca_user_id'),
+      abaUserName: text(b, 'aba_user_name'),
+      abaFiMnemonic: text(b, 'aba_fi_mnemonic'),
+    };
+    const trx = this.tx.get();
+    await companyOf(trx, companyId);
+    let result;
+    try {
+      result = await setCompanyBankAccountAba(trx, companyId, id, input);
+    } catch (e) {
+      if (e instanceof BankAccountValidationError) bad(e.message);
+      if (e instanceof BankAccountArchivedError || pgCode(e) === '23514') throw ARCHIVED();
+      throw e;
+    }
+    if (!result) throw UNKNOWN_ACCOUNT();
+    const names = await this.glNames(companyId);
+    const view = viewOf(result.after, names);
+    if (result.changed)
+      this.audit.describe({
+        entityType: 'bank_account',
+        entityId: id,
+        before: viewOf(result.before, names),
+        after: view,
+      });
+    return { account: view, changed: result.changed };
+  }
+
+  @Post(':id/archive')
+  @HttpCode(200)
+  @RequirePermission('settings.setup.manage')
+  @RequireStepUp(STEP_UP_SECONDS)
+  async archive(
+    @Param('id') idParam: string,
+    @Headers('idempotency-key') key: string | undefined,
+    @Body() body: unknown,
+  ) {
+    requireKey(key);
+    const id = uuid(idParam, 'id');
+    const companyId = uuid(bodyOf(body)['company_id'], 'company_id');
+    const trx = this.tx.get();
+    await companyOf(trx, companyId);
+    const designated = await remittanceAccountOf(trx, companyId);
+    const result = await archiveCompanyBankAccount(trx, companyId, id);
+    if (!result) throw UNKNOWN_ACCOUNT();
+    const released =
+      result.changed && designated === id && (await remittanceAccountOf(trx, companyId)) === null;
+    const names = await this.glNames(companyId);
+    const view = viewOf(result.after, names);
+    if (result.changed)
+      this.audit.describe({
+        entityType: 'bank_account',
+        entityId: id,
+        before: viewOf(result.before, names),
+        after: { ...view, remittance_released: released },
+      });
+    return { account: view, changed: result.changed, remittance_released: released };
   }
 }

@@ -1,0 +1,69 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42463
+ ❯ |db| packages/db/src/bank-account-aba.db.test.ts (3 tests | 2 failed) 736ms
+     × SS-PLAT-151 lf_app sets the APCA user id, ABA user name and FI mnemonic of an active account [T-0193] 11ms
+     × SS-PLAT-151 an archived account keeps its ABA details: changing them is refused [T-0193] 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/db/src/bank-account-aba.db.test.ts > SS-PLAT-151: only the ABA header of a company bank account is editable in place > SS-PLAT-151 lf_app sets the APCA user id, ABA user name and FI mnemonic of an active account [T-0193]
+error: permission denied for table bank_account
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ UpdateQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/update-query-builder.js:455:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ UpdateQueryBuilder.execute node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-builder/update-query-builder.js:455:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/db/src/bank-account-aba.db.test.ts:102:5
+    100|   it('SS-PLAT-151 lf_app sets the APCA user id, ABA user name and FI m…
+    101|     const id = await addAccount('Operating');
+    102|     await inTenant((trx) =>
+       |     ^
+    103|       trx
+    104|         .updateTable('app.bank_account')
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |db| packages/db/src/bank-account-aba.db.test.ts > SS-PLAT-151: only the ABA header of a company bank account is editable in place > SS-PLAT-151 an archived account keeps its ABA details: changing them is refused [T-0193]
+AssertionError: expected error: permission denied for table bank_a… { …(15) } to match object { code: '23514', …(1) }
+(17 matching properties omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "code": "23514",
+-   "message": StringMatching /archived/,
++ DatabaseError {
++   "code": "42501",
+  }
+
+ ❯ packages/db/src/bank-account-aba.db.test.ts:179:6
+    177|           .execute(),
+    178|       ),
+    179|     ).rejects.toMatchObject({ code: '23514', message: expect.stringMat…
+       |      ^
+    180|     // Archiving and changing the details in the same statement is ref…
+    181|     await expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  21:36:19
+   Duration  1.79s (transform 125ms, setup 0ms, import 258ms, tests 736ms, environment 0ms)
+

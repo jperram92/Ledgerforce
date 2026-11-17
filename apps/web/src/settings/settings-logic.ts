@@ -92,13 +92,72 @@ export function bankNumberText(masked: string): string {
   return tail ? `ending ${tail}` : 'not shown';
 }
 
+/** A remittance account as the screen names it (T-0183): name, BSB and the last 3 digits only. */
+export function remittanceText(
+  a: { name: string; bsb: string; account_number: string } | null,
+): string {
+  if (!a) return 'no remittance account';
+  return `${a.name}: BSB ${a.bsb}, account ${bankNumberText(a.account_number)}`;
+}
+
+/** The choice value that asks to remove the remittance account (`bank_account_id: null`). */
+export const REMOVE_REMITTANCE = 'remove';
+
+/**
+ * What a change may ask for: every active account other than the one in force, and removal when
+ * one is in force. The API decides again (ADR-0080: 422 for archived, NO_CHANGE for the same).
+ */
+export function remittanceChoices(
+  accounts: { id: string; name: string; bsb: string; account_number: string; status: string }[],
+  currentId: string | null,
+): { value: string; label: string }[] {
+  const out = accounts
+    .filter((a) => a.status === 'active' && a.id !== currentId)
+    .map((a) => ({ value: a.id, label: remittanceText(a) }));
+  if (currentId !== null)
+    out.push({ value: REMOVE_REMITTANCE, label: 'None: remove the remittance account' });
+  return out;
+}
+
+/** A remittance-account refusal in plain words (ADR-0080); null for anything else. */
+export function remittanceRefusal(error: unknown): string | null {
+  if (!(error instanceof AdminApiError)) return null;
+  switch (error.code) {
+    case 'sod_violation':
+      return error.body['small_team_exception_required'] === true
+        ? 'You asked for this change. In small-team mode you may approve it yourself if you write why; it is recorded for the Owner’s weekly review.'
+        : 'You asked for this change, so you can’t approve it as well. Someone else with the Owner or Finance Admin role has to approve it.';
+    case 'invalid_sod_exception':
+      return 'Write why you are approving your own change, in up to 2,000 characters.';
+    case 'CHANGE_PENDING':
+      return 'Another change is already waiting for approval. Reload the page to see it, then approve or reject it first.';
+    case 'NOT_PENDING':
+    case 'CHANGE_NOT_FOUND':
+      return 'This change has already been approved or rejected. Reload the page to see where it stands.';
+    case 'STALE_REQUEST':
+      return 'The remittance account changed after this change was asked for. Reject this one and ask again.';
+    case 'BANK_ACCOUNT_ARCHIVED':
+      return 'That bank account has been archived, so customers cannot pay into it. Choose an active account.';
+    case 'NO_CHANGE':
+      return 'That is already the remittance account: nothing to change.';
+    case 'BANK_ACCOUNT_NOT_FOUND':
+      return 'That bank account is not in this company any more. Reload the page and choose again.';
+    case 'CHANGE_ID_CONFLICT':
+      return 'LedgerForce could not record this request. Reload the page and try again.';
+    case 'invalid_request':
+      return sentence(messageOf(error));
+    default:
+      return null;
+  }
+}
+
 /** The currency a new bank account starts with: its GL account's, else the base currency. */
 export const bankCurrencyFor = (
   gl: { currency: string | null } | undefined,
   baseCurrency: string,
 ): string => gl?.currency ?? baseCurrency;
 
-/** A bank-account refusal in plain words (ADR-0084); null for anything else. */
+/** A bank-account refusal in plain words (ADR-0084, ADR-0094); null for anything else. */
 export function bankRefusal(error: unknown): string | null {
   if (!(error instanceof AdminApiError)) return null;
   switch (error.code) {
@@ -108,6 +167,10 @@ export function bankRefusal(error: unknown): string | null {
       return 'That GL account cannot take a bank account: choose an active bank account in the chart (an asset of subtype bank) in the same currency.';
     case 'UNKNOWN_GL_ACCOUNT':
       return 'That GL account is no longer in the chart. Reload the page and choose again.';
+    case 'BANK_ACCOUNT_ARCHIVED':
+      return 'This bank account has been archived, so its ABA details cannot change. Add the account again as a new bank account if you still use it.';
+    case 'UNKNOWN_BANK_ACCOUNT':
+      return 'That bank account is no longer one of this company’s accounts. Reload the page and choose again.';
     case 'kms_not_configured':
       return 'LedgerForce cannot store bank account numbers yet: the key service that encrypts them is not set up. Ask whoever runs your LedgerForce.';
     case 'invalid_request':

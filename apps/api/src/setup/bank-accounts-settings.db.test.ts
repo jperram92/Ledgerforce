@@ -8,6 +8,11 @@
  *   again is 200 `replayed:true`, a different one 409 GL_ACCOUNT_IN_USE. No KMS → 503.
  * - The clear number appears in no response and no audit row; another tenant's company is 404.
  * - After adding an account with ABA details, wizard step 4 has nothing missing.
+ * SS-PLAT-152 — T-0193 (ADR-0094, RQ-0176): `PUT /setup/bank-accounts/:id/aba` and
+ *   `POST /setup/bank-accounts/:id/archive` (settings.setup.manage + step-up 300 s,
+ *   Idempotency-Key, masked before/after audit; the same state again 200 `changed:false`).
+ *   Archiving the designated remittance account releases it (`remittance_released`, migration
+ *   0072); an archived account's ABA details are 409; another company's or tenant's account 404.
  */
 import 'reflect-metadata';
 import { randomBytes, randomUUID } from 'node:crypto';
@@ -32,6 +37,8 @@ const people: Record<string, { id: string; roles: string[] }> = {
   fa: { id: randomUUID(), roles: ['finance_admin'] },
   accountant: { id: randomUUID(), roles: ['accountant'] },
   clerk: { id: randomUUID(), roles: ['ar_clerk'] },
+  // T-0193: a Finance Admin who never confirms their sign-in (step-up refusals).
+  stale: { id: randomUUID(), roles: ['finance_admin'] },
 };
 
 function call(
@@ -339,5 +346,272 @@ describe('SS-PLAT-130: company bank accounts over HTTP (wizard step 4)', () => {
     expect(r.status).toBe(503);
     expect(await json(r)).toEqual({ error: 'kms_not_configured' });
     expect(await rows()).toBe(2);
+  });
+});
+
+describe('SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193)', () => {
+  const abaBody = (extra: Record<string, unknown> = {}) => ({
+    company_id: c,
+    apca_user_id: '654321',
+    aba_user_name: 'BAY ST PAYROLL',
+    aba_fi_mnemonic: 'WBC',
+    ...extra,
+  });
+  const put = (id: string, body: unknown, who = 'fa', init: { key?: string | null } = {}) =>
+    call('PUT', `/setup/bank-accounts/${id}/aba`, who, { ...init, body });
+  const archive = (id: string, body: unknown, who = 'fa', init: { key?: string | null } = {}) =>
+    call('POST', `/setup/bank-accounts/${id}/archive`, who, { ...init, body });
+  const listed = async () =>
+    (await json(await call('GET', `/setup/bank-accounts?company_id=${c}`, 'fa')))[
+      'accounts'
+    ] as Record<string, unknown>[];
+  const idOf = async (name: RegExp) => {
+    const a = (await listed()).find(
+      (x) => name.test(String(x['name'])) && x['status'] === 'active',
+    );
+    if (!a) throw new Error(`no active account ${String(name)}`);
+    return String(a['id']);
+  };
+  const remittance = async () =>
+    (
+      await f.admin.query<{ id: string | null }>(
+        'SELECT remittance_bank_account_id AS id FROM app.ar_settings WHERE tenant_id = $1 AND company_id = $2',
+        [f.tenantId, c],
+      )
+    ).rows[0]?.id ?? null;
+  const bankAuditRows = async () =>
+    (
+      await f.admin.query<{ action: string; entity_id: string; before: unknown; after: unknown }>(
+        `SELECT action, entity_id, before, after FROM audit.audit_log
+          WHERE tenant_id = $1 AND entity_type = 'bank_account' ORDER BY id`,
+        [f.tenantId],
+      )
+    ).rows;
+
+  it('SS-PLAT-152 both routes need settings.setup.manage and a fresh step-up; nothing changes [T-0193]', async () => {
+    const payroll = await idOf(/^Payroll/);
+    const operating = await idOf(/^Operating/);
+    for (const r of [
+      await put(payroll, abaBody(), 'stale'),
+      await archive(operating, { company_id: c }, 'stale'),
+    ]) {
+      expect(r.status).toBe(401);
+      expect(await json(r)).toEqual({ error: 'step_up_required', max_age: 300 });
+    }
+    for (const r of [
+      await put(payroll, abaBody(), 'accountant'),
+      await archive(operating, { company_id: c }, 'accountant'),
+    ]) {
+      expect(r.status).toBe(403);
+      expect(await json(r)).toMatchObject({ permission: 'settings.setup.manage' });
+    }
+    expect((await listed()).find((x) => x['id'] === payroll)).toMatchObject({
+      apca_user_id: null,
+      status: 'active',
+    });
+    expect((await listed()).find((x) => x['id'] === operating)).toMatchObject({
+      status: 'active',
+    });
+  });
+
+  it('SS-PLAT-152 refusals: no key 400, malformed 400, unknown or another company’s or tenant’s account 404 [T-0193]', async () => {
+    await stepUp('fa');
+    const payroll = await idOf(/^Payroll/);
+    const noKey = await put(payroll, abaBody(), 'fa', { key: null });
+    expect(noKey.status).toBe(400);
+    expect((await json(noKey))['error']).toBe('idempotency_key_required');
+    const noKeyArchive = await archive(payroll, { company_id: c }, 'fa', { key: null });
+    expect(noKeyArchive.status).toBe(400);
+
+    for (const bad of [
+      { apca_user_id: '12345' },
+      { apca_user_id: undefined },
+      { aba_user_name: 'Name with | pipe' },
+      { aba_user_name: 'X'.repeat(27) },
+      { aba_user_name: '' },
+      { aba_fi_mnemonic: 'cba' },
+      { aba_fi_mnemonic: null },
+    ]) {
+      const r = await put(payroll, abaBody(bad), 'fa');
+      expect(r.status, JSON.stringify(bad)).toBe(400);
+      expect(await json(r)).toMatchObject({ error: 'invalid_request' });
+    }
+    const notUuid = await put('not-a-uuid', abaBody());
+    expect(notUuid.status).toBe(400);
+
+    const unknown = await put(randomUUID(), abaBody());
+    expect(unknown.status).toBe(404);
+    expect((await json(unknown))['error']).toBe('UNKNOWN_BANK_ACCOUNT');
+    const unknownArchive = await archive(randomUUID(), { company_id: c });
+    expect(unknownArchive.status).toBe(404);
+    expect((await json(unknownArchive))['error']).toBe('UNKNOWN_BANK_ACCOUNT');
+
+    // The account exists, but under another company of this tenant: 404, not changed.
+    const elsewhere = await put(payroll, abaBody({ company_id: f.companyId }));
+    expect(elsewhere.status).toBe(404);
+    expect((await json(elsewhere))['error']).toBe('UNKNOWN_BANK_ACCOUNT');
+    // Another tenant's company and another tenant's account: RLS hides both.
+    const foreign = await put(payroll, abaBody({ company_id: other.companyId }));
+    expect(foreign.status).toBe(404);
+    const theirGl = randomUUID();
+    await other.admin.query(
+      `INSERT INTO app.account (id, tenant_id, company_id, code, name, type, subtype, normal_balance)
+       VALUES ($1, $2, $3, '1090', 'Their bank', 'asset', 'bank', 'debit')`,
+      [theirGl, other.tenantId, other.companyId],
+    );
+    const theirAccount = randomUUID();
+    await other.admin.query(
+      `INSERT INTO app.bank_account (id, tenant_id, company_id, gl_account_id, name, currency, bsb,
+         account_name, account_number_last3, account_number_ct, account_number_iv,
+         account_number_tag, dek_wrapped, kek_id, enc_version)
+       VALUES ($1, $2, $3, $4, 'Theirs', 'AUD', '062-000', 'Them', '111', '\\x00',
+         decode(repeat('00', 12), 'hex'), decode(repeat('00', 16), 'hex'),
+         decode(repeat('00', 60), 'hex'), 'k1', 1)`,
+      [theirAccount, other.tenantId, other.companyId, theirGl],
+    );
+    expect((await put(theirAccount, abaBody())).status).toBe(404);
+    expect((await archive(theirAccount, { company_id: c })).status).toBe(404);
+    const stillTheirs = await other.admin.query<{ apca: string | null; status: string }>(
+      'SELECT apca_user_id AS apca, status FROM app.bank_account WHERE id = $1',
+      [theirAccount],
+    );
+    expect(stillTheirs.rows[0]).toEqual({ apca: null, status: 'active' });
+    expect((await listed()).find((x) => x['id'] === payroll)).toMatchObject({
+      apca_user_id: null,
+    });
+  });
+
+  it('SS-PLAT-152 archiving the designated remittance account releases it, audits masked, and step 4 asks for ABA details again [T-0193]', async () => {
+    await stepUp('fa');
+    const operating = await idOf(/^Operating/);
+    await f.admin.query(
+      `INSERT INTO app.ar_settings (tenant_id, company_id, remittance_bank_account_id) VALUES ($1, $2, $3)
+       ON CONFLICT (tenant_id, company_id) DO UPDATE SET remittance_bank_account_id = EXCLUDED.remittance_bank_account_id`,
+      [f.tenantId, c, operating],
+    );
+    expect(await remittance()).toBe(operating);
+    const audits = (await bankAuditRows()).length;
+
+    const r = await archive(operating, { company_id: c });
+    expect(r.status).toBe(200);
+    const text = await r.text();
+    expect(text).not.toContain(NUMBER);
+    expect(JSON.parse(text)).toEqual({
+      changed: true,
+      remittance_released: true,
+      account: expect.objectContaining({
+        id: operating,
+        name: 'Operating',
+        account_number: '***678',
+        status: 'archived',
+      }) as unknown,
+    });
+    expect(await remittance()).toBeNull();
+    const rows = await bankAuditRows();
+    expect(rows).toHaveLength(audits + 1);
+    expect(rows.at(-1)).toMatchObject({
+      action: 'POST /setup/bank-accounts/:id/archive',
+      entity_id: operating,
+      before: expect.objectContaining({ status: 'active', account_number: '***678' }) as unknown,
+      after: expect.objectContaining({
+        status: 'archived',
+        account_number: '***678',
+        remittance_released: true,
+      }) as unknown,
+    });
+    expect(JSON.stringify(rows)).not.toContain(NUMBER);
+    const released = await f.admin.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM audit.audit_log
+        WHERE tenant_id = $1 AND action = 'remittance_account.released' AND entity_id = $2`,
+      [f.tenantId, c],
+    );
+    expect(released.rows[0]?.n).toBe(1);
+    expect(await wizardMissing()).toEqual([
+      'No bank account has an APCA user id and ABA user name (batch payments)',
+    ]);
+    // The GL account is free again: a replacement can be added on it.
+    const list = await json(await call('GET', `/setup/bank-accounts?company_id=${c}`, 'fa'));
+    expect(list['gl_accounts']).toContainEqual(
+      expect.objectContaining({ code: '1010', in_use: false }),
+    );
+
+    // Again: nothing to do, no bank_account audit, nothing released.
+    const again = await archive(operating, { company_id: c });
+    expect(again.status).toBe(200);
+    expect(await json(again)).toMatchObject({
+      changed: false,
+      remittance_released: false,
+      account: { id: operating, status: 'archived' },
+    });
+    expect(await bankAuditRows()).toHaveLength(audits + 1);
+  });
+
+  it('SS-PLAT-152 PUT sets the ABA details, audits before/after masked, empties step 4; the same values again change nothing [T-0193]', async () => {
+    await stepUp('fa');
+    const payroll = await idOf(/^Payroll/);
+    const audits = (await bankAuditRows()).length;
+    const r = await put(payroll, abaBody());
+    expect(r.status).toBe(200);
+    const text = await r.text();
+    const body = JSON.parse(text) as { account: Record<string, unknown>; changed: boolean };
+    expect(body.changed).toBe(true);
+    expect(body.account).toMatchObject({
+      id: payroll,
+      apca_user_id: '654321',
+      aba_user_name: 'BAY ST PAYROLL',
+      aba_fi_mnemonic: 'WBC',
+      status: 'active',
+      bsb: '062-000',
+    });
+    expect(String(body.account['account_number'])).toMatch(/^\*\*\*\d{3}$/);
+    expect(text).not.toMatch(/11111111|22222222/);
+    const rows = await bankAuditRows();
+    expect(rows).toHaveLength(audits + 1);
+    expect(rows.at(-1)).toMatchObject({
+      action: 'PUT /setup/bank-accounts/:id/aba',
+      entity_id: payroll,
+      before: expect.objectContaining({
+        apca_user_id: null,
+        aba_user_name: null,
+        aba_fi_mnemonic: null,
+      }) as unknown,
+      after: expect.objectContaining({
+        apca_user_id: '654321',
+        aba_user_name: 'BAY ST PAYROLL',
+        aba_fi_mnemonic: 'WBC',
+      }) as unknown,
+    });
+    expect(JSON.stringify(rows)).not.toMatch(/11111111|22222222/);
+    expect(await wizardMissing()).toEqual([]);
+
+    const again = await put(payroll, abaBody());
+    expect(again.status).toBe(200);
+    expect(await json(again)).toMatchObject({
+      changed: false,
+      account: { apca_user_id: '654321' },
+    });
+    expect(await bankAuditRows()).toHaveLength(audits + 1);
+
+    // A correction is a change again.
+    const fix = await put(payroll, abaBody({ aba_fi_mnemonic: 'CBA' }));
+    expect(await json(fix)).toMatchObject({ changed: true, account: { aba_fi_mnemonic: 'CBA' } });
+    expect(await bankAuditRows()).toHaveLength(audits + 2);
+  });
+
+  it('SS-PLAT-152 an archived account’s ABA details cannot change: 409 BANK_ACCOUNT_ARCHIVED [T-0193]', async () => {
+    await stepUp('fa');
+    const archived = (await listed()).find(
+      (x) => x['name'] === 'Operating' && x['status'] === 'archived',
+    );
+    const id = String(archived?.['id']);
+    const audits = (await bankAuditRows()).length;
+    const r = await put(id, abaBody());
+    expect(r.status).toBe(409);
+    expect((await json(r))['error']).toBe('BANK_ACCOUNT_ARCHIVED');
+    expect((await listed()).find((x) => x['id'] === id)).toMatchObject({
+      apca_user_id: '123456',
+      aba_user_name: 'BAY STREET STUDIO',
+    });
+    expect(await bankAuditRows()).toHaveLength(audits);
   });
 });

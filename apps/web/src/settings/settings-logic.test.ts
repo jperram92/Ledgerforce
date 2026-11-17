@@ -10,6 +10,10 @@ import {
   dayText,
   fiscalStart,
   percentOf,
+  REMOVE_REMITTANCE,
+  remittanceChoices,
+  remittanceRefusal,
+  remittanceText,
   taxRefusal,
 } from './settings-logic.ts';
 
@@ -100,5 +104,83 @@ describe('T-0185 bank accounts logic (SS-PLAT-130)', () => {
     );
     expect(bankRefusal(new Error('x'))).toBeNull();
     expect(bankRefusal(e(500, 'boom'))).toBeNull();
+  });
+
+  it('SS-PLAT-153 turns the ABA change and archive refusals into plain words [T-0193]', () => {
+    const e = (status: number, error: string) => new AdminApiError(status, { error, message: 'x' });
+    expect(bankRefusal(e(409, 'BANK_ACCOUNT_ARCHIVED'))).toMatch(
+      /archived, so its ABA details cannot change.*new bank account/,
+    );
+    expect(bankRefusal(e(404, 'UNKNOWN_BANK_ACCOUNT'))).toMatch(
+      /no longer one of this company’s accounts/,
+    );
+  });
+});
+
+describe('T-0183 remittance account logic (SS-PLAT-149)', () => {
+  const operating = {
+    id: 'a1',
+    name: 'Operating',
+    bsb: '062-000',
+    account_name: 'Harbour & Co Pty Ltd',
+    account_number: '***678',
+    currency: 'AUD',
+    status: 'active',
+  };
+
+  it('SS-PLAT-149 names a remittance account by its BSB and last 3 digits only', () => {
+    expect(remittanceText(operating)).toBe('Operating: BSB 062-000, account ending 678');
+    expect(remittanceText({ ...operating, account_number: '12345678' })).toBe(
+      'Operating: BSB 062-000, account ending 678',
+    );
+    expect(remittanceText(null)).toBe('no remittance account');
+  });
+
+  it('SS-PLAT-149 offers active accounts other than the one in force, and removal when one is', () => {
+    const reserve = { ...operating, id: 'a2', name: 'Reserve', account_number: '***321' };
+    const old = { ...operating, id: 'a3', name: 'Old', status: 'archived' };
+    expect(remittanceChoices([operating, reserve, old], null)).toEqual([
+      { value: 'a1', label: 'Operating: BSB 062-000, account ending 678' },
+      { value: 'a2', label: 'Reserve: BSB 062-000, account ending 321' },
+    ]);
+    expect(remittanceChoices([operating, reserve, old], 'a1')).toEqual([
+      { value: 'a2', label: 'Reserve: BSB 062-000, account ending 321' },
+      { value: REMOVE_REMITTANCE, label: 'None: remove the remittance account' },
+    ]);
+  });
+
+  it('SS-PLAT-149 turns the remittance refusals into plain words', () => {
+    const e = (status: number, body: Record<string, unknown>) => new AdminApiError(status, body);
+    const sod = { error: 'sod_violation', rule: 'SOD_REMITTANCE_SELF_APPROVAL' };
+    expect(remittanceRefusal(e(403, { ...sod, small_team_exception_required: false }))).toMatch(
+      /You asked for this change, so you can’t approve it as well/,
+    );
+    expect(remittanceRefusal(e(403, { ...sod, small_team_exception_required: true }))).toMatch(
+      /small-team mode you may approve it yourself if you write why/,
+    );
+    expect(remittanceRefusal(e(409, { error: 'CHANGE_PENDING' }))).toMatch(
+      /Another change is already waiting for approval/,
+    );
+    expect(remittanceRefusal(e(409, { error: 'NOT_PENDING' }))).toMatch(
+      /already been approved or rejected/,
+    );
+    expect(remittanceRefusal(e(404, { error: 'CHANGE_NOT_FOUND' }))).toMatch(
+      /already been approved or rejected/,
+    );
+    expect(remittanceRefusal(e(409, { error: 'STALE_REQUEST' }))).toMatch(
+      /changed after this change was asked for/,
+    );
+    expect(remittanceRefusal(e(422, { error: 'BANK_ACCOUNT_ARCHIVED' }))).toMatch(/archived/);
+    expect(remittanceRefusal(e(422, { error: 'NO_CHANGE' }))).toMatch(/already the remittance/);
+    expect(remittanceRefusal(e(404, { error: 'BANK_ACCOUNT_NOT_FOUND' }))).toMatch(
+      /not in this company/,
+    );
+    expect(remittanceRefusal(e(409, { error: 'CHANGE_ID_CONFLICT' }))).toMatch(/try again/);
+    expect(remittanceRefusal(e(400, { error: 'invalid_sod_exception' }))).toMatch(/Write why/);
+    expect(
+      remittanceRefusal(e(400, { error: 'invalid_request', message: 'a reason is required' })),
+    ).toBe('A reason is required.');
+    expect(remittanceRefusal(new Error('x'))).toBeNull();
+    expect(remittanceRefusal(e(500, { error: 'boom' }))).toBeNull();
   });
 });

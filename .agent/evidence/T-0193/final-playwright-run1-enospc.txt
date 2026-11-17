@@ -1,0 +1,137 @@
+
+Running 13 tests using 2 workers
+
+[1/13] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 1440 [T-0193]
+[2/13] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:384:1 › SS-PLAT-153: refusals are said in plain words and nothing changes [T-0193]
+[3/13] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:422:1 › SS-PLAT-153: an Accountant sees no way to change or archive an account [T-0193]
+[4/13] [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:292:3 › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 1440 [T-0185]
+[5/13] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193]
+  1) [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:292:3 › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 1440 [T-0185] 
+
+    Error: page.screenshot: Target crashed 
+    Call log:
+      - taking page screenshot
+      - waiting for fonts to load...
+      - fonts loaded
+
+
+       at ../../packages/testing/src/evidence/fixture.ts:54
+
+      52 |         date,
+      53 |       });
+    > 54 |       await page.screenshot({ path, fullPage: true });
+         |                  ^
+      55 |       await testInfo.attach(`${scenarioId}-${slug}`, { path, contentType: 'image/png' });
+      56 |       pending.push({
+      57 |         scenario: scenarioId,
+        at evidence (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/packages/testing/src/evidence/fixture.ts:54:18)
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/tests/e2e/web/settings-bank-accounts.spec.ts:327:11
+
+    attachment #1: SS-PLAT-130-bank-accounts-empty-1440 (image/png) ────────────────────────────────
+    test-results/web-settings-bank-accounts-5208f-sees-it-masked-1440-T-0185--chromium/attachments/SS-PLAT-130-bank-accounts-empty-1440-830af725f487728998f89d734ecdfa446c4a2c37.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/web-settings-bank-accounts-5208f-sees-it-masked-1440-T-0185--chromium/error-context.md
+
+    Error Context: test-results/web-settings-bank-accounts-5208f-sees-it-masked-1440-T-0185--chromium/error-context.md
+
+
+[6/13] [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:292:3 › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 390 [T-0185]
+  2) [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:251:3 › SS-PLAT-153: the Finance Admin sets the payroll account's ABA details, then archives the operating account after a confirmation @ 390 [T-0193] 
+
+    Error: page.screenshot: Protocol error (Page.captureScreenshot): Unable to capture screenshot
+    Call log:
+      - taking page screenshot
+      - waiting for fonts to load...
+      - fonts loaded
+
+
+       at ../../packages/testing/src/evidence/fixture.ts:54
+
+      52 |         date,
+      53 |       });
+    > 54 |       await page.screenshot({ path, fullPage: true });
+         |                  ^
+      55 |       await testInfo.attach(`${scenarioId}-${slug}`, { path, contentType: 'image/png' });
+      56 |       pending.push({
+      57 |         scenario: scenarioId,
+        at evidence (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/packages/testing/src/evidence/fixture.ts:54:18)
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/tests/e2e/web/settings-bank-accounts-edit.spec.ts:279:11
+
+    attachment #1: SS-PLAT-153-bank-accounts-aba-form-390 (image/png) ──────────────────────────────
+    test-results/web-settings-bank-accounts-1f51b--a-confirmation-390-T-0193--chromium/attachments/SS-PLAT-153-bank-accounts-aba-form-390-a0f3a80bb2306cf8e9aa746421262a06092072b9.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/web-settings-bank-accounts-1f51b--a-confirmation-390-T-0193--chromium/error-context.md
+
+    Error Context: test-results/web-settings-bank-accounts-1f51b--a-confirmation-390-T-0193--chromium/error-context.md
+
+
+  3) [chromium] › tests/e2e/web/settings-bank-accounts.spec.ts:292:3 › SS-PLAT-130: the Finance Admin follows step 4's link, adds the operating account with its ABA details and sees it masked @ 390 [T-0185] 
+
+    Error: page.goto: net::ERR_INSUFFICIENT_RESOURCES at http://127.0.0.1:33651/settings/setup
+    Call log:
+      - navigating to "http://127.0.0.1:33651/settings/setup", waiting until "load"
+
+
+      223 | async function open(page: Page, path: string, width: number) {
+      224 |   await page.setViewportSize({ width, height: width > 600 ? 900 : 844 });
+    > 225 |   await page.goto(`${origin}${path}`);
+          |              ^
+      226 |   await expect(page.locator('h1')).toHaveCount(1);
+      227 |   await page.evaluate(() => document.fonts.ready);
+      228 | }
+        at open (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/tests/e2e/web/settings-bank-accounts.spec.ts:225:14)
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/tests/e2e/web/settings-bank-accounts.spec.ts:297:5
+
+    Error Context: test-results/web-settings-bank-accounts-d492c--sees-it-masked-390-T-0185--chromium/error-context.md
+
+    Error Context: test-results/web-settings-bank-accounts-d492c--sees-it-masked-390-T-0185--chromium/error-context.md
+
+
+[7/13] [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:348:1 › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; "Keep it" archives nothing [T-0193]
+[chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:348:1 › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; "Keep it" archives nothing [T-0193]
+Error: ENOSPC: no space left on device, mkdir '/tmp/lf-web-rIJnun/deps_temp_f156925b'
+    at Object.mkdirSync (node:fs:1370:26)
+    at runOptimizeDeps (file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:28635:5)
+    at file:///home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/vite@8.3.5_@types+node@22.20.5_yaml@2.9.1/node_modules/vite/dist/node/chunks/node.js:35985:28
+
+  4) [chromium] › tests/e2e/web/settings-bank-accounts-edit.spec.ts:348:1 › SS-PLAT-153: changing or archiving asks for a fresh sign-in first; "Keep it" archives nothing [T-0193] 
+
+    Error: browserType.launch: Target page, context or browser has been closed
+    Browser logs:
+
+    <launching> /opt/pw-browsers/chromium_headless_shell-1243/chrome-headless-shell-linux64/chrome-headless-shell --disable-field-trial-config --disable-background-networking --disable-background-timer-throttling --disable-backgrounding-occluded-windows --disable-back-forward-cache --disable-breakpad --disable-client-side-phishing-detection --disable-component-extensions-with-background-pages --disable-component-update --no-default-browser-check --disable-default-apps --disable-dev-shm-usage --disable-edgeupdater --disable-extensions --disable-features=AvoidUnnecessaryBeforeUnloadCheckSync,DestroyProfileOnBrowserClose,DialMediaRouteProvider,GlobalMenode:events:497
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: ENOSPC: no space left on device, write
+    at writeSync (node:fs:916:3)
+    at SyncWriteStream._write (node:internal/fs/sync_write_stream:27:5)
+    at writeOrBuffer (node:internal/streams/writable:572:12)
+    at _write (node:internal/streams/writable:501:10)
+    at SyncWriteStream.Writable.write (node:internal/streams/writable:510:10)
+    at StripAnsiStream.write (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/runner/index.js:1067:25)
+    at LineReporter.writeLine (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/runner/index.js:1314:25)
+    at LineReporter.onTestEnd (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/runner/index.js:4626:12)
+    at /home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/runner/index.js:1632:44
+    at Multiplexer._wrap (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/runner/index.js:1675:7)
+    at Multiplexer.onTestEnd (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/runner/index.js:1632:12)
+    at InternalReporter.onTestEnd (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/runner/index.js:1817:31)
+    at JobDispatcher._reportTestEnd (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/runner/index.js:6028:39)
+    at JobDispatcher._onTestEnd (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/runner/index.js:5783:10)
+    at WorkerHost.emit (node:events:519:28)
+    at ChildProcess.<anonymous> (/home/user/Ledgerforce/.claude/worktrees/agent-a95a308f72979efb5/node_modules/.pnpm/playwright@1.63.0/node_modules/playwright/lib/runner/index.js:1958:16)
+    at ChildProcess.emit (node:events:519:28)
+    at emit (node:internal/child_process:949:14)
+    at processTicksAndRejections (node:internal/process/task_queues:90:21)
+Emitted 'error' event on SyncWriteStream instance at:
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at processTicksAndRejections (node:internal/process/task_queues:89:21) {
+  errno: -28,
+  syscall: 'write',
+  code: 'ENOSPC'
+}
+
+Node.js v22.23.4

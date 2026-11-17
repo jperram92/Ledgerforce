@@ -1,0 +1,7 @@
+ ✓ |db| packages/modules/ap/src/inbox-mailbox.db.test.ts > SS-PLAT-154: A message in the bills mailbox becomes one inbox item > SS-PLAT-154 one item per message; re-poll, a UIDVALIDITY reset and concurrent polls add nothing; the mailbox is untouched 157ms
+ ✓ |db| packages/modules/ap/src/inbox-mailbox.db.test.ts > SS-PLAT-154: A message in the bills mailbox becomes one inbox item > SS-PLAT-154 the tenant poll covers every active mailbox of the tenant and only those 180ms
+ ✓ |db| packages/modules/ap/src/inbox-mailbox.db.test.ts > SS-PLAT-155: Oversize or invalid mail is refused without blocking the inbox > SS-PLAT-155 a too-large message is not downloaded, a 10 MB+ PDF is refused, later mail still arrives; batches resume 489ms
+ ✓ |db| packages/modules/ap/src/inbox-mailbox.db.test.ts > SS-PLAT-156: Mailbox credentials are sealed and failures never leak them > SS-PLAT-156 the password is envelope-encrypted, AAD-bound to its row, never returned; a change supersedes 28ms
+ ✓ |db| packages/modules/ap/src/inbox-mailbox.db.test.ts > SS-PLAT-156: Mailbox credentials are sealed and failures never leak them > SS-PLAT-156 a refused login is recorded as auth_failed without server text; the cursor stays; the poll does not throw 50ms
+ ✓ |db| packages/modules/ap/src/inbox-mailbox.db.test.ts > SS-PLAT-156: Mailbox credentials are sealed and failures never leak them > SS-PLAT-156 lf_app cannot rewrite the identity or secret columns, and input is validated 46ms
+      Tests  6 passed (6)

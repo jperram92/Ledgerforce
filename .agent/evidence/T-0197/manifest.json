@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0197",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-145",
+      "file": ".agent/evidence/T-0197/tests-db.json",
+      "test": "7 test(s): apps/worker/src/security-notices.db.test.ts › SS-PLAT-145 the owner installs the every-minute schedule and both queues idempotently [T-0197] | apps/worker/src/security-notices.db.test.ts › SS-PLAT-145 fan-out sends one job per active tenant and minute; a repeat in that minute adds nothing [T-0197] | apps/worker/src/security-notices.db.test.ts › SS-PLAT-145 without SMTP the job sends nothing and the notices stay pending [T-0197] | apps/worker/src/security-notices.db.test.ts › SS-PLAT-145 the worker job sends the tenant's due notices once [T-0197] | packages/modules/email/src/security-notice-email.db.test.ts › SS-PLAT-145 each Owner and Finance Admin gets one plain-text notice; the notice becomes sent [T-0197] | packages/modules/email/src/security-notice-email.db.test.ts › SS-PLAT-145 a redelivery sends nothing again [T-0197] | packages/modules/email/src/security-notice-email.db.test.ts › SS-PLAT-145 two dispatchers running at once send each notice exactly once [T-0197]",
+      "commit": "e5961a9",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:59:53.483Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-146",
+      "file": ".agent/evidence/T-0197/tests-db.json",
+      "test": "1 test(s): packages/modules/email/src/security-notice-email.db.test.ts › SS-PLAT-146 the supplier contact gets one masked notice; a no_recipient notice is never sent [T-0197]",
+      "commit": "e5961a9",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:59:53.483Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-147",
+      "file": ".agent/evidence/T-0197/tests-db.json",
+      "test": "4 test(s): packages/modules/email/src/security-notice-email.db.test.ts › SS-PLAT-147 the retry delay doubles from 1 minute and stops growing at 6 hours [T-0197] | packages/modules/email/src/security-notice-email.db.test.ts › SS-PLAT-147 a refused send marks the notice failed, waits out the backoff, then sends it [T-0197] | packages/modules/email/src/security-notice-email.db.test.ts › SS-PLAT-147 a tenant's dispatch never reads or sends another tenant's notices [T-0197] | packages/modules/email/src/security-notice-email.db.test.ts › SS-PLAT-147 lf_app can only append delivery records, and only one sent record per notice [T-0197]",
+      "commit": "e5961a9",
+      "provider": "claude",
+      "timestamp": "2026-11-17T04:59:53.483Z",
+      "result": "passed"
+    }
+  ]
+}

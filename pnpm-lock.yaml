@@ -223,6 +223,9 @@ importers:
 
   apps/worker:
     dependencies:
+      '@ledgerforce/ap':
+        specifier: workspace:*
+        version: link:../../packages/modules/ap
       '@ledgerforce/ar':
         specifier: workspace:*
         version: link:../../packages/modules/ar
@@ -657,6 +660,9 @@ importers:
       '@ledgerforce/ledger':
         specifier: workspace:*
         version: link:../../ledger
+      '@ledgerforce/parties':
+        specifier: workspace:*
+        version: link:../parties
       '@ledgerforce/products':
         specifier: workspace:*
         version: link:../products

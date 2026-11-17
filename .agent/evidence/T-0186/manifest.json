@@ -109,6 +109,114 @@
       "provider": "unknown",
       "timestamp": "2026-11-16T08:02:05.219Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214439-SS-PLAT-131-approvals-suggested-1440.png",
+      "test": "web/settings-approvals.spec.ts › SS-PLAT-131: Approval amounts: the Owner follows step 10's link, changes the journal amount with a reason and saves @ 1440 [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:39.752Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214440-SS-PLAT-131-approvals-saved-1440.png",
+      "test": "web/settings-approvals.spec.ts › SS-PLAT-131: Approval amounts: the Owner follows step 10's link, changes the journal amount with a reason and saves @ 1440 [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:40.614Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214440-SS-PLAT-131-wizard-step-10-ready-1440.png",
+      "test": "web/settings-approvals.spec.ts › SS-PLAT-131: Approval amounts: the Owner follows step 10's link, changes the journal amount with a reason and saves @ 1440 [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:40.787Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214443-SS-PLAT-131-approvals-read-only-1440.png",
+      "test": "web/settings-approvals.spec.ts › SS-PLAT-131: a Finance Admin sees the approval amounts read-only [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:43.386Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214443-SS-PLAT-131-approvals-suggested-390.png",
+      "test": "web/settings-approvals.spec.ts › SS-PLAT-131: Approval amounts: the Owner follows step 10's link, changes the journal amount with a reason and saves @ 390 [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:43.039Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214443-SS-PLAT-131-approvals-saved-390.png",
+      "test": "web/settings-approvals.spec.ts › SS-PLAT-131: Approval amounts: the Owner follows step 10's link, changes the journal amount with a reason and saves @ 390 [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:43.802Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214454-SS-PLAT-131-billing-empty-1440.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 1440 [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:54.354Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214455-SS-PLAT-131-billing-saved-1440.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 1440 [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:55.756Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214456-SS-PLAT-131-wizard-step-8-ready-1440.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 1440 [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:56.054Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214457-SS-PLAT-131-billing-read-only-1440.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: an Accountant sees Numbering and billing read-only [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:57.675Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214458-SS-PLAT-131-billing-empty-390.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 390 [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:58.115Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261116-214459-SS-PLAT-131-billing-saved-390.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 390 [T-0186]",
+      "commit": "bcf5dae06e55-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-16T21:44:59.477Z",
+      "result": "passed"
     }
   ]
 }

@@ -5,7 +5,7 @@
     {
       "scenario": "SS-PLAT-141",
       "file": ".agent/evidence/T-0192/20261116-080322-SS-PLAT-141-release-step-up-prompt-old-session.png",
-      "test": "web/step-up-rotation.spec.ts \u203a SS-PLAT-141 Step-up rotates the session: the release screen stays put and the retried release succeeds with the new cookie [T-0192]",
+      "test": "web/step-up-rotation.spec.ts › SS-PLAT-141 Step-up rotates the session: the release screen stays put and the retried release succeeds with the new cookie [T-0192]",
       "commit": "7814ba495fee",
       "provider": "unknown",
       "timestamp": "2026-11-16T08:03:22.248Z",
@@ -14,7 +14,7 @@
     {
       "scenario": "SS-PLAT-141",
       "file": ".agent/evidence/T-0192/20261116-080323-SS-PLAT-141-release-succeeds-on-rotated-session.png",
-      "test": "web/step-up-rotation.spec.ts \u203a SS-PLAT-141 Step-up rotates the session: the release screen stays put and the retried release succeeds with the new cookie [T-0192]",
+      "test": "web/step-up-rotation.spec.ts › SS-PLAT-141 Step-up rotates the session: the release screen stays put and the retried release succeeds with the new cookie [T-0192]",
       "commit": "7814ba495fee",
       "provider": "unknown",
       "timestamp": "2026-11-16T08:03:23.752Z",
@@ -23,10 +23,64 @@
     {
       "scenario": "SS-PLAT-141",
       "file": ".agent/evidence/T-0192/20261116-080324-SS-PLAT-141-bank-detail-verified-on-rotated-session-390.png",
-      "test": "web/step-up-rotation.spec.ts \u203a SS-PLAT-141 Step-up rotates the session: the typed verification note survives and the retried verify succeeds [T-0192]",
+      "test": "web/step-up-rotation.spec.ts › SS-PLAT-141 Step-up rotates the session: the typed verification note survives and the retried verify succeeds [T-0192]",
       "commit": "7814ba495fee",
       "provider": "unknown",
       "timestamp": "2026-11-16T08:03:24.225Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-20",
+      "file": ".agent/evidence/T-0192/20261117-100109-tests-api-db.json",
+      "test": "15 test(s): apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › an Accountant who logged in without MFA is refused on a finance endpoint (403 mfa_required), and it is audited | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › member routes stay open without MFA, so the Accountant can see who they are and step up | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › an Accountant with MFA (amr otp) may call it; an idle session of 31 minutes is refused (401 session_expired) | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › a configured MFA acr counts as MFA even when amr shows only a password | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › a non-finance role (AR Clerk) is unaffected without MFA | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › holding one finance role among others is enough to require MFA | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › role owner without MFA: refused = true | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › role finance_admin without MFA: refused = true | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › role accountant without MFA: refused = true | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › role ar_clerk without MFA: refused = false | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › role ap_clerk without MFA: refused = true | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › role approver without MFA: refused = false | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › role payroll_officer without MFA: refused = true | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › role auditor without MFA: refused = false | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-20: MFA and session policy for finance roles › after an MFA step-up the rotated session may use finance endpoints (ADR-0087)",
+      "commit": "0c2f47f68df0",
+      "provider": "claude",
+      "timestamp": "2026-11-17T10:01:09.378Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC06-03",
+      "file": ".agent/evidence/T-0192/20261117-100109-tests-api-db.json",
+      "test": "3 test(s): apps/api/src/authz/mfa-step-up.db.test.ts › SS-UC06-03: Release requires step-up MFA › user B without a fresh step-up gets step_up_required; after step-up the release succeeds | apps/api/src/authz/mfa-step-up.db.test.ts › SS-UC06-03: Release requires step-up MFA › a fresh login without MFA is not a step-up: the Approver (no MFA needed to sign in) is refused | apps/api/src/authz/mfa-step-up.db.test.ts › SS-UC06-03: Release requires step-up MFA › the step-up lasts its maximum age: 301 seconds later the release is refused again",
+      "commit": "0c2f47f68df0",
+      "provider": "claude",
+      "timestamp": "2026-11-17T10:01:09.378Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-58",
+      "file": ".agent/evidence/T-0192/20261117-100109-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-58: Step-up re-authenticates the signed-in user (rotated session, ADR-0087) › step-up redirects to the IdP with prompt=login, max_age and the MFA acr_values, plus PKCE, state and nonce | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-58: Step-up re-authenticates the signed-in user (rotated session, ADR-0087) › the IdP re-authenticates even though it still has an SSO session | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-58: Step-up re-authenticates the signed-in user (rotated session, ADR-0087) › the callback records auth_time, amr and acr on a new rotated session, sets its cookie, and audits the rotation | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-58: Step-up re-authenticates the signed-in user (rotated session, ADR-0087) › a login stores the auth_time the IdP asserted | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-58: Step-up re-authenticates the signed-in user (rotated session, ADR-0087) › without return_to the step-up lands on /; a replayed callback is refused",
+      "commit": "0c2f47f68df0",
+      "provider": "claude",
+      "timestamp": "2026-11-17T10:01:09.378Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-59",
+      "file": ".agent/evidence/T-0192/20261117-100109-tests-api-db.json",
+      "test": "10 test(s): apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-59: Step-up fails closed › a step-up completed at the IdP as another user is refused (403 step_up_mismatch), session unchanged, audited | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-59: Step-up fails closed › a step-up without MFA is refused (403 mfa_required) and does not touch the session | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-59: Step-up fails closed › an IdP answer with a stale auth_time is rejected by the max_age check (400 login_failed) | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-59: Step-up fails closed › the callback needs the same session cookie that started the step-up | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-59: Step-up fails closed › a session that ended (logout) cannot be stepped up | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-59: Step-up fails closed › starting a step-up needs a session and a sane max_age and return_to | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-59: Step-up fails closed › a session without a recorded auth_time never satisfies a step-up | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-59: Step-up fails closed › bank-detail change and period reopen need a fresh step-up too | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-59: Step-up fails closed › a route with a step-up permission but no @RequireStepUp still demands step-up | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-59: Step-up fails closed › permission comes before step-up: a user without the permission gets 403 forbidden, not a step-up prompt",
+      "commit": "0c2f47f68df0",
+      "provider": "claude",
+      "timestamp": "2026-11-17T10:01:09.378Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-139",
+      "file": ".agent/evidence/T-0192/20261117-100109-tests-api-db.json",
+      "test": "3 test(s): apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-139: Step-up rotates the session id and cookie (ASVS 5.0 7.2.4) › SS-PLAT-139 after a step-up the old session cookie is refused and the new one works with the fresh step-up time | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-139: Step-up rotates the session id and cookie (ASVS 5.0 7.2.4) › SS-PLAT-139 the rotated session keeps the 12-hour cap and the revoke-all epoch; logout ends it | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-139: Step-up rotates the session id and cookie (ASVS 5.0 7.2.4) › SS-PLAT-139 a refused step-up issues no cookie and the old session keeps working unchanged",
+      "commit": "0c2f47f68df0",
+      "provider": "claude",
+      "timestamp": "2026-11-17T10:01:09.378Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-140",
+      "file": ".agent/evidence/T-0192/20261117-100109-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-140: Rotation under concurrency fails closed › SS-PLAT-140 a concurrent request with the old cookie during rotation fails closed (401), never with elevated rights | apps/api/src/authz/mfa-step-up.db.test.ts › SS-PLAT-140: Rotation under concurrency fails closed › SS-PLAT-140 requests racing the callback with the old cookie never get the fresh step-up",
+      "commit": "0c2f47f68df0",
+      "provider": "claude",
+      "timestamp": "2026-11-17T10:01:09.378Z",
       "result": "passed"
     }
   ]

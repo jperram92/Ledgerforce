@@ -166,7 +166,10 @@ async function call(
   path: string,
   who?: Who,
   body?: unknown,
-  /** POST /sod/settings needs an Idempotency-Key (ADR-0085): a fresh one unless null. */
+  /**
+   * POST /sod/settings (ADR-0085) and POST /sod/exceptions/weekly/acknowledge (ADR-0093) need an
+   * Idempotency-Key: a fresh one unless null.
+   */
   key?: string | null,
 ): Promise<Response> {
   const headers: Record<string, string> = {};
@@ -175,7 +178,8 @@ async function call(
   headers['sec-fetch-site'] = 'same-origin';
   if (body !== undefined) headers['content-type'] = 'application/json';
   const k = key === undefined ? `sod-${randomUUID()}` : key;
-  if (method === 'POST' && path === '/sod/settings' && k !== null) headers['idempotency-key'] = k;
+  const keyed = path === '/sod/settings' || path === '/sod/exceptions/weekly/acknowledge';
+  if (method === 'POST' && keyed && k !== null) headers['idempotency-key'] = k;
   return fetch(`${api.url}${path}`, {
     method,
     headers,
@@ -501,6 +505,50 @@ describe('SS-UC05-06: Small-team mode records a visible exception', () => {
       await call('GET', `/sod/exceptions/weekly?week_start=${body.week_start}`, 'ownerA')
     ).json()) as typeof body;
     expect(other.exceptions).toEqual([]);
+  });
+
+  it('SS-PLAT-150 acknowledging a week needs an Idempotency-Key; without one nothing is written; with one 201 new, 200 already acknowledged [T-0196]', async () => {
+    const acks = async () =>
+      (
+        await tdb.admin.query<{ n: number }>(
+          'SELECT count(*)::int AS n FROM app.sod_exception_ack WHERE tenant_id = $1',
+          [S],
+        )
+      ).rows[0]?.n ?? 0;
+    const audits = async () =>
+      (
+        await tdb.admin.query<{ n: number }>(
+          "SELECT count(*)::int AS n FROM audit.audit_log WHERE entity_type = 'sod_exception_week'",
+        )
+      ).rows[0]?.n ?? 0;
+    const week = '2026-10-19';
+    const before = { acks: await acks(), audits: await audits() };
+    const path = '/sod/exceptions/weekly/acknowledge';
+    const none = await call('POST', path, 'solo', { week_start: week, note: 'no key' }, null);
+    expect(none.status).toBe(400);
+    expect(await none.json()).toEqual({ error: 'idempotency_key_required' });
+    // A body that is also invalid answers the key error first: nothing is read.
+    const both = await call('POST', path, 'solo', { week_start: 42 }, null);
+    expect(await both.json()).toEqual({ error: 'idempotency_key_required' });
+    const empty = await call('POST', path, 'solo', { week_start: week }, '');
+    expect(empty.status).toBe(400);
+    expect(await acks()).toBe(before.acks);
+    expect(await audits()).toBe(before.audits);
+
+    // With a key the behaviour is unchanged: 201 for a new acknowledgement ...
+    const first = await call('POST', path, 'solo', { week_start: week });
+    expect(first.status).toBe(201);
+    expect(await first.json()).toEqual({ week_start: week, exceptions: 0 });
+    expect(await acks()).toBe(before.acks + 1);
+    // Audited as before (the request audit and the route's description of the week).
+    const audited = await audits();
+    expect(audited).toBeGreaterThan(before.audits);
+    // ... and 200, writing nothing, when the week is already acknowledged (any key).
+    const again = await call('POST', path, 'solo', { week_start: week });
+    expect(again.status).toBe(200);
+    expect(await again.json()).toEqual({ week_start: week, exceptions: 0 });
+    expect(await acks()).toBe(before.acks + 1);
+    expect(await audits()).toBe(audited);
   });
 
   it('small-team mode does not except a conflict another eligible person could resolve', async () => {

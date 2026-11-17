@@ -1,0 +1,83 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a445ddbe879b5e963
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42087
+ ❯ |db| apps/worker/src/security-notices.db.test.ts (4 tests | 3 failed) 744ms
+     × SS-PLAT-145 the owner installs the every-minute schedule and both queues idempotently [T-0197] 8ms
+     × SS-PLAT-145 fan-out sends one job per active tenant and minute; a repeat in that minute adds nothing [T-0197] 32ms
+     × SS-PLAT-145 the worker job sends the tenant's due notices once [T-0197] 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| apps/worker/src/security-notices.db.test.ts > SS-PLAT-145: security notices are delivered by a per-tenant job every minute > SS-PLAT-145 the owner installs the every-minute schedule and both queues idempotently [T-0197]
+AssertionError: expected [] to deeply equal [ ObjectContaining{…} ]
+
+- Expected
++ Received
+
+- [
+-   ObjectContaining {
+-     "cron": "* * * * *",
+-     "timezone": "UTC",
+-   },
+- ]
++ []
+
+ ❯ apps/worker/src/security-notices.db.test.ts:100:79
+     98|     await installSecurityNoticeSchedule(owner);
+     99|     const schedules = await owner.getSchedules();
+    100|     expect(schedules.filter((s) => s.name === SECURITY_NOTICES_FANOUT_…
+       |                                                                               ^
+    101|       expect.objectContaining({ cron: SECURITY_NOTICES_CRON, timezone:…
+    102|     ]);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  |db| apps/worker/src/security-notices.db.test.ts > SS-PLAT-145: security notices are delivered by a per-tenant job every minute > SS-PLAT-145 fan-out sends one job per active tenant and minute; a repeat in that minute adds nothing [T-0197]
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ apps/worker/src/security-notices.db.test.ts:121:24
+    119|     expect(first.tenants).toContain(f.tenantId);
+    120|     expect(first.tenants).not.toContain(suspended);
+    121|     expect(first.sent).toBe(first.tenants.length);
+       |                        ^
+    122|     expect(again.sent).toBe(0);
+    123|     expect(next.sent).toBe(next.tenants.length);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |db| apps/worker/src/security-notices.db.test.ts > SS-PLAT-145: security notices are delivered by a per-tenant job every minute > SS-PLAT-145 the worker job sends the tenant's due notices once [T-0197]
+AssertionError: expected null to deeply equal { sent: 2, failed: +0 }
+
+- Expected:
+{
+  "failed": 0,
+  "sent": 2,
+}
+
++ Received:
+null
+
+ ❯ apps/worker/src/security-notices.db.test.ts:144:72
+    142|     const sender = new SmtpSender({ url: sink.url, from: 'LedgerForce …
+    143|     const data = { tenantId: f.tenantId };
+    144|     expect(await runSecurityNoticeJob(f.db, sender, data, new Date()))…
+       |                                                                        ^
+    145|       sent: 2,
+    146|       failed: 0,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  04:46:32
+   Duration  3.80s (transform 1.26s, setup 0ms, import 2.10s, tests 744ms, environment 0ms)
+
+exit 1

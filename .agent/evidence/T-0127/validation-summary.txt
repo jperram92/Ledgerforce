@@ -1,0 +1,11 @@
+T-0127 validation (2026-11-17, branch feat/T-0127-bills-inbox-transports), exit codes checked:
+pnpm typecheck                                   exit 0
+pnpm -s lint                                     exit 0
+pnpm -s format:check                             exit 0
+node scripts/agent/conductor.ts lint-backlog     exit 0 (backlog OK)
+vitest --project unit (full)                     exit 0  837/837, 0 skipped
+vitest --project db packages/modules/ap apps/worker packages/db (VITEST_MAX_WORKERS=1)
+                                                 exit 0  1060/1060, 0 skipped
+vitest --project api-unit (full)                 exit 0  185/185
+vitest --project api-db apps/api/src/ap          exit 0  29/29
+Not run: full db/api-db projects, web, Playwright (no UI change), scripts/agent/verify.sh (lead runs it).

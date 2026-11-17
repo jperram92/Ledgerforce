@@ -6,9 +6,10 @@
  * exports one (profileGaps, openingBalanceOf, listCompanyBankAccounts); otherwise the
  * module's table is read. T-0158 (ADR-0071, RQ-0153) added the GST basis and BAS frequency (tax,
  * step 3) and invoice branding, default payment terms and accepted payment methods (ar, step 8);
- * step 10 needed nothing new.
+ * step 10 needed nothing new. T-0183 (ADR-0079 decision 2) added the remittance bank account
+ * (ar, step 8) when bank transfer is accepted.
  */
-import { INVOICE_NUMBER_SERIES, invoiceSettingsOf } from '@ledgerforce/ar';
+import { INVOICE_NUMBER_SERIES, invoiceSettingsOf, remittanceAccountOf } from '@ledgerforce/ar';
 import { listCompanyBankAccounts } from '@ledgerforce/bank';
 import type { Database } from '@ledgerforce/db';
 import { CORE_SYSTEM_ROLES } from '@ledgerforce/gl';
@@ -182,7 +183,9 @@ const profiles: StepValidator = async (trx, { companyId, asOf }) => {
 
 /**
  * 8. Invoice numbering and billing formats (ledger series, documents); branding, default payment
- * terms and accepted payment methods (ar); Stripe set up when it is accepted (stripe connector).
+ * terms and accepted payment methods (ar); Stripe set up when it is accepted (stripe connector);
+ * an approved, active remittance bank account in force when bank transfer is accepted (ar,
+ * ADR-0079 decision 2, T-0183): a pending change does not count until a second person approves.
  */
 const numbering: StepValidator = async (trx, { companyId }) => {
   const out: string[] = [];
@@ -216,6 +219,11 @@ const numbering: StepValidator = async (trx, { companyId }) => {
       out.push(
         'Stripe is an accepted payment method but Stripe is not set up (no clearing account)',
       );
+  }
+  if (ar.acceptedPaymentMethods?.includes('bank_transfer')) {
+    const { account } = await remittanceAccountOf(trx, companyId);
+    if (account?.status !== 'active')
+      out.push('No remittance bank account has been chosen for bank transfer');
   }
   return out;
 };

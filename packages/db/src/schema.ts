@@ -649,6 +649,29 @@ export interface EmailDeliveryTable {
   sent_at: Timestamp;
 }
 
+/**
+ * Migration 0075 (T-0197, ADR-0092): one row per attempt to email a security notice. Append-only;
+ * exactly one notice id is set, matching notice_kind; at most one 'sent' row per notice.
+ */
+export interface SecurityNoticeDeliveryTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  notice_kind: 'remittance_account_changed' | 'bank_details_changed';
+  remittance_notice_id: string | null;
+  bank_detail_notice_id: string | null;
+  attempt: number;
+  outcome: 'sent' | 'failed';
+  to_addr: string;
+  subject: string;
+  message_id: string | null;
+  error_name: string | null;
+  error_code: string | null;
+  smtp_code: number | null;
+  error_message: string | null;
+  next_attempt_at: Date | null;
+  attempted_at: Timestamp;
+}
+
 /** Migration 0049 (T-0073, RQ-0115): Stripe Payment Link per invoice and amount due. */
 export interface StripePaymentLinkTable {
   id: Generated<string>;
@@ -933,6 +956,33 @@ export interface BillInboxItemTable {
   status: Generated<'new' | 'no_attachment' | 'coded' | 'rejected'>;
   bill_id: string | null;
   received_at: Timestamp;
+}
+
+/** Migration 0073 (T-0127, ADR-0095): bills inbox IMAP mailbox — sealed password, poll cursor. */
+export interface BillInboxMailboxTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: string;
+  host: string;
+  port: Generated<number>;
+  username: string;
+  folder: Generated<string>;
+  password_ct: Buffer;
+  password_iv: Buffer;
+  password_tag: Buffer;
+  password_dek_wrapped: Buffer;
+  password_kek_id: string;
+  password_enc_version: number;
+  status: Generated<'active' | 'superseded' | 'disabled'>;
+  /** bigint as a decimal string. */
+  uidvalidity: string | null;
+  /** bigint as a decimal string. */
+  last_uid: Generated<string>;
+  refused_count: Generated<number>;
+  last_polled_at: Timestamp | null;
+  last_error: string | null;
+  created_by: string | null;
+  created_at: ColumnType<Date, Date | string | undefined, never>;
 }
 
 export interface DocumentAttachmentTable {
@@ -1251,9 +1301,10 @@ export interface BankAccountTable {
   dek_wrapped: ColumnType<Buffer, Buffer, never>;
   kek_id: ColumnType<string, string, never>;
   enc_version: ColumnType<number, number, never>;
-  apca_user_id: ColumnType<string | null, string | null | undefined, never>;
-  aba_user_name: ColumnType<string | null, string | null | undefined, never>;
-  aba_fi_mnemonic: ColumnType<string | null, string | null | undefined, never>;
+  /** ABA header: updatable by lf_app while active (migration 0076, ADR-0094). */
+  apca_user_id: ColumnType<string | null, string | null | undefined, string>;
+  aba_user_name: ColumnType<string | null, string | null | undefined, string>;
+  aba_fi_mnemonic: ColumnType<string | null, string | null | undefined, string>;
   /** The bank's CSV layout; validate with @ledgerforce/bank validateCsvMapping. */
   csv_mapping: ColumnType<unknown, string | null | undefined, string | null>;
   status: Generated<'active' | 'archived'>;
@@ -1415,6 +1466,7 @@ export interface Database {
   'app.payment_batch_refund': PaymentBatchRefundTable;
   'app.supplier_bill_line': SupplierBillLineTable;
   'app.bill_inbox_item': BillInboxItemTable;
+  'app.bill_inbox_mailbox': BillInboxMailboxTable;
   'app.document_attachment': DocumentAttachmentTable;
   'app.customer_prepayment': CustomerPrepaymentTable;
   'app.prepayment_application': PrepaymentApplicationTable;
@@ -1422,6 +1474,7 @@ export interface Database {
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;
+  'app.security_notice_delivery': SecurityNoticeDeliveryTable;
   'app.stripe_payment_link': StripePaymentLinkTable;
   'app.stripe_settings': StripeSettingsTable;
   'app.stripe_payout': StripePayoutTable;
