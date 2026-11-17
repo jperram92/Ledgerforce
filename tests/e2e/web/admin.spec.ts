@@ -13,7 +13,7 @@
  * ones the API's own db tests prove (users.lifecycle, users.list, user roles, sod, audit-log).
  * Times are shown in Australia/Sydney. Screenshots go to .agent/evidence/T-0093/.
  */
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { AxeBuilder } from '@axe-core/playwright';
@@ -36,11 +36,14 @@ let origin = '';
 
 test.use({ evidenceTaskId: 'T-0093', timezoneId: 'Australia/Sydney', locale: 'en-AU' });
 
+// The worker's Vite cache is removed after its tests; left behind it fills the disk (DL-0820).
+let cacheDir = '';
+
 test.beforeAll(async () => {
   server = await createViteServer({
     root: WEB,
     configFile: false,
-    cacheDir: mkdtempSync(join(tmpdir(), 'lf-web-')),
+    cacheDir: (cacheDir = mkdtempSync(join(tmpdir(), 'lf-web-'))),
     logLevel: 'error',
     server: { host: '127.0.0.1', port: 0, strictPort: false, hmr: false },
   });
@@ -52,6 +55,7 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
   await server?.close();
+  if (cacheDir) rmSync(cacheDir, { recursive: true, force: true });
 });
 
 type Who = 'owner' | 'finance_admin' | 'auditor' | 'clerk';

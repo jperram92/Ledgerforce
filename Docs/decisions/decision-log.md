@@ -4095,3 +4095,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: apps/api rule "every mutating endpoint requires an idempotency key"; RQ-0167 S8; T-0196 AC-1/AC-2. RED: the api-db test got 201 without a key; the e2e with the old client got the fake's 400 and no acknowledgement.
 - Alternatives: store keys and replay responses (rejected: no other settings route does, and the route is already state-idempotent); accept but not require the key (rejected: the rule stays broken).
 - ADR: ADR-0093 · Status: proposed (architecture, accepted on cross-review)
+
+### DL-0820 — Each Playwright web spec removes its Vite cache directory
+- Date: 2026-11-17 · By: claude · Task: sprint-0 · Category: tooling
+- Decision: the 28 web specs that start a Vite server with `cacheDir: mkdtempSync(tmpdir()/lf-web-*)` keep the path and remove it with `rmSync(..., { recursive: true, force: true })` in `test.afterAll`, after the server closes.
+- Why: every run left one cache directory per spec and worker behind; about 2,400 of them (11 GB) filled the shared disk on 2026-11-17 and made verify and agent test runs fail with ENOSPC. Per-spec cleanup keeps the per-worker isolation the cache was created for and cannot remove a directory another run is using.
+- Alternatives: a global teardown deleting all `lf-web-*` (rejected: would delete caches of concurrent runs); one shared cache (rejected: parallel workers race on it).
+- ADR: none · Status: accepted

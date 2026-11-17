@@ -8,7 +8,7 @@
  * GET /ar/invoices[/:id], GET /ar/invoices/:id/payment-status, PUT /ar/credit-notes/:id,
  * GET /ar/credit-notes/:id[/journal] and POST /ar/credit-notes/:id/approve (T-0045, T-0131, T-0151).
  */
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { AxeBuilder } from '@axe-core/playwright';
@@ -30,11 +30,14 @@ let origin = '';
 
 test.use({ evidenceTaskId: 'T-0085', timezoneId: 'Australia/Sydney', locale: 'en-AU' });
 
+// The worker's Vite cache is removed after its tests; left behind it fills the disk (DL-0820).
+let cacheDir = '';
+
 test.beforeAll(async () => {
   server = await createViteServer({
     root: WEB,
     configFile: false,
-    cacheDir: mkdtempSync(join(tmpdir(), 'lf-web-')),
+    cacheDir: (cacheDir = mkdtempSync(join(tmpdir(), 'lf-web-'))),
     logLevel: 'error',
     server: { host: '127.0.0.1', port: 0, strictPort: false, hmr: false },
   });
@@ -46,6 +49,7 @@ test.beforeAll(async () => {
 
 test.afterAll(async () => {
   await server?.close();
+  if (cacheDir) rmSync(cacheDir, { recursive: true, force: true });
 });
 
 const ME = {
