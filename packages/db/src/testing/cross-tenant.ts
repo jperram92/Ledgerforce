@@ -202,6 +202,21 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     raw_sha256: () => randomBytes(32).toString('hex'),
     status: () => 'new',
   },
+  // T-0127: bills inbox IMAP mailbox (migration 0073): a complete sealed password.
+  'app.bill_inbox_mailbox': {
+    id: () => randomUUID(),
+    host: () => `imap-${randomBytes(4).toString('hex')}.example.test`,
+    username: () => 'bills@example.test',
+    folder: () => 'INBOX',
+    password_ct: () => '\\x01',
+    password_iv: () => `\\x${'00'.repeat(12)}`,
+    password_tag: () => `\\x${'00'.repeat(16)}`,
+    password_dek_wrapped: () => `\\x${'00'.repeat(60)}`,
+    password_kek_id: () => 'k1',
+    password_enc_version: () => '1',
+    status: () => 'superseded',
+    last_error: () => 'timeout',
+  },
   'app.document_attachment': {
     owner_type: () => 'bill_inbox_item',
     content_type: () => 'application/pdf',
