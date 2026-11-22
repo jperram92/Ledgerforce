@@ -694,6 +694,31 @@ describe('RQ-0165 Q1: the step-up condition fails closed, and an API token never
   });
 });
 
+/**
+ * Move every recorded send activity of a refund an hour back (superuser, triggers off: the
+ * records are append-only), as if the cancel's cooling-off had passed (security review r10).
+ */
+async function anHourAgo(refundId: string) {
+  const id = refundId.toLowerCase();
+  if (!/^[0-9a-f-]{36}$/.test(id)) throw new Error('not a uuid');
+  await f.admin.query(`
+    BEGIN;
+    SET LOCAL session_replication_role = replica;
+    UPDATE app.customer_refund_approval SET approved_at = approved_at - interval '1 hour'
+     WHERE refund_id = '${id}';
+    UPDATE app.outbox_delivery_failure d SET failed_at = d.failed_at - interval '1 hour'
+      FROM app.outbox_event e WHERE e.id = d.event_id AND e.aggregate_id = '${id}';
+    UPDATE app.sync_issue i
+       SET last_failed_at = i.last_failed_at - interval '1 hour',
+           first_failed_at = i.first_failed_at - interval '1 hour',
+           status_changed_at = i.status_changed_at - interval '1 hour',
+           created_at = i.created_at - interval '1 hour'
+      FROM app.outbox_event e WHERE e.id = i.event_id AND e.aggregate_id = '${id}';
+    UPDATE app.outbox_event SET created_at = created_at - interval '1 hour'
+     WHERE aggregate_id = '${id}';
+    COMMIT;`);
+}
+
 describe('SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanently', () => {
   /** The open Sync issue the worker leaves for a refused send (outbox dead letter). */
   async function syncIssueFor(refundId: string, error: unknown) {
@@ -757,6 +782,17 @@ describe('SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanen
     // An Approver (no ar.refund.create) cannot cancel; the clerk can.
     const denied = await call('POST', `/ar/refunds/${id}/cancel?${q()}`, 'approver');
     expect(denied.status).toBe(403);
+    // Security review r10 M1(b): within 15 minutes of the last send activity, 422
+    // SEND_NOT_FINISHED, and Stripe is not asked.
+    const asked = stub.received.length;
+    const early = await call('POST', `/ar/refunds/${id}/cancel?${q()}`, 'arClerk');
+    expect(early.status).toBe(422);
+    expect(await early.json()).toMatchObject({
+      error: 'SEND_NOT_FINISHED',
+      message: expect.stringMatching(/less than 15 minutes ago/) as unknown,
+    });
+    expect(stub.received.length).toBe(asked);
+    await anHourAgo(id);
     const before = stub.received.length;
     const ok = await call('POST', `/ar/refunds/${id}/cancel?${q()}`, 'arClerk');
     expect(ok.status).toBe(200);
@@ -856,6 +892,12 @@ describe('T-0189 a Stripe refund older than 23 hours: check at Stripe, record on
     const { credit, id, no } = await requested('ApiVanished');
     await approvedHoursAgo(id, 30);
     setVars('vanished', credit, id, no, 're_1SQbT0189ApiResent');
+    // Security review r10 L1: past its window the stored view says the send finished.
+    const stored = await call('GET', `/ar/refunds/${id}?${q()}`, 'arClerk');
+    expect(await stored.json()).toMatchObject({
+      status: 'requested',
+      stripe: { status: 'failed', code: 'KEY_EXPIRED' },
+    });
     // Twice: a repeated check changes nothing.
     for (let i = 0; i < 2; i++) {
       const check = await call('POST', `/ar/refunds/${id}/stripe-check?${q()}`, 'approver');
@@ -954,5 +996,87 @@ describe('T-0189 a Stripe refund older than 23 hours: check at Stripe, record on
       'approver',
     );
     expect(foreign.status).toBe(404);
+  });
+});
+
+describe('Security review r10 L3: confirming a resend sends money, so an API token never confirms it', () => {
+  it('SS-UC11-13 an API token holding ar.refund.approve cannot confirm a Stripe refund resend: 401 step_up_required, no Stripe call, nothing confirmed', async () => {
+    const issued = await call('POST', '/api-tokens', 'financeAdmin', {
+      name: 'resend-bot',
+      scopes: ['ar.refund.approve'],
+    });
+    expect(issued.status).toBe(201);
+    const t = (await issued.json()) as { id: string; token: string };
+    const credit = await seedCredit(f, 'TokenResend', profiles);
+    const id = randomUUID();
+    const created = await call('PUT', `/ar/refunds/${id}`, 'arClerk', stripeBody(credit.partyId));
+    const c = (await created.json()) as { refund_no: string };
+    await f.admin.query(
+      `INSERT INTO app.customer_refund_approval (tenant_id, company_id, refund_id, approved_by, approved_at)
+       VALUES ($1, $2, $3, $4, clock_timestamp() - interval '30 hours')`,
+      [f.tenantId, f.companyId, id, people.approver?.id],
+    );
+    // A resend asked for under the T-0189 rules ('refused' always answers an empty lookup).
+    Object.assign(stub.vars, {
+      tenantId: f.tenantId,
+      companyId: f.companyId,
+      refusedRefundId: id,
+      refusedRefundNo: c.refund_no,
+      refusedCreditNoteId: credit.creditNoteId,
+      refusedCreditNoteNo: credit.creditNoteNo,
+      refusedPaymentIntentId: credit.paymentIntentId,
+    });
+    const resendId = randomUUID();
+    const asked = await call(
+      'PUT',
+      `/ar/refunds/${id}/stripe-resends/${resendId}?${q()}`,
+      'approver',
+      { reason: 'Checked at Stripe: nothing was refunded' },
+    );
+    expect(asked.status).toBe(201);
+    const before = stub.received.length;
+    const refused = await fetch(
+      `${api.url}/ar/refunds/${id}/stripe-resends/${resendId}/confirm?${q()}`,
+      { method: 'POST', headers: { authorization: `Bearer ${t.token}` } },
+    );
+    expect(refused.status).toBe(401);
+    expect(await refused.json()).toEqual({ error: 'step_up_required', max_age: 300 });
+    expect(stub.received.length).toBe(before);
+    const row = await f.admin.query<{ confirmed_by: string | null }>(
+      `SELECT confirmed_by::text FROM app.customer_refund_stripe_resend WHERE tenant_id = $1 AND id = $2`,
+      [f.tenantId, resendId],
+    );
+    expect(row.rows).toEqual([{ confirmed_by: null }]);
+    expect(await entriesFor(id)).toBe(0);
+
+    // The handler re-checks (the final gate, DL-0692): with the route's step-up declaration made
+    // conditional and false (test-only seam, as F3), a stale session is still refused.
+    const descriptor = Object.getOwnPropertyDescriptor(
+      ArRefundsController.prototype,
+      'confirmResend',
+    );
+    if (!descriptor) throw new Error('no confirmResend handler');
+    RequireStepUp(300, () => Promise.resolve(false))(
+      ArRefundsController.prototype,
+      'confirmResend',
+      descriptor,
+    );
+    try {
+      const stale = await call(
+        'POST',
+        `/ar/refunds/${id}/stripe-resends/${resendId}/confirm?${q()}`,
+        'staleFinanceAdmin',
+      );
+      expect(stale.status).toBe(401);
+      expect(await stale.json()).toEqual({ error: 'step_up_required', max_age: 300 });
+      expect(stub.received.length).toBe(before);
+      const still = await f.admin.query<{ confirmed_by: string | null }>(
+        `SELECT confirmed_by::text FROM app.customer_refund_stripe_resend WHERE tenant_id = $1 AND id = $2`,
+        [f.tenantId, resendId],
+      );
+      expect(still.rows).toEqual([{ confirmed_by: null }]);
+    } finally {
+      RequireStepUp(300)(ArRefundsController.prototype, 'confirmResend', descriptor);
+    }
   });
 });

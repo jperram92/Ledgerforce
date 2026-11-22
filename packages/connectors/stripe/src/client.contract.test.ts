@@ -7,6 +7,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   formEncode,
   STRIPE_API_VERSION,
+  STRIPE_REQUEST_TIMEOUT_MS,
+  STRIPE_SEND_IDLE_TIMEOUT_MS,
   StripeApiError,
   StripeClient,
   StripeConfigError,
@@ -151,5 +153,46 @@ describe('Stripe client (fetch, form-encoded, test mode)', () => {
     expect(() => StripeClient.fromEnv({})).toThrow(/LF_STRIPE_SECRET_KEY/);
     expect(StripeClient.fromEnv({ LF_STRIPE_SECRET_KEY: TEST_KEY }).mode).toBe('test');
     expect(stub.received.length).toBe(n);
+  });
+});
+
+describe('Security review r10 M1(a): every Stripe request has a deadline shorter than the database idle timeout', () => {
+  it('SS-UC11-11 a request that never answers fails after the timeout as a retryable "timeout", and the transport is told to abort', async () => {
+    let signal: AbortSignal | undefined;
+    const hung = new StripeClient({
+      secretKey: TEST_KEY,
+      mode: 'test',
+      baseUrl: stub.url,
+      timeoutMs: 50,
+      http: (_url, init) => {
+        signal = init.signal;
+        return new Promise(() => {});
+      },
+    });
+    const started = Date.now();
+    const e = await failure(
+      hung.findRefund('pi_1SQbTHung', () => true),
+      StripeApiError,
+    );
+    expect(Date.now() - started).toBeLessThan(5000);
+    expect(e).toMatchObject({ status: null, stripeCode: 'timeout', retryable: true });
+    expect(e.message).toMatch(/did not answer within 50 ms/);
+    expect(signal?.aborted).toBe(true);
+  });
+
+  it('SS-UC11-11 the default deadline is 30 s, below the send transaction idle timeout (STRIPE_SEND_IDLE_TIMEOUT_MS), and out-of-range values are refused', () => {
+    expect(STRIPE_REQUEST_TIMEOUT_MS).toBe(30_000);
+    expect(STRIPE_REQUEST_TIMEOUT_MS).toBeLessThan(STRIPE_SEND_IDLE_TIMEOUT_MS);
+    expect(() => new StripeClient({ secretKey: TEST_KEY, mode: 'test', timeoutMs: 0 })).toThrow(
+      StripeConfigError,
+    );
+    expect(
+      () =>
+        new StripeClient({
+          secretKey: TEST_KEY,
+          mode: 'test',
+          timeoutMs: STRIPE_SEND_IDLE_TIMEOUT_MS,
+        }),
+    ).toThrow(/below/);
   });
 });

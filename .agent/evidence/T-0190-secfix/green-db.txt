@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:33351
+(node:7199) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:7438) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:7997) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:8269) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:8921) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ Test Files  64 passed (64)
+      Tests  1297 passed (1297)
+   Start at  08:17:51
+   Duration  166.04s (transform 3.10s, setup 0ms, import 33.43s, tests 119.28s, environment 5ms)
+
+[vitest-pool]: Timeout terminating forks worker for test files /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/packages/modules/ap/src/imap-client.tls.db.test.ts.
+[vitest-pool]: Failed to terminate forks worker for test files /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/packages/modules/ap/src/imap-client.tls.db.test.ts. Error: [vitest-pool-runner]: Timeout waiting for worker to respond
+    at Timeout.<anonymous> (file:///home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/node_modules/.pnpm/vitest@4.1.12_@opentelemetry+api@1.9.1_@types+node@22.20.5_@vitest+coverage-v8@4.1.12_j_fb65c21c8e71efd1e33d79ed77baf9a3/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:3108:58)
+    at listOnTimeout (node:internal/timers:585:17)
+    at process.processTimers (node:internal/timers:521:7)
+exit=0

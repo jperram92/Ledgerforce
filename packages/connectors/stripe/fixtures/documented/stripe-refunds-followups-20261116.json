@@ -1,5 +1,5 @@
 {
-  "source": "Built for T-0190 and T-0189 (RQ-0173) from the Refund object, RefundListParams and the error object in the official stripe@23.1.0 type definitions (OpenAPI v2596; Refund.status pending | requires_action | succeeded | failed | canceled, Refund.created, failure_reason, failure_balance_transaction), in the shape of the T-0172 fixture (RQ-0163, RQ-0164). Not recorded from a live account: no Stripe key or network was available. lf-refund-v2-<refund id> is the document's first key; lf-refund-v3-<resend id> is a resend's recorded key (ADR-0091). No interaction answers a v2 create for a document Stripe already holds or for the 'vanished' document, and none answers a second create for the 'refused' one: they must never be requested.",
+  "source": "Built for T-0190 and T-0189 (RQ-0173) from the Refund object, RefundListParams and the error object in the official stripe@23.1.0 type definitions (OpenAPI v2596; Refund.status pending | requires_action | succeeded | failed | canceled, Refund.created, failure_reason, failure_balance_transaction), in the shape of the T-0172 fixture (RQ-0163, RQ-0164). Not recorded from a live account: no Stripe key or network was available. lf-refund-v2-<refund id> is the document's first key; lf-refund-v3-<resend id> is a resend's recorded key (ADR-0091). No interaction answers a v2 create for a document Stripe already holds or for the 'vanished' document, and none answers a second create for the 'refused' one: they must never be requested. Security review r10 (2026-11-22): 'hung' (a create that lands after the cancel; no create is answered for the later document of the same credit) and 'mismatch' (a live refund of another amount).",
   "apiVersion": "2026-10-28.endive",
   "accessed": "2026-11-16",
   "placeholders": "{{name}} is replaced by the test before matching (ids generated at run time). `times` limits how often an interaction answers (then the next matching one answers).",
@@ -646,6 +646,154 @@
               "status": "failed",
               "failure_reason": "expired_or_canceled_card",
               "failure_balance_transaction": "txn_1SQbT0189FailedBack"
+            }
+          ],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      }
+    },
+    {
+      "name": "list-refunds-hung-before",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{hungPaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      },
+      "times": 2
+    },
+    {
+      "name": "refund-document-hung",
+      "request": {
+        "method": "POST",
+        "path": "/v1/refunds",
+        "idempotencyKey": "lf-refund-v2-{{hungRefundId}}",
+        "form": {
+          "payment_intent": "{{hungPaymentIntentId}}",
+          "amount": "22000",
+          "reason": "requested_by_customer",
+          "metadata[lf_tenant_id]": "{{tenantId}}",
+          "metadata[lf_company_id]": "{{companyId}}",
+          "metadata[lf_refund_id]": "{{hungRefundId}}",
+          "metadata[lf_refund_no]": "{{hungRefundNo}}",
+          "metadata[lf_credit_note_id]": "{{hungCreditNoteId}}",
+          "metadata[lf_credit_note_no]": "{{hungCreditNoteNo}}"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "id": "{{hungStripeRefundId}}",
+          "object": "refund",
+          "amount": 22000,
+          "balance_transaction": "txn_1SQbT0189Hung",
+          "charge": "ch_1SQbT0189Hung",
+          "created": 1795568400,
+          "currency": "aud",
+          "metadata": {
+            "lf_tenant_id": "{{tenantId}}",
+            "lf_company_id": "{{companyId}}",
+            "lf_refund_id": "{{hungRefundId}}",
+            "lf_refund_no": "{{hungRefundNo}}",
+            "lf_credit_note_id": "{{hungCreditNoteId}}",
+            "lf_credit_note_no": "{{hungCreditNoteNo}}"
+          },
+          "payment_intent": "{{hungPaymentIntentId}}",
+          "reason": "requested_by_customer",
+          "receipt_number": null,
+          "status": "succeeded"
+        }
+      }
+    },
+    {
+      "name": "list-refunds-hung-after",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{hungPaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [
+            {
+              "id": "{{hungStripeRefundId}}",
+              "object": "refund",
+              "amount": 22000,
+              "balance_transaction": "txn_1SQbT0189Hung",
+              "charge": "ch_1SQbT0189Hung",
+              "created": 1795568400,
+              "currency": "aud",
+              "metadata": {
+                "lf_tenant_id": "{{tenantId}}",
+                "lf_company_id": "{{companyId}}",
+                "lf_refund_id": "{{hungRefundId}}",
+                "lf_refund_no": "{{hungRefundNo}}",
+                "lf_credit_note_id": "{{hungCreditNoteId}}",
+                "lf_credit_note_no": "{{hungCreditNoteNo}}"
+              },
+              "payment_intent": "{{hungPaymentIntentId}}",
+              "reason": "requested_by_customer",
+              "receipt_number": null,
+              "status": "succeeded"
+            }
+          ],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      }
+    },
+    {
+      "name": "list-refunds-mismatch",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{mismatchPaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [
+            {
+              "id": "{{mismatchStripeRefundId}}",
+              "object": "refund",
+              "amount": 21000,
+              "balance_transaction": "txn_1SQbT0189Mismatch",
+              "charge": "ch_1SQbT0189Mismatch",
+              "created": 1795568400,
+              "currency": "aud",
+              "metadata": {
+                "lf_tenant_id": "{{tenantId}}",
+                "lf_company_id": "{{companyId}}",
+                "lf_refund_id": "{{mismatchRefundId}}",
+                "lf_refund_no": "{{mismatchRefundNo}}",
+                "lf_credit_note_id": "{{mismatchCreditNoteId}}",
+                "lf_credit_note_no": "{{mismatchCreditNoteNo}}"
+              },
+              "payment_intent": "{{mismatchPaymentIntentId}}",
+              "reason": "requested_by_customer",
+              "receipt_number": null,
+              "status": "succeeded"
             }
           ],
           "has_more": false,

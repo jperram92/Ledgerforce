@@ -452,6 +452,9 @@ function stripeState(r: CustomerRefund): string {
     }: the money has left, but the refund is not posted in the books: ${
       r.stripe.message ?? 'no reason given'
     }. A Finance Admin sees it in Sync issues; retrying it there records this Stripe refund and never sends another.`;
+  // Security review r10 L1: past its 23-hour window the send has stopped (not a Stripe refusal).
+  if (r.approval === 'approved' && r.stripe?.code === 'KEY_EXPIRED')
+    return 'Approved more than 23 hours ago and not sent, so LedgerForce no longer sends it automatically. An Approver checks it with Stripe; whoever requests refunds can cancel it, so the credit can be refunded another way.';
   if (r.approval === 'approved')
     return r.stripe?.status === 'failed'
       ? `Approved, but Stripe refused the refund: ${(r.stripe.message ?? 'no reason given').replace(/\.$/, '')}. A Finance Admin sees it in Sync issues; whoever requests refunds can cancel it, so the credit can be refunded another way.`

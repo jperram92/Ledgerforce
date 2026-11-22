@@ -289,6 +289,7 @@ graph LR
 | [T-0206](T-0206.md) | Single-supply documents on an open contract: s 29-70 tax invoice (candidate GP-046) and deposit-invoice refusal (ADR-0089 R9) | MVP | todo | T-0203 | UC-04 | 0 |
 | [T-0207](T-0207.md) | AR: cancel a requested bank refund that no live payment batch pays | MVP | todo | T-0190 | UC-11 | 0 |
 | [T-0208](T-0208.md) | Refund region: check a Stripe refund with Stripe and ask or confirm a resend; nightly sweep for Stripe refunds no document records | MVP | todo | T-0189 | UC-11 | 0 |
+| [T-0217](T-0217.md) | Stripe: a refund that fails after it was recorded paid (refund.updated / charge.refund.updated webhook) | MVP | todo | T-0189 | UC-11 | 0 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
 | [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | review | T-0117 | UC-11 | 0 |
 | [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |
