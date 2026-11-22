@@ -54,7 +54,7 @@ bash "$root/infra/compose/init-secrets.sh"
 echo "--- building images (tagged as compose names them: <project>-<service>)"
 ca=()
 if [[ -n "${LF_BUILD_CA_FILE:-}" ]]; then ca=(--secret "id=extra_ca,src=${LF_BUILD_CA_FILE}"); fi
-for target in setup api worker web; do
+for target in setup api worker web backup; do
   docker build "${ca[@]}" -f "$root/infra/docker/Dockerfile" --target "$target" -t "${project}-${target}" "$root"
 done
 docker build -f "$root/infra/docker/keycloak.Dockerfile" -t "${project}-keycloak" "$root"

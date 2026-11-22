@@ -25,6 +25,7 @@ import { runRestoreDrill } from './restore-drill.ts';
 
 const ROOT = resolve(import.meta.dirname, '..', '..', '..', '..');
 const CLI = join(ROOT, 'packages/ledger/src/cli/restore-drill.ts');
+const BACKUP_CLI = join(ROOT, 'packages/db/src/cli/backup.ts');
 
 const TENANT_A = '01900000-0000-7000-8000-0000000143aa';
 const TENANT_B = '01900000-0000-7000-8000-0000000143bb';
@@ -170,6 +171,32 @@ describe('SS-PLAT-174 restore drill proves every company chain after restore int
     expect(r.stdout).toContain(`company ${a.companyId} tenant ${TENANT_A} chain ok entries 5`);
     expect(r.stdout).toContain(`company ${b.companyId} tenant ${TENANT_B} chain ok entries 4`);
     expect(r.stdout).toMatch(/restore drill OK/);
+  });
+  it('SS-PLAT-174 the backup CLI (as the compose service runs it) writes a backup the drill CLI verifies', () => {
+    const out = join(dir, 'cli.lfbackup');
+    const b1 = spawnSync(process.execPath, [BACKUP_CLI, '--out', out], {
+      cwd: ROOT,
+      encoding: 'utf8',
+      env: {
+        PATH: process.env['PATH'],
+        ...(process.env['LF_PG_BINDIR'] ? { LF_PG_BINDIR: process.env['LF_PG_BINDIR'] } : {}),
+        LF_BACKUP_DATABASE_URL: a.tdb.url('superuser'),
+        LF_KMS_PROVIDER: 'local',
+        LF_KMS_KEYRING_FILE: keyringFile,
+      },
+    });
+    expect(b1.status, b1.stdout + b1.stderr).toBe(0);
+    expect(b1.stdout).toMatch(/^backup \S+ written to .*cli\.lfbackup/);
+    const r = runCli(['--file', out, '--database', 'lf_drill_from_cli'], keyringFile);
+    expect(r.status, r.stdout + r.stderr).toBe(0);
+
+    const bad = spawnSync(process.execPath, [BACKUP_CLI, '--daily'], {
+      cwd: ROOT,
+      encoding: 'utf8',
+      env: { PATH: process.env['PATH'] },
+    });
+    expect(bad.status).toBe(2);
+    expect(bad.stderr).toContain('--daily needs --dir');
   });
 });
 

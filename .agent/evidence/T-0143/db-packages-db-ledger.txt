@@ -1,0 +1,3 @@
+# VITEST_MAX_WORKERS=1 pnpm exec vitest run --project db packages/db packages/ledger (exit 0), 2026-11-22
+ Test Files  35 passed (35)
+      Tests  1191 passed (1191)

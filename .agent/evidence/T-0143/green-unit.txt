@@ -1,21 +1,58 @@
 
  RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0143-backup
 
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 0-byte payload and the manifest 42ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 1-byte payload and the manifest 11ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65535-byte payload and the manifest 4ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65536-byte payload and the manifest 3ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65537-byte payload and the manifest 20ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 196608-byte payload and the manifest 4ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 the file holds neither the plaintext nor the manifest in the clear 3ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a different key does not open the backup 2ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 any altered byte (header, MAC, manifest or payload) fails closed 16ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 truncation (at a chunk boundary or mid-chunk), dropped chunks and trailing bytes fail 13ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a wrapped key copied from another backup does not open this one 3ms
- ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a file that is not an lf-backup fails with BackupDecryptError 0ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 0-byte payload and the manifest 78ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 1-byte payload and the manifest 5ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65535-byte payload and the manifest 6ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65536-byte payload and the manifest 4ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65537-byte payload and the manifest 28ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 196608-byte payload and the manifest 5ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 the file holds neither the plaintext nor the manifest in the clear 4ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a different key does not open the backup 3ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 any altered byte (header, MAC, manifest or payload) fails closed 21ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 truncation (at a chunk boundary or mid-chunk), dropped chunks and trailing bytes fail 18ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a wrapped key copied from another backup does not open this one 5ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a file that is not an lf-backup fails with BackupDecryptError 1ms
+ ✓ |unit| infra/test/security-workflow.contract.test.ts > approved security workflow contract [T-0095] > provides pinned scanners for SAST, secrets, inventory and image vulnerabilities 31ms
+ ✓ |unit| infra/test/security-workflow.contract.test.ts > approved security workflow contract [T-0095] > runs unprivileged on pull requests with immutable actions and no softened jobs 72ms
+ ✓ |unit| infra/test/security-workflow.contract.test.ts > approved security workflow contract [T-0095] > excuses only past commits in .gitleaksignore, never the working tree (DL-0244) 19ms
+ ✓ |unit| infra/test/security-workflow.contract.test.ts > approved security workflow contract [T-0095] > ships runtime images without build tooling the gate flags (DL-0248) 1ms
+ ✓ |unit| infra/test/security-workflow.contract.test.ts > approved security workflow contract [T-0095] > covers every ADR-0043 scan kind, the production audit and each shipped image 1ms
+ ✓ |unit| infra/test/security-workflow.contract.test.ts > approved security workflow contract [T-0095] > SS-PLAT-101 runs the ADR-0044 DAST baseline against the started stack, contract-tested [T-0096] 38ms
+ ✓ |unit| infra/test/install-contract.test.ts > runs the Node runtime package-update regression [T-0057] 1111ms
+ ✓ |unit| packages/db/src/ops/backup-schedule.test.ts > SS-PLAT-174 nightly backup schedule and retention > SS-PLAT-174 the next run is today at HH:MM UTC, or tomorrow when that has passed 2ms
+ ✓ |unit| packages/db/src/ops/backup-schedule.test.ts > SS-PLAT-174 nightly backup schedule and retention > SS-PLAT-174 backup files are named by UTC time so they sort chronologically 0ms
+ ✓ |unit| packages/db/src/ops/backup-schedule.test.ts > SS-PLAT-174 nightly backup schedule and retention > SS-PLAT-174 configuration has safe defaults and rejects bad values by name 2ms
+ ✓ |unit| packages/db/src/ops/backup-schedule.test.ts > SS-PLAT-174 nightly backup schedule and retention > SS-PLAT-174 pruning removes backups older than the retention, keeps the newest and other files 31ms
+ ✓ |unit| packages/db/src/ops/backup-schedule.test.ts > SS-PLAT-174 nightly backup schedule and retention > SS-PLAT-174 the newest backup is kept even when every backup is past the retention 4ms
+ ✓ |unit| infra/test/workflow-contract.test.ts > T-0112 evidence paths use a supported Actions expression context > ci.yml gives the consuming step the runner evidence directory 53ms
+ ✓ |unit| infra/test/workflow-contract.test.ts > T-0112 evidence paths use a supported Actions expression context > install-smoke.yml gives the consuming step the runner evidence directory 4ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 images > SS-PLAT-86 every base image is pinned by tag and digest 1ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 images > SS-PLAT-86 every runtime target runs as a non-root user 8ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 images > SS-PLAT-86 no image bakes a secret (no ENV/ARG secret, no secrets folder copied) 19ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup, the scheduler (ADR-0062) and the nightly backup (ADR-0101) 1ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > every service compose would build has an image the smoke script makes (up --no-build) 14ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > T-0147 the scheduler is the worker image running the owner-only scheduler CLI (ADR-0062 option 1) 1ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 images are pinned; app services build the shared Dockerfile targets 0ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 secrets are files in the ignored secrets folder, never values in the file 29ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 each secret reaches only the services that need it 1ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > T-0142 AC-5 the api trusts exactly the nginx hop for the client address, overridable by the operator (ADR-0054) 0ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 the runtime connects as lf_app; only setup and the scheduler hold the migrator password 0ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 only the web origin is published, on loopback by default; the database and IdP are not 0ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 start order: setup waits for a healthy database and IdP; api and worker wait for setup 0ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 every service drops privileges it does not need 1ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 compose stack > SS-PLAT-86 the old compose path includes the new file instead of being deleted 1ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 Keycloak realm > SS-PLAT-86 no self-registration, no e-mail reset, brute-force protection, strong password policy 0ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 Keycloak realm > SS-PLAT-86 the client: confidential, code flow + PKCE S256 only, secret from the environment 0ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 Keycloak realm > SS-PLAT-86 the ACR mapping names the MFA level the API accepts (ADR-0025, HANDOVER Q13) 0ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 generated secrets stay out of git > SS-PLAT-86 the secrets folder and the install env file are ignored; examples only are tracked 1ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-86 generated secrets stay out of git > SS-PLAT-86 init-secrets.sh writes distinct random secrets (and the backup keyring) once and never overwrites 365ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) > SS-PLAT-174 the backup image is the node runtime plus the PostgreSQL 17 client, non-root, with a /backups folder it owns 1ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) > SS-PLAT-174 compose runs the backup nightly with a retention setting, a dedicated keyring and its own volume 1ms
+ ✓ |unit| infra/test/install-contract.test.ts > SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) > SS-PLAT-174 the runbook covers backup, off-host key custody, the restore drill and its failure codes 0ms
 
- Test Files  1 passed (1)
-      Tests  12 passed (12)
-   Start at  08:14:16
-   Duration  775ms (transform 343ms, setup 0ms, import 431ms, tests 125ms, environment 0ms)
+ Test Files  5 passed (5)
+      Tests  49 passed (49)
+   Start at  08:30:47
+   Duration  2.47s (transform 440ms, setup 0ms, import 1.19s, tests 2.13s, environment 0ms)
 

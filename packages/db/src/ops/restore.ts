@@ -38,7 +38,13 @@ async function adminQuery(serverUrl: string, fn: (c: pg.Client) => Promise<void>
 export async function dropDatabase(serverUrl: string, database: string): Promise<void> {
   if (!DB_NAME.test(database)) throw new RestoreError('invalid database name');
   await adminQuery(serverUrl, async (c) => {
-    await c.query(`DROP DATABASE IF EXISTS ${database} WITH (FORCE)`);
+    // Plain DROP first: PostgreSQL waits a few seconds for sessions that are already closing
+    // (the drill's own pool), so they are not killed mid-shutdown; FORCE only if one remains.
+    try {
+      await c.query(`DROP DATABASE IF EXISTS ${database}`);
+    } catch {
+      await c.query(`DROP DATABASE IF EXISTS ${database} WITH (FORCE)`);
+    }
   });
 }
 

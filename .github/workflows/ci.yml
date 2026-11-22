@@ -63,6 +63,17 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # Invoice PDFs render with headless Chromium (ADR-0045, T-0041).
       - run: pnpm exec playwright install --with-deps chromium
+      # The restore drill (T-0143, ADR-0101) dumps the postgres:17 service, so pg_dump/pg_restore
+      # must be 17 (pg_dump refuses newer servers), and it restores into a fresh cluster (initdb).
+      # PGDG binaries only; no cluster is created or started.
+      - name: PostgreSQL 17 binaries for the restore drill
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          echo 'create_main_cluster = false' | sudo tee -a /etc/postgresql-common/createcluster.conf
+          sudo apt-get install -y --no-install-recommends postgresql-17
+          echo "LF_PG_BINDIR=/usr/lib/postgresql/17/bin" >> "$GITHUB_ENV"
       - run: pnpm test:db
 
   invariants:

@@ -190,6 +190,32 @@ services:
       timeout: 5s
       retries: 6
 
+  # Nightly encrypted backup (T-0143, ADR-0101; runbook Docs/ops/backup-restore.md): pg_dump under
+  # an exported snapshot, envelope-encrypted with the dedicated backup keyring, into the `backups`
+  # volume at LF_BACKUP_AT (UTC), keeping LF_BACKUP_RETENTION_DAYS. It connects as the postgres
+  # superuser because pg_dump must read past FORCEd RLS (a least-privilege lf_backup role is T-0227).
+  # Copy the volume and the keyring off the host: a backup whose only key is on the lost VM is not one.
+  backup:
+    <<: *app
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile
+      target: backup
+    environment:
+      LF_DB_HOST: postgres
+      LF_DB_NAME: ledgerforce
+      LF_BACKUP_DB_USER: postgres
+      LF_BACKUP_DB_PASSWORD_FILE: /run/secrets/postgres_password
+      LF_KMS_PROVIDER: local
+      LF_KMS_KEYRING_FILE: /run/secrets/backup_keyring
+      LF_BACKUP_AT: ${LF_BACKUP_AT:-02:30}
+      LF_BACKUP_RETENTION_DAYS: ${LF_BACKUP_RETENTION_DAYS:-14}
+    secrets: [postgres_password, backup_keyring]
+    volumes:
+      - backups:/backups
+    depends_on:
+      setup: { condition: service_completed_successfully }
+
   web:
     <<: *app
     build:
@@ -223,6 +249,8 @@ secrets:
   keycloak_db_password: { file: ./secrets/keycloak_db_password }
   oidc_client_secret: { file: ./secrets/oidc_client_secret }
   keycloak_admin_client_secret: { file: ./secrets/keycloak_admin_client_secret }
+  backup_keyring: { file: ./secrets/backup_keyring }
 
 volumes:
   pgdata:
+  backups:

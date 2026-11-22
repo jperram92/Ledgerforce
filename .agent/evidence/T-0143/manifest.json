@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0143",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-174",
+      "file": ".agent/evidence/T-0143/green-db.txt",
+      "test": "3 test(s): |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster > SS-PLAT-174 restores the backup into a fresh cluster and reports every chain ok with the same entry counts | |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster > SS-PLAT-174 the CLI exits 0 and prints one ok line per company | |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster > SS-PLAT-174 the backup CLI (as the compose service runs it) writes a backup the drill CLI verifies [T-0143]",
+      "commit": "a142786-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:26:48.452Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-174",
+      "file": ".agent/evidence/T-0143/green-unit.txt",
+      "test": "8 test(s): |unit| packages/db/src/ops/backup-schedule.test.ts > SS-PLAT-174 nightly backup schedule and retention > SS-PLAT-174 the next run is today at HH:MM UTC, or tomorrow when that has passed | |unit| packages/db/src/ops/backup-schedule.test.ts > SS-PLAT-174 nightly backup schedule and retention > SS-PLAT-174 backup files are named by UTC time so they sort chronologically | |unit| packages/db/src/ops/backup-schedule.test.ts > SS-PLAT-174 nightly backup schedule and retention > SS-PLAT-174 configuration has safe defaults and rejects bad values by name | |unit| packages/db/src/ops/backup-schedule.test.ts > SS-PLAT-174 nightly backup schedule and retention > SS-PLAT-174 pruning removes backups older than the retention, keeps the newest and other files | |unit| packages/db/src/ops/backup-schedule.test.ts > SS-PLAT-174 nightly backup schedule and retention > SS-PLAT-174 the newest backup is kept even when every backup is past the retention | |unit| infra/test/install-contract.test.ts > SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) > SS-PLAT-174 the backup image is the node runtime plus the PostgreSQL 17 client, non-root, with a /backups folder it owns | |unit| infra/test/install-contract.test.ts > SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) > SS-PLAT-174 compose runs the backup nightly with a retention setting, a dedicated keyring and its own volume | |unit| infra/test/install-contract.test.ts > SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) > SS-PLAT-174 the runbook covers backup, off-host key custody, the restore drill and its failure codes [T-0143]",
+      "commit": "a142786-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:26:48.452Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-175",
+      "file": ".agent/evidence/T-0143/green-db.txt",
+      "test": "4 test(s): |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 a backup with one altered byte exits non-zero with BACKUP_DECRYPT_FAILED and leaves no database | |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 a truncated backup exits non-zero with BACKUP_DECRYPT_FAILED | |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 the drill refuses to restore over an existing database | |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 a journal line tampered before the backup exits non-zero naming the company, seq and reason [T-0143]",
+      "commit": "a142786-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:26:48.452Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-176",
+      "file": ".agent/evidence/T-0143/green-db.txt",
+      "test": "3 test(s): |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key > SS-PLAT-176 the file holds no plaintext dump, table name, tenant name, memo or company id | |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key > SS-PLAT-176 the configured key yields a pg_dump archive; a different key is refused | |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key > SS-PLAT-176 the manifest and the dump come from the same snapshot (row counts match the restored copy) [T-0143]",
+      "commit": "a142786-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:26:48.452Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-176",
+      "file": ".agent/evidence/T-0143/green-unit.txt",
+      "test": "12 test(s): |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 0-byte payload and the manifest | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 1-byte payload and the manifest | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65535-byte payload and the manifest | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65536-byte payload and the manifest | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65537-byte payload and the manifest | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 196608-byte payload and the manifest | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 the file holds neither the plaintext nor the manifest in the clear | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a different key does not open the backup | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 any altered byte (header, MAC, manifest or payload) fails closed | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 truncation (at a chunk boundary or mid-chunk), dropped chunks and trailing bytes fail | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a wrapped key copied from another backup does not open this one | |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a file that is not an lf-backup fails with BackupDecryptError [T-0143]",
+      "commit": "a142786-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:26:48.452Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-174",
+      "file": ".agent/evidence/T-0143/red.txt",
+      "test": "RED before implementation (modules absent; install contract before compose changes) [T-0143]",
+      "commit": "a142786-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:26:48.452Z",
+      "result": "failed-as-expected"
+    }
+  ]
+}

@@ -1,19 +1,20 @@
 
  RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0143-backup
 
-[db] test PostgreSQL ready (local) on 127.0.0.1:34993
- ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster > SS-PLAT-174 restores the backup into a fresh cluster and reports every chain ok with the same entry counts 1413ms
- ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster > SS-PLAT-174 the CLI exits 0 and prints one ok line per company 969ms
- ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 a backup with one altered byte exits non-zero with BACKUP_DECRYPT_FAILED and leaves no database 725ms
- ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 a truncated backup exits non-zero with BACKUP_DECRYPT_FAILED 295ms
- ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 the drill refuses to restore over an existing database 40ms
- ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 a journal line tampered before the backup exits non-zero naming the company, seq and reason 4673ms
- ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key > SS-PLAT-176 the file holds no plaintext dump, table name, tenant name, memo or company id 3ms
- ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key > SS-PLAT-176 the configured key yields a pg_dump archive; a different key is refused 361ms
- ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key > SS-PLAT-176 the manifest and the dump come from the same snapshot (row counts match the restored copy) 2ms
+[db] test PostgreSQL ready (local) on 127.0.0.1:46639
+ ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster > SS-PLAT-174 restores the backup into a fresh cluster and reports every chain ok with the same entry counts 1722ms
+ ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster > SS-PLAT-174 the CLI exits 0 and prints one ok line per company 2710ms
+ ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster > SS-PLAT-174 the backup CLI (as the compose service runs it) writes a backup the drill CLI verifies 1785ms
+ ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 a backup with one altered byte exits non-zero with BACKUP_DECRYPT_FAILED and leaves no database 1850ms
+ ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 a truncated backup exits non-zero with BACKUP_DECRYPT_FAILED 244ms
+ ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 the drill refuses to restore over an existing database 11ms
+ ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain > SS-PLAT-175 a journal line tampered before the backup exits non-zero naming the company, seq and reason 2947ms
+ ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key > SS-PLAT-176 the file holds no plaintext dump, table name, tenant name, memo or company id 57ms
+ ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key > SS-PLAT-176 the configured key yields a pg_dump archive; a different key is refused 206ms
+ ✓ |db| packages/ledger/src/ops/restore-drill.db.test.ts > SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key > SS-PLAT-176 the manifest and the dump come from the same snapshot (row counts match the restored copy) 1ms
 
  Test Files  1 passed (1)
-      Tests  9 passed (9)
-   Start at  08:14:19
-   Duration  15.26s (transform 591ms, setup 0ms, import 872ms, tests 12.81s, environment 0ms)
+      Tests  10 passed (10)
+   Start at  19:25:03
+   Duration  73.61s (transform 7.71s, setup 0ms, import 9.68s, tests 29.61s, environment 0ms)
 
