@@ -1,0 +1,121 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:43217
+ ❯ |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts (11 tests | 6 failed) 2428ms
+     × SS-UC11-11 refused (charge_disputed), then cancelled after a lookup at Stripe: credit freed, the outbox handler does nothing 226ms
+     × SS-UC11-11 a refund Stripe holds (a commit lost after the send) is never cancelled: AT_STRIPE with the Stripe refund id 158ms
+     × SS-UC11-12 R2 an unapproved document whose refund Stripe holds is reported (never recorded unapproved, never cancelled); approving it adopts, no create 89ms
+     × SS-UC11-11 M1 a hung send (client timeout) is not cancelled until it is finished and cooled off; when its create lands after the cancel, the next document for the same credit is refused before any create, and stripe-check reports it 179ms
+     × SS-UC11-12 L2 a live Stripe refund for the document but of another amount is SENT_NOT_POSTED (money is out), never REFUND_FAILED; nothing is created 81ms
+     × SS-UC11-12 L4 a refund found at Stripe dated in an AR-locked period: "reject" leaves it SENT_NOT_POSTED; "first open date" records it once on the first open date, entry, allocation, Stripe record and paid date alike 89ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; its amount stops counting as requested > SS-UC11-11 refused (charge_disputed), then cancelled after a lookup at Stripe: credit freed, the outbox handler does nothing
+AssertionError: expected 'resolved' to be 'SEND_NOT_FINISHED' // Object.is equality
+
+Expected: "SEND_NOT_FINISHED"
+Received: "resolved"
+
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:255:46
+    253|     // SEND_NOT_FINISHED and Stripe is not even asked.
+    254|     const asked = stub.received.length;
+    255|     expect(await codeOf(cancel(r.refundId))).toBe('SEND_NOT_FINISHED');
+       |                                              ^
+    256|     await sendFailedFor(r.refundId, 'charge_disputed', 'Charge has bee…
+    257|     const early = await cancel(r.refundId).catch(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; its amount stops counting as requested > SS-UC11-11 a refund Stripe holds (a commit lost after the send) is never cancelled: AT_STRIPE with the Stripe refund id
+AssertionError: expected 'AT_STRIPE' to be 'NOT_CANCELLABLE' // Object.is equality
+
+Expected: "NOT_CANCELLABLE"
+Received: "AT_STRIPE"
+
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:332:46
+    330|     expect(lost).toBe('connection lost before COMMIT');
+    331|     // Unapproved: nothing to withdraw here (security review r10 L1, T…
+    332|     expect(await codeOf(cancel(r.refundId))).toBe('NOT_CANCELLABLE');
+       |                                              ^
+    333|     // Re-approved more than 23 hours ago (KEY_EXPIRED, a finished sen…
+    334|     await approvedHoursAgo(r, 30);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-12 T-0189 AC-1 / review r8 R2: a refund Stripe already holds is recorded once and never sent again > SS-UC11-12 R2 an unapproved document whose refund Stripe holds is reported (never recorded unapproved, never cancelled); approving it adopts, no create
+AssertionError: expected 'AT_STRIPE' to be 'NOT_CANCELLABLE' // Object.is equality
+
+Expected: "NOT_CANCELLABLE"
+Received: "AT_STRIPE"
+
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:497:46
+    495|     expect(await journalOf(r.refundId)).toEqual([]);
+    496|     // Unapproved, so never cancelled (security review r10 L1); approv…
+    497|     expect(await codeOf(cancel(r.refundId))).toBe('NOT_CANCELLABLE');
+       |                                              ^
+    498|     await approve(r);
+    499|     const sent = await f.inTenant((trx) =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > Security review r10: a cancel never races a create; a refund under a cancelled document blocks the next create > SS-UC11-11 M1 a hung send (client timeout) is not cancelled until it is finished and cooled off; when its create lands after the cancel, the next document for the same credit is refused before any create, and stripe-check reports it
+AssertionError: expected 'resolved' to be 'SEND_NOT_FINISHED' // Object.is equality
+
+Expected: "SEND_NOT_FINISHED"
+Received: "resolved"
+
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:826:46
+    824|     // Pending (the outbox retries), even an hour later: not finished,…
+    825|     await anHourAgo(a.refundId);
+    826|     expect(await codeOf(cancel(a.refundId))).toBe('SEND_NOT_FINISHED');
+       |                                              ^
+    827|     // The outbox gives up (a Sync issue) and the cooling-off passes: …
+    828|     // Stripe, asked now, holds nothing yet.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > Security review r10: a cancel never races a create; a refund under a cancelled document blocks the next create > SS-UC11-12 L2 a live Stripe refund for the document but of another amount is SENT_NOT_POSTED (money is out), never REFUND_FAILED; nothing is created
+AssertionError: expected { status: 'failed', …(3) } to match object { status: 'failed', …(2) }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "code": "SENT_NOT_POSTED",
++   "code": "REFUND_FAILED",
+    "status": "failed",
+-   "stripeRefundId": "re_1SQbT0190Mismatch210",
++   "stripeRefundId": null,
+  }
+
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:904:17
+    902|     );
+    903|     expect(stub.mismatches).toEqual([]);
+    904|     expect(out).toMatchObject({
+       |                 ^
+    905|       status: 'failed',
+    906|       code: 'SENT_NOT_POSTED',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > Security review r10: a cancel never races a create; a refund under a cancelled document blocks the next create > SS-UC11-12 L4 a refund found at Stripe dated in an AR-locked period: "reject" leaves it SENT_NOT_POSTED; "first open date" records it once on the first open date, entry, allocation, Stripe record and paid date alike
+StripeRefundError: refund RF-000015 was sent to Stripe as re_1SQbT0190LockedLive (the money has left), but it was not posted: DATE_BEFORE_DOCUMENT: allocation date 2026-11-25 is before 2026-12-01. The books do not show it yet; fix the cause and retry it from Sync issues (the retry records this Stripe refund and never sends another)
+ ❯ sentNotPosted packages/connectors/stripe/src/refund.ts:485:5
+
+ ❯ sendOrRecord packages/connectors/stripe/src/refund.ts:562:25
+ ❯ sendStripeCustomerRefund packages/connectors/stripe/src/refund.ts:405:16
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:956:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed | 5 passed (11)
+   Start at  03:13:42
+   Duration  4.04s (transform 486ms, setup 0ms, import 729ms, tests 2.43s, environment 0ms)
+

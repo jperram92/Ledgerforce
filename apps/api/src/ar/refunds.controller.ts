@@ -67,6 +67,7 @@ import {
   type StripeRefundResendView,
   STRIPE_REFUND_APPROVED,
   STRIPE_REFUND_SEND_HANDLER,
+  STRIPE_REFUND_SEND_WINDOW_MS,
   stripeRefundOf,
   stripeRefundToday,
   trySendStripeCustomerRefund,
@@ -215,9 +216,28 @@ async function storedStripeView(
          ORDER BY i.last_failed_at DESC, i.id DESC
          LIMIT 1`.execute(trx)
     ).rows[0];
-    return issue
-      ? { status: 'failed', stripe_refund_id: null, message: issue.message, code: issue.code }
-      : { status: 'pending', stripe_refund_id: null, message: null };
+    if (issue)
+      return { status: 'failed', stripe_refund_id: null, message: issue.message, code: issue.code };
+    // Security review r10 L1: past its window the send has finished (KEY_EXPIRED) even when no
+    // worker attempt recorded it, so the region and the cancel rule agree.
+    const age = (
+      await sql<{ ms: string | null }>`
+        SELECT (extract(epoch FROM clock_timestamp() - coalesce(
+                  (SELECT max(confirmed_at) FROM app.customer_refund_stripe_resend
+                    WHERE company_id = ${companyId}::uuid AND refund_id = ${r.refundId}::uuid),
+                  (SELECT approved_at FROM app.customer_refund_approval
+                    WHERE company_id = ${companyId}::uuid AND refund_id = ${r.refundId}::uuid)))
+                * 1000)::bigint::text AS ms`.execute(trx)
+    ).rows[0]?.ms;
+    if (age !== null && age !== undefined && Number(age) > STRIPE_REFUND_SEND_WINDOW_MS)
+      return {
+        status: 'failed',
+        stripe_refund_id: null,
+        code: 'KEY_EXPIRED',
+        message:
+          'it was not sent within 23 hours of its approval, so it is no longer sent automatically; check it with Stripe, then resend or cancel it',
+      };
+    return { status: 'pending', stripe_refund_id: null, message: null };
   }
   return { status: 'not_sent', stripe_refund_id: null, message: null };
 }
@@ -449,6 +469,10 @@ export class ArRefundsController {
       outcome: c.outcome,
       stripe_refund_id: c.stripeRefundId,
       failed_at_stripe: c.failedAtStripe,
+      cancelled_held_at_stripe: c.cancelledHeldAtStripe.map((x) => ({
+        refund_id: x.refundId,
+        stripe_refund_id: x.stripeRefundId,
+      })),
       resendable: c.resendable,
       refund,
     };
@@ -528,6 +552,11 @@ export class ArRefundsController {
     await getCustomerRefund(trx, cid, refundId).catch(refusal);
     const deps = this.stripeDeps();
     if (!deps) throw new ServiceUnavailableException({ error: 'stripe_refunds_unavailable' });
+    // Security review r10 L3: this route sends money, so, as approve, refuse unless the interceptor
+    // verified the step-up for this request (DL-0692: the handler check is the final gate).
+    if (!this.tx.stepUpVerified(STRIPE_REFUND_STEP_UP_SECONDS)) {
+      throw new StepUpRequired(STRIPE_REFUND_STEP_UP_SECONDS);
+    }
     const v = await confirmStripeRefundResend(trx, {
       companyId: cid,
       refundId,

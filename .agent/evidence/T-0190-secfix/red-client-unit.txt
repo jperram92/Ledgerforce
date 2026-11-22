@@ -1,0 +1,47 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2
+
+ ❯ |unit| packages/connectors/stripe/src/client.contract.test.ts (10 tests | 2 failed) 5090ms
+     × SS-UC11-11 a request that never answers fails after the timeout as a retryable "timeout", and the transport is told to abort 5003ms
+     × SS-UC11-11 the default deadline is 30 s, below the send transaction idle timeout (STRIPE_SEND_IDLE_TIMEOUT_MS), and out-of-range values are refused 5ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/connectors/stripe/src/client.contract.test.ts > Security review r10 M1(a): every Stripe request has a deadline shorter than the database idle timeout > SS-UC11-11 a request that never answers fails after the timeout as a retryable "timeout", and the transport is told to abort
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ packages/connectors/stripe/src/client.contract.test.ts:160:3
+    158|
+    159| describe('Security review r10 M1(a): every Stripe request has a deadli…
+    160|   it('SS-UC11-11 a request that never answers fails after the timeout …
+       |   ^
+    161|     let signal: AbortSignal | undefined;
+    162|     const hung = new StripeClient({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |unit| packages/connectors/stripe/src/client.contract.test.ts > Security review r10 M1(a): every Stripe request has a deadline shorter than the database idle timeout > SS-UC11-11 the default deadline is 30 s, below the send transaction idle timeout (STRIPE_SEND_IDLE_TIMEOUT_MS), and out-of-range values are refused
+AssertionError: expected undefined to be 30000 // Object.is equality
+
+- Expected:
+30000
+
++ Received:
+undefined
+
+ ❯ packages/connectors/stripe/src/client.contract.test.ts:184:39
+    182|
+    183|   it('SS-UC11-11 the default deadline is 30 s, below the send transact…
+    184|     expect(STRIPE_REQUEST_TIMEOUT_MS).toBe(30_000);
+       |                                       ^
+    185|     expect(STRIPE_REQUEST_TIMEOUT_MS).toBeLessThan(STRIPE_SEND_IDLE_TI…
+    186|     expect(() => new StripeClient({ secretKey: TEST_KEY, mode: 'test',…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 8 passed (10)
+   Start at  03:11:38
+   Duration  6.49s (transform 549ms, setup 0ms, import 1.07s, tests 5.09s, environment 0ms)
+

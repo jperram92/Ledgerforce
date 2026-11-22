@@ -61,7 +61,9 @@ export type RefundErrorCode =
   /** T-0190: only a requested Stripe refund with no live refund at Stripe is cancelled. */
   | 'NOT_CANCELLABLE'
   /** T-0190 (RQ-0173): Stripe holds a live refund for this document; it is never cancelled. */
-  | 'AT_STRIPE';
+  | 'AT_STRIPE'
+  /** Security review r10 M1/L1: the send has not finished (or only just), so no cancel yet. */
+  | 'SEND_NOT_FINISHED';
 
 export class RefundError extends Error {
   readonly code: RefundErrorCode;
@@ -440,17 +442,25 @@ export async function markCustomerRefundPaid(
 export type StripeRefundHeldCheck = (trx: Trx, r: CustomerRefundView) => Promise<string | null>;
 
 /**
+ * The Stripe connector's "has the send finished?" for a cancel (security review r10 M1(b), L1):
+ * why not, or null when the document may be cancelled.
+ */
+export type StripeSendFinishedCheck = (trx: Trx, r: CustomerRefundView) => Promise<string | null>;
+
+/**
  * Cancel a requested Stripe refund that no live Stripe refund pays (T-0190, RQ-0173): its amount
- * stops counting as requested, so the credit can be refunded another way. Under the party lock
- * (no send of the party runs meanwhile) the caller's `heldAtStripe` asks Stripe; a live refund
- * there is AT_STRIPE and the document stays requested. A paid or bank refund is NOT_CANCELLABLE
+ * stops counting as requested, so the credit can be refunded another way. Only an approved one
+ * whose send has finished (failed or expired) and gone quiet (`sendNotFinished`, security review
+ * r10 M1/L1; else SEND_NOT_FINISHED). Under the party lock (no send of the party runs meanwhile)
+ * the caller's `heldAtStripe` asks Stripe; a live refund there is AT_STRIPE and the document stays
+ * requested. A paid or bank refund is NOT_CANCELLABLE
  * (bank: T-0207). A repeat returns the cancelled refund (`replayed`). The 0055 guard keeps it
  * cancelled for good. No money moves, so neither a checker nor a step-up is needed.
  */
 export async function cancelCustomerRefund(
   trx: Trx,
   c: { companyId: string; refundId: string },
-  opts: { heldAtStripe?: StripeRefundHeldCheck } = {},
+  opts: { heldAtStripe?: StripeRefundHeldCheck; sendNotFinished?: StripeSendFinishedCheck } = {},
 ): Promise<CustomerRefundView> {
   const companyId = c.companyId.toLowerCase();
   const before = await getCustomerRefund(trx, companyId, c.refundId);
@@ -463,12 +473,22 @@ export async function cancelCustomerRefund(
       `refund ${r.refundNo} is ${r.status} (${r.method}); only a requested Stripe refund is cancelled here`,
     );
   }
-  if (!opts.heldAtStripe) {
+  if (r.approval !== 'approved') {
+    // Security review r10 L1: only a send that finished is cancelled here (withdrawing an
+    // unapproved request is T-0207's).
+    throw new RefundError(
+      'NOT_CANCELLABLE',
+      `refund ${r.refundNo} is not approved, so it was never sent; only a Stripe refund whose send failed or expired is cancelled here`,
+    );
+  }
+  if (!opts.heldAtStripe || !opts.sendNotFinished) {
     throw new RefundError(
       'METHOD_NOT_AVAILABLE',
       'refunds through Stripe are not configured here, so Stripe cannot be asked first',
     );
   }
+  const notYet = await opts.sendNotFinished(trx, r);
+  if (notYet) throw new RefundError('SEND_NOT_FINISHED', notYet);
   const held = await opts.heldAtStripe(trx, r);
   if (held) {
     throw new RefundError(
