@@ -352,6 +352,42 @@
       "provider": "claude",
       "timestamp": "2026-11-22T19:46:23.734Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-162",
+      "file": ".agent/evidence/T-0209/20261122-195417-tests-db.json",
+      "test": "3 test(s): packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-162: failed security notices are listed in their tenant, masked › SS-PLAT-162 masks an address to its first character and domain [T-0209] | packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-162: failed security notices are listed in their tenant, masked › SS-PLAT-162 lists each failed notice with attempts, last SMTP code and next attempt time [T-0209] | packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-162: failed security notices are listed in their tenant, masked › SS-PLAT-162 another tenant lists none of this tenant's notices [T-0209]",
+      "commit": "03e63bd6b4fb",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:54:17.670Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-163",
+      "file": ".agent/evidence/T-0209/20261122-195417-tests-db.json",
+      "test": "4 test(s): packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-163: retry-now makes a failed notice due at the next dispatch, append-only › SS-PLAT-163 a request appends one row; the next dispatch sends that notice only [T-0209] | packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-163: retry-now makes a failed notice due at the next dispatch, append-only › SS-PLAT-163 a second request for the same failed attempt adds nothing [T-0209] | packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-163: retry-now makes a failed notice due at the next dispatch, append-only › SS-PLAT-163 a sent notice cannot be retried; unknown ids are not found [T-0209] | packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-163: retry-now makes a failed notice due at the next dispatch, append-only › SS-PLAT-163 lf_app can only append retry rows, and only for the latest failed attempt [T-0209]",
+      "commit": "03e63bd6b4fb",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:54:17.670Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-195420-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-161: failed security notices are listed for administrators of their tenant › SS-PLAT-161 Owner, Finance Admin and Auditor see the failed notices with attempts, SMTP code and next attempt [T-0209] | apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-161: failed security notices are listed for administrators of their tenant › SS-PLAT-161 the Accountant and a clerk are refused; another tenant sees none [T-0209]",
+      "commit": "03e63bd6b4fb-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:54:20.678Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-163",
+      "file": ".agent/evidence/T-0209/20261122-195420-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited › SS-PLAT-163 needs security_notices.retry and an Idempotency-Key [T-0209] | apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited › SS-PLAT-163 201 appends the request; a replay answers 200 and adds nothing; each call audited [T-0209] | apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited › SS-PLAT-163 a sent notice is 409, an unknown or other-tenant one 404, a bad kind 404 [T-0209] | apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited › SS-PLAT-163 tenants never see each other: the other tenant cannot list or retry here [T-0209]",
+      "commit": "03e63bd6b4fb-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:54:20.678Z",
+      "result": "passed"
     }
   ]
 }

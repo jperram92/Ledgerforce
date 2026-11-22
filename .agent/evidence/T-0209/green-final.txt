@@ -1,0 +1,17 @@
+# T-0209 final validation on the merged tree (base 2bb9c08, migration 0080) 2026-11-22
+## LF_TEST_DB_TMPDIR=/tmp/lf-t0209 VITEST_MAX_WORKERS=1 npx vitest run --project db --project api-db
+ Test Files  178 passed (178)
+      Tests  2185 passed (2185)
+exit=0
+skipped/todo mentions: 0
+
+## npx vitest run --project unit --project ui --project web --project api-unit
+ Test Files  119 passed (119)
+      Tests  1377 passed (1377)
+
+## pnpm exec playwright test security-notices + shell + sync-issues --trace off
+  32 passed (1.1m)
+
+## pnpm typecheck exit 0; pnpm -s lint exit 0; pnpm -s format:check exit 0; conductor lint-backlog OK
+## vitest JSON evidence: 20261122-195417-tests-db.json (SS-PLAT-162, SS-PLAT-163 passed), 20261122-195420-tests-api-db.json (SS-PLAT-161, SS-PLAT-163 passed), 20261122-083551-tests-unit.json, 20261122-083555-tests-web.json (SS-PLAT-161 passed)
+## Not run: scripts/agent/verify.sh (lead runs it after merging)
