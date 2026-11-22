@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0209",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082348-SS-PLAT-161-failed-notices-forbidden-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:23:48.392Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082350-SS-PLAT-161-failed-notices-empty-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:23:50.118Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082352-SS-PLAT-161-failed-notices-error-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:23:52.199Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082420-SS-PLAT-161-failed-notices-owner-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 1440 [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:20.148Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082420-SS-PLAT-161-failed-notices-refused-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a refused retry is explained next to the list [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:20.868Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082423-SS-PLAT-161-failed-notices-auditor-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Auditor sees the list without the retry action [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:23.915Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082424-SS-PLAT-161-failed-notices-owner-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 390 [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:24.372Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082428-SS-PLAT-161-failed-notices-retried-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a Finance Admin retries one notice now by keyboard [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:28.204Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082427-SS-PLAT-161-failed-notices-forbidden-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:27.787Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082429-SS-PLAT-161-failed-notices-empty-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:29.944Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082432-SS-PLAT-161-failed-notices-error-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:32.940Z",
+      "result": "passed"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+# T-0209 GREEN api-db 2026-11-22: VITEST_MAX_WORKERS=1 npx vitest run --project api-db apps/api/src/security-notices apps/api/src/users apps/api/src/sync apps/api/src/setup/remittance-account-notice.db.test.ts
+ Test Files  5 passed (5)
+      Tests  23 passed (23)

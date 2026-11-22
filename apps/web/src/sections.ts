@@ -17,6 +17,7 @@ export interface SubPage {
     | '/reports/control-exceptions'
     | '/reports/audit-log'
     | '/settings/sync-issues'
+    | '/settings/security-notices'
     | '/accounting/journals'
     | '/accounting/chart'
     | '/accounting/posting-profiles'
@@ -284,6 +285,12 @@ export const SECTIONS: readonly Section[] = [
         to: '/settings/sync-issues',
         name: 'Salesforce sync issues',
         text: 'Changes that could not be sent to Salesforce: what went wrong, and retry or ignore them.',
+      },
+      // Failed security notices (T-0209, ADR-0097).
+      {
+        to: '/settings/security-notices',
+        name: 'Failed security notices',
+        text: 'Emails about a changed bank account that could not be delivered: what went wrong, and send one again now.',
       },
     ],
   },
