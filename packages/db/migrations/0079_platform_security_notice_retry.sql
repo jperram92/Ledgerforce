@@ -1,8 +1,6 @@
 -- 0079 — Retry-now of failed security notices (T-0209, ADR-0097, RQ-0179, DL-0840..DL-0845).
 -- Owner: packages/modules/email (dispatcher and retry), apps/api (routes).
--- Numbering: round 11 reserved 0079 for this migration. The file is numbered 0078 on its task
--- branch only because the runner refuses gaps and the base ends at 0077; the integrator renames
--- it when merging (nothing else refers to the number).
+-- Numbering: round 11 reserved 0079 for this migration (0078 is T-0204's, merged into the base).
 --
 -- * app.security_notice_retry: one row per failed delivery attempt that an administrator released
 --   for an immediate retry ("retry now"). It names exactly one notice (as 0073 does) and the
