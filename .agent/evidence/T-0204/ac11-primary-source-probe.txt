@@ -1,0 +1,10 @@
+# T-0204 AC-11 primary-source reachability probe, 2026-11-22T03:10Z
+# curl -sS -m 25 -o /dev/null -w '%{http_code}' <url> through the build environment's agent proxy
+https://www.legislation.gov.au/C2004A00446/latest/text -> curl: (56) CONNECT tunnel failed, response 403 000
+https://www.legislation.gov.au/ -> curl: (56) CONNECT tunnel failed, response 403 000
+https://www.ato.gov.au/ -> 403
+https://www.ato.gov.au/law/view/document?docid=GST/GSTR200029/NAT/ATO/00001 -> 403
+https://www.ato.gov.au/law/view/document?docid=GST/GSTR20018/NAT/ATO/00001 -> 403
+https://www.ato.gov.au/forms-and-instructions/business-activity-statement-bas-instructions -> 403
+https://www.aasb.gov.au/ -> curl: (56) CONNECT tunnel failed, response 403 000
+https://www.austlii.edu.au/cgi-bin/viewdoc/au/legis/cth/consol_act/antsta1999402/s29.20.html -> curl: (56) CONNECT tunnel failed, response 403 000
