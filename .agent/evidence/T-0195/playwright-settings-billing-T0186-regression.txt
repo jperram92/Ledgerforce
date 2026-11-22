@@ -1,0 +1,10 @@
+
+Running 6 tests using 2 workers
+
+[1/6] [chromium] › tests/e2e/web/settings-billing.spec.ts:337:3 › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 1440 [T-0186]
+[2/6] [chromium] › tests/e2e/web/settings-billing.spec.ts:479:1 › SS-PLAT-131: an Accountant sees Numbering and billing read-only [T-0186]
+[3/6] [chromium] › tests/e2e/web/settings-billing.spec.ts:519:1 › SS-PLAT-131: without settings.read, Numbering and billing is forbidden [T-0186]
+[4/6] [chromium] › tests/e2e/web/settings-billing.spec.ts:530:1 › SS-PLAT-131: Numbering and billing and Approval amounts are listed on the Settings page [T-0186]
+[5/6] [chromium] › tests/e2e/web/settings-billing.spec.ts:337:3 › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 390 [T-0186]
+[6/6] [chromium] › tests/e2e/web/settings-billing.spec.ts:432:1 › SS-PLAT-131: Numbering and billing refusals are said in plain words, and incomplete forms send nothing [T-0186]
+  6 passed (23.4s)
