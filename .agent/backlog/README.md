@@ -17,9 +17,9 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 146 |
-| todo | 26 |
-| verifying | 8 |
-| **total** | **191** |
+| todo | 27 |
+| verifying | 9 |
+| **total** | **193** |
 
 | Phase | Cards |
 |---|---:|
@@ -242,7 +242,7 @@ graph LR
 | [T-0096](T-0096.md) | DAST smoke test against the compose stack | MVP | review | T-0094, T-0095 | — | 0 |
 | [T-0097](T-0097.md) | Pilot hardening: backups, restore drill, security headers, rate limits (superseded by T-0142, T-0143, T-0144) | MVP | blocked | T-0094, T-0096 | — | 0 |
 | [T-0142](T-0142.md) | Platform - API security headers, strict CORS and rate limits on auth and mutating routes | MVP | review | T-0094 | — | 1 |
-| [T-0143](T-0143.md) | Ops - encrypted database backup and restore drill that proves the hash chain | MVP | todo | T-0094 | — | 0 |
+| [T-0143](T-0143.md) | Ops - encrypted database backup and restore drill that proves the hash chain | MVP | verifying | T-0094 | — | 0 |
 | [T-0144](T-0144.md) | Platform - CSRF guard with Fetch Metadata and Origin checks for cookie-authenticated mutations | MVP | review | T-0142 | — | 0 |
 | [T-0098](T-0098.md) | Pilot data migration (opening balances, open AR/AP) and dry run | MVP | todo | T-0080, T-0142, T-0143, T-0144 | — | 0 |
 | [T-0099](T-0099.md) | MVP gate: pilot month and gate evidence pack (human gate) | MVP | todo | T-0098, T-0082, T-0083, T-0084, T-0085, T-0086, T-0087, T-0088, T-0089, T-0090, T-0091, T-0092, T-0093, T-0069, T-0070, T-0072, T-0075, T-0068, T-0048, T-0047, T-0033, T-0031, T-0035 | — | 0 |
@@ -274,6 +274,8 @@ graph LR
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | verifying | T-0051 |
 | [T-0215](T-0215.md) | Bills inbox transport: signed provider inbound webhooks (SaaS) | MVP | todo | T-0127 |
 | [T-0216](T-0216.md) | Bills mailbox: settings API/UI and OAuth2 XOAUTH2 (Microsoft 365, Google Workspace) | MVP | todo | T-0127 |
+| [T-0227](T-0227.md) | Ops - least-privilege lf_backup role for the nightly backup (replace the superuser) | MVP | todo | T-0143 |
+| [T-0228](T-0228.md) | Ops - point-in-time recovery (WAL archiving) for the hosted RPO 15 min and optional self-host PITR | Phase 1 | todo | T-0143 |
 | [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | in_progress | — | — | 0 |
 | [T-0129](T-0129.md) | Per-party overdue-reminder pause (audited); daily job split to T-0147 | MVP | review | T-0068 | UC-04 | 0 |
 | [T-0130](T-0130.md) | Stripe payouts: fetch from the API, payout.paid webhook, bank line match | MVP | todo | T-0075, T-0060 | UC-03, UC-08 | 0 |

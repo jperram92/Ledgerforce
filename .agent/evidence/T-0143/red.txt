@@ -1,0 +1,76 @@
+# T-0143 RED (2026-11-22): tests written before any implementation; both fail because the modules under test do not exist yet.
+
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0143-backup
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:39849
+ ❯ |db| packages/ledger/src/ops/restore-drill.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/ledger/src/ops/restore-drill.db.test.ts [ packages/ledger/src/ops/restore-drill.db.test.ts ]
+Error: Cannot find package '@ledgerforce/db/ops' imported from /home/user/Ledgerforce/.claude/worktrees/t0143-backup/packages/ledger/src/ops/restore-drill.db.test.ts
+ ❯ packages/ledger/src/ops/restore-drill.db.test.ts:13:1
+     11|  */
+     12| import { LocalKeyringKms } from '@ledgerforce/shared/crypto';
+     13| import { openBackup, BackupDecryptError } from '@ledgerforce/db/ops';
+       | ^
+     14| import { startTestDatabase, type TestDatabaseServer } from '@ledgerfor…
+     15| import { sql } from 'kysely';
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  03:12:25
+   Duration  1.37s (transform 175ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
+
+# T-0143 step 4 RED: schedule/retention tests before backup-schedule.ts exists
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0143-backup
+
+ ❯ |unit| packages/db/src/ops/backup-schedule.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/db/src/ops/backup-schedule.test.ts [ packages/db/src/ops/backup-schedule.test.ts ]
+Error: Cannot find module './backup-schedule.ts' imported from /home/user/Ledgerforce/.claude/worktrees/t0143-backup/packages/db/src/ops/backup-schedule.test.ts
+ ❯ packages/db/src/ops/backup-schedule.test.ts:10:1
+      8| import { join } from 'node:path';
+      9| import { afterAll, describe, expect, it } from 'vitest';
+     10| import { backupFileName, nextRunAt, parseBackupConfig, pruneBackups } …
+       | ^
+     11|
+     12| const dir = mkdtempSync(join(tmpdir(), 'lf-backup-schedule-'));
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  08:15:11
+   Duration  386ms (transform 31ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
+
+# T-0143 step 4 RED: install-contract (AC-4) before compose/Dockerfile/runbook changes
+     × SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup, the scheduler (ADR-0062) and the nightly backup (ADR-0101) 16ms
+     × SS-PLAT-86 each secret reaches only the services that need it 5ms
+     × SS-PLAT-86 every service drops privileges it does not need 1ms
+     × SS-PLAT-86 init-secrets.sh writes distinct random secrets (and the backup keyring) once and never overwrites 181ms
+     × SS-PLAT-174 the backup image is the node runtime plus the PostgreSQL 17 client, non-root, with a /backups folder it owns 1ms
+     × SS-PLAT-174 compose runs the backup nightly with a retention setting, a dedicated keyring and its own volume 0ms
+     × SS-PLAT-174 the runbook covers backup, off-host key custody, the restore drill and its failure codes 1ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: expected [ 'api', 'keycloak', 'postgres', …(4) ] to deeply equal [ 'api', 'backup', 'keycloak', …(5) ]
+AssertionError: expected [ Array(6) ] to deeply equal [ 'backup_keyring', …(6) ]
+Error: no service backup
+    129|   if (!s) throw new Error(`no service ${n}`);
+SyntaxError: Unexpected end of JSON input
+AssertionError: expected undefined to be 'node-runtime' // Object.is equality
+Error: no service backup
+    129|   if (!s) throw new Error(`no service ${n}`);
+Error: ENOENT: no such file or directory, open '/home/user/Ledgerforce/.claude/worktrees/t0143-backup/Docs/ops/backup-restore.md'
+      Tests  7 failed | 17 passed (24)

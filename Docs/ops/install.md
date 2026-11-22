@@ -121,9 +121,12 @@ After the Owner's first sign-in, setup refuses to reissue.
 - **Not public**: the database, Keycloak and the API are reachable only inside the compose
   network. The web service returns 404 for Keycloak's `/admin/` and `/realms/master/`. To use the
   Keycloak admin console, publish it temporarily on loopback and use an SSH tunnel.
-- **Backups**: back up the `pgdata` volume (both databases) and `infra/compose/secrets/`; test
-  restores. Point-in-time recovery and encrypted off-site backups are your responsibility on a
-  single server (design §6.9 targets apply to hosted).
+- **Backups**: the `backup` service writes a nightly encrypted backup of the LedgerForce database
+  to the `backups` volume (T-0143). Copy that volume and `infra/compose/secrets/backup_keyring`
+  off the host, and run the restore drill quarterly: see [backup-restore.md](backup-restore.md).
+  The Keycloak database is not in it; back it up with the `pgdata` volume or `pg_dump keycloak`.
+  Point-in-time recovery is not part of the single-server install (design §6.9 targets apply to
+  hosted; T-0228).
 - **Updates**: pull the new version, then `up -d --build`. Setup applies new migrations before
   the new api and worker start. Migrations are forward-only.
 - **Hardening in the stack**: every service has `no-new-privileges`; app containers drop all Linux
