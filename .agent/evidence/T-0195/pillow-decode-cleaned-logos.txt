@@ -1,0 +1,4 @@
+Pillow decode of cleanInvoiceLogo output vs original (pixels equal, Exif/text gone), 2026-11-22
+logo-exif.jpg size (120, 40) pixels_equal True exif_after {} exif_before_tags 4 info_after ['jfif', 'jfif_density', 'jfif_unit', 'jfif_version']
+logo-progressive.jpg size (120, 40) pixels_equal True exif_after {} exif_before_tags 4 info_after ['jfif', 'jfif_density', 'jfif_unit', 'jfif_version', 'progression', 'progressive']
+logo-text.png size (120, 40) pixels_equal True exif_after {} exif_before_tags 4 info_after []

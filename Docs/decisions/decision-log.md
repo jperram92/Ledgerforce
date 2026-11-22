@@ -4249,3 +4249,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the card's ACs are contract and db; the UI and the sweep are each a screen or job of their own (about 300 lines).
 - Alternatives: build everything here (rejected: oversized).
 - ADR: ADR-0091 · Status: accepted
+
+### DL-0870 — ADR-0100 accepted: logo upload as base64 JSON with a 1 MiB route-scoped reader; logo served only behind settings.read, sandboxed (T-0195)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: `PUT /setup/billing/logo {company_id, logo: {content_type, content_base64} | null}` with the ADR-0078 scoped JSON reader (extended to PUT) limited to 1 MiB for that path; `GET /setup/billing/logo` serves the stored PNG/JPEG with a fixed file name, `Content-Disposition: inline`, `Content-Security-Policy: default-src 'none'; sandbox`, `Cross-Origin-Resource-Policy: same-origin` and the global `nosniff`/`no-store`. Accepted under DL-0691.
+- Why: RQ-0182 findings 1 and 4: no multipart dependency, the repository's reviewed base64 pattern (ADR-0078) and Odoo's; OWASP File Upload (generated name, authorised access); GitHub's user-content headers.
+- Alternatives: multipart via multer (new direct runtime dependency); a public logo URL (tenant data).
+- ADR: ADR-0100 · Status: accepted
+
+### DL-0871 — Uploaded logos are cleaned structurally (no re-encode): metadata dropped, ≤ 4,000 × 4,000 px, no SVG (T-0195)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: `cleanInvoiceLogo` in `@ledgerforce/ar` walks the PNG chunks (length, CRC-32, IHDR first, IEND last, nothing after) or JPEG segments (SOI, segments to SOS, SOF before SOS, EOI last), refuses images over 4,000 px a side, keeps only appearance chunks/segments and drops Exif, XMP, IPTC, text, time, comments and unknown chunks. Applied by the upload route before `setInvoiceSettings`; the module's own checks are unchanged. SVG stays refused.
+- Why: RQ-0182 findings 2 and 3: magic bytes alone accept polyglots; the logo goes into every customer invoice, so camera GPS/serials/author must not; re-encoding needs a native image codec (new dependency, own CVEs); SVG can carry script and the renderer/CHECK accept PNG/JPEG only.
+- Alternatives: re-encode with sharp/ImageMagick; keep files byte-for-byte; sanitised SVG.
+- ADR: ADR-0100 · Status: accepted
+
+### DL-0872 — Stripe payout fields: which accounts/parties qualify, optional per request, never cleared (T-0195)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: architecture
+- Decision: fee account = active, postable, non-control, debit-normal expense account; payout account = GL account of an active company bank account in the base currency (account active, postable, not control); Stripe party = active party with an active supplier role. Each is optional on `PUT /setup/billing/stripe`, checked before writing (422 `INVALID_FEE_ACCOUNT` / `INVALID_PAYOUT_ACCOUNT` / `INVALID_STRIPE_PARTY`), and a saved one can be changed but not cleared.
+- Why: GP-027's journal (Dr bank net, Dr fee with party Stripe, Cr clearing), design §3.2 (no control accounts without a sub-ledger), `setStripeSettings` never clears a payout field and payouts refuse while one is missing (RQ-0182 finding 5).
+- Alternatives: any account of the company (the FK alone; lets fees post to a bank or revenue account); allow clearing (only breaks the next payout).
+- ADR: ADR-0100 · Status: accepted
+
+### DL-0873 — The Stripe view gains the three payout fields; T-0186's exact-shape assertion follows the contract (T-0195)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: architecture
+- Decision: `stripe` in `GET /setup/billing` and in `PUT /setup/billing/stripe` answers is `{clearing_account_id, fee_account_id, payout_account_id, stripe_party_id}`. The T-0186 api-db test that asserted the old exact shape now asserts the new exact shape (the three fields null); nothing is loosened.
+- Why: ADR-0100 item 3; the screen must show what is saved.
+- Alternatives: a separate `stripe_payout` object (two places for one row); `toMatchObject` (would loosen the test, rejected).
+- ADR: ADR-0100 · Status: accepted
+
+### DL-0874 — Screen: logo preview from data: URLs, payout fields sent only when chosen; SS-PLAT-171..173 (T-0195)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: ui
+- Decision: The Invoices block gains the accent colour and a Logo block (choose PNG/JPEG, preview from a `data:` URL, upload, remove; saved logo shown with `<img>` from the same origin). The Stripe block gains the payout account, fee account and Stripe supplier pickers; the PUT sends a payout field only when one is chosen, so the T-0186 flow's body is unchanged. New success scenarios SS-PLAT-171 (logo and accent), SS-PLAT-172 (payout settings), SS-PLAT-173 (read-only and forbidden). No migration needed (reserved 0081 unused).
+- Why: the nginx CSP allows `img-src 'self' data:` but not `blob:`; ADR-0100.
+- Alternatives: object URLs (blocked by CSP); always sending all four Stripe fields (would send empty values).
+- ADR: ADR-0100 · Status: accepted

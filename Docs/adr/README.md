@@ -130,5 +130,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0093](0093-idempotency-key-on-weekly-sod-acknowledgement.md) | Idempotency-Key required on POST /sod/exceptions/weekly/acknowledge (amends ADR-0085) | architecture | no | Proposed |
 | [0094](0094-company-bank-account-aba-details-and-archive.md) | Company bank account: change the ABA details in place, or archive it, over HTTP (grant + step-up + audit, no SoD) | security | yes (delegated, DL-0691) | Accepted (supersedes ADR-0084 in part) |
 | [0095](0095-bills-inbox-imap-client-and-mailbox-credentials.md) | Bills inbox IMAP polling: in-house minimal IMAP client, sealed mailbox credentials, read-only polling | security | yes (delegated, DL-0691) | Accepted |
+| [0100](0100-invoice-logo-upload-and-stripe-payout-settings-routes.md) | Invoice logo upload and serving, and Stripe payout settings, under /setup/billing (extends ADR-0085) | security | yes (delegated, DL-0691) | Accepted |
 
 Next free number: **0055** (0055–0060 are reserved for the DL-0409 parallel round) (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).
