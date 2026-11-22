@@ -63,6 +63,8 @@ const WRITE_HOLDERS: Record<string, readonly RoleId[]> = {
   'payroll.net_pay_batch.create': ['owner', 'payroll_officer'],
   'payroll.net_pay_batch.release': ['owner'],
   'sync.issues.manage': ['owner', 'finance_admin', 'accountant'], // T-0071, DL-0215
+  // T-0209, ADR-0097: retry-now of a failed security notice; not the Accountant.
+  'security_notices.retry': ['owner', 'finance_admin'],
 };
 
 /** Design §6.4 "Can" and "Cannot (by default)" columns, as permissions. */
@@ -206,6 +208,16 @@ describe('SS-PLAT-48: Role templates grant exactly the design §6.4 matrix', () 
     expect(Object.isFrozen(ROLE_TEMPLATES)).toBe(true);
     expect(Object.isFrozen(ROLE_TEMPLATES.ar_clerk)).toBe(true);
     expect(Object.isFrozen(ROLE_TEMPLATES.ar_clerk.permissions)).toBe(true);
+  });
+});
+
+describe('SS-PLAT-161: failed security notices are an administrator list (ADR-0097)', () => {
+  it('SS-PLAT-161 security_notices.read is held by Owner, Finance Admin and (read-only) Auditor only [T-0209]', () => {
+    expect(PERMISSIONS['security_notices.read']).toBe('read');
+    expect(
+      ROLE_IDS.filter((r) => ROLE_TEMPLATES[r].permissions.includes('security_notices.read')),
+    ).toEqual(['owner', 'finance_admin', 'auditor']);
+    expect(rolesAllow(['accountant'], 'security_notices.read')).toBe(false);
   });
 });
 

@@ -10,7 +10,9 @@
  * handled in its own tenant transaction, locked FOR UPDATE SKIP LOCKED, so two dispatchers never
  * send the same notice at once. Every attempt is recorded in app.security_notice_delivery (one
  * `sent` row per notice at most, by a unique index), and the notice moves to `sent` or `failed`.
- * A failed attempt n is due again after min(6 h, 1 min · 2^(n−1)); there is no give-up.
+ * A failed attempt n is due again after min(6 h, 1 min · 2^(n−1)); there is no give-up. An
+ * administrator's retry-now (app.security_notice_retry, T-0209, ADR-0097) releases the backoff of
+ * every attempt up to the one it names, so the notice is due at the next dispatch.
  * `no_recipient` notices are never selected. Sending is at-least-once across a crash between the
  * SMTP accept and the commit (ADR-0046 rule 3).
  *
@@ -231,7 +233,12 @@ async function nextDue(trx: Trx, kind: SecurityNoticeKind, now: Date): Promise<D
              AND NOT EXISTS (
                    SELECT 1 FROM app.security_notice_delivery d
                     WHERE d.tenant_id = n.tenant_id AND d.remittance_notice_id = n.id
-                      AND (d.outcome = 'sent' OR d.next_attempt_at > ${now}))
+                      AND (d.outcome = 'sent'
+                           OR (d.next_attempt_at > ${now}
+                               AND NOT EXISTS (
+                                     SELECT 1 FROM app.security_notice_retry r
+                                      WHERE r.tenant_id = d.tenant_id AND r.remittance_notice_id = n.id
+                                        AND r.after_attempt >= d.attempt))))
            ORDER BY n.created_at, n.id
            LIMIT 1
              FOR UPDATE OF n SKIP LOCKED`.execute(trx)
@@ -246,7 +253,12 @@ async function nextDue(trx: Trx, kind: SecurityNoticeKind, now: Date): Promise<D
              AND NOT EXISTS (
                    SELECT 1 FROM app.security_notice_delivery d
                     WHERE d.tenant_id = n.tenant_id AND d.bank_detail_notice_id = n.id
-                      AND (d.outcome = 'sent' OR d.next_attempt_at > ${now}))
+                      AND (d.outcome = 'sent'
+                           OR (d.next_attempt_at > ${now}
+                               AND NOT EXISTS (
+                                     SELECT 1 FROM app.security_notice_retry r
+                                      WHERE r.tenant_id = d.tenant_id AND r.bank_detail_notice_id = n.id
+                                        AND r.after_attempt >= d.attempt))))
            ORDER BY n.created_at, n.id
            LIMIT 1
              FOR UPDATE OF n SKIP LOCKED`.execute(trx);

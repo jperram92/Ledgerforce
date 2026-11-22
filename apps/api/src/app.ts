@@ -61,6 +61,7 @@ import { AuditLogController } from './audit/audit-log.controller.ts';
 import { requestIdMiddleware } from './audit/request-id.ts';
 import { applySecurity, type SecurityOptions } from './security/security.ts';
 import { statementImportBody } from './security/statement-body.ts';
+import { SecurityNoticesController } from './security-notices/security-notices.controller.ts';
 import { SyncIssuesController } from './sync/sync-issues.controller.ts';
 import { CLOCK, DB, KMS, MFA_POLICY, SYNC_REQUEUE } from './tokens.ts';
 import type { DeliveryRequeue } from '@ledgerforce/outbox';
@@ -138,6 +139,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   UserApiTokensController,
   AuditLogController,
   SyncIssuesController,
+  SecurityNoticesController,
   ArBatchesController,
   ArCreditNotesController,
   ArInvoicesController,
@@ -198,6 +200,7 @@ class AppModule {
         UserApiTokensController,
         AuditLogController,
         SyncIssuesController,
+        SecurityNoticesController,
         ArBatchesController,
         ArCreditNotesController,
         ArInvoicesController,

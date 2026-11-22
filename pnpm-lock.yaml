@@ -86,6 +86,9 @@ importers:
       '@ledgerforce/documents':
         specifier: workspace:*
         version: link:../../packages/modules/documents
+      '@ledgerforce/email':
+        specifier: workspace:*
+        version: link:../../packages/modules/email
       '@ledgerforce/gl':
         specifier: workspace:*
         version: link:../../packages/modules/gl
