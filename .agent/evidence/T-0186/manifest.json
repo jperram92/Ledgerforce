@@ -217,6 +217,60 @@
       "provider": "unknown",
       "timestamp": "2026-11-16T21:44:59.477Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261122-081452-SS-PLAT-131-billing-read-only-1440.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: an Accountant sees Numbering and billing read-only [T-0186]",
+      "commit": "1f4dd9e72f2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:14:52.656Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261122-081452-SS-PLAT-131-billing-empty-1440.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 1440 [T-0186]",
+      "commit": "1f4dd9e72f2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:14:52.796Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261122-081455-SS-PLAT-131-billing-saved-1440.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 1440 [T-0186]",
+      "commit": "1f4dd9e72f2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:14:55.745Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261122-081456-SS-PLAT-131-wizard-step-8-ready-1440.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 1440 [T-0186]",
+      "commit": "1f4dd9e72f2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:14:56.263Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261122-081458-SS-PLAT-131-billing-empty-390.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 390 [T-0186]",
+      "commit": "1f4dd9e72f2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:14:58.951Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-131",
+      "file": ".agent/evidence/T-0186/20261122-081500-SS-PLAT-131-billing-saved-390.png",
+      "test": "web/settings-billing.spec.ts › SS-PLAT-131: Numbering and billing: the Finance Admin follows step 8's link and sets up numbers, formats, invoices and Stripe @ 390 [T-0186]",
+      "commit": "1f4dd9e72f2a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:15:00.699Z",
+      "result": "passed"
     }
   ]
 }

@@ -48,6 +48,10 @@ export interface OpeningPreview {
     debit: string;
     credit: string;
     party_id: string | null;
+    /** T-0126 (GP-043): the line's transaction currency, absolute amount and rate (base: rate 1). */
+    txn_currency?: string;
+    txn_amount?: string;
+    fx_rate?: string;
     due_date: string | null;
     memo: string | null;
   }[];
@@ -70,6 +74,10 @@ export interface OpeningBalance {
     line_no: number;
     amount: string;
     gst_amount: string;
+    /** T-0126 (GP-043): currency, signed currency amount and rate (base items: rate 1). */
+    currency?: string;
+    currency_amount?: string;
+    fx_rate?: string;
   }[];
 }
 

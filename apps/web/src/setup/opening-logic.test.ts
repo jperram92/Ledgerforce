@@ -4,7 +4,14 @@
  */
 import { describe, expect, it } from 'vitest';
 import { AdminApiError } from '../admin/client.ts';
-import { balanceDay, kindWord, obRefusal, sideOf } from './opening-logic.ts';
+import {
+  balanceDay,
+  fxNote,
+  itemColumnsHelp,
+  kindWord,
+  obRefusal,
+  sideOf,
+} from './opening-logic.ts';
 
 describe('opening balances wording [T-0177]', () => {
   it('a preview line shows the side whose decimal string is not zero', () => {
@@ -35,5 +42,48 @@ describe('opening balances wording [T-0177]', () => {
     ).toBe('LedgerForce did not accept the files: already there.');
     expect(obRefusal(new AdminApiError(400, { error: 'invalid_opening_balance' }))).toBeNull();
     expect(obRefusal(new Error('offline'))).toBeNull();
+  });
+});
+
+describe('opening balances, foreign-currency items [T-0202]', () => {
+  it('SS-PLAT-164 a foreign line names its currency, currency amount and rate; a base line names none', () => {
+    const usd = { txn_currency: 'USD', txn_amount: '1000.0000', fx_rate: '1.53846154' };
+    expect(fxNote(usd, 'AUD')).toBe('USD 1,000.00 @ 1.53846154');
+    // A posted AP item carries a signed currency amount: the note says the size, not the sign.
+    expect(
+      fxNote({ txn_currency: 'USD', txn_amount: '-400.0000', fx_rate: '1.53846154' }, 'AUD'),
+    ).toBe('USD 400.00 @ 1.53846154');
+    // The currency's own minor unit (JPY has none).
+    expect(
+      fxNote({ txn_currency: 'JPY', txn_amount: '150000.0000', fx_rate: '0.01020000' }, 'AUD'),
+    ).toBe('JPY 150,000 @ 0.01020000');
+    expect(
+      fxNote({ txn_currency: 'AUD', txn_amount: '1375.0000', fx_rate: '1' }, 'AUD'),
+    ).toBeNull();
+    expect(fxNote({ txn_currency: null, txn_amount: null, fx_rate: null }, 'AUD')).toBeNull();
+    expect(fxNote({}, 'AUD')).toBeNull();
+  });
+
+  it('SS-PLAT-165 an FX_MISMATCH refusal says in plain words that the rate does not give the amount, with its line', () => {
+    const text = obRefusal(
+      new AdminApiError(422, {
+        error: 'FX_MISMATCH',
+        message:
+          'INV-1004: USD 357.50 × 1.5 = 536.25 (half-up to cents), not the base amount 550.00; correct the rate or leave it empty to imply it',
+        row: 3,
+      }),
+    );
+    expect(text).toBe(
+      'LedgerForce did not accept the files: on line 3 of the file, the exchange rate times the currency amount does not give the amount. INV-1004: USD 357.50 × 1.5 = 536.25 (half-up to cents), not the base amount 550.00; correct the rate or leave it empty to imply it.',
+    );
+  });
+
+  it('SS-PLAT-166 the open-items CSV help lists the three optional foreign-currency columns', () => {
+    const help = itemColumnsHelp('AUD');
+    expect(help).toContain('party, document_no, document_date, due_date, amount and gst_amount');
+    for (const col of ['currency', 'currency_amount', 'fx_rate']) expect(help).toContain(col);
+    expect(help).toMatch(/optional/);
+    expect(help).toMatch(/carrying amount in AUD/);
+    expect(help).toMatch(/AUD per one unit/);
   });
 });

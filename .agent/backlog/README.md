@@ -16,10 +16,10 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | blocked | 7 |
 | done | 3 |
 | in_progress | 1 |
-| review | 143 |
-| todo | 26 |
+| review | 146 |
+| todo | 25 |
 | verifying | 8 |
-| **total** | **188** |
+| **total** | **190** |
 
 | Phase | Cards |
 |---|---:|
@@ -206,7 +206,7 @@ graph LR
 | [T-0219](T-0219.md) | Platform: show undeliverable (no-recipient) security notices to administrators with a way to add the contact | MVP | todo | T-0209 | UC-06 | 0 |
 | [T-0220](T-0220.md) | Platform: alert administrators to failed security notices outside the Settings list (count badge or home alert) | MVP | todo | T-0209 | UC-01, UC-06 | 0 |
 | [T-0201](T-0201.md) | Opening balances: Xero reader (trial balance and open invoices/bills at the balance date) | Phase 1 | todo | T-0126 | — | 0 |
-| [T-0202](T-0202.md) | Opening balances screen: show currency, currency amount and rate of foreign-currency items | MVP | todo | T-0126, T-0177 | — | 0 |
+| [T-0202](T-0202.md) | Opening balances screen: show currency, currency amount and rate of foreign-currency items | MVP | verifying | T-0126, T-0177 | — | 0 |
 | [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | todo | T-0180 | UC-01 | 0 |
 | [T-0192](T-0192.md) | Security: rotate the session id on step-up re-authentication (ASVS 5.0 7.2.4) | MVP | verifying | — | — | 0 |
 | [T-0085](T-0085.md) | UI: receipts, allocations, credit notes and refunds | MVP | review | T-0081, T-0046, T-0045, T-0055, T-0151 | UC-03, UC-11 | 2 |
@@ -230,7 +230,7 @@ graph LR
 | [T-0193](T-0193.md) | Bank: change ABA details or archive a company bank account over HTTP — found in T-0185 | MVP | verifying | T-0185 | — | 0 |
 | [T-0185](T-0185.md) | UI: bank accounts settings screen (wizard step 4) — split from T-0176 | MVP | todo | T-0176 | — | 0 |
 | [T-0186](T-0186.md) | UI: numbering and billing (step 8) and approval amounts (step 10) settings screens — split from T-0176 | MVP | verifying | T-0176 | — | 0 |
-| [T-0195](T-0195.md) | UI: invoice logo, accent colour and Stripe payout accounts on the Numbering and billing screen — split from T-0186 | MVP | todo | T-0186 | — | 0 |
+| [T-0195](T-0195.md) | UI: invoice logo, accent colour and Stripe payout accounts on the Numbering and billing screen — split from T-0186 | MVP | verifying | T-0186 | claude | 0 |
 | [T-0196](T-0196.md) | API: require an Idempotency-Key on POST /sod/exceptions/weekly/acknowledge — from T-0186 | MVP | verifying | T-0186 | — | 0 |
 | [T-0177](T-0177.md) | UI: opening balances import and posting-profile matrix screens (wizard steps 9 and 7) — split from T-0091 | MVP | todo | T-0091 | — | 0 |
 | [T-0176](T-0176.md) | UI: settings forms for setup wizard steps 1, 3, 4, 8 and 10 — split from T-0091 | MVP | todo | T-0091 | — | 0 |
@@ -286,11 +286,13 @@ graph LR
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | verifying | T-0047, T-0035 | UC-04 | 3 |
 | [T-0203](T-0203.md) | Single-supply GST attribution: role binding, contract record and accruals receipt posting (GP-040) | MVP | verifying | T-0168 | UC-04 | 0 |
-| [T-0204](T-0204.md) | Single-supply GST attribution: final invoice, price change, cancellation/refund and BAS-preparation reports (GP-041, GP-042) | MVP | todo | T-0203 | UC-04, UC-11 | 0 |
-| [T-0205](T-0205.md) | Single-supply receipts limited by the contract total as varied (review finding 7) | MVP | todo | T-0203, T-0204 | UC-04 | 0 |
+| [T-0204](T-0204.md) | Single-supply GST attribution: final invoice, price change, cancellation/refund and BAS-preparation reports (GP-045, GP-044) | MVP | verifying | T-0203 | UC-04, UC-11 | 1 |
+| [T-0205](T-0205.md) | Single-supply receipts limited by the contract total as varied (review finding 7) | MVP | todo | T-0203, T-0204, T-0217 | UC-04 | 0 |
 | [T-0206](T-0206.md) | Single-supply documents on an open contract: s 29-70 tax invoice (candidate GP-046) and deposit-invoice refusal (ADR-0089 R9) | MVP | todo | T-0203 | UC-04 | 0 |
 | [T-0207](T-0207.md) | AR: cancel a requested bank refund that no live payment batch pays | MVP | todo | T-0190 | UC-11 | 0 |
 | [T-0208](T-0208.md) | Refund region: check a Stripe refund with Stripe and ask or confirm a resend; nightly sweep for Stripe refunds no document records | MVP | todo | T-0189 | UC-11 | 0 |
+| [T-0217](T-0217.md) | Single-supply cancellation, refund, receipt reversal, contract-variation document and cash-basis final invoice (GP-044, candidate GP-047+, GP-022) | MVP | todo | T-0204 | UC-04, UC-11 | 0 |
+| [T-0218](T-0218.md) | Single-supply BAS preparation: basis guard, aged unbilled GST report, no negative G1/1A (G18/1B), credit_note_bas setting, lifecycle properties and primary-law reading | MVP | todo | T-0217 | UC-04, UC-11 | 0 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
 | [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | review | T-0117 | UC-11 | 0 |
 | [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |

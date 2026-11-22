@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0195",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-172",
+      "file": ".agent/evidence/T-0195/20261122-081703-SS-PLAT-172-stripe-payouts-saved-390.png",
+      "test": "web/settings-billing-branding.spec.ts › SS-PLAT-172: the Finance Admin chooses the Stripe payout bank account, fees account and supplier @ 390 [T-0195]",
+      "commit": "51360ac7282a",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:17:03.377Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-171",
+      "file": ".agent/evidence/T-0195/20261122-081702-SS-PLAT-171-logo-chosen-1440.png",
+      "test": "web/settings-billing-branding.spec.ts › SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ 1440 [T-0195]",
+      "commit": "51360ac7282a",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:17:02.774Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-171",
+      "file": ".agent/evidence/T-0195/20261122-081704-SS-PLAT-171-logo-saved-1440.png",
+      "test": "web/settings-billing-branding.spec.ts › SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ 1440 [T-0195]",
+      "commit": "51360ac7282a",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:17:04.165Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-173",
+      "file": ".agent/evidence/T-0195/20261122-081706-SS-PLAT-173-branding-payouts-read-only-1440.png",
+      "test": "web/settings-billing-branding.spec.ts › SS-PLAT-173: an Accountant sees the logo, accent colour and payout settings read-only [T-0195]",
+      "commit": "51360ac7282a",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:17:06.038Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-172",
+      "file": ".agent/evidence/T-0195/20261122-081707-SS-PLAT-172-stripe-payouts-saved-1440.png",
+      "test": "web/settings-billing-branding.spec.ts › SS-PLAT-172: the Finance Admin chooses the Stripe payout bank account, fees account and supplier @ 1440 [T-0195]",
+      "commit": "51360ac7282a",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:17:07.327Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-173",
+      "file": ".agent/evidence/T-0195/20261122-081708-SS-PLAT-173-branding-forbidden-1440.png",
+      "test": "web/settings-billing-branding.spec.ts › SS-PLAT-173: without settings.read neither the settings nor the logo are read [T-0195]",
+      "commit": "51360ac7282a",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:17:08.271Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-171",
+      "file": ".agent/evidence/T-0195/20261122-081709-SS-PLAT-171-logo-chosen-390.png",
+      "test": "web/settings-billing-branding.spec.ts › SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ 390 [T-0195]",
+      "commit": "51360ac7282a",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:17:09.950Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-171",
+      "file": ".agent/evidence/T-0195/20261122-081710-SS-PLAT-171-logo-saved-390.png",
+      "test": "web/settings-billing-branding.spec.ts › SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ 390 [T-0195]",
+      "commit": "51360ac7282a",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:17:10.859Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-173",
+      "file": ".agent/evidence/T-0195/20261122-081738-SS-PLAT-173-branding-forbidden-1440.png",
+      "test": "web/settings-billing-branding.spec.ts › SS-PLAT-173: without settings.read neither the settings nor the logo are read [T-0195]",
+      "commit": "51360ac7282a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:17:38.782Z",
+      "result": "passed"
+    }
+  ]
+}

@@ -60,7 +60,7 @@ import { AuditTrail, TenantTx } from './tenancy/tenant-tx.ts';
 import { AuditLogController } from './audit/audit-log.controller.ts';
 import { requestIdMiddleware } from './audit/request-id.ts';
 import { applySecurity, type SecurityOptions } from './security/security.ts';
-import { statementImportBody } from './security/statement-body.ts';
+import { logoUploadBody, statementImportBody } from './security/statement-body.ts';
 import { SecurityNoticesController } from './security-notices/security-notices.controller.ts';
 import { SyncIssuesController } from './sync/sync-issues.controller.ts';
 import { CLOCK, DB, KMS, MFA_POLICY, SYNC_REQUEUE } from './tokens.ts';
@@ -311,8 +311,10 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
   // First: headers on every answer (429s included), limits before routing and request ids (ADR-0054).
   applySecurity(app, opts.security);
   // Then: statement import alone reads JSON up to 10 MB; every other route keeps Nest's 100 kB
-  // parser, which skips a body already read (ADR-0078, RQ-0151).
+  // parser, which skips a body already read (ADR-0078, RQ-0151). The invoice logo upload reads
+  // up to 1 MiB the same way (ADR-0100).
   app.use(statementImportBody());
+  app.use(logoUploadBody());
   app.use(requestIdMiddleware);
   await app.listen(opts.port ?? 0, opts.host ?? '127.0.0.1');
   const addr = app.getHttpServer().address() as AddressInfo;

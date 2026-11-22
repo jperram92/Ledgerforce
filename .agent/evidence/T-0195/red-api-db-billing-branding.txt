@@ -1,0 +1,141 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0195
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:39973
+ ❯ |api-db| apps/api/src/settings/billing-branding.db.test.ts (6 tests | 6 failed) 1950ms
+     × SS-PLAT-171 PUT /setup/billing/logo stores a cleaned JPEG; GET serves it safely; the same file again changes nothing [T-0195] 41ms
+     × SS-PLAT-171 logo refusals are in plain words: SVG, wrong type, not an image, bad base64, too large [T-0195] 7ms
+     × SS-PLAT-171 the accent colour is saved with the invoice settings; logo null removes the logo [T-0195] 23ms
+     × SS-PLAT-172 GET /setup/billing lists the fee accounts, payout bank accounts and Stripe supplier parties [T-0195] 11ms
+     × SS-PLAT-172 PUT /setup/billing/stripe saves the payout fields; unsuitable ones are refused; a repeat changes nothing [T-0195] 9ms
+     × SS-PLAT-173 writes need settings.setup.manage and a key; the logo read needs settings.read; another tenant's company is 404 [T-0195] 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-branding.db.test.ts > SS-PLAT-171: invoice logo and accent colour over HTTP > SS-PLAT-171 PUT /setup/billing/logo stores a cleaned JPEG; GET serves it safely; the same file again changes nothing [T-0195]
+AssertionError: expected 404 to be 200 // Object.is equality
+
+- Expected
++ Received
+
+- 200
++ 404
+
+ ❯ apps/api/src/settings/billing-branding.db.test.ts:138:22
+    136|     expect(raw.includes('Jane Secret')).toBe(true);
+    137|     const r = await upload('image/jpeg', raw);
+    138|     expect(r.status).toBe(200);
+       |                      ^
+    139|     const b = await json(r);
+    140|     expect(b).toMatchObject({ changed: true, invoice: { has_logo: true…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-branding.db.test.ts > SS-PLAT-171: invoice logo and accent colour over HTTP > SS-PLAT-171 logo refusals are in plain words: SVG, wrong type, not an image, bad base64, too large [T-0195]
+AssertionError: expected 404 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 404
+
+ ❯ apps/api/src/settings/billing-branding.db.test.ts:183:24
+    181|       Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"><script>ale…
+    182|     );
+    183|     expect(svg.status).toBe(400);
+       |                        ^
+    184|     expect(await json(svg)).toMatchObject({
+    185|       error: 'INVALID_INVOICE_SETTINGS',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-branding.db.test.ts > SS-PLAT-171: invoice logo and accent colour over HTTP > SS-PLAT-171 the accent colour is saved with the invoice settings; logo null removes the logo [T-0195]
+AssertionError: expected { invoice: { …(5) }, changed: true } to match object { invoice: { …(3) } }
+(3 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "invoice": {
+      "brand_accent_colour": "#F2A900",
+      "brand_colour": "#0A5C8A",
+-     "has_logo": true,
++     "has_logo": false,
+    },
+  }
+
+ ❯ apps/api/src/settings/billing-branding.db.test.ts:233:27
+    231|     });
+    232|     expect(r.status).toBe(200);
+    233|     expect(await json(r)).toMatchObject({
+       |                           ^
+    234|       invoice: { brand_colour: '#0A5C8A', brand_accent_colour: '#F2A90…
+    235|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-branding.db.test.ts > SS-PLAT-172: Stripe payout settings over HTTP > SS-PLAT-172 GET /setup/billing lists the fee accounts, payout bank accounts and Stripe supplier parties [T-0195]
+AssertionError: expected undefined to deeply equal []
+
+- Expected:
+[]
+
++ Received:
+undefined
+
+ ❯ apps/api/src/settings/billing-branding.db.test.ts:255:34
+    253|   it('SS-PLAT-172 GET /setup/billing lists the fee accounts, payout ba…
+    254|     let b = await json(await call('GET', `/setup/billing?company_id=${…
+    255|     expect(b['payout_accounts']).toEqual([]);
+       |                                  ^
+    256|     const fee = b['fee_accounts'] as { id: string; code: string; name:…
+    257|     expect(fee).toContainEqual({ id: acct('6120'), code: '6120', name:…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-branding.db.test.ts > SS-PLAT-172: Stripe payout settings over HTTP > SS-PLAT-172 PUT /setup/billing/stripe saves the payout fields; unsuitable ones are refused; a repeat changes nothing [T-0195]
+AssertionError: fee_account_id 01a2013f-ebc7-71ee-a95a-2688ae5d2256: expected 200 to be 422 // Object.is equality
+
+- Expected
++ Received
+
+- 422
++ 200
+
+ ❯ apps/api/src/settings/billing-branding.db.test.ts:297:45
+    295|         body: { ...base, [field]: value },
+    296|       });
+    297|       expect(r.status, `${field} ${value}`).toBe(422);
+       |                                             ^
+    298|       expect(await json(r)).toMatchObject({ error });
+    299|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |api-db| apps/api/src/settings/billing-branding.db.test.ts > SS-PLAT-173: permissions of the logo and payout routes > SS-PLAT-173 writes need settings.setup.manage and a key; the logo read needs settings.read; another tenant's company is 404 [T-0195]
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/settings/billing-branding.db.test.ts:354:24
+    352|   it("SS-PLAT-173 writes need settings.setup.manage and a key; the log…
+    353|     const acc = await upload('image/png', logo('logo-plain.png'), 'acc…
+    354|     expect(acc.status).toBe(403);
+       |                        ^
+    355|     expect(await json(acc)).toMatchObject({ permission: 'settings.setu…
+    356|     const accStripe = await call('PUT', '/setup/billing/stripe', 'acco…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
+   Start at  03:14:51
+   Duration  5.91s (transform 1.67s, setup 0ms, import 2.82s, tests 1.95s, environment 0ms)
+

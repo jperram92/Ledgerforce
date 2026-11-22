@@ -141,15 +141,39 @@ export interface BillingSettings {
   series: NumberSeries[];
   formats: { code: string; name: string; posted: boolean; status: string }[];
   invoice: InvoiceSettingsValue;
-  stripe: { clearing_account_id: string } | null;
+  stripe: StripeSettingsValue | null;
   clearing_accounts: { id: string; code: string; name: string }[];
+  /** T-0195 (ADR-0100): the accounts and parties the Stripe payout fields may name. */
+  fee_accounts: { id: string; code: string; name: string }[];
+  payout_accounts: { id: string; code: string; name: string; bank_account_name: string }[];
+  stripe_parties: { id: string; name: string }[];
+}
+
+export interface StripeSettingsValue {
+  clearing_account_id: string;
+  fee_account_id: string | null;
+  payout_account_id: string | null;
+  stripe_party_id: string | null;
+}
+
+/** A payout field is sent only when chosen; a saved one is never cleared (ADR-0100 item 3). */
+export interface StripeInput {
+  clearing_account_id: string;
+  fee_account_id?: string;
+  payout_account_id?: string;
+  stripe_party_id?: string;
 }
 
 export interface InvoiceInput {
   brand_colour: string;
   default_payment_terms_days: number;
   accepted_payment_methods: PaymentMethod[];
+  /** Sent only when typed, or null to remove a saved one (T-0195). */
+  brand_accent_colour?: string | null;
 }
+
+/** A logo to upload (base64 of a PNG or JPEG file), or null to remove the saved one. */
+export type LogoInput = { content_type: 'image/png' | 'image/jpeg'; content_base64: string } | null;
 
 export type ThresholdName =
   'bill_self_approval' | 'credit_note_self_approval' | 'journal_approval' | 'batch_two_releasers';
@@ -254,9 +278,16 @@ export interface SettingsClient {
   ): Promise<{ invoice: InvoiceSettingsValue; changed: boolean }>;
   saveStripe(
     companyId: string,
-    clearingAccountId: string,
+    input: StripeInput,
     key: string,
-  ): Promise<{ stripe: { clearing_account_id: string }; changed: boolean }>;
+  ): Promise<{ stripe: StripeSettingsValue; changed: boolean }>;
+  saveLogo(
+    companyId: string,
+    logo: LogoInput,
+    key: string,
+  ): Promise<{ invoice: InvoiceSettingsValue; changed: boolean }>;
+  /** Where the saved logo is read from (same origin, settings.read; ADR-0100 item 2). */
+  logoUrl(companyId: string, version: number): string;
   approvals(): Promise<ApprovalSettings>;
   /** 201 when a new settings row was saved, 200 when the values were already in force. */
   saveApprovals(
@@ -346,8 +377,10 @@ export function createSettingsClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Se
       send('POST', '/setup/billing/formats/standard', { company_id: c }, key),
     saveInvoice: (c, input, key) =>
       send('PUT', '/setup/billing/invoice', { company_id: c, ...input }, key),
-    saveStripe: (c, id, key) =>
-      send('PUT', '/setup/billing/stripe', { company_id: c, clearing_account_id: id }, key),
+    saveStripe: (c, input, key) =>
+      send('PUT', '/setup/billing/stripe', { company_id: c, ...input }, key),
+    saveLogo: (c, logo, key) => send('PUT', '/setup/billing/logo', { company_id: c, logo }, key),
+    logoUrl: (c, version) => `${env.apiBase}/setup/billing/logo${q(c)}&v=${String(version)}`,
     approvals: () => send('GET', '/sod/settings'),
     saveApprovals: async (input, key) => {
       const r = await sendWithStatus<ApprovalSettings>('POST', '/sod/settings', input, key);

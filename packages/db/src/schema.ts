@@ -623,6 +623,24 @@ export interface SingleSupplyContractStatusTable {
   set_at: Timestamp;
 }
 
+/** Migration 0078 (T-0204): the final tax invoice of a single-supply contract (GP-045). */
+export interface SingleSupplyFinalisationTable {
+  tenant_id: TenantId;
+  company_id: string;
+  contract_id: string;
+  invoice_id: string;
+  entry_id: string;
+  invoice_date: ColumnType<Date, string, never>;
+  final_net: Numeric;
+  price_change_net: Numeric;
+  price_change_tax: Numeric;
+  variation_date: ColumnType<Date | null, string | null | undefined, never>;
+  variation_reason: string | null;
+  idempotency_key: string;
+  created_by: string | null;
+  created_at: Timestamp;
+}
+
 export interface SalesInvoiceDepositTable {
   tenant_id: TenantId;
   company_id: string;
@@ -1548,6 +1566,7 @@ export interface Database {
   'app.single_supply_attribution': SingleSupplyAttributionTable;
   'app.single_supply_receipt': SingleSupplyReceiptTable;
   'app.single_supply_contract_status': SingleSupplyContractStatusTable;
+  'app.single_supply_finalisation': SingleSupplyFinalisationTable;
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;

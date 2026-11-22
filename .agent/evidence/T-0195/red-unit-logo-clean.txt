@@ -1,0 +1,66 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0195
+
+ ❯ |unit| packages/modules/ar/src/logo-clean.test.ts (4 tests | 4 failed) 14ms
+     × SS-PLAT-171 a JPEG keeps its picture and loses Exif (camera, artist, GPS), XMP and the comment [T-0195] 8ms
+     × SS-PLAT-171 a progressive JPEG is accepted and stripped [T-0195] 1ms
+     × SS-PLAT-171 a PNG keeps IHDR, IDAT and IEND and loses tEXt, iTXt and eXIf [T-0195] 2ms
+     × SS-PLAT-171 refuses, in plain words, files that only start like an image, trailing data, bad CRCs, huge sizes and SVG [T-0195] 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/ar/src/logo-clean.test.ts > SS-PLAT-171: uploaded logos are checked by structure and stripped of metadata > SS-PLAT-171 a JPEG keeps its picture and loses Exif (camera, artist, GPS), XMP and the comment [T-0195]
+TypeError: cleanInvoiceLogo is not a function
+ ❯ packages/modules/ar/src/logo-clean.test.ts:77:17
+     75|     expect(has(raw, 'Jane XMP')).toBe(true);
+     76|     expect(has(raw, 'TestCam')).toBe(true);
+     77|     const out = cleanInvoiceLogo('image/jpeg', raw);
+       |                 ^
+     78|     expect(out.width).toBe(120);
+     79|     expect(out.height).toBe(40);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |unit| packages/modules/ar/src/logo-clean.test.ts > SS-PLAT-171: uploaded logos are checked by structure and stripped of metadata > SS-PLAT-171 a progressive JPEG is accepted and stripped [T-0195]
+TypeError: cleanInvoiceLogo is not a function
+ ❯ packages/modules/ar/src/logo-clean.test.ts:97:17
+     95|
+     96|   it('SS-PLAT-171 a progressive JPEG is accepted and stripped [T-0195]…
+     97|     const out = cleanInvoiceLogo('image/jpeg', fixture('logo-progressi…
+       |                 ^
+     98|     expect([out.width, out.height]).toEqual([120, 40]);
+     99|     expect(has(out.content, 'TestCam')).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |unit| packages/modules/ar/src/logo-clean.test.ts > SS-PLAT-171: uploaded logos are checked by structure and stripped of metadata > SS-PLAT-171 a PNG keeps IHDR, IDAT and IEND and loses tEXt, iTXt and eXIf [T-0195]
+TypeError: cleanInvoiceLogo is not a function
+ ❯ packages/modules/ar/src/logo-clean.test.ts:105:17
+    103|     const raw = fixture('logo-text.png');
+    104|     expect(pngChunks(raw)).toEqual(expect.arrayContaining(['tEXt', 'iT…
+    105|     const out = cleanInvoiceLogo('image/png', raw);
+       |                 ^
+    106|     expect([out.width, out.height]).toEqual([120, 40]);
+    107|     const kept = pngChunks(out.content);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |unit| packages/modules/ar/src/logo-clean.test.ts > SS-PLAT-171: uploaded logos are checked by structure and stripped of metadata > SS-PLAT-171 refuses, in plain words, files that only start like an image, trailing data, bad CRCs, huge sizes and SVG [T-0195]
+AssertionError: expected TypeError: (0 , __vite_ssr_import_4__.cle… to be an instance of InvoiceSettingsError
+ ❯ refusal packages/modules/ar/src/logo-clean.test.ts:65:15
+     63|     f();
+     64|   } catch (e) {
+     65|     expect(e).toBeInstanceOf(InvoiceSettingsError);
+       |               ^
+     66|     return (e as InvoiceSettingsError).message;
+     67|   }
+ ❯ packages/modules/ar/src/logo-clean.test.ts:121:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  03:11:59
+   Duration  897ms (transform 443ms, setup 0ms, import 671ms, tests 14ms, environment 0ms)
+

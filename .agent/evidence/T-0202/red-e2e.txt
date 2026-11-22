@@ -1,0 +1,95 @@
+
+Running 3 tests using 2 workers
+
+  ✘  2 [chromium] › tests/e2e/web/opening-balances.spec.ts:653:5 › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 1440 [T-0202] (7.5s)
+  ✘  1 [chromium] › tests/e2e/web/opening-balances.spec.ts:700:3 › foreign-currency open items [T-0202] › SS-PLAT-165: an FX_MISMATCH refusal names the CSV line in plain words, and nothing is posted [T-0202] (7.6s)
+  ✘  3 [chromium] › tests/e2e/web/opening-balances.spec.ts:653:5 › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 390 [T-0202] (6.5s)
+
+
+  1) [chromium] › tests/e2e/web/opening-balances.spec.ts:653:5 › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 1440 [T-0202] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/optional columns currency, currency_amount and fx_rate/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/optional columns currency, currency_amount and fx_rate/) with timeout 5000ms
+      - waiting for getByText(/optional columns currency, currency_amount and fx_rate/)
+
+
+      661 |       // The CSV help names the optional columns and what the amount means (SS-PLAT-166 on screen).
+      662 |       const help = page.getByText(/optional columns currency, currency_amount and fx_rate/);
+    > 663 |       await expect(help).toBeVisible();
+          |                          ^
+      664 |       await expect(help).toContainText('carrying amount in AUD');
+      665 |
+      666 |       await fillFx(page);
+        at /home/user/Ledgerforce/.claude/worktrees/agent-T0202/tests/e2e/web/opening-balances.spec.ts:663:26
+
+    Error Context: test-results/web-opening-balances-forei-d5930-s-show-no-rate-1440-T-0202--chromium/error-context.md
+
+    Error Context: test-results/web-opening-balances-forei-d5930-s-show-no-rate-1440-T-0202--chromium/error-context.md
+
+  2) [chromium] › tests/e2e/web/opening-balances.spec.ts:653:5 › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 390 [T-0202] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByText(/optional columns currency, currency_amount and fx_rate/)
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByText(/optional columns currency, currency_amount and fx_rate/) with timeout 5000ms
+      - waiting for getByText(/optional columns currency, currency_amount and fx_rate/)
+
+
+      661 |       // The CSV help names the optional columns and what the amount means (SS-PLAT-166 on screen).
+      662 |       const help = page.getByText(/optional columns currency, currency_amount and fx_rate/);
+    > 663 |       await expect(help).toBeVisible();
+          |                          ^
+      664 |       await expect(help).toContainText('carrying amount in AUD');
+      665 |
+      666 |       await fillFx(page);
+        at /home/user/Ledgerforce/.claude/worktrees/agent-T0202/tests/e2e/web/opening-balances.spec.ts:663:26
+
+    Error Context: test-results/web-opening-balances-forei-99234-es-show-no-rate-390-T-0202--chromium/error-context.md
+
+    Error Context: test-results/web-opening-balances-forei-99234-es-show-no-rate-390-T-0202--chromium/error-context.md
+
+  3) [chromium] › tests/e2e/web/opening-balances.spec.ts:700:3 › foreign-currency open items [T-0202] › SS-PLAT-165: an FX_MISMATCH refusal names the CSV line in plain words, and nothing is posted [T-0202] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "on line 3 of the file, the exchange rate times the currency amount does not give the amount"
+    Received string:    "LedgerForce did not accept the files: INV-2001: USD 1000.00 × 1.5 = 1500.00 (half-up to cents), not the base amount 1538.46; correct the rate or leave it empty to imply it (line 3 of the file)."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('alert') with timeout 5000ms
+      - waiting for getByRole('alert')
+        14 × locator resolved to <p role="alert" class="refusal">LedgerForce did not accept the files: INV-2001: U…</p>
+           - unexpected value "LedgerForce did not accept the files: INV-2001: USD 1000.00 × 1.5 = 1500.00 (half-up to cents), not the base amount 1538.46; correct the rate or leave it empty to imply it (line 3 of the file)."
+
+
+      717 |     const alert = page.getByRole('alert');
+      718 |     await expect(alert).toContainText('LedgerForce did not accept the files');
+    > 719 |     await expect(alert).toContainText(
+          |                         ^
+      720 |       'on line 3 of the file, the exchange rate times the currency amount does not give the amount',
+      721 |     );
+      722 |     await expect(alert).toContainText('not the base amount 1538.46');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-T0202/tests/e2e/web/opening-balances.spec.ts:719:25
+
+    Error Context: test-results/web-opening-balances-forei-e8be2-d-nothing-is-posted-T-0202--chromium/error-context.md
+
+    Error Context: test-results/web-opening-balances-forei-e8be2-d-nothing-is-posted-T-0202--chromium/error-context.md
+
+  3 failed
+    [chromium] › tests/e2e/web/opening-balances.spec.ts:653:5 › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 1440 [T-0202] 
+    [chromium] › tests/e2e/web/opening-balances.spec.ts:653:5 › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 390 [T-0202] 
+    [chromium] › tests/e2e/web/opening-balances.spec.ts:700:3 › foreign-currency open items [T-0202] › SS-PLAT-165: an FX_MISMATCH refusal names the CSV line in plain words, and nothing is posted [T-0202] 

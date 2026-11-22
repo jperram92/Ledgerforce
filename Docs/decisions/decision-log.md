@@ -4250,6 +4250,90 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: build everything here (rejected: oversized).
 - ADR: ADR-0091 · Status: accepted
 
+### DL-0850 — Opening balances screen shows a foreign item's currency amount and rate as "USD 1,000.00 @ 1.53846154" (T-0202)
+- Date: 2026-11-22 · By: claude · Task: T-0202 · Category: ui
+- Decision: The screen formats the API's FX fields only: currency code, the currency amount's size in the currency's own minor unit (formatMoney on the decimal string, sign dropped because the Dr/Cr column or the signed base amount already says the direction), "@", and the rate exactly as the API sends it (NUMERIC(18,8) text, base per one unit). In the journal preview it is appended to the line's gloss, so it sits in the same row as the AUD amount without changing the shared JournalTable; in the posted open items it is a column "In its currency", shown only when an item is foreign, with the base currency code for base items (an empty cell collapses in the 390 stacked layout). A line is foreign when its currency differs from the company's base currency, so base lines (rate "1" or "1.00000000") show no rate. A note explains that the AUD amount is the old system's carrying amount and no exchange difference is posted (GP-043, ADR-0088).
+- Why: GP-043 writes lines as "USD 1,000.00 @ 1.53846154"; principles P3 (decimal strings, grouped, minor unit); the browser computes nothing. Appending to the gloss avoids a shared-component change for one screen.
+- Alternatives: a new optional `fx` field on JournalTable lines (rejected for now: one consumer; can be lifted later); a separate column in the preview (rejected: the journal table's columns are fixed Dr/Cr per P3/P12).
+- ADR: — · Status: accepted
+
+### DL-0851 — FX_MISMATCH refusal leads with plain words and the CSV line (T-0202)
+- Date: 2026-11-22 · By: claude · Task: T-0202 · Category: ui
+- Decision: For a 422 `FX_MISMATCH` with a `row`, the screen says "LedgerForce did not accept the files: on line N of the file, the exchange rate times the currency amount does not give the amount." and then the engine's message (document, figures and the fix). Other refusals keep the T-0177 wording. The open-items CSV help names the optional columns currency, currency_amount and fx_rate, what amount and fx_rate mean, and that foreign items are revalued in the old system first when the balance date ends a reporting period (ADR-0088 consequences).
+- Why: card AC-2 and AC-3; P6 plain words; the engine's message alone starts with a formula.
+- Alternatives: rewrite the engine message in the browser (rejected: duplicates the module's arithmetic text).
+- ADR: — · Status: accepted
+
+### DL-0870 — ADR-0100 accepted: logo upload as base64 JSON with a 1 MiB route-scoped reader; logo served only behind settings.read, sandboxed (T-0195)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: `PUT /setup/billing/logo {company_id, logo: {content_type, content_base64} | null}` with the ADR-0078 scoped JSON reader (extended to PUT) limited to 1 MiB for that path; `GET /setup/billing/logo` serves the stored PNG/JPEG with a fixed file name, `Content-Disposition: inline`, `Content-Security-Policy: default-src 'none'; sandbox`, `Cross-Origin-Resource-Policy: same-origin` and the global `nosniff`/`no-store`. Accepted under DL-0691.
+- Why: RQ-0182 findings 1 and 4: no multipart dependency, the repository's reviewed base64 pattern (ADR-0078) and Odoo's; OWASP File Upload (generated name, authorised access); GitHub's user-content headers.
+- Alternatives: multipart via multer (new direct runtime dependency); a public logo URL (tenant data).
+- ADR: ADR-0100 · Status: accepted
+
+### DL-0871 — Uploaded logos are cleaned structurally (no re-encode): metadata dropped, ≤ 4,000 × 4,000 px, no SVG (T-0195)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: `cleanInvoiceLogo` in `@ledgerforce/ar` walks the PNG chunks (length, CRC-32, IHDR first, IEND last, nothing after) or JPEG segments (SOI, segments to SOS, SOF before SOS, EOI last), refuses images over 4,000 px a side, keeps only appearance chunks/segments and drops Exif, XMP, IPTC, text, time, comments and unknown chunks. Applied by the upload route before `setInvoiceSettings`; the module's own checks are unchanged. SVG stays refused.
+- Why: RQ-0182 findings 2 and 3: magic bytes alone accept polyglots; the logo goes into every customer invoice, so camera GPS/serials/author must not; re-encoding needs a native image codec (new dependency, own CVEs); SVG can carry script and the renderer/CHECK accept PNG/JPEG only.
+- Alternatives: re-encode with sharp/ImageMagick; keep files byte-for-byte; sanitised SVG.
+- ADR: ADR-0100 · Status: accepted
+
+### DL-0872 — Stripe payout fields: which accounts/parties qualify, optional per request, never cleared (T-0195)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: architecture
+- Decision: fee account = active, postable, non-control, debit-normal expense account; payout account = GL account of an active company bank account in the base currency (account active, postable, not control); Stripe party = active party with an active supplier role. Each is optional on `PUT /setup/billing/stripe`, checked before writing (422 `INVALID_FEE_ACCOUNT` / `INVALID_PAYOUT_ACCOUNT` / `INVALID_STRIPE_PARTY`), and a saved one can be changed but not cleared.
+- Why: GP-027's journal (Dr bank net, Dr fee with party Stripe, Cr clearing), design §3.2 (no control accounts without a sub-ledger), `setStripeSettings` never clears a payout field and payouts refuse while one is missing (RQ-0182 finding 5).
+- Alternatives: any account of the company (the FK alone; lets fees post to a bank or revenue account); allow clearing (only breaks the next payout).
+- ADR: ADR-0100 · Status: accepted
+
+### DL-0873 — The Stripe view gains the three payout fields; T-0186's exact-shape assertion follows the contract (T-0195)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: architecture
+- Decision: `stripe` in `GET /setup/billing` and in `PUT /setup/billing/stripe` answers is `{clearing_account_id, fee_account_id, payout_account_id, stripe_party_id}`. The T-0186 api-db test that asserted the old exact shape now asserts the new exact shape (the three fields null); nothing is loosened.
+- Why: ADR-0100 item 3; the screen must show what is saved.
+- Alternatives: a separate `stripe_payout` object (two places for one row); `toMatchObject` (would loosen the test, rejected).
+- ADR: ADR-0100 · Status: accepted
+
+### DL-0874 — Screen: logo preview from data: URLs, payout fields sent only when chosen; SS-PLAT-171..173 (T-0195)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: ui
+- Decision: The Invoices block gains the accent colour and a Logo block (choose PNG/JPEG, preview from a `data:` URL, upload, remove; saved logo shown with `<img>` from the same origin). The Stripe block gains the payout account, fee account and Stripe supplier pickers; the PUT sends a payout field only when one is chosen, so the T-0186 flow's body is unchanged. New success scenarios SS-PLAT-171 (logo and accent), SS-PLAT-172 (payout settings), SS-PLAT-173 (read-only and forbidden). No migration needed (reserved 0081 unused).
+- Why: the nginx CSP allows `img-src 'self' data:` but not `blob:`; ADR-0100.
+- Alternatives: object URLs (blocked by CSP); always sending all four Stripe fields (would send empty values).
+- ADR: ADR-0100 · Status: accepted
+
+### DL-0830 — The single-supply final tax invoice is a register invoice posted as one GP-045 entry (T-0204)
+- Date: 2026-11-22 · By: claude · Task: T-0204 · Category: accounting
+- Decision: `finaliseSingleSupply` records the final tax invoice as an `app.sales_invoice` row (kind `standard`, `source_key = single-supply:<contract>`, number from `ar_invoice_document`) with priced lines, and posts one GP-045 entry (source `ar_invoice`, sourceId = the invoice). The AR debit item equals the tax invoice; the cash-received AR credit item is allocated to it in the same transaction. The entry's AR lines use the customer's party-profile control account, as ordinary invoices do. No credit-hold check (the supply is complete; refusing the invoice lowers no exposure) and no `ar.invoice.posted` event yet (delivery moved to T-0217).
+- Why: GP-045 exists so that the register and the AR original agree (review finding 17); every comparable system keeps the final document a normal invoice with the money received allocated (RQ-0178 Q1). The register gives numbering, statements, aged AR and write-back for free.
+- Alternatives: a contract-only document table (rejected: duplicates the register and leaves statements without the invoice); posting through `approveInvoice` (rejected: it prices GST from the lines, which would report the GST twice).
+- ADR: ADR-0089 (R6, addendum A) · Status: accepted
+
+### DL-0831 — Several final-invoice lines: one uncoded revenue line per account, the change on the largest line, GP-023a GST spread (T-0204)
+- Date: 2026-11-22 · By: claude · Task: T-0204 · Category: accounting
+- Decision: The lines carry the final price. The journal posts the contract's known net uncoded, one revenue line per account in line order; the price change is taken out of the account of the largest line (ties: the last) and posted as one coded line with its own GST on that account. If that account's uncoded amount would be zero or less, the request is refused `CHANGE_EXCEEDS_LINE`. The document GST (attributed + change GST) is spread over the printed lines in proportion, half-up, residual to the largest line (`distributeTax`). For one line this is exactly GP-045a/b/c.
+- Why: deterministic, reproduces the golden, never posts a negative revenue line, reuses the GP-023a tie rule (RQ-0178 Q2/Q3).
+- Alternatives: pro-rata the change over every line (rejected: several coded lines and rounding residues for one change); refuse more than one line (rejected: real final invoices list stages).
+- ADR: none · Status: accepted
+
+### DL-0832 — Migration 0078 single_supply_finalisation holds the price change and the adjustment-note particulars (T-0204)
+- Date: 2026-11-22 · By: claude · Task: T-0204 · Category: architecture
+- Decision: New immutable tenant table `app.single_supply_finalisation`, one row per contract (PK), linking invoice and entry, with final net, signed price change and its GST, variation date and reason (all-or-nothing CHECK). A decrease's document view returns adjustment-note particulars (title, reason, decrease net/GST/gross, the attribution it adjusts, `withinThreshold` for ≤ $75 per s 29-80), always issued (AC-10). "Variation date = invoice date" is enforced in the module, not by a CHECK, so the T-0217 variation document can relax it without a DROP. Migration number 0078 as reserved.
+- Why: the particulars must be kept with the document; the contract-status row has no place for them; a one-per-contract key is the database backstop for one final invoice.
+- Alternatives: JSON on `sales_invoice.warnings` (rejected: wrong meaning, mutable while draft); columns on `single_supply_contract_status` (rejected: that table is already merged and immutable).
+- ADR: none · Status: accepted
+
+### DL-0833 — T-0204 split: slice 1 here, cancellation/refund/reversal/variation/cash to T-0217, BAS preparation and AC-11 to T-0218 (T-0204)
+- Date: 2026-11-22 · By: claude · Task: T-0204 · Category: scope
+- Decision: T-0204 keeps AC-1 (accruals, netted presentation), the AC-6 guard, AC-8, AC-10 on 45c and AC-5 over receipts + final invoice. T-0217 (new) takes AC-2, AC-3, AC-9 recording, AC-10 on 44a/44d, the AC-6 variation document (candidate goldens GP-047+), the cash-basis final invoice and invoice delivery. T-0218 (new) takes AC-4, AC-7, the `credit_note_bas` setting with AC-1's GST-ADJ variant (the setting does not exist in the schema), the rest of AC-5, AC-9 presentation and AC-11. T-0205 now also depends on T-0217 (it limits receipts by the varied total). Criteria text is copied in full; the T-0204 originals stay unchanged.
+- Why: eleven criteria over three posting families and a report — several times the ~400-line threshold (new-task-card skill); slice 1 is complete and testable on its own.
+- Alternatives: build everything on one branch (rejected: oversized, unreviewable); invent the `credit_note_bas` setting here (rejected: it needs an accounting ADR and applies to all credit notes).
+- ADR: none · Status: accepted
+
+### DL-0834 — AC-11 primary-law reading still not possible; recorded, not claimed (T-0204)
+- Date: 2026-11-22 · By: claude · Task: T-0204 · Category: accounting
+- Decision: AC-11 stays open and moves to T-0218, which cannot close without it. On 2026-11-22 the build environment's proxy refused legislation.gov.au, aasb.gov.au and austlii.edu.au (CONNECT 403) and ato.gov.au answered 403 (`.agent/evidence/T-0204/ac11-primary-source-probe.txt`). No golden was changed or added; slice 1 relies only on Approved GP-045 and the review's extracts.
+- Why: the card forbids claiming AC-11 without the primary text; the owner's instruction is to record and continue.
+- Alternatives: rely on secondary summaries (rejected: AC-11 asks for primary text).
+- ADR: none · Status: accepted
+
 ### DL-0840 — Failed security notices get an administrator list of their own, not a Sync issues source (T-0209)
 - Date: 2026-11-22 · By: claude · Task: T-0209 · Category: security
 - Decision: Failed security notices are shown at Settings → "Failed security notices" (`GET /security-notices/failed`), not in the Sync issues inbox.

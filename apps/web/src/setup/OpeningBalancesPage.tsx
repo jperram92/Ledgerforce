@@ -6,6 +6,8 @@
  * (Idempotency-Key). The API (T-0080) reads the files, builds the GP-037 journal, and refuses
  * anything wrong. This screen computes nothing: it shows what the engine answers.
  * Every route needs settings.chart.manage, so without it the screen says so and reads nothing.
+ * Foreign-currency items (T-0202, GP-043, RQ-0170, ADR-0088): their currency amount and rate are
+ * shown beside the base amount, as the API sends them; base lines show no rate.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
@@ -24,12 +26,21 @@ import { useServices } from '../env.tsx';
 import { typeGloss } from '../gl/gl-logic.ts';
 import { useCompany } from '../sales/InvoicesPage.tsx';
 import type { OpeningBalance, OpeningBalanceFiles, OpeningPreview } from './client.ts';
-import { balanceDay, kindWord, obRefusal, sideOf } from './opening-logic.ts';
+import {
+  balanceDay,
+  fxNote,
+  itemColumnsHelp,
+  kindWord,
+  obRefusal,
+  sideOf,
+} from './opening-logic.ts';
 
 const TITLE = 'Opening balances';
 const GLOSS =
   'The balances your books start from: the old system’s trial balance on the day before you start in LedgerForce, with the customer invoices and supplier bills still open behind it.';
 const newKey = () => `opening-${crypto.randomUUID()}`;
+const carrying = (currency: string) =>
+  `Items in another currency show their currency amount and rate beside the ${currency} amount. The ${currency} amount is the old system’s carrying amount at the balance date, and no exchange difference is posted here.`;
 
 function ObRefusal({ error }: { error: unknown }) {
   const text = obRefusal(error);
@@ -42,6 +53,8 @@ function ObRefusal({ error }: { error: unknown }) {
 }
 
 function Posted({ ob, currency }: { ob: OpeningBalance; currency: string }) {
+  const notes = ob.items.map((i) => fxNote(i, currency));
+  const foreign = notes.some((n) => n !== null);
   return (
     <section className="admin-block" aria-labelledby="ob-posted-h">
       <h2 id="ob-posted-h" tabIndex={-1}>
@@ -55,35 +68,40 @@ function Posted({ ob, currency }: { ob: OpeningBalance; currency: string }) {
       {ob.items.length === 0 ? (
         <p className="admin-note">No open customer or supplier items were brought across.</p>
       ) : (
-        <div className="scroll">
-          <table className="admin-table">
-            <caption>Open items brought across</caption>
-            <thead>
-              <tr>
-                <th scope="col">Document</th>
-                <th scope="col">Who owes</th>
-                <th scope="col">Dated</th>
-                <th scope="col">Due</th>
-                <th scope="col" className="num">
-                  Amount
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {ob.items.map((i) => (
-                <tr key={`${i.kind}-${i.document_no}-${String(i.line_no)}`}>
-                  <th scope="row">{i.document_no}</th>
-                  <td data-label="Who owes">{kindWord(i.kind)}</td>
-                  <td data-label="Dated">{balanceDay(i.document_date)}</td>
-                  <td data-label="Due">{balanceDay(i.due_date)}</td>
-                  <td className="num" data-label="Amount">
-                    <Money value={i.amount} currency={currency} />
-                  </td>
+        <>
+          {foreign ? <p className="admin-note">{carrying(currency)}</p> : null}
+          <div className="scroll">
+            <table className="admin-table">
+              <caption>Open items brought across</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Document</th>
+                  <th scope="col">Who owes</th>
+                  <th scope="col">Dated</th>
+                  <th scope="col">Due</th>
+                  <th scope="col" className="num">
+                    Amount
+                  </th>
+                  {foreign ? <th scope="col">In its currency</th> : null}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {ob.items.map((i, n) => (
+                  <tr key={`${i.kind}-${i.document_no}-${String(i.line_no)}`}>
+                    <th scope="row">{i.document_no}</th>
+                    <td data-label="Who owes">{kindWord(i.kind)}</td>
+                    <td data-label="Dated">{balanceDay(i.document_date)}</td>
+                    <td data-label="Due">{balanceDay(i.due_date)}</td>
+                    <td className="num" data-label="Amount">
+                      <Money value={i.amount} currency={currency} />
+                    </td>
+                    {foreign ? <td data-label="In its currency">{notes[n] ?? currency}</td> : null}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
       <p>
         <Link to="/settings/setup">Back to the setup steps</Link>
@@ -103,6 +121,7 @@ function Preview({
   names: Map<string, { name: string; type: string }>;
   children: ReactNode;
 }) {
+  const foreign = preview.lines.some((l) => fxNote(l, currency) !== null);
   return (
     <section className="admin-block" aria-labelledby="ob-preview-h">
       <h2 id="ob-preview-h">The journal LedgerForce would post</h2>
@@ -110,15 +129,18 @@ function Preview({
         From the posting engine itself, dated {balanceDay(preview.entry_date)}. Nothing is posted
         yet. Each open item has its own line on the customer or supplier control account.
       </p>
+      {foreign ? <p className="admin-note">{carrying(currency)}</p> : null}
       <JournalTable
         journal="preview"
         currency={currency}
         lines={preview.lines.map((l) => {
           const a = names.get(l.account_code);
+          const gloss = l.party_id && l.memo ? l.memo : a ? typeGloss(a.type) : '';
+          const fx = fxNote(l, currency);
           return {
             code: l.account_code,
             account: a?.name ?? `Account ${l.account_code}`,
-            gloss: l.party_id && l.memo ? l.memo : a ? typeGloss(a.type) : '',
+            gloss: fx ? [gloss, fx].filter((t) => t !== '').join(', ') : gloss,
             ...sideOf(l),
           };
         })}
@@ -283,7 +305,7 @@ export function OpeningBalancesPage() {
           />
           <label htmlFor={ids.ar}>Open customer invoices (CSV file, optional)</label>
           <p className="admin-note" id={`${ids.ar}-hint`}>
-            Columns party, document_no, document_date, due_date, amount and gst_amount.
+            {itemColumnsHelp(currency)}
           </p>
           <input
             id={ids.ar}
