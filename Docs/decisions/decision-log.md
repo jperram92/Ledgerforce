@@ -4249,3 +4249,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the card's ACs are contract and db; the UI and the sweep are each a screen or job of their own (about 300 lines).
 - Alternatives: build everything here (rejected: oversized).
 - ADR: ADR-0091 · Status: accepted
+
+### DL-0830 — The single-supply final tax invoice is a register invoice posted as one GP-045 entry (T-0204)
+- Date: 2026-11-22 · By: claude · Task: T-0204 · Category: accounting
+- Decision: `finaliseSingleSupply` records the final tax invoice as an `app.sales_invoice` row (kind `standard`, `source_key = single-supply:<contract>`, number from `ar_invoice_document`) with priced lines, and posts one GP-045 entry (source `ar_invoice`, sourceId = the invoice). The AR debit item equals the tax invoice; the cash-received AR credit item is allocated to it in the same transaction. The entry's AR lines use the customer's party-profile control account, as ordinary invoices do. No credit-hold check (the supply is complete; refusing the invoice lowers no exposure) and no `ar.invoice.posted` event yet (delivery moved to T-0217).
+- Why: GP-045 exists so that the register and the AR original agree (review finding 17); every comparable system keeps the final document a normal invoice with the money received allocated (RQ-0178 Q1). The register gives numbering, statements, aged AR and write-back for free.
+- Alternatives: a contract-only document table (rejected: duplicates the register and leaves statements without the invoice); posting through `approveInvoice` (rejected: it prices GST from the lines, which would report the GST twice).
+- ADR: ADR-0089 (R6, addendum A) · Status: accepted
+
+### DL-0831 — Several final-invoice lines: one uncoded revenue line per account, the change on the largest line, GP-023a GST spread (T-0204)
+- Date: 2026-11-22 · By: claude · Task: T-0204 · Category: accounting
+- Decision: The lines carry the final price. The journal posts the contract's known net uncoded, one revenue line per account in line order; the price change is taken out of the account of the largest line (ties: the last) and posted as one coded line with its own GST on that account. If that account's uncoded amount would be zero or less, the request is refused `CHANGE_EXCEEDS_LINE`. The document GST (attributed + change GST) is spread over the printed lines in proportion, half-up, residual to the largest line (`distributeTax`). For one line this is exactly GP-045a/b/c.
+- Why: deterministic, reproduces the golden, never posts a negative revenue line, reuses the GP-023a tie rule (RQ-0178 Q2/Q3).
+- Alternatives: pro-rata the change over every line (rejected: several coded lines and rounding residues for one change); refuse more than one line (rejected: real final invoices list stages).
+- ADR: none · Status: accepted
+
+### DL-0832 — Migration 0078 single_supply_finalisation holds the price change and the adjustment-note particulars (T-0204)
+- Date: 2026-11-22 · By: claude · Task: T-0204 · Category: architecture
+- Decision: New immutable tenant table `app.single_supply_finalisation`, one row per contract (PK), linking invoice and entry, with final net, signed price change and its GST, variation date and reason (all-or-nothing CHECK). A decrease's document view returns adjustment-note particulars (title, reason, decrease net/GST/gross, the attribution it adjusts, `withinThreshold` for ≤ $75 per s 29-80), always issued (AC-10). "Variation date = invoice date" is enforced in the module, not by a CHECK, so the T-0217 variation document can relax it without a DROP. Migration number 0078 as reserved.
+- Why: the particulars must be kept with the document; the contract-status row has no place for them; a one-per-contract key is the database backstop for one final invoice.
+- Alternatives: JSON on `sales_invoice.warnings` (rejected: wrong meaning, mutable while draft); columns on `single_supply_contract_status` (rejected: that table is already merged and immutable).
+- ADR: none · Status: accepted
+
+### DL-0833 — T-0204 split: slice 1 here, cancellation/refund/reversal/variation/cash to T-0217, BAS preparation and AC-11 to T-0218 (T-0204)
+- Date: 2026-11-22 · By: claude · Task: T-0204 · Category: scope
+- Decision: T-0204 keeps AC-1 (accruals, netted presentation), the AC-6 guard, AC-8, AC-10 on 45c and AC-5 over receipts + final invoice. T-0217 (new) takes AC-2, AC-3, AC-9 recording, AC-10 on 44a/44d, the AC-6 variation document (candidate goldens GP-047+), the cash-basis final invoice and invoice delivery. T-0218 (new) takes AC-4, AC-7, the `credit_note_bas` setting with AC-1's GST-ADJ variant (the setting does not exist in the schema), the rest of AC-5, AC-9 presentation and AC-11. T-0205 now also depends on T-0217 (it limits receipts by the varied total). Criteria text is copied in full; the T-0204 originals stay unchanged.
+- Why: eleven criteria over three posting families and a report — several times the ~400-line threshold (new-task-card skill); slice 1 is complete and testable on its own.
+- Alternatives: build everything on one branch (rejected: oversized, unreviewable); invent the `credit_note_bas` setting here (rejected: it needs an accounting ADR and applies to all credit notes).
+- ADR: none · Status: accepted
+
+### DL-0834 — AC-11 primary-law reading still not possible; recorded, not claimed (T-0204)
+- Date: 2026-11-22 · By: claude · Task: T-0204 · Category: accounting
+- Decision: AC-11 stays open and moves to T-0218, which cannot close without it. On 2026-11-22 the build environment's proxy refused legislation.gov.au, aasb.gov.au and austlii.edu.au (CONNECT 403) and ato.gov.au answered 403 (`.agent/evidence/T-0204/ac11-primary-source-probe.txt`). No golden was changed or added; slice 1 relies only on Approved GP-045 and the review's extracts.
+- Why: the card forbids claiming AC-11 without the primary text; the owner's instruction is to record and continue.
+- Alternatives: rely on secondary summaries (rejected: AC-11 asks for primary text).
+- ADR: none · Status: accepted
