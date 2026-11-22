@@ -749,7 +749,7 @@ export interface SecurityNoticeDeliveryTable {
 }
 
 /**
- * Migration 0079 (T-0209, ADR-0097): an administrator released the latest failed attempt of a
+ * Migration 0080 (T-0209, ADR-0097): an administrator released the latest failed attempt of a
  * security notice for an immediate retry. Append-only; one row per released attempt.
  */
 export interface SecurityNoticeRetryTable {
