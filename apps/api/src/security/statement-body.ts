@@ -29,13 +29,14 @@ function mediaType(req: Request): { type: string; charset: string | null } {
 }
 
 /**
- * A JSON reader with its own size limit for POST requests whose path matches `path`.
+ * A JSON reader with its own size limit for requests of `methods` (POST by default) whose path
+ * matches `path`.
  * Refusals: 413 payload_too_large (declared or counted), 415 unsupported_content_encoding or
  * unsupported_charset, 400 invalid_json (malformed, or not an object or array at the top).
  */
-export function scopedJsonBody(path: RegExp, limit: number) {
+export function scopedJsonBody(path: RegExp, limit: number, methods: readonly string[] = ['POST']) {
   return (req: Request, res: Response, next: NextFunction): void => {
-    if (req.method !== 'POST' || !path.test(req.path)) {
+    if (!methods.includes(req.method) || !path.test(req.path)) {
       next();
       return;
     }
@@ -115,3 +116,15 @@ export function scopedJsonBody(path: RegExp, limit: number) {
 /** The statement import route's reader (ADR-0078). */
 export const statementImportBody = () =>
   scopedJsonBody(STATEMENT_IMPORT_PATH, STATEMENT_BODY_LIMIT);
+
+/**
+ * 1 MiB: a 512 KiB logo is 683 KiB as base64, plus the JSON keys (T-0195, ADR-0100, RQ-0182
+ * finding 1).
+ */
+export const LOGO_BODY_LIMIT = 1024 * 1024;
+
+/** The logo upload route as Express matches it: case-insensitive, optional trailing slash. */
+export const LOGO_UPLOAD_PATH = /^\/setup\/billing\/logo\/?$/i;
+
+/** The invoice logo upload route's reader (ADR-0100). */
+export const logoUploadBody = () => scopedJsonBody(LOGO_UPLOAD_PATH, LOGO_BODY_LIMIT, ['PUT']);
