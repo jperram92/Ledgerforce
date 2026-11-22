@@ -101,7 +101,12 @@ interface Fake {
     accepted_payment_methods: string[] | null;
     has_logo: boolean;
   };
-  stripe: { clearing_account_id: string } | null;
+  stripe: {
+    clearing_account_id: string;
+    fee_account_id: string | null;
+    payout_account_id: string | null;
+    stripe_party_id: string | null;
+  } | null;
   /** T-0183: an approved remittance account is in force (it is set on its own screen). */
   remittance: boolean;
   refuse: Map<string, { status: number; body: unknown }>;
@@ -191,6 +196,10 @@ async function fakeApi(page: Page, who: keyof typeof ME): Promise<Fake> {
               { id: SAVER, code: '1020', name: 'Business saver' },
               { id: CLEARING, code: '1210', name: 'Stripe clearing' },
             ],
+            // T-0195 (ADR-0100): the payout pickers' lists; empty here (the T-0195 spec fills them).
+            fee_accounts: [],
+            payout_accounts: [],
+            stripe_parties: [],
           });
         if (path === '/setup/wizard') {
           const miss = (n: number) => (n === 8 ? missing8(f) : []);
@@ -269,7 +278,12 @@ async function fakeApi(page: Page, who: keyof typeof ME): Promise<Fake> {
         if (acct !== CLEARING && acct !== SAVER)
           return send(route, 422, { error: 'INVALID_CLEARING_ACCOUNT', message: 'no' });
         const changed = f.stripe?.clearing_account_id !== acct;
-        f.stripe = { clearing_account_id: acct };
+        f.stripe = {
+          clearing_account_id: acct,
+          fee_account_id: null,
+          payout_account_id: null,
+          stripe_party_id: null,
+        };
         return send(route, 200, { stripe: f.stripe, changed });
       }
       return send(route, 404, { error: 'not_found' });
@@ -482,7 +496,12 @@ test('SS-PLAT-131: an Accountant sees Numbering and billing read-only [T-0186]',
     default_payment_terms_days: 14,
     accepted_payment_methods: ['bank_transfer', 'stripe'],
   };
-  f.stripe = { clearing_account_id: CLEARING };
+  f.stripe = {
+    clearing_account_id: CLEARING,
+    fee_account_id: null,
+    payout_account_id: null,
+    stripe_party_id: null,
+  };
   await open(page, '/settings/billing', 1440);
   await expect(page.getByText(/The next invoice will be INV-000108/)).toBeVisible();
   await expect(page.getByText('14 days after the invoice date')).toBeVisible();

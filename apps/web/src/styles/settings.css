@@ -28,3 +28,21 @@
   overflow-x: auto;
   max-width: 100%;
 }
+/* Invoice logo (T-0195): shown at most as large as it prints; never wider than the column. */
+.settings-logo {
+  display: block;
+  max-height: 88px;
+  max-width: min(100%, 280px);
+  margin: var(--s2) 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--paper);
+}
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+}
+.settings-dl-row {
+  display: contents;
+}

@@ -1,0 +1,147 @@
+
+Running 6 tests using 2 workers
+
+[1/6] [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:365:3 › SS-PLAT-172: the Finance Admin chooses the Stripe payout bank account, fees account and supplier @ 390 [T-0195]
+[2/6] [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:275:3 › SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ 1440 [T-0195]
+  1) [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:365:3 › SS-PLAT-172: the Finance Admin chooses the Stripe payout bank account, fees account and supplier @ 390 [T-0195] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('form', { name: 'Stripe payouts' })
+    Expected substring: "Stripe payouts cannot be recorded until"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('form', { name: 'Stripe payouts' }) with timeout 5000ms
+      - waiting for getByRole('form', { name: 'Stripe payouts' })
+
+
+      370 |     await open(page, width);
+      371 |     const payouts = page.getByRole('form', { name: 'Stripe payouts' });
+    > 372 |     await expect(payouts).toContainText('Stripe payouts cannot be recorded until');
+          |                           ^
+      373 |     await payouts.getByRole('button', { name: 'Save Stripe payout settings' }).click();
+      374 |     await expect(payouts.getByRole('alert')).toContainText('Choose at least one');
+      375 |     expect(f.writes).toEqual([]);
+        at /home/user/Ledgerforce/.claude/worktrees/t0195/tests/e2e/web/settings-billing-branding.spec.ts:372:27
+
+    Error Context: test-results/web-settings-billing-brand-426d8-nt-and-supplier-390-T-0195--chromium/error-context.md
+
+    Error Context: test-results/web-settings-billing-brand-426d8-nt-and-supplier-390-T-0195--chromium/error-context.md
+
+
+  2) [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:275:3 › SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ 1440 [T-0195] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Invoice logo' }).getByText('No logo yet: invoices show the company name only.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'Invoice logo' }).getByText('No logo yet: invoices show the company name only.') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Invoice logo' }).getByText('No logo yet: invoices show the company name only.')
+
+
+      280 |     await open(page, width);
+      281 |     const logo = page.getByRole('region', { name: 'Invoice logo' });
+    > 282 |     await expect(logo.getByText('No logo yet: invoices show the company name only.')).toBeVisible();
+          |                                                                                       ^
+      283 |
+      284 |     await page.getByLabel('Accent colour (optional)').fill('#f2a900');
+      285 |     await page.getByRole('button', { name: 'Save invoice settings' }).click();
+        at /home/user/Ledgerforce/.claude/worktrees/t0195/tests/e2e/web/settings-billing-branding.spec.ts:282:87
+
+    Error Context: test-results/web-settings-billing-brand-4d2c8-e-invoice-logo-1440-T-0195--chromium/error-context.md
+
+    Error Context: test-results/web-settings-billing-brand-4d2c8-e-invoice-logo-1440-T-0195--chromium/error-context.md
+
+
+[3/6] [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:429:1 › SS-PLAT-173: an Accountant sees the logo, accent colour and payout settings read-only [T-0195]
+[4/6] [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:365:3 › SS-PLAT-172: the Finance Admin chooses the Stripe payout bank account, fees account and supplier @ 1440 [T-0195]
+  3) [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:429:1 › SS-PLAT-173: an Accountant sees the logo, accent colour and payout settings read-only [T-0195] 
+
+    Error: Timeout 5000ms exceeded while waiting on the predicate
+
+      270 |   expect
+      271 |     .poll(() => page.getByAltText(alt).evaluate((img) => (img as HTMLImageElement).naturalWidth))
+    > 272 |     .toBeGreaterThan(0);
+          |      ^
+      273 |
+      274 | for (const width of [1440, 390]) {
+      275 |   test(`SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ ${String(width)} [T-0195]`, async ({
+        at loaded (/home/user/Ledgerforce/.claude/worktrees/t0195/tests/e2e/web/settings-billing-branding.spec.ts:272:6)
+        at /home/user/Ledgerforce/.claude/worktrees/t0195/tests/e2e/web/settings-billing-branding.spec.ts:443:9
+
+    Error Context: test-results/web-settings-billing-brand-0fc84--settings-read-only-T-0195--chromium/error-context.md
+
+    Error Context: test-results/web-settings-billing-brand-0fc84--settings-read-only-T-0195--chromium/error-context.md
+
+
+  4) [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:365:3 › SS-PLAT-172: the Finance Admin chooses the Stripe payout bank account, fees account and supplier @ 1440 [T-0195] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('form', { name: 'Stripe payouts' })
+    Expected substring: "Stripe payouts cannot be recorded until"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('form', { name: 'Stripe payouts' }) with timeout 5000ms
+      - waiting for getByRole('form', { name: 'Stripe payouts' })
+
+
+      370 |     await open(page, width);
+      371 |     const payouts = page.getByRole('form', { name: 'Stripe payouts' });
+    > 372 |     await expect(payouts).toContainText('Stripe payouts cannot be recorded until');
+          |                           ^
+      373 |     await payouts.getByRole('button', { name: 'Save Stripe payout settings' }).click();
+      374 |     await expect(payouts.getByRole('alert')).toContainText('Choose at least one');
+      375 |     expect(f.writes).toEqual([]);
+        at /home/user/Ledgerforce/.claude/worktrees/t0195/tests/e2e/web/settings-billing-branding.spec.ts:372:27
+
+    Error Context: test-results/web-settings-billing-brand-c3a4b-t-and-supplier-1440-T-0195--chromium/error-context.md
+
+    Error Context: test-results/web-settings-billing-brand-c3a4b-t-and-supplier-1440-T-0195--chromium/error-context.md
+
+
+[5/6] [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:459:1 › SS-PLAT-173: without settings.read neither the settings nor the logo are read [T-0195]
+[6/6] [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:275:3 › SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ 390 [T-0195]
+  5) [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:275:3 › SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ 390 [T-0195] 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('region', { name: 'Invoice logo' }).getByText('No logo yet: invoices show the company name only.')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('region', { name: 'Invoice logo' }).getByText('No logo yet: invoices show the company name only.') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Invoice logo' }).getByText('No logo yet: invoices show the company name only.')
+
+
+      280 |     await open(page, width);
+      281 |     const logo = page.getByRole('region', { name: 'Invoice logo' });
+    > 282 |     await expect(logo.getByText('No logo yet: invoices show the company name only.')).toBeVisible();
+          |                                                                                       ^
+      283 |
+      284 |     await page.getByLabel('Accent colour (optional)').fill('#f2a900');
+      285 |     await page.getByRole('button', { name: 'Save invoice settings' }).click();
+        at /home/user/Ledgerforce/.claude/worktrees/t0195/tests/e2e/web/settings-billing-branding.spec.ts:282:87
+
+    Error Context: test-results/web-settings-billing-brand-53b31-he-invoice-logo-390-T-0195--chromium/error-context.md
+
+    Error Context: test-results/web-settings-billing-brand-53b31-he-invoice-logo-390-T-0195--chromium/error-context.md
+
+
+  5 failed
+    [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:275:3 › SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ 1440 [T-0195] 
+    [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:365:3 › SS-PLAT-172: the Finance Admin chooses the Stripe payout bank account, fees account and supplier @ 1440 [T-0195] 
+    [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:275:3 › SS-PLAT-171: the Finance Admin sets the accent colour and uploads, replaces and removes the invoice logo @ 390 [T-0195] 
+    [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:365:3 › SS-PLAT-172: the Finance Admin chooses the Stripe payout bank account, fees account and supplier @ 390 [T-0195] 
+    [chromium] › tests/e2e/web/settings-billing-branding.spec.ts:429:1 › SS-PLAT-173: an Accountant sees the logo, accent colour and payout settings read-only [T-0195] 
+  1 passed (26.3s)

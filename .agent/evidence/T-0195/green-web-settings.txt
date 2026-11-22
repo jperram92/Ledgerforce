@@ -1,0 +1,9 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0195
+
+
+ Test Files  3 passed (3)
+      Tests  24 passed (24)
+   Start at  08:15:16
+   Duration  4.02s (transform 935ms, setup 1.23s, import 1.16s, tests 57ms, environment 7.56s)
+
