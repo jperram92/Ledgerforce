@@ -5,7 +5,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044843-SS-PLAT-149-remittance-empty-1440.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:48:43.842Z",
@@ -14,7 +14,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044844-SS-PLAT-149-remittance-request-step-up-1440.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:48:44.596Z",
@@ -23,7 +23,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044846-SS-PLAT-149-remittance-requested-1440.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:48:46.300Z",
@@ -32,7 +32,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044849-SS-PLAT-149-remittance-to-approve-1440.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:48:49.412Z",
@@ -41,7 +41,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044850-SS-PLAT-149-remittance-approved-1440.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 1440 [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:48:50.399Z",
@@ -50,7 +50,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044855-SS-PLAT-149-remittance-read-only-1440.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: an Accountant sees the remittance account and a pending change read-only, masked [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: an Accountant sees the remittance account and a pending change read-only, masked [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:48:55.792Z",
@@ -59,7 +59,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044854-SS-PLAT-149-remittance-empty-390.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:48:54.493Z",
@@ -68,7 +68,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044855-SS-PLAT-149-remittance-requested-390.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:48:55.391Z",
@@ -77,7 +77,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044858-SS-PLAT-149-remittance-to-approve-390.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:48:58.271Z",
@@ -86,7 +86,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044859-SS-PLAT-149-remittance-approved-390.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: the Finance Admin asks for the remittance account and cannot approve it; the Owner approves it after a fresh sign-in @ 390 [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:48:59.054Z",
@@ -95,7 +95,7 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044902-SS-PLAT-149-remittance-reject-reason-1440.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: a rejection needs a reason; the account in force stays [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: a rejection needs a reason; the account in force stays [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:49:02.109Z",
@@ -104,10 +104,28 @@
     {
       "scenario": "SS-PLAT-149",
       "file": ".agent/evidence/T-0183/20261117-044904-SS-PLAT-149-remittance-small-team-1440.png",
-      "test": "web/settings-remittance.spec.ts \u203a SS-PLAT-149: in small-team mode the requester may approve their own change with a reason; refusals are in plain words [T-0183]",
+      "test": "web/settings-remittance.spec.ts › SS-PLAT-149: in small-team mode the requester may approve their own change with a reason; refusals are in plain words [T-0183]",
       "commit": "5729f01cb382-dirty",
       "provider": "unknown",
       "timestamp": "2026-11-17T04:49:04.407Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-121",
+      "file": ".agent/evidence/T-0183/20261122-030254-tests-db.json",
+      "test": "8 test(s): packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121: step 3 requires the GST basis and BAS frequency (tax module) › SS-PLAT-121 AC-1 step 3 lists the GST basis and BAS frequency until a tax setting is in force on the as-of date [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121: step 3 requires the GST basis and BAS frequency (tax module) › SS-PLAT-121 AC-1 the setting in force is the latest from on or before the date; saving the same date corrects it [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121: step 3 requires the GST basis and BAS frequency (tax module) › SS-PLAT-121 AC-1 malformed tax settings are refused by the module and by the database [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121: step 8 requires branding, payment terms and payment methods (ar module) › SS-PLAT-121 AC-2 step 8 lists branding, payment terms and methods until the ar module stores each [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121: step 8 requires branding, payment terms and payment methods (ar module) › SS-PLAT-121 AC-2 accepting Stripe needs Stripe set up; a logo is optional and stored with its type [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121: step 8 requires branding, payment terms and payment methods (ar module) › SS-PLAT-121 AC-2 malformed AR invoice settings are refused by the module and by the database [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121: tenant isolation and step 10 › SS-PLAT-121 AC-3 another tenant cannot read or write the company settings [T-0158] | packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-121: tenant isolation and step 10 › SS-PLAT-121 step 10 asks for nothing beyond the users and the saved SoD thresholds (RQ-0153 Q4) [T-0158]",
+      "commit": "8d03fe2a4027",
+      "provider": "claude",
+      "timestamp": "2026-11-22T03:02:54.782Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-148",
+      "file": ".agent/evidence/T-0183/20261122-030254-tests-db.json",
+      "test": "1 test(s): packages/modules/setup/src/wizard-settings.db.test.ts › SS-PLAT-148: step 8 asks for a remittance bank account when bank transfer is accepted › SS-PLAT-148 step 8 lists the remittance account with bank transfer and none in force; not with Stripe only, nor once an approved account is in force [T-0183]",
+      "commit": "8d03fe2a4027",
+      "provider": "claude",
+      "timestamp": "2026-11-22T03:02:54.782Z",
       "result": "passed"
     }
   ]

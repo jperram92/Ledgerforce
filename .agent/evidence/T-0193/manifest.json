@@ -244,6 +244,33 @@
       "provider": "unknown",
       "timestamp": "2026-11-17T10:19:04.092Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-151",
+      "file": ".agent/evidence/T-0193/20261122-030327-tests-db.json",
+      "test": "3 test(s): packages/db/src/bank-account-aba.db.test.ts › SS-PLAT-151: only the ABA header of a company bank account is editable in place › SS-PLAT-151 lf_app sets the APCA user id, ABA user name and FI mnemonic of an active account [T-0193] | packages/db/src/bank-account-aba.db.test.ts › SS-PLAT-151: only the ABA header of a company bank account is editable in place › SS-PLAT-151 the BSB, account name, number columns, currency, GL account and company stay immutable for lf_app [T-0193] | packages/db/src/bank-account-aba.db.test.ts › SS-PLAT-151: only the ABA header of a company bank account is editable in place › SS-PLAT-151 an archived account keeps its ABA details: changing them is refused [T-0193]",
+      "commit": "8d03fe2a4027-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T03:03:27.869Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-130",
+      "file": ".agent/evidence/T-0193/20261122-030331-tests-api-db.json",
+      "test": "7 test(s): apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-130: company bank accounts over HTTP (wizard step 4) › SS-PLAT-130 GET /setup/bank-accounts lists no accounts yet and the bank GL accounts that can take one [T-0185] | apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-130: company bank accounts over HTTP (wizard step 4) › SS-PLAT-130 adding needs settings.setup.manage and a fresh step-up; reading needs settings.read [T-0185] | apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-130: company bank accounts over HTTP (wizard step 4) › SS-PLAT-130 POST adds the account sealed, answers and audits it masked, and step 4 empties [T-0185] | apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-130: company bank accounts over HTTP (wizard step 4) › SS-PLAT-130 the same request again is a replay that writes nothing; a different one on the same GL account is 409 [T-0185] | apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-130: company bank accounts over HTTP (wizard step 4) › SS-PLAT-130 two first requests racing on one GL account: one is added, the other is 409 [T-0185] | apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-130: company bank accounts over HTTP (wizard step 4) › SS-PLAT-130 refusals: no key 400, malformed 400, unknown GL account 404, not a bank account or another currency 422, another tenant 404 [T-0185] | apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-130: company bank accounts over HTTP (wizard step 4) › SS-PLAT-130 without a key service the add is 503 kms_not_configured and nothing is written [T-0185]",
+      "commit": "8d03fe2a4027-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T03:03:31.673Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-152",
+      "file": ".agent/evidence/T-0193/20261122-030331-tests-api-db.json",
+      "test": "5 test(s): apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193) › SS-PLAT-152 both routes need settings.setup.manage and a fresh step-up; nothing changes [T-0193] | apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193) › SS-PLAT-152 refusals: no key 400, malformed 400, unknown or another company’s or tenant’s account 404 [T-0193] | apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193) › SS-PLAT-152 archiving the designated remittance account releases it, audits masked, and step 4 asks for ABA details again [T-0193] | apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193) › SS-PLAT-152 PUT sets the ABA details, audits before/after masked, empties step 4; the same values again change nothing [T-0193] | apps/api/src/setup/bank-accounts-settings.db.test.ts › SS-PLAT-152: change the ABA details of a company bank account, or archive it (T-0193) › SS-PLAT-152 an archived account’s ABA details cannot change: 409 BANK_ACCOUNT_ARCHIVED [T-0193]",
+      "commit": "8d03fe2a4027-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T03:03:31.673Z",
+      "result": "passed"
     }
   ]
 }
