@@ -208,6 +208,78 @@
       "provider": "claude",
       "timestamp": "2026-11-22T08:35:55.431Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193128-SS-PLAT-161-failed-notices-refused-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a refused retry is explained next to the list [T-0209]",
+      "commit": "807e92786a64",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:28.360Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193128-SS-PLAT-161-failed-notices-owner-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 1440 [T-0209]",
+      "commit": "807e92786a64",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:28.354Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193132-SS-PLAT-161-failed-notices-auditor-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Auditor sees the list without the retry action [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:32.565Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193133-SS-PLAT-161-failed-notices-owner-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 390 [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:33.060Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193138-SS-PLAT-161-failed-notices-retried-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a Finance Admin retries one notice now by keyboard [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:38.773Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193138-SS-PLAT-161-failed-notices-forbidden-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:38.054Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193141-SS-PLAT-161-failed-notices-empty-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:41.109Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193143-SS-PLAT-161-failed-notices-error-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:43.604Z",
+      "result": "passed"
     }
   ]
 }
