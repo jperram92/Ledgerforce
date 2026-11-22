@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0202",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-164",
+      "file": ".agent/evidence/T-0202/20261122-031000-SS-PLAT-164-opening-balances-fx-preview-1440.png",
+      "test": "web/opening-balances.spec.ts › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 1440 [T-0202]",
+      "commit": "fb38e5b94513-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T03:10:00.444Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-164",
+      "file": ".agent/evidence/T-0202/20261122-031001-SS-PLAT-164-opening-balances-fx-posted-1440.png",
+      "test": "web/opening-balances.spec.ts › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 1440 [T-0202]",
+      "commit": "fb38e5b94513-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T03:10:01.271Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-164",
+      "file": ".agent/evidence/T-0202/20261122-031003-SS-PLAT-164-opening-balances-fx-preview-390.png",
+      "test": "web/opening-balances.spec.ts › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 390 [T-0202]",
+      "commit": "fb38e5b94513-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T03:10:03.803Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-164",
+      "file": ".agent/evidence/T-0202/20261122-031004-SS-PLAT-164-opening-balances-fx-posted-390.png",
+      "test": "web/opening-balances.spec.ts › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 390 [T-0202]",
+      "commit": "fb38e5b94513-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T03:10:04.636Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-165",
+      "file": ".agent/evidence/T-0202/20261122-031007-SS-PLAT-165-opening-balances-fx-mismatch-1440.png",
+      "test": "web/opening-balances.spec.ts › foreign-currency open items [T-0202] › SS-PLAT-165: an FX_MISMATCH refusal names the CSV line in plain words, and nothing is posted [T-0202]",
+      "commit": "fb38e5b94513-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T03:10:07.028Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-164",
+      "file": ".agent/evidence/T-0202/20261122-031033-SS-PLAT-164-opening-balances-fx-preview-1440.png",
+      "test": "web/opening-balances.spec.ts › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 1440 [T-0202]",
+      "commit": "fb38e5b94513-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T03:10:33.337Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-164",
+      "file": ".agent/evidence/T-0202/20261122-031034-SS-PLAT-164-opening-balances-fx-posted-1440.png",
+      "test": "web/opening-balances.spec.ts › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 1440 [T-0202]",
+      "commit": "fb38e5b94513-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T03:10:34.179Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-164",
+      "file": ".agent/evidence/T-0202/20261122-031037-SS-PLAT-164-opening-balances-fx-preview-390.png",
+      "test": "web/opening-balances.spec.ts › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 390 [T-0202]",
+      "commit": "fb38e5b94513-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T03:10:37.117Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-164",
+      "file": ".agent/evidence/T-0202/20261122-031038-SS-PLAT-164-opening-balances-fx-posted-390.png",
+      "test": "web/opening-balances.spec.ts › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 390 [T-0202]",
+      "commit": "fb38e5b94513-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T03:10:38.064Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-165",
+      "file": ".agent/evidence/T-0202/20261122-031040-SS-PLAT-165-opening-balances-fx-mismatch-1440.png",
+      "test": "web/opening-balances.spec.ts › foreign-currency open items [T-0202] › SS-PLAT-165: an FX_MISMATCH refusal names the CSV line in plain words, and nothing is posted [T-0202]",
+      "commit": "fb38e5b94513-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T03:10:40.756Z",
+      "result": "passed"
+    }
+  ]
+}

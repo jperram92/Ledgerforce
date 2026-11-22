@@ -4249,3 +4249,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the card's ACs are contract and db; the UI and the sweep are each a screen or job of their own (about 300 lines).
 - Alternatives: build everything here (rejected: oversized).
 - ADR: ADR-0091 · Status: accepted
+
+### DL-0850 — Opening balances screen shows a foreign item's currency amount and rate as "USD 1,000.00 @ 1.53846154" (T-0202)
+- Date: 2026-11-22 · By: claude · Task: T-0202 · Category: ui
+- Decision: The screen formats the API's FX fields only: currency code, the currency amount's size in the currency's own minor unit (formatMoney on the decimal string, sign dropped because the Dr/Cr column or the signed base amount already says the direction), "@", and the rate exactly as the API sends it (NUMERIC(18,8) text, base per one unit). In the journal preview it is appended to the line's gloss, so it sits in the same row as the AUD amount without changing the shared JournalTable; in the posted open items it is a column "In its currency", shown only when an item is foreign, with the base currency code for base items (an empty cell collapses in the 390 stacked layout). A line is foreign when its currency differs from the company's base currency, so base lines (rate "1" or "1.00000000") show no rate. A note explains that the AUD amount is the old system's carrying amount and no exchange difference is posted (GP-043, ADR-0088).
+- Why: GP-043 writes lines as "USD 1,000.00 @ 1.53846154"; principles P3 (decimal strings, grouped, minor unit); the browser computes nothing. Appending to the gloss avoids a shared-component change for one screen.
+- Alternatives: a new optional `fx` field on JournalTable lines (rejected for now: one consumer; can be lifted later); a separate column in the preview (rejected: the journal table's columns are fixed Dr/Cr per P3/P12).
+- ADR: — · Status: accepted
+
+### DL-0851 — FX_MISMATCH refusal leads with plain words and the CSV line (T-0202)
+- Date: 2026-11-22 · By: claude · Task: T-0202 · Category: ui
+- Decision: For a 422 `FX_MISMATCH` with a `row`, the screen says "LedgerForce did not accept the files: on line N of the file, the exchange rate times the currency amount does not give the amount." and then the engine's message (document, figures and the fix). Other refusals keep the T-0177 wording. The open-items CSV help names the optional columns currency, currency_amount and fx_rate, what amount and fx_rate mean, and that foreign items are revalued in the old system first when the balance date ends a reporting period (ADR-0088 consequences).
+- Why: card AC-2 and AC-3; P6 plain words; the engine's message alone starts with a formula.
+- Alternatives: rewrite the engine message in the browser (rejected: duplicates the module's arithmetic text).
+- ADR: — · Status: accepted

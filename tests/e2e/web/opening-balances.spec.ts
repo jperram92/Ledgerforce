@@ -171,6 +171,9 @@ interface Fake {
   gets: number;
   posted: boolean;
   refuse: Map<'preview' | 'post', { status: number; body: unknown }>;
+  /** The journal and the posted view the fake answers with (GP-037 unless a test swaps them). */
+  preview: unknown;
+  view: unknown;
 }
 
 async function fakeApi(page: Page, who: keyof typeof ME): Promise<Fake> {
@@ -181,6 +184,8 @@ async function fakeApi(page: Page, who: keyof typeof ME): Promise<Fake> {
     gets: 0,
     posted: false,
     refuse: new Map(),
+    preview: PREVIEW,
+    view: POSTED,
   };
   page.on('console', (m) => {
     if (m.type() === 'error' && !/status of (401|403|404|409|422|503)/.test(m.text()))
@@ -262,7 +267,7 @@ async function fakeApi(page: Page, who: keyof typeof ME): Promise<Fake> {
         expect(url.searchParams.get('company_id')).toBe(CO);
         f.gets += 1;
         return f.posted
-          ? send(route, 200, POSTED)
+          ? send(route, 200, f.view)
           : send(route, 404, { error: 'no_opening_balance' });
       }
       if (path.startsWith('/setup/opening-balances') && req.method() === 'POST') {
@@ -277,19 +282,19 @@ async function fakeApi(page: Page, who: keyof typeof ME): Promise<Fake> {
         (which === 'preview' ? f.previews : f.posts).push(call);
         const r = f.refuse.get(which);
         if (r) return send(route, r.status, r.body);
-        if (which === 'preview') return send(route, 200, PREVIEW);
+        if (which === 'preview') return send(route, 200, f.preview);
         if (!call.key) return send(route, 400, { error: 'idempotency_key_required' });
         if (f.posted) {
           const first = f.posts[0];
           return first?.key === call.key
-            ? send(route, 200, { ...POSTED, replayed: true })
+            ? send(route, 200, { ...(f.view as object), replayed: true })
             : send(route, 422, {
                 error: 'OPENING_EXISTS',
                 message: 'the company already has an opening balance',
               });
         }
         f.posted = true;
-        return send(route, 201, { ...POSTED, replayed: false });
+        return send(route, 201, { ...(f.view as object), replayed: false });
       }
       return send(route, 404, { error: 'not_found' });
     },
@@ -479,4 +484,249 @@ test('SS-PLAT-132: an Accountant without settings.chart.manage cannot import, an
   expect(f.previews).toEqual([]);
   await assertPage(page, 1440);
   expect(f.errors).toEqual([]);
+});
+
+/**
+ * T-0202 (GP-043, RQ-0170, ADR-0088): foreign-currency open items. The T-0126 API names each preview
+ * line's txn_currency, txn_amount and fx_rate, and each posted item's currency, currency_amount and
+ * fx_rate (base lines: the base currency at rate 1). The screen shows them; it computes nothing.
+ */
+test.describe('foreign-currency open items [T-0202]', () => {
+  test.use({ evidenceTaskId: 'T-0202' });
+
+  const INV = 'Acme Pty Ltd,INV-2001,2026-09-20,2026-10-20,1538.46,0.00,USD,1000.00,1.53846154';
+  const FX_HEAD =
+    'party,document_no,document_date,due_date,amount,gst_amount,currency,currency_amount,fx_rate';
+  const FX_AR = [
+    FX_HEAD,
+    'Acme Pty Ltd,INV-0991,2026-09-15,2026-10-15,1375.00,125.00,,,',
+    INV,
+  ].join('\n');
+  const FX_AP = [
+    FX_HEAD,
+    'Supplier Pty Ltd,B-88,2026-10-05,2026-11-04,-615.38,0.00,USD,-400.00,1.53846154',
+  ].join('\n');
+  const FX_TB = [
+    'account_code,debit,credit',
+    '1010,10000.00,',
+    '1200,2913.46,',
+    '2000,,615.38',
+    '2310,,125.00',
+    '3200,,8000.00',
+    '4110,,4173.08',
+  ].join('\n');
+  /** GP-043 as the engine previews it: base lines in AUD at rate 1, USD lines with their rate. */
+  const FX_PREVIEW = {
+    balance_date: '2026-10-31',
+    entry_date: '2026-10-31',
+    total: '12913.4600',
+    lines: [
+      ['1010', '10000.0000', Z, null, null, null, 'AUD', '10000.0000', '1'],
+      [
+        '1200',
+        '1375.0000',
+        Z,
+        ACME,
+        '2026-10-15',
+        'INV-0991 dated 2026-09-15',
+        'AUD',
+        '1375.0000',
+        '1',
+      ],
+      [
+        '1200',
+        '1538.4600',
+        Z,
+        ACME,
+        '2026-10-20',
+        'INV-2001 dated 2026-09-20',
+        'USD',
+        '1000.0000',
+        '1.53846154',
+      ],
+      [
+        '2000',
+        Z,
+        '615.3800',
+        SUPP,
+        '2026-11-04',
+        'B-88 dated 2026-10-05',
+        'USD',
+        '400.0000',
+        '1.53846154',
+      ],
+      ['2310', Z, '125.0000', null, null, null, 'AUD', '125.0000', '1'],
+      ['3200', Z, '8000.0000', null, null, null, 'AUD', '8000.0000', '1'],
+      ['4110', Z, '4173.0800', null, null, null, 'AUD', '4173.0800', '1'],
+    ].map(([account_code, debit, credit, party_id, due_date, memo, cur, amt, rate], i) => ({
+      line_no: i + 1,
+      account_code,
+      debit,
+      credit,
+      party_id,
+      txn_currency: cur,
+      txn_amount: amt,
+      fx_rate: rate,
+      due_date,
+      memo,
+    })),
+  };
+  const FX_POSTED = {
+    ...POSTED,
+    items: [
+      [
+        'ar',
+        ACME,
+        'INV-0991',
+        '2026-09-15',
+        '2026-10-15',
+        2,
+        '1375.0000',
+        '125.0000',
+        'AUD',
+        '1375.0000',
+        '1.00000000',
+      ],
+      [
+        'ar',
+        ACME,
+        'INV-2001',
+        '2026-09-20',
+        '2026-10-20',
+        3,
+        '1538.4600',
+        '0.0000',
+        'USD',
+        '1000.0000',
+        '1.53846154',
+      ],
+      [
+        'ap',
+        SUPP,
+        'B-88',
+        '2026-10-05',
+        '2026-11-04',
+        4,
+        '-615.3800',
+        '0.0000',
+        'USD',
+        '-400.0000',
+        '1.53846154',
+      ],
+    ].map(
+      ([
+        kind,
+        party_id,
+        document_no,
+        document_date,
+        due_date,
+        line_no,
+        amount,
+        gst,
+        cur,
+        camt,
+        rate,
+      ]) => ({
+        kind,
+        party_id,
+        document_no,
+        document_date,
+        due_date,
+        line_no,
+        amount,
+        gst_amount: gst,
+        currency: cur,
+        currency_amount: camt,
+        fx_rate: rate,
+      }),
+    ),
+  };
+
+  async function fillFx(page: Page) {
+    await page.getByLabel('Conversion date').fill('2026-11-01');
+    await page.getByLabel(/^Trial balance/).setInputFiles(file('trial-balance.csv', FX_TB));
+    await page.getByLabel(/^Open customer invoices/).setInputFiles(file('ar-items.csv', FX_AR));
+    await page.getByLabel(/^Open supplier bills/).setInputFiles(file('ap-items.csv', FX_AP));
+  }
+
+  for (const width of [1440, 390]) {
+    test(`SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ ${String(width)} [T-0202]`, async ({
+      page,
+      evidence,
+    }) => {
+      const f = await fakeApi(page, 'fa');
+      f.preview = FX_PREVIEW;
+      f.view = FX_POSTED;
+      await open(page, '/settings/setup/opening-balances', width);
+      // The CSV help names the optional columns and what the amount means (SS-PLAT-166 on screen).
+      const help = page.getByText(/optional columns currency, currency_amount and fx_rate/);
+      await expect(help).toBeVisible();
+      await expect(help).toContainText('carrying amount in AUD');
+
+      await fillFx(page);
+      await page.getByRole('button', { name: 'Show the journal' }).click();
+      const journal = page.getByRole('table', { name: 'Journal preview' });
+      await expect(journal).toBeVisible();
+      expect(f.previews[0]?.body).toMatchObject({ ar_items_csv: FX_AR, ap_items_csv: FX_AP });
+      const row = (text: string) => journal.locator('tbody tr').filter({ hasText: text });
+      await expect(row('INV-2001')).toContainText('USD 1,000.00 @ 1.53846154');
+      await expect(row('INV-2001')).toContainText('1,538.46');
+      await expect(row('B-88')).toContainText('USD 400.00 @ 1.53846154');
+      await expect(row('B-88')).toContainText('615.38');
+      for (const base of ['INV-0991', 'Operating account', 'GST collected', 'Retained earnings'])
+        await expect(row(base)).not.toContainText('@');
+      await expect(journal.locator('tfoot')).toContainText('12,913.46');
+      await expect(page.getByText(/old system’s carrying amount/).first()).toBeVisible();
+      await expect(page.getByText(/no exchange difference is posted/)).toBeVisible();
+      await assertPage(page, width);
+      await evidence('SS-PLAT-164', `opening-balances-fx-preview-${String(width)}`);
+
+      await page.getByRole('button', { name: 'Post the opening balance' }).click();
+      const items = page.getByRole('table', { name: 'Open items brought across' });
+      await expect(items).toBeVisible();
+      const item = (doc: string) => items.locator('tbody tr').filter({ hasText: doc });
+      await expect(items.getByRole('columnheader', { name: 'In its currency' })).toBeVisible();
+      await expect(item('INV-2001')).toContainText('USD 1,000.00 @ 1.53846154');
+      await expect(item('INV-2001')).toContainText('1,538.46');
+      await expect(item('B-88')).toContainText('USD 400.00 @ 1.53846154');
+      await expect(item('B-88')).toContainText('(615.38)');
+      // A base item is in AUD: no rate (and no empty cell on a narrow screen).
+      await expect(item('INV-0991').locator('td').last()).toHaveText('AUD');
+      await expect(item('INV-0991')).not.toContainText('@');
+      await assertPage(page, width);
+      await evidence('SS-PLAT-164', `opening-balances-fx-posted-${String(width)}`);
+      expect(f.errors).toEqual([]);
+    });
+  }
+
+  test('SS-PLAT-165: an FX_MISMATCH refusal names the CSV line in plain words, and nothing is posted [T-0202]', async ({
+    page,
+    evidence,
+  }) => {
+    const f = await fakeApi(page, 'fa');
+    f.refuse.set('preview', {
+      status: 422,
+      body: {
+        error: 'FX_MISMATCH',
+        message:
+          'INV-2001: USD 1000.00 × 1.5 = 1500.00 (half-up to cents), not the base amount 1538.46; correct the rate or leave it empty to imply it',
+        row: 3,
+      },
+    });
+    await open(page, '/settings/setup/opening-balances', 1440);
+    await fillFx(page);
+    await page.getByRole('button', { name: 'Show the journal' }).click();
+    const alert = page.getByRole('alert');
+    await expect(alert).toContainText('LedgerForce did not accept the files');
+    await expect(alert).toContainText(
+      'on line 3 of the file, the exchange rate times the currency amount does not give the amount',
+    );
+    await expect(alert).toContainText('not the base amount 1538.46');
+    await expect(page.getByRole('table', { name: 'Journal preview' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Post the opening balance' })).toHaveCount(0);
+    expect(f.posts).toEqual([]);
+    await assertPage(page, 1440);
+    await evidence('SS-PLAT-165', 'opening-balances-fx-mismatch-1440');
+    expect(f.errors).toEqual([]);
+  });
 });
