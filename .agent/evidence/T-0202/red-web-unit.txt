@@ -1,0 +1,56 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-T0202
+
+ ❯ |web| apps/web/src/setup/opening-logic.test.ts (7 tests | 3 failed) 25ms
+     × SS-PLAT-164 a foreign line names its currency, currency amount and rate; a base line names none 3ms
+     × SS-PLAT-165 an FX_MISMATCH refusal says in plain words that the rate does not give the amount, with its line 4ms
+     × SS-PLAT-166 the open-items CSV help lists the three optional foreign-currency columns 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |web| apps/web/src/setup/opening-logic.test.ts > opening balances, foreign-currency items [T-0202] > SS-PLAT-164 a foreign line names its currency, currency amount and rate; a base line names none
+TypeError: fxNote is not a function
+ ❯ apps/web/src/setup/opening-logic.test.ts:51:12
+     49|   it('SS-PLAT-164 a foreign line names its currency, currency amount a…
+     50|     const usd = { txn_currency: 'USD', txn_amount: '1000.0000', fx_rat…
+     51|     expect(fxNote(usd, 'AUD')).toBe('USD 1,000.00 @ 1.53846154');
+       |            ^
+     52|     // A posted AP item carries a signed currency amount: the note say…
+     53|     expect(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  |web| apps/web/src/setup/opening-logic.test.ts > opening balances, foreign-currency items [T-0202] > SS-PLAT-165 an FX_MISMATCH refusal says in plain words that the rate does not give the amount, with its line
+AssertionError: expected 'LedgerForce did not accept the files:…' to be 'LedgerForce did not accept the files:…' // Object.is equality
+
+Expected: "LedgerForce did not accept the files: on line 3 of the file, the exchange rate times the currency amount does not give the amount. INV-1004: USD 357.50 × 1.5 = 536.25 (half-up to cents), not the base amount 550.00; correct the rate or leave it empty to imply it."
+Received: "LedgerForce did not accept the files: INV-1004: USD 357.50 × 1.5 = 536.25 (half-up to cents), not the base amount 550.00; correct the rate or leave it empty to imply it (line 3 of the file)."
+
+ ❯ apps/web/src/setup/opening-logic.test.ts:74:18
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |web| apps/web/src/setup/opening-logic.test.ts > opening balances, foreign-currency items [T-0202] > SS-PLAT-166 the open-items CSV help lists the three optional foreign-currency columns
+TypeError: itemColumnsHelp is not a function
+ ❯ apps/web/src/setup/opening-logic.test.ts:80:18
+     78|
+     79|   it('SS-PLAT-166 the open-items CSV help lists the three optional for…
+     80|     const help = itemColumnsHelp('AUD');
+       |                  ^
+     81|     expect(help).toContain('party, document_no, document_date, due_dat…
+     82|     for (const col of ['currency', 'currency_amount', 'fx_rate']) expe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 4 passed (7)
+   Start at  03:08:09
+   Duration  980ms (transform 50ms, setup 117ms, import 38ms, tests 25ms, environment 605ms)
+
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.3
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.3
+npm notice To update run: npm install -g npm@12.2.3
+npm notice
