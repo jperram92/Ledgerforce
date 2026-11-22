@@ -1043,6 +1043,29 @@ export interface BillInboxMailboxTable {
   created_at: ColumnType<Date, Date | string | undefined, never>;
 }
 
+/** Bills inbox inbound address (migration 0078/reserved 0080, ADR-0099). */
+export interface BillInboxAddressTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: string;
+  /** 26 characters base32 (a–z, 2–7); write-once. */
+  token: string;
+  status: Generated<'active' | 'superseded'>;
+  created_by: string | null;
+  created_at: ColumnType<Date, Date | string | undefined, never>;
+}
+
+/** Accepted provider inbound deliveries: single-use provider tokens (ADR-0099). */
+export interface InboundWebhookReceiptTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  provider: 'mailgun';
+  provider_token: string;
+  inbox_item_id: string | null;
+  received_at: ColumnType<Date, Date | string | undefined, never>;
+}
+
 export interface DocumentAttachmentTable {
   id: Generated<string>;
   tenant_id: TenantId;
@@ -1525,6 +1548,8 @@ export interface Database {
   'app.supplier_bill_line': SupplierBillLineTable;
   'app.bill_inbox_item': BillInboxItemTable;
   'app.bill_inbox_mailbox': BillInboxMailboxTable;
+  'app.bill_inbox_address': BillInboxAddressTable;
+  'app.inbound_webhook_receipt': InboundWebhookReceiptTable;
   'app.document_attachment': DocumentAttachmentTable;
   'app.customer_prepayment': CustomerPrepaymentTable;
   'app.prepayment_application': PrepaymentApplicationTable;

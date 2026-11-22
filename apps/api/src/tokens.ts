@@ -16,3 +16,5 @@ export const STRIPE_WEBHOOK = Symbol('STRIPE_WEBHOOK');
 export const DOCUMENT_OUTBOX = Symbol('DOCUMENT_OUTBOX');
 /** Stripe refunds (ADR-0083): the Stripe client; null makes `method: stripe` unavailable. */
 export const STRIPE_REFUNDS = Symbol('STRIPE_REFUNDS');
+/** Mailgun inbound webhook (ADR-0099); null makes POST /webhooks/mailgun/messages.mime answer 503. */
+export const MAILGUN_INBOUND = Symbol('MAILGUN_INBOUND');

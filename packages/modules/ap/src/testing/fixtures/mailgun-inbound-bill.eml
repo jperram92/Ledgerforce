@@ -1,0 +1,21 @@
+From: Paper Co Accounts <accounts@paperco.example>
+To: bills-placeholder@inbound.ledgerforce.test
+Subject: Invoice SUP-INV-2215
+Message-ID: <inv-2215@paperco.example>
+Date: Fri, 20 Nov 2026 01:02:03 +0000
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="--_NmP-81f8c1a634e0583a-Part_1"
+
+----_NmP-81f8c1a634e0583a-Part_1
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+
+Please find our invoice SUP-INV-2215 attached.
+----_NmP-81f8c1a634e0583a-Part_1
+Content-Type: application/pdf; name=SUP-INV-2215.pdf
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=SUP-INV-2215.pdf
+
+JVBERi0xLjQKMSAwIG9iaiA8PCAvVHlwZSAvQ2F0YWxvZyA+PiBlbmRvYmoKdHJhaWxlciA8PCAv
+Um9vdCAxIDAgUiA+PgolJUVPRgo=
+----_NmP-81f8c1a634e0583a-Part_1--

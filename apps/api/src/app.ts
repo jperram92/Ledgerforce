@@ -1,5 +1,9 @@
 import { ApBillCodingController, ApBillsController } from './ap/bills.controller.ts';
 import { ApInboxController } from './ap/inbox.controller.ts';
+import {
+  MailgunInboundController,
+  type MailgunInboundConfig,
+} from './ap/mailgun-inbound.controller.ts';
 import { ApPaymentBatchesController } from './ap/payment-batches.controller.ts';
 import { ArReceiptsController } from './ar/receipts.controller.ts';
 import { ArRefundsController, type StripeRefundsOptions } from './ar/refunds.controller.ts';
@@ -60,12 +64,19 @@ import { AuditTrail, TenantTx } from './tenancy/tenant-tx.ts';
 import { AuditLogController } from './audit/audit-log.controller.ts';
 import { requestIdMiddleware } from './audit/request-id.ts';
 import { applySecurity, type SecurityOptions } from './security/security.ts';
+import { inboundWebhookBody } from './security/inbound-body.ts';
 import { statementImportBody } from './security/statement-body.ts';
 import { SyncIssuesController } from './sync/sync-issues.controller.ts';
 import { CLOCK, DB, KMS, MFA_POLICY, SYNC_REQUEUE } from './tokens.ts';
 import type { DeliveryRequeue } from '@ledgerforce/outbox';
 import type { PostingOutbox } from '@ledgerforce/ledger';
-import { DOCUMENT_OUTBOX, POSTING_OUTBOX, STRIPE_REFUNDS, STRIPE_WEBHOOK } from './tokens.ts';
+import {
+  DOCUMENT_OUTBOX,
+  MAILGUN_INBOUND,
+  POSTING_OUTBOX,
+  STRIPE_REFUNDS,
+  STRIPE_WEBHOOK,
+} from './tokens.ts';
 
 export interface ApiOptions {
   /** Connection string for lf_app (never a superuser or the migrator). */
@@ -102,6 +113,11 @@ export interface ApiOptions {
    * Without it (or without `documentOutbox` and `postingOutbox`) `method: stripe` is refused.
    */
   stripeRefunds?: StripeRefundsOptions;
+  /**
+   * Mailgun inbound webhook for the bills inbox (ADR-0099): signing keys and the inbound domain.
+   * Without it POST /webhooks/mailgun/messages.mime answers 503 and reads no body.
+   */
+  mailgunInbound?: MailgunInboundConfig;
   /** Security headers, trusted proxy hops and rate limits (ADR-0054, T-0142). */
   security?: SecurityOptions;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
@@ -149,6 +165,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ApInboxController,
   ApPaymentBatchesController,
   StripeWebhookController,
+  MailgunInboundController,
   ReportsController,
   PeriodReopenController,
   CloseChecklistController,
@@ -181,6 +198,7 @@ class AppModule {
     stripeWebhook: StripeWebhookOptions | null,
     documentOutbox: DocumentOutbox | null,
     stripeRefunds: StripeRefundsOptions | null,
+    mailgunInbound: MailgunInboundConfig | null,
   ): DynamicModule {
     return {
       module: AppModule,
@@ -209,6 +227,7 @@ class AppModule {
         ApInboxController,
         ApPaymentBatchesController,
         StripeWebhookController,
+        MailgunInboundController,
         ReportsController,
         PeriodReopenController,
         CloseChecklistController,
@@ -238,6 +257,7 @@ class AppModule {
         { provide: STRIPE_WEBHOOK, useValue: stripeWebhook },
         { provide: DOCUMENT_OUTBOX, useValue: documentOutbox },
         { provide: STRIPE_REFUNDS, useValue: stripeRefunds },
+        { provide: MAILGUN_INBOUND, useValue: mailgunInbound },
         TenantTx,
         AuditTrail,
         Authz,
@@ -298,6 +318,7 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
       opts.stripeWebhook ?? null,
       opts.documentOutbox ?? null,
       opts.stripeRefunds ?? null,
+      opts.mailgunInbound ?? null,
     ),
     {
       logger: ['error', 'warn'],
@@ -310,6 +331,8 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
   // Then: statement import alone reads JSON up to 10 MB; every other route keeps Nest's 100 kB
   // parser, which skips a body already read (ADR-0078, RQ-0151).
   app.use(statementImportBody());
+  // The Mailgun inbound route reads multipart up to 26 MiB itself, only when configured (ADR-0099).
+  app.use(inboundWebhookBody(opts.mailgunInbound !== undefined));
   app.use(requestIdMiddleware);
   await app.listen(opts.port ?? 0, opts.host ?? '127.0.0.1');
   const addr = app.getHttpServer().address() as AddressInfo;

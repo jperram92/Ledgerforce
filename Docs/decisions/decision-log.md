@@ -4273,7 +4273,7 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 
 ### DL-0863 — Inbound webhook status codes follow Mailgun's retry contract
 - Date: 2026-11-22 · By: claude · Task: T-0215 · Category: architecture
-- Decision: 200 created/duplicate; 401 missing, wrong or stale signature; 406 replayed token, unknown recipient, misconfigured route (store() or no body-mime) or a message `ingestBillEmail` refuses; 413 over 26 MiB; 415 not multipart; 400 malformed form; 503 not configured or infrastructure failure (Mailgun retries). Error bodies are fixed codes only.
+- Decision: 200 created/duplicate; 401 missing, wrong or stale signature; 406 replayed token, unknown recipient, misconfigured route (store() or no body-mime) or a message `ingestBillEmail` refuses; 413 over 26 MiB; 415 not multipart; 400 malformed form; 503 not configured; an unexpected server failure answers Nest's generic 500 (no detail), which Mailgun retries. Error bodies are fixed codes only. The provider token is the route's idempotency key (no Idempotency-Key header: Mailgun cannot send one), and the receipt row is its audit trail.
 - Why: Mailgun never retries a 406 and retries anything else for about 8 hours (RQ-0181 F3); refusals that a retry cannot fix should stop retries, outages should not.
 - Alternatives: 400 for everything (retry storms for permanent refusals).
 - ADR: ADR-0099 · Status: accepted
