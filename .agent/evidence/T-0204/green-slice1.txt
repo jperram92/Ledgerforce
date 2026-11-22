@@ -1,0 +1,19 @@
+# T-0204 slice 1 GREEN validation, 2026-11-22, at 8eae302 (code unchanged since c7c06ad/cbee52b)
+pnpm typecheck -> exit 0
+pnpm -s lint -> exit 0
+pnpm -s format:check -> exit 0
+node scripts/agent/conductor.ts lint-backlog -> backlog OK
+
+# vitest --project unit (all) -> exit 0
+ Test Files  73 passed (73)
+      Tests  844 passed (844)
+
+# VITEST_MAX_WORKERS=1 vitest --project db packages/modules/ar packages/db packages/ledger/src/golden packages/modules/tax -> exit 0 (0 skipped)
+ Test Files  37 passed (37)
+      Tests  1153 passed (1153)
+
+# Ledger tables written only through the posting engine (grep in the new module, expect none):
+none (posting via post() and allocate() from @ledgerforce/ledger)
+
+# Migration self-check (forbidden verbs in 0078, expect none):
+none

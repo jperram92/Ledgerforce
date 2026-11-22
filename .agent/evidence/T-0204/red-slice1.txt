@@ -1,0 +1,24 @@
+# T-0204 slice 1 RED (2026-11-22). 1) module absent:
+ FAIL  |db| packages/modules/ar/src/single-supply-final.db.test.ts [ packages/modules/ar/src/single-supply-final.db.test.ts ]
+Error: Cannot find module './single-supply-final.ts' imported from /home/user/Ledgerforce/.claude/worktrees/t0204/packages/modules/ar/src/single-supply-final.db.test.ts
+      Tests  no tests
+
+# 2) interface present, behaviour not built, table 0078 absent:
+     × SS-PLAT-157 AC-1 price unchanged posts GP-045a line for line: register invoice 11,000.00 with the fixed GST, AR credit 6,600.00 allocated, unbilled and prepayments cleared, contract finalised, replay idempotent, second finalisation and later receipts refused [T-0204] 78ms
+     × SS-PLAT-157 AC-1 a price increase agreed on the invoice date posts GP-045b: the 500.00 change coded with its own 50.00 GST, invoice 11,550.00, due 4,950.00, GST for the contract 1,050.00 [T-0204] 47ms
+     × SS-PLAT-157 AC-1 AC-10 a price reduction agreed on the invoice date posts GP-045c and the document carries adjustment-note particulars although 50.00 GST is within the $75 threshold [T-0204] 48ms
+     × SS-PLAT-157 AC-1 several lines: one uncoded revenue line per account, the change coded on the largest line, the fixed GST spread over the printed lines by the GP-023a residual rule [T-0204] 28ms
+     × SS-PLAT-158 AC-6 AC-8 a changed price without a variation agreed on the invoice date, a final price below the cash received, and a change larger than its line are refused by name [T-0204] 42ms
+     × SS-PLAT-158 a contract with nothing attributed, a cash-basis contract and an invoice dated after a basis change are refused by name until their goldens are built (T-0217) [T-0204] 69ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+SingleSupplyError: final invoice not built yet
+     80|     new SingleSupplyError('INVALID_SINGLE_SUPPLY', 'final invoice not …
+SingleSupplyError: final invoice not built yet
+     80|     new SingleSupplyError('INVALID_SINGLE_SUPPLY', 'final invoice not …
+SingleSupplyError: final invoice not built yet
+     80|     new SingleSupplyError('INVALID_SINGLE_SUPPLY', 'final invoice not …
+SingleSupplyError: final invoice not built yet
+     80|     new SingleSupplyError('INVALID_SINGLE_SUPPLY', 'final invoice not …
+error: relation "app.single_supply_finalisation" does not exist
+error: relation "app.single_supply_finalisation" does not exist
+      Tests  6 failed (6)

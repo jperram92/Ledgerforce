@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0204",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-157",
+      "file": ".agent/evidence/T-0204/red-slice1.txt",
+      "test": "single-supply-final.db.test.ts before the module, then before the behaviour and migration 0078",
+      "commit": "c7c06ad",
+      "provider": "claude",
+      "timestamp": "2026-11-22T03:20:00.000Z",
+      "result": "failed (RED, expected)"
+    },
+    {
+      "scenario": "SS-PLAT-158",
+      "file": ".agent/evidence/T-0204/red-slice1.txt",
+      "test": "refusal tests before migration 0078 (relation missing)",
+      "commit": "c7c06ad",
+      "provider": "claude",
+      "timestamp": "2026-11-22T03:20:00.000Z",
+      "result": "failed (RED, expected)"
+    },
+    {
+      "scenario": "SS-PLAT-159",
+      "file": ".agent/evidence/T-0204/property-slice1.txt",
+      "test": "single-supply-final.prop.db.test.ts default numRuns, plus a mutation run showing it detects a dropped change GST",
+      "commit": "cbee52b",
+      "provider": "claude",
+      "timestamp": "2026-11-22T03:40:00.000Z",
+      "result": "passed (mutation run failed as expected, reverted)"
+    },
+    {
+      "scenario": "SS-PLAT-157",
+      "file": ".agent/evidence/T-0204/green-slice1.txt",
+      "test": "typecheck, lint, format:check, lint-backlog, unit project, db suites ar/db/golden/tax (incl. RLS cross-tenant over 0078)",
+      "commit": "8eae302",
+      "provider": "claude",
+      "timestamp": "2026-11-22T04:00:00.000Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-135",
+      "file": ".agent/evidence/T-0204/ac11-primary-source-probe.txt",
+      "test": "AC-11 primary-source reachability probe (legislation.gov.au, ato.gov.au, aasb.gov.au, austlii)",
+      "commit": "c7c06ad",
+      "provider": "claude",
+      "timestamp": "2026-11-22T03:10:00.000Z",
+      "result": "unreachable (403) — AC-11 open, moved to T-0218"
+    }
+  ]
+}
