@@ -1,0 +1,11 @@
+# SS-PLAT-159 property (default numRuns 100), 2026-11-22
+ Test Files  1 passed (1)
+      Tests  1 passed (1)
+   Duration  11.78s (transform 1.25s, setup 0ms, import 1.54s, tests 8.92s, environment 0ms)
+
+# Written after the implementation, so a temporary mutation was run to show it detects a fault:
+# single-supply-final.ts taxTotal = attributed (GST on the price change dropped) -> property fails:
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+Counterexample: [6n,[1],1,-834]
+      Tests  1 failed (1)
+# file restored from the committed version (git diff empty) after the run.
