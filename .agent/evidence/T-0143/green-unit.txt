@@ -1,0 +1,21 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0143-backup
+
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 0-byte payload and the manifest 42ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 1-byte payload and the manifest 11ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65535-byte payload and the manifest 4ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65536-byte payload and the manifest 3ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 65537-byte payload and the manifest 20ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 round-trips a 196608-byte payload and the manifest 4ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 the file holds neither the plaintext nor the manifest in the clear 3ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a different key does not open the backup 2ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 any altered byte (header, MAC, manifest or payload) fails closed 16ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 truncation (at a chunk boundary or mid-chunk), dropped chunks and trailing bytes fail 13ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a wrapped key copied from another backup does not open this one 3ms
+ ✓ |unit| packages/db/src/ops/backup-format.test.ts > SS-PLAT-176 lf-backup/v1 format > SS-PLAT-176 a file that is not an lf-backup fails with BackupDecryptError 0ms
+
+ Test Files  1 passed (1)
+      Tests  12 passed (12)
+   Start at  08:14:16
+   Duration  775ms (transform 343ms, setup 0ms, import 431ms, tests 125ms, environment 0ms)
+

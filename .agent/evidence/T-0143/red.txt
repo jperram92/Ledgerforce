@@ -1,0 +1,29 @@
+# T-0143 RED (2026-11-22): tests written before any implementation; both fail because the modules under test do not exist yet.
+
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0143-backup
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:39849
+ ❯ |db| packages/ledger/src/ops/restore-drill.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/ledger/src/ops/restore-drill.db.test.ts [ packages/ledger/src/ops/restore-drill.db.test.ts ]
+Error: Cannot find package '@ledgerforce/db/ops' imported from /home/user/Ledgerforce/.claude/worktrees/t0143-backup/packages/ledger/src/ops/restore-drill.db.test.ts
+ ❯ packages/ledger/src/ops/restore-drill.db.test.ts:13:1
+     11|  */
+     12| import { LocalKeyringKms } from '@ledgerforce/shared/crypto';
+     13| import { openBackup, BackupDecryptError } from '@ledgerforce/db/ops';
+       | ^
+     14| import { startTestDatabase, type TestDatabaseServer } from '@ledgerfor…
+     15| import { sql } from 'kysely';
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  03:12:25
+   Duration  1.37s (transform 175ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

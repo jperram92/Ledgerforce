@@ -4249,3 +4249,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the card's ACs are contract and db; the UI and the sweep are each a screen or job of their own (about 300 lines).
 - Alternatives: build everything here (rejected: oversized).
 - ADR: ADR-0091 · Status: accepted
+
+### DL-0880 — T-0143's research question is RQ-0183 (the card's "RQ-0142" was never created) (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: process
+- Decision: The backup/restore research the card calls RQ-0142 is recorded as RQ-0183 (reserved number for this round); the card's `research` field and text point to RQ-0183.
+- Why: RQ-0142 does not exist (RQ-0141 and RQ-0143 do); reusing a gap number risks a collision with another line.
+- Alternatives: create RQ-0142 (rejected: not in this line's reserved range).
+- ADR: none · Status: accepted
+
+### DL-0881 — Backups are envelope-encrypted through the existing Kms with an age-style AES-256-GCM STREAM (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: security
+- Decision: Format `lf-backup/v1`: per-backup data key wrapped by the configured `Kms` (AAD `lf-backup-v1|<backupId>`), HKDF-derived header-MAC / manifest / payload keys, HMAC'd header, sealed manifest, 64 KiB AES-256-GCM chunks with counter‖final-flag nonces. ADR-0101 accepted under DL-0691.
+- Why: RQ-0183 Findings 4-5 — no new dependency or binary, one key-custody model (local keyring or OpenBao transit), authenticated before a byte reaches pg_restore; truncation, reordering, wrong key and header edits all fail.
+- Alternatives: age (second key system, new binary), openssl enc (unauthenticated), openssl cms/gpg (PKI/keyring and binary).
+- ADR: ADR-0101 · Status: accepted
+
+### DL-0882 — Backup/restore primitives in packages/db/src/ops, the drill and its test in packages/ledger/src/ops (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: architecture
+- Decision: `createBackup`, `restoreBackup`, the file format and tool discovery live in `@ledgerforce/db/ops`; `runRestoreDrill` (which calls `verifyChain`) and its CLI live in `packages/ledger`. The AC test path moves from `packages/db/src/ops/restore-drill.db.test.ts` to `packages/ledger/src/ops/restore-drill.db.test.ts`.
+- Why: `verifyChain` is in `@ledgerforce/ledger`, which depends on `@ledgerforce/db`; the card's path would need a package cycle.
+- Alternatives: db devDepends on ledger (rejected: workspace cycle); copy the verifier (rejected: the drill must use the product's verifier).
+- ADR: ADR-0101 · Status: accepted
+
+### DL-0883 — Backups run as the cluster superuser under an exported snapshot; lf_backup role split to T-0227 (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: security
+- Decision: `createBackup` opens REPEATABLE READ, exports the snapshot, computes the manifest and runs `pg_dump -Fc --snapshot` in the same instant, as the cluster superuser. A least-privilege `lf_backup` role (BYPASSRLS + pg_read_all_data) is card T-0227.
+- Why: pg_dump errors on FORCEd RLS tables for NOBYPASSRLS roles (RQ-0183 Finding 3); a new role changes the cluster bootstrap existing installs already ran.
+- Alternatives: `--enable-row-security` (rejected: silently partial dump); add lf_backup now (deferred: bootstrap change for existing installs).
+- ADR: ADR-0101 · Status: accepted
+
+### DL-0884 — The restore drill restores into a brand-new cluster in its test and drops the target on any failure (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: process
+- Decision: The AC test starts a second throw-away cluster (startTestDatabase local mode, initdb/pg_ctl) as the restore target; the restore applies the idempotent bootstrap, creates a new database (refusing an existing one), streams into `pg_restore --single-transaction --exit-on-error`, and drops the database on any failure. The CI db job installs PostgreSQL 17 binaries (PGDG) so pg_dump matches the postgres:17 service and initdb exists.
+- Why: proves restore into a fresh cluster, not only a fresh database (RQ-0183 Findings 6, 8); pg_dump refuses newer servers.
+- Alternatives: restore into a new database on the harness server only (rejected: does not prove a fresh cluster works).
+- ADR: ADR-0101 · Status: accepted
+
+### DL-0885 — PITR (WAL archiving) for the hosted RPO is out of T-0143; card T-0228 (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: scope
+- Decision: T-0143 delivers nightly encrypted logical backups and the drill; physical backups with WAL archiving (pgBackRest/WAL-G or managed PITR) for RPO 15 min become T-0228.
+- Why: RQ-0183 Finding 1 — RPO 15 min is a hosted-platform property needing a separate daemon and repository.
+- Alternatives: add WAL archiving to compose now (rejected: oversized and not what §7.2 promises the single VM).
+- ADR: ADR-0101 · Status: accepted
