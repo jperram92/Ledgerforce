@@ -217,6 +217,17 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     status: () => 'superseded',
     last_error: () => 'timeout',
   },
+  // T-0215: inbound address (26-char base32 token, globally unique) and webhook receipts.
+  'app.bill_inbox_address': {
+    id: () => randomUUID(),
+    token: () =>
+      [...randomBytes(26)].map((b) => 'abcdefghijklmnopqrstuvwxyz234567'[b % 32]).join(''),
+    status: () => 'superseded',
+  },
+  'app.inbound_webhook_receipt': {
+    provider: () => 'mailgun',
+    provider_token: () => randomBytes(25).toString('hex'),
+  },
   'app.document_attachment': {
     owner_type: () => 'bill_inbox_item',
     content_type: () => 'application/pdf',

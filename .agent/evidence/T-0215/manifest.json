@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0215",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-167",
+      "file": ".agent/evidence/T-0215/scenarios-verbose.txt",
+      "test": "apps/api/src/ap/bills-inbound-webhook.db.test.ts, packages/modules/ap/src/inbound-webhook.test.ts",
+      "commit": "dda9be8791db",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-167",
+      "file": ".agent/evidence/T-0215/green-db-api-db.txt",
+      "test": "vitest --project db --project api-db (full, 175 files, 2146 tests, 0 skipped)",
+      "commit": "dda9be8791db",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-168",
+      "file": ".agent/evidence/T-0215/scenarios-verbose.txt",
+      "test": "apps/api/src/ap/bills-inbound-webhook.db.test.ts, packages/modules/ap/src/inbound-webhook.test.ts, apps/api/src/config.test.ts",
+      "commit": "dda9be8791db",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-168",
+      "file": ".agent/evidence/T-0215/green-db-api-db.txt",
+      "test": "vitest --project db --project api-db (full, 175 files, 2146 tests, 0 skipped)",
+      "commit": "dda9be8791db",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-169",
+      "file": ".agent/evidence/T-0215/scenarios-verbose.txt",
+      "test": "apps/api/src/ap/bills-inbound-webhook.db.test.ts, packages/modules/ap/src/inbound-webhook.test.ts",
+      "commit": "dda9be8791db",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-169",
+      "file": ".agent/evidence/T-0215/green-db-api-db.txt",
+      "test": "vitest --project db --project api-db (full, 175 files, 2146 tests, 0 skipped)",
+      "commit": "dda9be8791db",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-170",
+      "file": ".agent/evidence/T-0215/scenarios-verbose.txt",
+      "test": "packages/db/src/rls.db.test.ts",
+      "commit": "dda9be8791db",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-170",
+      "file": ".agent/evidence/T-0215/green-db-api-db.txt",
+      "test": "vitest --project db --project api-db (full, 175 files, 2146 tests, 0 skipped)",
+      "commit": "dda9be8791db",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-168",
+      "file": ".agent/evidence/T-0215/green-unit-api-unit.txt",
+      "test": "vitest --project unit --project api-unit (full, 81 files, 1056 tests, 0 skipped)",
+      "commit": "dda9be8791db",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-167..170",
+      "file": ".agent/evidence/T-0215/red-unit.txt",
+      "test": "RED: inbound-webhook.test.ts before implementation (module missing)",
+      "commit": "a57935b",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "failed (expected RED)"
+    },
+    {
+      "scenario": "SS-PLAT-167..170",
+      "file": ".agent/evidence/T-0215/red-api-db.txt",
+      "test": "RED: bills-inbound-webhook.db.test.ts before implementation",
+      "commit": "a57935b",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "failed (expected RED)"
+    },
+    {
+      "scenario": "SS-PLAT-167..170",
+      "file": ".agent/evidence/T-0215/red-rls-db.txt",
+      "test": "RED: SS-PLAT-170 before migration (relation missing)",
+      "commit": "a57935b",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "failed (expected RED)"
+    },
+    {
+      "scenario": "SS-PLAT-167..170",
+      "file": ".agent/evidence/T-0215/red-config.txt",
+      "test": "RED: config.test.ts T-0215 cases before config",
+      "commit": "a57935b",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:38:02Z",
+      "result": "failed (expected RED)"
+    }
+  ]
+}

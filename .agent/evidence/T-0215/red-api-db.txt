@@ -1,0 +1,30 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0215
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:38881
+ ❯ |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts (14 tests | 14 skipped) 1631ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts [ apps/api/src/ap/bills-inbound-webhook.db.test.ts ]
+TypeError: ensureInboxAddress is not a function
+ ❯ fn apps/api/src/ap/bills-inbound-webhook.db.test.ts:76:42
+     74| beforeAll(async () => {
+     75|   f = await createLedgerFixture('01900000-0000-7000-8000-000000021501'…
+     76|   const tokA = await f.inTenant((trx) => ensureInboxAddress(trx, { com…
+       |                                          ^
+     77|   // ensureInboxAddress is idempotent: the active token is returned ag…
+     78|   expect(await f.inTenant((trx) => ensureInboxAddress(trx, { companyId…
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:76:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  14 skipped (14)
+   Start at  03:16:27
+   Duration  9.19s (transform 3.67s, setup 0ms, import 6.08s, tests 1.63s, environment 0ms)
+

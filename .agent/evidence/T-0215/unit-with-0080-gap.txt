@@ -1,0 +1,30 @@
+# Committed migration number 0080 with 0079 unmerged (T-0209): the only failure is the expected gap check in migrate.test.ts; with the file named 0079 locally the same run is fully green (green-unit-api-unit.txt).
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0215
+
+ ❯ |unit| packages/db/src/migrate.test.ts (36 tests | 1 failed) 96ms
+     × the shipped migrations directory passes all checks 57ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/db/src/migrate.test.ts > loadMigrations > the shipped migrations directory passes all checks
+MigrationSequenceError: 0080_ap_inbound_webhook.sql: expected version 0079 (no gaps or duplicates)
+ ❯ packages/db/src/migrate.ts:176:13
+    174|   files.forEach((f, idx) => {
+    175|     if (f.version !== idx + 1) {
+    176|       throw new MigrationSequenceError(
+       |             ^
+    177|         `${f.filename}: expected version ${String(idx + 1).padStart(4,…
+    178|       );
+ ❯ loadMigrations packages/db/src/migrate.ts:174:9
+ ❯ packages/db/src/migrate.test.ts:112:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 80 passed (81)
+      Tests  1 failed | 1055 passed (1056)
+   Start at  08:39:35
+   Duration  13.31s (transform 5.77s, setup 0ms, import 16.35s, tests 9.90s, environment 7ms)
+
+unit=1

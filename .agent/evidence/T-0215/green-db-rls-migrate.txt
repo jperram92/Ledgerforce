@@ -1,0 +1,10 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0215
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:43691
+
+ Test Files  2 passed (2)
+      Tests  967 passed (967)
+   Start at  08:18:32
+   Duration  17.03s (transform 159ms, setup 0ms, import 1.17s, tests 14.53s, environment 0ms)
+

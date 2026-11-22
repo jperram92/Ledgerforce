@@ -1,0 +1,59 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0215
+
+ ❯ |api-unit| apps/api/src/config.test.ts (15 tests | 2 failed) 19ms
+     × SS-PLAT-168 keys from a file (comma-separated during a roll) with the inbound domain, lower-cased 7ms
+     × SS-PLAT-168 a key without a domain, a domain without a key, an empty key or a bad domain is refused at start-up 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-unit| apps/api/src/config.test.ts > T-0215 Mailgun inbound webhook signing key and inbound domain from the environment (ADR-0099) > SS-PLAT-168 keys from a file (comma-separated during a roll) with the inbound domain, lower-cased
+AssertionError: expected undefined to deeply equal { …(2) }
+
+- Expected:
+{
+  "inboundDomain": "inbound.ledgerforce.example",
+  "signingKeys": [
+    "key-new",
+    "key-old",
+  ],
+}
+
++ Received:
+undefined
+
+ ❯ apps/api/src/config.test.ts:190:30
+    188|       read,
+    189|     );
+    190|     expect(o.mailgunInbound).toEqual({
+       |                              ^
+    191|       signingKeys: ['key-new', 'key-old'],
+    192|       inboundDomain: 'inbound.ledgerforce.example',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-unit| apps/api/src/config.test.ts > T-0215 Mailgun inbound webhook signing key and inbound domain from the environment (ADR-0099) > SS-PLAT-168 a key without a domain, a domain without a key, an empty key or a bad domain is refused at start-up
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ apps/api/src/config.test.ts:197:85
+    195|
+    196|   it('SS-PLAT-168 a key without a domain, a domain without a key, an e…
+    197|     expect(() => apiOptionsFromEnv({ ...base, LF_MAILGUN_SIGNING_KEY: …
+       |                                                                                     ^
+    198|       /LF_INBOUND_EMAIL_DOMAIN/,
+    199|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 13 passed (15)
+   Start at  03:18:46
+   Duration  764ms (transform 208ms, setup 0ms, import 362ms, tests 19ms, environment 0ms)
+

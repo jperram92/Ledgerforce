@@ -17,9 +17,9 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 146 |
-| todo | 27 |
-| verifying | 9 |
-| **total** | **193** |
+| todo | 28 |
+| verifying | 10 |
+| **total** | **195** |
 
 | Phase | Cards |
 |---|---:|
@@ -272,10 +272,12 @@ graph LR
 | [T-0120](T-0120.md) | Worker: run approved billing batches and deliver document email as jobs | MVP | review | T-0044, T-0042 |
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | verifying | T-0051 |
-| [T-0215](T-0215.md) | Bills inbox transport: signed provider inbound webhooks (SaaS) | MVP | todo | T-0127 |
+| [T-0215](T-0215.md) | Bills inbox transport: signed provider inbound webhooks (SaaS) | MVP | verifying | T-0127 |
 | [T-0216](T-0216.md) | Bills mailbox: settings API/UI and OAuth2 XOAUTH2 (Microsoft 365, Google Workspace) | MVP | todo | T-0127 |
 | [T-0227](T-0227.md) | Ops - least-privilege lf_backup role for the nightly backup (replace the superuser) | MVP | todo | T-0143 |
 | [T-0228](T-0228.md) | Ops - point-in-time recovery (WAL archiving) for the hosted RPO 15 min and optional self-host PITR | Phase 1 | todo | T-0143 |
+| [T-0223](T-0223.md) | Bills inbox transport: SendGrid Inbound Parse (signed security policy, send_raw) | MVP | todo | T-0215 |
+| [T-0224](T-0224.md) | Bills inbox transport: Postmark inbound (Basic credentials) and AWS SES via S3 + SNS | MVP | todo | T-0215 |
 | [T-0128](T-0128.md) | Restore the unit-coverage gate after the Line A integration | MVP | in_progress | — | — | 0 |
 | [T-0129](T-0129.md) | Per-party overdue-reminder pause (audited); daily job split to T-0147 | MVP | review | T-0068 | UC-04 | 0 |
 | [T-0130](T-0130.md) | Stripe payouts: fetch from the API, payout.paid webhook, bank line match | MVP | todo | T-0075, T-0060 | UC-03, UC-08 | 0 |

@@ -8,8 +8,11 @@
  * 3. A generated cross-tenant suite runs for every tenant_id table discovered from
  *    information_schema: tenant A cannot SELECT, UPDATE, DELETE or INSERT-as-B tenant B's rows.
  */
+import { randomUUID } from 'node:crypto';
+import { sql } from 'kysely';
 import pg from 'pg';
 import { afterAll, describe, expect, it } from 'vitest';
+import { withTenant } from './tenant.ts';
 import { createTestDatabase } from './testing/test-db.ts';
 import { defineCrossTenantSuite, findRlsViolations } from './testing/cross-tenant.ts';
 
@@ -83,6 +86,100 @@ describe('RLS completeness check', () => {
       expect(byTable['app.invoker_view']).toBeUndefined();
       // The shipped view passes (positive control within the same schema).
       expect(byTable['app.account_role_binding']).toBeUndefined();
+    } finally {
+      await tdb.close();
+    }
+  });
+});
+
+// T-0215 (ADR-0099): the inbound-address route lookup is a narrow cross-tenant primitive.
+describe('SS-PLAT-170 app.bill_inbox_route(): SECURITY DEFINER lookup of an inbound-address token', () => {
+  it('SS-PLAT-170 returns only (tenant, company) for an active token, nothing otherwise; tables stay tenant-isolated; tokens are single-use across tenants', async () => {
+    const tdb = await createTestDatabase({ migrate: true });
+    try {
+      const db = tdb.app;
+      const A = randomUUID();
+      const B = randomUUID();
+      const seed = (tenant: string, token: string, old: string) =>
+        withTenant(db, tenant, async (trx) => {
+          await trx
+            .insertInto('app.tenant')
+            .values({ id: tenant, name: `T ${tenant}` })
+            .execute();
+          const c = await trx
+            .insertInto('app.company')
+            .values({ name: 'Co', base_currency: 'AUD' })
+            .returning('id')
+            .executeTakeFirstOrThrow();
+          await trx
+            .insertInto('app.bill_inbox_address')
+            .values([
+              { id: randomUUID(), company_id: c.id, token: old, status: 'superseded' },
+              { id: randomUUID(), company_id: c.id, token, status: 'active' },
+            ])
+            .execute();
+          return c.id;
+        });
+      const tokA = 'a'.repeat(26);
+      const tokB = 'b'.repeat(26);
+      const oldA = 'c'.repeat(26);
+      const companyA = await seed(A, tokA, oldA);
+      const companyB = await seed(B, tokB, 'd'.repeat(26));
+
+      // No tenant context at all: the function is the only path, and it answers one pair.
+      const route = async (t: string) =>
+        (await sql<Record<string, unknown>>`SELECT * FROM app.bill_inbox_route(${t})`.execute(db))
+          .rows;
+      expect(await route(tokA)).toEqual([{ tenant_id: A, company_id: companyA }]);
+      expect(await route(tokB.toUpperCase())).toEqual([{ tenant_id: B, company_id: companyB }]);
+      expect(await route(oldA)).toEqual([]);
+      expect(await route('e'.repeat(26))).toEqual([]);
+      expect(await route('')).toEqual([]);
+
+      // Inactive tenant: no route.
+      await tdb.admin.query(`UPDATE app.tenant SET status = 'suspended' WHERE id = $1`, [B]);
+      expect(await route(tokB)).toEqual([]);
+
+      // Direct reads stay inside the tenant.
+      const seen = await withTenant(db, B, (trx) =>
+        trx.selectFrom('app.bill_inbox_address').select('token').execute(),
+      );
+      expect(seen.map((r) => r.token).sort()).toEqual([tokB, 'd'.repeat(26)]);
+
+      // A Mailgun token recorded for tenant A cannot be recorded again by tenant B (global unique).
+      const receipt = (tenant: string, company: string) =>
+        withTenant(db, tenant, (trx) =>
+          trx
+            .insertInto('app.inbound_webhook_receipt')
+            .values({ company_id: company, provider: 'mailgun', provider_token: 'T'.repeat(50) })
+            .execute(),
+        );
+      await receipt(A, companyA);
+      await expect(receipt(B, companyB)).rejects.toThrow(/inbound_webhook_receipt_token_uq/);
+
+      // The function is definer-owned by lf_migrator, pins search_path, and only lf_app may run it.
+      const fn = await tdb.admin.query<{
+        definer: boolean;
+        owner: string;
+        config: string[] | null;
+        public_exec: boolean;
+        app_exec: boolean;
+      }>(
+        `SELECT p.prosecdef AS definer, pg_get_userbyid(p.proowner) AS owner, p.proconfig AS config,
+                has_function_privilege('public', p.oid, 'EXECUTE') AS public_exec,
+                has_function_privilege('lf_app', p.oid, 'EXECUTE') AS app_exec
+           FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+          WHERE n.nspname = 'app' AND p.proname = 'bill_inbox_route'`,
+      );
+      expect(fn.rows).toEqual([
+        {
+          definer: true,
+          owner: 'lf_migrator',
+          config: ['search_path=pg_catalog, pg_temp'],
+          public_exec: false,
+          app_exec: true,
+        },
+      ]);
     } finally {
       await tdb.close();
     }

@@ -141,6 +141,8 @@ documentation).
 
 - T-0215 webhook transport (AC-2 of T-0127); T-0216 XOAUTH2 + mailbox settings API/UI.
 - Re-check provider limits and signature schemes when T-0215 starts (vendor facts move).
+  Done 2026-11-22 in RQ-0181 (Mailgun re-verified from source code and a recorded vector;
+  vendor hosts still unreachable; SendGrid/Postmark/SES to T-0223/T-0224).
 
 **Affects:** packages/modules/ap (inbox), apps/worker (scheduler, worker), packages/db migration
 0077, ADR-0095, design §6.6, §7.2, UC-05.

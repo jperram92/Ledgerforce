@@ -4352,10 +4352,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: New card T-0229 handles `refund.updated` / `charge.refund.updated`. A recorded refund that later fails or is canceled at Stripe is reversed through the engine, and its credit is reopened. The card id is the next free one after T-0216, because the lead did not reserve a card range for this fix round.
 - Why: the review's I1. This needs a webhook, a reversal and probably a data-model change, so it needs research and an ADR.
 - Alternatives: none.
+
+### DL-0860 — ADR-0099 accepted: signed Mailgun inbound webhook for the bills inbox (T-0215)
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: security
+- Decision: Accept ADR-0099 under DL-0691. Mailgun routes `forward()` posts to `POST /webhooks/mailgun/messages.mime`; authenticity = hex HMAC-SHA256(signing key, timestamp‖token) in constant time against every configured key, timestamp within ±300 s; the token is single-use through `app.inbound_webhook_receipt` (global unique, written in the ingest transaction so a failed ingest does not burn a genuine retry); the company comes only from the recipient's random inbound-address token through the SECURITY DEFINER `app.bill_inbox_route()`, looked up after the signature check.
+- Why: RQ-0181 (vendor docs unreachable; algorithm re-verified against a recorded vector from Rails Action Mailbox, payload shape from Rails and django-anymail; Mailgun 406 = no retry from search extracts). The signature does not cover the body, so token single use is the replay guard; the Stripe endpoint (ADR-0049) is the in-repo precedent.
+- Alternatives: Basic credentials in the URL (weaker, static secret); one provider route per company with a path token (does not scale); tenant id in the payload (never trusted).
+- ADR: ADR-0099 · Status: accepted
+
+### DL-0861 — T-0215 scope: Mailgun only; SendGrid to T-0223, Postmark and SES to T-0224
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: scope
+- Decision: T-0215 builds the Mailgun transport end to end (migration, route lookup, endpoint, config). SendGrid Inbound Parse (ECDSA signed security policy, `send_raw`) becomes T-0223; Postmark (Basic credentials only, documented weaker) and SES via S3 + SNS X.509 become T-0224. Showing the inbound address in settings stays with T-0216 (mailbox settings UI).
+- Why: the brief and the card prefer one provider fully done; each provider has its own authenticity scheme and vendor facts that could not be re-read this session (RQ-0181 Q7).
+- Alternatives: several providers half-built (rejected).
+- ADR: ADR-0099 · Status: accepted
+
+### DL-0862 — In-house octet-exact multipart/form-data parser for the inbound webhook (no dependency)
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: architecture
+- Decision: Parse the Mailgun POST with a small RFC 7578 parser over a Buffer (≤ 32 parts, part headers ≤ 8 KiB, body already capped at 26 MiB by a route-scoped reader), keeping `body-mime` byte-exact.
+- Why: Node's `Response.formData()` decodes text fields as UTF-8 and would corrupt 8-bit MIME (Rails keeps the field binary for that reason, RQ-0181 S1); busboy/multer are only transitive and would need an ADR as a direct runtime dependency.
+- Alternatives: undici `formData()` (lossy); busboy (new dependency).
+- ADR: ADR-0099 · Status: accepted
+
+### DL-0863 — Inbound webhook status codes follow Mailgun's retry contract
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: architecture
+- Decision: 200 created/duplicate; 401 missing, wrong or stale signature; 406 replayed token, unknown recipient, misconfigured route (store() or no body-mime) or a message `ingestBillEmail` refuses; 413 over 26 MiB; 415 not multipart; 400 malformed form; 503 not configured; an unexpected server failure answers Nest's generic 500 (no detail), which Mailgun retries. Error bodies are fixed codes only. The provider token is the route's idempotency key (no Idempotency-Key header: Mailgun cannot send one), and the receipt row is its audit trail.
+- Why: Mailgun never retries a 406 and retries anything else for about 8 hours (RQ-0181 F3); refusals that a retry cannot fix should stop retries, outages should not.
+- Alternatives: 400 for everything (retry storms for permanent refusals).
+- ADR: ADR-0099 · Status: accepted
+
+### DL-0864 — T-0215 migration committed as 0080 (round-11 reservation); tests run with it as 0079 locally
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: process
+- Decision: The migration (`bill_inbox_address`, `inbound_webhook_receipt`, `bill_inbox_route()`) is committed as `0080_ap_inbound_webhook.sql`, the number the lead assigned (0078 is T-0204's, merged; 0079 is reserved for T-0209, not yet merged). Because the runner refuses gaps, the db tests ran with the same file temporarily named 0079 in the working tree (never committed); the lead keeps the sequence gapless at merge.
+- Why: lead instruction; tests must run against a gapless sequence (DL-0777 precedent).
+- Alternatives: commit as 0079 (rejected: reserved for T-0209).
 - ADR: none · Status: accepted
 
 - Note: written as T-0217 on the build branch; renumbered to T-0229 at merge because T-0217 was taken by T-0204.
 
+- Note (lead, merge): renumbered to 0079 at merge because T-0215 merged before T-0209; T-0209 takes 0080.
 ### DL-0880 — T-0143's research question is RQ-0183 (the card's "RQ-0142" was never created) (T-0143)
 - Date: 2026-11-22 · By: claude · Task: T-0143 · Category: process
 - Decision: The backup/restore research the card calls RQ-0142 is recorded as RQ-0183 (reserved number for this round); the card's `research` field and text point to RQ-0183.
