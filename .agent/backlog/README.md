@@ -284,7 +284,7 @@ graph LR
 | [T-0167](T-0167.md) | Accounting-review persona with canonical provenance | MVP | blocked | — | — | 1 |
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | verifying | T-0047, T-0035 | UC-04 | 3 |
 | [T-0203](T-0203.md) | Single-supply GST attribution: role binding, contract record and accruals receipt posting (GP-040) | MVP | verifying | T-0168 | UC-04 | 0 |
-| [T-0204](T-0204.md) | Single-supply GST attribution: final invoice, price change, cancellation/refund and BAS-preparation reports (GP-045, GP-044) | MVP | in_progress | T-0203 | UC-04, UC-11 | 1 |
+| [T-0204](T-0204.md) | Single-supply GST attribution: final invoice, price change, cancellation/refund and BAS-preparation reports (GP-045, GP-044) | MVP | verifying | T-0203 | UC-04, UC-11 | 1 |
 | [T-0205](T-0205.md) | Single-supply receipts limited by the contract total as varied (review finding 7) | MVP | todo | T-0203, T-0204, T-0217 | UC-04 | 0 |
 | [T-0206](T-0206.md) | Single-supply documents on an open contract: s 29-70 tax invoice (candidate GP-046) and deposit-invoice refusal (ADR-0089 R9) | MVP | todo | T-0203 | UC-04 | 0 |
 | [T-0207](T-0207.md) | AR: cancel a requested bank refund that no live payment batch pays | MVP | todo | T-0190 | UC-11 | 0 |
