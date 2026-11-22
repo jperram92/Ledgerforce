@@ -1,23 +1,11 @@
 
  RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0215
 
-[db] test PostgreSQL ready (local) on 127.0.0.1:40879
-[db] test PostgreSQL ready (local) on 127.0.0.1:39203
-[31m[Nest] 13605  - [39m11/22/2026, 8:22:07 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
-    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/ar/refunds-stripe.db.test.ts:579:29[90m)[39m
-    at [90m/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
-[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
-    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
-    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
-[31m[Nest] 13605  - [39m11/22/2026, 8:22:07 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
-    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/ar/refunds-stripe.db.test.ts:579:29[90m)[39m
-    at [90m/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
-[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
-    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
-    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
-(node:13806) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+[db] test PostgreSQL ready (local) on 127.0.0.1:37609
+[db] test PostgreSQL ready (local) on 127.0.0.1:33987
+(node:3444) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[31m[Nest] 13806  - [39m11/22/2026, 8:22:22 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+[31m[Nest] 3444  - [39m11/22/2026, 7:27:51 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
     at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
     at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
     at read [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
@@ -33,7 +21,7 @@
   limit: [33m102400[39m,
   type: [32m'entity.too.large'[39m
 }
-[31m[Nest] 13806  - [39m11/22/2026, 8:22:22 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+[31m[Nest] 3444  - [39m11/22/2026, 7:27:51 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
     at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
     at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
     at read [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
@@ -49,7 +37,7 @@
   limit: [33m102400[39m,
   type: [32m'entity.too.large'[39m
 }
-[31m[Nest] 13806  - [39m11/22/2026, 8:22:22 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+[31m[Nest] 3444  - [39m11/22/2026, 7:27:51 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
     at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
     at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
     at read [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
@@ -65,16 +53,39 @@
   limit: [33m102400[39m,
   type: [32m'entity.too.large'[39m
 }
-[31m[Nest] 14232  - [39m11/22/2026, 8:22:27 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: SoD: subject type bill has no create step for a reported creator
-    at historyOf [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/sod/sod.service.ts:67:11[90m)[39m
+[31m[Nest] 3506  - [39m11/22/2026, 7:27:56 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/ar/refunds-stripe.db.test.ts:579:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
 [90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
-    at checkSod [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/sod/sod.service.ts:186:19[90m)[39m
-    at [90m/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/tenancy/tenant.interceptor.ts:140:26
     at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
     at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
-(node:14752) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+[31m[Nest] 3506  - [39m11/22/2026, 7:27:56 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/ar/refunds-stripe.db.test.ts:579:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+[31m[Nest] 3679  - [39m11/22/2026, 7:28:06 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204862[39m,
+  length: [33m204862[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+(node:4044) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-[31m[Nest] 14752  - [39m11/22/2026, 8:22:44 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39merror: permission denied for table job_common
+(node:4300) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+[31m[Nest] 4300  - [39m11/22/2026, 7:28:41 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39merror: permission denied for table job_common
     at [90m/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/pg@8.23.1/node_modules/[4mpg[24m/lib/client.js:694:17
 [90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
     at async PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:118:28[90m)[39m
@@ -113,13 +124,18 @@
   line: [32m'2812'[39m,
   routine: [32m'aclcheck_error'[39m
 }
-(node:15520) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+[31m[Nest] 4518  - [39m11/22/2026, 7:28:51 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: SoD: subject type bill has no create step for a reported creator
+    at historyOf [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/sod/sod.service.ts:67:11[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at checkSod [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/sod/sod.service.ts:186:19[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/t0215/[39mapps/api/src/tenancy/tenant.interceptor.ts:140:26
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+(node:4886) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:15862) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(node:5383) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:16933) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
-(Use `node --trace-deprecation ...` to show where the warning was created)
-[31m[Nest] 18324  - [39m11/22/2026, 8:25:09 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+[31m[Nest] 5461  - [39m11/22/2026, 7:29:44 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
     at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
     at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
     at read [90m(/home/user/Ledgerforce/.claude/worktrees/t0215/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
@@ -135,23 +151,25 @@
   limit: [33m102400[39m,
   type: [32m'entity.too.large'[39m
 }
-(node:21296) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(node:12504) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:25381) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(node:12978) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:26725) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(node:15029) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:29213) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(node:15605) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:29558) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(node:16500) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:30483) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(node:16956) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
-(node:1096) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(node:17058) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 
- Test Files  172 passed (172)
-      Tests  2124 passed (2124)
-   Start at  08:21:45
-   Duration  790.11s (transform 9.55s, setup 0ms, import 158.90s, tests 581.73s, environment 23ms)
+ Test Files  175 passed (175)
+      Tests  2146 passed (2146)
+   Start at  19:27:40
+   Duration  534.14s (transform 8.24s, setup 0ms, import 104.98s, tests 400.23s, environment 13ms)
 
+[vitest-pool]: Timeout terminating forks worker for test files /home/user/Ledgerforce/.claude/worktrees/t0215/packages/modules/ap/src/imap-client.tls.db.test.ts.
+exit=0
