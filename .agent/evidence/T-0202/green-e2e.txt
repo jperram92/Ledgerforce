@@ -1,0 +1,12 @@
+
+Running 7 tests using 2 workers
+
+  ✓  1 [chromium] › tests/e2e/web/opening-balances.spec.ts:653:5 › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 1440 [T-0202] (4.6s)
+  ✓  2 [chromium] › tests/e2e/web/opening-balances.spec.ts:356:3 › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 1440 [T-0177] (7.4s)
+  ✓  3 [chromium] › tests/e2e/web/opening-balances.spec.ts:653:5 › foreign-currency open items [T-0202] › SS-PLAT-164: a USD item shows its currency amount and rate beside its AUD amount, in the preview and once posted; base lines show no rate @ 390 [T-0202] (3.8s)
+  ✓  5 [chromium] › tests/e2e/web/opening-balances.spec.ts:702:3 › foreign-currency open items [T-0202] › SS-PLAT-165: an FX_MISMATCH refusal names the CSV line in plain words, and nothing is posted [T-0202] (2.8s)
+  ✓  4 [chromium] › tests/e2e/web/opening-balances.spec.ts:356:3 › SS-PLAT-132: Opening balances screen previews the engine's journal, posts it once, and step 9 becomes completable @ 390 [T-0177] (5.0s)
+  ✓  6 [chromium] › tests/e2e/web/opening-balances.spec.ts:422:1 › SS-PLAT-132: a refused file is explained with its line, and nothing is posted [T-0177] (2.3s)
+  ✓  7 [chromium] › tests/e2e/web/opening-balances.spec.ts:473:1 › SS-PLAT-132: an Accountant without settings.chart.manage cannot import, and nothing is read [T-0177] (1.4s)
+
+  7 passed (18.6s)

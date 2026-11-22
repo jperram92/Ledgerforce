@@ -1,0 +1,9 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-T0202
+
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  03:09:51
+   Duration  1.60s (transform 267ms, setup 192ms, import 298ms, tests 27ms, environment 842ms)
+

@@ -1,4 +1,4 @@
--- 0078 (reserved 0080; renumbered to the next free number at merge, DL-0864) —
+-- 0080 (round-11 reservation; 0078 is T-0204, 0079 is reserved for T-0209; DL-0864) —
 -- Bills inbox SaaS transport: inbound addresses, webhook receipts (single-use provider tokens)
 -- and the inbound route lookup (T-0215, ADR-0099, RQ-0181). Owner: packages/modules/ap
 -- (inbound-webhook.ts).

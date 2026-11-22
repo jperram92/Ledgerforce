@@ -62,6 +62,14 @@ export function billingRefusal(error: unknown): string | null {
       return 'A document has already been given a number from this series, so its prefix and number of digits can no longer change. Numbers must run on without a break.';
     case 'INVALID_CLEARING_ACCOUNT':
       return 'Choose an asset account of this company that takes postings and is not a control account, such as Stripe clearing.';
+    case 'INVALID_FEE_ACCOUNT':
+      return 'Choose an expense account of this company that takes postings and is not a control account, such as Merchant fees.';
+    case 'INVALID_PAYOUT_ACCOUNT':
+      return "Choose the ledger account of one of the company's bank accounts in Australian dollars; add the bank account on Bank accounts first.";
+    case 'INVALID_STRIPE_PARTY':
+      return 'Choose an active supplier of this company for Stripe; add Stripe as a supplier first.';
+    case 'payload_too_large':
+      return 'The logo file is too large: it must be at most 512 KB.';
     case 'INVALID_NUMBER_SERIES':
     case 'INVALID_INVOICE_SETTINGS':
     case 'invalid_request':
@@ -78,4 +86,39 @@ export function approvalRefusal(error: unknown): string | null {
     return 'The approval amounts could not be saved: check that each amount is a plain amount such as 1000 or 1000.50, the time zone is chosen and a reason is given.';
   if (error.code === 'forbidden') return 'Only the Owner can change the approval amounts.';
   return null;
+}
+
+/** The largest logo file the API keeps (ar MAX_LOGO_BYTES, ADR-0100). */
+const MAX_LOGO_BYTES = 512 * 1024;
+
+/**
+ * Why a chosen logo file cannot be sent, or null. Only a courtesy before uploading: the API
+ * checks the file's content and structure and has the last word (T-0195, RQ-0182).
+ */
+export function logoFileProblem(file: { type: string; size: number }): string | null {
+  if (file.type !== 'image/png' && file.type !== 'image/jpeg')
+    return 'Choose a PNG or JPEG file. SVG and other formats are not accepted: export the logo as PNG.';
+  if (file.size === 0) return 'The chosen file is empty.';
+  if (file.size > MAX_LOGO_BYTES)
+    return 'The logo file is larger than 512 KB. Export it smaller, for example 600 pixels wide.';
+  return null;
+}
+
+/** The base64 part of a PNG or JPEG data URL (as FileReader gives it), else null. */
+export function base64OfDataUrl(url: string): string | null {
+  const m = /^data:image\/(?:png|jpeg);base64,([A-Za-z0-9+/]*={0,2})$/.exec(url);
+  return m?.[1] ?? null;
+}
+
+/**
+ * The accent colour part of an invoice-settings save: the typed colour, null to remove a saved
+ * one when the field is cleared, or nothing (so the request is the same as before T-0195).
+ */
+export function accentToSend(
+  typed: string,
+  saved: string | null,
+): { brand_accent_colour?: string | null } {
+  const t = typed.trim();
+  if (t !== '') return { brand_accent_colour: t };
+  return saved === null ? {} : { brand_accent_colour: null };
 }

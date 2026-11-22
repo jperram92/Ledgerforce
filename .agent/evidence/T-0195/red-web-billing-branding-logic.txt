@@ -1,0 +1,65 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0195
+
+ ❯ |web| apps/web/src/settings/billing-branding-logic.test.ts (4 tests | 4 failed) 9ms
+     × SS-PLAT-171 says before sending when the chosen file is not a PNG or JPEG or is over 512 KB 5ms
+     × SS-PLAT-171 takes the base64 part of a data URL, only for PNG or JPEG 1ms
+     × SS-PLAT-171 sends the accent colour when typed, null to remove a saved one, nothing otherwise 0ms
+     × SS-PLAT-172 says the payout, fee, party and size refusals in plain words 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |web| apps/web/src/settings/billing-branding-logic.test.ts > SS-PLAT-171 T-0195 logo and accent colour helpers > SS-PLAT-171 says before sending when the chosen file is not a PNG or JPEG or is over 512 KB
+TypeError: logoFileProblem is not a function
+ ❯ apps/web/src/settings/billing-branding-logic.test.ts:11:12
+      9| describe('SS-PLAT-171 T-0195 logo and accent colour helpers', () => {
+     10|   it('SS-PLAT-171 says before sending when the chosen file is not a PN…
+     11|     expect(logoFileProblem({ type: 'image/png', size: 2048 })).toBeNul…
+       |            ^
+     12|     expect(logoFileProblem({ type: 'image/jpeg', size: 512 * 1024 })).…
+     13|     expect(logoFileProblem({ type: 'image/svg+xml', size: 100 })).toBe(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |web| apps/web/src/settings/billing-branding-logic.test.ts > SS-PLAT-171 T-0195 logo and accent colour helpers > SS-PLAT-171 takes the base64 part of a data URL, only for PNG or JPEG
+TypeError: base64OfDataUrl is not a function
+ ❯ apps/web/src/settings/billing-branding-logic.test.ts:23:12
+     21|
+     22|   it('SS-PLAT-171 takes the base64 part of a data URL, only for PNG or…
+     23|     expect(base64OfDataUrl('data:image/png;base64,iVBORw0KGgo=')).toBe…
+       |            ^
+     24|     expect(base64OfDataUrl('data:image/jpeg;base64,/9j/4AAQ')).toBe('/…
+     25|     expect(base64OfDataUrl('data:image/svg+xml;base64,PHN2Zz4=')).toBe…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |web| apps/web/src/settings/billing-branding-logic.test.ts > SS-PLAT-171 T-0195 logo and accent colour helpers > SS-PLAT-171 sends the accent colour when typed, null to remove a saved one, nothing otherwise
+TypeError: accentToSend is not a function
+ ❯ apps/web/src/settings/billing-branding-logic.test.ts:30:12
+     28|
+     29|   it('SS-PLAT-171 sends the accent colour when typed, null to remove a…
+     30|     expect(accentToSend(' #f2a900 ', null)).toEqual({ brand_accent_col…
+       |            ^
+     31|     expect(accentToSend('', '#F2A900')).toEqual({ brand_accent_colour:…
+     32|     expect(accentToSend('  ', null)).toEqual({});
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |web| apps/web/src/settings/billing-branding-logic.test.ts > SS-PLAT-172 T-0195 payout refusals > SS-PLAT-172 says the payout, fee, party and size refusals in plain words
+TypeError: .toMatch() expects to receive a string, but got object
+ ❯ apps/web/src/settings/billing-branding-logic.test.ts:40:46
+     38|     const said = (status: number, error: string) =>
+     39|       billingRefusal(new AdminApiError(status, { error, message: 'm' }…
+     40|     expect(said(422, 'INVALID_FEE_ACCOUNT')).toMatch(/expense account/…
+       |                                              ^
+     41|     expect(said(422, 'INVALID_PAYOUT_ACCOUNT')).toMatch(/bank account/…
+     42|     expect(said(422, 'INVALID_STRIPE_PARTY')).toMatch(/active supplier…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed (4)
+   Start at  03:18:41
+   Duration  2.08s (transform 386ms, setup 313ms, import 386ms, tests 9ms, environment 1.11s)
+

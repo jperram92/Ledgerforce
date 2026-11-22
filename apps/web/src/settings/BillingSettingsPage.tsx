@@ -6,10 +6,14 @@
  * see them read-only. The API decides every rule (a series is fixed once it has issued a number,
  * which accounts may be the clearing account); this screen says what it answers. The remittance
  * account, also part of step 8, has its own screen (T-0183).
+ * T-0195 (ADR-0100, RQ-0182, SS-PLAT-171..173): the accent colour, the invoice logo (chosen
+ * PNG/JPEG previewed from a data: URL, uploaded as base64; the API checks and cleans it and serves
+ * the saved one) and the Stripe payout settings (payout bank account, fees account, Stripe
+ * supplier) that payouts need before they can be recorded.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { useId, useMemo, useState } from 'react';
+import { useId, useMemo, useRef, useState } from 'react';
 import {
   Failure,
   Forbidden,
@@ -27,8 +31,17 @@ import {
   INVOICE_SERIES,
   type BillingSettings,
   type PaymentMethod,
+  type StripeInput,
 } from './client.ts';
-import { billingRefusal, digitsInput, firstNumber, termsInput } from './billing-logic.ts';
+import {
+  accentToSend,
+  base64OfDataUrl,
+  billingRefusal,
+  digitsInput,
+  firstNumber,
+  logoFileProblem,
+  termsInput,
+} from './billing-logic.ts';
 
 const TITLE = 'Numbering and billing';
 const GLOSS =
@@ -198,6 +211,8 @@ function InvoiceNow({ b }: { b: BillingSettings }) {
     <dl className="settings-dl">
       <dt>Brand colour</dt>
       <dd>{i.brand_colour ?? 'Not set yet'}</dd>
+      <dt>Accent colour</dt>
+      <dd>{i.brand_accent_colour ?? 'None'}</dd>
       <dt>Payment terms</dt>
       <dd>
         {i.default_payment_terms_days === null
@@ -220,19 +235,77 @@ function clearingName(b: BillingSettings): string {
   return a ? `${a.code} ${a.name}` : 'An account that is no longer usable: choose another';
 }
 
+const PAYOUT_MISSING =
+  'Stripe payouts cannot be recorded until the payout bank account, the fees account and the Stripe supplier are chosen.';
+
+/** The saved payout settings in words (names from the lists the API gave). */
+function payoutNow(b: BillingSettings): { label: string; value: string }[] {
+  const s = b.stripe;
+  const pick = (id: string | null | undefined, list: { id: string; text: string }[]) =>
+    id
+      ? (list.find((x) => x.id === id)?.text ?? 'One that can no longer be used: choose another')
+      : 'Not chosen yet';
+  return [
+    {
+      label: 'Payout bank account',
+      value: pick(
+        s?.payout_account_id,
+        b.payout_accounts.map((a) => ({
+          id: a.id,
+          text: `${a.code} ${a.name} (${a.bank_account_name})`,
+        })),
+      ),
+    },
+    {
+      label: 'Stripe fees account',
+      value: pick(
+        s?.fee_account_id,
+        b.fee_accounts.map((a) => ({ id: a.id, text: `${a.code} ${a.name}` })),
+      ),
+    },
+    {
+      label: 'Stripe supplier',
+      value: pick(
+        s?.stripe_party_id,
+        b.stripe_parties.map((p) => ({ id: p.id, text: p.name })),
+      ),
+    },
+  ];
+}
+
+const payoutReady = (b: BillingSettings) =>
+  !!(b.stripe?.payout_account_id && b.stripe.fee_account_id && b.stripe.stripe_party_id);
+
+function LogoNow({ b, src }: { b: BillingSettings; src: string }) {
+  return b.invoice.has_logo ? (
+    <img className="settings-logo" src={src} alt="The invoice logo now saved" />
+  ) : (
+    <p className="admin-note">No logo yet: invoices show the company name only.</p>
+  );
+}
+
 function InvoiceForm({ b, companyId }: { b: BillingSettings; companyId: string }) {
   const { env } = useServices();
   const client = useMemo(() => createSettingsClient(env), [env]);
   const queryClient = useQueryClient();
   const i = b.invoice;
   const [colour, setColour] = useState(i.brand_colour ?? '');
+  const [accent, setAccent] = useState(i.brand_accent_colour ?? '');
   const [terms, setTerms] = useState(
     i.default_payment_terms_days === null ? '' : String(i.default_payment_terms_days),
   );
   const [methods, setMethods] = useState<PaymentMethod[]>(i.accepted_payment_methods ?? []);
   const [missing, setMissing] = useState(false);
   const [key, setKey] = useState(newKey);
-  const ids = { c: useId(), cHint: useId(), t: useId(), err: useId(), h: useId() };
+  const ids = {
+    c: useId(),
+    cHint: useId(),
+    a: useId(),
+    aHint: useId(),
+    t: useId(),
+    err: useId(),
+    h: useId(),
+  };
   const save = useMutation({
     mutationFn: (days: number) =>
       client.saveInvoice(
@@ -241,6 +314,7 @@ function InvoiceForm({ b, companyId }: { b: BillingSettings; companyId: string }
           brand_colour: colour.trim(),
           default_payment_terms_days: days,
           accepted_payment_methods: methods,
+          ...accentToSend(accent, i.brand_accent_colour),
         },
         key,
       ),
@@ -277,6 +351,18 @@ function InvoiceForm({ b, companyId }: { b: BillingSettings; companyId: string }
         />
         <p className="admin-note" id={ids.cHint}>
           The colour of the invoice heading, as # and six hexadecimal digits, such as #0A5C8A.
+        </p>
+        <label htmlFor={ids.a}>Accent colour (optional)</label>
+        <input
+          id={ids.a}
+          value={accent}
+          maxLength={7}
+          placeholder="#F2A900"
+          aria-describedby={ids.aHint}
+          onChange={(e) => setAccent(e.target.value)}
+        />
+        <p className="admin-note" id={ids.aHint}>
+          A second colour for lines and highlights on the invoice. Leave it empty for none.
         </p>
         <label htmlFor={ids.t}>Payment terms (days)</label>
         <input
@@ -327,6 +413,246 @@ function InvoiceForm({ b, companyId }: { b: BillingSettings; companyId: string }
   );
 }
 
+function LogoForm({ b, companyId, src }: { b: BillingSettings; companyId: string; src: string }) {
+  const { env } = useServices();
+  const client = useMemo(() => createSettingsClient(env), [env]);
+  const queryClient = useQueryClient();
+  const [chosen, setChosen] = useState<{
+    type: 'image/png' | 'image/jpeg';
+    url: string;
+    name: string;
+  } | null>(null);
+  const [problem, setProblem] = useState<string | null>(null);
+  const [key, setKey] = useState(newKey);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const ids = { h: useId(), f: useId(), hint: useId(), err: useId() };
+  const save = useMutation({
+    mutationFn: (logo: Parameters<typeof client.saveLogo>[1]) =>
+      client.saveLogo(companyId, logo, key),
+    onSuccess: () => {
+      setChosen(null);
+      if (fileRef.current) fileRef.current.value = '';
+    },
+    onSettled: async () => {
+      setKey(newKey());
+      await queryClient.invalidateQueries({ queryKey: ['setup', 'billing', companyId] });
+    },
+  });
+  const choose = (file: File | undefined) => {
+    save.reset();
+    setChosen(null);
+    if (!file) {
+      setProblem(null);
+      return;
+    }
+    const why = logoFileProblem(file);
+    setProblem(why);
+    if (why) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const url = typeof reader.result === 'string' ? reader.result : '';
+      if (!base64OfDataUrl(url)) {
+        setProblem(logoFileProblem({ type: 'other', size: 1 }));
+        return;
+      }
+      setChosen({ type: file.type as 'image/png' | 'image/jpeg', url, name: file.name });
+    };
+    reader.onerror = () => setProblem('The file could not be read. Choose it again.');
+    reader.readAsDataURL(file);
+  };
+  return (
+    <section className="admin-block" aria-labelledby={ids.h}>
+      <h2 id={ids.h}>Invoice logo</h2>
+      <LogoNow b={b} src={src} />
+      <form
+        className="admin-form"
+        noValidate
+        onSubmit={(e) => {
+          e.preventDefault();
+          const data = chosen ? base64OfDataUrl(chosen.url) : null;
+          if (!chosen || !data) {
+            setProblem(problem ?? 'Choose the logo file first.');
+            return;
+          }
+          save.mutate({ content_type: chosen.type, content_base64: data });
+        }}
+      >
+        <label htmlFor={ids.f}>Logo file</label>
+        <input
+          id={ids.f}
+          ref={fileRef}
+          type="file"
+          accept="image/png,image/jpeg"
+          aria-describedby={problem ? `${ids.hint} ${ids.err}` : ids.hint}
+          aria-invalid={problem !== null}
+          onChange={(e) => choose(e.target.files?.[0])}
+        />
+        <p className="admin-note" id={ids.hint}>
+          A PNG or JPEG of up to 512 KB, at most 4,000 pixels on a side. It is printed at the top of
+          every invoice. Hidden details in the file, such as camera or location data, are removed
+          when it is saved.
+        </p>
+        {problem ? (
+          <p className="refusal" id={ids.err} role="alert">
+            {problem}
+          </p>
+        ) : null}
+        {chosen ? (
+          <>
+            <p className="admin-note">The logo you chose ({chosen.name}), not saved yet:</p>
+            <img
+              className="settings-logo"
+              src={chosen.url}
+              alt="The logo you chose, not saved yet"
+            />
+          </>
+        ) : null}
+        <div className="settings-actions">
+          <button type="submit" className="secondary" disabled={save.isPending}>
+            Save logo
+          </button>
+          {b.invoice.has_logo ? (
+            <button
+              type="button"
+              className="secondary"
+              disabled={save.isPending}
+              onClick={() => save.mutate(null)}
+            >
+              Remove logo
+            </button>
+          ) : null}
+        </div>
+        {save.isSuccess ? (
+          <p className="done" role="status">
+            {save.data.changed
+              ? save.data.invoice.has_logo
+                ? 'Logo saved. It is printed on invoices from now on.'
+                : 'Logo removed. Invoices show the company name only.'
+              : 'Nothing changed: this is already the saved logo.'}
+          </p>
+        ) : null}
+        {save.isError ? <Said error={save.error} /> : null}
+      </form>
+    </section>
+  );
+}
+
+function PayoutForm({ b, companyId }: { b: BillingSettings; companyId: string }) {
+  const { env } = useServices();
+  const client = useMemo(() => createSettingsClient(env), [env]);
+  const queryClient = useQueryClient();
+  const s = b.stripe;
+  const [payout, setPayout] = useState(s?.payout_account_id ?? '');
+  const [fee, setFee] = useState(s?.fee_account_id ?? '');
+  const [party, setParty] = useState(s?.stripe_party_id ?? '');
+  const [none, setNone] = useState(false);
+  const [key, setKey] = useState(newKey);
+  const ids = { h: useId(), p: useId(), f: useId(), s: useId() };
+  const save = useMutation({
+    mutationFn: (input: StripeInput) => client.saveStripe(companyId, input, key),
+    onSettled: async () => {
+      setKey(newKey());
+      await queryClient.invalidateQueries({ queryKey: ['setup', 'billing', companyId] });
+    },
+  });
+  if (!s)
+    return (
+      <p className="admin-note">
+        Stripe payouts: choose and save the Stripe clearing account first; then the payout settings
+        can be chosen here.
+      </p>
+    );
+  return (
+    <form
+      className="admin-form"
+      noValidate
+      aria-labelledby={ids.h}
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!payout && !fee && !party) {
+          setNone(true);
+          return;
+        }
+        setNone(false);
+        save.mutate({
+          clearing_account_id: s.clearing_account_id,
+          ...(payout ? { payout_account_id: payout } : {}),
+          ...(fee ? { fee_account_id: fee } : {}),
+          ...(party ? { stripe_party_id: party } : {}),
+        });
+      }}
+    >
+      <h3 id={ids.h}>Stripe payouts</h3>
+      <p className="admin-note">
+        When Stripe pays out, the money arrives in your bank account, Stripe&apos;s fee is recorded
+        as an expense from Stripe as a supplier, and the total leaves Stripe clearing.{' '}
+        {payoutReady(b) ? 'Payouts can be recorded.' : PAYOUT_MISSING}
+      </p>
+      {b.payout_accounts.length === 0 ? (
+        <p className="admin-note">
+          Payout bank account: no bank account yet. Add one on{' '}
+          <Link to="/settings/bank-accounts">Bank accounts</Link>.
+        </p>
+      ) : (
+        <>
+          <label htmlFor={ids.p}>Payout bank account</label>
+          <select id={ids.p} value={payout} onChange={(e) => setPayout(e.target.value)}>
+            <option value="">Choose a bank account</option>
+            {b.payout_accounts.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.code} {a.name} ({a.bank_account_name})
+              </option>
+            ))}
+          </select>
+        </>
+      )}
+      <label htmlFor={ids.f}>Stripe fees account</label>
+      <select id={ids.f} value={fee} onChange={(e) => setFee(e.target.value)}>
+        <option value="">Choose an expense account</option>
+        {b.fee_accounts.map((a) => (
+          <option key={a.id} value={a.id}>
+            {a.code} {a.name}
+          </option>
+        ))}
+      </select>
+      {b.stripe_parties.length === 0 ? (
+        <p className="admin-note">
+          Stripe supplier: no supplier yet. Add Stripe as a supplier, then choose it here.
+        </p>
+      ) : (
+        <>
+          <label htmlFor={ids.s}>Stripe supplier</label>
+          <select id={ids.s} value={party} onChange={(e) => setParty(e.target.value)}>
+            <option value="">Choose a supplier</option>
+            {b.stripe_parties.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </>
+      )}
+      <p className="admin-note">A choice once saved can be changed but not left empty.</p>
+      {none ? (
+        <p className="refusal" role="alert">
+          Choose at least one of the payout bank account, the fees account or the Stripe supplier.
+        </p>
+      ) : null}
+      <button type="submit" className="secondary" disabled={save.isPending}>
+        Save Stripe payout settings
+      </button>
+      {save.isSuccess ? (
+        <p className="done" role="status">
+          {save.data.changed
+            ? 'Stripe payout settings saved.'
+            : 'Nothing changed: these are already the Stripe payout settings.'}
+        </p>
+      ) : null}
+      {save.isError ? <Said error={save.error} /> : null}
+    </form>
+  );
+}
+
 function StripeForm({ b, companyId }: { b: BillingSettings; companyId: string }) {
   const { env } = useServices();
   const client = useMemo(() => createSettingsClient(env), [env]);
@@ -335,7 +661,7 @@ function StripeForm({ b, companyId }: { b: BillingSettings; companyId: string })
   const [key, setKey] = useState(newKey);
   const ids = { a: useId(), h: useId() };
   const save = useMutation({
-    mutationFn: () => client.saveStripe(companyId, account, key),
+    mutationFn: () => client.saveStripe(companyId, { clearing_account_id: account }, key),
     onSettled: async () => {
       setKey(newKey());
       await queryClient.invalidateQueries({ queryKey: ['setup', 'billing', companyId] });
@@ -386,6 +712,9 @@ function StripeForm({ b, companyId }: { b: BillingSettings; companyId: string })
             {save.isError ? <Said error={save.error} /> : null}
           </form>
         )
+      ) : null}
+      {b.invoice.accepted_payment_methods?.includes('stripe') ? (
+        <PayoutForm b={b} companyId={companyId} />
       ) : (
         <p className="admin-note">
           Only needed when customers can pay by card through Stripe: choose that under Invoices
@@ -396,7 +725,7 @@ function StripeForm({ b, companyId }: { b: BillingSettings; companyId: string })
   );
 }
 
-function Manage({ b, companyId }: { b: BillingSettings; companyId: string }) {
+function Manage({ b, companyId, src }: { b: BillingSettings; companyId: string; src: string }) {
   const { env } = useServices();
   const client = useMemo(() => createSettingsClient(env), [env]);
   const queryClient = useQueryClient();
@@ -444,12 +773,13 @@ function Manage({ b, companyId }: { b: BillingSettings; companyId: string }) {
         </div>
       </section>
       <InvoiceForm b={b} companyId={companyId} />
+      <LogoForm b={b} companyId={companyId} src={src} />
       <StripeForm b={b} companyId={companyId} />
     </>
   );
 }
 
-function ReadOnly({ b }: { b: BillingSettings }) {
+function ReadOnly({ b, src }: { b: BillingSettings; src: string }) {
   return (
     <>
       <section className="admin-block" aria-labelledby="billing-ro-n">
@@ -467,7 +797,18 @@ function ReadOnly({ b }: { b: BillingSettings }) {
       <section className="admin-block" aria-labelledby="billing-ro-i">
         <h2 id="billing-ro-i">Invoices</h2>
         <InvoiceNow b={b} />
+        <h3>Invoice logo</h3>
+        <LogoNow b={b} src={src} />
+        <h3>Stripe</h3>
         <p className="admin-note">Stripe clearing account: {clearingName(b)}.</p>
+        <dl className="settings-dl" aria-label="Stripe payouts">
+          {payoutNow(b).map((r) => (
+            <div key={r.label} className="settings-dl-row">
+              <dt>{r.label}</dt>
+              <dd>{r.value}</dd>
+            </div>
+          ))}
+        </dl>
         <p className="admin-note">
           Only the Owner or a Finance Admin can change numbering and billing.
         </p>
@@ -517,8 +858,14 @@ export function BillingSettingsPage() {
         onRetry={() => void (billing.isError ? billing.refetch() : company.refetch())}
       />
     );
-  else if (canManage) body = <Manage key={companyId} b={billing.data} companyId={companyId} />;
-  else body = <ReadOnly b={billing.data} />;
+  else {
+    const src = client.logoUrl(companyId, billing.dataUpdatedAt);
+    body = canManage ? (
+      <Manage key={companyId} b={billing.data} companyId={companyId} src={src} />
+    ) : (
+      <ReadOnly b={billing.data} src={src} />
+    );
+  }
 
   return (
     <>

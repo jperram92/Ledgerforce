@@ -122,7 +122,7 @@ re-verified by computation against an independent recorded test vector (S1, spik
   `ingestBillEmail(body-mime octets)`, then link the receipt to the inbox item → 200
   `{outcome: created | duplicate}`; an `InboxError` answers 406 (never retried, message
   refused) and keeps nothing.
-- Migration (reserved 0080): `app.bill_inbox_address` (per-company random token, one active per
+- Migration 0080: `app.bill_inbox_address` (per-company random token, one active per
   company, supersede to rotate), `app.inbound_webhook_receipt` (replay table, tenant-owned, global
   unique `(provider, provider_token)`), function `app.bill_inbox_route(text)`.
 - Configuration: `LF_MAILGUN_SIGNING_KEY[_FILE]` (comma-separated during a roll) and
@@ -143,4 +143,4 @@ whether a Mailgun retry reuses the original timestamp (no source; mitigation rec
   S3 + SNS.
 
 **Affects:** packages/modules/ap (inbox webhook), apps/api (route, body reader, config),
-packages/db migration (reserved 0080), ADR-0099, design §6, UC-05.
+packages/db migration 0080, ADR-0099, design §6, UC-05.

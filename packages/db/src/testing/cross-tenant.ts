@@ -267,6 +267,12 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
   'app.single_supply_attribution': { attributed_tax: () => '1' },
   'app.single_supply_receipt': { gross: () => '1', net: () => '1', tax: () => '0' },
   'app.single_supply_contract_status': { status: () => 'finalised' },
+  // T-0204: single-supply finalisation (final_net > 0; no change → change columns zero, NULLs empty).
+  'app.single_supply_finalisation': {
+    final_net: () => '1',
+    price_change_net: () => '0',
+    price_change_tax: () => '0',
+  },
   'app.sales_invoice_deposit': { net: () => '1', tax: () => '0' },
   // T-0046: customer receipts (method CHECK, amount > 0).
   'app.customer_receipt': { method: () => 'eft', amount: () => '1' },

@@ -283,7 +283,16 @@ describe('SS-PLAT-131: numbering and billing over HTTP (wizard step 8)', () => {
     const body = { company_id: co, clearing_account_id: acct('1210') };
     const r = await call('PUT', '/setup/billing/stripe', 'fa', { body });
     expect(r.status).toBe(200);
-    expect(await json(r)).toEqual({ stripe: { clearing_account_id: acct('1210') }, changed: true });
+    // T-0195 (ADR-0100, DL-0873): the Stripe view also has the payout fields, still unset here.
+    expect(await json(r)).toEqual({
+      stripe: {
+        clearing_account_id: acct('1210'),
+        fee_account_id: null,
+        payout_account_id: null,
+        stripe_party_id: null,
+      },
+      changed: true,
+    });
     const again = await call('PUT', '/setup/billing/stripe', 'fa', { body });
     expect(await json(again)).toMatchObject({ changed: false });
     expect(await audits('stripe_settings')).toBe(before + 1);
