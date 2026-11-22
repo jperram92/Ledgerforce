@@ -4,6 +4,8 @@
  * 1,375.00 as real, extractable text. Real PostgreSQL as lf_app, real Chromium, real PDF parser.
  */
 import { randomBytes, randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   approveInvoice,
   approveRemittanceAccountChange,
@@ -253,6 +255,45 @@ describe('T-0165: branded invoice PDF', () => {
     const text = await pdfText(pdf);
     expect(text).toContain('Pay by bank transfer');
     expect(text).not.toContain('Pay online');
+  }, 60_000);
+});
+
+// ---------------- T-0195 security review r11 F5: logos saved before the cleaner ----------------
+
+describe('SS-PLAT-171: a logo saved before T-0195 is cleaned, or left out, before it reaches an invoice', () => {
+  const storeRaw = (contentType: string, bytes: Buffer) =>
+    f.admin.query(
+      'UPDATE app.ar_settings SET logo = $1, logo_content_type = $2 WHERE tenant_id = $3 AND company_id = $4',
+      [bytes, contentType, f.tenantId, f.companyId],
+    );
+
+  it('SS-PLAT-171 F5 a legacy JPEG with Exif reaches the document without its metadata [T-0195]', async () => {
+    const exif = readFileSync(
+      join(import.meta.dirname, '..', '..', 'ar', 'src', 'testing', 'logos', 'logo-exif.jpg'),
+    );
+    expect(exif.includes('Jane Secret')).toBe(true);
+    await storeRaw('image/jpeg', exif);
+    const doc = await f.inTenant((trx) => loadInvoiceDocument(trx, f.companyId, invoiceId));
+    const bytes = Buffer.from(doc.branding?.logo?.content ?? new Uint8Array());
+    expect(doc.branding?.logo?.contentType).toBe('image/jpeg');
+    expect([bytes[0], bytes[1]]).toEqual([0xff, 0xd8]);
+    expect(bytes.includes('Jane')).toBe(false);
+    expect(bytes.includes('Exif')).toBe(false);
+  });
+
+  it('SS-PLAT-171 F5 a legacy logo that fails the checks is left out and the invoice still renders [T-0195]', async () => {
+    await storeRaw(
+      'image/png',
+      Buffer.concat([
+        Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+        Buffer.from('<html>legacy</html>'),
+      ]),
+    );
+    const doc = await f.inTenant((trx) => loadInvoiceDocument(trx, f.companyId, invoiceId));
+    expect(doc.branding?.logo ?? null).toBeNull();
+    expect(doc.branding?.colour).toBe('#0B6E4F');
+    const pdf = await renderer.render(renderInvoiceHtml(doc));
+    expect(await pdfImages(pdf)).toEqual({ pages: 1, images: 0 });
   }, 60_000);
 });
 

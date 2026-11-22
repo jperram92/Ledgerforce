@@ -66,8 +66,15 @@ export interface LedgerFixture {
   close(): Promise<void>;
 }
 
-export async function createLedgerFixture(tenantId: string): Promise<LedgerFixture> {
-  const tdb = await createTestDatabase({ migrate: true });
+/**
+ * `opts.tdb` seeds the tenant into an existing fixture database instead of a fresh one (several
+ * tenants in one database, e.g. the restore drill, T-0143); `close()` then leaves it open.
+ */
+export async function createLedgerFixture(
+  tenantId: string,
+  opts: { tdb?: TestDatabase } = {},
+): Promise<LedgerFixture> {
+  const tdb = opts.tdb ?? (await createTestDatabase({ migrate: true }));
   const db = createDb(tdb.url('lf_app'), 4);
   const inTenant = <R>(fn: (trx: Transaction<Database>) => Promise<R>) =>
     withTenant(db, tenantId, fn);
@@ -212,7 +219,7 @@ export async function createLedgerFixture(tenantId: string): Promise<LedgerFixtu
       ).then((r) => r.n),
     async close() {
       await db.destroy();
-      await tdb.close();
+      if (!opts.tdb) await tdb.close();
     },
   };
 }

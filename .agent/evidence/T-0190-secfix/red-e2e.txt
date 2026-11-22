@@ -1,0 +1,39 @@
+
+Running 1 test using 1 worker
+
+  ✘  1 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:454:3 › T-0190 cancel › SS-UC11-11: a Stripe refund past its 23-hour window says so (not "Stripe refused") and offers Cancel; a cancel the API refuses as SEND_NOT_FINISHED shows why [T-0190] (18.9s)
+
+
+  1) [chromium] › tests/e2e/web/stripe-refunds.spec.ts:454:3 › T-0190 cancel › SS-UC11-11: a Stripe refund past its 23-hour window says so (not "Stripe refused") and offers Cancel; a cancel the API refuses as SEND_NOT_FINISHED shows why [T-0190] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Refund' }).getByRole('status')
+    Expected substring: "Approved more than 23 hours ago and not sent"
+    Received string:    "Approved, but Stripe refused the refund: it was not sent within 23 hours of its approval, so it is no longer sent automatically; check it with Stripe, then resend or cancel it. A Finance Admin sees it in Sync issues; whoever requests refunds can cancel it, so the credit can be refunded another way."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Refund' }).getByRole('status') with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('status')
+        3 × locator resolved to <p role="status" class="admin-state">Loading the customer's credit…</p>
+          - unexpected value "Loading the customer's credit…"
+        9 × locator resolved to <p role="status" class="admin-state">Approved, but Stripe refused the refund: it was n…</p>
+          - unexpected value "Approved, but Stripe refused the refund: it was not sent within 23 hours of its approval, so it is no longer sent automatically; check it with Stripe, then resend or cancel it. A Finance Admin sees it in Sync issues; whoever requests refunds can cancel it, so the credit can be refunded another way."
+
+
+      477 |     await page.reload();
+      478 |     const status = refund.getByRole('status');
+    > 479 |     await expect(status).toContainText('Approved more than 23 hours ago and not sent');
+          |                          ^
+      480 |     await expect(status).not.toContainText('Stripe refused');
+      481 |     await refund.getByRole('button', { name: 'Cancel refund' }).click();
+      482 |     await refund
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2/tests/e2e/web/stripe-refunds.spec.ts:479:26
+
+    Error Context: test-results/web-stripe-refunds-T-0190--f9f99--FINISHED-shows-why-T-0190--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refunds-T-0190--f9f99--FINISHED-shows-why-T-0190--chromium/error-context.md
+
+  1 failed
+    [chromium] › tests/e2e/web/stripe-refunds.spec.ts:454:3 › T-0190 cancel › SS-UC11-11: a Stripe refund past its 23-hour window says so (not "Stripe refused") and offers Cancel; a cancel the API refuses as SEND_NOT_FINISHED shows why [T-0190] 

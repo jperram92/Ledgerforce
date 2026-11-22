@@ -23,11 +23,12 @@ import {
   type CustomerRefundView,
 } from '@ledgerforce/ar';
 import { seedBillableCustomers, seedBillingCompany } from '@ledgerforce/ar/testing';
+import { DEFAULT_PERIOD_SETTINGS, setPeriodSettings, setPeriodStatus } from '@ledgerforce/ledger';
 import { createLedgerFixture, type LedgerFixture } from '@ledgerforce/ledger/testing';
 import type { SeededProfiles } from '@ledgerforce/products';
 import { sql } from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { StripeClient } from './client.ts';
+import { fetchHttpPost, StripeClient, type HttpPost } from './client.ts';
 import {
   assertStripeRefundable,
   cancelStripeCustomerRefund,
@@ -36,6 +37,7 @@ import {
   requestStripeRefundResend,
   sendStripeCustomerRefund,
   STRIPE_REFUND_APPROVED,
+  STRIPE_REFUND_SEND_HANDLER,
   stripeRefundSendHandler,
   trySendStripeCustomerRefund,
 } from './refund.ts';
@@ -58,6 +60,7 @@ let profiles: SeededProfiles;
 const clerk = randomUUID();
 const approver = randomUUID();
 const secondApprover = randomUUID();
+const financeAdmin = randomUUID();
 
 const creates = () => stub.received.filter((x) => x.method === 'POST');
 
@@ -135,23 +138,97 @@ const codeOf = (p: Promise<unknown>) =>
     (e: unknown) => (e as { code?: string }).code ?? String(e),
   );
 
+/**
+ * The worker gave up on the document's send: an outbox event, its failed attempt and the open
+ * Sync issue the dead letter leaves (packages/outbox recordSyncIssue), written as lf_app.
+ */
+async function sendFailedFor(refundId: string, code: string, message: string) {
+  await f.inTenant(async (trx) => {
+    const event = (
+      await sql<{ id: string }>`
+        INSERT INTO app.outbox_event (company_id, topic, aggregate_type, aggregate_id, payload)
+        VALUES (${f.companyId}::uuid, ${STRIPE_REFUND_APPROVED}, 'customer_refund', ${refundId}::uuid,
+                ${JSON.stringify({ refundId })}::jsonb)
+        RETURNING id::text`.execute(trx)
+    ).rows[0]?.id;
+    if (!event) throw new Error('no event');
+    const failure = (
+      await sql<{ id: string }>`
+        INSERT INTO app.outbox_delivery_failure
+          (event_id, handler, attempt, error_name, error_code, retryable, error_message)
+        VALUES (${event}::uuid, ${STRIPE_REFUND_SEND_HANDLER}, 1, 'StripeRefundError', ${code},
+                false, ${message})
+        RETURNING id::text`.execute(trx)
+    ).rows[0]?.id;
+    await sql`
+      INSERT INTO app.sync_issue
+        (company_id, event_id, handler, connector, attempts, last_failure_id, error_name,
+         error_code, retryable, error_message, dead_letter_job_id)
+      VALUES (${f.companyId}::uuid, ${event}::uuid, ${STRIPE_REFUND_SEND_HANDLER}, 'stripe', 1,
+              ${failure ?? null}::uuid, 'StripeRefundError', ${code}, false, ${message},
+              ${randomUUID()}::uuid)`.execute(trx);
+  });
+}
+
+/**
+ * Move every recorded send activity of the document an hour back (superuser, triggers off: the
+ * records are append-only), as if the cooling-off had passed.
+ */
+async function anHourAgo(refundId: string) {
+  const id = refundId.toLowerCase();
+  if (!/^[0-9a-f-]{36}$/.test(id)) throw new Error('not a uuid');
+  await f.admin.query(`
+    BEGIN;
+    SET LOCAL session_replication_role = replica;
+    UPDATE app.customer_refund_approval SET approved_at = approved_at - interval '1 hour'
+     WHERE refund_id = '${id}';
+    UPDATE app.customer_refund_stripe_resend SET confirmed_at = confirmed_at - interval '1 hour'
+     WHERE refund_id = '${id}' AND confirmed_at IS NOT NULL;
+    UPDATE app.outbox_delivery_failure d SET failed_at = d.failed_at - interval '1 hour'
+      FROM app.outbox_event e WHERE e.id = d.event_id AND e.aggregate_id = '${id}';
+    UPDATE app.sync_issue i
+       SET last_failed_at = i.last_failed_at - interval '1 hour',
+           first_failed_at = i.first_failed_at - interval '1 hour',
+           status_changed_at = i.status_changed_at - interval '1 hour',
+           created_at = i.created_at - interval '1 hour'
+      FROM app.outbox_event e WHERE e.id = i.event_id AND e.aggregate_id = '${id}';
+    UPDATE app.outbox_event SET created_at = created_at - interval '1 hour'
+     WHERE aggregate_id = '${id}';
+    COMMIT;`);
+}
+
 beforeAll(async () => {
   stub = await startRecordedStripe(loadCassette(REFUND_FOLLOWUPS_FIXTURE));
   client = new StripeClient({ secretKey: 'sk_test_dummy', mode: 'test', baseUrl: stub.url });
   f = await createLedgerFixture('01900000-0000-7000-8000-000000019001');
   profiles = await seedBillingCompany(f);
-  for (const id of [clerk, approver, secondApprover]) {
+  for (const id of [clerk, approver, secondApprover, financeAdmin]) {
     await f.admin.query(
       `INSERT INTO app.app_user (id, tenant_id, email, display_name, status) VALUES ($1, $2, $3, $3, 'active')`,
       [id, f.tenantId, `${id}@t0190.test`],
     );
   }
+  // Locks periods and sets the lock-date policy in the r10 L4 scenario (period.lock).
+  await f.admin.query('INSERT INTO app.user_role (tenant_id, user_id, role) VALUES ($1, $2, $3)', [
+    f.tenantId,
+    financeAdmin,
+    'finance_admin',
+  ]);
 }, 180_000);
 
 afterAll(async () => {
   await (stub as RecordedStripe | undefined)?.close();
   await (f as LedgerFixture | undefined)?.close();
 });
+
+/** A refund approved `hours` ago (the database's clock), as after the 23-hour window passed. */
+async function approvedHoursAgo(r: CustomerRefundView, hours: number) {
+  await f.admin.query(
+    `INSERT INTO app.customer_refund_approval (tenant_id, company_id, refund_id, approved_by, approved_at)
+     VALUES ($1, $2, $3, $4, clock_timestamp() - make_interval(hours => $5))`,
+    [f.tenantId, f.companyId, r.refundId, approver, hours],
+  );
+}
 
 describe('SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; its amount stops counting as requested', () => {
   it('SS-UC11-11 refused (charge_disputed), then cancelled after a lookup at Stripe: credit freed, the outbox handler does nothing', async () => {
@@ -170,6 +247,20 @@ describe('SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; it
     expect(out.status === 'failed' ? out.message : '').toMatch(/charged back/);
     const held = await f.inTenant((trx) => customerCredit(trx, f.companyId, credit.partyId));
     expect(held).toMatchObject({ requested: '220.0000', available: '0.0000' });
+
+    // Security review r10 M1/L1: only a finished send is cancelled. While the outbox may still
+    // retry (no Sync issue), and for 15 minutes after the last send activity, the answer is
+    // SEND_NOT_FINISHED and Stripe is not even asked.
+    const asked = stub.received.length;
+    expect(await codeOf(cancel(r.refundId))).toBe('SEND_NOT_FINISHED');
+    await sendFailedFor(r.refundId, 'charge_disputed', 'Charge has been charged back');
+    const early = await cancel(r.refundId).catch(
+      (e: unknown) => e as { code?: string; message?: string },
+    );
+    expect(early).toMatchObject({ code: 'SEND_NOT_FINISHED' });
+    expect((early as { message?: string }).message).toMatch(/15 minutes/);
+    expect(stub.received.length).toBe(asked);
+    await anHourAgo(r.refundId);
 
     const posts = creates().length;
     const lookups = stub.received.length;
@@ -237,6 +328,10 @@ describe('SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; it
       })
       .catch((e: unknown) => (e as Error).message);
     expect(lost).toBe('connection lost before COMMIT');
+    // Unapproved: nothing to withdraw here (security review r10 L1, T-0207).
+    expect(await codeOf(cancel(r.refundId))).toBe('NOT_CANCELLABLE');
+    // Re-approved more than 23 hours ago (KEY_EXPIRED, a finished send): Stripe holds it.
+    await approvedHoursAgo(r, 30);
     const posts = creates().length;
     const refused = await cancel(r.refundId).catch(
       (e: unknown) => e as { code?: string; message?: string },
@@ -288,6 +383,7 @@ describe('SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; it
     const refused = await seedCredit('Final');
     const c = await requestRefund(refused);
     setVars('refused', refused, c);
+    await approvedHoursAgo(c, 30);
     await cancel(c.refundId);
     const moved = await f.admin
       .query(
@@ -311,15 +407,6 @@ describe('SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; it
     ).toBe('REFUND_NOT_FOUND');
   });
 });
-
-/** A refund approved `hours` ago (the database's clock), as after the 23-hour window passed. */
-async function approvedHoursAgo(r: CustomerRefundView, hours: number) {
-  await f.admin.query(
-    `INSERT INTO app.customer_refund_approval (tenant_id, company_id, refund_id, approved_by, approved_at)
-     VALUES ($1, $2, $3, $4, clock_timestamp() - make_interval(hours => $5))`,
-    [f.tenantId, f.companyId, r.refundId, approver, hours],
-  );
-}
 
 const journalOf = (refundId: string) =>
   f.inTenant(
@@ -406,7 +493,8 @@ describe('SS-UC11-12 T-0189 AC-1 / review r8 R2: a refund Stripe already holds i
       resendable: false,
     });
     expect(await journalOf(r.refundId)).toEqual([]);
-    expect(await codeOf(cancel(r.refundId))).toBe('AT_STRIPE');
+    // Unapproved, so never cancelled (security review r10 L1); approving it records the refund.
+    expect(await codeOf(cancel(r.refundId))).toBe('NOT_CANCELLABLE');
     await approve(r);
     const sent = await f.inTenant((trx) =>
       sendStripeCustomerRefund(trx, client, {
@@ -697,5 +785,219 @@ describe('SS-UC11-13 T-0189 AC-2 / review r8 R3: with no live refund at Stripe, 
         (e: unknown) => String(e),
       );
     expect(reason).toMatch(/permission denied|cannot be changed/);
+  });
+});
+
+describe('Security review r10: a cancel never races a create; a refund under a cancelled document blocks the next create', () => {
+  it('SS-UC11-11 M1 a hung send (client timeout) is not cancelled until it is finished and cooled off; when its create lands after the cancel, the next document for the same credit is refused before any create, and stripe-check reports it', async () => {
+    const credit = await seedCredit('Hung');
+    const a = await requestRefund(credit);
+    await approve(a);
+    setVars('hung', credit, a, 're_1SQbT0190HungLate');
+    // The POST reaches the transport but no answer comes back: the client gives up after its
+    // deadline (M1(a)); Stripe processes the request later.
+    const held: { url: string; init: Parameters<HttpPost>[1] }[] = [];
+    const hungClient = new StripeClient({
+      secretKey: 'sk_test_dummy',
+      mode: 'test',
+      baseUrl: stub.url,
+      timeoutMs: 100,
+      http: (url, init) => {
+        if (init.method === 'POST') {
+          held.push({ url, init });
+          return new Promise(() => {});
+        }
+        return fetchHttpPost(url, init);
+      },
+    });
+    const out = await f.inTenant((trx) =>
+      trySendStripeCustomerRefund(trx, hungClient, {
+        companyId: f.companyId,
+        refundId: a.refundId,
+        now: NOW,
+      }),
+    );
+    expect(out).toMatchObject({ status: 'pending' });
+    expect(out.status === 'pending' ? out.message : '').toMatch(/did not answer within 100 ms/);
+    expect(held).toHaveLength(1);
+
+    // Pending (the outbox retries), even an hour later: not finished, so not cancelled.
+    await anHourAgo(a.refundId);
+    expect(await codeOf(cancel(a.refundId))).toBe('SEND_NOT_FINISHED');
+    // The outbox gives up (a Sync issue) and the cooling-off passes: the cancel goes ahead, and
+    // Stripe, asked now, holds nothing yet.
+    await sendFailedFor(a.refundId, 'timeout', 'the Stripe API did not answer within 100 ms');
+    await anHourAgo(a.refundId);
+    expect(await cancel(a.refundId)).toMatchObject({ status: 'cancelled' });
+
+    // The hung create lands at Stripe after the cancel: money is out under a cancelled document.
+    const late = held[0];
+    if (!late) throw new Error('no held request');
+    const { signal: _ignored, ...init } = late.init;
+    const landed = await fetchHttpPost(late.url, init);
+    expect(landed.status).toBe(200);
+    const posts = creates().length;
+
+    // The freed credit is requested again; approving it must not send a second refund.
+    const b = await requestRefund(credit);
+    await approve(b);
+    const second = await f.inTenant((trx) =>
+      trySendStripeCustomerRefund(trx, client, {
+        companyId: f.companyId,
+        refundId: b.refundId,
+        now: NOW,
+      }),
+    );
+    expect(stub.mismatches).toEqual([]);
+    expect(second).toMatchObject({
+      status: 'failed',
+      code: 'CANCELLED_REFUND_AT_STRIPE',
+      stripeRefundId: 're_1SQbT0190HungLate',
+    });
+    expect(second.status === 'failed' ? second.message : '').toMatch(
+      new RegExp(`cancelled refund ${a.refundNo}`),
+    );
+    expect(creates().length).toBe(posts);
+    expect(await journalOf(b.refundId)).toEqual([]);
+
+    // stripe-check reports it, on the cancelled document and on any document of the party (M1(d)).
+    const onA = await f.inTenant((trx) =>
+      checkStripeCustomerRefund(trx, client, {
+        companyId: f.companyId,
+        refundId: a.refundId,
+        now: NOW,
+      }),
+    );
+    expect(onA).toMatchObject({
+      outcome: 'held_cancelled',
+      stripeRefundId: 're_1SQbT0190HungLate',
+      resendable: false,
+    });
+    const onB = await f.inTenant((trx) =>
+      checkStripeCustomerRefund(trx, client, {
+        companyId: f.companyId,
+        refundId: b.refundId,
+        now: NOW,
+      }),
+    );
+    expect(onB).toMatchObject({
+      outcome: 'not_at_stripe',
+      cancelledHeldAtStripe: [{ refundId: a.refundId, stripeRefundId: 're_1SQbT0190HungLate' }],
+    });
+    expect(creates().length).toBe(posts);
+  });
+
+  it('SS-UC11-12 L2 a live Stripe refund for the document but of another amount is SENT_NOT_POSTED (money is out), never REFUND_FAILED; nothing is created', async () => {
+    const credit = await seedCredit('Mismatch');
+    const r = await requestRefund(credit);
+    await approve(r);
+    setVars('mismatch', credit, r, 're_1SQbT0190Mismatch210');
+    const posts = creates().length;
+    const out = await f.inTenant((trx) =>
+      trySendStripeCustomerRefund(trx, client, {
+        companyId: f.companyId,
+        refundId: r.refundId,
+        now: NOW,
+      }),
+    );
+    expect(stub.mismatches).toEqual([]);
+    expect(out).toMatchObject({
+      status: 'failed',
+      code: 'SENT_NOT_POSTED',
+      stripeRefundId: 're_1SQbT0190Mismatch210',
+    });
+    expect(out.status === 'failed' ? out.message : '').toMatch(/21000 AUD/);
+    expect(creates().length).toBe(posts);
+    expect(await journalOf(r.refundId)).toEqual([]);
+  });
+
+  it('SS-UC11-12 L4 a refund found at Stripe dated in an AR-locked period: "reject" leaves it SENT_NOT_POSTED; "first open date" records it once on the first open date, entry, allocation, Stripe record and paid date alike', async () => {
+    const credit = await seedCredit('Locked');
+    const r = await requestRefund(credit);
+    await approvedHoursAgo(r, 30);
+    setVars('expired', credit, r, 're_1SQbT0190LockedLive');
+    // Stripe made it on 2026-11-25 (Sydney); November is AR-locked.
+    const november = await f.inTenant(
+      async (trx) =>
+        (
+          await sql<{ id: string }>`SELECT id::text FROM app.fiscal_period
+            WHERE company_id = ${f.companyId}::uuid AND start_date <= '2026-11-25'
+              AND end_date >= '2026-11-25'`.execute(trx)
+        ).rows[0]?.id ?? '',
+    );
+    const policy = (lockDatePolicy: 'reject' | 'post_to_first_open_date_with_note') =>
+      f.inTenant((trx) =>
+        setPeriodSettings(trx, {
+          settings: { ...DEFAULT_PERIOD_SETTINGS, lockDatePolicy },
+          setBy: financeAdmin,
+          reason: `policy ${lockDatePolicy} for the r10 L4 scenario`,
+        }),
+      );
+    await f.inTenant((trx) =>
+      setPeriodStatus(trx, { periodId: november, status: 'ar_locked', actorId: financeAdmin }),
+    );
+    try {
+      await policy('reject');
+      const rejected = await f.inTenant((trx) =>
+        trySendStripeCustomerRefund(trx, client, {
+          companyId: f.companyId,
+          refundId: r.refundId,
+          now: NOW,
+        }),
+      );
+      expect(rejected).toMatchObject({
+        status: 'failed',
+        code: 'SENT_NOT_POSTED',
+        stripeRefundId: 're_1SQbT0190LockedLive',
+      });
+      expect(await journalOf(r.refundId)).toEqual([]);
+
+      await policy('post_to_first_open_date_with_note');
+      const sent = await f.inTenant((trx) =>
+        sendStripeCustomerRefund(trx, client, {
+          companyId: f.companyId,
+          refundId: r.refundId,
+          now: NOW,
+        }),
+      );
+      expect(sent).toMatchObject({ stripeRefundId: 're_1SQbT0190LockedLive', replayed: false });
+      expect(sent.refund).toMatchObject({ status: 'paid', paidOn: '2026-12-01' });
+      expect(await journalOf(r.refundId)).toEqual([
+        { entry_date: '2026-12-01', created_by: approver },
+      ]);
+      expect(await stripeRows(r.refundId)).toEqual([
+        expect.objectContaining({
+          stripe_refund_id: 're_1SQbT0190LockedLive',
+          refund_date: '2026-12-01',
+        }),
+      ]);
+      const allocated = await f.inTenant(async (trx) =>
+        (
+          await sql<{ d: string }>`SELECT to_char(a.allocation_date, 'YYYY-MM-DD') AS d
+              FROM app.allocation a JOIN app.subledger_entry s
+                ON s.tenant_id = a.tenant_id AND (s.id = a.from_entry_id OR s.id = a.to_entry_id)
+             WHERE s.entry_id = ${sent.entryId}::uuid`.execute(trx)
+        ).rows.map((x) => x.d),
+      );
+      expect(allocated).toEqual(['2026-12-01']);
+      const memo = await f.inTenant(
+        async (trx) =>
+          (
+            await sql<{ memo: string }>`SELECT memo FROM app.journal_entry
+              WHERE id = ${sent.entryId}::uuid`.execute(trx)
+          ).rows[0]?.memo,
+      );
+      expect(memo).toMatch(/Dated 2026-11-25 in period .*posted on the first open date 2026-12-01/);
+    } finally {
+      await policy('reject');
+      await f.inTenant((trx) =>
+        setPeriodStatus(trx, {
+          periodId: november,
+          status: 'open',
+          actorId: financeAdmin,
+          reason: 'end of the r10 L4 scenario',
+        }),
+      );
+    }
   });
 });

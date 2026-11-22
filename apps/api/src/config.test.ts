@@ -163,6 +163,58 @@ describe('T-0074 Stripe webhook signing secret from the environment (ADR-0049)',
   });
 });
 
+describe('T-0215 Mailgun inbound webhook signing key and inbound domain from the environment (ADR-0099)', () => {
+  const secretFiles: Record<string, string> = {
+    ...files,
+    '/run/secrets/mailgun_signing_key': 'key-new,key-old\n',
+  };
+  const read = (p: string): string => {
+    const v = secretFiles[p];
+    if (v === undefined) throw new Error(`ENOENT ${p}`);
+    return v;
+  };
+
+  it('SS-PLAT-168 nothing configured: the inbound route stays off (503), never unverified', () => {
+    expect(apiOptionsFromEnv(base, read).mailgunInbound).toBeUndefined();
+  });
+
+  it('SS-PLAT-168 keys from a file (comma-separated during a roll) with the inbound domain, lower-cased', () => {
+    const o = apiOptionsFromEnv(
+      {
+        ...base,
+        LF_MAILGUN_SIGNING_KEY_FILE: '/run/secrets/mailgun_signing_key',
+        LF_INBOUND_EMAIL_DOMAIN: 'Inbound.LedgerForce.example',
+      },
+      read,
+    );
+    expect(o.mailgunInbound).toEqual({
+      signingKeys: ['key-new', 'key-old'],
+      inboundDomain: 'inbound.ledgerforce.example',
+    });
+  });
+
+  it('SS-PLAT-168 a key without a domain, a domain without a key, an empty key or a bad domain is refused at start-up', () => {
+    expect(() => apiOptionsFromEnv({ ...base, LF_MAILGUN_SIGNING_KEY: 'k' }, read)).toThrow(
+      /LF_INBOUND_EMAIL_DOMAIN/,
+    );
+    expect(() =>
+      apiOptionsFromEnv({ ...base, LF_INBOUND_EMAIL_DOMAIN: 'inbound.example' }, read),
+    ).toThrow(/LF_MAILGUN_SIGNING_KEY/);
+    expect(() =>
+      apiOptionsFromEnv(
+        { ...base, LF_MAILGUN_SIGNING_KEY: 'k,', LF_INBOUND_EMAIL_DOMAIN: 'inbound.example' },
+        read,
+      ),
+    ).toThrow(/LF_MAILGUN_SIGNING_KEY/);
+    expect(() =>
+      apiOptionsFromEnv(
+        { ...base, LF_MAILGUN_SIGNING_KEY: 'k', LF_INBOUND_EMAIL_DOMAIN: 'not a domain' },
+        read,
+      ),
+    ).toThrow(/LF_INBOUND_EMAIL_DOMAIN/);
+  });
+});
+
 describe('T-0142 AC-5 security headers and rate limits from the environment (ADR-0054)', () => {
   it('AC-5 production always enables the default limits; no trusted proxy unless configured [T-0142]', () => {
     const o = apiOptionsFromEnv(base, readFile);

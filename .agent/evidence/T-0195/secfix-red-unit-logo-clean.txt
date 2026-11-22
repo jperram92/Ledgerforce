@@ -1,0 +1,75 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0195-secfix
+
+ ❯ |unit| packages/modules/ar/src/logo-clean.test.ts (8 tests | 4 failed) 43ms
+     × SS-PLAT-171 F1 refuses a JPEG with data after its end even when the file ends with FF D9 (polyglot) [T-0195] 9ms
+     × SS-PLAT-171 F2 drops APP1, APPn and COM segments placed after the first scan, keeping the image [T-0195] 3ms
+     × SS-PLAT-171 F3 refuses a JPEG with more than 100 scans [T-0195] 0ms
+     × SS-PLAT-171 F4 accepts only the PNG header values the standard allows [T-0195] 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/ar/src/logo-clean.test.ts > SS-PLAT-171: security review r11 fixes (F1-F4) > SS-PLAT-171 F1 refuses a JPEG with data after its end even when the file ends with FF D9 (polyglot) [T-0195]
+Error: not refused
+ ❯ refusal packages/modules/ar/src/logo-clean.test.ts:68:9
+     66|     return (e as InvoiceSettingsError).message;
+     67|   }
+     68|   throw new Error('not refused');
+       |         ^
+     69| };
+     70|
+ ❯ packages/modules/ar/src/logo-clean.test.ts:192:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |unit| packages/modules/ar/src/logo-clean.test.ts > SS-PLAT-171: security review r11 fixes (F1-F4) > SS-PLAT-171 F2 drops APP1, APPn and COM segments placed after the first scan, keeping the image [T-0195]
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ packages/modules/ar/src/logo-clean.test.ts:213:40
+    211|     );
+    212|     const out = cleanInvoiceLogo('image/jpeg', sneaky);
+    213|     expect(has(out.content, 'SECRET')).toBe(false);
+       |                                        ^
+    214|     // Exactly the original's scans remain (its own metadata before SO…
+    215|     expect(Buffer.from(out.content)).toEqual(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |unit| packages/modules/ar/src/logo-clean.test.ts > SS-PLAT-171: security review r11 fixes (F1-F4) > SS-PLAT-171 F3 refuses a JPEG with more than 100 scans [T-0195]
+Error: not refused
+ ❯ refusal packages/modules/ar/src/logo-clean.test.ts:68:9
+     66|     return (e as InvoiceSettingsError).message;
+     67|   }
+     68|   throw new Error('not refused');
+       |         ^
+     69| };
+     70|
+ ❯ packages/modules/ar/src/logo-clean.test.ts:225:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  |unit| packages/modules/ar/src/logo-clean.test.ts > SS-PLAT-171: security review r11 fixes (F1-F4) > SS-PLAT-171 F4 accepts only the PNG header values the standard allows [T-0195]
+Error: not refused
+ ❯ refusal packages/modules/ar/src/logo-clean.test.ts:68:9
+     66|     return (e as InvoiceSettingsError).message;
+     67|   }
+     68|   throw new Error('not refused');
+       |         ^
+     69| };
+     70|
+ ❯ packages/modules/ar/src/logo-clean.test.ts:254:14
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 4 passed (8)
+   Start at  19:27:41
+   Duration  806ms (transform 425ms, setup 0ms, import 596ms, tests 43ms, environment 0ms)
+

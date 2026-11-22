@@ -7,7 +7,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./testing": "./src/testing/payables-fixture.ts",
-    "./testing/imap": "./src/testing/fake-imap-server.ts"
+    "./testing/imap": "./src/testing/fake-imap-server.ts",
+    "./testing/mailgun": "./src/testing/mailgun-forward.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

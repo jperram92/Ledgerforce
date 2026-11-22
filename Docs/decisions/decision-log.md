@@ -4199,7 +4199,7 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: Add `POST /ar/refunds/:id/cancel?company_id=` (permission `ar.refund.create`). It holds the party's advisory lock, then lists the party's PaymentIntents' refunds at Stripe (read-only). It moves a requested Stripe refund document, approved or not, to `cancelled` only when Stripe holds no live refund (`pending`, `requires_action`, `succeeded`) carrying its `lf_refund_id`. Otherwise it answers 409 `AT_STRIPE` with the Stripe refund id. A paid or bank refund gets 422 `NOT_CANCELLABLE` (bank refunds: new card T-0207). With no Stripe client the answer is 503, and when Stripe cannot be asked the request fails closed. A repeat replays. The cancel is audited, has no SoD step and needs no step-up. The card's "create or approve" is narrowed to `ar.refund.create`.
 - Why: RQ-0173 findings 1–3. A commit lost after a send can leave the document requested and unapproved while Stripe has the money (review r8 R2), so "nothing recorded" is not enough. The party lock excludes a concurrent send. Cancelling is the maker withdrawing a request and moves no money; spending the freed credit needs a new approved document. `RequirePermission` takes one permission, and an any-of check would change the authorisation framework (a security change outside this card). Owner and Finance Admin hold both permissions; the Approver role only checks. Comparable systems cancel unpaid documents and keep them as history (Odoo `payment.transaction` `cancel`, ERPNext Payment Request `Cancelled`).
 - Alternatives: cancel whenever nothing is recorded locally (rejected: misses R2); allow `ar.refund.approve` too through a new any-of decorator (rejected: authz framework change); a new permission `ar.refund.cancel` (rejected: a migration of role grants for no control gain); a SoD rule "creator cannot cancel" (rejected: withdrawing one's own request is the expected maker action).
-- ADR: none (within ADR-0074/ADR-0083, whose consequences name this cancel) · Status: accepted
+- ADR: none (within ADR-0074/ADR-0083, whose consequences name this cancel) · Status: accepted · Superseded in part by DL-0778
 
 ### DL-0771 — The Stripe send handler treats a cancelled refund as done (T-0190)
 - Date: 2026-11-17 · By: claude · Task: T-0190 · Category: architecture
@@ -4332,7 +4332,141 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: AC-11 stays open and moves to T-0218, which cannot close without it. On 2026-11-22 the build environment's proxy refused legislation.gov.au, aasb.gov.au and austlii.edu.au (CONNECT 403) and ato.gov.au answered 403 (`.agent/evidence/T-0204/ac11-primary-source-probe.txt`). No golden was changed or added; slice 1 relies only on Approved GP-045 and the review's extracts.
 - Why: the card forbids claiming AC-11 without the primary text; the owner's instruction is to record and continue.
 - Alternatives: rely on secondary summaries (rejected: AC-11 asks for primary text).
+
+### DL-0778 — Cancel a Stripe refund only after its send finished and went quiet; never create while Stripe holds a refund of a cancelled document (security review r10 M1, L1)
+- Date: 2026-11-22 · By: claude · Task: T-0190 · Category: security
+- Decision: Supersedes DL-0770 in part (who may be cancelled, and when). `POST /ar/refunds/:id/cancel` now accepts only an approved, requested Stripe document whose send has finished: its 23-hour window passed (KEY_EXPIRED), or the worker gave up (an open or ignored Sync issue for `stripe.refund.send`, and none `retried`). It must also be quiet: no approval, confirmed resend, outbox event, failed attempt or Sync issue change in the last 15 minutes (`STRIPE_REFUND_CANCEL_COOLING_OFF_MS`). Otherwise the answer is 422 `SEND_NOT_FINISHED`, giving the time after which a cancel is possible; an unapproved document is 422 `NOT_CANCELLABLE` (withdrawing an unapproved request is T-0207). Every Stripe request has a 30 s deadline (`STRIPE_REQUEST_TIMEOUT_MS`; the transport is aborted). A send sets `idle_in_transaction_session_timeout` to 5 min for its transaction (`STRIPE_SEND_IDLE_TIMEOUT_MS`, which must stay above the request deadline). Before any create, the lookup also lists live refunds carrying a *cancelled* Stripe document of the same customer; if there is one, the send refuses `CANCELLED_REFUND_AT_STRIPE` (permanent, a Sync issue) and creates nothing. `stripe-check` answers `held_cancelled` for a cancelled document Stripe holds a refund for, and lists `cancelled_held_at_stripe` for any document of the customer.
+- Why: security review r10 M1. The party lock only serialises sends while the sending transaction lives. A crash or a database kill during a POST can release it while Stripe still creates the refund, and a cancel then sees nothing; the freed credit could be refunded a second time. Why 15 minutes: it is three times the outbox job expiry and the send's idle timeout (5 min each) and 30 times the request deadline, so any send that could still reach Stripe has ended on our side and been answered. The window costs a user at most a short wait on a refund that has already failed. The create-time guard catches what the window cannot: a create that lands later still never leads to a second refund. The hung-send contract test proves it end to end.
+- Alternatives: rely on the party lock alone (rejected, see above); a longer window, e.g. 24 h (rejected: the create-time guard already covers late creates, and the window only needs to outlast our own attempt); cancel via Stripe's refund cancel API (rejected: Stripe cancels only `requires_action` refunds, RQ-0173 S3).
+- ADR: ADR-0091 (addendum) · Status: accepted
+
+### DL-0779 — Security review r10 L2, L3, L4 fixed; T-0190 tests follow DL-0778
+- Date: 2026-11-22 · By: claude · Task: T-0190 · Category: security
+- Decision: (L2) A live refund Stripe holds for the document with another amount or currency is `SENT_NOT_POSTED` with its Stripe id (money is out), never `REFUND_FAILED`. (L3) The confirm-resend handler re-checks `tx.stepUpVerified(300)` like approve, proven by an API-token test and a forced-condition test; the forced test failed (200) without the re-check. (L4) The send dates the allocation, `stripe_refund.refund_date` and `paid_on` by the engine's resolved entry date from `preview()`. Under the lock-date policy "post to first open date with note", an adopted refund dated in a locked period is therefore recorded on the first open date with the engine's note. Before, it stuck in `SENT_NOT_POSTED` (DATE_BEFORE_DOCUMENT), as the new test showed. Under "reject" it stays `SENT_NOT_POSTED` until the period reopens. The stored refund view shows `failed`/`KEY_EXPIRED` once the window has passed, and the refund region says "not sent within 23 hours" rather than "Stripe refused", so the region and the server rule agree. The T-0190 tests that cancelled unapproved documents now expect `NOT_CANCELLABLE`. Their `AT_STRIPE` and finality checks run on documents approved more than 23 hours ago.
+- Why: the review's L2–L4 and the superseding decision DL-0778. No assertion was weakened: each changed expectation pins the new, stricter rule.
+- Alternatives: for L4, date everything by Stripe's date and let the engine refuse (rejected: it leaves money out unrecorded under a policy the tenant chose to allow).
+- ADR: ADR-0091 (addendum) · Status: accepted
+
+### DL-0890 — Follow-up card T-0229 for a Stripe refund that fails after it was recorded paid (security review r10 I1)
+- Date: 2026-11-22 · By: claude · Task: T-0190 · Category: scope
+- Decision: New card T-0229 handles `refund.updated` / `charge.refund.updated`. A recorded refund that later fails or is canceled at Stripe is reversed through the engine, and its credit is reopened. The card id is the next free one after T-0216, because the lead did not reserve a card range for this fix round.
+- Why: the review's I1. This needs a webhook, a reversal and probably a data-model change, so it needs research and an ADR.
+- Alternatives: none.
+
+### DL-0860 — ADR-0099 accepted: signed Mailgun inbound webhook for the bills inbox (T-0215)
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: security
+- Decision: Accept ADR-0099 under DL-0691. Mailgun routes `forward()` posts to `POST /webhooks/mailgun/messages.mime`; authenticity = hex HMAC-SHA256(signing key, timestamp‖token) in constant time against every configured key, timestamp within ±300 s; the token is single-use through `app.inbound_webhook_receipt` (global unique, written in the ingest transaction so a failed ingest does not burn a genuine retry); the company comes only from the recipient's random inbound-address token through the SECURITY DEFINER `app.bill_inbox_route()`, looked up after the signature check.
+- Why: RQ-0181 (vendor docs unreachable; algorithm re-verified against a recorded vector from Rails Action Mailbox, payload shape from Rails and django-anymail; Mailgun 406 = no retry from search extracts). The signature does not cover the body, so token single use is the replay guard; the Stripe endpoint (ADR-0049) is the in-repo precedent.
+- Alternatives: Basic credentials in the URL (weaker, static secret); one provider route per company with a path token (does not scale); tenant id in the payload (never trusted).
+- ADR: ADR-0099 · Status: accepted
+
+### DL-0861 — T-0215 scope: Mailgun only; SendGrid to T-0223, Postmark and SES to T-0224
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: scope
+- Decision: T-0215 builds the Mailgun transport end to end (migration, route lookup, endpoint, config). SendGrid Inbound Parse (ECDSA signed security policy, `send_raw`) becomes T-0223; Postmark (Basic credentials only, documented weaker) and SES via S3 + SNS X.509 become T-0224. Showing the inbound address in settings stays with T-0216 (mailbox settings UI).
+- Why: the brief and the card prefer one provider fully done; each provider has its own authenticity scheme and vendor facts that could not be re-read this session (RQ-0181 Q7).
+- Alternatives: several providers half-built (rejected).
+- ADR: ADR-0099 · Status: accepted
+
+### DL-0862 — In-house octet-exact multipart/form-data parser for the inbound webhook (no dependency)
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: architecture
+- Decision: Parse the Mailgun POST with a small RFC 7578 parser over a Buffer (≤ 32 parts, part headers ≤ 8 KiB, body already capped at 26 MiB by a route-scoped reader), keeping `body-mime` byte-exact.
+- Why: Node's `Response.formData()` decodes text fields as UTF-8 and would corrupt 8-bit MIME (Rails keeps the field binary for that reason, RQ-0181 S1); busboy/multer are only transitive and would need an ADR as a direct runtime dependency.
+- Alternatives: undici `formData()` (lossy); busboy (new dependency).
+- ADR: ADR-0099 · Status: accepted
+
+### DL-0863 — Inbound webhook status codes follow Mailgun's retry contract
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: architecture
+- Decision: 200 created/duplicate; 401 missing, wrong or stale signature; 406 replayed token, unknown recipient, misconfigured route (store() or no body-mime) or a message `ingestBillEmail` refuses; 413 over 26 MiB; 415 not multipart; 400 malformed form; 503 not configured; an unexpected server failure answers Nest's generic 500 (no detail), which Mailgun retries. Error bodies are fixed codes only. The provider token is the route's idempotency key (no Idempotency-Key header: Mailgun cannot send one), and the receipt row is its audit trail.
+- Why: Mailgun never retries a 406 and retries anything else for about 8 hours (RQ-0181 F3); refusals that a retry cannot fix should stop retries, outages should not.
+- Alternatives: 400 for everything (retry storms for permanent refusals).
+- ADR: ADR-0099 · Status: accepted
+
+### DL-0864 — T-0215 migration committed as 0080 (round-11 reservation); tests run with it as 0079 locally
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: process
+- Decision: The migration (`bill_inbox_address`, `inbound_webhook_receipt`, `bill_inbox_route()`) is committed as `0080_ap_inbound_webhook.sql`, the number the lead assigned (0078 is T-0204's, merged; 0079 is reserved for T-0209, not yet merged). Because the runner refuses gaps, the db tests ran with the same file temporarily named 0079 in the working tree (never committed); the lead keeps the sequence gapless at merge.
+- Why: lead instruction; tests must run against a gapless sequence (DL-0777 precedent).
+- Alternatives: commit as 0079 (rejected: reserved for T-0209).
 - ADR: none · Status: accepted
+
+- Note: written as T-0217 on the build branch; renumbered to T-0229 at merge because T-0217 was taken by T-0204.
+
+- Note (lead, merge): renumbered to 0079 at merge because T-0215 merged before T-0209; T-0209 takes 0080.
+### DL-0880 — T-0143's research question is RQ-0183 (the card's "RQ-0142" was never created) (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: process
+- Decision: The backup/restore research the card calls RQ-0142 is recorded as RQ-0183 (reserved number for this round); the card's `research` field and text point to RQ-0183.
+- Why: RQ-0142 does not exist (RQ-0141 and RQ-0143 do); reusing a gap number risks a collision with another line.
+- Alternatives: create RQ-0142 (rejected: not in this line's reserved range).
+- ADR: none · Status: accepted
+
+### DL-0881 — Backups are envelope-encrypted through the existing Kms with an age-style AES-256-GCM STREAM (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: security
+- Decision: Format `lf-backup/v1`: per-backup data key wrapped by the configured `Kms` (AAD `lf-backup-v1|<backupId>`), HKDF-derived header-MAC / manifest / payload keys, HMAC'd header, sealed manifest, 64 KiB AES-256-GCM chunks with counter‖final-flag nonces. ADR-0101 accepted under DL-0691.
+- Why: RQ-0183 Findings 4-5 — no new dependency or binary, one key-custody model (local keyring or OpenBao transit), authenticated before a byte reaches pg_restore; truncation, reordering, wrong key and header edits all fail.
+- Alternatives: age (second key system, new binary), openssl enc (unauthenticated), openssl cms/gpg (PKI/keyring and binary).
+- ADR: ADR-0101 · Status: accepted
+
+### DL-0882 — Backup/restore primitives in packages/db/src/ops, the drill and its test in packages/ledger/src/ops (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: architecture
+- Decision: `createBackup`, `restoreBackup`, the file format and tool discovery live in `@ledgerforce/db/ops`; `runRestoreDrill` (which calls `verifyChain`) and its CLI live in `packages/ledger`. The AC test path moves from `packages/db/src/ops/restore-drill.db.test.ts` to `packages/ledger/src/ops/restore-drill.db.test.ts`.
+- Why: `verifyChain` is in `@ledgerforce/ledger`, which depends on `@ledgerforce/db`; the card's path would need a package cycle.
+- Alternatives: db devDepends on ledger (rejected: workspace cycle); copy the verifier (rejected: the drill must use the product's verifier).
+- ADR: ADR-0101 · Status: accepted
+
+### DL-0883 — Backups run as the cluster superuser under an exported snapshot; lf_backup role split to T-0227 (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: security
+- Decision: `createBackup` opens REPEATABLE READ, exports the snapshot, computes the manifest and runs `pg_dump -Fc --snapshot` in the same instant, as the cluster superuser. A least-privilege `lf_backup` role (BYPASSRLS + pg_read_all_data) is card T-0227.
+- Why: pg_dump errors on FORCEd RLS tables for NOBYPASSRLS roles (RQ-0183 Finding 3); a new role changes the cluster bootstrap existing installs already ran.
+- Alternatives: `--enable-row-security` (rejected: silently partial dump); add lf_backup now (deferred: bootstrap change for existing installs).
+- ADR: ADR-0101 · Status: accepted
+
+### DL-0884 — The restore drill restores into a brand-new cluster in its test and drops the target on any failure (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: process
+- Decision: The AC test starts a second throw-away cluster (startTestDatabase local mode, initdb/pg_ctl) as the restore target; the restore applies the idempotent bootstrap, creates a new database (refusing an existing one), streams into `pg_restore --single-transaction --exit-on-error`, and drops the database on any failure. The CI db job installs PostgreSQL 17 binaries (PGDG) so pg_dump matches the postgres:17 service and initdb exists.
+- Why: proves restore into a fresh cluster, not only a fresh database (RQ-0183 Findings 6, 8); pg_dump refuses newer servers.
+- Alternatives: restore into a new database on the harness server only (rejected: does not prove a fresh cluster works).
+- ADR: ADR-0101 · Status: accepted
+
+### DL-0885 — PITR (WAL archiving) for the hosted RPO is out of T-0143; card T-0228 (T-0143)
+- Date: 2026-11-22 · By: claude · Task: T-0143 · Category: scope
+- Decision: T-0143 delivers nightly encrypted logical backups and the drill; physical backups with WAL archiving (pgBackRest/WAL-G or managed PITR) for RPO 15 min become T-0228.
+- Why: RQ-0183 Finding 1 — RPO 15 min is a hosted-platform property needing a separate daemon and repository.
+- Alternatives: add WAL archiving to compose now (rejected: oversized and not what §7.2 promises the single VM).
+- ADR: ADR-0101 · Status: accepted
+
+### DL-0875 — JPEG logos: walk every scan and refuse anything after the first EOI (security review r11 F1)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: `cleanInvoiceLogo` walks the entropy-coded data after each SOS (`FF 00`, RSTn are data, `FF` fill skipped), stops at the first real `FF D9` and refuses any trailing byte, even when the file ends with another `FF D9`.
+- Why: the review showed `valid.jpg + <html>… + FFD9` was accepted and stored, contradicting RQ-0182 finding 2; ITU-T T.81 Annex B defines byte stuffing, so the first unstuffed `FF D9` is the image's end.
+- Alternatives: `indexOf(FF D9)` on the scan data only (would not also give F2/F3).
+- ADR: ADR-0100 (addendum) · Status: accepted
+
+### DL-0876 — JPEG metadata dropped between scans too (r11 F2)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: APP1, APP3–APP13, APP15 and COM are dropped wherever they occur before EOI, not only before the first SOS.
+- Why: progressive files can carry Exif/XMP/COM between scans, which would then reach customers (privacy).
+- Alternatives: keep the documented limit (rejected: the walk from DL-0875 makes it free).
+- ADR: ADR-0100 (addendum) · Status: accepted
+
+### DL-0877 — At most 100 JPEG scans per logo (r11 F3)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: a JPEG logo with more than 100 SOS segments is refused in plain words.
+- Why: a progressive "scan bomb" fits in 512 KiB and can cost the PDF renderer seconds per decode; libjpeg-turbo has no default cap (its `djpeg -maxscans` exists for that reason); normal progressive files use about 10.
+- Alternatives: no cap (renderer timeouts); a lower cap such as 20 (risk of refusing unusual but valid encoders).
+- ADR: ADR-0100 (addendum) · Status: accepted
+
+### DL-0878 — PNG IHDR values checked against the standard (r11 F4)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: only the colour-type/bit-depth pairs of PNG 3rd ed. §11.2.1 Table 11, compression 0, filter 0 and interlace 0/1 are accepted.
+- Why: invalid headers were accepted and stored (decoders reject them later, so the invoice image breaks); the check is a few lines.
+- Alternatives: a decoded-size cap as well (not needed: dimensions are already ≤ 4,000 px a side).
+- ADR: ADR-0100 (addendum) · Status: accepted
+
+### DL-0879 — Logos stored before T-0195 are re-cleaned on use; GET answers 422 LOGO_INVALID (r11 F5)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: `GET /setup/billing/logo` maps a cleaner refusal of a stored logo to 422 `LOGO_INVALID` with a request to upload again; `loadInvoiceDocument` cleans the stored logo and leaves out one that fails, so the invoice renders without it.
+- Why: T-0165 stored logos with magic-byte checks only; the GET answered 500 and the PDF embedded uncleaned bytes.
+- Alternatives: a one-off migration re-cleaning stored logos (rejected: a data rewrite of tenant rows for a rare case; cleaning on use covers every path).
+- ADR: ADR-0100 (addendum) · Status: accepted
 
 ### DL-0840 — Failed security notices get an administrator list of their own, not a Sync issues source (T-0209)
 - Date: 2026-11-22 · By: claude · Task: T-0209 · Category: security

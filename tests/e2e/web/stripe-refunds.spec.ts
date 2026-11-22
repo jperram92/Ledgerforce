@@ -111,6 +111,8 @@ interface Fake {
   approvals: number;
   stepUps: number;
   cancels: number;
+  /** Security review r10 M1(b): the API refuses the cancel while the send has not gone quiet. */
+  cancelRefusal: string | null;
   refund: Record<string, unknown> | null;
 }
 
@@ -124,6 +126,7 @@ async function fakeApi(page: Page, who: Who): Promise<Fake> {
     approvals: 0,
     stepUps: 0,
     cancels: 0,
+    cancelRefusal: null,
     refund: null,
   };
   page.on('console', (m) => {
@@ -239,6 +242,8 @@ async function fakeApi(page: Page, who: Who): Promise<Fake> {
         if (!perms.includes('ar.refund.create'))
           return send(route, 403, { error: 'forbidden', permission: 'ar.refund.create' });
         expect(url.searchParams.get('company_id')).toBe(CO);
+        if (f.cancelRefusal)
+          return send(route, 422, { error: 'SEND_NOT_FINISHED', message: f.cancelRefusal });
         f.cancels += 1;
         f.refund = {
           ...f.refund,
@@ -443,6 +448,47 @@ test.describe('T-0190 cancel', () => {
     await expect(refund.getByRole('status')).toContainText('the money has left');
     await expect(refund.getByRole('button', { name: 'Cancel refund' })).toHaveCount(0);
     expect(f.cancels).toBe(0);
+    expect(f.errors).toEqual([]);
+  });
+
+  test('SS-UC11-11: a Stripe refund past its 23-hour window says so (not "Stripe refused") and offers Cancel; a cancel the API refuses as SEND_NOT_FINISHED shows why [T-0190]', async ({
+    page,
+    evidence,
+  }) => {
+    const f = await fakeApi(page, 'clerk');
+    await open(page, CN_PAGE, 1440);
+    const refund = await requestStripeRefund(page, f);
+    // Stored view of a refund approved more than 23 hours ago and never sent (security review r10 L1).
+    f.refund = {
+      ...f.refund,
+      approval: 'approved',
+      approved_by: ME.approver.user_id,
+      approved_at: '2026-11-23T00:00:00.000Z',
+      stripe: {
+        status: 'failed',
+        code: 'KEY_EXPIRED',
+        stripe_refund_id: null,
+        message:
+          'it was not sent within 23 hours of its approval, so it is no longer sent automatically; check it with Stripe, then resend or cancel it',
+      },
+    };
+    f.cancelRefusal =
+      'refund RF-000004 had a send attempt less than 15 minutes ago; Stripe may still be processing it. Cancel it after 2026-11-24T00:15Z';
+    await page.reload();
+    const status = refund.getByRole('status');
+    await expect(status).toContainText('Approved more than 23 hours ago and not sent');
+    await expect(status).not.toContainText('Stripe refused');
+    await refund.getByRole('button', { name: 'Cancel refund' }).click();
+    await refund
+      .getByRole('group', { name: 'Cancel this refund?' })
+      .getByRole('button', { name: 'Yes, cancel it' })
+      .click();
+    await expect(refund.getByRole('alert')).toContainText(
+      'We could not cancel this refund: refund RF-000004 had a send attempt less than 15 minutes ago',
+    );
+    expect(f.cancels).toBe(0);
+    await noAxeViolations(page);
+    await evidence('SS-UC11-11', 'stripe-refund-cancel-not-finished-1440');
     expect(f.errors).toEqual([]);
   });
 });

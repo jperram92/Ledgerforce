@@ -1,0 +1,10 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0215
+
+
+ Test Files  81 passed (81)
+      Tests  1056 passed (1056)
+   Start at  19:27:16
+   Duration  17.29s (transform 8.07s, setup 0ms, import 21.53s, tests 13.66s, environment 6ms)
+
+unit=0

@@ -1,9 +1,10 @@
 # LedgerForce application images for the self-hosted install (T-0094, RQ-0041, DL-0196).
-# One multi-stage build, four targets:
+# One multi-stage build, five targets:
 #   api     NestJS API (SWC build), runs as lf_app
 #   worker  pg-boss outbox consumer, runs as lf_app
 #   setup   one-shot first start: migrations + queue as lf_migrator, first Owner (ADR-0037)
 #   web     the SPA served by nginx (unprivileged), with the same-origin proxy to api and Keycloak
+#   backup  nightly encrypted pg_dump with retention (T-0143, ADR-0101)
 # Build from the repository root:  docker build -f infra/docker/Dockerfile --target api .
 #
 # Workspace packages are TypeScript source run by Node's type stripping, which Node refuses under
@@ -74,6 +75,16 @@ CMD ["node", "apps/worker/src/main.ts"]
 
 FROM node-runtime AS setup
 CMD ["node", "apps/worker/src/cli/setup.ts"]
+
+# Nightly encrypted backup (T-0143, ADR-0101): pg_dump/pg_restore 17 to match the postgres:17
+# service (pg_dump refuses newer servers, RQ-0183 Finding 8). /backups is the named volume's
+# mount point, owned by the runtime user so a fresh volume is writable.
+FROM node-runtime AS backup
+USER root
+RUN apk add --no-cache postgresql17-client \
+ && mkdir -p /backups && chown node:node /backups
+USER node
+CMD ["node", "packages/db/src/cli/backup.ts", "--daily", "--dir", "/backups"]
 
 FROM nginxinc/nginx-unprivileged:1.30.6-alpine@sha256:f5116ed4606f3eb015dd4a8e28cb9b351476dc0ad4bc6e9f93b19cec130cdf03 AS web
 COPY infra/docker/nginx/default.conf.template /etc/nginx/templates/default.conf.template

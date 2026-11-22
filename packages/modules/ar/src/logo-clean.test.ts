@@ -155,3 +155,106 @@ describe('SS-PLAT-171: uploaded logos are checked by structure and stripped of m
     );
   });
 });
+
+/** A JPEG segment `FF m` with its 2-byte length and data. */
+const segment = (m: number, data: Buffer) => {
+  const h = Buffer.from([0xff, m, 0, 0]);
+  h.writeUInt16BE(data.length + 2, 2);
+  return Buffer.concat([h, data]);
+};
+const EOI = Buffer.from([0xff, 0xd9]);
+/** The JPEG with `extra` inserted just before its final EOI (between/after the scans). */
+const beforeEoi = (jpeg: Buffer, extra: Buffer) =>
+  Buffer.concat([jpeg.subarray(0, jpeg.length - 2), extra, EOI]);
+/** A PNG of one 1x1 pixel with the given IHDR fields (CRCs correct). */
+function pngWith(depth: number, colour: number, comp = 0, filter = 0, interlace = 0): Buffer {
+  const d = Buffer.alloc(13);
+  d.writeUInt32BE(1, 0);
+  d.writeUInt32BE(1, 4);
+  d[8] = depth;
+  d[9] = colour;
+  d[10] = comp;
+  d[11] = filter;
+  d[12] = interlace;
+  return Buffer.concat([
+    SIG,
+    chunk('IHDR', d),
+    chunk('IDAT', Buffer.from([0x78, 0x9c, 0x63, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01])),
+    chunk('IEND', Buffer.alloc(0)),
+  ]);
+}
+
+describe('SS-PLAT-171: security review r11 fixes (F1-F4)', () => {
+  it('SS-PLAT-171 F1 refuses a JPEG with data after its end even when the file ends with FF D9 (polyglot) [T-0195]', () => {
+    for (const name of ['logo-exif.jpg', 'logo-progressive.jpg']) {
+      const jpeg = Buffer.from(fixture(name));
+      const polyglot = Buffer.concat([jpeg, Buffer.from('<html><script>SECRET</script>'), EOI]);
+      expect(
+        refusal(() => cleanInvoiceLogo('image/jpeg', polyglot)),
+        name,
+      ).toBe('the logo file has data after the end of the image');
+      const twoImages = Buffer.concat([jpeg, jpeg]);
+      expect(
+        refusal(() => cleanInvoiceLogo('image/jpeg', twoImages)),
+        name,
+      ).toBe('the logo file has data after the end of the image');
+    }
+  });
+
+  it('SS-PLAT-171 F2 drops APP1, APPn and COM segments placed after the first scan, keeping the image [T-0195]', () => {
+    const jpeg = Buffer.from(fixture('logo-progressive.jpg'));
+    const sneaky = beforeEoi(
+      jpeg,
+      Buffer.concat([
+        segment(0xfe, Buffer.from('COMMENT SECRET')),
+        segment(0xe1, Buffer.from('Exif\0\0APP1 SECRET')),
+        segment(0xed, Buffer.from('Photoshop 3.0\0IPTC SECRET')),
+      ]),
+    );
+    const out = cleanInvoiceLogo('image/jpeg', sneaky);
+    expect(has(out.content, 'SECRET')).toBe(false);
+    // Exactly the original's scans remain (its own metadata before SOS is dropped as before).
+    expect(Buffer.from(out.content)).toEqual(
+      Buffer.from(cleanInvoiceLogo('image/jpeg', jpeg).content),
+    );
+  });
+
+  it('SS-PLAT-171 F3 refuses a JPEG with more than 100 scans [T-0195]', () => {
+    const jpeg = Buffer.from(fixture('logo-progressive.jpg'));
+    // An empty scan of one component: SOS header, no entropy-coded bytes.
+    const scan = segment(0xda, Buffer.from([1, 1, 0, 0, 0x3f, 0]));
+    const many = beforeEoi(jpeg, Buffer.concat(Array.from({ length: 101 }, () => scan)));
+    expect(refusal(() => cleanInvoiceLogo('image/jpeg', many))).toBe(
+      'the logo has too many scans (at most 100): export it again as a standard JPEG or PNG',
+    );
+  });
+
+  it('SS-PLAT-171 F4 accepts only the PNG header values the standard allows [T-0195]', () => {
+    for (const [depth, colour] of [
+      [1, 0],
+      [16, 0],
+      [8, 2],
+      [16, 2],
+      [1, 3],
+      [8, 3],
+      [8, 4],
+      [8, 6],
+      [16, 6],
+    ] as const)
+      expect(cleanInvoiceLogo('image/png', pngWith(depth, colour)).width).toBe(1);
+    expect(cleanInvoiceLogo('image/png', pngWith(8, 2, 0, 0, 1)).width).toBe(1);
+    for (const bad of [
+      pngWith(99, 2),
+      pngWith(8, 99),
+      pngWith(4, 2),
+      pngWith(16, 3),
+      pngWith(1, 6),
+      pngWith(8, 2, 1),
+      pngWith(8, 2, 0, 1),
+      pngWith(8, 2, 0, 0, 2),
+    ])
+      expect(refusal(() => cleanInvoiceLogo('image/png', bad))).toBe(
+        'the logo file is not a valid PNG (its header is not one the PNG standard allows)',
+      );
+  });
+});

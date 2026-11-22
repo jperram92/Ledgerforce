@@ -97,7 +97,39 @@ export function apiOptionsFromEnv(
   }
   const webhook = stripeWebhook(env, readFile);
   if (webhook) opts.stripeWebhook = webhook;
+  const inbound = mailgunInbound(env, readFile);
+  if (inbound) opts.mailgunInbound = inbound;
   return opts;
+}
+
+/**
+ * Mailgun inbound webhook (ADR-0099): LF_MAILGUN_SIGNING_KEY[_FILE] (comma-separated during a key
+ * roll) and LF_INBOUND_EMAIL_DOMAIN (the domain of `bills-<token>@…` addresses), both or neither.
+ * Unset: POST /webhooks/mailgun/messages.mime answers 503.
+ */
+function mailgunInbound(
+  env: Env,
+  readFile: ReadFile,
+): { signingKeys: string[]; inboundDomain: string } | undefined {
+  const raw = readSecret(env, 'LF_MAILGUN_SIGNING_KEY', readFile)?.trim() ?? '';
+  const domain = (env['LF_INBOUND_EMAIL_DOMAIN'] ?? '').trim().toLowerCase();
+  if (raw === '' && domain === '') return undefined;
+  if (raw === '')
+    throw new ConfigError('LF_MAILGUN_SIGNING_KEY is required with LF_INBOUND_EMAIL_DOMAIN');
+  if (domain === '')
+    throw new ConfigError('LF_INBOUND_EMAIL_DOMAIN is required with LF_MAILGUN_SIGNING_KEY');
+  const signingKeys = raw.split(',').map((k) => k.trim());
+  if (signingKeys.some((k) => !/^\S+$/.test(k))) {
+    throw new ConfigError('LF_MAILGUN_SIGNING_KEY must be one or more non-empty keys');
+  }
+  if (
+    !/^(?=.{1,253}$)[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/.test(
+      domain,
+    )
+  ) {
+    throw new ConfigError('LF_INBOUND_EMAIL_DOMAIN must be a domain name');
+  }
+  return { signingKeys, inboundDomain: domain };
 }
 
 /**

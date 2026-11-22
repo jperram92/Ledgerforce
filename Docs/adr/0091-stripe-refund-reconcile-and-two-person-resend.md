@@ -100,3 +100,25 @@ T-0189 asks for a safe path in both cases. The path must never refund the custom
   adoption. The two dates differ only when a commit was lost.
 - The refund region does not yet offer the check or the resend. That is card T-0208, together
   with a nightly sweep that finds R2 strays across the company.
+
+## Addendum (2026-11-22, security review r10): no cancel while a send may still land
+Added by claude for findings M1, L1, L2, L3 and L4 of security review r10 (DL-0778, DL-0779). It
+strengthens the decision above and T-0190's cancel (DL-0770); it does not change this ADR's
+status.
+
+- **Deadlines.** Every Stripe request is abandoned after 30 s. A send sets
+  `idle_in_transaction_session_timeout` to 5 min, so the database never ends a sending transaction
+  (and releases the party lock) while one of its requests is still waiting.
+- **Cancel only a finished, quiet send.** An approved document is cancelled only when its window
+  has passed, or the worker gave up (an open or ignored Sync issue, none being retried), and no
+  send activity happened in the last 15 minutes. Otherwise the answer is 422 `SEND_NOT_FINISHED`.
+  Unapproved documents are not cancelled here (T-0207).
+- **Never create past a stray.** Before any create, the lookup also lists live refunds carrying a
+  cancelled Stripe document of the same customer; one there refuses
+  `CANCELLED_REFUND_AT_STRIPE`. `stripe-check` reports such refunds (`held_cancelled`,
+  `cancelled_held_at_stripe`).
+- **L2.** A live refund of another amount or currency is `SENT_NOT_POSTED`.
+- **L3.** The confirm handler re-checks the verified step-up.
+- **L4.** Posting dates follow the engine's resolved date (the lock-date policy).
+- **I1.** A refund that fails after it was recorded paid is card T-0229 (renumbered from T-0217 at merge).
+

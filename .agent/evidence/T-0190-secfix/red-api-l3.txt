@@ -1,0 +1,34 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a13d7ed4ef04840f2
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:34303
+ ❯ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts (14 tests | 1 failed | 13 skipped) 4311ms
+     × SS-UC11-13 an API token holding ar.refund.approve cannot confirm a Stripe refund resend: 401 step_up_required, no Stripe call, nothing confirmed 574ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > Security review r10 L3: confirming a resend sends money, so an API token never confirms it > SS-UC11-13 an API token holding ar.refund.approve cannot confirm a Stripe refund resend: 401 step_up_required, no Stripe call, nothing confirmed
+AssertionError: expected 200 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 200
+
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:1070:28
+    1068|         'staleFinanceAdmin',
+    1069|       );
+    1070|       expect(stale.status).toBe(401);
+       |                            ^
+    1071|       expect(await stale.json()).toEqual({ error: 'step_up_required', …
+    1072|       expect(stub.received.length).toBe(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 13 skipped (14)
+   Start at  03:18:05
+   Duration  12.34s (transform 3.45s, setup 0ms, import 6.12s, tests 4.31s, environment 0ms)
+

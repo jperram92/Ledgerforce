@@ -9,11 +9,30 @@
 
 export const STRIPE_API_VERSION = '2026-10-28.endive';
 export const STRIPE_API_BASE = 'https://api.stripe.com';
+/**
+ * Every Stripe request is abandoned after this long (security review r10 M1(a)). It is well below
+ * STRIPE_SEND_IDLE_TIMEOUT_MS, the idle timeout a refund send sets on its own transaction, so the
+ * database never ends a sending transaction (and releases the party lock) while a request may
+ * still be in flight on our side.
+ */
+export const STRIPE_REQUEST_TIMEOUT_MS = 30_000;
+/**
+ * The `idle_in_transaction_session_timeout` a Stripe refund send sets for its transaction
+ * (refund.ts): a process that hangs while holding the party lock is cut off after this long,
+ * aligned with the outbox job expiry (5 min, packages/outbox queue.ts).
+ */
+export const STRIPE_SEND_IDLE_TIMEOUT_MS = 5 * 60 * 1000;
 
 /** The transport (named for its first use): a POST with a form body, or a GET without a body. */
 export type HttpPost = (
   url: string,
-  init: { method: 'POST' | 'GET'; headers: Record<string, string>; body?: string },
+  init: {
+    method: 'POST' | 'GET';
+    headers: Record<string, string>;
+    body?: string;
+    /** Aborted at the client's deadline (STRIPE_REQUEST_TIMEOUT_MS). */
+    signal?: AbortSignal;
+  },
 ) => Promise<{ status: number; text(): Promise<string> }>;
 
 /** Production transport: global fetch, no redirects. */
@@ -160,12 +179,15 @@ export class StripeClient {
   readonly #key: string;
   readonly #base: string;
   readonly #http: HttpPost;
+  readonly #timeoutMs: number;
 
   constructor(cfg: {
     secretKey: string;
     mode?: 'test' | 'live';
     baseUrl?: string;
     http?: HttpPost;
+    /** Request deadline in ms (default STRIPE_REQUEST_TIMEOUT_MS); below the send idle timeout. */
+    timeoutMs?: number;
   }) {
     this.mode = cfg.mode ?? 'test';
     const prefix = this.mode === 'live' ? /^(sk|rk)_live_\S+$/ : /^(sk|rk)_test_\S+$/;
@@ -181,6 +203,16 @@ export class StripeClient {
     this.#key = cfg.secretKey;
     this.#base = base.origin;
     this.#http = cfg.http ?? fetchHttpPost;
+    const timeout = cfg.timeoutMs ?? STRIPE_REQUEST_TIMEOUT_MS;
+    if (!Number.isInteger(timeout) || timeout < 1) {
+      throw new StripeConfigError('the Stripe request timeout is a positive whole number of ms');
+    }
+    if (timeout >= STRIPE_SEND_IDLE_TIMEOUT_MS) {
+      throw new StripeConfigError(
+        `the Stripe request timeout must stay below the send idle timeout (${String(STRIPE_SEND_IDLE_TIMEOUT_MS)} ms)`,
+      );
+    }
+    this.#timeoutMs = timeout;
   }
 
   /** LF_STRIPE_SECRET_KEY (required) and LF_STRIPE_MODE (`test` by default, or `live`). */
@@ -376,13 +408,42 @@ export class StripeClient {
     path: string,
     init: Parameters<HttpPost>[1],
   ): Promise<{ status: number; body: Record<string, unknown> }> {
+    // A deadline on the whole exchange (security review r10 M1(a)): the transport is asked to
+    // abort, and the client stops waiting even if a transport ignores the signal.
+    const abort = new AbortController();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const deadline = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        abort.abort();
+        reject(
+          new StripeApiError(
+            null,
+            'timeout',
+            `the Stripe API did not answer within ${String(this.#timeoutMs)} ms`,
+          ),
+        );
+      }, this.#timeoutMs);
+    });
     let res: { status: number; text(): Promise<string> };
+    let text: string;
     try {
-      res = await this.#http(`${this.#base}${path}`, init);
-    } catch {
-      throw new StripeApiError(null, 'unreachable', 'the Stripe API could not be reached');
+      const exchange = (async () => {
+        let r: { status: number; text(): Promise<string> };
+        try {
+          r = await this.#http(`${this.#base}${path}`, { ...init, signal: abort.signal });
+        } catch {
+          throw new StripeApiError(null, 'unreachable', 'the Stripe API could not be reached');
+        }
+        return { r, t: await r.text() };
+      })();
+      // A late failure after the deadline won is not an unhandled rejection.
+      exchange.catch(() => undefined);
+      const got = await Promise.race([exchange, deadline]);
+      res = got.r;
+      text = got.t;
+    } finally {
+      clearTimeout(timer);
     }
-    const text = await res.text();
     let body: Record<string, unknown> | null = null;
     try {
       const v: unknown = JSON.parse(text);

@@ -4,3 +4,5 @@
 *.sh text eol=lf
 # Bank payment files (ABA/Cemtex) are byte-exact fixtures with CRLF record separators (T-0056).
 *.aba -text
+# Recorded email fixtures (RFC 5322, CRLF) stay byte-exact (T-0215).
+*.eml -text

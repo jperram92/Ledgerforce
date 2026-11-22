@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0190",
+  "entries": [
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190-secfix/red-client-unit.txt",
+      "test": "RED: client.contract.test.ts r10 M1(a) deadline tests before the client timeout (2 failed: test timed out; STRIPE_REQUEST_TIMEOUT_MS undefined)",
+      "commit": "feat/T-0190-secfix",
+      "provider": "claude",
+      "timestamp": "2026-11-22T04:00:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190-secfix/red-connector-db.txt",
+      "test": "RED: stripe-refund-followups.contract.db.test.ts before the r10 fixes (6 failed: cancel not refused while sending; unapproved cancelled; hung-send cancel; L2 REFUND_FAILED; L4 DATE_BEFORE_DOCUMENT stuck)",
+      "commit": "feat/T-0190-secfix",
+      "provider": "claude",
+      "timestamp": "2026-11-22T04:00:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190-secfix/red-api-l3.txt",
+      "test": "RED: refunds-stripe.db.test.ts L3 with the confirm handler's step-up re-check removed (stale confirm answered 200; the -t filter skipped the other 13 tests in this RED run only)",
+      "commit": "feat/T-0190-secfix",
+      "provider": "claude",
+      "timestamp": "2026-11-22T04:00:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190-secfix/red-e2e.txt",
+      "test": "RED: stripe-refunds.spec.ts KEY_EXPIRED wording against the previous RefundRegion (said 'Stripe refused')",
+      "commit": "feat/T-0190-secfix",
+      "provider": "claude",
+      "timestamp": "2026-11-22T04:00:00Z",
+      "result": "failed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190-secfix/green-db.txt",
+      "test": "GREEN: vitest db packages/connectors, modules/ar, modules/ap, packages/db, apps/worker (64 files, 1297 tests, 0 skipped)",
+      "commit": "feat/T-0190-secfix",
+      "provider": "claude",
+      "timestamp": "2026-11-22T04:00:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190-secfix/green-api-db.txt",
+      "test": "GREEN: vitest api-db full (51 files, 386 tests, 0 skipped)",
+      "commit": "feat/T-0190-secfix",
+      "provider": "claude",
+      "timestamp": "2026-11-22T04:00:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190-secfix/green-unit-web.txt",
+      "test": "GREEN: vitest unit, api-unit, web (102 files, 1252 tests)",
+      "commit": "feat/T-0190-secfix",
+      "provider": "claude",
+      "timestamp": "2026-11-22T04:00:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190-secfix/green-e2e.txt",
+      "test": "GREEN: playwright stripe-refunds.spec.ts (8 passed)",
+      "commit": "feat/T-0190-secfix",
+      "provider": "claude",
+      "timestamp": "2026-11-22T04:00:00Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190-secfix/green-db-full.txt",
+      "test": "GREEN: vitest db full project (120 files, 1711 tests, 0 skipped)",
+      "commit": "feat/T-0190-secfix",
+      "provider": "claude",
+      "timestamp": "2026-11-22T04:00:00Z",
+      "result": "passed"
+    }
+  ]
+}

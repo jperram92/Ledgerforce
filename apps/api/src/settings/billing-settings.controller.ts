@@ -252,7 +252,18 @@ export class BillingSettingsController {
     if (!l)
       throw new NotFoundException({ error: 'LOGO_NOT_SET', message: 'no invoice logo is saved' });
     // Stored only after cleaning; checked again so nothing else is ever served (RQ-0182 finding 4).
-    const { contentType, content } = cleanInvoiceLogo(l.contentType, l.content);
+    // A logo saved before these checks (T-0165) that fails them asks for a new upload (r11 F5).
+    let clean: ReturnType<typeof cleanInvoiceLogo>;
+    try {
+      clean = cleanInvoiceLogo(l.contentType, l.content);
+    } catch (e) {
+      if (!(e instanceof InvoiceSettingsError)) throw e;
+      throw new UnprocessableEntityException({
+        error: 'LOGO_INVALID',
+        message: `the saved logo does not pass the current checks (${e.message}): upload it again`,
+      });
+    }
+    const { contentType, content } = clean;
     res.setHeader('Content-Type', contentType);
     res.setHeader(
       'Content-Disposition',

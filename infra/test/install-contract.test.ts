@@ -131,9 +131,9 @@ const svc = (n: string): Service => {
 };
 
 describe('SS-PLAT-86 compose stack', () => {
-  it('SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup and the scheduler (ADR-0062)', () => {
+  it('SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup, the scheduler (ADR-0062) and the nightly backup (ADR-0101)', () => {
     expect(Object.keys(compose.services).sort()).toEqual(
-      ['api', 'keycloak', 'postgres', 'scheduler', 'setup', 'web', 'worker'].sort(),
+      ['api', 'backup', 'keycloak', 'postgres', 'scheduler', 'setup', 'web', 'worker'].sort(),
     );
   });
 
@@ -207,6 +207,7 @@ describe('SS-PLAT-86 compose stack', () => {
         .sort();
     expect(Object.keys(compose.secrets).sort()).toEqual(
       [
+        'backup_keyring',
         'keycloak_admin_client_secret',
         'keycloak_db_password',
         'lf_app_password',
@@ -215,7 +216,9 @@ describe('SS-PLAT-86 compose stack', () => {
         'postgres_password',
       ].sort(),
     );
-    expect(holders('postgres_password')).toEqual(['postgres']);
+    // The backup reads every tenant (pg_dump needs to bypass FORCEd RLS, ADR-0101; lf_backup is T-0227).
+    expect(holders('postgres_password')).toEqual(['backup', 'postgres']);
+    expect(holders('backup_keyring')).toEqual(['backup']);
     expect(holders('lf_migrator_password')).toEqual(['postgres', 'scheduler', 'setup']);
     expect(holders('lf_app_password')).toEqual(['api', 'postgres', 'setup', 'worker']);
     expect(holders('keycloak_db_password')).toEqual(['keycloak', 'postgres']);
@@ -276,7 +279,7 @@ describe('SS-PLAT-86 compose stack', () => {
     for (const [n, s] of Object.entries(compose.services)) {
       expect(s.security_opt, n).toContain('no-new-privileges:true');
     }
-    for (const n of ['api', 'worker', 'scheduler', 'setup', 'web']) {
+    for (const n of ['api', 'worker', 'scheduler', 'setup', 'web', 'backup']) {
       expect(svc(n).cap_drop, n).toEqual(['ALL']);
       expect(svc(n).read_only, n).toBe(true);
     }
@@ -351,7 +354,7 @@ describe('SS-PLAT-86 generated secrets stay out of git', () => {
     }
   });
 
-  it('SS-PLAT-86 init-secrets.sh writes six distinct random secrets once and never overwrites', () => {
+  it('SS-PLAT-86 init-secrets.sh writes distinct random secrets (and the backup keyring) once and never overwrites', () => {
     // The install targets Linux. Use its native filesystem even from Windows: NTFS's
     // synthetic stat mode cannot prove chmod 0700. Pipe the exact script bytes to WSL,
     // avoiding Windows path conversion; all original permission/idempotency checks remain.
@@ -382,11 +385,83 @@ for file in "$dir"/*; do printf '%s:%s\\n' "$(basename "$file")" "$(cat "$file")
     const records = first.trim().split('\n');
     const names = records.map((r) => r.split(':')[0]).sort();
     expect(names).toEqual(Object.keys(compose.secrets).sort());
-    const values = records.map((r) => r.split(':')[1] ?? '');
+    // backup_keyring is a LocalKeyringKms JSON keyring (one 32-byte key), checked on its own.
+    const keyring = records.find((r) => r.startsWith('backup_keyring:'));
+    const ring = JSON.parse(keyring?.slice('backup_keyring:'.length) ?? '') as {
+      active: string;
+      keys: Record<string, string>;
+    };
+    expect(ring.active).toMatch(/^backup-\d{8}$/);
+    expect(Object.keys(ring.keys)).toEqual([ring.active]);
+    expect(Buffer.from(ring.keys[ring.active] ?? '', 'base64')).toHaveLength(32);
+    const values = records.filter((r) => r !== keyring).map((r) => r.split(':')[1] ?? '');
     for (const v of values) expect(v).toMatch(/^[A-Za-z0-9]{40,}$/);
     expect(new Set(values).size).toBe(values.length);
     expect(output.split('\n')[0]).toBe('MODE:700');
     expect(output).not.toContain(values[0] ?? '-');
     expect(second.trim().split('\n')).toEqual(records);
+  });
+});
+
+describe('SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101)', () => {
+  it('SS-PLAT-174 the backup image is the node runtime plus the PostgreSQL 17 client, non-root, with a /backups folder it owns', () => {
+    const app = stages(read('infra/docker/Dockerfile'));
+    const s = app.find((x) => x.name === 'backup');
+    expect(s?.from).toBe('node-runtime');
+    const body = s?.lines.join('\n') ?? '';
+    // pg_dump must be at least the server's major version (postgres:17 in compose; RQ-0183 F8).
+    expect(body).toMatch(/apk add --no-cache postgresql17-client/);
+    expect(body).toMatch(/chown node:node \/backups/);
+    expect(s ? effectiveUser(app, s) : undefined).toBe('node');
+    expect(body).toMatch(
+      /CMD \["node", "packages\/db\/src\/cli\/backup\.ts", "--daily", "--dir", "\/backups"\]/,
+    );
+    expect(read('infra/compose/smoke.sh')).toMatch(/for target in [a-z ]*\bbackup\b/);
+  });
+
+  it('SS-PLAT-174 compose runs the backup nightly with a retention setting, a dedicated keyring and its own volume', () => {
+    const b = svc('backup');
+    expect(b.build).toEqual({
+      context: '../..',
+      dockerfile: 'infra/docker/Dockerfile',
+      target: 'backup',
+    });
+    const env = b.environment ?? {};
+    expect(env['LF_BACKUP_RETENTION_DAYS']).toBe('${LF_BACKUP_RETENTION_DAYS:-14}');
+    expect(env['LF_BACKUP_AT']).toBe('${LF_BACKUP_AT:-02:30}');
+    expect(env['LF_KMS_PROVIDER']).toBe('local');
+    expect(env['LF_KMS_KEYRING_FILE']).toBe('/run/secrets/backup_keyring');
+    expect(env['LF_BACKUP_DB_PASSWORD_FILE']).toBe('/run/secrets/postgres_password');
+    expect(env['LF_DB_HOST']).toBe('postgres');
+    expect(b.secrets?.sort()).toEqual(['backup_keyring', 'postgres_password']);
+    expect(b.ports).toBeUndefined();
+    expect(b.read_only).toBe(true);
+    expect((b as { volumes?: string[] }).volumes).toEqual(['backups:/backups']);
+    expect(compose.volumes).toHaveProperty('backups');
+    expect(b.depends_on?.['setup']).toEqual({ condition: 'service_completed_successfully' });
+    expect(compose.secrets['backup_keyring']).toEqual({ file: './secrets/backup_keyring' });
+    const example = read('infra/compose/ledgerforce.env.example');
+    expect(example).toMatch(/^#? ?LF_BACKUP_RETENTION_DAYS=14$/m);
+    expect(example).toMatch(/^#? ?LF_BACKUP_AT=02:30$/m);
+  });
+
+  it('SS-PLAT-174 the runbook covers backup, off-host key custody, the restore drill and its failure codes', () => {
+    const doc = read('Docs/ops/backup-restore.md');
+    for (const needle of [
+      'LF_BACKUP_RETENTION_DAYS',
+      'LF_BACKUP_AT',
+      'backup_keyring',
+      'packages/ledger/src/cli/restore-drill.ts',
+      'packages/db/src/cli/backup.ts',
+      'BACKUP_DECRYPT_FAILED',
+      'CHAIN_BROKEN',
+      'ROW_COUNT_MISMATCH',
+      'off the host',
+      'quarterly',
+      'ADR-0101',
+    ]) {
+      expect(doc, needle).toContain(needle);
+    }
+    expect(read('Docs/ops/install.md')).toContain('backup-restore.md');
   });
 });

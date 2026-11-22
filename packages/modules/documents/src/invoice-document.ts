@@ -9,7 +9,12 @@
  * the render path; the returned document must not be stored, logged or published. Without a KMS
  * nothing is decrypted and the block says the details are available on request.
  */
-import { invoiceLogoOf, invoiceSettingsOf } from '@ledgerforce/ar';
+import {
+  cleanInvoiceLogo,
+  invoiceLogoOf,
+  InvoiceSettingsError,
+  invoiceSettingsOf,
+} from '@ledgerforce/ar';
 import { remittanceDetailsOf } from '@ledgerforce/bank';
 import type { Database } from '@ledgerforce/db';
 import type { Kms } from '@ledgerforce/shared/crypto';
@@ -29,6 +34,24 @@ export class DocumentError extends Error {
 export interface InvoiceDocumentOptions {
   /** Render path only: decrypt the designated remittance account (ADR-0079). */
   readonly kms?: Kms | null;
+}
+
+/**
+ * The stored logo as it may go to a customer: cleaned again (structure, metadata) because logos
+ * saved before T-0195 only had their magic bytes checked; one that fails is left out rather than
+ * stopping the invoice (security review r11 F5, ADR-0100 addendum).
+ */
+function cleanLogo(
+  l: Awaited<ReturnType<typeof invoiceLogoOf>>,
+): Awaited<ReturnType<typeof invoiceLogoOf>> {
+  if (!l) return null;
+  try {
+    const c = cleanInvoiceLogo(l.contentType, l.content);
+    return { contentType: c.contentType, content: c.content };
+  } catch (e) {
+    if (e instanceof InvoiceSettingsError) return null;
+    throw e;
+  }
 }
 
 export async function loadInvoiceDocument(
@@ -83,7 +106,7 @@ export async function loadInvoiceDocument(
       ? {
           colour: settings.brandColour,
           accentColour: settings.brandAccentColour,
-          logo: settings.logo ? await invoiceLogoOf(trx, companyId) : null,
+          logo: settings.logo ? cleanLogo(await invoiceLogoOf(trx, companyId)) : null,
         }
       : null;
   let bankTransfer: InvoiceRemittanceView | null = null;
