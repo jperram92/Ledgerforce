@@ -195,8 +195,16 @@ Configured in `.agent/config.yaml → human_gates`:
 accounting ADR and approve or supersede golden postings itself, provided each decision is backed
 by a research record (law, standards, how comparable systems behave), logged in the decision log
 with the reason, and covered by the golden runner and tests. Approved entries are still never
-edited — supersede them. **Security** ADRs, releases, phase gates and out-of-scope choices remain
-with the product owner.
+edited — supersede them.
+
+**Standing delegation extended (product owner, 2026-11-15, DL-0691; §6 updated on the owner's
+instruction 2026-11-22, DL-0896).** Gate 1 for category **security** and gate 4 (open decisions in
+design §11.2 and out-of-scope choices) are also delegated: the building agent decides them itself
+instead of asking, on the same conditions — a research record comparing standards and existing
+open-source and commercial systems, a decision-log entry with the reason, tests, and an
+independent security review for security ADRs. **Releases, phase gates and merges to `main`**
+remain with the product owner, and so does the golden guard's trust anchor (an approval record
+counts only once it is on `main`, ADR-0047).
 
 Everything else — technical unknowns, missing libraries, environment problems — is yours to
 research and solve. Record it, don't escalate it.

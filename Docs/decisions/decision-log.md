@@ -4467,3 +4467,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: T-0165 stored logos with magic-byte checks only; the GET answered 500 and the PDF embedded uncleaned bytes.
 - Alternatives: a one-off migration re-cleaning stored logos (rejected: a data rewrite of tenant rows for a rare case; cleaning on use covers every path).
 - ADR: ADR-0100 (addendum) · Status: accepted
+
+### DL-0896 — AGENTS.md §6 updated to match DL-0691 (security ADRs and open decisions delegated)
+- Date: 2026-11-22 · By: human (recorded by claude) · Task: sprint-0 · Category: process
+- Decision: On the product owner's explicit instruction in this session ("Do it", in reply to the offer to update §6 to match DL-0691), AGENTS.md §6 now states that gate 1 for security ADRs and gate 4 (open decisions and out-of-scope choices) are delegated to the building agent, on the conditions of research, a decision-log entry, tests and an independent security review. Releases, phase gates, merges to main and the golden guard's trust anchor stay with the owner.
+- Why: security reviewers repeatedly flagged the conflict between §6 and DL-0691 (reviews r10, r11); the owner resolved it.
+- Alternatives: leave §6 as it was and rely on DL-0691 (rejected by the owner).
+- ADR: none · Status: accepted
