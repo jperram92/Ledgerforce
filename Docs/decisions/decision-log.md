@@ -4291,3 +4291,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: thin controller, one place for the due rule and masking.
 - Alternatives: SQL in the controller (rejected: duplicates the dispatcher's rule).
 - ADR: none · Status: accepted
+
+### DL-0846 — T-0209 scope: failed notices only; no-recipient notices and an alert badge split to T-0219 and T-0220 (T-0209)
+- Date: 2026-11-22 · By: claude · Task: T-0209 · Category: scope
+- Decision: T-0209 lists notices in `failed` status. `no_recipient` supplier notices (never sent, nobody told) become T-0219; a count badge or home alert outside Settings becomes T-0220. The screen lives at `/settings/security-notices`; "Retry now" needs no confirmation step because it only makes an already-approved notice send sooner (design §5.6 "one-click retry"); each press sends a fresh `Idempotency-Key`.
+- Why: card ACs are about failed notices; each split item needs its own research (re-sending an old notice to a contact added later; where the shell shows counts).
+- Alternatives: include them here (rejected: oversized, open questions).
+- ADR: ADR-0097 · Status: accepted

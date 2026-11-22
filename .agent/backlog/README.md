@@ -202,7 +202,9 @@ graph LR
 | [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | verifying | T-0180 | UC-01 | 0 |
 | [T-0192](T-0192.md) | Security: rotate the session id on step-up re-authentication (ASVS 5.0 7.2.4) | MVP | todo | — | — | 0 |
 | [T-0197](T-0197.md) | Platform: send security notices (bank-detail and remittance account changes) by email | MVP | verifying | T-0191 | UC-01, UC-06 | 0 |
-| [T-0209](T-0209.md) | Platform: surface failed security notices to administrators with a retry-now action | MVP | todo | T-0197 | UC-01, UC-06 | 0 |
+| [T-0209](T-0209.md) | Platform: surface failed security notices to administrators with a retry-now action | MVP | verifying | T-0197 | UC-01, UC-06 | 0 |
+| [T-0219](T-0219.md) | Platform: show undeliverable (no-recipient) security notices to administrators with a way to add the contact | MVP | todo | T-0209 | UC-06 | 0 |
+| [T-0220](T-0220.md) | Platform: alert administrators to failed security notices outside the Settings list (count badge or home alert) | MVP | todo | T-0209 | UC-01, UC-06 | 0 |
 | [T-0201](T-0201.md) | Opening balances: Xero reader (trial balance and open invoices/bills at the balance date) | Phase 1 | todo | T-0126 | — | 0 |
 | [T-0202](T-0202.md) | Opening balances screen: show currency, currency amount and rate of foreign-currency items | MVP | todo | T-0126, T-0177 | — | 0 |
 | [T-0191](T-0191.md) | AR: remittance account hardening — re-activation needs a new approval; notify Owners and Finance Admins of every change | MVP | todo | T-0180 | UC-01 | 0 |
