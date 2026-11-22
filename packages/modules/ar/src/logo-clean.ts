@@ -8,7 +8,10 @@
  * - JPEG (ITU-T T.81 Annex B): SOI, marker segments with lengths up to the first SOS, a frame
  *   header (SOFn) before it, EOI last. APP1 (Exif/XMP), APP3–APP13, APP15 and COM before SOS are
  *   dropped; APP0 (JFIF), APP2 (ICC) and APP14 (Adobe) are kept because they change the colours.
- *   Everything from the first SOS on is kept verbatim.
+ *   Security review r11 (ADR-0100 addendum): the walk continues through the entropy-coded data
+ *   of every scan (FF 00 and RSTn are data), drops metadata between scans too (F2), allows at
+ *   most 100 scans (F3) and stops at the first real EOI, refusing anything after it (F1). PNG
+ *   IHDR values must be ones the standard allows (F4).
  * SVG and any other type are refused. Refusals are InvoiceSettingsError in plain words.
  */
 import { crc32 } from 'node:zlib';
@@ -16,6 +19,18 @@ import { InvoiceSettingsError, MAX_LOGO_BYTES, type LogoContentType } from './in
 
 /** The largest logo side in pixels (a logo is printed at most 70 mm wide). */
 export const MAX_LOGO_PIXELS = 4000;
+
+/** The most scans a JPEG logo may have; a progressive JPEG normally has about 10 (F3). */
+export const MAX_JPEG_SCANS = 100;
+
+/** Allowed bit depths per PNG colour type (W3C PNG 3rd ed. §11.2.1, Table 11). */
+const PNG_DEPTHS: Record<number, readonly number[]> = {
+  0: [1, 2, 4, 8, 16],
+  2: [8, 16],
+  3: [1, 2, 4, 8],
+  4: [8, 16],
+  6: [8, 16],
+};
 
 export interface CleanLogo {
   readonly contentType: LogoContentType;
@@ -75,6 +90,15 @@ function cleanPng(b: Buffer): CleanLogo {
       width = b.readUInt32BE(at + 8);
       height = b.readUInt32BE(at + 12);
       checkSize(width, height);
+      const [depth = 0, colour = 0, compression, filter, interlace = 0] = b.subarray(
+        at + 16,
+        at + 21,
+      );
+      const depths = Object.hasOwn(PNG_DEPTHS, colour) ? PNG_DEPTHS[colour] : undefined;
+      if (!depths?.includes(depth) || compression !== 0 || filter !== 0 || interlace > 1)
+        throw invalid(
+          'the logo file is not a valid PNG (its header is not one the PNG standard allows)',
+        );
       first = false;
     } else if (type === 'IHDR') throw incomplete();
     if (type === 'IDAT') idat = true;
@@ -102,6 +126,7 @@ function cleanJpeg(b: Buffer): CleanLogo {
   let at = 2;
   let width = 0;
   let height = 0;
+  let scans = 0;
   for (;;) {
     if (at + 2 > b.length || b[at] !== 0xff) throw incomplete();
     const m = b[at + 1] ?? 0;
@@ -109,7 +134,13 @@ function cleanJpeg(b: Buffer): CleanLogo {
       at += 1; // fill byte
       continue;
     }
-    if (m === 0xd8 || m === 0xd9 || m === 0x00) throw incomplete();
+    if (m === 0xd9) {
+      // The first real EOI ends the image: nothing may follow it (no polyglots, F1).
+      kept.push(b.subarray(at, at + 2));
+      if (at + 2 !== b.length) throw invalid('the logo file has data after the end of the image');
+      break;
+    }
+    if (m === 0xd8 || m === 0x00) throw incomplete();
     if (standalone(m)) {
       kept.push(b.subarray(at, at + 2));
       at += 2;
@@ -117,7 +148,7 @@ function cleanJpeg(b: Buffer): CleanLogo {
     }
     if (at + 4 > b.length) throw incomplete();
     const len = b.readUInt16BE(at + 2);
-    const end = at + 2 + len;
+    let end = at + 2 + len;
     if (len < 2 || end > b.length) throw incomplete();
     if (isSof(m)) {
       if (len < 8) throw incomplete();
@@ -127,20 +158,29 @@ function cleanJpeg(b: Buffer): CleanLogo {
     }
     if (m === 0xda) {
       if (width === 0) throw incomplete();
-      break;
+      scans += 1;
+      if (scans > MAX_JPEG_SCANS)
+        throw invalid(
+          `the logo has too many scans (at most ${String(MAX_JPEG_SCANS)}): export it again as a standard JPEG or PNG`,
+        );
+      // Entropy-coded data: FF is followed by 00 (stuffing) or RSTn inside it; any other marker
+      // (after optional FF fill bytes) ends the scan.
+      for (;;) {
+        const ff = b.indexOf(0xff, end);
+        if (ff < 0 || ff + 1 >= b.length) throw incomplete();
+        const n = b[ff + 1] ?? 0;
+        if (n === 0x00 || (n >= 0xd0 && n <= 0xd7)) {
+          end = ff + 2;
+          continue;
+        }
+        end = ff;
+        break;
+      }
     }
+    // Metadata is dropped wherever it appears, before or between scans (F2).
     if (!dropped(m)) kept.push(b.subarray(at, end));
     at = end;
   }
-  // From the first SOS on: the scans, kept verbatim, and EOI as the very last two bytes.
-  const scans = b.subarray(at);
-  if (scans.length < 4 || b[b.length - 2] !== 0xff || b[b.length - 1] !== 0xd9) {
-    const eoi = scans.indexOf(Buffer.from([0xff, 0xd9]));
-    if (eoi >= 0 && eoi + 2 < scans.length)
-      throw invalid('the logo file has data after the end of the image');
-    throw incomplete();
-  }
-  kept.push(scans);
   return { contentType: 'image/jpeg', content: new Uint8Array(Buffer.concat(kept)), width, height };
 }
 

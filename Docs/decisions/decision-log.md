@@ -4333,3 +4333,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the card forbids claiming AC-11 without the primary text; the owner's instruction is to record and continue.
 - Alternatives: rely on secondary summaries (rejected: AC-11 asks for primary text).
 - ADR: none · Status: accepted
+
+### DL-0875 — JPEG logos: walk every scan and refuse anything after the first EOI (security review r11 F1)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: `cleanInvoiceLogo` walks the entropy-coded data after each SOS (`FF 00`, RSTn are data, `FF` fill skipped), stops at the first real `FF D9` and refuses any trailing byte, even when the file ends with another `FF D9`.
+- Why: the review showed `valid.jpg + <html>… + FFD9` was accepted and stored, contradicting RQ-0182 finding 2; ITU-T T.81 Annex B defines byte stuffing, so the first unstuffed `FF D9` is the image's end.
+- Alternatives: `indexOf(FF D9)` on the scan data only (would not also give F2/F3).
+- ADR: ADR-0100 (addendum) · Status: accepted
+
+### DL-0876 — JPEG metadata dropped between scans too (r11 F2)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: APP1, APP3–APP13, APP15 and COM are dropped wherever they occur before EOI, not only before the first SOS.
+- Why: progressive files can carry Exif/XMP/COM between scans, which would then reach customers (privacy).
+- Alternatives: keep the documented limit (rejected: the walk from DL-0875 makes it free).
+- ADR: ADR-0100 (addendum) · Status: accepted
+
+### DL-0877 — At most 100 JPEG scans per logo (r11 F3)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: a JPEG logo with more than 100 SOS segments is refused in plain words.
+- Why: a progressive "scan bomb" fits in 512 KiB and can cost the PDF renderer seconds per decode; libjpeg-turbo has no default cap (its `djpeg -maxscans` exists for that reason); normal progressive files use about 10.
+- Alternatives: no cap (renderer timeouts); a lower cap such as 20 (risk of refusing unusual but valid encoders).
+- ADR: ADR-0100 (addendum) · Status: accepted
+
+### DL-0878 — PNG IHDR values checked against the standard (r11 F4)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: only the colour-type/bit-depth pairs of PNG 3rd ed. §11.2.1 Table 11, compression 0, filter 0 and interlace 0/1 are accepted.
+- Why: invalid headers were accepted and stored (decoders reject them later, so the invoice image breaks); the check is a few lines.
+- Alternatives: a decoded-size cap as well (not needed: dimensions are already ≤ 4,000 px a side).
+- ADR: ADR-0100 (addendum) · Status: accepted
+
+### DL-0879 — Logos stored before T-0195 are re-cleaned on use; GET answers 422 LOGO_INVALID (r11 F5)
+- Date: 2026-11-22 · By: claude · Task: T-0195 · Category: security
+- Decision: `GET /setup/billing/logo` maps a cleaner refusal of a stored logo to 422 `LOGO_INVALID` with a request to upload again; `loadInvoiceDocument` cleans the stored logo and leaves out one that fails, so the invoice renders without it.
+- Why: T-0165 stored logos with magic-byte checks only; the GET answered 500 and the PDF embedded uncleaned bytes.
+- Alternatives: a one-off migration re-cleaning stored logos (rejected: a data rewrite of tenant rows for a rare case; cleaning on use covers every path).
+- ADR: ADR-0100 (addendum) · Status: accepted

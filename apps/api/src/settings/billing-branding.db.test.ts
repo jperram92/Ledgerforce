@@ -359,6 +359,48 @@ describe('SS-PLAT-172: Stripe payout settings over HTTP', () => {
   });
 });
 
+describe('SS-PLAT-171: security review r11 fixes over HTTP (F1, F5)', () => {
+  it('SS-PLAT-171 F1 a JPEG with an HTML payload and a second FF D9 after its end is refused and nothing is stored [T-0195]', async () => {
+    const before = (await audits('ar_settings')).length;
+    const jpeg = logo('logo-progressive.jpg');
+    const polyglot = Buffer.concat([
+      jpeg,
+      Buffer.from('<html><script>SECRET</script>'),
+      Buffer.from([0xff, 0xd9]),
+    ]);
+    const r = await upload('image/jpeg', polyglot);
+    expect(r.status).toBe(400);
+    expect(await json(r)).toEqual({
+      error: 'INVALID_INVOICE_SETTINGS',
+      message: 'the logo file has data after the end of the image',
+    });
+    expect(await audits('ar_settings')).toHaveLength(before);
+  });
+
+  it('SS-PLAT-171 F5 a logo saved before the checks that no longer passes them is answered 422 LOGO_INVALID, asking for a new upload [T-0195]', async () => {
+    // As T-0165 stored it: magic bytes only.
+    const legacy = Buffer.concat([
+      Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+      Buffer.from('<html>legacy</html>'),
+    ]);
+    await f.admin.query(
+      `UPDATE app.ar_settings SET logo = $1, logo_content_type = 'image/png' WHERE tenant_id = $2 AND company_id = $3`,
+      [legacy, f.tenantId, co],
+    );
+    const r = await call('GET', `/setup/billing/logo?company_id=${co}`, 'fa');
+    expect(r.status).toBe(422);
+    expect(await json(r)).toEqual({
+      error: 'LOGO_INVALID',
+      message:
+        'the saved logo does not pass the current checks (the logo file is not a complete PNG image): upload it again',
+    });
+    const rm = await call('PUT', '/setup/billing/logo', 'fa', {
+      body: { company_id: co, logo: null },
+    });
+    expect(await json(rm)).toMatchObject({ changed: true, invoice: { has_logo: false } });
+  });
+});
+
 describe('SS-PLAT-173: permissions of the logo and payout routes', () => {
   it("SS-PLAT-173 writes need settings.setup.manage and a key; the logo read needs settings.read; another tenant's company is 404 [T-0195]", async () => {
     const acc = await upload('image/png', logo('logo-plain.png'), 'accountant');

@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0195-secfix
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37059
+[31m[Nest] 5977  - [39m11/22/2026, 7:30:11 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mPayloadTooLargeError: request entity too large
+    at readStream [90m(/home/user/Ledgerforce/.claude/worktrees/t0195-secfix/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:163:17[90m)[39m
+    at getRawBody [90m(/home/user/Ledgerforce/.claude/worktrees/t0195-secfix/[39mnode_modules/[4m.pnpm[24m/raw-body@3.0.2/node_modules/[4mraw-body[24m/index.js:116:12[90m)[39m
+    at read [90m(/home/user/Ledgerforce/.claude/worktrees/t0195-secfix/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/read.js:134:3[90m)[39m
+    at jsonParser [90m(/home/user/Ledgerforce/.claude/worktrees/t0195-secfix/[39mnode_modules/[4m.pnpm[24m/body-parser@2.4.0/node_modules/[4mbody-parser[24m/lib/types/json.js:60:5[90m)[39m
+    at Layer.handleRequest [90m(/home/user/Ledgerforce/.claude/worktrees/t0195-secfix/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/lib/layer.js:152:17[90m)[39m
+    at trimPrefix [90m(/home/user/Ledgerforce/.claude/worktrees/t0195-secfix/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:342:13[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/t0195-secfix/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:297:9
+    at processParams [90m(/home/user/Ledgerforce/.claude/worktrees/t0195-secfix/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:582:12[90m)[39m
+    at next [90m(/home/user/Ledgerforce/.claude/worktrees/t0195-secfix/[39mnode_modules/[4m.pnpm[24m/router@2.2.0/node_modules/[4mrouter[24m/index.js:291:5[90m)[39m
+    at requestIdMiddleware [90m(/home/user/Ledgerforce/.claude/worktrees/t0195-secfix/[39mapps/api/src/audit/request-id.ts:13:3[90m)[39m {
+  expected: [33m204862[39m,
+  length: [33m204862[39m,
+  limit: [33m102400[39m,
+  type: [32m'entity.too.large'[39m
+}
+
+ Test Files  2 passed (2)
+      Tests  15 passed (15)
+   Start at  19:30:05
+   Duration  9.38s (transform 2.00s, setup 0ms, import 4.29s, tests 3.78s, environment 0ms)
+

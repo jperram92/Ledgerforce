@@ -86,3 +86,26 @@ decide where GP-027 posts.
 
 ## Links
 RQ-0182, RQ-0167, ADR-0085, ADR-0078, ADR-0071, ADR-0054, GP-027, T-0195, DL-0870 to DL-0874.
+
+## Addendum 2026-11-22 — security review r11 (status unchanged)
+Security review r11 of the merged T-0195 found one Medium and four Low findings. The decision
+stands; the logo cleaner and its users are tightened (DL-0875 to DL-0879):
+
+- **F1 (Medium).** A JPEG walk now continues through the entropy-coded data of every scan
+  (`FF 00` and `FF D0`–`FF D7` are data; `FF` fill bytes are skipped) and stops at the **first**
+  real EOI; any byte after it is refused ("the logo file has data after the end of the image"),
+  even when the file ends with another `FF D9`. This closes the JPEG+HTML+`FFD9` polyglot.
+- **F2 (Low).** APP1, APP3–APP13, APP15 and COM are dropped wherever they appear before EOI,
+  including between scans (decision item 1's list now applies to the whole file).
+- **F3 (Low).** At most 100 scans (`MAX_JPEG_SCANS`); more is refused in plain words.
+- **F4 (Low).** PNG IHDR values must be allowed by the standard: colour type 0 with depth
+  1/2/4/8/16, 2/4/6 with 8/16, 3 with 1/2/4/8; compression 0; filter 0; interlace 0 or 1.
+- **F5 (Low).** Logos stored before T-0195 (magic bytes only) are cleaned again where they are
+  used: `GET /setup/billing/logo` answers 422 `LOGO_INVALID` ("… upload it again") instead of
+  500 when one fails, and the invoice document loader cleans the logo before rendering and
+  leaves out one that fails, so the invoice still renders.
+
+Not changed: F6 (1 MiB read before authentication, same pattern as ADR-0078) and F7 (payout
+mapping notifications) are accepted as Info; F8 is a governance note for the owner (AGENTS.md §6
+versus DL-0691). The iCCP profile name (1–79 bytes) is still kept; it is part of a chunk that
+affects colours and rewriting it would need a CRC change — recorded as a known minor limit.
