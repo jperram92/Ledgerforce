@@ -137,3 +137,11 @@ normally exported from design tools without it.
 
 **Affects:** packages/modules/ar/src/logo-clean.ts, apps/api/src/settings/billing-settings.controller.ts,
 apps/api/src/security/statement-body.ts, apps/api/src/app.ts, apps/web/src/settings.
+
+## Update 2026-11-22 — security review r11
+The "known limit" above (segments after the first JPEG SOS kept verbatim) no longer holds: the
+cleaner now walks every scan, drops metadata between scans, caps scans at 100 and refuses any
+data after the first EOI; PNG IHDR values are checked against PNG 3rd ed. §11.2.1 (Table 11);
+legacy logos are re-cleaned on use. See the ADR-0100 addendum and DL-0875 to DL-0879. Source for
+the scan cap: libjpeg-turbo documents `djpeg -maxscans` because the library has no default limit
+on progressive scans (security review r11 F3; not re-fetched this session).

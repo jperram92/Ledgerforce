@@ -1,0 +1,9 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0195-secfix
+
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  19:28:03
+   Duration  1.01s (transform 617ms, setup 0ms, import 814ms, tests 60ms, environment 0ms)
+

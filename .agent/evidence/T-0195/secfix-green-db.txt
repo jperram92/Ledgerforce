@@ -1,0 +1,10 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0195-secfix
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:37479
+
+ Test Files  2 passed (2)
+      Tests  21 passed (21)
+   Start at  19:30:16
+   Duration  7.72s (transform 776ms, setup 0ms, import 2.44s, tests 3.99s, environment 0ms)
+
