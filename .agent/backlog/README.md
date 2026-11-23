@@ -275,7 +275,7 @@ graph LR
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | verifying | T-0051 |
 | [T-0215](T-0215.md) | Bills inbox transport: signed provider inbound webhooks (SaaS) | MVP | verifying | T-0127 |
-| [T-0216](T-0216.md) | Bills mailbox: settings API/UI and OAuth2 XOAUTH2 (Microsoft 365, Google Workspace) | MVP | todo | T-0127 |
+| [T-0216](T-0216.md) | Bills mailbox: OAuth2 sign-in (authorization code + PKCE) and IMAP XOAUTH2 for Microsoft 365 and Google Workspace | MVP | in_progress | T-0127 |
 | [T-0227](T-0227.md) | Ops - least-privilege lf_backup role for the nightly backup (replace the superuser) | MVP | todo | T-0143 |
 | [T-0228](T-0228.md) | Ops - point-in-time recovery (WAL archiving) for the hosted RPO 15 min and optional self-host PITR | Phase 1 | todo | T-0143 |
 | [T-0223](T-0223.md) | Bills inbox transport: SendGrid Inbound Parse (signed security policy, send_raw) | MVP | todo | T-0215 |
@@ -299,6 +299,8 @@ graph LR
 | [T-0218](T-0218.md) | Single-supply BAS preparation: basis guard, aged unbilled GST report, no negative G1/1A (G18/1B), credit_note_bas setting, lifecycle properties and primary-law reading | MVP | todo | T-0217 | UC-04, UC-11 | 0 |
 | [T-0229](T-0229.md) | Stripe: a refund that fails after it was recorded paid (refund.updated / charge.refund.updated webhook) | MVP | todo | T-0189 | UC-11 | 0 |
 | [T-0230](T-0230.md) | Bills inbox webhook: slow-upload protection (per-client in-flight cap, minimum transfer rate, first-byte timeout) | MVP | todo | T-0215 | UC-05 | 0 |
+| [T-0237](T-0237.md) | Bills mailbox settings: password mailbox API, test connection, inbound address show/rotate and the Settings screen | MVP | todo | T-0216, T-0215 | UC-05 | 0 |
+| [T-0238](T-0238.md) | Bills mailbox: unattended OAuth grants (Microsoft 365 app-only client credentials, Google service-account delegation) | Phase 1 | todo | T-0216 | UC-05 | 0 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
 | [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | review | T-0117 | UC-11 | 0 |
 | [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |

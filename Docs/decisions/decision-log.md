@@ -4572,3 +4572,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: N1 affects only availability of the inbound route, not data or tenant isolation; it needs its own tests and tuning.
 - Alternatives: fix inside T-0215 (rejected: separate behaviour; T-0215 already passed review).
 - ADR: none · Status: accepted
+
+### DL-0930 — T-0216 split: OAuth slice here; settings API/screen to T-0237; unattended grants to T-0238
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: scope
+- Decision: T-0216 builds the OAuth2 slice end to end (RQ-0187, ADR-0105, migration, IMAP XOAUTH2, token exchange/refresh, sealed refresh token with rotation, poller, connect API). The password-mailbox settings API, "Test connection", inbound-address show/rotate and the Settings screen (old AC-1, AC-2, AC-4) move to new card T-0237; Microsoft app-only and Google service-account grants to T-0238. Old AC-3 (XOAUTH2 against the fake server) stays and is extended.
+- Why: the original card (estimate 380 lines) holds two independent deliverables of about 900 lines each with tests; the brief allows splitting and asks to build the first slice fully.
+- Alternatives: build everything half (rejected: directive "no shortcuts"); screen first (rejected: without OAuth the screen cannot connect Microsoft 365 at all).
+- ADR: ADR-0105 · Status: accepted
+
+### DL-0931 — Delegated authorization code + PKCE for Microsoft 365 and Google; app-only deferred
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: Mailbox OAuth uses the delegated authorization code flow with PKCE S256 for both providers (Microsoft scopes `https://outlook.office.com/IMAP.AccessAsUser.All offline_access`; Google `https://mail.google.com/` with `access_type=offline`, `prompt=consent`). Resolves RQ-0177 S7: Microsoft app-only IMAP is supported since 2022 but needs Exchange PowerShell per mailbox, so it becomes T-0238.
+- Why: RQ-0187 F2–F4; comparable products (Freshdesk, osTicket) ship delegated sign-in; the OAuth Security BCP recommends PKCE for confidential clients too.
+- Alternatives: app-only first (rejected for MVP: PowerShell steps); password-only (impossible on Microsoft 365).
+- ADR: ADR-0105 · Status: accepted
+
+### DL-0932 — In-house OAuth2 client over fetch + node:crypto; no new dependency
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: architecture
+- Decision: `packages/modules/ap/src/mailbox-oauth.ts` implements authorization URL, code exchange and refresh (RFC 6749/7636) with an injectable `fetch`: HTTPS only, `redirect: 'error'`, 15 s timeout, 64 KiB answer bound, fixed error classes. Tests use recorded token responses.
+- Why: RQ-0187 F7 — four HTTPS calls; `openid-client` is OIDC-centred and would be a new dependency of `@ledgerforce/ap` and the worker.
+- Alternatives: openid-client (rejected), simple-oauth2 (rejected: new dependency).
+- ADR: ADR-0105 · Status: accepted
+
+### DL-0933 — Refresh token in the mailbox's sealed-secret columns (AAD field refresh_token), rotated in place; client credentials are install configuration
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: Migration 0084 adds `auth_method`, `oauth_provider`, `secret_rotated_at` to `app.bill_inbox_mailbox`; OAuth rows keep the refresh token in the existing sealed columns with AAD field `refresh_token`. A rotated refresh token is re-sealed into the same row (lf_app UPDATE on the secret columns, narrowed by a trigger to active oauth2 rows with `secret_rotated_at` set); old tokens are not kept. Client id/secret per provider and the redirect URI come from install configuration (`LF_MAILBOX_OAUTH_*`), never the database. Amends ADR-0095 rule 4 for OAuth rows only.
+- Why: RQ-0187 F5 — Microsoft replaces the refresh token on every use and recommends discarding the old one; an append-only history would keep live credentials; the forward-only runner cannot relax NOT NULL on the password columns, and a separate table would duplicate the sealed-field pattern.
+- Alternatives: append-only token table (rejected: retains live old tokens); per-company app registrations (rejected: SMB operators would need an Entra/Google app each).
+- ADR: ADR-0105 · Status: accepted
+
+### DL-0934 — Mailbox connect permission: settings.setup.manage + step-up; callback bound to the starting session; no SoD step
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: Answers T-0216's open question. Starting a mailbox connection needs `settings.setup.manage`, a 300 s step-up and an Idempotency-Key (like bank accounts, ADR-0084); the callback needs the same permission and is accepted only for the user and session that started it, once, within 10 minutes. No SoD maker-checker: mailbox credentials can inject bills into the inbox but every bill still needs coding and approval before it posts, and they are not payment data (unlike remittance/bank details, ADR-0079).
+- Why: RQ-0187 F4; design §6.2 step-up for credential changes; ADR-0095 rule 7 (nothing posts from email).
+- Alternatives: SoD request/approve (rejected: an OAuth consent cannot be "approved" by a second person after the fact, and the risk is bounded by bill approval).
+- ADR: ADR-0105 · Status: accepted
+
+### DL-0935 — OAuth failures reuse the existing mailbox error classes
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: Token endpoint `invalid_grant`, `invalid_client`, `unauthorized_client` → `auth_failed` (reconnect needed); network failure, timeout, 5xx, redirect, oversized or malformed answers → `connect_failed`. No provider text is stored or returned.
+- Why: RQ-0187 F6; the `last_error` CHECK cannot be widened by the forward-only runner (precedent 0073), and the UI can show "Reconnect" from `auth_method = oauth2` + `auth_failed` (T-0237).
+- Alternatives: new error column (rejected: not needed).
+- ADR: ADR-0105 · Status: accepted
