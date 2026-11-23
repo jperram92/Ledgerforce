@@ -4573,6 +4573,221 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: fix inside T-0215 (rejected: separate behaviour; T-0215 already passed review).
 - ADR: none · Status: accepted
 
+### DL-0920 — Mailgun inbound reader: one upload per client, first byte in 3 s, at least 64 KiB/s from 5 s
+- Date: 2026-11-23 · By: claude · Task: T-0230 · Category: security
+- Decision: `inboundWebhookBody` adds `maxInFlightPerClient` (default 1; 1..maxInFlight, checked before the global slot and byte reservation, 503 `inbound_busy` + Retry-After), `firstByteTimeoutMs` (3 000; 408 `first_byte_timeout`) and `minBytesPerSecond` / `minRateGraceMs` (64 KiB/s averaged over the request, checked once a second from 5 s; 408 `upload_too_slow`). Every refusal keeps `Connection: close`; all timers stop on end, refusal or client close; global cap 4, 64 MiB budget, 60 s and 26 MiB unchanged. Delegated security decision under DL-0691 with research RQ-0186; no ADR (no dependency, data model or public contract change; the ADR-0099 addendum already puts upload bounds in this reader).
+- Why: T-0215 re-review N1 (DL-0898): four trickling connections from one address held every slot. Per-address concurrency (nginx `limit_conn addr 1`), a data timeout (nginx `client_body_timeout`) and a rate floor (Apache `MinRate`) are the standard trio; the floor can be far above Apache's 500 B/s because the sender is Mailgun's data centre and genuine 26 MiB bodies already need ~450 KiB/s to meet the 60 s cap.
+- Alternatives: idle (between-reads) timeout only, as nginx (rejected: one byte per interval survives it); per-client cap 2 (rejected: halves the cost of an attack; a genuine same-address burst is only delayed by Mailgun's retry); a lower whole-body timeout (rejected: would cut genuine large messages).
+- ADR: none (ADR-0099 addendum) · Status: accepted
+
+### DL-0921 — Per-client key is the rate limiter's address; inbound DB harness runs behind one trusted proxy
+- Date: 2026-11-23 · By: claude · Task: T-0230 · Category: security
+- Decision: `clientAddress(req)` in rate-limit.ts (`req.ip` under Express `trust proxy` = LF_TRUST_PROXY_HOPS, `::ffff:` folded) is shared by the rate limiter and the upload reader. Proven on a real Nest app with `applySecurity`: with 0 hops a forged X-Forwarded-For does not make a second client; with 1 hop only the proxy-added entry counts. The default-limits `api` instance of bills-inbound-webhook.db.test.ts now uses `trustProxyHops: 1` (as compose) and its SS-PLAT-178 racing deliveries carry two forwarded documentation addresses; assertions unchanged.
+- Why: RQ-0186 F4 — one helper so the two limits can never key differently. The racing test hit the new one-per-address cap from loopback (RED kept as evidence); in production the two racers are two Mailgun addresses behind nginx, which the harness now models instead of raising the cap.
+- Alternatives: raise `maxInFlightPerClient` in the harness (rejected: tests a non-default configuration); trust X-Forwarded-For directly (rejected: client-chosen key).
+- ADR: none · Status: accepted
+
+### DL-0922 — Limits stay code-configurable; environment variables split to T-0235
+- Date: 2026-11-23 · By: claude · Task: T-0230 · Category: process
+- Decision: The new thresholds are `InboundBodyLimits` fields like the T-0215 ones; exposing them through config.ts and compose (with bounds and install-contract tests) is follow-up card T-0235.
+- Why: Keeps T-0230 to the reader; compose and the install contract are shared files with their own tests.
+- Alternatives: add env vars here (rejected: scope).
+- ADR: none · Status: accepted
+
+### DL-0923 — Runbook: Mailgun allow-list and alert on 503/408 from the nginx access log
+- Date: 2026-11-23 · By: claude · Task: T-0230 · Category: security
+- Decision: Docs/ops/install.md documents the limits, the dependency on a correct LF_TRUST_PROXY_HOPS, an optional allow-list of Mailgun's webhook egress addresses at the TLS proxy, and alerting on 503/408 answers for the route that persist for more than ~15 minutes, read from the `web` access log. No API metric is added.
+- Why: RQ-0186 F6 — a many-address attack can still fill the global cap; only network-level filtering closes it. The access log already records status per path, so no new code or dependency is needed for the alert.
+- Alternatives: a Prometheus counter in the API (rejected for now: no metrics endpoint exists in the MVP stack).
+
+### DL-0900 — T-0217 sliced: cancellation and refund now; reversal, cash-basis final invoice and delivery to T-0231; variation document to T-0232
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: scope
+- Decision: T-0217 builds AC-2 and AC-10 (rest): GP-044a/c cancellation (plus the cash-basis and nothing-attributed cases), the GP-044b refund through the existing customer refund approval path, the GP-044d refund with maker-checker and adjustment-note particulars, forfeiture refused, contract cancelled, and a lifecycle property. AC-3 and AC-9 (receipt reversal and its BAS label), the cash-basis final invoice (GP-022), the NOTHING_ATTRIBUTED decision and the final invoice's `ar.invoice.posted` event move with full text to T-0231; the contract-variation document (AC-6 rest, candidate goldens GP-047+) moves to T-0232. T-0218 now also depends on T-0231.
+- Why: the card covers four posting families and is several times the ~400-line split threshold (RQ-0184 Q7); the variation document needs its own research and goldens before any code.
+- Alternatives: build everything in one branch (rejected: oversized, half-built risk); leave the rest on T-0217 unticked (rejected: a card must be finishable).
+- ADR: none · Status: accepted
+
+### DL-0901 — Cancellation states the refund decision; cash basis and nothing attributed post no entry
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: accounting
+- Decision: `cancelSingleSupply` requires `refund` ∈ {agreed, undecided, forfeited} and a reason (1–500 characters, the adjustment-note reason); `forfeited` is refused FORFEITURE_NOT_SUPPORTED with nothing written. Accruals with GST attributed: agreed → GP-044a, undecided → GP-044c (no entry when nothing is unbilled, i.e. fully received). Cash basis, or accruals with no receipt: no entry; the contract is cancelled and cash-basis money is refunded by the GP-044d shape (GP-044 "Cash basis" note). Dates on or after the contract and its last receipt; the basis in force must still be the contract's (BASIS_CHANGED).
+- Why: RQ-0184 Q1–Q3; GP-044 (Approved, DL-0755); ADR-0089 R7/R8 and addendum A.
+- Alternatives: a default refund decision (rejected: the user must state the fact, as the R1 classification); refusing cash-basis cancellation (rejected: GP-044 covers it).
+- ADR: ADR-0089 (addendum A) · Status: accepted
+
+### DL-0902 — GP-044b reuses the customer refund unchanged; GP-044d is a contract refund with approver ≠ maker
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: accounting
+- Decision: After GP-044a the refund is an ordinary customer refund (createCustomerRefund → approveCustomerRefund by another person → payCustomerRefund, GP-006, allocated oldest first, which is the 44a credit when there is no older one). GP-044d is `refundCancelledSingleSupply`: the whole cash received, on the refund date (= the date it is agreed), with `approvedBy` required and different from `createdBy` (SOD_REFUND_SELF_APPROVAL in the module and a CHECK in the database). It is refused for an agreed accruals cancellation (REFUND_VIA_CUSTOMER_REFUND: that money is an AR credit), for nothing received (NOTHING_TO_REFUND) and a second time (key).
+- Why: RQ-0184 Q4: 44b's journal is GP-006; 44d debits CUSTOMER_PREPAYMENTS with the decreasing adjustment, so it cannot go through AR; comparable systems refund a deposit from the deposit; ADR-0074's control is another person's approval before money leaves.
+- Alternatives: a new two-step request/approve table for 44d (rejected: no golden or criterion needs a separate step, more surface); paying 44d by the payment batch (not needed for the golden).
+- ADR: ADR-0074, ADR-0089 · Status: accepted
+
+### DL-0903 — Adjustment-note particulars on the 44a, 44c and 44d documents; no new number series
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: accounting
+- Decision: The cancellation and the 44d refund return the 45c particulars shape (title, reason, decrease net/GST/gross, the earlier document adjusted, `withinThreshold` when the GST is $75 or less, s 29-80); 44c carries them too. The documents are identified by the contract reference and date; no adjustment-note number series is added.
+- Why: RQ-0184 Q5 (AC-10; review findings 8 and 10 from ATO extracts; GP-042a carried them for the 44c journal).
+- Alternatives: numbered adjustment notes from a new series (deferred to a document/print UI; not needed for the journal or BAS).
+- ADR: none · Status: accepted
+
+### DL-0904 — Migration 0082: single_supply_cancellation and single_supply_refund
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: architecture
+- Decision: `0082_ar_single_supply_cancellation.sql` adds two immutable tenant-owned tables (RLS ENABLE + FORCE, tenant_isolation, lf_app SELECT/INSERT, UPDATE/DELETE raise): the cancellation (one per contract; decision, reason, entry or NULL, decrease net/GST) and the 44d refund (one per contract; amounts, account, entry, reason, maker, approver, CHECK approver ≠ maker). Status stays in `single_supply_contract_status`. Number 0082 is the reserved one for this round (the lead may renumber at merge).
+- Why: RQ-0184 Q6; immutable posted documents (ADR-0004 spirit).
+- Alternatives: extra columns on the status table (rejected: no ALTER on an immutable table's meaning; separate concerns).
+- ADR: none · Status: accepted
+
+### DL-0905 — T-0217 primary-law reading not possible in this environment; recorded, not claimed
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: accounting
+- Decision: legislation.gov.au and austlii.edu.au refuse CONNECT (403) and ato.gov.au answers 403 (`.agent/evidence/T-0217/primary-source-probe.txt`). T-0217 claims no primary-law reading; it implements Approved GP-044. The reading remains T-0218's exit item.
+- Why: directive 4 (research with sources) and honesty about what was read.
+- Alternatives: none.
+- ADR: none · Status: accepted
+
+### DL-0906 — Undecided cancellation with only a rounding residue unbilled is refused by name
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: accounting
+- Decision: `cancelSingleSupply` with `refund: 'undecided'` refuses ROUNDING_RESIDUE_NOT_COVERED (nothing written) when the not-received net is zero or below while unbilled GST is non-zero, or unbilled GST is negative; a fully received contract (both zero) is cancelled with no entry; refund agreed (GP-044a) is always available and clears the residue.
+- Why: RQ-0184 addendum A — the SS-PLAT-182 property found the counterexample (net 0.05, receipt 0.05 with GST 0.00) where the first cut left 0.01 on GST_ATTRIBUTED_UNBILLED; no valid GP-044c line can carry a GST-only or negative residue and no golden covers it.
+- Alternatives: clear the residue uncoded against GST collected (rejected: ledger and code-driven BAS would differ by the residue); against CUSTOMER_PREPAYMENTS (rejected: changes the money held and the later 44d amounts without a golden).
+- ADR: none · Status: accepted
+
+### DL-0910 — The nightly Stripe refund sweep only looks and reports; recording stays a person's action
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: security
+- Decision: The sweep and its handler use only the read-only lookup (`refundsAtStripe`) under the party lock; they never call `checkStripeCustomerRefund` (which records), a Stripe create, the posting engine or a status change. Recording a stray stays "Check with Stripe" in the refund region, or approving an unapproved (R2) document, which adopts and sends nothing.
+- Why: money-out maker-checker (design §6.5, ADR-0091); RQ-0185 findings 2–4; comparable systems finish bookkeeping only on a person's decision (RQ-0185 S6, S7).
+- Alternatives: nightly automatic recording (rejected: unattended journal for money out, not allowed for unapproved documents).
+- ADR: ADR-0103 · Status: accepted
+
+### DL-0911 — Strays are reported as Sync issues through an outbox event and a read-only handler
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: architecture
+- Decision: One `ar.refund.stripe_unrecorded` event per stray document; handler `stripe.refund.unrecorded_check` repeats the read-only look and throws `HELD_AT_STRIPE` (`retryable: false`) while the stray is there, so the dead letter is the Sync issue (connector `stripe`); a retry succeeds and resolves it once the document is recorded or the stray is gone. No event is published while an earlier one for the document has no successful delivery (one issue per document).
+- Why: Sync issues already give status, retry, ignore and audit (design §5.6, migration 0030 needs an event and handler); RQ-0185 finding 3.
+- Alternatives: a new strays table and screen (rejected: migration, permission and screen for an existing capability); a direct insert into `app.sync_issue` (rejected: its retry would have nothing meaningful to run).
+- ADR: ADR-0103 · Status: proposed (accepted on cross-review)
+
+### DL-0912 — Sweep candidates, schedule and per-document transactions
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: architecture
+- Decision: Candidates are Stripe documents `requested`, or `cancelled` with a change in the last 30 days. The scheduler fans out one `stripe.refunds.sweep` job per active tenant and UTC day at 15:35 UTC (job data `{ tenantId }`); the worker (only with Stripe configured) sweeps each document in its own tenant transaction, continues past a failing document and then fails the job so pg-boss retries (idempotent).
+- Why: a cancelled-document stray can only appear within minutes of the cancel (r10 cooling-off, 30 s deadline), so 30 days bounds Stripe calls with ample margin; per-document transactions keep party locks short (RQ-0185 finding 1–2; ADR-0062 pattern).
+- Alternatives: all cancelled documents forever (rejected: unbounded calls); one transaction for the tenant (rejected: holds every party lock across many Stripe calls).
+- ADR: ADR-0103 · Status: accepted
+
+### DL-0913 — The refund view carries the waiting resend with the requester's display name
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: architecture
+- Decision: Every stored Stripe view gains `stripe.resend` = `{ id, requested_by, requested_by_name, requested_at, reason }` of the unconfirmed resend, or null (null right after a send). The exact-shape assertion of the create view in refunds-stripe.db.test.ts now includes `resend: null` (contract addition, still `toEqual`).
+- Why: AC-3; the confirmer must see who asked by name to judge "not me" (RQ-0185 finding 5).
+- Alternatives: a separate GET for resends (rejected: an extra call for every view).
+- ADR: ADR-0103 · Status: accepted
+
+### DL-0914 — Refund region: who is offered the check, the ask and the confirm
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: ui
+- Decision: "Check with Stripe" for `ar.refund.approve` on an approved, requested Stripe refund whose send failed or expired (not `SENT_NOT_POSTED`) while no resend waits; "Ask to send again" (reason required, 1–500) only when the check says `resendable`; the waiting resend is shown to every reader; "Confirm and send again" only to a holder of the permission who is not the requester (compared with `/auth/me`), behind StepUpPrompt; Cancel stays available to the clerk. The API's SoD rule and database CHECK remain the authority.
+- Why: AC-1, AC-3; maker-checker visible on screen (RQ-0185 finding 5; Docs/ui/principles.md).
+- Alternatives: show the confirm button to the requester and rely on the 403 (rejected: invites a refused action).
+- ADR: ADR-0103 · Status: accepted
+
+### DL-0915 — T-0208 IDs: RQ-0185, ADR-0103, SS-UC11-14..17; no migration
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: process
+- Decision: Used RQ-0185, ADR-0103, DL-0910–DL-0915 and SS-UC11-14 to SS-UC11-17 from the round-12 reservation; the reserved migration 0083 and cards T-0233/T-0234 were not needed. The follow-ups fixture gained an additive 'waiting' list interaction; a new documented list-only fixture `stripe-refunds-sweep-20261123.json` was added.
+- Why: lead's reserved ranges.
+
+### DL-0930 — T-0216 split: OAuth slice here; settings API/screen to T-0237; unattended grants to T-0238
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: scope
+- Decision: T-0216 builds the OAuth2 slice end to end (RQ-0187, ADR-0105, migration, IMAP XOAUTH2, token exchange/refresh, sealed refresh token with rotation, poller, connect API). The password-mailbox settings API, "Test connection", inbound-address show/rotate and the Settings screen (old AC-1, AC-2, AC-4) move to new card T-0237; Microsoft app-only and Google service-account grants to T-0238. Old AC-3 (XOAUTH2 against the fake server) stays and is extended.
+- Why: the original card (estimate 380 lines) holds two independent deliverables of about 900 lines each with tests; the brief allows splitting and asks to build the first slice fully.
+- Alternatives: build everything half (rejected: directive "no shortcuts"); screen first (rejected: without OAuth the screen cannot connect Microsoft 365 at all).
+- ADR: ADR-0105 · Status: accepted
+
+### DL-0931 — Delegated authorization code + PKCE for Microsoft 365 and Google; app-only deferred
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: Mailbox OAuth uses the delegated authorization code flow with PKCE S256 for both providers (Microsoft scopes `https://outlook.office.com/IMAP.AccessAsUser.All offline_access`; Google `https://mail.google.com/` with `access_type=offline`, `prompt=consent`). Resolves RQ-0177 S7: Microsoft app-only IMAP is supported since 2022 but needs Exchange PowerShell per mailbox, so it becomes T-0238.
+- Why: RQ-0187 F2–F4; comparable products (Freshdesk, osTicket) ship delegated sign-in; the OAuth Security BCP recommends PKCE for confidential clients too.
+- Alternatives: app-only first (rejected for MVP: PowerShell steps); password-only (impossible on Microsoft 365).
+- ADR: ADR-0105 · Status: accepted
+
+### DL-0932 — In-house OAuth2 client over fetch + node:crypto; no new dependency
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: architecture
+- Decision: `packages/modules/ap/src/mailbox-oauth.ts` implements authorization URL, code exchange and refresh (RFC 6749/7636) with an injectable `fetch`: HTTPS only, `redirect: 'error'`, 15 s timeout, 64 KiB answer bound, fixed error classes. Tests use recorded token responses.
+- Why: RQ-0187 F7 — four HTTPS calls; `openid-client` is OIDC-centred and would be a new dependency of `@ledgerforce/ap` and the worker.
+- Alternatives: openid-client (rejected), simple-oauth2 (rejected: new dependency).
+- ADR: ADR-0105 · Status: accepted
+
+### DL-0933 — Refresh token in the mailbox's sealed-secret columns (AAD field refresh_token), rotated in place; client credentials are install configuration
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: Migration 0084 adds `auth_method`, `oauth_provider`, `secret_rotated_at` to `app.bill_inbox_mailbox`; OAuth rows keep the refresh token in the existing sealed columns with AAD field `refresh_token`. A rotated refresh token is re-sealed into the same row (lf_app UPDATE on the secret columns, narrowed by a trigger to active oauth2 rows with `secret_rotated_at` set); old tokens are not kept. Client id/secret per provider and the redirect URI come from install configuration (`LF_MAILBOX_OAUTH_*`), never the database. Amends ADR-0095 rule 4 for OAuth rows only.
+- Why: RQ-0187 F5 — Microsoft replaces the refresh token on every use and recommends discarding the old one; an append-only history would keep live credentials; the forward-only runner cannot relax NOT NULL on the password columns, and a separate table would duplicate the sealed-field pattern.
+- Alternatives: append-only token table (rejected: retains live old tokens); per-company app registrations (rejected: SMB operators would need an Entra/Google app each).
+- ADR: ADR-0105 · Status: accepted · Superseded in part by DL-0936 (rotation mechanism)
+
+### DL-0934 — Mailbox connect permission: settings.setup.manage + step-up; callback bound to the starting session; no SoD step
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: Answers T-0216's open question. Starting a mailbox connection needs `settings.setup.manage`, a 300 s step-up and an Idempotency-Key (like bank accounts, ADR-0084); the callback needs the same permission and is accepted only for the user and session that started it, once, within 10 minutes. No SoD maker-checker: mailbox credentials can inject bills into the inbox but every bill still needs coding and approval before it posts, and they are not payment data (unlike remittance/bank details, ADR-0079).
+- Why: RQ-0187 F4; design §6.2 step-up for credential changes; ADR-0095 rule 7 (nothing posts from email).
+- Alternatives: SoD request/approve (rejected: an OAuth consent cannot be "approved" by a second person after the fact, and the risk is bounded by bill approval).
+- ADR: ADR-0105 · Status: accepted
+
+### DL-0935 — OAuth failures reuse the existing mailbox error classes
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: Token endpoint `invalid_grant`, `invalid_client`, `unauthorized_client` → `auth_failed` (reconnect needed); network failure, timeout, 5xx, redirect, oversized or malformed answers → `connect_failed`. No provider text is stored or returned.
+- Why: RQ-0187 F6; the `last_error` CHECK cannot be widened by the forward-only runner (precedent 0073), and the UI can show "Reconnect" from `auth_method = oauth2` + `auth_failed` (T-0237).
+- Alternatives: new error column (rejected: not needed).
+- ADR: ADR-0105 · Status: accepted
+
+### DL-0936 — Refresh-token rotation through a SECURITY DEFINER function, not a column grant
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: Supersedes the mechanism part of DL-0933. lf_app keeps no UPDATE on the mailbox's secret columns; the poller re-seals a rotated refresh token through `app.rotate_bill_inbox_refresh_token()` (SECURITY DEFINER, owner lf_migrator, pinned search_path, EXECUTE to lf_app only), which changes one active oauth2 row of the current tenant (FORCE RLS filters the owner) and stamps `secret_rotated_at`. The trigger stays as defence in depth for every role. The view reports `authMethod: 'login' | 'oauth2'`.
+- Why: narrower than a column grant (lf_app cannot write an arbitrary secret into any row), and the existing SS-PLAT-156 test (lf_app gets permission denied on `password_ct`) holds unchanged; the first implementation made it fail, which showed the grant widened the surface.
+- Alternatives: column grant + trigger (rejected: wider; changed an existing security assertion).
+- ADR: ADR-0105 (rule 6 updated) · Status: accepted
+
+### DL-0937 — T-0216 migration numbered 0082 locally (reserved 0084)
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: process
+- Decision: The OAuth migration is `0082_ap_bill_inbox_mailbox_oauth.sql`, the next free number on the base (runs to 0081); the reserved number is 0084 and the lead renumbers at merge to keep the sequence gapless.
+- Why: the runner refuses gaps; round-12 brief.
+- Alternatives: none.
+- ADR: none · Status: accepted
+
+- Note (lead, merge): renumbered to 0083 at merge because T-0217 took 0082.
+
+### DL-0940 — Nightly backup connects as a dedicated lf_backup role (BYPASSRLS + pg_read_all_data), not the superuser
+- Date: 2026-11-23 · By: claude · Task: T-0227 · Category: security
+- Decision: The cluster bootstrap creates `lf_backup LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION BYPASSRLS INHERIT CONNECTION LIMIT 4`, member of `pg_read_all_data` only, `default_transaction_read_only = on`, `CONNECT` on the LedgerForce database; every run re-asserts the attributes and revokes any other membership in either direction. ADR-0106 accepted by the building agent under DL-0691 / DL-0896 with research RQ-0188; an independent security review follows.
+- Why: pg_dump must read past FORCEd RLS, which only BYPASSRLS or superuser allows; `pg_read_all_data` covers every future table without per-migration grants (RQ-0188 Findings 1–4, 8). Superuser could write, disable triggers and run programs.
+- Alternatives: keep superuser; explicit SELECT grants + default privileges; a see-all RLS policy with `--enable-row-security`; physical backup with a REPLICATION role (all rejected, ADR-0106).
+- ADR: ADR-0106 · Status: accepted
+
+### DL-0941 — Revoke TEMPORARY on the LedgerForce database from PUBLIC in the shared bootstrap
+- Date: 2026-11-23 · By: claude · Task: T-0227 · Category: security
+- Decision: `02_database_grants.sql` revokes `TEMPORARY` from PUBLIC (compose's `20-keycloak-db.sh` already did); `lf_migrator` keeps its explicit grant, `lf_app` and `lf_backup` create no temp objects on any install.
+- Why: "lf_backup cannot create objects" must hold on every install, not only compose; aligns the test harness with production (RQ-0188 Finding 3).
+- Alternatives: leave PUBLIC TEMP (temp tables are session-private, but still object creation by the backup role).
+- ADR: ADR-0106 · Status: accepted
+
+### DL-0942 — lf_backup logins confined by a managed pg_hba.conf block to the compose backup network
+- Date: 2026-11-23 · By: claude · Task: T-0227 · Category: security
+- Decision: `10-ledgerforce-roles.sh` writes, before every other rule of `SHOW hba_file`, a block allowing `lf_backup` scram logins only to `$POSTGRES_DB` from `LF_BACKUP_ALLOWED_CIDR` and rejecting it everywhere else (TCP and local socket); replaced between markers on each run, CIDR validated, parse checked with `pg_hba_file_rules` (old file restored on error), then `pg_reload_conf()`. Compose: an `internal` `backup` network (subnet `LF_BACKUP_SUBNET`, default 172.30.227.0/29) joined only by postgres and backup.
+- Why: pg_hba is PostgreSQL's only per-role source-address control; compose IPs are dynamic, a dedicated subnet is not (RQ-0188 Finding 5). The internal network also gives the key-holding container no route off the host.
+- Alternatives: password-only restriction (a leaked password would work from any container); hostname rules in pg_hba (depend on Docker reverse DNS); fixed container IP (same collision risk, less flexible).
+- ADR: ADR-0106 · Status: accepted
+
+### DL-0943 — The init script is the idempotent upgrade step for existing installs
+- Date: 2026-11-23 · By: claude · Task: T-0227 · Category: process
+- Decision: Existing installs run `bash infra/compose/init-secrets.sh`, `docker compose … up -d`, then `docker compose … exec -u postgres postgres bash /docker-entrypoint-initdb.d/10-ledgerforce-roles.sh` (Docs/ops/backup-restore.md). The script tolerates a missing `LF_BACKUP_PASSWORD` / CIDR (role exists, cannot log in) and accepts `LF_BOOTSTRAP_DIR` so the db test runs it against a real cluster.
+- Why: initdb scripts run only on an empty data directory (RQ-0188 Finding 6); one code path for new and old installs is tested once.
+- Alternatives: a separate upgrade script (two code paths); doing it in `setup` (runs as lf_migrator, cannot create roles).
+- ADR: ADR-0106 · Status: accepted
+
+### DL-0944 — T-0227 uses no migration (0085 unused); SS-PLAT-193..195 assigned
+- Date: 2026-11-23 · By: claude · Task: T-0227 · Category: process
+- Decision: The role lives in the cluster bootstrap, not in a migration (the migration runner rejects BYPASSRLS, and roles are cluster-wide); reserved migration number 0085 is not used. Scenarios: SS-PLAT-193 (role reads all, writes nothing), SS-PLAT-194 (bootstrap / init script / pg_hba), SS-PLAT-195 (compose secrets and network).
+- Why: lead's reserved ranges (round 12, row E).
+- Alternatives: none.
+- ADR: none · Status: accepted
+
+### DL-0899 — Security review r12: T-0216 and T-0227 pass; follow-ups T-0243 and T-0244
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: The independent security review of T-0216 (bills mailbox OAuth2, ADR-0105) and T-0227 (lf_backup role, ADR-0106) passed both, with no critical or high findings; it is the independent review DL-0691/AGENTS.md section 6 require for those security ADRs. Its medium findings (M1 code exchange inside a DB transaction; M2 backups fail on an un-upgraded install) and low findings go to new cards T-0243 and T-0244.
+- Why: none of the findings exposes data or crosses tenants; each needs its own tests.
+- Alternatives: fix inside T-0216/T-0227 (rejected: both already passed review and are merged).
+- ADR: ADR-0105, ADR-0106 · Status: accepted
 ### DL-0950 — Cancel a requested refund by either method; bank refunds only outside a live payment batch (RQ-0189)
 - Date: 2026-11-23 · By: claude · Task: T-0207 · Category: security
 - Decision: `POST /ar/refunds/:id/cancel` cancels a requested refund, approved or not. A bank refund is refused `NOT_CANCELLABLE` while a payable line of any batch that is not cancelled pays it (draft, partially released, released, confirmed), with the batch named; otherwise it is cancelled with no external call. A paid refund stays `NOT_CANCELLABLE`; a repeat replays.
@@ -4587,9 +4802,9 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Alternatives: withdraw without asking Stripe (rejected: r8 R2); keep refusing unapproved documents (rejected: the card note moves that withdrawal here).
 - ADR: ADR-0107 · Status: accepted
 
-### DL-0952 — Migration 0082 (reserved 0086): no payable batch line for a refund that is not requested
+### DL-0952 — Migration 0084 (reserved 0086): no payable batch line for a refund that is not requested
 - Date: 2026-11-23 · By: claude · Task: T-0207 · Category: data
-- Decision: BEFORE INSERT trigger `payment_batch_refund_requested_only` reads the refund `FOR SHARE` and refuses a payable line for a refund that is not `requested`. Written as 0082 locally (next free number on the base); the lead renumbers to the reserved 0086 or the next gapless number at merge.
+- Decision: BEFORE INSERT trigger `payment_batch_refund_requested_only` reads the refund `FOR SHARE` and refuses a payable line for a refund that is not `requested`. Numbered 0084: first written and tested as 0082, renumbered when the base reached 0083 (lead instruction); the lead may renumber again at merge to stay gapless.
 - Why: the batch build and the cancel take different advisory locks and the 0070 trigger reads only the approval, so a build that read the refund as requested could insert its line after the cancel committed. `FOR SHARE` conflicts with the cancel's row lock and re-reads the committed status; the reverse order is caught by the 0055 guard (proven by a two-transaction test).
 - Alternatives: take the batch's company lock in the cancel (rejected: module-only, a direct write would bypass it).
 - ADR: ADR-0107 · Status: accepted
@@ -4610,7 +4825,7 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 
 ### DL-0955 — T-0207 IDs used: SS-UC11-18..20, RQ-0189, ADR-0107, T-0241
 - Date: 2026-11-23 · By: claude · Task: T-0207 · Category: process
-- Decision: from the round-12 reserved range (row F): SS-UC11-18 (bank cancel), SS-UC11-19 (live batch refusal and the 0082 guard), SS-UC11-20 (unapproved Stripe withdrawal); RQ-0189; ADR-0107; card T-0241 (T-0242 unused); DL-0950..0955 (0956..0959 unused).
+- Decision: from the round-12 reserved range (row F): SS-UC11-18 (bank cancel), SS-UC11-19 (live batch refusal and the 0084 guard), SS-UC11-20 (unapproved Stripe withdrawal); RQ-0189; ADR-0107; card T-0241 (T-0242 unused); DL-0950..0955 (0956..0959 unused).
 - Why: lead's ID allocation.
 - Alternatives: none.
 - ADR: none · Status: accepted

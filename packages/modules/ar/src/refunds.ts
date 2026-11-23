@@ -492,7 +492,7 @@ export type StripeSendFinishedCheck = (trx: Trx, r: CustomerRefundView) => Promi
  * send of the party runs meanwhile):
  * - **bank_batch**, approved or not: refused NOT_CANCELLABLE while a live payment batch pays it
  *   (draft, partially released, released or confirmed; the message names the batch). Nothing was
- *   sent, so there is no external call. The 0055 guard refuses it too, and the 0082 guard keeps a
+ *   sent, so there is no external call. The 0055 guard refuses it too, and the 0084 guard keeps a
  *   cancelled refund out of every later batch line.
  * - **stripe**: the caller's `heldAtStripe` asks Stripe first (fail closed: METHOD_NOT_AVAILABLE
  *   without it); a live refund there is AT_STRIPE. This holds for an *unapproved* request too

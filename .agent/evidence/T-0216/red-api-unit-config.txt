@@ -1,0 +1,60 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae6edc668685af2c4
+
+ ❯ |api-unit| apps/api/src/config.test.ts (18 tests | 2 failed) 36ms
+     × SS-PLAT-189 a configured provider and an optional Settings return path 12ms
+     × SS-PLAT-189 a return path that could leave the site, or a provider without a secret, is refused at start-up 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-unit| apps/api/src/config.test.ts > T-0216 bills mailbox OAuth client configuration from the environment (ADR-0105) > SS-PLAT-189 a configured provider and an optional Settings return path
+AssertionError: expected undefined to deeply equal { …(3) }
+
+- Expected:
+{
+  "google": {
+    "clientId": "g-id",
+    "clientSecret": "g-secret",
+  },
+  "redirectUri": "https://books.example/api/setup/bills-mailbox/oauth/callback",
+  "settingsUrl": "/app/settings/bills-mailbox",
+}
+
++ Received:
+undefined
+
+ ❯ apps/api/src/config.test.ts:267:28
+    265|       readFile,
+    266|     );
+    267|     expect(o.mailboxOAuth).toEqual({
+       |                            ^
+    268|       redirectUri: 'https://books.example/api/setup/bills-mailbox/oaut…
+    269|       google: { clientId: 'g-id', clientSecret: 'g-secret' },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-unit| apps/api/src/config.test.ts > T-0216 bills mailbox OAuth client configuration from the environment (ADR-0105) > SS-PLAT-189 a return path that could leave the site, or a provider without a secret, is refused at start-up
+AssertionError: expected [Function] to throw an error
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ apps/api/src/config.test.ts:278:9
+    276|       expect(() =>
+    277|         apiOptionsFromEnv({ ...oauthEnv, LF_MAILBOX_OAUTH_SETTINGS_URL…
+    278|       ).toThrow(/LF_MAILBOX_OAUTH_SETTINGS_URL/);
+       |         ^
+    279|     }
+    280|     expect(() =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 16 passed (18)
+   Start at  11:55:54
+   Duration  957ms (transform 316ms, setup 0ms, import 574ms, tests 36ms, environment 0ms)
+

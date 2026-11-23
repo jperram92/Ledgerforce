@@ -1,4 +1,4 @@
--- 0082 (round 12; reserved as 0086, the lead renumbers at merge to stay gapless) —
+-- 0084 (round 12; reserved as 0086, numbered 0084 after the base reached 0083; the lead may renumber at merge) —
 -- A payment batch never pays a refund that is not requested (T-0207, RQ-0189, ADR-0107,
 -- DL-0950..DL-0959). Owner: packages/modules/ar (refunds.ts) with packages/modules/ap
 -- (payment-batches.ts).

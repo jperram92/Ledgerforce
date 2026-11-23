@@ -4,7 +4,7 @@
  * protect the worker from a hostile or broken server. No network.
  */
 import { describe, expect, it } from 'vitest';
-import { ImapClient, ImapError } from './imap-client.ts';
+import { ImapClient, ImapError, xoauth2InitialResponse } from './imap-client.ts';
 import { FakeImapServer } from './testing/fake-imap-server.ts';
 
 const MSG1 = Buffer.from(
@@ -133,5 +133,77 @@ describe('SS-PLAT-156: IMAP failures are classified, bounded and never echo serv
     const c = await ImapClient.connect(() => s.connect());
     expect(await kindOf(c.login('a\r\nb', 'x'))).toBe('protocol_error');
     c.close();
+  });
+});
+
+describe('SS-PLAT-190: AUTHENTICATE XOAUTH2 with an OAuth access token (T-0216, RQ-0187)', () => {
+  const TOKEN = 'eyJ0eXAiOiJKV1QiLCJub25jZSI6IkFRQUJBQUFBQUFE.recorded-shape.access-token';
+  const oauthServer = () => {
+    const s = new FakeImapServer({
+      user: 'bills@harbour.example',
+      pass: 'unused',
+      accessToken: TOKEN,
+      folders: { INBOX: { uidValidity: 9, messages: [] } },
+    });
+    s.deliver('INBOX', MSG1);
+    return s;
+  };
+  const failure = (p: Promise<unknown>) =>
+    p.then(
+      () => null,
+      (x: unknown) => x,
+    );
+
+  it("SS-PLAT-190 the initial client response equals Google's published XOAUTH2 example (RQ-0187 X1)", () => {
+    expect(
+      xoauth2InitialResponse(
+        'someuser@example.com',
+        'ya29.vF9dft4qmTc2Nvb3RlckBhdHRhdmlzdGEuY29tCg',
+      ),
+    ).toBe(
+      'dXNlcj1zb21ldXNlckBleGFtcGxlLmNvbQFhdXRoPUJlYXJlciB5YTI5LnZGOWRmdDRxbVRjMk52YjNSbGNrQmhkSFJoZG1semRHRXVZMjl0Q2cBAQ==',
+    );
+  });
+
+  it('SS-PLAT-190 the right token authenticates in one line (SASL-IR) and the mailbox can be read', async () => {
+    const s = oauthServer();
+    const c = await ImapClient.connect(() => s.connect());
+    await c.authenticateXOAuth2('bills@harbour.example', TOKEN);
+    expect(await c.examine('INBOX')).toEqual({ uidValidity: 9, exists: 1 });
+    await c.logout();
+    const auth = s.commands.filter((x) => x.startsWith('AUTHENTICATE'));
+    expect(auth).toEqual([
+      `AUTHENTICATE XOAUTH2 ${xoauth2InitialResponse('bills@harbour.example', TOKEN)}`,
+    ]);
+    expect(s.commands.some((x) => x.startsWith('LOGIN'))).toBe(false);
+  });
+
+  it('SS-PLAT-190 a wrong token: the JSON challenge is answered with an empty line, then auth_failed without server text', async () => {
+    const s = oauthServer();
+    const c = await ImapClient.connect(() => s.connect());
+    const e = await failure(c.authenticateXOAuth2('bills@harbour.example', 'expired-token'));
+    expect(e).toBeInstanceOf(ImapError);
+    expect((e as ImapError).kind).toBe('auth_failed');
+    expect((e as Error).message).not.toMatch(/invalid credentials|harbour|Bearer|mail\.google/i);
+    expect(s.commands.at(-1)).toBe('<sasl-response:0 bytes>');
+    c.close();
+  });
+
+  it('SS-PLAT-190 a username with ^A/CR/LF or a token with spaces or non-ASCII is refused before anything is sent', async () => {
+    const s = oauthServer();
+    const cases: [string, string][] = [
+      ['a\u0001b@x.example', TOKEN],
+      ['a\r\nb@x.example', TOKEN],
+      ['bills@harbour.example', 'two words'],
+      ['bills@harbour.example', 'tökén'],
+      ['bills@harbour.example', ''],
+    ];
+    for (const [u, t] of cases) {
+      const c = await ImapClient.connect(() => s.connect());
+      const e = await failure(c.authenticateXOAuth2(u, t));
+      expect((e as ImapError).kind).toBe('protocol_error');
+      c.close();
+    }
+    expect(s.commands.some((x) => x.startsWith('AUTHENTICATE'))).toBe(false);
   });
 });

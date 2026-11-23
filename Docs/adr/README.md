@@ -133,6 +133,7 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0099](0099-bills-inbox-mailgun-inbound-webhook.md) | Bills inbox SaaS transport: signed Mailgun inbound webhook, single-use tokens, routing by random inbound address | security | yes (delegated, DL-0691) | Accepted (r11 security addendum 2026-11-22) |
 | [0100](0100-invoice-logo-upload-and-stripe-payout-settings-routes.md) | Invoice logo upload and serving, and Stripe payout settings, under /setup/billing (extends ADR-0085) | security | yes (delegated, DL-0691) | Accepted |
 | [0101](0101-encrypted-logical-backup-and-restore-drill.md) | Encrypted logical backups: Kms envelope with an AES-256-GCM STREAM payload, snapshot-consistent manifest, restore drill that verifies every company's hash chain | security | yes (delegated, DL-0691) | Accepted |
+| [0103](0103-stripe-refund-nightly-sweep-and-waiting-resend-view.md) | A nightly read-only sweep reports Stripe refunds no document records as Sync issues; the refund view shows the waiting resend | integration | no | Proposed |
 | [0107](0107-cancel-requested-refund-either-method.md) | Cancel a requested customer refund by either method: bank refunds outside a live batch, unapproved requests after a Stripe lookup | security | yes (delegated, DL-0691) | Accepted |
 | [0097](0097-failed-security-notices-list-and-retry-now.md) | Failed security notices: an admin list of their own and an append-only retry-now | security | yes (delegated, DL-0691) | Accepted |
 

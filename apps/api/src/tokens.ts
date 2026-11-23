@@ -18,3 +18,5 @@ export const DOCUMENT_OUTBOX = Symbol('DOCUMENT_OUTBOX');
 export const STRIPE_REFUNDS = Symbol('STRIPE_REFUNDS');
 /** Mailgun inbound webhook (ADR-0099); null makes POST /webhooks/mailgun/messages.mime answer 503. */
 export const MAILGUN_INBOUND = Symbol('MAILGUN_INBOUND');
+/** Bills mailbox OAuth (ADR-0105): install client configuration; null makes the connect routes answer 503. */
+export const MAILBOX_OAUTH = Symbol('MAILBOX_OAUTH');

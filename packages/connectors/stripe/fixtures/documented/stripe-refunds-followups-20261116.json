@@ -1,5 +1,5 @@
 {
-  "source": "Built for T-0190 and T-0189 (RQ-0173) from the Refund object, RefundListParams and the error object in the official stripe@23.1.0 type definitions (OpenAPI v2596; Refund.status pending | requires_action | succeeded | failed | canceled, Refund.created, failure_reason, failure_balance_transaction), in the shape of the T-0172 fixture (RQ-0163, RQ-0164). Not recorded from a live account: no Stripe key or network was available. lf-refund-v2-<refund id> is the document's first key; lf-refund-v3-<resend id> is a resend's recorded key (ADR-0091). No interaction answers a v2 create for a document Stripe already holds or for the 'vanished' document, and none answers a second create for the 'refused' one: they must never be requested. Security review r10 (2026-11-22): 'hung' (a create that lands after the cancel; no create is answered for the later document of the same credit) and 'mismatch' (a live refund of another amount).",
+  "source": "Built for T-0190 and T-0189 (RQ-0173) from the Refund object, RefundListParams and the error object in the official stripe@23.1.0 type definitions (OpenAPI v2596; Refund.status pending | requires_action | succeeded | failed | canceled, Refund.created, failure_reason, failure_balance_transaction), in the shape of the T-0172 fixture (RQ-0163, RQ-0164). Not recorded from a live account: no Stripe key or network was available. lf-refund-v2-<refund id> is the document's first key; lf-refund-v3-<resend id> is a resend's recorded key (ADR-0091). No interaction answers a v2 create for a document Stripe already holds or for the 'vanished' document, and none answers a second create for the 'refused' one: they must never be requested. Security review r10 (2026-11-22): 'hung' (a create that lands after the cancel; no create is answered for the later document of the same credit) and 'mismatch' (a live refund of another amount). T-0208 (2026-11-23, RQ-0185): 'waiting' (nothing at Stripe; a resend is asked and left waiting, so the GET view shows it).",
   "apiVersion": "2026-10-28.endive",
   "accessed": "2026-11-16",
   "placeholders": "{{name}} is replaced by the test before matching (ids generated at run time). `times` limits how often an interaction answers (then the next matching one answers).",
@@ -816,6 +816,26 @@
               "status": "succeeded"
             }
           ],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      }
+    },
+    {
+      "name": "list-refunds-waiting",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{waitingPaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [],
           "has_more": false,
           "url": "/v1/refunds"
         }

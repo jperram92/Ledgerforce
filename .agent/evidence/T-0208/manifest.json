@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0208",
+  "entries": [
+    {
+      "scenario": "SS-UC11-14",
+      "file": ".agent/evidence/T-0208/20261123-115132-SS-UC11-14-stripe-check-nothing-at-stripe-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 1440 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:32.752Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-14",
+      "file": ".agent/evidence/T-0208/20261123-115136-SS-UC11-14-stripe-check-nothing-at-stripe-390.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 390 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:36.512Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115133-SS-UC11-15-stripe-resend-asked-requester-view-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 1440 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:33.671Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115136-SS-UC11-15-stripe-resend-confirm-step-up-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 1440 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:36.604Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115137-SS-UC11-15-stripe-resend-confirmed-sent-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 1440 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:37.904Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-14",
+      "file": ".agent/evidence/T-0208/20261123-115138-SS-UC11-14-stripe-check-recorded-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-14: a check that finds the refund at Stripe records it; the region shows it refunded [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:38.932Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115141-SS-UC11-15-stripe-resend-asked-requester-view-390.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 390 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:41.519Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115144-SS-UC11-15-stripe-resend-confirm-step-up-390.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 390 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:44.179Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115144-SS-UC11-15-stripe-resend-confirmed-sent-390.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 390 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:44.947Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-16",
+      "file": ".agent/evidence/T-0208/20261123-115153-SS-UC11-16-stripe-resend-waiting-clerk-view-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-16: a waiting resend shows who asked, when and why, to everyone who can read the refund [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:53.479Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-14",
+      "file": ".agent/evidence/T-0208/20261123-115243-SS-UC11-14-stripe-check-nothing-at-stripe-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 1440 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:52:43.351Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-14",
+      "file": ".agent/evidence/T-0208/20261123-115246-SS-UC11-14-stripe-check-nothing-at-stripe-390.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 390 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:52:46.146Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115243-SS-UC11-15-stripe-resend-asked-requester-view-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 1440 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:52:43.865Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115246-SS-UC11-15-stripe-resend-confirm-step-up-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 1440 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:52:46.359Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115247-SS-UC11-15-stripe-resend-confirmed-sent-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 1440 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:52:47.201Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-14",
+      "file": ".agent/evidence/T-0208/20261123-115248-SS-UC11-14-stripe-check-recorded-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-14: a check that finds the refund at Stripe records it; the region shows it refunded [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:52:48.850Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115249-SS-UC11-15-stripe-resend-asked-requester-view-390.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 390 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:52:49.911Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115252-SS-UC11-15-stripe-resend-confirm-step-up-390.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 390 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:52:52.267Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-15",
+      "file": ".agent/evidence/T-0208/20261123-115253-SS-UC11-15-stripe-resend-confirmed-sent-390.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 390 [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:52:53.180Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-16",
+      "file": ".agent/evidence/T-0208/20261123-115257-SS-UC11-16-stripe-resend-waiting-clerk-view-1440.png",
+      "test": "web/stripe-refund-check-resend.spec.ts › SS-UC11-16: a waiting resend shows who asked, when and why, to everyone who can read the refund [T-0208]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:52:57.520Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-17",
+      "file": ".agent/evidence/T-0208/20261123-115348-tests-db.json",
+      "test": "5 test(s): apps/worker/src/stripe-refund-sweep.db.test.ts › SS-UC11-17 the nightly Stripe refund sweep runs per tenant and lands strays in Sync issues › SS-UC11-17 the owner installs the nightly schedule idempotently; fan-out sends one job per active tenant and UTC day | apps/worker/src/stripe-refund-sweep.db.test.ts › SS-UC11-17 the nightly Stripe refund sweep runs per tenant and lands strays in Sync issues › SS-UC11-17 the tenant job reports the stray once through the outbox; the read-only handler dead-letters it into one open Sync issue; a second run adds nothing; nothing recorded or created | packages/connectors/stripe/src/stripe-refund-sweep.contract.db.test.ts › SS-UC11-17 the nightly sweep reports Stripe refunds no document records, and records and creates nothing › SS-UC11-17 one report per stray document (unapproved, approved-unrecorded, cancelled, two live); none for clean or failed-only; no create, no journal; a second sweep adds nothing | packages/connectors/stripe/src/stripe-refund-sweep.contract.db.test.ts › SS-UC11-17 the nightly sweep reports Stripe refunds no document records, and records and creates nothing › SS-UC11-17 tenant isolation: one tenant's sweep never sees, asks Stripe about or reports another tenant's documents | packages/connectors/stripe/src/stripe-refund-sweep.contract.db.test.ts › SS-UC11-17 the nightly sweep reports Stripe refunds no document records, and records and creates nothing › SS-UC11-17 the report handler repeats the read-only look: a permanent HELD_AT_STRIPE error while the stray is there, success once a person recorded it",
+      "commit": "9be0382ef0b7",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:53:48.580Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-09",
+      "file": ".agent/evidence/T-0208/20261123-115402-tests-api-db.json",
+      "test": "7 test(s): apps/api/src/ar/refunds-stripe.db.test.ts › SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 Stripe variant › SS-UC11-09 a stepped-up Approver approves a Stripe refund: Stripe is called once, GP-006 (Stripe) posts, a repeat replays | apps/api/src/ar/refunds-stripe.db.test.ts › SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 Stripe variant › SS-UC11-09 approving a Stripe refund without a fresh step-up is 401 step_up_required (300 s); a bank refund needs none | apps/api/src/ar/refunds-stripe.db.test.ts › SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 Stripe variant › SS-UC11-09 the person who requested a Stripe refund is refused its approval (SOD_REFUND_SELF_APPROVAL), even stepped up | apps/api/src/ar/refunds-stripe.db.test.ts › SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 Stripe variant › SS-UC11-09 another tenant's Stripe refund is 404; a Stripe refund with no Stripe payment behind it is 422 NO_STRIPE_PAYMENT | apps/api/src/ar/refunds-stripe.db.test.ts › Security review r8: a Stripe success that cannot be posted, and step-up the handler re-checks › SS-UC11-09 F3 the handler refuses a Stripe refund whose step-up was not verified, even when the route condition saw none | apps/api/src/ar/refunds-stripe.db.test.ts › RQ-0165 Q1: the step-up condition fails closed, and an API token never approves a Stripe refund › SS-UC11-09 RQ-0165 test 2: an error thrown by the step-up condition fails the request: no approval, no event, no Stripe call, nothing posted | apps/api/src/ar/refunds-stripe.db.test.ts › RQ-0165 Q1: the step-up condition fails closed, and an API token never approves a Stripe refund › SS-UC11-09 RQ-0165 test 4: an API token holding ar.refund.approve cannot approve a Stripe refund: 401 step_up_required, no Stripe call",
+      "commit": "9be0382ef0b7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:54:02.142Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-10",
+      "file": ".agent/evidence/T-0208/20261123-115402-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/ar/refunds-stripe.db.test.ts › SS-UC11-10 a Stripe refund that cannot be sent at approval is retried, never posted twice › SS-UC11-10 Stripe unreachable: the approval and its outbox event commit, nothing is posted, the answer says it will be retried | apps/api/src/ar/refunds-stripe.db.test.ts › Security review r8: a Stripe success that cannot be posted, and step-up the handler re-checks › SS-UC11-10 F1 the posting fails after Stripe accepted: the answer is failed SENT_NOT_POSTED with the Stripe refund id, nothing is posted",
+      "commit": "9be0382ef0b7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:54:02.142Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0208/20261123-115402-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/ar/refunds-stripe.db.test.ts › SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanently › SS-UC11-11 a refused Stripe refund shows failed after a reload, the clerk cancels it (a repeat replays) and its credit is freed | apps/api/src/ar/refunds-stripe.db.test.ts › SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanently › SS-UC11-11 a sent (paid) Stripe refund is 422 NOT_CANCELLABLE; another tenant's is 404; a malformed id is 400",
+      "commit": "9be0382ef0b7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:54:02.142Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-12",
+      "file": ".agent/evidence/T-0208/20261123-115402-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ar/refunds-stripe.db.test.ts › T-0189 a Stripe refund older than 23 hours: check at Stripe, record once, or resend after a second person (ADR-0091) › SS-UC11-12 stripe-check records a refund Stripe holds for an expired send once, dated the Stripe refund date; an AR Clerk cannot check",
+      "commit": "9be0382ef0b7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:54:02.142Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-13",
+      "file": ".agent/evidence/T-0208/20261123-115402-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/ar/refunds-stripe.db.test.ts › T-0189 a Stripe refund older than 23 hours: check at Stripe, record once, or resend after a second person (ADR-0091) › SS-UC11-13 nothing at Stripe: one person asks a resend, the same person cannot confirm, a stale step-up is refused, a second person confirms and it is sent once with a new key | apps/api/src/ar/refunds-stripe.db.test.ts › Security review r10 L3: confirming a resend sends money, so an API token never confirms it › SS-UC11-13 an API token holding ar.refund.approve cannot confirm a Stripe refund resend: 401 step_up_required, no Stripe call, nothing confirmed",
+      "commit": "9be0382ef0b7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:54:02.142Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-16",
+      "file": ".agent/evidence/T-0208/20261123-115402-tests-api-db.json",
+      "test": "1 test(s): apps/api/src/ar/refunds-stripe.db.test.ts › T-0189 a Stripe refund older than 23 hours: check at Stripe, record once, or resend after a second person (ADR-0091) › SS-UC11-16 the GET view shows a waiting resend: who asked (id and name), when and why; none before it is asked",
+      "commit": "9be0382ef0b7-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:54:02.142Z",
+      "result": "passed"
+    }
+  ]
+}

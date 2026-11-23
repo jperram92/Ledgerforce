@@ -8,10 +8,15 @@
  * that the file is fresh.
  */
 import { writeFileSync } from 'node:fs';
+import { mailboxOAuthConfigFromEnv } from '@ledgerforce/ap';
 import { createDb, databaseUrlFromEnv } from '@ledgerforce/db';
 import { PdfRenderer } from '@ledgerforce/documents';
 import { invoiceEmailHandler, reminderEmailHandler, SmtpSender } from '@ledgerforce/email';
-import { StripeClient, stripeRefundSendHandler } from '@ledgerforce/connector-stripe';
+import {
+  StripeClient,
+  stripeRefundSendHandler,
+  stripeRefundUnrecordedHandler,
+} from '@ledgerforce/connector-stripe';
 import { enqueue, HandlerRegistry, ledgerOutbox, runtimeBossOptions } from '@ledgerforce/outbox';
 import { kmsFromEnv } from '@ledgerforce/shared/crypto';
 import { sql } from 'kysely';
@@ -21,6 +26,7 @@ import { startReminderWorker } from './daily-jobs.ts';
 import { startInboxPollWorker } from './inbox-poll-jobs.ts';
 import { startOutboxWorker } from './outbox-worker.ts';
 import { startSecurityNoticeWorker } from './security-notices.ts';
+import { startStripeRefundSweepWorker } from './stripe-refund-sweep.ts';
 import { startSyncIssueWorker } from './sync-issue-worker.ts';
 
 let url: string;
@@ -80,15 +86,21 @@ if (process.env['LF_SMTP_URL'] && process.env['LF_SMTP_FROM']) {
 }
 // Approved Stripe refunds whose send failed at approval are retried here (T-0172, ADR-0083).
 // Without LF_STRIPE_SECRET_KEY the events wait undelivered to this handler and the gap is logged.
-if (process.env['LF_STRIPE_SECRET_KEY']) {
+// The nightly sweep's reports of Stripe refunds no document records become Sync issues through
+// a read-only handler (T-0208, ADR-0103).
+const stripeClient = process.env['LF_STRIPE_SECRET_KEY'] ? StripeClient.fromEnv(process.env) : null;
+if (stripeClient) {
   registry.register(
     stripeRefundSendHandler({
-      client: StripeClient.fromEnv(process.env),
+      client: stripeClient,
       posting: { outbox: ledgerOutbox(boss) },
     }),
   );
+  registry.register(stripeRefundUnrecordedHandler({ client: stripeClient }));
 } else {
-  console.warn('LF_STRIPE_SECRET_KEY not set: approved Stripe refunds are not retried');
+  console.warn(
+    'LF_STRIPE_SECRET_KEY not set: approved Stripe refunds are not retried and not swept nightly',
+  );
 }
 await startOutboxWorker({ boss, db, registry });
 // Approved billing batches, one job per batch (T-0120).
@@ -99,8 +111,16 @@ await startReminderWorker({ boss, db, outbox: documentOutbox });
 await startSecurityNoticeWorker({ boss, db, sender });
 // Bills inbox IMAP polling, one job per tenant every 5 minutes (T-0127, ADR-0095). Mailbox
 // passwords are sealed, so polling needs the KMS; without it no mailbox is read.
-if (kms) await startInboxPollWorker({ boss, db, deps: { kms } });
+// OAuth mailboxes (Microsoft 365, Google; ADR-0105) refresh with the install's client
+// configuration (LF_MAILBOX_OAUTH_*); without it they are recorded as connect_failed.
+const mailboxOAuth = mailboxOAuthConfigFromEnv(process.env);
+if (kms) await startInboxPollWorker({ boss, db, deps: { kms, oauth: mailboxOAuth } });
 else console.warn('LF_KMS_PROVIDER not set: bills mailboxes are not polled');
+// The nightly sweep for Stripe refunds no document records, one job per tenant (T-0208): it only
+// looks and reports; it records nothing and creates nothing at Stripe.
+if (stripeClient) {
+  await startStripeRefundSweepWorker({ boss, db, client: stripeClient, outbox: documentOutbox });
+}
 // Dead-lettered deliveries become Sync issues (design §5.6 rule 2, T-0071).
 await startSyncIssueWorker({ boss, db });
 

@@ -1,4 +1,8 @@
 import { ApBillCodingController, ApBillsController } from './ap/bills.controller.ts';
+import {
+  BillsMailboxOAuthController,
+  type MailboxOAuthOptions,
+} from './ap/bills-mailbox-oauth.controller.ts';
 import { ApInboxController } from './ap/inbox.controller.ts';
 import {
   MailgunInboundController,
@@ -73,6 +77,7 @@ import type { DeliveryRequeue } from '@ledgerforce/outbox';
 import type { PostingOutbox } from '@ledgerforce/ledger';
 import {
   DOCUMENT_OUTBOX,
+  MAILBOX_OAUTH,
   MAILGUN_INBOUND,
   POSTING_OUTBOX,
   STRIPE_REFUNDS,
@@ -119,6 +124,11 @@ export interface ApiOptions {
    * Without it POST /webhooks/mailgun/messages.mime answers 503 and reads no body.
    */
   mailgunInbound?: MailgunInboundConfig;
+  /**
+   * Bills mailbox OAuth (ADR-0105): Microsoft / Google client configuration and redirect URI.
+   * Without it the connect routes answer 503 `oauth_not_configured`.
+   */
+  mailboxOAuth?: MailboxOAuthOptions;
   /** Security headers, trusted proxy hops and rate limits (ADR-0054, T-0142). */
   security?: SecurityOptions;
   /** Explicit resolver (tests); otherwise sessions, otherwise refuse-all. */
@@ -168,6 +178,7 @@ export const API_CONTROLLERS: readonly Type[] = [
   ApPaymentBatchesController,
   StripeWebhookController,
   MailgunInboundController,
+  BillsMailboxOAuthController,
   ReportsController,
   PeriodReopenController,
   CloseChecklistController,
@@ -201,6 +212,7 @@ class AppModule {
     documentOutbox: DocumentOutbox | null,
     stripeRefunds: StripeRefundsOptions | null,
     mailgunInbound: MailgunInboundConfig | null,
+    mailboxOAuth: MailboxOAuthOptions | null,
   ): DynamicModule {
     return {
       module: AppModule,
@@ -231,6 +243,7 @@ class AppModule {
         ApPaymentBatchesController,
         StripeWebhookController,
         MailgunInboundController,
+        BillsMailboxOAuthController,
         ReportsController,
         PeriodReopenController,
         CloseChecklistController,
@@ -261,6 +274,7 @@ class AppModule {
         { provide: DOCUMENT_OUTBOX, useValue: documentOutbox },
         { provide: STRIPE_REFUNDS, useValue: stripeRefunds },
         { provide: MAILGUN_INBOUND, useValue: mailgunInbound },
+        { provide: MAILBOX_OAUTH, useValue: mailboxOAuth },
         TenantTx,
         AuditTrail,
         Authz,
@@ -322,6 +336,7 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
       opts.documentOutbox ?? null,
       opts.stripeRefunds ?? null,
       opts.mailgunInbound ?? null,
+      opts.mailboxOAuth ?? null,
     ),
     {
       logger: ['error', 'warn'],

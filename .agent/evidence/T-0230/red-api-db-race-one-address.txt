@@ -1,0 +1,38 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a8e855c313275ce6c
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42785
+[31m[Nest] 25573  - [39m11/23/2026, 5:18:41 AM [31m  ERROR[39m [38;5;3m[MailgunInbound] [39m[31minbound webhook failed: DatabaseError P0001[39m
+ ❯ |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts (22 tests | 1 failed) 3406ms
+     × SS-PLAT-178 two identical deliveries racing: one created, one duplicate; two different ones racing: one created, one replayed 24ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) > SS-PLAT-178 two identical deliveries racing: one created, one duplicate; two different ones racing: one created, one replayed
+AssertionError: expected [ 'created', undefined ] to deeply equal [ 'created', 'duplicate' ]
+
+- Expected
++ Received
+
+  [
+    "created",
+-   "duplicate",
++   undefined,
+  ]
+
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:596:49
+    594|     const same = sign(addrA, { bodyMime: variant('178d') });
+    595|     const a = await Promise.all([post(api, same), post(api, same)]);
+    596|     expect(a.map((r) => r.json.outcome).sort()).toEqual(['created', 'd…
+       |                                                 ^
+    597|     const first = sign(addrA, { bodyMime: variant('178e') });
+    598|     const clash = sign(addrA, {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 21 passed (22)
+   Start at  05:18:33
+   Duration  7.69s (transform 1.92s, setup 0ms, import 3.26s, tests 3.41s, environment 0ms)
+

@@ -97,7 +97,7 @@ refunded, would refund twice (design §3.9, §6.5).
     without the connector; the API answers 503). An approved document also keeps the r10
     `SEND_NOT_FINISHED` guard. A live refund at Stripe is `AT_STRIPE`.
   - paid → `NOT_CANCELLABLE`; cancelled → replay.
-- New migration (reserved 0086; local 0082): `payment_batch_refund_requested_only` BEFORE INSERT
+- New migration (reserved 0086; numbered 0084, the next free number on the base): `payment_batch_refund_requested_only` BEFORE INSERT
   trigger refusing a payable line for a refund that is not `requested` (`FOR SHARE`).
 - The refund view carries `payment_batch` (`{ id, batch_no, status }` with status `draft`,
   `partially_released`, `released` or `confirmed`) for a bank refund a live batch pays, so the

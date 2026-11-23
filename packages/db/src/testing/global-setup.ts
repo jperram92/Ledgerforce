@@ -30,7 +30,11 @@ export default async function setup(project: TestProject): Promise<() => Promise
   const admin = new pg.Client({ connectionString: server.connectionString('postgres') });
   await admin.connect();
   try {
-    await bootstrapCluster(admin, { migrator: rolePassword, app: rolePassword });
+    await bootstrapCluster(admin, {
+      migrator: rolePassword,
+      app: rolePassword,
+      backup: rolePassword,
+    });
   } finally {
     await admin.end();
   }

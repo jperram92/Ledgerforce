@@ -1,0 +1,69 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41469
+ ❯ |api-db| apps/api/src/ar/refunds-stripe.db.test.ts (15 tests | 2 failed | 12 skipped) 2646ms
+     × SS-UC11-13 nothing at Stripe: one person asks a resend, the same person cannot confirm, a stale step-up is refused, a second person confirms and it is sent once with a new key 426ms
+     × SS-UC11-16 the GET view shows a waiting resend: who asked (id and name), when and why; none before it is asked 154ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > T-0189 a Stripe refund older than 23 hours: check at Stripe, record once, or resend after a second person (ADR-0091) > SS-UC11-13 nothing at Stripe: one person asks a resend, the same person cannot confirm, a stale step-up is refused, a second person confirms and it is sent once with a new key
+AssertionError: expected { …(15) } to match object { status: 'paid', …(1) }
+(16 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "status": "paid",
+    "stripe": {
+-     "resend": null,
++     "message": null,
++     "status": "sent",
++     "stripe_refund_id": "re_1SQbT0189ApiResent",
+    },
+  }
+
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:995:32
+    993|     // T-0208 AC-3: a confirmed resend is no longer waiting.
+    994|     const after = await call('GET', `/ar/refunds/${id}?${q()}`, 'arCle…
+    995|     expect(await after.json()).toMatchObject({ status: 'paid', stripe:…
+       |                                ^
+    996|     const foreign = await call(
+    997|       'POST',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds-stripe.db.test.ts > T-0189 a Stripe refund older than 23 hours: check at Stripe, record once, or resend after a second person (ADR-0091) > SS-UC11-16 the GET view shows a waiting resend: who asked (id and name), when and why; none before it is asked
+AssertionError: expected { …(15) } to match object { status: 'requested', …(1) }
+(15 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "status": "requested",
+    "stripe": {
+      "code": "KEY_EXPIRED",
+-     "resend": null,
+      "status": "failed",
+    },
+  }
+
+ ❯ apps/api/src/ar/refunds-stripe.db.test.ts:1009:33
+    1007|     setVars('waiting', credit, id, no, '');
+    1008|     const before = await call('GET', `/ar/refunds/${id}?${q()}`, 'arCl…
+    1009|     expect(await before.json()).toMatchObject({
+       |                                 ^
+    1010|       status: 'requested',
+    1011|       stripe: { status: 'failed', code: 'KEY_EXPIRED', resend: null },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed | 12 skipped (15)
+   Start at  05:17:03
+   Duration  6.58s (transform 1.88s, setup 0ms, import 3.09s, tests 2.65s, environment 0ms)
+

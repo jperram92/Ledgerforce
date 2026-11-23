@@ -18,6 +18,8 @@ import {
   type ReadFile,
 } from '@ledgerforce/db';
 import { readFileSync } from 'node:fs';
+import { mailboxOAuthConfigFromEnv } from '@ledgerforce/ap';
+import type { MailboxOAuthOptions } from './ap/bills-mailbox-oauth.controller.ts';
 import type { ApiOptions } from './app.ts';
 import { DEFAULT_RATE_LIMITS } from './security/rate-limit.ts';
 
@@ -99,7 +101,27 @@ export function apiOptionsFromEnv(
   if (webhook) opts.stripeWebhook = webhook;
   const inbound = mailgunInbound(env, readFile);
   if (inbound) opts.mailgunInbound = inbound;
+  const mailbox = mailboxOAuth(env, readFile);
+  if (mailbox) opts.mailboxOAuth = mailbox;
   return opts;
+}
+
+/**
+ * Bills mailbox OAuth (ADR-0105 rule 2): LF_MAILBOX_OAUTH_* (see mailboxOAuthConfigFromEnv) and
+ * LF_MAILBOX_OAUTH_SETTINGS_URL, the site-relative path the callback redirects to (default
+ * /settings/bills-mailbox). An absolute or protocol-relative URL is refused (no open redirect).
+ */
+function mailboxOAuth(env: Env, readFile: ReadFile): MailboxOAuthOptions | undefined {
+  const config = mailboxOAuthConfigFromEnv(env, readFile);
+  if (!config) return undefined;
+  const settingsUrl = (env['LF_MAILBOX_OAUTH_SETTINGS_URL'] ?? '').trim();
+  if (settingsUrl === '') return config;
+  if (!/^\/(?![/\\])[A-Za-z0-9/_.~-]*$/.test(settingsUrl)) {
+    throw new ConfigError(
+      'LF_MAILBOX_OAUTH_SETTINGS_URL must be a site-relative path such as /settings/bills-mailbox',
+    );
+  }
+  return { ...config, settingsUrl };
 }
 
 /**

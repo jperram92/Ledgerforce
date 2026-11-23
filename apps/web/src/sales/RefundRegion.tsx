@@ -12,18 +12,25 @@
  * Stripe first and refuses if Stripe has a refund for it. A requested bank refund that no payment
  * batch pays, and a request not yet approved (either method), can be cancelled too (T-0207,
  * ADR-0107); a bank refund in a live batch shows that batch instead.
+ * T-0208 (ADR-0091, ADR-0103, RQ-0185): an Approver checks a Stripe refund whose send failed or
+ * expired with Stripe ("Check with Stripe", read-only at Stripe; the API records a refund Stripe
+ * holds once). With nothing at Stripe, one Approver asks to send it again with a reason; the region
+ * shows the waiting resend (who asked, when, why) to everyone, and only a different person is
+ * offered "Confirm and send again", behind the step-up prompt. The API (SoD rule
+ * SOD_REFUND_RESEND_SELF_CONFIRM and the database) stays the authority.
  * No accounting in the browser: every amount and journal line is the API's.
  */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { JournalTable, Money } from '@ledgerforce/ui';
-import { useId, useState, type FormEvent } from 'react';
+import { useId, useRef, useState, type FormEvent } from 'react';
 import { AdminApiError } from '../admin/client.ts';
+import { timeLabel } from '../admin/dates.ts';
 import { Failure, Loading, Refusal, useAccess, useFailureRouting } from '../admin/common.tsx';
 import { useServices } from '../env.tsx';
 import { typeGloss } from '../gl/gl-logic.ts';
 import { isStepUp, StepUpPrompt, useMutationFailureRouting } from '../purchases/StepUpPrompt.tsx';
-import type { CustomerRefund } from './client.ts';
+import type { CustomerRefund, StripeCheck, WaitingResend } from './client.ts';
 
 const refused = (e: unknown): string | null =>
   e instanceof AdminApiError && e.status === 422 && typeof e.body['message'] === 'string'
@@ -352,10 +359,357 @@ function RefundView({
       ) : isStepUp(approve.error) ? null : (
         <Refusal error={approve.error} />
       )}
+      {stripe ? (
+        <StripeFollowUp companyId={companyId} refund={refund} canApprove={canApprove} />
+      ) : null}
       {canCancel && cancellable(refund) ? (
         <CancelRefund companyId={companyId} refund={refund} />
       ) : null}
     </>
+  );
+}
+
+/** What the API's 409/422/503 answer says, for a sentence. */
+const said = (e: unknown): string | null =>
+  e instanceof AdminApiError &&
+  (e.status === 409 || e.status === 422 || e.status === 503) &&
+  typeof e.body['message'] === 'string'
+    ? e.body['message']
+    : null;
+
+/**
+ * T-0208: an approved Stripe refund whose send failed or expired (and Stripe does not have the
+ * money: not SENT_NOT_POSTED, whose retry is in Sync issues) can be checked with Stripe.
+ */
+const checkable = (r: CustomerRefund) =>
+  r.method === 'stripe' &&
+  r.status === 'requested' &&
+  r.approval === 'approved' &&
+  r.stripe?.status === 'failed' &&
+  r.stripe.code !== 'SENT_NOT_POSTED' &&
+  !r.stripe.resend;
+
+function useMyUserId(): string {
+  const { api } = useServices();
+  const me = useQuery({ queryKey: ['auth', 'me'], queryFn: () => api.me() });
+  return me.data?.user_id ?? '';
+}
+
+/** Check with Stripe, ask a resend, and the waiting resend (T-0208). */
+function StripeFollowUp({
+  companyId,
+  refund,
+  canApprove,
+}: {
+  companyId: string;
+  refund: CustomerRefund;
+  canApprove: boolean;
+}) {
+  const { sales } = useServices();
+  const queryClient = useQueryClient();
+  const headingId = useId();
+  const [result, setResult] = useState<StripeCheck | null>(null);
+  const check = useMutation({
+    mutationFn: () => sales.checkRefundAtStripe(companyId, refund.id),
+    onSuccess: async (c) => {
+      setResult(c);
+      queryClient.setQueryData(refundKey(c.refund.id), c.refund);
+      await queryClient.invalidateQueries({ queryKey: creditKey(c.refund.party_id) });
+    },
+  });
+  useMutationFailureRouting(check.error);
+  const waiting = refund.status === 'requested' ? (refund.stripe?.resend ?? null) : null;
+  const offerCheck = canApprove && checkable(refund);
+  if (!waiting && !offerCheck && !result) return null;
+  const why = said(check.error);
+  return (
+    <>
+      {waiting ? (
+        <WaitingResendView
+          companyId={companyId}
+          refund={refund}
+          resend={waiting}
+          canApprove={canApprove}
+        />
+      ) : null}
+      {offerCheck && !result ? (
+        <div className="rf-action">
+          <p className="admin-note">
+            Checking asks Stripe what it holds for this refund. It never sends a refund; if Stripe
+            has one, LedgerForce records it once.
+          </p>
+          <button
+            type="button"
+            className="secondary"
+            disabled={check.isPending}
+            onClick={() => check.mutate()}
+          >
+            Check with Stripe
+          </button>
+        </div>
+      ) : null}
+      {why ? (
+        <p className="refusal" role="alert">
+          We could not check with Stripe: {why}
+        </p>
+      ) : (
+        <Refusal error={check.error} />
+      )}
+      {result ? (
+        <section className="admin-block" aria-labelledby={headingId} aria-live="polite">
+          <h3 id={headingId}>What Stripe holds</h3>
+          <CheckOutcome
+            companyId={companyId}
+            refund={refund}
+            result={result}
+            canAsk={canApprove && result.resendable && refund.status === 'requested' && !waiting}
+            onAsked={() => setResult(null)}
+          />
+        </section>
+      ) : null}
+    </>
+  );
+}
+
+function CheckOutcome({
+  companyId,
+  refund,
+  result,
+  canAsk,
+  onAsked,
+}: {
+  companyId: string;
+  refund: CustomerRefund;
+  result: StripeCheck;
+  canAsk: boolean;
+  onAsked: () => void;
+}) {
+  const [asking, setAsking] = useState(false);
+  const no = refund.refund_no;
+  const held = result.cancelled_held_at_stripe;
+  return (
+    <>
+      {result.outcome === 'recorded' ? (
+        <p>
+          Stripe had this refund ({result.stripe_refund_id ?? 'no id'}). LedgerForce recorded it
+          once, dated the day Stripe made it; nothing more was sent.
+        </p>
+      ) : result.outcome === 'held_unapproved' ? (
+        <p>
+          Stripe holds refund {result.stripe_refund_id ?? ''} for {no}, which is not approved.
+          Approving it records that refund; nothing more is sent.
+        </p>
+      ) : result.outcome === 'held_cancelled' ? (
+        <p>
+          Stripe holds refund {result.stripe_refund_id ?? ''} for {no}, which is cancelled: money
+          has left that no refund records. Deal with it in Stripe.
+        </p>
+      ) : (
+        <>
+          <p>Stripe holds no refund that moved money for {no}.</p>
+          {result.failed_at_stripe.length > 0 ? (
+            <p>
+              Refunds Stripe failed or cancelled for it (no money left):{' '}
+              {result.failed_at_stripe.join(', ')}.
+            </p>
+          ) : null}
+          {result.resendable ? (
+            <p>
+              It can be sent again: one Approver asks, with a reason, and a different person
+              confirms it.
+            </p>
+          ) : (
+            <p>
+              It cannot be sent again now:{' '}
+              {held.length > 0
+                ? 'Stripe holds a refund of a cancelled refund of this customer (below); deal with it in Stripe first.'
+                : 'its send has not finished. Check again later.'}
+            </p>
+          )}
+        </>
+      )}
+      {held.length > 0 ? (
+        <p>
+          Stripe also holds {held.length === 1 ? 'a refund' : 'refunds'} of a cancelled refund of
+          this customer, which no refund records: {held.map((x) => x.stripe_refund_id).join(', ')}.
+        </p>
+      ) : null}
+      {canAsk ? (
+        asking ? (
+          <AskResend companyId={companyId} refund={refund} onAsked={onAsked} />
+        ) : (
+          <div className="rf-action">
+            <button type="button" className="secondary" onClick={() => setAsking(true)}>
+              Ask to send again
+            </button>
+          </div>
+        )
+      ) : null}
+    </>
+  );
+}
+
+/** One Approver asks a resend with a reason (PUT …/stripe-resends/:id, a client id). */
+function AskResend({
+  companyId,
+  refund,
+  onAsked,
+}: {
+  companyId: string;
+  refund: CustomerRefund;
+  onAsked: () => void;
+}) {
+  const { sales } = useServices();
+  const queryClient = useQueryClient();
+  const [resendId] = useState(() => crypto.randomUUID());
+  const [reason, setReason] = useState('');
+  const [missing, setMissing] = useState(false);
+  const reasonRef = useRef<HTMLTextAreaElement>(null);
+  const baseId = useId();
+  const ask = useMutation({
+    mutationFn: () => sales.askRefundResend(companyId, refund.id, resendId, reason.trim()),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: refundKey(refund.id) });
+      onAsked();
+    },
+  });
+  useMutationFailureRouting(ask.error);
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!reason.trim()) {
+      setMissing(true);
+      reasonRef.current?.focus();
+      return;
+    }
+    setMissing(false);
+    ask.mutate();
+  };
+  const why = said(ask.error);
+  return (
+    <form
+      className="admin-form"
+      onSubmit={submit}
+      noValidate
+      aria-label="Ask to send this refund again"
+    >
+      <p>
+        Nothing is sent when you ask. A different Approver, Finance Admin or Owner confirms it, and
+        only then is {money2(refund.amount)} sent back to the card, with a new request to Stripe.
+      </p>
+      <label htmlFor={`${baseId}-reason`}>Why send it again</label>
+      <textarea
+        id={`${baseId}-reason`}
+        ref={reasonRef}
+        maxLength={500}
+        rows={3}
+        required
+        aria-invalid={missing}
+        aria-describedby={missing ? `${baseId}-error` : undefined}
+        value={reason}
+        onChange={(e) => setReason(e.target.value)}
+      />
+      {missing ? (
+        <p id={`${baseId}-error`} className="refusal" role="alert">
+          Say why it should be sent again (up to 500 characters).
+        </p>
+      ) : null}
+      <button type="submit" className="primary" disabled={ask.isPending}>
+        Ask to send again
+      </button>
+      {why ? (
+        <p className="refusal" role="alert">
+          We could not ask to send it again: {why}
+        </p>
+      ) : (
+        <Refusal error={ask.error} />
+      )}
+    </form>
+  );
+}
+
+/** The waiting resend: who asked, when, why; a different person confirms it (step-up). */
+function WaitingResendView({
+  companyId,
+  refund,
+  resend,
+  canApprove,
+}: {
+  companyId: string;
+  refund: CustomerRefund;
+  resend: WaitingResend;
+  canApprove: boolean;
+}) {
+  const { sales } = useServices();
+  const queryClient = useQueryClient();
+  const me = useMyUserId();
+  const legendId = useId();
+  const [prompting, setPrompting] = useState(false);
+  const confirm = useMutation({
+    mutationFn: () => sales.confirmRefundResend(companyId, refund.id, resend.id),
+    onSuccess: async (r) => {
+      setPrompting(false);
+      queryClient.setQueryData(refundKey(r.refund.id), r.refund);
+      await queryClient.invalidateQueries({ queryKey: creditKey(r.refund.party_id) });
+    },
+    onError: (e) => setPrompting(isStepUp(e)),
+  });
+  useMutationFailureRouting(confirm.error);
+  const mine = me !== '' && me === resend.requested_by;
+  const who = resend.requested_by_name ?? 'Someone';
+  const why = said(confirm.error);
+  return (
+    <div className="rf-action" role="group" aria-labelledby={legendId}>
+      <p id={legendId}>
+        <strong>Resend waiting for a second person</strong>
+      </p>
+      <p>
+        {mine ? 'You' : who} asked to send it again on {timeLabel(resend.requested_at)}: “
+        {resend.reason}”
+      </p>
+      {mine ? (
+        <p className="admin-note">
+          Nothing is sent until another Approver, Finance Admin or Owner confirms it; you cannot
+          confirm your own request.
+        </p>
+      ) : canApprove ? (
+        <p className="admin-note">
+          You can confirm it: you did not ask for it. Confirming sends {money2(refund.amount)} back
+          to the card again, through Stripe, with a new request.
+        </p>
+      ) : (
+        <p className="admin-note">
+          Nothing is sent until another Approver, Finance Admin or Owner (not {who}) confirms it.
+        </p>
+      )}
+      {!mine && canApprove ? (
+        prompting && isStepUp(confirm.error) ? (
+          <StepUpPrompt
+            error={confirm.error}
+            why={`Confirming this resend sends ${money2(refund.amount)} back to the card again, through Stripe. Confirm it’s you first.`}
+            onCancel={() => {
+              setPrompting(false);
+              confirm.reset();
+            }}
+          />
+        ) : (
+          <button
+            type="button"
+            className="primary"
+            disabled={confirm.isPending || me === ''}
+            onClick={() => confirm.mutate()}
+          >
+            Confirm and send again
+          </button>
+        )
+      ) : null}
+      {why ? (
+        <p className="refusal" role="alert">
+          We could not send it again: {why}
+        </p>
+      ) : isStepUp(confirm.error) ? null : (
+        <Refusal error={confirm.error} />
+      )}
+    </div>
   );
 }
 
@@ -472,6 +826,9 @@ function stripeState(r: CustomerRefund): string {
     }: the money has left, but the refund is not posted in the books: ${
       r.stripe.message ?? 'no reason given'
     }. A Finance Admin sees it in Sync issues; retrying it there records this Stripe refund and never sends another.`;
+  // T-0208: a resend was asked; it waits for a second person (shown below the state line).
+  if (r.approval === 'approved' && r.stripe?.resend)
+    return 'Approved, not sent. Someone asked to send it again; it waits for a second person to confirm it.';
   // Security review r10 L1: past its 23-hour window the send has stopped (not a Stripe refusal).
   if (r.approval === 'approved' && r.stripe?.code === 'KEY_EXPIRED')
     return 'Approved more than 23 hours ago and not sent, so LedgerForce no longer sends it automatically. An Approver checks it with Stripe; whoever requests refunds can cancel it, so the credit can be refunded another way.';

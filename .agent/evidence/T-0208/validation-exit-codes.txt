@@ -1,0 +1,7 @@
+db=0
+unit=0
+lint=0
+fmt=0
+backlog=0
+done
+typecheck=0 (pnpm -s typecheck, final)

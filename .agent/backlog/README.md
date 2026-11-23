@@ -17,14 +17,14 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 146 |
-| todo | 30 |
-| verifying | 11 |
-| **total** | **198** |
+| todo | 32 |
+| verifying | 16 |
+| **total** | **205** |
 
 | Phase | Cards |
 |---|---:|
 | Sprint 0 | 9 |
-| MVP | 99 |
+| MVP | 100 |
 | Phase 1 | 1 |
 | Phase 2 | 1 |
 | Phase 3 | 1 |
@@ -275,7 +275,7 @@ graph LR
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | verifying | T-0051 |
 | [T-0215](T-0215.md) | Bills inbox transport: signed provider inbound webhooks (SaaS) | MVP | verifying | T-0127 |
-| [T-0216](T-0216.md) | Bills mailbox: settings API/UI and OAuth2 XOAUTH2 (Microsoft 365, Google Workspace) | MVP | todo | T-0127 |
+| [T-0216](T-0216.md) | Bills mailbox: OAuth2 sign-in (authorization code + PKCE) and IMAP XOAUTH2 for Microsoft 365 and Google Workspace | MVP | verifying | T-0127 |
 | [T-0227](T-0227.md) | Ops - least-privilege lf_backup role for the nightly backup (replace the superuser) | MVP | todo | T-0143 |
 | [T-0228](T-0228.md) | Ops - point-in-time recovery (WAL archiving) for the hosted RPO 15 min and optional self-host PITR | Phase 1 | todo | T-0143 |
 | [T-0223](T-0223.md) | Bills inbox transport: SendGrid Inbound Parse (signed security policy, send_raw) | MVP | todo | T-0215 |
@@ -291,15 +291,26 @@ graph LR
 | [T-0168](T-0168.md) | Single-supply attribution reconciliation and implementation | MVP | verifying | T-0047, T-0035 | UC-04 | 3 |
 | [T-0203](T-0203.md) | Single-supply GST attribution: role binding, contract record and accruals receipt posting (GP-040) | MVP | verifying | T-0168 | UC-04 | 0 |
 | [T-0204](T-0204.md) | Single-supply GST attribution: final invoice, price change, cancellation/refund and BAS-preparation reports (GP-045, GP-044) | MVP | verifying | T-0203 | UC-04, UC-11 | 1 |
-| [T-0205](T-0205.md) | Single-supply receipts limited by the contract total as varied (review finding 7) | MVP | todo | T-0203, T-0204, T-0217 | UC-04 | 0 |
+| [T-0205](T-0205.md) | Single-supply receipts limited by the contract total as varied (review finding 7) | MVP | todo | T-0203, T-0204, T-0217, T-0232 | UC-04 | 0 |
 | [T-0206](T-0206.md) | Single-supply documents on an open contract: s 29-70 tax invoice (candidate GP-046) and deposit-invoice refusal (ADR-0089 R9) | MVP | todo | T-0203 | UC-04 | 0 |
 | [T-0207](T-0207.md) | AR: cancel a requested bank refund that no live payment batch pays | MVP | in_progress | T-0190 | UC-11 | 0 |
 | [T-0208](T-0208.md) | Refund region: check a Stripe refund with Stripe and ask or confirm a resend; nightly sweep for Stripe refunds no document records | MVP | todo | T-0189 | UC-11 | 0 |
+| [T-0217](T-0217.md) | Single-supply cancellation and refund (GP-044a-d): refund approval path, contract refund with maker-checker, adjustment-note particulars | MVP | verifying | T-0204 | UC-04, UC-11 | 0 |
+| [T-0218](T-0218.md) | Single-supply BAS preparation: basis guard, aged unbilled GST report, no negative G1/1A (G18/1B), credit_note_bas setting, lifecycle properties and primary-law reading | MVP | todo | T-0217, T-0231 | UC-04, UC-11 | 0 |
+| [T-0208](T-0208.md) | Refund region: check a Stripe refund with Stripe and ask or confirm a resend; nightly sweep for Stripe refunds no document records | MVP | verifying | T-0189 | UC-11 | 0 |
 | [T-0217](T-0217.md) | Single-supply cancellation, refund, receipt reversal, contract-variation document and cash-basis final invoice (GP-044, candidate GP-047+, GP-022) | MVP | todo | T-0204 | UC-04, UC-11 | 0 |
 | [T-0218](T-0218.md) | Single-supply BAS preparation: basis guard, aged unbilled GST report, no negative G1/1A (G18/1B), credit_note_bas setting, lifecycle properties and primary-law reading | MVP | todo | T-0217 | UC-04, UC-11 | 0 |
 | [T-0229](T-0229.md) | Stripe: a refund that fails after it was recorded paid (refund.updated / charge.refund.updated webhook) | MVP | todo | T-0189 | UC-11 | 0 |
+| [T-0230](T-0230.md) | Bills inbox webhook: slow-upload protection (per-client in-flight cap, minimum transfer rate, first-byte timeout) | MVP | verifying | T-0215 | UC-05 | 0 |
+| [T-0243](T-0243.md) | Bills mailbox OAuth2 hardening: code exchange outside the DB transaction, rotation failure handling, verifier cleanup, rotation-function tests | MVP | todo | T-0216 | UC-05 | 0 |
+| [T-0244](T-0244.md) | Backup role hardening: detect missing lf_backup on upgrade, large-object refusal, pg_hba script robustness, /32 rule | MVP | todo | T-0227 | — | 0 |
+| [T-0235](T-0235.md) | Bills inbox webhook: upload limits configurable from the environment (compose + config.ts) | MVP | todo | T-0230 | UC-05 | 0 |
 | [T-0241](T-0241.md) | AP: cancel an unreleased payment batch so its bills and refunds can be re-batched or cancelled | MVP | todo | T-0207 | UC-06, UC-11 | 0 |
 | [T-0230](T-0230.md) | Bills inbox webhook: slow-upload protection (per-client in-flight cap, minimum transfer rate, first-byte timeout) | MVP | todo | T-0215 | UC-05 | 0 |
+| [T-0231](T-0231.md) | Single-supply receipt reversal and its BAS label, cash-basis final invoice (GP-022), nothing-attributed final invoice decision and final-invoice delivery event | MVP | todo | T-0217 | UC-04 | 0 |
+| [T-0232](T-0232.md) | Single-supply contract-variation document dated at agreement (candidate goldens GP-047+, review finding 7) | MVP | todo | T-0217 | UC-04 | 0 |
+| [T-0237](T-0237.md) | Bills mailbox settings: password mailbox API, test connection, inbound address show/rotate and the Settings screen | MVP | todo | T-0216, T-0215 | UC-05 | 0 |
+| [T-0238](T-0238.md) | Bills mailbox: unattended OAuth grants (Microsoft 365 app-only client credentials, Google service-account delegation) | Phase 1 | todo | T-0216 | UC-05 | 0 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |
 | [T-0145](T-0145.md) | AR write-off: resolve the ECL allowance by the AR_ECL_ALLOWANCE role | Phase 1 | review | T-0117 | UC-11 | 0 |
 | [T-0146](T-0146.md) | GL: re-bind a system role (core or period-end) through the API | Phase 1 | todo | T-0117, T-0082 | — | 0 |

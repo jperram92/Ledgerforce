@@ -4,3 +4,4 @@ export * from './webhook-signature.ts';
 export * from './webhook.ts';
 export * from './refund.ts';
 export * from './payout.ts';
+export * from './refund-sweep.ts';

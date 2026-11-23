@@ -192,6 +192,36 @@ interface StripeView {
   message: string | null;
   /** Only when failed: why (e.g. SENT_NOT_POSTED: Stripe has the refund, the books do not). */
   code?: string;
+  /** T-0208 AC-3 (ADR-0103): the resend waiting for a second person, or null. */
+  resend: WaitingResend | null;
+}
+
+interface WaitingResend {
+  id: string;
+  requested_by: string;
+  requested_by_name: string | null;
+  requested_at: string;
+  reason: string;
+}
+
+/** The unconfirmed resend of a refund document (at most one, ADR-0091), with who asked. */
+async function waitingResend(
+  trx: Transaction<Database>,
+  companyId: string,
+  refundId: string,
+): Promise<WaitingResend | null> {
+  const row = (
+    await sql<WaitingResend>`
+      SELECT s.id::text, s.requested_by::text, u.display_name AS requested_by_name, s.reason,
+             to_char(s.requested_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS requested_at
+        FROM app.customer_refund_stripe_resend s
+        LEFT JOIN app.app_user u ON u.id = s.requested_by
+       WHERE s.company_id = ${companyId}::uuid AND s.refund_id = ${refundId}::uuid
+         AND s.confirmed_by IS NULL
+       ORDER BY s.requested_at DESC
+       LIMIT 1`.execute(trx)
+  ).rows[0];
+  return row ?? null;
 }
 
 /**
@@ -207,9 +237,15 @@ async function storedStripeView(
   if (r.method !== 'stripe') return undefined;
   if (r.status === 'paid') {
     const s = await stripeRefundOf(trx, companyId, r.entryId);
-    return { status: 'sent', stripe_refund_id: s?.stripeRefundId ?? null, message: null };
+    return {
+      status: 'sent',
+      stripe_refund_id: s?.stripeRefundId ?? null,
+      message: null,
+      resend: null,
+    };
   }
   if (r.status === 'requested' && r.approval === 'approved') {
+    const resend = await waitingResend(trx, companyId, r.refundId);
     const issue = (
       await sql<{ code: string; message: string }>`
         SELECT coalesce(i.error_code, i.error_name) AS code, i.error_message AS message
@@ -221,7 +257,13 @@ async function storedStripeView(
          LIMIT 1`.execute(trx)
     ).rows[0];
     if (issue)
-      return { status: 'failed', stripe_refund_id: null, message: issue.message, code: issue.code };
+      return {
+        status: 'failed',
+        stripe_refund_id: null,
+        message: issue.message,
+        code: issue.code,
+        resend,
+      };
     // Security review r10 L1: past its window the send has finished (KEY_EXPIRED) even when no
     // worker attempt recorded it, so the region and the cancel rule agree.
     const age = (
@@ -240,18 +282,26 @@ async function storedStripeView(
         code: 'KEY_EXPIRED',
         message:
           'it was not sent within 23 hours of its approval, so it is no longer sent automatically; check it with Stripe, then resend or cancel it',
+        resend,
       };
-    return { status: 'pending', stripe_refund_id: null, message: null };
+    return { status: 'pending', stripe_refund_id: null, message: null, resend };
   }
-  return { status: 'not_sent', stripe_refund_id: null, message: null };
+  return { status: 'not_sent', stripe_refund_id: null, message: null, resend: null };
 }
 
+/** Right after a send (approval or a confirmed resend) nothing waits for a second person. */
 const sentView = (o: StripeSendOutcome): StripeView =>
   o.status === 'sent'
-    ? { status: 'sent', stripe_refund_id: o.stripeRefundId, message: null }
+    ? { status: 'sent', stripe_refund_id: o.stripeRefundId, message: null, resend: null }
     : o.status === 'failed'
-      ? { status: 'failed', stripe_refund_id: o.stripeRefundId, message: o.message, code: o.code }
-      : { status: 'pending', stripe_refund_id: null, message: o.message };
+      ? {
+          status: 'failed',
+          stripe_refund_id: o.stripeRefundId,
+          message: o.message,
+          code: o.code,
+          resend: null,
+        }
+      : { status: 'pending', stripe_refund_id: null, message: o.message, resend: null };
 
 function viewOf(r: CustomerRefundView, stripe?: StripeView) {
   return {

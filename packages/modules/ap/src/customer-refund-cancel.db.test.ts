@@ -3,7 +3,7 @@
  * PostgreSQL as lf_app. A requested `bank_batch` refund, approved or not, that no live payment
  * batch pays is cancelled and stops counting as requested. One that a live batch pays (draft,
  * released or confirmed) is refused: by the module (NOT_CANCELLABLE, naming the batch) and by
- * the 0055 guard. A cancelled refund can never be put into a batch (migration 0082 guard), also
+ * the 0055 guard. A cancelled refund can never be put into a batch (migration 0084 guard), also
  * when the batch build and the cancel race.
  */
 import { randomUUID } from 'node:crypto';
@@ -266,7 +266,7 @@ describe('SS-UC11-19: a bank refund a live payment batch pays is never cancelled
     expect((await refusal(cancel(r.refundId)))?.code).toBe('NOT_CANCELLABLE');
   });
 
-  it('SS-UC11-19 a payable batch line for a cancelled refund is refused (migration 0082 guard)', async () => {
+  it('SS-UC11-19 a payable batch line for a cancelled refund is refused (migration 0084 guard)', async () => {
     const party = await customerWithCredit('Late Line Pty Ltd', '2026-11-09');
     const r = await request(party, '220.00', '2026-11-10');
     await approve(r.refundId);

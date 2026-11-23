@@ -3,7 +3,10 @@
  * `connect()` returns one end of an in-memory duplex pair and the server speaks RFC 3501
  * responses on the other end — greeting, CAPABILITY, LOGIN (quoted, atom or literal arguments),
  * EXAMINE, UID SEARCH UID n:*, UID FETCH (UID, RFC822.SIZE, BODY.PEEK[] → BODY[] literal),
- * NOOP, LOGOUT. Every received command line is recorded so tests can prove the client never
+ * NOOP, LOGOUT, and `AUTHENTICATE XOAUTH2 <initial response>` (SASL-IR, RFC 4959; T-0216): a
+ * wrong token gets Google's JSON error challenge, the client's (empty) answer is recorded as
+ * `<sasl-response:N bytes>`, then a tagged NO (RQ-0187 S5). Every received command line is
+ * recorded so tests can prove the client never
  * sends a mailbox-changing command. Fault knobs simulate hostile or broken servers.
  */
 import { duplexPair, type Duplex } from 'node:stream';
@@ -21,6 +24,8 @@ export interface FakeFolder {
 export interface FakeImapOptions {
   readonly user: string;
   readonly pass: string;
+  /** The OAuth access token `AUTHENTICATE XOAUTH2` accepts for `user` (T-0216). */
+  readonly accessToken?: string;
   readonly folders: Record<string, FakeFolder>;
 }
 
@@ -79,6 +84,8 @@ export class FakeImapServer {
     let buf = Buffer.alloc(0);
     let pendingLiteral = 0;
     let parts: Buffer[] = [];
+    /** Tag of an AUTHENTICATE waiting for the client's answer to our error challenge. */
+    let saslTag: string | null = null;
     const send = (s: string | Buffer) => {
       if (!sock.destroyed) sock.write(s);
     };
@@ -87,7 +94,7 @@ export class FakeImapServer {
       sock.end();
       return;
     }
-    send('* OK [CAPABILITY IMAP4rev1 AUTH=PLAIN] fake ready\r\n');
+    send('* OK [CAPABILITY IMAP4rev1 SASL-IR AUTH=PLAIN AUTH=XOAUTH2] fake ready\r\n');
     if (this.faults.hugeLine) {
       send(Buffer.alloc(this.faults.hugeLine, 0x61));
       return;
@@ -95,6 +102,13 @@ export class FakeImapServer {
 
     const handle = (line: Buffer, literals: Buffer[]) => {
       const text = line.toString('latin1');
+      if (saslTag !== null) {
+        // The client's answer to the error challenge (must be empty, RQ-0187 S5).
+        this.commands.push(`<sasl-response:${String(line.length)} bytes>`);
+        const t = saslTag;
+        saslTag = null;
+        return send(`${t} NO [AUTHENTICATIONFAILED] Invalid credentials (Failure)\r\n`);
+      }
       const m = /^(\S+) (.*)$/s.exec(text);
       if (!m) return send('* BAD missing tag\r\n');
       const tag = m[1] ?? '';
@@ -123,6 +137,24 @@ export class FakeImapServer {
           return send(`${tag} OK [CAPABILITY IMAP4rev1] logged in\r\n`);
         }
         return send(`${tag} NO [AUTHENTICATIONFAILED] invalid credentials for ${asText(u)}\r\n`);
+      }
+      if (cmd === 'AUTHENTICATE' && String(args[1]).toUpperCase() === 'XOAUTH2') {
+        const ir = Buffer.from(String(args[2] ?? ''), 'base64').toString('utf8');
+        const token = this.#opts.accessToken;
+        if (
+          token !== undefined &&
+          ir === `user=${this.#opts.user}\u0001auth=Bearer ${token}\u0001\u0001`
+        ) {
+          authed = true;
+          return send(`${tag} OK [CAPABILITY IMAP4rev1] ${this.#opts.user} authenticated\r\n`);
+        }
+        saslTag = tag;
+        const challenge = JSON.stringify({
+          status: '400',
+          schemes: 'Bearer',
+          scope: 'https://mail.google.com/',
+        });
+        return send(`+ ${Buffer.from(challenge).toString('base64')}\r\n`);
       }
       if (!authed) return send(`${tag} BAD not authenticated\r\n`);
       if (cmd === 'EXAMINE') {

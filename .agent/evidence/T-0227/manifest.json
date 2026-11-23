@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0227",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-193",
+      "file": ".agent/evidence/T-0227/20261123-120317-tests-db.json",
+      "test": "5 test(s): packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-193 lf_backup dumps every tenant and can write nothing › SS-PLAT-193 has BYPASSRLS and pg_read_all_data only: no superuser, DDL, replication or other membership | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-193 lf_backup dumps every tenant and can write nothing › SS-PLAT-193 createBackup as lf_backup includes every tenant and restores to the same manifest | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-193 lf_backup dumps every tenant and can write nothing › SS-PLAT-193 holds no write, truncate, trigger or references privilege on any table, sequence write or SECURITY DEFINER function | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-193 lf_backup dumps every tenant and can write nothing › SS-PLAT-193 INSERT, UPDATE, DELETE, TRUNCATE and DDL fail even with read-only switched off | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-193 lf_backup dumps every tenant and can write nothing › SS-PLAT-193 cannot disable triggers or row security, and its sessions start read-only",
+      "commit": "440d4c892b1f",
+      "provider": "claude",
+      "timestamp": "2026-11-23T12:03:17.180Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-194",
+      "file": ".agent/evidence/T-0227/20261123-120317-tests-db.json",
+      "test": "3 test(s): packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-194 bootstrap, init script and upgrade step › SS-PLAT-194 bootstrapCluster creates lf_backup idempotently and repairs a pre-existing over-privileged one | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-194 bootstrap, init script and upgrade step › SS-PLAT-194 the init script (fresh install and upgrade step) confines lf_backup logins to the backup subnet, idempotently | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-194 bootstrap, init script and upgrade step › SS-PLAT-194 the init script refuses a malformed subnet and leaves pg_hba.conf unchanged",
+      "commit": "440d4c892b1f",
+      "provider": "claude",
+      "timestamp": "2026-11-23T12:03:17.180Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-174",
+      "file": ".agent/evidence/T-0227/20261123-120317-tests-db.json",
+      "test": "3 test(s): packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster › SS-PLAT-174 restores the backup into a fresh cluster and reports every chain ok with the same entry counts | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster › SS-PLAT-174 the CLI exits 0 and prints one ok line per company | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster › SS-PLAT-174 the backup CLI (as the compose service runs it) writes a backup the drill CLI verifies",
+      "commit": "440d4c892b1f",
+      "provider": "claude",
+      "timestamp": "2026-11-23T12:03:17.180Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-175",
+      "file": ".agent/evidence/T-0227/20261123-120317-tests-db.json",
+      "test": "4 test(s): packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain › SS-PLAT-175 a backup with one altered byte exits non-zero with BACKUP_DECRYPT_FAILED and leaves no database | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain › SS-PLAT-175 a truncated backup exits non-zero with BACKUP_DECRYPT_FAILED | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain › SS-PLAT-175 the drill refuses to restore over an existing database | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain › SS-PLAT-175 a journal line tampered before the backup exits non-zero naming the company, seq and reason",
+      "commit": "440d4c892b1f",
+      "provider": "claude",
+      "timestamp": "2026-11-23T12:03:17.180Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-176",
+      "file": ".agent/evidence/T-0227/20261123-120317-tests-db.json",
+      "test": "3 test(s): packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key › SS-PLAT-176 the file holds no plaintext dump, table name, tenant name, memo or company id | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key › SS-PLAT-176 the configured key yields a pg_dump archive; a different key is refused | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key › SS-PLAT-176 the manifest and the dump come from the same snapshot (row counts match the restored copy)",
+      "commit": "440d4c892b1f",
+      "provider": "claude",
+      "timestamp": "2026-11-23T12:03:17.180Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-86",
+      "file": ".agent/evidence/T-0227/20261123-120335-tests-unit.json",
+      "test": "20 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 every base image is pinned by tag and digest | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 every runtime target runs as a non-root user | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 no image bakes a secret (no ENV/ARG secret, no secrets folder copied) | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup, the scheduler (ADR-0062) and the nightly backup (ADR-0101) | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › every service compose would build has an image the smoke script makes (up --no-build) | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › T-0147 the scheduler is the worker image running the owner-only scheduler CLI (ADR-0062 option 1) | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 images are pinned; app services build the shared Dockerfile targets | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 secrets are files in the ignored secrets folder, never values in the file | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 each secret reaches only the services that need it | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › T-0142 AC-5 the api trusts exactly the nginx hop for the client address, overridable by the operator (ADR-0054) | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 the runtime connects as lf_app; only setup and the scheduler hold the migrator password | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 only the web origin is published, on loopback by default; the database and IdP are not | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 start order: setup waits for a healthy database and IdP; api and worker wait for setup | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 every service drops privileges it does not need | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 the old compose path includes the new file instead of being deleted | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 no self-registration, no e-mail reset, brute-force protection, strong password policy | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 the client: confidential, code flow + PKCE S256 only, secret from the environment | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 the ACR mapping names the MFA level the API accepts (ADR-0025, HANDOVER Q13) | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 generated secrets stay out of git › SS-PLAT-86 the secrets folder and the install env file are ignored; examples only are tracked | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-86 generated secrets stay out of git › SS-PLAT-86 init-secrets.sh writes distinct random secrets (and the backup keyring) once and never overwrites",
+      "commit": "440d4c892b1f",
+      "provider": "claude",
+      "timestamp": "2026-11-23T12:03:35.130Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-174",
+      "file": ".agent/evidence/T-0227/20261123-120335-tests-unit.json",
+      "test": "3 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) › SS-PLAT-174 the backup image is the node runtime plus the PostgreSQL 17 client, non-root, with a /backups folder it owns | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) › SS-PLAT-174 compose runs the backup nightly with a retention setting, a dedicated keyring and its own volume | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) › SS-PLAT-174 the runbook covers backup, off-host key custody, the restore drill and its failure codes",
+      "commit": "440d4c892b1f",
+      "provider": "claude",
+      "timestamp": "2026-11-23T12:03:35.130Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-195",
+      "file": ".agent/evidence/T-0227/20261123-120335-tests-unit.json",
+      "test": "3 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-195 the backup connects as lf_backup, only from its own network (T-0227, ADR-0106) › SS-PLAT-195 the backup service holds lf_backup_password and never the superuser password | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-195 the backup connects as lf_backup, only from its own network (T-0227, ADR-0106) › SS-PLAT-195 an internal backup network joined only by postgres and backup; postgres allows lf_backup from its subnet only | /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd/infra/test/install-contract.test.ts › SS-PLAT-195 the backup connects as lf_backup, only from its own network (T-0227, ADR-0106) › SS-PLAT-195 the init script that creates lf_backup and its pg_hba block is mounted, and the runbook gives the upgrade step",
+      "commit": "440d4c892b1f",
+      "provider": "claude",
+      "timestamp": "2026-11-23T12:03:35.130Z",
+      "result": "passed"
+    }
+  ]
+}

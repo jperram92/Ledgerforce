@@ -211,7 +211,28 @@ export interface CustomerRefund {
     message: string | null;
     /** Only when failed; SENT_NOT_POSTED: Stripe has the money out, the books do not (r8 F1). */
     code?: string;
+    /** T-0208 (ADR-0103): the resend waiting for a second person, or null. */
+    resend?: WaitingResend | null;
   };
+}
+
+/** A resend asked by one person and not yet confirmed by another (ADR-0091). */
+export interface WaitingResend {
+  id: string;
+  requested_by: string;
+  requested_by_name: string | null;
+  requested_at: string;
+  reason: string;
+}
+
+/** POST /ar/refunds/:id/stripe-check (T-0189, ADR-0091): what Stripe holds; never a create. */
+export interface StripeCheck {
+  outcome: 'recorded' | 'held_unapproved' | 'held_cancelled' | 'not_at_stripe';
+  stripe_refund_id: string | null;
+  failed_at_stripe: string[];
+  cancelled_held_at_stripe: { refund_id: string; stripe_refund_id: string }[];
+  resendable: boolean;
+  refund: CustomerRefund;
 }
 
 export interface RefundRequest {
@@ -260,6 +281,21 @@ export interface SalesClient {
    * Stripe one Stripe holds no refund for, a bank one no live payment batch pays.
    */
   cancelRefund(companyId: string, id: string, idempotencyKey: string): Promise<CustomerRefund>;
+  /** T-0208: check a Stripe refund with Stripe (read-only at Stripe; may record what it holds). */
+  checkRefundAtStripe(companyId: string, id: string): Promise<StripeCheck>;
+  /** T-0208: ask for a resend (client id kept for the form's life; a repeat replays). */
+  askRefundResend(
+    companyId: string,
+    id: string,
+    resendId: string,
+    reason: string,
+  ): Promise<{ id: string; status: 'requested' | 'confirmed' }>;
+  /** T-0208: another person confirms the resend (step-up 300 s); it is sent. */
+  confirmRefundResend(
+    companyId: string,
+    id: string,
+    resendId: string,
+  ): Promise<{ resend: { id: string; status: string }; refund: CustomerRefund }>;
   companies(): Promise<Company[]>;
   invoices(companyId: string, status?: InvoiceStatus): Promise<{ invoices: InvoiceRow[] }>;
   invoice(companyId: string, id: string): Promise<Invoice>;
@@ -322,6 +358,18 @@ export function createSalesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Sales
         `/ar/refunds/${seg(id)}/cancel?${co(companyId)}`,
         {},
         { 'idempotency-key': key },
+      ),
+    checkRefundAtStripe: (companyId, id) =>
+      send('POST', `/ar/refunds/${seg(id)}/stripe-check?${co(companyId)}`, {}),
+    askRefundResend: (companyId, id, resendId, reason) =>
+      send('PUT', `/ar/refunds/${seg(id)}/stripe-resends/${seg(resendId)}?${co(companyId)}`, {
+        reason,
+      }),
+    confirmRefundResend: (companyId, id, resendId) =>
+      send(
+        'POST',
+        `/ar/refunds/${seg(id)}/stripe-resends/${seg(resendId)}/confirm?${co(companyId)}`,
+        {},
       ),
     companies: () => get('/companies'),
     invoices: (companyId, status) =>

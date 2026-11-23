@@ -4,7 +4,7 @@
  *   const tdb = await createTestDatabase({ migrate: true });
  *   tdb.admin   — pg.Pool as the superuser on this database (seeding / verification, bypasses RLS)
  *   tdb.app     — Kysely<Database> as lf_app (the application role: RLS applies)
- *   tdb.url(r)  — connection string for 'lf_app' | 'lf_migrator' | 'superuser'
+ *   tdb.url(r)  — connection string for 'lf_app' | 'lf_migrator' | 'lf_backup' | 'superuser'
  *   await tdb.close();
  */
 import { randomBytes } from 'node:crypto';
@@ -16,7 +16,7 @@ import { migrate } from '../migrate.ts';
 import type { Database } from '../schema.ts';
 import { createDb } from '../tenant.ts';
 
-export type TestRole = 'lf_app' | 'lf_migrator' | 'superuser';
+export type TestRole = 'lf_app' | 'lf_migrator' | 'lf_backup' | 'superuser';
 
 export interface TestDatabase {
   name: string;

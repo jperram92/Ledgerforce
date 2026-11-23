@@ -3,8 +3,9 @@
  * Findings 2-3). One session opens REPEATABLE READ, exports its snapshot, computes the manifest
  * (exact row count of every table, every company's chain entries and head) and stays open while
  * `pg_dump -Fc --snapshot=<id>` streams through the encryptor, so the manifest and the dump are
- * the same instant. It must connect as a role that bypasses RLS (the cluster superuser today;
- * lf_app and lf_migrator are NOBYPASSRLS and pg_dump refuses FORCEd tables it cannot read).
+ * the same instant. It must connect as a role that bypasses RLS: `lf_backup` (BYPASSRLS +
+ * pg_read_all_data, read-only; T-0227, ADR-0106). lf_app and lf_migrator are NOBYPASSRLS and
+ * pg_dump refuses FORCEd tables it cannot read.
  */
 import type { Kms } from '@ledgerforce/shared/crypto';
 import { spawn } from 'node:child_process';
@@ -73,7 +74,7 @@ export async function readManifest(url: string): Promise<BackupManifest> {
 }
 
 export async function createBackup(opts: {
-  /** Superuser (or BYPASSRLS) URL of the database to back up. */
+  /** URL of the database to back up, as `lf_backup` (or another BYPASSRLS role). */
   url: string;
   out: string;
   kms: Kms;

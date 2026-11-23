@@ -7,7 +7,8 @@
  * (initdb/pg_ctl, DL-0007) and verified: every table's row count and every company's chain
  * (verifyChain, ADR-0017) must match the manifest. Altered bytes, a wrong key and a chain broken
  * before the backup must each fail loudly (non-zero exit naming the failure) and leave no
- * restored database behind.
+ * restored database behind. Every backup here is taken as the least-privilege `lf_backup` role
+ * the compose service uses (T-0227, ADR-0106), not the superuser.
  */
 import { createDb } from '@ledgerforce/db';
 import { BackupDecryptError, createBackup, openBackup } from '@ledgerforce/db/ops';
@@ -126,7 +127,7 @@ beforeAll(async () => {
   });
 
   backupFile = join(dir, 'nightly.lfbackup');
-  await createBackup({ url: a.tdb.url('superuser'), out: backupFile, kms });
+  await createBackup({ url: a.tdb.url('lf_backup'), out: backupFile, kms });
 }, 240_000);
 
 afterAll(async () => {
@@ -180,7 +181,7 @@ describe('SS-PLAT-174 restore drill proves every company chain after restore int
       env: {
         PATH: process.env['PATH'],
         ...(process.env['LF_PG_BINDIR'] ? { LF_PG_BINDIR: process.env['LF_PG_BINDIR'] } : {}),
-        LF_BACKUP_DATABASE_URL: a.tdb.url('superuser'),
+        LF_BACKUP_DATABASE_URL: a.tdb.url('lf_backup'),
         LF_KMS_PROVIDER: 'local',
         LF_KMS_KEYRING_FILE: keyringFile,
       },
@@ -261,7 +262,7 @@ describe('SS-PLAT-175 restore drill fails loudly on an altered backup or a broke
       }),
     );
     const tamperedBackup = join(dir, 'tampered-chain.lfbackup');
-    await createBackup({ url: a.tdb.url('superuser'), out: tamperedBackup, kms });
+    await createBackup({ url: a.tdb.url('lf_backup'), out: tamperedBackup, kms });
 
     const report = await runRestoreDrill({
       file: tamperedBackup,

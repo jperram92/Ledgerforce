@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0217",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-181",
+      "file": ".agent/evidence/T-0217/20261123-115146-tests-db.json",
+      "test": "4 test(s): packages/modules/ar/src/single-supply-cancel.db.test.ts › SS-PLAT-181: cancelling a single supply posts GP-044 and the refund follows its path › SS-PLAT-181 AC-2 AC-10 refund agreed: GP-044a line for line (whole 1,000.00 decrease, 3,300.00 AR credit, adjustment-note particulars), contract cancelled, replay idempotent, receipts, final invoice and a second cancellation refused; GP-044b through the customer refund approval path allocated to that credit [T-0217] | packages/modules/ar/src/single-supply-cancel.db.test.ts › SS-PLAT-181: cancelling a single supply posts GP-044 and the refund follows its path › SS-PLAT-181 AC-2 AC-10 refund undecided: GP-044c line for line (unbilled 700.00 removed, particulars), money held; GP-044d later with its own adjustment note, approver not the maker; every contract balance ends at zero [T-0217] | packages/modules/ar/src/single-supply-cancel.db.test.ts › SS-PLAT-181: cancelling a single supply posts GP-044 and the refund follows its path › SS-PLAT-181 AC-2 nothing attributed (accruals, no receipt) and a cash-basis contract post no cancellation entry; the cash-basis money is refunded by the GP-044d shape with the GST of the receipts reversed [T-0217] | packages/modules/ar/src/single-supply-cancel.db.test.ts › SS-PLAT-181: cancelling a single supply posts GP-044 and the refund follows its path › SS-PLAT-181 AC-10 a small decrease (GST within $75) still carries the particulars, flagged within the threshold [T-0217]",
+      "commit": "8acc79ba51db-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:46.289Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-183",
+      "file": ".agent/evidence/T-0217/20261123-115146-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/single-supply-cancel.db.test.ts › SS-PLAT-183: cancellations and refunds the goldens do not cover are refused with nothing written › SS-PLAT-183 forfeiture, missing or long reasons, an unknown refund decision, dates before the last receipt, a basis change, a finalised contract, an unknown contract, a contract refund on an open contract and an undecided cancellation with only a rounding residue unbilled are refused by name [T-0217] | packages/modules/ar/src/single-supply-cancel.db.test.ts › SS-PLAT-183: cancellations and refunds the goldens do not cover are refused with nothing written › SS-PLAT-183 lf_app cannot UPDATE or DELETE a cancellation or a contract refund, a second row per contract is refused, and the database refuses a refund approved by its maker [T-0217]",
+      "commit": "8acc79ba51db-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:46.289Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-182",
+      "file": ".agent/evidence/T-0217/20261123-115146-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/single-supply-cancel.prop.db.test.ts › SS-PLAT-182: single-supply invariants over cancellation and refund (ADR-0089 R11) › SS-PLAT-182 AC-2 every entry balances; after cancellation the unbilled GST is zero and the GST left on the contract is the GST on the money still held (agreed: 0 with an AR credit = cash received; undecided: the GST of the receipts); after the refund every contract balance, the GST and the AR open items are zero [T-0217]",
+      "commit": "8acc79ba51db-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:51:46.289Z",
+      "result": "passed"
+    }
+  ]
+}

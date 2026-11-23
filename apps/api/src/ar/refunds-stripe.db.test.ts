@@ -261,7 +261,12 @@ describe('SS-UC11-09 approving a Stripe refund: step-up, SoD, sent once, GP-006 
     expect(created.status).toBe(201);
     const c = (await created.json()) as { refund_no: string; stripe: unknown };
     expect(c).toMatchObject({ id, method: 'stripe', status: 'requested', approval: 'pending' });
-    expect(c.stripe).toEqual({ status: 'not_sent', stripe_refund_id: null, message: null });
+    expect(c.stripe).toEqual({
+      status: 'not_sent',
+      stripe_refund_id: null,
+      message: null,
+      resend: null,
+    });
     expect(stub.received).toHaveLength(0);
     useVars(credit, id, c.refund_no, 're_1SQbT0172ApiAcme220');
 
@@ -999,12 +1004,58 @@ describe('T-0189 a Stripe refund older than 23 hours: check at Stripe, record on
     });
     expect(stub.received.filter((x) => x.method === 'POST').length).toBe(posts + 1);
     expect(await entriesFor(id)).toBe(1);
+    // T-0208 AC-3: a confirmed resend is no longer waiting.
+    const after = await call('GET', `/ar/refunds/${id}?${q()}`, 'arClerk');
+    expect(await after.json()).toMatchObject({ status: 'paid', stripe: { resend: null } });
     const foreign = await call(
       'POST',
       `/ar/refunds/${foreignRefund}/stripe-check?${q()}`,
       'approver',
     );
     expect(foreign.status).toBe(404);
+  });
+
+  it('SS-UC11-16 the GET view shows a waiting resend: who asked (id and name), when and why; none before it is asked', async () => {
+    const { credit, id, no } = await requested('ApiWaiting');
+    await approvedHoursAgo(id, 30);
+    setVars('waiting', credit, id, no, '');
+    const before = await call('GET', `/ar/refunds/${id}?${q()}`, 'arClerk');
+    expect(await before.json()).toMatchObject({
+      status: 'requested',
+      stripe: { status: 'failed', code: 'KEY_EXPIRED', resend: null },
+    });
+    const resendId = randomUUID();
+    const reason = 'Checked the payment in Stripe: no refund was made';
+    const asked = await call(
+      'PUT',
+      `/ar/refunds/${id}/stripe-resends/${resendId}?${q()}`,
+      'approver',
+      { reason },
+    );
+    expect(asked.status).toBe(201);
+    const askedAt = ((await asked.json()) as { requested_at: string }).requested_at;
+    for (const who of ['arClerk', 'financeAdmin']) {
+      const view = await call('GET', `/ar/refunds/${id}?${q()}`, who);
+      expect(view.status).toBe(200);
+      expect(await view.json()).toMatchObject({
+        status: 'requested',
+        stripe: {
+          status: 'failed',
+          code: 'KEY_EXPIRED',
+          resend: {
+            id: resendId,
+            requested_by: people.approver?.id,
+            requested_by_name: 'approver',
+            requested_at: askedAt,
+            reason,
+          },
+        },
+      });
+    }
+    expect(askedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    expect(
+      stub.received.filter((x) => x.method === 'POST' && x.form['metadata[lf_refund_id]'] === id),
+    ).toEqual([]);
   });
 });
 

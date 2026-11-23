@@ -1,0 +1,13 @@
+T-0217 primary-source probe, 2026-11-23T05:15:19Z, from the build sandbox through the agent proxy (curl -sS -o /dev/null -w "%{http_code}" --max-time 20 <url>)
+
+https://www.legislation.gov.au/ -> curl: (56) CONNECT tunnel failed, response 403 (000)
+https://www.legislation.gov.au/C2004A00446/latest/text -> curl: (56) CONNECT tunnel failed, response 403 (000)
+https://www.ato.gov.au/ -> 403
+https://www.ato.gov.au/law/view/document?docid=GST/GSTR200029/NAT/ATO/00001 -> 403
+https://www.austlii.edu.au/ -> curl: (56) CONNECT tunnel failed, response 403 (000)
+
+Conclusion: the primary text of the A New Tax System (Goods and Services Tax) Act 1999
+(ss 19-10, 29-20, 29-75, 29-80), GSTR 2000/29 and the BAS instructions was NOT read in this
+session. T-0217 claims no primary-law reading. Its legal statements rest on the ATO web extracts
+recorded in .agent/evidence/T-0168/accounting-review-20261116.md and on the Approved golden
+GP-044 (DL-0755). The primary-law reading stays an open exit item owned by T-0218 (AC-11).

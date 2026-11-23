@@ -641,6 +641,38 @@ export interface SingleSupplyFinalisationTable {
   created_at: Timestamp;
 }
 
+export interface SingleSupplyCancellationTable {
+  tenant_id: TenantId;
+  company_id: string;
+  contract_id: string;
+  cancel_date: ColumnType<Date, string, never>;
+  refund_decision: 'agreed' | 'undecided';
+  reason: string;
+  entry_id: string | null;
+  decrease_net: Numeric;
+  decrease_tax: Numeric;
+  idempotency_key: string;
+  created_by: string | null;
+  created_at: Timestamp;
+}
+
+export interface SingleSupplyRefundTable {
+  tenant_id: TenantId;
+  company_id: string;
+  contract_id: string;
+  refund_date: ColumnType<Date, string, never>;
+  gross: Numeric;
+  net: Numeric;
+  tax: Numeric;
+  account_id: string;
+  entry_id: string;
+  reason: string;
+  created_by: string;
+  approved_by: string;
+  idempotency_key: string;
+  created_at: Timestamp;
+}
+
 export interface SalesInvoiceDepositTable {
   tenant_id: TenantId;
   company_id: string;
@@ -1076,6 +1108,27 @@ export interface BillInboxMailboxTable {
   last_error: string | null;
   created_by: string | null;
   created_at: ColumnType<Date, Date | string | undefined, never>;
+  /** Migration 0082 (reserved 0084; T-0216, ADR-0105): oauth2 rows seal the refresh token in password_*. */
+  auth_method: Generated<'password' | 'oauth2'>;
+  oauth_provider: 'microsoft' | 'google' | null;
+  secret_rotated_at: Timestamp | null;
+}
+
+/** Bills mailbox OAuth pre-authorization (migration 0082, reserved 0084, T-0216, ADR-0105 rule 3). */
+export interface BillInboxOauthRequestTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: string;
+  state_sha256: string;
+  code_verifier: string;
+  provider: 'microsoft' | 'google';
+  username: string;
+  folder: Generated<string>;
+  user_id: string;
+  session_id: string;
+  created_at: ColumnType<Date, Date | string | undefined, never>;
+  expires_at: ColumnType<Date, Date | string, never>;
+  consumed_at: Timestamp | null;
 }
 
 /** Bills inbox inbound address (migration 0080, ADR-0099). */
@@ -1583,6 +1636,7 @@ export interface Database {
   'app.supplier_bill_line': SupplierBillLineTable;
   'app.bill_inbox_item': BillInboxItemTable;
   'app.bill_inbox_mailbox': BillInboxMailboxTable;
+  'app.bill_inbox_oauth_request': BillInboxOauthRequestTable;
   'app.bill_inbox_address': BillInboxAddressTable;
   'app.inbound_webhook_receipt': InboundWebhookReceiptTable;
   'app.document_attachment': DocumentAttachmentTable;
@@ -1594,6 +1648,8 @@ export interface Database {
   'app.single_supply_receipt': SingleSupplyReceiptTable;
   'app.single_supply_contract_status': SingleSupplyContractStatusTable;
   'app.single_supply_finalisation': SingleSupplyFinalisationTable;
+  'app.single_supply_cancellation': SingleSupplyCancellationTable;
+  'app.single_supply_refund': SingleSupplyRefundTable;
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;

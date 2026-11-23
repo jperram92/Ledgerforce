@@ -1,0 +1,11 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae6edc668685af2c4
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44919
+
+ Test Files  15 passed (15)
+      Tests  62 passed (62)
+   Start at  12:00:49
+   Duration  75.55s (transform 2.36s, setup 0ms, import 16.45s, tests 54.17s, environment 2ms)
+
+[vitest-pool]: Timeout terminating forks worker for test files /home/user/Ledgerforce/.claude/worktrees/agent-ae6edc668685af2c4/packages/modules/ap/src/imap-client.tls.db.test.ts.

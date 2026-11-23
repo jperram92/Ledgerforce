@@ -7,7 +7,7 @@ author: claude
 category: security
 human_gate: yes (delegated, DL-0691)
 supersedes: none
-superseded_by: none
+superseded_by: ADR-0106 (in part: the backup's database role only)
 ---
 
 # ADR-0101: Encrypted logical backups and the hash-chain restore drill
@@ -18,6 +18,9 @@ Accepted 2026-11-22 by the building agent under the product owner's standing ins
 (security decisions delegated on condition of research, a decision-log entry and tests):
 research RQ-0183, decisions DL-0880..DL-0885, tests in
 `packages/ledger/src/ops/restore-drill.db.test.ts` and `infra/test/install-contract.test.ts`.
+
+Partly superseded by ADR-0106 (2026-11-23, T-0227): the backup connects as the least-privilege
+`lf_backup` role instead of the cluster superuser. Everything else in this ADR stands.
 
 ## Context and problem statement
 

@@ -1,0 +1,81 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae6edc668685af2c4
+
+ ❯ |unit| packages/modules/ap/src/imap-client.test.ts (11 tests | 4 failed) 147ms
+     × SS-PLAT-190 the initial client response equals Google's published XOAUTH2 example (RQ-0187 X1) 24ms
+     × SS-PLAT-190 the right token authenticates in one line (SASL-IR) and the mailbox can be read 1ms
+     × SS-PLAT-190 a wrong token: the JSON challenge is answered with an empty line, then auth_failed without server text 1ms
+     × SS-PLAT-190 a username with ^A/CR/LF or a token with spaces or non-ASCII is refused before anything is sent 1ms
+ ❯ |unit| packages/modules/ap/src/mailbox-oauth.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/ap/src/mailbox-oauth.test.ts [ packages/modules/ap/src/mailbox-oauth.test.ts ]
+Error: Cannot find module './mailbox-oauth.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-ae6edc668685af2c4/packages/modules/ap/src/mailbox-oauth.test.ts
+ ❯ packages/modules/ap/src/mailbox-oauth.test.ts:8:1
+      6| import { ConfigError } from '@ledgerforce/db';
+      7| import { describe, expect, it } from 'vitest';
+      8| import {
+       | ^
+      9|   authorizationUrl,
+     10|   exchangeAuthorizationCode,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| packages/modules/ap/src/imap-client.test.ts > SS-PLAT-190: AUTHENTICATE XOAUTH2 with an OAuth access token (T-0216, RQ-0187) > SS-PLAT-190 the initial client response equals Google's published XOAUTH2 example (RQ-0187 X1)
+TypeError: xoauth2InitialResponse is not a function
+ ❯ packages/modules/ap/src/imap-client.test.ts:159:7
+    157|   it("SS-PLAT-190 the initial client response equals Google's publishe…
+    158|     expect(
+    159|       xoauth2InitialResponse(
+       |       ^
+    160|         'someuser@example.com',
+    161|         'ya29.vF9dft4qmTc2Nvb3RlckBhdHRhdmlzdGEuY29tCg',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  |unit| packages/modules/ap/src/imap-client.test.ts > SS-PLAT-190: AUTHENTICATE XOAUTH2 with an OAuth access token (T-0216, RQ-0187) > SS-PLAT-190 the right token authenticates in one line (SASL-IR) and the mailbox can be read
+TypeError: c.authenticateXOAuth2 is not a function
+ ❯ packages/modules/ap/src/imap-client.test.ts:171:13
+    169|     const s = oauthServer();
+    170|     const c = await ImapClient.connect(() => s.connect());
+    171|     await c.authenticateXOAuth2('bills@harbour.example', TOKEN);
+       |             ^
+    172|     expect(await c.examine('INBOX')).toEqual({ uidValidity: 9, exists:…
+    173|     await c.logout();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  |unit| packages/modules/ap/src/imap-client.test.ts > SS-PLAT-190: AUTHENTICATE XOAUTH2 with an OAuth access token (T-0216, RQ-0187) > SS-PLAT-190 a wrong token: the JSON challenge is answered with an empty line, then auth_failed without server text
+TypeError: c.authenticateXOAuth2 is not a function
+ ❯ packages/modules/ap/src/imap-client.test.ts:184:31
+    182|     const s = oauthServer();
+    183|     const c = await ImapClient.connect(() => s.connect());
+    184|     const e = await failure(c.authenticateXOAuth2('bills@harbour.examp…
+       |                               ^
+    185|     expect(e).toBeInstanceOf(ImapError);
+    186|     expect((e as ImapError).kind).toBe('auth_failed');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  |unit| packages/modules/ap/src/imap-client.test.ts > SS-PLAT-190: AUTHENTICATE XOAUTH2 with an OAuth access token (T-0216, RQ-0187) > SS-PLAT-190 a username with ^A/CR/LF or a token with spaces or non-ASCII is refused before anything is sent
+TypeError: c.authenticateXOAuth2 is not a function
+ ❯ packages/modules/ap/src/imap-client.test.ts:203:33
+    201|     for (const [u, t] of cases) {
+    202|       const c = await ImapClient.connect(() => s.connect());
+    203|       const e = await failure(c.authenticateXOAuth2(u, t));
+       |                                 ^
+    204|       expect((e as ImapError).kind).toBe('protocol_error');
+    205|       c.close();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 7 passed (11)
+   Start at  05:21:37
+   Duration  984ms (transform 516ms, setup 0ms, import 330ms, tests 147ms, environment 0ms)
+

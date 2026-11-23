@@ -54,7 +54,7 @@ refund the customer no longer wants locks the credit. RQ-0189 found:
 
 - Good, because it matches the existing 0055 guard exactly (one definition of "live").
 - Good, because the batch total releasers approve never changes.
-- Good, because the 0082 trigger closes the race in both orders inside the database.
+- Good, because the 0084 trigger closes the race in both orders inside the database.
 - Bad, because a refund caught in a draft batch stays until that batch can be cancelled
   (follow-up T-0241).
 
@@ -85,7 +85,7 @@ Rules:
    Stripe is 409 `AT_STRIPE`. An approved document also keeps r10's `SEND_NOT_FINISHED`
    (send finished and 15 minutes quiet). An unapproved document has no committed send activity to
    wait on; the lookup alone decides.
-4. Migration 0082 (reserved 0086): `payment_batch_refund_requested_only`, BEFORE INSERT on
+4. Migration 0084 (reserved 0086): `payment_batch_refund_requested_only`, BEFORE INSERT on
    `app.payment_batch_refund`, reads the refund `FOR SHARE` and refuses a payable line for a
    refund that is not `requested`. Excluded lines are unaffected.
 5. Route `POST /ar/refunds/:id/cancel?company_id=`: permission `ar.refund.create` (Owner, Finance
