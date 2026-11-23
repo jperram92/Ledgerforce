@@ -1,0 +1,208 @@
+
+Running 8 tests using 2 workers
+
+  ✘  1 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:319:3 › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 1440 [T-0208] (30.1s)
+  ✘  2 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:384:3 › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 1440 [T-0208] (30.1s)
+  ✘  3 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:319:3 › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 390 [T-0208] (30.1s)
+  ✘  4 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:384:3 › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 390 [T-0208] (30.0s)
+  ✘  6 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:443:1 › SS-UC11-15: a self-confirm the API refuses (SoD) is shown in plain words, nothing is sent [T-0208] (7.3s)
+  ✘  7 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:470:1 › SS-UC11-16: a waiting resend shows who asked, when and why, to everyone who can read the refund [T-0208] (7.1s)
+  ✘  5 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:341:1 › SS-UC11-14: a check that finds the refund at Stripe records it; the region shows it refunded [T-0208] (30.0s)
+  ✘  8 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:363:1 › SS-UC11-14: when a resend is not possible the check says why, and lists Stripe refunds of cancelled refunds; an AR Clerk is not offered the check [T-0208] (30.1s)
+
+
+  1) [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:319:3 › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 1440 [T-0208] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('button', { name: 'Check with Stripe' })
+
+
+      326 |       'Approved more than 23 hours ago and not sent',
+      327 |     );
+    > 328 |     await refund.getByRole('button', { name: 'Check with Stripe' }).click();
+          |                                                                     ^
+      329 |     const outcome = refund.getByRole('region', { name: 'What Stripe holds' });
+      330 |     await expect(outcome).toContainText('Stripe holds no refund that moved money for RF-000004');
+      331 |     await expect(outcome).toContainText('re_1SQbT0208Failed');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/tests/e2e/web/stripe-refund-check-resend.spec.ts:328:69
+
+    Error Context: test-results/web-stripe-refund-check-re-a6159-led-refund-ids-1440-T-0208--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refund-check-re-a6159-led-refund-ids-1440-T-0208--chromium/error-context.md
+
+  2) [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:319:3 › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 390 [T-0208] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('button', { name: 'Check with Stripe' })
+
+
+      326 |       'Approved more than 23 hours ago and not sent',
+      327 |     );
+    > 328 |     await refund.getByRole('button', { name: 'Check with Stripe' }).click();
+          |                                                                     ^
+      329 |     const outcome = refund.getByRole('region', { name: 'What Stripe holds' });
+      330 |     await expect(outcome).toContainText('Stripe holds no refund that moved money for RF-000004');
+      331 |     await expect(outcome).toContainText('re_1SQbT0208Failed');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/tests/e2e/web/stripe-refund-check-resend.spec.ts:328:69
+
+    Error Context: test-results/web-stripe-refund-check-re-47e37-iled-refund-ids-390-T-0208--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refund-check-re-47e37-iled-refund-ids-390-T-0208--chromium/error-context.md
+
+  3) [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:341:1 › SS-UC11-14: a check that finds the refund at Stripe records it; the region shows it refunded [T-0208] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('button', { name: 'Check with Stripe' })
+
+
+      346 |   f.check = 'recorded';
+      347 |   const refund = await open(page, 1440);
+    > 348 |   await refund.getByRole('button', { name: 'Check with Stripe' }).click();
+          |                                                                   ^
+      349 |   const outcome = refund.getByRole('region', { name: 'What Stripe holds' });
+      350 |   await expect(outcome).toContainText('Stripe had this refund (re_1SQbT0208Found)');
+      351 |   await expect(outcome).toContainText('recorded it once');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/tests/e2e/web/stripe-refund-check-resend.spec.ts:348:67
+
+    Error Context: test-results/web-stripe-refund-check-re-65dbe-n-shows-it-refunded-T-0208--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refund-check-re-65dbe-n-shows-it-refunded-T-0208--chromium/error-context.md
+
+  4) [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:363:1 › SS-UC11-14: when a resend is not possible the check says why, and lists Stripe refunds of cancelled refunds; an AR Clerk is not offered the check [T-0208] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('button', { name: 'Check with Stripe' })
+
+
+      371 |   f.check = 'not_resendable';
+      372 |   await page.reload();
+    > 373 |   await refund.getByRole('button', { name: 'Check with Stripe' }).click();
+          |                                                                   ^
+      374 |   const outcome = refund.getByRole('region', { name: 'What Stripe holds' });
+      375 |   await expect(outcome).toContainText('cannot be sent again now');
+      376 |   await expect(outcome).toContainText('re_1SQbT0208Stray');
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/tests/e2e/web/stripe-refund-check-resend.spec.ts:373:67
+
+    Error Context: test-results/web-stripe-refund-check-re-c58d3-t-offered-the-check-T-0208--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refund-check-re-c58d3-t-offered-the-check-T-0208--chromium/error-context.md
+
+  5) [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:384:3 › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 1440 [T-0208] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('button', { name: 'Check with Stripe' })
+
+
+      388 |     const f = await fakeApi(page, 'approver');
+      389 |     const refund = await open(page, width);
+    > 390 |     await refund.getByRole('button', { name: 'Check with Stripe' }).click();
+          |                                                                     ^
+      391 |     const outcome = refund.getByRole('region', { name: 'What Stripe holds' });
+      392 |     await outcome.getByRole('button', { name: 'Ask to send again' }).click();
+      393 |     const form = refund.getByRole('form', { name: 'Ask to send this refund again' });
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/tests/e2e/web/stripe-refund-check-resend.spec.ts:390:69
+
+    Error Context: test-results/web-stripe-refund-check-re-a8794-and-it-is-sent-1440-T-0208--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refund-check-re-a8794-and-it-is-sent-1440-T-0208--chromium/error-context.md
+
+  6) [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:384:3 › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 390 [T-0208] 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('button', { name: 'Check with Stripe' })
+
+
+      388 |     const f = await fakeApi(page, 'approver');
+      389 |     const refund = await open(page, width);
+    > 390 |     await refund.getByRole('button', { name: 'Check with Stripe' }).click();
+          |                                                                     ^
+      391 |     const outcome = refund.getByRole('region', { name: 'What Stripe holds' });
+      392 |     await outcome.getByRole('button', { name: 'Ask to send again' }).click();
+      393 |     const form = refund.getByRole('form', { name: 'Ask to send this refund again' });
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/tests/e2e/web/stripe-refund-check-resend.spec.ts:390:69
+
+    Error Context: test-results/web-stripe-refund-check-re-b7e31--and-it-is-sent-390-T-0208--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refund-check-re-b7e31--and-it-is-sent-390-T-0208--chromium/error-context.md
+
+  7) [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:443:1 › SS-UC11-15: a self-confirm the API refuses (SoD) is shown in plain words, nothing is sent [T-0208] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Refund' }).getByRole('group', { name: 'Resend waiting for a second person' })
+    Expected substring: "You asked to send it again"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Refund' }).getByRole('group', { name: 'Resend waiting for a second person' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('group', { name: 'Resend waiting for a second person' })
+
+
+      461 |   const refund = await open(page, 1440);
+      462 |   const waiting = refund.getByRole('group', { name: 'Resend waiting for a second person' });
+    > 463 |   await expect(waiting).toContainText('You asked to send it again');
+          |                         ^
+      464 |   await expect(waiting.getByRole('button', { name: 'Confirm and send again' })).toHaveCount(0);
+      465 |   await expect(refund.getByRole('button', { name: 'Check with Stripe' })).toHaveCount(0);
+      466 |   expect(f.confirms).toBe(0);
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/tests/e2e/web/stripe-refund-check-resend.spec.ts:463:25
+
+    Error Context: test-results/web-stripe-refund-check-re-c2b37-rds-nothing-is-sent-T-0208--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refund-check-re-c2b37-rds-nothing-is-sent-T-0208--chromium/error-context.md
+
+  8) [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:470:1 › SS-UC11-16: a waiting resend shows who asked, when and why, to everyone who can read the refund [T-0208] 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('region', { name: 'Refund' }).getByRole('group', { name: 'Resend waiting for a second person' })
+    Expected substring: "Ana Kim asked to send it again on 24 Nov 2026, 12:30 pm"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('region', { name: 'Refund' }).getByRole('group', { name: 'Resend waiting for a second person' }) with timeout 5000ms
+      - waiting for getByRole('region', { name: 'Refund' }).getByRole('group', { name: 'Resend waiting for a second person' })
+
+
+      488 |   const refund = await open(page, 1440);
+      489 |   const waiting = refund.getByRole('group', { name: 'Resend waiting for a second person' });
+    > 490 |   await expect(waiting).toContainText('Ana Kim asked to send it again on 24 Nov 2026, 12:30 pm');
+          |                         ^
+      491 |   await expect(waiting).toContainText('Checked the payment in Stripe: no refund was made');
+      492 |   await expect(waiting).toContainText('another Approver, Finance Admin or Owner');
+      493 |   // A clerk reads it; only Approvers act on it.
+        at /home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/tests/e2e/web/stripe-refund-check-resend.spec.ts:490:25
+
+    Error Context: test-results/web-stripe-refund-check-re-b145f-can-read-the-refund-T-0208--chromium/error-context.md
+
+    Error Context: test-results/web-stripe-refund-check-re-b145f-can-read-the-refund-T-0208--chromium/error-context.md
+
+  8 failed
+    [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:319:3 › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 1440 [T-0208] 
+    [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:319:3 › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 390 [T-0208] 
+    [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:341:1 › SS-UC11-14: a check that finds the refund at Stripe records it; the region shows it refunded [T-0208] 
+    [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:363:1 › SS-UC11-14: when a resend is not possible the check says why, and lists Stripe refunds of cancelled refunds; an AR Clerk is not offered the check [T-0208] 
+    [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:384:3 › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 1440 [T-0208] 
+    [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:384:3 › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 390 [T-0208] 
+    [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:443:1 › SS-UC11-15: a self-confirm the API refuses (SoD) is shown in plain words, nothing is sent [T-0208] 
+    [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:470:1 › SS-UC11-16: a waiting resend shows who asked, when and why, to everyone who can read the refund [T-0208] 

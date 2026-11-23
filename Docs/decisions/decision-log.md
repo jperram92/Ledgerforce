@@ -4572,3 +4572,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: N1 affects only availability of the inbound route, not data or tenant isolation; it needs its own tests and tuning.
 - Alternatives: fix inside T-0215 (rejected: separate behaviour; T-0215 already passed review).
 - ADR: none · Status: accepted
+
+### DL-0910 — The nightly Stripe refund sweep only looks and reports; recording stays a person's action
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: security
+- Decision: The sweep and its handler use only the read-only lookup (`refundsAtStripe`) under the party lock; they never call `checkStripeCustomerRefund` (which records), a Stripe create, the posting engine or a status change. Recording a stray stays "Check with Stripe" in the refund region, or approving an unapproved (R2) document, which adopts and sends nothing.
+- Why: money-out maker-checker (design §6.5, ADR-0091); RQ-0185 findings 2–4; comparable systems finish bookkeeping only on a person's decision (RQ-0185 S6, S7).
+- Alternatives: nightly automatic recording (rejected: unattended journal for money out, not allowed for unapproved documents).
+- ADR: ADR-0103 · Status: accepted
+
+### DL-0911 — Strays are reported as Sync issues through an outbox event and a read-only handler
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: architecture
+- Decision: One `ar.refund.stripe_unrecorded` event per stray document; handler `stripe.refund.unrecorded_check` repeats the read-only look and throws `HELD_AT_STRIPE` (`retryable: false`) while the stray is there, so the dead letter is the Sync issue (connector `stripe`); a retry succeeds and resolves it once the document is recorded or the stray is gone. No event is published while an earlier one for the document has no successful delivery (one issue per document).
+- Why: Sync issues already give status, retry, ignore and audit (design §5.6, migration 0030 needs an event and handler); RQ-0185 finding 3.
+- Alternatives: a new strays table and screen (rejected: migration, permission and screen for an existing capability); a direct insert into `app.sync_issue` (rejected: its retry would have nothing meaningful to run).
+- ADR: ADR-0103 · Status: proposed (accepted on cross-review)
+
+### DL-0912 — Sweep candidates, schedule and per-document transactions
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: architecture
+- Decision: Candidates are Stripe documents `requested`, or `cancelled` with a change in the last 30 days. The scheduler fans out one `stripe.refunds.sweep` job per active tenant and UTC day at 15:35 UTC (job data `{ tenantId }`); the worker (only with Stripe configured) sweeps each document in its own tenant transaction, continues past a failing document and then fails the job so pg-boss retries (idempotent).
+- Why: a cancelled-document stray can only appear within minutes of the cancel (r10 cooling-off, 30 s deadline), so 30 days bounds Stripe calls with ample margin; per-document transactions keep party locks short (RQ-0185 finding 1–2; ADR-0062 pattern).
+- Alternatives: all cancelled documents forever (rejected: unbounded calls); one transaction for the tenant (rejected: holds every party lock across many Stripe calls).
+- ADR: ADR-0103 · Status: accepted
+
+### DL-0913 — The refund view carries the waiting resend with the requester's display name
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: architecture
+- Decision: Every stored Stripe view gains `stripe.resend` = `{ id, requested_by, requested_by_name, requested_at, reason }` of the unconfirmed resend, or null (null right after a send). The exact-shape assertion of the create view in refunds-stripe.db.test.ts now includes `resend: null` (contract addition, still `toEqual`).
+- Why: AC-3; the confirmer must see who asked by name to judge "not me" (RQ-0185 finding 5).
+- Alternatives: a separate GET for resends (rejected: an extra call for every view).
+- ADR: ADR-0103 · Status: accepted
+
+### DL-0914 — Refund region: who is offered the check, the ask and the confirm
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: ui
+- Decision: "Check with Stripe" for `ar.refund.approve` on an approved, requested Stripe refund whose send failed or expired (not `SENT_NOT_POSTED`) while no resend waits; "Ask to send again" (reason required, 1–500) only when the check says `resendable`; the waiting resend is shown to every reader; "Confirm and send again" only to a holder of the permission who is not the requester (compared with `/auth/me`), behind StepUpPrompt; Cancel stays available to the clerk. The API's SoD rule and database CHECK remain the authority.
+- Why: AC-1, AC-3; maker-checker visible on screen (RQ-0185 finding 5; Docs/ui/principles.md).
+- Alternatives: show the confirm button to the requester and rely on the 403 (rejected: invites a refused action).
+- ADR: ADR-0103 · Status: accepted
+
+### DL-0915 — T-0208 IDs: RQ-0185, ADR-0103, SS-UC11-14..17; no migration
+- Date: 2026-11-23 · By: claude · Task: T-0208 · Category: process
+- Decision: Used RQ-0185, ADR-0103, DL-0910–DL-0915 and SS-UC11-14 to SS-UC11-17 from the round-12 reservation; the reserved migration 0083 and cards T-0233/T-0234 were not needed. The follow-ups fixture gained an additive 'waiting' list interaction; a new documented list-only fixture `stripe-refunds-sweep-20261123.json` was added.
+- Why: lead's reserved ranges.
+- Alternatives: none.
+- ADR: none · Status: accepted
