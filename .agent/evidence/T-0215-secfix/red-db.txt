@@ -1,0 +1,369 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0215-secfix
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:46291
+[db] test PostgreSQL ready (local) on 127.0.0.1:36627
+[31m[Nest] 12460  - [39m11/22/2026, 7:53:11 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: Maximum header size of 2097152 bytes exceeded
+    at MimeNode.feed [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/postal-mime@4.0.8/node_modules/[4mpostal-mime[24m/dist/esm/mime-node.js:576:27[90m)[39m
+    at PostalMime.processLine [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/postal-mime@4.0.8/node_modules/[4mpostal-mime[24m/dist/esm/postal-mime.js:184:30[90m)[39m
+    at PostalMime.parse [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/postal-mime@4.0.8/node_modules/[4mpostal-mime[24m/dist/esm/postal-mime.js:588:24[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+[31m[Nest] 12460  - [39m11/22/2026, 7:54:11 PM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39merror: forced failure for <inv-178c@paperco.example>
+    at [90m/home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/pg@8.23.1/node_modules/[4mpg[24m/lib/client.js:694:17
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:118:28[90m)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
+    at async #run [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
+    at async DefaultQueryExecutor.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
+    at async InsertQueryBuilder.execute [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-builder/insert-query-builder.js:1101:24[90m)[39m
+    at async InsertQueryBuilder.executeTakeFirst [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-builder/insert-query-builder.js:1113:26[90m)[39m
+    at async InsertQueryBuilder.executeTakeFirstOrThrow [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-builder/insert-query-builder.js:1122:24[90m)[39m
+    at PostgresConnection.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/dialect/postgres/postgres-driver.js:131:41[90m)[39m
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:39:24
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:1057:20
+    at async #run [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/single-connection-provider.js:24:16[90m)[39m
+    at async DefaultQueryExecutor.executeQuery [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-executor/query-executor-base.js:38:28[90m)[39m
+    at async InsertQueryBuilder.execute [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-builder/insert-query-builder.js:1101:24[90m)[39m
+    at async InsertQueryBuilder.executeTakeFirst [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-builder/insert-query-builder.js:1113:26[90m)[39m
+    at async InsertQueryBuilder.executeTakeFirstOrThrow [90m(file:///home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/query-builder/insert-query-builder.js:1122:24[90m)[39m
+    at ingestBillEmail [90m(/home/user/Ledgerforce/.claude/worktrees/t0215-secfix/[39mpackages/modules/ap/src/inbox.ts:125:16[90m)[39m {
+  length: [33m159[39m,
+  severity: [32m'ERROR'[39m,
+  code: [32m'P0001'[39m,
+  detail: [90mundefined[39m,
+  hint: [90mundefined[39m,
+  position: [90mundefined[39m,
+  internalPosition: [90mundefined[39m,
+  internalQuery: [90mundefined[39m,
+  where: [32m'PL/pgSQL function app.t0215_fail() line 2 at RAISE'[39m,
+  schema: [90mundefined[39m,
+  table: [90mundefined[39m,
+  column: [90mundefined[39m,
+  dataType: [90mundefined[39m,
+  constraint: [90mundefined[39m,
+  file: [32m'pl_exec.c'[39m,
+  line: [32m'3897'[39m,
+  routine: [32m'exec_stmt_raise'[39m
+}
+ ❯ |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts (22 tests | 10 failed) 181431ms
+     × SS-PLAT-168 a reused token answers 406 unless it carries the same message and recipient (a genuine retry is a duplicate, r11 F2) 31ms
+     × SS-PLAT-169 the route counts against its own inbound_email rate-limit class, lower than /webhooks/* (429 once spent, r11 F1) 10ms
+     × SS-PLAT-177 a second upload while one is in flight answers 503 with Retry-After without being read; the first still lands 226ms
+     × SS-PLAT-177 a declared length over the remaining byte budget answers 503 before reading 47ms
+     × SS-PLAT-177 a body not sent within the timeout answers 408 and frees the slot 60002ms
+     × SS-PLAT-177 every refusal closes the connection (415, 413, 401, 406, 400) 4ms
+     × SS-PLAT-178 after a refused message (406) the same token with another message answers replayed 28ms
+     × SS-PLAT-178 after an unknown recipient (406) the same token to a valid recipient answers replayed 12ms
+     × SS-PLAT-178 after a server failure (500, logged without message content) the identical retry lands 12ms
+     × SS-PLAT-178 two identical deliveries racing: one created, one duplicate; two different ones racing: one created, one replayed 11ms
+ ❯ |db| packages/modules/ap/src/inbox.db.test.ts (5 tests | 1 failed) 712ms
+     × SS-PLAT-179 a second message with a known Message-ID but different bytes is kept as its own flagged item, not dropped as a duplicate 18ms
+ ❯ |db| packages/modules/ap/src/inbound-address.db.test.ts (2 tests | 2 failed) 739ms
+     × SS-PLAT-180 ensure audits the first creation only; rotate audits the new address; tokens never appear in audit 19ms
+     × SS-PLAT-180 lf_app cannot bring a superseded address back, re-supersede, or change token or company 4ms
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts [ apps/api/src/ap/bills-inbound-webhook.db.test.ts ]
+Error: Hook timed out in 120000ms.
+If this is a long-running hook, pass a timeout value as the last argument or configure it globally with "hookTimeout".
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:181:1
+    179| }, 180_000);
+    180|
+    181| afterAll(async () => {
+       | ^
+    182|   await (api as Api | undefined)?.close();
+    183|   await (limited as Api | undefined)?.close();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/14]⎯
+
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 13 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage > SS-PLAT-168 a reused token answers 406 unless it carries the same message and recipient (a genuine retry is a duplicate, r11 F2)
+AssertionError: expected { error: 'replayed' } to deeply equal { Object (received, outcome) }
+
+- Expected
++ Received
+
+  {
+-   "outcome": "duplicate",
+-   "received": true,
++   "error": "replayed",
+  }
+
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:280:46
+    278|     // The identical request again (Mailgun retrying after a lost answ…
+    279|     const before = await stored(f.tenantId);
+    280|     expect((await post(api, original)).json).toEqual({ received: true,…
+       |                                              ^
+    281|     expect(await stored(f.tenantId)).toEqual(before);
+    282|     // Same signed token/timestamp, swapped body and recipient (the bo…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/14]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-169 the recipient token picks the company; unknown recipients learn nothing > SS-PLAT-169 the route counts against its own inbound_email rate-limit class, lower than /webhooks/* (429 once spent, r11 F1)
+AssertionError: expected [ 401, 401, 401 ] to deeply equal [ 401, 401, 429 ]
+
+- Expected
++ Received
+
+  [
+    401,
+    401,
+-   429,
++   401,
+  ]
+
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:429:22
+    427|       statuses.push((await post(limited, sign(addrA, { signature: 'c'.…
+    428|     }
+    429|     expect(statuses).toEqual([401, 401, 429]);
+       |                      ^
+    430|   });
+    431| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/14]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) > SS-PLAT-177 a second upload while one is in flight answers 503 with Retry-After without being read; the first still lands
+AssertionError: expected 200 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 200
+
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:444:27
+    442|     await new Promise((r) => setTimeout(r, 200));
+    443|     const second = await rawPost(tight, sign(addrA)).done;
+    444|     expect(second.status).toBe(503);
+       |                           ^
+    445|     expect(JSON.parse(second.text)).toEqual({ error: 'inbound_busy' });
+    446|     expect(Number(second.headers['retry-after'])).toBeGreaterThan(0);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/14]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) > SS-PLAT-177 a declared length over the remaining byte budget answers 503 before reading
+AssertionError: expected 500 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 500
+
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:461:24
+    459|     const big = sign(addrA, { bodyMime: Buffer.alloc(5 * 1024 * 1024, …
+    460|     const res = await rawPost(tight, big).done;
+    461|     expect(res.status).toBe(503);
+       |                        ^
+    462|     expect(JSON.parse(res.text)).toEqual({ error: 'inbound_busy' });
+    463|     expect(res.headers.connection).toBe('close');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/14]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) > SS-PLAT-177 a body not sent within the timeout answers 408 and frees the slot
+Error: Test timed out in 60000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:466:3
+    464|   });
+    465|
+    466|   it('SS-PLAT-177 a body not sent within the timeout answers 408 and f…
+       |   ^
+    467|     const before = await stored(f.tenantId);
+    468|     const slow = rawPost(tight, sign(addrA), { partial: 50 });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/14]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) > SS-PLAT-177 every refusal closes the connection (415, 413, 401, 406, 400)
+AssertionError: expected { status: 415, …(1) } to deeply equal { status: 415, connection: 'close' }
+
+- Expected
++ Received
+
+  {
+-   "connection": "close",
++   "connection": "keep-alive",
+    "status": 415,
+  }
+
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:490:74
+    488|     for (const c of cases) {
+    489|       const res = await rawPost(api, c.req).done;
+    490|       expect({ status: res.status, connection: res.headers.connection …
+       |                                                                          ^
+    491|         status: c.status,
+    492|         connection: 'close',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/14]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) > SS-PLAT-178 after a refused message (406) the same token with another message answers replayed
+AssertionError: expected { received: true, outcome: 'created' } to deeply equal { error: 'replayed' }
+
+- Expected
++ Received
+
+  {
+-   "error": "replayed",
++   "outcome": "created",
++   "received": true,
+  }
+
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:514:43
+    512|       timestamp: Number(refusedFirst.timestamp),
+    513|     });
+    514|     expect((await post(api, reuse)).json).toEqual({ error: 'replayed' …
+       |                                           ^
+    515|     expect(await stored(f.tenantId)).toEqual(before);
+    516|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/14]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) > SS-PLAT-178 after an unknown recipient (406) the same token to a valid recipient answers replayed
+AssertionError: expected { received: true, outcome: 'created' } to deeply equal { error: 'replayed' }
+
+- Expected
++ Received
+
+  {
+-   "error": "replayed",
++   "outcome": "created",
++   "received": true,
+  }
+
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:528:45
+    526|         timestamp: Number(lost.timestamp),
+    527|       });
+    528|       expect((await post(api, reuse)).json).toEqual({ error: 'replayed…
+       |                                             ^
+    529|     }
+    530|     expect([await stored(f.tenantId), await stored(TENANT_B)]).toEqual…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/14]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) > SS-PLAT-178 after a server failure (500, logged without message content) the identical retry lands
+AssertionError: expected { status: 500, json: { …(2) } } to deeply equal { status: 500, …(1) }
+
+- Expected
++ Received
+
+  {
+    "json": {
+-     "error": "internal_error",
++     "message": "Internal server error",
++     "statusCode": 500,
+    },
+    "status": 500,
+  }
+
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:561:58
+    559|       await f.admin.query('DROP FUNCTION app.t0215_fail()');
+    560|     }
+    561|     expect({ status: failed.status, json: failed.json }).toEqual({
+       |                                                          ^
+    562|       status: 500,
+    563|       json: { error: 'internal_error' },
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/14]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts > SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) > SS-PLAT-178 two identical deliveries racing: one created, one duplicate; two different ones racing: one created, one replayed
+AssertionError: expected [ 'created', undefined ] to deeply equal [ 'created', 'duplicate' ]
+
+- Expected
++ Received
+
+  [
+    "created",
+-   "duplicate",
++   undefined,
+  ]
+
+ ❯ apps/api/src/ap/bills-inbound-webhook.db.test.ts:586:49
+    584|     const same = sign(addrA, { bodyMime: variant('178d') });
+    585|     const a = await Promise.all([post(api, same), post(api, same)]);
+    586|     expect(a.map((r) => r.json.outcome).sort()).toEqual(['created', 'd…
+       |                                                 ^
+    587|     const first = sign(addrA, { bodyMime: variant('178e') });
+    588|     const clash = sign(addrA, {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/14]⎯
+
+ FAIL  |db| packages/modules/ap/src/inbound-address.db.test.ts > SS-PLAT-180 inbound addresses only move forward and every change is audited > SS-PLAT-180 ensure audits the first creation only; rotate audits the new address; tokens never appear in audit
+error: permission denied for table audit_log
+ ❯ node_modules/.pnpm/pg@8.23.1/node_modules/pg/lib/client.js:694:17
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:118:28
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ packages/modules/ap/src/inbound-address.db.test.ts:25:7
+     23|   f.inTenant(async (trx) =>
+     24|     (
+     25|       await sql<{ action: string; entity_id: string; after: Record<str…
+       |       ^
+     26|         SELECT action, entity_id, after FROM audit.audit_log
+     27|          WHERE entity_type = 'bill_inbox_address' ORDER BY id`.execute…
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ PostgresConnection.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/dialect/postgres/postgres-driver.js:131:41
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:39:24
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:1057:20
+ ❯ #run node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/single-connection-provider.js:24:16
+ ❯ DefaultQueryExecutor.executeQuery node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/query-executor/query-executor-base.js:38:28
+ ❯ packages/modules/ap/src/inbound-address.db.test.ts:25:7
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/inbound-address.db.test.ts:42:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/14]⎯
+
+ FAIL  |db| packages/modules/ap/src/inbound-address.db.test.ts > SS-PLAT-180 inbound addresses only move forward and every change is audited > SS-PLAT-180 lf_app cannot bring a superseded address back, re-supersede, or change token or company
+AssertionError: expected 'duplicate key value violates unique c…' to match /only active -> superseded/
+
+- Expected:
+/only active -> superseded/
+
++ Received:
+"duplicate key value violates unique constraint \"bill_inbox_address_one_active_uq\""
+
+ ❯ packages/modules/ap/src/inbound-address.db.test.ts:59:7
+     57|     expect(
+     58|       await tryUpdate(`UPDATE app.bill_inbox_address SET status = 'act…
+     59|     ).toMatch(/only active -> superseded/);
+       |       ^
+     60|     expect(
+     61|       await tryUpdate(`UPDATE app.bill_inbox_address SET status = 'sup…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/14]⎯
+
+ FAIL  |db| packages/modules/ap/src/inbox.db.test.ts > SS-PLAT-179 ingest trusts nothing provider- or relay-added inside the message (r11 F3, F6) > SS-PLAT-179 a second message with a known Message-ID but different bytes is kept as its own flagged item, not dropped as a duplicate
+AssertionError: expected { …(7) } to match object { replayed: false, …(1) }
+(6 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "messageIdConflictOf": null,
+    "replayed": false,
+  }
+
+ ❯ packages/modules/ap/src/inbox.db.test.ts:249:19
+    247|       return [a, b, c, d];
+    248|     });
+    249|     expect(first).toMatchObject({ replayed: false, messageIdConflictOf…
+       |                   ^
+    250|     expect(second).toMatchObject({ replayed: false, partyId: supplier,…
+    251|     expect(second.id).not.toBe(first.id);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/14]⎯
+
+
+ Test Files  3 failed (3)
+      Tests  13 failed | 16 passed (29)
+   Start at  19:53:05
+   Duration  188.16s (transform 2.21s, setup 0ms, import 3.71s, tests 182.88s, environment 0ms)
+

@@ -10,7 +10,7 @@
  * up after the signature check. The message is parsed (by `ingestBillEmail`) only after every
  * check passed. Errors carry fixed reason codes, never keys, tokens or message content.
  */
-import { createHmac, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from 'node:crypto';
 import { withTenant, type Database } from '@ledgerforce/db';
 import { sql, type Kysely, type Transaction } from 'kysely';
 import { ingestBillEmail, InboxError } from './inbox.ts';
@@ -211,14 +211,32 @@ export async function ensureInboxAddress(
     .where('status', '=', 'active')
     .executeTakeFirst();
   if (existing) return existing.token;
+  return createAddress(trx, companyId, c.createdBy ?? null, 'ap.inbox_address.created');
+}
+
+async function createAddress(
+  trx: Trx,
+  companyId: string,
+  createdBy: string | null,
+  action: 'ap.inbox_address.created' | 'ap.inbox_address.rotated',
+): Promise<string> {
   const token = newInboundToken();
+  const id = randomUUID();
   await trx
     .insertInto('app.bill_inbox_address')
+    .values({ id, company_id: companyId, token, created_by: createdBy })
+    .execute();
+  // Who can inject bills is security-relevant (r11 F5): audit it, without the token itself.
+  await trx
+    .insertInto('audit.audit_log')
     .values({
-      id: randomUUID(),
-      company_id: companyId,
-      token,
-      created_by: c.createdBy ?? null,
+      actor_type: createdBy ? 'user' : 'system',
+      actor_user_id: createdBy,
+      action,
+      entity_type: 'bill_inbox_address',
+      entity_id: id,
+      before: null,
+      after: JSON.stringify({ companyId, status: 'active' }),
     })
     .execute();
   return token;
@@ -236,7 +254,7 @@ export async function rotateInboxAddress(
     .where('company_id', '=', companyId)
     .where('status', '=', 'active')
     .execute();
-  return ensureInboxAddress(trx, c);
+  return createAddress(trx, companyId, c.createdBy ?? null, 'ap.inbox_address.rotated');
 }
 
 export interface MailgunInboundOptions {
@@ -276,10 +294,26 @@ export async function receiveMailgunInbound(
     opts.nowSeconds ?? Math.floor(Date.now() / 1000),
   );
   const mime = parts.filter((p) => p.name === 'body-mime');
+  const recipients = parts.filter((p) => p.name === 'recipient');
+  // Consume the token now, in its own committed statement, before anything can refuse or fail
+  // (r11 F2): the signature does not cover the body or recipient, so the token is bound to their
+  // hashes. Only an identical request (Mailgun retrying) may use it again.
+  const sha = (b: Buffer | string) => createHash('sha256').update(b).digest();
+  const bodyHash =
+    mime.length === 1 ? sha(mime[0]?.data ?? '') : sha(`\u0000parts:${String(mime.length)}`);
+  const recipientHash = sha(
+    recipients.map((r) => r.data.toString('utf8').trim().toLowerCase()).join('\n'),
+  );
+  const verdict = (
+    await sql<{ v: string }>`
+      SELECT app.consume_inbound_webhook_token('mailgun', ${token ?? ''}, ${bodyHash}, ${recipientHash}) AS v`.execute(
+      db,
+    )
+  ).rows[0]?.v;
+  if (verdict !== 'new' && verdict !== 'retry') throw new InboundWebhookError('replayed');
   if (mime.length !== 1 || parts.some((p) => p.name === 'attachments')) {
     throw new InboundWebhookError('misconfigured_route');
   }
-  const recipients = parts.filter((p) => p.name === 'recipient');
   const routeToken =
     recipients.length === 1
       ? inboundTokenOf(recipients[0]?.data.toString('utf8') ?? '', opts.inboundDomain)
@@ -293,15 +327,16 @@ export async function receiveMailgunInbound(
   if (!target) throw new InboundWebhookError('unknown_recipient');
 
   return withTenant(db, target.tenant_id, async (trx) => {
-    // Single use, before the message is parsed. A conflicting insert waits for a concurrent
-    // holder of the same token and then finds it (unique index across tenants).
+    // One ingest per token. Reaching here with a used token means an identical request (the
+    // hashes matched above): a concurrent twin waits on the unique index, then finds the row, and
+    // a retry after a lost answer finds it at once — both are the delivery already recorded.
     const receipt = await trx
       .insertInto('app.inbound_webhook_receipt')
       .values({ company_id: target.company_id, provider: 'mailgun', provider_token: token ?? '' })
       .onConflict((oc) => oc.columns(['provider', 'provider_token']).doNothing())
       .returning('id')
       .executeTakeFirst();
-    if (!receipt) throw new InboundWebhookError('replayed');
+    if (!receipt) return { outcome: 'duplicate' };
     let item;
     try {
       item = await ingestBillEmail(trx, {

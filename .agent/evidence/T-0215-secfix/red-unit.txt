@@ -1,0 +1,78 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/t0215-secfix
+
+ ❯ |api-unit| apps/api/src/security/rate-limit.test.ts (23 tests | 4 failed) 35ms
+     × AC-4 POST /webhooks/mailgun/messages.mime → inbound_email [T-0142] 12ms
+     × AC-4 POST /Webhooks//Mailgun/messages.mime/ → inbound_email [T-0142] 1ms
+     × AC-5 production defaults are 30 auth, 300 mutating, 600 webhook, 60 inbound email per 60 s [T-0142][T-0215] 7ms
+     × SS-PLAT-177 the inbound email class has its own counter and falls back to the default when unset [T-0215] 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 POST /webhooks/mailgun/messages.mime → inbound_email [T-0142]
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 rate limit route classes > AC-4 POST /Webhooks//Mailgun/messages.mime/ → inbound_email [T-0142]
+AssertionError: expected 'webhook' to be 'inbound_email' // Object.is equality
+
+Expected: "inbound_email"
+Received: "webhook"
+
+ ❯ apps/api/src/security/rate-limit.test.ts:29:42
+     27|     ['GET', '/t/acme/auth/login/extra', null],
+     28|   ])('AC-4 %s %s → %s [T-0142]', (method, path, cls) => {
+     29|     expect(rateLimitClass(method, path)).toBe(cls);
+       |                                          ^
+     30|   });
+     31| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 fixed-window limiter > AC-5 production defaults are 30 auth, 300 mutating, 600 webhook, 60 inbound email per 60 s [T-0142][T-0215]
+AssertionError: expected { windowMs: 60000, auth: 30, …(3) } to deeply equal { windowMs: 60000, auth: 30, …(4) }
+
+- Expected
++ Received
+
+  {
+    "auth": 30,
+-   "inboundEmail": 60,
+    "maxKeys": 50000,
+    "mutating": 300,
+    "webhook": 600,
+    "windowMs": 60000,
+  }
+
+ ❯ apps/api/src/security/rate-limit.test.ts:72:33
+     70|
+     71|   it('AC-5 production defaults are 30 auth, 300 mutating, 600 webhook,…
+     72|     expect(DEFAULT_RATE_LIMITS).toEqual({
+       |                                 ^
+     73|       windowMs: 60_000,
+     74|       auth: 30,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  |api-unit| apps/api/src/security/rate-limit.test.ts > T-0142 fixed-window limiter > SS-PLAT-177 the inbound email class has its own counter and falls back to the default when unset [T-0215]
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ apps/api/src/security/rate-limit.test.ts:85:50
+     83|     const l = new FixedWindowLimiter(policy, () => 1_000_000);
+     84|     for (let i = 0; i < 60; i++) expect(l.hit('inbound_email', 'mg').a…
+     85|     expect(l.hit('inbound_email', 'mg').allowed).toBe(false);
+       |                                                  ^
+     86|     // The Stripe webhook class is unaffected.
+     87|     expect(l.hit('webhook', 'mg').allowed).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  4 failed | 31 passed (35)
+   Start at  19:53:04
+   Duration  689ms (transform 422ms, setup 0ms, import 613ms, tests 84ms, environment 0ms)
+

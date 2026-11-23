@@ -5,7 +5,7 @@
  */
 import type { NextFunction, Request, Response } from 'express';
 
-export type RateLimitClass = 'auth' | 'mutating' | 'webhook';
+export type RateLimitClass = 'auth' | 'mutating' | 'webhook' | 'inbound_email';
 
 export interface RateLimitPolicy {
   windowMs: number;
@@ -13,6 +13,11 @@ export interface RateLimitPolicy {
   auth: number;
   mutating: number;
   webhook: number;
+  /**
+   * The Mailgun inbound route (bodies up to 26 MiB, unauthenticated until parsed; ADR-0099
+   * addendum, r11 F1): its own, lower class. Default 60.
+   */
+  inboundEmail?: number;
   /** Most (class, address) counters kept; the oldest is evicted beyond it. Default 50 000. */
   maxKeys?: number;
 }
@@ -22,6 +27,7 @@ export const DEFAULT_RATE_LIMITS: RateLimitPolicy = {
   auth: 30,
   mutating: 300,
   webhook: 600,
+  inboundEmail: 60,
   maxKeys: 50_000,
 };
 
@@ -30,6 +36,7 @@ export type Hit = { allowed: true } | { allowed: false; retryAfterSeconds: numbe
 const SAFE = new Set(['GET', 'HEAD', 'OPTIONS']);
 const AUTH = /^\/(?:t\/[^/]+\/auth\/login|auth\/(?:callback|step-up))$/;
 const WEBHOOK = /^\/webhooks(?:\/|$)/;
+const INBOUND_EMAIL = /^\/webhooks\/mailgun(?:\/|$)/;
 
 /**
  * The class a request counts against, or null when it is not limited. The path is normalised the
@@ -43,6 +50,7 @@ export function rateLimitClass(method: string, path: string): RateLimitClass | n
     .replace(/(.)\/+$/, '$1');
   if (AUTH.test(p)) return 'auth';
   if (SAFE.has(method.toUpperCase())) return null;
+  if (INBOUND_EMAIL.test(p)) return 'inbound_email';
   return WEBHOOK.test(p) ? 'webhook' : 'mutating';
 }
 
@@ -59,12 +67,19 @@ export class FixedWindowLimiter {
     return this.windows.size;
   }
 
+  private limit(cls: RateLimitClass): number {
+    if (cls === 'inbound_email') {
+      return this.policy.inboundEmail ?? DEFAULT_RATE_LIMITS.inboundEmail ?? 60;
+    }
+    return this.policy[cls];
+  }
+
   hit(cls: RateLimitClass, key: string): Hit {
     const t = this.now();
     const id = `${cls} ${key}`;
     const w = this.windows.get(id);
     if (w && t - w.start < this.policy.windowMs) {
-      if (w.count >= this.policy[cls]) {
+      if (w.count >= this.limit(cls)) {
         const left = w.start + this.policy.windowMs - t;
         return { allowed: false, retryAfterSeconds: Math.max(1, Math.ceil(left / 1000)) };
       }

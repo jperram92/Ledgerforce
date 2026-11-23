@@ -4467,3 +4467,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: T-0165 stored logos with magic-byte checks only; the GET answered 500 and the PDF embedded uncleaned bytes.
 - Alternatives: a one-off migration re-cleaning stored logos (rejected: a data rewrite of tenant rows for a rare case; cleaning on use covers every path).
 - ADR: ADR-0100 (addendum) · Status: accepted
+
+### DL-0865 — Inbound webhook uploads bounded: own rate class, in-flight cap, byte budget, timeout (r11 F1, F4)
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: security
+- Decision: `POST /webhooks/mailgun/messages.mime` gets its own rate class `inbound_email` (60/min per address); the body reader admits at most 4 uploads and reserves at most 64 MiB in total (Content-Length reserved before reading, chunked bodies at 2× per chunk), answering 503 `inbound_busy` + `Retry-After: 30` over either; 60 s to send the body (408); a declared length is read into one preallocated buffer (mismatch 400); every refusal sends `Connection: close` and stops reading.
+- Why: security review r11 F1 (High): anonymous clients could hold up to 26 MiB per request, ~600 at once per IP; F4: 415 drained unbounded bodies on keep-alive sockets. Mailgun retries non-406 answers (RQ-0181 F3), so 503 loses no mail.
+- Alternatives: require Content-Length (rejected: Mailgun's transfer encoding is unverified); IP allowlist only (kept as a deployment option, not a code control).
+- ADR: ADR-0099 addendum · Status: accepted
+
+### DL-0866 — Mailgun token consumed right after the signature check, bound to message and recipient hashes (r11 F2)
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: security
+- Decision: After signature and timestamp pass, `app.consume_inbound_webhook_token()` (SECURITY DEFINER) records the token with SHA-256 of `body-mime` and the recipient in the global table `app.inbound_webhook_token` in its own committed statement; same token + same hashes = retry, else 406 `replayed`. An identical retry of a delivery already ingested answers 200 `duplicate` (the first version answered 406 `replayed`; the SS-PLAT-168 assertion was changed to the new required behaviour, and the swapped-body/recipient case still asserts `replayed`). The table is global (consumed before routing), added to `GLOBAL_TABLES` with lf_migrator-only policies and no lf_app grant — needing a security ADR per `packages/db/AGENTS.md`: the ADR-0099 addendum, accepted by the building agent under DL-0691 (AGENTS.md §6 as updated by DL-0896), with the independent security review r11 as its review.
+- Why: r11 F2: a token released by a refused/misrouted/failed delivery could carry any body and recipient for the rest of the window.
+- Alternatives: tenant-scoped token table (rejected: unknown-recipient deliveries have no tenant, the gap the review names); keep release-on-rollback (rejected).
+- ADR: ADR-0099 addendum · Status: accepted
+
+### DL-0867 — Dedicated Mailgun (sub)account key required; ingest never trusts headers inside the message (r11 F3)
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: security
+- Decision: Deployments must configure the signing key of a Mailgun account or subaccount used only for the bills-inbox route; `inbox.ts` states and SS-PLAT-179 tests that `Authentication-Results`, SPF/DKIM verdicts and `X-Mailgun-*` headers in `body-mime` change neither supplier match nor status.
+- Why: an account key signs all its webhooks and never the body, so any other receiver's triples are valid here; F2 cannot catch tokens never seen here (RQ-0181 addendum).
+- Alternatives: per-route keys (Mailgun has none).
+- ADR: ADR-0099 addendum · Status: accepted
+
+### DL-0868 — Inbound addresses forward-only with audit; Message-ID reuse kept as a flagged item (r11 F5, F6)
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: security
+- Decision: A trigger on `app.bill_inbox_address` allows only active → superseded (all roles); create/rotate write `audit.audit_log` rows without the token. `ingestBillEmail` stays idempotent on Message-ID only when the raw SHA-256 matches; a different message reusing it becomes its own item keyed `<sha256:…>` with `message_id_conflict_of` set (applies to IMAP polling too). Showing the flag in the inbox screen is follow-up work for the inbox UI owner (T-0136 line).
+- Why: r11 F5 (a leaked address could be revived; rotation unaudited) and F6 (a first message with a guessed Message-ID silently suppressed a genuine bill).
+- Alternatives: drop the Message-ID unique constraint (forbidden: migrations are additive).
+- ADR: ADR-0099 addendum · Status: accepted
+
+### DL-0869 — 5xx logs carry no message content; digit-shift and race tests; token spec corrected (r11 F7, F8)
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: security
+- Decision: Unexpected failures answer 500 `internal_error` and log one line with the error class and SQLSTATE only (test forces a database error whose text quotes the Message-ID and asserts nothing of the message, token or key is logged). Added tests for characters shifted across `timestamp‖token` and for racing identical and conflicting deliveries; ADR-0099 rule 2 now says 16–256 characters `[A-Za-z0-9_-]`.
+- Why: r11 F7/F8.
+- Alternatives: none.
+- ADR: ADR-0099 addendum · Status: accepted
+
+### DL-0897 — T-0215 security-fix migration numbered 0081 (after T-0209's 0080)
+- Date: 2026-11-22 · By: claude · Task: T-0215 · Category: process
+- Decision: `0081_ap_inbound_webhook_hardening.sql` (token table + consume function, address trigger, `message_id_conflict_of`). Written while T-0209's 0080 was unmerged (first test runs used the file as 0080 locally); after T-0209 merged, the base was merged in and the final validation ran with 0081 in a gapless sequence.
+- Why: lead instruction (DL-0864 precedent).
+- Alternatives: none.
+- ADR: none · Status: accepted

@@ -186,6 +186,59 @@ describe('SS-PLAT-170 app.bill_inbox_route(): SECURITY DEFINER lookup of an inbo
   });
 });
 
+// T-0215 r11 F2 (ADR-0099 addendum): the global token table is reachable only via its function.
+describe('SS-PLAT-178 app.consume_inbound_webhook_token(): consume-once, bound to message and recipient hashes', () => {
+  it('SS-PLAT-178 new, then retry only with both hashes equal, else replayed; lf_app cannot read or write the table', async () => {
+    const tdb = await createTestDatabase({ migrate: true });
+    try {
+      const h = (c: string) => Buffer.alloc(32, c);
+      const consume = async (token: string, body: Buffer, rcpt: Buffer) =>
+        (
+          await sql<{
+            v: string;
+          }>`SELECT app.consume_inbound_webhook_token('mailgun', ${token}, ${body}, ${rcpt}) AS v`.execute(
+            tdb.app,
+          )
+        ).rows[0]?.v;
+      const tok = 'T'.repeat(50);
+      expect(await consume(tok, h('a'), h('r'))).toBe('new');
+      expect(await consume(tok, h('a'), h('r'))).toBe('retry');
+      expect(await consume(tok, h('b'), h('r'))).toBe('replayed');
+      expect(await consume(tok, h('a'), h('s'))).toBe('replayed');
+      expect(await consume('U'.repeat(50), h('b'), h('s'))).toBe('new');
+      await expect(sql`SELECT * FROM app.inbound_webhook_token`.execute(tdb.app)).rejects.toThrow(
+        /permission denied/,
+      );
+      await expect(
+        sql`INSERT INTO app.inbound_webhook_token VALUES ('mailgun', ${'V'.repeat(50)}, ${h('a')}, ${h('a')})`.execute(
+          tdb.app,
+        ),
+      ).rejects.toThrow(/permission denied/);
+      const fn = await tdb.admin.query<{
+        definer: boolean;
+        owner: string;
+        config: string[] | null;
+        public_exec: boolean;
+      }>(
+        `SELECT p.prosecdef AS definer, pg_get_userbyid(p.proowner) AS owner, p.proconfig AS config,
+                has_function_privilege('public', p.oid, 'EXECUTE') AS public_exec
+           FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+          WHERE n.nspname = 'app' AND p.proname = 'consume_inbound_webhook_token'`,
+      );
+      expect(fn.rows).toEqual([
+        {
+          definer: true,
+          owner: 'lf_migrator',
+          config: ['search_path=pg_catalog, pg_temp'],
+          public_exec: false,
+        },
+      ]);
+    } finally {
+      await tdb.close();
+    }
+  });
+});
+
 // The generated suite: one describe block per tenant-owned table, discovered at collection time.
 const suiteDb = await createTestDatabase({ migrate: true });
 afterAll(async () => {

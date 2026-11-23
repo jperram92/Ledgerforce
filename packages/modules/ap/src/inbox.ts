@@ -7,6 +7,11 @@
  * suggests the supplier (an active supplier's contact email); nothing is posted. An email without
  * a PDF is kept as `no_attachment`. codeInboxItem turns an item into a draft supplier bill
  * (createBill) and copies the PDF to it; approval then follows the bill workflow.
+ *
+ * Trust rule (ADR-0099 addendum, r11 F3): nothing inside the message is evidence of who sent it.
+ * Authentication-Results, Received-SPF, DKIM verdicts and provider headers (X-Mailgun-*, …) can
+ * be written by whoever composed the bytes, so ingest never reads them; the sender address only
+ * suggests a supplier and a person codes and approves every bill.
  */
 import { createHash } from 'node:crypto';
 import type { Database } from '@ledgerforce/db';
@@ -36,6 +41,8 @@ export interface InboxItemView {
   readonly fromAddress: string | null;
   readonly subject: string | null;
   readonly partyId: string | null;
+  /** Set when this message reused that earlier item's Message-ID with different bytes (r11 F6). */
+  readonly messageIdConflictOf: string | null;
   readonly attachments: readonly {
     fileName: string;
     contentType: string;
@@ -52,7 +59,7 @@ async function viewOf(
 ): Promise<InboxItemView> {
   const item = await trx
     .selectFrom('app.bill_inbox_item')
-    .select(['id', 'status', 'from_address', 'subject', 'party_id'])
+    .select(['id', 'status', 'from_address', 'subject', 'party_id', 'message_id_conflict_of'])
     .where('company_id', '=', companyId)
     .where('id', '=', id)
     .executeTakeFirstOrThrow();
@@ -70,6 +77,7 @@ async function viewOf(
     fromAddress: item.from_address,
     subject: item.subject,
     partyId: item.party_id,
+    messageIdConflictOf: item.message_id_conflict_of,
     attachments: atts.map((a) => ({
       fileName: a.file_name,
       contentType: a.content_type,
@@ -92,14 +100,28 @@ export async function ingestBillEmail(
   if (bytes.length === 0) throw new InboxError('INVALID_EMAIL', 'empty message');
   const rawSha = createHash('sha256').update(bytes).digest('hex');
   const email = await PostalMime.parse(bytes);
-  const messageId = (email.messageId ?? '').trim() || `<sha256:${rawSha}>`;
-  const existing = await trx
-    .selectFrom('app.bill_inbox_item')
-    .select('id')
-    .where('company_id', '=', companyId)
-    .where('message_id', '=', messageId)
-    .executeTakeFirst();
-  if (existing) return viewOf(trx, companyId, existing.id, true);
+  const byBytes = `<sha256:${rawSha}>`;
+  const claimed = (email.messageId ?? '').trim().slice(0, 998) || byBytes;
+  const find = (id: string) =>
+    trx
+      .selectFrom('app.bill_inbox_item')
+      .select(['id', 'raw_sha256'])
+      .where('company_id', '=', companyId)
+      .where('message_id', '=', id)
+      .executeTakeFirst();
+  // Idempotent on Message-ID only while the bytes match (r11 F6): a different message reusing a
+  // known Message-ID (guessable, or injected first) is kept as its own flagged item, keyed by its
+  // bytes, so it can never silently suppress a genuine bill.
+  let messageId = claimed;
+  let conflictOf: string | null = null;
+  const existing = await find(claimed);
+  if (existing && existing.raw_sha256 === rawSha) return viewOf(trx, companyId, existing.id, true);
+  if (existing) {
+    const own = await find(byBytes);
+    if (own) return viewOf(trx, companyId, own.id, true);
+    messageId = byBytes;
+    conflictOf = existing.id;
+  }
 
   const from = email.from?.address?.toLowerCase() ?? null;
   const supplier = from
@@ -126,7 +148,8 @@ export async function ingestBillEmail(
     .insertInto('app.bill_inbox_item')
     .values({
       company_id: companyId,
-      message_id: messageId.slice(0, 998),
+      message_id: messageId,
+      message_id_conflict_of: conflictOf,
       raw_sha256: rawSha,
       from_address: from,
       subject: email.subject?.slice(0, 998) ?? null,
