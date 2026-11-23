@@ -118,6 +118,87 @@
       "provider": "claude",
       "timestamp": "2026-11-22T19:38:02Z",
       "result": "failed (expected RED)"
+    },
+    {
+      "scenario": "SS-PLAT-167",
+      "file": ".agent/evidence/T-0215/20261123-113951-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-167 a signed Mailgun forward() delivers one inbox item; a redelivery adds nothing › SS-PLAT-167 the recorded supplier email lands in the addressed company with its PDF; the token is recorded | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-167 a signed Mailgun forward() delivers one inbox item; a redelivery adds nothing › SS-PLAT-167 a redelivery of the same message with a fresh token answers duplicate and adds no item",
+      "commit": "2ab8e3c4817e-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:39:51.546Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-168",
+      "file": ".agent/evidence/T-0215/20261123-113951-tests-api-db.json",
+      "test": "8 test(s): apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 no signature, a forged signature or a wrong key answers 401 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 a correctly signed but stale or future timestamp (outside ±300 s) answers 401 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 a reused token answers 406 unless it carries the same message and recipient (a genuine retry is a duplicate, r11 F2) | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 the signature is checked before the message: an invalid message with a bad signature is 401, with a good one 406 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 a store() route (attachments field) or a forward without body-mime answers 406 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 malformed forms answer 400; a JSON or urlencoded body answers 415 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 a body over 26 MiB answers 413, by Content-Length and by count when streamed | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 without a signing key and inbound domain the route answers 503 and stores nothing",
+      "commit": "2ab8e3c4817e-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:39:51.546Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-169",
+      "file": ".agent/evidence/T-0215/20261123-113951-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-169 the recipient token picks the company; unknown recipients learn nothing › SS-PLAT-169 each signed delivery lands only in the company and tenant its token belongs to | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-169 the recipient token picks the company; unknown recipients learn nothing › SS-PLAT-169 unknown, superseded, foreign-domain, listed or malformed recipients all answer the same 406 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-169 the recipient token picks the company; unknown recipients learn nothing › SS-PLAT-169 answers never contain the signing key, tokens, tenant or company ids | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-169 the recipient token picks the company; unknown recipients learn nothing › SS-PLAT-169 the route counts against its own inbound_email rate-limit class, lower than /webhooks/* (429 once spent, r11 F1)",
+      "commit": "2ab8e3c4817e-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:39:51.546Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-177",
+      "file": ".agent/evidence/T-0215/20261123-113951-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) › SS-PLAT-177 a second upload while one is in flight answers 503 with Retry-After without being read; the first still lands | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) › SS-PLAT-177 a declared length over the remaining byte budget answers 503 before reading | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) › SS-PLAT-177 a body not sent within the timeout answers 408 and frees the slot | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) › SS-PLAT-177 every refusal closes the connection (415, 413, 401, 406, 400)",
+      "commit": "2ab8e3c4817e-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:39:51.546Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-178",
+      "file": ".agent/evidence/T-0215/20261123-113951-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) › SS-PLAT-178 after a refused message (406) the same token with another message answers replayed | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) › SS-PLAT-178 after an unknown recipient (406) the same token to a valid recipient answers replayed | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) › SS-PLAT-178 after a server failure (500, logged without message content) the identical retry lands | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) › SS-PLAT-178 two identical deliveries racing: one created, one duplicate; two different ones racing: one created, one replayed",
+      "commit": "2ab8e3c4817e-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:39:51.546Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-180",
+      "file": ".agent/evidence/T-0215/20261123-114016-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/inbound-address.db.test.ts › SS-PLAT-180 inbound addresses only move forward and every change is audited › SS-PLAT-180 ensure audits the first creation only; rotate audits the new address; tokens never appear in audit | packages/modules/ap/src/inbound-address.db.test.ts › SS-PLAT-180 inbound addresses only move forward and every change is audited › SS-PLAT-180 lf_app cannot bring a superseded address back, re-supersede, or change token or company",
+      "commit": "2ab8e3c4817e-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:40:16.548Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC05-01",
+      "file": ".agent/evidence/T-0215/20261123-114016-tests-db.json",
+      "test": "3 test(s): packages/modules/ap/src/inbox.db.test.ts › SS-UC05-01: Emailed PDF becomes a draft bill › SS-UC05-01 ingest stores a draft with the PDF attached, matched to the supplier; nothing posts; re-ingest is idempotent | packages/modules/ap/src/inbox.db.test.ts › SS-UC05-01: Emailed PDF becomes a draft bill › SS-UC05-01 coding the inbox item creates a draft bill that keeps the PDF | packages/modules/ap/src/inbox.db.test.ts › SS-UC05-01: Emailed PDF becomes a draft bill › an unknown sender is kept for a person to assign; a message without a PDF is kept as no_attachment",
+      "commit": "2ab8e3c4817e-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:40:16.548Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-179",
+      "file": ".agent/evidence/T-0215/20261123-114016-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/inbox.db.test.ts › SS-PLAT-179 ingest trusts nothing provider- or relay-added inside the message (r11 F3, F6) › SS-PLAT-179 Authentication-Results and X-Mailgun-* headers change neither the supplier match nor the status | packages/modules/ap/src/inbox.db.test.ts › SS-PLAT-179 ingest trusts nothing provider- or relay-added inside the message (r11 F3, F6) › SS-PLAT-179 a second message with a known Message-ID but different bytes is kept as its own flagged item, not dropped as a duplicate",
+      "commit": "2ab8e3c4817e-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:40:16.548Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-177",
+      "file": ".agent/evidence/T-0215/20261123-114021-tests-api-unit.json",
+      "test": "1 test(s): apps/api/src/security/rate-limit.test.ts › T-0142 fixed-window limiter › SS-PLAT-177 the inbound email class has its own counter and falls back to the default when unset [T-0215]",
+      "commit": "2ab8e3c4817e-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:40:21.640Z",
+      "result": "passed"
     }
   ]
 }
