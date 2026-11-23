@@ -1,0 +1,205 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a61b803d4b14ba07c
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41917
+ ❯ |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts (12 tests | 4 failed) 3164ms
+     × SS-UC11-11 a refund Stripe holds (a commit lost after the send) is never cancelled: AT_STRIPE with the Stripe refund id 279ms
+     × SS-UC11-20 an unapproved Stripe request is withdrawn once Stripe, asked under the party lock, holds none; without the connector it is refused 137ms
+     × SS-UC11-11 a paid (sent) refund and a bank refund are NOT_CANCELLABLE; a cancelled one stays cancelled; another company sees none 287ms
+     × SS-UC11-12 R2 an unapproved document whose refund Stripe holds is reported (never recorded unapproved, never cancelled); approving it adopts, no create 97ms
+ ❯ |db| packages/modules/ap/src/customer-refund-cancel.db.test.ts (6 tests | 6 failed) 2082ms
+     × SS-UC11-18 an approved bank refund outside any batch is cancelled, stops counting as requested, and a repeat replays 161ms
+     × SS-UC11-18 an unapproved bank request is withdrawn; it can then never be approved 118ms
+     × SS-UC11-19 in a draft batch: NOT_CANCELLABLE naming the batch, the 0055 guard refuses too, the view shows the batch 136ms
+     × SS-UC11-19 in a released batch, and once the batch is confirmed (paid): NOT_CANCELLABLE 119ms
+     × SS-UC11-19 a payable batch line for a cancelled refund is refused (migration 0082 guard) 154ms
+     × SS-UC11-19 a batch build and a cancel racing: the cancel waits for the line and is refused by the 0055 guard 453ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; its amount stops counting as requested > SS-UC11-11 a refund Stripe holds (a commit lost after the send) is never cancelled: AT_STRIPE with the Stripe refund id
+AssertionError: expected RefundError: refund RF-000002 is not appr… { code: '…' } to match object { code: 'AT_STRIPE' }
+(1 matching property omitted from actual)
+
+- Expected
++ Received
+
+- {
+-   "code": "AT_STRIPE",
++ RefundError {
++   "code": "NOT_CANCELLABLE",
+  }
+
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:337:23
+    335|       (e: unknown) => e as { code?: string; message?: string },
+    336|     );
+    337|     expect(withdrawn).toMatchObject({ code: 'AT_STRIPE' });
+       |                       ^
+    338|     expect((withdrawn as { message?: string }).message).toMatch(/re_1S…
+    339|     // Re-approved more than 23 hours ago (KEY_EXPIRED, a finished sen…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; its amount stops counting as requested > SS-UC11-20 an unapproved Stripe request is withdrawn once Stripe, asked under the party lock, holds none; without the connector it is refused
+AssertionError: expected 'NOT_CANCELLABLE' to be 'METHOD_NOT_AVAILABLE' // Object.is equality
+
+Expected: "METHOD_NOT_AVAILABLE"
+Received: "NOT_CANCELLABLE"
+
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:363:7
+    361|         f.inTenant((trx) => cancelCustomerRefund(trx, { companyId: f.c…
+    362|       ),
+    363|     ).toBe('METHOD_NOT_AVAILABLE');
+       |       ^
+    364|     const before = stub.received.length;
+    365|     const done = await cancel(r.refundId);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; its amount stops counting as requested > SS-UC11-11 a paid (sent) refund and a bank refund are NOT_CANCELLABLE; a cancelled one stays cancelled; another company sees none
+RefundError: refund RF-000005 is requested (bank_batch); only a requested Stripe refund is cancelled here
+ ❯ cancelCustomerRefund packages/modules/ar/src/refunds.ts:471:11
+    469|   if (r.status === 'cancelled') return { ...r, replayed: true };
+    470|   if (r.status !== 'requested' || r.method !== 'stripe') {
+    471|     throw new RefundError(
+       |           ^
+    472|       'NOT_CANCELLABLE',
+    473|       `refund ${r.refundNo} is ${r.status} (${r.method}); only a reque…
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:413:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  |db| packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts > SS-UC11-12 T-0189 AC-1 / review r8 R2: a refund Stripe already holds is recorded once and never sent again > SS-UC11-12 R2 an unapproved document whose refund Stripe holds is reported (never recorded unapproved, never cancelled); approving it adopts, no create
+AssertionError: expected 'NOT_CANCELLABLE' to be 'AT_STRIPE' // Object.is equality
+
+Expected: "AT_STRIPE"
+Received: "NOT_CANCELLABLE"
+
+ ❯ packages/connectors/stripe/src/stripe-refund-followups.contract.db.test.ts:532:46
+    530|     // Unapproved but held at Stripe: the withdrawal asks Stripe and i…
+    531|     // approving it records the refund.
+    532|     expect(await codeOf(cancel(r.refundId))).toBe('AT_STRIPE');
+       |                                              ^
+    533|     await approve(r);
+    534|     const sent = await f.inTenant((trx) =>
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  |db| packages/modules/ap/src/customer-refund-cancel.db.test.ts > SS-UC11-18: a requested bank refund no live payment batch pays is cancelled > SS-UC11-18 an approved bank refund outside any batch is cancelled, stops counting as requested, and a repeat replays
+AssertionError: expected undefined to be null
+
+- Expected:
+null
+
++ Received:
+undefined
+
+ ❯ packages/modules/ap/src/customer-refund-cancel.db.test.ts:170:51
+    168|       available: '100.0000',
+    169|     });
+    170|     expect((await read(r.refundId)).paymentBatch).toBeNull();
+       |                                                   ^
+    171|     const done = await cancel(r.refundId);
+    172|     expect(done).toMatchObject({
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  |db| packages/modules/ap/src/customer-refund-cancel.db.test.ts > SS-UC11-18: a requested bank refund no live payment batch pays is cancelled > SS-UC11-18 an unapproved bank request is withdrawn; it can then never be approved
+RefundError: refund RF-000002 is requested (bank_batch); only a requested Stripe refund is cancelled here
+ ❯ cancelCustomerRefund packages/modules/ar/src/refunds.ts:471:11
+    469|   if (r.status === 'cancelled') return { ...r, replayed: true };
+    470|   if (r.status !== 'requested' || r.method !== 'stripe') {
+    471|     throw new RefundError(
+       |           ^
+    472|       'NOT_CANCELLABLE',
+    473|       `refund ${r.refundNo} is ${r.status} (${r.method}); only a reque…
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/customer-refund-cancel.db.test.ts:202:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  |db| packages/modules/ap/src/customer-refund-cancel.db.test.ts > SS-UC11-19: a bank refund a live payment batch pays is never cancelled > SS-UC11-19 in a draft batch: NOT_CANCELLABLE naming the batch, the 0055 guard refuses too, the view shows the batch
+AssertionError: expected [ …(2) ] to deeply equal [ Array(1) ]
+
+- Expected
++ Received
+
+  [
++   "3c918e56-668c-448b-8ad5-d236a9ac246c",
+    "60721fc3-0d3b-4017-abe8-d143958da55f",
+  ]
+
+ ❯ packages/modules/ap/src/customer-refund-cancel.db.test.ts:219:46
+    217|     const b = await draftBatch('2026-11-05');
+    218|     expect(b.status).toBe('draft');
+    219|     expect(b.refunds.map((x) => x.refundId)).toEqual([r.refundId]);
+       |                                              ^
+    220|     expect((await read(r.refundId)).paymentBatch).toEqual({
+    221|       batchId: b.batchId,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+ FAIL  |db| packages/modules/ap/src/customer-refund-cancel.db.test.ts > SS-UC11-19: a bank refund a live payment batch pays is never cancelled > SS-UC11-19 in a released batch, and once the batch is confirmed (paid): NOT_CANCELLABLE
+AssertionError: expected undefined to match object { status: 'released' }
+
+- Expected:
+{
+  "status": "released",
+}
+
++ Received:
+undefined
+
+ ❯ packages/modules/ap/src/customer-refund-cancel.db.test.ts:242:51
+    240|       releasePaymentBatch(trx, { companyId: f.companyId, batchId: b.ba…
+    241|     );
+    242|     expect((await read(r.refundId)).paymentBatch).toMatchObject({ stat…
+       |                                                   ^
+    243|     const released = await refusal(cancel(r.refundId));
+    244|     expect(released?.code).toBe('NOT_CANCELLABLE');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯
+
+ FAIL  |db| packages/modules/ap/src/customer-refund-cancel.db.test.ts > SS-UC11-19: a bank refund a live payment batch pays is never cancelled > SS-UC11-19 a payable batch line for a cancelled refund is refused (migration 0082 guard)
+RefundError: refund RF-000005 is requested (bank_batch); only a requested Stripe refund is cancelled here
+ ❯ cancelCustomerRefund packages/modules/ar/src/refunds.ts:471:11
+    469|   if (r.status === 'cancelled') return { ...r, replayed: true };
+    470|   if (r.status !== 'requested' || r.method !== 'stripe') {
+    471|     throw new RefundError(
+       |           ^
+    472|       'NOT_CANCELLABLE',
+    473|       `refund ${r.refundNo} is ${r.status} (${r.method}); only a reque…
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/customer-refund-cancel.db.test.ts:272:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯
+
+ FAIL  |db| packages/modules/ap/src/customer-refund-cancel.db.test.ts > SS-UC11-19: a bank refund a live payment batch pays is never cancelled > SS-UC11-19 a batch build and a cancel racing: the cancel waits for the line and is refused by the 0055 guard
+AssertionError: expected 'RefundError: refund RF-000006 is requ…' to match /is in a live payment batch and cannot…/
+
+- Expected:
+/is in a live payment batch and cannot be cancelled/
+
++ Received:
+"RefundError: refund RF-000006 is requested (bank_batch); only a requested Stripe refund is cancelled here"
+
+ ❯ packages/modules/ap/src/customer-refund-cancel.db.test.ts:327:23
+    325|     await build;
+    326|     const e = await cancelling;
+    327|     expect(String(e)).toMatch(/is in a live payment batch and cannot b…
+       |                       ^
+    328|     expect(await read(r.refundId)).toMatchObject({
+    329|       status: 'requested',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  10 failed | 8 passed (18)
+   Start at  05:20:49
+   Duration  8.88s (transform 1.06s, setup 0ms, import 2.28s, tests 5.25s, environment 0ms)
+

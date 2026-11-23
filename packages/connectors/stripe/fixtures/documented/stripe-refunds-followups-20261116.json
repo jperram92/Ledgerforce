@@ -760,6 +760,26 @@
       }
     },
     {
+      "name": "list-refunds-withdrawn-none",
+      "request": {
+        "method": "GET",
+        "path": "/v1/refunds",
+        "form": {
+          "payment_intent": "{{withdrawnPaymentIntentId}}",
+          "limit": "100"
+        }
+      },
+      "response": {
+        "status": 200,
+        "body": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "url": "/v1/refunds"
+        }
+      }
+    },
+    {
       "name": "list-refunds-mismatch",
       "request": {
         "method": "GET",

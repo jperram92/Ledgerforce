@@ -83,8 +83,14 @@ const people: Record<string, { id: string; roles: string[] }> = {
   financeAdmin: { id: randomUUID(), roles: ['finance_admin'] },
 };
 
-async function call(method: string, path: string, who: string, body?: unknown) {
-  const h: Record<string, string> = {};
+async function call(
+  method: string,
+  path: string,
+  who: string,
+  body?: unknown,
+  headers: Record<string, string> = {},
+) {
+  const h: Record<string, string> = { ...headers };
   const c = cookies.get(who);
   if (c) h.cookie = `lf_session=${c}`;
   h['sec-fetch-site'] = 'same-origin';
@@ -97,6 +103,9 @@ async function call(method: string, path: string, who: string, body?: unknown) {
 }
 
 const q = () => `company_id=${f.companyId}`;
+/** The cancel route needs an Idempotency-Key (T-0207, ADR-0107). */
+const cancelAs = (path: string, who: string) =>
+  call('POST', path, who, undefined, { 'idempotency-key': randomUUID() });
 const stripeBody = (party: string, amount = '220.00') => ({
   company_id: f.companyId,
   party_id: party,
@@ -780,12 +789,12 @@ describe('SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanen
     });
 
     // An Approver (no ar.refund.create) cannot cancel; the clerk can.
-    const denied = await call('POST', `/ar/refunds/${id}/cancel?${q()}`, 'approver');
+    const denied = await cancelAs(`/ar/refunds/${id}/cancel?${q()}`, 'approver');
     expect(denied.status).toBe(403);
     // Security review r10 M1(b): within 15 minutes of the last send activity, 422
     // SEND_NOT_FINISHED, and Stripe is not asked.
     const asked = stub.received.length;
-    const early = await call('POST', `/ar/refunds/${id}/cancel?${q()}`, 'arClerk');
+    const early = await cancelAs(`/ar/refunds/${id}/cancel?${q()}`, 'arClerk');
     expect(early.status).toBe(422);
     expect(await early.json()).toMatchObject({
       error: 'SEND_NOT_FINISHED',
@@ -794,7 +803,7 @@ describe('SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanen
     expect(stub.received.length).toBe(asked);
     await anHourAgo(id);
     const before = stub.received.length;
-    const ok = await call('POST', `/ar/refunds/${id}/cancel?${q()}`, 'arClerk');
+    const ok = await cancelAs(`/ar/refunds/${id}/cancel?${q()}`, 'arClerk');
     expect(ok.status).toBe(200);
     expect(await ok.json()).toMatchObject({
       id,
@@ -806,7 +815,7 @@ describe('SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanen
     expect(stub.received.slice(before).map((x) => [x.method, x.matched])).toEqual([
       ['GET', 'list-refunds-none-disputed'],
     ]);
-    const again = await call('POST', `/ar/refunds/${id}/cancel?${q()}`, 'arClerk');
+    const again = await cancelAs(`/ar/refunds/${id}/cancel?${q()}`, 'arClerk');
     expect(again.status).toBe(200);
     expect(await again.json()).toMatchObject({ replayed: true, status: 'cancelled' });
     expect(stub.received.length).toBe(before + 1);
@@ -829,14 +838,14 @@ describe('SS-UC11-11 T-0190: cancel a Stripe refund that Stripe refused permanen
     useVars(credit, id, c.refund_no, 're_1SQbT0190ApiSent220');
     const paid = await call('POST', `/ar/refunds/${id}/approve?${q()}`, 'approver');
     expect(await paid.json()).toMatchObject({ status: 'paid' });
-    const sent = await call('POST', `/ar/refunds/${id}/cancel?${q()}`, 'arClerk');
+    const sent = await cancelAs(`/ar/refunds/${id}/cancel?${q()}`, 'arClerk');
     expect(sent.status).toBe(422);
     expect(await sent.json()).toMatchObject({ error: 'NOT_CANCELLABLE' });
     expect(await entriesFor(id)).toBe(1);
 
-    const foreign = await call('POST', `/ar/refunds/${foreignRefund}/cancel?${q()}`, 'arClerk');
+    const foreign = await cancelAs(`/ar/refunds/${foreignRefund}/cancel?${q()}`, 'arClerk');
     expect(foreign.status).toBe(404);
-    const malformed = await call('POST', `/ar/refunds/not-a-uuid/cancel?${q()}`, 'arClerk');
+    const malformed = await cancelAs(`/ar/refunds/not-a-uuid/cancel?${q()}`, 'arClerk');
     expect(malformed.status).toBe(400);
   });
 });

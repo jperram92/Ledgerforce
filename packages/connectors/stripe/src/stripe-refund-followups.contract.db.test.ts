@@ -17,6 +17,7 @@
 import { randomUUID } from 'node:crypto';
 import {
   approveCustomerRefund,
+  cancelCustomerRefund,
   createCustomerRefund,
   customerCredit,
   getCustomerRefund,
@@ -328,8 +329,13 @@ describe('SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; it
       })
       .catch((e: unknown) => (e as Error).message);
     expect(lost).toBe('connection lost before COMMIT');
-    // Unapproved: nothing to withdraw here (security review r10 L1, T-0207).
-    expect(await codeOf(cancel(r.refundId))).toBe('NOT_CANCELLABLE');
+    // Unapproved, yet Stripe holds it: withdrawing the request asks Stripe first (T-0207) and
+    // is refused AT_STRIPE (the r10 L1 refusal of every unapproved document is superseded).
+    const withdrawn = await cancel(r.refundId).catch(
+      (e: unknown) => e as { code?: string; message?: string },
+    );
+    expect(withdrawn).toMatchObject({ code: 'AT_STRIPE' });
+    expect((withdrawn as { message?: string }).message).toMatch(/re_1SQbT0190HeldLive/);
     // Re-approved more than 23 hours ago (KEY_EXPIRED, a finished send): Stripe holds it.
     await approvedHoursAgo(r, 30);
     const posts = creates().length;
@@ -343,6 +349,34 @@ describe('SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; it
     expect(
       await f.inTenant((trx) => getCustomerRefund(trx, f.companyId, r.refundId)),
     ).toMatchObject({ status: 'requested' });
+  });
+
+  it('SS-UC11-20 an unapproved Stripe request is withdrawn once Stripe, asked under the party lock, holds none; without the connector it is refused', async () => {
+    const credit = await seedCredit('Withdrawn');
+    const r = await requestRefund(credit);
+    setVars('withdrawn', credit, r);
+    // Without the Stripe connector nobody can ask Stripe: fail closed.
+    expect(
+      await codeOf(
+        f.inTenant((trx) =>
+          cancelCustomerRefund(trx, { companyId: f.companyId, refundId: r.refundId }),
+        ),
+      ),
+    ).toBe('METHOD_NOT_AVAILABLE');
+    const before = stub.received.length;
+    const done = await cancel(r.refundId);
+    expect(stub.mismatches).toEqual([]);
+    expect(done).toMatchObject({ status: 'cancelled', approval: 'pending', replayed: false });
+    // Asked once, read-only: no create.
+    expect(stub.received.slice(before).map((x) => [x.method, x.matched])).toEqual([
+      ['GET', 'list-refunds-withdrawn-none'],
+    ]);
+    expect(
+      await f.inTenant((trx) => customerCredit(trx, f.companyId, credit.partyId)),
+    ).toMatchObject({ requested: '0.0000' });
+    // The cancelled document is never approved, so never sent.
+    expect(await codeOf(approve(r))).toBe('NOT_APPROVABLE');
+    expect(await cancel(r.refundId)).toMatchObject({ status: 'cancelled', replayed: true });
   });
 
   it('SS-UC11-11 a paid (sent) refund and a bank refund are NOT_CANCELLABLE; a cancelled one stays cancelled; another company sees none', async () => {
@@ -364,7 +398,7 @@ describe('SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; it
       await f.inTenant((trx) => getCustomerRefund(trx, f.companyId, r.refundId)),
     ).toMatchObject({ status: 'paid' });
 
-    // A bank refund is cancelled elsewhere (T-0207): not by this Stripe path.
+    // A bank refund is cancelled through the same path without asking Stripe (T-0207).
     const bankCredit = await seedCredit('Bank');
     const bank = await f.inTenant((trx) =>
       createCustomerRefund(trx, {
@@ -377,7 +411,9 @@ describe('SS-UC11-11 a Stripe refund Stripe refused permanently is cancelled; it
         createdBy: clerk,
       }),
     );
-    expect(await codeOf(cancel(bank.refundId))).toBe('NOT_CANCELLABLE');
+    const asked = stub.received.length;
+    expect(await cancel(bank.refundId)).toMatchObject({ status: 'cancelled', replayed: false });
+    expect(stub.received.length).toBe(asked);
 
     // Cancelled is final: the 0055 guard refuses to move it back.
     const refused = await seedCredit('Final');
@@ -493,8 +529,9 @@ describe('SS-UC11-12 T-0189 AC-1 / review r8 R2: a refund Stripe already holds i
       resendable: false,
     });
     expect(await journalOf(r.refundId)).toEqual([]);
-    // Unapproved, so never cancelled (security review r10 L1); approving it records the refund.
-    expect(await codeOf(cancel(r.refundId))).toBe('NOT_CANCELLABLE');
+    // Unapproved but held at Stripe: the withdrawal asks Stripe and is refused (T-0207);
+    // approving it records the refund.
+    expect(await codeOf(cancel(r.refundId))).toBe('AT_STRIPE');
     await approve(r);
     const sent = await f.inTenant((trx) =>
       sendStripeCustomerRefund(trx, client, {

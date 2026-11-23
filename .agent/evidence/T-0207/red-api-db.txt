@@ -1,0 +1,57 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a61b803d4b14ba07c
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:35267
+ ❯ |api-db| apps/api/src/ar/refunds.db.test.ts (6 tests | 2 failed) 3205ms
+     × SS-UC11-18 an approved and an unapproved bank refund are cancelled (a repeat replays), freeing the credit; audited once each 59ms
+     × SS-UC11-18 needs ar.refund.create (an Approver or Auditor is 403) and an Idempotency-Key (400); another tenant is 404; a malformed id 400 30ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds.db.test.ts > SS-UC11-18: the AR Clerk cancels a requested bank refund over HTTP (T-0207) > SS-UC11-18 an approved and an unapproved bank refund are cancelled (a repeat replays), freeing the credit; audited once each
+AssertionError: expected { …(14) } to match object { status: 'requested', …(1) }
+(13 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "payment_batch": null,
+    "status": "requested",
+  }
+
+ ❯ apps/api/src/ar/refunds.db.test.ts:417:31
+    415|     ).toBe(201);
+    416|     const read = await call('GET', `/ar/refunds/${approvedId}?${q()}`,…
+    417|     expect(await read.json()).toMatchObject({ status: 'requested', pay…
+       |                               ^
+    418|
+    419|     const key = randomUUID();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-db| apps/api/src/ar/refunds.db.test.ts > SS-UC11-18: the AR Clerk cancels a requested bank refund over HTTP (T-0207) > SS-UC11-18 needs ar.refund.create (an Approver or Auditor is 403) and an Idempotency-Key (400); another tenant is 404; a malformed id 400
+AssertionError: expected 422 to be 400 // Object.is equality
+
+- Expected
++ Received
+
+- 400
++ 422
+
+ ❯ apps/api/src/ar/refunds.db.test.ts:468:26
+    466|     }
+    467|     const noKey = await cancel(id, 'arClerk', null);
+    468|     expect(noKey.status).toBe(400);
+       |                          ^
+    469|     expect(await noKey.json()).toMatchObject({ error: 'idempotency_key…
+    470|     const read = await call('GET', `/ar/refunds/${id}?${q()}`, 'audito…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 4 passed (6)
+   Start at  05:21:05
+   Duration  8.41s (transform 2.16s, setup 0ms, import 3.98s, tests 3.21s, environment 0ms)
+
