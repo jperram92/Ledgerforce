@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0215",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-177",
+      "file": ".agent/evidence/T-0215-secfix/scenarios-verbose.txt",
+      "test": "apps/api/src/ap/bills-inbound-webhook.db.test.ts, apps/api/src/security/rate-limit.test.ts",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-177",
+      "file": ".agent/evidence/T-0215-secfix/green-db-api-db.txt",
+      "test": "vitest --project db --project api-db (full, 179 files, 2198 tests, 0 skipped)",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-177",
+      "file": ".agent/evidence/T-0215-secfix/green-unit-api-unit.txt",
+      "test": "vitest --project unit --project api-unit (full, 83 files, 1090 tests, 0 skipped)",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-178",
+      "file": ".agent/evidence/T-0215-secfix/scenarios-verbose.txt",
+      "test": "apps/api/src/ap/bills-inbound-webhook.db.test.ts, packages/db/src/rls.db.test.ts",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-178",
+      "file": ".agent/evidence/T-0215-secfix/green-db-api-db.txt",
+      "test": "vitest --project db --project api-db (full, 179 files, 2198 tests, 0 skipped)",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-178",
+      "file": ".agent/evidence/T-0215-secfix/green-unit-api-unit.txt",
+      "test": "vitest --project unit --project api-unit (full, 83 files, 1090 tests, 0 skipped)",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-179",
+      "file": ".agent/evidence/T-0215-secfix/scenarios-verbose.txt",
+      "test": "packages/modules/ap/src/inbox.db.test.ts",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-179",
+      "file": ".agent/evidence/T-0215-secfix/green-db-api-db.txt",
+      "test": "vitest --project db --project api-db (full, 179 files, 2198 tests, 0 skipped)",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-179",
+      "file": ".agent/evidence/T-0215-secfix/green-unit-api-unit.txt",
+      "test": "vitest --project unit --project api-unit (full, 83 files, 1090 tests, 0 skipped)",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-180",
+      "file": ".agent/evidence/T-0215-secfix/scenarios-verbose.txt",
+      "test": "packages/modules/ap/src/inbound-address.db.test.ts",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-180",
+      "file": ".agent/evidence/T-0215-secfix/green-db-api-db.txt",
+      "test": "vitest --project db --project api-db (full, 179 files, 2198 tests, 0 skipped)",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-180",
+      "file": ".agent/evidence/T-0215-secfix/green-unit-api-unit.txt",
+      "test": "vitest --project unit --project api-unit (full, 83 files, 1090 tests, 0 skipped)",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-168",
+      "file": ".agent/evidence/T-0215-secfix/scenarios-verbose.txt",
+      "test": "apps/api/src/ap/bills-inbound-webhook.db.test.ts, packages/modules/ap/src/inbound-webhook.test.ts",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-168",
+      "file": ".agent/evidence/T-0215-secfix/green-db-api-db.txt",
+      "test": "vitest --project db --project api-db (full, 179 files, 2198 tests, 0 skipped)",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-168",
+      "file": ".agent/evidence/T-0215-secfix/green-unit-api-unit.txt",
+      "test": "vitest --project unit --project api-unit (full, 83 files, 1090 tests, 0 skipped)",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-177..180",
+      "file": ".agent/evidence/T-0215-secfix/red-unit.txt",
+      "test": "RED: rate-limit inbound_email class before implementation",
+      "commit": "pre-fix (feat/T-0215-secfix)",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "failed (expected RED)"
+    },
+    {
+      "scenario": "SS-PLAT-177..180",
+      "file": ".agent/evidence/T-0215-secfix/red-db.txt",
+      "test": "RED: SS-PLAT-168/169/177/178/179/180 db tests before implementation (13 failing)",
+      "commit": "pre-fix (feat/T-0215-secfix)",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "failed (expected RED)"
+    },
+    {
+      "scenario": "T-0215 r11 fixes",
+      "file": ".agent/evidence/T-0215-secfix/final-typecheck.txt",
+      "test": "typecheck",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "T-0215 r11 fixes",
+      "file": ".agent/evidence/T-0215-secfix/final-lint.txt",
+      "test": "lint",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "T-0215 r11 fixes",
+      "file": ".agent/evidence/T-0215-secfix/final-format.txt",
+      "test": "format",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "T-0215 r11 fixes",
+      "file": ".agent/evidence/T-0215-secfix/final-lint-backlog.txt",
+      "test": "lint-backlog",
+      "commit": "2ba4e7a088c4",
+      "provider": "claude",
+      "timestamp": "2026-11-23T05:03:57Z",
+      "result": "passed"
+    }
+  ]
+}
