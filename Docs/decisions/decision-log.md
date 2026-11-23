@@ -4781,3 +4781,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: lead's reserved ranges (round 12, row E).
 - Alternatives: none.
 - ADR: none · Status: accepted
+
+### DL-0899 — Security review r12: T-0216 and T-0227 pass; follow-ups T-0243 and T-0244
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: The independent security review of T-0216 (bills mailbox OAuth2, ADR-0105) and T-0227 (lf_backup role, ADR-0106) passed both, with no critical or high findings; it is the independent review DL-0691/AGENTS.md section 6 require for those security ADRs. Its medium findings (M1 code exchange inside a DB transaction; M2 backups fail on an un-upgraded install) and low findings go to new cards T-0243 and T-0244.
+- Why: none of the findings exposes data or crosses tenants; each needs its own tests.
+- Alternatives: fix inside T-0216/T-0227 (rejected: both already passed review and are merged).
+- ADR: ADR-0105, ADR-0106 · Status: accepted
