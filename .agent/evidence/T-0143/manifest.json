@@ -55,6 +55,60 @@
       "provider": "claude",
       "timestamp": "2026-11-22T19:26:48.452Z",
       "result": "failed-as-expected"
+    },
+    {
+      "scenario": "SS-PLAT-174",
+      "file": ".agent/evidence/T-0143/20261123-044413-tests-db.json",
+      "test": "3 test(s): packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster › SS-PLAT-174 restores the backup into a fresh cluster and reports every chain ok with the same entry counts | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster › SS-PLAT-174 the CLI exits 0 and prints one ok line per company | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-174 restore drill proves every company chain after restore into a fresh cluster › SS-PLAT-174 the backup CLI (as the compose service runs it) writes a backup the drill CLI verifies",
+      "commit": "b68922e77aa6-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T04:44:13.772Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-175",
+      "file": ".agent/evidence/T-0143/20261123-044413-tests-db.json",
+      "test": "4 test(s): packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain › SS-PLAT-175 a backup with one altered byte exits non-zero with BACKUP_DECRYPT_FAILED and leaves no database | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain › SS-PLAT-175 a truncated backup exits non-zero with BACKUP_DECRYPT_FAILED | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain › SS-PLAT-175 the drill refuses to restore over an existing database | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-175 restore drill fails loudly on an altered backup or a broken chain › SS-PLAT-175 a journal line tampered before the backup exits non-zero naming the company, seq and reason",
+      "commit": "b68922e77aa6-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T04:44:13.772Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-176",
+      "file": ".agent/evidence/T-0143/20261123-044413-tests-db.json",
+      "test": "3 test(s): packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key › SS-PLAT-176 the file holds no plaintext dump, table name, tenant name, memo or company id | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key › SS-PLAT-176 the configured key yields a pg_dump archive; a different key is refused | packages/ledger/src/ops/restore-drill.db.test.ts › SS-PLAT-176 the backup at rest is encrypted and opens only with the configured key › SS-PLAT-176 the manifest and the dump come from the same snapshot (row counts match the restored copy)",
+      "commit": "b68922e77aa6-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T04:44:13.772Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-86",
+      "file": ".agent/evidence/T-0143/20261123-044437-tests-unit.json",
+      "test": "20 test(s): /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 every base image is pinned by tag and digest | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 every runtime target runs as a non-root user | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 no image bakes a secret (no ENV/ARG secret, no secrets folder copied) | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup, the scheduler (ADR-0062) and the nightly backup (ADR-0101) | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › every service compose would build has an image the smoke script makes (up --no-build) | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › T-0147 the scheduler is the worker image running the owner-only scheduler CLI (ADR-0062 option 1) | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 images are pinned; app services build the shared Dockerfile targets | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 secrets are files in the ignored secrets folder, never values in the file | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 each secret reaches only the services that need it | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › T-0142 AC-5 the api trusts exactly the nginx hop for the client address, overridable by the operator (ADR-0054) | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 the runtime connects as lf_app; only setup and the scheduler hold the migrator password | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 only the web origin is published, on loopback by default; the database and IdP are not | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 start order: setup waits for a healthy database and IdP; api and worker wait for setup | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 every service drops privileges it does not need | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 the old compose path includes the new file instead of being deleted | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 no self-registration, no e-mail reset, brute-force protection, strong password policy | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 the client: confidential, code flow + PKCE S256 only, secret from the environment | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 the ACR mapping names the MFA level the API accepts (ADR-0025, HANDOVER Q13) | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 generated secrets stay out of git › SS-PLAT-86 the secrets folder and the install env file are ignored; examples only are tracked | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-86 generated secrets stay out of git › SS-PLAT-86 init-secrets.sh writes distinct random secrets (and the backup keyring) once and never overwrites",
+      "commit": "b68922e77aa6-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T04:44:37.735Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-174",
+      "file": ".agent/evidence/T-0143/20261123-044437-tests-unit.json",
+      "test": "8 test(s): /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) › SS-PLAT-174 the backup image is the node runtime plus the PostgreSQL 17 client, non-root, with a /backups folder it owns | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) › SS-PLAT-174 compose runs the backup nightly with a retention setting, a dedicated keyring and its own volume | /home/user/Ledgerforce/infra/test/install-contract.test.ts › SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) › SS-PLAT-174 the runbook covers backup, off-host key custody, the restore drill and its failure codes | packages/db/src/ops/backup-schedule.test.ts › SS-PLAT-174 nightly backup schedule and retention › SS-PLAT-174 the next run is today at HH:MM UTC, or tomorrow when that has passed | packages/db/src/ops/backup-schedule.test.ts › SS-PLAT-174 nightly backup schedule and retention › SS-PLAT-174 backup files are named by UTC time so they sort chronologically | packages/db/src/ops/backup-schedule.test.ts › SS-PLAT-174 nightly backup schedule and retention › SS-PLAT-174 configuration has safe defaults and rejects bad values by name | packages/db/src/ops/backup-schedule.test.ts › SS-PLAT-174 nightly backup schedule and retention › SS-PLAT-174 pruning removes backups older than the retention, keeps the newest and other files | packages/db/src/ops/backup-schedule.test.ts › SS-PLAT-174 nightly backup schedule and retention › SS-PLAT-174 the newest backup is kept even when every backup is past the retention",
+      "commit": "b68922e77aa6-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T04:44:37.735Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-176",
+      "file": ".agent/evidence/T-0143/20261123-044437-tests-unit.json",
+      "test": "12 test(s): packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 round-trips a 0-byte payload and the manifest | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 round-trips a 1-byte payload and the manifest | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 round-trips a 65535-byte payload and the manifest | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 round-trips a 65536-byte payload and the manifest | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 round-trips a 65537-byte payload and the manifest | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 round-trips a 196608-byte payload and the manifest | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 the file holds neither the plaintext nor the manifest in the clear | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 a different key does not open the backup | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 any altered byte (header, MAC, manifest or payload) fails closed | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 truncation (at a chunk boundary or mid-chunk), dropped chunks and trailing bytes fail | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 a wrapped key copied from another backup does not open this one | packages/db/src/ops/backup-format.test.ts › SS-PLAT-176 lf-backup/v1 format › SS-PLAT-176 a file that is not an lf-backup fails with BackupDecryptError",
+      "commit": "b68922e77aa6-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-23T04:44:37.735Z",
+      "result": "passed"
     }
   ]
 }
