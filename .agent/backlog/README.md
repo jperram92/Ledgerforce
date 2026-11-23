@@ -294,7 +294,7 @@ graph LR
 | [T-0205](T-0205.md) | Single-supply receipts limited by the contract total as varied (review finding 7) | MVP | todo | T-0203, T-0204, T-0217 | UC-04 | 0 |
 | [T-0206](T-0206.md) | Single-supply documents on an open contract: s 29-70 tax invoice (candidate GP-046) and deposit-invoice refusal (ADR-0089 R9) | MVP | todo | T-0203 | UC-04 | 0 |
 | [T-0207](T-0207.md) | AR: cancel a requested bank refund that no live payment batch pays | MVP | todo | T-0190 | UC-11 | 0 |
-| [T-0208](T-0208.md) | Refund region: check a Stripe refund with Stripe and ask or confirm a resend; nightly sweep for Stripe refunds no document records | MVP | todo | T-0189 | UC-11 | 0 |
+| [T-0208](T-0208.md) | Refund region: check a Stripe refund with Stripe and ask or confirm a resend; nightly sweep for Stripe refunds no document records | MVP | verifying | T-0189 | UC-11 | 0 |
 | [T-0217](T-0217.md) | Single-supply cancellation, refund, receipt reversal, contract-variation document and cash-basis final invoice (GP-044, candidate GP-047+, GP-022) | MVP | todo | T-0204 | UC-04, UC-11 | 0 |
 | [T-0218](T-0218.md) | Single-supply BAS preparation: basis guard, aged unbilled GST report, no negative G1/1A (G18/1B), credit_note_bas setting, lifecycle properties and primary-law reading | MVP | todo | T-0217 | UC-04, UC-11 | 0 |
 | [T-0229](T-0229.md) | Stripe: a refund that fails after it was recorded paid (refund.updated / charge.refund.updated webhook) | MVP | todo | T-0189 | UC-11 | 0 |
