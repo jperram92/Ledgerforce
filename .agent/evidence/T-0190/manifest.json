@@ -226,6 +226,51 @@
       "provider": "unknown",
       "timestamp": "2026-11-22T20:20:08.889Z",
       "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261123-115304-SS-UC11-11-stripe-refund-cancel-confirm-1440.png",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:53:04.532Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261123-115305-SS-UC11-11-stripe-refund-cancelled-1440.png",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:53:05.602Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261123-115312-SS-UC11-11-stripe-refund-cancel-confirm-390.png",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:53:12.760Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261123-115314-SS-UC11-11-stripe-refund-cancelled-390.png",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:53:14.680Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261123-115325-SS-UC11-11-stripe-refund-cancel-not-finished-1440.png",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund past its 23-hour window says so (not \"Stripe refused\") and offers Cancel; a cancel the API refuses as SEND_NOT_FINISHED shows why [T-0190]",
+      "commit": "8eb05548ced1-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-23T11:53:25.411Z",
+      "result": "passed"
     }
   ]
 }

@@ -7,6 +7,8 @@
  * - the every-minute `security.notices.fanout` schedule and consumer, which sends one
  *   `security.notices.dispatch` job per active tenant (T-0197, ADR-0092).
  * - the `ap.inbox.fanout` consumer (every 5 minutes), one `ap.inbox.poll` job per active tenant.
+ * - the nightly `stripe.refunds.sweep.fanout` consumer, one `stripe.refunds.sweep` job per active
+ *   tenant (T-0208, ADR-0103); the worker runs it only when Stripe is configured.
  * Tenant data is never read here; the worker does that per tenant, as lf_app.
  *
  * Health: every 10 s it runs `SELECT 1` and touches LF_SCHEDULER_HEARTBEAT_FILE
@@ -18,6 +20,10 @@ import pg from 'pg';
 import { installDailySchedules, startFanOutWorker } from '../daily-jobs.ts';
 import { installInboxPollSchedule, startInboxFanOutWorker } from '../inbox-poll-jobs.ts';
 import { startMaintenance } from '../queue-admin.ts';
+import {
+  installStripeRefundSweepSchedule,
+  startStripeRefundSweepFanOutWorker,
+} from '../stripe-refund-sweep.ts';
 import {
   installSecurityNoticeSchedule,
   startSecurityNoticeFanOutWorker,
@@ -41,6 +47,9 @@ await startSecurityNoticeFanOutWorker(owner, url);
 // Bills inbox polling: one ap.inbox.poll job per active tenant every 5 minutes (T-0127, DL-0814).
 await installInboxPollSchedule(owner);
 await startInboxFanOutWorker(owner, url);
+// The nightly sweep for Stripe refunds no document records (T-0208, ADR-0103).
+await installStripeRefundSweepSchedule(owner);
+await startStripeRefundSweepFanOutWorker(owner, url);
 
 const pool = new pg.Pool({ connectionString: url, max: 1 });
 async function beat(): Promise<void> {

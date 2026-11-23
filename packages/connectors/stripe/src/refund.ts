@@ -104,7 +104,9 @@ export type StripeRefundErrorCode =
    * same customer (a create that landed after the cancel). Nothing more is created for the
    * customer until someone deals with it at Stripe.
    */
-  | 'CANCELLED_REFUND_AT_STRIPE';
+  | 'CANCELLED_REFUND_AT_STRIPE'
+  /** T-0208 (ADR-0103): the nightly sweep found a live Stripe refund no document records. */
+  | 'HELD_AT_STRIPE';
 
 export class StripeRefundError extends Error {
   readonly code: StripeRefundErrorCode;
@@ -291,7 +293,7 @@ async function partyPaymentIntents(
  */
 const isLive = (x: ListedRefund) => POSTABLE_STATUS.has(x.status);
 
-interface AtStripe {
+export interface AtStripe {
   /** The one live refund Stripe holds for this document, or null. */
   readonly live: ListedRefund | null;
   /** Its failed or canceled refunds (no money out under them; never adopted). */
@@ -313,7 +315,7 @@ interface AtStripe {
  * check or resend (RQ-0173). Read-only at Stripe. Two live refunds for one document should never
  * exist; if they do, nothing is adopted or sent and the caller is told (SENT_NOT_POSTED).
  */
-async function refundsAtStripe(
+export async function refundsAtStripe(
   trx: Trx,
   client: StripeClient,
   companyId: string,

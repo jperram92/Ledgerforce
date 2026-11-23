@@ -1,0 +1,21 @@
+
+Running 16 tests using 2 workers
+
+  ✓   1 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:321:3 › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 1440 [T-0208] (5.0s)
+  ✓   3 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:321:3 › SS-UC11-14: an Approver checks an expired Stripe refund with Stripe and sees that nothing moved money, with the failed refund ids @ 390 [T-0208] (2.7s)
+  ✓   2 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:388:3 › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 1440 [T-0208] (8.8s)
+  ✓   4 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:343:1 › SS-UC11-14: a check that finds the refund at Stripe records it; the region shows it refunded [T-0208] (2.6s)
+  ✓   6 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:365:1 › SS-UC11-14: when a resend is not possible the check says why, and lists Stripe refunds of cancelled refunds; an AR Clerk is not offered the check [T-0208] (3.1s)
+  ✓   5 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:388:3 › SS-UC11-15: one Approver asks to send it again with a reason; the same person cannot confirm; another person confirms behind the step-up and it is sent @ 390 [T-0208] (5.9s)
+  ✓   8 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:447:1 › SS-UC11-15: while their resend waits, the person who asked is offered neither the confirm nor the check, and nothing is sent [T-0208] (1.5s)
+  ✓   7 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:308:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 1440 [T-0172] (5.4s)
+  ✓   9 [chromium] › tests/e2e/web/stripe-refund-check-resend.spec.ts:474:1 › SS-UC11-16: a waiting resend shows who asked, when and why, to everyone who can read the refund [T-0208] (2.9s)
+  ✓  10 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:308:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 390 [T-0172] (5.7s)
+  ✓  11 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:396:5 › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190] (7.9s)
+  ✓  12 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:346:1 › SS-UC11-10: a Stripe send that did not finish at approval says it is retried automatically [T-0172] (5.9s)
+  ✓  13 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:396:5 › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190] (9.2s)
+  ✓  14 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:368:1 › SS-UC11-10: a refund Stripe took but the books could not record says the money has left and is not posted [T-0172] (6.5s)
+  ✓  15 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:434:3 › T-0190 cancel › SS-UC11-11: a refund Stripe took (sent, not posted) offers no Cancel, even to the clerk [T-0190] (5.3s)
+  ✓  16 [chromium] › tests/e2e/web/stripe-refunds.spec.ts:454:3 › T-0190 cancel › SS-UC11-11: a Stripe refund past its 23-hour window says so (not "Stripe refused") and offers Cancel; a cancel the API refuses as SEND_NOT_FINISHED shows why [T-0190] (5.2s)
+
+  16 passed (52.1s)

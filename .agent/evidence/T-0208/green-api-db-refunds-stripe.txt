@@ -1,0 +1,22 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44495
+[31m[Nest] 25444  - [39m11/23/2026, 5:18:34 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/[39mapps/api/src/ar/refunds-stripe.db.test.ts:579:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+[31m[Nest] 25444  - [39m11/23/2026, 5:18:34 AM [31m  ERROR[39m [38;5;3m[ExceptionsHandler] [39mError: step-up condition failed
+    at stepUpWhen [90m(/home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/[39mapps/api/src/ar/refunds-stripe.db.test.ts:579:29[90m)[39m
+    at [90m/home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/[39mapps/api/src/tenancy/tenant.interceptor.ts:131:46
+[90m    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)[39m
+    at async [90mfile:///home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/kysely.js:690:32
+    at async DefaultConnectionProvider.provideConnection [90m(file:///home/user/Ledgerforce/.claude/worktrees/agent-a4cd9a48b8f6087ed/[39mnode_modules/[4m.pnpm[24m/kysely@0.29.7/node_modules/[4mkysely[24m/dist/driver/default-connection-provider.js:10:20[90m)[39m
+
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
+   Start at  05:18:26
+   Duration  8.38s (transform 1.78s, setup 0ms, import 2.98s, tests 4.37s, environment 0ms)
+

@@ -17,8 +17,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 146 |
-| todo | 31 |
-| verifying | 13 |
+| todo | 30 |
+| verifying | 14 |
 | **total** | **201** |
 
 | Phase | Cards |
@@ -297,6 +297,9 @@ graph LR
 | [T-0208](T-0208.md) | Refund region: check a Stripe refund with Stripe and ask or confirm a resend; nightly sweep for Stripe refunds no document records | MVP | todo | T-0189 | UC-11 | 0 |
 | [T-0217](T-0217.md) | Single-supply cancellation and refund (GP-044a-d): refund approval path, contract refund with maker-checker, adjustment-note particulars | MVP | verifying | T-0204 | UC-04, UC-11 | 0 |
 | [T-0218](T-0218.md) | Single-supply BAS preparation: basis guard, aged unbilled GST report, no negative G1/1A (G18/1B), credit_note_bas setting, lifecycle properties and primary-law reading | MVP | todo | T-0217, T-0231 | UC-04, UC-11 | 0 |
+| [T-0208](T-0208.md) | Refund region: check a Stripe refund with Stripe and ask or confirm a resend; nightly sweep for Stripe refunds no document records | MVP | verifying | T-0189 | UC-11 | 0 |
+| [T-0217](T-0217.md) | Single-supply cancellation, refund, receipt reversal, contract-variation document and cash-basis final invoice (GP-044, candidate GP-047+, GP-022) | MVP | todo | T-0204 | UC-04, UC-11 | 0 |
+| [T-0218](T-0218.md) | Single-supply BAS preparation: basis guard, aged unbilled GST report, no negative G1/1A (G18/1B), credit_note_bas setting, lifecycle properties and primary-law reading | MVP | todo | T-0217 | UC-04, UC-11 | 0 |
 | [T-0229](T-0229.md) | Stripe: a refund that fails after it was recorded paid (refund.updated / charge.refund.updated webhook) | MVP | todo | T-0189 | UC-11 | 0 |
 | [T-0230](T-0230.md) | Bills inbox webhook: slow-upload protection (per-client in-flight cap, minimum transfer rate, first-byte timeout) | MVP | verifying | T-0215 | UC-05 | 0 |
 | [T-0235](T-0235.md) | Bills inbox webhook: upload limits configurable from the environment (compose + config.ts) | MVP | todo | T-0230 | UC-05 | 0 |
