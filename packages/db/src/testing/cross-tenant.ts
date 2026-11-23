@@ -278,6 +278,19 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     price_change_net: () => '0',
     price_change_tax: () => '0',
   },
+  // T-0217: single-supply cancellation (decision CHECK; no entry → zero decrease) and refund.
+  'app.single_supply_cancellation': {
+    refund_decision: () => 'agreed',
+    reason: () => 'Cancelled',
+    decrease_net: () => '0',
+    decrease_tax: () => '0',
+  },
+  'app.single_supply_refund': {
+    gross: () => '1',
+    net: () => '1',
+    tax: () => '0',
+    reason: () => 'Refund',
+  },
   'app.sales_invoice_deposit': { net: () => '1', tax: () => '0' },
   // T-0046: customer receipts (method CHECK, amount > 0).
   'app.customer_receipt': { method: () => 'eft', amount: () => '1' },

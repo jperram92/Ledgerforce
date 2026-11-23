@@ -4572,3 +4572,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: N1 affects only availability of the inbound route, not data or tenant isolation; it needs its own tests and tuning.
 - Alternatives: fix inside T-0215 (rejected: separate behaviour; T-0215 already passed review).
 - ADR: none · Status: accepted
+
+### DL-0900 — T-0217 sliced: cancellation and refund now; reversal, cash-basis final invoice and delivery to T-0231; variation document to T-0232
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: scope
+- Decision: T-0217 builds AC-2 and AC-10 (rest): GP-044a/c cancellation (plus the cash-basis and nothing-attributed cases), the GP-044b refund through the existing customer refund approval path, the GP-044d refund with maker-checker and adjustment-note particulars, forfeiture refused, contract cancelled, and a lifecycle property. AC-3 and AC-9 (receipt reversal and its BAS label), the cash-basis final invoice (GP-022), the NOTHING_ATTRIBUTED decision and the final invoice's `ar.invoice.posted` event move with full text to T-0231; the contract-variation document (AC-6 rest, candidate goldens GP-047+) moves to T-0232. T-0218 now also depends on T-0231.
+- Why: the card covers four posting families and is several times the ~400-line split threshold (RQ-0184 Q7); the variation document needs its own research and goldens before any code.
+- Alternatives: build everything in one branch (rejected: oversized, half-built risk); leave the rest on T-0217 unticked (rejected: a card must be finishable).
+- ADR: none · Status: accepted
+
+### DL-0901 — Cancellation states the refund decision; cash basis and nothing attributed post no entry
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: accounting
+- Decision: `cancelSingleSupply` requires `refund` ∈ {agreed, undecided, forfeited} and a reason (1–500 characters, the adjustment-note reason); `forfeited` is refused FORFEITURE_NOT_SUPPORTED with nothing written. Accruals with GST attributed: agreed → GP-044a, undecided → GP-044c (no entry when nothing is unbilled, i.e. fully received). Cash basis, or accruals with no receipt: no entry; the contract is cancelled and cash-basis money is refunded by the GP-044d shape (GP-044 "Cash basis" note). Dates on or after the contract and its last receipt; the basis in force must still be the contract's (BASIS_CHANGED).
+- Why: RQ-0184 Q1–Q3; GP-044 (Approved, DL-0755); ADR-0089 R7/R8 and addendum A.
+- Alternatives: a default refund decision (rejected: the user must state the fact, as the R1 classification); refusing cash-basis cancellation (rejected: GP-044 covers it).
+- ADR: ADR-0089 (addendum A) · Status: accepted
+
+### DL-0902 — GP-044b reuses the customer refund unchanged; GP-044d is a contract refund with approver ≠ maker
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: accounting
+- Decision: After GP-044a the refund is an ordinary customer refund (createCustomerRefund → approveCustomerRefund by another person → payCustomerRefund, GP-006, allocated oldest first, which is the 44a credit when there is no older one). GP-044d is `refundCancelledSingleSupply`: the whole cash received, on the refund date (= the date it is agreed), with `approvedBy` required and different from `createdBy` (SOD_REFUND_SELF_APPROVAL in the module and a CHECK in the database). It is refused for an agreed accruals cancellation (REFUND_VIA_CUSTOMER_REFUND: that money is an AR credit), for nothing received (NOTHING_TO_REFUND) and a second time (key).
+- Why: RQ-0184 Q4: 44b's journal is GP-006; 44d debits CUSTOMER_PREPAYMENTS with the decreasing adjustment, so it cannot go through AR; comparable systems refund a deposit from the deposit; ADR-0074's control is another person's approval before money leaves.
+- Alternatives: a new two-step request/approve table for 44d (rejected: no golden or criterion needs a separate step, more surface); paying 44d by the payment batch (not needed for the golden).
+- ADR: ADR-0074, ADR-0089 · Status: accepted
+
+### DL-0903 — Adjustment-note particulars on the 44a, 44c and 44d documents; no new number series
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: accounting
+- Decision: The cancellation and the 44d refund return the 45c particulars shape (title, reason, decrease net/GST/gross, the earlier document adjusted, `withinThreshold` when the GST is $75 or less, s 29-80); 44c carries them too. The documents are identified by the contract reference and date; no adjustment-note number series is added.
+- Why: RQ-0184 Q5 (AC-10; review findings 8 and 10 from ATO extracts; GP-042a carried them for the 44c journal).
+- Alternatives: numbered adjustment notes from a new series (deferred to a document/print UI; not needed for the journal or BAS).
+- ADR: none · Status: accepted
+
+### DL-0904 — Migration 0082: single_supply_cancellation and single_supply_refund
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: architecture
+- Decision: `0082_ar_single_supply_cancellation.sql` adds two immutable tenant-owned tables (RLS ENABLE + FORCE, tenant_isolation, lf_app SELECT/INSERT, UPDATE/DELETE raise): the cancellation (one per contract; decision, reason, entry or NULL, decrease net/GST) and the 44d refund (one per contract; amounts, account, entry, reason, maker, approver, CHECK approver ≠ maker). Status stays in `single_supply_contract_status`. Number 0082 is the reserved one for this round (the lead may renumber at merge).
+- Why: RQ-0184 Q6; immutable posted documents (ADR-0004 spirit).
+- Alternatives: extra columns on the status table (rejected: no ALTER on an immutable table's meaning; separate concerns).
+- ADR: none · Status: accepted
+
+### DL-0905 — T-0217 primary-law reading not possible in this environment; recorded, not claimed
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: accounting
+- Decision: legislation.gov.au and austlii.edu.au refuse CONNECT (403) and ato.gov.au answers 403 (`.agent/evidence/T-0217/primary-source-probe.txt`). T-0217 claims no primary-law reading; it implements Approved GP-044. The reading remains T-0218's exit item.
+- Why: directive 4 (research with sources) and honesty about what was read.
+- Alternatives: none.
+- ADR: none · Status: accepted

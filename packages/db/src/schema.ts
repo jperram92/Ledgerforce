@@ -641,6 +641,38 @@ export interface SingleSupplyFinalisationTable {
   created_at: Timestamp;
 }
 
+export interface SingleSupplyCancellationTable {
+  tenant_id: TenantId;
+  company_id: string;
+  contract_id: string;
+  cancel_date: ColumnType<Date, string, never>;
+  refund_decision: 'agreed' | 'undecided';
+  reason: string;
+  entry_id: string | null;
+  decrease_net: Numeric;
+  decrease_tax: Numeric;
+  idempotency_key: string;
+  created_by: string | null;
+  created_at: Timestamp;
+}
+
+export interface SingleSupplyRefundTable {
+  tenant_id: TenantId;
+  company_id: string;
+  contract_id: string;
+  refund_date: ColumnType<Date, string, never>;
+  gross: Numeric;
+  net: Numeric;
+  tax: Numeric;
+  account_id: string;
+  entry_id: string;
+  reason: string;
+  created_by: string;
+  approved_by: string;
+  idempotency_key: string;
+  created_at: Timestamp;
+}
+
 export interface SalesInvoiceDepositTable {
   tenant_id: TenantId;
   company_id: string;
@@ -1594,6 +1626,8 @@ export interface Database {
   'app.single_supply_receipt': SingleSupplyReceiptTable;
   'app.single_supply_contract_status': SingleSupplyContractStatusTable;
   'app.single_supply_finalisation': SingleSupplyFinalisationTable;
+  'app.single_supply_cancellation': SingleSupplyCancellationTable;
+  'app.single_supply_refund': SingleSupplyRefundTable;
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;
