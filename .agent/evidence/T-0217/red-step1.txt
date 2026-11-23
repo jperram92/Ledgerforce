@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a28905b54c51ee15a
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:40983
+ ❯ |db| packages/modules/ar/src/single-supply-cancel.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply-cancel.db.test.ts [ packages/modules/ar/src/single-supply-cancel.db.test.ts ]
+Error: Cannot find module './single-supply-cancel.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a28905b54c51ee15a/packages/modules/ar/src/single-supply-cancel.db.test.ts
+ ❯ packages/modules/ar/src/single-supply-cancel.db.test.ts:31:1
+     29|   singleSupplyContract,
+     30| } from './single-supply.ts';
+     31| import { cancelSingleSupply, refundCancelledSingleSupply } from './sin…
+       | ^
+     32| import { finaliseSingleSupply } from './single-supply-final.ts';
+     33| import { seedBillableCustomers, seedBillingCompany } from './testing/b…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  05:19:34
+   Duration  1.78s (transform 504ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+
