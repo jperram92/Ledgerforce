@@ -9,8 +9,10 @@
 #
 # Roles: setup applies migrations and installs the queue as lf_migrator; api and worker run as
 # lf_app (no superuser, no BYPASSRLS — setup refuses to run otherwise). The scheduler holds the
-# lf_migrator password too, for the daily fan-out only (ADR-0062). Keycloak has its own
-# database and role. Only the web origin is published; postgres, keycloak and api are internal.
+# lf_migrator password too, for the daily fan-out only (ADR-0062). The nightly backup reads as
+# lf_backup (BYPASSRLS + pg_read_all_data, read-only), only from the internal `backup` network
+# (ADR-0106). Keycloak has its own database and role. Only the web origin is published;
+# postgres, keycloak and api are internal.
 name: ledgerforce
 
 x-hardening: &hardening
@@ -33,8 +35,13 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
       LF_MIGRATOR_PASSWORD_FILE: /run/secrets/lf_migrator_password
       LF_APP_PASSWORD_FILE: /run/secrets/lf_app_password
+      LF_BACKUP_PASSWORD_FILE: /run/secrets/lf_backup_password
+      # pg_hba lets lf_backup log in only from the backup network (10-ledgerforce-roles.sh).
+      LF_BACKUP_ALLOWED_CIDR: ${LF_BACKUP_SUBNET:-172.30.227.0/29}
       KEYCLOAK_DB_PASSWORD_FILE: /run/secrets/keycloak_db_password
-    secrets: [postgres_password, lf_migrator_password, lf_app_password, keycloak_db_password]
+    secrets:
+      [postgres_password, lf_migrator_password, lf_app_password, lf_backup_password, keycloak_db_password]
+    networks: [default, backup]
     volumes:
       - pgdata:/var/lib/postgresql/data
       # Role and grant bootstrap: one source of truth shared with the test harness.
@@ -192,8 +199,9 @@ services:
 
   # Nightly encrypted backup (T-0143, ADR-0101; runbook Docs/ops/backup-restore.md): pg_dump under
   # an exported snapshot, envelope-encrypted with the dedicated backup keyring, into the `backups`
-  # volume at LF_BACKUP_AT (UTC), keeping LF_BACKUP_RETENTION_DAYS. It connects as the postgres
-  # superuser because pg_dump must read past FORCEd RLS (a least-privilege lf_backup role is T-0227).
+  # volume at LF_BACKUP_AT (UTC), keeping LF_BACKUP_RETENTION_DAYS. It connects as lf_backup
+  # (BYPASSRLS + pg_read_all_data, read-only, owns nothing; T-0227, ADR-0106) and sits only on the
+  # internal `backup` network, the one subnet pg_hba accepts lf_backup from (no route off the host).
   # Copy the volume and the keyring off the host: a backup whose only key is on the lost VM is not one.
   backup:
     <<: *app
@@ -204,13 +212,14 @@ services:
     environment:
       LF_DB_HOST: postgres
       LF_DB_NAME: ledgerforce
-      LF_BACKUP_DB_USER: postgres
-      LF_BACKUP_DB_PASSWORD_FILE: /run/secrets/postgres_password
+      LF_BACKUP_DB_USER: lf_backup
+      LF_BACKUP_DB_PASSWORD_FILE: /run/secrets/lf_backup_password
       LF_KMS_PROVIDER: local
       LF_KMS_KEYRING_FILE: /run/secrets/backup_keyring
       LF_BACKUP_AT: ${LF_BACKUP_AT:-02:30}
       LF_BACKUP_RETENTION_DAYS: ${LF_BACKUP_RETENTION_DAYS:-14}
-    secrets: [postgres_password, backup_keyring]
+    secrets: [lf_backup_password, backup_keyring]
+    networks: [backup]
     volumes:
       - backups:/backups
     depends_on:
@@ -246,10 +255,19 @@ secrets:
   postgres_password: { file: ./secrets/postgres_password }
   lf_migrator_password: { file: ./secrets/lf_migrator_password }
   lf_app_password: { file: ./secrets/lf_app_password }
+  lf_backup_password: { file: ./secrets/lf_backup_password }
   keycloak_db_password: { file: ./secrets/keycloak_db_password }
   oidc_client_secret: { file: ./secrets/oidc_client_secret }
   keycloak_admin_client_secret: { file: ./secrets/keycloak_admin_client_secret }
   backup_keyring: { file: ./secrets/backup_keyring }
+
+networks:
+  # Only postgres and backup (ADR-0106). Change LF_BACKUP_SUBNET if it collides with a local network.
+  backup:
+    internal: true
+    ipam:
+      config:
+        - subnet: ${LF_BACKUP_SUBNET:-172.30.227.0/29}
 
 volumes:
   pgdata:

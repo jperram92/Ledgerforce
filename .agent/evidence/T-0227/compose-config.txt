@@ -1,0 +1,29 @@
+$ docker compose -f infra/compose/compose.yaml --env-file infra/compose/ledgerforce.env.example config
+exit=0 (Docker Compose v5.6.1; no daemon available, so the stack itself was not started)
+
+networks:
+  backup:
+    name: ledgerforce_backup
+    ipam:
+      config:
+        - subnet: 172.30.227.0/29
+    internal: true
+  default:
+    name: ledgerforce_default
+volumes:
+  backups:
+52-    environment:
+53-      LF_BACKUP_AT: '02:30'
+54-      LF_BACKUP_DB_PASSWORD_FILE: /run/secrets/lf_backup_password
+55:      LF_BACKUP_DB_USER: lf_backup
+56-      LF_BACKUP_RETENTION_DAYS: "14"
+57-      LF_DB_HOST: postgres
+58-      LF_DB_NAME: ledgerforce
+--
+129-    environment:
+130-      KEYCLOAK_DB_PASSWORD_FILE: /run/secrets/keycloak_db_password
+131-      LF_APP_PASSWORD_FILE: /run/secrets/lf_app_password
+132:      LF_BACKUP_ALLOWED_CIDR: 172.30.227.0/29
+133-      LF_BACKUP_PASSWORD_FILE: /run/secrets/lf_backup_password
+134-      LF_MIGRATOR_PASSWORD_FILE: /run/secrets/lf_migrator_password
+135-      POSTGRES_DB: ledgerforce
