@@ -10,7 +10,7 @@ export const BOOTSTRAP_DIR = fileURLToPath(new URL('../bootstrap/', import.meta.
 
 export async function bootstrapCluster(
   superuser: pg.ClientBase | pg.Pool,
-  passwords: { migrator?: string; app?: string } = {},
+  passwords: { migrator?: string; app?: string; backup?: string } = {},
 ): Promise<void> {
   await superuser.query(await readFile(`${BOOTSTRAP_DIR}01_cluster_roles.sql`, 'utf8'));
   const escape = (s: string) => `'${s.replace(/'/g, "''")}'`;
@@ -19,6 +19,9 @@ export async function bootstrapCluster(
   }
   if (passwords.app !== undefined) {
     await superuser.query(`ALTER ROLE lf_app PASSWORD ${escape(passwords.app)}`);
+  }
+  if (passwords.backup !== undefined) {
+    await superuser.query(`ALTER ROLE lf_backup PASSWORD ${escape(passwords.backup)}`);
   }
 }
 

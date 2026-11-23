@@ -5,7 +5,8 @@
  *   node packages/db/src/cli/backup.ts --daily --dir /backups             the compose service
  *
  * Database: LF_BACKUP_DATABASE_URL, or LF_DB_HOST / LF_DB_PORT / LF_DB_NAME with
- * LF_BACKUP_DB_USER (default postgres; must bypass RLS, ADR-0101) and LF_BACKUP_DB_PASSWORD(_FILE).
+ * LF_BACKUP_DB_USER (compose: lf_backup, ADR-0106; fallback postgres; must bypass RLS) and
+ * LF_BACKUP_DB_PASSWORD(_FILE).
  * Key: LF_KMS_PROVIDER=local + LF_KMS_KEYRING_FILE (a dedicated backup keyring), or transit.
  * Schedule: LF_BACKUP_AT (UTC HH:MM, default 02:30), LF_BACKUP_RETENTION_DAYS (default 14).
  * Exit 0 on success, 1 on a failed backup, 2 on bad configuration. Secrets are never printed.

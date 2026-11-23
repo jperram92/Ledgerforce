@@ -1,0 +1,168 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a574479f416f876fd
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42355
+ ❯ |db| packages/db/src/ops/backup-role.db.test.ts (8 tests | 8 failed) 1634ms
+     × SS-PLAT-193 has BYPASSRLS and pg_read_all_data only: no superuser, DDL, replication or other membership 15ms
+     × SS-PLAT-193 createBackup as lf_backup includes every tenant and restores to the same manifest 4ms
+     × SS-PLAT-193 holds no write, truncate, trigger or references privilege on any table, sequence write or SECURITY DEFINER function 2ms
+     × SS-PLAT-193 INSERT, UPDATE, DELETE, TRUNCATE and DDL fail even with read-only switched off 3ms
+     × SS-PLAT-193 cannot disable triggers or row security, and its sessions start read-only 2ms
+     × SS-PLAT-194 bootstrapCluster creates lf_backup idempotently and repairs a pre-existing over-privileged one 15ms
+     × SS-PLAT-194 the init script (fresh install and upgrade step) confines lf_backup logins to the backup subnet, idempotently 42ms
+     × SS-PLAT-194 the init script refuses a malformed subnet and leaves pg_hba.conf unchanged 40ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role.db.test.ts > SS-PLAT-193 lf_backup dumps every tenant and can write nothing > SS-PLAT-193 has BYPASSRLS and pg_read_all_data only: no superuser, DDL, replication or other membership
+AssertionError: expected [] to deeply equal [ { rolsuper: false, …(10) } ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "member_of": [
+-       "pg_read_all_data",
+-     ],
+-     "members": [],
+-     "rolbypassrls": true,
+-     "rolcanlogin": true,
+-     "rolconfig": [
+-       "default_transaction_read_only=on",
+-     ],
+-     "rolconnlimit": 4,
+-     "rolcreatedb": false,
+-     "rolcreaterole": false,
+-     "rolinherit": true,
+-     "rolreplication": false,
+-     "rolsuper": false,
+-   },
+- ]
++ []
+
+ ❯ packages/db/src/ops/backup-role.db.test.ts:91:18
+     89|          FROM pg_roles r WHERE rolname = 'lf_backup'`,
+     90|     );
+     91|     expect(rows).toEqual([
+       |                  ^
+     92|       {
+     93|         rolsuper: false,
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role.db.test.ts > SS-PLAT-193 lf_backup dumps every tenant and can write nothing > SS-PLAT-193 createBackup as lf_backup includes every tenant and restores to the same manifest
+ FAIL  |db| packages/db/src/ops/backup-role.db.test.ts > SS-PLAT-193 lf_backup dumps every tenant and can write nothing > SS-PLAT-193 INSERT, UPDATE, DELETE, TRUNCATE and DDL fail even with read-only switched off
+ FAIL  |db| packages/db/src/ops/backup-role.db.test.ts > SS-PLAT-193 lf_backup dumps every tenant and can write nothing > SS-PLAT-193 cannot disable triggers or row security, and its sessions start read-only
+error: role "lf_backup" does not exist
+ ❯ parseErrorMessage node_modules/.pnpm/pg-protocol@1.16.1/node_modules/pg-protocol/src/parser.ts:395:8
+ ❯ Parser.handlePacket node_modules/.pnpm/pg-protocol@1.16.1/node_modules/pg-protocol/src/parser.ts:212:18
+ ❯ Parser.parse node_modules/.pnpm/pg-protocol@1.16.1/node_modules/pg-protocol/src/parser.ts:105:29
+ ❯ Socket.<anonymous> node_modules/.pnpm/pg-protocol@1.16.1/node_modules/pg-protocol/src/index.ts:7:47
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role.db.test.ts > SS-PLAT-193 lf_backup dumps every tenant and can write nothing > SS-PLAT-193 holds no write, truncate, trigger or references privilege on any table, sequence write or SECURITY DEFINER function
+error: role "lf_backup" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ packages/db/src/ops/backup-role.db.test.ts:151:20
+    149|
+    150|   it('SS-PLAT-193 holds no write, truncate, trigger or references priv…
+    151|     const tables = await tdb.admin.query<{ t: string }>(
+       |                    ^
+    152|       `SELECT format('%I.%I', n.nspname, c.relname) AS t
+    153|          FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role.db.test.ts > SS-PLAT-194 bootstrap, init script and upgrade step > SS-PLAT-194 bootstrapCluster creates lf_backup idempotently and repairs a pre-existing over-privileged one
+AssertionError: expected [ { rolsuper: true, …(8) } ] to deeply equal [ { rolsuper: false, …(8) } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "member_of": [
+-       "pg_read_all_data",
++       "lf_migrator",
+      ],
+-     "members": [],
+-     "rolbypassrls": true,
+-     "rolcanlogin": true,
+-     "rolconnlimit": 4,
+-     "rolcreatedb": false,
+-     "rolcreaterole": false,
+-     "rolreplication": false,
+-     "rolsuper": false,
++     "members": [
++       "lf_backup_friend",
++     ],
++     "rolbypassrls": false,
++     "rolcanlogin": false,
++     "rolconnlimit": -1,
++     "rolcreatedb": true,
++     "rolcreaterole": true,
++     "rolreplication": true,
++     "rolsuper": true,
+    },
+  ]
+
+ ❯ packages/db/src/ops/backup-role.db.test.ts:294:22
+    292|            FROM pg_roles r WHERE rolname = 'lf_backup'`,
+    293|       );
+    294|       expect(r.rows).toEqual([
+       |                      ^
+    295|         {
+    296|           rolsuper: false,
+ ❯ withClient packages/db/src/ops/backup-role.db.test.ts:41:12
+ ❯ packages/db/src/ops/backup-role.db.test.ts:277:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role.db.test.ts > SS-PLAT-194 bootstrap, init script and upgrade step > SS-PLAT-194 the init script (fresh install and upgrade step) confines lf_backup logins to the backup subnet, idempotently
+AssertionError: psql: error: /lf-bootstrap/01_cluster_roles.sql: No such file or directory
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ packages/db/src/ops/backup-role.db.test.ts:313:55
+    311|     // No subnet configured: the role exists but may log in from nowhe…
+    312|     const first = runInit({});
+    313|     expect(first.status, first.stdout + first.stderr).toBe(0);
+       |                                                       ^
+    314|     expect(await loginAsBackup()).toMatch(/pg_hba\.conf rejects connec…
+    315|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role.db.test.ts > SS-PLAT-194 bootstrap, init script and upgrade step > SS-PLAT-194 the init script refuses a malformed subnet and leaves pg_hba.conf unchanged
+AssertionError: expected 'psql: error: /lf-bootstrap/01_cluster…' to match /LF_BACKUP_ALLOWED_CIDR/
+
+- Expected:
+/LF_BACKUP_ALLOWED_CIDR/
+
++ Received:
+"psql: error: /lf-bootstrap/01_cluster_roles.sql: No such file or directory
+"
+
+ ❯ packages/db/src/ops/backup-role.db.test.ts:354:24
+    352|     const bad = runInit({ LF_BACKUP_ALLOWED_CIDR: '0.0.0.0/0 trust\nho…
+    353|     expect(bad.status).not.toBe(0);
+    354|     expect(bad.stderr).toMatch(/LF_BACKUP_ALLOWED_CIDR/);
+       |                        ^
+    355|     expect(readFileSync(hbaFile, 'utf8')).toBe(before);
+    356|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed (8)
+   Start at  05:18:11
+   Duration  3.00s (transform 161ms, setup 0ms, import 306ms, tests 1.63s, environment 0ms)
+

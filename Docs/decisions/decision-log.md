@@ -4572,3 +4572,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: N1 affects only availability of the inbound route, not data or tenant isolation; it needs its own tests and tuning.
 - Alternatives: fix inside T-0215 (rejected: separate behaviour; T-0215 already passed review).
 - ADR: none · Status: accepted
+
+### DL-0940 — Nightly backup connects as a dedicated lf_backup role (BYPASSRLS + pg_read_all_data), not the superuser
+- Date: 2026-11-23 · By: claude · Task: T-0227 · Category: security
+- Decision: The cluster bootstrap creates `lf_backup LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION BYPASSRLS INHERIT CONNECTION LIMIT 4`, member of `pg_read_all_data` only, `default_transaction_read_only = on`, `CONNECT` on the LedgerForce database; every run re-asserts the attributes and revokes any other membership in either direction. ADR-0106 accepted by the building agent under DL-0691 / DL-0896 with research RQ-0188; an independent security review follows.
+- Why: pg_dump must read past FORCEd RLS, which only BYPASSRLS or superuser allows; `pg_read_all_data` covers every future table without per-migration grants (RQ-0188 Findings 1–4, 8). Superuser could write, disable triggers and run programs.
+- Alternatives: keep superuser; explicit SELECT grants + default privileges; a see-all RLS policy with `--enable-row-security`; physical backup with a REPLICATION role (all rejected, ADR-0106).
+- ADR: ADR-0106 · Status: accepted
+
+### DL-0941 — Revoke TEMPORARY on the LedgerForce database from PUBLIC in the shared bootstrap
+- Date: 2026-11-23 · By: claude · Task: T-0227 · Category: security
+- Decision: `02_database_grants.sql` revokes `TEMPORARY` from PUBLIC (compose's `20-keycloak-db.sh` already did); `lf_migrator` keeps its explicit grant, `lf_app` and `lf_backup` create no temp objects on any install.
+- Why: "lf_backup cannot create objects" must hold on every install, not only compose; aligns the test harness with production (RQ-0188 Finding 3).
+- Alternatives: leave PUBLIC TEMP (temp tables are session-private, but still object creation by the backup role).
+- ADR: ADR-0106 · Status: accepted
+
+### DL-0942 — lf_backup logins confined by a managed pg_hba.conf block to the compose backup network
+- Date: 2026-11-23 · By: claude · Task: T-0227 · Category: security
+- Decision: `10-ledgerforce-roles.sh` writes, before every other rule of `SHOW hba_file`, a block allowing `lf_backup` scram logins only to `$POSTGRES_DB` from `LF_BACKUP_ALLOWED_CIDR` and rejecting it everywhere else (TCP and local socket); replaced between markers on each run, CIDR validated, parse checked with `pg_hba_file_rules` (old file restored on error), then `pg_reload_conf()`. Compose: an `internal` `backup` network (subnet `LF_BACKUP_SUBNET`, default 172.30.227.0/29) joined only by postgres and backup.
+- Why: pg_hba is PostgreSQL's only per-role source-address control; compose IPs are dynamic, a dedicated subnet is not (RQ-0188 Finding 5). The internal network also gives the key-holding container no route off the host.
+- Alternatives: password-only restriction (a leaked password would work from any container); hostname rules in pg_hba (depend on Docker reverse DNS); fixed container IP (same collision risk, less flexible).
+- ADR: ADR-0106 · Status: accepted
+
+### DL-0943 — The init script is the idempotent upgrade step for existing installs
+- Date: 2026-11-23 · By: claude · Task: T-0227 · Category: process
+- Decision: Existing installs run `bash infra/compose/init-secrets.sh`, `docker compose … up -d`, then `docker compose … exec -u postgres postgres bash /docker-entrypoint-initdb.d/10-ledgerforce-roles.sh` (Docs/ops/backup-restore.md). The script tolerates a missing `LF_BACKUP_PASSWORD` / CIDR (role exists, cannot log in) and accepts `LF_BOOTSTRAP_DIR` so the db test runs it against a real cluster.
+- Why: initdb scripts run only on an empty data directory (RQ-0188 Finding 6); one code path for new and old installs is tested once.
+- Alternatives: a separate upgrade script (two code paths); doing it in `setup` (runs as lf_migrator, cannot create roles).
+- ADR: ADR-0106 · Status: accepted
+
+### DL-0944 — T-0227 uses no migration (0085 unused); SS-PLAT-193..195 assigned
+- Date: 2026-11-23 · By: claude · Task: T-0227 · Category: process
+- Decision: The role lives in the cluster bootstrap, not in a migration (the migration runner rejects BYPASSRLS, and roles are cluster-wide); reserved migration number 0085 is not used. Scenarios: SS-PLAT-193 (role reads all, writes nothing), SS-PLAT-194 (bootstrap / init script / pg_hba), SS-PLAT-195 (compose secrets and network).
+- Why: lead's reserved ranges (round 12, row E).
+- Alternatives: none.
+- ADR: none · Status: accepted
