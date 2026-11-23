@@ -1,0 +1,15 @@
+# T-0209 post-merge (base 5378a4d, migration 0079) 2026-11-22
+## LF_TEST_DB_TMPDIR=/tmp/lf-t0209 VITEST_MAX_WORKERS=1 npx vitest run --project db --project api-db
+ Test Files  176 passed (176)
+      Tests  2136 passed (2136)
+exit=0
+skipped/todo mentions: 0
+
+## npx vitest run --project unit --project ui --project web --project api-unit
+ Test Files  116 passed (116)
+      Tests  1336 passed (1336)
+
+## playwright security-notices + shell + sync-issues (--trace off)
+  32 passed (1.4m)
+
+## pnpm typecheck 0; pnpm -s lint 0; pnpm -s format:check 0; conductor lint-backlog OK

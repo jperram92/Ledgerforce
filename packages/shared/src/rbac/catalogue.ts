@@ -88,6 +88,9 @@ export const PERMISSIONS = P({
   // Integrations: the Sync issues inbox (design §5.6 rule 2, T-0071)
   'sync.issues.read': 'read',
   'sync.issues.manage': 'write', // one-click retry, ignore
+  // Failed security notices (T-0209, ADR-0097): an administrator list, not Sync issues.
+  'security_notices.read': 'read', // Owner, Finance Admin; Auditor as every read (§6.4)
+  'security_notices.retry': 'write', // retry now; Owner, Finance Admin
 });
 
 export type Permission = keyof typeof PERMISSIONS;
@@ -185,6 +188,8 @@ export const ROLE_TEMPLATES: Readonly<Record<RoleId, RoleTemplate>> = Object.fre
       'ar.invoice.approve', // DL-0477
       'ar.refund.create',
       'ar.refund.approve',
+      'security_notices.read', // T-0209, ADR-0097
+      'security_notices.retry',
     ],
     mfaRequired: true,
     interactiveLogin: true,

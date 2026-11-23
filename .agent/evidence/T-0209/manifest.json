@@ -1,0 +1,393 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0209",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082348-SS-PLAT-161-failed-notices-forbidden-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:23:48.392Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082350-SS-PLAT-161-failed-notices-empty-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:23:50.118Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082352-SS-PLAT-161-failed-notices-error-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:23:52.199Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082420-SS-PLAT-161-failed-notices-owner-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 1440 [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:20.148Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082420-SS-PLAT-161-failed-notices-refused-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a refused retry is explained next to the list [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:20.868Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082423-SS-PLAT-161-failed-notices-auditor-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Auditor sees the list without the retry action [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:23.915Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082424-SS-PLAT-161-failed-notices-owner-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 390 [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:24.372Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082428-SS-PLAT-161-failed-notices-retried-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a Finance Admin retries one notice now by keyboard [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:28.204Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082427-SS-PLAT-161-failed-notices-forbidden-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:27.787Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082429-SS-PLAT-161-failed-notices-empty-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:29.944Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-082432-SS-PLAT-161-failed-notices-error-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "20be7d9ffd3a-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T08:24:32.940Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-083533-SS-PLAT-161-failed-notices-owner-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 1440 [T-0209]",
+      "commit": "353144ce29f7",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:33.798Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-083536-SS-PLAT-161-failed-notices-refused-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a refused retry is explained next to the list [T-0209]",
+      "commit": "353144ce29f7",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:36.022Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-083537-SS-PLAT-161-failed-notices-owner-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 390 [T-0209]",
+      "commit": "353144ce29f7-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:37.816Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-083539-SS-PLAT-161-failed-notices-auditor-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Auditor sees the list without the retry action [T-0209]",
+      "commit": "353144ce29f7-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:39.711Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-083541-SS-PLAT-161-failed-notices-retried-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a Finance Admin retries one notice now by keyboard [T-0209]",
+      "commit": "353144ce29f7-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:41.686Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-083543-SS-PLAT-161-failed-notices-forbidden-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "353144ce29f7-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:43.884Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-083546-SS-PLAT-161-failed-notices-empty-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "353144ce29f7-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:46.627Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-083549-SS-PLAT-161-failed-notices-error-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "353144ce29f7-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:49.490Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-48",
+      "file": ".agent/evidence/T-0209/20261122-083551-tests-unit.json",
+      "test": "61 test(s): packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › has the ten role templates of §6.4, each with its id | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › lists the holders of every write permission (no write permission is unlisted) | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › users.manage is held by exactly [\"owner\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › users.roles.assign is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › users.roles.assign_owner is held by exactly [\"owner\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › subscription.manage is held by exactly [\"owner\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › settings.sod.manage is held by exactly [\"owner\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › settings.chart.manage is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › settings.setup.manage is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › settings.tax.manage is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › settings.posting_rules.author is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › settings.posting_rules.activate is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › period.close is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › period.lock is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › period.lock.override is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › period.reopen is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › gl.journal.post is held by exactly [\"owner\",\"finance_admin\",\"accountant\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › gl.journal.approve is held by exactly [\"owner\",\"approver\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › parties.manage is held by exactly [\"owner\",\"finance_admin\",\"accountant\",\"ar_clerk\",\"ap_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › parties.bank_account.change_request is held by exactly [\"owner\",\"ap_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › parties.bank_account.verify is held by exactly [\"owner\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › bank.statement.import is held by exactly [\"owner\",\"finance_admin\",\"accountant\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › bank.reconcile is held by exactly [\"owner\",\"finance_admin\",\"accountant\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › tax.bas.prepare is held by exactly [\"owner\",\"finance_admin\",\"accountant\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.invoice.create is held by exactly [\"owner\",\"ar_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.invoice.send is held by exactly [\"owner\",\"ar_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.credit_note.create is held by exactly [\"owner\",\"ar_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.credit_note.approve is held by exactly [\"owner\",\"approver\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.receipt.record is held by exactly [\"owner\",\"ar_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.dunning.run is held by exactly [\"owner\",\"ar_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.batch.run is held by exactly [\"owner\",\"ar_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.batch.approve is held by exactly [\"owner\",\"finance_admin\",\"approver\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.invoice.approve is held by exactly [\"owner\",\"finance_admin\",\"approver\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.refund.create is held by exactly [\"owner\",\"finance_admin\",\"ar_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar.refund.approve is held by exactly [\"owner\",\"finance_admin\",\"approver\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ap.bill.enter is held by exactly [\"owner\",\"ap_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ap.bill.approve is held by exactly [\"owner\",\"approver\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ap.payment_batch.create is held by exactly [\"owner\",\"ap_clerk\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ap.payment_batch.approve is held by exactly [\"owner\",\"approver\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ap.payment_batch.release is held by exactly [\"owner\",\"approver\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › payroll.pay_run.import is held by exactly [\"owner\",\"payroll_officer\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › payroll.net_pay_batch.create is held by exactly [\"owner\",\"payroll_officer\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › payroll.net_pay_batch.release is held by exactly [\"owner\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › sync.issues.manage is held by exactly [\"owner\",\"finance_admin\",\"accountant\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › security_notices.retry is held by exactly [\"owner\",\"finance_admin\"] | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › owner: can and cannot as in §6.4 | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › finance_admin: can and cannot as in §6.4 | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › accountant: can and cannot as in §6.4 | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ar_clerk: can and cannot as in §6.4 | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › ap_clerk: can and cannot as in §6.4 | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › approver: can and cannot as in §6.4 | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › payroll_officer: can and cannot as in §6.4 | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › auditor: can and cannot as in §6.4 | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › sales_user: can and cannot as in §6.4 | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › integration: can and cannot as in §6.4 | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › Owner holds every permission; Auditor holds every read permission and no write | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › Sales user and Integration hold nothing and never log in interactively | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › MFA is mandatory exactly for Owner, Finance Admin, Accountant, AP Clerk, Payroll Officer (§6.2) | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › permissions of several roles are their union; unknown roles grant nothing | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › granting or revoking Owner needs users.roles.assign_owner; any other role users.roles.assign | packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-48: Role templates grant exactly the design §6.4 matrix › templates cannot be changed at runtime",
+      "commit": "353144ce29f7-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:51.048Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-083551-tests-unit.json",
+      "test": "1 test(s): packages/shared/src/rbac/rbac.matrix.test.ts › SS-PLAT-161: failed security notices are an administrator list (ADR-0097) › SS-PLAT-161 security_notices.read is held by Owner, Finance Admin and (read-only) Auditor only [T-0209]",
+      "commit": "353144ce29f7-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:51.048Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC02-07",
+      "file": ".agent/evidence/T-0209/20261122-083551-tests-unit.json",
+      "test": "11 test(s): packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › owner may run a batch only if the template grants ar.batch.run | packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › finance_admin may run a batch only if the template grants ar.batch.run | packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › accountant may run a batch only if the template grants ar.batch.run | packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › ar_clerk may run a batch only if the template grants ar.batch.run | packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › ap_clerk may run a batch only if the template grants ar.batch.run | packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › approver may run a batch only if the template grants ar.batch.run | packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › payroll_officer may run a batch only if the template grants ar.batch.run | packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › auditor may run a batch only if the template grants ar.batch.run | packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › sales_user may run a batch only if the template grants ar.batch.run | packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › integration may run a batch only if the template grants ar.batch.run | packages/shared/src/rbac/rbac.matrix.test.ts › SS-UC02-07: Permission required to run a batch › a user with no role may not run a batch",
+      "commit": "353144ce29f7-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:51.048Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-083555-tests-web.json",
+      "test": "3 test(s): apps/web/src/notices/logic.test.ts › SS-PLAT-161 failed security notices: plain words › SS-PLAT-161 names the change with the last 3 digits only [T-0209] | apps/web/src/notices/logic.test.ts › SS-PLAT-161 failed security notices: plain words › SS-PLAT-161 explains SMTP failures without SMTP words [T-0209] | apps/web/src/notices/logic.test.ts › SS-PLAT-161 failed security notices: plain words › SS-PLAT-161 a notice that is no longer failing is explained [T-0209]",
+      "commit": "353144ce29f7-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T08:35:55.431Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193128-SS-PLAT-161-failed-notices-refused-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a refused retry is explained next to the list [T-0209]",
+      "commit": "807e92786a64",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:28.360Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193128-SS-PLAT-161-failed-notices-owner-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 1440 [T-0209]",
+      "commit": "807e92786a64",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:28.354Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193132-SS-PLAT-161-failed-notices-auditor-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Auditor sees the list without the retry action [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:32.565Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193133-SS-PLAT-161-failed-notices-owner-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 390 [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:33.060Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193138-SS-PLAT-161-failed-notices-retried-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a Finance Admin retries one notice now by keyboard [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:38.773Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193138-SS-PLAT-161-failed-notices-forbidden-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:38.054Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193141-SS-PLAT-161-failed-notices-empty-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:41.109Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-193143-SS-PLAT-161-failed-notices-error-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "807e92786a64-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:31:43.604Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-194612-SS-PLAT-161-failed-notices-owner-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 1440 [T-0209]",
+      "commit": "8e740920dfe3",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:46:12.181Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-194614-SS-PLAT-161-failed-notices-refused-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a refused retry is explained next to the list [T-0209]",
+      "commit": "8e740920dfe3",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:46:14.295Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-194615-SS-PLAT-161-failed-notices-owner-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 390 [T-0209]",
+      "commit": "8e740920dfe3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:46:15.617Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-194617-SS-PLAT-161-failed-notices-auditor-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: the Auditor sees the list without the retry action [T-0209]",
+      "commit": "8e740920dfe3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:46:17.282Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-194618-SS-PLAT-161-failed-notices-retried-1440.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: a Finance Admin retries one notice now by keyboard [T-0209]",
+      "commit": "8e740920dfe3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:46:18.114Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-194619-SS-PLAT-161-failed-notices-forbidden-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "8e740920dfe3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:46:19.332Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-194621-SS-PLAT-161-failed-notices-empty-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "8e740920dfe3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:46:21.922Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-194623-SS-PLAT-161-failed-notices-error-390.png",
+      "test": "web/security-notices.spec.ts › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]",
+      "commit": "8e740920dfe3-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:46:23.734Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-162",
+      "file": ".agent/evidence/T-0209/20261122-195417-tests-db.json",
+      "test": "3 test(s): packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-162: failed security notices are listed in their tenant, masked › SS-PLAT-162 masks an address to its first character and domain [T-0209] | packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-162: failed security notices are listed in their tenant, masked › SS-PLAT-162 lists each failed notice with attempts, last SMTP code and next attempt time [T-0209] | packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-162: failed security notices are listed in their tenant, masked › SS-PLAT-162 another tenant lists none of this tenant's notices [T-0209]",
+      "commit": "03e63bd6b4fb",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:54:17.670Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-163",
+      "file": ".agent/evidence/T-0209/20261122-195417-tests-db.json",
+      "test": "4 test(s): packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-163: retry-now makes a failed notice due at the next dispatch, append-only › SS-PLAT-163 a request appends one row; the next dispatch sends that notice only [T-0209] | packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-163: retry-now makes a failed notice due at the next dispatch, append-only › SS-PLAT-163 a second request for the same failed attempt adds nothing [T-0209] | packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-163: retry-now makes a failed notice due at the next dispatch, append-only › SS-PLAT-163 a sent notice cannot be retried; unknown ids are not found [T-0209] | packages/modules/email/src/security-notice-retry.db.test.ts › SS-PLAT-163: retry-now makes a failed notice due at the next dispatch, append-only › SS-PLAT-163 lf_app can only append retry rows, and only for the latest failed attempt [T-0209]",
+      "commit": "03e63bd6b4fb",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:54:17.670Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-161",
+      "file": ".agent/evidence/T-0209/20261122-195420-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-161: failed security notices are listed for administrators of their tenant › SS-PLAT-161 Owner, Finance Admin and Auditor see the failed notices with attempts, SMTP code and next attempt [T-0209] | apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-161: failed security notices are listed for administrators of their tenant › SS-PLAT-161 the Accountant and a clerk are refused; another tenant sees none [T-0209]",
+      "commit": "03e63bd6b4fb-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:54:20.678Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-163",
+      "file": ".agent/evidence/T-0209/20261122-195420-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited › SS-PLAT-163 needs security_notices.retry and an Idempotency-Key [T-0209] | apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited › SS-PLAT-163 201 appends the request; a replay answers 200 and adds nothing; each call audited [T-0209] | apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited › SS-PLAT-163 a sent notice is 409, an unknown or other-tenant one 404, a bad kind 404 [T-0209] | apps/api/src/security-notices/security-notices.db.test.ts › SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited › SS-PLAT-163 tenants never see each other: the other tenant cannot list or retry here [T-0209]",
+      "commit": "03e63bd6b4fb-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-22T19:54:20.678Z",
+      "result": "passed"
+    }
+  ]
+}

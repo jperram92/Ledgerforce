@@ -4474,3 +4474,52 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: security reviewers repeatedly flagged the conflict between §6 and DL-0691 (reviews r10, r11); the owner resolved it.
 - Alternatives: leave §6 as it was and rely on DL-0691 (rejected by the owner).
 - ADR: none · Status: accepted
+
+### DL-0840 — Failed security notices get an administrator list of their own, not a Sync issues source (T-0209)
+- Date: 2026-11-22 · By: claude · Task: T-0209 · Category: security
+- Decision: Failed security notices are shown at Settings → "Failed security notices" (`GET /security-notices/failed`), not in the Sync issues inbox.
+- Why: RQ-0179. `app.sync_issue` needs an outbox event and a handler and retries by a delivery job (0030); the notices have neither, and `event_id NOT NULL` cannot be relaxed by the forward-only runner. The Sync issues audience includes the Accountant; these notices concern Owner/Finance Admin controls. Odoo, django-post_office and Discourse keep failed outbound email in an admin-only list with a per-message retry.
+- Alternatives: widen `app.sync_issue` (rejected: schema and audience); a home-screen alert only (rejected: no place for the error or the retry; a badge is follow-up card T-0220).
+- ADR: ADR-0097 · Status: accepted
+
+### DL-0841 — Two permissions: security_notices.read (Owner, Finance Admin, Auditor) and security_notices.retry (Owner, Finance Admin) (T-0209)
+- Date: 2026-11-22 · By: claude · Task: T-0209 · Category: security
+- Decision: New catalogue permissions mirrored in `app.permission_known`. The retry is limited to Owner and Finance Admin as the card asks; the read permission is a `read` permission, so the Auditor holds it under design §6.4 ("read-only everything"). Neither is step-up or token-forbidden (a retry only makes a notice send sooner), consistent with `sync.issues.*`. AC-1 is read as "administrators of its tenant (and the read-only Auditor)".
+- Why: design §6.4 outranks the card's wording; making the read a `write` permission to hide it from the Auditor would misstate the catalogue and break the "Auditor holds every read" invariant (rbac.matrix.test.ts).
+- Alternatives: reuse `audit_log.read`/`users.roles.assign` (rejected: unrelated meaning); one write permission for list and retry (rejected: above).
+- ADR: ADR-0097 · Status: accepted
+
+### DL-0842 — Retry-now is an appended app.security_notice_retry row releasing the latest failed attempt (T-0209)
+- Date: 2026-11-22 · By: claude · Task: T-0209 · Category: architecture
+- Decision: New append-only tenant table `app.security_notice_retry (notice, after_attempt, requested_by)`, unique per released attempt, composite FK to the delivery row, insert guard (latest attempt, failed, notice unsent; another tenant's row left to RLS as 0077). The dispatcher's due rule ignores a failed attempt's `next_attempt_at` when a retry row with `after_attempt >= attempt` exists. Migration `0080_platform_security_notice_retry.sql`, the number the lead assigned (round 11 reserved 0079; T-0204 took 0078 and T-0215 took 0079, both merged into the base before final validation).
+- Why: keeps `app.security_notice_delivery` append-only and the notice grants unchanged (card note); records who asked and when; one release per attempt makes the route idempotent by state.
+- Alternatives: set the notice back to `pending` (rejected: the due rule reads the delivery rows; hides who asked); a synthetic delivery row (rejected: falsifies the attempt history).
+- ADR: ADR-0097 · Status: accepted
+
+### DL-0843 — Retry route: Idempotency-Key required, not stored; 201 new, 200 already released, 409 not failed; every call audited (T-0209)
+- Date: 2026-11-22 · By: claude · Task: T-0209 · Category: architecture
+- Decision: `POST /security-notices/{kind}/{id}/retry` calls `requireKey` first (ADR-0093 pattern), answers 201 when a row was appended and 200 when the latest failed attempt was already released (`ON CONFLICT DO NOTHING`, also under a race). 404 for an unknown kind, id or another tenant's notice; 409 `security_notice_not_failed`. Each call is audited as `security_notice_retry` with `created` true/false.
+- Why: apps/api rule "every mutating endpoint requires an idempotency key"; state already makes the route replay-safe, so no key table (ADR-0093 option 1).
+- Alternatives: store keys (rejected as in ADR-0093).
+- ADR: ADR-0097 · Status: accepted
+
+### DL-0844 — Recipients masked to first character and domain, also inside SMTP error text (T-0209)
+- Date: 2026-11-22 · By: claude · Task: T-0209 · Category: security
+- Decision: The list shows `o•••@example.com`; every address inside the stored error message is masked the same way before it leaves the module (SMTP replies often quote the recipient). Account numbers come only from the masked payload (last 3 digits).
+- Why: card "masked recipient"; ADR-0018 / design §6.6 show-the-minimum rule. The domain is kept so an admin can tell a mail-server problem from a typo.
+- Alternatives: full address (rejected: card); hide domain (rejected: loses the diagnostic value).
+- ADR: ADR-0097 · Status: accepted
+
+### DL-0845 — apps/api depends on the workspace package @ledgerforce/email (T-0209)
+- Date: 2026-11-22 · By: claude · Task: T-0209 · Category: tooling
+- Decision: `apps/api/package.json` adds `"@ledgerforce/email": "workspace:*"` so the controller calls `listFailedSecurityNotices` / `requestSecurityNoticeRetry` where the dispatcher's due rule lives. Internal workspace link only; no third-party dependency, so no ADR.
+- Why: thin controller, one place for the due rule and masking.
+- Alternatives: SQL in the controller (rejected: duplicates the dispatcher's rule).
+- ADR: none · Status: accepted
+
+### DL-0846 — T-0209 scope: failed notices only; no-recipient notices and an alert badge split to T-0219 and T-0220 (T-0209)
+- Date: 2026-11-22 · By: claude · Task: T-0209 · Category: scope
+- Decision: T-0209 lists notices in `failed` status. `no_recipient` supplier notices (never sent, nobody told) become T-0219; a count badge or home alert outside Settings becomes T-0220. The screen lives at `/settings/security-notices`; "Retry now" needs no confirmation step because it only makes an already-approved notice send sooner (design §5.6 "one-click retry"); each press sends a fresh `Idempotency-Key`.
+- Why: card ACs are about failed notices; each split item needs its own research (re-sending an old notice to a contact added later; where the shell shows counts).
+- Alternatives: include them here (rejected: oversized, open questions).
+- ADR: ADR-0097 · Status: accepted

@@ -17,6 +17,7 @@
     "@ledgerforce/connector-stripe": "workspace:*",
     "@ledgerforce/db": "workspace:*",
     "@ledgerforce/documents": "workspace:*",
+    "@ledgerforce/email": "workspace:*",
     "@ledgerforce/gl": "workspace:*",
     "@ledgerforce/journals": "workspace:*",
     "@ledgerforce/ledger": "workspace:*",
