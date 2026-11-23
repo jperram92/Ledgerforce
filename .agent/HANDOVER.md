@@ -1,27 +1,24 @@
 # Handover: rounds 8-10 integrated; golden-dependent cards await main merge (2026-11-17 19:30 UTC)
 
 ## Codex continuation prompt
-> Resume from the repository, not the chat. Read AGENTS.md, run `bash scripts/agent/resume.sh`, then read this file and DL-0691 (owner: the building agent makes open decisions itself after research; do not ask), DL-0820. Branch `claude/loving-lovelace-nozqpk`.
+> Resume from the repository, not the chat. Read AGENTS.md (section 6 now delegates security ADRs and open decisions, DL-0691/DL-0896), run `bash scripts/agent/resume.sh`, then read this file. Branch `claude/loving-lovelace-nozqpk`.
 >
-> **State**
-> - In `review` (VERIFY OK except 2c/8 PENDING by design): rounds 3-8 cards listed below, plus T-0176, T-0177, T-0180, T-0187, T-0188, T-0172, T-0185, T-0186, T-0191, T-0197, T-0127.
-> - At `verifying`, verify running or queued on local branch `verify/r9-no-golden` (worktree `.claude/worktrees/verify-r9`, the combined tree minus the golden merges): T-0192, T-0183, T-0196, T-0193. Copy their evidence/manifest from that worktree when they pass, then release.
-> - At `verifying`, **blocked on the owner's merge to main**: T-0168, T-0126, T-0203. They change `Docs/accounting/postings.md` (goldens GP-040, GP-043, GP-044, GP-045, approved under DL-0263 with research and an independent accounting review). ADR-0047's golden guard trusts `Docs/decisions/golden-approvals.json` only once it is on main, so verify gate 4 fails on this branch until then. Do not edit the guard.
-> - Building: T-0190 then T-0189 (Stripe refund follow-ups; migration 0077 if needed).
-> - Migrations run to 0076. The next is 0077.
+> **State (2026-11-23)**
+> - In `review` (VERIFY OK except 2c/8 PENDING by design): all round 3-10 cards except those below, incl. T-0176, T-0177, T-0180, T-0187, T-0188, T-0172, T-0185, T-0186, T-0191, T-0192, T-0197, T-0127, T-0183, T-0196, T-0193.
+> - At `verifying`, **blocked on the owner's merge to main** (ADR-0047 golden guard: postings.md differs from main): T-0168, T-0126, T-0203, T-0202, T-0204, and everything verified on top of them: T-0195, T-0190, T-0189, T-0143 (each passes every gate except 4; outputs in `.agent/evidence/<T>/verify-full-tree-r11.txt`). T-0209 merged, verify still to run.
+> - Building: T-0215 security fixes (review r11 F1 High: unbounded in-flight uploads; F2 Medium: replay guard) on `feat/T-0215-secfix`. T-0215 stays out of review until fixed and re-reviewed.
+> - Migrations run to 0080. The next is 0081.
 >
-> **Next actions, in order**
-> 1. Finish verify/release of T-0192, T-0183, T-0196, T-0193; merge and verify T-0190/T-0189 when the agent reports.
-> 2. Next ready cards: T-0204 (GST final invoice/variation/cancellation, after T-0203), T-0205, T-0206, T-0201/T-0202, T-0209, T-0215/T-0216, T-0130, T-0143, T-0182, T-0195. T-0110/T-0111 need a scratch org; T-0119 needs docker; T-0162/T-0163 wait on T-0057.
-> 3. Gate 8: Codex cross-review is pending for every card in review. Gate 2c stays PENDING until main's baseline is re-recorded as unit+db (next merge to main, an owner gate).
+> **Next actions**
+> 1. Merge and re-review T-0215 secfix; run verify on the full tree for T-0209 and T-0215.
+> 2. Owner: merge this branch to main after the Codex cross-review; then re-run verify for the blocked cards (gate 4 then trusts golden-approvals.json) and re-record the coverage baseline (2c).
+> 3. Ready cards: T-0205, T-0206, T-0207, T-0208, T-0216, T-0217, T-0218, T-0219, T-0220, T-0223, T-0224, T-0227, T-0228, T-0229, T-0201, T-0130, T-0182. T-0110/T-0111 need a scratch org; T-0119 needs docker; T-0162/T-0163 wait on T-0057.
 >
 > **Process reminders**
-> - Reserve migration numbers per agent but renumber at merge so the sequence stays gapless; reserve GP and SS ids per agent too (collisions happened in round 9).
-> - Clean stale `/tmp/lf-web-*` and `/tmp/lf-pg-*` if the disk fills (DL-0820 fixes the web cache leak going forward).
-> - Check `pnpm typecheck` by its exit code, not by filtered output.
-> - Session-cookie API tests must send `sec-fetch-site: same-origin` (CSRF guard, ADR-0076).
-> - `.log` evidence files are gitignored; use `.txt` or `.json`.
-> - Never commit format-patch output (DL-0464).
+> - Reserve migration/GP/SS/card ids per agent; renumber at merge so migrations stay gapless.
+> - Database-tested scenarios need manifest entries: `LF_TASK_ID=T-NNNN pnpm evidence:tests --project db|api-db --require SS-... <files>`.
+> - Clean stale `/tmp/lf-web-*` and `/tmp/lf-pg-*` (not in use) and merged worktrees when the disk fills.
+> - Check `pnpm typecheck` by its exit code. `.log` evidence is gitignored; use `.txt`/`.json`.
 
 ---
 
