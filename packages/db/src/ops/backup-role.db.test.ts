@@ -134,10 +134,10 @@ describe('SS-PLAT-193 lf_backup dumps every tenant and can write nothing', () =>
     try {
       expect(await readManifest(restored.url)).toEqual(manifest);
       const names = await withClient(restored.url, (c) =>
-        c.query<{ name: string }>(`SELECT name FROM app.tenant WHERE id IN ($1, $2) ORDER BY name`, [
-          A,
-          B,
-        ]),
+        c.query<{ name: string }>(
+          `SELECT name FROM app.tenant WHERE id IN ($1, $2) ORDER BY name`,
+          [A, B],
+        ),
       );
       expect(names.rows.map((r) => r.name)).toEqual(['Backup Tenant A', 'Backup Tenant B']);
     } finally {
@@ -250,9 +250,12 @@ describe('SS-PLAT-194 bootstrap, init script and upgrade step', () => {
 
   async function loginAsBackup(): Promise<string> {
     try {
-      await withClient(server.connectionString('ledgerforce', 'lf_backup', pw.backup), async (c) => {
-        await c.query('SELECT 1');
-      });
+      await withClient(
+        server.connectionString('ledgerforce', 'lf_backup', pw.backup),
+        async (c) => {
+          await c.query('SELECT 1');
+        },
+      );
       return 'ok';
     } catch (e) {
       return (e as Error).message;
@@ -345,7 +348,9 @@ describe('SS-PLAT-194 bootstrap, init script and upgrade step', () => {
     const hba = readFileSync(hbaFile, 'utf8');
     expect(hba.match(/^# BEGIN lf_backup/gm)).toHaveLength(1);
     const firstRule = hba.split('\n').find((l) => /^(local|host)/.test(l));
-    expect(firstRule).toMatch(/^host\s+ledgerforce\s+lf_backup\s+127\.0\.0\.1\/32\s+scram-sha-256$/);
+    expect(firstRule).toMatch(
+      /^host\s+ledgerforce\s+lf_backup\s+127\.0\.0\.1\/32\s+scram-sha-256$/,
+    );
     await withClient(server.connectionString('ledgerforce', 'lf_app', pw.app), (c) =>
       c.query('SELECT 1'),
     );

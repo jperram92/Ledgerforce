@@ -40,7 +40,13 @@ services:
       LF_BACKUP_ALLOWED_CIDR: ${LF_BACKUP_SUBNET:-172.30.227.0/29}
       KEYCLOAK_DB_PASSWORD_FILE: /run/secrets/keycloak_db_password
     secrets:
-      [postgres_password, lf_migrator_password, lf_app_password, lf_backup_password, keycloak_db_password]
+      [
+        postgres_password,
+        lf_migrator_password,
+        lf_app_password,
+        lf_backup_password,
+        keycloak_db_password,
+      ]
     networks: [default, backup]
     volumes:
       - pgdata:/var/lib/postgresql/data
