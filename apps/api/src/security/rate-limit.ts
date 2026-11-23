@@ -98,6 +98,15 @@ export class FixedWindowLimiter {
   }
 }
 
+/**
+ * The client address a per-client limit is keyed on: `req.ip` as Express resolves it under
+ * `trust proxy` = LF_TRUST_PROXY_HOPS (applySecurity), so X-Forwarded-For counts only across the
+ * configured trusted hops; IPv4-mapped IPv6 is folded to IPv4. Shared by the rate limiter and the
+ * inbound upload reader (T-0230, RQ-0186 F4) so the two can never key differently.
+ */
+export const clientAddress = (req: Request): string =>
+  (req.ip ?? 'unknown').replace(/^::ffff:/, '');
+
 /** Express middleware: refuse over-limit requests with 429 {error:'rate_limited'} + Retry-After. */
 export function rateLimitMiddleware(limiter: FixedWindowLimiter) {
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -106,7 +115,7 @@ export function rateLimitMiddleware(limiter: FixedWindowLimiter) {
       next();
       return;
     }
-    const hit = limiter.hit(cls, (req.ip ?? 'unknown').replace(/^::ffff:/, ''));
+    const hit = limiter.hit(cls, clientAddress(req));
     if (hit.allowed) {
       next();
       return;
