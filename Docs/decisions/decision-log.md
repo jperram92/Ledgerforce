@@ -4565,3 +4565,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: lead instruction (DL-0864 precedent).
 - Alternatives: none.
 - ADR: none · Status: accepted
+
+### DL-0898 — T-0215 security re-review passed; slow-upload exposure (N1) moved to T-0230
+- Date: 2026-11-23 · By: claude · Task: T-0215 · Category: security
+- Decision: The independent re-review of the T-0215 fixes passed F1–F8 (no slot leak under aborted or malformed uploads; the global token table and its SECURITY DEFINER function leak nothing across tenants; identical retries are handled correctly; the address-status trigger holds). Its new Medium finding N1 (slow uploads can hold every in-flight slot and keep the route at 503 until Mailgun stops retrying) does not block T-0215 and becomes card T-0230: per-client in-flight cap, minimum transfer rate and first-byte timeout.
+- Why: N1 affects only availability of the inbound route, not data or tenant isolation; it needs its own tests and tuning.
+- Alternatives: fix inside T-0215 (rejected: separate behaviour; T-0215 already passed review).
+- ADR: none · Status: accepted
