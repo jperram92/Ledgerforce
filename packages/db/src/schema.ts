@@ -1047,6 +1047,8 @@ export interface BillInboxItemTable {
   status: Generated<'new' | 'no_attachment' | 'coded' | 'rejected'>;
   bill_id: string | null;
   received_at: Timestamp;
+  /** r11 F6 (migration 0081): this message reused that item's Message-ID with different bytes. */
+  message_id_conflict_of: string | null;
 }
 
 /** Migration 0073 (T-0127, ADR-0095): bills inbox IMAP mailbox — sealed password, poll cursor. */

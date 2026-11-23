@@ -14,6 +14,8 @@ import {
   HttpCode,
   HttpException,
   Inject,
+  InternalServerErrorException,
+  Logger,
   Post,
   Req,
   ServiceUnavailableException,
@@ -22,7 +24,7 @@ import { InboundWebhookError, receiveMailgunInbound } from '@ledgerforce/ap';
 import type { Database } from '@ledgerforce/db';
 import type { Request } from 'express';
 import type { Kysely } from 'kysely';
-import { inboundBodyOf } from '../security/inbound-body.ts';
+import { inboundBodyOf, type InboundBodyLimits } from '../security/inbound-body.ts';
 import { Public } from '../tenancy/public.decorator.ts';
 import { DB, MAILGUN_INBOUND } from '../tokens.ts';
 
@@ -30,10 +32,26 @@ import { DB, MAILGUN_INBOUND } from '../tokens.ts';
 export interface MailgunInboundConfig {
   readonly signingKeys: readonly string[];
   readonly inboundDomain: string;
+  /** Upload bounds of the body reader (r11 F1); defaults in DEFAULT_INBOUND_BODY_LIMITS. */
+  readonly limits?: Partial<InboundBodyLimits>;
+}
+
+/**
+ * A log line for an unexpected failure that cannot carry message content (r11 F8): database
+ * errors quote values (a unique-violation detail names the Message-ID), so only the error class
+ * and a SQLSTATE-shaped code are kept.
+ */
+function failureLine(e: unknown): string {
+  const name = e instanceof Error ? e.constructor.name : typeof e;
+  const code = (e as { code?: unknown } | null)?.code;
+  const safeCode = typeof code === 'string' && /^[0-9A-Z]{5}$/.test(code) ? ` ${code}` : '';
+  return `inbound webhook failed: ${/^[A-Za-z]{1,64}$/.test(name) ? name : 'Error'}${safeCode}`;
 }
 
 @Controller('webhooks/mailgun')
 export class MailgunInboundController {
+  private readonly logger = new Logger('MailgunInbound');
+
   constructor(
     @Inject(DB) private readonly db: Kysely<Database>,
     @Inject(MAILGUN_INBOUND) private readonly config: MailgunInboundConfig | null,
@@ -56,8 +74,12 @@ export class MailgunInboundController {
       );
       return { received: true, outcome: out.outcome };
     } catch (e) {
+      // Refusals and failures close the connection (r11 F4).
+      req.res?.setHeader('Connection', 'close');
       if (e instanceof InboundWebhookError) throw new HttpException({ error: e.reason }, e.status);
-      throw e;
+      this.logger.error(failureLine(e));
+      // An HttpException is not logged again by Nest; Mailgun retries a 500.
+      throw new InternalServerErrorException({ error: 'internal_error' });
     }
   }
 }

@@ -1,0 +1,54 @@
+
+> ledgerforce@0.0.0 typecheck /home/user/Ledgerforce/.claude/worktrees/t0215-secfix
+> pnpm -r --if-present typecheck && tsc -p tsconfig.json
+
+Scope: 24 of 25 workspace projects
+packages/connectors/aba typecheck$ tsc -p tsconfig.json
+packages/shared typecheck$ tsc -p tsconfig.json
+packages/testing typecheck$ tsc -p tsconfig.json
+packages/connectors/aba typecheck: Done
+packages/shared typecheck: Done
+packages/testing typecheck: Done
+packages/db typecheck$ tsc -p tsconfig.json
+packages/ui typecheck$ tsc -p tsconfig.json
+packages/ui typecheck: Done
+packages/db typecheck: Done
+apps/web typecheck$ tsc -p tsconfig.json
+packages/modules/parties typecheck$ tsc -p tsconfig.json
+packages/modules/gl typecheck$ tsc -p tsconfig.json
+packages/modules/gl typecheck: Done
+packages/modules/parties typecheck: Done
+apps/web typecheck: Done
+packages/ledger typecheck$ tsc -p tsconfig.json
+packages/ledger typecheck: Done
+packages/modules/journals typecheck$ tsc -p tsconfig.json
+packages/modules/tax typecheck$ tsc -p tsconfig.json
+packages/outbox typecheck$ tsc -p tsconfig.json
+packages/modules/reporting typecheck$ tsc -p tsconfig.json
+packages/modules/journals typecheck: Done
+packages/outbox typecheck: Done
+packages/modules/reporting typecheck: Done
+packages/modules/tax typecheck: Done
+packages/modules/products typecheck$ tsc -p tsconfig.json
+packages/modules/products typecheck: Done
+packages/modules/ar typecheck$ tsc -p tsconfig.json
+packages/connectors/salesforce typecheck$ tsc -p tsconfig.json
+packages/modules/ar typecheck: Done
+packages/connectors/salesforce typecheck: Done
+packages/modules/bank typecheck$ tsc -p tsconfig.json
+packages/modules/bank typecheck: Done
+packages/modules/documents typecheck$ tsc -p tsconfig.json
+packages/modules/documents typecheck: Done
+packages/modules/email typecheck$ tsc -p tsconfig.json
+packages/modules/setup typecheck$ tsc -p tsconfig.json
+packages/modules/email typecheck: Done
+packages/modules/setup typecheck: Done
+packages/connectors/stripe typecheck$ tsc -p tsconfig.json
+packages/modules/ap typecheck$ tsc -p tsconfig.json
+packages/connectors/stripe typecheck: Done
+packages/modules/ap typecheck: Done
+apps/worker typecheck$ tsc -p tsconfig.json
+apps/api typecheck$ tsc -p tsconfig.json
+apps/worker typecheck: Done
+apps/api typecheck: Done
+typecheck=0

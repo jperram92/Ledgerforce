@@ -27,7 +27,12 @@ export interface TableRef {
 }
 
 /** Tables in RLS_SCHEMAS that legitimately have no tenant_id column (protected by own policy). */
-export const GLOBAL_TABLES: readonly string[] = ['app.tenant'];
+export const GLOBAL_TABLES: readonly string[] = [
+  'app.tenant',
+  // Provider webhook tokens consumed before tenant routing (ADR-0099 addendum, r11 F2): no lf_app
+  // grant, lf_migrator-only policies, reached only through app.consume_inbound_webhook_token().
+  'app.inbound_webhook_token',
+];
 export const RLS_SCHEMAS: readonly string[] = ['app', 'audit'];
 
 /**

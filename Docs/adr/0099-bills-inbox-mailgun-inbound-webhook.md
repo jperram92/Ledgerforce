@@ -62,8 +62,8 @@ in-house RFC 7578 parser over bytes (chosen, ~100 lines, octet-exact, bounded)**
    → MIME parse and ingest.
 2. **Signature.** hex HMAC-SHA256(signing key, `timestamp ‖ token`) compared with
    `timingSafeEqual` against every configured key (several during a key roll). Keys come from
-   `LF_MAILGUN_SIGNING_KEY[_FILE]` only. Token: 1–256 characters `[A-Za-z0-9]`; timestamp: 1–12
-   digits.
+   `LF_MAILGUN_SIGNING_KEY[_FILE]` only. Token: 16–256 characters `[A-Za-z0-9_-]` (corrected by
+   the addendum, r11 F7); timestamp: 1–12 digits.
 3. **Single-use tokens.** `app.inbound_webhook_receipt (provider, provider_token)` has a global
    unique key and is written **in the ingest transaction**, before `ingestBillEmail` runs. A
    committed token refuses every later request with 406 `replayed` (Mailgun never retries a
@@ -113,3 +113,61 @@ in-house RFC 7578 parser over bytes (chosen, ~100 lines, octet-exact, bounded)**
 
 RQ-0181, RQ-0177, ADR-0049, ADR-0053, ADR-0054, ADR-0095, ADR-0016, DL-0691, T-0215, T-0223,
 T-0224, design §6, UC-05.
+
+## Addendum 2026-11-22 — security review r11 (accepted under DL-0691; DL-0865..DL-0869, DL-0897)
+
+Security review r11 failed the first version: F1 (High) unbounded unauthenticated buffering and
+F2 (Medium) a token consumed only when ingest succeeded, plus F3–F8. This addendum amends the
+decision outcome; everything not named here stands.
+
+1. **Upload bounds (F1, F4)** amend rule 1. The route has its own rate class `inbound_email`
+   (default 60 per minute per address, separate from `/webhooks/*`). The body reader admits at
+   most 4 uploads at once and reserves at most 64 MiB across them (a declared Content-Length is
+   reserved before reading; a chunked body twice its size per chunk). Over either: 503
+   `inbound_busy` with `Retry-After: 30`, which Mailgun retries. A body must arrive within 60 s
+   (408). With a Content-Length the body is read into one buffer of that size; a body longer or
+   shorter than declared is 400. Every refusal answers `Connection: close` and stops reading.
+2. **Token consumed after the signature check (F2)** replaces rule 3's first sentence. Right after
+   signature and timestamp pass — before route shape, routing or ingest can refuse or fail — the
+   token is consumed in its own committed statement through `app.consume_inbound_webhook_token()`
+   (SECURITY DEFINER, owner `lf_migrator`, `search_path` pinned, EXECUTE to `lf_app` only) into
+   the global table `app.inbound_webhook_token`, with SHA-256 of `body-mime` and of the
+   normalised `recipient` field. A later request with the same token is accepted only when both
+   hashes match (a genuine retry); anything else is 406 `replayed`. The table has no tenant (the
+   token is consumed before routing), so it is listed in `GLOBAL_TABLES`: RLS ENABLE + FORCE,
+   `lf_migrator`-only policies, no `lf_app` grant. The tenant receipt table keeps one ingest per
+   token; an identical request finding it answers 200 `duplicate`.
+3. **Shared signing key exposure (F3)** amends rule 5. Mailgun signs every webhook of an account
+   with the same key (event webhooks, other routes, integrations), and the signature never covers
+   the body; any receiver of those webhooks, or any log of them, holds triples valid here for
+   300 s with any body and recipient. Tokens never seen here are not in the token table, so F2
+   cannot close this. Therefore: **a deployment must use a dedicated Mailgun account or
+   subaccount, used only for the bills-inbox route, and configure its key alone** in
+   `LF_MAILGUN_SIGNING_KEY` (subaccounts sign with their own key and add a `parent-signature`
+   with the primary account's, RQ-0181 S5). And ingest **never trusts anything inside the
+   message** as evidence of origin: `Authentication-Results`, SPF/DKIM verdicts and `X-Mailgun-*`
+   headers are not read (rule in `packages/modules/ap/src/inbox.ts`, test SS-PLAT-179).
+4. **Inbound addresses only move forward (F5)** amends rule 4. A trigger allows only
+   `active → superseded` and no change to any other column, for every role. Creating and rotating
+   an address writes `audit.audit_log` rows (`ap.inbox_address.created` / `.rotated`) without the
+   token. A future rotation endpoint (T-0216) needs a permission and step-up.
+5. **Message-ID reuse (F6)** amends rule 6. Ingest is idempotent on Message-ID only while the raw
+   bytes match. A different message reusing a known Message-ID is kept as its own item, keyed
+   `<sha256:…>` and marked `message_id_conflict_of`, instead of being answered `duplicate`.
+6. **Failures log no content (F8).** An unexpected failure answers 500 `internal_error` and logs
+   one line with the error class and SQLSTATE only (database errors quote values).
+7. **Token format (F7)** corrects rule 2: the token is 16–256 characters of `[A-Za-z0-9_-]`
+   (code and database CHECK); characters moved across `timestamp‖token` keep the signature valid
+   but always fall outside the ±300 s window (test).
+
+Governance: rule 2 adds a table to `GLOBAL_TABLES`, which `packages/db/AGENTS.md` ties to a
+security ADR. Security ADRs are delegated to the building agent (AGENTS.md §6 as updated on the
+owner's instruction, DL-0896, confirming DL-0691) on condition of research, a decision-log entry,
+tests and an independent security review: RQ-0181 addendum, DL-0865..DL-0869, the tests below,
+and security review r11 (whose findings this addendum answers). Accepted on that basis.
+
+Validation added: `apps/api/src/ap/bills-inbound-webhook.db.test.ts` (SS-PLAT-177, SS-PLAT-178),
+`packages/modules/ap/src/inbox.db.test.ts` (SS-PLAT-179),
+`packages/modules/ap/src/inbound-address.db.test.ts` (SS-PLAT-180), `packages/db/src/rls.db.test.ts`
+(SS-PLAT-178 function), `apps/api/src/security/rate-limit.test.ts`,
+`packages/modules/ap/src/inbound-webhook.test.ts` (digit shift).

@@ -105,7 +105,9 @@ export function apiOptionsFromEnv(
 /**
  * Mailgun inbound webhook (ADR-0099): LF_MAILGUN_SIGNING_KEY[_FILE] (comma-separated during a key
  * roll) and LF_INBOUND_EMAIL_DOMAIN (the domain of `bills-<token>@…` addresses), both or neither.
- * Unset: POST /webhooks/mailgun/messages.mime answers 503.
+ * Unset: POST /webhooks/mailgun/messages.mime answers 503. The key must belong to a Mailgun account
+ * or subaccount used only for the bills-inbox route (ADR-0099 addendum rule 3): an account key
+ * signs all of that account's webhooks, and the signature never covers the message.
  */
 function mailgunInbound(
   env: Env,

@@ -9,6 +9,7 @@
  */
 import 'reflect-metadata';
 import { randomBytes, randomUUID } from 'node:crypto';
+import { request as httpRequest, type IncomingHttpHeaders } from 'node:http';
 import {
   ensureInboxAddress,
   inboundAddress,
@@ -31,6 +32,7 @@ let f: LedgerFixture;
 let api: Api;
 let limited: Api;
 let unconfigured: Api;
+let tight: Api;
 let companyB = '';
 let addrA = '';
 let addrOther = '';
@@ -55,6 +57,59 @@ async function post(
     // non-JSON answers keep json empty
   }
   return { status: res.status, text, json };
+}
+
+/**
+ * A POST over node:http, so the test sees the Connection header and can hold a body open.
+ * `hold` sends the headers and the first `partial` bytes, then waits until `release()`.
+ */
+function rawPost(
+  target: Api,
+  req: { body: Buffer; contentType: string; contentLength?: number },
+  hold?: { partial: number },
+): {
+  done: Promise<{ status: number; headers: IncomingHttpHeaders; text: string }>;
+  release: () => void;
+} {
+  const url = new URL(`${target.url}${PATH}`);
+  let release = () => {};
+  const done = new Promise<{ status: number; headers: IncomingHttpHeaders; text: string }>(
+    (resolve, reject) => {
+      const r = httpRequest(
+        {
+          host: url.hostname,
+          port: url.port,
+          path: url.pathname,
+          method: 'POST',
+          headers: {
+            'content-type': req.contentType,
+            'content-length': String(req.contentLength ?? req.body.length),
+          },
+        },
+        (res) => {
+          const chunks: Buffer[] = [];
+          res.on('data', (c: Buffer) => chunks.push(c));
+          res.on('end', () =>
+            resolve({
+              status: res.statusCode ?? 0,
+              headers: res.headers,
+              text: Buffer.concat(chunks).toString('utf8'),
+            }),
+          );
+          res.on('error', reject);
+        },
+      );
+      // The server may close the socket after answering a refusal; the answer already arrived.
+      r.on('error', () => {});
+      if (hold) {
+        r.write(req.body.subarray(0, hold.partial));
+        release = () => r.end(req.body.subarray(hold.partial));
+      } else {
+        r.end(req.body);
+      }
+    },
+  );
+  return { done, release: () => release() };
 }
 
 /** Stored rows per tenant, read as superuser (verification only). */
@@ -108,15 +163,26 @@ beforeAll(async () => {
   limited = await createApi({
     databaseUrl: f.tdb.url('lf_app'),
     mailgunInbound,
-    security: { rateLimits: { windowMs: 60_000, auth: 100, mutating: 100, webhook: 2 } },
+    security: {
+      rateLimits: { windowMs: 60_000, auth: 100, mutating: 100, webhook: 100, inboundEmail: 2 },
+    },
   });
   unconfigured = await createApi({ databaseUrl: f.tdb.url('lf_app') });
+  // One upload at a time, 4 MiB buffered in total, 1.5 s to send a body (r11 F1).
+  tight = await createApi({
+    databaseUrl: f.tdb.url('lf_app'),
+    mailgunInbound: {
+      ...mailgunInbound,
+      limits: { maxInFlight: 1, maxBufferedBytes: 4 * 1024 * 1024, timeoutMs: 1500 },
+    },
+  });
 }, 180_000);
 
 afterAll(async () => {
   await (api as Api | undefined)?.close();
   await (limited as Api | undefined)?.close();
   await (unconfigured as Api | undefined)?.close();
+  await (tight as Api | undefined)?.close();
   await (f as LedgerFixture | undefined)?.close();
 });
 
@@ -206,10 +272,13 @@ describe('SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize re
     await refused(sign(addrA, { bodyMime: other, timestamp: now + 301 }), 401, 'stale_timestamp');
   });
 
-  it('SS-PLAT-168 a replayed token answers 406 even with a different message or recipient', async () => {
+  it('SS-PLAT-168 a reused token answers 406 unless it carries the same message and recipient (a genuine retry is a duplicate, r11 F2)', async () => {
     const original = sign(addrA, { bodyMime: other });
     expect((await post(api, original)).json).toEqual({ received: true, outcome: 'created' });
-    await refused(original, 406, 'replayed');
+    // The identical request again (Mailgun retrying after a lost answer) changes nothing.
+    const before = await stored(f.tenantId);
+    expect((await post(api, original)).json).toEqual({ received: true, outcome: 'duplicate' });
+    expect(await stored(f.tenantId)).toEqual(before);
     // Same signed token/timestamp, swapped body and recipient (the body is unsigned, RQ-0181 F1).
     const swapped = sign(addrB, {
       token: original.token,
@@ -352,11 +421,189 @@ describe('SS-PLAT-169 the recipient token picks the company; unknown recipients 
     }
   });
 
-  it('SS-PLAT-169 the route counts against the /webhooks/* rate-limit class (429 once the window is spent)', async () => {
+  it('SS-PLAT-169 the route counts against its own inbound_email rate-limit class, lower than /webhooks/* (429 once spent, r11 F1)', async () => {
     const statuses: number[] = [];
     for (let i = 0; i < 3; i++) {
       statuses.push((await post(limited, sign(addrA, { signature: 'c'.repeat(64) }))).status);
     }
     expect(statuses).toEqual([401, 401, 429]);
+  });
+});
+
+describe('SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4)', () => {
+  it('SS-PLAT-177 a second upload while one is in flight answers 503 with Retry-After without being read; the first still lands', async () => {
+    const first = sign(addrA, {
+      bodyMime: Buffer.from(
+        MAILGUN_BILL_EML.toString('latin1').replace('<inv-2215@', '<inv-177a@'),
+        'latin1',
+      ),
+    });
+    const held = rawPost(tight, first, { partial: 100 });
+    await new Promise((r) => setTimeout(r, 200));
+    const second = await rawPost(tight, sign(addrA)).done;
+    expect(second.status).toBe(503);
+    expect(JSON.parse(second.text)).toEqual({ error: 'inbound_busy' });
+    expect(Number(second.headers['retry-after'])).toBeGreaterThan(0);
+    expect(second.headers.connection).toBe('close');
+    held.release();
+    const ok = await held.done;
+    expect({ status: ok.status, json: JSON.parse(ok.text) as unknown }).toEqual({
+      status: 200,
+      json: { received: true, outcome: 'created' },
+    });
+    // The slot is released once the first request finished: the next upload is read.
+    expect((await rawPost(tight, sign(addrA)).done).status).toBe(200);
+  });
+
+  it('SS-PLAT-177 a declared length over the remaining byte budget answers 503 before reading', async () => {
+    const big = sign(addrA, { bodyMime: Buffer.alloc(5 * 1024 * 1024, 0x41) });
+    const res = await rawPost(tight, big).done;
+    expect(res.status).toBe(503);
+    expect(JSON.parse(res.text)).toEqual({ error: 'inbound_busy' });
+    expect(res.headers.connection).toBe('close');
+  });
+
+  it('SS-PLAT-177 a body not sent within the timeout answers 408 and frees the slot', async () => {
+    const before = await stored(f.tenantId);
+    const slow = rawPost(tight, sign(addrA), { partial: 50 });
+    const res = await slow.done;
+    expect(res.status).toBe(408);
+    expect(JSON.parse(res.text)).toEqual({ error: 'request_timeout' });
+    expect(res.headers.connection).toBe('close');
+    expect(await stored(f.tenantId)).toEqual(before);
+    expect((await rawPost(tight, sign(addrA)).done).status).toBe(200);
+  });
+
+  it('SS-PLAT-177 every refusal closes the connection (415, 413, 401, 406, 400)', async () => {
+    const cases: {
+      req: { body: Buffer; contentType: string; contentLength?: number };
+      status: number;
+    }[] = [
+      { req: { body: Buffer.from('x'.repeat(64)), contentType: 'text/plain' }, status: 415 },
+      {
+        req: {
+          body: Buffer.alloc(16),
+          contentType: 'multipart/form-data; boundary=x',
+          contentLength: INBOUND_BODY_LIMIT + 1,
+        },
+        status: 413,
+      },
+      { req: sign(addrA, { signature: 'd'.repeat(64) }), status: 401 },
+      { req: sign(inboundAddress(newInboundToken(), DOMAIN)), status: 406 },
+      {
+        req: { body: Buffer.from('--x\r\nbroken'), contentType: 'multipart/form-data; boundary=x' },
+        status: 400,
+      },
+    ];
+    for (const c of cases) {
+      const res = await rawPost(api, c.req).done;
+      expect({ status: res.status, connection: res.headers.connection }).toEqual({
+        status: c.status,
+        connection: 'close',
+      });
+    }
+  });
+});
+
+describe('SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2)', () => {
+  const variant = (tag: string) =>
+    Buffer.from(
+      MAILGUN_BILL_EML.toString('latin1').replace('<inv-2215@', `<inv-${tag}@`),
+      'latin1',
+    );
+
+  it('SS-PLAT-178 after a refused message (406) the same token with another message answers replayed', async () => {
+    const refusedFirst = sign(addrA, { bodyMime: Buffer.alloc(0) });
+    expect((await post(api, refusedFirst)).json).toEqual({ error: 'message_refused' });
+    const before = await stored(f.tenantId);
+    const reuse = sign(addrA, {
+      bodyMime: variant('178a'),
+      token: refusedFirst.token,
+      timestamp: Number(refusedFirst.timestamp),
+    });
+    expect((await post(api, reuse)).json).toEqual({ error: 'replayed' });
+    expect(await stored(f.tenantId)).toEqual(before);
+  });
+
+  it('SS-PLAT-178 after an unknown recipient (406) the same token to a valid recipient answers replayed', async () => {
+    const lost = sign(inboundAddress(newInboundToken(), DOMAIN), { bodyMime: variant('178b') });
+    expect((await post(api, lost)).json).toEqual({ error: 'unknown_recipient' });
+    const before = [await stored(f.tenantId), await stored(TENANT_B)];
+    for (const recipient of [addrA, addrB]) {
+      const reuse = sign(recipient, {
+        bodyMime: variant('178b'),
+        token: lost.token,
+        timestamp: Number(lost.timestamp),
+      });
+      expect((await post(api, reuse)).json).toEqual({ error: 'replayed' });
+    }
+    expect([await stored(f.tenantId), await stored(TENANT_B)]).toEqual(before);
+  });
+
+  it('SS-PLAT-178 after a server failure (500, logged without message content) the identical retry lands', async () => {
+    const body = variant('178c');
+    const delivery = sign(addrA, { bodyMime: body });
+    // Force an unexpected database failure whose own text carries message data.
+    await f.admin.query(`CREATE FUNCTION app.t0215_fail() RETURNS trigger LANGUAGE plpgsql AS $$
+      BEGIN RAISE EXCEPTION 'forced failure for %', NEW.message_id; END $$`);
+    await f.admin.query(
+      `CREATE TRIGGER t0215_fail BEFORE INSERT ON app.bill_inbox_item FOR EACH ROW EXECUTE FUNCTION app.t0215_fail()`,
+    );
+    const logged: string[] = [];
+    const capture = (orig: typeof process.stdout.write) =>
+      ((chunk: string | Uint8Array, ...rest: unknown[]) => {
+        logged.push(typeof chunk === 'string' ? chunk : Buffer.from(chunk).toString('utf8'));
+        return (orig as (...a: unknown[]) => boolean).call(process.stdout, chunk, ...rest);
+      }) as typeof process.stdout.write;
+    const out = process.stdout.write.bind(process.stdout);
+    const err = process.stderr.write.bind(process.stderr);
+    process.stdout.write = capture(out);
+    process.stderr.write = capture(err);
+    let failed;
+    try {
+      failed = await post(api, delivery);
+    } finally {
+      process.stdout.write = out;
+      process.stderr.write = err;
+      await f.admin.query('DROP TRIGGER t0215_fail ON app.bill_inbox_item');
+      await f.admin.query('DROP FUNCTION app.t0215_fail()');
+    }
+    expect({ status: failed.status, json: failed.json }).toEqual({
+      status: 500,
+      json: { error: 'internal_error' },
+    });
+    const text = logged.join('');
+    expect(text).toContain('inbound webhook failed');
+    for (const content of [
+      'inv-178c@paperco.example',
+      'SUP-INV-2215',
+      'JVBERi0',
+      'paperco.example',
+      delivery.token,
+      KEY,
+      addrA,
+      'forced failure',
+    ]) {
+      expect(text).not.toContain(content);
+    }
+    // The failed attempt kept nothing, so Mailgun's identical retry is accepted and lands.
+    expect((await post(api, delivery)).json).toEqual({ received: true, outcome: 'created' });
+  });
+
+  it('SS-PLAT-178 two identical deliveries racing: one created, one duplicate; two different ones racing: one created, one replayed', async () => {
+    const same = sign(addrA, { bodyMime: variant('178d') });
+    const a = await Promise.all([post(api, same), post(api, same)]);
+    expect(a.map((r) => r.json.outcome).sort()).toEqual(['created', 'duplicate']);
+    const first = sign(addrA, { bodyMime: variant('178e') });
+    const clash = sign(addrA, {
+      bodyMime: variant('178f'),
+      token: first.token,
+      timestamp: Number(first.timestamp),
+    });
+    const before = await stored(f.tenantId);
+    const b = await Promise.all([post(api, first), post(api, clash)]);
+    expect(b.map((r) => r.status).sort()).toEqual([200, 406]);
+    expect(b.find((r) => r.status === 406)?.json).toEqual({ error: 'replayed' });
+    expect(Number((await stored(f.tenantId))?.items)).toBe(Number(before?.items) + 1);
   });
 });

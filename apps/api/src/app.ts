@@ -337,7 +337,7 @@ export async function createApi(opts: ApiOptions): Promise<Api> {
   app.use(statementImportBody());
   app.use(logoUploadBody());
   // The Mailgun inbound route reads multipart up to 26 MiB itself, only when configured (ADR-0099).
-  app.use(inboundWebhookBody(opts.mailgunInbound !== undefined));
+  app.use(inboundWebhookBody(opts.mailgunInbound !== undefined, opts.mailgunInbound?.limits));
   app.use(requestIdMiddleware);
   await app.listen(opts.port ?? 0, opts.host ?? '127.0.0.1');
   const addr = app.getHttpServer().address() as AddressInfo;

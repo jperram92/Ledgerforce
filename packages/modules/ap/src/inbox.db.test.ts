@@ -184,3 +184,104 @@ describe('SS-UC05-01: Emailed PDF becomes a draft bill', () => {
     expect(err?.code).toBe('NOT_CODABLE');
   });
 });
+
+describe('SS-PLAT-179 ingest trusts nothing provider- or relay-added inside the message (r11 F3, F6)', () => {
+  const withHeaders = async (o: {
+    messageId: string;
+    from: string;
+    headers: Record<string, string>;
+  }) =>
+    new MailComposer({
+      from: o.from,
+      to: 'bills@harbour.example',
+      subject: 'Invoice SUP-INV-179',
+      text: 'Invoice attached.',
+      messageId: o.messageId,
+      headers: o.headers,
+      attachments: [{ filename: 'SUP-INV-179.pdf', content: PDF, contentType: 'application/pdf' }],
+    })
+      .compile()
+      .build();
+
+  it('SS-PLAT-179 Authentication-Results and X-Mailgun-* headers change neither the supplier match nor the status', async () => {
+    const claims = {
+      'Authentication-Results':
+        'mx.harbour.example; dmarc=pass header.from=paperco.example; spf=pass',
+      'X-Mailgun-Spf': 'Pass',
+      'X-Mailgun-Dkim-Check-Result': 'Pass',
+      'X-Mailgun-Sflag': 'No',
+    };
+    const spam = {
+      'X-Mailgun-Sflag': 'Yes',
+      'X-Mailgun-Sscore': '99.0',
+      'Authentication-Results': 'mx; dmarc=fail',
+    };
+    const views = await f.inTenant(async (trx) => [
+      // A stranger claiming passed checks is still a stranger.
+      await ingestBillEmail(trx, {
+        companyId: f.companyId,
+        raw: await withHeaders({
+          messageId: '<h1-179@stranger.example>',
+          from: 'billing@stranger.example',
+          headers: claims,
+        }),
+      }),
+      await ingestBillEmail(trx, {
+        companyId: f.companyId,
+        raw: await withHeaders({
+          messageId: '<h2-179@stranger.example>',
+          from: 'billing@stranger.example',
+          headers: {},
+        }),
+      }),
+      // The known supplier is matched by From only, whatever the relay headers say.
+      await ingestBillEmail(trx, {
+        companyId: f.companyId,
+        raw: await withHeaders({
+          messageId: '<h3-179@paperco.example>',
+          from: 'accounts@paperco.example',
+          headers: spam,
+        }),
+      }),
+    ]);
+    expect(views.map((v) => [v.status, v.partyId])).toEqual([
+      ['new', null],
+      ['new', null],
+      ['new', supplier],
+    ]);
+  });
+
+  it('SS-PLAT-179 a second message with a known Message-ID but different bytes is kept as its own flagged item, not dropped as a duplicate', async () => {
+    const messageId = '<reused-179@paperco.example>';
+    const [first, second, again, same] = await f.inTenant(async (trx) => {
+      const a = await ingestBillEmail(trx, {
+        companyId: f.companyId,
+        raw: await withHeaders({ messageId, from: 'billing@stranger.example', headers: {} }),
+      });
+      const genuineRaw = await withHeaders({
+        messageId,
+        from: 'accounts@paperco.example',
+        headers: { 'X-Seq': '2' },
+      });
+      const b = await ingestBillEmail(trx, { companyId: f.companyId, raw: genuineRaw });
+      const c = await ingestBillEmail(trx, { companyId: f.companyId, raw: genuineRaw });
+      const d = await ingestBillEmail(trx, {
+        companyId: f.companyId,
+        raw: await withHeaders({ messageId, from: 'billing@stranger.example', headers: {} }),
+      });
+      return [a, b, c, d];
+    });
+    expect(first).toMatchObject({ replayed: false, messageIdConflictOf: null });
+    expect(second).toMatchObject({
+      replayed: false,
+      partyId: supplier,
+      messageIdConflictOf: first.id,
+    });
+    expect(second.id).not.toBe(first.id);
+    // The flagged item is itself idempotent on its bytes.
+    expect(again).toMatchObject({ id: second.id, replayed: true });
+    // MailComposer adds a fresh Date/boundary, so "the same" composed again differs in bytes too;
+    // it is flagged against the first item, never silently merged.
+    expect(same.messageIdConflictOf).toBe(first.id);
+  });
+});

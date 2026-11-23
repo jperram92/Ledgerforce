@@ -14,6 +14,8 @@ describe('T-0142 rate limit route classes', () => {
     ['GET', '/Auth//Callback/', 'auth'],
     ['POST', '/webhooks/stripe', 'webhook'],
     ['POST', '/WEBHOOKS/stripe/', 'webhook'],
+    ['POST', '/webhooks/mailgun/messages.mime', 'inbound_email'],
+    ['POST', '/Webhooks//Mailgun/messages.mime/', 'inbound_email'],
     ['POST', '/auth/logout', 'mutating'],
     ['POST', '/ar/invoices', 'mutating'],
     ['put', '/companies/1', 'mutating'],
@@ -66,13 +68,25 @@ describe('T-0142 fixed-window limiter', () => {
     expect(l.hit('mutating', 'c')).toEqual({ allowed: false, retryAfterSeconds: 10 });
   });
 
-  it('AC-5 production defaults are 30 auth, 300 mutating, 600 webhook per 60 s [T-0142]', () => {
+  it('AC-5 production defaults are 30 auth, 300 mutating, 600 webhook, 60 inbound email per 60 s [T-0142][T-0215]', () => {
     expect(DEFAULT_RATE_LIMITS).toEqual({
       windowMs: 60_000,
       auth: 30,
       mutating: 300,
       webhook: 600,
+      inboundEmail: 60,
       maxKeys: 50_000,
     });
+  });
+
+  it('SS-PLAT-177 the inbound email class has its own counter and falls back to the default when unset [T-0215]', () => {
+    const l = new FixedWindowLimiter(policy, () => 1_000_000);
+    for (let i = 0; i < 60; i++) expect(l.hit('inbound_email', 'mg').allowed).toBe(true);
+    expect(l.hit('inbound_email', 'mg').allowed).toBe(false);
+    // The Stripe webhook class is unaffected.
+    expect(l.hit('webhook', 'mg').allowed).toBe(true);
+    const own = new FixedWindowLimiter({ ...policy, inboundEmail: 1 }, () => 1_000_000);
+    expect(own.hit('inbound_email', 'mg').allowed).toBe(true);
+    expect(own.hit('inbound_email', 'mg').allowed).toBe(false);
   });
 });

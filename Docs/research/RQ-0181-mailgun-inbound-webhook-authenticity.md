@@ -144,3 +144,23 @@ whether a Mailgun retry reuses the original timestamp (no source; mitigation rec
 
 **Affects:** packages/modules/ap (inbox webhook), apps/api (route, body reader, config),
 packages/db migration 0079, ADR-0099, design §6, UC-05.
+
+## Addendum 2026-11-22 — security review r11
+
+- **Shared key (r11 F3).** S5 (search extract of Mailgun "Securing webhooks"): subaccount
+  webhooks carry their own `signature` plus a `parent-signature` made with the primary account's
+  key — so a subaccount signs with its own key, and a dedicated (sub)account confines valid
+  triples to the bills-inbox route. Every other webhook of a shared account would carry triples
+  valid here (the body is unsigned, F1). Conclusion: a dedicated Mailgun (sub)account for the
+  inbound route is a deployment requirement (ADR-0099 addendum rule 3). Vendor docs still
+  unreachable; to be re-read with T-0223.
+- **Token binding (r11 F2).** F4 above assumed a failed ingest should release the token so a
+  retry lands. That also releases it for a different body/recipient. Superseding F4's mechanism:
+  the token is consumed right after the signature check and bound to SHA-256 of `body-mime` and
+  the recipient field; only an identical request is a retry (ADR-0099 addendum rule 2). Mailgun
+  retries the same POST (same message, same recipient), so genuine retries still land whether or
+  not they reuse the token.
+- **Memory bound (r11 F1).** The parse before the signature check is linear and bounded
+  (reviewer's measurement: 26 MiB pathological input in 20 ms); what needed bounding was
+  concurrency and total buffered bytes, now capped (ADR-0099 addendum rule 1).
+

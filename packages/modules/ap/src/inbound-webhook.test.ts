@@ -76,6 +76,21 @@ describe('SS-PLAT-168 Mailgun signature: HMAC-SHA256(timestamp‖token), constan
     );
   });
 
+  it('SS-PLAT-168 moving characters across timestamp‖token (same signed string) is refused (r11 F7)', () => {
+    // The HMAC input has no separator, so these keep a valid signature; the window refuses them.
+    const shiftedRight = {
+      ...RAILS,
+      timestamp: RAILS.timestamp.slice(0, -1),
+      token: `${RAILS.timestamp.slice(-1)}${RAILS.token}`,
+    };
+    const shiftedLeft = { ...RAILS, timestamp: `${RAILS.timestamp}7`, token: RAILS.token.slice(1) };
+    expect(RAILS.token.startsWith('7')).toBe(true);
+    for (const f of [shiftedRight, shiftedLeft]) {
+      expect(`${f.timestamp}${f.token}`).toBe(`${RAILS.timestamp}${RAILS.token}`);
+      expect(reason(() => verifyMailgunSignature(f, [RAILS.key], NOW))).toBe('stale_timestamp');
+    }
+  });
+
   it('SS-PLAT-168 refuses missing or malformed fields and an empty key set', () => {
     expect(
       reason(() => verifyMailgunSignature({ ...RAILS, signature: undefined }, [RAILS.key], NOW)),
