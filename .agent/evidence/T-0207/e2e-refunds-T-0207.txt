@@ -1,0 +1,10 @@
+
+Running 6 tests using 2 workers
+
+[1/6] [chromium] › tests/e2e/web/refunds.spec.ts:464:5 › T-0207 cancel a requested refund from the refund region › SS-UC11-18: the Clerk cancels an approved bank refund no payment batch pays, freeing the credit @ 1440 [T-0207]
+[2/6] [chromium] › tests/e2e/web/refunds.spec.ts:516:3 › T-0207 cancel a requested refund from the refund region › SS-UC11-19: a bank refund in a draft payment batch names the batch and offers no Cancel [T-0207]
+[3/6] [chromium] › tests/e2e/web/refunds.spec.ts:547:3 › T-0207 cancel a requested refund from the refund region › SS-UC11-19: a refusal from the API (a batch took it meanwhile) is shown in place [T-0207]
+[4/6] [chromium] › tests/e2e/web/refunds.spec.ts:464:5 › T-0207 cancel a requested refund from the refund region › SS-UC11-18: the Clerk cancels an approved bank refund no payment batch pays, freeing the credit @ 390 [T-0207]
+[5/6] [chromium] › tests/e2e/web/refunds.spec.ts:570:3 › T-0207 cancel a requested refund from the refund region › SS-UC11-20: an unapproved Stripe request offers Cancel, checked with Stripe first [T-0207]
+[6/6] [chromium] › tests/e2e/web/refunds.spec.ts:497:3 › T-0207 cancel a requested refund from the refund region › SS-UC11-18: an unapproved bank request is withdrawn by the Clerk; an Approver is not offered Cancel [T-0207]
+  6 passed (19.4s)
