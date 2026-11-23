@@ -504,7 +504,7 @@ describe('SS-PLAT-181: cancelling a single supply posts GP-044 and the refund fo
 });
 
 describe('SS-PLAT-183: cancellations and refunds the goldens do not cover are refused with nothing written', () => {
-  it('SS-PLAT-183 forfeiture, missing or long reasons, an unknown refund decision, dates before the last receipt, a basis change, a finalised contract, an unknown contract, and a contract refund on an open contract are refused by name [T-0217]', async () => {
+  it('SS-PLAT-183 forfeiture, missing or long reasons, an unknown refund decision, dates before the last receipt, a basis change, a finalised contract, an unknown contract, a contract refund on an open contract and an undecided cancellation with only a rounding residue unbilled are refused by name [T-0217]', async () => {
     const c = await contractWithReceipts({ receipts: [['2026-11-20', '3300.00']] });
     const before = await counts();
     const cases: [() => Promise<unknown>, string][] = [
@@ -524,6 +524,21 @@ describe('SS-PLAT-183: cancellations and refunds the goldens do not cover are re
       expect(r.code, r.message).toBe(code);
     }
     expect(await counts()).toEqual(before);
+
+    // Net 0.05, GST 0.01: a receipt of 0.05 carries GST 0.00, so the net is fully received while
+    // 0.01 GST stays unbilled — a rounding residue no GP-044c line can carry.
+    const tiny = await contractWithReceipts({
+      knownNet: '0.05',
+      receipts: [['2026-11-10', '0.05']],
+    });
+    const beforeTiny = await counts();
+    expect(
+      await refusal(cancel(tiny.contractId, { key: 'x-tiny', refund: 'undecided' })),
+    ).toMatchObject({ code: 'ROUNDING_RESIDUE_NOT_COVERED' });
+    expect(await counts()).toEqual(beforeTiny);
+    const tinyAgreed = await cancel(tiny.contractId, { key: 'x-tiny-agreed' });
+    expect(tinyAgreed).toMatchObject({ customerCredit: '0.0500' });
+    expect(await contractBalance('GST_ATTRIBUTED_UNBILLED', tiny.contractId)).toBe('0.0000');
 
     const fin = await contractWithReceipts({});
     await f.inTenant((trx) =>

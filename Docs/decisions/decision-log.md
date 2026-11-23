@@ -4614,3 +4614,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: directive 4 (research with sources) and honesty about what was read.
 - Alternatives: none.
 - ADR: none · Status: accepted
+
+### DL-0906 — Undecided cancellation with only a rounding residue unbilled is refused by name
+- Date: 2026-11-23 · By: claude · Task: T-0217 · Category: accounting
+- Decision: `cancelSingleSupply` with `refund: 'undecided'` refuses ROUNDING_RESIDUE_NOT_COVERED (nothing written) when the not-received net is zero or below while unbilled GST is non-zero, or unbilled GST is negative; a fully received contract (both zero) is cancelled with no entry; refund agreed (GP-044a) is always available and clears the residue.
+- Why: RQ-0184 addendum A — the SS-PLAT-182 property found the counterexample (net 0.05, receipt 0.05 with GST 0.00) where the first cut left 0.01 on GST_ATTRIBUTED_UNBILLED; no valid GP-044c line can carry a GST-only or negative residue and no golden covers it.
+- Alternatives: clear the residue uncoded against GST collected (rejected: ledger and code-driven BAS would differ by the residue); against CUSTOMER_PREPAYMENTS (rejected: changes the money held and the later 44d amounts without a golden).
+- ADR: none · Status: accepted

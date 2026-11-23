@@ -1,0 +1,11 @@
+T-0217 RED captured by the SS-PLAT-182 property (first run, 2026-11-23, before the residue rule):
+  VITEST_MAX_WORKERS=1 pnpm vitest run --project db packages/modules/ar/src/single-supply-cancel.prop.db.test.ts -> exit 1
+  Error: Property failed after 51 tests
+  Counterexample: [5n,[1],834,false]
+  Caused by: AssertionError: expected '0.0100' to be '0.0000' // Object.is equality
+Meaning: known net 0.05 (GST 0.01), one receipt of 0.05 whose GST part rounds to 0.00, refund
+undecided. The net is fully received, so the first cut of GP-044c posted nothing and left 0.01 on
+GST_ATTRIBUTED_UNBILLED. Fix (RQ-0184 Q3 addendum, DL-0906): such a rounding-only residue (or a
+negative unbilled GST) is refused ROUNDING_RESIDUE_NOT_COVERED with nothing written; cancelling
+with the refund agreed (GP-044a) clears it. Regression test added to single-supply-cancel.db.test.ts
+(SS-PLAT-183); the property now expects the refusal and passes with default runs.

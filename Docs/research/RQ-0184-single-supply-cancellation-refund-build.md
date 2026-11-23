@@ -175,3 +175,18 @@ Q6 migration 0082, two immutable tables. Q7 slice and split as above. Q8 unread,
 Decisions: DL-0900 (slice and split), DL-0901 (cancellation inputs and cash/nothing-attributed),
 DL-0902 (44b reuse and 44d path with SoD), DL-0903 (particulars), DL-0904 (migration 0082),
 DL-0905 (primary law status).
+
+## Addendum A (2026-11-23) — rounding residue found by the property
+
+The SS-PLAT-182 property found a counterexample to the Q3 claim that "a fully received contract
+has U = 0": receipts are recorded gross and their GST part is rounded per receipt, so the net can
+be fully received while GST is still unbilled (known net 0.05, GST 0.01, one receipt 0.05 with GST
+0.00 → N − Rn = 0, U = 0.01), and several rounded-up receipts can leave U < 0 while net is still
+unreceived. The engine refuses a zero-amount line and a coded line whose tax runs against its
+side, so no GP-044c line can carry such a residue, and GP-044 has no example of it. Decision
+(DL-0906): an undecided cancellation with a rounding-only residue (N − Rn ≤ 0 with U ≠ 0, or
+U < 0) is refused `ROUNDING_RESIDUE_NOT_COVERED` with nothing written; cancelling with the refund
+agreed (GP-044a, whose lines carry N and T and clear U by its actual balance) remains available.
+The residue is at most a few cents and arises only when the contract is (almost) fully paid, so a
+refund-agreed cancellation is the expected case anyway. A golden for the residue may be proposed
+later if a real case needs it.

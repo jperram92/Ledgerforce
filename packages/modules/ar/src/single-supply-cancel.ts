@@ -12,7 +12,9 @@
  *    credit, refunded by the customer refund path, GP-044b = GP-006, ADR-0074).
  *  - accruals, refund undecided (GP-044c): Dr CUSTOMER_PREPAYMENTS coded (N − Rn) (tax U) / Dr
  *    GST collected U / Cr CUSTOMER_PREPAYMENTS uncoded (N − Rn) / Cr GST_ATTRIBUTED_UNBILLED U; no
- *    entry when nothing is unbilled (fully received). The money stays on CUSTOMER_PREPAYMENTS.
+ *    entry when nothing is unbilled (fully received). The money stays on CUSTOMER_PREPAYMENTS. A
+ *    rounding-only residue (N − Rn = 0 with U ≠ 0, or U < 0) is refused
+ *    ROUNDING_RESIDUE_NOT_COVERED: cancel with the refund agreed instead (RQ-0184 Q3 addendum).
  *  - cash basis, or accruals with no receipt: no entry (GP-044 "Cash basis" note; nothing was
  *    attributed beyond the cash).
  * The contract becomes cancelled. A posted decrease returns adjustment-note particulars (AC-10),
@@ -53,7 +55,8 @@ export type CancellationErrorCode =
   | 'REFUND_VIA_CUSTOMER_REFUND'
   | 'NOTHING_TO_REFUND'
   | 'ALREADY_REFUNDED'
-  | 'SOD_REFUND_SELF_APPROVAL';
+  | 'SOD_REFUND_SELF_APPROVAL'
+  | 'ROUNDING_RESIDUE_NOT_COVERED';
 
 const fail = (code: CancellationErrorCode, message: string): never => {
   throw new SingleSupplyError(code as SingleSupplyErrorCode, message);
@@ -240,7 +243,16 @@ export async function cancelSingleSupply(
           partyId: k.partyId,
         }),
       ];
-    } else if (notReceived.gt(0)) {
+    } else if (notReceived.isZero() && unbilled.isZero()) {
+      // Fully received: nothing is unbilled, so GP-044c has no lines.
+    } else if (!notReceived.gt(0) || unbilled.isNegative()) {
+      // Per-receipt rounding left a GST-only or negative residue (RQ-0184 Q3 addendum): no
+      // coded line can carry it, and no golden covers it.
+      fail(
+        'ROUNDING_RESIDUE_NOT_COVERED',
+        `contract ${k.reference}: the part not received (net ${numeric(notReceived)}, GST ${numeric(unbilled)}) is a rounding residue no GP-044c line can carry; cancel with the refund agreed (GP-044a), which clears it`,
+      );
+    } else {
       decreaseNet = notReceived;
       decreaseTax = unbilled;
       lines = [
