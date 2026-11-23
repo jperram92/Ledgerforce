@@ -4572,3 +4572,45 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: N1 affects only availability of the inbound route, not data or tenant isolation; it needs its own tests and tuning.
 - Alternatives: fix inside T-0215 (rejected: separate behaviour; T-0215 already passed review).
 - ADR: none · Status: accepted
+
+### DL-0950 — Cancel a requested refund by either method; bank refunds only outside a live payment batch (RQ-0189)
+- Date: 2026-11-23 · By: claude · Task: T-0207 · Category: security
+- Decision: `POST /ar/refunds/:id/cancel` cancels a requested refund, approved or not. A bank refund is refused `NOT_CANCELLABLE` while a payable line of any batch that is not cancelled pays it (draft, partially released, released, confirmed), with the batch named; otherwise it is cancelled with no external call. A paid refund stays `NOT_CANCELLABLE`; a repeat replays.
+- Why: a bank refund nobody wants locked the customer's credit (T-0207). A batch's lines are append-only and its total frozen at build (0047, 0055), so a refund cannot leave a draft batch without changing what releasers approve; ERPNext likewise frees a document held by a payment order only by cancelling the order (RQ-0189 S8).
+- Alternatives: cancel out of a draft batch and skip the line later (rejected: changes an approved total, every consumer must skip it); no bank cancel (rejected: the T-0207 problem).
+- ADR: ADR-0107 · Status: accepted
+
+### DL-0951 — Withdrawing an unapproved Stripe request still asks Stripe first (supersedes the r10 L1 refusal, DL-0778)
+- Date: 2026-11-23 · By: claude · Task: T-0207 · Category: security
+- Decision: an unapproved Stripe document is withdrawn only after the read-only lookup at Stripe, under the party lock, finds no live refund (else 409 `AT_STRIPE`); without the Stripe connector it is refused (`METHOD_NOT_AVAILABLE`, API 503). `SEND_NOT_FINISHED` still applies to approved documents only. Two contract assertions that expected `NOT_CANCELLABLE` for an unapproved held document now expect `AT_STRIPE`, and the bank refund through the Stripe path is now cancelled without a Stripe call.
+- Why: a lost commit after a send leaves Stripe holding a refund of a document that reads unapproved (review r8 R2), so "unapproved means never sent" is not safe on its own. The residual in-flight window is bounded by the 30 s client deadline and detected afterwards by r10 M1(c)/(d).
+- Alternatives: withdraw without asking Stripe (rejected: r8 R2); keep refusing unapproved documents (rejected: the card note moves that withdrawal here).
+- ADR: ADR-0107 · Status: accepted
+
+### DL-0952 — Migration 0082 (reserved 0086): no payable batch line for a refund that is not requested
+- Date: 2026-11-23 · By: claude · Task: T-0207 · Category: data
+- Decision: BEFORE INSERT trigger `payment_batch_refund_requested_only` reads the refund `FOR SHARE` and refuses a payable line for a refund that is not `requested`. Written as 0082 locally (next free number on the base); the lead renumbers to the reserved 0086 or the next gapless number at merge.
+- Why: the batch build and the cancel take different advisory locks and the 0070 trigger reads only the approval, so a build that read the refund as requested could insert its line after the cancel committed. `FOR SHARE` conflicts with the cancel's row lock and re-reads the committed status; the reverse order is caught by the 0055 guard (proven by a two-transaction test).
+- Alternatives: take the batch's company lock in the cancel (rejected: module-only, a direct write would bypass it).
+- ADR: ADR-0107 · Status: accepted
+
+### DL-0953 — Follow-up card T-0241: cancel an unreleased payment batch
+- Date: 2026-11-23 · By: claude · Task: T-0207 · Category: scope
+- Decision: no module function or route cancels a payment batch today, though the database allows draft/partially released → cancelled. Card T-0241 adds it, so a refund held by an unreleased batch can be freed; T-0207 does not build it.
+- Why: separate behaviour with its own SoD question (who may cancel a batch others have partly released); keeps T-0207 to its card.
+- Alternatives: build it in T-0207 (rejected: scope).
+- ADR: none · Status: accepted
+
+### DL-0954 — Cancel route: `ar.refund.create`, Idempotency-Key required (not stored), audited; view carries `payment_batch`
+- Date: 2026-11-23 · By: claude · Task: T-0207 · Category: security
+- Decision: the cancel keeps `ar.refund.create` (Owner, Finance Admin, AR Clerk) with no SoD step and no step-up; it now requires an `Idempotency-Key` header (400 `idempotency_key_required`), not stored because the route is idempotent by state (as ADR-0097). The refund view of a bank refund gains `payment_batch: { id, batch_no, status } | null`; the exact-shape assertion in SS-UC11-08 gains that field. The web client sends one key per Cancel control.
+- Why: whoever may ask for a refund may take the request back; cancelling moves no money and only lowers what can leave (ADR-0074 drivers). `apps/api/AGENTS.md` requires a key on every mutating route; the region needs the batch to decide whether to offer Cancel.
+- Alternatives: `ar.refund.approve` (rejected: approvers do not originate requests); a stored key table (rejected: state already makes it idempotent).
+- ADR: ADR-0107 · Status: accepted
+
+### DL-0955 — T-0207 IDs used: SS-UC11-18..20, RQ-0189, ADR-0107, T-0241
+- Date: 2026-11-23 · By: claude · Task: T-0207 · Category: process
+- Decision: from the round-12 reserved range (row F): SS-UC11-18 (bank cancel), SS-UC11-19 (live batch refusal and the 0082 guard), SS-UC11-20 (unapproved Stripe withdrawal); RQ-0189; ADR-0107; card T-0241 (T-0242 unused); DL-0950..0955 (0956..0959 unused).
+- Why: lead's ID allocation.
+- Alternatives: none.
+- ADR: none · Status: accepted
