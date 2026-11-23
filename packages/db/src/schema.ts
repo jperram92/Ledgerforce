@@ -748,6 +748,21 @@ export interface SecurityNoticeDeliveryTable {
   attempted_at: Timestamp;
 }
 
+/**
+ * Migration 0080 (T-0209, ADR-0097): an administrator released the latest failed attempt of a
+ * security notice for an immediate retry. Append-only; one row per released attempt.
+ */
+export interface SecurityNoticeRetryTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  notice_kind: 'remittance_account_changed' | 'bank_details_changed';
+  remittance_notice_id: string | null;
+  bank_detail_notice_id: string | null;
+  after_attempt: number;
+  requested_by: string;
+  requested_at: Timestamp;
+}
+
 /** Migration 0049 (T-0073, RQ-0115): Stripe Payment Link per invoice and amount due. */
 export interface StripePaymentLinkTable {
   id: Generated<string>;
@@ -1583,6 +1598,7 @@ export interface Database {
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;
   'app.security_notice_delivery': SecurityNoticeDeliveryTable;
+  'app.security_notice_retry': SecurityNoticeRetryTable;
   'app.stripe_payment_link': StripePaymentLinkTable;
   'app.stripe_settings': StripeSettingsTable;
   'app.stripe_payout': StripePayoutTable;

@@ -420,6 +420,12 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     outcome: () => 'sent',
     to_addr: () => 'to@example.test',
   },
+  // Retry-now of a failed security notice (T-0209, ADR-0097): the released attempt (attempt 1,
+  // failed) is seeded by the prerequisite below.
+  'app.security_notice_retry': {
+    notice_kind: () => 'bank_details_changed',
+    after_attempt: () => '1',
+  },
   // Salesforce Pub/Sub subscriber state (migration 0026): a CDC channel name, a cdc:/event: key,
   // an opaque replay id; a resync request for a rejected replay id has no entity or records.
   'app.salesforce_replay_cursor': { channel: () => '/data/AccountChangeEvent' },
@@ -754,6 +760,32 @@ export const PREREQUISITES: Readonly<
       1,
     );
     row.set('bank_detail_notice_id', String(notice['id']));
+  },
+  // A retry releases the latest failed attempt of an unsent notice (T-0209, insert guard): seed a
+  // bank-detail notice of the same tenant and its failed attempt 1, and point the row at them.
+  'app.security_notice_retry': async (admin, row) => {
+    const tenant = row.get('tenant_id') ?? '';
+    const notice = await seedRow(
+      admin,
+      {
+        schema: 'app',
+        table: 'bank_detail_change_notice',
+        qualified: 'app.bank_detail_change_notice',
+      },
+      tenant,
+      DEFAULT_ROW_OVERRIDES,
+      1,
+    );
+    await admin.query(
+      `INSERT INTO app.security_notice_delivery
+         (tenant_id, notice_kind, bank_detail_notice_id, attempt, outcome, to_addr, subject,
+          error_name, next_attempt_at)
+       VALUES ($1, 'bank_details_changed', $2, 1, 'failed', 'to@example.test', 'Security notice',
+               'Error', clock_timestamp() + interval '1 minute')`,
+      [tenant, notice['id']],
+    );
+    row.set('bank_detail_notice_id', String(notice['id']));
+    row.delete('remittance_notice_id');
   },
   // Migration 0077 (T-0189, ADR-0091): a resend's key is fixed by its id; seeded unconfirmed. Its
   // refund must be an approved, requested Stripe refund (insert guard): make the generated parent

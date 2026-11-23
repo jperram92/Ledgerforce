@@ -1,0 +1,31 @@
+# T-0209 RED Playwright (screen not built yet) 2026-11-22
+[1/6] [chromium] › tests/e2e/web/security-notices.spec.ts:213:5 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 1440 [T-0209]
+[2/6] [chromium] › tests/e2e/web/security-notices.spec.ts:272:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: a refused retry is explained next to the list [T-0209]
+  1) [chromium] › tests/e2e/web/security-notices.spec.ts:213:5 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 1440 [T-0209] 
+    Error: locator.click: Test timeout of 30000ms exceeded.
+  2) [chromium] › tests/e2e/web/security-notices.spec.ts:272:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: a refused retry is explained next to the list [T-0209] 
+    Error: locator.click: Test timeout of 30000ms exceeded.
+      285 |     await evidence('SS-PLAT-161', 'failed-notices-refused-390');
+[3/6] [chromium] › tests/e2e/web/security-notices.spec.ts:213:5 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 390 [T-0209]
+[4/6] [chromium] › tests/e2e/web/security-notices.spec.ts:289:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Auditor sees the list without the retry action [T-0209]
+  3) [chromium] › tests/e2e/web/security-notices.spec.ts:289:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Auditor sees the list without the retry action [T-0209] 
+    Error: expect(locator).toHaveCount(expected) failed
+[5/6] [chromium] › tests/e2e/web/security-notices.spec.ts:305:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]
+  4) [chromium] › tests/e2e/web/security-notices.spec.ts:305:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209] 
+    Error: expect(locator).toBeVisible() failed
+    Error: element(s) not found
+      314 |     await evidence('SS-PLAT-161', 'failed-notices-forbidden-390');
+  5) [chromium] › tests/e2e/web/security-notices.spec.ts:213:5 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 390 [T-0209] 
+    Error: locator.click: Test timeout of 30000ms exceeded.
+[6/6] [chromium] › tests/e2e/web/security-notices.spec.ts:242:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: a Finance Admin retries one notice now by keyboard [T-0209]
+  6) [chromium] › tests/e2e/web/security-notices.spec.ts:242:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: a Finance Admin retries one notice now by keyboard [T-0209] 
+    Error: locator.focus: Test timeout of 30000ms exceeded.
+  6 failed
+    [chromium] › tests/e2e/web/security-notices.spec.ts:213:5 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 1440 [T-0209] 
+    [chromium] › tests/e2e/web/security-notices.spec.ts:213:5 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 390 [T-0209] 
+    [chromium] › tests/e2e/web/security-notices.spec.ts:242:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: a Finance Admin retries one notice now by keyboard [T-0209] 
+    [chromium] › tests/e2e/web/security-notices.spec.ts:272:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: a refused retry is explained next to the list [T-0209] 
+    [chromium] › tests/e2e/web/security-notices.spec.ts:289:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Auditor sees the list without the retry action [T-0209] 
+    [chromium] › tests/e2e/web/security-notices.spec.ts:305:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209] 
+
+# web unit (logic.test.ts) written with the logic in one step; see DL note

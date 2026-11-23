@@ -5,7 +5,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261117-044854-SS-UC11-11-stripe-refund-cancel-confirm-1440.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
       "commit": "f7add7c",
       "provider": "claude",
       "timestamp": "2026-11-17T04:48:54.099Z",
@@ -14,7 +14,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261117-044855-SS-UC11-11-stripe-refund-cancelled-1440.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
       "commit": "f7add7c",
       "provider": "claude",
       "timestamp": "2026-11-17T04:48:55.267Z",
@@ -23,7 +23,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261117-044901-SS-UC11-11-stripe-refund-cancel-confirm-390.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
       "commit": "f7add7c",
       "provider": "claude",
       "timestamp": "2026-11-17T04:49:01.768Z",
@@ -32,7 +32,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261117-044902-SS-UC11-11-stripe-refund-cancelled-390.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
       "commit": "f7add7c",
       "provider": "claude",
       "timestamp": "2026-11-17T04:49:02.629Z",
@@ -104,7 +104,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261117-192647-SS-UC11-11-stripe-refund-cancel-confirm-1440.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
       "commit": "7647a0c (post-merge regression run)",
       "provider": "claude",
       "timestamp": "2026-11-17T19:26:47.566Z",
@@ -113,7 +113,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261117-192648-SS-UC11-11-stripe-refund-cancelled-1440.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
       "commit": "7647a0c (post-merge regression run)",
       "provider": "claude",
       "timestamp": "2026-11-17T19:26:48.310Z",
@@ -122,7 +122,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261117-192651-SS-UC11-11-stripe-refund-cancel-confirm-390.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
       "commit": "7647a0c (post-merge regression run)",
       "provider": "claude",
       "timestamp": "2026-11-17T19:26:51.935Z",
@@ -131,7 +131,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261117-192652-SS-UC11-11-stripe-refund-cancelled-390.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
       "commit": "7647a0c (post-merge regression run)",
       "provider": "claude",
       "timestamp": "2026-11-17T19:26:52.554Z",
@@ -140,7 +140,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261122-031919-SS-UC11-11-stripe-refund-cancel-confirm-1440.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
       "commit": "feat/T-0190-secfix (security review r10 run)",
       "provider": "claude",
       "timestamp": "2026-11-22T03:19:19.638Z",
@@ -149,7 +149,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261122-031920-SS-UC11-11-stripe-refund-cancelled-1440.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
       "commit": "feat/T-0190-secfix (security review r10 run)",
       "provider": "claude",
       "timestamp": "2026-11-22T03:19:20.991Z",
@@ -158,7 +158,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261122-031927-SS-UC11-11-stripe-refund-cancel-confirm-390.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
       "commit": "feat/T-0190-secfix (security review r10 run)",
       "provider": "claude",
       "timestamp": "2026-11-22T03:19:27.327Z",
@@ -167,7 +167,7 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261122-031928-SS-UC11-11-stripe-refund-cancelled-390.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
       "commit": "feat/T-0190-secfix (security review r10 run)",
       "provider": "claude",
       "timestamp": "2026-11-22T03:19:28.452Z",
@@ -176,10 +176,55 @@
     {
       "scenario": "SS-UC11-11",
       "file": ".agent/evidence/T-0190/20261122-031939-SS-UC11-11-stripe-refund-cancel-not-finished-1440.png",
-      "test": "web/stripe-refunds.spec.ts \u203a T-0190 cancel \u203a SS-UC11-11: a Stripe refund past its 23-hour window says so (not \"Stripe refused\") and offers Cancel; a cancel the API refuses as SEND_NOT_FINISHED shows why [T-0190]",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund past its 23-hour window says so (not \"Stripe refused\") and offers Cancel; a cancel the API refuses as SEND_NOT_FINISHED shows why [T-0190]",
       "commit": "feat/T-0190-secfix (security review r10 run)",
       "provider": "claude",
       "timestamp": "2026-11-22T03:19:39.674Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261122-201957-SS-UC11-11-stripe-refund-cancel-confirm-1440.png",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "commit": "b68922e77aa6",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T20:19:57.928Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261122-201958-SS-UC11-11-stripe-refund-cancelled-1440.png",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]",
+      "commit": "b68922e77aa6",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T20:19:58.698Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261122-202002-SS-UC11-11-stripe-refund-cancel-confirm-390.png",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "commit": "b68922e77aa6-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T20:20:02.124Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261122-202002-SS-UC11-11-stripe-refund-cancelled-390.png",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]",
+      "commit": "b68922e77aa6-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T20:20:02.709Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-UC11-11",
+      "file": ".agent/evidence/T-0190/20261122-202008-SS-UC11-11-stripe-refund-cancel-not-finished-1440.png",
+      "test": "web/stripe-refunds.spec.ts › T-0190 cancel › SS-UC11-11: a Stripe refund past its 23-hour window says so (not \"Stripe refused\") and offers Cancel; a cancel the API refuses as SEND_NOT_FINISHED shows why [T-0190]",
+      "commit": "b68922e77aa6-dirty",
+      "provider": "unknown",
+      "timestamp": "2026-11-22T20:20:08.889Z",
       "result": "passed"
     }
   ]

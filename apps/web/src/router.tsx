@@ -39,6 +39,7 @@ import { ApprovalSettingsPage } from './settings/ApprovalSettingsPage.tsx';
 import { Shell } from './Shell.tsx';
 import { SignInPage, type SignInReason } from './SignIn.tsx';
 import { inboxSearch } from './sync/logic.ts';
+import { SecurityNoticesPage } from './notices/SecurityNoticesPage.tsx';
 import { SyncIssuePage } from './sync/SyncIssuePage.tsx';
 import { SyncIssuesPage } from './sync/SyncIssuesPage.tsx';
 import { BatchesPage } from './sales/BatchesPage.tsx';
@@ -150,6 +151,13 @@ const syncIssueRoute = createRoute({
     const { issueId } = syncIssueRoute.useParams();
     return <SyncIssuePage key={issueId} issueId={issueId} />;
   },
+});
+
+// Failed security notices (T-0209, ADR-0097): an administrator list under Settings, not Sync issues.
+const securityNoticesRoute = createRoute({
+  getParentRoute: () => shellRoute,
+  path: 'settings/security-notices',
+  component: SecurityNoticesPage,
 });
 
 // Setup wizard (T-0091, DL-0600): under Settings; the API owns /setup/wizard on the same origin.
@@ -553,6 +561,7 @@ const routeTree = rootRoute.addChildren([
     auditRoute,
     syncIssuesRoute,
     syncIssueRoute,
+    securityNoticesRoute,
     setupRoute,
     companySettingsRoute,
     taxSettingsRoute,

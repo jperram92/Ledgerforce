@@ -1,0 +1,11 @@
+# T-0209 GREEN Playwright 2026-11-22: pnpm exec playwright test tests/e2e/web/security-notices.spec.ts --trace off --reporter=line
+[1/6] [chromium] › tests/e2e/web/security-notices.spec.ts:213:5 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 1440 [T-0209]
+[2/6] [chromium] › tests/e2e/web/security-notices.spec.ts:272:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: a refused retry is explained next to the list [T-0209]
+[3/6] [chromium] › tests/e2e/web/security-notices.spec.ts:213:5 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Owner opens the failed notices from Settings @ 390 [T-0209]
+[4/6] [chromium] › tests/e2e/web/security-notices.spec.ts:289:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: the Auditor sees the list without the retry action [T-0209]
+[5/6] [chromium] › tests/e2e/web/security-notices.spec.ts:305:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: an Accountant is refused; empty and error states [T-0209]
+[6/6] [chromium] › tests/e2e/web/security-notices.spec.ts:242:3 › SS-PLAT-161 failed security notices › SS-PLAT-161: a Finance Admin retries one notice now by keyboard [T-0209]
+  6 passed (23.2s)
+
+# Regressions: shell.spec.ts + sync-issues.spec.ts
+  26 passed (59.6s)

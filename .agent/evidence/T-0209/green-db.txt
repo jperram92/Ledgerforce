@@ -1,0 +1,3 @@
+# T-0209 GREEN db 2026-11-22: VITEST_MAX_WORKERS=1 npx vitest run --project db packages/modules/email/src packages/db/src/rls.db.test.ts packages/db/src/user-lifecycle.db.test.ts
+ Test Files  7 passed (7)
+      Tests  989 passed (989)

@@ -1,0 +1,46 @@
+# T-0209 RED run 2026-11-22 (before implementation)
+## unit rbac.matrix.test.ts
+ FAIL  |unit| packages/shared/src/rbac/rbac.matrix.test.ts > SS-PLAT-161: failed security notices are an administrator list (ADR-0097) > SS-PLAT-161 security_notices.read is held by Owner, Finance Admin and (read-only) Auditor only [T-0209]
+AssertionError: expected undefined to be 'read' // Object.is equality
+
+- Expected:
+"read"
+
++ Received:
+undefined
+
+ ❯ packages/shared/src/rbac/rbac.matrix.test.ts:216:50
+    214| describe('SS-PLAT-161: failed security notices are an administrator li…
+    215|   it('SS-PLAT-161 security_notices.read is held by Owner, Finance Admi…
+    216|     expect(PERMISSIONS['security_notices.read']).toBe('read');
+       |                                                  ^
+    217|     expect(
+    218|       ROLE_IDS.filter((r) => ROLE_TEMPLATES[r].permissions.includes('s…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 70 passed (73)
+   Start at  03:12:31
+   Duration  365ms (transform 99ms, setup 0ms, import 119ms, tests 29ms, environment 0ms)
+
+
+## db security-notice-retry.db.test.ts
+ FAIL  |db| packages/modules/email/src/security-notice-retry.db.test.ts [ packages/modules/email/src/security-notice-retry.db.test.ts ]
+Error: Cannot find module './security-notice-retry.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-t0209/packages/modules/email/src/security-notice-retry.db.test.ts
+      Tests  no tests
+
+## api-db security-notices.db.test.ts
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+ FAIL  |api-db| apps/api/src/security-notices/security-notices.db.test.ts > SS-PLAT-161: failed security notices are listed for administrators of their tenant > SS-PLAT-161 Owner, Finance Admin and Auditor see the failed notices with attempts, SMTP code and next attempt [T-0209]
+AssertionError: owner: expected 404 to be 200 // Object.is equality
+ FAIL  |api-db| apps/api/src/security-notices/security-notices.db.test.ts > SS-PLAT-161: failed security notices are listed for administrators of their tenant > SS-PLAT-161 the Accountant and a clerk are refused; another tenant sees none [T-0209]
+AssertionError: accountant: expected 404 to be 403 // Object.is equality
+ FAIL  |api-db| apps/api/src/security-notices/security-notices.db.test.ts > SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited > SS-PLAT-163 needs security_notices.retry and an Idempotency-Key [T-0209]
+AssertionError: auditor: expected 404 to be 403 // Object.is equality
+ FAIL  |api-db| apps/api/src/security-notices/security-notices.db.test.ts > SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited > SS-PLAT-163 201 appends the request; a replay answers 200 and adds nothing; both audited once [T-0209]
+AssertionError: expected 404 to be 201 // Object.is equality
+ FAIL  |api-db| apps/api/src/security-notices/security-notices.db.test.ts > SS-PLAT-163: retry-now over HTTP is keyed, idempotent by state and audited > SS-PLAT-163 a sent notice is 409, an unknown or other-tenant one 404, a bad kind 404 [T-0209]
+AssertionError: expected 404 to be 409 // Object.is equality
+      Tests  5 failed | 1 passed (6)
