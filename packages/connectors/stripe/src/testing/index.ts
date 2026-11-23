@@ -33,3 +33,9 @@ export const REFUND_FOLLOWUPS_FIXTURE = new URL(
 );
 
 export { seedStripePaidCredit, type StripePaidCredit } from './stripe-paid-credit.ts';
+
+/** The documented fixture of the nightly sweep for unrecorded Stripe refunds (T-0208, RQ-0185). */
+export const REFUND_SWEEP_FIXTURE = new URL(
+  '../../fixtures/documented/stripe-refunds-sweep-20261123.json',
+  import.meta.url,
+);
