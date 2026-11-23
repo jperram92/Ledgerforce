@@ -3,6 +3,7 @@ export * from './bills-read.ts';
 export * from './inbox.ts';
 export * from './inbox-mailbox.ts';
 export * from './mailbox-oauth.ts';
+export * from './mailbox-oauth-connect.ts';
 export * from './inbound-webhook.ts';
 export {
   ImapClient,
