@@ -275,7 +275,7 @@ graph LR
 | [T-0121](T-0121.md) | Reconcile verification coverage and golden approval evidence | MVP | review | — | — | 0 |
 | [T-0127](T-0127.md) | Bills inbox transports: IMAP polling (self-host) and provider inbound webhooks (SaaS) | MVP | verifying | T-0051 |
 | [T-0215](T-0215.md) | Bills inbox transport: signed provider inbound webhooks (SaaS) | MVP | verifying | T-0127 |
-| [T-0216](T-0216.md) | Bills mailbox: OAuth2 sign-in (authorization code + PKCE) and IMAP XOAUTH2 for Microsoft 365 and Google Workspace | MVP | in_progress | T-0127 |
+| [T-0216](T-0216.md) | Bills mailbox: OAuth2 sign-in (authorization code + PKCE) and IMAP XOAUTH2 for Microsoft 365 and Google Workspace | MVP | verifying | T-0127 |
 | [T-0227](T-0227.md) | Ops - least-privilege lf_backup role for the nightly backup (replace the superuser) | MVP | todo | T-0143 |
 | [T-0228](T-0228.md) | Ops - point-in-time recovery (WAL archiving) for the hosted RPO 15 min and optional self-host PITR | Phase 1 | todo | T-0143 |
 | [T-0223](T-0223.md) | Bills inbox transport: SendGrid Inbound Parse (signed security policy, send_raw) | MVP | todo | T-0215 |

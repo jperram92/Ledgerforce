@@ -246,3 +246,39 @@ describe('T-0142 AC-5 security headers and rate limits from the environment (ADR
     }
   });
 });
+
+describe('T-0216 bills mailbox OAuth client configuration from the environment (ADR-0105)', () => {
+  const oauthEnv = {
+    ...base,
+    LF_MAILBOX_OAUTH_REDIRECT_URI: 'https://books.example/api/setup/bills-mailbox/oauth/callback',
+    LF_MAILBOX_OAUTH_GOOGLE_CLIENT_ID: 'g-id',
+    LF_MAILBOX_OAUTH_GOOGLE_CLIENT_SECRET: 'g-secret',
+  };
+
+  it('SS-PLAT-189 nothing configured: the connect routes stay off (503)', () => {
+    expect(apiOptionsFromEnv(base, readFile).mailboxOAuth).toBeUndefined();
+  });
+
+  it('SS-PLAT-189 a configured provider and an optional Settings return path', () => {
+    const o = apiOptionsFromEnv(
+      { ...oauthEnv, LF_MAILBOX_OAUTH_SETTINGS_URL: '/app/settings/bills-mailbox' },
+      readFile,
+    );
+    expect(o.mailboxOAuth).toEqual({
+      redirectUri: 'https://books.example/api/setup/bills-mailbox/oauth/callback',
+      google: { clientId: 'g-id', clientSecret: 'g-secret' },
+      settingsUrl: '/app/settings/bills-mailbox',
+    });
+  });
+
+  it('SS-PLAT-189 a return path that could leave the site, or a provider without a secret, is refused at start-up', () => {
+    for (const bad of ['//evil.example/x', 'http://evil.example/x', 'javascript:alert(1)', 'x']) {
+      expect(() =>
+        apiOptionsFromEnv({ ...oauthEnv, LF_MAILBOX_OAUTH_SETTINGS_URL: bad }, readFile),
+      ).toThrow(/LF_MAILBOX_OAUTH_SETTINGS_URL/);
+    }
+    expect(() =>
+      apiOptionsFromEnv({ ...oauthEnv, LF_MAILBOX_OAUTH_GOOGLE_CLIENT_SECRET: '' }, readFile),
+    ).toThrow(/LF_MAILBOX_OAUTH_GOOGLE_CLIENT_SECRET/);
+  });
+});

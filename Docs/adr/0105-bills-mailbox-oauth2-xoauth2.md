@@ -81,16 +81,20 @@ Chosen option 1:
    never shown or stored. The callback writes its own audit row (GET requests are not audited by
    the interceptor): `ap.bills_mailbox.oauth_connected` with provider, host, username, folder.
 5. **Storage.** `app.bill_inbox_mailbox` gains `auth_method` (`password` | `oauth2`, default
-   `password`), `oauth_provider` and `secret_rotated_at` (migration 0084). On OAuth rows the
+   `password`), `oauth_provider` and `secret_rotated_at` (migration reserved 0084, numbered 0082
+   locally as the next free number; the lead renumbers at merge). On OAuth rows the
    existing sealed-secret columns hold the **refresh token**, AAD
    `lf-field-v1|<tenant>|<company>|app.bill_inbox_mailbox|<id>|refresh_token` (a different field
    name from `password`, so neither can be opened as the other). Connecting supersedes the active
    mailbox as before (a new row).
 6. **Rotation in place.** When a refresh returns a new refresh token, the poller re-seals it into
-   the same row (same AAD) and sets `secret_rotated_at`. `lf_app` gets UPDATE on the secret
-   columns, and a trigger allows that update only on `oauth2` rows that are `active`, and only
-   together with `secret_rotated_at`; identity columns stay non-updatable. Old refresh tokens are
-   not kept (Microsoft recommends discarding them, RQ-0187 S4).
+   the same row (same AAD) and sets `secret_rotated_at`. `lf_app` still has **no** UPDATE on the
+   secret or identity columns; its only path is `app.rotate_bill_inbox_refresh_token()`
+   (SECURITY DEFINER, owner `lf_migrator`, pinned `search_path`, EXECUTE granted to `lf_app`
+   only), which updates one `active` `oauth2` row of the current tenant (FORCE RLS filters the
+   owner too) and stamps `secret_rotated_at = clock_timestamp()`. A trigger repeats the rule for
+   every role: a secret change needs an active `oauth2` row and a new `secret_rotated_at`
+   (DL-0936). Old refresh tokens are not kept (Microsoft recommends discarding them, RQ-0187 S4).
 7. **Polling.** For an OAuth row the poller opens the refresh token, calls the token endpoint
    (outside any database transaction), then `AUTHENTICATE XOAUTH2` with SASL-IR; a `+` challenge
    is answered with an empty line and the tagged NO becomes `auth_failed`. Token endpoint

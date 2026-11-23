@@ -4599,7 +4599,7 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: Migration 0084 adds `auth_method`, `oauth_provider`, `secret_rotated_at` to `app.bill_inbox_mailbox`; OAuth rows keep the refresh token in the existing sealed columns with AAD field `refresh_token`. A rotated refresh token is re-sealed into the same row (lf_app UPDATE on the secret columns, narrowed by a trigger to active oauth2 rows with `secret_rotated_at` set); old tokens are not kept. Client id/secret per provider and the redirect URI come from install configuration (`LF_MAILBOX_OAUTH_*`), never the database. Amends ADR-0095 rule 4 for OAuth rows only.
 - Why: RQ-0187 F5 — Microsoft replaces the refresh token on every use and recommends discarding the old one; an append-only history would keep live credentials; the forward-only runner cannot relax NOT NULL on the password columns, and a separate table would duplicate the sealed-field pattern.
 - Alternatives: append-only token table (rejected: retains live old tokens); per-company app registrations (rejected: SMB operators would need an Entra/Google app each).
-- ADR: ADR-0105 · Status: accepted
+- ADR: ADR-0105 · Status: accepted · Superseded in part by DL-0936 (rotation mechanism)
 
 ### DL-0934 — Mailbox connect permission: settings.setup.manage + step-up; callback bound to the starting session; no SoD step
 - Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
@@ -4614,3 +4614,17 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: RQ-0187 F6; the `last_error` CHECK cannot be widened by the forward-only runner (precedent 0073), and the UI can show "Reconnect" from `auth_method = oauth2` + `auth_failed` (T-0237).
 - Alternatives: new error column (rejected: not needed).
 - ADR: ADR-0105 · Status: accepted
+
+### DL-0936 — Refresh-token rotation through a SECURITY DEFINER function, not a column grant
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: security
+- Decision: Supersedes the mechanism part of DL-0933. lf_app keeps no UPDATE on the mailbox's secret columns; the poller re-seals a rotated refresh token through `app.rotate_bill_inbox_refresh_token()` (SECURITY DEFINER, owner lf_migrator, pinned search_path, EXECUTE to lf_app only), which changes one active oauth2 row of the current tenant (FORCE RLS filters the owner) and stamps `secret_rotated_at`. The trigger stays as defence in depth for every role. The view reports `authMethod: 'login' | 'oauth2'`.
+- Why: narrower than a column grant (lf_app cannot write an arbitrary secret into any row), and the existing SS-PLAT-156 test (lf_app gets permission denied on `password_ct`) holds unchanged; the first implementation made it fail, which showed the grant widened the surface.
+- Alternatives: column grant + trigger (rejected: wider; changed an existing security assertion).
+- ADR: ADR-0105 (rule 6 updated) · Status: accepted
+
+### DL-0937 — T-0216 migration numbered 0082 locally (reserved 0084)
+- Date: 2026-11-23 · By: claude · Task: T-0216 · Category: process
+- Decision: The OAuth migration is `0082_ap_bill_inbox_mailbox_oauth.sql`, the next free number on the base (runs to 0081); the reserved number is 0084 and the lead renumbers at merge to keep the sequence gapless.
+- Why: the runner refuses gaps; round-12 brief.
+- Alternatives: none.
+- ADR: none · Status: accepted

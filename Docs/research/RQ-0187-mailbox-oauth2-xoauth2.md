@@ -91,7 +91,7 @@ spikes against published test vectors.
    mailbox row's secret columns, AAD field **`refresh_token`** (a sealed password cannot be
    replayed as a refresh token or vice versa). Microsoft replaces the refresh token on every use
    and recommends discarding the old one (S4): the poller re-seals the new token **in place** on
-   OAuth rows only (a trigger refuses it on password rows); no history of old refresh tokens is
+   OAuth rows only (through a narrow SECURITY DEFINER function, a trigger refuses it on password rows; DL-0936); no history of old refresh tokens is
    kept (a retained old token would be a live credential for up to 90 days). Access tokens are
    never stored (one per poll, in memory). The OAuth **client id/secret are install-level
    configuration** (one app registration per provider per deployment, read from env/secret

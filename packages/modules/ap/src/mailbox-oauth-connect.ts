@@ -120,6 +120,22 @@ export interface ConnectedMailbox {
   readonly folder: string;
 }
 
+/** Use up the caller's own pre-authorization when the provider answered with an error. */
+export async function cancelMailboxOAuth(
+  trx: Trx,
+  input: Omit<CompleteMailboxOAuthInput, 'code'>,
+): Promise<void> {
+  if (!STATE.test(input.state)) return;
+  await trx
+    .updateTable('app.bill_inbox_oauth_request')
+    .set({ consumed_at: input.now })
+    .where('state_sha256', '=', sha256(input.state))
+    .where('consumed_at', 'is', null)
+    .where('user_id', '=', input.userId)
+    .where('session_id', '=', input.sessionId)
+    .execute();
+}
+
 /**
  * The callback: consume the pre-authorization (same user and session, unexpired, once), exchange
  * the code, save the mailbox and audit it. Throws MailboxOAuthError (`invalid_request` for an
