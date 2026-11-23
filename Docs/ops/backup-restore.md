@@ -21,8 +21,44 @@ The compose `backup` service runs `node packages/db/src/cli/backup.ts --daily --
 Set `LF_BACKUP_AT` and `LF_BACKUP_RETENTION_DAYS` in `infra/compose/ledgerforce.env`. A failed
 night is logged (`docker compose … logs backup`) and the service tries again the next day.
 
-The service connects as the `postgres` superuser, because `pg_dump` must read past the forced
-row-level security of every tenant table. A read-only `lf_backup` role is planned (T-0227).
+## The database role: `lf_backup`
+
+The service connects as `lf_backup`, not as the superuser ([ADR-0106](../adr/0106-least-privilege-backup-role.md),
+research [RQ-0188](../research/RQ-0188-least-privilege-backup-role.md), T-0227). `pg_dump` must read
+past the forced row-level security of every tenant table, so the role has `BYPASSRLS` and the
+built-in `pg_read_all_data` role, and nothing else:
+
+- it cannot insert, update, delete, truncate, create tables, schemas, roles or temporary tables,
+  disable triggers or row security, or run the privileged (SECURITY DEFINER) functions; it owns
+  nothing and its sessions start read-only;
+- at most four sessions at a time (`CONNECTION LIMIT 4`);
+- it may log in only to the `ledgerforce` database and only from the internal `backup` network,
+  which only the `postgres` and `backup` services join (subnet `LF_BACKUP_SUBNET`, default
+  `172.30.227.0/29`; change it in `ledgerforce.env` if it collides with a network on your host).
+  `infra/compose/initdb/10-ledgerforce-roles.sh` writes this rule at the top of `pg_hba.conf`
+  between `# BEGIN lf_backup` and `# END lf_backup`; do not edit that block by hand, re-run the
+  script instead;
+- its password is the `lf_backup_password` secret, mounted only into `postgres` (which sets it)
+  and `backup`. The superuser password is no longer mounted into `backup`.
+
+The `backup` network has no route off the host. If you use the OpenBao transit key service on
+another machine, also attach `backup` to a network that reaches it.
+
+### Upgrading an install created before T-0227
+
+The init scripts run only when the data directory is empty, so an existing install adds the role
+once with the same (idempotent) script:
+
+```bash
+bash infra/compose/init-secrets.sh            # adds lf_backup_password; keeps every other secret
+docker compose -f infra/compose/compose.yaml --env-file infra/compose/ledgerforce.env up -d
+docker compose -f infra/compose/compose.yaml --env-file infra/compose/ledgerforce.env \
+  exec -u postgres postgres bash /docker-entrypoint-initdb.d/10-ledgerforce-roles.sh
+```
+
+The last command prints `lf_backup logins allowed from <subnet>`. Running it again is safe: it
+re-applies the role settings, resets the passwords from the secrets and replaces the
+`pg_hba.conf` block. Then take a one-off backup (below) to confirm the role works.
 
 ## The key: keep it off the host
 

@@ -211,13 +211,16 @@ describe('SS-PLAT-86 compose stack', () => {
         'keycloak_admin_client_secret',
         'keycloak_db_password',
         'lf_app_password',
+        'lf_backup_password',
         'lf_migrator_password',
         'oidc_client_secret',
         'postgres_password',
       ].sort(),
     );
-    // The backup reads every tenant (pg_dump needs to bypass FORCEd RLS, ADR-0101; lf_backup is T-0227).
-    expect(holders('postgres_password')).toEqual(['backup', 'postgres']);
+    // The superuser password stays in the database container; the backup reads as lf_backup
+    // (BYPASSRLS + pg_read_all_data, read-only; T-0227, ADR-0106).
+    expect(holders('postgres_password')).toEqual(['postgres']);
+    expect(holders('lf_backup_password')).toEqual(['backup', 'postgres']);
     expect(holders('backup_keyring')).toEqual(['backup']);
     expect(holders('lf_migrator_password')).toEqual(['postgres', 'scheduler', 'setup']);
     expect(holders('lf_app_password')).toEqual(['api', 'postgres', 'setup', 'worker']);
@@ -431,9 +434,10 @@ describe('SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4,
     expect(env['LF_BACKUP_AT']).toBe('${LF_BACKUP_AT:-02:30}');
     expect(env['LF_KMS_PROVIDER']).toBe('local');
     expect(env['LF_KMS_KEYRING_FILE']).toBe('/run/secrets/backup_keyring');
-    expect(env['LF_BACKUP_DB_PASSWORD_FILE']).toBe('/run/secrets/postgres_password');
+    expect(env['LF_BACKUP_DB_USER']).toBe('lf_backup');
+    expect(env['LF_BACKUP_DB_PASSWORD_FILE']).toBe('/run/secrets/lf_backup_password');
     expect(env['LF_DB_HOST']).toBe('postgres');
-    expect(b.secrets?.sort()).toEqual(['backup_keyring', 'postgres_password']);
+    expect(b.secrets?.sort()).toEqual(['backup_keyring', 'lf_backup_password']);
     expect(b.ports).toBeUndefined();
     expect(b.read_only).toBe(true);
     expect((b as { volumes?: string[] }).volumes).toEqual(['backups:/backups']);
@@ -463,5 +467,70 @@ describe('SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4,
       expect(doc, needle).toContain(needle);
     }
     expect(read('Docs/ops/install.md')).toContain('backup-restore.md');
+  });
+});
+
+describe('SS-PLAT-195 the backup connects as lf_backup, only from its own network (T-0227, ADR-0106)', () => {
+  type Net = { internal?: boolean; ipam?: { config?: { subnet?: string }[] } };
+  const raw = compose as unknown as {
+    services: Record<string, { networks?: string[] | Record<string, unknown>; volumes?: string[] }>;
+    networks?: Record<string, Net>;
+  };
+  const netsOf = (n: string): string[] => {
+    const v = raw.services[n]?.networks;
+    if (v === undefined) return ['default'];
+    return (Array.isArray(v) ? v : Object.keys(v)).sort();
+  };
+
+  it('SS-PLAT-195 the backup service holds lf_backup_password and never the superuser password', () => {
+    const b = svc('backup');
+    expect(b.environment?.['LF_BACKUP_DB_USER']).toBe('lf_backup');
+    expect(b.secrets).not.toContain('postgres_password');
+    expect(JSON.stringify(b)).not.toMatch(/postgres_password/);
+    expect(compose.secrets['lf_backup_password']).toEqual({ file: './secrets/lf_backup_password' });
+    const pg = svc('postgres');
+    expect(pg.environment?.['LF_BACKUP_PASSWORD_FILE']).toBe('/run/secrets/lf_backup_password');
+    expect(pg.secrets).toContain('lf_backup_password');
+  });
+
+  it('SS-PLAT-195 an internal backup network joined only by postgres and backup; postgres allows lf_backup from its subnet only', () => {
+    const subnet = '${LF_BACKUP_SUBNET:-172.30.227.0/29}';
+    expect(raw.networks?.['backup']).toEqual({ internal: true, ipam: { config: [{ subnet }] } });
+    const members = Object.keys(raw.services)
+      .filter((n) => netsOf(n).includes('backup'))
+      .sort();
+    expect(members).toEqual(['backup', 'postgres']);
+    expect(netsOf('backup')).toEqual(['backup']);
+    expect(netsOf('postgres')).toEqual(['backup', 'default']);
+    expect(svc('postgres').environment?.['LF_BACKUP_ALLOWED_CIDR']).toBe(subnet);
+    expect(read('infra/compose/ledgerforce.env.example')).toMatch(
+      /^#? ?LF_BACKUP_SUBNET=172\.30\.227\.0\/29$/m,
+    );
+  });
+
+  it('SS-PLAT-195 the init script that creates lf_backup and its pg_hba block is mounted, and the runbook gives the upgrade step', () => {
+    expect(raw.services['postgres']?.volumes).toEqual(
+      expect.arrayContaining([
+        '../../packages/db/bootstrap:/lf-bootstrap:ro',
+        './initdb/10-ledgerforce-roles.sh:/docker-entrypoint-initdb.d/10-ledgerforce-roles.sh:ro',
+      ]),
+    );
+    const script = read('infra/compose/initdb/10-ledgerforce-roles.sh');
+    expect(script).toContain('LF_BACKUP_PASSWORD');
+    expect(script).toContain('LF_BACKUP_ALLOWED_CIDR');
+    expect(read('packages/db/bootstrap/01_cluster_roles.sql')).toMatch(
+      /ALTER ROLE lf_backup\s+NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION BYPASSRLS/,
+    );
+    const doc = read('Docs/ops/backup-restore.md');
+    for (const needle of [
+      'lf_backup',
+      'ADR-0106',
+      'lf_backup_password',
+      'LF_BACKUP_SUBNET',
+      'exec -u postgres postgres bash /docker-entrypoint-initdb.d/10-ledgerforce-roles.sh',
+    ]) {
+      expect(doc, needle).toContain(needle);
+    }
+    expect(doc).not.toMatch(/connects as the `postgres` superuser/);
   });
 });
