@@ -1,0 +1,236 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87
+
+ ❯ |unit| infra/test/install-contract.test.ts (31 tests | 3 failed) 408ms
+     × SS-PLAT-201 the backup container has a static address and postgres allows lf_backup from that /32 only 15ms
+     × SS-PLAT-201 the env example and the runbook document LF_BACKUP_ADDRESS and the /32 rule 1ms
+     × SS-PLAT-200 every named start-up error is explained in the runbook 24ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-201 lf_backup may log in only from the backup container address (T-0244, ADR-0109) > SS-PLAT-201 the backup container has a static address and postgres allows lf_backup from that /32 only
+AssertionError: expected [ 'backup' ] to deeply equal { Object (backup) }
+
+- Expected:
+{
+  "backup": {
+    "ipv4_address": "${LF_BACKUP_ADDRESS:-172.30.227.6}",
+  },
+}
+
++ Received:
+[
+  "backup",
+]
+
+ ❯ infra/test/install-contract.test.ts:549:46
+    547|
+    548|   it('SS-PLAT-201 the backup container has a static address and postgr…
+    549|     expect(raw.services['backup']?.networks).toEqual({ backup: { ipv4_…
+       |                                              ^
+    550|     expect(svc('postgres').environment?.['LF_BACKUP_ALLOWED_CIDR']).to…
+    551|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-201 lf_backup may log in only from the backup container address (T-0244, ADR-0109) > SS-PLAT-201 the env example and the runbook document LF_BACKUP_ADDRESS and the /32 rule
+AssertionError: expected '# LedgerForce self-hosted install set…' to match /^#? ?LF_BACKUP_ADDRESS=172\.30\.227\…/m
+
+- Expected:
+/^#? ?LF_BACKUP_ADDRESS=172\.30\.227\.6$/m
+
++ Received:
+"# LedgerForce self-hosted install settings (T-0094). Copy to infra/compose/ledgerforce.env (git-
+# ignored) and edit. No secrets here: passwords are files made by infra/compose/init-secrets.sh.
+#
+# Public origin of the install. For a trial on this machine keep http://ledgerforce.localhost:8080
+# (browsers resolve *.localhost to this machine). In production use your https URL, with TLS
+# terminated by a reverse proxy in front of the web service (Docs/ops/install.md).
+LF_PUBLIC_URL=http://ledgerforce.localhost:8080
+# Port the web service listens on (inside the network too) and the address it is published on.
+LF_HTTP_PORT=8080
+LF_HTTP_BIND=127.0.0.1
+
+# The organisation and its first Owner. The Owner's sign-in name is this e-mail address.
+LF_TENANT_SLUG=harbour-co
+LF_TENANT_NAME=Harbour Co
+LF_OWNER_EMAIL=owner@example.com
+LF_OWNER_NAME=Owner Name
+
+# Set to 1 for one run of setup to issue a new one-time owner password (only while the Owner has
+# not completed the first sign-in).
+LF_SETUP_REISSUE=0
+
+# Nightly encrypted backup (Docs/ops/backup-restore.md): daily run time in UTC (HH:MM) and how
+# many days of backups the `backups` volume keeps (the newest is always kept).
+LF_BACKUP_AT=02:30
+LF_BACKUP_RETENTION_DAYS=14
+# Subnet of the internal network shared only by postgres and backup; the database accepts the
+# lf_backup role only from here (ADR-0106). Change it if it collides with a network on your host.
+LF_BACKUP_SUBNET=172.30.227.0/29
+"
+
+ ❯ infra/test/install-contract.test.ts:564:59
+    562|
+    563|   it('SS-PLAT-201 the env example and the runbook document LF_BACKUP_A…
+    564|     expect(read('infra/compose/ledgerforce.env.example')).toMatch(
+       |                                                           ^
+    565|       /^#? ?LF_BACKUP_ADDRESS=172\.30\.227\.6$/m,
+    566|     );
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  |unit| infra/test/install-contract.test.ts > SS-PLAT-200 the runbook names the backup start-up errors (T-0244, ADR-0109) > SS-PLAT-200 every named start-up error is explained in the runbook
+AssertionError: LF_BACKUP_ROLE_MISSING: expected '# Backup and restore drill (self-host…' to contain 'LF_BACKUP_ROLE_MISSING'
+
+- Expected
++ Received
+
+- LF_BACKUP_ROLE_MISSING
++ # Backup and restore drill (self-hosted)
++
++ How the single-server install backs up the LedgerForce database, where the key lives, and how to
++ prove a backup restores to the same books. Decision: [ADR-0101](../adr/0101-encrypted-logical-backup-and-restore-drill.md);
++ research: [RQ-0183](../research/RQ-0183-encrypted-backup-and-restore-drill.md); task T-0143.
++
++ ## What runs
++
++ The compose `backup` service runs `node packages/db/src/cli/backup.ts --daily --dir /backups`:
++
++ - every day at `LF_BACKUP_AT` (UTC, `HH:MM`, default `02:30`) it takes a `pg_dump` (custom format)
++   of the `ledgerforce` database under one exported snapshot, together with a manifest: the exact
++   row count of every table and, for every company, the number of chained journal entries and the
++   chain head hash;
++ - it encrypts both with a fresh data key wrapped by the backup keyring (`lf-backup/v1`: AES-256-GCM
++   in authenticated 64 KiB chunks) and writes `ledgerforce-<UTC time>.lfbackup` (mode 0600) to the
++   `backups` volume;
++ - it deletes backups older than `LF_BACKUP_RETENTION_DAYS` (default `14`), always keeping the
++   newest.
++
++ Set `LF_BACKUP_AT` and `LF_BACKUP_RETENTION_DAYS` in `infra/compose/ledgerforce.env`. A failed
++ night is logged (`docker compose … logs backup`) and the service tries again the next day.
++
++ ## The database role: `lf_backup`
++
++ The service connects as `lf_backup`, not as the superuser ([ADR-0106](../adr/0106-least-privilege-backup-role.md),
++ research [RQ-0188](../research/RQ-0188-least-privilege-backup-role.md), T-0227). `pg_dump` must read
++ past the forced row-level security of every tenant table, so the role has `BYPASSRLS` and the
++ built-in `pg_read_all_data` role, and nothing else:
++
++ - it cannot insert, update, delete, truncate, create tables, schemas, roles or temporary tables,
++   disable triggers or row security, or run the privileged (SECURITY DEFINER) functions; it owns
++   nothing and its sessions start read-only;
++ - at most four sessions at a time (`CONNECTION LIMIT 4`);
++ - it may log in only to the `ledgerforce` database and only from the internal `backup` network,
++   which only the `postgres` and `backup` services join (subnet `LF_BACKUP_SUBNET`, default
++   `172.30.227.0/29`; change it in `ledgerforce.env` if it collides with a network on your host).
++   `infra/compose/initdb/10-ledgerforce-roles.sh` writes this rule at the top of `pg_hba.conf`
++   between `# BEGIN lf_backup` and `# END lf_backup`; do not edit that block by hand, re-run the
++   script instead;
++ - its password is the `lf_backup_password` secret, mounted only into `postgres` (which sets it)
++   and `backup`. The superuser password is no longer mounted into `backup`.
++
++ The `backup` network has no route off the host. If you use the OpenBao transit key service on
++ another machine, also attach `backup` to a network that reaches it.
++
++ ### Upgrading an install created before T-0227
++
++ The init scripts run only when the data directory is empty, so an existing install adds the role
++ once with the same (idempotent) script:
++
++ ```bash
++ bash infra/compose/init-secrets.sh            # adds lf_backup_password; keeps every other secret
++ docker compose -f infra/compose/compose.yaml --env-file infra/compose/ledgerforce.env up -d
++ docker compose -f infra/compose/compose.yaml --env-file infra/compose/ledgerforce.env \
++   exec -u postgres postgres bash /docker-entrypoint-initdb.d/10-ledgerforce-roles.sh
++ ```
++
++ The last command prints `lf_backup logins allowed from <subnet>`. Running it again is safe: it
++ re-applies the role settings, resets the passwords from the secrets and replaces the
++ `pg_hba.conf` block. Then take a one-off backup (below) to confirm the role works.
++
++ ## The key: keep it off the host
++
++ `bash infra/compose/init-secrets.sh` creates `infra/compose/secrets/backup_keyring`, a JSON keyring
++ with one random 32-byte key. **Without this file no backup can be restored.** Store a copy off the
++ host (a password manager or a sealed envelope in a safe), separately from the backup copies. Keep
++ the backup files somewhere other than the server as well, for example by syncing the `backups`
++ volume to object storage each morning. A backup that exists only on the lost server, or whose
++ only key is on the lost server, is not a backup.
++
++ Rotation: add a new key to `keys`, set `active` to it, and restart `backup`. Keep the old keys
++ for as long as backups made with them are retained. To keep the key outside the server entirely,
++ use the OpenBao transit key service instead (`LF_KMS_PROVIDER=transit`, ADR-0038) with a policy
++ that allows the backup host to encrypt only.
++
++ One-off backup (for example before an upgrade):
++
++ ```bash
++ docker compose -f infra/compose/compose.yaml --env-file infra/compose/ledgerforce.env \
++   run --rm backup node packages/db/src/cli/backup.ts --out /backups/before-upgrade.lfbackup
++ ```
++
++ ## Restore drill (quarterly, and before you rely on a backup)
++
++ Design §6.9 asks for a restore drill every quarter. The drill restores a backup into a **new**
++ database, on a server of your choice (a fresh PostgreSQL 17 server is best), then proves it:
++
++ 1. the file opens with the keyring (any changed byte, a truncated file or a wrong key fails);
++ 2. it restores in one transaction (`pg_restore --single-transaction`) after creating the
++    LedgerForce roles if the server is new;
++ 3. every table has exactly the row count recorded at backup time;
++ 4. every company's journal hash chain verifies (each entry's hash recomputed from its rows,
++    ADR-0017) with the recorded entry count and head hash.
++
++ ```bash
++ LF_KMS_PROVIDER=local LF_KMS_KEYRING_FILE=/secure/backup_keyring \
++ LF_RESTORE_SERVER_URL=postgres://postgres@drill-host:5432/postgres \
++ LF_RESTORE_SERVER_PASSWORD_FILE=/secure/drill_superuser_password \
++ node packages/ledger/src/cli/restore-drill.ts --file ledgerforce-20261122T023000Z.lfbackup \
++   --database lf_drill_2026q4
++ ```
++
++ It needs `pg_restore` 17 (or newer) on the machine that runs it (`LF_PG_BINDIR` picks a
++ version). Exit code 0 prints one `company … chain ok entries N` line per company and
++ `restore drill OK`. Record the output with the date in your operations log. The restored
++ database is kept for inspection; drop it when done.
++
++ Exit code 1 means the drill failed. Each problem is one line on stderr, and the half-restored
++ database is dropped:
++
++ | Code | Meaning | What to do |
++ | --- | --- | --- |
++ | `BACKUP_DECRYPT_FAILED` | Wrong keyring, not an lf-backup file, or the file was changed or truncated | Check you used the right keyring; try an older backup; treat a changed file as a security incident |
++ | `RESTORE_FAILED` | `pg_restore` failed, or the target database already exists | Use a new database name; check the server version (17+) |
++ | `ROW_COUNT_MISMATCH` | A table has a different row count than at backup time | The dump is incomplete; do not rely on this backup |
++ | `COMPANY_SET_MISMATCH` | Companies differ from the backup's manifest | As above |
++ | `CHAIN_BROKEN` | A company's journal hash chain does not verify (seq and reason named) | The journal was altered, possibly before the backup: compare with the live system's chain check; security incident |
++ | `CHAIN_COUNT_MISMATCH` / `CHAIN_HEAD_MISMATCH` | The chain verifies but differs from the backup's record | As for `CHAIN_BROKEN` |
++
++ Exit code 2 means a usage or configuration error (missing `--file`, `--database`, keyring or
++ server URL).
++
++ ## Restoring for real
++
++ Run the drill against the replacement server, then point the stack at the restored database (set
++ the passwords of `lf_migrator` and `lf_app` on the new server from `infra/compose/secrets/`) and
++ start compose. Setup applies any newer migrations. Point-in-time recovery to a moment between
++ nightly backups is not available on the single-server install (T-0228).
++
+
+ ❯ infra/test/install-contract.test.ts:584:25
+    582|       'LF_BACKUP_ROLE_CANNOT_BYPASS_RLS',
+    583|     ]) {
+    584|       expect(doc, code).toContain(code);
+       |                         ^
+    585|     }
+    586|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 28 passed (31)
+   Start at  19:06:49
+   Duration  813ms (transform 89ms, setup 0ms, import 161ms, tests 408ms, environment 0ms)
+
