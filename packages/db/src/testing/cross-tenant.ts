@@ -221,6 +221,19 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     password_enc_version: () => '1',
     status: () => 'superseded',
     last_error: () => 'timeout',
+    // T-0216 (migration 0082, reserved 0084): oauth_provider is set exactly on oauth2 rows.
+    auth_method: () => 'password',
+  },
+  // T-0216 (migration 0082, reserved 0084): mailbox OAuth pre-authorization (hash, PKCE verifier, 10-minute TTL).
+  'app.bill_inbox_oauth_request': {
+    id: () => randomUUID(),
+    state_sha256: () => randomBytes(32).toString('hex'),
+    code_verifier: () => randomBytes(32).toString('base64url'),
+    provider: () => 'google',
+    username: () => 'bills@example.test',
+    folder: () => 'INBOX',
+    created_at: () => '2026-01-01T00:00:00Z',
+    expires_at: () => '2026-01-01T00:10:00Z',
   },
   // T-0215: inbound address (26-char base32 token, globally unique) and webhook receipts.
   'app.bill_inbox_address': {

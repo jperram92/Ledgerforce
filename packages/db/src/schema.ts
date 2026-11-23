@@ -1108,6 +1108,27 @@ export interface BillInboxMailboxTable {
   last_error: string | null;
   created_by: string | null;
   created_at: ColumnType<Date, Date | string | undefined, never>;
+  /** Migration 0082 (reserved 0084; T-0216, ADR-0105): oauth2 rows seal the refresh token in password_*. */
+  auth_method: Generated<'password' | 'oauth2'>;
+  oauth_provider: 'microsoft' | 'google' | null;
+  secret_rotated_at: Timestamp | null;
+}
+
+/** Bills mailbox OAuth pre-authorization (migration 0082, reserved 0084, T-0216, ADR-0105 rule 3). */
+export interface BillInboxOauthRequestTable {
+  id: string;
+  tenant_id: TenantId;
+  company_id: string;
+  state_sha256: string;
+  code_verifier: string;
+  provider: 'microsoft' | 'google';
+  username: string;
+  folder: Generated<string>;
+  user_id: string;
+  session_id: string;
+  created_at: ColumnType<Date, Date | string | undefined, never>;
+  expires_at: ColumnType<Date, Date | string, never>;
+  consumed_at: Timestamp | null;
 }
 
 /** Bills inbox inbound address (migration 0080, ADR-0099). */
@@ -1615,6 +1636,7 @@ export interface Database {
   'app.supplier_bill_line': SupplierBillLineTable;
   'app.bill_inbox_item': BillInboxItemTable;
   'app.bill_inbox_mailbox': BillInboxMailboxTable;
+  'app.bill_inbox_oauth_request': BillInboxOauthRequestTable;
   'app.bill_inbox_address': BillInboxAddressTable;
   'app.inbound_webhook_receipt': InboundWebhookReceiptTable;
   'app.document_attachment': DocumentAttachmentTable;

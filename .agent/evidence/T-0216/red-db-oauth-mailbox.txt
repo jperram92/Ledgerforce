@@ -1,0 +1,119 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae6edc668685af2c4
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44059
+ ❯ |db| packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts (6 tests | 6 failed) 1444ms
+     × SS-PLAT-191 the refresh token is sealed with AAD field refresh_token (not openable as a password), the host is the provider’s, reads carry no secret 28ms
+     × SS-PLAT-191 Microsoft: refresh, XOAUTH2 at outlook.office365.com, one inbox item; the rotated refresh token is re-sealed in place and used next time 28ms
+     × SS-PLAT-191 Google: a refresh without a new refresh token keeps the sealed one 50ms
+     × SS-PLAT-191 a revoked grant (invalid_grant) is auth_failed: no IMAP connection, cursor unchanged, no provider text stored 19ms
+     × SS-PLAT-191 a wrong access token at the IMAP server is auth_failed; a worker without OAuth configuration records connect_failed 27ms
+     × SS-PLAT-191 lf_app cannot change a password row’s secret, a superseded OAuth row’s secret, or rotate without secret_rotated_at; it can rotate an active OAuth row 35ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 6 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts > SS-PLAT-191: OAuth mailbox credentials are sealed as a refresh token > SS-PLAT-191 the refresh token is sealed with AAD field refresh_token (not openable as a password), the host is the provider’s, reads carry no secret
+TypeError: saveOAuthBillsMailbox is not a function
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:64:5
+     62| async function oauthMailbox(company: string, provider: MailboxOAuthPro…
+     63|   return f.inTenant((trx) =>
+     64|     saveOAuthBillsMailbox(trx, kms, company, {
+       |     ^
+     65|       provider,
+     66|       username: 'bills@harbour.example',
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:115:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯
+
+ FAIL  |db| packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts > SS-PLAT-191: an OAuth mailbox polls with a refreshed access token > SS-PLAT-191 Microsoft: refresh, XOAUTH2 at outlook.office365.com, one inbox item; the rotated refresh token is re-sealed in place and used next time
+TypeError: saveOAuthBillsMailbox is not a function
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:64:5
+     62| async function oauthMailbox(company: string, provider: MailboxOAuthPro…
+     63|   return f.inTenant((trx) =>
+     64|     saveOAuthBillsMailbox(trx, kms, company, {
+       |     ^
+     65|       provider,
+     66|       username: 'bills@harbour.example',
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:148:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯
+
+ FAIL  |db| packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts > SS-PLAT-191: an OAuth mailbox polls with a refreshed access token > SS-PLAT-191 Google: a refresh without a new refresh token keeps the sealed one
+TypeError: saveOAuthBillsMailbox is not a function
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:64:5
+     62| async function oauthMailbox(company: string, provider: MailboxOAuthPro…
+     63|   return f.inTenant((trx) =>
+     64|     saveOAuthBillsMailbox(trx, kms, company, {
+       |     ^
+     65|       provider,
+     66|       username: 'bills@harbour.example',
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:183:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯
+
+ FAIL  |db| packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts > SS-PLAT-191: an OAuth mailbox polls with a refreshed access token > SS-PLAT-191 a revoked grant (invalid_grant) is auth_failed: no IMAP connection, cursor unchanged, no provider text stored
+TypeError: saveOAuthBillsMailbox is not a function
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:64:5
+     62| async function oauthMailbox(company: string, provider: MailboxOAuthPro…
+     63|   return f.inTenant((trx) =>
+     64|     saveOAuthBillsMailbox(trx, kms, company, {
+       |     ^
+     65|       provider,
+     66|       username: 'bills@harbour.example',
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:201:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯
+
+ FAIL  |db| packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts > SS-PLAT-191: an OAuth mailbox polls with a refreshed access token > SS-PLAT-191 a wrong access token at the IMAP server is auth_failed; a worker without OAuth configuration records connect_failed
+TypeError: saveOAuthBillsMailbox is not a function
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:64:5
+     62| async function oauthMailbox(company: string, provider: MailboxOAuthPro…
+     63|   return f.inTenant((trx) =>
+     64|     saveOAuthBillsMailbox(trx, kms, company, {
+       |     ^
+     65|       provider,
+     66|       username: 'bills@harbour.example',
+ ❯ packages/db/src/tenant.ts:34:12
+ ❯ node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/kysely.js:690:32
+ ❯ DefaultConnectionProvider.provideConnection node_modules/.pnpm/kysely@0.29.7/node_modules/kysely/dist/driver/default-connection-provider.js:10:20
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:223:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯
+
+ FAIL  |db| packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts > SS-PLAT-191: the database keeps password secrets write-once (migration 0084 trigger) > SS-PLAT-191 lf_app cannot change a password row’s secret, a superseded OAuth row’s secret, or rotate without secret_rotated_at; it can rotate an active OAuth row
+AssertionError: expected [Function] to throw error matching /write-once/ but got 'column "secret_rotated_at" of relatio…'
+
+- Expected:
+/write-once/
+
++ Received:
+"column \"secret_rotated_at\" of relation \"bill_inbox_mailbox\" does not exist"
+
+ ❯ packages/modules/ap/src/inbox-mailbox-oauth.db.test.ts:259:36
+    257|       }),
+    258|     );
+    259|     await expect(rewrite(pw, true)).rejects.toThrow(/write-once/);
+       |                                    ^
+    260|     const old = await oauthMailbox(company, 'google');
+    261|     const active = await oauthMailbox(company, 'microsoft');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  6 failed (6)
+   Start at  11:44:50
+   Duration  3.85s (transform 826ms, setup 0ms, import 1.08s, tests 1.44s, environment 0ms)
+

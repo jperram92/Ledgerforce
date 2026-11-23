@@ -3,7 +3,10 @@
  *
  * The subset of RFC 3501 (also served by IMAP4rev2, RFC 9051) the poller needs: greeting, LOGIN,
  * EXAMINE (read-only select), UID SEARCH UID n:*, UID FETCH (UID RFC822.SIZE) and
- * UID FETCH (UID BODY.PEEK[]) (never sets \Seen), LOGOUT. There is deliberately no command that
+ * UID FETCH (UID BODY.PEEK[]) (never sets \Seen), LOGOUT, and `AUTHENTICATE XOAUTH2` with the
+ * initial response on the command line (SASL-IR, RFC 4959; T-0216, ADR-0105, RQ-0187 F1): an
+ * error challenge is answered with one empty line and the tagged NO is `auth_failed`. There is
+ * deliberately no command that
  * stores flags, expunges, copies, moves or appends: LedgerForce never changes the mailbox.
  *
  * Production connects with implicit TLS and full certificate verification (RFC 8314;
@@ -119,6 +122,8 @@ export class ImapClient {
   #seq = 0;
   #pending: Pending | null = null;
   #continuation: (() => void) | null = null;
+  /** Set during AUTHENTICATE: how to answer a server challenge (`+ …`). */
+  #challenge: (() => void) | null = null;
   #greeting: { resolve(): void; reject(e: ImapError): void } | null = null;
   #failed: ImapError | null = null;
 
@@ -168,6 +173,30 @@ export class ImapClient {
   async login(user: string, pass: string): Promise<void> {
     const r = await this.#command(['LOGIN', user, pass]);
     if (r.status !== 'OK') throw new ImapError('auth_failed');
+  }
+
+  /**
+   * SASL XOAUTH2 with an OAuth 2.0 access token (Microsoft 365, Google; RQ-0187 F1). The token is
+   * never echoed in an error. A server challenge (Google sends its JSON error this way) gets one
+   * empty line; a second challenge is a protocol error.
+   */
+  async authenticateXOAuth2(user: string, accessToken: string): Promise<void> {
+    const ir = xoauth2InitialResponse(user, accessToken);
+    let challenges = 0;
+    this.#challenge = () => {
+      challenges += 1;
+      if (challenges > 1) {
+        this.#fail(new ImapError('protocol_error'));
+        return;
+      }
+      this.#sock.write('\r\n');
+    };
+    try {
+      const r = await this.#command(['AUTHENTICATE', 'XOAUTH2', ir], true);
+      if (r.status !== 'OK') throw new ImapError('auth_failed');
+    } finally {
+      this.#challenge = null;
+    }
   }
 
   /** Read-only select; returns UIDVALIDITY and the message count. */
@@ -249,16 +278,23 @@ export class ImapClient {
     return r;
   }
 
-  /** Send one command; string arguments become atoms, quoted strings or literals. */
-  async #command(args: string[]): Promise<{ status: string; text: string; untagged: Response[] }> {
+  /**
+   * Send one command; string arguments become atoms, quoted strings or literals. `atoms` sends
+   * every argument as an atom (SASL mechanism and base64 initial response); each must be one.
+   */
+  async #command(
+    args: string[],
+    atoms = false,
+  ): Promise<{ status: string; text: string; untagged: Response[] }> {
     if (this.#failed) throw this.#failed;
     if (this.#pending) throw new ImapError('protocol_error');
-    this.#seq += 1;
-    const tag = `L${String(this.#seq)}`;
     const pieces: (string | Buffer)[] = [];
     for (const [i, a] of args.entries()) {
-      pieces.push(i === 0 ? a : encodeArg(a, i < 2 || args[0] === 'UID'));
+      if (atoms && !/^[A-Za-z0-9+/=]+$/.test(a)) throw new ImapError('protocol_error');
+      pieces.push(i === 0 || atoms ? a : encodeArg(a, i < 2 || args[0] === 'UID'));
     }
+    this.#seq += 1;
+    const tag = `L${String(this.#seq)}`;
     const result = new Promise<{ status: string; text: string; untagged: Response[] }>(
       (resolve, reject) => {
         this.#pending = {
@@ -366,6 +402,7 @@ export class ImapClient {
       const c = this.#continuation;
       this.#continuation = null;
       if (c) c();
+      else if (this.#challenge && this.#pending) this.#challenge();
       else this.#fail(new ImapError('protocol_error'));
       return;
     }
@@ -385,6 +422,22 @@ export class ImapClient {
     clearTimeout(p.timer);
     p.resolve({ status: (m[2] ?? '').toUpperCase(), text: m[3] ?? '', untagged: p.untagged });
   }
+}
+
+/**
+ * The XOAUTH2 initial client response: base64(`user=` U ^A `auth=Bearer ` T ^A ^A) (RQ-0187 S5,
+ * X1). The user may not contain ^A, CR, LF or NUL; the token must be printable ASCII without
+ * spaces (RFC 6750 b64token is narrower still).
+ */
+export function xoauth2InitialResponse(user: string, accessToken: string): string {
+  // eslint-disable-next-line no-control-regex
+  if (user.length === 0 || user.length > 320 || /[\u0000-\u001f\u007f]/.test(user)) {
+    throw new ImapError('protocol_error');
+  }
+  if (!/^[\x21-\x7e]{1,16384}$/.test(accessToken)) throw new ImapError('protocol_error');
+  return Buffer.from(`user=${user}\u0001auth=Bearer ${accessToken}\u0001\u0001`, 'utf8').toString(
+    'base64',
+  );
 }
 
 /**

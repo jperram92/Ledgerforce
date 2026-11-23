@@ -8,6 +8,7 @@
  * that the file is fresh.
  */
 import { writeFileSync } from 'node:fs';
+import { mailboxOAuthConfigFromEnv } from '@ledgerforce/ap';
 import { createDb, databaseUrlFromEnv } from '@ledgerforce/db';
 import { PdfRenderer } from '@ledgerforce/documents';
 import { invoiceEmailHandler, reminderEmailHandler, SmtpSender } from '@ledgerforce/email';
@@ -110,7 +111,10 @@ await startReminderWorker({ boss, db, outbox: documentOutbox });
 await startSecurityNoticeWorker({ boss, db, sender });
 // Bills inbox IMAP polling, one job per tenant every 5 minutes (T-0127, ADR-0095). Mailbox
 // passwords are sealed, so polling needs the KMS; without it no mailbox is read.
-if (kms) await startInboxPollWorker({ boss, db, deps: { kms } });
+// OAuth mailboxes (Microsoft 365, Google; ADR-0105) refresh with the install's client
+// configuration (LF_MAILBOX_OAUTH_*); without it they are recorded as connect_failed.
+const mailboxOAuth = mailboxOAuthConfigFromEnv(process.env);
+if (kms) await startInboxPollWorker({ boss, db, deps: { kms, oauth: mailboxOAuth } });
 else console.warn('LF_KMS_PROVIDER not set: bills mailboxes are not polled');
 // The nightly sweep for Stripe refunds no document records, one job per tenant (T-0208): it only
 // looks and reports; it records nothing and creates nothing at Stripe.

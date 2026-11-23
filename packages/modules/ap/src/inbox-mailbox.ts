@@ -13,6 +13,12 @@
  * (InboxError) are counted as refused and the cursor moves on; any other error stops the poll with
  * the cursor where it is. Connection and login failures are recorded on the row as a fixed error
  * class and returned, not thrown. No network I/O runs inside a database transaction.
+ *
+ * OAuth mailboxes (T-0216, ADR-0105, DL-0933): saveOAuthBillsMailbox stores the provider's refresh
+ * token in the same sealed columns with AAD field `refresh_token`, at the provider's fixed IMAP
+ * host. Each poll refreshes an access token (outside any transaction), re-seals a rotated refresh
+ * token in place, and logs in with AUTHENTICATE XOAUTH2. A refused grant is `auth_failed`, a
+ * token-endpoint failure `connect_failed` (DL-0935).
  */
 import { randomUUID } from 'node:crypto';
 import { withTenant, type Database } from '@ledgerforce/db';
@@ -27,6 +33,14 @@ import {
   type ImapErrorKind,
 } from './imap-client.ts';
 import { InboxError, ingestBillEmail } from './inbox.ts';
+import {
+  isMailboxOAuthProvider,
+  MAILBOX_OAUTH_PROVIDERS,
+  MailboxOAuthError,
+  refreshAccessToken,
+  type MailboxOAuthConfig,
+  type MailboxOAuthProvider,
+} from './mailbox-oauth.ts';
 
 type Trx = Transaction<Database>;
 
@@ -63,6 +77,21 @@ export interface BillsMailboxView {
   readonly lastPolledAt: Date | null;
   readonly lastError: string | null;
   readonly createdAt: Date;
+  /**
+   * `login`: IMAP LOGIN with a stored password; `oauth2`: signed in with Microsoft or Google
+   * (T-0216). Never carries a secret.
+   */
+  readonly authMethod: 'login' | 'oauth2';
+  readonly oauthProvider: MailboxOAuthProvider | null;
+}
+
+export interface OAuthBillsMailboxInput {
+  readonly provider: MailboxOAuthProvider;
+  /** The mailbox address the grant is for (XOAUTH2 `user=`). */
+  readonly username: string;
+  readonly refreshToken: string;
+  readonly folder?: string;
+  readonly createdBy?: string;
 }
 
 const HOST = /^[A-Za-z0-9][A-Za-z0-9.:-]{0,252}$/;
@@ -70,8 +99,36 @@ const FOLDER = /^[ -~]{1,255}$/;
 // eslint-disable-next-line no-control-regex
 const CONTROL = /[\u0000-\u001f\u007f]/;
 
-const aadFor = (tenantId: string, companyId: string, id: string) =>
-  `lf-field-v1|${tenantId}|${companyId}|app.bill_inbox_mailbox|${id}|password`;
+type SecretField = 'password' | 'refresh_token';
+
+const aadFor = (tenantId: string, companyId: string, id: string, field: SecretField = 'password') =>
+  `lf-field-v1|${tenantId}|${companyId}|app.bill_inbox_mailbox|${id}|${field}`;
+
+const fieldOf = (authMethod: string): SecretField =>
+  authMethod === 'oauth2' ? 'refresh_token' : 'password';
+
+async function currentTenant(trx: Trx): Promise<string> {
+  const t = await sql<{ tenant_id: string | null }>`
+    SELECT nullif(current_setting('app.tenant_id', true), '') AS tenant_id`.execute(trx);
+  const tenantId = t.rows[0]?.tenant_id;
+  if (!tenantId) throw new Error('bills mailbox writes must run inside a tenant transaction');
+  return tenantId;
+}
+
+const sealedColumns = (sealed: Awaited<ReturnType<typeof sealField>>) => ({
+  password_ct: sealed.ciphertext,
+  password_iv: sealed.iv,
+  password_tag: sealed.tag,
+  password_dek_wrapped: sealed.wrappedDek,
+  password_kek_id: sealed.keyId,
+  password_enc_version: sealed.version,
+});
+
+function checkUsername(username: string): void {
+  if (username.length === 0 || username.length > 320 || CONTROL.test(username)) {
+    throw new BillsMailboxError('username must be 1-320 characters without control characters');
+  }
+}
 
 /** Store the company's bills mailbox; the active one (if any) becomes superseded. Returns its id. */
 export async function saveBillsMailbox(
@@ -89,9 +146,7 @@ export async function saveBillsMailbox(
   if (!Number.isInteger(port) || port < 1 || port > 65535) {
     throw new BillsMailboxError('port must be 1-65535');
   }
-  if (username.length === 0 || username.length > 320 || CONTROL.test(username)) {
-    throw new BillsMailboxError('username must be 1-320 characters without control characters');
-  }
+  checkUsername(username);
   if (
     input.password.length === 0 ||
     input.password.length > 1024 ||
@@ -100,10 +155,7 @@ export async function saveBillsMailbox(
     throw new BillsMailboxError('password must be 1-1024 characters without CR, LF or NUL');
   }
   if (!FOLDER.test(folder)) throw new BillsMailboxError('folder must be printable ASCII');
-  const t = await sql<{ tenant_id: string | null }>`
-    SELECT nullif(current_setting('app.tenant_id', true), '') AS tenant_id`.execute(trx);
-  const tenantId = t.rows[0]?.tenant_id;
-  if (!tenantId) throw new Error('saveBillsMailbox must run inside a tenant transaction');
+  const tenantId = await currentTenant(trx);
   const id = randomUUID();
   const sealed = await sealField(kms, input.password, aadFor(tenantId, company, id));
   await trx
@@ -121,12 +173,58 @@ export async function saveBillsMailbox(
       port,
       username,
       folder,
-      password_ct: sealed.ciphertext,
-      password_iv: sealed.iv,
-      password_tag: sealed.tag,
-      password_dek_wrapped: sealed.wrappedDek,
-      password_kek_id: sealed.keyId,
-      password_enc_version: sealed.version,
+      ...sealedColumns(sealed),
+      created_by: input.createdBy ?? null,
+    })
+    .execute();
+  return id;
+}
+
+/**
+ * Store a mailbox connected with OAuth (T-0216, ADR-0105 rule 5): the provider's fixed IMAP host,
+ * the refresh token sealed with AAD field `refresh_token`. The active mailbox becomes superseded.
+ */
+export async function saveOAuthBillsMailbox(
+  trx: Trx,
+  kms: Kms,
+  companyId: string,
+  input: OAuthBillsMailboxInput,
+): Promise<string> {
+  const company = companyId.toLowerCase();
+  if (!isMailboxOAuthProvider(input.provider)) throw new BillsMailboxError('unknown provider');
+  const username = input.username.trim();
+  const folder = input.folder ?? 'INBOX';
+  checkUsername(username);
+  if (!FOLDER.test(folder)) throw new BillsMailboxError('folder must be printable ASCII');
+  if (!/^[\x21-\x7e]{1,4000}$/.test(input.refreshToken)) {
+    throw new BillsMailboxError('refresh token must be 1-4000 printable characters');
+  }
+  const spec = MAILBOX_OAUTH_PROVIDERS[input.provider];
+  const tenantId = await currentTenant(trx);
+  const id = randomUUID();
+  const sealed = await sealField(
+    kms,
+    input.refreshToken,
+    aadFor(tenantId, company, id, 'refresh_token'),
+  );
+  await trx
+    .updateTable('app.bill_inbox_mailbox')
+    .set({ status: 'superseded' })
+    .where('company_id', '=', company)
+    .where('status', '=', 'active')
+    .execute();
+  await trx
+    .insertInto('app.bill_inbox_mailbox')
+    .values({
+      id,
+      company_id: company,
+      host: spec.imapHost,
+      port: spec.imapPort,
+      username,
+      folder,
+      ...sealedColumns(sealed),
+      auth_method: 'oauth2',
+      oauth_provider: input.provider,
       created_by: input.createdBy ?? null,
     })
     .execute();
@@ -147,6 +245,8 @@ const VIEW = [
   'last_polled_at',
   'last_error',
   'created_at',
+  'auth_method',
+  'oauth_provider',
 ] as const;
 
 /** The company's mailboxes, newest first, without secrets. */
@@ -172,6 +272,8 @@ export async function listBillsMailboxes(trx: Trx, companyId: string): Promise<B
     lastPolledAt: r.last_polled_at,
     lastError: r.last_error,
     createdAt: r.created_at,
+    authMethod: r.auth_method === 'oauth2' ? 'oauth2' : 'login',
+    oauthProvider: r.oauth_provider,
   }));
 }
 
@@ -185,6 +287,8 @@ export interface PollDeps {
   readonly maxPerPoll?: number;
   readonly commandTimeoutMs?: number;
   readonly now?: () => Date;
+  /** OAuth client configuration (ADR-0105 rule 2); without it OAuth mailboxes fail connect_failed. */
+  readonly oauth?: MailboxOAuthConfig | null;
 }
 
 export interface PollResult {
@@ -209,6 +313,8 @@ interface MailboxRow {
   status: string;
   uidvalidity: string | null;
   last_uid: string;
+  auth_method: 'password' | 'oauth2';
+  oauth_provider: MailboxOAuthProvider | null;
 }
 
 /**
@@ -247,6 +353,28 @@ async function step(
       .execute();
     return { done: true, refused: out.refused, replayed };
   });
+}
+
+/** Re-seal a rotated refresh token into the same (active, oauth2) row; same AAD (ADR-0105 rule 6). */
+async function rotateRefreshToken(
+  db: Kysely<Database>,
+  kms: Kms,
+  tenantId: string,
+  row: MailboxRow,
+  refreshToken: string,
+): Promise<void> {
+  const sealed = await sealField(
+    kms,
+    refreshToken,
+    aadFor(tenantId.toLowerCase(), row.company_id, row.id, 'refresh_token'),
+  );
+  // lf_app has no UPDATE on the secret columns; the narrow SECURITY DEFINER function does it
+  // for an active oauth2 row of this tenant only (migration 0082). A superseded row is left alone.
+  await withTenant(db, tenantId, (trx) =>
+    sql`SELECT app.rotate_bill_inbox_refresh_token(
+          ${row.id}::uuid, ${sealed.ciphertext}, ${sealed.iv}, ${sealed.tag},
+          ${sealed.wrappedDek}, ${sealed.keyId}, ${sealed.version}::smallint)`.execute(trx),
+  );
 }
 
 async function record(
@@ -296,6 +424,8 @@ export async function pollBillsMailbox(
         'password_dek_wrapped',
         'password_kek_id',
         'password_enc_version',
+        'auth_method',
+        'oauth_provider',
       ])
       .where('id', '=', c.mailboxId)
       .executeTakeFirst();
@@ -311,7 +441,7 @@ export async function pollBillsMailbox(
           keyId: row.password_kek_id,
           version: row.password_enc_version,
         },
-        aadFor(c.tenantId.toLowerCase(), row.company_id, row.id),
+        aadFor(c.tenantId.toLowerCase(), row.company_id, row.id, fieldOf(row.auth_method)),
       );
       return { row: row as MailboxRow, password };
     } catch {
@@ -325,10 +455,33 @@ export async function pollBillsMailbox(
     return { ...base, status: 'failed', error: 'credentials_unreadable' };
   }
   const { row, password } = loaded;
-  const connector = (deps.connector ?? ((m) => tlsConnector(m.host, m.port)))({
-    host: row.host,
-    port: row.port,
-  });
+
+  // 1b. OAuth: a fresh access token (network, outside any transaction); keep a rotated refresh
+  // token (ADR-0105 rules 6–7). The IMAP host is the provider's, never the stored one.
+  let accessToken: string | null = null;
+  let endpoint = { host: row.host, port: row.port };
+  if (row.auth_method === 'oauth2') {
+    const provider = row.oauth_provider;
+    if (!provider || !deps.oauth) {
+      await record(db, c.tenantId, row.id, now(), 'connect_failed');
+      return { ...base, status: 'failed', error: 'connect_failed' };
+    }
+    const spec = MAILBOX_OAUTH_PROVIDERS[provider];
+    endpoint = { host: spec.imapHost, port: spec.imapPort };
+    try {
+      const t = await refreshAccessToken(deps.oauth, provider, password);
+      accessToken = t.accessToken;
+      if (t.refreshToken !== null && t.refreshToken !== password) {
+        await rotateRefreshToken(db, deps.kms, c.tenantId, row, t.refreshToken);
+      }
+    } catch (e) {
+      if (!(e instanceof MailboxOAuthError)) throw e;
+      const kind = e.kind === 'auth_failed' ? 'auth_failed' : 'connect_failed';
+      await record(db, c.tenantId, row.id, now(), kind);
+      return { ...base, status: 'failed', error: kind };
+    }
+  }
+  const connector = (deps.connector ?? ((m) => tlsConnector(m.host, m.port)))(endpoint);
 
   // 2. Talk to the server; each message is committed on its own.
   let client: ImapClient | null = null;
@@ -341,7 +494,8 @@ export async function pollBillsMailbox(
       maxLiteralBytes: maxBytes,
       ...(deps.commandTimeoutMs ? { commandTimeoutMs: deps.commandTimeoutMs } : {}),
     });
-    await client.login(row.username, password);
+    if (accessToken !== null) await client.authenticateXOAuth2(row.username, accessToken);
+    else await client.login(row.username, password);
     const box = await client.examine(row.folder);
     const sameValidity =
       row.uidvalidity !== null && Number.parseInt(row.uidvalidity, 10) === box.uidValidity;

@@ -1,0 +1,157 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae6edc668685af2c4
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:36009
+ ❯ |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts (7 tests | 7 failed) 1337ms
+     × SS-PLAT-192 needs a fresh step-up and settings.setup.manage; an Idempotency-Key; a valid body 40ms
+     × SS-PLAT-192 an unconfigured provider or server is 503 oauth_not_configured 6ms
+     × SS-PLAT-192 answers the provider authorization URL with PKCE S256 and state; stores only the state hash; audited without state or verifier 3ms
+     × SS-PLAT-192 another user’s or another session’s callback is refused and leaves the request usable; the owner connects: 303 to Settings, mailbox sealed, old one superseded, audited without secret 5ms
+     × SS-PLAT-192 an expired request (over 10 minutes) is refused without calling the provider 4ms
+     × SS-PLAT-192 a refused consent, a refused code (invalid_grant) or a provider outage redirects with a fixed code; no mailbox changes; the request is used up 5ms
+     × SS-PLAT-192 the callback needs settings.setup.manage and a malformed one is invalid_request 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts > SS-PLAT-192: starting a mailbox connection > SS-PLAT-192 needs a fresh step-up and settings.setup.manage; an Idempotency-Key; a valid body
+AssertionError: expected 404 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 404
+
+ ❯ apps/api/src/ap/bills-mailbox-oauth.db.test.ts:186:26
+    184|   it('SS-PLAT-192 needs a fresh step-up and settings.setup.manage; an …
+    185|     const stale = await call(api, 'POST', START, 'fa', startBody());
+    186|     expect(stale.status).toBe(401);
+       |                          ^
+    187|     expect(await stale.json()).toEqual({ error: 'step_up_required', ma…
+    188|     const clerk = await call(api, 'POST', START, 'clerk', startBody());
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts > SS-PLAT-192: starting a mailbox connection > SS-PLAT-192 an unconfigured provider or server is 503 oauth_not_configured
+AssertionError: expected 404 to be 503 // Object.is equality
+
+- Expected
++ Received
+
+- 503
++ 404
+
+ ❯ apps/api/src/ap/bills-mailbox-oauth.db.test.ts:214:27
+    212|   it('SS-PLAT-192 an unconfigured provider or server is 503 oauth_not_…
+    213|     const google = await call(api, 'POST', START, 'fa', startBody({ pr…
+    214|     expect(google.status).toBe(503);
+       |                           ^
+    215|     expect(await google.json()).toMatchObject({ error: 'oauth_not_conf…
+    216|     cookies.set('fa@bare', cookies.get('fa') ?? '');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts > SS-PLAT-192: starting a mailbox connection > SS-PLAT-192 answers the provider authorization URL with PKCE S256 and state; stores only the state hash; audited without state or verifier
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ apps/api/src/ap/bills-mailbox-oauth.db.test.ts:224:24
+    222|   it('SS-PLAT-192 answers the provider authorization URL with PKCE S25…
+    223|     const res = await call(api, 'POST', START, 'fa', startBody({ folde…
+    224|     expect(res.status).toBe(201);
+       |                        ^
+    225|     const text = await res.text();
+    226|     const body = JSON.parse(text) as {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts > SS-PLAT-192: the callback connects the mailbox once, for the same person > SS-PLAT-192 another user’s or another session’s callback is refused and leaves the request usable; the owner connects: 303 to Settings, mailbox sealed, old one superseded, audited without secret
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ start apps/api/src/ap/bills-mailbox-oauth.db.test.ts:102:22
+    100| async function start(who = 'fa') {
+    101|   const res = await call(api, 'POST', START, who, startBody());
+    102|   expect(res.status).toBe(201);
+       |                      ^
+    103|   const body = (await res.json()) as { authorization_url: string; expi…
+    104|   const url = new URL(body.authorization_url);
+ ❯ apps/api/src/ap/bills-mailbox-oauth.db.test.ts:268:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts > SS-PLAT-192: the callback connects the mailbox once, for the same person > SS-PLAT-192 an expired request (over 10 minutes) is refused without calling the provider
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ start apps/api/src/ap/bills-mailbox-oauth.db.test.ts:102:22
+    100| async function start(who = 'fa') {
+    101|   const res = await call(api, 'POST', START, who, startBody());
+    102|   expect(res.status).toBe(201);
+       |                      ^
+    103|   const body = (await res.json()) as { authorization_url: string; expi…
+    104|   const url = new URL(body.authorization_url);
+ ❯ apps/api/src/ap/bills-mailbox-oauth.db.test.ts:343:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts > SS-PLAT-192: the callback connects the mailbox once, for the same person > SS-PLAT-192 a refused consent, a refused code (invalid_grant) or a provider outage redirects with a fixed code; no mailbox changes; the request is used up
+AssertionError: expected 404 to be 201 // Object.is equality
+
+- Expected
++ Received
+
+- 201
++ 404
+
+ ❯ start apps/api/src/ap/bills-mailbox-oauth.db.test.ts:102:22
+    100| async function start(who = 'fa') {
+    101|   const res = await call(api, 'POST', START, who, startBody());
+    102|   expect(res.status).toBe(201);
+       |                      ^
+    103|   const body = (await res.json()) as { authorization_url: string; expi…
+    104|   const url = new URL(body.authorization_url);
+ ❯ apps/api/src/ap/bills-mailbox-oauth.db.test.ts:360:15
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts > SS-PLAT-192: the callback connects the mailbox once, for the same person > SS-PLAT-192 the callback needs settings.setup.manage and a malformed one is invalid_request
+AssertionError: expected 404 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 404
+
+ ❯ apps/api/src/ap/bills-mailbox-oauth.db.test.ts:390:26
+    388|   it('SS-PLAT-192 the callback needs settings.setup.manage and a malfo…
+    389|     const clerk = await callback('clerk', { state: 'x'.repeat(43), cod…
+    390|     expect(clerk.status).toBe(403);
+       |                          ^
+    391|     const missing = await callback('fa', { code: 'c' });
+    392|     expect(missing.headers.get('location')).toBe(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed (7)
+   Start at  11:53:45
+   Duration  6.06s (transform 2.08s, setup 0ms, import 3.75s, tests 1.34s, environment 0ms)
+

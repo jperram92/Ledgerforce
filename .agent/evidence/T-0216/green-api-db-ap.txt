@@ -1,0 +1,14 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-ae6edc668685af2c4
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:36011
+[31m[Nest] 25222  - [39m11/23/2026, 12:01:13 PM [31m  ERROR[39m [38;5;3m[MailgunInbound] [39m[31minbound webhook failed: DatabaseError P0001[39m
+(node:25590) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ Test Files  10 passed (10)
+      Tests  70 passed (70)
+   Start at  12:00:52
+   Duration  67.17s (transform 4.29s, setup 0ms, import 28.52s, tests 33.97s, environment 1ms)
+
+[vitest-pool]: Timeout terminating forks worker for test files /home/user/Ledgerforce/.claude/worktrees/agent-ae6edc668685af2c4/apps/api/src/ap/payment-batch-aba.db.test.ts.

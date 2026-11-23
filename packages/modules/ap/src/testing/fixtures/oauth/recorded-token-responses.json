@@ -1,0 +1,69 @@
+{
+  "_source": "Token-endpoint answers transcribed from the providers' published example responses (Microsoft identity platform v2.0 authorization-code and refresh-token docs; Google OAuth 2.0 for web server applications), with token values shortened and replaced by fixed fakes. Shapes, field names, status codes and error codes are as published (RQ-0187). No real credential.",
+  "microsoft_code": {
+    "status": 200,
+    "body": {
+      "token_type": "Bearer",
+      "scope": "https://outlook.office.com/IMAP.AccessAsUser.All",
+      "expires_in": 3599,
+      "ext_expires_in": 3599,
+      "access_token": "eyJ0eXAiOiJKV1QiLCJub25jZSI6IkFRQUJBQUFBQUFE.ms-access-1",
+      "refresh_token": "0.AXEA-ms-refresh-1-AwABAAAAvPM1KaPlrEqdFSBzjqfTGAMxZGUTdM0t4B4"
+    }
+  },
+  "microsoft_refresh": {
+    "status": 200,
+    "body": {
+      "token_type": "Bearer",
+      "scope": "https://outlook.office.com/IMAP.AccessAsUser.All",
+      "expires_in": 3599,
+      "ext_expires_in": 3599,
+      "access_token": "eyJ0eXAiOiJKV1QiLCJub25jZSI6IkFRQUJBQUFBQUFE.ms-access-2",
+      "refresh_token": "0.AXEA-ms-refresh-2-AwABAAAAvPM1KaPlrEqdFSBzjqfTGBCmXwnC4Kdl8s5"
+    }
+  },
+  "microsoft_invalid_grant": {
+    "status": 400,
+    "body": {
+      "error": "invalid_grant",
+      "error_description": "AADSTS70000: The provided value for the 'code' parameter is not valid. bills@harbour.example",
+      "error_codes": [70000],
+      "timestamp": "2026-11-23 01:02:03Z",
+      "trace_id": "0000aaaa-11bb-cccc-dd22-eeeeee333333",
+      "correlation_id": "aaaa0000-bb11-2222-33cc-444444dddddd"
+    }
+  },
+  "google_code": {
+    "status": 200,
+    "body": {
+      "access_token": "ya29.a0AfB_byC-google-access-1",
+      "expires_in": 3599,
+      "refresh_token": "1//0gGoogleRefresh1-L9IrK2dN3w",
+      "scope": "https://mail.google.com/",
+      "token_type": "Bearer"
+    }
+  },
+  "google_refresh": {
+    "status": 200,
+    "body": {
+      "access_token": "ya29.a0AfB_byC-google-access-2",
+      "expires_in": 3599,
+      "scope": "https://mail.google.com/",
+      "token_type": "Bearer"
+    }
+  },
+  "google_invalid_grant": {
+    "status": 400,
+    "body": {
+      "error": "invalid_grant",
+      "error_description": "Token has been expired or revoked."
+    }
+  },
+  "server_error": {
+    "status": 503,
+    "body": {
+      "error": "temporarily_unavailable",
+      "error_description": "AADSTS90033: A transient error has occurred."
+    }
+  }
+}
