@@ -39,13 +39,22 @@ let addrOther = '';
 let addrB = '';
 let supersededA = '';
 
+// Two documentation-range addresses standing in for two Mailgun egress addresses.
+const MAILGUN_IP_1 = '192.0.2.21';
+const MAILGUN_IP_2 = '192.0.2.22';
+
 async function post(
   target: Api,
   req: { body: Buffer | ReadableStream<Uint8Array>; contentType: string },
+  /** The address the trusted proxy in front of `api` reports (X-Forwarded-For), if any. */
+  forwardedFor?: string,
 ): Promise<{ status: number; text: string; json: Record<string, unknown> }> {
   const res = await fetch(`${target.url}${PATH}`, {
     method: 'POST',
-    headers: { 'content-type': req.contentType },
+    headers: {
+      'content-type': req.contentType,
+      ...(forwardedFor === undefined ? {} : { 'x-forwarded-for': forwardedFor }),
+    },
     body: req.body,
     ...(req.body instanceof ReadableStream ? { duplex: 'half' } : {}),
   } as RequestInit);
@@ -159,7 +168,14 @@ beforeAll(async () => {
     DOMAIN,
   );
   const mailgunInbound = { signingKeys: [KEY], inboundDomain: DOMAIN };
-  api = await createApi({ databaseUrl: f.tdb.url('lf_app'), mailgunInbound });
+  // Default upload limits behind one trusted proxy, as compose runs it (LF_TRUST_PROXY_HOPS=1):
+  // racing deliveries below come from two Mailgun addresses, as they would in production, since
+  // one address may have only one upload in flight (T-0230).
+  api = await createApi({
+    databaseUrl: f.tdb.url('lf_app'),
+    mailgunInbound,
+    security: { trustProxyHops: 1 },
+  });
   limited = await createApi({
     databaseUrl: f.tdb.url('lf_app'),
     mailgunInbound,
@@ -592,7 +608,7 @@ describe('SS-PLAT-178 a Mailgun token is consumed right after the signature chec
 
   it('SS-PLAT-178 two identical deliveries racing: one created, one duplicate; two different ones racing: one created, one replayed', async () => {
     const same = sign(addrA, { bodyMime: variant('178d') });
-    const a = await Promise.all([post(api, same), post(api, same)]);
+    const a = await Promise.all([post(api, same, MAILGUN_IP_1), post(api, same, MAILGUN_IP_2)]);
     expect(a.map((r) => r.json.outcome).sort()).toEqual(['created', 'duplicate']);
     const first = sign(addrA, { bodyMime: variant('178e') });
     const clash = sign(addrA, {
@@ -601,7 +617,7 @@ describe('SS-PLAT-178 a Mailgun token is consumed right after the signature chec
       timestamp: Number(first.timestamp),
     });
     const before = await stored(f.tenantId);
-    const b = await Promise.all([post(api, first), post(api, clash)]);
+    const b = await Promise.all([post(api, first, MAILGUN_IP_1), post(api, clash, MAILGUN_IP_2)]);
     expect(b.map((r) => r.status).sort()).toEqual([200, 406]);
     expect(b.find((r) => r.status === 406)?.json).toEqual({ error: 'replayed' });
     expect(Number((await stored(f.tenantId))?.items)).toBe(Number(before?.items) + 1);

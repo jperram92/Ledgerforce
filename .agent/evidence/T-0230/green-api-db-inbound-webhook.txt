@@ -1,0 +1,11 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a8e855c313275ce6c
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:36213
+[31m[Nest] 26089  - [39m11/23/2026, 5:19:11 AM [31m  ERROR[39m [38;5;3m[MailgunInbound] [39m[31minbound webhook failed: DatabaseError P0001[39m
+
+ Test Files  1 passed (1)
+      Tests  22 passed (22)
+   Start at  05:19:04
+   Duration  7.33s (transform 1.74s, setup 0ms, import 2.98s, tests 3.27s, environment 0ms)
+

@@ -1,0 +1,16 @@
+
+> ledgerforce@0.0.0 evidence:tests /home/user/Ledgerforce/.claude/worktrees/agent-a8e855c313275ce6c
+> node packages/testing/src/evidence/record-tests.ts --project api-unit --require SS-PLAT-186 --require SS-PLAT-187 --require SS-PLAT-188 apps/api/src/security/inbound-body.test.ts
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a8e855c313275ce6c
+
+ ✓ |api-unit| apps/api/src/security/inbound-body.test.ts (13 tests) 145ms
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  11:42:27
+   Duration  3.82s (transform 1.64s, setup 0ms, import 3.10s, tests 145ms, environment 0ms)
+
+JSON report written to /home/user/Ledgerforce/.claude/worktrees/agent-a8e855c313275ce6c/.agent/evidence/T-0230/20261123-114226-tests-api-unit.json
+record-tests: 3 scenario(s) → .agent/evidence/T-0230/20261123-114226-tests-api-unit.json: SS-PLAT-186=passed, SS-PLAT-187=passed, SS-PLAT-188=passed

@@ -115,6 +115,20 @@ After the Owner's first sign-in, setup refuses to reissue.
   `LF_TRUST_PROXY_HOPS=2`; otherwise leave `1`. Too low merges every user into the proxy's bucket;
   too high lets a client choose its own bucket. The API also sends `Cache-Control: no-store`,
   CSP, `nosniff`, `X-Frame-Options: DENY` and, for an https `LF_PUBLIC_URL`, HSTS (one year).
+- **Bills inbox webhook (Mailgun)** (T-0230, RQ-0186): `POST /webhooks/mailgun/messages.mime`
+  takes unauthenticated uploads up to 26 MiB, so it takes at most 4 uploads at once and **1 per
+  client address** (a second one answers 503 `inbound_busy` + `Retry-After`; Mailgun retries).
+  An upload must send its first byte within 3 s and average at least 64 KiB/s from 5 s on, or it
+  is cut off with 408 (`first_byte_timeout` / `upload_too_slow`). The per-address rule uses the
+  same address as the rate limits above, so `LF_TRUST_PROXY_HOPS` must be right: too low and every
+  delivery shares the proxy's address and waits its turn. These limits make an attack from one
+  address harmless but not one from many addresses. Two optional measures close that gap:
+  - **Allow only Mailgun** to reach that path in your TLS proxy (Mailgun publishes the addresses
+    it sends webhooks from; keep the list current). Other clients then never take a slot.
+  - **Alert on busy answers**: in the `web` (nginx) access log, alert when 503 or 408 answers on
+    `/webhooks/mailgun/messages.mime` persist for more than about 15 minutes. Mailgun keeps
+    retrying for about 8 hours and then drops the message, so a sustained alert means supplier
+    bills are at risk; check the client addresses in the log and block or allow-list.
 - **Reachability**: the api container must reach `LF_PUBLIC_URL` (it fetches the OIDC discovery
   document from it). With public DNS this works through your reverse proxy; check with
   `docker compose … exec api node -e "fetch(process.env.LF_PUBLIC_URL+'/realms/ledgerforce').then(r=>console.log(r.status))"`.

@@ -4572,3 +4572,31 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: N1 affects only availability of the inbound route, not data or tenant isolation; it needs its own tests and tuning.
 - Alternatives: fix inside T-0215 (rejected: separate behaviour; T-0215 already passed review).
 - ADR: none · Status: accepted
+
+### DL-0920 — Mailgun inbound reader: one upload per client, first byte in 3 s, at least 64 KiB/s from 5 s
+- Date: 2026-11-23 · By: claude · Task: T-0230 · Category: security
+- Decision: `inboundWebhookBody` adds `maxInFlightPerClient` (default 1; 1..maxInFlight, checked before the global slot and byte reservation, 503 `inbound_busy` + Retry-After), `firstByteTimeoutMs` (3 000; 408 `first_byte_timeout`) and `minBytesPerSecond` / `minRateGraceMs` (64 KiB/s averaged over the request, checked once a second from 5 s; 408 `upload_too_slow`). Every refusal keeps `Connection: close`; all timers stop on end, refusal or client close; global cap 4, 64 MiB budget, 60 s and 26 MiB unchanged. Delegated security decision under DL-0691 with research RQ-0186; no ADR (no dependency, data model or public contract change; the ADR-0099 addendum already puts upload bounds in this reader).
+- Why: T-0215 re-review N1 (DL-0898): four trickling connections from one address held every slot. Per-address concurrency (nginx `limit_conn addr 1`), a data timeout (nginx `client_body_timeout`) and a rate floor (Apache `MinRate`) are the standard trio; the floor can be far above Apache's 500 B/s because the sender is Mailgun's data centre and genuine 26 MiB bodies already need ~450 KiB/s to meet the 60 s cap.
+- Alternatives: idle (between-reads) timeout only, as nginx (rejected: one byte per interval survives it); per-client cap 2 (rejected: halves the cost of an attack; a genuine same-address burst is only delayed by Mailgun's retry); a lower whole-body timeout (rejected: would cut genuine large messages).
+- ADR: none (ADR-0099 addendum) · Status: accepted
+
+### DL-0921 — Per-client key is the rate limiter's address; inbound DB harness runs behind one trusted proxy
+- Date: 2026-11-23 · By: claude · Task: T-0230 · Category: security
+- Decision: `clientAddress(req)` in rate-limit.ts (`req.ip` under Express `trust proxy` = LF_TRUST_PROXY_HOPS, `::ffff:` folded) is shared by the rate limiter and the upload reader. Proven on a real Nest app with `applySecurity`: with 0 hops a forged X-Forwarded-For does not make a second client; with 1 hop only the proxy-added entry counts. The default-limits `api` instance of bills-inbound-webhook.db.test.ts now uses `trustProxyHops: 1` (as compose) and its SS-PLAT-178 racing deliveries carry two forwarded documentation addresses; assertions unchanged.
+- Why: RQ-0186 F4 — one helper so the two limits can never key differently. The racing test hit the new one-per-address cap from loopback (RED kept as evidence); in production the two racers are two Mailgun addresses behind nginx, which the harness now models instead of raising the cap.
+- Alternatives: raise `maxInFlightPerClient` in the harness (rejected: tests a non-default configuration); trust X-Forwarded-For directly (rejected: client-chosen key).
+- ADR: none · Status: accepted
+
+### DL-0922 — Limits stay code-configurable; environment variables split to T-0235
+- Date: 2026-11-23 · By: claude · Task: T-0230 · Category: process
+- Decision: The new thresholds are `InboundBodyLimits` fields like the T-0215 ones; exposing them through config.ts and compose (with bounds and install-contract tests) is follow-up card T-0235.
+- Why: Keeps T-0230 to the reader; compose and the install contract are shared files with their own tests.
+- Alternatives: add env vars here (rejected: scope).
+- ADR: none · Status: accepted
+
+### DL-0923 — Runbook: Mailgun allow-list and alert on 503/408 from the nginx access log
+- Date: 2026-11-23 · By: claude · Task: T-0230 · Category: security
+- Decision: Docs/ops/install.md documents the limits, the dependency on a correct LF_TRUST_PROXY_HOPS, an optional allow-list of Mailgun's webhook egress addresses at the TLS proxy, and alerting on 503/408 answers for the route that persist for more than ~15 minutes, read from the `web` access log. No API metric is added.
+- Why: RQ-0186 F6 — a many-address attack can still fill the global cap; only network-level filtering closes it. The access log already records status per path, so no new code or dependency is needed for the alert.
+- Alternatives: a Prometheus counter in the API (rejected for now: no metrics endpoint exists in the MVP stack).
+- ADR: none · Status: accepted
