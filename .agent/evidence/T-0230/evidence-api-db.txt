@@ -1,0 +1,20 @@
+
+> ledgerforce@0.0.0 evidence:tests /home/user/Ledgerforce/.claude/worktrees/agent-a8e855c313275ce6c
+> node packages/testing/src/evidence/record-tests.ts --project api-db --require SS-PLAT-178 --require SS-PLAT-177 apps/api/src/ap/bills-inbound-webhook.db.test.ts
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a8e855c313275ce6c
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:41317
+[31m[Nest] 2145  - [39m11/23/2026, 11:42:45 AM [31m  ERROR[39m [38;5;3m[MailgunInbound] [39m[31minbound webhook failed: DatabaseError P0001[39m
+ ✓ |api-db| apps/api/src/ap/bills-inbound-webhook.db.test.ts (22 tests) 4763ms
+     ✓ SS-PLAT-168 a body over 26 MiB answers 413, by Content-Length and by count when streamed  925ms
+     ✓ SS-PLAT-177 a body not sent within the timeout answers 408 and frees the slot  1527ms
+
+ Test Files  1 passed (1)
+      Tests  22 passed (22)
+   Start at  11:42:33
+   Duration  12.39s (transform 4.02s, setup 0ms, import 5.96s, tests 4.76s, environment 0ms)
+
+JSON report written to /home/user/Ledgerforce/.claude/worktrees/agent-a8e855c313275ce6c/.agent/evidence/T-0230/20261123-114232-tests-api-db.json
+record-tests: 5 scenario(s) → .agent/evidence/T-0230/20261123-114232-tests-api-db.json: SS-PLAT-167=passed, SS-PLAT-168=passed, SS-PLAT-169=passed, SS-PLAT-177=passed, SS-PLAT-178=passed

@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0230",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-186",
+      "file": ".agent/evidence/T-0230/20261123-114226-tests-api-unit.json",
+      "test": "7 test(s): apps/api/src/security/inbound-body.test.ts › T-0230 slow-upload protection (fake clock) › SS-PLAT-186 at most one upload in flight per client address › SS-PLAT-186 AC-1 a second concurrent upload from the same address is refused 503 + Retry-After without taking a global slot [T-0230] | apps/api/src/security/inbound-body.test.ts › T-0230 slow-upload protection (fake clock) › SS-PLAT-186 at most one upload in flight per client address › SS-PLAT-186 AC-1 IPv4-mapped IPv6 and plain IPv4 spellings are the same client [T-0230] | apps/api/src/security/inbound-body.test.ts › T-0230 slow-upload protection (fake clock) › SS-PLAT-186 at most one upload in flight per client address › SS-PLAT-186 AC-1 the per-client cap is configurable and must lie between 1 and the global cap [T-0230] | apps/api/src/security/inbound-body.test.ts › T-0230 slow-upload protection (fake clock) › SS-PLAT-186 at most one upload in flight per client address › SS-PLAT-186 AC-1 defaults: one per client, first byte 3 s, 64 KiB/s after 5 s (RQ-0186 F2) [T-0230] | apps/api/src/security/inbound-body.test.ts › SS-PLAT-186 the client address comes from the trusted-proxy setting, never from X-Forwarded-For alone › SS-PLAT-186 AC-1 with no trusted hop, uploads claiming different X-Forwarded-For from one socket address share one slot [T-0230] | apps/api/src/security/inbound-body.test.ts › SS-PLAT-186 the client address comes from the trusted-proxy setting, never from X-Forwarded-For alone › SS-PLAT-186 AC-1 behind one trusted proxy, the forwarded address is the client: two addresses get two slots [T-0230] | apps/api/src/security/inbound-body.test.ts › SS-PLAT-186 the client address comes from the trusted-proxy setting, never from X-Forwarded-For alone › SS-PLAT-186 AC-1 the reader and the rate limiter use the same address helper [T-0230]",
+      "commit": "20d24984d7e6",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:42:26.206Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-187",
+      "file": ".agent/evidence/T-0230/20261123-114226-tests-api-unit.json",
+      "test": "5 test(s): apps/api/src/security/inbound-body.test.ts › T-0230 slow-upload protection (fake clock) › SS-PLAT-187 a slow or silent upload is aborted with Connection: close and its slots released › SS-PLAT-187 AC-2 no first byte within the first-byte timeout answers 408 first_byte_timeout and frees both slots [T-0230] | apps/api/src/security/inbound-body.test.ts › T-0230 slow-upload protection (fake clock) › SS-PLAT-187 a slow or silent upload is aborted with Connection: close and its slots released › SS-PLAT-187 AC-2 an upload averaging under 64 KiB/s after the first 5 s answers 408 upload_too_slow [T-0230] | apps/api/src/security/inbound-body.test.ts › T-0230 slow-upload protection (fake clock) › SS-PLAT-187 a slow or silent upload is aborted with Connection: close and its slots released › SS-PLAT-187 AC-2 an upload at or above the floor is not aborted by the rate check [T-0230] | apps/api/src/security/inbound-body.test.ts › T-0230 slow-upload protection (fake clock) › SS-PLAT-187 a slow or silent upload is aborted with Connection: close and its slots released › SS-PLAT-187 AC-2 a chunked (no Content-Length) trickle is aborted the same way [T-0230] | apps/api/src/security/inbound-body.test.ts › T-0230 slow-upload protection (fake clock) › SS-PLAT-187 a slow or silent upload is aborted with Connection: close and its slots released › SS-PLAT-187 AC-2 no slot leaks: after silent, slow, aborted, refused, mismatched and completed uploads every counter is back to zero [T-0230]",
+      "commit": "20d24984d7e6",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:42:26.206Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-188",
+      "file": ".agent/evidence/T-0230/20261123-114226-tests-api-unit.json",
+      "test": "1 test(s): apps/api/src/security/inbound-body.test.ts › T-0230 slow-upload protection (fake clock) › SS-PLAT-188 a trickling upload is refused long before the 60 s body timeout; a normal delivery afterwards lands › SS-PLAT-188 AC-3 one byte every 500 ms is refused within 6 s; the next delivery from the same address is passed on and answered 200 [T-0230]",
+      "commit": "20d24984d7e6",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:42:26.206Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-167",
+      "file": ".agent/evidence/T-0230/20261123-114232-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-167 a signed Mailgun forward() delivers one inbox item; a redelivery adds nothing › SS-PLAT-167 the recorded supplier email lands in the addressed company with its PDF; the token is recorded | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-167 a signed Mailgun forward() delivers one inbox item; a redelivery adds nothing › SS-PLAT-167 a redelivery of the same message with a fresh token answers duplicate and adds no item",
+      "commit": "20d24984d7e6",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:42:32.339Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-168",
+      "file": ".agent/evidence/T-0230/20261123-114232-tests-api-db.json",
+      "test": "8 test(s): apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 no signature, a forged signature or a wrong key answers 401 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 a correctly signed but stale or future timestamp (outside ±300 s) answers 401 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 a reused token answers 406 unless it carries the same message and recipient (a genuine retry is a duplicate, r11 F2) | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 the signature is checked before the message: an invalid message with a bad signature is 401, with a good one 406 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 a store() route (attachments field) or a forward without body-mime answers 406 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 malformed forms answer 400; a JSON or urlencoded body answers 415 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 a body over 26 MiB answers 413, by Content-Length and by count when streamed | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-168 unauthenticated, stale, replayed, misshaped or oversize requests are refused before parsing or storage › SS-PLAT-168 without a signing key and inbound domain the route answers 503 and stores nothing",
+      "commit": "20d24984d7e6",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:42:32.339Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-169",
+      "file": ".agent/evidence/T-0230/20261123-114232-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-169 the recipient token picks the company; unknown recipients learn nothing › SS-PLAT-169 each signed delivery lands only in the company and tenant its token belongs to | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-169 the recipient token picks the company; unknown recipients learn nothing › SS-PLAT-169 unknown, superseded, foreign-domain, listed or malformed recipients all answer the same 406 | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-169 the recipient token picks the company; unknown recipients learn nothing › SS-PLAT-169 answers never contain the signing key, tokens, tenant or company ids | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-169 the recipient token picks the company; unknown recipients learn nothing › SS-PLAT-169 the route counts against its own inbound_email rate-limit class, lower than /webhooks/* (429 once spent, r11 F1)",
+      "commit": "20d24984d7e6",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:42:32.339Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-177",
+      "file": ".agent/evidence/T-0230/20261123-114232-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) › SS-PLAT-177 a second upload while one is in flight answers 503 with Retry-After without being read; the first still lands | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) › SS-PLAT-177 a declared length over the remaining byte budget answers 503 before reading | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) › SS-PLAT-177 a body not sent within the timeout answers 408 and frees the slot | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-177 the unauthenticated upload path is bounded: in-flight cap, byte budget, timeout, connection closed on refusal (r11 F1, F4) › SS-PLAT-177 every refusal closes the connection (415, 413, 401, 406, 400)",
+      "commit": "20d24984d7e6",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:42:32.339Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-178",
+      "file": ".agent/evidence/T-0230/20261123-114232-tests-api-db.json",
+      "test": "4 test(s): apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) › SS-PLAT-178 after a refused message (406) the same token with another message answers replayed | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) › SS-PLAT-178 after an unknown recipient (406) the same token to a valid recipient answers replayed | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) › SS-PLAT-178 after a server failure (500, logged without message content) the identical retry lands | apps/api/src/ap/bills-inbound-webhook.db.test.ts › SS-PLAT-178 a Mailgun token is consumed right after the signature check, bound to the message and recipient (r11 F2) › SS-PLAT-178 two identical deliveries racing: one created, one duplicate; two different ones racing: one created, one replayed",
+      "commit": "20d24984d7e6",
+      "provider": "claude",
+      "timestamp": "2026-11-23T11:42:32.339Z",
+      "result": "passed"
+    }
+  ]
+}
