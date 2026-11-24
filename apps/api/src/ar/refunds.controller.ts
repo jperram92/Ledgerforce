@@ -4,8 +4,10 @@
  *   PUT  /ar/refunds/:id                   ar.refund.create, SoD refund.create (client id; replay 200)
  *   POST /ar/refunds/:id/approve           ar.refund.approve, SoD refund.approve (the creator is
  *                                          refused, SOD_REFUND_SELF_APPROVAL); a repeat replays
- *   POST /ar/refunds/:id/cancel            ar.refund.create: a requested Stripe refund with no live
- *                                          refund at Stripe (T-0190); a repeat replays
+ *   POST /ar/refunds/:id/cancel            ar.refund.create, Idempotency-Key: a requested refund,
+ *                                          approved or not — Stripe: none live at Stripe (T-0190);
+ *                                          bank: no live payment batch pays it (T-0207,
+ *                                          ADR-0107); a repeat replays
  *   POST /ar/refunds/:id/stripe-check      ar.refund.approve: reconcile with Stripe, never a create
  *                                          (T-0189, ADR-0091)
  *   PUT  /ar/refunds/:id/stripe-resends/:r ar.refund.approve, SoD refund_resend.request: ask a resend
@@ -34,6 +36,7 @@ import {
   ConflictException,
   Controller,
   Get,
+  Headers,
   HttpCode,
   Inject,
   NotFoundException,
@@ -86,6 +89,7 @@ import {
   RequireStepUp,
   type StepUpCondition,
 } from '../authz/permission.decorator.ts';
+import { requireKey } from '../settings/settings-common.ts';
 import { InvalidSodSubject, SoD, type SubjectFrom } from '../sod/sod.decorator.ts';
 import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
 import { CLOCK, DOCUMENT_OUTBOX, POSTING_OUTBOX, STRIPE_REFUNDS } from '../tokens.ts';
@@ -315,6 +319,19 @@ function viewOf(r: CustomerRefundView, stripe?: StripeView) {
     approved_at: r.approvedAt,
     entry_id: r.entryId,
     paid_on: r.paidOn,
+    // T-0207 (ADR-0107): the live payment batch paying a bank refund, so Cancel is offered only
+    // when no batch pays it.
+    ...(r.method === 'bank_batch'
+      ? {
+          payment_batch: r.paymentBatch
+            ? {
+                id: r.paymentBatch.batchId,
+                batch_no: r.paymentBatch.batchNo,
+                status: r.paymentBatch.status,
+              }
+            : null,
+        }
+      : {}),
     ...(stripe ? { stripe } : {}),
   };
 }
@@ -448,15 +465,23 @@ export class ArRefundsController {
   }
 
   /**
-   * Cancel a requested Stripe refund that no live Stripe refund pays (T-0190, RQ-0173): asks
-   * Stripe first under the party lock (409 AT_STRIPE when Stripe holds one); 422 NOT_CANCELLABLE
-   * when paid or a bank refund; a repeat replays. The maker withdraws a request: no SoD step and
-   * no step-up (no money moves). Audited.
+   * Cancel a requested refund (T-0190, T-0207; RQ-0173, RQ-0189, ADR-0107), approved or not. A
+   * Stripe one: Stripe is asked first under the party lock (409 AT_STRIPE when Stripe holds one;
+   * 503 without the Stripe client). A bank one: 422 NOT_CANCELLABLE while a live payment batch
+   * pays it. Paid: 422 NOT_CANCELLABLE. A repeat replays (200). Permission `ar.refund.create`:
+   * whoever may ask for a refund may take the request back; no SoD step and no step-up, because
+   * cancelling moves no money and only lowers what can leave. Idempotency-Key required (not
+   * stored: the route is idempotent by state). Audited.
    */
   @Post('refunds/:id/cancel')
   @HttpCode(200)
   @RequirePermission('ar.refund.create')
-  async cancel(@Param('id') id: string, @Query('company_id') companyId: string | undefined) {
+  async cancel(
+    @Headers('idempotency-key') key: string | undefined,
+    @Param('id') id: string,
+    @Query('company_id') companyId: string | undefined,
+  ) {
+    requireKey(key);
     const cid = uuid(companyId, 'company_id');
     const refundId = uuid(id, 'id');
     const trx = this.tx.get();

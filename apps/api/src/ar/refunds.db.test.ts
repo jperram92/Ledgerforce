@@ -5,6 +5,7 @@
  *   POST /ar/refunds/:id/approve?company_id=      — ar.refund.approve, SoD refund.approve
  *   GET  /ar/refunds/:id[/journal]?company_id=    — ar.read; the journal is GP-006, writes nothing
  *   GET  /ar/parties/:id/credit?company_id=       — ar.read
+ *   POST /ar/refunds/:id/cancel?company_id=       — ar.refund.create, Idempotency-Key (T-0207)
  * The creator may not approve (SOD_REFUND_SELF_APPROVAL); another tenant's party or refund is 404;
  * money is a decimal string. The preview is compared line for line with the Approved GP-006.
  */
@@ -47,8 +48,14 @@ const people: Record<string, { id: string; roles: string[] }> = {
   apClerk: { id: randomUUID(), roles: ['ap_clerk'] },
 };
 
-async function call(method: string, path: string, who: string, body?: unknown) {
-  const h: Record<string, string> = {};
+async function call(
+  method: string,
+  path: string,
+  who: string,
+  body?: unknown,
+  headers: Record<string, string> = {},
+) {
+  const h: Record<string, string> = { ...headers };
   const c = cookies.get(who);
   if (c) h.cookie = `lf_session=${c}`;
   h['sec-fetch-site'] = 'same-origin';
@@ -222,6 +229,8 @@ describe('SS-UC11-08: refund of the customer credit, approved by another person,
       approved_at: null,
       entry_id: null,
       paid_on: null,
+      // T-0207 (ADR-0107): no live payment batch pays it yet.
+      payment_batch: null,
     });
     const replay = await call('PUT', `/ar/refunds/${id}`, 'arClerk', body(acme, '220.00'));
     expect(replay.status).toBe(200);
@@ -379,5 +388,99 @@ describe('SS-UC11-08: refund of the customer credit, approved by another person,
       amount: 10,
     });
     expect(bad.status).toBe(400);
+  });
+});
+
+describe('SS-UC11-18: the AR Clerk cancels a requested bank refund over HTTP (T-0207)', () => {
+  const cancel = (id: string, who: string, key: string | null = randomUUID()) =>
+    call(
+      'POST',
+      `/ar/refunds/${id}/cancel?${q()}`,
+      who,
+      undefined,
+      key === null ? {} : { 'idempotency-key': key },
+    );
+
+  it('SS-UC11-18 an approved and an unapproved bank refund are cancelled (a repeat replays), freeing the credit; audited once each', async () => {
+    const before = await call('GET', `/ar/parties/${beta}/credit?${q()}`, 'auditor');
+    const was = (await before.json()) as { requested: string; available: string };
+    const approvedId = randomUUID();
+    expect(
+      (await call('PUT', `/ar/refunds/${approvedId}`, 'arClerk', body(beta, '40.00'))).status,
+    ).toBe(201);
+    expect(
+      (await call('POST', `/ar/refunds/${approvedId}/approve?${q()}`, 'approver')).status,
+    ).toBe(200);
+    const pendingId = randomUUID();
+    expect(
+      (await call('PUT', `/ar/refunds/${pendingId}`, 'arClerk', body(beta, '25.00'))).status,
+    ).toBe(201);
+    const read = await call('GET', `/ar/refunds/${approvedId}?${q()}`, 'auditor');
+    expect(await read.json()).toMatchObject({ status: 'requested', payment_batch: null });
+
+    const key = randomUUID();
+    const ok = await cancel(approvedId, 'arClerk', key);
+    expect(ok.status).toBe(200);
+    expect(await ok.json()).toMatchObject({
+      id: approvedId,
+      method: 'bank_batch',
+      status: 'cancelled',
+      approval: 'approved',
+      replayed: false,
+      payment_batch: null,
+    });
+    const again = await cancel(approvedId, 'arClerk', key);
+    expect(again.status).toBe(200);
+    expect(await again.json()).toMatchObject({ status: 'cancelled', replayed: true });
+    const withdrawn = await cancel(pendingId, 'arClerk');
+    expect(withdrawn.status).toBe(200);
+    expect(await withdrawn.json()).toMatchObject({ status: 'cancelled', approval: 'pending' });
+
+    const after = await call('GET', `/ar/parties/${beta}/credit?${q()}`, 'auditor');
+    expect(await after.json()).toMatchObject({
+      requested: was.requested,
+      available: was.available,
+    });
+    for (const id of [approvedId, pendingId]) {
+      const audited = await f.admin.query<{ n: number; before: string | null }>(
+        `SELECT count(*)::int AS n, max(before->>'status') AS before FROM audit.audit_log
+          WHERE tenant_id = $1 AND entity_type = 'customer_refund' AND entity_id = $2
+            AND after->>'status' = 'cancelled'`,
+        [f.tenantId, id],
+      );
+      expect(audited.rows[0], id).toEqual({ n: 1, before: 'requested' });
+    }
+    // A withdrawn request can no longer be approved.
+    const late = await call('POST', `/ar/refunds/${pendingId}/approve?${q()}`, 'approver');
+    expect(late.status).toBe(422);
+    expect(await late.json()).toMatchObject({ error: 'NOT_APPROVABLE' });
+  });
+
+  it('SS-UC11-18 needs ar.refund.create (an Approver or Auditor is 403) and an Idempotency-Key (400); another tenant is 404; a malformed id 400', async () => {
+    const id = randomUUID();
+    expect((await call('PUT', `/ar/refunds/${id}`, 'arClerk', body(beta, '10.00'))).status).toBe(
+      201,
+    );
+    for (const who of ['approver', 'auditor']) {
+      const denied = await cancel(id, who);
+      expect(denied.status, who).toBe(403);
+      expect(await denied.json()).toEqual({ error: 'forbidden', permission: 'ar.refund.create' });
+    }
+    const noKey = await cancel(id, 'arClerk', null);
+    expect(noKey.status).toBe(400);
+    expect(await noKey.json()).toMatchObject({ error: 'idempotency_key_required' });
+    const read = await call('GET', `/ar/refunds/${id}?${q()}`, 'auditor');
+    expect(await read.json()).toMatchObject({ status: 'requested' });
+
+    const foreign = await cancel(foreignRefund, 'arClerk');
+    expect(foreign.status).toBe(404);
+    expect(await foreign.json()).toMatchObject({ error: 'not_found' });
+    const stillThere = await other.admin.query<{ status: string }>(
+      'SELECT status FROM app.customer_refund WHERE id = $1',
+      [foreignRefund],
+    );
+    expect(stillThere.rows[0]?.status).toBe('requested');
+    expect((await cancel('not-a-uuid', 'arClerk')).status).toBe(400);
+    expect((await cancel(id, 'arClerk')).status).toBe(200);
   });
 });

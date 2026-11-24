@@ -58,7 +58,10 @@ export type RefundErrorCode =
   | 'BANK_ACCOUNT_REQUIRED'
   | 'NO_STRIPE_PAYMENT'
   | 'NOT_DUE'
-  /** T-0190: only a requested Stripe refund with no live refund at Stripe is cancelled. */
+  /**
+   * T-0190, T-0207: paid, or a bank refund a live payment batch pays (a Stripe refund Stripe
+   * holds is AT_STRIPE instead).
+   */
   | 'NOT_CANCELLABLE'
   /** T-0190 (RQ-0173): Stripe holds a live refund for this document; it is never cancelled. */
   | 'AT_STRIPE'
@@ -104,7 +107,18 @@ export interface CustomerRefundView {
   readonly approvedBy: string | null;
   /** ISO timestamp of the approval. */
   readonly approvedAt: string | null;
+  /**
+   * T-0207: the live payment batch that pays this bank refund (a payable line in a batch that is
+   * not cancelled), or null. `confirmed`: the bank confirmed the batch. Always null for Stripe.
+   */
+  readonly paymentBatch: RefundPaymentBatch | null;
   readonly replayed: boolean;
+}
+
+export interface RefundPaymentBatch {
+  readonly batchId: string;
+  readonly batchNo: string;
+  readonly status: 'draft' | 'partially_released' | 'released' | 'confirmed';
 }
 
 export interface CustomerCredit {
@@ -160,6 +174,7 @@ export async function getCustomerRefund(
     .where('r.id', '=', refundId.toLowerCase())
     .executeTakeFirst();
   if (!r) throw new RefundError('REFUND_NOT_FOUND', `refund ${refundId} is not in company ${cid}`);
+  const paymentBatch = r.method === 'bank_batch' ? await livePaymentBatch(trx, cid, r.id) : null;
   return {
     refundId: r.id,
     refundNo: r.refund_no,
@@ -174,8 +189,32 @@ export async function getCustomerRefund(
     approval: r.approved_by ? 'approved' : 'pending',
     approvedBy: r.approved_by,
     approvedAt: r.approved_at,
+    paymentBatch,
     replayed,
   };
+}
+
+/** The live batch paying a bank refund (as the 0055 guard defines live), or null. */
+async function livePaymentBatch(
+  trx: Trx,
+  companyId: string,
+  refundId: string,
+): Promise<RefundPaymentBatch | null> {
+  const b = (
+    await sql<{ id: string; batch_no: string; status: RefundPaymentBatch['status'] }>`
+      SELECT b.id::text, b.batch_no,
+             CASE WHEN EXISTS (
+                    SELECT 1 FROM app.payment_batch_confirmation c
+                     WHERE c.tenant_id = b.tenant_id AND c.batch_id = b.id)
+                  THEN 'confirmed' ELSE b.status END AS status
+        FROM app.payment_batch_refund i
+        JOIN app.payment_batch b ON b.tenant_id = i.tenant_id AND b.id = i.batch_id
+       WHERE i.company_id = ${companyId}::uuid AND i.refund_id = ${refundId}::uuid
+         AND i.excluded_reason IS NULL AND b.status <> 'cancelled'
+       ORDER BY b.created_at DESC
+       LIMIT 1`.execute(trx)
+  ).rows[0];
+  return b ? { batchId: b.id, batchNo: b.batch_no, status: b.status } : null;
 }
 
 /** The party's AR balance, refunds requested and the credit still refundable. */
@@ -448,14 +487,20 @@ export type StripeRefundHeldCheck = (trx: Trx, r: CustomerRefundView) => Promise
 export type StripeSendFinishedCheck = (trx: Trx, r: CustomerRefundView) => Promise<string | null>;
 
 /**
- * Cancel a requested Stripe refund that no live Stripe refund pays (T-0190, RQ-0173): its amount
- * stops counting as requested, so the credit can be refunded another way. Only an approved one
- * whose send has finished (failed or expired) and gone quiet (`sendNotFinished`, security review
- * r10 M1/L1; else SEND_NOT_FINISHED). Under the party lock (no send of the party runs meanwhile)
- * the caller's `heldAtStripe` asks Stripe; a live refund there is AT_STRIPE and the document stays
- * requested. A paid or bank refund is NOT_CANCELLABLE
- * (bank: T-0207). A repeat returns the cancelled refund (`replayed`). The 0055 guard keeps it
- * cancelled for good. No money moves, so neither a checker nor a step-up is needed.
+ * Cancel a requested refund (T-0190, T-0207; RQ-0173, RQ-0189, ADR-0107): its amount stops
+ * counting as requested, so the credit can be refunded another way. Under the party lock (no
+ * send of the party runs meanwhile):
+ * - **bank_batch**, approved or not: refused NOT_CANCELLABLE while a live payment batch pays it
+ *   (draft, partially released, released or confirmed; the message names the batch). Nothing was
+ *   sent, so there is no external call. The 0055 guard refuses it too, and the 0084 guard keeps a
+ *   cancelled refund out of every later batch line.
+ * - **stripe**: the caller's `heldAtStripe` asks Stripe first (fail closed: METHOD_NOT_AVAILABLE
+ *   without it); a live refund there is AT_STRIPE. This holds for an *unapproved* request too
+ *   (withdrawing it, T-0207): a commit lost after the send leaves Stripe holding a refund for a
+ *   document that reads unapproved (review r8 R2). An approved one must also have finished its
+ *   send and gone quiet (`sendNotFinished`, security review r10 M1/L1; else SEND_NOT_FINISHED).
+ * A paid refund is NOT_CANCELLABLE. A repeat returns the cancelled refund (`replayed`). The 0055
+ * guard keeps it cancelled for good. No money moves, so neither a checker nor a step-up is needed.
  */
 export async function cancelCustomerRefund(
   trx: Trx,
@@ -467,34 +512,41 @@ export async function cancelCustomerRefund(
   await partyLock(trx, companyId, before.partyId);
   const r = await getCustomerRefund(trx, companyId, before.refundId);
   if (r.status === 'cancelled') return { ...r, replayed: true };
-  if (r.status !== 'requested' || r.method !== 'stripe') {
+  if (r.status !== 'requested') {
     throw new RefundError(
       'NOT_CANCELLABLE',
-      `refund ${r.refundNo} is ${r.status} (${r.method}); only a requested Stripe refund is cancelled here`,
+      `refund ${r.refundNo} is ${r.status}; only a requested refund is cancelled`,
     );
   }
-  if (r.approval !== 'approved') {
-    // Security review r10 L1: only a send that finished is cancelled here (withdrawing an
-    // unapproved request is T-0207's).
-    throw new RefundError(
-      'NOT_CANCELLABLE',
-      `refund ${r.refundNo} is not approved, so it was never sent; only a Stripe refund whose send failed or expired is cancelled here`,
-    );
-  }
-  if (!opts.heldAtStripe || !opts.sendNotFinished) {
-    throw new RefundError(
-      'METHOD_NOT_AVAILABLE',
-      'refunds through Stripe are not configured here, so Stripe cannot be asked first',
-    );
-  }
-  const notYet = await opts.sendNotFinished(trx, r);
-  if (notYet) throw new RefundError('SEND_NOT_FINISHED', notYet);
-  const held = await opts.heldAtStripe(trx, r);
-  if (held) {
-    throw new RefundError(
-      'AT_STRIPE',
-      `refund ${r.refundNo} cannot be cancelled: Stripe holds refund ${held} for it (the money has left or is leaving); record it instead`,
-    );
+  if (r.method === 'bank_batch') {
+    const b = r.paymentBatch;
+    if (b) {
+      const unreleased = b.status === 'draft' || b.status === 'partially_released';
+      throw new RefundError(
+        'NOT_CANCELLABLE',
+        unreleased
+          ? `refund ${r.refundNo} is in payment batch ${b.batchNo} (${b.status === 'draft' ? 'draft' : 'partially released'}); a batch's payments are fixed when it is built, so the refund can be cancelled only after that batch is cancelled`
+          : `refund ${r.refundNo} is in payment batch ${b.batchNo}, ${b.status === 'confirmed' ? 'confirmed by the bank' : 'released to the bank'}; it can no longer be cancelled`,
+      );
+    }
+  } else {
+    if (!opts.heldAtStripe || !opts.sendNotFinished) {
+      throw new RefundError(
+        'METHOD_NOT_AVAILABLE',
+        'refunds through Stripe are not configured here, so Stripe cannot be asked first',
+      );
+    }
+    if (r.approval === 'approved') {
+      const notYet = await opts.sendNotFinished(trx, r);
+      if (notYet) throw new RefundError('SEND_NOT_FINISHED', notYet);
+    }
+    const held = await opts.heldAtStripe(trx, r);
+    if (held) {
+      throw new RefundError(
+        'AT_STRIPE',
+        `refund ${r.refundNo} cannot be cancelled: Stripe holds refund ${held} for it (the money has left or is leaving); record it instead`,
+      );
+    }
   }
   await trx
     .updateTable('app.customer_refund')

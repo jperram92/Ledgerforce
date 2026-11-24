@@ -9,7 +9,9 @@
  * so approving it needs a fresh sign-in step (DL-0562: the step-up prompt); the region then shows
  * what Stripe did, or that LedgerForce is retrying the send. A Stripe refund that Stripe refused can
  * be cancelled by someone who requests refunds (T-0190), after a confirmation step; the API asks
- * Stripe first and refuses if Stripe has a refund for it.
+ * Stripe first and refuses if Stripe has a refund for it. A requested bank refund that no payment
+ * batch pays, and a request not yet approved (either method), can be cancelled too (T-0207,
+ * ADR-0107); a bank refund in a live batch shows that batch instead.
  * T-0208 (ADR-0091, ADR-0103, RQ-0185): an Approver checks a Stripe refund whose send failed or
  * expired with Stripe ("Check with Stripe", read-only at Stripe; the API records a refund Stripe
  * holds once). With nothing at Stripe, one Approver asks to send it again with a reason; the region
@@ -273,9 +275,11 @@ function RefundView({
       ? `Paid on ${refund.paid_on ?? ''}. Its journal is in the general ledger.`
       : refund.status === 'cancelled'
         ? 'Cancelled.'
-        : approved
-          ? 'Approved. It will be paid in the next supplier payment batch.'
-          : 'Waiting for approval. An Approver, not the person who requested it, approves it.';
+        : refund.payment_batch
+          ? batchState(refund.payment_batch)
+          : approved
+            ? 'Approved. It will be paid in the next supplier payment batch.'
+            : 'Waiting for approval. An Approver, not the person who requested it, approves it.';
   const approveWhy = refused(approve.error);
   const journalWhy = refused(journal.error);
   return (
@@ -710,23 +714,30 @@ function WaitingResendView({
 }
 
 /**
- * T-0190: a requested Stripe refund that Stripe refused (its send failed, and Stripe does not have
- * the money: not SENT_NOT_POSTED) can be cancelled, so its credit can be refunded another way.
+ * Which requested refunds the region offers to cancel (the API decides again and may refuse):
+ * - T-0207 (ADR-0107): a bank refund, approved or not, that no live payment batch pays;
+ * - T-0207: a Stripe request not yet approved (withdrawn; the API asks Stripe first);
+ * - T-0190: an approved Stripe refund that Stripe refused (its send failed, and Stripe does not
+ *   have the money: not SENT_NOT_POSTED), so its credit can be refunded another way.
  */
 const cancellable = (r: CustomerRefund) =>
-  r.method === 'stripe' &&
   r.status === 'requested' &&
-  r.stripe?.status === 'failed' &&
-  r.stripe.code !== 'SENT_NOT_POSTED';
+  (r.method === 'bank_batch'
+    ? !r.payment_batch
+    : r.approval === 'pending' ||
+      (r.stripe?.status === 'failed' && r.stripe.code !== 'SENT_NOT_POSTED'));
 
-/** Cancel with a confirmation step (T-0190); the API asks Stripe first and may refuse. */
+/** Cancel with a confirmation step (T-0190, T-0207); the API may still refuse. */
 function CancelRefund({ companyId, refund }: { companyId: string; refund: CustomerRefund }) {
   const { sales } = useServices();
   const queryClient = useQueryClient();
   const [asking, setAsking] = useState(false);
+  // One Idempotency-Key for this refund's cancel, so a retry is the same request (ADR-0107).
+  const [key] = useState(() => crypto.randomUUID());
   const legendId = useId();
+  const stripe = refund.method === 'stripe';
   const cancel = useMutation({
-    mutationFn: () => sales.cancelRefund(companyId, refund.id),
+    mutationFn: () => sales.cancelRefund(companyId, refund.id, key),
     onSuccess: async (r) => {
       setAsking(false);
       queryClient.setQueryData(refundKey(r.id), r);
@@ -748,9 +759,9 @@ function CancelRefund({ companyId, refund }: { companyId: string; refund: Custom
             <strong>Cancel this refund?</strong>
           </p>
           <p>
-            Cancelling frees {money2(refund.amount)} of the customer’s credit, so it can be refunded
-            another way. LedgerForce checks with Stripe first and refuses if Stripe has a refund for
-            it.
+            {stripe
+              ? `Cancelling frees ${money2(refund.amount)} of the customer’s credit, so it can be refunded another way. LedgerForce checks with Stripe first and refuses if Stripe has a refund for it.`
+              : `Cancelling frees ${money2(refund.amount)} of the customer’s credit, so it can be refunded another way or kept as credit. No payment batch pays this refund, so no money has left.`}
           </p>
           <button
             type="button"
@@ -787,6 +798,15 @@ function CancelRefund({ companyId, refund }: { companyId: string; refund: Custom
       )}
     </>
   );
+}
+
+/** T-0207: a requested bank refund a live payment batch pays cannot be cancelled; say why. */
+function batchState(b: NonNullable<CustomerRefund['payment_batch']>): string {
+  if (b.status === 'draft' || b.status === 'partially_released')
+    return `Approved and in payment batch ${b.batch_no}, which is not released yet. A batch’s payments are fixed when it is built, so this refund can be cancelled only after that batch is cancelled.`;
+  return `Approved and in payment batch ${b.batch_no}, ${
+    b.status === 'confirmed' ? 'which the bank has confirmed' : 'which is released to the bank'
+  }. It can no longer be cancelled.`;
 }
 
 /** "220.0000" → "220.00" for a sentence; the amount is the API's, only its text is shortened. */

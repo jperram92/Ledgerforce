@@ -146,6 +146,8 @@ interface Fake {
   errors: string[];
   created: { id: string; body: unknown }[];
   approvals: number;
+  /** T-0207: the Idempotency-Key of each POST …/cancel. */
+  cancels: string[];
   previewCalls: number;
   refund: Record<string, unknown> | null;
   override: Map<string, { status: number; body: unknown }>;
@@ -157,6 +159,7 @@ async function fakeApi(page: Page, who: Who): Promise<Fake> {
     errors: [],
     created: [],
     approvals: 0,
+    cancels: [],
     previewCalls: 0,
     refund: null,
     override: new Map(),
@@ -227,6 +230,16 @@ async function fakeApi(page: Page, who: Who): Promise<Fake> {
         };
         return send(route, 200, f.refund);
       }
+      if (req.method() === 'POST' && /^\/ar\/refunds\/[0-9a-f-]{36}\/cancel$/.test(path)) {
+        if (!perms.includes('ar.refund.create'))
+          return send(route, 403, { error: 'forbidden', permission: 'ar.refund.create' });
+        expect(url.searchParams.get('company_id')).toBe(CO);
+        const key = req.headers()['idempotency-key'];
+        if (!key) return send(route, 400, { error: 'idempotency_key_required' });
+        f.cancels.push(key);
+        f.refund = { ...f.refund, status: 'cancelled' };
+        return send(route, 200, f.refund);
+      }
       if (!perms.includes('ar.read'))
         return send(route, 403, { error: 'forbidden', permission: 'ar.read' });
       expect(url.searchParams.get('company_id')).toBe(CO);
@@ -238,8 +251,8 @@ async function fakeApi(page: Page, who: Who): Promise<Fake> {
         return send(route, 200, {
           party_id: ACME,
           balance: '-220.0000',
-          requested: f.refund ? '220.0000' : '0.0000',
-          available: f.refund ? '0.0000' : '220.0000',
+          requested: f.refund?.['status'] === 'requested' ? '220.0000' : '0.0000',
+          available: f.refund?.['status'] === 'requested' ? '0.0000' : '220.0000',
         });
       if (f.refund && path === `/ar/refunds/${String(f.refund['id'])}`)
         return send(route, 200, { ...f.refund, replayed: false });
@@ -416,4 +429,169 @@ test('SS-UC11-08 forbidden: a user without the refund permissions sees the credi
   await evidence('SS-UC11-08', 'refund-forbidden-1440');
   expect(f.created).toEqual([]);
   expect(f.errors).toEqual([]);
+});
+
+/**
+ * T-0207 (ADR-0107, RQ-0189): the region offers Cancel for a requested bank refund no live
+ * payment batch pays (approved or not) and for a request not yet approved by either method; a
+ * bank refund in a live batch names the batch and offers no Cancel. POST …/cancel carries an
+ * Idempotency-Key (proven against the real route by apps/api/src/ar/refunds.db.test.ts).
+ */
+test.describe('T-0207 cancel a requested refund from the refund region', () => {
+  test.use({ evidenceTaskId: 'T-0207' });
+  const RID = id(0x20701);
+  const bankRefund = (over: Record<string, unknown> = {}) => ({
+    id: RID,
+    replayed: false,
+    refund_no: 'RF-000004',
+    party_id: ACME,
+    refund_date: '2026-11-24',
+    amount: '220.0000',
+    method: 'bank_batch',
+    status: 'requested',
+    approval: 'approved',
+    created_by: ME.clerk.user_id,
+    approved_by: ME.approver.user_id,
+    approved_at: '2026-11-24T01:00:00.000Z',
+    entry_id: null,
+    paid_on: null,
+    payment_batch: null,
+    ...over,
+  });
+  const REFUND_PAGE = `${CN_PAGE}&refund=${RID}`;
+
+  for (const width of [1440, 390]) {
+    test(`SS-UC11-18: the Clerk cancels an approved bank refund no payment batch pays, freeing the credit @ ${String(width)} [T-0207]`, async ({
+      page,
+      evidence,
+    }) => {
+      const f = await fakeApi(page, 'clerk');
+      f.refund = bankRefund();
+      await open(page, REFUND_PAGE, width);
+      const refund = page.getByRole('region', { name: 'Refund' });
+      await expect(refund.getByRole('status')).toContainText(
+        'Approved. It will be paid in the next supplier payment batch.',
+      );
+      await refund.getByRole('button', { name: 'Cancel refund' }).click();
+      const ask = refund.getByRole('group', { name: 'Cancel this refund?' });
+      await expect(ask).toContainText('No payment batch pays this refund, so no money has left.');
+      await expect(ask).toContainText('Cancelling frees 220.00 of the customer’s credit');
+      await assertPage(page, width);
+      await evidence('SS-UC11-18', `refund-cancel-confirm-${String(width)}`);
+      await ask.getByRole('button', { name: 'Yes, cancel it' }).click();
+      await expect(refund.getByRole('status')).toHaveText('Cancelled.');
+      expect(f.cancels).toHaveLength(1);
+      expect(f.cancels[0]).toMatch(/^[0-9a-f-]{36}$/);
+      await expect(refund.getByRole('button', { name: 'Cancel refund' })).toHaveCount(0);
+      expect(
+        await refund
+          .locator('dl [data-amount]')
+          .evaluateAll((els) => els.map((e) => e.getAttribute('data-amount'))),
+      ).toEqual(['220.00', '0.00']);
+      await assertPage(page, width);
+      await evidence('SS-UC11-18', `refund-cancelled-${String(width)}`);
+      expect(f.errors).toEqual([]);
+    });
+  }
+
+  test('SS-UC11-18: an unapproved bank request is withdrawn by the Clerk; an Approver is not offered Cancel [T-0207]', async ({
+    page,
+  }) => {
+    const f = await fakeApi(page, 'approver');
+    f.refund = bankRefund({ approval: 'pending', approved_by: null, approved_at: null });
+    await open(page, REFUND_PAGE, 1440);
+    const refund = page.getByRole('region', { name: 'Refund' });
+    await expect(refund.getByRole('button', { name: 'Approve refund' })).toBeVisible();
+    await expect(refund.getByRole('button', { name: 'Cancel refund' })).toHaveCount(0);
+    f.who = 'clerk';
+    await page.reload();
+    await expect(refund.getByRole('status')).toContainText('Waiting for approval');
+    await refund.getByRole('button', { name: 'Cancel refund' }).click();
+    await refund.getByRole('button', { name: 'Yes, cancel it' }).click();
+    await expect(refund.getByRole('status')).toHaveText('Cancelled.');
+    expect(f.cancels).toHaveLength(1);
+    expect(f.errors).toEqual([]);
+  });
+
+  test('SS-UC11-19: a bank refund in a draft payment batch names the batch and offers no Cancel [T-0207]', async ({
+    page,
+    evidence,
+  }) => {
+    const f = await fakeApi(page, 'clerk');
+    f.refund = bankRefund({
+      payment_batch: { id: id(0x20711), batch_no: 'PB-000004', status: 'draft' },
+    });
+    await open(page, REFUND_PAGE, 1440);
+    const refund = page.getByRole('region', { name: 'Refund' });
+    await expect(refund.getByRole('status')).toContainText(
+      'Approved and in payment batch PB-000004, which is not released yet.',
+    );
+    await expect(refund.getByRole('status')).toContainText(
+      'can be cancelled only after that batch is cancelled',
+    );
+    await expect(refund.getByRole('button', { name: 'Cancel refund' })).toHaveCount(0);
+    await assertPage(page, 1440);
+    await evidence('SS-UC11-19', 'refund-in-draft-batch-1440');
+    f.refund = bankRefund({
+      payment_batch: { id: id(0x20711), batch_no: 'PB-000004', status: 'released' },
+    });
+    await page.reload();
+    await expect(refund.getByRole('status')).toContainText(
+      'which is released to the bank. It can no longer be cancelled.',
+    );
+    await expect(refund.getByRole('button', { name: 'Cancel refund' })).toHaveCount(0);
+    expect(f.cancels).toEqual([]);
+    expect(f.errors).toEqual([]);
+  });
+
+  test('SS-UC11-19: a refusal from the API (a batch took it meanwhile) is shown in place [T-0207]', async ({
+    page,
+  }) => {
+    const f = await fakeApi(page, 'clerk');
+    f.refund = bankRefund();
+    f.override.set('POST /ar/refunds/:id/cancel', {
+      status: 422,
+      body: {
+        error: 'NOT_CANCELLABLE',
+        message:
+          "refund RF-000004 is in payment batch PB-000005 (draft); a batch's payments are fixed when it is built, so the refund can be cancelled only after that batch is cancelled",
+      },
+    });
+    await open(page, REFUND_PAGE, 1440);
+    const refund = page.getByRole('region', { name: 'Refund' });
+    await refund.getByRole('button', { name: 'Cancel refund' }).click();
+    await refund.getByRole('button', { name: 'Yes, cancel it' }).click();
+    await expect(refund.getByRole('alert')).toContainText(
+      'We could not cancel this refund: refund RF-000004 is in payment batch PB-000005',
+    );
+    expect(f.errors).toEqual([]);
+  });
+
+  test('SS-UC11-20: an unapproved Stripe request offers Cancel, checked with Stripe first [T-0207]', async ({
+    page,
+    evidence,
+  }) => {
+    const f = await fakeApi(page, 'clerk');
+    const { payment_batch: _none, ...base } = bankRefund();
+    f.refund = {
+      ...base,
+      method: 'stripe',
+      approval: 'pending',
+      approved_by: null,
+      approved_at: null,
+      stripe: { status: 'not_sent', stripe_refund_id: null, message: null },
+    };
+    await open(page, REFUND_PAGE, 1440);
+    const refund = page.getByRole('region', { name: 'Refund' });
+    await expect(refund.getByRole('status')).toContainText('Waiting for approval');
+    await refund.getByRole('button', { name: 'Cancel refund' }).click();
+    const ask = refund.getByRole('group', { name: 'Cancel this refund?' });
+    await expect(ask).toContainText('LedgerForce checks with Stripe first');
+    await assertPage(page, 1440);
+    await evidence('SS-UC11-20', 'stripe-request-withdraw-confirm-1440');
+    await ask.getByRole('button', { name: 'Yes, cancel it' }).click();
+    await expect(refund.getByRole('status')).toHaveText('Cancelled.');
+    expect(f.cancels).toHaveLength(1);
+    expect(f.errors).toEqual([]);
+  });
 });

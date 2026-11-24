@@ -195,6 +195,15 @@ export interface CustomerRefund {
   approved_at: string | null;
   entry_id: string | null;
   paid_on: string | null;
+  /**
+   * Bank refunds only (T-0207, ADR-0107): the live payment batch paying it, or null. While one
+   * does, the refund cannot be cancelled.
+   */
+  payment_batch?: {
+    id: string;
+    batch_no: string;
+    status: 'draft' | 'partially_released' | 'released' | 'confirmed';
+  } | null;
   /** Stripe refunds only (T-0172, ADR-0083): what happened to the send at Stripe. */
   stripe?: {
     status: 'not_sent' | 'pending' | 'sent' | 'failed';
@@ -267,8 +276,11 @@ export interface SalesClient {
   refund(companyId: string, id: string): Promise<CustomerRefund>;
   refundJournal(companyId: string, id: string): Promise<RefundJournal>;
   approveRefund(companyId: string, id: string): Promise<CustomerRefund>;
-  /** T-0190: cancel a requested Stripe refund Stripe did not take (POST …/cancel). */
-  cancelRefund(companyId: string, id: string): Promise<CustomerRefund>;
+  /**
+   * T-0190, T-0207 (ADR-0107): cancel a requested refund (POST …/cancel, Idempotency-Key): a
+   * Stripe one Stripe holds no refund for, a bank one no live payment batch pays.
+   */
+  cancelRefund(companyId: string, id: string, idempotencyKey: string): Promise<CustomerRefund>;
   /** T-0208: check a Stripe refund with Stripe (read-only at Stripe; may record what it holds). */
   checkRefundAtStripe(companyId: string, id: string): Promise<StripeCheck>;
   /** T-0208: ask for a resend (client id kept for the form's life; a repeat replays). */
@@ -340,8 +352,13 @@ export function createSalesClient(env: Pick<AppEnv, 'apiBase' | 'fetch'>): Sales
     refundJournal: (companyId, id) => get(`/ar/refunds/${seg(id)}/journal?${co(companyId)}`),
     approveRefund: (companyId, id) =>
       send('POST', `/ar/refunds/${seg(id)}/approve?${co(companyId)}`, {}),
-    cancelRefund: (companyId, id) =>
-      send('POST', `/ar/refunds/${seg(id)}/cancel?${co(companyId)}`, {}),
+    cancelRefund: (companyId, id, key) =>
+      send(
+        'POST',
+        `/ar/refunds/${seg(id)}/cancel?${co(companyId)}`,
+        {},
+        { 'idempotency-key': key },
+      ),
     checkRefundAtStripe: (companyId, id) =>
       send('POST', `/ar/refunds/${seg(id)}/stripe-check?${co(companyId)}`, {}),
     askRefundResend: (companyId, id, resendId, reason) =>

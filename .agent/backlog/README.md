@@ -293,7 +293,7 @@ graph LR
 | [T-0204](T-0204.md) | Single-supply GST attribution: final invoice, price change, cancellation/refund and BAS-preparation reports (GP-045, GP-044) | MVP | verifying | T-0203 | UC-04, UC-11 | 1 |
 | [T-0205](T-0205.md) | Single-supply receipts limited by the contract total as varied (review finding 7) | MVP | todo | T-0203, T-0204, T-0217, T-0232 | UC-04 | 0 |
 | [T-0206](T-0206.md) | Single-supply documents on an open contract: s 29-70 tax invoice (candidate GP-046) and deposit-invoice refusal (ADR-0089 R9) | MVP | todo | T-0203 | UC-04 | 0 |
-| [T-0207](T-0207.md) | AR: cancel a requested bank refund that no live payment batch pays | MVP | todo | T-0190 | UC-11 | 0 |
+| [T-0207](T-0207.md) | AR: cancel a requested bank refund that no live payment batch pays | MVP | verifying | T-0190 | UC-11 | 0 |
 | [T-0208](T-0208.md) | Refund region: check a Stripe refund with Stripe and ask or confirm a resend; nightly sweep for Stripe refunds no document records | MVP | todo | T-0189 | UC-11 | 0 |
 | [T-0217](T-0217.md) | Single-supply cancellation and refund (GP-044a-d): refund approval path, contract refund with maker-checker, adjustment-note particulars | MVP | verifying | T-0204 | UC-04, UC-11 | 0 |
 | [T-0218](T-0218.md) | Single-supply BAS preparation: basis guard, aged unbilled GST report, no negative G1/1A (G18/1B), credit_note_bas setting, lifecycle properties and primary-law reading | MVP | todo | T-0217, T-0231 | UC-04, UC-11 | 0 |
@@ -305,6 +305,7 @@ graph LR
 | [T-0243](T-0243.md) | Bills mailbox OAuth2 hardening: code exchange outside the DB transaction, rotation failure handling, verifier cleanup, rotation-function tests | MVP | todo | T-0216 | UC-05 | 0 |
 | [T-0244](T-0244.md) | Backup role hardening: detect missing lf_backup on upgrade, large-object refusal, pg_hba script robustness, /32 rule | MVP | todo | T-0227 | — | 0 |
 | [T-0235](T-0235.md) | Bills inbox webhook: upload limits configurable from the environment (compose + config.ts) | MVP | todo | T-0230 | UC-05 | 0 |
+| [T-0241](T-0241.md) | AP: cancel an unreleased payment batch so its bills and refunds can be re-batched or cancelled | MVP | todo | T-0207 | UC-06, UC-11 | 0 |
 | [T-0230](T-0230.md) | Bills inbox webhook: slow-upload protection (per-client in-flight cap, minimum transfer rate, first-byte timeout) | MVP | todo | T-0215 | UC-05 | 0 |
 | [T-0231](T-0231.md) | Single-supply receipt reversal and its BAS label, cash-basis final invoice (GP-022), nothing-attributed final invoice decision and final-invoice delivery event | MVP | todo | T-0217 | UC-04 | 0 |
 | [T-0232](T-0232.md) | Single-supply contract-variation document dated at agreement (candidate goldens GP-047+, review finding 7) | MVP | todo | T-0217 | UC-04 | 0 |
