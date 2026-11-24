@@ -4997,3 +4997,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: the guard fails closed today; tests and a startup check prevent a silent regression.
 - Alternatives: block T-0243 (rejected: no exploitable path today).
 - ADR: ADR-0108 · Status: accepted
+
+### DL-0958 — Security review r13: T-0244 passes; low findings recorded on the card
+- Date: 2026-11-24 · By: claude · Task: T-0244 · Category: security
+- Decision: The independent review of T-0244 (ADR-0109) passed: preflight errors are named and tested, large-object creation is revoked from PUBLIC, env values cannot inject into pg_hba, the previous file is restored on every failure path, the lf_backup password is set only after reload, and the /32 rule excludes the gateway. Its low findings (postgres could be assigned the reserved address; temp-file write for pg_hba; wide operator CIDRs; a misleading comment) are recorded on the T-0244 card for a follow-up; r12's M2 and L4-L7 are closed.
+- Why: availability and documentation only; no exposure.
+- Alternatives: block T-0244 (rejected).
+- ADR: ADR-0109 · Status: accepted
