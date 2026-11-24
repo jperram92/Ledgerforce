@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0243",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-196",
+      "file": ".agent/evidence/T-0243/20261124-032100-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts › SS-PLAT-196: the code exchange runs outside any database transaction › SS-PLAT-196 while the provider answers slowly the request is already consumed (committed), its verifier cleared, and no lf_app transaction is open; the save and audit follow in a second transaction | packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts › SS-PLAT-196: the code exchange runs outside any database transaction › SS-PLAT-196 a refused exchange leaves the request consumed (verifier cleared) and saves nothing",
+      "commit": "d3693068acfa",
+      "provider": "unknown",
+      "timestamp": "2026-11-24T03:21:00.681Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-197",
+      "file": ".agent/evidence/T-0243/20261124-032100-tests-db.json",
+      "test": "2 test(s): packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts › SS-PLAT-197: a failed re-seal of a rotated refresh token is retried or surfaced › SS-PLAT-197 a transient key-service failure is retried and the rotated token is sealed | packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts › SS-PLAT-197: a failed re-seal of a rotated refresh token is retried or surfaced › SS-PLAT-197 a lasting failure stops the poll before IMAP, keeps the old token and marks the mailbox token_rotation_failed; the next good rotation clears it",
+      "commit": "d3693068acfa",
+      "provider": "unknown",
+      "timestamp": "2026-11-24T03:21:00.681Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-198",
+      "file": ".agent/evidence/T-0243/20261124-032100-tests-db.json",
+      "test": "4 test(s): packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts › SS-PLAT-198: the PKCE verifier is cleared once it cannot be used any more › SS-PLAT-198 a cancelled request loses its verifier; an expired one is cleared by the tenant poll sweep; an unexpired unused one keeps it | packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts › SS-PLAT-198: the PKCE verifier is cleared once it cannot be used any more › SS-PLAT-198 the verifier is write-once-to-NULL for every role: no new value, no clearing of a live request, no insert without one | packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts › SS-PLAT-198: the rotation function is a narrow, pinned SECURITY DEFINER › SS-PLAT-198 owner lf_migrator, SECURITY DEFINER, search_path pinned to pg_catalog, pg_temp; EXECUTE for lf_app only (not PUBLIC) | packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts › SS-PLAT-198: the rotation function is a narrow, pinned SECURITY DEFINER › SS-PLAT-198 the secret and verifier guard triggers are plain (not SECURITY DEFINER) and pin their search_path",
+      "commit": "d3693068acfa",
+      "provider": "unknown",
+      "timestamp": "2026-11-24T03:21:00.681Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-192",
+      "file": ".agent/evidence/T-0243/20261124-032111-tests-api-db.json",
+      "test": "7 test(s): apps/api/src/ap/bills-mailbox-oauth.db.test.ts › SS-PLAT-192: starting a mailbox connection › SS-PLAT-192 needs a fresh step-up and settings.setup.manage; an Idempotency-Key; a valid body | apps/api/src/ap/bills-mailbox-oauth.db.test.ts › SS-PLAT-192: starting a mailbox connection › SS-PLAT-192 an unconfigured provider or server is 503 oauth_not_configured | apps/api/src/ap/bills-mailbox-oauth.db.test.ts › SS-PLAT-192: starting a mailbox connection › SS-PLAT-192 answers the provider authorization URL with PKCE S256 and state; stores only the state hash; audited without state or verifier | apps/api/src/ap/bills-mailbox-oauth.db.test.ts › SS-PLAT-192: the callback connects the mailbox once, for the same person › SS-PLAT-192 another user’s or another session’s callback is refused and leaves the request usable; the owner connects: 303 to Settings, mailbox sealed, old one superseded, audited without secret | apps/api/src/ap/bills-mailbox-oauth.db.test.ts › SS-PLAT-192: the callback connects the mailbox once, for the same person › SS-PLAT-192 an expired request (over 10 minutes) is refused without calling the provider | apps/api/src/ap/bills-mailbox-oauth.db.test.ts › SS-PLAT-192: the callback connects the mailbox once, for the same person › SS-PLAT-192 a refused consent, a refused code (invalid_grant) or a provider outage redirects with a fixed code; no mailbox changes; the request is used up | apps/api/src/ap/bills-mailbox-oauth.db.test.ts › SS-PLAT-192: the callback connects the mailbox once, for the same person › SS-PLAT-192 the callback needs settings.setup.manage and a malformed one is invalid_request",
+      "commit": "d3693068acfa",
+      "provider": "unknown",
+      "timestamp": "2026-11-24T03:21:11.788Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-196",
+      "file": ".agent/evidence/T-0243/20261124-032111-tests-api-db.json",
+      "test": "2 test(s): apps/api/src/ap/bills-mailbox-oauth.db.test.ts › SS-PLAT-196: the callback holds no database connection while the provider answers (T-0243, ADR-0108) › SS-PLAT-196 while the code exchange waits, the request is consumed (committed), its verifier cleared and no lf_app transaction is open; then the mailbox is saved and audited | apps/api/src/ap/bills-mailbox-oauth.db.test.ts › SS-PLAT-196: the callback holds no database connection while the provider answers (T-0243, ADR-0108) › SS-PLAT-196 a session revoked during the exchange stops the save: 401, no new mailbox",
+      "commit": "d3693068acfa",
+      "provider": "unknown",
+      "timestamp": "2026-11-24T03:21:11.788Z",
+      "result": "passed"
+    }
+  ]
+}
