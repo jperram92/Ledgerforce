@@ -4990,3 +4990,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: lead's reserved ranges (round 13, row B).
 - Alternatives: none.
 - ADR: none · Status: accepted
+
+### DL-0957 — Security review r13: T-0243 passes; @OwnTransactions guard tests go to T-0256
+- Date: 2026-11-24 · By: claude · Task: T-0243 · Category: security
+- Decision: The independent review of T-0243 (ADR-0108) passed: no route can bypass authentication, MFA, permission, step-up, SoD or tenant scoping through @OwnTransactions or the authorize() refactor; TenantTx.run re-checks access each time; the callback flow is replay- and race-safe; migration 0086 is additive. Its medium finding M1 (the misuse guard is per-request and untested) and low findings L1, L2, L3, L5 and I2 become card T-0256.
+- Why: the guard fails closed today; tests and a startup check prevent a silent regression.
+- Alternatives: block T-0243 (rejected: no exploitable path today).
+- ADR: ADR-0108 · Status: accepted

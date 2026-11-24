@@ -17,9 +17,9 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | done | 3 |
 | in_progress | 1 |
 | review | 146 |
-| todo | 32 |
+| todo | 33 |
 | verifying | 20 |
-| **total** | **209** |
+| **total** | **210** |
 
 | Phase | Cards |
 |---|---:|
@@ -305,6 +305,7 @@ graph LR
 | [T-0243](T-0243.md) | Bills mailbox OAuth2 hardening: code exchange outside the DB transaction, rotation failure handling, verifier cleanup, rotation-function tests | MVP | verifying | T-0216 | UC-05 | 0 |
 | [T-0244](T-0244.md) | Backup role hardening: detect missing lf_backup on upgrade, large-object refusal, pg_hba script robustness, /32 rule | MVP | todo | T-0227 | — | 0 |
 | [T-0255](T-0255.md) | Refunds: close the post-withdrawal Stripe window (re-check at Stripe after a withdrawal; hold bank refunds of freed credit until it clears) | MVP | todo | T-0207, T-0208 | UC-11 | 0 |
+| [T-0256](T-0256.md) | Own-transaction routes: startup guard and tests for misuse; refresh step-up/permissions per run; role-removed test; flagged-mailbox backoff | MVP | todo | T-0243 | UC-05 | 0 |
 | [T-0243](T-0243.md) | Bills mailbox OAuth2 hardening: code exchange outside the DB transaction, rotation failure handling, verifier cleanup, rotation-function tests | MVP | todo | T-0216 | UC-05 | 0 |
 | [T-0244](T-0244.md) | Backup role hardening: detect missing lf_backup on upgrade, large-object refusal, pg_hba script robustness, /32 rule | MVP | verifying | T-0227 | — | 3 |
 | [T-0247](T-0247.md) | Restore-drill db test: intermittent unhandled 57P01 (terminating connection due to administrator command) after the run | MVP | todo | T-0143 | — | 1 |
