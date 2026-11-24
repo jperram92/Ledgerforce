@@ -18,8 +18,14 @@ export interface RequestAccess {
   permissions: ReadonlySet<Permission>;
 }
 
+/** Opens a fresh tenant transaction that repeats the access checks first (ADR-0108). */
+export type TenantRunner = <T>(fn: (trx: Transaction<Database>) => Promise<T>) => Promise<T>;
+
 interface RequestScope {
-  trx: Transaction<Database>;
+  /** The request's tenant transaction; null on an @OwnTransactions route (use `run`). */
+  trx: Transaction<Database> | null;
+  /** Only on an @OwnTransactions route. */
+  run: TenantRunner | null;
   access: RequestAccess;
   audit?: AuditDescription;
   /**
@@ -38,8 +44,22 @@ export function runInTenantTx<T>(
   fn: (scope: RequestScope) => Promise<T>,
   stepUpVerified: number | null = null,
 ): Promise<T> {
-  const scope: RequestScope = { trx, access, stepUpVerified };
+  const scope: RequestScope = { trx, run: null, access, stepUpVerified };
   return storage.run(scope, () => fn(scope));
+}
+
+/**
+ * Runs `fn` for an @OwnTransactions route (ADR-0108): no transaction is open; handlers open
+ * short ones with TenantTx.run, which repeats the access checks in each.
+ */
+export function runOutsideTenantTx<T>(
+  run: TenantRunner,
+  access: RequestAccess,
+  fn: () => Promise<T>,
+  stepUpVerified: number | null = null,
+): Promise<T> {
+  const scope: RequestScope = { trx: null, run, access, stepUpVerified };
+  return storage.run(scope, fn);
 }
 
 export function scope(): RequestScope {
@@ -52,7 +72,19 @@ export function scope(): RequestScope {
 @Injectable()
 export class TenantTx {
   get(): Transaction<Database> {
-    return scope().trx;
+    const trx = scope().trx;
+    if (!trx) throw new Error('this route runs its own transactions (@OwnTransactions): use run()');
+    return trx;
+  }
+
+  /**
+   * On an @OwnTransactions route only (ADR-0108): run `fn` in a new tenant transaction, committed
+   * when `fn` returns, after the session, permission and step-up checks have been repeated in it.
+   */
+  run<T>(fn: (trx: Transaction<Database>) => Promise<T>): Promise<T> {
+    const run = scope().run;
+    if (!run) throw new Error('TenantTx.run is only for @OwnTransactions routes (ADR-0108)');
+    return run(fn);
   }
 
   /**

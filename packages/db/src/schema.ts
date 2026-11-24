@@ -1138,19 +1138,23 @@ export interface BillInboxMailboxTable {
   last_error: string | null;
   created_by: string | null;
   created_at: ColumnType<Date, Date | string | undefined, never>;
-  /** Migration 0082 (reserved 0084; T-0216, ADR-0105): oauth2 rows seal the refresh token in password_*. */
+  /** Migration 0083 (reserved 0084; T-0216, ADR-0105): oauth2 rows seal the refresh token in password_*. */
   auth_method: Generated<'password' | 'oauth2'>;
   oauth_provider: 'microsoft' | 'google' | null;
   secret_rotated_at: Timestamp | null;
+  /** Migration 0086, reserved 0085 (T-0243, ADR-0108): a rotated refresh token could not be re-sealed. */
+  secret_rotation_failed_at: ColumnType<Date | null, Date | null | undefined, Date | null>;
 }
 
-/** Bills mailbox OAuth pre-authorization (migration 0082, reserved 0084, T-0216, ADR-0105 rule 3). */
+/** Bills mailbox OAuth pre-authorization (migration 0083, reserved 0084, T-0216, ADR-0105 rule 3). */
 export interface BillInboxOauthRequestTable {
   id: string;
   tenant_id: TenantId;
   company_id: string;
   state_sha256: string;
-  code_verifier: string;
+  /** NULL once consumed, cancelled or expired (migration 0086, reserved 0085, T-0243, ADR-0108). */
+  code_verifier: ColumnType<string | null, string, null>;
+  verifier_cleared_at: ColumnType<Date | null, never, Date>;
   provider: 'microsoft' | 'google';
   username: string;
   folder: Generated<string>;

@@ -6,13 +6,21 @@
  * the provider's authorization URL. completeMailboxOAuth consumes it once — only for the same
  * user and session, unexpired — exchanges the code with the verifier, saves the mailbox (refresh
  * token sealed, the active mailbox superseded) and writes an audit row without any secret.
- * Both run in the caller's tenant transaction; the code exchange is the one network call.
+ * startMailboxOAuth runs in the caller's tenant transaction. completeMailboxOAuth gets a runner
+ * that opens a fresh tenant transaction per call (T-0243, ADR-0108, RQ-0190): it consumes the
+ * request in one, exchanges the code with no transaction open (the one network call, up to
+ * 15 s), then saves and audits in a second. The verifier is cleared by the consuming statement
+ * (and by a cancel); clearStaleMailboxOAuthVerifiers clears those of expired requests.
  */
 import { createHash, randomUUID } from 'node:crypto';
 import type { Database } from '@ledgerforce/db';
 import type { Kms } from '@ledgerforce/shared/crypto';
-import type { Transaction } from 'kysely';
-import { BillsMailboxError, saveOAuthBillsMailbox } from './inbox-mailbox.ts';
+import { sql, type Transaction } from 'kysely';
+import {
+  BillsMailboxError,
+  clearStaleMailboxOAuthVerifiers,
+  saveOAuthBillsMailbox,
+} from './inbox-mailbox.ts';
 import {
   authorizationUrl,
   exchangeAuthorizationCode,
@@ -27,6 +35,12 @@ import {
 } from './mailbox-oauth.ts';
 
 type Trx = Transaction<Database>;
+
+/**
+ * Runs `fn` in a new, committed-on-return tenant transaction of the caller's tenant (the API's
+ * TenantTx.run re-verifies the session and permission in each one, ADR-0108).
+ */
+export type TenantRun = <T>(fn: (trx: Trx) => Promise<T>) => Promise<T>;
 
 export const MAILBOX_OAUTH_REQUEST_TTL_MS = 10 * 60 * 1000;
 
@@ -77,6 +91,7 @@ export async function startMailboxOAuth(
   const verifier = newPkceVerifier();
   const id = randomUUID();
   const expiresAt = new Date(input.now.getTime() + MAILBOX_OAUTH_REQUEST_TTL_MS);
+  await clearStaleMailboxOAuthVerifiers(trx);
   await trx
     .insertInto('app.bill_inbox_oauth_request')
     .values({
@@ -128,70 +143,98 @@ export async function cancelMailboxOAuth(
   if (!STATE.test(input.state)) return;
   await trx
     .updateTable('app.bill_inbox_oauth_request')
-    .set({ consumed_at: input.now })
+    .set({ consumed_at: input.now, code_verifier: null, verifier_cleared_at: input.now })
     .where('state_sha256', '=', sha256(input.state))
     .where('consumed_at', 'is', null)
+    .where('code_verifier', 'is not', null)
     .where('user_id', '=', input.userId)
     .where('session_id', '=', input.sessionId)
     .execute();
 }
 
+interface ConsumedRequest {
+  id: string;
+  company_id: string;
+  code_verifier: string;
+  provider: MailboxOAuthProvider;
+  username: string;
+  folder: string;
+}
+
 /**
- * The callback: consume the pre-authorization (same user and session, unexpired, once), exchange
- * the code, save the mailbox and audit it. Throws MailboxOAuthError (`invalid_request` for an
- * unknown, used, expired or foreign state; `auth_failed`/`connect_failed` from the provider).
- * The consumption stays committed when the caller turns the error into a redirect.
+ * The callback: consume the pre-authorization (same user and session, unexpired, once) and clear
+ * its verifier in one transaction, exchange the code with no transaction open, then save the
+ * mailbox and audit it in a second transaction (T-0243, ADR-0108). Throws MailboxOAuthError
+ * (`invalid_request` for an unknown, used, expired or foreign state; `auth_failed` /
+ * `connect_failed` from the provider). The consumption is committed before the exchange, so a
+ * failed exchange leaves the request used up.
  */
 export async function completeMailboxOAuth(
-  trx: Trx,
+  run: TenantRun,
   kms: Kms,
   config: MailboxOAuthConfig,
   input: CompleteMailboxOAuthInput,
 ): Promise<ConnectedMailbox> {
   if (!STATE.test(input.state)) throw new MailboxOAuthError('invalid_request');
-  const req = await trx
-    .updateTable('app.bill_inbox_oauth_request')
-    .set({ consumed_at: input.now })
-    .where('state_sha256', '=', sha256(input.state))
-    .where('consumed_at', 'is', null)
-    .where('expires_at', '>', input.now)
-    .where('user_id', '=', input.userId)
-    .where('session_id', '=', input.sessionId)
-    .returning(['id', 'company_id', 'code_verifier', 'provider', 'username', 'folder'])
-    .executeTakeFirst();
+  // 1. Consume and clear the verifier; the old value comes back from the locked row.
+  const req = await run(async (trx) => {
+    const r = await sql<ConsumedRequest>`
+      WITH old AS (
+        SELECT id, code_verifier FROM app.bill_inbox_oauth_request
+         WHERE state_sha256 = ${sha256(input.state)}
+           AND consumed_at IS NULL
+           AND code_verifier IS NOT NULL
+           AND expires_at > ${input.now}
+           AND user_id = ${input.userId}::uuid
+           AND session_id = ${input.sessionId}::uuid
+         FOR UPDATE
+      )
+      UPDATE app.bill_inbox_oauth_request r
+         SET consumed_at = ${input.now}, code_verifier = NULL, verifier_cleared_at = ${input.now}
+        FROM old
+       WHERE r.id = old.id
+      RETURNING r.id::text AS id, r.company_id::text AS company_id, old.code_verifier,
+                r.provider, r.username, r.folder`.execute(trx);
+    return r.rows[0];
+  });
   if (!req) throw new MailboxOAuthError('invalid_request');
+  // 2. The network call, outside any transaction.
   const tokens = await exchangeAuthorizationCode(config, req.provider, {
     code: input.code,
     codeVerifier: req.code_verifier,
   });
-  const mailboxId = await saveOAuthBillsMailbox(trx, kms, req.company_id, {
-    provider: req.provider,
-    username: req.username,
-    folder: req.folder,
-    refreshToken: tokens.refreshToken,
-    createdBy: input.userId,
+  // 3. Save and audit.
+  const mailboxId = await run(async (trx) => {
+    const id = await saveOAuthBillsMailbox(trx, kms, req.company_id, {
+      provider: req.provider,
+      username: req.username,
+      folder: req.folder,
+      refreshToken: tokens.refreshToken,
+      createdBy: input.userId,
+    });
+    // GET callbacks are not audited by the request interceptor: write the row here, no secret.
+    await trx
+      .insertInto('audit.audit_log')
+      .values({
+        actor_type: 'user',
+        actor_user_id: input.userId,
+        action: 'ap.bills_mailbox.oauth_connected',
+        entity_type: 'bill_inbox_mailbox',
+        entity_id: id,
+        before: null,
+        after: JSON.stringify({
+          companyId: req.company_id,
+          authMethod: 'oauth2',
+          provider: req.provider,
+          host: MAILBOX_OAUTH_PROVIDERS[req.provider].imapHost,
+          username: req.username,
+          folder: req.folder,
+          oauthRequestId: req.id,
+        }),
+      })
+      .execute();
+    return id;
   });
-  // GET callbacks are not audited by the request interceptor: write the row here, no secret.
-  await trx
-    .insertInto('audit.audit_log')
-    .values({
-      actor_type: 'user',
-      actor_user_id: input.userId,
-      action: 'ap.bills_mailbox.oauth_connected',
-      entity_type: 'bill_inbox_mailbox',
-      entity_id: mailboxId,
-      before: null,
-      after: JSON.stringify({
-        companyId: req.company_id,
-        authMethod: 'oauth2',
-        provider: req.provider,
-        host: MAILBOX_OAUTH_PROVIDERS[req.provider].imapHost,
-        username: req.username,
-        folder: req.folder,
-        oauthRequestId: req.id,
-      }),
-    })
-    .execute();
   return {
     mailboxId,
     companyId: req.company_id,
