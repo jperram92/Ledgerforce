@@ -1,0 +1,54 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a5370afd55b74fab5
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:42723
+ ❯ |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts (9 tests | 2 failed) 1625ms
+     × SS-PLAT-196 while the code exchange waits, the request is consumed (committed), its verifier cleared and no lf_app transaction is open; then the mailbox is saved and audited 28ms
+     × SS-PLAT-196 a session revoked during the exchange stops the save: 401, no new mailbox 19ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts > SS-PLAT-196: the callback holds no database connection while the provider answers (T-0243, ADR-0108) > SS-PLAT-196 while the code exchange waits, the request is consumed (committed), its verifier cleared and no lf_app transaction is open; then the mailbox is saved and audited
+AssertionError: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ apps/api/src/ap/bills-mailbox-oauth.db.test.ts:445:18
+    443|     }
+    444|     const res = await pending;
+    445|     expect(open).toBe(0);
+       |                  ^
+    446|     expect(row?.consumed_at).not.toBeNull();
+    447|     expect(row?.code_verifier).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  |api-db| apps/api/src/ap/bills-mailbox-oauth.db.test.ts > SS-PLAT-196: the callback holds no database connection while the provider answers (T-0243, ADR-0108) > SS-PLAT-196 a session revoked during the exchange stops the save: 401, no new mailbox
+AssertionError: expected 303 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 303
+
+ ❯ apps/api/src/ap/bills-mailbox-oauth.db.test.ts:470:24
+    468|     }
+    469|     const res = await pending;
+    470|     expect(res.status).toBe(401);
+       |                        ^
+    471|     expect((await mailboxes()).length).toBe(count);
+    472|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 7 passed (9)
+   Start at  19:06:57
+   Duration  5.92s (transform 2.04s, setup 0ms, import 3.25s, tests 1.63s, environment 0ms)
+

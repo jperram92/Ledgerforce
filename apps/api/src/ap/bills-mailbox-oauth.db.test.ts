@@ -392,3 +392,82 @@ describe('SS-PLAT-192: the callback connects the mailbox once, for the same pers
     );
   });
 });
+
+describe('SS-PLAT-196: the callback holds no database connection while the provider answers (T-0243, ADR-0108)', () => {
+  const slowAnswer = () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => {
+      release = r;
+    });
+    let reached!: () => void;
+    const waiting = new Promise<void>((r) => {
+      reached = r;
+    });
+    tok.queue(async () => {
+      reached();
+      await gate;
+      return new Response(JSON.stringify(recordedBody('microsoft_code')), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    });
+    return { release, waiting };
+  };
+  const openAppTransactions = async () =>
+    Number(
+      (
+        await f.admin.query<{ n: string }>(
+          `SELECT count(*)::text AS n FROM pg_stat_activity
+            WHERE datname = current_database() AND usename = 'lf_app' AND xact_start IS NOT NULL`,
+        )
+      ).rows[0]?.n,
+    );
+
+  it('SS-PLAT-196 while the code exchange waits, the request is consumed (committed), its verifier cleared and no lf_app transaction is open; then the mailbox is saved and audited', async () => {
+    const { state } = await start('fa');
+    const slow = slowAnswer();
+    const pending = callback('fa', { state, code: 'code-slow' });
+    await slow.waiting;
+    let open: number;
+    let row: { consumed_at: Date | null; code_verifier: string | null } | undefined;
+    try {
+      open = await openAppTransactions();
+      row = (
+        await f.admin.query<{ consumed_at: Date | null; code_verifier: string | null }>(
+          'SELECT consumed_at, code_verifier FROM app.bill_inbox_oauth_request WHERE state_sha256 = $1',
+          [createHash('sha256').update(state).digest('hex')],
+        )
+      ).rows[0];
+    } finally {
+      slow.release();
+    }
+    const res = await pending;
+    expect(open).toBe(0);
+    expect(row?.consumed_at).not.toBeNull();
+    expect(row?.code_verifier).toBeNull();
+    expect(res.headers.get('location')).toBe('/settings/bills-mailbox?mailbox=connected');
+    const audit = await auditRows('ap.bills_mailbox.oauth_connected');
+    const active = (await mailboxes()).find((m) => m.status === 'active');
+    expect(audit.at(-1)).toMatchObject({ actor_user_id: people.fa?.id, entity_id: active?.id });
+  });
+
+  it('SS-PLAT-196 a session revoked during the exchange stops the save: 401, no new mailbox', async () => {
+    const { state } = await start('fa');
+    const count = (await mailboxes()).length;
+    const slow = slowAnswer();
+    const pending = callback('fa', { state, code: 'code-revoked' });
+    await slow.waiting;
+    const sessionId = cookies.get('fa')?.split('.')[1] ?? '';
+    try {
+      await f.admin.query(
+        `UPDATE app.session SET revoked_at = now(), revoke_reason = 'logout' WHERE id = $1`,
+        [sessionId],
+      );
+    } finally {
+      slow.release();
+    }
+    const res = await pending;
+    expect(res.status).toBe(401);
+    expect((await mailboxes()).length).toBe(count);
+  });
+});

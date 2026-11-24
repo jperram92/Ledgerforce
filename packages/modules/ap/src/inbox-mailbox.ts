@@ -19,6 +19,12 @@
  * host. Each poll refreshes an access token (outside any transaction), re-seals a rotated refresh
  * token in place, and logs in with AUTHENTICATE XOAUTH2. A refused grant is `auth_failed`, a
  * token-endpoint failure `connect_failed` (DL-0935).
+ *
+ * Hardening (T-0243, ADR-0108, RQ-0190): a rotated refresh token whose re-seal fails (KMS or
+ * database) is retried; if it still fails the poll stops before the access token is used, the row
+ * gets secret_rotation_failed_at and the result is `token_rotation_failed` (cleared by the next
+ * good rotation). Each tenant poll also clears the PKCE verifiers of consumed or expired OAuth
+ * connect requests.
  */
 import { randomUUID } from 'node:crypto';
 import { withTenant, type Database } from '@ledgerforce/db';
@@ -83,6 +89,11 @@ export interface BillsMailboxView {
    */
   readonly authMethod: 'login' | 'oauth2';
   readonly oauthProvider: MailboxOAuthProvider | null;
+  /**
+   * When a rotated refresh token could not be stored (T-0243): the operator must check the key
+   * service; null when the last rotation (if any) was stored.
+   */
+  readonly secretRotationFailedAt: Date | null;
 }
 
 export interface OAuthBillsMailboxInput {
@@ -247,6 +258,7 @@ const VIEW = [
   'created_at',
   'auth_method',
   'oauth_provider',
+  'secret_rotation_failed_at',
 ] as const;
 
 /** The company's mailboxes, newest first, without secrets. */
@@ -274,6 +286,7 @@ export async function listBillsMailboxes(trx: Trx, companyId: string): Promise<B
     createdAt: r.created_at,
     authMethod: r.auth_method === 'oauth2' ? 'oauth2' : 'login',
     oauthProvider: r.oauth_provider,
+    secretRotationFailedAt: r.secret_rotation_failed_at,
   }));
 }
 
@@ -294,7 +307,7 @@ export interface PollDeps {
 export interface PollResult {
   readonly mailboxId: string;
   readonly status: 'ok' | 'failed' | 'skipped';
-  readonly error?: ImapErrorKind | 'credentials_unreadable';
+  readonly error?: ImapErrorKind | 'credentials_unreadable' | 'token_rotation_failed';
   readonly ingested: number;
   /** Messages already in the inbox (same Message-ID), e.g. after a UIDVALIDITY reset. */
   readonly replayed: number;
@@ -355,26 +368,54 @@ async function step(
   });
 }
 
-/** Re-seal a rotated refresh token into the same (active, oauth2) row; same AAD (ADR-0105 rule 6). */
+/** Re-seal attempts for a rotated refresh token, and the pause before each retry (RQ-0190 F2). */
+const ROTATION_RETRY_DELAYS_MS = [100, 400] as const;
+
+/**
+ * Re-seal a rotated refresh token into the same (active, oauth2) row; same AAD (ADR-0105 rule 6).
+ * Returns false when the row is no longer an active OAuth mailbox (nothing to keep it for). A KMS
+ * or database failure is retried (T-0243); the last one is thrown.
+ */
 async function rotateRefreshToken(
   db: Kysely<Database>,
   kms: Kms,
   tenantId: string,
   row: MailboxRow,
   refreshToken: string,
-): Promise<void> {
-  const sealed = await sealField(
-    kms,
-    refreshToken,
-    aadFor(tenantId.toLowerCase(), row.company_id, row.id, 'refresh_token'),
-  );
-  // lf_app has no UPDATE on the secret columns; the narrow SECURITY DEFINER function does it
-  // for an active oauth2 row of this tenant only (migration 0082). A superseded row is left alone.
-  await withTenant(db, tenantId, (trx) =>
-    sql`SELECT app.rotate_bill_inbox_refresh_token(
-          ${row.id}::uuid, ${sealed.ciphertext}, ${sealed.iv}, ${sealed.tag},
-          ${sealed.wrappedDek}, ${sealed.keyId}, ${sealed.version}::smallint)`.execute(trx),
-  );
+): Promise<boolean> {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const sealed = await sealField(
+        kms,
+        refreshToken,
+        aadFor(tenantId.toLowerCase(), row.company_id, row.id, 'refresh_token'),
+      );
+      // lf_app has no UPDATE on the secret columns; the narrow SECURITY DEFINER function does it
+      // for an active oauth2 row of this tenant only (migration 0083). A superseded row is left
+      // alone. A previous rotation failure is cleared in the same transaction.
+      return await withTenant(db, tenantId, async (trx) => {
+        const r = await sql<{ ok: boolean }>`SELECT app.rotate_bill_inbox_refresh_token(
+              ${row.id}::uuid, ${sealed.ciphertext}, ${sealed.iv}, ${sealed.tag},
+              ${sealed.wrappedDek}, ${sealed.keyId}, ${sealed.version}::smallint) AS ok`.execute(
+          trx,
+        );
+        const ok = r.rows[0]?.ok === true;
+        if (ok) {
+          await trx
+            .updateTable('app.bill_inbox_mailbox')
+            .set({ secret_rotation_failed_at: null })
+            .where('id', '=', row.id)
+            .where('secret_rotation_failed_at', 'is not', null)
+            .execute();
+        }
+        return ok;
+      });
+    } catch (e) {
+      const delay = ROTATION_RETRY_DELAYS_MS[attempt];
+      if (delay === undefined) throw e;
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
 }
 
 async function record(
@@ -468,17 +509,34 @@ export async function pollBillsMailbox(
     }
     const spec = MAILBOX_OAUTH_PROVIDERS[provider];
     endpoint = { host: spec.imapHost, port: spec.imapPort };
+    let rotated: string | null = null;
     try {
       const t = await refreshAccessToken(deps.oauth, provider, password);
       accessToken = t.accessToken;
-      if (t.refreshToken !== null && t.refreshToken !== password) {
-        await rotateRefreshToken(db, deps.kms, c.tenantId, row, t.refreshToken);
-      }
+      if (t.refreshToken !== null && t.refreshToken !== password) rotated = t.refreshToken;
     } catch (e) {
       if (!(e instanceof MailboxOAuthError)) throw e;
       const kind = e.kind === 'auth_failed' ? 'auth_failed' : 'connect_failed';
       await record(db, c.tenantId, row.id, now(), kind);
       return { ...base, status: 'failed', error: kind };
+    }
+    if (rotated !== null) {
+      // Keep the rotated token before using the access token: a provider with reuse detection
+      // can revoke the grant when the old one is presented again (RQ-0190 F2).
+      let kept: boolean;
+      try {
+        kept = await rotateRefreshToken(db, deps.kms, c.tenantId, row, rotated);
+      } catch {
+        await withTenant(db, c.tenantId, (trx) =>
+          trx
+            .updateTable('app.bill_inbox_mailbox')
+            .set({ secret_rotation_failed_at: now(), last_polled_at: now() })
+            .where('id', '=', row.id)
+            .execute(),
+        );
+        return { ...base, status: 'failed', error: 'token_rotation_failed' };
+      }
+      if (!kept) return { ...base, status: 'skipped' };
     }
   }
   const connector = (deps.connector ?? ((m) => tlsConnector(m.host, m.port)))(endpoint);
@@ -557,15 +615,30 @@ export async function pollTenantMailboxes(
   deps: PollDeps,
   tenantId: string,
 ): Promise<PollResult[]> {
-  const ids = await withTenant(db, tenantId, (trx) =>
-    trx
+  const ids = await withTenant(db, tenantId, async (trx) => {
+    await clearStaleMailboxOAuthVerifiers(trx);
+    return trx
       .selectFrom('app.bill_inbox_mailbox')
       .select('id')
       .where('status', '=', 'active')
       .orderBy('id')
-      .execute(),
-  );
+      .execute();
+  });
   const out: PollResult[] = [];
   for (const { id } of ids) out.push(await pollBillsMailbox(db, deps, { tenantId, mailboxId: id }));
   return out;
+}
+
+/**
+ * Clear the PKCE verifier of every request of the current tenant that is consumed or expired
+ * (by the database clock, as the guard trigger checks) and still holds one (T-0243, RQ-0190 F3).
+ * Run by each start and by the tenant's inbox poll. Returns how many were cleared.
+ */
+export async function clearStaleMailboxOAuthVerifiers(trx: Trx): Promise<number> {
+  const r = await sql`
+    UPDATE app.bill_inbox_oauth_request
+       SET code_verifier = NULL, verifier_cleared_at = clock_timestamp()
+     WHERE code_verifier IS NOT NULL
+       AND (consumed_at IS NOT NULL OR expires_at <= clock_timestamp())`.execute(trx);
+  return Number(r.numAffectedRows ?? 0n);
 }

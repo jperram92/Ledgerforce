@@ -1,0 +1,173 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a5370afd55b74fab5
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:45097
+(node:6419) PromiseRejectionHandledWarning: Promise rejection was handled asynchronously (rejection id: 1)
+(Use `node --trace-warnings ...` to show where the warning was created)
+ ❯ |db| packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts (8 tests | 7 failed) 1280ms
+     × SS-PLAT-196 while the provider answers slowly the request is already consumed (committed), its verifier cleared, and no lf_app transaction is open; the save and audit follow in a second transaction 230ms
+     × SS-PLAT-196 a refused exchange leaves the request consumed (verifier cleared) and saves nothing 42ms
+     × SS-PLAT-197 a transient key-service failure is retried and the rotated token is sealed 74ms
+     × SS-PLAT-197 a lasting failure stops the poll before IMAP, keeps the old token and marks the mailbox token_rotation_failed; the next good rotation clears it 30ms
+     × SS-PLAT-198 a cancelled request loses its verifier; an expired one is cleared by the tenant poll sweep; an unexpired unused one keeps it 21ms
+     × SS-PLAT-198 the verifier is write-once-to-NULL for every role: no new value, no clearing of a live request, no insert without one 21ms
+     × SS-PLAT-198 the secret and verifier guard triggers are plain (not SECURITY DEFINER) and pin their search_path 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts > SS-PLAT-196: the code exchange runs outside any database transaction > SS-PLAT-196 while the provider answers slowly the request is already consumed (committed), its verifier cleared, and no lf_app transaction is open; the save and audit follow in a second transaction
+TypeError: trx.updateTable is not a function
+ ❯ completeMailboxOAuth packages/modules/ap/src/mailbox-oauth-connect.ts:153:6
+    151|   if (!STATE.test(input.state)) throw new MailboxOAuthError('invalid_r…
+    152|   const req = await trx
+    153|     .updateTable('app.bill_inbox_oauth_request')
+       |      ^
+    154|     .set({ consumed_at: input.now })
+    155|     .where('state_sha256', '=', sha256(input.state))
+ ❯ packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:132:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  |db| packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts > SS-PLAT-196: the code exchange runs outside any database transaction > SS-PLAT-196 a refused exchange leaves the request consumed (verifier cleared) and saves nothing
+AssertionError: expected TypeError: trx.updateTable is not a funct… to match object { kind: 'auth_failed' }
+
+- Expected
++ Received
+
+- {
+-   "kind": "auth_failed",
++ TypeError {
++   "message": "trx.updateTable is not a function",
+  }
+
+ ❯ packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:175:6
+    173|         now: new Date(),
+    174|       }),
+    175|     ).rejects.toMatchObject({ kind: 'auth_failed' });
+       |      ^
+    176|     const row = await requestRow(req.id);
+    177|     expect(row.consumed_at).not.toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  |db| packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts > SS-PLAT-197: a failed re-seal of a rotated refresh token is retried or surfaced > SS-PLAT-197 a transient key-service failure is retried and the rotated token is sealed
+Error: kms unavailable
+ ❯ Object.wrap packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:190:38
+    188|     async wrap(dek: Buffer, aad: string) {
+    189|       k.wraps += 1;
+    190|       if (k.wraps <= failures) throw new Error('kms unavailable');
+       |                                      ^
+    191|       return kms.wrap(dek, aad);
+    192|     },
+ ❯ sealField packages/shared/src/crypto/envelope.ts:138:42
+ ❯ rotateRefreshToken packages/modules/ap/src/inbox-mailbox.ts:366:24
+ ❯ pollBillsMailbox packages/modules/ap/src/inbox-mailbox.ts:475:15
+ ❯ packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:260:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  |db| packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts > SS-PLAT-197: a failed re-seal of a rotated refresh token is retried or surfaced > SS-PLAT-197 a lasting failure stops the poll before IMAP, keeps the old token and marks the mailbox token_rotation_failed; the next good rotation clears it
+Error: kms unavailable
+ ❯ Object.wrap packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:190:38
+    188|     async wrap(dek: Buffer, aad: string) {
+    189|       k.wraps += 1;
+    190|       if (k.wraps <= failures) throw new Error('kms unavailable');
+       |                                      ^
+    191|       return kms.wrap(dek, aad);
+    192|     },
+ ❯ sealField packages/shared/src/crypto/envelope.ts:138:42
+ ❯ rotateRefreshToken packages/modules/ap/src/inbox-mailbox.ts:366:24
+ ❯ pollBillsMailbox packages/modules/ap/src/inbox-mailbox.ts:475:15
+ ❯ packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:279:17
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  |db| packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts > SS-PLAT-198: the PKCE verifier is cleared once it cannot be used any more > SS-PLAT-198 a cancelled request loses its verifier; an expired one is cleared by the tenant poll sweep; an unexpired unused one keeps it
+error: column "verifier_cleared_at" does not exist
+ ❯ node_modules/.pnpm/pg-pool@3.14.0_pg@8.23.1/node_modules/pg-pool/index.js:45:11
+ ❯ requestRow packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:93:5
+     91| const requestRow = async (id: string): Promise<RequestRow> => {
+     92|   const r = (
+     93|     await f.admin.query<RequestRow>(
+       |     ^
+     94|       'SELECT code_verifier, verifier_cleared_at, consumed_at FROM app…
+     95|       [id],
+ ❯ packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:305:12
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  |db| packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts > SS-PLAT-198: the PKCE verifier is cleared once it cannot be used any more > SS-PLAT-198 the verifier is write-once-to-NULL for every role: no new value, no clearing of a live request, no insert without one
+AssertionError: expected [Function] to throw error matching /verifier/ but got 'permission denied for table bill_inbo…'
+
+- Expected:
+/verifier/
+
++ Received:
+"permission denied for table bill_inbox_oauth_request"
+
+ ❯ packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:337:6
+    335|           .execute(),
+    336|       ),
+    337|     ).rejects.toThrow(/verifier/);
+       |      ^
+    338|     await expect(
+    339|       f.admin.query(
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  |db| packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts > SS-PLAT-198: the rotation function is a narrow, pinned SECURITY DEFINER > SS-PLAT-198 the secret and verifier guard triggers are plain (not SECURITY DEFINER) and pin their search_path
+AssertionError: expected [ { …(3) } ] to deeply equal [ { …(3) }, { …(3) } ]
+
+- Expected
++ Received
+
+@@ -4,13 +4,6 @@
+        "search_path=pg_catalog, app",
+      ],
+      "proname": "bill_inbox_mailbox_secret_guard",
+      "prosecdef": false,
+    },
+-   {
+-     "proconfig": [
+-       "search_path=pg_catalog, pg_temp",
+-     ],
+-     "proname": "bill_inbox_oauth_request_verifier_guard",
+-     "prosecdef": false,
+-   },
+  ]
+
+ ❯ packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:405:18
+    403|       )
+    404|     ).rows;
+    405|     expect(rows).toEqual([
+       |                  ^
+    406|       {
+    407|         proname: 'bill_inbox_mailbox_secret_guard',
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+TypeError: trx.updateTable is not a function
+ ❯ completeMailboxOAuth packages/modules/ap/src/mailbox-oauth-connect.ts:153:6
+ ❯ packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts:132:18
+ ❯ process.processTicksAndRejections node:internal/process/task_queues:103:5
+ ❯ node_modules/.pnpm/@vitest+runner@4.1.12/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20
+
+This error originated in "packages/modules/ap/src/mailbox-oauth-hardening.db.test.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "SS-PLAT-196 while the provider answers slowly the request is already consumed (committed), its verifier cleared, and no lf_app transaction is open; the save and audit follow in a second transaction". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed | 1 passed (8)
+     Errors  1 error
+   Start at  19:04:22
+   Duration  2.92s (transform 396ms, setup 0ms, import 657ms, tests 1.28s, environment 0ms)
+

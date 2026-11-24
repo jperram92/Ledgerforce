@@ -14,7 +14,10 @@
  *   session, exchanges the code, saves the mailbox (refresh token sealed) and writes its own audit
  *   row. Always a 303 to the Settings page: `?mailbox=connected` or `?mailbox_error=<code>` with
  *   code one of invalid_request, access_denied, auth_failed, connect_failed, not_configured —
- *   never provider text. The redirect is sent after the request transaction commits.
+ *   never provider text. @OwnTransactions (T-0243, ADR-0108): the request is consumed in one
+ *   short tenant transaction, the code is exchanged with none open (a slow provider holds no
+ *   pooled connection or lock), the mailbox is saved and audited in a second; each transaction
+ *   repeats the session and permission checks, so a session revoked meanwhile stops the save (401).
  */
 import {
   Body,
@@ -45,6 +48,7 @@ import { principalOf } from '../auth/session-tenant-resolver.ts';
 import type { Clock } from '../auth/session.service.ts';
 import { RequirePermission, RequireStepUp } from '../authz/permission.decorator.ts';
 import { bad, bodyOf, companyOf, requireKey, uuid } from '../settings/settings-common.ts';
+import { OwnTransactions } from '../tenancy/own-transactions.decorator.ts';
 import { AuditTrail, TenantTx } from '../tenancy/tenant-tx.ts';
 import { CLOCK, KMS, MAILBOX_OAUTH } from '../tokens.ts';
 
@@ -141,6 +145,7 @@ export class BillsMailboxOAuthController {
   }
 
   @Get('callback')
+  @OwnTransactions()
   @Redirect()
   @RequirePermission('settings.setup.manage')
   async callback(
@@ -169,12 +174,17 @@ export class BillsMailboxOAuthController {
     const now = this.clock.now();
     if (error !== undefined) {
       // The provider refused (e.g. the administrator declined consent): use the request up.
-      await cancelMailboxOAuth(this.tx.get(), { state, ...who, now });
+      await this.tx.run((trx) => cancelMailboxOAuth(trx, { state, ...who, now }));
       return error === 'access_denied' ? 'access_denied' : 'auth_failed';
     }
     if (typeof code !== 'string') return 'invalid_request';
     try {
-      await completeMailboxOAuth(this.tx.get(), this.kms, config, { state, code, ...who, now });
+      await completeMailboxOAuth((fn) => this.tx.run(fn), this.kms, config, {
+        state,
+        code,
+        ...who,
+        now,
+      });
       return 'connected';
     } catch (e) {
       if (e instanceof BillsMailboxError) return 'invalid_request';
