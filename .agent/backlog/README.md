@@ -302,7 +302,7 @@ graph LR
 | [T-0218](T-0218.md) | Single-supply BAS preparation: basis guard, aged unbilled GST report, no negative G1/1A (G18/1B), credit_note_bas setting, lifecycle properties and primary-law reading | MVP | todo | T-0217 | UC-04, UC-11 | 0 |
 | [T-0229](T-0229.md) | Stripe: a refund that fails after it was recorded paid (refund.updated / charge.refund.updated webhook) | MVP | todo | T-0189 | UC-11 | 0 |
 | [T-0230](T-0230.md) | Bills inbox webhook: slow-upload protection (per-client in-flight cap, minimum transfer rate, first-byte timeout) | MVP | verifying | T-0215 | UC-05 | 0 |
-| [T-0243](T-0243.md) | Bills mailbox OAuth2 hardening: code exchange outside the DB transaction, rotation failure handling, verifier cleanup, rotation-function tests | MVP | todo | T-0216 | UC-05 | 0 |
+| [T-0243](T-0243.md) | Bills mailbox OAuth2 hardening: code exchange outside the DB transaction, rotation failure handling, verifier cleanup, rotation-function tests | MVP | verifying | T-0216 | UC-05 | 0 |
 | [T-0244](T-0244.md) | Backup role hardening: detect missing lf_backup on upgrade, large-object refusal, pg_hba script robustness, /32 rule | MVP | todo | T-0227 | — | 0 |
 | [T-0235](T-0235.md) | Bills inbox webhook: upload limits configurable from the environment (compose + config.ts) | MVP | todo | T-0230 | UC-05 | 0 |
 | [T-0230](T-0230.md) | Bills inbox webhook: slow-upload protection (per-client in-flight cap, minimum transfer rate, first-byte timeout) | MVP | todo | T-0215 | UC-05 | 0 |

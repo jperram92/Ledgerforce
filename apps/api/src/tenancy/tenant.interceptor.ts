@@ -159,8 +159,7 @@ export class TenantInterceptor implements NestInterceptor {
                 stepUpMet ? stepUp : null,
               );
             });
-        return from(handled
-        ).pipe(
+        return from(handled).pipe(
           catchError((e: unknown) => {
             if (!isAccessRefusal(e)) throw e;
             return from(this.auditDenial(claim.tenantId, req, e)).pipe(

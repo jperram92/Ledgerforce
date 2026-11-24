@@ -4788,3 +4788,38 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: none of the findings exposes data or crosses tenants; each needs its own tests.
 - Alternatives: fix inside T-0216/T-0227 (rejected: both already passed review and are merged).
 - ADR: ADR-0105, ADR-0106 · Status: accepted
+
+### DL-0960 — @OwnTransactions: a read route may run without the request transaction and open its own, each re-checking access
+- Date: 2026-11-24 · By: claude · Task: T-0243 · Category: security
+- Decision: TenantInterceptor gains a handler-level opt-in `@OwnTransactions()`. All access checks (session/token, MFA, permission, step-up) run and commit in their own tenant transaction. The handler then runs with no transaction open and uses `TenantTx.run(fn)`. Each `run` is a fresh `withTenant` that repeats every access check before `fn`. The opt-in is allowed only on read methods without `@SoD`, otherwise it fails closed (500). `TenantTx.get()` throws on such routes.
+- Why: security review r12 M1. The OAuth callback held a pooled lf_app connection and a row lock through a provider call of up to 15 s. Repeating the checks in each transaction closes the window between the first check and a later write (RQ-0190 F1).
+- Alternatives: `@Public` with ad-hoc checks (rejected: ADR-0023); a second connection inside the request transaction (rejected: still holds the first connection); after-commit hooks (rejected: the redirect outcome depends on the exchange).
+- ADR: ADR-0108 · Status: accepted
+
+### DL-0961 — Bills mailbox OAuth callback: consume, exchange outside any transaction, save
+- Date: 2026-11-24 · By: claude · Task: T-0243 · Category: security
+- Decision: `completeMailboxOAuth(run, kms, config, input)` takes a tenant runner. One transaction consumes the request and clears its verifier in the same statement (CTE `SELECT … FOR UPDATE` then `UPDATE … RETURNING old.code_verifier`). The code exchange runs with no transaction open. A second transaction saves the mailbox and writes the audit row. The callback route is `@OwnTransactions`. The cancel path also runs in its own `TenantTx.run`.
+- Why: RQ-0190 F1. A failed exchange still leaves the request used up (unchanged contract).
+- Alternatives: keep a single transaction (the finding).
+- ADR: ADR-0108 · Status: accepted
+
+### DL-0962 — PKCE verifier is cleared on consume, cancel or expiry; write-once-to-NULL trigger
+- Date: 2026-11-24 · By: claude · Task: T-0243 · Category: security
+- Decision: Migration 0084 (reserved 0085) makes `code_verifier` nullable (`DROP NOT NULL` is allowed by the runner) and adds `verifier_cleared_at`, with CHECK `(code_verifier IS NULL) = (verifier_cleared_at IS NOT NULL)`. A guard trigger (pinned `search_path=pg_catalog, pg_temp`) refuses an INSERT without a verifier, any new value, and clearing a live request. lf_app gets UPDATE on the two columns. `clearStaleMailboxOAuthVerifiers` clears consumed or expired requests (database clock) on each start and on each tenant inbox poll. No backfill, because FORCE RLS hides rows from the migrator. The first poll sweep clears old rows.
+- Why: RQ-0190 F3. The verifier is needed only for the one token request. Spring Security, Auth.js and Keycloak drop it on use.
+- Alternatives: seal the verifier (rejected: a KMS round-trip for a single-use value); a separate cleanup job (rejected: the 5-minute tenant poll already exists).
+- ADR: ADR-0108 · Status: accepted
+
+### DL-0963 — Failed re-seal of a rotated refresh token: retry twice, then stop and flag the mailbox
+- Date: 2026-11-24 · By: claude · Task: T-0243 · Category: security
+- Decision: The poller re-seals a rotated refresh token before it uses the access token. A KMS or database failure is retried after 100 ms and after 400 ms. If it still fails, the poll stops with no IMAP connection, `secret_rotation_failed_at` is set (new column, lf_app UPDATE) and the result is `token_rotation_failed`. The next good rotation clears the flag in the same transaction. `BillsMailboxView.secretRotationFailedAt` exposes the flag. If the rotation function finds the row no longer active, the poll is `skipped`.
+- Why: RQ-0190 F2. With rotation and reuse detection (RFC 9700, Auth0) the old token can get the grant revoked, so the failure must be visible before that happens. The 0074 `last_error` CHECK cannot be widened (the runner refuses DROP CONSTRAINT; precedents 0054, 0073), so the flag gets its own column.
+- Alternatives: keep polling with the access token (rejected: hides the failure); a new last_error value (impossible without DROP CONSTRAINT); unbounded retries (rejected: a stuck KMS would stall the tenant's job).
+- ADR: ADR-0108 · Status: accepted
+
+### DL-0964 — T-0243 numbering: migration 0084 locally (reserved 0085), SS-PLAT-196..198, no new cards
+- Date: 2026-11-24 · By: claude · Task: T-0243 · Category: process
+- Decision: The migration runner needs a gapless sequence, so the migration is `0084_ap_mailbox_oauth_hardening.sql` locally. The lead renumbers it to the reserved 0085 at merge (0084 is T-0207's). Scenarios: SS-PLAT-196 (exchange outside a transaction), SS-PLAT-197 (rotation failure), SS-PLAT-198 (verifier lifetime and catalog checks). Cards T-0245..T-0246 are not used.
+- Why: round-13 reserved ranges (row A).
+- Alternatives: none.
+- ADR: none · Status: accepted

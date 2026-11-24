@@ -640,5 +640,5 @@ export async function clearStaleMailboxOAuthVerifiers(trx: Trx): Promise<number>
        SET code_verifier = NULL, verifier_cleared_at = clock_timestamp()
      WHERE code_verifier IS NOT NULL
        AND (consumed_at IS NOT NULL OR expires_at <= clock_timestamp())`.execute(trx);
-  return Number(r.numAffectedRows ?? 0n);
+  return Number.parseInt(String(r.numAffectedRows ?? 0n), 10);
 }

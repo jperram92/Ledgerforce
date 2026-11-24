@@ -135,5 +135,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0101](0101-encrypted-logical-backup-and-restore-drill.md) | Encrypted logical backups: Kms envelope with an AES-256-GCM STREAM payload, snapshot-consistent manifest, restore drill that verifies every company's hash chain | security | yes (delegated, DL-0691) | Accepted |
 | [0103](0103-stripe-refund-nightly-sweep-and-waiting-resend-view.md) | A nightly read-only sweep reports Stripe refunds no document records as Sync issues; the refund view shows the waiting resend | integration | no | Proposed |
 | [0097](0097-failed-security-notices-list-and-retry-now.md) | Failed security notices: an admin list of their own and an append-only retry-now | security | yes (delegated, DL-0691) | Accepted |
+| [0108](0108-own-transaction-routes-and-mailbox-oauth-hardening.md) | Own-transaction routes for slow external calls (access checks repeated per transaction); bills mailbox OAuth verifier cleared after use, failed refresh-token re-seal retried then flagged | security | yes (delegated, DL-0691) | Accepted |
 
 Next free number: **0055** (0055–0060 are reserved for the DL-0409 parallel round) (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

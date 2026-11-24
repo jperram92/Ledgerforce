@@ -101,13 +101,14 @@ const requestRow = async (id: string): Promise<RequestRow> => {
 
 /** lf_app backends of this database with an open transaction (the caller's own is the admin). */
 const openAppTransactions = async () =>
-  Number(
+  Number.parseInt(
     (
       await f.admin.query<{ n: string }>(
         `SELECT count(*)::text AS n FROM pg_stat_activity
           WHERE datname = current_database() AND usename = 'lf_app' AND xact_start IS NOT NULL`,
       )
-    ).rows[0]?.n,
+    ).rows[0]?.n ?? '-1',
+    10,
   );
 
 describe('SS-PLAT-196: the code exchange runs outside any database transaction', () => {
