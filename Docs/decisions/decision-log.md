@@ -4851,3 +4851,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: never claim a source that was not read.
 - Alternatives: none.
 - ADR: none · Status: accepted
+
+### DL-0989 — T-0231 migration file is 0084 locally (reserved 0087); SS-PLAT-202..205 assigned
+- Date: 2026-11-24 · By: claude · Task: T-0231 · Category: process
+- Decision: The migrator refuses gaps, and this branch's base ends at 0083, so the DL-0984 migration is `0084_ar_single_supply_receipt_reversal.sql` on this branch; the lead renumbers it to the reserved 0087 (or the next free number) at merge. Scenarios: SS-PLAT-202 (reversal mirrors and restores, re-attribution), SS-PLAT-203 (refusals, immutability), SS-PLAT-204 (BAS treatment), SS-PLAT-205 (property).
+- Why: round-13 reserved ranges (row C); the brief says to use the next free number locally and report it.
+- Alternatives: a 0087 file (rejected: the migrator refuses the 0084–0086 gap).
+- ADR: none · Status: accepted
