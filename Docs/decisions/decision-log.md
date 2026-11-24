@@ -4829,3 +4829,10 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: lead's ID allocation.
 - Alternatives: none.
 - ADR: none · Status: accepted
+
+### DL-0956 — Security review r13: T-0207 passes; L1 becomes T-0255, I4 added to T-0241
+- Date: 2026-11-24 · By: claude · Task: T-0207 · Category: security
+- Decision: The independent security review of T-0207 (ADR-0107) passed: no path frees a customer credit while LedgerForce itself still pays it (0084 trigger and the unchanged 0055 guard cover both batch race orders; live-batch refusal includes draft; ar.refund.create without step-up is sound because a cancel moves no money). Its Low finding L1 — the Stripe in-flight risk after a withdrawal is wider than DL-0951 states, and a same-day bank refund of the freed credit is not checked — becomes card T-0255. Info I4 (a partially released batch must not be cancellable once any bank file was exported) is AC-4 on T-0241.
+- Why: L1 needs a delayed re-check and a cross-method guard with their own tests and a security ADR.
+- Alternatives: block T-0207 (rejected: the window is narrow, detected nightly, and needs a separate design).
+- ADR: ADR-0107 · Status: accepted
