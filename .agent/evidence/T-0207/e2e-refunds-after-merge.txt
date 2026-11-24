@@ -1,0 +1,23 @@
+
+Running 19 tests using 2 workers
+
+[1/19] [chromium] › tests/e2e/web/refunds.spec.ts:464:5 › T-0207 cancel a requested refund from the refund region › SS-UC11-18: the Clerk cancels an approved bank refund no payment batch pays, freeing the credit @ 390 [T-0207]
+[2/19] [chromium] › tests/e2e/web/refunds.spec.ts:309:3 › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 1440 [T-0152]
+[3/19] [chromium] › tests/e2e/web/refunds.spec.ts:497:3 › T-0207 cancel a requested refund from the refund region › SS-UC11-18: an unapproved bank request is withdrawn by the Clerk; an Approver is not offered Cancel [T-0207]
+[4/19] [chromium] › tests/e2e/web/refunds.spec.ts:309:3 › SS-UC11-08: the Clerk requests a refund of the credit, sees GP-006, and an Approver approves it @ 390 [T-0152]
+[5/19] [chromium] › tests/e2e/web/refunds.spec.ts:516:3 › T-0207 cancel a requested refund from the refund region › SS-UC11-19: a bank refund in a draft payment batch names the batch and offers no Cancel [T-0207]
+[6/19] [chromium] › tests/e2e/web/refunds.spec.ts:547:3 › T-0207 cancel a requested refund from the refund region › SS-UC11-19: a refusal from the API (a batch took it meanwhile) is shown in place [T-0207]
+[7/19] [chromium] › tests/e2e/web/refunds.spec.ts:570:3 › T-0207 cancel a requested refund from the refund region › SS-UC11-20: an unapproved Stripe request offers Cancel, checked with Stripe first [T-0207]
+[8/19] [chromium] › tests/e2e/web/refunds.spec.ts:378:1 › SS-UC11-08 refusal: the person who requested a refund cannot approve it (SOD_REFUND_SELF_APPROVAL) [T-0152]
+[9/19] [chromium] › tests/e2e/web/stripe-refunds.spec.ts:308:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 1440 [T-0172]
+[10/19] [chromium] › tests/e2e/web/refunds.spec.ts:398:1 › SS-UC11-08 refusal: more than the customer can have back is refused in place [T-0152]
+[11/19] [chromium] › tests/e2e/web/refunds.spec.ts:418:1 › SS-UC11-08 forbidden: a user without the refund permissions sees the credit but can neither request nor approve [T-0152]
+[12/19] [chromium] › tests/e2e/web/stripe-refunds.spec.ts:308:3 › SS-UC11-09: a Stripe refund is approved after a fresh sign-in step and the result is shown @ 390 [T-0172]
+[13/19] [chromium] › tests/e2e/web/refunds.spec.ts:464:5 › T-0207 cancel a requested refund from the refund region › SS-UC11-18: the Clerk cancels an approved bank refund no payment batch pays, freeing the credit @ 1440 [T-0207]
+[14/19] [chromium] › tests/e2e/web/stripe-refunds.spec.ts:396:5 › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 1440 [T-0190]
+[15/19] [chromium] › tests/e2e/web/stripe-refunds.spec.ts:346:1 › SS-UC11-10: a Stripe send that did not finish at approval says it is retried automatically [T-0172]
+[16/19] [chromium] › tests/e2e/web/stripe-refunds.spec.ts:368:1 › SS-UC11-10: a refund Stripe took but the books could not record says the money has left and is not posted [T-0172]
+[17/19] [chromium] › tests/e2e/web/stripe-refunds.spec.ts:396:5 › T-0190 cancel › SS-UC11-11: a Stripe refund Stripe refused is cancelled by the clerk and its credit is free again @ 390 [T-0190]
+[18/19] [chromium] › tests/e2e/web/stripe-refunds.spec.ts:434:3 › T-0190 cancel › SS-UC11-11: a refund Stripe took (sent, not posted) offers no Cancel, even to the clerk [T-0190]
+[19/19] [chromium] › tests/e2e/web/stripe-refunds.spec.ts:454:3 › T-0190 cancel › SS-UC11-11: a Stripe refund past its 23-hour window says so (not "Stripe refused") and offers Cancel; a cancel the API refuses as SEND_NOT_FINISHED shows why [T-0190]
+  19 passed (41.2s)
