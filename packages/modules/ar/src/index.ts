@@ -5,6 +5,7 @@ export * from './receipts.ts';
 export * from './prepayments.ts';
 export * from './single-supply.ts';
 export * from './single-supply-final.ts';
+export * from './single-supply-reversal.ts';
 export * from './write-off.ts';
 export * from './aged.ts';
 export * from './writeback.ts';

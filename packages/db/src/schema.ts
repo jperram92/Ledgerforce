@@ -673,6 +673,36 @@ export interface SingleSupplyRefundTable {
   created_at: Timestamp;
 }
 
+export interface SingleSupplyReceiptReversalTable {
+  id: Generated<string>;
+  tenant_id: TenantId;
+  company_id: string;
+  contract_id: string;
+  receipt_id: string;
+  reversal_date: ColumnType<Date, string, never>;
+  reason: string;
+  reversed_entry_id: string;
+  entry_id: string;
+  unattributes: boolean;
+  bas_treatment: 'same_period' | 'error_correction';
+  bas_period_start: ColumnType<Date, string, never>;
+  bas_period_end: ColumnType<Date, string, never>;
+  idempotency_key: string;
+  created_by: string | null;
+  created_at: Timestamp;
+}
+
+export interface SingleSupplyAttributionRenewalTable {
+  tenant_id: TenantId;
+  company_id: string;
+  contract_id: string;
+  after_reversal_id: string;
+  attribution_date: ColumnType<Date, string, never>;
+  attributed_tax: Numeric;
+  entry_id: string;
+  created_at: Timestamp;
+}
+
 export interface SalesInvoiceDepositTable {
   tenant_id: TenantId;
   company_id: string;
@@ -1650,6 +1680,8 @@ export interface Database {
   'app.single_supply_finalisation': SingleSupplyFinalisationTable;
   'app.single_supply_cancellation': SingleSupplyCancellationTable;
   'app.single_supply_refund': SingleSupplyRefundTable;
+  'app.single_supply_receipt_reversal': SingleSupplyReceiptReversalTable;
+  'app.single_supply_attribution_renewal': SingleSupplyAttributionRenewalTable;
   'app.credit_note_line': CreditNoteLineTable;
   'app.billing_format': BillingFormatTable;
   'app.email_delivery': EmailDeliveryTable;

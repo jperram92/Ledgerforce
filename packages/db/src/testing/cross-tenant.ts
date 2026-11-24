@@ -304,6 +304,13 @@ export const DEFAULT_ROW_OVERRIDES: Overrides = {
     tax: () => '0',
     reason: () => 'Refund',
   },
+  // T-0231: receipt reversal (reason; treatment matches its period: equal dates → same_period)
+  // and the attribution renewal (whole cents).
+  'app.single_supply_receipt_reversal': {
+    reason: () => 'Reversed',
+    bas_treatment: () => 'same_period',
+  },
+  'app.single_supply_attribution_renewal': { attributed_tax: () => '1' },
   'app.sales_invoice_deposit': { net: () => '1', tax: () => '0' },
   // T-0046: customer receipts (method CHECK, amount > 0).
   'app.customer_receipt': { method: () => 'eft', amount: () => '1' },
