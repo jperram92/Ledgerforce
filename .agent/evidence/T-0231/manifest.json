@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0231",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-202",
+      "file": ".agent/evidence/T-0231/20261124-030621-tests-db.json",
+      "test": "3 test(s): packages/modules/ar/src/single-supply-reversal.db.test.ts › SS-PLAT-202: reversing a single-supply receipt mirrors it and restores every balance › SS-PLAT-202 AC-3 a GP-040a receipt reversed before finalisation: the GP-040a mirror line for line, every stored balance restored, nothing attributed; replay idempotent; the next receipt attributes the whole GST again (GP-040a) [T-0231] | packages/modules/ar/src/single-supply-reversal.db.test.ts › SS-PLAT-202: reversing a single-supply receipt mirrors it and restores every balance › SS-PLAT-202 AC-3 receipts are reversed last in, first out: the GP-040b receipt first (its mirror), then the GP-040a receipt; the contract returns to no receipt and every balance is restored [T-0231] | packages/modules/ar/src/single-supply-reversal.db.test.ts › SS-PLAT-202: reversing a single-supply receipt mirrors it and restores every balance › SS-PLAT-202 AC-3 a cash-basis GP-020 receipt reversed: the GP-020 mirror line for line, balances restored [T-0231]",
+      "commit": "66006551d4fc",
+      "provider": "unknown",
+      "timestamp": "2026-11-24T03:06:21.950Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-203",
+      "file": ".agent/evidence/T-0231/20261124-030621-tests-db.json",
+      "test": "2 test(s): packages/modules/ar/src/single-supply-reversal.db.test.ts › SS-PLAT-203: receipt reversals no golden covers are refused with nothing written › SS-PLAT-203 AC-3 after finalisation (credit note instead), after cancellation, already reversed, an early date, a missing or long reason, a basis change and an unknown receipt are refused by name [T-0231] | packages/modules/ar/src/single-supply-reversal.db.test.ts › SS-PLAT-203: receipt reversals no golden covers are refused with nothing written › SS-PLAT-203 lf_app cannot UPDATE or DELETE a reversal or a renewal, a second reversal of a receipt and a second renewal after one reversal are refused, and the stored treatment must match its period [T-0231]",
+      "commit": "66006551d4fc",
+      "provider": "unknown",
+      "timestamp": "2026-11-24T03:06:21.950Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-204",
+      "file": ".agent/evidence/T-0231/20261124-030621-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/single-supply-reversal.db.test.ts › SS-PLAT-204: a receipt reversal records its BAS treatment for BAS preparation › SS-PLAT-204 AC-9 monthly, quarterly and annual: same_period within the receipt period, error_correction after it, the period set by the frequency in force on the receipt date [T-0231]",
+      "commit": "66006551d4fc",
+      "provider": "unknown",
+      "timestamp": "2026-11-24T03:06:21.950Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-205",
+      "file": ".agent/evidence/T-0231/20261124-030621-tests-db.json",
+      "test": "1 test(s): packages/modules/ar/src/single-supply-reversal.prop.db.test.ts › SS-PLAT-205: single-supply invariants over receipts and reversals (ADR-0089 R11, INV-reversal) › SS-PLAT-205 AC-3 every entry balances; after last-in-first-out reversals the contract liability, unbilled GST and GST collected equal those of the receipts left standing (whole GST attributed while any stands); reversing every receipt returns every figure of the contract to zero [T-0231]",
+      "commit": "66006551d4fc",
+      "provider": "unknown",
+      "timestamp": "2026-11-24T03:06:21.950Z",
+      "result": "passed"
+    }
+  ]
+}

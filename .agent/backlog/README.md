@@ -18,8 +18,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | in_progress | 1 |
 | review | 146 |
 | todo | 33 |
-| verifying | 17 |
-| **total** | **207** |
+| verifying | 18 |
+| **total** | **208** |
 
 | Phase | Cards |
 |---|---:|
@@ -308,8 +308,9 @@ graph LR
 | [T-0235](T-0235.md) | Bills inbox webhook: upload limits configurable from the environment (compose + config.ts) | MVP | todo | T-0230 | UC-05 | 0 |
 | [T-0241](T-0241.md) | AP: cancel an unreleased payment batch so its bills and refunds can be re-batched or cancelled | MVP | todo | T-0207 | UC-06, UC-11 | 0 |
 | [T-0230](T-0230.md) | Bills inbox webhook: slow-upload protection (per-client in-flight cap, minimum transfer rate, first-byte timeout) | MVP | todo | T-0215 | UC-05 | 0 |
-| [T-0231](T-0231.md) | Single-supply receipt reversal and its BAS label, cash-basis final invoice (GP-022), nothing-attributed final invoice decision and final-invoice delivery event | MVP | todo | T-0217 | UC-04 | 0 |
+| [T-0231](T-0231.md) | Single-supply receipt reversal and its BAS label, cash-basis final invoice (GP-022), nothing-attributed final invoice decision and final-invoice delivery event | MVP | verifying | T-0217 | UC-04 | 0 |
 | [T-0232](T-0232.md) | Single-supply contract-variation document dated at agreement (candidate goldens GP-047+, review finding 7) | MVP | todo | T-0217 | UC-04 | 0 |
+| [T-0249](T-0249.md) | Single-supply cash-basis final invoice (GP-022), nothing-attributed final invoice (GP-022a) and the final invoice's ar.invoice.posted delivery event | MVP | todo | T-0231 | UC-04 | 0 |
 | [T-0237](T-0237.md) | Bills mailbox settings: password mailbox API, test connection, inbound address show/rotate and the Settings screen | MVP | todo | T-0216, T-0215 | UC-05 | 0 |
 | [T-0238](T-0238.md) | Bills mailbox: unattended OAuth grants (Microsoft 365 app-only client credentials, Google service-account delegation) | Phase 1 | todo | T-0216 | UC-05 | 0 |
 | [T-0122](T-0122.md) | Customer refund via Stripe refund API — superseded by T-0074 | MVP | blocked | T-0055, T-0073, T-0074 | UC-11 | 0 |

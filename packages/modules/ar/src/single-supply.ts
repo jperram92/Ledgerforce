@@ -137,11 +137,28 @@ export async function singleSupplyContract(
              coalesce(rc.gross, 0)::text AS gross, coalesce(rc.net, 0)::text AS net,
              coalesce(rc.tax, 0)::text AS tax, s.status
         FROM app.single_supply_contract c
-        LEFT JOIN app.single_supply_attribution a ON a.tenant_id = c.tenant_id AND a.contract_id = c.id
+        LEFT JOIN LATERAL (
+          -- The attribution in force: the first one, or its renewal after the attributing receipt
+          -- was reversed (T-0231, 0084); one whose receipt is reversed no longer counts.
+          SELECT y.attributed_tax, y.attribution_date FROM (
+            SELECT a0.attributed_tax, a0.attribution_date, a0.entry_id, a0.created_at
+              FROM app.single_supply_attribution a0
+             WHERE a0.tenant_id = c.tenant_id AND a0.contract_id = c.id
+            UNION ALL
+            SELECT n.attributed_tax, n.attribution_date, n.entry_id, n.created_at
+              FROM app.single_supply_attribution_renewal n
+             WHERE n.tenant_id = c.tenant_id AND n.contract_id = c.id
+          ) y
+           WHERE NOT EXISTS (SELECT 1 FROM app.single_supply_receipt_reversal v
+                              WHERE v.tenant_id = c.tenant_id AND v.reversed_entry_id = y.entry_id)
+           ORDER BY y.created_at DESC LIMIT 1
+        ) a ON true
         LEFT JOIN app.single_supply_contract_status s ON s.tenant_id = c.tenant_id AND s.contract_id = c.id
         LEFT JOIN LATERAL (
           SELECT sum(x.gross) AS gross, sum(x.net) AS net, sum(x.tax) AS tax
             FROM app.single_supply_receipt x WHERE x.tenant_id = c.tenant_id AND x.contract_id = c.id
+             AND NOT EXISTS (SELECT 1 FROM app.single_supply_receipt_reversal v
+                              WHERE v.tenant_id = x.tenant_id AND v.receipt_id = x.id)
         ) rc ON true
        WHERE c.company_id = ${companyId}::uuid AND c.id = ${contractId}::uuid`.execute(trx)
   ).rows[0];
@@ -422,16 +439,32 @@ export async function recordSingleSupplyReceipt(
     opts,
   );
   if (attributes) {
-    await trx
-      .insertInto('app.single_supply_attribution')
-      .values({
-        company_id: companyId,
-        contract_id: k.contractId,
-        attribution_date: c.receiptDate,
-        attributed_tax: numeric(wholeTax),
-        entry_id: posted.entryId,
-      })
-      .execute();
+    // The first attribution, or — after the attributing receipt was reversed (T-0231, DL-0981) —
+    // its renewal, one per such reversal (0084).
+    const cleared = (
+      await sql<{ id: string }>`
+        SELECT v.id::text FROM app.single_supply_receipt_reversal v
+         WHERE v.company_id = ${companyId}::uuid AND v.contract_id = ${k.contractId}::uuid
+           AND v.unattributes
+           AND NOT EXISTS (SELECT 1 FROM app.single_supply_attribution_renewal n
+                            WHERE n.tenant_id = v.tenant_id AND n.after_reversal_id = v.id)
+         ORDER BY v.created_at DESC LIMIT 1`.execute(trx)
+    ).rows[0];
+    const attribution = {
+      company_id: companyId,
+      contract_id: k.contractId,
+      attribution_date: c.receiptDate,
+      attributed_tax: numeric(wholeTax),
+      entry_id: posted.entryId,
+    };
+    if (cleared) {
+      await trx
+        .insertInto('app.single_supply_attribution_renewal')
+        .values({ ...attribution, after_reversal_id: cleared.id })
+        .execute();
+    } else {
+      await trx.insertInto('app.single_supply_attribution').values(attribution).execute();
+    }
   }
   const row = await trx
     .insertInto('app.single_supply_receipt')
@@ -470,9 +503,12 @@ async function receiptView(
     }>`
       SELECT r.id::text, r.contract_id::text, r.entry_id::text, r.gross::text, r.net::text,
              r.tax::text,
-             EXISTS (SELECT 1 FROM app.single_supply_attribution a
-                      WHERE a.tenant_id = r.tenant_id AND a.contract_id = r.contract_id
-                        AND a.entry_id = r.entry_id) AS attributes
+             (EXISTS (SELECT 1 FROM app.single_supply_attribution a
+                       WHERE a.tenant_id = r.tenant_id AND a.contract_id = r.contract_id
+                         AND a.entry_id = r.entry_id)
+              OR EXISTS (SELECT 1 FROM app.single_supply_attribution_renewal n
+                          WHERE n.tenant_id = r.tenant_id AND n.contract_id = r.contract_id
+                            AND n.entry_id = r.entry_id)) AS attributes
         FROM app.single_supply_receipt r
        WHERE r.company_id = ${companyId}::uuid AND r.id = ${id}::uuid`.execute(trx)
   ).rows[0];

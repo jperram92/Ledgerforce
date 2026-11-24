@@ -1,0 +1,26 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a0aadf5b4d59ec606
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:46067
+ ❯ |db| packages/modules/ar/src/single-supply-reversal.db.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply-reversal.db.test.ts [ packages/modules/ar/src/single-supply-reversal.db.test.ts ]
+Error: Cannot find module './single-supply-reversal.ts' imported from /home/user/Ledgerforce/.claude/worktrees/agent-a0aadf5b4d59ec606/packages/modules/ar/src/single-supply-reversal.db.test.ts
+ ❯ packages/modules/ar/src/single-supply-reversal.db.test.ts:30:1
+     28| import { cancelSingleSupply } from './single-supply-cancel.ts';
+     29| import { finaliseSingleSupply } from './single-supply-final.ts';
+     30| import { reverseSingleSupplyReceipt } from './single-supply-reversal.t…
+       | ^
+     31| import { seedBillableCustomers, seedBillingCompany } from './testing/b…
+     32|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  19:06:41
+   Duration  1.74s (transform 498ms, setup 0ms, import 0ms, tests 0ms, environment 0ms)
+

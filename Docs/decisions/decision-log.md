@@ -4836,3 +4836,76 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Why: L1 needs a delayed re-check and a cross-method guard with their own tests and a security ADR.
 - Alternatives: block T-0207 (rejected: the window is narrow, detected nightly, and needs a separate design).
 - ADR: ADR-0107 · Status: accepted
+
+
+### DL-0980 — A single-supply receipt is reversed by the engine reversal (GP-019); no new golden
+- Date: 2026-11-23 · By: claude · Task: T-0231 · Category: accounting
+- Decision: Reversing a GP-040a, GP-040b or cash-basis GP-020 receipt posts the engine's mirror of the receipt entry (`reverse`, GP-019, postings.md Q11). No candidate golden; GP-047..GP-049 stay unused.
+- Why: GP-019 (Approved) defines a reversal for every posted entry as a line-for-line mirror; the receipts carry no AR/AP open items, so Q11 never blocks them, and the mirror restores every balance incl. the contract dimension balances (RQ-0192 Q1). Comparable systems undo a payment with one generic mirror.
+- Alternatives: a per-type reversal golden (rejected: restates the mirror); a custom reversal journal (rejected: the engine already enforces mirror, period and immutability rules).
+- ADR: ADR-0089 (unchanged) · Status: accepted
+
+### DL-0981 — Receipts are reversed last in, first out; a reversed first receipt is re-attributed by the next receipt
+- Date: 2026-11-23 · By: claude · Task: T-0231 · Category: accounting
+- Decision: Only the latest receipt of a contract that is not reversed may be reversed (NOT_LATEST_RECEIPT). Reversing the attributing receipt (GP-040a) returns the contract to nothing attributed; the next receipt attributes the whole GST again (GP-040a) and is recorded in `app.single_supply_attribution_renewal`, one row per reversal of an attributing receipt.
+- Why: later receipts clear the attribution made by the first; LIFO keeps every state reachable without reversals, so the Approved goldens describe it. A reversed receipt was never consideration received, so s 29-5(1) attribution follows the next real receipt (RQ-0192 Q2). 0076 allows one attribution row per contract (no DROP allowed), hence an additive renewal table.
+- Alternatives: reverse any receipt (rejected: leaves 40b credits without attribution); refuse receipts after a 40a reversal and require a new contract (rejected: a dishonoured first payment is common).
+- ADR: ADR-0089 (unchanged) · Status: accepted
+
+### DL-0982 — Receipt reversal refusals
+- Date: 2026-11-23 · By: claude · Task: T-0231 · Category: accounting
+- Decision: Refused with nothing written: a finalised contract (REVERSAL_AFTER_FINALISATION, credit note instead, Q11), a cancelled contract (REVERSAL_AFTER_CANCELLATION), a receipt already reversed (ALREADY_REVERSED), not the latest (NOT_LATEST_RECEIPT), a reversal dated before the receipt, a reason not 1–500 characters, a basis change on the reversal date (BASIS_CHANGED, ADR-0089 R8). The same idempotency key replays.
+- Why: the final invoice allocates/applies the receipts and the cancellation already adjusted their GST; a reversal would double-count (RQ-0192 Q3).
+- Alternatives: allow reversal after cancellation with a recomputed adjustment (rejected: no golden).
+- ADR: none · Status: accepted
+
+### DL-0983 — A later-period receipt reversal is recorded as an error correction for BAS preparation
+- Date: 2026-11-23 · By: claude · Task: T-0231 · Category: accounting
+- Decision: The reversal record stores `bas_treatment` = `error_correction` when the reversal date is after the end of the receipt's BAS period, else `same_period`, with the period bounds. The period is set by the BAS frequency in force on the receipt date: monthly = calendar month, quarterly = calendar quarter, annual = financial year 1 Jul–30 Jun. T-0218 presents it.
+- Why: T-0168 review MINOR-4 / row 12 (ATO "correcting GST errors" extract): a later-period reversal of an erroneous receipt corrects an error, not a Div 19 adjustment (RQ-0192 Q4). The ledger reverses in the reversal period (GP-019 period rule).
+- Alternatives: derive the label in the BAS query from journal dates (rejected: the frequency in force on the receipt date must be fixed at reversal; recorded fact is auditable).
+- ADR: none · Status: accepted
+
+### DL-0984 — Migration 0087: single-supply receipt reversal and attribution renewal
+- Date: 2026-11-23 · By: claude · Task: T-0231 · Category: architecture
+- Decision: Migration 0087 (reserved for T-0231) adds `app.single_supply_receipt_reversal` (one per receipt) and `app.single_supply_attribution_renewal` (one per reversal of an attributing receipt), both immutable, tenant-owned, RLS ENABLE + FORCE, lf_app SELECT/INSERT, covered by the cross-tenant suite.
+- Why: forward-only, additive (no change to 0076 tables); immutable facts like the other contract records.
+- Alternatives: a status column on the receipt (rejected: receipts are immutable).
+- ADR: none · Status: accepted
+
+### DL-0985 — The cash-basis final invoice is covered by Approved GP-022; no candidate golden
+- Date: 2026-11-23 · By: claude · Task: T-0231 · Category: accounting
+- Decision: On the cash basis the single-supply final invoice posts GP-022a and applies the contract's GP-020 receipts by GP-022b, allocated to the invoice item. Built in T-0249.
+- Why: GP-040 (Approved) says so explicitly; GP-020 lists `single` as a supply type; review row 13 confirmed (RQ-0192 Q5).
+- Alternatives: a single-supply cash golden (rejected: would restate GP-022).
+- ADR: ADR-0089 R8 · Status: accepted
+
+### DL-0986 — A final invoice with nothing attributed is an ordinary invoice that finalises the contract
+- Date: 2026-11-23 · By: claude · Task: T-0231 · Category: accounting
+- Decision: On an accruals contract with no receipt, the final invoice posts GP-022a (GP-001 shape, GST on the final price) and finalises the contract; no adjustment particulars (nothing was attributed). Replaces the NOTHING_ATTRIBUTED refusal in T-0249.
+- Why: with nothing attributed the invoice is the first attribution event of the supply (s 29-5(1)); Approved GP-022a/GP-001 cover the journal; one document per contract (RQ-0192 Q6).
+- Alternatives: keep refusing and let users raise an ordinary invoice outside the contract (rejected: leaves the contract open forever).
+- ADR: none · Status: accepted
+
+### DL-0987 — T-0231 slice 1 is the receipt reversal; T-0249 takes the cash/nothing-attributed final invoice and the delivery event
+- Date: 2026-11-23 · By: claude · Task: T-0231 · Category: scope
+- Decision: T-0231 builds AC-3 and AC-9 (recording). The cash-basis final invoice, the nothing-attributed final invoice and the `ar.invoice.posted` event of every final invoice move with full text to T-0249 (depends on T-0231), research done in RQ-0192.
+- Why: the card is above the ~400-line split threshold across three posting families (RQ-0192 Q8).
+- Alternatives: build all at once (rejected: oversized).
+- ADR: none · Status: accepted
+
+### DL-0988 — Primary law still unread for T-0231
+- Date: 2026-11-23 · By: claude · Task: T-0231 · Category: accounting
+- Decision: Record that legislation.gov.au, austlii.edu.au and ato.gov.au were unreachable on 2026-11-23 (`.agent/evidence/T-0231/primary-source-probe.txt`); the error-correction label rests on the T-0168 review's ATO extract and GP-019. T-0218 AC-11 keeps the reading.
+- Why: never claim a source that was not read.
+- Alternatives: none.
+- ADR: none · Status: accepted
+
+### DL-0989 — T-0231 migration file is 0084 locally (reserved 0087); SS-PLAT-202..205 assigned
+- Date: 2026-11-24 · By: claude · Task: T-0231 · Category: process
+- Decision: The migrator refuses gaps, and this branch's base ends at 0083, so the DL-0984 migration is `0084_ar_single_supply_receipt_reversal.sql` on this branch; the lead renumbers it to the reserved 0087 (or the next free number) at merge. Scenarios: SS-PLAT-202 (reversal mirrors and restores, re-attribution), SS-PLAT-203 (refusals, immutability), SS-PLAT-204 (BAS treatment), SS-PLAT-205 (property).
+- Why: round-13 reserved ranges (row C); the brief says to use the next free number locally and report it.
+- Alternatives: a 0087 file (rejected: the migrator refuses the 0084–0086 gap).
+- ADR: none · Status: accepted
+
+- Note (lead, merge): renumbered to 0085 at merge because T-0207 took 0084.

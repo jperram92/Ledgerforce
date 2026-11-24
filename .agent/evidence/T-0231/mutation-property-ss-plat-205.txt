@@ -1,0 +1,41 @@
+Mutation check (T-0231): single-supply.ts with the reversed-receipt exclusion removed from the contract view (AND true); the SS-PLAT-205 property fails as it must. The file was then restored from HEAD.
+
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-a0aadf5b4d59ec606
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:40901
+ ❯ |db| packages/modules/ar/src/single-supply-reversal.prop.db.test.ts (1 test | 1 failed) 1833ms
+     × SS-PLAT-205 AC-3 every entry balances; after last-in-first-out reversals the contract liability, unbilled GST and GST collected equal those of the receipts left standing (whole GST attributed while any stands); reversing every receipt returns every figure of the contract to zero [T-0231] 586ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/modules/ar/src/single-supply-reversal.prop.db.test.ts > SS-PLAT-205: single-supply invariants over receipts and reversals (ADR-0089 R11, INV-reversal) > SS-PLAT-205 AC-3 every entry balances; after last-in-first-out reversals the contract liability, unbilled GST and GST collected equal those of the receipts left standing (whole GST attributed while any stands); reversing every receipt returns every figure of the contract to zero [T-0231]
+Error: Property failed after 1 tests
+{ seed: -988039921, path: "0:0:0:0:0", endOnFailure: true }
+Counterexample: [2n,[1],0,[]]
+Shrunk 4 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ asyncThrowIfFailed node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2481:8
+
+Caused by: AssertionError: expected '0.0100' to be '0.0000' // Object.is equality
+
+Expected: "0.0000"
+Received: "0.0100"
+
+ ❯ expectStanding packages/modules/ar/src/single-supply-reversal.prop.db.test.ts:191:40
+ ❯ packages/modules/ar/src/single-supply-reversal.prop.db.test.ts:202:11
+ ❯ AsyncProperty.run node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:1217:19
+ ❯ asyncPropertyExecution node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2564:14
+ ❯ asyncRunIt node_modules/.pnpm/fast-check@4.10.2/node_modules/fast-check/lib/fast-check.js:2557:15
+ ❯ packages/modules/ar/src/single-supply-reversal.prop.db.test.ts:66:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  03:06:06
+   Duration  4.18s (transform 738ms, setup 0ms, import 992ms, tests 1.83s, environment 0ms)
+

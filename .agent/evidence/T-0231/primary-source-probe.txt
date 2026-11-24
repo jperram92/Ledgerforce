@@ -1,0 +1,10 @@
+T-0231 primary-source probe, 2026-11-23T19:01Z (build environment, through the agent proxy)
+
+$ curl -sS -o /dev/null -w "%{http_code}" --max-time 20 <url>
+https://www.legislation.gov.au/C2004A00446/latest/text           -> curl: (56) CONNECT tunnel failed, response 403 (000)
+https://www.ato.gov.au/.../gst/correcting-gst-errors             -> 403
+https://www.austlii.edu.au/au/legis/cth/consol_act/antsta1999402/s29.5.html -> curl: (56) CONNECT tunnel failed, response 403 (000)
+
+Result: the GST Act (s 29-5, 29-20, Div 19), the ATO "correcting GST errors" guidance and the
+BAS instructions could not be read. RQ-0192 records which findings rest on the T-0168 review's
+ATO extracts and which on the Approved goldens; no finding claims the primary text.
