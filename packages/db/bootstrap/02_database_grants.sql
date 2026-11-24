@@ -15,3 +15,12 @@ $$;
 -- public holds only public.schema_migrations (owned by lf_migrator). Nobody else creates there.
 REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 GRANT USAGE, CREATE ON SCHEMA public TO lf_migrator;
+
+-- Creating a large object needs no privilege in PostgreSQL, only EXECUTE on these functions,
+-- which PUBLIC has by default; a session that switches read-only off could otherwise store data
+-- (T-0244, ADR-0109, RQ-0191 Finding 2). LedgerForce stores no large objects. lo_import /
+-- lo_export are superuser-only already; the other lo_* writes need an existing object the caller
+-- owns. The ACL lives in this database's pg_proc, so it is set per database, here.
+REVOKE EXECUTE ON FUNCTION pg_catalog.lo_creat(integer) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION pg_catalog.lo_create(oid) FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION pg_catalog.lo_from_bytea(oid, bytea) FROM PUBLIC;

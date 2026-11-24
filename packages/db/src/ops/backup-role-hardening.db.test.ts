@@ -215,9 +215,7 @@ describe('SS-PLAT-200 / SS-PLAT-201 on a separate cluster', () => {
     it('SS-PLAT-200 a login refused by pg_hba is LF_BACKUP_LOGIN_REJECTED; a wrong password is LF_BACKUP_LOGIN_FAILED', async () => {
       const closed = runInit({});
       expect(closed.status, closed.stdout + closed.stderr).toBe(0);
-      expect((await rejection(checkBackupRole(backupUrl()))).code).toBe(
-        'LF_BACKUP_LOGIN_REJECTED',
-      );
+      expect((await rejection(checkBackupRole(backupUrl()))).code).toBe('LF_BACKUP_LOGIN_REJECTED');
 
       const open = runInit({ LF_BACKUP_ALLOWED_CIDR: '127.0.0.1/32' });
       expect(open.status, open.stdout + open.stderr).toBe(0);
@@ -313,8 +311,9 @@ describe('SS-PLAT-200 / SS-PLAT-201 on a separate cluster', () => {
       // A psql that fails only the post-write validation query, as a lost connection would.
       const bin = join(work, 'failing-bin');
       mkdirSync(bin, { recursive: true });
-      const realPsql = spawnSync('bash', ['-c', 'command -v psql'], { encoding: 'utf8' })
-        .stdout.trim();
+      const realPsql = spawnSync('bash', ['-c', 'command -v psql'], {
+        encoding: 'utf8',
+      }).stdout.trim();
       writeFileSync(
         join(bin, 'psql'),
         `#!/usr/bin/env bash\nfor a in "$@"; do\n  if [[ "$a" == *"lf_backup_hba_validation"* ]]; then echo 'psql: connection lost' >&2; exit 2; fi\ndone\nexec ${realPsql} "$@"\n`,

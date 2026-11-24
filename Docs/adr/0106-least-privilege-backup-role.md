@@ -7,7 +7,7 @@ author: claude
 category: security
 human_gate: yes (delegated, DL-0691 / DL-0896)
 supersedes: ADR-0101 (only the rule that the backup connects as the cluster superuser)
-superseded_by: none
+superseded_by: ADR-0109 (only the rule that lf_backup may log in from the whole backup subnet)
 ---
 
 # ADR-0106: Least-privilege `lf_backup` role for the nightly backup

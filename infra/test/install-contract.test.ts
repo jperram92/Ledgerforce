@@ -502,7 +502,11 @@ describe('SS-PLAT-195 the backup connects as lf_backup, only from its own networ
     expect(members).toEqual(['backup', 'postgres']);
     expect(netsOf('backup')).toEqual(['backup']);
     expect(netsOf('postgres')).toEqual(['backup', 'default']);
-    expect(svc('postgres').environment?.['LF_BACKUP_ALLOWED_CIDR']).toBe(subnet);
+    // Since T-0244 (ADR-0109) the rule is the backup container's own address inside this subnet,
+    // not the whole subnet: SS-PLAT-201 below checks the /32.
+    expect(svc('postgres').environment?.['LF_BACKUP_ALLOWED_CIDR']).toBe(
+      '${LF_BACKUP_ADDRESS:-172.30.227.6}/32',
+    );
     expect(read('infra/compose/ledgerforce.env.example')).toMatch(
       /^#? ?LF_BACKUP_SUBNET=172\.30\.227\.0\/29$/m,
     );
@@ -565,7 +569,13 @@ describe('SS-PLAT-201 lf_backup may log in only from the backup container addres
       /^#? ?LF_BACKUP_ADDRESS=172\.30\.227\.6$/m,
     );
     const doc = read('Docs/ops/backup-restore.md');
-    for (const needle of ['LF_BACKUP_ADDRESS', '/32', 'ADR-0109', 'gateway', 'already has errors']) {
+    for (const needle of [
+      'LF_BACKUP_ADDRESS',
+      '/32',
+      'ADR-0109',
+      'gateway',
+      'already has errors',
+    ]) {
       expect(doc, needle).toContain(needle);
     }
   });
