@@ -1,0 +1,206 @@
+
+ RUN  v4.1.12 /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87
+
+[db] test PostgreSQL ready (local) on 127.0.0.1:44539
+ ❯ |db| packages/db/src/ops/backup-role-hardening.db.test.ts (12 tests | 11 failed) 2936ms
+     × SS-PLAT-199 lo_creat, lo_create and lo_from_bytea are not executable by PUBLIC 9ms
+     × SS-PLAT-199 with read-only switched off, lf_backup and lf_app still get permission denied (42501) 8ms
+       × SS-PLAT-200 an install without lf_backup (upgrade step not run) fails the check with LF_BACKUP_ROLE_MISSING and the upgrade command 2ms
+       × SS-PLAT-200 the backup CLI exits 2 at start-up with the named error, for a one-off run and for the nightly service 128ms
+       × SS-PLAT-200 a login refused by pg_hba is LF_BACKUP_LOGIN_REJECTED; a wrong password is LF_BACKUP_LOGIN_FAILED 220ms
+       × SS-PLAT-200 a correctly bootstrapped lf_backup passes, and the CLI gets past the check 2ms
+       × SS-PLAT-200 a misconfigured lf_backup fails with LF_BACKUP_ROLE_MISCONFIGURED naming every problem, until the bootstrap repairs it 7ms
+       × SS-PLAT-200 a superuser is accepted with a warning; a role that cannot read past RLS is refused 1ms
+       × SS-PLAT-201 refuses a /0 prefix and any public or invalid address, leaving pg_hba.conf unchanged 223ms
+       × SS-PLAT-201 restores the previous pg_hba.conf when the validation itself fails 248ms
+       × SS-PLAT-201 a pre-existing parse error is reported clearly and tolerated: roles done, rule and password unchanged 184ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 11 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-199 lf_backup cannot create large objects > SS-PLAT-199 lo_creat, lo_create and lo_from_bytea are not executable by PUBLIC
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:91:52
+     89|         ORDER BY f`,
+     90|     );
+     91|     expect(rows.every((r) => !r.backup && !r.app)).toBe(true);
+       |                                                    ^
+     92|     expect(rows).toHaveLength(5);
+     93|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/11]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-199 lf_backup cannot create large objects > SS-PLAT-199 with read-only switched off, lf_backup and lf_app still get permission denied (42501)
+AssertionError: lf_backup: expected 'succeeded' to be '42501' // Object.is equality
+
+Expected: "42501"
+Received: "succeeded"
+
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:98:64
+     96|     for (const role of ['lf_backup', 'lf_app'] as const) {
+     97|       const url = tdb.url(role);
+     98|       expect(await sqlstate(url, 'SELECT lo_creat(-1)'), role).toBe('4…
+       |                                                                ^
+     99|       expect(await sqlstate(url, 'SELECT lo_create(0)'), role).toBe('4…
+    100|       expect(await sqlstate(url, `SELECT lo_from_bytea(0, '\\x01')`), …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/11]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-200 / SS-PLAT-201 on a separate cluster > SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up > SS-PLAT-200 an install without lf_backup (upgrade step not run) fails the check with LF_BACKUP_ROLE_MISSING and the upgrade command
+Error: checkBackupRole: not implemented
+ ❯ checkBackupRole packages/db/src/ops/backup-preflight.ts:23:25
+     21|
+     22| export function checkBackupRole(_url: string): Promise<{ role: string;…
+     23|   return Promise.reject(new Error('checkBackupRole: not implemented'));
+       |                         ^
+     24| }
+     25|
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:189:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/11]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-200 / SS-PLAT-201 on a separate cluster > SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up > SS-PLAT-200 the backup CLI exits 2 at start-up with the named error, for a one-off run and for the nightly service
+AssertionError: backup: backup failed: role "lf_backup" does not exist
+: expected 1 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:201:54
+    199|       const out = join(work, 'never.lfbackup');
+    200|       const once = runBackupCli(['--out', out], backupUrl());
+    201|       expect(once.status, once.stdout + once.stderr).toBe(2);
+       |                                                      ^
+    202|       expect(once.stderr).toMatch(/LF_BACKUP_ROLE_MISSING/);
+    203|       expect(existsSync(out)).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/11]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-200 / SS-PLAT-201 on a separate cluster > SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up > SS-PLAT-200 a login refused by pg_hba is LF_BACKUP_LOGIN_REJECTED; a wrong password is LF_BACKUP_LOGIN_FAILED
+Error: checkBackupRole: not implemented
+ ❯ checkBackupRole packages/db/src/ops/backup-preflight.ts:23:25
+     21|
+     22| export function checkBackupRole(_url: string): Promise<{ role: string;…
+     23|   return Promise.reject(new Error('checkBackupRole: not implemented'));
+       |                         ^
+     24| }
+     25|
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:218:31
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/11]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-200 / SS-PLAT-201 on a separate cluster > SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up > SS-PLAT-200 a correctly bootstrapped lf_backup passes, and the CLI gets past the check
+AssertionError: promise rejected "Error: checkBackupRole: not implemented" instead of resolving
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:231:49
+    229|
+    230|     it('SS-PLAT-200 a correctly bootstrapped lf_backup passes, and the…
+    231|       await expect(checkBackupRole(backupUrl())).resolves.toEqual({
+       |                                                 ^
+    232|         role: 'lf_backup',
+    233|         warnings: [],
+
+Caused by: Error: checkBackupRole: not implemented
+ ❯ checkBackupRole packages/db/src/ops/backup-preflight.ts:23:25
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:231:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/11]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-200 / SS-PLAT-201 on a separate cluster > SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up > SS-PLAT-200 a misconfigured lf_backup fails with LF_BACKUP_ROLE_MISCONFIGURED naming every problem, until the bootstrap repairs it
+Error: checkBackupRole: not implemented
+ ❯ checkBackupRole packages/db/src/ops/backup-preflight.ts:23:25
+     21|
+     22| export function checkBackupRole(_url: string): Promise<{ role: string;…
+     23|   return Promise.reject(new Error('checkBackupRole: not implemented'));
+       |                         ^
+     24| }
+     25|
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:246:33
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/11]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-200 / SS-PLAT-201 on a separate cluster > SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up > SS-PLAT-200 a superuser is accepted with a warning; a role that cannot read past RLS is refused
+Error: checkBackupRole: not implemented
+ ❯ checkBackupRole packages/db/src/ops/backup-preflight.ts:23:25
+     21|
+     22| export function checkBackupRole(_url: string): Promise<{ role: string;…
+     23|   return Promise.reject(new Error('checkBackupRole: not implemented'));
+       |                         ^
+     24| }
+     25|
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:266:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/11]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-200 / SS-PLAT-201 on a separate cluster > SS-PLAT-201 the pg_hba step of the init script > SS-PLAT-201 refuses a /0 prefix and any public or invalid address, leaving pg_hba.conf unchanged
+AssertionError: 0.0.0.0/0: expected +0 not to be +0 // Object.is equality
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:281:36
+    279|       for (const cidr of ['0.0.0.0/0', '10.0.0.0/0', '::/0']) {
+    280|         const r = runInit({ LF_BACKUP_ALLOWED_CIDR: cidr });
+    281|         expect(r.status, cidr).not.toBe(0);
+       |                                    ^
+    282|         expect(r.stderr, cidr).toMatch(/\/0 would allow lf_backup from…
+    283|       }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/11]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-200 / SS-PLAT-201 on a separate cluster > SS-PLAT-201 the pg_hba step of the init script > SS-PLAT-201 restores the previous pg_hba.conf when the validation itself fails
+AssertionError: expected +0 not to be +0 // Object.is equality
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:327:28
+    325|         `${bin}:${process.env['PATH'] ?? ''}`,
+    326|       );
+    327|       expect(r.status).not.toBe(0);
+       |                            ^
+    328|       expect(r.stderr).toMatch(/pg_hba\.conf restored/);
+    329|       expect(readFileSync(hbaFile, 'utf8')).toBe(before);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/11]⎯
+
+ FAIL  |db| packages/db/src/ops/backup-role-hardening.db.test.ts > SS-PLAT-200 / SS-PLAT-201 on a separate cluster > SS-PLAT-201 the pg_hba step of the init script > SS-PLAT-201 a pre-existing parse error is reported clearly and tolerated: roles done, rule and password unchanged
+AssertionError: DO
+ALTER ROLE
+ALTER ROLE
+ALTER ROLE
+ALTER ROLE
+GRANT ROLE
+DO
+DO
+REVOKE
+GRANT
+ALTER ROLE
+ALTER ROLE
+ALTER ROLE
+psql:/home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/packages/db/bootstrap/01_cluster_roles.sql:33: NOTICE:  role "lf_backup" has already been granted membership in role "pg_read_all_data" by role "postgres"
+10-ledgerforce-roles: pg_hba.conf would not parse; left unchanged
+: expected 1 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 1
+
+ ❯ packages/db/src/ops/backup-role-hardening.db.test.ts:339:47
+    337|       try {
+    338|         const r = runInit({ LF_BACKUP_ALLOWED_CIDR: '127.0.0.1/32', LF…
+    339|         expect(r.status, r.stdout + r.stderr).toBe(0);
+       |                                               ^
+    340|         expect(r.stderr).toMatch(/pg_hba\.conf already has errors/);
+    341|         expect(r.stderr).toContain(`line ${String(brokenLine)}`);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/11]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  11 failed | 1 passed (12)
+   Start at  19:06:15
+   Duration  4.02s (transform 108ms, setup 0ms, import 233ms, tests 2.94s, environment 0ms)
+

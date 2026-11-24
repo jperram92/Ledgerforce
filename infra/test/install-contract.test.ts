@@ -502,7 +502,11 @@ describe('SS-PLAT-195 the backup connects as lf_backup, only from its own networ
     expect(members).toEqual(['backup', 'postgres']);
     expect(netsOf('backup')).toEqual(['backup']);
     expect(netsOf('postgres')).toEqual(['backup', 'default']);
-    expect(svc('postgres').environment?.['LF_BACKUP_ALLOWED_CIDR']).toBe(subnet);
+    // Since T-0244 (ADR-0109) the rule is the backup container's own address inside this subnet,
+    // not the whole subnet: SS-PLAT-201 below checks the /32.
+    expect(svc('postgres').environment?.['LF_BACKUP_ALLOWED_CIDR']).toBe(
+      '${LF_BACKUP_ADDRESS:-172.30.227.6}/32',
+    );
     expect(read('infra/compose/ledgerforce.env.example')).toMatch(
       /^#? ?LF_BACKUP_SUBNET=172\.30\.227\.0\/29$/m,
     );
@@ -532,5 +536,62 @@ describe('SS-PLAT-195 the backup connects as lf_backup, only from its own networ
       expect(doc, needle).toContain(needle);
     }
     expect(doc).not.toMatch(/connects as the `postgres` superuser/);
+  });
+});
+
+describe('SS-PLAT-201 lf_backup may log in only from the backup container address (T-0244, ADR-0109)', () => {
+  const raw = compose as unknown as {
+    services: Record<string, { networks?: string[] | Record<string, unknown> }>;
+    networks?: Record<string, { ipam?: { config?: { subnet?: string }[] } }>;
+  };
+  const address = '${LF_BACKUP_ADDRESS:-172.30.227.6}';
+  const defaultOf = (v: string): string => /:-([^}]+)\}/.exec(v)?.[1] ?? '';
+  const toInt = (ip: string): number =>
+    ip.split('.').reduce((n, o) => n * 256 + Number.parseInt(o, 10), 0);
+
+  it('SS-PLAT-201 the backup container has a static address and postgres allows lf_backup from that /32 only', () => {
+    expect(raw.services['backup']?.networks).toEqual({ backup: { ipv4_address: address } });
+    expect(svc('postgres').environment?.['LF_BACKUP_ALLOWED_CIDR']).toBe(`${address}/32`);
+  });
+
+  it('SS-PLAT-201 the default address is a host address inside the default subnet, not the gateway', () => {
+    const subnet = defaultOf(raw.networks?.['backup']?.ipam?.config?.[0]?.subnet ?? '');
+    const [net = '', bits = '32'] = subnet.split('/');
+    const size = 2 ** (32 - Number.parseInt(bits, 10));
+    const base = toInt(net);
+    const ip = toInt(defaultOf(address));
+    expect(ip).toBeGreaterThan(base + 1); // not the network address, not the gateway (host side)
+    expect(ip).toBeLessThan(base + size - 1); // not the broadcast address
+  });
+
+  it('SS-PLAT-201 the env example and the runbook document LF_BACKUP_ADDRESS and the /32 rule', () => {
+    expect(read('infra/compose/ledgerforce.env.example')).toMatch(
+      /^#? ?LF_BACKUP_ADDRESS=172\.30\.227\.6$/m,
+    );
+    const doc = read('Docs/ops/backup-restore.md');
+    for (const needle of [
+      'LF_BACKUP_ADDRESS',
+      '/32',
+      'ADR-0109',
+      'gateway',
+      'already has errors',
+    ]) {
+      expect(doc, needle).toContain(needle);
+    }
+  });
+});
+
+describe('SS-PLAT-200 the runbook names the backup start-up errors (T-0244, ADR-0109)', () => {
+  it('SS-PLAT-200 every named start-up error is explained in the runbook', () => {
+    const doc = read('Docs/ops/backup-restore.md');
+    for (const code of [
+      'LF_BACKUP_ROLE_MISSING',
+      'LF_BACKUP_LOGIN_FAILED',
+      'LF_BACKUP_LOGIN_REJECTED',
+      'LF_BACKUP_ROLE_MISCONFIGURED',
+      'LF_BACKUP_ROLE_CANNOT_BYPASS_RLS',
+    ]) {
+      expect(doc, code).toContain(code);
+    }
   });
 });

@@ -4766,7 +4766,7 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - Decision: `10-ledgerforce-roles.sh` writes, before every other rule of `SHOW hba_file`, a block allowing `lf_backup` scram logins only to `$POSTGRES_DB` from `LF_BACKUP_ALLOWED_CIDR` and rejecting it everywhere else (TCP and local socket); replaced between markers on each run, CIDR validated, parse checked with `pg_hba_file_rules` (old file restored on error), then `pg_reload_conf()`. Compose: an `internal` `backup` network (subnet `LF_BACKUP_SUBNET`, default 172.30.227.0/29) joined only by postgres and backup.
 - Why: pg_hba is PostgreSQL's only per-role source-address control; compose IPs are dynamic, a dedicated subnet is not (RQ-0188 Finding 5). The internal network also gives the key-holding container no route off the host.
 - Alternatives: password-only restriction (a leaked password would work from any container); hostname rules in pg_hba (depend on Docker reverse DNS); fixed container IP (same collision risk, less flexible).
-- ADR: ADR-0106 · Status: accepted
+- ADR: ADR-0106 · Status: accepted · Partly superseded by DL-0974 (subnet rule → /32 of the backup container)
 
 ### DL-0943 — The init script is the idempotent upgrade step for existing installs
 - Date: 2026-11-23 · By: claude · Task: T-0227 · Category: process
@@ -4947,3 +4947,46 @@ says `Supersedes DL-NNNN`, and the old entry gets a trailing `Superseded by DL-M
 - ADR: none · Status: accepted
 
 - Note (lead, merge): renumbered to 0086 at merge (0084 is T-0207, 0085 is T-0231).
+
+
+### DL-0970 — Backup checks its role at start-up and fails with a named error (no privileged one-shot service)
+- Date: 2026-11-23 · By: claude · Task: T-0244 · Category: security
+- Decision: `checkBackupRole` (`packages/db/src/ops/backup-preflight.ts`) runs in the backup CLI at start-up (exit 2) and before every nightly run; named errors `LF_BACKUP_ROLE_MISSING`, `LF_BACKUP_LOGIN_FAILED`, `LF_BACKUP_LOGIN_REJECTED`, `LF_BACKUP_ROLE_MISCONFIGURED` (every difference listed), `LF_BACKUP_ROLE_CANNOT_BYPASS_RLS`, each with the upgrade command; a superuser connection is accepted with a warning (manual runs), other connection errors exit 1. ADR-0109 accepted by the building agent under DL-0691 / DL-0896 with research RQ-0191.
+- Why: security review r12 M2 (DL-0899): an install that skipped the upgrade step failed quietly every night. A start-up failure makes compose show `backup` restarting with the reason in its log (RQ-0191 Finding 1; pgBackRest `check` / `barman check` do the same).
+- Alternatives: a one-shot compose service running the role script (rejected: needs the superuser password and write access to `pg_hba.conf` in `pgdata` in a second container); checking in `setup` (would stop the whole stack for a backup problem).
+- ADR: ADR-0109 · Status: accepted
+
+### DL-0971 — Large-object creation revoked from PUBLIC in the per-database bootstrap
+- Date: 2026-11-23 · By: claude · Task: T-0244 · Category: security
+- Decision: `02_database_grants.sql` revokes `EXECUTE` on `lo_creat(integer)`, `lo_create(oid)` and `lo_from_bytea(oid, bytea)` from PUBLIC; SS-PLAT-199 shows `lf_backup` and `lf_app` get 42501 with read-only off. The T-0227 assertion that `lo_creat` fails with 25006 (read-only) in the default session now expects 42501 (the privilege check comes first), a stronger guarantee.
+- Why: r12 L4; creating a large object needs no privilege by default (RQ-0191 Finding 2, probed on PostgreSQL 16). LedgerForce stores no large objects; the superuser restore is not affected.
+- Alternatives: keep relying on the read-only default (switchable by the session).
+- ADR: ADR-0109 · Status: accepted
+
+### DL-0972 — pg_hba step: restore on any failure, tolerate a pre-existing parse error, password last
+- Date: 2026-11-23 · By: claude · Task: T-0244 · Category: security
+- Decision: `10-ledgerforce-roles.sh` checks the current `pg_hba.conf` first; if it already has errors it prints the file, each line and error, completes the roles, leaves the file, the lf_backup rule and its password unchanged and exits 0. Otherwise an `EXIT` trap restores the previous file on any failure between the rewrite and a successful `pg_reload_conf()`; the `lf_backup` password is set only after the reload.
+- Why: r12 L5; PostgreSQL keeps its last valid rules while the file has any error, so writing then is pointless and blaming the managed block misleads (RQ-0191 Finding 3). Exit 0 keeps an otherwise healthy upgrade or first start unblocked; the backup start-up check (DL-0970) names the resulting login failure.
+- Alternatives: fail every run (the reported problem); overwrite or "fix" the operator's file (not ours to edit).
+- ADR: ADR-0109 · Status: accepted
+
+### DL-0973 — LF_BACKUP_ALLOWED_CIDR: refuse /0 and anything outside private or loopback space
+- Date: 2026-11-23 · By: claude · Task: T-0244 · Category: security
+- Decision: after the existing shape regex, a `/0` prefix is refused with a message naming it, then PostgreSQL's `inet` parser (read-only query, before any change) requires a non-zero prefix inside 10/8, 172.16/12, 192.168/16, 127/8, fc00::/7 or ::1; unparsable values are refused too.
+- Why: r12 L6; the backup network is an internal Docker network, always private space, so a zero, public or invalid prefix can only be a mistake (RQ-0191 Finding 4).
+- Alternatives: refuse only `/0` (then `/1` is as bad); a minimum prefix length (arbitrary).
+- ADR: ADR-0109 · Status: accepted
+
+### DL-0974 — The backup container gets a fixed address and pg_hba allows lf_backup from that /32 only
+- Date: 2026-11-23 · By: claude · Task: T-0244 · Category: security
+- Decision: compose sets `ipv4_address: ${LF_BACKUP_ADDRESS:-172.30.227.6}` for `backup` on the `backup` network and `LF_BACKUP_ALLOWED_CIDR=${LF_BACKUP_ADDRESS:-172.30.227.6}/32` for `postgres`; `LF_BACKUP_ADDRESS` is documented in `ledgerforce.env.example` and the runbook (change it with `LF_BACKUP_SUBNET`). Supersedes the subnet-wide rule of DL-0942 (the rest of DL-0942 stands).
+- Why: r12 L7; the host owns the subnet's gateway address and an `internal` network does not remove it (RQ-0191 Finding 5). Local bridge IPAM gives the only dynamic member (`postgres`) the first free address, so the last usable address does not collide.
+- Alternatives: a `reject` line for the gateway (depends on Docker's default gateway, leaves the rest of the subnet open); `ip_range` plus a third setting (not needed with first-free allocation).
+- ADR: ADR-0109 · Status: accepted
+
+### DL-0975 — T-0244 uses no migration (0086 unused); SS-PLAT-199..201 assigned
+- Date: 2026-11-23 · By: claude · Task: T-0244 · Category: process
+- Decision: the large-object revoke lives in the per-database bootstrap (pg_catalog functions are owned by the bootstrap superuser, which migrations as `lf_migrator` cannot change), so reserved migration 0086 is unused. Scenarios: SS-PLAT-199 (no large objects), SS-PLAT-200 (start-up role check), SS-PLAT-201 (pg_hba script robustness and /32 rule).
+- Why: lead's reserved ranges (round 13, row B).
+- Alternatives: none.
+- ADR: none · Status: accepted

@@ -32,12 +32,21 @@ built-in `pg_read_all_data` role, and nothing else:
   disable triggers or row security, or run the privileged (SECURITY DEFINER) functions; it owns
   nothing and its sessions start read-only;
 - at most four sessions at a time (`CONNECTION LIMIT 4`);
-- it may log in only to the `ledgerforce` database and only from the internal `backup` network,
-  which only the `postgres` and `backup` services join (subnet `LF_BACKUP_SUBNET`, default
-  `172.30.227.0/29`; change it in `ledgerforce.env` if it collides with a network on your host).
+- it may log in only to the `ledgerforce` database and only from the `backup` container's own
+  address on the internal `backup` network, which only the `postgres` and `backup` services join.
+  The rule is a `/32` for that one address (`LF_BACKUP_ADDRESS`, default `172.30.227.6`, the last
+  usable address of the subnet `LF_BACKUP_SUBNET`, default `172.30.227.0/29`), so neither another
+  address in the subnet nor its gateway (`172.30.227.1`, which is the Docker host itself) can use
+  the role ([ADR-0109](../adr/0109-backup-role-hardening.md), T-0244). If the subnet collides with
+  a network on your host, change `LF_BACKUP_SUBNET` and `LF_BACKUP_ADDRESS` together in
+  `ledgerforce.env` and re-run the upgrade step below.
   `infra/compose/initdb/10-ledgerforce-roles.sh` writes this rule at the top of `pg_hba.conf`
   between `# BEGIN lf_backup` and `# END lf_backup`; do not edit that block by hand, re-run the
-  script instead;
+  script instead. It refuses a `/0` prefix and any address outside private or loopback space,
+  restores the previous `pg_hba.conf` if anything fails before the new rules are loaded, and sets
+  the `lf_backup` password only once the rule is in force;
+- it cannot create large objects: `EXECUTE` on `lo_creat`, `lo_create` and `lo_from_bytea` is
+  revoked from everyone (ADR-0109), so this holds even if a session switches read-only off;
 - its password is the `lf_backup_password` secret, mounted only into `postgres` (which sets it)
   and `backup`. The superuser password is no longer mounted into `backup`.
 
@@ -56,9 +65,33 @@ docker compose -f infra/compose/compose.yaml --env-file infra/compose/ledgerforc
   exec -u postgres postgres bash /docker-entrypoint-initdb.d/10-ledgerforce-roles.sh
 ```
 
-The last command prints `lf_backup logins allowed from <subnet>`. Running it again is safe: it
-re-applies the role settings, resets the passwords from the secrets and replaces the
+The last command prints `lf_backup logins allowed from <address>/32`. Running it again is safe:
+it re-applies the role settings, resets the passwords from the secrets and replaces the
 `pg_hba.conf` block. Then take a one-off backup (below) to confirm the role works.
+
+If `pg_hba.conf` already has errors (for example a hand edit), PostgreSQL ignores every change to
+the file until they are fixed. The script then prints
+`WARNING: <file> already has errors …` with each line number and error, finishes the roles,
+leaves the file, the `lf_backup` rule and its password unchanged, and exits 0. Fix the named
+lines and run the script again.
+
+### When the backup service will not start
+
+At start-up, and again before every nightly run, the backup checks the role it connects with. A
+problem stops the service at once with exit code 2 and a named error, so
+`docker compose … ps` shows `backup` restarting and `docker compose … logs backup` says why
+(T-0244, ADR-0109):
+
+| Error | Meaning | What to do |
+| --- | --- | --- |
+| `LF_BACKUP_ROLE_MISSING` | The `lf_backup` role does not exist (an install from before T-0227) | Run the upgrade step above |
+| `LF_BACKUP_LOGIN_FAILED` | Password authentication failed: the role is missing (with password authentication PostgreSQL does not say which) or its password differs from the `lf_backup_password` secret | Run `bash infra/compose/init-secrets.sh`, then the upgrade step |
+| `LF_BACKUP_LOGIN_REJECTED` | `pg_hba.conf` refuses `lf_backup` from the backup container's address (no rule yet, or `LF_BACKUP_ADDRESS` changed) | Run the upgrade step; check `LF_BACKUP_ADDRESS` lies in `LF_BACKUP_SUBNET` |
+| `LF_BACKUP_ROLE_MISCONFIGURED` | `lf_backup` logged in but differs from the bootstrap (each difference is listed: not BYPASSRLS, extra attributes or memberships, sessions not read-only) | Run the upgrade step; it repairs the role |
+| `LF_BACKUP_ROLE_CANNOT_BYPASS_RLS` | `LF_BACKUP_DB_USER` names a role that is neither `lf_backup`, BYPASSRLS nor superuser, so it cannot dump the tenant tables | Set `LF_BACKUP_DB_USER=lf_backup` |
+
+A database that is not reachable yet is not a role problem: the service exits with code 1 and
+compose starts it again.
 
 ## The key: keep it off the host
 

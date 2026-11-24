@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "taskId": "T-0244",
+  "entries": [
+    {
+      "scenario": "SS-PLAT-199",
+      "file": ".agent/evidence/T-0244/20261124-030712-tests-db.json",
+      "test": "2 test(s): packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-199 lf_backup cannot create large objects › SS-PLAT-199 lo_creat, lo_create and lo_from_bytea are not executable by PUBLIC | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-199 lf_backup cannot create large objects › SS-PLAT-199 with read-only switched off, lf_backup and lf_app still get permission denied (42501)",
+      "commit": "e0aec2618b96-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-24T03:07:12.715Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-200",
+      "file": ".agent/evidence/T-0244/20261124-030712-tests-db.json",
+      "test": "10 test(s): packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 an install without lf_backup (upgrade step not run) fails the check with LF_BACKUP_ROLE_MISSING and the upgrade command | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 the backup CLI exits 2 at start-up with the named error, for a one-off run and for the nightly service | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 a login refused by pg_hba is LF_BACKUP_LOGIN_REJECTED; a wrong password is LF_BACKUP_LOGIN_FAILED | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 a correctly bootstrapped lf_backup passes, and the CLI gets past the check | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 a misconfigured lf_backup fails with LF_BACKUP_ROLE_MISCONFIGURED naming every problem, until the bootstrap repairs it | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 a superuser is accepted with a warning; a role that cannot read past RLS is refused | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-201 the pg_hba step of the init script › SS-PLAT-201 refuses a /0 prefix and any public or invalid address, leaving pg_hba.conf unchanged | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-201 the pg_hba step of the init script › SS-PLAT-201 the compose default (the backup container address as a /32) is accepted and admits no other address | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-201 the pg_hba step of the init script › SS-PLAT-201 restores the previous pg_hba.conf when the validation itself fails | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-201 the pg_hba step of the init script › SS-PLAT-201 a pre-existing parse error is reported clearly and tolerated: roles done, rule and password unchanged",
+      "commit": "e0aec2618b96-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-24T03:07:12.715Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-201",
+      "file": ".agent/evidence/T-0244/20261124-030712-tests-db.json",
+      "test": "10 test(s): packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 an install without lf_backup (upgrade step not run) fails the check with LF_BACKUP_ROLE_MISSING and the upgrade command | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 the backup CLI exits 2 at start-up with the named error, for a one-off run and for the nightly service | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 a login refused by pg_hba is LF_BACKUP_LOGIN_REJECTED; a wrong password is LF_BACKUP_LOGIN_FAILED | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 a correctly bootstrapped lf_backup passes, and the CLI gets past the check | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 a misconfigured lf_backup fails with LF_BACKUP_ROLE_MISCONFIGURED naming every problem, until the bootstrap repairs it | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-200 the backup detects a missing or misconfigured lf_backup at start-up › SS-PLAT-200 a superuser is accepted with a warning; a role that cannot read past RLS is refused | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-201 the pg_hba step of the init script › SS-PLAT-201 refuses a /0 prefix and any public or invalid address, leaving pg_hba.conf unchanged | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-201 the pg_hba step of the init script › SS-PLAT-201 the compose default (the backup container address as a /32) is accepted and admits no other address | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-201 the pg_hba step of the init script › SS-PLAT-201 restores the previous pg_hba.conf when the validation itself fails | packages/db/src/ops/backup-role-hardening.db.test.ts › SS-PLAT-200 / SS-PLAT-201 on a separate cluster › SS-PLAT-201 the pg_hba step of the init script › SS-PLAT-201 a pre-existing parse error is reported clearly and tolerated: roles done, rule and password unchanged",
+      "commit": "e0aec2618b96-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-24T03:07:12.715Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-193",
+      "file": ".agent/evidence/T-0244/20261124-030712-tests-db.json",
+      "test": "5 test(s): packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-193 lf_backup dumps every tenant and can write nothing › SS-PLAT-193 has BYPASSRLS and pg_read_all_data only: no superuser, DDL, replication or other membership | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-193 lf_backup dumps every tenant and can write nothing › SS-PLAT-193 createBackup as lf_backup includes every tenant and restores to the same manifest | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-193 lf_backup dumps every tenant and can write nothing › SS-PLAT-193 holds no write, truncate, trigger or references privilege on any table, sequence write or SECURITY DEFINER function | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-193 lf_backup dumps every tenant and can write nothing › SS-PLAT-193 INSERT, UPDATE, DELETE, TRUNCATE and DDL fail even with read-only switched off | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-193 lf_backup dumps every tenant and can write nothing › SS-PLAT-193 cannot disable triggers or row security, and its sessions start read-only",
+      "commit": "e0aec2618b96-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-24T03:07:12.715Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-194",
+      "file": ".agent/evidence/T-0244/20261124-030712-tests-db.json",
+      "test": "3 test(s): packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-194 bootstrap, init script and upgrade step › SS-PLAT-194 bootstrapCluster creates lf_backup idempotently and repairs a pre-existing over-privileged one | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-194 bootstrap, init script and upgrade step › SS-PLAT-194 the init script (fresh install and upgrade step) confines lf_backup logins to the backup subnet, idempotently | packages/db/src/ops/backup-role.db.test.ts › SS-PLAT-194 bootstrap, init script and upgrade step › SS-PLAT-194 the init script refuses a malformed subnet and leaves pg_hba.conf unchanged",
+      "commit": "e0aec2618b96-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-24T03:07:12.715Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-86",
+      "file": ".agent/evidence/T-0244/20261124-030730-tests-unit.json",
+      "test": "20 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 every base image is pinned by tag and digest | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 every runtime target runs as a non-root user | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 images › SS-PLAT-86 no image bakes a secret (no ENV/ARG secret, no secrets folder copied) | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 has exactly the design §7.2 services plus the one-shot setup, the scheduler (ADR-0062) and the nightly backup (ADR-0101) | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › every service compose would build has an image the smoke script makes (up --no-build) | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › T-0147 the scheduler is the worker image running the owner-only scheduler CLI (ADR-0062 option 1) | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 images are pinned; app services build the shared Dockerfile targets | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 secrets are files in the ignored secrets folder, never values in the file | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 each secret reaches only the services that need it | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › T-0142 AC-5 the api trusts exactly the nginx hop for the client address, overridable by the operator (ADR-0054) | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 the runtime connects as lf_app; only setup and the scheduler hold the migrator password | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 only the web origin is published, on loopback by default; the database and IdP are not | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 start order: setup waits for a healthy database and IdP; api and worker wait for setup | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 every service drops privileges it does not need | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 compose stack › SS-PLAT-86 the old compose path includes the new file instead of being deleted | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 no self-registration, no e-mail reset, brute-force protection, strong password policy | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 the client: confidential, code flow + PKCE S256 only, secret from the environment | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 Keycloak realm › SS-PLAT-86 the ACR mapping names the MFA level the API accepts (ADR-0025, HANDOVER Q13) | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 generated secrets stay out of git › SS-PLAT-86 the secrets folder and the install env file are ignored; examples only are tracked | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-86 generated secrets stay out of git › SS-PLAT-86 init-secrets.sh writes distinct random secrets (and the backup keyring) once and never overwrites",
+      "commit": "e0aec2618b96-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-24T03:07:30.377Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-174",
+      "file": ".agent/evidence/T-0244/20261124-030730-tests-unit.json",
+      "test": "3 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) › SS-PLAT-174 the backup image is the node runtime plus the PostgreSQL 17 client, non-root, with a /backups folder it owns | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) › SS-PLAT-174 compose runs the backup nightly with a retention setting, a dedicated keyring and its own volume | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-174 nightly encrypted backup service and runbook (T-0143 AC-4, ADR-0101) › SS-PLAT-174 the runbook covers backup, off-host key custody, the restore drill and its failure codes",
+      "commit": "e0aec2618b96-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-24T03:07:30.377Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-195",
+      "file": ".agent/evidence/T-0244/20261124-030730-tests-unit.json",
+      "test": "3 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-195 the backup connects as lf_backup, only from its own network (T-0227, ADR-0106) › SS-PLAT-195 the backup service holds lf_backup_password and never the superuser password | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-195 the backup connects as lf_backup, only from its own network (T-0227, ADR-0106) › SS-PLAT-195 an internal backup network joined only by postgres and backup; postgres allows lf_backup from its subnet only | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-195 the backup connects as lf_backup, only from its own network (T-0227, ADR-0106) › SS-PLAT-195 the init script that creates lf_backup and its pg_hba block is mounted, and the runbook gives the upgrade step",
+      "commit": "e0aec2618b96-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-24T03:07:30.377Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-201",
+      "file": ".agent/evidence/T-0244/20261124-030730-tests-unit.json",
+      "test": "3 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-201 lf_backup may log in only from the backup container address (T-0244, ADR-0109) › SS-PLAT-201 the backup container has a static address and postgres allows lf_backup from that /32 only | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-201 lf_backup may log in only from the backup container address (T-0244, ADR-0109) › SS-PLAT-201 the default address is a host address inside the default subnet, not the gateway | /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-201 lf_backup may log in only from the backup container address (T-0244, ADR-0109) › SS-PLAT-201 the env example and the runbook document LF_BACKUP_ADDRESS and the /32 rule",
+      "commit": "e0aec2618b96-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-24T03:07:30.377Z",
+      "result": "passed"
+    },
+    {
+      "scenario": "SS-PLAT-200",
+      "file": ".agent/evidence/T-0244/20261124-030730-tests-unit.json",
+      "test": "1 test(s): /home/user/Ledgerforce/.claude/worktrees/agent-affb2352ff530de87/infra/test/install-contract.test.ts › SS-PLAT-200 the runbook names the backup start-up errors (T-0244, ADR-0109) › SS-PLAT-200 every named start-up error is explained in the runbook",
+      "commit": "e0aec2618b96-dirty",
+      "provider": "claude",
+      "timestamp": "2026-11-24T03:07:30.377Z",
+      "result": "passed"
+    }
+  ]
+}

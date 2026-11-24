@@ -18,8 +18,8 @@ table below whose `depends_on` are all `done`** (AGENTS.md §2). Rows are in dep
 | in_progress | 1 |
 | review | 146 |
 | todo | 32 |
-| verifying | 19 |
-| **total** | **208** |
+| verifying | 20 |
+| **total** | **209** |
 
 | Phase | Cards |
 |---|---:|
@@ -305,6 +305,9 @@ graph LR
 | [T-0243](T-0243.md) | Bills mailbox OAuth2 hardening: code exchange outside the DB transaction, rotation failure handling, verifier cleanup, rotation-function tests | MVP | verifying | T-0216 | UC-05 | 0 |
 | [T-0244](T-0244.md) | Backup role hardening: detect missing lf_backup on upgrade, large-object refusal, pg_hba script robustness, /32 rule | MVP | todo | T-0227 | — | 0 |
 | [T-0255](T-0255.md) | Refunds: close the post-withdrawal Stripe window (re-check at Stripe after a withdrawal; hold bank refunds of freed credit until it clears) | MVP | todo | T-0207, T-0208 | UC-11 | 0 |
+| [T-0243](T-0243.md) | Bills mailbox OAuth2 hardening: code exchange outside the DB transaction, rotation failure handling, verifier cleanup, rotation-function tests | MVP | todo | T-0216 | UC-05 | 0 |
+| [T-0244](T-0244.md) | Backup role hardening: detect missing lf_backup on upgrade, large-object refusal, pg_hba script robustness, /32 rule | MVP | verifying | T-0227 | — | 3 |
+| [T-0247](T-0247.md) | Restore-drill db test: intermittent unhandled 57P01 (terminating connection due to administrator command) after the run | MVP | todo | T-0143 | — | 1 |
 | [T-0235](T-0235.md) | Bills inbox webhook: upload limits configurable from the environment (compose + config.ts) | MVP | todo | T-0230 | UC-05 | 0 |
 | [T-0241](T-0241.md) | AP: cancel an unreleased payment batch so its bills and refunds can be re-batched or cancelled | MVP | todo | T-0207 | UC-06, UC-11 | 0 |
 | [T-0230](T-0230.md) | Bills inbox webhook: slow-upload protection (per-client in-flight cap, minimum transfer rate, first-byte timeout) | MVP | todo | T-0215 | UC-05 | 0 |

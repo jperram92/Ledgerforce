@@ -137,5 +137,6 @@ Proposed ──(gate passed)──▶ Accepted ──(new ADR replaces it)──
 | [0107](0107-cancel-requested-refund-either-method.md) | Cancel a requested customer refund by either method: bank refunds outside a live batch, unapproved requests after a Stripe lookup | security | yes (delegated, DL-0691) | Accepted |
 | [0097](0097-failed-security-notices-list-and-retry-now.md) | Failed security notices: an admin list of their own and an append-only retry-now | security | yes (delegated, DL-0691) | Accepted |
 | [0108](0108-own-transaction-routes-and-mailbox-oauth-hardening.md) | Own-transaction routes for slow external calls (access checks repeated per transaction); bills mailbox OAuth verifier cleared after use, failed refresh-token re-seal retried then flagged | security | yes (delegated, DL-0691) | Accepted |
+| [0109](0109-backup-role-hardening.md) | lf_backup hardening: start-up role check with named errors, no large-object creation, robust pg_hba step, single-address (/32) rule | security | yes (delegated, DL-0691) | Accepted |
 
 Next free number: **0055** (0055–0060 are reserved for the DL-0409 parallel round) (0048–0052 are used by Line A ADRs arriving through integration) (unused: 0028 — T-0027; 0031 — T-0026; 0033 — T-0076; 0041 — T-0072; none needed an ADR).

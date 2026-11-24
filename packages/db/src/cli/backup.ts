@@ -9,12 +9,17 @@
  * LF_BACKUP_DB_PASSWORD(_FILE).
  * Key: LF_KMS_PROVIDER=local + LF_KMS_KEYRING_FILE (a dedicated backup keyring), or transit.
  * Schedule: LF_BACKUP_AT (UTC HH:MM, default 02:30), LF_BACKUP_RETENTION_DAYS (default 14).
+ * Start-up check (T-0244, ADR-0109): before anything else the role is checked
+ * (checkBackupRole); a missing, refused or misconfigured lf_backup stops the process with exit 2
+ * and a named error (LF_BACKUP_ROLE_MISSING, ...), so compose shows the service restarting
+ * instead of a quiet nightly failure. The check runs again before every nightly backup.
  * Exit 0 on success, 1 on a failed backup, 2 on bad configuration. Secrets are never printed.
  */
 import { kmsFromEnv, type Kms } from '@ledgerforce/shared/crypto';
 import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { readSecret, requireEnv } from '../env.ts';
+import { BackupRoleError, checkBackupRole } from '../ops/backup-preflight.ts';
 import { createBackup } from '../ops/backup.ts';
 import {
   backupFileName,
@@ -62,6 +67,19 @@ try {
   fail((e as Error).message, 2);
 }
 
+/** The role check; prints its warnings. Throws BackupRoleError for a role problem. */
+async function preflight(): Promise<void> {
+  const { warnings } = await checkBackupRole(url);
+  for (const w of warnings) console.warn(`backup: warning: ${w}`);
+}
+
+try {
+  await preflight();
+} catch (e) {
+  if (e instanceof BackupRoleError) fail(e.message, 2);
+  fail(`cannot reach the database: ${(e as Error).message}`, 1);
+}
+
 async function once(file: string): Promise<void> {
   const started = Date.now();
   const { backupId, manifest } = await createBackup({ url, out: file, kms });
@@ -88,6 +106,7 @@ for (;;) {
   const next = nextRunAt(new Date(), config.at);
   await new Promise((r) => setTimeout(r, next.getTime() - Date.now()));
   try {
+    await preflight();
     await once(join(dir, backupFileName(new Date())));
     const removed = await pruneBackups(dir, config.retentionDays);
     if (removed.length > 0) console.log(`pruned ${String(removed.length)}: ${removed.join(', ')}`);

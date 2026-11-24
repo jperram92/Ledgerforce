@@ -218,9 +218,10 @@ describe('SS-PLAT-193 lf_backup dumps every tenant and can write nothing', () =>
       }
       return { v: s.rows[0]?.v, lo };
     });
-    // 25006 read_only_sql_transaction: a large object (the one object PUBLIC may always create)
-    // cannot be created in the default read-only session.
-    expect(ro).toEqual({ v: 'on', lo: '25006' });
+    // A large object was the one object PUBLIC could always create; T-0227 stopped it only by the
+    // read-only default (25006). Since T-0244 (ADR-0109) EXECUTE on lo_creat is revoked from
+    // PUBLIC, so the privilege check refuses it first (42501), read-only or not (SS-PLAT-199).
+    expect(ro).toEqual({ v: 'on', lo: '42501' });
   });
 });
 
